@@ -3,29 +3,67 @@ Imports Microsoft.Office.Interop.Outlook
 Imports System.Diagnostics
 Imports System.IO
 Imports System
+Imports System.Runtime.Serialization.Formatters.Binary
+Imports System.Security.Authentication.ExtendedProtection
 
 Public Class ThisAddIn
 
     Public UsedIDList As List(Of String) = New List(Of String)
 
+    Public WithEvents OlItems As Outlook.Items
+    Public WithEvents OlInboxItems As Outlook.Items
+    Private WithEvents OlReminders As Outlook.Reminders
+
+
     Private ribTM As TaskMasterRibbon
+    Dim FileName_ProjectList As String
+    Dim FileName_IDList As String
+    Const AppDataFolder = "TaskMaster"
+    Public WithEvents ProjDict As ProjectList
+    Public WithEvents IDList As cIDList
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
-        If Globals.ThisAddIn.UsedIDList.Count = 0 Then
-            Globals.ThisAddIn.UsedIDList_Load()
+        OlItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
+        OlInboxItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderInbox).Items
+        OlReminders = Application.Reminders
+
+        FileName_ProjectList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "ProjectList.bin")
+        If File.Exists(FileName_ProjectList) Then
+            Dim TestFileStream As Stream = File.OpenRead(FileName_ProjectList)
+            Dim deserializer As New BinaryFormatter
+            ProjDict = CType(deserializer.Deserialize(TestFileStream), ProjectList)
+            TestFileStream.Close()
+        Else
+            ProjDict = New ProjectList(New Dictionary(Of String, String))
         End If
+
+        FileName_IDList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "UsedIDList.bin")
+
+        If File.Exists(FileName_IDList) Then
+            Dim TestFileStream As Stream = File.OpenRead(FileName_IDList)
+            Dim deserializer As New BinaryFormatter
+            IDList = CType(deserializer.Deserialize(TestFileStream), cIDList)
+            TestFileStream.Close()
+        Else
+            IDList = New cIDList(New List(Of String))
+            IDList.RePopulate()
+            IDList.Save(FileName_IDList)
+            'Save_IDList()
+        End If
+
+        ''Legacy code here until migration is complete
+        'If Globals.ThisAddIn.UsedIDList.Count = 0 Then
+        '    Globals.ThisAddIn.UsedIDList_Load()
+        'End If
+        ''END LEGACY CODE
+
         Access_Ribbons_By_Explorer()
-    End Sub
-
-    Private Sub ThisAddIn_Shutdown() Handles Me.Shutdown
-
     End Sub
 
     Private Sub Access_Ribbons_By_Explorer()
         Dim ribbonCollection As ThisRibbonCollection = Globals.Ribbons _
             (Globals.ThisAddIn.Application.ActiveExplorer())
         ribTM = ribbonCollection.Ribbon1                                    'Grab handle on on Ribbon
-
 
     End Sub
 
@@ -48,6 +86,7 @@ Public Class ThisAddIn
         GetItemsCol_ToDo = colItems
     End Function
 
+    'Original Function RefreshToDoID_Max
     Public Function RefreshToDoID_Max() As Long
         Dim colItems As Collection
         Dim colItems_NoID As Collection
@@ -95,6 +134,7 @@ Public Class ThisAddIn
         End If
 
         Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
+        If IO.File.Exists(filename_UsedIDList) Then IO.File.Delete(filename_UsedIDList)
         Using sw As StreamWriter = New StreamWriter(filename_UsedIDList)
             For Each objItem In colItems
                 strTmp = CustomFieldID_GetValue(objItem, "ToDoID")
@@ -111,6 +151,16 @@ Public Class ThisAddIn
         Debug.WriteLine(lngMax)
         Debug.WriteLine(My.Settings.MaxToDo.ToString)
     End Function
+
+    Public Sub CompressToDoIDs()
+        Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree()
+        DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadAll)
+        'DM.WriteTreeToDisk()
+        DM.ReNumberIDs(IDList)
+        DM.WriteTreeToDisk()
+    End Sub
+
+
     Public Function CustomFieldID_GetValue(objItem As Object, ByVal UserDefinedFieldName As String) As String
         Dim OlMail As Outlook.MailItem
         Dim OlTask As Outlook.TaskItem
@@ -354,4 +404,160 @@ Public Class ThisAddIn
         End Try
 
     End Sub
+
+    Private Sub OlItems_ItemChange(Item As Object) Handles OlItems.ItemChange
+        Dim objProperty_ToDoID As Outlook.UserProperty = Item.UserProperties.Find("ToDoID")
+        Dim objProperty_Project As Outlook.UserProperty = Item.UserProperties.Find("TagProject")
+        Dim strToDoID As String = ""
+        Dim strToDoID_root As String = ""
+        Dim strProject As String = ""
+        Dim strProjectToDo As String = ""
+
+
+
+        'If objProperty Is Nothing Then objProperty = oTask.UserProperties.Add(UserDefinedFieldName, olUPType)
+
+        'Check to see if the project exists before attempting to autocode the id
+        If Not objProperty_Project Is Nothing Then
+
+            'Check to see whether there is an existing ID
+            If Not objProperty_ToDoID Is Nothing Then
+                strToDoID = objProperty_ToDoID.Value
+
+                'Don't autocode branches that existed to another project previously
+                If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
+
+                    'Get Project Name
+                    If IsArray(objProperty_Project.Value) Then
+                        strProject = FlattenArry(objProperty_Project.Value)
+                    Else
+                        strProject = objProperty_Project.Value
+                    End If
+
+                    'Check to see if the Project name returned a value before attempting to autocode
+                    If strProject.Length <> 0 Then
+
+                        'Check to ensure it is in the dictionary before autocoding
+                        If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                            strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                            If strToDoID.Length = 2 Then
+                                ' Change the Item's todoid to be a node of the project
+
+                                strToDoID = GetNextAvailableToDoID(strProjectToDo & "00")
+                                CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+
+                            End If
+
+
+                        Else 'If it is not in the dictionary, see if this is a project we should add
+                            If strToDoID.Length = 4 Then
+                                Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
+                                If response = vbYes Then
+                                    ProjDict.ProjectDictionary.Add(strProject, strToDoID)
+                                    SaveDict()
+                                End If
+                            End If
+                        End If
+                    End If
+
+                ElseIf strToDoID.Length = 0 Then
+                    If IsArray(objProperty_Project.Value) Then
+                        strProject = FlattenArry(objProperty_Project.Value)
+                    Else
+                        strProject = objProperty_Project.Value
+                    End If
+                    If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                        strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                        strToDoID = GetNextAvailableToDoID(strProjectToDo & "00")
+                        CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                    End If
+
+                End If
+            Else 'In this case, the project name exists but the todo id does not
+                'Get Project Name
+                If IsArray(objProperty_Project.Value) Then
+                    strProject = FlattenArry(objProperty_Project.Value)
+                Else
+                    strProject = objProperty_Project.Value
+                End If
+
+                'If the project name is in our dictionary, autoadd the ToDoID to this item
+                If strProject.Length <> 0 Then
+                    If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                        strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                        'Add the next ToDoID available in that branch
+                        strToDoID = GetNextAvailableToDoID(strProjectToDo & "00")
+                        CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                        '***NEED CODE HERE***
+                        '***NEED CODE HERE***
+                        '***NEED CODE HERE***
+                    End If
+                End If
+            End If
+
+
+        End If
+
+
+    End Sub
+    Public Function GetNextAvailableToDoID(strSeed As String) As String
+        Dim blContinue As Boolean = True
+        Dim lngMaxID As Long = ConvertToDecimal(125, strSeed)
+        Dim strMaxID As String = ""
+
+        While blContinue
+            lngMaxID += 1
+            strMaxID = ConvertToBase(125, lngMaxID)
+            If Globals.ThisAddIn.UsedIDList.Contains(strMaxID) = False Then
+                blContinue = False
+            End If
+        End While
+        Globals.ThisAddIn.UsedIDList_Append(strMaxID)
+        Return strMaxID
+    End Function
+    Public Sub SaveDict()
+        If Not Directory.Exists(Path.GetDirectoryName(FileName_ProjectList)) Then
+            Directory.CreateDirectory(Path.GetDirectoryName(FileName_ProjectList))
+        End If
+        Dim TestFileStream As Stream = File.Create(FileName_ProjectList)
+        Dim serializer As New BinaryFormatter
+        serializer.Serialize(TestFileStream, ProjDict)
+        TestFileStream.Close()
+    End Sub
+
+    Private Sub OlInboxItems_ItemAdd(Item As Object) Handles OlInboxItems.ItemAdd
+
+    End Sub
+End Class
+
+Public Class Conditions
+    Private _ConversationID As String
+    Private _People As String
+    Public Sub New()
+
+    End Sub
+    Public Sub New(objItem As Object)
+        If TypeOf objItem Is MailItem Then
+            Dim OlMail As MailItem = objItem
+            _ConversationID = OlMail.ConversationID
+            _People = Globals.ThisAddIn.CustomFieldID_GetValue(objItem, "TagPeople")
+        End If
+    End Sub
+
+    Public Property ConversationID
+        Get
+            ConversationID = _ConversationID
+        End Get
+        Set(value)
+            _ConversationID = value
+        End Set
+    End Property
+    Public Property People
+        Get
+            People = _People
+        End Get
+        Set(value)
+            _People = value
+        End Set
+    End Property
 End Class
