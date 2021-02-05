@@ -87,7 +87,7 @@
         'btn_RefreshMax
         '
         Me.btn_RefreshMax.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.btn_RefreshMax.Label = "Refresh MaxID"
+        Me.btn_RefreshMax.Label = "Refresh IDList"
         Me.btn_RefreshMax.Name = "btn_RefreshMax"
         Me.btn_RefreshMax.OfficeImageId = "AccessRefreshAllLists"
         Me.btn_RefreshMax.ShowImage = True

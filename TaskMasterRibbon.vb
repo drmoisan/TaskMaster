@@ -8,7 +8,7 @@ Public Class TaskMasterRibbon
     End Sub
 
     Private Sub btn_RefreshMax_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_RefreshMax.Click
-        Globals.ThisAddIn.RefreshToDoID_Max()
+        Globals.ThisAddIn.RefreshIDList()
     End Sub
 
     Private Sub btn_TreeView_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_TreeView.Click

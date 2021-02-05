@@ -10,7 +10,7 @@ Public Class ThisAddIn
 
     Public UsedIDList As List(Of String) = New List(Of String)
 
-    Public WithEvents OlItems As Outlook.Items
+    Public WithEvents OlToDoItems As Outlook.Items
     Public WithEvents OlInboxItems As Outlook.Items
     Private WithEvents OlReminders As Outlook.Reminders
 
@@ -23,7 +23,7 @@ Public Class ThisAddIn
     Public WithEvents IDList As cIDList
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
-        OlItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
+        OlToDoItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
         OlInboxItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderInbox).Items
         OlReminders = Application.Reminders
 
@@ -51,6 +51,8 @@ Public Class ThisAddIn
             'Save_IDList()
         End If
 
+        'Dim strOutput() As String = IDList.UsedIDList.ToArray
+        'WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", strOutput)
         ''Legacy code here until migration is complete
         'If Globals.ThisAddIn.UsedIDList.Count = 0 Then
         '    Globals.ThisAddIn.UsedIDList_Load()
@@ -84,6 +86,13 @@ Public Class ThisAddIn
             Next objItem
         Next
         GetItemsCol_ToDo = colItems
+    End Function
+
+    Public Function RefreshIDList() As Long
+        IDList = New cIDList(New List(Of String))
+        IDList.RePopulate()
+        IDList.Save(FileName_IDList)
+        WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", IDList.UsedIDList.ToArray)
     End Function
 
     'Original Function RefreshToDoID_Max
@@ -151,6 +160,21 @@ Public Class ThisAddIn
         Debug.WriteLine(lngMax)
         Debug.WriteLine(My.Settings.MaxToDo.ToString)
     End Function
+
+    Public Sub WriteToCSV(filename As String, strOutput() As String)
+        If IO.File.Exists(filename) Then IO.File.Delete(filename)
+        Using sw As StreamWriter = New StreamWriter(filename)
+            For i As Long = LBound(strOutput) To UBound(strOutput)
+                sw.WriteLine(strOutput(i))
+            Next
+        End Using
+    End Sub
+    Public Sub WriteToCSV(filename As String, strOutput As String)
+        If IO.File.Exists(filename) Then IO.File.Delete(filename)
+        Using sw As StreamWriter = New StreamWriter(filename)
+            sw.WriteLine(strOutput)
+        End Using
+    End Sub
 
     Public Sub CompressToDoIDs()
         Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree()
@@ -405,7 +429,7 @@ Public Class ThisAddIn
 
     End Sub
 
-    Private Sub OlItems_ItemChange(Item As Object) Handles OlItems.ItemChange
+    Private Sub OlToDoItems_ItemChange(Item As Object) Handles OlToDoItems.ItemChange
         Dim objProperty_ToDoID As Outlook.UserProperty = Item.UserProperties.Find("ToDoID")
         Dim objProperty_Project As Outlook.UserProperty = Item.UserProperties.Find("TagProject")
         Dim strToDoID As String = ""
@@ -443,9 +467,9 @@ Public Class ThisAddIn
                             If strToDoID.Length = 2 Then
                                 ' Change the Item's todoid to be a node of the project
 
-                                strToDoID = GetNextAvailableToDoID(strProjectToDo & "00")
+                                strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-
+                                IDList.Save(FileName_IDList)
                             End If
 
 
@@ -468,8 +492,9 @@ Public Class ThisAddIn
                     End If
                     If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                         strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                        strToDoID = GetNextAvailableToDoID(strProjectToDo & "00")
+                        strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                         CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                        IDList.Save(FileName_IDList)
                     End If
 
                 End If
@@ -486,8 +511,9 @@ Public Class ThisAddIn
                     If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                         strProjectToDo = ProjDict.ProjectDictionary(strProject)
                         'Add the next ToDoID available in that branch
-                        strToDoID = GetNextAvailableToDoID(strProjectToDo & "00")
+                        strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                         CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                        IDList.Save(FileName_IDList)
                         '***NEED CODE HERE***
                         '***NEED CODE HERE***
                         '***NEED CODE HERE***
@@ -498,8 +524,48 @@ Public Class ThisAddIn
 
         End If
 
+        If OlToDoItem_IsMarkedComplete(Item) Then
+            If InStr(Item.Categories, "Tag KB Completed") = False Then
+                Dim strTmp As String = Replace(Replace(Item.Categories, "Tag KB Backlog", ""), ",,", ",")
+                strTmp = Replace(Replace(strTmp, "Tag KB InProgress", ""), ",,", ",")
+                strTmp = Replace(Replace(strTmp, "Tag KB Planned", ""), ",,", ",")
+                While Left(strTmp, 1) = ","
+                    strTmp = Right(strTmp, strTmp.Length - 1)
+                End While
+                If strTmp.Length > 0 Then
+                    strTmp += ", Tag KB Completed"
+                Else
+                    strTmp += "Tag KB Completed"
+                End If
+                Item.Categories = strTmp
+                Item.Save
+                CustomFieldID_Set("KBF", "Completed", SpecificItem:=Item)
+            End If
+        End If
 
     End Sub
+
+    Private Function OlToDoItem_IsMarkedComplete(Item As Object) As Boolean
+        If TypeOf Item Is Outlook.MailItem Then
+            Dim OlMail = Item
+            If OlMail.FlagStatus = OlFlagStatus.olFlagComplete Then
+                Return True
+            Else
+                Return False
+            End If
+        ElseIf TypeOf Item Is TaskItem Then
+            Dim OlTask = Item
+            If OlTask.Complete = True Then
+                Return True
+            Else
+                Return False
+            End If
+        Else
+            Return False
+        End If
+
+    End Function
+
     Public Function GetNextAvailableToDoID(strSeed As String) As String
         Dim blContinue As Boolean = True
         Dim lngMaxID As Long = ConvertToDecimal(125, strSeed)
@@ -526,6 +592,15 @@ Public Class ThisAddIn
     End Sub
 
     Private Sub OlInboxItems_ItemAdd(Item As Object) Handles OlInboxItems.ItemAdd
+
+    End Sub
+
+    Private Sub OlToDoItems_ItemAdd(Item As Object) Handles OlToDoItems.ItemAdd
+        Dim strToDoID As String = CustomFieldID_GetValue(Item, "ToDoID")
+        If strToDoID.Length = 0 Then
+            strToDoID = IDList.GetMaxToDoID
+            CustomFieldID_Set(Item, "ToDoID")
+        End If
 
     End Sub
 End Class

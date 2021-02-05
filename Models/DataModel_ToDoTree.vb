@@ -36,7 +36,6 @@ Public Class DataModel_ToDoTree
         End Get
     End Property
 
-
     Public Sub LoadTree(LoadType As LoadOptions)
         Dim objItem As Object
 
@@ -312,6 +311,7 @@ Public Class ToDoItem
     Private _TagTopic As String = ""
     Private _Priority As Outlook.OlImportance
     Private _TaskCreateDate As Date
+    Private _StartDate As Date
     Private _Complete As Boolean
 
     Public Sub New(OlMail As Outlook.MailItem)
@@ -328,6 +328,7 @@ Public Class ToDoItem
         _TagTopic = CustomFieldID_GetValue(OlObject, "TagTopic")
         _Priority = OlMail.Importance
         _TaskCreateDate = OlMail.CreationTime
+        _StartDate = OlMail.TaskStartDate
         _Complete = (OlMail.FlagStatus = OlFlagStatus.olFlagComplete)
     End Sub
     Public Sub New(OlTask As Outlook.TaskItem)
@@ -341,6 +342,7 @@ Public Class ToDoItem
         _TagTopic = CustomFieldID_GetValue(OlObject, "TagTopic")
         _Priority = OlTask.Importance
         _TaskCreateDate = OlTask.CreationTime
+        _StartDate = OlTask.StartDate
         _Complete = OlTask.Complete
     End Sub
 
@@ -353,6 +355,16 @@ Public Class ToDoItem
             TaskCreateDate = _TaskCreateDate
         End Get
     End Property
+
+    Public Property StartDate As Date
+        Get
+            Return _TaskCreateDate
+        End Get
+        Set(value As Date)
+            _TaskCreateDate = value
+        End Set
+    End Property
+
     Public Property Priority As Outlook.OlImportance
         Get
 
@@ -767,6 +779,16 @@ Public Class cIDList
             End If
         End While
         UsedIDList.Add(strMaxID)
+        Return strMaxID
+    End Function
+
+    Public Function GetMaxToDoID() As String
+        Dim strMaxID = UsedIDList.Max()
+        Dim lngMaxID As Long = ConvertToDecimal(125, strMaxID)
+        lngMaxID += 1
+        strMaxID = ConvertToBase(125, lngMaxID)
+        UsedIDList.Add(strMaxID)
+
         Return strMaxID
     End Function
 

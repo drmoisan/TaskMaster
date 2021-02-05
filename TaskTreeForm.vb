@@ -15,6 +15,30 @@ Public Class TaskTreeForm
     'Public ToDoTree As TreeNode(Of ToDoItem)
     Public ToDoTree As List(Of TreeNode(Of ToDoItem)) = New List(Of TreeNode(Of ToDoItem))
     Public DM As DataModel_ToDoTree = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem)))
+    Private rs As New Resizer
+    Private rscol As New Resizer
+    Private expanded As Boolean = False
+    Private filtercompleted As Boolean = True
+
+    Private Sub TaskTreeForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+
+        TreeListView1.CanExpandGetter = Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).ChildCount > 0
+        TreeListView1.ChildrenGetter = Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Children
+        TreeListView1.ModelFilter = New ModelFilter(Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Value.Complete = False)
+        TreeListView1.Roots = DM.ListOfToDoTree
+
+
+        Dim sink1 = CType(Me.TreeListView1.DropSink, SimpleDropSink)
+        sink1.AcceptExternal = True
+        sink1.CanDropBetween = True
+        sink1.CanDropOnBackground = True
+
+        rs.FindAllControls(Me)
+        rs.SetResizeDimensions(Me.SplitContainer1, Resizer.ResizeDimensions.None, True)
+        rs.SetResizeDimensions(Me.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position Or Resizer.ResizeDimensions.Size, True)
+        rs.PrintDict()
+    End Sub
 
     ''Original
     'Friend Function Init_DataModel()
@@ -97,6 +121,7 @@ Public Class TaskTreeForm
     'End Function
 
     Friend Function Init_DataModel()
+        DM = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem))) 'Added for the second use of function which was appending
         DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView)
         ToDoTree = DM.ListOfToDoTree
     End Function
@@ -259,19 +284,7 @@ Public Class TaskTreeForm
     End Function
 
 
-    Private Sub TaskTreeForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-
-        TreeListView1.CanExpandGetter = Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).ChildCount > 0
-        TreeListView1.ChildrenGetter = Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Children
-        TreeListView1.Roots = DM.ListOfToDoTree
-
-        Dim sink1 = CType(Me.TreeListView1.DropSink, SimpleDropSink)
-        sink1.AcceptExternal = True
-        sink1.CanDropBetween = True
-        sink1.CanDropOnBackground = True
-
-    End Sub
 
     Private Sub HandleModelCanDrop(ByVal sender As Object, ByVal e As ModelDropEventArgs) Handles TreeListView1.ModelCanDrop
         e.Handled = True
@@ -343,6 +356,7 @@ Public Class TaskTreeForm
         End Select
 
         e.RefreshObjects()
+        If filtercompleted Then TreeListView1.ModelFilter = New ModelFilter(Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Value.Complete = False)
     End Sub
 
 
@@ -613,6 +627,7 @@ Public Class TaskTreeForm
                     If OlExplorer.IsItemSelectableInView(OlMail) Then
                         OlExplorer.ClearSelection()
                         OlExplorer.AddToSelection(OlMail)
+                        OlMail.Display()
                     Else
                         OlMail.Display()
                     End If
@@ -624,6 +639,7 @@ Public Class TaskTreeForm
                     If OlExplorer.IsItemSelectableInView(OlTask) Then
                         OlExplorer.ClearSelection()
                         OlExplorer.AddToSelection(OlTask)
+                        OlTask.Display()
                     Else
                         OlTask.Display()
                     End If
@@ -647,5 +663,38 @@ Public Class TaskTreeForm
         Else
             e.Item.Font = New Font(e.Item.Font, e.Item.Font.Style And Not FontStyle.Strikeout)
         End If
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles But_ExpandCollapse.Click
+        If expanded Then
+            TreeListView1.CollapseAll()
+        Else
+            TreeListView1.ExpandAll()
+        End If
+        expanded = Not expanded
+
+    End Sub
+
+    Private Sub TaskTreeForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        rs.ResizeAllControls(Me)
+        'TreeListView1.AutoResizeColumns()
+        TreeListView1.AutoScaleColumnsToContainer()
+    End Sub
+
+    Private Sub But_ShowHideComplete_Click(sender As Object, e As EventArgs) Handles But_ShowHideComplete.Click
+        'TreeListView1.ChildrenGetter = Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Children
+        If filtercompleted Then
+            TreeListView1.ModelFilter = Nothing
+            filtercompleted = False
+        Else
+            TreeListView1.ModelFilter = New ModelFilter(Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Value.Complete = False)
+            filtercompleted = True
+        End If
+    End Sub
+
+    Private Sub But_ReloadTree_Click(sender As Object, e As EventArgs) Handles But_ReloadTree.Click
+        Init_DataModel()
+        TreeListView1.Roots = DM.ListOfToDoTree
+        TreeListView1.RebuildAll(preserveState:=False)
     End Sub
 End Class

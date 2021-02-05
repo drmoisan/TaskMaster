@@ -211,6 +211,7 @@
     <Compile Include="Models\ToDoItem.vb" />
     <Compile Include="Models\TreeNodeOfT.vb" />
     <Compile Include="ProjectList.vb" />
+    <Compile Include="Resizer.vb" />
     <Compile Include="Tags.Designer.vb">
       <DependentUpon>Tags.vb</DependentUpon>
     </Compile>
