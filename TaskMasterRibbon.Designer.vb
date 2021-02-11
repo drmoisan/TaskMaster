@@ -46,11 +46,10 @@
         Me.Group1 = Me.Factory.CreateRibbonGroup
         Me.TaskMenu = Me.Factory.CreateRibbonMenu
         Me.btn_RefreshMax = Me.Factory.CreateRibbonButton
-        Me.btn_TreeView = Me.Factory.CreateRibbonButton
         Me.btn_SplitToDoID = Me.Factory.CreateRibbonButton
-        Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
         Me.but_Dictionary = Me.Factory.CreateRibbonButton
         Me.but_CompressIDs = Me.Factory.CreateRibbonButton
+        Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
         Me.SuspendLayout()
@@ -66,6 +65,7 @@
         'Group1
         '
         Me.Group1.Items.Add(Me.TaskMenu)
+        Me.Group1.Items.Add(Me.Btn_TreeListView)
         Me.Group1.Label = "Group1"
         Me.Group1.Name = "Group1"
         '
@@ -74,9 +74,7 @@
         Me.TaskMenu.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
         Me.TaskMenu.Image = CType(resources.GetObject("TaskMenu.Image"), System.Drawing.Image)
         Me.TaskMenu.Items.Add(Me.btn_RefreshMax)
-        Me.TaskMenu.Items.Add(Me.btn_TreeView)
         Me.TaskMenu.Items.Add(Me.btn_SplitToDoID)
-        Me.TaskMenu.Items.Add(Me.Btn_TreeListView)
         Me.TaskMenu.Items.Add(Me.but_Dictionary)
         Me.TaskMenu.Items.Add(Me.but_CompressIDs)
         Me.TaskMenu.ItemSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
@@ -92,14 +90,6 @@
         Me.btn_RefreshMax.OfficeImageId = "AccessRefreshAllLists"
         Me.btn_RefreshMax.ShowImage = True
         '
-        'btn_TreeView
-        '
-        Me.btn_TreeView.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.btn_TreeView.Label = "Load Tree View"
-        Me.btn_TreeView.Name = "btn_TreeView"
-        Me.btn_TreeView.OfficeImageId = "BaselineSave"
-        Me.btn_TreeView.ShowImage = True
-        '
         'btn_SplitToDoID
         '
         Me.btn_SplitToDoID.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
@@ -107,14 +97,6 @@
         Me.btn_SplitToDoID.Name = "btn_SplitToDoID"
         Me.btn_SplitToDoID.OfficeImageId = "ConvertTextToTable"
         Me.btn_SplitToDoID.ShowImage = True
-        '
-        'Btn_TreeListView
-        '
-        Me.Btn_TreeListView.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Btn_TreeListView.Label = "Load Tree 2"
-        Me.Btn_TreeListView.Name = "Btn_TreeListView"
-        Me.Btn_TreeListView.OfficeImageId = "BaselineSave"
-        Me.Btn_TreeListView.ShowImage = True
         '
         'but_Dictionary
         '
@@ -131,6 +113,14 @@
         Me.but_CompressIDs.Name = "but_CompressIDs"
         Me.but_CompressIDs.OfficeImageId = "ReviewCombineRevisions"
         Me.but_CompressIDs.ShowImage = True
+        '
+        'Btn_TreeListView
+        '
+        Me.Btn_TreeListView.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Btn_TreeListView.Label = "Load Tree"
+        Me.Btn_TreeListView.Name = "Btn_TreeListView"
+        Me.Btn_TreeListView.OfficeImageId = "BaselineSave"
+        Me.Btn_TreeListView.ShowImage = True
         '
         'TaskMasterRibbon
         '
@@ -149,7 +139,6 @@
     Friend WithEvents Group1 As Microsoft.Office.Tools.Ribbon.RibbonGroup
     Friend WithEvents TaskMenu As Microsoft.Office.Tools.Ribbon.RibbonMenu
     Friend WithEvents btn_RefreshMax As Microsoft.Office.Tools.Ribbon.RibbonButton
-    Friend WithEvents btn_TreeView As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents btn_SplitToDoID As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents Btn_TreeListView As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents but_Dictionary As Microsoft.Office.Tools.Ribbon.RibbonButton

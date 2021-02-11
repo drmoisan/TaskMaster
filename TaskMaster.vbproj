@@ -207,6 +207,7 @@
   <ItemGroup>
     <AppDesigner Include="My Project\" />
     <Compile Include="BaseChanger.vb" />
+    <Compile Include="Models\ComparatorExample.vb" />
     <Compile Include="Models\DataModel_ToDoTree.vb" />
     <Compile Include="Models\ToDoItem.vb" />
     <Compile Include="Models\TreeNodeOfT.vb" />

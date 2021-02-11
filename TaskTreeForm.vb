@@ -91,8 +91,8 @@ Public Class TaskTreeForm
 
     '        For i = max To 0 Step -1
     '            ToDoNode = ToDoTree.Item(i)
-    '            If ToDoNode.ID.Length > 2 Then
-    '                Dim strID As String = ToDoNode.ID
+    '            If ToDoNode.Value.ToDoID.Length > 2 Then
+    '                Dim strID As String = ToDoNode.Value.ToDoID
     '                Dim strParentID As String = Mid(strID, 1, strID.Length - 2)
 
     '                Dim blContinue As Boolean = True
@@ -100,7 +100,7 @@ Public Class TaskTreeForm
     '                While blContinue
     '                    NodeParent = ToDoTree.FindChildByID(strParentID)
     '                    If Not NodeParent Is Nothing Then
-    '                        NodeParent.AddChild(ToDoNode, ToDoNode.ID)
+    '                        NodeParent.AddChild(ToDoNode, ToDoNode.Value.ToDoID)
     '                        ToDoTree.RemoveChild(ToDoNode)
     '                        blContinue = False
     '                    End If
@@ -182,8 +182,8 @@ Public Class TaskTreeForm
 
     '        For i = max To 0 Step -1
     '            ToDoNode = ToDoTree(i)
-    '            If ToDoNode.ID.Length > 2 Then
-    '                Dim strID As String = ToDoNode.ID
+    '            If ToDoNode.Value.ToDoID.Length > 2 Then
+    '                Dim strID As String = ToDoNode.Value.ToDoID
     '                Dim strParentID As String = Mid(strID, 1, strID.Length - 2)
 
     '                Dim blContinue As Boolean = True
@@ -192,7 +192,7 @@ Public Class TaskTreeForm
     '                    'NodeParent = ToDoTree.FindChildByID(strParentID)
     '                    NodeParent = FindChildByID(strParentID, ToDoTree)
     '                    If Not NodeParent Is Nothing Then
-    '                        NodeParent.AddChild(ToDoNode, ToDoNode.ID)
+    '                        NodeParent.AddChild(ToDoNode, ToDoNode.Value.ToDoID)
     '                        'ToDoTree.RemoveChild(ToDoNode)
     '                        ToDoTree.Remove(ToDoNode)
     '                        blContinue = False
@@ -551,7 +551,7 @@ Public Class TaskTreeForm
         Dim rnode As TreeNode(Of ToDoItem)
 
         For Each node In nodes
-            If node.ID = ID Then
+            If node.Value.ToDoID = ID Then
                 Return node
             Else
                 rnode = FindChildByID(ID, node.Children)

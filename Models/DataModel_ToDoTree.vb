@@ -69,13 +69,13 @@ Public Class DataModel_ToDoTree
                 End If
 
                 'Add the temporary ToDoItem to the tree, assigning an ID if missing
-                If tmpToDo.ToDoID = "nothing" Then
-                    'ToDoTree.AddChild(tmpToDo)
-                    ToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo))
-                Else
-                    'ToDoTree.AddChild(tmpToDo, tmpToDo.ToDoID)
-                    ToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo, tmpToDo.ToDoID))
-                End If
+                'If tmpToDo.ToDoID = "nothing" Then
+                'ToDoTree.AddChild(tmpToDo)
+                ToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo))
+                'Else
+                'ToDoTree.AddChild(tmpToDo, tmpToDo.ToDoID)
+                'ToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo, tmpToDo.ToDoID))
+                'End If
             Next
 
             '***STEP 3: MAKE TREE HIERARCHICAL
@@ -92,15 +92,16 @@ Public Class DataModel_ToDoTree
                 'Filtered Items, it is possible that the parent is not visible.
                 'If the parent is not visible, work recursively to find the next 
                 'closest visible parent until you get to the root
-                If ToDoNode.ID.Length > 2 Then
-                    Dim strID As String = ToDoNode.ID
+                If ToDoNode.Value.ToDoID.Length > 2 Then
+                    Dim strID As String = ToDoNode.Value.ToDoID
                     Dim strParentID As String = Mid(strID, 1, strID.Length - 2)
                     Dim blContinue As Boolean = True
 
                     While blContinue
                         NodeParent = FindChildByID(strParentID, ToDoTree)
+                        'NodeParent = F
                         If Not NodeParent Is Nothing Then
-                            NodeParent.InsertChild(ToDoNode, ToDoNode.ID)
+                            NodeParent.InsertChild(ToDoNode)
                             ToDoTree.Remove(ToDoNode)
                             blContinue = False
                         End If
@@ -120,6 +121,14 @@ Public Class DataModel_ToDoTree
         End Try
     End Sub
 
+    Public Function CompareToDoID(item As ToDoItem, strToDoID As String) As Boolean
+        If item.ToDoID = strToDoID Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
     Public Function AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As cIDList) As TreeNode(Of ToDoItem)
         Parent.Children.Add(Child)
         Dim strSeed As String
@@ -129,7 +138,6 @@ Public Class DataModel_ToDoTree
             strSeed = Parent.Value.ToDoID & "00"
         End If
         Child.Value.ToDoID = IDList.GetNextAvailableToDoID(strSeed)
-        Child.ID = Child.Value.ToDoID
         If Child.Children.Count > 0 Then
             ReNumberChildrenIDs(Child.Children, IDList)
         End If
@@ -152,13 +160,13 @@ Public Class DataModel_ToDoTree
         Dim i As Integer
         Dim max As Integer = Children.Count - 1
         If max >= 0 Then
-            Dim strParentID As String = Children(i).Parent.ID
+            Dim strParentID As String = Children(i).Parent.Value.ToDoID
             For i = 0 To max
-                If IDList.UsedIDList.Contains(Children(i).ID) Then IDList.UsedIDList.Remove(Children(i).ID)
+                If IDList.UsedIDList.Contains(Children(i).Value.ToDoID) Then IDList.UsedIDList.Remove(Children(i).Value.ToDoID)
             Next i
             For i = 0 To max
-                Children(i).ID = IDList.GetNextAvailableToDoID(strParentID & "00")
-                Children(i).Value.ToDoID = Children(i).ID
+                Children(i).Value.ToDoID = IDList.GetNextAvailableToDoID(strParentID & "00")
+                Children(i).Value.ToDoID = Children(i).Value.ToDoID
                 If Children(i).Children.Count > 0 Then ReNumberChildrenIDs(Children(i).Children, IDList)
             Next
         End If
@@ -170,7 +178,7 @@ Public Class DataModel_ToDoTree
         Dim rnode As TreeNode(Of ToDoItem)
 
         For Each node In nodes
-            If node.ID = ID Then
+            If node.Value.ToDoID = ID Then
                 Return node
             Else
                 rnode = FindChildByID(ID, node.Children)
@@ -740,6 +748,7 @@ End Class
 Public Class cIDList
 
     Public UsedIDList As List(Of String)
+    Private PMaxIDLength As Long
 
     Public Sub New(ByVal listUsedID As List(Of String))
         Me.UsedIDList = listUsedID
@@ -752,7 +761,10 @@ Public Class cIDList
         UsedIDList = New List(Of String)
         For Each ObjItem In ToDoList
             Dim strID As String = CustomFieldID_GetValue(ObjItem, "ToDoID")
-            If UsedIDList.Contains(strID) = False And strID.Length <> 0 Then UsedIDList.Add(strID)
+            If UsedIDList.Contains(strID) = False And strID.Length <> 0 Then
+                UsedIDList.Add(strID)
+                If strID.Length > PMaxIDLength Then PMaxIDLength = strID.Length
+            End If
         Next
 
         ToDoList = Nothing
@@ -765,6 +777,25 @@ Public Class cIDList
 
     '    Dim ToDoTree As List(Of TreeNode(Of ToDoItem)) = DM.ListOfToDoTree
     'End Sub
+
+    Public ReadOnly Property MaxIDLength As Long
+        Get
+            If PMaxIDLength = 0 Then
+                Dim maxLen As Long = 0
+                For Each strID As String In UsedIDList
+                    If strID.Length > maxLen Then
+                        maxLen = strID.Length
+                    End If
+                Next
+                PMaxIDLength = maxLen
+            End If
+            Return PMaxIDLength
+
+        End Get
+    End Property
+
+
+
 
     Public Function GetNextAvailableToDoID(strSeed As String) As String
         Dim blContinue As Boolean = True
@@ -779,6 +810,7 @@ Public Class cIDList
             End If
         End While
         UsedIDList.Add(strMaxID)
+        If strMaxID.Length > PMaxIDLength Then PMaxIDLength = strMaxID.Length
         Return strMaxID
     End Function
 
@@ -788,6 +820,7 @@ Public Class cIDList
         lngMaxID += 1
         strMaxID = ConvertToBase(125, lngMaxID)
         UsedIDList.Add(strMaxID)
+        If strMaxID.Length > PMaxIDLength Then PMaxIDLength = strMaxID.Length
 
         Return strMaxID
     End Function

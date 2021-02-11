@@ -6,9 +6,10 @@ Imports System
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Security.Authentication.ExtendedProtection
 
+
 Public Class ThisAddIn
 
-    Public UsedIDList As List(Of String) = New List(Of String)
+    'Public UsedIDList As List(Of String) = New List(Of String)
 
     Public WithEvents OlToDoItems As Outlook.Items
     Public WithEvents OlInboxItems As Outlook.Items
@@ -373,27 +374,29 @@ Public Class ThisAddIn
         End Try
 
     End Function
-    Public Function Refresh_ToDoID_Splits()
+    Public Sub Refresh_ToDoID_Splits()
         Dim objItem As Object
         Dim OlItems As Items = GetItemsInView_ToDo()
         For Each objItem In OlItems
             Split_ToDoID(objItem)
         Next
-    End Function
-    Public Function Split_ToDoID(objItem As Object)
-        Dim i As Integer
+    End Sub
+
+    Public Sub Split_ToDoID(objItem As Object)
         Dim strField As String = ""
         Dim strFieldValue As String = ""
-
         Try
             Dim strToDoID As String = CustomFieldID_GetValue(objItem, "ToDoID")
-            Dim intDepth As Integer = strToDoID.Length / 2
-
-            For i = 3 To intDepth
-                strField = "ToDoIdLvl" & i
-                strFieldValue = Mid(strToDoID, i * 2 - 1, 2)
-                CustomFieldID_Set(strField, strFieldValue, SpecificItem:=objItem)
-            Next
+            If strToDoID.Length > 0 Then
+                For i = 2 To IDList.MaxIDLength Step 2
+                    strField = "ToDoIdLvl" & (i / 2)
+                    strFieldValue = "00"
+                    If i <= strToDoID.Length Then
+                        strFieldValue = Mid(strToDoID, i - 1, 2)
+                    End If
+                    CustomFieldID_Set(strField, strFieldValue, SpecificItem:=objItem)
+                Next
+            End If
         Catch
             Debug.WriteLine("Error in Split_ToDoID")
             Debug.WriteLine(Err.Description)
@@ -401,33 +404,59 @@ Public Class ThisAddIn
             Debug.WriteLine("Field Value is " & strFieldValue)
             Stop
         End Try
-
-    End Function
-
-    Public Sub UsedIDList_Append(strID As String)
-        'Append an item to the UsedIDList and write to disk
-        UsedIDList.Add(strID)
-        Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
-        Using sw As StreamWriter = File.AppendText(filename_UsedIDList)
-            sw.WriteLine(strID)
-        End Using
     End Sub
 
-    Public Sub UsedIDList_Load()
-        'Load the used ID list
-        Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
+    'Public Sub OldSplit_ToDoID(objItem As Object)
+    '    Dim i As Integer
+    '    Dim strField As String = ""
+    '    Dim strFieldValue As String = ""
 
-        Try
-            Using sr As StreamReader = New StreamReader(filename_UsedIDList)
-                While (sr.Peek > -1)
-                    UsedIDList.Add(sr.ReadLine)
-                End While
-            End Using
-        Catch
-            Debug.WriteLine(Err.Description)
-        End Try
+    '    Try
+    '        Dim strToDoID As String = CustomFieldID_GetValue(objItem, "ToDoID")
+    '        Dim intDepth As Integer = strToDoID.Length / 2
 
-    End Sub
+    '        For i = 3 To intDepth
+    '            strField = "ToDoIdLvl" & i
+    '            strFieldValue = Mid(strToDoID, i * 2 - 1, 2)
+    '            CustomFieldID_Set(strField, strFieldValue, SpecificItem:=objItem)
+    '        Next
+    '        If intDepth < IDList.MaxIDLength Then
+
+    '        End If
+    '    Catch
+    '        Debug.WriteLine("Error in Split_ToDoID")
+    '        Debug.WriteLine(Err.Description)
+    '        Debug.WriteLine("Field Name is " & strField)
+    '        Debug.WriteLine("Field Value is " & strFieldValue)
+    '        Stop
+    '    End Try
+
+    'End Sub
+
+    'Public Sub UsedIDList_Append(strID As String)
+    '    'Append an item to the UsedIDList and write to disk
+    '    UsedIDList.Add(strID)
+    '    Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
+    '    Using sw As StreamWriter = File.AppendText(filename_UsedIDList)
+    '        sw.WriteLine(strID)
+    '    End Using
+    'End Sub
+
+    'Public Sub UsedIDList_Load()
+    '    'Load the used ID list
+    '    Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
+
+    '    Try
+    '        Using sr As StreamReader = New StreamReader(filename_UsedIDList)
+    '            While (sr.Peek > -1)
+    '                UsedIDList.Add(sr.ReadLine)
+    '            End While
+    '        End Using
+    '    Catch
+    '        Debug.WriteLine(Err.Description)
+    '    End Try
+
+    'End Sub
 
     Private Sub OlToDoItems_ItemChange(Item As Object) Handles OlToDoItems.ItemChange
         Dim objProperty_ToDoID As Outlook.UserProperty = Item.UserProperties.Find("ToDoID")
@@ -470,6 +499,7 @@ Public Class ThisAddIn
                                 strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
                                 IDList.Save(FileName_IDList)
+                                Split_ToDoID(objItem:=Item)
                             End If
 
 
@@ -495,6 +525,7 @@ Public Class ThisAddIn
                         strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                         CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
                         IDList.Save(FileName_IDList)
+                        Split_ToDoID(objItem:=Item)
                     End If
 
                 End If
@@ -514,6 +545,7 @@ Public Class ThisAddIn
                         strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                         CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
                         IDList.Save(FileName_IDList)
+                        Split_ToDoID(objItem:=Item)
                         '***NEED CODE HERE***
                         '***NEED CODE HERE***
                         '***NEED CODE HERE***
@@ -566,21 +598,21 @@ Public Class ThisAddIn
 
     End Function
 
-    Public Function GetNextAvailableToDoID(strSeed As String) As String
-        Dim blContinue As Boolean = True
-        Dim lngMaxID As Long = ConvertToDecimal(125, strSeed)
-        Dim strMaxID As String = ""
+    'Public Function GetNextAvailableToDoID(strSeed As String) As String
+    '    Dim blContinue As Boolean = True
+    '    Dim lngMaxID As Long = ConvertToDecimal(125, strSeed)
+    '    Dim strMaxID As String = ""
 
-        While blContinue
-            lngMaxID += 1
-            strMaxID = ConvertToBase(125, lngMaxID)
-            If Globals.ThisAddIn.UsedIDList.Contains(strMaxID) = False Then
-                blContinue = False
-            End If
-        End While
-        Globals.ThisAddIn.UsedIDList_Append(strMaxID)
-        Return strMaxID
-    End Function
+    '    While blContinue
+    '        lngMaxID += 1
+    '        strMaxID = ConvertToBase(125, lngMaxID)
+    '        If Globals.ThisAddIn.UsedIDList.Contains(strMaxID) = False Then
+    '            blContinue = False
+    '        End If
+    '    End While
+    '    Globals.ThisAddIn.UsedIDList_Append(strMaxID)
+    '    Return strMaxID
+    'End Function
     Public Sub SaveDict()
         If Not Directory.Exists(Path.GetDirectoryName(FileName_ProjectList)) Then
             Directory.CreateDirectory(Path.GetDirectoryName(FileName_ProjectList))
@@ -591,9 +623,7 @@ Public Class ThisAddIn
         TestFileStream.Close()
     End Sub
 
-    Private Sub OlInboxItems_ItemAdd(Item As Object) Handles OlInboxItems.ItemAdd
 
-    End Sub
 
     Private Sub OlToDoItems_ItemAdd(Item As Object) Handles OlToDoItems.ItemAdd
         Dim strToDoID As String = CustomFieldID_GetValue(Item, "ToDoID")
