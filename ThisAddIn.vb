@@ -9,8 +9,6 @@ Imports System.Security.Authentication.ExtendedProtection
 
 Public Class ThisAddIn
 
-    'Public UsedIDList As List(Of String) = New List(Of String)
-
     Public WithEvents OlToDoItems As Outlook.Items
     Public WithEvents OlInboxItems As Outlook.Items
     Private WithEvents OlReminders As Outlook.Reminders
@@ -52,14 +50,6 @@ Public Class ThisAddIn
             'Save_IDList()
         End If
 
-        'Dim strOutput() As String = IDList.UsedIDList.ToArray
-        'WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", strOutput)
-        ''Legacy code here until migration is complete
-        'If Globals.ThisAddIn.UsedIDList.Count = 0 Then
-        '    Globals.ThisAddIn.UsedIDList_Load()
-        'End If
-        ''END LEGACY CODE
-
         Access_Ribbons_By_Explorer()
     End Sub
 
@@ -70,24 +60,7 @@ Public Class ThisAddIn
 
     End Sub
 
-    'Public Function GetItemsCol_ToDo() As Collection
-    '    Dim OlItems As Items
-    '    Dim colItems As Collection
-    '    Dim objItem As Object
-    '    Dim OlFolder As Folder
-    '    Dim oStore As Outlook.Store
 
-    '    colItems = New Collection
-    '    For Each oStore In Globals.ThisAddIn.Application.Session.Stores
-    '        OlFolder = oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo)
-    '        OlItems = OlFolder.Items
-    '        For Each objItem In OlItems
-    '            'Debug.Print objItem.Subject
-    '            colItems.Add(objItem)
-    '        Next objItem
-    '    Next
-    '    GetItemsCol_ToDo = colItems
-    'End Function
 
     Public Function RefreshIDList() As Long
         IDList = New cIDList(New List(Of String))
@@ -96,71 +69,7 @@ Public Class ThisAddIn
         WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", IDList.UsedIDList.ToArray)
     End Function
 
-    'Original Function RefreshToDoID_Max
-    'Public Function RefreshToDoID_Max() As Long
-    '    Dim colItems As Collection
-    '    Dim colItems_NoID As Collection
-    '    Dim objItem As Object
-    '    Dim lngTmp As Long
-    '    Dim lngMax As Long
-    '    Dim strTmp As String
-    '    Dim msgResponse As MsgBoxResult
 
-
-    '    On Error Resume Next
-
-    '    colItems = GetItemsCol_ToDo()
-
-    '    colItems_NoID = New Collection
-    '    lngMax = 0
-
-    '    For Each objItem In colItems
-
-    '        strTmp = CustomFieldID_GetValue(objItem, "ToDoID")
-    '        If strTmp.Length = 0 Then
-    '            colItems_NoID.Add(objItem)
-    '        Else
-    '            lngTmp = ConvertToDecimal(125, Left(strTmp, 2))
-    '            If Err.Number <> 0 Then
-    '                Debug.WriteLine("Error can't convert variable strTmp = " & strTmp & " to Long")
-    '                Debug.WriteLine("Adding item to list of items to renumber")
-    '                Err.Clear()
-    '                colItems_NoID.Add(objItem)
-    '            Else
-    '                If lngTmp > lngMax Then lngMax = lngTmp
-    '            End If
-    '        End If
-    '    Next objItem
-
-    '    If colItems_NoID.Count > 0 Then
-    '        msgResponse = MsgBox(colItems_NoID.Count & " Items with no ToDoID. Assign them IDs now?", vbYesNo)
-    '        If msgResponse = vbYes Then
-    '            For Each objItem In colItems_NoID
-    '                Debug.WriteLine(objItem.Subject)
-    '                lngMax += 1
-    '                CustomFieldID_Set("ToDoID", ConvertToBase(125, lngMax), SpecificItem:=objItem)
-    '            Next objItem
-    '        End If
-    '    End If
-
-    '    Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
-    '    If IO.File.Exists(filename_UsedIDList) Then IO.File.Delete(filename_UsedIDList)
-    '    Using sw As StreamWriter = New StreamWriter(filename_UsedIDList)
-    '        For Each objItem In colItems
-    '            strTmp = CustomFieldID_GetValue(objItem, "ToDoID")
-    '            sw.WriteLine(strTmp)
-    '        Next
-    '    End Using
-
-
-    '    Debug.WriteLine(Err.Description)
-
-
-    '    My.Settings.MaxToDo = lngMax
-    '    My.Settings.Save()
-    '    Debug.WriteLine(lngMax)
-    '    Debug.WriteLine(My.Settings.MaxToDo.ToString)
-    'End Function
 
     Public Sub WriteToCSV(filename As String, strOutput() As String)
         If IO.File.Exists(filename) Then IO.File.Delete(filename)
@@ -384,81 +293,7 @@ Public Class ThisAddIn
         Next
     End Sub
 
-    'Public Sub Split_ToDoID(objItem As Object)
-    '    Dim strField As String = ""
-    '    Dim strFieldValue As String = ""
-    '    Try
-    '        Dim strToDoID As String = CustomFieldID_GetValue(objItem, "ToDoID")
-    '        If strToDoID.Length > 0 Then
-    '            For i = 2 To IDList.MaxIDLength Step 2
-    '                strField = "ToDoIdLvl" & (i / 2)
-    '                strFieldValue = "00"
-    '                If i <= strToDoID.Length Then
-    '                    strFieldValue = Mid(strToDoID, i - 1, 2)
-    '                End If
-    '                CustomFieldID_Set(strField, strFieldValue, SpecificItem:=objItem)
-    '            Next
-    '        End If
-    '    Catch
-    '        Debug.WriteLine("Error in Split_ToDoID")
-    '        Debug.WriteLine(Err.Description)
-    '        Debug.WriteLine("Field Name is " & strField)
-    '        Debug.WriteLine("Field Value is " & strFieldValue)
-    '        Stop
-    '    End Try
-    'End Sub
 
-    'Public Sub OldSplit_ToDoID(objItem As Object)
-    '    Dim i As Integer
-    '    Dim strField As String = ""
-    '    Dim strFieldValue As String = ""
-
-    '    Try
-    '        Dim strToDoID As String = CustomFieldID_GetValue(objItem, "ToDoID")
-    '        Dim intDepth As Integer = strToDoID.Length / 2
-
-    '        For i = 3 To intDepth
-    '            strField = "ToDoIdLvl" & i
-    '            strFieldValue = Mid(strToDoID, i * 2 - 1, 2)
-    '            CustomFieldID_Set(strField, strFieldValue, SpecificItem:=objItem)
-    '        Next
-    '        If intDepth < IDList.MaxIDLength Then
-
-    '        End If
-    '    Catch
-    '        Debug.WriteLine("Error in Split_ToDoID")
-    '        Debug.WriteLine(Err.Description)
-    '        Debug.WriteLine("Field Name is " & strField)
-    '        Debug.WriteLine("Field Value is " & strFieldValue)
-    '        Stop
-    '    End Try
-
-    'End Sub
-
-    'Public Sub UsedIDList_Append(strID As String)
-    '    'Append an item to the UsedIDList and write to disk
-    '    UsedIDList.Add(strID)
-    '    Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
-    '    Using sw As StreamWriter = File.AppendText(filename_UsedIDList)
-    '        sw.WriteLine(strID)
-    '    End Using
-    'End Sub
-
-    'Public Sub UsedIDList_Load()
-    '    'Load the used ID list
-    '    Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
-
-    '    Try
-    '        Using sr As StreamReader = New StreamReader(filename_UsedIDList)
-    '            While (sr.Peek > -1)
-    '                UsedIDList.Add(sr.ReadLine)
-    '            End While
-    '        End Using
-    '    Catch
-    '        Debug.WriteLine(Err.Description)
-    '    End Try
-
-    'End Sub
 
     Private Sub OlToDoItems_ItemChange(Item As Object) Handles OlToDoItems.ItemChange
         Static blIsRunning As Boolean
@@ -736,21 +571,7 @@ Public Class ThisAddIn
 
     End Function
 
-    'Public Function GetNextAvailableToDoID(strSeed As String) As String
-    '    Dim blContinue As Boolean = True
-    '    Dim lngMaxID As Long = ConvertToDecimal(125, strSeed)
-    '    Dim strMaxID As String = ""
 
-    '    While blContinue
-    '        lngMaxID += 1
-    '        strMaxID = ConvertToBase(125, lngMaxID)
-    '        If Globals.ThisAddIn.UsedIDList.Contains(strMaxID) = False Then
-    '            blContinue = False
-    '        End If
-    '    End While
-    '    Globals.ThisAddIn.UsedIDList_Append(strMaxID)
-    '    Return strMaxID
-    'End Function
     Public Sub SaveDict()
         If Not Directory.Exists(Path.GetDirectoryName(FileName_ProjectList)) Then
             Directory.CreateDirectory(Path.GetDirectoryName(FileName_ProjectList))

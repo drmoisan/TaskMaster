@@ -1,7 +1,6 @@
 ﻿Imports Microsoft.Office.Tools.Ribbon
 
 Public Class TaskMasterRibbon
-    Private frmTree As frm_TaskTree
     Private frmTTF As TaskTreeForm
 
     Private Sub btn_RefreshMax_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_RefreshMax.Click
