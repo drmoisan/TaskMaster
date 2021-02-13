@@ -70,24 +70,24 @@ Public Class ThisAddIn
 
     End Sub
 
-    Public Function GetItemsCol_ToDo() As Collection
-        Dim OlItems As Items
-        Dim colItems As Collection
-        Dim objItem As Object
-        Dim OlFolder As Folder
-        Dim oStore As Outlook.Store
+    'Public Function GetItemsCol_ToDo() As Collection
+    '    Dim OlItems As Items
+    '    Dim colItems As Collection
+    '    Dim objItem As Object
+    '    Dim OlFolder As Folder
+    '    Dim oStore As Outlook.Store
 
-        colItems = New Collection
-        For Each oStore In Globals.ThisAddIn.Application.Session.Stores
-            OlFolder = oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo)
-            OlItems = OlFolder.Items
-            For Each objItem In OlItems
-                'Debug.Print objItem.Subject
-                colItems.Add(objItem)
-            Next objItem
-        Next
-        GetItemsCol_ToDo = colItems
-    End Function
+    '    colItems = New Collection
+    '    For Each oStore In Globals.ThisAddIn.Application.Session.Stores
+    '        OlFolder = oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo)
+    '        OlItems = OlFolder.Items
+    '        For Each objItem In OlItems
+    '            'Debug.Print objItem.Subject
+    '            colItems.Add(objItem)
+    '        Next objItem
+    '    Next
+    '    GetItemsCol_ToDo = colItems
+    'End Function
 
     Public Function RefreshIDList() As Long
         IDList = New cIDList(New List(Of String))
@@ -97,70 +97,70 @@ Public Class ThisAddIn
     End Function
 
     'Original Function RefreshToDoID_Max
-    Public Function RefreshToDoID_Max() As Long
-        Dim colItems As Collection
-        Dim colItems_NoID As Collection
-        Dim objItem As Object
-        Dim lngTmp As Long
-        Dim lngMax As Long
-        Dim strTmp As String
-        Dim msgResponse As MsgBoxResult
+    'Public Function RefreshToDoID_Max() As Long
+    '    Dim colItems As Collection
+    '    Dim colItems_NoID As Collection
+    '    Dim objItem As Object
+    '    Dim lngTmp As Long
+    '    Dim lngMax As Long
+    '    Dim strTmp As String
+    '    Dim msgResponse As MsgBoxResult
 
 
-        On Error Resume Next
+    '    On Error Resume Next
 
-        colItems = GetItemsCol_ToDo()
+    '    colItems = GetItemsCol_ToDo()
 
-        colItems_NoID = New Collection
-        lngMax = 0
+    '    colItems_NoID = New Collection
+    '    lngMax = 0
 
-        For Each objItem In colItems
+    '    For Each objItem In colItems
 
-            strTmp = CustomFieldID_GetValue(objItem, "ToDoID")
-            If strTmp.Length = 0 Then
-                colItems_NoID.Add(objItem)
-            Else
-                lngTmp = ConvertToDecimal(125, Left(strTmp, 2))
-                If Err.Number <> 0 Then
-                    Debug.WriteLine("Error can't convert variable strTmp = " & strTmp & " to Long")
-                    Debug.WriteLine("Adding item to list of items to renumber")
-                    Err.Clear()
-                    colItems_NoID.Add(objItem)
-                Else
-                    If lngTmp > lngMax Then lngMax = lngTmp
-                End If
-            End If
-        Next objItem
+    '        strTmp = CustomFieldID_GetValue(objItem, "ToDoID")
+    '        If strTmp.Length = 0 Then
+    '            colItems_NoID.Add(objItem)
+    '        Else
+    '            lngTmp = ConvertToDecimal(125, Left(strTmp, 2))
+    '            If Err.Number <> 0 Then
+    '                Debug.WriteLine("Error can't convert variable strTmp = " & strTmp & " to Long")
+    '                Debug.WriteLine("Adding item to list of items to renumber")
+    '                Err.Clear()
+    '                colItems_NoID.Add(objItem)
+    '            Else
+    '                If lngTmp > lngMax Then lngMax = lngTmp
+    '            End If
+    '        End If
+    '    Next objItem
 
-        If colItems_NoID.Count > 0 Then
-            msgResponse = MsgBox(colItems_NoID.Count & " Items with no ToDoID. Assign them IDs now?", vbYesNo)
-            If msgResponse = vbYes Then
-                For Each objItem In colItems_NoID
-                    Debug.WriteLine(objItem.Subject)
-                    lngMax += 1
-                    CustomFieldID_Set("ToDoID", ConvertToBase(125, lngMax), SpecificItem:=objItem)
-                Next objItem
-            End If
-        End If
+    '    If colItems_NoID.Count > 0 Then
+    '        msgResponse = MsgBox(colItems_NoID.Count & " Items with no ToDoID. Assign them IDs now?", vbYesNo)
+    '        If msgResponse = vbYes Then
+    '            For Each objItem In colItems_NoID
+    '                Debug.WriteLine(objItem.Subject)
+    '                lngMax += 1
+    '                CustomFieldID_Set("ToDoID", ConvertToBase(125, lngMax), SpecificItem:=objItem)
+    '            Next objItem
+    '        End If
+    '    End If
 
-        Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
-        If IO.File.Exists(filename_UsedIDList) Then IO.File.Delete(filename_UsedIDList)
-        Using sw As StreamWriter = New StreamWriter(filename_UsedIDList)
-            For Each objItem In colItems
-                strTmp = CustomFieldID_GetValue(objItem, "ToDoID")
-                sw.WriteLine(strTmp)
-            Next
-        End Using
-
-
-        Debug.WriteLine(Err.Description)
+    '    Dim filename_UsedIDList As String = "C:\Users\03311352\Documents\UsedIDList.csv"
+    '    If IO.File.Exists(filename_UsedIDList) Then IO.File.Delete(filename_UsedIDList)
+    '    Using sw As StreamWriter = New StreamWriter(filename_UsedIDList)
+    '        For Each objItem In colItems
+    '            strTmp = CustomFieldID_GetValue(objItem, "ToDoID")
+    '            sw.WriteLine(strTmp)
+    '        Next
+    '    End Using
 
 
-        My.Settings.MaxToDo = lngMax
-        My.Settings.Save()
-        Debug.WriteLine(lngMax)
-        Debug.WriteLine(My.Settings.MaxToDo.ToString)
-    End Function
+    '    Debug.WriteLine(Err.Description)
+
+
+    '    My.Settings.MaxToDo = lngMax
+    '    My.Settings.Save()
+    '    Debug.WriteLine(lngMax)
+    '    Debug.WriteLine(My.Settings.MaxToDo.ToString)
+    'End Function
 
     Public Sub WriteToCSV(filename As String, strOutput() As String)
         If IO.File.Exists(filename) Then IO.File.Delete(filename)
@@ -376,35 +376,37 @@ Public Class ThisAddIn
     End Function
     Public Sub Refresh_ToDoID_Splits()
         Dim objItem As Object
+        Dim todo As ToDoItem
         Dim OlItems As Items = GetItemsInView_ToDo()
         For Each objItem In OlItems
-            Split_ToDoID(objItem)
+            todo = New ToDoItem(objItem, OnDemand:=True)
+            todo.SplitID()
         Next
     End Sub
 
-    Public Sub Split_ToDoID(objItem As Object)
-        Dim strField As String = ""
-        Dim strFieldValue As String = ""
-        Try
-            Dim strToDoID As String = CustomFieldID_GetValue(objItem, "ToDoID")
-            If strToDoID.Length > 0 Then
-                For i = 2 To IDList.MaxIDLength Step 2
-                    strField = "ToDoIdLvl" & (i / 2)
-                    strFieldValue = "00"
-                    If i <= strToDoID.Length Then
-                        strFieldValue = Mid(strToDoID, i - 1, 2)
-                    End If
-                    CustomFieldID_Set(strField, strFieldValue, SpecificItem:=objItem)
-                Next
-            End If
-        Catch
-            Debug.WriteLine("Error in Split_ToDoID")
-            Debug.WriteLine(Err.Description)
-            Debug.WriteLine("Field Name is " & strField)
-            Debug.WriteLine("Field Value is " & strFieldValue)
-            Stop
-        End Try
-    End Sub
+    'Public Sub Split_ToDoID(objItem As Object)
+    '    Dim strField As String = ""
+    '    Dim strFieldValue As String = ""
+    '    Try
+    '        Dim strToDoID As String = CustomFieldID_GetValue(objItem, "ToDoID")
+    '        If strToDoID.Length > 0 Then
+    '            For i = 2 To IDList.MaxIDLength Step 2
+    '                strField = "ToDoIdLvl" & (i / 2)
+    '                strFieldValue = "00"
+    '                If i <= strToDoID.Length Then
+    '                    strFieldValue = Mid(strToDoID, i - 1, 2)
+    '                End If
+    '                CustomFieldID_Set(strField, strFieldValue, SpecificItem:=objItem)
+    '            Next
+    '        End If
+    '    Catch
+    '        Debug.WriteLine("Error in Split_ToDoID")
+    '        Debug.WriteLine(Err.Description)
+    '        Debug.WriteLine("Field Name is " & strField)
+    '        Debug.WriteLine("Field Value is " & strFieldValue)
+    '        Stop
+    '    End Try
+    'End Sub
 
     'Public Sub OldSplit_ToDoID(objItem As Object)
     '    Dim i As Integer
@@ -459,27 +461,88 @@ Public Class ThisAddIn
     'End Sub
 
     Private Sub OlToDoItems_ItemChange(Item As Object) Handles OlToDoItems.ItemChange
-        Dim objProperty_ToDoID As Outlook.UserProperty = Item.UserProperties.Find("ToDoID")
-        Dim objProperty_Project As Outlook.UserProperty = Item.UserProperties.Find("TagProject")
-        Dim strToDoID As String = ""
-        Dim strToDoID_root As String = ""
-        Dim strProject As String = ""
-        Dim strProjectToDo As String = ""
+        Static blIsRunning As Boolean
+
+        If blIsRunning = False Then
+
+            blIsRunning = True
+            Dim todo As ToDoItem = New ToDoItem(Item, OnDemand:=True)
+            Dim objProperty_ToDoID As Outlook.UserProperty = Item.UserProperties.Find("ToDoID")
+            Dim objProperty_Project As Outlook.UserProperty = Item.UserProperties.Find("TagProject")
+            Dim strToDoID As String = ""
+            Dim strToDoID_root As String = ""
+            Dim strProject As String = ""
+            Dim strProjectToDo As String = ""
 
 
+            'AUTOCODE ToDoID based on Project
+            'Check to see if the project exists before attempting to autocode the id
+            If Not objProperty_Project Is Nothing Then
 
-        'If objProperty Is Nothing Then objProperty = oTask.UserProperties.Add(UserDefinedFieldName, olUPType)
+                'Check to see whether there is an existing ID
+                If Not objProperty_ToDoID Is Nothing Then
+                    strToDoID = objProperty_ToDoID.Value
 
-        'Check to see if the project exists before attempting to autocode the id
-        If Not objProperty_Project Is Nothing Then
+                    'Don't autocode branches that existed to another project previously
+                    If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
 
-            'Check to see whether there is an existing ID
-            If Not objProperty_ToDoID Is Nothing Then
-                strToDoID = objProperty_ToDoID.Value
+                        'Get Project Name
+                        strProject = todo.TagProject
 
-                'Don't autocode branches that existed to another project previously
-                If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
+                        'If IsArray(objProperty_Project.Value) Then
+                        '    strProject = FlattenArry(objProperty_Project.Value)
+                        'Else
+                        '    strProject = objProperty_Project.Value
+                        'End If
 
+                        'Check to see if the Project name returned a value before attempting to autocode
+                        If strProject.Length <> 0 Then
+
+                            'Check to ensure it is in the dictionary before autocoding
+                            If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                                strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                                If strToDoID.Length = 2 Then
+                                    ' Change the Item's todoid to be a node of the project
+
+                                    todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                    'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                    'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                                    IDList.Save(FileName_IDList)
+                                    'Split_ToDoID(objItem:=Item)
+                                    todo.SplitID()
+                                End If
+
+
+                            Else 'If it is not in the dictionary, see if this is a project we should add
+                                If strToDoID.Length = 4 Then
+                                    Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
+                                    If response = vbYes Then
+                                        ProjDict.ProjectDictionary.Add(strProject, strToDoID)
+                                        SaveDict()
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                    ElseIf strToDoID.Length = 0 Then
+                        strProject = todo.TagProject
+                        'If IsArray(objProperty_Project.Value) Then
+                        '    strProject = FlattenArry(objProperty_Project.Value)
+                        'Else
+                        '    strProject = objProperty_Project.Value
+                        'End If
+                        If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                            strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                            todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                            'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                            'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                            IDList.Save(FileName_IDList)
+                            'Split_ToDoID(objItem:=Item)
+                            todo.SplitID()
+                        End If
+
+                    End If
+                Else 'In this case, the project name exists but the todo id does not
                     'Get Project Name
                     If IsArray(objProperty_Project.Value) Then
                         strProject = FlattenArry(objProperty_Project.Value)
@@ -487,93 +550,168 @@ Public Class ThisAddIn
                         strProject = objProperty_Project.Value
                     End If
 
-                    'Check to see if the Project name returned a value before attempting to autocode
+                    'If the project name is in our dictionary, autoadd the ToDoID to this item
                     If strProject.Length <> 0 Then
-
-                        'Check to ensure it is in the dictionary before autocoding
                         If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                             strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                            If strToDoID.Length = 2 Then
-                                ' Change the Item's todoid to be a node of the project
-
-                                strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                IDList.Save(FileName_IDList)
-                                Split_ToDoID(objItem:=Item)
-                            End If
-
-
-                        Else 'If it is not in the dictionary, see if this is a project we should add
-                            If strToDoID.Length = 4 Then
-                                Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
-                                If response = vbYes Then
-                                    ProjDict.ProjectDictionary.Add(strProject, strToDoID)
-                                    SaveDict()
-                                End If
-                            End If
+                            'Add the next ToDoID available in that branch
+                            todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                            'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                            'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                            IDList.Save(FileName_IDList)
+                            'Split_ToDoID(objItem:=Item)
+                            todo.SplitID()
+                            '***NEED CODE HERE***
+                            '***NEED CODE HERE***
+                            '***NEED CODE HERE***
                         End If
                     End If
+                End If
 
-                ElseIf strToDoID.Length = 0 Then
-                    If IsArray(objProperty_Project.Value) Then
-                        strProject = FlattenArry(objProperty_Project.Value)
+
+            End If
+
+            'If OlToDoItem_IsMarkedComplete(Item) Then
+            'Check to see if todo was just marked complete 
+            'If So, adjust Kan Ban fields and categories
+            If todo.Complete Then
+                If InStr(Item.Categories, "Tag KB Completed") = False Then
+                    Dim strCats As String = Replace(Replace(Item.Categories, "Tag KB Backlog", ""), ",,", ",")
+                    strCats = Replace(Replace(strCats, "Tag KB InProgress", ""), ",,", ",")
+                    strCats = Replace(Replace(strCats, "Tag KB Planned", ""), ",,", ",")
+                    While Left(strCats, 1) = ","
+                        strCats = Right(strCats, strCats.Length - 1)
+                    End While
+                    If strCats.Length > 0 Then
+                        strCats += ", Tag KB Completed"
                     Else
-                        strProject = objProperty_Project.Value
+                        strCats += "Tag KB Completed"
                     End If
-                    If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                        strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                        strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                        CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                        IDList.Save(FileName_IDList)
-                        Split_ToDoID(objItem:=Item)
-                    End If
-
+                    Item.Categories = strCats
+                    Item.Save
+                    todo.KB = "Completed"
                 End If
-            Else 'In this case, the project name exists but the todo id does not
-                'Get Project Name
-                If IsArray(objProperty_Project.Value) Then
-                    strProject = FlattenArry(objProperty_Project.Value)
+            ElseIf todo.KB = "Completed" Then
+                Dim strCats As String = Item.Categories
+
+                'Strip Completed from categories
+                If InStr(strCats, "Tag KB Completed") = True Then
+                    strCats = Replace(Replace(strCats, "Tag KB Completed", ""), ",,", ",")
+                End If
+                Dim strReplace As String = ""
+                Dim strKB As String = ""
+
+                If InStr(strCats, "Tag A Top Priority Today") = True Then
+                    strReplace = "Tag KB InProgress"
+                    strKB = "InProgress"
+                ElseIf InStr(strCats, "Tag Bullpin Priorities") = True Then
+                    strReplace = "Tag KB Planned"
+                    strKB = "Planned"
                 Else
-                    strProject = objProperty_Project.Value
+                    strReplace = "Tag KB Backlog"
+                    strKB = "Backlog"
                 End If
-
-                'If the project name is in our dictionary, autoadd the ToDoID to this item
-                If strProject.Length <> 0 Then
-                    If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                        strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                        'Add the next ToDoID available in that branch
-                        strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                        CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                        IDList.Save(FileName_IDList)
-                        Split_ToDoID(objItem:=Item)
-                        '***NEED CODE HERE***
-                        '***NEED CODE HERE***
-                        '***NEED CODE HERE***
-                    End If
-                End If
-            End If
-
-
-        End If
-
-        If OlToDoItem_IsMarkedComplete(Item) Then
-            If InStr(Item.Categories, "Tag KB Completed") = False Then
-                Dim strTmp As String = Replace(Replace(Item.Categories, "Tag KB Backlog", ""), ",,", ",")
-                strTmp = Replace(Replace(strTmp, "Tag KB InProgress", ""), ",,", ",")
-                strTmp = Replace(Replace(strTmp, "Tag KB Planned", ""), ",,", ",")
-                While Left(strTmp, 1) = ","
-                    strTmp = Right(strTmp, strTmp.Length - 1)
-                End While
-                If strTmp.Length > 0 Then
-                    strTmp += ", Tag KB Completed"
+                If strCats.Length > 0 Then
+                    strCats += ", " & strReplace
                 Else
-                    strTmp += "Tag KB Completed"
+                    strCats = strReplace
                 End If
-                Item.Categories = strTmp
+                Item.Categories = strCats
                 Item.Save
-                CustomFieldID_Set("KBF", "Completed", SpecificItem:=Item)
+                todo.KB = strKB
+
             End If
+            blIsRunning = False
         End If
+
+        ''AUTOCODE ToDoID based on Project
+        ''Check to see if the project exists before attempting to autocode the id
+        'If Not objProperty_Project Is Nothing Then
+
+        '    'Check to see whether there is an existing ID
+        '    If Not objProperty_ToDoID Is Nothing Then
+        '        strToDoID = objProperty_ToDoID.Value
+
+        '        'Don't autocode branches that existed to another project previously
+        '        If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
+
+        '            'Get Project Name
+        '            If IsArray(objProperty_Project.Value) Then
+        '                strProject = FlattenArry(objProperty_Project.Value)
+        '            Else
+        '                strProject = objProperty_Project.Value
+        '            End If
+
+        '            'Check to see if the Project name returned a value before attempting to autocode
+        '            If strProject.Length <> 0 Then
+
+        '                'Check to ensure it is in the dictionary before autocoding
+        '                If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+        '                    strProjectToDo = ProjDict.ProjectDictionary(strProject)
+        '                    If strToDoID.Length = 2 Then
+        '                        ' Change the Item's todoid to be a node of the project
+
+        '                        strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+        '                        CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+        '                        IDList.Save(FileName_IDList)
+        '                        Split_ToDoID(objItem:=Item)
+        '                    End If
+
+
+        '                Else 'If it is not in the dictionary, see if this is a project we should add
+        '                    If strToDoID.Length = 4 Then
+        '                        Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
+        '                        If response = vbYes Then
+        '                            ProjDict.ProjectDictionary.Add(strProject, strToDoID)
+        '                            SaveDict()
+        '                        End If
+        '                    End If
+        '                End If
+        '            End If
+
+        '        ElseIf strToDoID.Length = 0 Then
+        '            If IsArray(objProperty_Project.Value) Then
+        '                strProject = FlattenArry(objProperty_Project.Value)
+        '            Else
+        '                strProject = objProperty_Project.Value
+        '            End If
+        '            If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+        '                strProjectToDo = ProjDict.ProjectDictionary(strProject)
+        '                strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+        '                CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+        '                IDList.Save(FileName_IDList)
+        '                Split_ToDoID(objItem:=Item)
+        '            End If
+
+        '        End If
+        '    Else 'In this case, the project name exists but the todo id does not
+        '        'Get Project Name
+        '        If IsArray(objProperty_Project.Value) Then
+        '            strProject = FlattenArry(objProperty_Project.Value)
+        '        Else
+        '            strProject = objProperty_Project.Value
+        '        End If
+
+        '        'If the project name is in our dictionary, autoadd the ToDoID to this item
+        '        If strProject.Length <> 0 Then
+        '            If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+        '                strProjectToDo = ProjDict.ProjectDictionary(strProject)
+        '                'Add the next ToDoID available in that branch
+        '                strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+        '                CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+        '                IDList.Save(FileName_IDList)
+        '                Split_ToDoID(objItem:=Item)
+        '                '***NEED CODE HERE***
+        '                '***NEED CODE HERE***
+        '                '***NEED CODE HERE***
+        '            End If
+        '        End If
+        '    End If
+
+
+        'End If
+
+
 
     End Sub
 
