@@ -1,6 +1,7 @@
 ﻿Imports System
 Imports System.ComponentModel
 Imports System.Drawing
+Imports System.Numerics
 Imports BrightIdeasSoftware
 Imports System.Collections
 Imports System.IO
@@ -140,6 +141,7 @@ Public Class DataModel_ToDoTree
         If Child.Children.Count > 0 Then
             ReNumberChildrenIDs(Child.Children, IDList)
         End If
+        IDList.Save()
     End Function
 
     Public Sub ReNumberIDs(IDList As cIDList)
@@ -167,6 +169,7 @@ Public Class DataModel_ToDoTree
                 'Children(i).Value.ToDoID = Children(i).Value.ToDoID
                 If Children(i).Children.Count > 0 Then ReNumberChildrenIDs(Children(i).Children, IDList)
             Next
+            IDList.Save()
         End If
     End Sub
 
@@ -303,811 +306,611 @@ Public Class DataModel_ToDoTree
 
 End Class
 
-Public Class ToDoItem
-    Private OlObject As Object
-    Private _ToDoID As String = ""
-    Public _TaskSubject As String = ""
-    Public _MetaTaskSubject As String = ""
-    Public _MetaTaskLvl As String = ""
-    Private _TagContext As String = ""
-    Private _TagProgram As String = ""
-    Private _TagProject As String = ""
-    Private _TagPeople As String = ""
-    Private _TagTopic As String = ""
-    Private _Priority As Outlook.OlImportance
-    Private _TaskCreateDate As Date
-    Private _StartDate As Date
-    Private _Complete As Boolean
-    Private _KB As String = ""
-
-    Public Sub New(OlMail As Outlook.MailItem)
-        OlObject = OlMail
-        If OlMail.TaskSubject.Length <> 0 Then
-            _TaskSubject = OlMail.TaskSubject
-        Else
-            _TaskSubject = OlMail.Subject
-        End If
-        _TagContext = CustomField("TagContext")
-        _TagProgram = CustomField("TagProgram")
-        _TagProject = CustomField("TagProject")
-        _TagPeople = CustomField("TagPeople")
-        _TagTopic = CustomField("TagTopic")
-        _KB = CustomField("KBF")
-        _Priority = OlMail.Importance
-        _TaskCreateDate = OlMail.CreationTime
-        _StartDate = OlMail.TaskStartDate
-        _Complete = (OlMail.FlagStatus = OlFlagStatus.olFlagComplete)
-    End Sub
-    Public Sub New(OlTask As Outlook.TaskItem)
-        OlObject = OlTask
-
-        _TaskSubject = OlTask.Subject
-        _TagContext = CustomField("TagContext")
-        _TagProgram = CustomField("TagProgram")
-        _TagProject = CustomField("TagProject")
-        _TagPeople = CustomField("TagPeople")
-        _TagTopic = CustomField("TagTopic")
-        _KB = CustomField("KBF")
-        _Priority = OlTask.Importance
-        _TaskCreateDate = OlTask.CreationTime
-        _StartDate = OlTask.StartDate
-        _Complete = OlTask.Complete
-    End Sub
-    Public Sub New(OlMail As Outlook.MailItem, OnDemand As Boolean)
-        OlObject = OlMail
-        If OnDemand = False Then
-            If OlMail.TaskSubject.Length <> 0 Then
-                _TaskSubject = OlMail.TaskSubject
-            Else
-                _TaskSubject = OlMail.Subject
-            End If
-            _TagContext = CustomField("TagContext")
-            _TagProgram = CustomField("TagProgram")
-            _TagProject = CustomField("TagProject")
-            _TagPeople = CustomField("TagPeople")
-            _TagTopic = CustomField("TagTopic")
-            _KB = CustomField("KBF")
-            _Priority = OlMail.Importance
-            _TaskCreateDate = OlMail.CreationTime
-            _StartDate = OlMail.TaskStartDate
-            _Complete = (OlMail.FlagStatus = OlFlagStatus.olFlagComplete)
-        End If
-    End Sub
-    Public Sub New(OlTask As Outlook.TaskItem, OnDemand As Boolean)
-        OlObject = OlTask
-        If OnDemand = False Then
-            _TaskSubject = OlTask.Subject
-            _TagContext = CustomField("TagContext")
-            _TagProgram = CustomField("TagProgram")
-            _TagProject = CustomField("TagProject")
-            _TagPeople = CustomField("TagPeople")
-            _TagTopic = CustomField("TagTopic")
-            _KB = CustomField("KBF")
-            _Priority = OlTask.Importance
-            _TaskCreateDate = OlTask.CreationTime
-            _StartDate = OlTask.StartDate
-            _Complete = OlTask.Complete
-        End If
-    End Sub
-    Public Sub New(Item As Object, OnDemand As Boolean)
-
-        OlObject = Item
-        If OnDemand = False Then
-            MsgBox("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand")
-        End If
-    End Sub
-    Public Sub New(strID As String)
-        _ToDoID = strID
-    End Sub
-
-    Public ReadOnly Property TaskCreateDate As Date
-        Get
-            TaskCreateDate = _TaskCreateDate
-        End Get
-    End Property
-
-    Public Property StartDate As Date
-        Get
-            Return _TaskCreateDate
-        End Get
-        Set(value As Date)
-            _TaskCreateDate = value
-        End Set
-    End Property
-
-    Public Property Priority As Outlook.OlImportance
-        Get
-
-            If OlObject Is Nothing Then
-                _Priority = OlImportance.olImportanceNormal
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                _Priority = OlMail.Importance
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                _Priority = OlTask.Importance
-            End If
-            Return _Priority
-        End Get
-        Set(value As Outlook.OlImportance)
-            _Priority = value
-            If OlObject Is Nothing Then
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                OlMail.Importance = _Priority
-                OlMail.Save()
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                OlTask.Importance = _Priority
-                OlTask.Save()
-            End If
-        End Set
-    End Property
-
-    Public Property Complete As Boolean
-        Get
-            If OlObject Is Nothing Then
-                _Complete = False
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                If (OlMail.FlagStatus = OlFlagStatus.olFlagComplete) Then
-                    _Complete = True
-                Else
-                    _Complete = False
-                End If
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                _Complete = OlTask.Complete
-            End If
-            Return _Complete
-        End Get
-        Set(value As Boolean)
-            If OlObject Is Nothing Then
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                If value = True Then
-                    OlMail.FlagStatus = OlFlagStatus.olFlagComplete
-                Else
-                    OlMail.FlagStatus = OlFlagStatus.olFlagMarked
-                End If
-                OlMail.Save()
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                OlTask.Complete = value
-                OlTask.Save()
-            End If
-            _Complete = value
-        End Set
-    End Property
-
-    Public Property TaskSubject As String
-        Get
-            If _TaskSubject.Length = 0 Then
-                If OlObject Is Nothing Then
-                    _TaskSubject = ""
-                ElseIf TypeOf OlObject Is MailItem Then
-                    Dim OlMail As MailItem = OlObject
-                    _TaskSubject = OlMail.TaskSubject
-                ElseIf TypeOf OlObject Is TaskItem Then
-                    Dim OlTask As TaskItem = OlObject
-                    _TaskSubject = OlTask.Subject
-                Else
-                    _TaskSubject = ""
-                End If
-            End If
-            Return _TaskSubject
-        End Get
-        Set(value As String)
-            _TaskSubject = value
-            If OlObject Is Nothing Then
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                OlMail.TaskSubject = _TaskSubject
-                OlMail.Save()
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                OlTask.Subject = _TaskSubject
-                OlTask.Save()
-            End If
-        End Set
-    End Property
-
-    Public Property TagPeople As String
-        Get
-            If _TagPeople.Length <> 0 Then
-                Return _TagPeople
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagPeople = CustomField("TagPeople")
-                Return _TagPeople
-            End If
-        End Get
-        Set(value As String)
-            _TagPeople = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagPeople") = value
-            End If
-        End Set
-    End Property
-
-    Public Property TagProject As String
-        Get
-            If _TagProject.Length <> 0 Then
-                Return _TagProject
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagProject = CustomField("TagProject")
-                Return _TagProject
-            End If
-
-        End Get
-        Set(value As String)
-            _TagProject = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagProject") = value
-            End If
-        End Set
-    End Property
-
-    Public Property TagProgram As String
-        Get
-            If _TagProgram.Length <> 0 Then
-                Return _TagProgram
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagProgram = CustomField("TagProgram")
-                Return _TagProgram
-            End If
-
-        End Get
-        Set(value As String)
-            _TagProgram = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagProgram") = value
-            End If
-        End Set
-    End Property
-
-    Public Property TagContext As String
-        Get
-            If _TagContext.Length <> 0 Then
-                Return _TagContext
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagContext = CustomField("TagContext")
-                Return _TagContext
-            End If
-
-        End Get
-        Set(value As String)
-            _TagContext = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagContext") = value
-            End If
-        End Set
-    End Property
-
-    Public Property TagTopic As String
-        Get
-            If _TagTopic.Length <> 0 Then
-                Return _TagTopic
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagTopic = CustomField("TagTopic")
-                Return _TagTopic
-            End If
-
-        End Get
-        Set(value As String)
-            _TagTopic = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagTopic") = value
-            End If
-        End Set
-    End Property
-    Public Property KB As String
-        Get
-            If _KB.Length <> 0 Then
-                Return _KB
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _KB = CustomField("KBF")
-                Return _TagTopic
-            End If
-
-        End Get
-        Set(value As String)
-            _KB = value
-            If Not OlObject Is Nothing Then
-                CustomField("KBF") = value
-            End If
-        End Set
-    End Property
-    Public Property ToDoID As String
-        Get
-            If _ToDoID.Length <> 0 Then
-                Return _ToDoID
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _ToDoID = CustomField("ToDoID")
-                Return _ToDoID
-            End If
-        End Get
-        Set(strID As String)
-            _ToDoID = strID
-            If Not OlObject Is Nothing Then
-                CustomField("ToDoID") = strID
-                SplitID()
-            End If
-        End Set
-    End Property
-
-    Public Sub SplitID()
-        Dim strField As String = ""
-        Dim strFieldValue As String = ""
-        Try
-            Dim strToDoID As String = ToDoID
-            Dim strToDoID_Len As Long = strToDoID.Length
-            If strToDoID_Len > 0 Then
-                Dim maxlen As Long = Globals.ThisAddIn.IDList.MaxIDLength
-
-                For i = 2 To maxlen Step 2
-                    strField = "ToDoIdLvl" & (i / 2)
-                    strFieldValue = "00"
-                    If i <= strToDoID_Len Then
-                        strFieldValue = Mid(strToDoID, i - 1, 2)
-                    End If
-                    CustomField(strField) = strFieldValue
-                Next
-            End If
-        Catch
-            Debug.WriteLine("Error in Split_ToDoID")
-            Debug.WriteLine(Err.Description)
-            Debug.WriteLine("Field Name is " & strField)
-            Debug.WriteLine("Field Value is " & strFieldValue)
-            Stop
-        End Try
-    End Sub
-
-    Public Property MetaTaskLvl As String
-        Get
-            If _MetaTaskLvl.Length <> 0 Then
-                Return _MetaTaskLvl
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _MetaTaskLvl = CustomField("Meta Task Level")
-                Return _MetaTaskLvl
-            End If
-        End Get
-        Set(strLvl As String)
-            _MetaTaskLvl = strLvl
-            If Not OlObject Is Nothing Then
-                CustomField("Meta Task Level") = strLvl
-            End If
-        End Set
-    End Property
-
-    Public Property MetaTaskSubject As String
-        Get
-            If _MetaTaskSubject.Length <> 0 Then
-                Return _MetaTaskSubject
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _MetaTaskSubject = CustomField("Meta Task Subject")
-                Return _MetaTaskSubject
-            End If
-        End Get
-        Set(strID As String)
-            _MetaTaskSubject = strID
-            If Not OlObject Is Nothing Then
-                'CustomFieldID_Set("Meta Task Subject", strID, SpecificItem:=OlObject)
-                CustomField("Meta Task Subject") = strID
-            End If
-        End Set
-    End Property
-
-    Public Sub SwapIDPrefix(strPrefixOld, strPrefixNew)
-
-    End Sub
-
-    Public Function GetItem() As Object
-        Return OlObject
-    End Function
-
-    Private Property CustomField(FieldName As String, Optional ByVal OlFieldType As Outlook.OlUserPropertyType = Outlook.OlUserPropertyType.olText)
-        Get
-            Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find(FieldName)
-            If objProperty Is Nothing Then
-                Return ""
-            Else
-                If IsArray(objProperty.Value) Then
-                    Return FlattenArry(objProperty.Value)
-                Else
-                    Return objProperty.Value
-                End If
-            End If
-        End Get
-        Set(value)
-            Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find(FieldName)
-            If objProperty Is Nothing Then objProperty = OlObject.UserProperties.Add(FieldName, OlFieldType)
-            objProperty.Value = value
-            OlObject.Save()
-        End Set
-
-    End Property
-    'Private Function CustomFieldID_GetValue(OlMail As Outlook.MailItem, ByVal UserDefinedFieldName As String) As String
-    '    Dim objProperty As Outlook.UserProperty = OlMail.UserProperties.Find(UserDefinedFieldName)
-
-    '    If objProperty Is Nothing Then
-    '        Return ""
-    '    Else
-    '        If IsArray(objProperty.Value) Then
-    '            Return FlattenArry(objProperty.Value)
-    '        Else
-    '            Return objProperty.Value
-    '        End If
-    '    End If
-    'End Function
-
-    'Private Function CustomFieldID_GetValue(OlTask As Outlook.TaskItem, ByVal UserDefinedFieldName As String) As String
-    '    Dim objProperty As Outlook.UserProperty = OlTask.UserProperties.Find(UserDefinedFieldName)
-
-    '    If objProperty Is Nothing Then
-    '        Return ""
-    '    Else
-    '        If IsArray(objProperty.Value) Then
-    '            Return FlattenArry(objProperty.Value)
-    '        Else
-    '            Return objProperty.Value
-    '        End If
-    '    End If
-    'End Function
-    'Private Function CustomFieldID_GetValue(OlAppt As Outlook.AppointmentItem, ByVal UserDefinedFieldName As String) As String
-    '    Dim objProperty As Outlook.UserProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
-
-    '    If objProperty Is Nothing Then
-    '        Return ""
-    '    Else
-    '        If IsArray(objProperty.Value) Then
-    '            Return FlattenArry(objProperty.Value)
-    '        Else
-    '            Return objProperty.Value
-    '        End If
-    '    End If
-    'End Function
-    'Private Function CustomFieldID_GetValue(OlMeet As Outlook.MeetingItem, ByVal UserDefinedFieldName As String) As String
-    '    Dim objProperty As Outlook.UserProperty = OlMeet.UserProperties.Find(UserDefinedFieldName)
-
-    '    If objProperty Is Nothing Then
-    '        Return ""
-    '    Else
-    '        If IsArray(objProperty.Value) Then
-    '            Return FlattenArry(objProperty.Value)
-    '        Else
-    '            Return objProperty.Value
-    '        End If
-    '    End If
-    'End Function
-    'Private Function CustomFieldID_GetValue(objItem As Object, ByVal UserDefinedFieldName As String) As String
-    '    Dim OlMail As Outlook.MailItem
-    '    Dim OlTask As Outlook.TaskItem
-    '    Dim OlAppt As Outlook.AppointmentItem
-    '    Dim objProperty As Outlook.UserProperty
-
-
-    '    If objItem Is Nothing Then
-    '        Return ""
-    '    ElseIf TypeOf objItem Is Outlook.MailItem Then
-    '        OlMail = objItem
-    '        objProperty = OlMail.UserProperties.Find(UserDefinedFieldName)
-
-    '    ElseIf TypeOf objItem Is Outlook.TaskItem Then
-    '        OlTask = objItem
-    '        objProperty = OlTask.UserProperties.Find(UserDefinedFieldName)
-    '    ElseIf TypeOf objItem Is Outlook.AppointmentItem Then
-    '        OlAppt = objItem
-    '        objProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
-    '    Else
-    '        objProperty = Nothing
-    '        MsgBox("Unsupported object type")
-    '    End If
-
-    '    If objProperty Is Nothing Then
-    '        Return ""
-    '    Else
-    '        If IsArray(objProperty.Value) Then
-    '            Return FlattenArry(objProperty.Value)
-    '        Else
-    '            Return objProperty.Value
-    '        End If
-    '    End If
-
-    '    OlMail = Nothing
-    '    OlTask = Nothing
-    '    OlAppt = Nothing
-    '    objProperty = Nothing
-
-    'End Function
-    Private Function FlattenArry(varBranch() As Object) As String
-        Dim i As Integer
-        Dim strTemp As String
-
-        strTemp = ""
-
-        For i = 0 To UBound(varBranch)
-            If IsArray(varBranch(i)) Then
-                strTemp = strTemp & ", " & FlattenArry(varBranch(i))
-            Else
-                strTemp = strTemp & ", " & varBranch(i)
-            End If
-        Next i
-        If strTemp.Length <> 0 Then strTemp = Right(strTemp, Len(strTemp) - 2)
-        FlattenArry = strTemp
-    End Function
-
-    'Private Function CustomFieldID_Set(ByVal UserDefinedFieldName As String,
-    '                           Optional ByVal Value As String = "",
-    '                           Optional ByVal IsCustomEntry As Boolean = False,
-    '                           Optional ByRef SpecificItem As Object = Nothing,
-    '                           Optional ByVal olUPType As Outlook.OlUserPropertyType =
-    '                           Outlook.OlUserPropertyType.olText) As Boolean
-
-    '    Dim myCollection As Object
-    '    Dim Msg As Outlook.MailItem
-    '    Dim oTask As Outlook.TaskItem
-    '    Dim oMail As Outlook.MailItem
-    '    Dim OlAppointment As Outlook.AppointmentItem
-    '    Dim objProperty As Outlook.UserProperty
-
-
-    '    Try
-    '        If Not SpecificItem Is Nothing Then
-    '            If TypeOf SpecificItem Is MailItem Then
-    '                oMail = SpecificItem
-    '                objProperty = oMail.UserProperties.Find(UserDefinedFieldName)
-    '                If objProperty Is Nothing Then objProperty = oMail.UserProperties.Add(UserDefinedFieldName, olUPType)
-    '                objProperty.Value = Value
-    '                oMail.Save()
-    '            End If
-    '            If TypeOf SpecificItem Is TaskItem Then
-    '                oTask = SpecificItem
-    '                objProperty = oTask.UserProperties.Find(UserDefinedFieldName)
-    '                If objProperty Is Nothing Then objProperty = oTask.UserProperties.Add(UserDefinedFieldName, olUPType)
-    '                objProperty.Value = Value
-    '                oTask.Save()
-    '            End If
-    '            If TypeOf SpecificItem Is Outlook.AppointmentItem Then
-    '                OlAppointment = SpecificItem
-    '                objProperty = OlAppointment.UserProperties.Find(UserDefinedFieldName)
-    '                If objProperty Is Nothing Then objProperty = OlAppointment.UserProperties.Add(UserDefinedFieldName, olUPType)
-    '                objProperty.Value = Value
-    '                OlAppointment.Save()
-    '            End If
-    '        End If
-    '        CustomFieldID_Set = True
-    '    Catch
-    '        Debug.WriteLine("Exception caught: ", Err)
-    '        CustomFieldID_Set = False
-    '        Err.Clear()
-    '    Finally
-    '        Msg = Nothing
-    '        objProperty = Nothing
-    '        myCollection = Nothing
-    '        oTask = Nothing
-    '        oMail = Nothing
-    '        OlAppointment = Nothing
-    '    End Try
-
-    'End Function
-
-End Class
-
-<Serializable()>
-Public Class cIDList
-
-    Public UsedIDList As List(Of String)
-    Private PMaxIDLength As Long
-
-    Public Sub New(ByVal listUsedID As List(Of String))
-        Me.UsedIDList = listUsedID
-    End Sub
-
-    Public Sub RePopulate()
-        Dim ObjItem As Object = New Object
-        Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree
-        Dim ToDoList As List(Of Object) = DM.GetToDoList(DataModel_ToDoTree.LoadOptions.vbLoadAll)
-        UsedIDList = New List(Of String)
-        For Each ObjItem In ToDoList
-            Dim strID As String = CustomFieldID_GetValue(ObjItem, "ToDoID")
-            If UsedIDList.Contains(strID) = False And strID.Length <> 0 Then
-                UsedIDList.Add(strID)
-                If strID.Length > PMaxIDLength Then PMaxIDLength = strID.Length
-            End If
-        Next
-
-        ToDoList = Nothing
-        DM = Nothing
-    End Sub
-
-    'Public Sub CondenseIDs()
-    '    Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree
-    '    DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadAll)
-
-    '    Dim ToDoTree As List(Of TreeNode(Of ToDoItem)) = DM.ListOfToDoTree
-    'End Sub
-
-    Public ReadOnly Property MaxIDLength As Long
-        Get
-            If PMaxIDLength = 0 Then
-                Dim maxLen As Long = 0
-                For Each strID As String In UsedIDList
-                    If strID.Length > maxLen Then
-                        maxLen = strID.Length
-                    End If
-                Next
-                PMaxIDLength = maxLen
-            End If
-            Return PMaxIDLength
-
-        End Get
-    End Property
-
-
-
-
-    Public Function GetNextAvailableToDoID(strSeed As String) As String
-        Dim blContinue As Boolean = True
-        Dim lngMaxID As Long = ConvertToDecimal(125, strSeed)
-        Dim strMaxID As String = ""
-
-        While blContinue
-            lngMaxID += 1
-            strMaxID = ConvertToBase(125, lngMaxID)
-            If UsedIDList.Contains(strMaxID) = False Then
-                blContinue = False
-            End If
-        End While
-        UsedIDList.Add(strMaxID)
-        If strMaxID.Length > PMaxIDLength Then PMaxIDLength = strMaxID.Length
-        Return strMaxID
-    End Function
-
-    Public Function GetMaxToDoID() As String
-        Dim strMaxID = UsedIDList.Max()
-        Dim lngMaxID As Long = ConvertToDecimal(125, strMaxID)
-        lngMaxID += 1
-        strMaxID = ConvertToBase(125, lngMaxID)
-        UsedIDList.Add(strMaxID)
-        If strMaxID.Length > PMaxIDLength Then PMaxIDLength = strMaxID.Length
-
-        Return strMaxID
-    End Function
-
-    Public Sub Save(FileName_IDList As String)
-        If Not Directory.Exists(Path.GetDirectoryName(FileName_IDList)) Then
-            Directory.CreateDirectory(Path.GetDirectoryName(FileName_IDList))
-        End If
-        Dim TestFileStream As Stream = File.Create(FileName_IDList)
-        Dim serializer As New BinaryFormatter
-        serializer.Serialize(TestFileStream, Me)
-        TestFileStream.Close()
-    End Sub
-
-    Public Function ConvertToBase(nbase As Integer, ByVal num As Long, Optional intMinDigits As Integer = 2) As String
-        Dim chars As String
-        Dim r As Long
-        Dim newNumber As String
-        Dim maxBase As Integer
-        Dim i As Integer
-
-        chars = "0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
-        maxBase = Len(chars)
-
-        ' check if we can convert to this base
-        If (nbase > maxBase) Then
-            ConvertToBase = ""
-        Else
-
-            ' in r we have the offset of the char that was converted to the new base
-            newNumber = ""
-            While num >= nbase
-                r = num Mod nbase
-                newNumber = Mid(chars, r + 1, 1) & newNumber
-                num \= nbase
-            End While
-
-            newNumber = Mid(chars, num + 1, 1) & newNumber
-
-            For i = 1 To (Len(newNumber) Mod intMinDigits)
-                newNumber = CStr(0) & newNumber
-            Next i
-
-            ConvertToBase = newNumber
-        End If
-    End Function
-
-    Public Function ConvertToDecimal(nbase As Integer, ByVal strBase As String) As Long
-        Dim chars As String
-        Dim i As Integer
-        Dim intLoc As Integer
-        Dim lngTmp As Long
-
-        chars = "0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
-        lngTmp = 0
-
-        For i = 1 To Len(strBase)
-            lngTmp *= nbase
-            intLoc = InStr(chars, Mid(strBase, i, 1))
-            lngTmp += intLoc - 1
-        Next i
-
-        ConvertToDecimal = lngTmp
-    End Function
-
-    Private Function CustomFieldID_GetValue(objItem As Object, ByVal UserDefinedFieldName As String) As String
-        Dim OlMail As Outlook.MailItem
-        Dim OlTask As Outlook.TaskItem
-        Dim OlAppt As Outlook.AppointmentItem
-        Dim objProperty As Outlook.UserProperty
-
-
-        If objItem Is Nothing Then
-            Return ""
-        ElseIf TypeOf objItem Is Outlook.MailItem Then
-            OlMail = objItem
-            objProperty = OlMail.UserProperties.Find(UserDefinedFieldName)
-
-        ElseIf TypeOf objItem Is Outlook.TaskItem Then
-            OlTask = objItem
-            objProperty = OlTask.UserProperties.Find(UserDefinedFieldName)
-        ElseIf TypeOf objItem Is Outlook.AppointmentItem Then
-            OlAppt = objItem
-            objProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
-        Else
-            objProperty = Nothing
-            MsgBox("Unsupported object type")
-        End If
-
-        If objProperty Is Nothing Then
-            Return ""
-        Else
-            If IsArray(objProperty.Value) Then
-                Return FlattenArry(objProperty.Value)
-            Else
-                Return objProperty.Value
-            End If
-        End If
-
-        OlMail = Nothing
-        OlTask = Nothing
-        OlAppt = Nothing
-        objProperty = Nothing
-
-    End Function
-
-    Public Function FlattenArry(varBranch() As Object) As String
-        Dim i As Integer
-        Dim strTemp As String
-
-        strTemp = ""
-
-        For i = 0 To UBound(varBranch)
-            If IsArray(varBranch(i)) Then
-                strTemp = strTemp & ", " & FlattenArry(varBranch(i))
-            Else
-                strTemp = strTemp & ", " & varBranch(i)
-            End If
-        Next i
-        If strTemp.Length <> 0 Then strTemp = Right(strTemp, Len(strTemp) - 2)
-        FlattenArry = strTemp
-    End Function
-End Class
+'Public Class ToDoItem
+'    Private OlObject As Object
+'    Private _ToDoID As String = ""
+'    Public _TaskSubject As String = ""
+'    Public _MetaTaskSubject As String = ""
+'    Public _MetaTaskLvl As String = ""
+'    Private _TagContext As String = ""
+'    Private _TagProgram As String = ""
+'    Private _TagProject As String = ""
+'    Private _TagPeople As String = ""
+'    Private _TagTopic As String = ""
+'    Private _Priority As Outlook.OlImportance
+'    Private _TaskCreateDate As Date
+'    Private _StartDate As Date
+'    Private _Complete As Boolean
+'    Private _KB As String = ""
+
+'    Public Sub New(OlMail As Outlook.MailItem)
+'        OlObject = OlMail
+'        If OlMail.TaskSubject.Length <> 0 Then
+'            _TaskSubject = OlMail.TaskSubject
+'        Else
+'            _TaskSubject = OlMail.Subject
+'        End If
+'        _TagContext = CustomField("TagContext")
+'        _TagProgram = CustomField("TagProgram")
+'        _TagProject = CustomField("TagProject")
+'        _TagPeople = CustomField("TagPeople")
+'        _TagTopic = CustomField("TagTopic")
+'        _KB = CustomField("KBF")
+'        _Priority = OlMail.Importance
+'        _TaskCreateDate = OlMail.CreationTime
+'        _StartDate = OlMail.TaskStartDate
+'        _Complete = (OlMail.FlagStatus = OlFlagStatus.olFlagComplete)
+'    End Sub
+'    Public Sub New(OlTask As Outlook.TaskItem)
+'        OlObject = OlTask
+
+'        _TaskSubject = OlTask.Subject
+'        _TagContext = CustomField("TagContext")
+'        _TagProgram = CustomField("TagProgram")
+'        _TagProject = CustomField("TagProject")
+'        _TagPeople = CustomField("TagPeople")
+'        _TagTopic = CustomField("TagTopic")
+'        _KB = CustomField("KBF")
+'        _Priority = OlTask.Importance
+'        _TaskCreateDate = OlTask.CreationTime
+'        _StartDate = OlTask.StartDate
+'        _Complete = OlTask.Complete
+'    End Sub
+'    Public Sub New(OlMail As Outlook.MailItem, OnDemand As Boolean)
+'        OlObject = OlMail
+'        If OnDemand = False Then
+'            If OlMail.TaskSubject.Length <> 0 Then
+'                _TaskSubject = OlMail.TaskSubject
+'            Else
+'                _TaskSubject = OlMail.Subject
+'            End If
+'            _TagContext = CustomField("TagContext")
+'            _TagProgram = CustomField("TagProgram")
+'            _TagProject = CustomField("TagProject")
+'            _TagPeople = CustomField("TagPeople")
+'            _TagTopic = CustomField("TagTopic")
+'            _KB = CustomField("KBF")
+'            _Priority = OlMail.Importance
+'            _TaskCreateDate = OlMail.CreationTime
+'            _StartDate = OlMail.TaskStartDate
+'            _Complete = (OlMail.FlagStatus = OlFlagStatus.olFlagComplete)
+'        End If
+'    End Sub
+'    Public Sub New(OlTask As Outlook.TaskItem, OnDemand As Boolean)
+'        OlObject = OlTask
+'        If OnDemand = False Then
+'            _TaskSubject = OlTask.Subject
+'            _TagContext = CustomField("TagContext")
+'            _TagProgram = CustomField("TagProgram")
+'            _TagProject = CustomField("TagProject")
+'            _TagPeople = CustomField("TagPeople")
+'            _TagTopic = CustomField("TagTopic")
+'            _KB = CustomField("KBF")
+'            _Priority = OlTask.Importance
+'            _TaskCreateDate = OlTask.CreationTime
+'            _StartDate = OlTask.StartDate
+'            _Complete = OlTask.Complete
+'        End If
+'    End Sub
+'    Public Sub New(Item As Object, OnDemand As Boolean)
+
+'        OlObject = Item
+'        If OnDemand = False Then
+'            MsgBox("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand")
+'        End If
+'    End Sub
+'    Public Sub New(strID As String)
+'        _ToDoID = strID
+'    End Sub
+
+'    Public ReadOnly Property TaskCreateDate As Date
+'        Get
+'            TaskCreateDate = _TaskCreateDate
+'        End Get
+'    End Property
+
+'    Public Property StartDate As Date
+'        Get
+'            Return _TaskCreateDate
+'        End Get
+'        Set(value As Date)
+'            _TaskCreateDate = value
+'        End Set
+'    End Property
+
+'    Public Property Priority As Outlook.OlImportance
+'        Get
+
+'            If OlObject Is Nothing Then
+'                _Priority = OlImportance.olImportanceNormal
+'            ElseIf TypeOf OlObject Is MailItem Then
+'                Dim OlMail As MailItem = OlObject
+'                _Priority = OlMail.Importance
+'            ElseIf TypeOf OlObject Is TaskItem Then
+'                Dim OlTask As TaskItem = OlObject
+'                _Priority = OlTask.Importance
+'            End If
+'            Return _Priority
+'        End Get
+'        Set(value As Outlook.OlImportance)
+'            _Priority = value
+'            If OlObject Is Nothing Then
+'            ElseIf TypeOf OlObject Is MailItem Then
+'                Dim OlMail As MailItem = OlObject
+'                OlMail.Importance = _Priority
+'                OlMail.Save()
+'            ElseIf TypeOf OlObject Is TaskItem Then
+'                Dim OlTask As TaskItem = OlObject
+'                OlTask.Importance = _Priority
+'                OlTask.Save()
+'            End If
+'        End Set
+'    End Property
+
+'    Public Property Complete As Boolean
+'        Get
+'            If OlObject Is Nothing Then
+'                _Complete = False
+'            ElseIf TypeOf OlObject Is MailItem Then
+'                Dim OlMail As MailItem = OlObject
+'                If (OlMail.FlagStatus = OlFlagStatus.olFlagComplete) Then
+'                    _Complete = True
+'                Else
+'                    _Complete = False
+'                End If
+'            ElseIf TypeOf OlObject Is TaskItem Then
+'                Dim OlTask As TaskItem = OlObject
+'                _Complete = OlTask.Complete
+'            End If
+'            Return _Complete
+'        End Get
+'        Set(value As Boolean)
+'            If OlObject Is Nothing Then
+'            ElseIf TypeOf OlObject Is MailItem Then
+'                Dim OlMail As MailItem = OlObject
+'                If value = True Then
+'                    OlMail.FlagStatus = OlFlagStatus.olFlagComplete
+'                Else
+'                    OlMail.FlagStatus = OlFlagStatus.olFlagMarked
+'                End If
+'                OlMail.Save()
+'            ElseIf TypeOf OlObject Is TaskItem Then
+'                Dim OlTask As TaskItem = OlObject
+'                OlTask.Complete = value
+'                OlTask.Save()
+'            End If
+'            _Complete = value
+'        End Set
+'    End Property
+
+'    Public Property TaskSubject As String
+'        Get
+'            If _TaskSubject.Length = 0 Then
+'                If OlObject Is Nothing Then
+'                    _TaskSubject = ""
+'                ElseIf TypeOf OlObject Is MailItem Then
+'                    Dim OlMail As MailItem = OlObject
+'                    _TaskSubject = OlMail.TaskSubject
+'                ElseIf TypeOf OlObject Is TaskItem Then
+'                    Dim OlTask As TaskItem = OlObject
+'                    _TaskSubject = OlTask.Subject
+'                Else
+'                    _TaskSubject = ""
+'                End If
+'            End If
+'            Return _TaskSubject
+'        End Get
+'        Set(value As String)
+'            _TaskSubject = value
+'            If OlObject Is Nothing Then
+'            ElseIf TypeOf OlObject Is MailItem Then
+'                Dim OlMail As MailItem = OlObject
+'                OlMail.TaskSubject = _TaskSubject
+'                OlMail.Save()
+'            ElseIf TypeOf OlObject Is TaskItem Then
+'                Dim OlTask As TaskItem = OlObject
+'                OlTask.Subject = _TaskSubject
+'                OlTask.Save()
+'            End If
+'        End Set
+'    End Property
+
+'    Public Property TagPeople As String
+'        Get
+'            If _TagPeople.Length <> 0 Then
+'                Return _TagPeople
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _TagPeople = CustomField("TagPeople")
+'                Return _TagPeople
+'            End If
+'        End Get
+'        Set(value As String)
+'            _TagPeople = value
+'            If Not OlObject Is Nothing Then
+'                CustomField("TagPeople") = value
+'            End If
+'        End Set
+'    End Property
+
+'    Public Property TagProject As String
+'        Get
+'            If _TagProject.Length <> 0 Then
+'                Return _TagProject
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _TagProject = CustomField("TagProject")
+'                Return _TagProject
+'            End If
+
+'        End Get
+'        Set(value As String)
+'            _TagProject = value
+'            If Not OlObject Is Nothing Then
+'                CustomField("TagProject") = value
+'            End If
+'        End Set
+'    End Property
+
+'    Public Property TagProgram As String
+'        Get
+'            If _TagProgram.Length <> 0 Then
+'                Return _TagProgram
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _TagProgram = CustomField("TagProgram")
+'                Return _TagProgram
+'            End If
+
+'        End Get
+'        Set(value As String)
+'            _TagProgram = value
+'            If Not OlObject Is Nothing Then
+'                CustomField("TagProgram") = value
+'            End If
+'        End Set
+'    End Property
+
+'    Public Property TagContext As String
+'        Get
+'            If _TagContext.Length <> 0 Then
+'                Return _TagContext
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _TagContext = CustomField("TagContext")
+'                Return _TagContext
+'            End If
+
+'        End Get
+'        Set(value As String)
+'            _TagContext = value
+'            If Not OlObject Is Nothing Then
+'                CustomField("TagContext") = value
+'            End If
+'        End Set
+'    End Property
+
+'    Public Property TagTopic As String
+'        Get
+'            If _TagTopic.Length <> 0 Then
+'                Return _TagTopic
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _TagTopic = CustomField("TagTopic")
+'                Return _TagTopic
+'            End If
+
+'        End Get
+'        Set(value As String)
+'            _TagTopic = value
+'            If Not OlObject Is Nothing Then
+'                CustomField("TagTopic") = value
+'            End If
+'        End Set
+'    End Property
+'    Public Property KB As String
+'        Get
+'            If _KB.Length <> 0 Then
+'                Return _KB
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _KB = CustomField("KBF")
+'                Return _TagTopic
+'            End If
+
+'        End Get
+'        Set(value As String)
+'            _KB = value
+'            If Not OlObject Is Nothing Then
+'                CustomField("KBF") = value
+'            End If
+'        End Set
+'    End Property
+'    Public Property ToDoID As String
+'        Get
+'            If _ToDoID.Length <> 0 Then
+'                Return _ToDoID
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _ToDoID = CustomField("ToDoID")
+'                Return _ToDoID
+'            End If
+'        End Get
+'        Set(strID As String)
+'            _ToDoID = strID
+'            If Not OlObject Is Nothing Then
+'                CustomField("ToDoID") = strID
+'                SplitID()
+'            End If
+'        End Set
+'    End Property
+
+'    Public Sub SplitID()
+'        Dim strField As String = ""
+'        Dim strFieldValue As String = ""
+'        Try
+'            Dim strToDoID As String = ToDoID
+'            Dim strToDoID_Len As Long = strToDoID.Length
+'            If strToDoID_Len > 0 Then
+'                Dim maxlen As Long = Globals.ThisAddIn.IDList.MaxIDLength
+
+'                For i = 2 To maxlen Step 2
+'                    strField = "ToDoIdLvl" & (i / 2)
+'                    strFieldValue = "00"
+'                    If i <= strToDoID_Len Then
+'                        strFieldValue = Mid(strToDoID, i - 1, 2)
+'                    End If
+'                    CustomField(strField) = strFieldValue
+'                Next
+'            End If
+'        Catch
+'            Debug.WriteLine("Error in Split_ToDoID")
+'            Debug.WriteLine(Err.Description)
+'            Debug.WriteLine("Field Name is " & strField)
+'            Debug.WriteLine("Field Value is " & strFieldValue)
+'            Stop
+'        End Try
+'    End Sub
+
+'    Public Property MetaTaskLvl As String
+'        Get
+'            If _MetaTaskLvl.Length <> 0 Then
+'                Return _MetaTaskLvl
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _MetaTaskLvl = CustomField("Meta Task Level")
+'                Return _MetaTaskLvl
+'            End If
+'        End Get
+'        Set(strLvl As String)
+'            _MetaTaskLvl = strLvl
+'            If Not OlObject Is Nothing Then
+'                CustomField("Meta Task Level") = strLvl
+'            End If
+'        End Set
+'    End Property
+
+'    Public Property MetaTaskSubject As String
+'        Get
+'            If _MetaTaskSubject.Length <> 0 Then
+'                Return _MetaTaskSubject
+'            ElseIf OlObject Is Nothing Then
+'                Return ""
+'            Else
+'                _MetaTaskSubject = CustomField("Meta Task Subject")
+'                Return _MetaTaskSubject
+'            End If
+'        End Get
+'        Set(strID As String)
+'            _MetaTaskSubject = strID
+'            If Not OlObject Is Nothing Then
+'                'CustomFieldID_Set("Meta Task Subject", strID, SpecificItem:=OlObject)
+'                CustomField("Meta Task Subject") = strID
+'            End If
+'        End Set
+'    End Property
+
+'    Public Sub SwapIDPrefix(strPrefixOld, strPrefixNew)
+
+'    End Sub
+
+'    Public Function GetItem() As Object
+'        Return OlObject
+'    End Function
+
+'    Private Property CustomField(FieldName As String, Optional ByVal OlFieldType As Outlook.OlUserPropertyType = Outlook.OlUserPropertyType.olText)
+'        Get
+'            Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find(FieldName)
+'            If objProperty Is Nothing Then
+'                Return ""
+'            Else
+'                If IsArray(objProperty.Value) Then
+'                    Return FlattenArry(objProperty.Value)
+'                Else
+'                    Return objProperty.Value
+'                End If
+'            End If
+'        End Get
+'        Set(value)
+'            Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find(FieldName)
+'            If objProperty Is Nothing Then objProperty = OlObject.UserProperties.Add(FieldName, OlFieldType)
+'            objProperty.Value = value
+'            OlObject.Save()
+'        End Set
+
+'    End Property
+'    'Private Function CustomFieldID_GetValue(OlMail As Outlook.MailItem, ByVal UserDefinedFieldName As String) As String
+'    '    Dim objProperty As Outlook.UserProperty = OlMail.UserProperties.Find(UserDefinedFieldName)
+
+'    '    If objProperty Is Nothing Then
+'    '        Return ""
+'    '    Else
+'    '        If IsArray(objProperty.Value) Then
+'    '            Return FlattenArry(objProperty.Value)
+'    '        Else
+'    '            Return objProperty.Value
+'    '        End If
+'    '    End If
+'    'End Function
+
+'    'Private Function CustomFieldID_GetValue(OlTask As Outlook.TaskItem, ByVal UserDefinedFieldName As String) As String
+'    '    Dim objProperty As Outlook.UserProperty = OlTask.UserProperties.Find(UserDefinedFieldName)
+
+'    '    If objProperty Is Nothing Then
+'    '        Return ""
+'    '    Else
+'    '        If IsArray(objProperty.Value) Then
+'    '            Return FlattenArry(objProperty.Value)
+'    '        Else
+'    '            Return objProperty.Value
+'    '        End If
+'    '    End If
+'    'End Function
+'    'Private Function CustomFieldID_GetValue(OlAppt As Outlook.AppointmentItem, ByVal UserDefinedFieldName As String) As String
+'    '    Dim objProperty As Outlook.UserProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
+
+'    '    If objProperty Is Nothing Then
+'    '        Return ""
+'    '    Else
+'    '        If IsArray(objProperty.Value) Then
+'    '            Return FlattenArry(objProperty.Value)
+'    '        Else
+'    '            Return objProperty.Value
+'    '        End If
+'    '    End If
+'    'End Function
+'    'Private Function CustomFieldID_GetValue(OlMeet As Outlook.MeetingItem, ByVal UserDefinedFieldName As String) As String
+'    '    Dim objProperty As Outlook.UserProperty = OlMeet.UserProperties.Find(UserDefinedFieldName)
+
+'    '    If objProperty Is Nothing Then
+'    '        Return ""
+'    '    Else
+'    '        If IsArray(objProperty.Value) Then
+'    '            Return FlattenArry(objProperty.Value)
+'    '        Else
+'    '            Return objProperty.Value
+'    '        End If
+'    '    End If
+'    'End Function
+'    'Private Function CustomFieldID_GetValue(objItem As Object, ByVal UserDefinedFieldName As String) As String
+'    '    Dim OlMail As Outlook.MailItem
+'    '    Dim OlTask As Outlook.TaskItem
+'    '    Dim OlAppt As Outlook.AppointmentItem
+'    '    Dim objProperty As Outlook.UserProperty
+
+
+'    '    If objItem Is Nothing Then
+'    '        Return ""
+'    '    ElseIf TypeOf objItem Is Outlook.MailItem Then
+'    '        OlMail = objItem
+'    '        objProperty = OlMail.UserProperties.Find(UserDefinedFieldName)
+
+'    '    ElseIf TypeOf objItem Is Outlook.TaskItem Then
+'    '        OlTask = objItem
+'    '        objProperty = OlTask.UserProperties.Find(UserDefinedFieldName)
+'    '    ElseIf TypeOf objItem Is Outlook.AppointmentItem Then
+'    '        OlAppt = objItem
+'    '        objProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
+'    '    Else
+'    '        objProperty = Nothing
+'    '        MsgBox("Unsupported object type")
+'    '    End If
+
+'    '    If objProperty Is Nothing Then
+'    '        Return ""
+'    '    Else
+'    '        If IsArray(objProperty.Value) Then
+'    '            Return FlattenArry(objProperty.Value)
+'    '        Else
+'    '            Return objProperty.Value
+'    '        End If
+'    '    End If
+
+'    '    OlMail = Nothing
+'    '    OlTask = Nothing
+'    '    OlAppt = Nothing
+'    '    objProperty = Nothing
+
+'    'End Function
+'    Private Function FlattenArry(varBranch() As Object) As String
+'        Dim i As Integer
+'        Dim strTemp As String
+
+'        strTemp = ""
+
+'        For i = 0 To UBound(varBranch)
+'            If IsArray(varBranch(i)) Then
+'                strTemp = strTemp & ", " & FlattenArry(varBranch(i))
+'            Else
+'                strTemp = strTemp & ", " & varBranch(i)
+'            End If
+'        Next i
+'        If strTemp.Length <> 0 Then strTemp = Right(strTemp, Len(strTemp) - 2)
+'        FlattenArry = strTemp
+'    End Function
+
+'    'Private Function CustomFieldID_Set(ByVal UserDefinedFieldName As String,
+'    '                           Optional ByVal Value As String = "",
+'    '                           Optional ByVal IsCustomEntry As Boolean = False,
+'    '                           Optional ByRef SpecificItem As Object = Nothing,
+'    '                           Optional ByVal olUPType As Outlook.OlUserPropertyType =
+'    '                           Outlook.OlUserPropertyType.olText) As Boolean
+
+'    '    Dim myCollection As Object
+'    '    Dim Msg As Outlook.MailItem
+'    '    Dim oTask As Outlook.TaskItem
+'    '    Dim oMail As Outlook.MailItem
+'    '    Dim OlAppointment As Outlook.AppointmentItem
+'    '    Dim objProperty As Outlook.UserProperty
+
+
+'    '    Try
+'    '        If Not SpecificItem Is Nothing Then
+'    '            If TypeOf SpecificItem Is MailItem Then
+'    '                oMail = SpecificItem
+'    '                objProperty = oMail.UserProperties.Find(UserDefinedFieldName)
+'    '                If objProperty Is Nothing Then objProperty = oMail.UserProperties.Add(UserDefinedFieldName, olUPType)
+'    '                objProperty.Value = Value
+'    '                oMail.Save()
+'    '            End If
+'    '            If TypeOf SpecificItem Is TaskItem Then
+'    '                oTask = SpecificItem
+'    '                objProperty = oTask.UserProperties.Find(UserDefinedFieldName)
+'    '                If objProperty Is Nothing Then objProperty = oTask.UserProperties.Add(UserDefinedFieldName, olUPType)
+'    '                objProperty.Value = Value
+'    '                oTask.Save()
+'    '            End If
+'    '            If TypeOf SpecificItem Is Outlook.AppointmentItem Then
+'    '                OlAppointment = SpecificItem
+'    '                objProperty = OlAppointment.UserProperties.Find(UserDefinedFieldName)
+'    '                If objProperty Is Nothing Then objProperty = OlAppointment.UserProperties.Add(UserDefinedFieldName, olUPType)
+'    '                objProperty.Value = Value
+'    '                OlAppointment.Save()
+'    '            End If
+'    '        End If
+'    '        CustomFieldID_Set = True
+'    '    Catch
+'    '        Debug.WriteLine("Exception caught: ", Err)
+'    '        CustomFieldID_Set = False
+'    '        Err.Clear()
+'    '    Finally
+'    '        Msg = Nothing
+'    '        objProperty = Nothing
+'    '        myCollection = Nothing
+'    '        oTask = Nothing
+'    '        oMail = Nothing
+'    '        OlAppointment = Nothing
+'    '    End Try
+
+'    'End Function
+
+'End Class
+

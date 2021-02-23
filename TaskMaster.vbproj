@@ -136,9 +136,16 @@
   -->
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="Deedle, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Deedle.2.3.0\lib\net45\Deedle.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -207,26 +214,32 @@
   <ItemGroup>
     <AppDesigner Include="My Project\" />
     <Compile Include="BaseChanger.vb" />
+    <Compile Include="Forms\ProjectInfoWindow.Designer.vb">
+      <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ProjectInfoWindow.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Models\cIDList.vb" />
     <Compile Include="Models\ComparatorExample.vb" />
     <Compile Include="Models\DataModel_ToDoTree.vb" />
     <Compile Include="Models\ToDoItem.vb" />
+    <Compile Include="Models\ToDoProjectInfo.vb" />
     <Compile Include="Models\TreeNodeOfT.vb" />
-    <Compile Include="ProjectList.vb" />
-    <Compile Include="Resizer.vb" />
-    <Compile Include="Tags.Designer.vb">
+    <Compile Include="Models\ProjectList.vb" />
+    <Compile Include="Forms\Resizer.vb" />
+    <Compile Include="Forms\Tags.Designer.vb">
       <DependentUpon>Tags.vb</DependentUpon>
     </Compile>
-    <Compile Include="Tags.vb">
+    <Compile Include="Forms\Tags.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TaskTreeForm.Designer.vb">
+    <Compile Include="Forms\TaskTreeForm.Designer.vb">
       <DependentUpon>TaskTreeForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="TaskTreeForm.vb">
+    <Compile Include="Forms\TaskTreeForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ToDoIDClass.vb" />
-    <Compile Include="My Project\Class1.vb" />
     <Compile Include="Settings.vb" />
     <Compile Include="TaskMasterRibbon.Designer.vb">
       <DependentUpon>TaskMasterRibbon.vb</DependentUpon>
@@ -237,16 +250,23 @@
     <Compile Include="ThisAddIn.vb">
       <SubType>Code</SubType>
     </Compile>
-    <EmbeddedResource Include="Tags.resx">
+    <EmbeddedResource Include="Forms\ProjectInfoWindow.resx">
+      <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Tags.resx">
       <DependentUpon>Tags.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TaskMasterRibbon.resx">
       <DependentUpon>TaskMasterRibbon.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TaskTreeForm.resx">
+    <EmbeddedResource Include="Forms\TaskTreeForm.resx">
       <DependentUpon>TaskTreeForm.vb</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="My Project\DataSources\Globals.datasource" />
+    <None Include="My Project\DataSources\ProjectInfo.datasource" />
+    <None Include="My Project\DataSources\ProjectInfoWindow.datasource" />
+    <None Include="packages.config" />
     <None Include="TaskMaster_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.vb</DependentUpon>

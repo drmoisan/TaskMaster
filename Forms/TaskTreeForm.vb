@@ -27,6 +27,7 @@ Public Class TaskTreeForm
         TreeListView1.ChildrenGetter = Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Children
         TreeListView1.ModelFilter = New ModelFilter(Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Value.Complete = False)
         TreeListView1.Roots = DM.ListOfToDoTree
+        TreeListView1.Sort(OlvToDoID, SortOrder.Ascending)
 
 
         Dim sink1 = CType(Me.TreeListView1.DropSink, SimpleDropSink)
@@ -341,6 +342,7 @@ Public Class TaskTreeForm
 
     Private Sub HandleModelDropped(ByVal sender As Object, ByVal e As ModelDropEventArgs) Handles TreeListView1.ModelDropped
         e.Handled = True
+        Debug.WriteLine("Fired HandleModelDropped")
 
         Select Case e.DropTargetLocation
             Case DropTargetLocation.AboveItem

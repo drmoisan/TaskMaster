@@ -1,14 +1,16 @@
 ﻿Option Explicit On
+Imports System.Diagnostics
+Imports System.Numerics
 
 Module BaseChanger
-    Public Function ConvertToBase(nbase As Integer, ByVal num As Long, Optional intMinDigits As Integer = 2) As String
+    Public Function ConvertToBase(nbase As Integer, ByVal num As BigInteger, Optional intMinDigits As Integer = 2) As String
         Dim chars As String
         Dim r As Long
         Dim newNumber As String
         Dim maxBase As Integer
         Dim i As Integer
 
-        chars = "0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
+        chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
         maxBase = Len(chars)
 
         ' check if we can convert to this base
@@ -21,7 +23,7 @@ Module BaseChanger
             While num >= nbase
                 r = num Mod nbase
                 newNumber = Mid(chars, r + 1, 1) & newNumber
-                num \= nbase
+                num /= nbase
             End While
 
             newNumber = Mid(chars, num + 1, 1) & newNumber
@@ -34,20 +36,29 @@ Module BaseChanger
         End If
     End Function
 
-    Public Function ConvertToDecimal(nbase As Integer, ByVal strBase As String) As Long
+    Public Function ConvertToDecimal(nbase As Integer, ByVal strBase As String) As BigInteger
         Dim chars As String
-        Dim i As Integer
-        Dim intLoc As Integer
+        Dim i As Long
+        Dim lngLoc As Long
         Dim lngTmp As Long
+        Dim bigint As BigInteger = New BigInteger
 
-        chars = "0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
-        lngTmp = 0
+        chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
+        bigint.Equals(0)
 
-        For i = 1 To Len(strBase)
-            lngTmp *= nbase
-            intLoc = InStr(chars, Mid(strBase, i, 1))
-            lngTmp += intLoc - 1
-        Next i
+        Try
+            For i = 1 To Len(strBase)
+                bigint *= nbase
+                lngLoc = InStr(chars, Mid(strBase, i, 1))
+                bigint += lngLoc - 1
+            Next i
+        Catch ex As Exception
+            Debug.WriteLine(ex.Message)
+            Debug.WriteLine(ex.Source)
+            Debug.WriteLine(ex.StackTrace)
+            Debug.WriteLine("")
+
+        End Try
 
         ConvertToDecimal = lngTmp
     End Function

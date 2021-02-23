@@ -18,23 +18,39 @@ Public Class TaskMasterRibbon
     End Sub
 
     Private Sub but_Dictionary_Click(sender As Object, e As RibbonControlEventArgs) Handles but_Dictionary.Click
-        Dim strMsg As StringBuilder = New StringBuilder
-        Dim strKey As String
-        Dim i As Integer = 0
-        For Each strKey In Globals.ThisAddIn.ProjDict.ProjectDictionary.Keys
-            i += 1
-            strMsg.AppendLine(i & " " & strKey & " " & Globals.ThisAddIn.ProjDict.ProjectDictionary(strKey))
-        Next
-        i = CInt(InputBox(strMsg.ToString()))
-        Dim strKeyToDelete As String = Globals.ThisAddIn.ProjDict.ProjectDictionary.Keys(i)
-        Dim response As MsgBoxResult = MsgBox("Delete key: " & strKeyToDelete & "?", vbYesNo)
-        If response = vbYes Then
-            Globals.ThisAddIn.ProjDict.ProjectDictionary.Remove(strKeyToDelete)
-            Globals.ThisAddIn.SaveDict()
-        End If
+        Dim projinfoview As ProjectInfoWindow = New ProjectInfoWindow(Globals.ThisAddIn.ProjInfo)
+        projinfoview.Show()
+        'Original Function
+        'Dim strMsg As StringBuilder = New StringBuilder
+        'Dim strKey As String
+        'Dim i As Integer = 0
+        'Dim reversedict As SortedDictionary(Of String, String) = New SortedDictionary(Of String, String)
+        'For Each strKey In Globals.ThisAddIn.ProjDict.ProjectDictionary.Keys
+        '    Try
+        '        reversedict.Add(Globals.ThisAddIn.ProjDict.ProjectDictionary(strKey), strKey)
+        '    Catch
+        '        MsgBox("Can't add:" + Globals.ThisAddIn.ProjDict.ProjectDictionary(strKey) + ", " + strKey)
+        '        Err.Clear()
+        '    End Try
+        'Next
+        'For Each strKey In reversedict.Keys
+        '    strMsg.AppendLine(i & " " & strKey & " " & reversedict(strKey))
+        '    i += 1
+        'Next
+        'i = CInt(InputBox(strMsg.ToString()))
+        'Dim strKeyToDelete As String = reversedict.Keys(i)
+        'Dim response As MsgBoxResult = MsgBox("Delete key: " & strKeyToDelete & "?", vbYesNo)
+        'If response = vbYes Then
+        '    Globals.ThisAddIn.ProjDict.ProjectDictionary.Remove(strKeyToDelete)
+        '    Globals.ThisAddIn.SaveDict()
+        'End If
     End Sub
 
     Private Sub but_CompressIDs_Click(sender As Object, e As RibbonControlEventArgs) Handles but_CompressIDs.Click
         Globals.ThisAddIn.CompressToDoIDs()
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As RibbonControlEventArgs) Handles Button1.Click
+        'Globals.ThisAddIn.FixToDoIDs()
     End Sub
 End Class

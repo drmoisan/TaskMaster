@@ -17,8 +17,10 @@ Public Class ThisAddIn
     Private ribTM As TaskMasterRibbon
     Dim FileName_ProjectList As String
     Dim FileName_IDList As String
+    Dim FileName_ProjInfo As String
     Const AppDataFolder = "TaskMaster"
-    Public WithEvents ProjDict As ProjectList
+    'Public ProjDict As ProjectList
+    Public ProjInfo As ProjectInfo
     Public WithEvents IDList As cIDList
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
@@ -26,14 +28,47 @@ Public Class ThisAddIn
         OlInboxItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderInbox).Items
         OlReminders = Application.Reminders
 
-        FileName_ProjectList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "ProjectList.bin")
-        If File.Exists(FileName_ProjectList) Then
-            Dim TestFileStream As Stream = File.OpenRead(FileName_ProjectList)
+        'FileName_ProjectList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "ProjectList.bin")
+        'If File.Exists(FileName_ProjectList) Then
+        '    Dim TestFileStream As Stream = File.OpenRead(FileName_ProjectList)
+        '    Dim deserializer As New BinaryFormatter
+        '    ProjDict = CType(deserializer.Deserialize(TestFileStream), ProjectList)
+        '    'ProjDict = CType(deserializer.Deserialize(TestFileStream), ToDoProjectInfo)
+        '    TestFileStream.Close()
+        '    'Dim ProjDict2 As ToDoProjectInfo = New ToDoProjectInfo(ProjDict.ProjectDictionary)
+        '    'ProjDict2.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "ProjectList2.bin"))
+
+        'Else
+        '    ProjDict = New ProjectList(New Dictionary(Of String, String))
+        '    'ProjDict = New ToDoProjectInfo(New Dictionary(Of String, String))
+        'End If
+
+        FileName_ProjInfo = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "ProjInfo.bin")
+
+        If File.Exists(FileName_ProjInfo) Then
+            Dim TestFileStream As Stream = File.OpenRead(FileName_ProjInfo)
             Dim deserializer As New BinaryFormatter
-            ProjDict = CType(deserializer.Deserialize(TestFileStream), ProjectList)
+            'Dim ProjInfo2 As ProjectInfo2 = CType(deserializer.Deserialize(TestFileStream), ProjectInfo2)
+            ProjInfo = CType(deserializer.Deserialize(TestFileStream), ProjectInfo)
             TestFileStream.Close()
+            'ProjInfo = New ProjectInfo
+            ProjInfo.pFileName = FileName_ProjInfo
+            ProjInfo.Sort()
+            'TestProjectInfo()
+            'Dim ProjInfo2 As New ProjectInfo2
+            'For Each pi As ProjectInfoEntry In ProjInfo2
+            '    ProjInfo.Add(pi)
+            'Next
+            'ProjInfo.Save(FileName_ProjInfo)
         Else
-            ProjDict = New ProjectList(New Dictionary(Of String, String))
+            ProjInfo = New ProjectInfo
+            'For Each key In ProjDict.ProjectDictionary.Keys
+            '    ProjInfo.Add(New ProjectInfoEntry(key, ProjDict.ProjectDictionary(key), ""))
+            'Next
+            'ProjInfo.Save(FileName_ProjInfo)
+            'Dim fmPI As ProjectInfoWindow = New ProjectInfoWindow(ProjInfo)
+            'fmPI.ShowDialog()
+            'ProjInfo.Save(FileName_ProjInfo)
         End If
 
         FileName_IDList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "UsedIDList.bin")
@@ -42,6 +77,7 @@ Public Class ThisAddIn
             Dim TestFileStream As Stream = File.OpenRead(FileName_IDList)
             Dim deserializer As New BinaryFormatter
             IDList = CType(deserializer.Deserialize(TestFileStream), cIDList)
+            IDList.pFileName = FileName_IDList
             TestFileStream.Close()
         Else
             IDList = New cIDList(New List(Of String))
@@ -71,19 +107,33 @@ Public Class ThisAddIn
 
 
 
-    Public Sub WriteToCSV(filename As String, strOutput() As String)
-        If IO.File.Exists(filename) Then IO.File.Delete(filename)
-        Using sw As StreamWriter = New StreamWriter(filename)
-            For i As Long = LBound(strOutput) To UBound(strOutput)
-                sw.WriteLine(strOutput(i))
-            Next
-        End Using
+    Public Sub WriteToCSV(filename As String, strOutput() As String, Optional overwrite As Boolean = False)
+        If overwrite Or IO.File.Exists(filename) = False Then
+            Using sw As StreamWriter = New StreamWriter(filename)
+                For i As Long = LBound(strOutput) To UBound(strOutput)
+                    sw.WriteLine(strOutput(i))
+                Next
+            End Using
+        Else
+            Using sw As StreamWriter = New StreamWriter(filename, append:=True)
+                For i As Long = LBound(strOutput) To UBound(strOutput)
+                    sw.WriteLine(strOutput(i))
+                Next
+            End Using
+        End If
+
     End Sub
-    Public Sub WriteToCSV(filename As String, strOutput As String)
-        If IO.File.Exists(filename) Then IO.File.Delete(filename)
-        Using sw As StreamWriter = New StreamWriter(filename)
-            sw.WriteLine(strOutput)
-        End Using
+    Public Sub WriteToCSV(filename As String, strOutput As String, Optional overwrite As Boolean = False)
+        If overwrite Or IO.File.Exists(filename) = False Then
+            Using sw As StreamWriter = New StreamWriter(filename)
+                sw.WriteLine(strOutput)
+            End Using
+        Else
+            Using sw As StreamWriter = New StreamWriter(filename, append:=True)
+                sw.WriteLine(strOutput)
+            End Using
+        End If
+
     End Sub
 
     Public Sub CompressToDoIDs()
@@ -334,17 +384,22 @@ Public Class ThisAddIn
                         If strProject.Length <> 0 Then
 
                             'Check to ensure it is in the dictionary before autocoding
-                            If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                                strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                            If ProjInfo.Contains_ProjectName(strProject) Then
+                                'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                                'strProjectToDo = ProjDict.ProjectDictionary(strProject)
+
                                 If strToDoID.Length = 2 Then
                                     ' Change the Item's todoid to be a node of the project
-
-                                    todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                    'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                    'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                    IDList.Save(FileName_IDList)
-                                    'Split_ToDoID(objItem:=Item)
-                                    todo.SplitID()
+                                    If todo.TagContext <> "Tag PROJECTS" Then
+                                        strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
+                                        todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
+                                        todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                        'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                        'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                                        IDList.Save(FileName_IDList)
+                                        'Split_ToDoID(objItem:=Item)
+                                        todo.SplitID()
+                                    End If
                                 End If
 
 
@@ -352,8 +407,11 @@ Public Class ThisAddIn
                                 If strToDoID.Length = 4 Then
                                     Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
                                     If response = vbYes Then
-                                        ProjDict.ProjectDictionary.Add(strProject, strToDoID)
-                                        SaveDict()
+                                        'ProjDict.ProjectDictionary.Add(strProject, strToDoID)
+                                        'SaveDict()
+                                        Dim strProgram As String = InputBox("What is the program name for " & strProject & "?", DefaultResponse:="")
+                                        ProjInfo.Add(New ProjectInfoEntry(strProject, strToDoID, strProgram))
+                                        ProjInfo.Save()
                                     End If
                                 End If
                             End If
@@ -366,8 +424,11 @@ Public Class ThisAddIn
                         'Else
                         '    strProject = objProperty_Project.Value
                         'End If
-                        If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                            strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                        If ProjInfo.Contains_ProjectName(strProject) Then
+                            strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
+                            todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
+                            'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                            'strProjectToDo = ProjDict.ProjectDictionary(strProject)
                             todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                             'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                             'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
@@ -387,10 +448,13 @@ Public Class ThisAddIn
 
                     'If the project name is in our dictionary, autoadd the ToDoID to this item
                     If strProject.Length <> 0 Then
-                        If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                            strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                        'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
+                        If ProjInfo.Contains_ProjectName(strProject) Then
+                            'strProjectToDo = ProjDict.ProjectDictionary(strProject)
+                            strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                             'Add the next ToDoID available in that branch
                             todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                            todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                             'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                             'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
                             IDList.Save(FileName_IDList)
@@ -459,95 +523,6 @@ Public Class ThisAddIn
             blIsRunning = False
         End If
 
-        ''AUTOCODE ToDoID based on Project
-        ''Check to see if the project exists before attempting to autocode the id
-        'If Not objProperty_Project Is Nothing Then
-
-        '    'Check to see whether there is an existing ID
-        '    If Not objProperty_ToDoID Is Nothing Then
-        '        strToDoID = objProperty_ToDoID.Value
-
-        '        'Don't autocode branches that existed to another project previously
-        '        If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
-
-        '            'Get Project Name
-        '            If IsArray(objProperty_Project.Value) Then
-        '                strProject = FlattenArry(objProperty_Project.Value)
-        '            Else
-        '                strProject = objProperty_Project.Value
-        '            End If
-
-        '            'Check to see if the Project name returned a value before attempting to autocode
-        '            If strProject.Length <> 0 Then
-
-        '                'Check to ensure it is in the dictionary before autocoding
-        '                If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-        '                    strProjectToDo = ProjDict.ProjectDictionary(strProject)
-        '                    If strToDoID.Length = 2 Then
-        '                        ' Change the Item's todoid to be a node of the project
-
-        '                        strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-        '                        CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-        '                        IDList.Save(FileName_IDList)
-        '                        Split_ToDoID(objItem:=Item)
-        '                    End If
-
-
-        '                Else 'If it is not in the dictionary, see if this is a project we should add
-        '                    If strToDoID.Length = 4 Then
-        '                        Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
-        '                        If response = vbYes Then
-        '                            ProjDict.ProjectDictionary.Add(strProject, strToDoID)
-        '                            SaveDict()
-        '                        End If
-        '                    End If
-        '                End If
-        '            End If
-
-        '        ElseIf strToDoID.Length = 0 Then
-        '            If IsArray(objProperty_Project.Value) Then
-        '                strProject = FlattenArry(objProperty_Project.Value)
-        '            Else
-        '                strProject = objProperty_Project.Value
-        '            End If
-        '            If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-        '                strProjectToDo = ProjDict.ProjectDictionary(strProject)
-        '                strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-        '                CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-        '                IDList.Save(FileName_IDList)
-        '                Split_ToDoID(objItem:=Item)
-        '            End If
-
-        '        End If
-        '    Else 'In this case, the project name exists but the todo id does not
-        '        'Get Project Name
-        '        If IsArray(objProperty_Project.Value) Then
-        '            strProject = FlattenArry(objProperty_Project.Value)
-        '        Else
-        '            strProject = objProperty_Project.Value
-        '        End If
-
-        '        'If the project name is in our dictionary, autoadd the ToDoID to this item
-        '        If strProject.Length <> 0 Then
-        '            If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-        '                strProjectToDo = ProjDict.ProjectDictionary(strProject)
-        '                'Add the next ToDoID available in that branch
-        '                strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-        '                CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-        '                IDList.Save(FileName_IDList)
-        '                Split_ToDoID(objItem:=Item)
-        '                '***NEED CODE HERE***
-        '                '***NEED CODE HERE***
-        '                '***NEED CODE HERE***
-        '            End If
-        '        End If
-        '    End If
-
-
-        'End If
-
-
-
     End Sub
 
     Private Function OlToDoItem_IsMarkedComplete(Item As Object) As Boolean
@@ -572,15 +547,15 @@ Public Class ThisAddIn
     End Function
 
 
-    Public Sub SaveDict()
-        If Not Directory.Exists(Path.GetDirectoryName(FileName_ProjectList)) Then
-            Directory.CreateDirectory(Path.GetDirectoryName(FileName_ProjectList))
-        End If
-        Dim TestFileStream As Stream = File.Create(FileName_ProjectList)
-        Dim serializer As New BinaryFormatter
-        serializer.Serialize(TestFileStream, ProjDict)
-        TestFileStream.Close()
-    End Sub
+    'Public Sub SaveDict()
+    '    If Not Directory.Exists(Path.GetDirectoryName(FileName_ProjectList)) Then
+    '        Directory.CreateDirectory(Path.GetDirectoryName(FileName_ProjectList))
+    '    End If
+    '    Dim TestFileStream As Stream = File.Create(FileName_ProjectList)
+    '    Dim serializer As New BinaryFormatter
+    '    serializer.Serialize(TestFileStream, ProjDict)
+    '    TestFileStream.Close()
+    'End Sub
 
 
 
@@ -592,6 +567,108 @@ Public Class ThisAddIn
         End If
 
     End Sub
+
+    Public Sub FixToDoIDs()
+
+
+        Dim ToDoItems As Outlook.Items = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
+        Dim max As Long = ToDoItems.Count
+        Dim j As Long = 0
+        For i As Long = 1 To max
+            Dim Item As ToDoItem = New ToDoItem(ToDoItems.Item(i), True)
+            j = j + 1
+            If Item.CustomField("NewID") <> "Done" Then
+                Dim strToDoID As String = Item.ToDoID
+                Dim strToDoIDnew As String = FixToDoID(strToDoID)
+                Item.ToDoID = strToDoIDnew
+                Item.CustomField("NewID") = "Done"
+            End If
+            If j = 40 Then
+                j = 0
+                System.Windows.Forms.Application.DoEvents()
+            End If
+        Next
+
+
+
+    End Sub
+
+    Private Function FixToDoID(strToDoID As String) As String
+        Dim charsorig As String = "0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
+        Dim charsnew As String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
+        '"0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
+        '"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
+        Dim c As Char = "A"
+        Dim strBuild As String = ""
+
+        For Each c In strToDoID
+            Dim intLoc As Integer = InStr(charsorig, c)
+            strBuild += Mid(charsnew, intLoc, 1)
+        Next
+
+        Return strBuild
+
+    End Function
+
+
+    Public Sub TestProjectInfo()
+
+        'Dim ftmp As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), AppDataFolder, "ProjInfo.csv")
+        'For Each entry As ProjectInfoEntry In ProjInfo
+        '    WriteToCSV(ftmp, entry.ToCSV)
+        'Next
+        If ProjInfo.Contains_ProgramName("Digital Transformation LATAM") Then
+            Dim lst As New List(Of ProjectInfoEntry)
+            lst = ProjInfo.Find_ByProgramName("Digital Transformation LATAM")
+            For Each entry As ProjectInfoEntry In lst
+                Debug.WriteLine(entry.ToCSV)
+            Next
+        End If
+        If ProjInfo.Contains_ProgramName("Pete") Then
+            Dim lst As List(Of ProjectInfoEntry)
+            lst = ProjInfo.Find_ByProgramName("Digital Transformation LATAM")
+            For Each entry As ProjectInfoEntry In lst
+                Debug.WriteLine(entry.ToCSV)
+            Next
+        End If
+        If ProjInfo.Contains_ProjectID("1308") Then
+            Dim lst As List(Of ProjectInfoEntry)
+            lst = ProjInfo.Find_ByProjectID("1308")
+            For Each entry As ProjectInfoEntry In lst
+                Debug.WriteLine(entry.ToCSV)
+            Next
+        End If
+        If ProjInfo.Contains_ProjectID("980H") Then
+            Dim lst As List(Of ProjectInfoEntry)
+            lst = ProjInfo.Find_ByProjectID("980H")
+            For Each entry As ProjectInfoEntry In lst
+                Debug.WriteLine(entry.ToCSV)
+            Next
+        End If
+        If ProjInfo.Contains_ProjectID("abcd") Then
+            Dim lst As List(Of ProjectInfoEntry)
+            lst = ProjInfo.Find_ByProjectID("abcd")
+            For Each entry As ProjectInfoEntry In lst
+                Debug.WriteLine(entry.ToCSV)
+            Next
+        End If
+        '5 CCO Org Design and Functions
+        If ProjInfo.Contains_ProjectName("5 CCO Org Design and Functions") Then
+            Dim lst As List(Of ProjectInfoEntry)
+            lst = ProjInfo.Find_ByProjectName("5 CCO Org Design and Functions")
+            For Each entry As ProjectInfoEntry In lst
+                Debug.WriteLine(entry.ToCSV)
+            Next
+        End If
+        If ProjInfo.Contains_ProjectName("pete") Then
+            Dim lst As List(Of ProjectInfoEntry)
+            lst = ProjInfo.Find_ByProgramName("5 CCO Org Design and Functions")
+            For Each entry As ProjectInfoEntry In lst
+                Debug.WriteLine(entry.ToCSV)
+            Next
+        End If
+    End Sub
+
 End Class
 
 Public Class Conditions

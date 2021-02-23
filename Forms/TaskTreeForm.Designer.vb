@@ -26,6 +26,7 @@ Partial Class TaskTreeForm
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.TreeListView1 = New BrightIdeasSoftware.TreeListView()
         Me.OlvTaskSubject = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
+        Me.OlvToDoID = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn1 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn2 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn3 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
@@ -33,7 +34,6 @@ Partial Class TaskTreeForm
         Me.OlvColumn4 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn5 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn7 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
-        Me.OlvToDoID = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
@@ -41,6 +41,7 @@ Partial Class TaskTreeForm
         Me.But_ExpandCollapse = New System.Windows.Forms.Button()
         Me.But_ShowHideComplete = New System.Windows.Forms.Button()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.OlvColumn8 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         CType(Me.TreeListView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
@@ -59,6 +60,7 @@ Partial Class TaskTreeForm
         'TreeListView1
         '
         Me.TreeListView1.AllColumns.Add(Me.OlvTaskSubject)
+        Me.TreeListView1.AllColumns.Add(Me.OlvToDoID)
         Me.TreeListView1.AllColumns.Add(Me.OlvColumn1)
         Me.TreeListView1.AllColumns.Add(Me.OlvColumn2)
         Me.TreeListView1.AllColumns.Add(Me.OlvColumn3)
@@ -66,14 +68,14 @@ Partial Class TaskTreeForm
         Me.TreeListView1.AllColumns.Add(Me.OlvColumn4)
         Me.TreeListView1.AllColumns.Add(Me.OlvColumn5)
         Me.TreeListView1.AllColumns.Add(Me.OlvColumn7)
-        Me.TreeListView1.AllColumns.Add(Me.OlvToDoID)
+        Me.TreeListView1.AllColumns.Add(Me.OlvColumn8)
         Me.TreeListView1.AllowColumnReorder = True
         Me.TreeListView1.AllowDrop = True
         Me.TreeListView1.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick
         Me.TreeListView1.CellEditUseWholeCell = False
         Me.TreeListView1.CheckBoxes = True
         Me.TreeListView1.CheckedAspectName = "Value.Complete"
-        Me.TreeListView1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.OlvTaskSubject, Me.OlvColumn2, Me.OlvColumn3, Me.OlvColumn7})
+        Me.TreeListView1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.OlvTaskSubject, Me.OlvToDoID, Me.OlvColumn2, Me.OlvColumn3, Me.OlvColumn6, Me.OlvColumn4, Me.OlvColumn7, Me.OlvColumn8})
         Me.TreeListView1.Cursor = System.Windows.Forms.Cursors.Default
         Me.TreeListView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TreeListView1.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -98,6 +100,12 @@ Partial Class TaskTreeForm
         Me.OlvTaskSubject.Text = "Task Subject"
         Me.OlvTaskSubject.Width = 246
         '
+        'OlvToDoID
+        '
+        Me.OlvToDoID.AspectName = "Value.ToDoID"
+        Me.OlvToDoID.Text = "To Do ID"
+        Me.OlvToDoID.Width = 117
+        '
         'OlvColumn1
         '
         Me.OlvColumn1.AspectName = "Value.TagProject"
@@ -121,15 +129,11 @@ Partial Class TaskTreeForm
         'OlvColumn6
         '
         Me.OlvColumn6.AspectName = "Value.MetaTaskLvl"
-        Me.OlvColumn6.DisplayIndex = 4
-        Me.OlvColumn6.IsVisible = False
         Me.OlvColumn6.Text = "Lvl"
         '
         'OlvColumn4
         '
         Me.OlvColumn4.AspectName = "Value.MetaTaskSubject"
-        Me.OlvColumn4.DisplayIndex = 5
-        Me.OlvColumn4.IsVisible = False
         Me.OlvColumn4.Text = "Meta Task"
         Me.OlvColumn4.Width = 187
         '
@@ -146,14 +150,6 @@ Partial Class TaskTreeForm
         Me.OlvColumn7.AspectName = "Value.StartDate"
         Me.OlvColumn7.Text = "Started"
         Me.OlvColumn7.Width = 100
-        '
-        'OlvToDoID
-        '
-        Me.OlvToDoID.AspectName = "Value.ToDoID"
-        Me.OlvToDoID.DisplayIndex = 8
-        Me.OlvToDoID.IsVisible = False
-        Me.OlvToDoID.Text = "To Do ID"
-        Me.OlvToDoID.Width = 117
         '
         'ContextMenuStrip1
         '
@@ -228,6 +224,12 @@ Partial Class TaskTreeForm
         Me.SplitContainer1.SplitterDistance = 30
         Me.SplitContainer1.TabIndex = 2
         '
+        'OlvColumn8
+        '
+        Me.OlvColumn8.AspectName = "Value.InFolder"
+        Me.OlvColumn8.Text = "In Folder"
+        Me.OlvColumn8.Width = 103
+        '
         'TaskTreeForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -265,4 +267,5 @@ Partial Class TaskTreeForm
     Friend WithEvents But_ShowHideComplete As Windows.Forms.Button
     Friend WithEvents SplitContainer1 As Windows.Forms.SplitContainer
     Friend WithEvents OlvColumn7 As BrightIdeasSoftware.OLVColumn
+    Friend WithEvents OlvColumn8 As BrightIdeasSoftware.OLVColumn
 End Class

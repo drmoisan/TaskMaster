@@ -49,6 +49,7 @@
         Me.btn_SplitToDoID = Me.Factory.CreateRibbonButton
         Me.but_Dictionary = Me.Factory.CreateRibbonButton
         Me.but_CompressIDs = Me.Factory.CreateRibbonButton
+        Me.Button1 = Me.Factory.CreateRibbonButton
         Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
@@ -77,6 +78,7 @@
         Me.TaskMenu.Items.Add(Me.btn_SplitToDoID)
         Me.TaskMenu.Items.Add(Me.but_Dictionary)
         Me.TaskMenu.Items.Add(Me.but_CompressIDs)
+        Me.TaskMenu.Items.Add(Me.Button1)
         Me.TaskMenu.ItemSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
         Me.TaskMenu.Label = "Menu1"
         Me.TaskMenu.Name = "TaskMenu"
@@ -114,6 +116,13 @@
         Me.but_CompressIDs.OfficeImageId = "ReviewCombineRevisions"
         Me.but_CompressIDs.ShowImage = True
         '
+        'Button1
+        '
+        Me.Button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Button1.Label = "FixToDoIDs"
+        Me.Button1.Name = "Button1"
+        Me.Button1.ShowImage = True
+        '
         'Btn_TreeListView
         '
         Me.Btn_TreeListView.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
@@ -143,6 +152,7 @@
     Friend WithEvents Btn_TreeListView As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents but_Dictionary As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents but_CompressIDs As Microsoft.Office.Tools.Ribbon.RibbonButton
+    Friend WithEvents Button1 As Microsoft.Office.Tools.Ribbon.RibbonButton
 End Class
 
 Partial Class ThisRibbonCollection
