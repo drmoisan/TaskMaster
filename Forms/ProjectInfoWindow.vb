@@ -3,6 +3,7 @@
 Public Class ProjectInfoWindow
     Public pi As ProjectInfo
     Private rs As New Resizer
+    Private blEditingCell As Boolean = False
 
     Public Sub New(ProjInfo As ProjectInfo)
 
@@ -38,5 +39,29 @@ Public Class ProjectInfoWindow
         rs.ResizeAllControls(Me)
         'TreeListView1.AutoResizeColumns()
         Me.olvProjInfo.AutoScaleColumnsToContainer()
+    End Sub
+
+    Private Sub olvProjInfo_KeyUp(sender As Object, e As Windows.Forms.KeyEventArgs) Handles olvProjInfo.KeyUp
+
+        If blEditingCell = False Then
+            If e.KeyData = Windows.Forms.Keys.Delete Then
+                Dim selection As System.Collections.ArrayList = Me.olvProjInfo.SelectedObjects
+                If Not selection Is Nothing Then
+                    For Each entry As ProjectInfoEntry In selection
+                        pi.Remove(entry)
+                    Next
+                    pi.Save()
+                    Me.olvProjInfo.RemoveObjects(Me.olvProjInfo.SelectedObjects)
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub olvProjInfo_CellEditStarting(sender As Object, e As BrightIdeasSoftware.CellEditEventArgs) Handles olvProjInfo.CellEditStarting
+        blEditingCell = True
+    End Sub
+
+    Private Sub olvProjInfo_CellEditFinishing(sender As Object, e As BrightIdeasSoftware.CellEditEventArgs) Handles olvProjInfo.CellEditFinishing
+        blEditingCell = False
     End Sub
 End Class

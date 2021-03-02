@@ -89,6 +89,17 @@ Public Class ThisAddIn
         Access_Ribbons_By_Explorer()
     End Sub
 
+    Public Sub Events_Hook()
+        OlToDoItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
+        OlInboxItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderInbox).Items
+        OlReminders = Application.Reminders
+    End Sub
+    Public Sub Events_Unhook()
+        OlToDoItems = Nothing
+        OlInboxItems = Nothing
+        OlReminders = Nothing
+    End Sub
+
     Private Sub Access_Ribbons_By_Explorer()
         Dim ribbonCollection As ThisRibbonCollection = Globals.Ribbons _
             (Globals.ThisAddIn.Application.ActiveExplorer())

@@ -2,6 +2,7 @@
 
 Public Class TaskMasterRibbon
     Private frmTTF As TaskTreeForm
+    Private blHook As Boolean = True
 
     Private Sub btn_RefreshMax_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_RefreshMax.Click
         Globals.ThisAddIn.RefreshIDList()
@@ -52,5 +53,19 @@ Public Class TaskMasterRibbon
 
     Private Sub Button1_Click(sender As Object, e As RibbonControlEventArgs) Handles Button1.Click
         'Globals.ThisAddIn.FixToDoIDs()
+    End Sub
+
+    Private Sub BTN_Hook_Click(sender As Object, e As RibbonControlEventArgs) Handles BTN_Hook.Click
+        If blHook = True Then
+            Globals.ThisAddIn.Events_Unhook()
+            blHook = False
+            Me.BTN_Hook.Label = "UnHook Events"
+            MsgBox("Events Disconnected")
+        Else
+            Globals.ThisAddIn.Events_Hook()
+            Me.BTN_Hook.Label = "Hook Events"
+            blHook = True
+            MsgBox("Hooked Events")
+        End If
     End Sub
 End Class

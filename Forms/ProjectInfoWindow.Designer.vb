@@ -55,7 +55,7 @@ Partial Class ProjectInfoWindow
         Me.SplitContainer1.Panel2.Controls.Add(Me.BTN_CANCEL)
         Me.SplitContainer1.Panel2.Controls.Add(Me.BTN_OK)
         Me.SplitContainer1.Size = New System.Drawing.Size(800, 450)
-        Me.SplitContainer1.SplitterDistance = 376
+        Me.SplitContainer1.SplitterDistance = 399
         Me.SplitContainer1.TabIndex = 0
         '
         'olvProjInfo
@@ -70,10 +70,12 @@ Partial Class ProjectInfoWindow
         Me.olvProjInfo.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.OlvProjectID, Me.OlvProjectName, Me.OlvProgramName})
         Me.olvProjInfo.Cursor = System.Windows.Forms.Cursors.Default
         Me.olvProjInfo.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.olvProjInfo.HasCollapsibleGroups = False
         Me.olvProjInfo.HideSelection = False
         Me.olvProjInfo.Location = New System.Drawing.Point(0, 0)
         Me.olvProjInfo.Name = "olvProjInfo"
-        Me.olvProjInfo.Size = New System.Drawing.Size(800, 376)
+        Me.olvProjInfo.ShowGroups = False
+        Me.olvProjInfo.Size = New System.Drawing.Size(800, 399)
         Me.olvProjInfo.TabIndex = 0
         Me.olvProjInfo.UseCompatibleStateImageBehavior = False
         Me.olvProjInfo.View = System.Windows.Forms.View.Details
@@ -90,18 +92,19 @@ Partial Class ProjectInfoWindow
         Me.OlvProjectName.AspectName = "ProjectName"
         Me.OlvProjectName.Groupable = False
         Me.OlvProjectName.Text = "Project Name"
-        Me.OlvProjectName.Width = 192
+        Me.OlvProjectName.Width = 318
         '
         'OlvProgramName
         '
         Me.OlvProgramName.AspectName = "ProgramName"
         Me.OlvProgramName.Groupable = False
         Me.OlvProgramName.Text = "Program Name"
-        Me.OlvProgramName.Width = 177
+        Me.OlvProgramName.Width = 283
         '
         'BTN_CANCEL
         '
-        Me.BTN_CANCEL.Location = New System.Drawing.Point(387, 25)
+        Me.BTN_CANCEL.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.BTN_CANCEL.Location = New System.Drawing.Point(440, 12)
         Me.BTN_CANCEL.Name = "BTN_CANCEL"
         Me.BTN_CANCEL.Size = New System.Drawing.Size(94, 23)
         Me.BTN_CANCEL.TabIndex = 1
@@ -110,7 +113,8 @@ Partial Class ProjectInfoWindow
         '
         'BTN_OK
         '
-        Me.BTN_OK.Location = New System.Drawing.Point(267, 25)
+        Me.BTN_OK.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.BTN_OK.Location = New System.Drawing.Point(312, 12)
         Me.BTN_OK.Name = "BTN_OK"
         Me.BTN_OK.Size = New System.Drawing.Size(94, 23)
         Me.BTN_OK.TabIndex = 0

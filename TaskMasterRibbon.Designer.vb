@@ -51,6 +51,7 @@
         Me.but_CompressIDs = Me.Factory.CreateRibbonButton
         Me.Button1 = Me.Factory.CreateRibbonButton
         Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
+        Me.BTN_Hook = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
         Me.SuspendLayout()
@@ -67,6 +68,7 @@
         '
         Me.Group1.Items.Add(Me.TaskMenu)
         Me.Group1.Items.Add(Me.Btn_TreeListView)
+        Me.Group1.Items.Add(Me.BTN_Hook)
         Me.Group1.Label = "Group1"
         Me.Group1.Name = "Group1"
         '
@@ -128,8 +130,16 @@
         Me.Btn_TreeListView.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
         Me.Btn_TreeListView.Label = "Load Tree"
         Me.Btn_TreeListView.Name = "Btn_TreeListView"
-        Me.Btn_TreeListView.OfficeImageId = "BaselineSave"
+        Me.Btn_TreeListView.OfficeImageId = "OutlineShowDetail"
         Me.Btn_TreeListView.ShowImage = True
+        '
+        'BTN_Hook
+        '
+        Me.BTN_Hook.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.BTN_Hook.Label = "UnHook Events"
+        Me.BTN_Hook.Name = "BTN_Hook"
+        Me.BTN_Hook.OfficeImageId = "PositionAbsoluteMarks"
+        Me.BTN_Hook.ShowImage = True
         '
         'TaskMasterRibbon
         '
@@ -153,6 +163,7 @@
     Friend WithEvents but_Dictionary As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents but_CompressIDs As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents Button1 As Microsoft.Office.Tools.Ribbon.RibbonButton
+    Friend WithEvents BTN_Hook As Microsoft.Office.Tools.Ribbon.RibbonButton
 End Class
 
 Partial Class ThisRibbonCollection
