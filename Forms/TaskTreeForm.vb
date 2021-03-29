@@ -359,6 +359,9 @@ Public Class TaskTreeForm
 
         e.RefreshObjects()
         If filtercompleted Then TreeListView1.ModelFilter = New ModelFilter(Function(ByVal x) CType(x, TreeNode(Of ToDoItem)).Value.Complete = False)
+        TreeListView1.Sort()
+        'this.lastSortColumn = Column;
+        'this.lastSortOrder = order;
     End Sub
 
 

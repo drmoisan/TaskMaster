@@ -52,6 +52,7 @@
         Me.Button1 = Me.Factory.CreateRibbonButton
         Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
         Me.BTN_Hook = Me.Factory.CreateRibbonButton
+        Me.BTN_FlagTask = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
         Me.SuspendLayout()
@@ -69,6 +70,7 @@
         Me.Group1.Items.Add(Me.TaskMenu)
         Me.Group1.Items.Add(Me.Btn_TreeListView)
         Me.Group1.Items.Add(Me.BTN_Hook)
+        Me.Group1.Items.Add(Me.BTN_FlagTask)
         Me.Group1.Label = "Group1"
         Me.Group1.Name = "Group1"
         '
@@ -141,6 +143,14 @@
         Me.BTN_Hook.OfficeImageId = "PositionAbsoluteMarks"
         Me.BTN_Hook.ShowImage = True
         '
+        'BTN_FlagTask
+        '
+        Me.BTN_FlagTask.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.BTN_FlagTask.Label = "Flag Task"
+        Me.BTN_FlagTask.Name = "BTN_FlagTask"
+        Me.BTN_FlagTask.OfficeImageId = "FlagMessage"
+        Me.BTN_FlagTask.ShowImage = True
+        '
         'TaskMasterRibbon
         '
         Me.Name = "TaskMasterRibbon"
@@ -164,6 +174,7 @@
     Friend WithEvents but_CompressIDs As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents Button1 As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents BTN_Hook As Microsoft.Office.Tools.Ribbon.RibbonButton
+    Friend WithEvents BTN_FlagTask As Microsoft.Office.Tools.Ribbon.RibbonButton
 End Class
 
 Partial Class ThisRibbonCollection

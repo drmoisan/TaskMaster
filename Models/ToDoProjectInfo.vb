@@ -92,7 +92,42 @@ Public Class ProjectInfo
     End Sub
 
     Public Function Contains_ProjectName(StrProjectName As String) As Boolean
-        Return Me.Any(Function(p) String.Equals(p.ProjectName, StrProjectName, StringComparison.CurrentCulture))
+        Dim common = StrProjectName.Split(", ").ToList().Intersect([Select](Function(b) b.ProjectName))
+        If (StrProjectName.Split(", ").ToList().Intersect([Select](Function(b) b.ProjectName)).ToList().Count > 0) Then
+            Return True
+        Else
+            Return False
+        End If
+        'Return Me.Any(Function(p) String.Equals(p.ProjectName, StrProjectName, StringComparison.CurrentCulture))
+    End Function
+
+    Public Function Programs_ByProjectNames(StrProjectNames As String) As String
+
+        Try
+            Dim strTemp As String = String.Join(", ", Me.Where(Function(p) StrProjectNames.Split({", "}, StringSplitOptions.None).ToList().Contains(p.ProjectName)).Select(Function(q) q.ProgramName).Distinct())
+            Return strTemp
+        Catch ex As System.Exception
+            Debug.WriteLine(ex.Message)
+            Debug.WriteLine(ex.StackTrace)
+            Return ""
+        End Try
+        'Debug.WriteLine("ProjectNames: " & StrProjectNames)
+        'Dim query1 = StrProjectNames.Split({", "}, StringSplitOptions.None).ToList()
+        'Debug.WriteLine("Project Names for Item")
+        'For Each itm As String In query1
+        '    Debug.WriteLine(itm)
+        'Next
+        'Debug.WriteLine("")
+
+        'Dim query2 = Me.Where(Function(p) StrProjectNames.Split({", "}, StringSplitOptions.None).ToList().Contains(p.ProjectName))
+        'Debug.WriteLine("Project Names that Match + Program Names")
+        'For Each itm2 In query2
+        '    Debug.WriteLine("Project: " & itm2.ProjectName & "     Program: " & itm2.ProgramName)
+        'Next
+        'Debug.WriteLine("")
+
+        'Dim query3 = query2.Select(Function(q) q.ProgramName).Distinct()
+        'Return String.Join(", ", query3)
     End Function
 
     Public Function Find_ByProjectName(StrProjectName As String) As List(Of ProjectInfoEntry)
@@ -100,6 +135,8 @@ Public Class ProjectInfo
     End Function
 
     Public Function Contains_ProjectID(StrProjectID As String) As Boolean
+        'Dim common = StrProjectID.Split(", ").ToList().Intersect([Select](Function(b) b.ProjectID))
+        'Return Me.Any(StrProjectID.Split(", ").ToList().Intersect([Select](Function(b) b.ProjectID)))
         Return Me.Any(Function(p) String.Equals(p.ProjectID, StrProjectID, StringComparison.Ordinal))
     End Function
 

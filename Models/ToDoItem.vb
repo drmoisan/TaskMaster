@@ -270,7 +270,7 @@ Public Class ToDoItem
             ElseIf OlObject Is Nothing Then
                 Return ""
             Else
-                _TagProgram = CustomField("TagProgram")
+                _TagProgram = CustomField("TagProgram", OlUserPropertyType.olKeywords)
                 Return _TagProgram
             End If
 
@@ -278,7 +278,7 @@ Public Class ToDoItem
         Set(value As String)
             _TagProgram = value
             If Not OlObject Is Nothing Then
-                CustomField("TagProgram") = value
+                CustomField("TagProgram", OlUserPropertyType.olKeywords) = value
             End If
         End Set
     End Property
@@ -456,9 +456,23 @@ Public Class ToDoItem
         End Get
         Set(value)
             Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find(FieldName)
-            If objProperty Is Nothing Then objProperty = OlObject.UserProperties.Add(FieldName, OlFieldType)
-            objProperty.Value = value
-            OlObject.Save()
+            If objProperty Is Nothing Then
+                Try
+                    objProperty = OlObject.UserProperties.Add(FieldName, OlFieldType)
+                    objProperty.Value = value
+                    OlObject.Save()
+                Catch e As System.Exception
+                    Debug.WriteLine("Exception in Set User Property: " & FieldName)
+                    Debug.WriteLine(e.Message)
+                    Debug.WriteLine(e.Source)
+                    Debug.WriteLine(e.StackTrace)
+
+                End Try
+            Else
+                objProperty.Value = value
+                OlObject.Save()
+            End If
+
         End Set
 
     End Property

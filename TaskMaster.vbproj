@@ -213,7 +213,7 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
-    <Compile Include="BaseChanger.vb" />
+    <Compile Include="Models\BaseChanger.vb" />
     <Compile Include="Forms\ProjectInfoWindow.Designer.vb">
       <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
     </Compile>
@@ -304,6 +304,9 @@
       <Project>{18feda0c-d147-4286-b39a-01204808106a}</Project>
       <Name>ObjectListView2012</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Examples\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

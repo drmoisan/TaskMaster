@@ -59,11 +59,11 @@ Public Class TaskMasterRibbon
         If blHook = True Then
             Globals.ThisAddIn.Events_Unhook()
             blHook = False
-            Me.BTN_Hook.Label = "UnHook Events"
+            Me.BTN_Hook.Label = "Hook Events"
             MsgBox("Events Disconnected")
         Else
             Globals.ThisAddIn.Events_Hook()
-            Me.BTN_Hook.Label = "Hook Events"
+            Me.BTN_Hook.Label = "UnHook Events"
             blHook = True
             MsgBox("Hooked Events")
         End If

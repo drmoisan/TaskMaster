@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListViewPrinter2012", "..\O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLibrary2012", "..\ObjectListViewDemo\SparkleLibrary\SparkleLibrary2012.csproj", "{D63F9786-B608-4085-AF08-D909448B0426}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CodeToTestInAConsoleApp", "..\CodeToTestInAConsoleApp\CodeToTestInAConsoleApp.vbproj", "{9254FE67-D312-47B0-962F-E16287A2ECE0}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "CodeToTestInAConsoleApp", "..\CodeToTestInAConsoleApp\CodeToTestInAConsoleApp.vbproj", "{9254FE67-D312-47B0-962F-E16287A2ECE0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
