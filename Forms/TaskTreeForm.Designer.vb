@@ -24,6 +24,13 @@ Partial Class TaskTreeForm
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.But_ReloadTree = New System.Windows.Forms.Button()
+        Me.But_ExpandCollapse = New System.Windows.Forms.Button()
+        Me.But_ShowHideComplete = New System.Windows.Forms.Button()
+        Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TreeListView1 = New BrightIdeasSoftware.TreeListView()
         Me.OlvTaskSubject = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvToDoID = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
@@ -34,21 +41,14 @@ Partial Class TaskTreeForm
         Me.OlvColumn4 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn5 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn7 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
-        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.But_ReloadTree = New System.Windows.Forms.Button()
-        Me.But_ExpandCollapse = New System.Windows.Forms.Button()
-        Me.But_ShowHideComplete = New System.Windows.Forms.Button()
-        Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.OlvColumn8 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
-        CType(Me.TreeListView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        CType(Me.TreeListView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'ImageList1
@@ -56,6 +56,86 @@ Partial Class TaskTreeForm
         Me.ImageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit
         Me.ImageList1.ImageSize = New System.Drawing.Size(16, 16)
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
+        '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.ImageScalingSize = New System.Drawing.Size(36, 36)
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(160, 48)
+        '
+        'ToolStripMenuItem1
+        '
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(159, 44)
+        Me.ToolStripMenuItem1.Text = "Open"
+        '
+        'FlowLayoutPanel1
+        '
+        Me.FlowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.FlowLayoutPanel1.Controls.Add(Me.But_ReloadTree)
+        Me.FlowLayoutPanel1.Controls.Add(Me.But_ExpandCollapse)
+        Me.FlowLayoutPanel1.Controls.Add(Me.But_ShowHideComplete)
+        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(7, 7, 7, 7)
+        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(5749, 90)
+        Me.FlowLayoutPanel1.TabIndex = 1
+        '
+        'But_ReloadTree
+        '
+        Me.But_ReloadTree.Location = New System.Drawing.Point(7, 7)
+        Me.But_ReloadTree.Margin = New System.Windows.Forms.Padding(7, 7, 7, 7)
+        Me.But_ReloadTree.Name = "But_ReloadTree"
+        Me.But_ReloadTree.Size = New System.Drawing.Size(273, 51)
+        Me.But_ReloadTree.TabIndex = 0
+        Me.But_ReloadTree.Text = "Reload Tree"
+        Me.But_ReloadTree.UseVisualStyleBackColor = True
+        '
+        'But_ExpandCollapse
+        '
+        Me.But_ExpandCollapse.Location = New System.Drawing.Point(294, 7)
+        Me.But_ExpandCollapse.Margin = New System.Windows.Forms.Padding(7, 7, 7, 7)
+        Me.But_ExpandCollapse.Name = "But_ExpandCollapse"
+        Me.But_ExpandCollapse.Size = New System.Drawing.Size(273, 51)
+        Me.But_ExpandCollapse.TabIndex = 1
+        Me.But_ExpandCollapse.Text = "Expand / Collapse All"
+        Me.But_ExpandCollapse.UseVisualStyleBackColor = True
+        '
+        'But_ShowHideComplete
+        '
+        Me.But_ShowHideComplete.Location = New System.Drawing.Point(581, 7)
+        Me.But_ShowHideComplete.Margin = New System.Windows.Forms.Padding(7, 7, 7, 7)
+        Me.But_ShowHideComplete.Name = "But_ShowHideComplete"
+        Me.But_ShowHideComplete.Size = New System.Drawing.Size(273, 51)
+        Me.But_ShowHideComplete.TabIndex = 3
+        Me.But_ShowHideComplete.Text = "Show/Hide Complete"
+        Me.But_ShowHideComplete.UseVisualStyleBackColor = True
+        '
+        'SplitContainer1
+        '
+        Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
+        Me.SplitContainer1.IsSplitterFixed = True
+        Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
+        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(7, 7, 7, 7)
+        Me.SplitContainer1.Name = "SplitContainer1"
+        Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainer1.Panel1
+        '
+        Me.SplitContainer1.Panel1.AccessibleName = "SplitContainer1Panel1"
+        Me.SplitContainer1.Panel1.Controls.Add(Me.FlowLayoutPanel1)
+        Me.SplitContainer1.Panel1MinSize = 35
+        '
+        'SplitContainer1.Panel2
+        '
+        Me.SplitContainer1.Panel2.AccessibleName = "SplitContainer1Panel2"
+        Me.SplitContainer1.Panel2.Controls.Add(Me.TreeListView1)
+        Me.SplitContainer1.Size = New System.Drawing.Size(3194, 1198)
+        Me.SplitContainer1.SplitterWidth = 9
+        Me.SplitContainer1.TabIndex = 2
         '
         'TreeListView1
         '
@@ -83,10 +163,11 @@ Partial Class TaskTreeForm
         Me.TreeListView1.IsSimpleDragSource = True
         Me.TreeListView1.IsSimpleDropSink = True
         Me.TreeListView1.Location = New System.Drawing.Point(0, 0)
+        Me.TreeListView1.Margin = New System.Windows.Forms.Padding(7)
         Me.TreeListView1.Name = "TreeListView1"
         Me.TreeListView1.ShowGroups = False
         Me.TreeListView1.ShowImagesOnSubItems = True
-        Me.TreeListView1.Size = New System.Drawing.Size(1369, 503)
+        Me.TreeListView1.Size = New System.Drawing.Size(5749, 2050)
         Me.TreeListView1.SmallImageList = Me.ImageList1
         Me.TreeListView1.TabIndex = 0
         Me.TreeListView1.UseCompatibleStateImageBehavior = False
@@ -151,79 +232,6 @@ Partial Class TaskTreeForm
         Me.OlvColumn7.Text = "Started"
         Me.OlvColumn7.Width = 100
         '
-        'ContextMenuStrip1
-        '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(104, 26)
-        '
-        'ToolStripMenuItem1
-        '
-        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(103, 22)
-        Me.ToolStripMenuItem1.Text = "Open"
-        '
-        'FlowLayoutPanel1
-        '
-        Me.FlowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.FlowLayoutPanel1.Controls.Add(Me.But_ReloadTree)
-        Me.FlowLayoutPanel1.Controls.Add(Me.But_ExpandCollapse)
-        Me.FlowLayoutPanel1.Controls.Add(Me.But_ShowHideComplete)
-        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
-        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1369, 30)
-        Me.FlowLayoutPanel1.TabIndex = 1
-        '
-        'But_ReloadTree
-        '
-        Me.But_ReloadTree.Location = New System.Drawing.Point(3, 3)
-        Me.But_ReloadTree.Name = "But_ReloadTree"
-        Me.But_ReloadTree.Size = New System.Drawing.Size(117, 23)
-        Me.But_ReloadTree.TabIndex = 0
-        Me.But_ReloadTree.Text = "Reload Tree"
-        Me.But_ReloadTree.UseVisualStyleBackColor = True
-        '
-        'But_ExpandCollapse
-        '
-        Me.But_ExpandCollapse.Location = New System.Drawing.Point(126, 3)
-        Me.But_ExpandCollapse.Name = "But_ExpandCollapse"
-        Me.But_ExpandCollapse.Size = New System.Drawing.Size(117, 23)
-        Me.But_ExpandCollapse.TabIndex = 1
-        Me.But_ExpandCollapse.Text = "Expand / Collapse All"
-        Me.But_ExpandCollapse.UseVisualStyleBackColor = True
-        '
-        'But_ShowHideComplete
-        '
-        Me.But_ShowHideComplete.Location = New System.Drawing.Point(249, 3)
-        Me.But_ShowHideComplete.Name = "But_ShowHideComplete"
-        Me.But_ShowHideComplete.Size = New System.Drawing.Size(117, 23)
-        Me.But_ShowHideComplete.TabIndex = 3
-        Me.But_ShowHideComplete.Text = "Show/Hide Complete"
-        Me.But_ShowHideComplete.UseVisualStyleBackColor = True
-        '
-        'SplitContainer1
-        '
-        Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
-        Me.SplitContainer1.IsSplitterFixed = True
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer1.Name = "SplitContainer1"
-        Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
-        '
-        'SplitContainer1.Panel1
-        '
-        Me.SplitContainer1.Panel1.AccessibleName = "SplitContainer1Panel1"
-        Me.SplitContainer1.Panel1.Controls.Add(Me.FlowLayoutPanel1)
-        '
-        'SplitContainer1.Panel2
-        '
-        Me.SplitContainer1.Panel2.AccessibleName = "SplitContainer1Panel2"
-        Me.SplitContainer1.Panel2.Controls.Add(Me.TreeListView1)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1369, 537)
-        Me.SplitContainer1.SplitterDistance = 30
-        Me.SplitContainer1.TabIndex = 2
-        '
         'OlvColumn8
         '
         Me.OlvColumn8.AspectName = "Value.InFolder"
@@ -232,19 +240,20 @@ Partial Class TaskTreeForm
         '
         'TaskTreeForm
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(14.0!, 29.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1369, 537)
+        Me.ClientSize = New System.Drawing.Size(3194, 1198)
         Me.Controls.Add(Me.SplitContainer1)
+        Me.Margin = New System.Windows.Forms.Padding(7, 7, 7, 7)
         Me.Name = "TaskTreeForm"
         Me.Text = "TaskTreeForm"
-        CType(Me.TreeListView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ContextMenuStrip1.ResumeLayout(False)
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        CType(Me.TreeListView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub

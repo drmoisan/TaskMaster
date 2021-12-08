@@ -213,6 +213,9 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
+    <Compile Include="Forms\cCheckBoxClass.vb" />
+    <Compile Include="Modules\Flag_Fields_Categories.vb" />
+    <Compile Include="Modules\UtilityFunctions.vb" />
     <Compile Include="Models\BaseChanger.vb" />
     <Compile Include="Forms\ProjectInfoWindow.Designer.vb">
       <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
@@ -228,12 +231,6 @@
     <Compile Include="Models\TreeNodeOfT.vb" />
     <Compile Include="Models\ProjectList.vb" />
     <Compile Include="Forms\Resizer.vb" />
-    <Compile Include="Forms\Tags.Designer.vb">
-      <DependentUpon>Tags.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Tags.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Forms\TaskTreeForm.Designer.vb">
       <DependentUpon>TaskTreeForm.vb</DependentUpon>
     </Compile>
@@ -252,9 +249,6 @@
     </Compile>
     <EmbeddedResource Include="Forms\ProjectInfoWindow.resx">
       <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Tags.resx">
-      <DependentUpon>Tags.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TaskMasterRibbon.resx">
       <DependentUpon>TaskMasterRibbon.vb</DependentUpon>

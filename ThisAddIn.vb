@@ -9,12 +9,13 @@ Imports System.Security.Authentication.ExtendedProtection
 
 Public Class ThisAddIn
 
+    Public CCOCatList As List(Of String)
     Public WithEvents OlToDoItems As Outlook.Items
     Public WithEvents PSTtoDo As Outlook.Items
     Public listToDoItems As List(Of Outlook.Items) = New List(Of Outlook.Items)
     Public WithEvents OlInboxItems As Outlook.Items
     Private WithEvents OlReminders As Outlook.Reminders
-
+    Public _OlNS As Outlook.NameSpace
 
     Private ribTM As TaskMasterRibbon
     Dim FileName_ProjectList As String
@@ -26,6 +27,7 @@ Public Class ThisAddIn
     Public WithEvents IDList As cIDList
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
+        _OlNS = Application.GetNamespace("MAPI")
         OlToDoItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
         OlInboxItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderInbox).Items
         OlReminders = Application.Reminders
@@ -72,7 +74,7 @@ Public Class ThisAddIn
             'ProjInfo.Save(FileName_ProjInfo)
             'Dim fmPI As ProjectInfoWindow = New ProjectInfoWindow(ProjInfo)
             'fmPI.ShowDialog()
-            'ProjInfo.Save(FileName_ProjInfo)
+            ProjInfo.Save(FileName_ProjInfo)
         End If
 
         FileName_IDList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "UsedIDList.bin")
