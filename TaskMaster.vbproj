@@ -136,12 +136,6 @@
   -->
   <ItemGroup>
     <Reference Include="Accessibility" />
-    <Reference Include="Deedle, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Deedle.2.3.0\lib\net45\Deedle.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -216,6 +210,7 @@
     <Compile Include="Forms\cCheckBoxClass.vb" />
     <Compile Include="Models\Flags.vb" />
     <Compile Include="Modules\Flag_Fields_Categories.vb" />
+    <Compile Include="Modules\olvExtension.vb" />
     <Compile Include="Modules\UtilityFunctions.vb" />
     <Compile Include="Models\BaseChanger.vb" />
     <Compile Include="Forms\ProjectInfoWindow.Designer.vb">
@@ -320,10 +315,11 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>91CF4C6DBCE9AF478234324E367ABCDF0F79A9EA</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>BEAD7788F7A6A4B03DF44BF81A95E5C636B80B28</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a Visual Basic project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
