@@ -6,6 +6,7 @@ Public Class TaskMasterRibbon
 
     Private Sub btn_RefreshMax_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_RefreshMax.Click
         Globals.ThisAddIn.RefreshIDList()
+        MsgBox("ID Refresh Complete")
     End Sub
 
     Private Sub btn_SplitToDoID_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_SplitToDoID.Click
@@ -21,34 +22,12 @@ Public Class TaskMasterRibbon
     Private Sub but_Dictionary_Click(sender As Object, e As RibbonControlEventArgs) Handles but_Dictionary.Click
         Dim projinfoview As ProjectInfoWindow = New ProjectInfoWindow(Globals.ThisAddIn.ProjInfo)
         projinfoview.Show()
-        'Original Function
-        'Dim strMsg As StringBuilder = New StringBuilder
-        'Dim strKey As String
-        'Dim i As Integer = 0
-        'Dim reversedict As SortedDictionary(Of String, String) = New SortedDictionary(Of String, String)
-        'For Each strKey In Globals.ThisAddIn.ProjDict.ProjectDictionary.Keys
-        '    Try
-        '        reversedict.Add(Globals.ThisAddIn.ProjDict.ProjectDictionary(strKey), strKey)
-        '    Catch
-        '        MsgBox("Can't add:" + Globals.ThisAddIn.ProjDict.ProjectDictionary(strKey) + ", " + strKey)
-        '        Err.Clear()
-        '    End Try
-        'Next
-        'For Each strKey In reversedict.Keys
-        '    strMsg.AppendLine(i & " " & strKey & " " & reversedict(strKey))
-        '    i += 1
-        'Next
-        'i = CInt(InputBox(strMsg.ToString()))
-        'Dim strKeyToDelete As String = reversedict.Keys(i)
-        'Dim response As MsgBoxResult = MsgBox("Delete key: " & strKeyToDelete & "?", vbYesNo)
-        'If response = vbYes Then
-        '    Globals.ThisAddIn.ProjDict.ProjectDictionary.Remove(strKeyToDelete)
-        '    Globals.ThisAddIn.SaveDict()
-        'End If
+
     End Sub
 
     Private Sub but_CompressIDs_Click(sender As Object, e As RibbonControlEventArgs) Handles but_CompressIDs.Click
         Globals.ThisAddIn.CompressToDoIDs()
+        MsgBox("ID Compression Complete")
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As RibbonControlEventArgs) Handles Button1.Click
@@ -67,5 +46,11 @@ Public Class TaskMasterRibbon
             blHook = True
             MsgBox("Hooked Events")
         End If
+    End Sub
+
+    Private Sub btnHideHeadersNoChildren_Click(sender As Object, e As RibbonControlEventArgs) Handles btnHideHeadersNoChildren.Click
+        Dim DMtmp = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem)))
+        DMtmp.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView)
+        DMtmp.HideEmptyHeadersInView()
     End Sub
 End Class

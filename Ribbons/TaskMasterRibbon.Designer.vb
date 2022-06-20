@@ -53,6 +53,8 @@
         Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
         Me.BTN_Hook = Me.Factory.CreateRibbonButton
         Me.BTN_FlagTask = Me.Factory.CreateRibbonButton
+        Me.Menu1 = Me.Factory.CreateRibbonMenu
+        Me.btnHideHeadersNoChildren = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
         Me.SuspendLayout()
@@ -67,11 +69,11 @@
         '
         'Group1
         '
-        Me.Group1.Items.Add(Me.TaskMenu)
         Me.Group1.Items.Add(Me.Btn_TreeListView)
-        Me.Group1.Items.Add(Me.BTN_Hook)
         Me.Group1.Items.Add(Me.BTN_FlagTask)
-        Me.Group1.Label = "Group1"
+        Me.Group1.Items.Add(Me.Menu1)
+        Me.Group1.Items.Add(Me.TaskMenu)
+        Me.Group1.Label = "Task Master"
         Me.Group1.Name = "Group1"
         '
         'TaskMenu
@@ -82,9 +84,10 @@
         Me.TaskMenu.Items.Add(Me.btn_SplitToDoID)
         Me.TaskMenu.Items.Add(Me.but_Dictionary)
         Me.TaskMenu.Items.Add(Me.but_CompressIDs)
+        Me.TaskMenu.Items.Add(Me.BTN_Hook)
         Me.TaskMenu.Items.Add(Me.Button1)
         Me.TaskMenu.ItemSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.TaskMenu.Label = "Menu1"
+        Me.TaskMenu.Label = "Utilities"
         Me.TaskMenu.Name = "TaskMenu"
         Me.TaskMenu.ShowImage = True
         '
@@ -151,6 +154,24 @@
         Me.BTN_FlagTask.OfficeImageId = "FlagMessage"
         Me.BTN_FlagTask.ShowImage = True
         '
+        'Menu1
+        '
+        Me.Menu1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Menu1.Items.Add(Me.btnHideHeadersNoChildren)
+        Me.Menu1.ItemSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Menu1.Label = "View"
+        Me.Menu1.Name = "Menu1"
+        Me.Menu1.OfficeImageId = "FindDialog"
+        Me.Menu1.ShowImage = True
+        '
+        'btnHideHeadersNoChildren
+        '
+        Me.btnHideHeadersNoChildren.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.btnHideHeadersNoChildren.Label = "Hide Empty Headers"
+        Me.btnHideHeadersNoChildren.Name = "btnHideHeadersNoChildren"
+        Me.btnHideHeadersNoChildren.OfficeImageId = "ReviewShowOrHideComment"
+        Me.btnHideHeadersNoChildren.ShowImage = True
+        '
         'TaskMasterRibbon
         '
         Me.Name = "TaskMasterRibbon"
@@ -175,6 +196,8 @@
     Friend WithEvents Button1 As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents BTN_Hook As Microsoft.Office.Tools.Ribbon.RibbonButton
     Friend WithEvents BTN_FlagTask As Microsoft.Office.Tools.Ribbon.RibbonButton
+    Friend WithEvents Menu1 As Microsoft.Office.Tools.Ribbon.RibbonMenu
+    Friend WithEvents btnHideHeadersNoChildren As Microsoft.Office.Tools.Ribbon.RibbonButton
 End Class
 
 Partial Class ThisRibbonCollection

@@ -214,6 +214,7 @@
   <ItemGroup>
     <AppDesigner Include="My Project\" />
     <Compile Include="Forms\cCheckBoxClass.vb" />
+    <Compile Include="Models\Flags.vb" />
     <Compile Include="Modules\Flag_Fields_Categories.vb" />
     <Compile Include="Modules\UtilityFunctions.vb" />
     <Compile Include="Models\BaseChanger.vb" />
@@ -238,10 +239,10 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Settings.vb" />
-    <Compile Include="TaskMasterRibbon.Designer.vb">
+    <Compile Include="Ribbons\TaskMasterRibbon.Designer.vb">
       <DependentUpon>TaskMasterRibbon.vb</DependentUpon>
     </Compile>
-    <Compile Include="TaskMasterRibbon.vb">
+    <Compile Include="Ribbons\TaskMasterRibbon.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ThisAddIn.vb">
@@ -250,7 +251,7 @@
     <EmbeddedResource Include="Forms\ProjectInfoWindow.resx">
       <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TaskMasterRibbon.resx">
+    <EmbeddedResource Include="Ribbons\TaskMasterRibbon.resx">
       <DependentUpon>TaskMasterRibbon.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TaskTreeForm.resx">
