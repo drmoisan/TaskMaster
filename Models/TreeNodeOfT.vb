@@ -112,6 +112,14 @@ Public Class TreeNode(Of T)
         Next
     End Sub
 
+    Public Sub Traverse(ByVal action As Action(Of TreeNode(Of T)))
+        action(Me)
+
+        For Each child In _children
+            child.Traverse(action)
+        Next
+    End Sub
+
     Public Function FindByDelegate(comparator As Func(Of T, String, Boolean), StringToCompare As String)
         Dim node As TreeNode(Of T)
 

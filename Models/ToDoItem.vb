@@ -31,6 +31,11 @@ Public Class ToDoItem
     Private _StartDate As Date
     Private _Complete As Boolean
     Private _KB As String = ""
+    Private _ActiveBranch As Boolean = False
+    Private _ExpandChildren As String = ""
+    Private _ExpandChildrenState As String = ""
+    Private _EC2 As Boolean
+    Private _VisibleTreeState As Integer
 
     Public Sub New(OlMail As Outlook.MailItem)
         OlObject = OlMail
@@ -45,6 +50,10 @@ Public Class ToDoItem
         _TagPeople = CustomField("TagPeople")
         _TagTopic = CustomField("TagTopic")
         _KB = CustomField("KBF")
+        _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
+        _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
+        _ExpandChildren = CustomField("EC")
+        _ExpandChildrenState = CustomField("EcState")
         _Priority = OlMail.Importance
         _TaskCreateDate = OlMail.CreationTime
         _StartDate = OlMail.TaskStartDate
@@ -60,6 +69,10 @@ Public Class ToDoItem
         _TagPeople = CustomField("TagPeople")
         _TagTopic = CustomField("TagTopic")
         _KB = CustomField("KBF")
+        _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
+        _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
+        _ExpandChildren = CustomField("EC")
+        _ExpandChildrenState = CustomField("EcState")
         _Priority = OlTask.Importance
         _TaskCreateDate = OlTask.CreationTime
         _StartDate = OlTask.StartDate
@@ -79,6 +92,10 @@ Public Class ToDoItem
             _TagPeople = CustomField("TagPeople")
             _TagTopic = CustomField("TagTopic")
             _KB = CustomField("KBF")
+            _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
+            _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
+            _ExpandChildren = CustomField("EC")
+            _ExpandChildrenState = CustomField("EcState")
             _Priority = OlMail.Importance
             _TaskCreateDate = OlMail.CreationTime
             _StartDate = OlMail.TaskStartDate
@@ -95,6 +112,10 @@ Public Class ToDoItem
             _TagPeople = CustomField("TagPeople")
             _TagTopic = CustomField("TagTopic")
             _KB = CustomField("KBF")
+            _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
+            _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
+            _ExpandChildren = CustomField("EC")
+            _ExpandChildrenState = CustomField("EcState")
             _Priority = OlTask.Importance
             _TaskCreateDate = OlTask.CreationTime
             _StartDate = OlTask.StartDate
@@ -236,9 +257,14 @@ Public Class ToDoItem
             End If
         End Get
         Set(value As String)
-            _TagPeople = value
+
             If Not OlObject Is Nothing Then
+                _TagPeople = value
                 CustomField("TagPeople") = value
+                Dim Flg As Flags = New Flags(OlObject.Categories)
+                Flg.People = value
+                OlObject.Categories = Flg.Combine()
+                OlObject.Save
             End If
         End Set
     End Property
@@ -259,6 +285,10 @@ Public Class ToDoItem
             _TagProject = value
             If Not OlObject Is Nothing Then
                 CustomField("TagProject") = value
+                Dim Flg As Flags = New Flags(OlObject.Categories)
+                Flg.Projects = value
+                OlObject.Categories = Flg.Combine()
+                OlObject.Save
             End If
         End Set
     End Property
@@ -319,6 +349,10 @@ Public Class ToDoItem
             _TagTopic = value
             If Not OlObject Is Nothing Then
                 CustomField("TagTopic") = value
+                Dim Flg As Flags = New Flags(OlObject.Categories)
+                Flg.Topics = value
+                OlObject.Categories = Flg.Combine()
+                OlObject.Save
             End If
         End Set
     End Property
@@ -357,6 +391,144 @@ Public Class ToDoItem
             If Not OlObject Is Nothing Then
                 CustomField("ToDoID") = strID
                 SplitID()
+            End If
+        End Set
+    End Property
+    '_VisibleTreeState
+    Public Property VisibleTreeStateLVL(ByVal Lvl As Integer) As Boolean
+        Get
+            Return ((Math.Pow(2, Lvl - 1) & VisibleTreeState) > 0)
+        End Get
+        Set(value As Boolean)
+            If value = True Then
+                VisibleTreeState = VisibleTreeState Or Math.Pow(2, Lvl - 1)
+            Else
+                VisibleTreeState = VisibleTreeState - (VisibleTreeState And Math.Pow(2, Lvl - 1))
+            End If
+        End Set
+    End Property
+    Public Property VisibleTreeState As Integer
+        Get
+            If _VisibleTreeState <> 0 Then
+                Return _VisibleTreeState
+            ElseIf OlObject Is Nothing Then
+                Return -1
+            Else
+                Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find("VTS")
+                If objProperty Is Nothing Then
+                    CustomField("VTS", OlUserPropertyType.olInteger) = 63 'Binary 111111 for 6 levels
+                    _VisibleTreeState = 63
+                Else
+                    _VisibleTreeState = CustomField("VTS", OlUserPropertyType.olInteger)
+                End If
+                Return _VisibleTreeState
+
+            End If
+        End Get
+        Set(intVTS As Integer)
+            If Not OlObject Is Nothing Then
+                _VisibleTreeState = intVTS
+                CustomField("VTS", OlUserPropertyType.olInteger) = intVTS
+            End If
+        End Set
+    End Property
+
+    Public Property ActiveBranch As Boolean
+        Get
+            If _ActiveBranch = True Then
+                Return True
+            ElseIf OlObject Is Nothing Then
+                Return False
+            Else
+                If CustomFieldExists("AB") Then
+                    _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
+                Else
+                    CustomField("AB", OlUserPropertyType.olYesNo) = True
+                    _ActiveBranch = True
+                End If
+
+                Return _ActiveBranch
+            End If
+        End Get
+        Set(blActive As Boolean)
+            _ActiveBranch = blActive
+            If Not OlObject Is Nothing Then
+                CustomField("AB", OlUserPropertyType.olYesNo) = blActive
+            End If
+        End Set
+    End Property
+
+    Public ReadOnly Property EC2 As Boolean
+        Get
+            If CustomFieldExists("EC2") Then
+                _EC2 = CustomField("EC2")
+
+                If _EC2 = True Then
+                    If ExpandChildren = "+" Then
+                        ExpandChildren = "-"
+                    End If
+                Else
+                    If ExpandChildren = "-" Then
+                        ExpandChildren = "+"
+                    End If
+                End If
+            End If
+            Return _EC2
+        End Get
+    End Property
+
+    Public Property EC_Change As Boolean
+        Get
+            If ExpandChildren.Length = 0 Then
+                ExpandChildren = "-"
+            End If
+
+            If ExpandChildrenState = ExpandChildren Then
+                Return False
+            Else
+                Return True
+            End If
+        End Get
+        Set(blValue As Boolean)
+            If blValue = False Then
+                ExpandChildrenState = ExpandChildren
+            End If
+        End Set
+    End Property
+    Public Property ExpandChildren As String
+        Get
+            If _ExpandChildren.Length <> 0 Then
+                Return _ExpandChildren
+            ElseIf OlObject Is Nothing Then
+                Return ""
+            Else
+                _ExpandChildren = CustomField("EC")
+                Return _ExpandChildren
+            End If
+        End Get
+        Set(strState As String)
+            _ExpandChildren = strState
+            If Not OlObject Is Nothing Then
+                CustomField("EC") = strState
+            End If
+        End Set
+    End Property
+
+    Public Property ExpandChildrenState As String
+        Get
+            If _ExpandChildrenState.Length <> 0 Then
+                Return _ExpandChildrenState
+            ElseIf OlObject Is Nothing Then
+                Return ""
+            Else
+                _ExpandChildrenState = CustomField("EcState")
+                Return _ExpandChildrenState
+            End If
+        End Get
+        Set(strState As String)
+            _ExpandChildrenState = strState
+            If Not OlObject Is Nothing Then
+                CustomField("EcState") = strState
             End If
         End Set
     End Property
@@ -437,15 +609,33 @@ Public Class ToDoItem
 
     Public ReadOnly Property InFolder() As String
         Get
-            Return OlObject.Parent.FolderPath
+            Dim prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
+            Return Replace(OlObject.Parent.FolderPath, prefix, "")
         End Get
     End Property
 
+    Public ReadOnly Property CustomFieldExists(FieldName As String) As Boolean
+        Get
+            Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find(FieldName)
+            If objProperty Is Nothing Then
+                Return False
+            Else
+                Return True
+            End If
+        End Get
+    End Property
     Public Property CustomField(FieldName As String, Optional ByVal OlFieldType As Outlook.OlUserPropertyType = Outlook.OlUserPropertyType.olText)
         Get
             Dim objProperty As Outlook.UserProperty = OlObject.UserProperties.Find(FieldName)
             If objProperty Is Nothing Then
-                Return ""
+                If OlFieldType = OlUserPropertyType.olInteger Then
+                    Return 0
+                ElseIf OlFieldType = OlUserPropertyType.olYesNo Then
+                    Return False
+                Else
+                    Return ""
+                End If
+
             Else
                 If IsArray(objProperty.Value) Then
                     Return FlattenArry(objProperty.Value)

@@ -137,6 +137,9 @@ Public Class DataModel_ToDoTree
         Else
             strSeed = Parent.Value.ToDoID & "00"
         End If
+        If IDList.UsedIDList.Contains(Child.Value.ToDoID) Then
+            IDList.UsedIDList.Remove(Child.Value.ToDoID)
+        End If
         Child.Value.ToDoID = IDList.GetNextAvailableToDoID(strSeed)
         If Child.Children.Count > 0 Then
             ReNumberChildrenIDs(Child.Children, IDList)
@@ -165,7 +168,10 @@ Public Class DataModel_ToDoTree
                 If IDList.UsedIDList.Contains(Children(i).Value.ToDoID) Then IDList.UsedIDList.Remove(Children(i).Value.ToDoID)
             Next i
             For i = 0 To max
-                Children(i).Value.ToDoID = IDList.GetNextAvailableToDoID(strParentID & "00")
+                Dim NextID As String = IDList.GetNextAvailableToDoID(strParentID & "00")
+                'Dim LevelChange As Boolean = (Children(i).Value.ToDoID.Length = NextID.Length)
+                Children(i).Value.ToDoID = NextID
+                'Children(i).Value.VisibleTreeState = 67
                 'Children(i).Value.ToDoID = Children(i).Value.ToDoID
                 If Children(i).Children.Count > 0 Then ReNumberChildrenIDs(Children(i).Children, IDList)
             Next
@@ -219,6 +225,35 @@ Public Class DataModel_ToDoTree
 
         Return ListObjects
     End Function
+
+    Private Function IsHeader(TagContext As String) As String
+        If InStr(TagContext, "@PROJECTS", CompareMethod.Text) Then
+            Return True
+        ElseIf InStr(TagContext, "HEADER", CompareMethod.Text) Then
+            Return True
+        ElseIf InStr(TagContext, "DELIVERABLE", CompareMethod.Text) Then
+            Return True
+        ElseIf InStr(TagContext, "@PROGRAMS", CompareMethod.Text) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Public Sub HideEmptyHeadersInView()
+        Dim action As Action(Of TreeNode(Of ToDoItem)) = Sub(node)
+                                                             If node.ChildCount = 0 Then
+                                                                 If IsHeader(node.Value.TagContext) Then
+                                                                     node.Value.ActiveBranch = False
+                                                                 End If
+                                                             End If
+                                                         End Sub
+
+        For Each node As TreeNode(Of ToDoItem) In ListOfToDoTree
+            node.Traverse(action)
+        Next
+    End Sub
+
     Private Function CompareItemsByToDoID(ByVal objItemLeft As Object, ByVal objItemRight As Object)
         Dim ToDoIDLeft As String = Globals.ThisAddIn.CustomFieldID_GetValue(objItemLeft, "ToDoID")
         Dim ToDoIDRight As String = Globals.ThisAddIn.CustomFieldID_GetValue(objItemRight, "ToDoID")
