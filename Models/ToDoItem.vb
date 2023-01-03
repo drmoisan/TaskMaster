@@ -458,7 +458,7 @@ Public Class ToDoItem
         End Set
     End Property
 
-    Public ReadOnly Property EC2 As Boolean
+    Public Property EC2 As Boolean
         Get
             If CustomFieldExists("EC2") Then
                 _EC2 = CustomField("EC2")
@@ -475,6 +475,12 @@ Public Class ToDoItem
             End If
             Return _EC2
         End Get
+        Set(blValue As Boolean)
+            _EC2 = blValue
+            CustomField("EC2", OlUserPropertyType.olYesNo) = blValue
+            _ExpandChildren = ""
+            _ExpandChildrenState = ""
+        End Set
     End Property
 
     Public Property EC_Change As Boolean

@@ -656,40 +656,43 @@ Public Class ThisAddIn
         'Check to see if change was in the EC
         If todo.EC_Change Then
             Dim strEC As String = todo.ExpandChildren
-            Dim strChFilter As String = "@SQL=" & Chr(34) & "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID" & Chr(34) & " like '" & todo.ToDoID & "%'"
-            Dim OlChildren As Outlook.Items = OlToDoItems.Restrict(strChFilter)
+            ' Extremely expensive. I wonder why it is done this way?
+            If todo.ToDoID <> "" Then
+                Dim strChFilter As String = "@SQL=" & Chr(34) & "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID" & Chr(34) & " like '" & todo.ToDoID & "%'"
+                Dim OlChildren As Outlook.Items = OlToDoItems.Restrict(strChFilter)
 
-            'Identify the tree depth of the current ToDoID (Length of ToDoID / 2)
-            Dim intLVL As Integer = CInt(Math.Truncate(todo.ToDoID.Length / 2))
-            Dim objItem As Object
-            For Each objItem In OlChildren
-                Dim todoTmp As ToDoItem = New ToDoItem(objItem, OnDemand:=True)
+                'Identify the tree depth of the current ToDoID (Length of ToDoID / 2)
+                Dim intLVL As Integer = CInt(Math.Truncate(todo.ToDoID.Length / 2))
+                Dim objItem As Object
+                For Each objItem In OlChildren
+                    Dim todoTmp As ToDoItem = New ToDoItem(objItem, OnDemand:=True)
 
-                'Set the toggle for that level to + or - for all descendants on the binary number
-                If todoTmp.ToDoID <> todo.ToDoID Then
-                    'Added if statement to correct for the fact that Restrict is not case sensitive
-                    If Left(todoTmp.ToDoID, todo.ToDoID.Length) = todo.ToDoID Then
-                        If strEC = "-" Then
-                            todoTmp.VisibleTreeStateLVL(intLVL + 1) = True
-                        ElseIf strEC = "+" Then
-                            todoTmp.VisibleTreeStateLVL(intLVL + 1) = False
-                        End If
-                        'Check to see if visible
-                        Dim VisibleMask As Integer = CInt(Math.Pow(2, todoTmp.ToDoID.Length / 2) - 1)
-                        Dim blnewAB = ((todoTmp.VisibleTreeState And VisibleMask) = VisibleMask)
-                        If blnewAB <> todoTmp.ActiveBranch Then
-                            todoTmp.ActiveBranch = blnewAB
+                    'Set the toggle for that level to + or - for all descendants on the binary number
+                    If todoTmp.ToDoID <> todo.ToDoID Then
+                        'Added if statement to correct for the fact that Restrict is not case sensitive
+                        If Left(todoTmp.ToDoID, todo.ToDoID.Length) = todo.ToDoID Then
+                            If strEC = "-" Then
+                                todoTmp.VisibleTreeStateLVL(intLVL + 1) = True
+                            ElseIf strEC = "+" Then
+                                todoTmp.VisibleTreeStateLVL(intLVL + 1) = False
+                            End If
+                            'Check to see if visible
+                            Dim VisibleMask As Integer = CInt(Math.Pow(2, todoTmp.ToDoID.Length / 2) - 1)
+                            Dim blnewAB = ((todoTmp.VisibleTreeState And VisibleMask) = VisibleMask)
+                            If blnewAB <> todoTmp.ActiveBranch Then
+                                todoTmp.ActiveBranch = blnewAB
+                            End If
                         End If
                     End If
-                End If
 
-            Next
+                Next
+            End If
             todo.EC_Change = False
-        End If
+            End If
 
-        'AUTOCODE ToDoID based on Project
-        'Check to see if the project exists before attempting to autocode the id
-        If Not objProperty_Project Is Nothing Then
+            'AUTOCODE ToDoID based on Project
+            'Check to see if the project exists before attempting to autocode the id
+            If Not objProperty_Project Is Nothing Then
 
             'Get Project Name
             strProject = todo.TagProject
@@ -720,6 +723,7 @@ Public Class ThisAddIn
                                     todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                     IDList.Save(FileName_IDList)
                                     todo.SplitID()
+                                    todo.EC2 = True
                                 End If
                             End If
 
@@ -765,6 +769,7 @@ Public Class ThisAddIn
                         todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                         IDList.Save(FileName_IDList)
                         todo.SplitID()
+                        todo.EC2 = True
                     End If
                 End If
             End If
@@ -777,9 +782,10 @@ Public Class ThisAddIn
         'If So, adjust Kan Ban fields and categories
         If todo.Complete Then
             If InStr(Item.Categories, "Tag KB Completed") = False Then
-                Dim strCats As String = Replace(Replace(Item.Categories, "Tag KB Backlog", ""), ",,", ",")
-                strCats = Replace(Replace(strCats, "Tag KB InProgress", ""), ",,", ",")
-                strCats = Replace(Replace(strCats, "Tag KB Planned", ""), ",,", ",")
+                Dim strCats As String = Item.Categories
+                strCats = strCats.Replace("Tag KB Backlog", "").Replace(",,", ",")
+                strCats = strCats.Replace("Tag KB InProgress", "").Replace(",,", ",")
+                strCats = strCats.Replace("Tag KB Planned", "").Replace(",,", ",")
                 While Left(strCats, 1) = ","
                     strCats = Right(strCats, strCats.Length - 1)
                 End While
