@@ -1,17 +1,36 @@
-﻿Public Class Flags
+﻿''' <summary>
+''' Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
+''' </summary>
+Public Class FlagParser
     Private _People As String = ""
-    Public _Projects As String = ""
-    Public _Topics As String = ""
+    Private _Projects As String = ""
+    Private _Topics As String = ""
     Public Context As String = ""
     Public KB As String = ""
     Public Other As String = ""
     Public Today As Boolean = False
     Public Bullpin As Boolean = False
 
+    ''' <summary>
+    ''' Constructor for the FlagParser class accepts a comma delimited string containing 
+    ''' color categories and initializes
+    ''' </summary>
+    ''' <param name="strCats_All"></param>
+    ''' <param name="DeleteSearchSubString"></param>
     Public Sub New(ByRef strCats_All As String, Optional DeleteSearchSubString As Boolean = False)
         Splitter(strCats_All, DeleteSearchSubString)
     End Sub
 
+    ''' <summary>
+    ''' Property accesses the private variable _Projects
+    ''' Set 
+    '''     Extract: Split comma delimited String to array of project names
+    '''     Transform: Iterate through array and append a prefix if not present 
+    '''     Load: Recombine in string and store value in _Projects
+    ''' Get accesses the value stored in _Projects
+    ''' </summary>
+    ''' <param name="IncludePrefix">Determines whether the return value includes the category prefix</param>
+    ''' <returns>A string containing a comma separated Project names</returns>
     Public Property Projects(Optional IncludePrefix As Boolean = False) As String
         Get
             Dim Prefix As String = "Tag PROJECT "
@@ -44,6 +63,16 @@
         End Set
     End Property
 
+    ''' <summary>
+    ''' Property accesses the private variable _Topics
+    ''' Set 
+    '''     Extract: Split comma delimited String to array of Topic names
+    '''     Transform: Iterate through array and append a prefix if not present 
+    '''     Load: Recombine in string and store value in _Topics
+    ''' Get accesses the value stored in _Topics
+    ''' </summary>
+    ''' <param name="IncludePrefix">Determines whether the return value includes the category prefix</param>
+    ''' <returns>A string containing a comma separated Topic names</returns>
     Public Property Topics(Optional IncludePrefix As Boolean = False) As String
         Get
             Dim Prefix As String = "Tag TOPIC "
@@ -76,6 +105,16 @@
         End Set
     End Property
 
+    ''' <summary>
+    ''' Property accesses the private variable _People
+    ''' Set 
+    '''     Extract: Split comma delimited String to array of People names
+    '''     Transform: Iterate through array and append a prefix if not present 
+    '''     Load: Recombine in string and store value in _People
+    ''' Get accesses the value stored in _People
+    ''' </summary>
+    ''' <param name="IncludePrefix"></param>
+    ''' <returns>A string containing a comma separated People names</returns>
     Public Property People(Optional IncludePrefix As Boolean = False) As String
         Get
             Dim Prefix As String = "Tag PPL "
@@ -108,6 +147,10 @@
         End Set
     End Property
 
+    ''' <summary>
+    ''' Function recombines flag settings in one comma delimited string representing color categories
+    ''' </summary>
+    ''' <returns>A string containing color categories</returns>
     Public Function Combine() As String
         Dim strTmp As String = ""
         If _People.Length > 0 Then
@@ -145,6 +188,11 @@
         Return strTmp
     End Function
 
+    ''' <summary>
+    ''' Subroutine extracts flag settings from color categories and loads to internal variables
+    ''' </summary>
+    ''' <param name="strCats_All">String containing comma delimited color categories</param>
+    ''' <param name="DeleteSearchSubString"></param>
     Public Sub Splitter(ByRef strCats_All As String, Optional DeleteSearchSubString As Boolean = False)
         _People = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         Other = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", True)
@@ -178,6 +226,14 @@
 
     End Sub
 
+    ''' <summary>
+    ''' Function adds wildcards to a seach string
+    ''' </summary>
+    ''' <param name="strOriginal">A search string</param>
+    ''' <param name="b_Leading">If true, a wildcard is added at the beginning</param>
+    ''' <param name="b_Trailing">If true, a wildcard is added at the end</param>
+    ''' <param name="charWC">Character representing wildcard. Default is *</param>
+    ''' <returns>A search string with wildcards added</returns>
     Public Function AddWildcards(ByVal strOriginal As String, Optional b_Leading As Boolean = True,
     Optional b_Trailing As Boolean = True, Optional charWC As String = "*") As String
 
@@ -190,6 +246,19 @@
 
     End Function
 
+    ''' <summary>
+    ''' Extract: Function accepts a comma delimited string and converts to an array of strings
+    ''' Transform: Function selects members of the array that match the substring
+    ''' Load: Function returns a comma delimited string containing matching elements
+    ''' </summary>
+    ''' <param name="strMainString">A comma delimited string that will be searched</param>
+    ''' <param name="strSubString">Target substring to find</param>
+    ''' <param name="strDelimiter">String used as delimiter</param>
+    ''' <param name="bNotSearchStr">Boolean flag that inverts the search to return 
+    ''' elements that don't match</param>
+    ''' <param name="DeleteSearchSubString">Boolean that determines if return value 
+    ''' eliminates substring from each match</param>
+    ''' <returns></returns>
     Public Function SubStr_w_Delimeter(strMainString As String, strSubString As String, strDelimiter As String, Optional bNotSearchStr As Boolean = False, Optional DeleteSearchSubString As Boolean = False) As String
         Dim varTempStrAry As Object
         Dim varFiltStrAry As Object
@@ -204,6 +273,16 @@
 
     End Function
 
+    ''' <summary>
+    ''' Function accepts a pointer to a string array and searches for a substring.
+    ''' It returns a pointer to a new string array containing matches 
+    ''' </summary>
+    ''' <param name="varStrArry">Pointer to the string array to search</param>
+    ''' <param name="SearchStr$">Target substring to search</param>
+    ''' <param name="bNotSearchStr">Boolean flag that inverts the search to return 
+    ''' any element that doesn't match</param>
+    ''' <param name="DeleteSearchSubString">Boolean that removes </param>
+    ''' <returns>Pointer to a string array with elements that match the criteria</returns>
     Public Function SearchArry4Str(ByRef varStrArry As Object, Optional SearchStr$ = "", Optional bNotSearchStr As Boolean = False, Optional DeleteSearchSubString As Boolean = False) As Object
         Dim m_Find As String
         Dim m_Wildcard As Boolean
@@ -219,15 +298,26 @@
 
             m_Find = SearchStr
 
-            m_Find = LCase$(m_Find)                             'Make lower case
-            m_Find = Replace(m_Find, "%", "*")                  'Standardize characters used as wildcards
-            m_Wildcard = (InStr(m_Find, "*"))                   'Determine if wildcards are present in search string
-            intFoundCt = 0
-            strSearchNoWC = Replace(SearchStr, "*", "")         'Remove wildcards from the string
+            'Make lower case
+            m_Find = LCase$(m_Find)
 
-            For i = LBound(varStrArry) To UBound(varStrArry)    'Loop through the array to find substring
+            'Standardize characters used as wildcards
+            m_Find = Replace(m_Find, "%", "*")
+
+            'Determine if wildcards are present in search string
+            m_Wildcard = (InStr(m_Find, "*"))
+
+            intFoundCt = 0
+
+            'Remove wildcards from the string
+            strSearchNoWC = Replace(SearchStr, "*", "")
+
+            'Loop through the array to find substring
+            For i = LBound(varStrArry) To UBound(varStrArry)
                 boolFound = False
-                If varStrArry(i) <> "" Then                       'Skip over blank entries
+
+                'Skip over blank entries
+                If varStrArry(i) <> "" Then
                     If m_Wildcard Then
                         If bNotSearchStr = False Then
                             boolFound = (LCase$(varStrArry(i)) Like m_Find)
@@ -266,6 +356,11 @@
 
     End Function
 
+    ''' <summary>
+    ''' Function accepts a pointer to a string array and collapses into a comma delimited string
+    ''' </summary>
+    ''' <param name="varAry">Pointer to string array</param>
+    ''' <returns>A comma delimited string</returns>
     Public Function Condense_Variant_To_Str(varAry As Object) As String
         Dim strTempStr As String = ""
         Dim i As Integer

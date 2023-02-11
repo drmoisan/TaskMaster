@@ -261,7 +261,7 @@ Public Class ToDoItem
             If Not OlObject Is Nothing Then
                 _TagPeople = value
                 CustomField("TagPeople") = value
-                Dim Flg As Flags = New Flags(OlObject.Categories)
+                Dim Flg As FlagParser = New FlagParser(OlObject.Categories)
                 Flg.People = value
                 OlObject.Categories = Flg.Combine()
                 OlObject.Save
@@ -285,7 +285,7 @@ Public Class ToDoItem
             _TagProject = value
             If Not OlObject Is Nothing Then
                 CustomField("TagProject") = value
-                Dim Flg As Flags = New Flags(OlObject.Categories)
+                Dim Flg As FlagParser = New FlagParser(OlObject.Categories)
                 Flg.Projects = value
                 OlObject.Categories = Flg.Combine()
                 OlObject.Save
@@ -349,7 +349,7 @@ Public Class ToDoItem
             _TagTopic = value
             If Not OlObject Is Nothing Then
                 CustomField("TagTopic") = value
-                Dim Flg As Flags = New Flags(OlObject.Categories)
+                Dim Flg As FlagParser = New FlagParser(OlObject.Categories)
                 Flg.Topics = value
                 OlObject.Categories = Flg.Combine()
                 OlObject.Save
