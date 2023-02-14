@@ -12,15 +12,16 @@ Option Strict On
 Option Explicit On
 
 
-
-<Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
- Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0"),  _
- Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-Partial Public NotInheritable Class MySettings
-    Inherits Global.System.Configuration.ApplicationSettingsBase
+Namespace My
     
-    Private Shared defaultInstance As MySettings = CType(Global.System.Configuration.ApplicationSettingsBase.Synchronized(New MySettings()),MySettings)
-    
+    <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0"),  _
+     Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
+    Partial Public NotInheritable Class MySettings
+        Inherits Global.System.Configuration.ApplicationSettingsBase
+        
+        Private Shared defaultInstance As MySettings = CType(Global.System.Configuration.ApplicationSettingsBase.Synchronized(New MySettings()),MySettings)
+        
 #Region "My.Settings Auto-Save Functionality"
 #If _MyType = "WindowsForms" Then
     Private Shared addedHandler As Boolean
@@ -35,10 +36,10 @@ Partial Public NotInheritable Class MySettings
     End Sub
 #End If
 #End Region
-    
-    Public Shared ReadOnly Property [Default]() As MySettings
-        Get
-            
+        
+        Public Shared ReadOnly Property [Default]() As MySettings
+            Get
+                
 #If _MyType = "WindowsForms" Then
                If Not addedHandler Then
                     SyncLock addedHandlerLockObject
@@ -49,34 +50,44 @@ Partial Public NotInheritable Class MySettings
                     End SyncLock
                 End If
 #End If
-            Return defaultInstance
-        End Get
-    End Property
-    
-    <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),
-     Global.System.Configuration.DefaultSettingValueAttribute("0")>
-    Public Property MaxToDo() As Long
-        Get
-            Return CType(Me("MaxToDo"), Long)
-        End Get
-        Set(ByVal value As Long)
-            Me("MaxToDo") = value
-        End Set
-    End Property
-
-    <Global.System.Configuration.UserScopedSettingAttribute(),  _
-     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-    Public Property Setting() As String
-        Get
-            Return CType(Me("Setting"),String)
-        End Get
-        Set
-            Me("Setting") = value
-        End Set
-    End Property
-End Class
+                Return defaultInstance
+            End Get
+        End Property
+        
+        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public ReadOnly Property MaxToDo() As Long
+            Get
+                Return CType(Me("MaxToDo"),Long)
+            End Get
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property Setting() As String
+            Get
+                Return CType(Me("Setting"),String)
+            End Get
+            Set
+                Me("Setting") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("15")>  _
+        Public Property Default_Task_Length() As Integer
+            Get
+                Return CType(Me("Default_Task_Length"),Integer)
+            End Get
+            Set
+                Me("Default_Task_Length") = value
+            End Set
+        End Property
+    End Class
+End Namespace
 
 Namespace My
     
@@ -86,9 +97,9 @@ Namespace My
     Friend Module MySettingsProperty
         
         <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
-        Friend ReadOnly Property Settings() As Global.TaskMaster.MySettings
+        Friend ReadOnly Property Settings() As Global.TaskMaster.My.MySettings
             Get
-                Return Global.TaskMaster.MySettings.Default
+                Return Global.TaskMaster.My.MySettings.Default
             End Get
         End Property
     End Module

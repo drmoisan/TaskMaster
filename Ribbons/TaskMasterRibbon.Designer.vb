@@ -44,17 +44,17 @@
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(TaskMasterRibbon))
         Me.Tab1 = Me.Factory.CreateRibbonTab
         Me.Group1 = Me.Factory.CreateRibbonGroup
+        Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
+        Me.BTN_FlagTask = Me.Factory.CreateRibbonButton
+        Me.Menu1 = Me.Factory.CreateRibbonMenu
+        Me.btnHideHeadersNoChildren = Me.Factory.CreateRibbonButton
         Me.TaskMenu = Me.Factory.CreateRibbonMenu
         Me.btn_RefreshMax = Me.Factory.CreateRibbonButton
         Me.btn_SplitToDoID = Me.Factory.CreateRibbonButton
         Me.but_Dictionary = Me.Factory.CreateRibbonButton
         Me.but_CompressIDs = Me.Factory.CreateRibbonButton
-        Me.Button1 = Me.Factory.CreateRibbonButton
-        Me.Btn_TreeListView = Me.Factory.CreateRibbonButton
         Me.BTN_Hook = Me.Factory.CreateRibbonButton
-        Me.BTN_FlagTask = Me.Factory.CreateRibbonButton
-        Me.Menu1 = Me.Factory.CreateRibbonMenu
-        Me.btnHideHeadersNoChildren = Me.Factory.CreateRibbonButton
+        Me.Button1 = Me.Factory.CreateRibbonButton
         Me.Tab1.SuspendLayout()
         Me.Group1.SuspendLayout()
         Me.SuspendLayout()
@@ -75,6 +75,40 @@
         Me.Group1.Items.Add(Me.TaskMenu)
         Me.Group1.Label = "Task Master"
         Me.Group1.Name = "Group1"
+        '
+        'Btn_TreeListView
+        '
+        Me.Btn_TreeListView.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Btn_TreeListView.Label = "Load Tree"
+        Me.Btn_TreeListView.Name = "Btn_TreeListView"
+        Me.Btn_TreeListView.OfficeImageId = "OutlineShowDetail"
+        Me.Btn_TreeListView.ShowImage = True
+        '
+        'BTN_FlagTask
+        '
+        Me.BTN_FlagTask.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.BTN_FlagTask.Label = "Flag Task"
+        Me.BTN_FlagTask.Name = "BTN_FlagTask"
+        Me.BTN_FlagTask.OfficeImageId = "FlagMessage"
+        Me.BTN_FlagTask.ShowImage = True
+        '
+        'Menu1
+        '
+        Me.Menu1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Menu1.Items.Add(Me.btnHideHeadersNoChildren)
+        Me.Menu1.ItemSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Menu1.Label = "View"
+        Me.Menu1.Name = "Menu1"
+        Me.Menu1.OfficeImageId = "FindDialog"
+        Me.Menu1.ShowImage = True
+        '
+        'btnHideHeadersNoChildren
+        '
+        Me.btnHideHeadersNoChildren.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.btnHideHeadersNoChildren.Label = "Hide Empty Headers"
+        Me.btnHideHeadersNoChildren.Name = "btnHideHeadersNoChildren"
+        Me.btnHideHeadersNoChildren.OfficeImageId = "ReviewShowOrHideComment"
+        Me.btnHideHeadersNoChildren.ShowImage = True
         '
         'TaskMenu
         '
@@ -123,21 +157,6 @@
         Me.but_CompressIDs.OfficeImageId = "ReviewCombineRevisions"
         Me.but_CompressIDs.ShowImage = True
         '
-        'Button1
-        '
-        Me.Button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Button1.Label = "FixToDoIDs"
-        Me.Button1.Name = "Button1"
-        Me.Button1.ShowImage = True
-        '
-        'Btn_TreeListView
-        '
-        Me.Btn_TreeListView.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Btn_TreeListView.Label = "Load Tree"
-        Me.Btn_TreeListView.Name = "Btn_TreeListView"
-        Me.Btn_TreeListView.OfficeImageId = "OutlineShowDetail"
-        Me.Btn_TreeListView.ShowImage = True
-        '
         'BTN_Hook
         '
         Me.BTN_Hook.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
@@ -146,31 +165,12 @@
         Me.BTN_Hook.OfficeImageId = "PositionAbsoluteMarks"
         Me.BTN_Hook.ShowImage = True
         '
-        'BTN_FlagTask
+        'Button1
         '
-        Me.BTN_FlagTask.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.BTN_FlagTask.Label = "Flag Task"
-        Me.BTN_FlagTask.Name = "BTN_FlagTask"
-        Me.BTN_FlagTask.OfficeImageId = "FlagMessage"
-        Me.BTN_FlagTask.ShowImage = True
-        '
-        'Menu1
-        '
-        Me.Menu1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Menu1.Items.Add(Me.btnHideHeadersNoChildren)
-        Me.Menu1.ItemSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Menu1.Label = "View"
-        Me.Menu1.Name = "Menu1"
-        Me.Menu1.OfficeImageId = "FindDialog"
-        Me.Menu1.ShowImage = True
-        '
-        'btnHideHeadersNoChildren
-        '
-        Me.btnHideHeadersNoChildren.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.btnHideHeadersNoChildren.Label = "Hide Empty Headers"
-        Me.btnHideHeadersNoChildren.Name = "btnHideHeadersNoChildren"
-        Me.btnHideHeadersNoChildren.OfficeImageId = "ReviewShowOrHideComment"
-        Me.btnHideHeadersNoChildren.ShowImage = True
+        Me.Button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
+        Me.Button1.Label = "FixToDoIDs"
+        Me.Button1.Name = "Button1"
+        Me.Button1.ShowImage = True
         '
         'TaskMasterRibbon
         '
@@ -202,8 +202,8 @@ End Class
 
 Partial Class ThisRibbonCollection
 
-    <System.Diagnostics.DebuggerNonUserCode()> _
-    Friend ReadOnly Property Ribbon1() As TaskMasterRibbon
+    <System.Diagnostics.DebuggerNonUserCode()>
+    Friend ReadOnly Property Ribbon_TM() As TaskMasterRibbon
         Get
             Return Me.GetRibbon(Of TaskMasterRibbon)()
         End Get

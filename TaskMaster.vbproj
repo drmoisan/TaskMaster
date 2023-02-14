@@ -207,11 +207,13 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
+    <Compile Include="Classes\TaskController.vb" />
+    <Compile Include="Classes\Flag_Tasks.vb" />
     <Compile Include="Forms\cCheckBoxClass.vb" />
-    <Compile Include="Forms\NewEMailAsTask.Designer.vb">
-      <DependentUpon>NewEMailAsTask.vb</DependentUpon>
+    <Compile Include="Forms\TaskViewer.Designer.vb">
+      <DependentUpon>TaskViewer.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\NewEMailAsTask.vb">
+    <Compile Include="Forms\TaskViewer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Models\FlagParser.vb" />
@@ -240,6 +242,12 @@
     <Compile Include="Forms\TaskTreeForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Ribbons\EmailRibbon.Designer.vb">
+      <DependentUpon>EmailRibbon.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Ribbons\EmailRibbon.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Settings.vb" />
     <Compile Include="Ribbons\TaskMasterRibbon.Designer.vb">
       <DependentUpon>TaskMasterRibbon.vb</DependentUpon>
@@ -250,8 +258,11 @@
     <Compile Include="ThisAddIn.vb">
       <SubType>Code</SubType>
     </Compile>
-    <EmbeddedResource Include="Forms\NewEMailAsTask.resx">
-      <DependentUpon>NewEMailAsTask.vb</DependentUpon>
+    <EmbeddedResource Include="Ribbons\EmailRibbon.resx">
+      <DependentUpon>EmailRibbon.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TaskViewer.resx">
+      <DependentUpon>TaskViewer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ProjectInfoWindow.resx">
       <DependentUpon>ProjectInfoWindow.vb</DependentUpon>

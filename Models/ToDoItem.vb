@@ -16,6 +16,9 @@ Imports System.Runtime.Serialization.Formatters.Binary
 
 
 Public Class ToDoItem
+    Const PA_TOTAL_WORK As String =
+            "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003"
+
     Private OlObject As Object
     Private _ToDoID As String = ""
     Public _TaskSubject As String = ""
@@ -31,6 +34,7 @@ Public Class ToDoItem
     Private _StartDate As Date
     Private _Complete As Boolean
     Private _KB As String = ""
+    Private _TotalWork As Integer = 0
     Private _ActiveBranch As Boolean = False
     Private _ExpandChildren As String = ""
     Private _ExpandChildrenState As String = ""
@@ -139,6 +143,38 @@ Public Class ToDoItem
         End Get
     End Property
 
+    Public Property ReminderTime As Date
+        Get
+            Return OlObject.ReminderTime
+        End Get
+        Set(value As Date)
+            OlObject.ReminderTime = value
+        End Set
+    End Property
+
+    Public Property DueDate As Date
+        Get
+            If TypeOf OlObject Is MailItem Then
+                Dim OlMail As MailItem = OlObject
+                Return OlMail.TaskDueDate
+            ElseIf TypeOf OlObject Is TaskItem Then
+                Dim OlTask As TaskItem = OlObject
+                Return OlTask.DueDate
+            Else
+                Return DateValue("1/1/4501")
+            End If
+        End Get
+        Set(value As Date)
+            If TypeOf OlObject Is MailItem Then
+                Dim OlMail As MailItem = OlObject
+                OlMail.TaskDueDate = value
+            ElseIf TypeOf OlObject Is TaskItem Then
+                Dim OlTask As TaskItem = OlObject
+                OlTask.DueDate = value
+            End If
+        End Set
+    End Property
+
     Public Property StartDate As Date
         Get
             Return _TaskCreateDate
@@ -176,6 +212,8 @@ Public Class ToDoItem
             End If
         End Set
     End Property
+
+
 
     Public Property Complete As Boolean
         Get
@@ -375,6 +413,47 @@ Public Class ToDoItem
             End If
         End Set
     End Property
+
+    Public Property TotalWork As Integer
+        Get
+            If _TotalWork = 0 Then
+                If OlObject Is Nothing Then
+                    _TotalWork = 0
+                ElseIf TypeOf OlObject Is MailItem Then
+                    Dim OlMail As MailItem = OlObject
+                    If PA_FieldExists(PA_TOTAL_WORK) Then
+                        _TotalWork = OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK)
+                    Else
+                        _TotalWork = 0
+                    End If
+
+                ElseIf TypeOf OlObject Is TaskItem Then
+                    Dim OlTask As TaskItem = OlObject
+                    _TotalWork = OlTask.TotalWork
+
+                Else
+                    _TotalWork = 0
+                End If
+            End If
+            Return _TotalWork
+
+        End Get
+
+        Set(value As Integer)
+            _TotalWork = value
+            If OlObject Is Nothing Then
+            ElseIf TypeOf OlObject Is MailItem Then
+                Dim OlMail As MailItem = OlObject
+                OlMail.PropertyAccessor.SetProperty(PA_TOTAL_WORK, value)
+                OlMail.Save()
+            ElseIf TypeOf OlObject Is TaskItem Then
+                Dim OlTask As TaskItem = OlObject
+                OlTask.TotalWork = value
+                OlTask.Save()
+            End If
+        End Set
+    End Property
+
     Public Property ToDoID As String
         Get
             If _ToDoID.Length <> 0 Then
@@ -617,6 +696,18 @@ Public Class ToDoItem
         Get
             Dim prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
             Return Replace(OlObject.Parent.FolderPath, prefix, "")
+        End Get
+    End Property
+
+    Public ReadOnly Property PA_FieldExists(PA_Schema As String) As Boolean
+        Get
+            Try
+                Dim OlPA As Outlook.PropertyAccessor = OlObject.PropertyAccessor
+                Dim OlProperty As Object = OlPA.GetProperty(PA_Schema)
+                Return True
+            Catch
+                Return False
+            End Try
         End Get
     End Property
 

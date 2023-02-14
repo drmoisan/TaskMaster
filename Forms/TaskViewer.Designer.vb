@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class NewEMailAsTask
+Partial Class TaskViewer
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -23,28 +23,29 @@ Partial Class NewEMailAsTask
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.Frame1 = New System.Windows.Forms.Panel()
-        Me.Category_Selection = New System.Windows.Forms.Label()
-        Me.People_Selection = New System.Windows.Forms.Label()
-        Me.Project_Selection = New System.Windows.Forms.Label()
-        Me.Topic_Selection = New System.Windows.Forms.Label()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.OK_Button = New System.Windows.Forms.Button()
-        Me.Cancel_Button = New System.Windows.Forms.Button()
-        Me.Cat_Deskwork = New System.Windows.Forms.Button()
-        Me.Cat_Agenda = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Cat_WaitingFor = New System.Windows.Forms.Button()
+        Me.cbxBULLPIN = New System.Windows.Forms.CheckBox()
+        Me.cbxTODAY = New System.Windows.Forms.CheckBox()
+        Me.cbxFlag = New System.Windows.Forms.CheckBox()
+        Me.Cat_Email = New System.Windows.Forms.Button()
+        Me.Cat_ReadingOther = New System.Windows.Forms.Button()
+        Me.Cat_Unprocessed = New System.Windows.Forms.Button()
         Me.Cat_ReadingBusiness = New System.Windows.Forms.Button()
         Me.Cat_Calls = New System.Windows.Forms.Button()
         Me.Cat_Internet = New System.Windows.Forms.Button()
-        Me.Cat_Unprocessed = New System.Windows.Forms.Button()
-        Me.Cat_ReadingOther = New System.Windows.Forms.Button()
-        Me.Cat_Email = New System.Windows.Forms.Button()
-        Me.cbxFlag = New System.Windows.Forms.CheckBox()
-        Me.cbxTODAY = New System.Windows.Forms.CheckBox()
-        Me.cbxBULLPIN = New System.Windows.Forms.CheckBox()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Cat_Agenda = New System.Windows.Forms.Button()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Cat_Deskwork = New System.Windows.Forms.Button()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Topic_Selection = New System.Windows.Forms.Label()
+        Me.Project_Selection = New System.Windows.Forms.Label()
+        Me.People_Selection = New System.Windows.Forms.Label()
+        Me.Category_Selection = New System.Windows.Forms.Label()
+        Me.OK_Button = New System.Windows.Forms.Button()
+        Me.Cancel_Button = New System.Windows.Forms.Button()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Task_Name = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
@@ -57,7 +58,6 @@ Partial Class NewEMailAsTask
         Me.Label9 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.DT_Reminder = New System.Windows.Forms.DateTimePicker()
-        Me.Cat_WaitingFor = New System.Windows.Forms.Button()
         Me.Frame1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -89,144 +89,84 @@ Partial Class NewEMailAsTask
         Me.Frame1.Size = New System.Drawing.Size(570, 322)
         Me.Frame1.TabIndex = 0
         '
-        'Category_Selection
+        'Cat_WaitingFor
         '
-        Me.Category_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.Category_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Category_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Category_Selection.Location = New System.Drawing.Point(160, 24)
-        Me.Category_Selection.Name = "Category_Selection"
-        Me.Category_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.Category_Selection.TabIndex = 0
-        Me.Category_Selection.Text = "[Category Label]"
+        Me.Cat_WaitingFor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Cat_WaitingFor.BackColor = System.Drawing.Color.DarkMagenta
+        Me.Cat_WaitingFor.ForeColor = System.Drawing.SystemColors.ControlLightLight
+        Me.Cat_WaitingFor.Location = New System.Drawing.Point(13, 246)
+        Me.Cat_WaitingFor.Name = "Cat_WaitingFor"
+        Me.Cat_WaitingFor.Size = New System.Drawing.Size(126, 34)
+        Me.Cat_WaitingFor.TabIndex = 19
+        Me.Cat_WaitingFor.Text = "Waiting For"
+        Me.Cat_WaitingFor.UseVisualStyleBackColor = False
         '
-        'People_Selection
+        'cbxBULLPIN
         '
-        Me.People_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.People_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.People_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.People_Selection.Location = New System.Drawing.Point(160, 60)
-        Me.People_Selection.Name = "People_Selection"
-        Me.People_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.People_Selection.TabIndex = 1
-        Me.People_Selection.Text = "[Assigned People Flagged]"
+        Me.cbxBULLPIN.AutoSize = True
+        Me.cbxBULLPIN.Location = New System.Drawing.Point(424, 290)
+        Me.cbxBULLPIN.Name = "cbxBULLPIN"
+        Me.cbxBULLPIN.Size = New System.Drawing.Size(113, 17)
+        Me.cbxBULLPIN.TabIndex = 18
+        Me.cbxBULLPIN.Text = "BULLPIN Priorities"
+        Me.cbxBULLPIN.UseVisualStyleBackColor = True
         '
-        'Project_Selection
+        'cbxTODAY
         '
-        Me.Project_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.Project_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Project_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Project_Selection.Location = New System.Drawing.Point(160, 97)
-        Me.Project_Selection.Name = "Project_Selection"
-        Me.Project_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.Project_Selection.TabIndex = 2
-        Me.Project_Selection.Text = "[Projects Flagged]"
+        Me.cbxTODAY.AutoSize = True
+        Me.cbxTODAY.Location = New System.Drawing.Point(292, 290)
+        Me.cbxTODAY.Name = "cbxTODAY"
+        Me.cbxTODAY.Size = New System.Drawing.Size(110, 17)
+        Me.cbxTODAY.TabIndex = 17
+        Me.cbxTODAY.Text = "Complete TODAY"
+        Me.cbxTODAY.UseVisualStyleBackColor = True
         '
-        'Topic_Selection
+        'cbxFlag
         '
-        Me.Topic_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.Topic_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Topic_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Topic_Selection.Location = New System.Drawing.Point(160, 133)
-        Me.Topic_Selection.Name = "Topic_Selection"
-        Me.Topic_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.Topic_Selection.TabIndex = 3
-        Me.Topic_Selection.Text = "[Other Topics Flagged]"
+        Me.cbxFlag.AutoSize = True
+        Me.cbxFlag.Checked = True
+        Me.cbxFlag.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.cbxFlag.Location = New System.Drawing.Point(160, 290)
+        Me.cbxFlag.Name = "cbxFlag"
+        Me.cbxFlag.Size = New System.Drawing.Size(114, 17)
+        Me.cbxFlag.TabIndex = 16
+        Me.cbxFlag.Text = "Flag For Follow Up"
+        Me.cbxFlag.UseVisualStyleBackColor = True
         '
-        'Label1
+        'Cat_Email
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(10, 25)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(54, 16)
-        Me.Label1.TabIndex = 4
-        Me.Label1.Text = "Context:"
+        Me.Cat_Email.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Cat_Email.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Cat_Email.Location = New System.Drawing.Point(160, 246)
+        Me.Cat_Email.Name = "Cat_Email"
+        Me.Cat_Email.Size = New System.Drawing.Size(126, 34)
+        Me.Cat_Email.TabIndex = 15
+        Me.Cat_Email.Text = "@ Email"
+        Me.Cat_Email.UseVisualStyleBackColor = False
         '
-        'Label2
+        'Cat_ReadingOther
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(10, 61)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(87, 16)
-        Me.Label2.TabIndex = 5
-        Me.Label2.Text = "Assigned To:"
+        Me.Cat_ReadingOther.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Cat_ReadingOther.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Cat_ReadingOther.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Cat_ReadingOther.Location = New System.Drawing.Point(292, 246)
+        Me.Cat_ReadingOther.Name = "Cat_ReadingOther"
+        Me.Cat_ReadingOther.Size = New System.Drawing.Size(126, 34)
+        Me.Cat_ReadingOther.TabIndex = 14
+        Me.Cat_ReadingOther.Text = "News | Articles | Other"
+        Me.Cat_ReadingOther.UseVisualStyleBackColor = False
         '
-        'Label3
+        'Cat_Unprocessed
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(10, 98)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(82, 16)
-        Me.Label3.TabIndex = 6
-        Me.Label3.Text = "Project Flag:"
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(10, 134)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(73, 16)
-        Me.Label4.TabIndex = 7
-        Me.Label4.Text = "Topic Tag:"
-        '
-        'OK_Button
-        '
-        Me.OK_Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.OK_Button.Location = New System.Drawing.Point(138, 530)
-        Me.OK_Button.Name = "OK_Button"
-        Me.OK_Button.Size = New System.Drawing.Size(145, 57)
-        Me.OK_Button.TabIndex = 1
-        Me.OK_Button.Text = "OK"
-        Me.OK_Button.UseVisualStyleBackColor = True
-        '
-        'Cancel_Button
-        '
-        Me.Cancel_Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Cancel_Button.Location = New System.Drawing.Point(297, 530)
-        Me.Cancel_Button.Name = "Cancel_Button"
-        Me.Cancel_Button.Size = New System.Drawing.Size(145, 57)
-        Me.Cancel_Button.TabIndex = 2
-        Me.Cancel_Button.Text = "Cancel"
-        Me.Cancel_Button.UseVisualStyleBackColor = True
-        '
-        'Cat_Deskwork
-        '
-        Me.Cat_Deskwork.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Cat_Deskwork.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.Cat_Deskwork.Location = New System.Drawing.Point(160, 166)
-        Me.Cat_Deskwork.Name = "Cat_Deskwork"
-        Me.Cat_Deskwork.Size = New System.Drawing.Size(126, 34)
-        Me.Cat_Deskwork.TabIndex = 1
-        Me.Cat_Deskwork.Text = "PERSONAL"
-        Me.Cat_Deskwork.UseVisualStyleBackColor = False
-        '
-        'Cat_Agenda
-        '
-        Me.Cat_Agenda.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Cat_Agenda.BackColor = System.Drawing.Color.Blue
-        Me.Cat_Agenda.ForeColor = System.Drawing.SystemColors.ButtonFace
-        Me.Cat_Agenda.Location = New System.Drawing.Point(292, 166)
-        Me.Cat_Agenda.Name = "Cat_Agenda"
-        Me.Cat_Agenda.Size = New System.Drawing.Size(126, 34)
-        Me.Cat_Agenda.TabIndex = 8
-        Me.Cat_Agenda.Text = "@ Meeting"
-        Me.Cat_Agenda.UseVisualStyleBackColor = False
-        '
-        'Button1
-        '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button1.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Button1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button1.Location = New System.Drawing.Point(424, 166)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(126, 34)
-        Me.Button1.TabIndex = 9
-        Me.Button1.Text = "@ Meeting"
-        Me.Button1.UseVisualStyleBackColor = False
+        Me.Cat_Unprocessed.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Cat_Unprocessed.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Cat_Unprocessed.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Cat_Unprocessed.Location = New System.Drawing.Point(424, 246)
+        Me.Cat_Unprocessed.Name = "Cat_Unprocessed"
+        Me.Cat_Unprocessed.Size = New System.Drawing.Size(126, 34)
+        Me.Cat_Unprocessed.TabIndex = 13
+        Me.Cat_Unprocessed.Text = "Unprocessed > 2min"
+        Me.Cat_Unprocessed.UseVisualStyleBackColor = False
         '
         'Cat_ReadingBusiness
         '
@@ -263,72 +203,144 @@ Partial Class NewEMailAsTask
         Me.Cat_Internet.Text = "@Internet"
         Me.Cat_Internet.UseVisualStyleBackColor = False
         '
-        'Cat_Unprocessed
+        'Button1
         '
-        Me.Cat_Unprocessed.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Cat_Unprocessed.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Cat_Unprocessed.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Cat_Unprocessed.Location = New System.Drawing.Point(424, 246)
-        Me.Cat_Unprocessed.Name = "Cat_Unprocessed"
-        Me.Cat_Unprocessed.Size = New System.Drawing.Size(126, 34)
-        Me.Cat_Unprocessed.TabIndex = 13
-        Me.Cat_Unprocessed.Text = "Unprocessed > 2min"
-        Me.Cat_Unprocessed.UseVisualStyleBackColor = False
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Button1.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Button1.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Button1.Location = New System.Drawing.Point(424, 166)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(126, 34)
+        Me.Button1.TabIndex = 9
+        Me.Button1.Text = "@ Meeting"
+        Me.Button1.UseVisualStyleBackColor = False
         '
-        'Cat_ReadingOther
+        'Cat_Agenda
         '
-        Me.Cat_ReadingOther.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Cat_ReadingOther.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Cat_ReadingOther.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Cat_ReadingOther.Location = New System.Drawing.Point(292, 246)
-        Me.Cat_ReadingOther.Name = "Cat_ReadingOther"
-        Me.Cat_ReadingOther.Size = New System.Drawing.Size(126, 34)
-        Me.Cat_ReadingOther.TabIndex = 14
-        Me.Cat_ReadingOther.Text = "News | Articles | Other"
-        Me.Cat_ReadingOther.UseVisualStyleBackColor = False
+        Me.Cat_Agenda.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Cat_Agenda.BackColor = System.Drawing.Color.Blue
+        Me.Cat_Agenda.ForeColor = System.Drawing.SystemColors.ButtonFace
+        Me.Cat_Agenda.Location = New System.Drawing.Point(292, 166)
+        Me.Cat_Agenda.Name = "Cat_Agenda"
+        Me.Cat_Agenda.Size = New System.Drawing.Size(126, 34)
+        Me.Cat_Agenda.TabIndex = 8
+        Me.Cat_Agenda.Text = "@ Meeting"
+        Me.Cat_Agenda.UseVisualStyleBackColor = False
         '
-        'Cat_Email
+        'Label4
         '
-        Me.Cat_Email.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Cat_Email.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Cat_Email.Location = New System.Drawing.Point(160, 246)
-        Me.Cat_Email.Name = "Cat_Email"
-        Me.Cat_Email.Size = New System.Drawing.Size(126, 34)
-        Me.Cat_Email.TabIndex = 15
-        Me.Cat_Email.Text = "@ Email"
-        Me.Cat_Email.UseVisualStyleBackColor = False
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(10, 134)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(73, 16)
+        Me.Label4.TabIndex = 7
+        Me.Label4.Text = "Topic Tag:"
         '
-        'cbxFlag
+        'Cat_Deskwork
         '
-        Me.cbxFlag.AutoSize = True
-        Me.cbxFlag.Checked = True
-        Me.cbxFlag.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbxFlag.Location = New System.Drawing.Point(160, 290)
-        Me.cbxFlag.Name = "cbxFlag"
-        Me.cbxFlag.Size = New System.Drawing.Size(114, 17)
-        Me.cbxFlag.TabIndex = 16
-        Me.cbxFlag.Text = "Flag For Follow Up"
-        Me.cbxFlag.UseVisualStyleBackColor = True
+        Me.Cat_Deskwork.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Cat_Deskwork.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.Cat_Deskwork.Location = New System.Drawing.Point(160, 166)
+        Me.Cat_Deskwork.Name = "Cat_Deskwork"
+        Me.Cat_Deskwork.Size = New System.Drawing.Size(126, 34)
+        Me.Cat_Deskwork.TabIndex = 1
+        Me.Cat_Deskwork.Text = "PERSONAL"
+        Me.Cat_Deskwork.UseVisualStyleBackColor = False
         '
-        'cbxTODAY
+        'Label3
         '
-        Me.cbxTODAY.AutoSize = True
-        Me.cbxTODAY.Location = New System.Drawing.Point(292, 290)
-        Me.cbxTODAY.Name = "cbxTODAY"
-        Me.cbxTODAY.Size = New System.Drawing.Size(110, 17)
-        Me.cbxTODAY.TabIndex = 17
-        Me.cbxTODAY.Text = "Complete TODAY"
-        Me.cbxTODAY.UseVisualStyleBackColor = True
+        Me.Label3.AutoSize = True
+        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label3.Location = New System.Drawing.Point(10, 98)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(82, 16)
+        Me.Label3.TabIndex = 6
+        Me.Label3.Text = "Project Flag:"
         '
-        'cbxBULLPIN
+        'Label2
         '
-        Me.cbxBULLPIN.AutoSize = True
-        Me.cbxBULLPIN.Location = New System.Drawing.Point(424, 290)
-        Me.cbxBULLPIN.Name = "cbxBULLPIN"
-        Me.cbxBULLPIN.Size = New System.Drawing.Size(113, 17)
-        Me.cbxBULLPIN.TabIndex = 18
-        Me.cbxBULLPIN.Text = "BULLPIN Priorities"
-        Me.cbxBULLPIN.UseVisualStyleBackColor = True
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.Location = New System.Drawing.Point(10, 61)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(87, 16)
+        Me.Label2.TabIndex = 5
+        Me.Label2.Text = "Assigned To:"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(10, 25)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(54, 16)
+        Me.Label1.TabIndex = 4
+        Me.Label1.Text = "Context:"
+        '
+        'Topic_Selection
+        '
+        Me.Topic_Selection.BackColor = System.Drawing.SystemColors.Window
+        Me.Topic_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.Topic_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Topic_Selection.Location = New System.Drawing.Point(160, 133)
+        Me.Topic_Selection.Name = "Topic_Selection"
+        Me.Topic_Selection.Size = New System.Drawing.Size(390, 24)
+        Me.Topic_Selection.TabIndex = 3
+        Me.Topic_Selection.Text = "[Other Topics Flagged]"
+        '
+        'Project_Selection
+        '
+        Me.Project_Selection.BackColor = System.Drawing.SystemColors.Window
+        Me.Project_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.Project_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Project_Selection.Location = New System.Drawing.Point(160, 97)
+        Me.Project_Selection.Name = "Project_Selection"
+        Me.Project_Selection.Size = New System.Drawing.Size(390, 24)
+        Me.Project_Selection.TabIndex = 2
+        Me.Project_Selection.Text = "[Projects Flagged]"
+        '
+        'People_Selection
+        '
+        Me.People_Selection.BackColor = System.Drawing.SystemColors.Window
+        Me.People_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.People_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.People_Selection.Location = New System.Drawing.Point(160, 60)
+        Me.People_Selection.Name = "People_Selection"
+        Me.People_Selection.Size = New System.Drawing.Size(390, 24)
+        Me.People_Selection.TabIndex = 1
+        Me.People_Selection.Text = "[Assigned People Flagged]"
+        '
+        'Category_Selection
+        '
+        Me.Category_Selection.BackColor = System.Drawing.SystemColors.Window
+        Me.Category_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.Category_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Category_Selection.Location = New System.Drawing.Point(160, 24)
+        Me.Category_Selection.Name = "Category_Selection"
+        Me.Category_Selection.Size = New System.Drawing.Size(390, 24)
+        Me.Category_Selection.TabIndex = 0
+        Me.Category_Selection.Text = "[Category Label]"
+        '
+        'OK_Button
+        '
+        Me.OK_Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.OK_Button.Location = New System.Drawing.Point(138, 530)
+        Me.OK_Button.Name = "OK_Button"
+        Me.OK_Button.Size = New System.Drawing.Size(145, 57)
+        Me.OK_Button.TabIndex = 1
+        Me.OK_Button.Text = "OK"
+        Me.OK_Button.UseVisualStyleBackColor = True
+        '
+        'Cancel_Button
+        '
+        Me.Cancel_Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Cancel_Button.Location = New System.Drawing.Point(297, 530)
+        Me.Cancel_Button.Name = "Cancel_Button"
+        Me.Cancel_Button.Size = New System.Drawing.Size(145, 57)
+        Me.Cancel_Button.TabIndex = 2
+        Me.Cancel_Button.Text = "Cancel"
+        Me.Cancel_Button.UseVisualStyleBackColor = True
         '
         'Label5
         '
@@ -382,6 +394,7 @@ Partial Class NewEMailAsTask
         'Priority_Box
         '
         Me.Priority_Box.FormattingEnabled = True
+        Me.Priority_Box.Items.AddRange(New Object() {"High", "Normal", "Low"})
         Me.Priority_Box.Location = New System.Drawing.Point(120, 82)
         Me.Priority_Box.Name = "Priority_Box"
         Me.Priority_Box.Size = New System.Drawing.Size(121, 21)
@@ -390,6 +403,7 @@ Partial Class NewEMailAsTask
         'KB_Selector
         '
         Me.KB_Selector.FormattingEnabled = True
+        Me.KB_Selector.Items.AddRange(New Object() {"Backlog", "Planned", "InProgress", "Complete"})
         Me.KB_Selector.Location = New System.Drawing.Point(120, 111)
         Me.KB_Selector.Name = "KB_Selector"
         Me.KB_Selector.Size = New System.Drawing.Size(121, 21)
@@ -406,6 +420,7 @@ Partial Class NewEMailAsTask
         '
         'DT_DueDate
         '
+        Me.DT_DueDate.Checked = False
         Me.DT_DueDate.CustomFormat = "MM/dd/yyyy hh:mm tt"
         Me.DT_DueDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
         Me.DT_DueDate.Location = New System.Drawing.Point(388, 83)
@@ -436,6 +451,7 @@ Partial Class NewEMailAsTask
         '
         'DT_Reminder
         '
+        Me.DT_Reminder.Checked = False
         Me.DT_Reminder.CustomFormat = "MM/dd/yyyy hh:mm tt"
         Me.DT_Reminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom
         Me.DT_Reminder.Location = New System.Drawing.Point(388, 112)
@@ -444,19 +460,7 @@ Partial Class NewEMailAsTask
         Me.DT_Reminder.Size = New System.Drawing.Size(184, 20)
         Me.DT_Reminder.TabIndex = 16
         '
-        'Cat_WaitingFor
-        '
-        Me.Cat_WaitingFor.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Cat_WaitingFor.BackColor = System.Drawing.Color.DarkMagenta
-        Me.Cat_WaitingFor.ForeColor = System.Drawing.SystemColors.ControlLightLight
-        Me.Cat_WaitingFor.Location = New System.Drawing.Point(13, 246)
-        Me.Cat_WaitingFor.Name = "Cat_WaitingFor"
-        Me.Cat_WaitingFor.Size = New System.Drawing.Size(126, 34)
-        Me.Cat_WaitingFor.TabIndex = 19
-        Me.Cat_WaitingFor.Text = "Waiting For"
-        Me.Cat_WaitingFor.UseVisualStyleBackColor = False
-        '
-        'NewEMailAsTask
+        'TaskViewer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -476,7 +480,7 @@ Partial Class NewEMailAsTask
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OK_Button)
         Me.Controls.Add(Me.Frame1)
-        Me.Name = "NewEMailAsTask"
+        Me.Name = "TaskViewer"
         Me.Text = "Change Flagged Email Into Task"
         Me.Frame1.ResumeLayout(False)
         Me.Frame1.PerformLayout()
