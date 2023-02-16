@@ -8,22 +8,7 @@ Public Class Flag_Tasks
     Private WithEvents _viewer As TaskViewer
     Private _controller As TaskController
 
-    <Flags>
-    Public Enum FlagsToSet
-        None = 0
-        Context = 1
-        People = 2
-        Projects = 4
-        Topics = 8
-        Priority = 16
-        TaskName = 32
-        WorkTime = 64
-        Today = 128
-        Bullpin = 256
-        KBF = 512
-        DueDate = 1024
-        All = 2047
-    End Enum
+
 
     Public Sub New(Optional ItemCollection As Collection = Nothing,
                    Optional blFile As Boolean = True,

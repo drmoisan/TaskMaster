@@ -5,6 +5,7 @@ Imports System.IO
 Imports System
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Security.Authentication.ExtendedProtection
+Imports Microsoft.VisualBasic.FileIO
 
 
 Public Class ThisAddIn
@@ -23,9 +24,12 @@ Public Class ThisAddIn
     Dim FileName_ProjectList As String
     Dim FileName_IDList As String
     Dim FileName_ProjInfo As String
+    Private filename_dictppl As String = "pplkey.xml"
+    Public ReadOnly staging_path As String = SpecialDirectories.MyDocuments
     Const AppDataFolder = "TaskMaster"
     'Public ProjDict As ProjectList
     Public ProjInfo As ProjectInfo
+    Public ppl_dict As PeopleDict(Of String, String)
     Public WithEvents IDList As cIDList
     Public DM_CurView As DataModel_ToDoTree
 
@@ -53,6 +57,8 @@ Public Class ThisAddIn
             ProjInfo = New ProjectInfo
             ProjInfo.Save(FileName_ProjInfo)
         End If
+
+        ppl_dict = Util.GetDict(staging_path, filename_dictppl)
 
         FileName_IDList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "UsedIDList.bin")
 
@@ -689,11 +695,11 @@ Public Class ThisAddIn
                 Next
             End If
             todo.EC_Change = False
-            End If
+        End If
 
-            'AUTOCODE ToDoID based on Project
-            'Check to see if the project exists before attempting to autocode the id
-            If Not objProperty_Project Is Nothing Then
+        'AUTOCODE ToDoID based on Project
+        'Check to see if the project exists before attempting to autocode the id
+        If Not objProperty_Project Is Nothing Then
 
             'Get Project Name
             strProject = todo.TagProject

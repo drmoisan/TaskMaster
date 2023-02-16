@@ -1,15 +1,15 @@
 ﻿''' <summary>
-''' Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
+''' Class converts color categories to flags relevant to People, Projects, Topics, context, etc
 ''' </summary>
 Public Class FlagParser
-    Private _People As String = ""
-    Private _Projects As String = ""
-    Private _Topics As String = ""
-    Public Context As String = ""
-    Public KB As String = ""
-    Public Other As String = ""
-    Public Today As Boolean = False
-    Public Bullpin As Boolean = False
+    Private _people As String = ""
+    Private _projects As String = ""
+    Private _topics As String = ""
+    Public context As String = ""
+    Public kb As String = ""
+    Public other As String = ""
+    Public today As Boolean = False
+    Public bullpin As Boolean = False
 
     ''' <summary>
     ''' Constructor for the FlagParser class accepts a comma delimited string containing 
@@ -22,19 +22,19 @@ Public Class FlagParser
     End Sub
 
     ''' <summary>
-    ''' Property accesses the private variable _Projects
+    ''' Property accesses the private variable _projects
     ''' Set 
     '''     Extract: Split comma delimited String to array of project names
     '''     Transform: Iterate through array and append a prefix if not present 
-    '''     Load: Recombine in string and store value in _Projects
-    ''' Get accesses the value stored in _Projects
+    '''     Load: Recombine in string and store value in _projects
+    ''' Get accesses the value stored in _projects
     ''' </summary>
     ''' <param name="IncludePrefix">Determines whether the return value includes the category prefix</param>
     ''' <returns>A string containing a comma separated Project names</returns>
     Public Property Projects(Optional IncludePrefix As Boolean = False) As String
         Get
             Dim Prefix As String = "Tag PROJECT "
-            Dim strReturn As String = _Projects
+            Dim strReturn As String = _projects
 
             If IncludePrefix = False Then
                 strReturn = SubStr_w_Delimeter(strReturn, Prefix, ", ", DeleteSearchSubString:=True)
@@ -59,24 +59,24 @@ Public Class FlagParser
             Else
                 strReturn = value
             End If
-            _Projects = strReturn
+            _projects = strReturn
         End Set
     End Property
 
     ''' <summary>
-    ''' Property accesses the private variable _Topics
+    ''' Property accesses the private variable _topics
     ''' Set 
     '''     Extract: Split comma delimited String to array of Topic names
     '''     Transform: Iterate through array and append a prefix if not present 
-    '''     Load: Recombine in string and store value in _Topics
-    ''' Get accesses the value stored in _Topics
+    '''     Load: Recombine in string and store value in _topics
+    ''' Get accesses the value stored in _topics
     ''' </summary>
     ''' <param name="IncludePrefix">Determines whether the return value includes the category prefix</param>
     ''' <returns>A string containing a comma separated Topic names</returns>
     Public Property Topics(Optional IncludePrefix As Boolean = False) As String
         Get
             Dim Prefix As String = "Tag TOPIC "
-            Dim strReturn As String = _Topics
+            Dim strReturn As String = _topics
 
             If IncludePrefix = False Then
                 strReturn = SubStr_w_Delimeter(strReturn, Prefix, ", ", DeleteSearchSubString:=True)
@@ -101,24 +101,24 @@ Public Class FlagParser
             Else
                 strReturn = value
             End If
-            _Topics = strReturn
+            _topics = strReturn
         End Set
     End Property
 
     ''' <summary>
-    ''' Property accesses the private variable _People
+    ''' Property accesses the private variable _people
     ''' Set 
     '''     Extract: Split comma delimited String to array of People names
     '''     Transform: Iterate through array and append a prefix if not present 
-    '''     Load: Recombine in string and store value in _People
-    ''' Get accesses the value stored in _People
+    '''     Load: Recombine in string and store value in _people
+    ''' Get accesses the value stored in _people
     ''' </summary>
     ''' <param name="IncludePrefix"></param>
     ''' <returns>A string containing a comma separated People names</returns>
     Public Property People(Optional IncludePrefix As Boolean = False) As String
         Get
             Dim Prefix As String = "Tag PPL "
-            Dim strReturn As String = _People
+            Dim strReturn As String = _people
 
             If IncludePrefix = False Then
                 strReturn = SubStr_w_Delimeter(strReturn, Prefix, ", ", DeleteSearchSubString:=True)
@@ -143,7 +143,7 @@ Public Class FlagParser
             Else
                 strReturn = value
             End If
-            _People = strReturn
+            _people = strReturn
         End Set
     End Property
 
@@ -153,31 +153,31 @@ Public Class FlagParser
     ''' <returns>A string containing color categories</returns>
     Public Function Combine() As String
         Dim strTmp As String = ""
-        If _People.Length > 0 Then
-            strTmp = strTmp & ", " & _People
+        If _people.Length > 0 Then
+            strTmp = strTmp & ", " & _people
         End If
 
-        If _Projects.Length > 0 Then
-            strTmp = strTmp & ", " & _Projects
+        If _projects.Length > 0 Then
+            strTmp = strTmp & ", " & _projects
         End If
 
-        If _Topics.Length > 0 Then
-            strTmp = strTmp & ", " & _Topics
+        If _topics.Length > 0 Then
+            strTmp = strTmp & ", " & _topics
         End If
 
-        If Context.Length > 0 Then
-            strTmp = strTmp & ", " & Context
+        If context.Length > 0 Then
+            strTmp = strTmp & ", " & context
         End If
 
-        If KB.Length > 0 Then
-            strTmp = strTmp & ", " & KB
+        If kb.Length > 0 Then
+            strTmp = strTmp & ", " & kb
         End If
 
-        If Today = True Then
+        If today = True Then
             strTmp = strTmp & ", " & "Tag A Top Priority Today"
         End If
 
-        If Bullpin = True Then
+        If bullpin = True Then
             strTmp = strTmp & ", " & "Tag Bullpin Priorities"
         End If
 
@@ -194,35 +194,35 @@ Public Class FlagParser
     ''' <param name="strCats_All">String containing comma delimited color categories</param>
     ''' <param name="DeleteSearchSubString"></param>
     Public Sub Splitter(ByRef strCats_All As String, Optional DeleteSearchSubString As Boolean = False)
-        _People = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
-        Other = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", True)
+        _people = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        other = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", True)
 
-        _Projects = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PROJECT "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
-        Other = SubStr_w_Delimeter(Other, AddWildcards("Tag PROJECT "), ", ", True)
+        _projects = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PROJECT "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        other = SubStr_w_Delimeter(other, AddWildcards("Tag PROJECT "), ", ", True)
 
         Dim strTemp As String = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag Bullpin Priorities"), ", ", DeleteSearchSubString:=False)
-        Other = SubStr_w_Delimeter(Other, AddWildcards("Tag Bullpin Priorities"), ", ", True)
+        other = SubStr_w_Delimeter(other, AddWildcards("Tag Bullpin Priorities"), ", ", True)
         If strTemp <> "" Then
-            Bullpin = True
+            bullpin = True
         Else
-            Bullpin = False
+            bullpin = False
         End If
 
         strTemp = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag A Top Priority Today"), ", ", DeleteSearchSubString:=False)
-        Other = SubStr_w_Delimeter(Other, AddWildcards("Tag A Top Priority Today"), ", ", True)
+        other = SubStr_w_Delimeter(other, AddWildcards("Tag A Top Priority Today"), ", ", True)
         If strTemp <> "" Then
-            Today = True
+            today = True
         Else
-            Today = False
+            today = False
         End If
 
-        _Topics = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag TOPIC "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
-        Other = SubStr_w_Delimeter(Other, AddWildcards("Tag TOPIC "), ", ", True)
+        _topics = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag TOPIC "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        other = SubStr_w_Delimeter(other, AddWildcards("Tag TOPIC "), ", ", True)
 
-        KB = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag KB "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
-        Other = SubStr_w_Delimeter(Other, AddWildcards("Tag KB "), ", ", True)
+        kb = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag KB "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        other = SubStr_w_Delimeter(other, AddWildcards("Tag KB "), ", ", True)
 
-        Context = Other
+        context = other
 
     End Sub
 

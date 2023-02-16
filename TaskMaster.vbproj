@@ -207,8 +207,17 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
+    <Compile Include="Modules\AutoFile.vb" />
+    <Compile Include="Classes\TagController.vb" />
     <Compile Include="Classes\TaskController.vb" />
     <Compile Include="Classes\Flag_Tasks.vb" />
+    <Compile Include="Classes\CsvSerializer.vb" />
+    <Compile Include="Forms\TagViewer.Designer.vb">
+      <DependentUpon>TagViewer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TagViewer.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\cCheckBoxClass.vb" />
     <Compile Include="Forms\TaskViewer.Designer.vb">
       <DependentUpon>TaskViewer.vb</DependentUpon>
@@ -220,7 +229,7 @@
     <Compile Include="Modules\Flag_Categorize_Context_Email.vb" />
     <Compile Include="Modules\Flag_Fields_Categories.vb" />
     <Compile Include="Modules\olvExtension.vb" />
-    <Compile Include="Modules\UtilityFunctions.vb" />
+    <Compile Include="Modules\Util.vb" />
     <Compile Include="Models\BaseChanger.vb" />
     <Compile Include="Forms\ProjectInfoWindow.Designer.vb">
       <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
@@ -242,6 +251,7 @@
     <Compile Include="Forms\TaskTreeForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Models\PeopleDict.vb" />
     <Compile Include="Ribbons\EmailRibbon.Designer.vb">
       <DependentUpon>EmailRibbon.vb</DependentUpon>
     </Compile>
@@ -258,6 +268,9 @@
     <Compile Include="ThisAddIn.vb">
       <SubType>Code</SubType>
     </Compile>
+    <EmbeddedResource Include="Forms\TagViewer.resx">
+      <DependentUpon>TagViewer.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Ribbons\EmailRibbon.resx">
       <DependentUpon>EmailRibbon.vb</DependentUpon>
     </EmbeddedResource>

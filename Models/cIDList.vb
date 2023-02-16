@@ -66,9 +66,6 @@ Public Class cIDList
         End Get
     End Property
 
-
-
-
     Public Function GetNextAvailableToDoID(strSeed As String) As String
         Dim blContinue As Boolean = True
         Dim lngMaxID As BigInteger = ConvertToDecimal(125, strSeed)

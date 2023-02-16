@@ -17,6 +17,10 @@ Public Class TaskViewer
     End Sub
 
     Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
-        MsgBox("Cancel Click")
+        _controller.Cancel_Action()
+    End Sub
+
+    Private Sub people_selection_Click(sender As Object, e As EventArgs) Handles people_selection.Click
+        _controller.Assign_People()
     End Sub
 End Class

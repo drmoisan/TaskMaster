@@ -648,7 +648,7 @@ End Class
 '            End If
 '        End Set
 '    End Property
-'    Public Property KB As String
+'    Public Property kb As String
 '        Get
 '            If _KB.Length <> 0 Then
 '                Return _KB

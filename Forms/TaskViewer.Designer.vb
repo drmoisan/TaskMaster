@@ -24,8 +24,8 @@ Partial Class TaskViewer
     Private Sub InitializeComponent()
         Me.Frame1 = New System.Windows.Forms.Panel()
         Me.Cat_WaitingFor = New System.Windows.Forms.Button()
-        Me.cbxBULLPIN = New System.Windows.Forms.CheckBox()
-        Me.cbxTODAY = New System.Windows.Forms.CheckBox()
+        Me.cbx_bullpin = New System.Windows.Forms.CheckBox()
+        Me.cbx_today = New System.Windows.Forms.CheckBox()
         Me.cbxFlag = New System.Windows.Forms.CheckBox()
         Me.Cat_Email = New System.Windows.Forms.Button()
         Me.Cat_ReadingOther = New System.Windows.Forms.Button()
@@ -35,37 +35,37 @@ Partial Class TaskViewer
         Me.Cat_Internet = New System.Windows.Forms.Button()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Cat_Agenda = New System.Windows.Forms.Button()
-        Me.Label4 = New System.Windows.Forms.Label()
+        Me.lbl_topic = New System.Windows.Forms.Label()
         Me.Cat_Deskwork = New System.Windows.Forms.Button()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.Topic_Selection = New System.Windows.Forms.Label()
-        Me.Project_Selection = New System.Windows.Forms.Label()
-        Me.People_Selection = New System.Windows.Forms.Label()
-        Me.Category_Selection = New System.Windows.Forms.Label()
+        Me.lbl_project = New System.Windows.Forms.Label()
+        Me.lbl_people = New System.Windows.Forms.Label()
+        Me.lbl_context = New System.Windows.Forms.Label()
+        Me.topic_selection = New System.Windows.Forms.Label()
+        Me.project_selection = New System.Windows.Forms.Label()
+        Me.people_selection = New System.Windows.Forms.Label()
+        Me.category_selection = New System.Windows.Forms.Label()
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.Task_Name = New System.Windows.Forms.TextBox()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.Label8 = New System.Windows.Forms.Label()
+        Me.lbl_taskname = New System.Windows.Forms.Label()
+        Me.task_name = New System.Windows.Forms.TextBox()
+        Me.lbl_priority = New System.Windows.Forms.Label()
+        Me.lbl_kbf = New System.Windows.Forms.Label()
+        Me.lbl_duration = New System.Windows.Forms.Label()
         Me.Priority_Box = New System.Windows.Forms.ComboBox()
-        Me.KB_Selector = New System.Windows.Forms.ComboBox()
-        Me.Duration = New System.Windows.Forms.TextBox()
-        Me.DT_DueDate = New System.Windows.Forms.DateTimePicker()
-        Me.Label9 = New System.Windows.Forms.Label()
-        Me.Label10 = New System.Windows.Forms.Label()
-        Me.DT_Reminder = New System.Windows.Forms.DateTimePicker()
+        Me.kb_selector = New System.Windows.Forms.ComboBox()
+        Me.duration = New System.Windows.Forms.TextBox()
+        Me.dt_duedate = New System.Windows.Forms.DateTimePicker()
+        Me.lbl_duedate = New System.Windows.Forms.Label()
+        Me.lbl_reminder = New System.Windows.Forms.Label()
+        Me.dt_reminder = New System.Windows.Forms.DateTimePicker()
         Me.Frame1.SuspendLayout()
         Me.SuspendLayout()
         '
         'Frame1
         '
         Me.Frame1.Controls.Add(Me.Cat_WaitingFor)
-        Me.Frame1.Controls.Add(Me.cbxBULLPIN)
-        Me.Frame1.Controls.Add(Me.cbxTODAY)
+        Me.Frame1.Controls.Add(Me.cbx_bullpin)
+        Me.Frame1.Controls.Add(Me.cbx_today)
         Me.Frame1.Controls.Add(Me.cbxFlag)
         Me.Frame1.Controls.Add(Me.Cat_Email)
         Me.Frame1.Controls.Add(Me.Cat_ReadingOther)
@@ -75,15 +75,15 @@ Partial Class TaskViewer
         Me.Frame1.Controls.Add(Me.Cat_Internet)
         Me.Frame1.Controls.Add(Me.Button1)
         Me.Frame1.Controls.Add(Me.Cat_Agenda)
-        Me.Frame1.Controls.Add(Me.Label4)
+        Me.Frame1.Controls.Add(Me.lbl_topic)
         Me.Frame1.Controls.Add(Me.Cat_Deskwork)
-        Me.Frame1.Controls.Add(Me.Label3)
-        Me.Frame1.Controls.Add(Me.Label2)
-        Me.Frame1.Controls.Add(Me.Label1)
-        Me.Frame1.Controls.Add(Me.Topic_Selection)
-        Me.Frame1.Controls.Add(Me.Project_Selection)
-        Me.Frame1.Controls.Add(Me.People_Selection)
-        Me.Frame1.Controls.Add(Me.Category_Selection)
+        Me.Frame1.Controls.Add(Me.lbl_project)
+        Me.Frame1.Controls.Add(Me.lbl_people)
+        Me.Frame1.Controls.Add(Me.lbl_context)
+        Me.Frame1.Controls.Add(Me.topic_selection)
+        Me.Frame1.Controls.Add(Me.project_selection)
+        Me.Frame1.Controls.Add(Me.people_selection)
+        Me.Frame1.Controls.Add(Me.category_selection)
         Me.Frame1.Location = New System.Drawing.Point(7, 186)
         Me.Frame1.Name = "Frame1"
         Me.Frame1.Size = New System.Drawing.Size(570, 322)
@@ -101,25 +101,25 @@ Partial Class TaskViewer
         Me.Cat_WaitingFor.Text = "Waiting For"
         Me.Cat_WaitingFor.UseVisualStyleBackColor = False
         '
-        'cbxBULLPIN
+        'cbx_bullpin
         '
-        Me.cbxBULLPIN.AutoSize = True
-        Me.cbxBULLPIN.Location = New System.Drawing.Point(424, 290)
-        Me.cbxBULLPIN.Name = "cbxBULLPIN"
-        Me.cbxBULLPIN.Size = New System.Drawing.Size(113, 17)
-        Me.cbxBULLPIN.TabIndex = 18
-        Me.cbxBULLPIN.Text = "BULLPIN Priorities"
-        Me.cbxBULLPIN.UseVisualStyleBackColor = True
+        Me.cbx_bullpin.AutoSize = True
+        Me.cbx_bullpin.Location = New System.Drawing.Point(424, 290)
+        Me.cbx_bullpin.Name = "cbx_bullpin"
+        Me.cbx_bullpin.Size = New System.Drawing.Size(113, 17)
+        Me.cbx_bullpin.TabIndex = 18
+        Me.cbx_bullpin.Text = "BULLPIN Priorities"
+        Me.cbx_bullpin.UseVisualStyleBackColor = True
         '
-        'cbxTODAY
+        'cbx_today
         '
-        Me.cbxTODAY.AutoSize = True
-        Me.cbxTODAY.Location = New System.Drawing.Point(292, 290)
-        Me.cbxTODAY.Name = "cbxTODAY"
-        Me.cbxTODAY.Size = New System.Drawing.Size(110, 17)
-        Me.cbxTODAY.TabIndex = 17
-        Me.cbxTODAY.Text = "Complete TODAY"
-        Me.cbxTODAY.UseVisualStyleBackColor = True
+        Me.cbx_today.AutoSize = True
+        Me.cbx_today.Location = New System.Drawing.Point(292, 290)
+        Me.cbx_today.Name = "cbx_today"
+        Me.cbx_today.Size = New System.Drawing.Size(110, 17)
+        Me.cbx_today.TabIndex = 17
+        Me.cbx_today.Text = "Complete TODAY"
+        Me.cbx_today.UseVisualStyleBackColor = True
         '
         'cbxFlag
         '
@@ -227,15 +227,15 @@ Partial Class TaskViewer
         Me.Cat_Agenda.Text = "@ Meeting"
         Me.Cat_Agenda.UseVisualStyleBackColor = False
         '
-        'Label4
+        'lbl_topic
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(10, 134)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(73, 16)
-        Me.Label4.TabIndex = 7
-        Me.Label4.Text = "Topic Tag:"
+        Me.lbl_topic.AutoSize = True
+        Me.lbl_topic.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_topic.Location = New System.Drawing.Point(10, 134)
+        Me.lbl_topic.Name = "lbl_topic"
+        Me.lbl_topic.Size = New System.Drawing.Size(73, 16)
+        Me.lbl_topic.TabIndex = 7
+        Me.lbl_topic.Text = "Topic Tag:"
         '
         'Cat_Deskwork
         '
@@ -248,79 +248,79 @@ Partial Class TaskViewer
         Me.Cat_Deskwork.Text = "PERSONAL"
         Me.Cat_Deskwork.UseVisualStyleBackColor = False
         '
-        'Label3
+        'lbl_project
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(10, 98)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(82, 16)
-        Me.Label3.TabIndex = 6
-        Me.Label3.Text = "Project Flag:"
+        Me.lbl_project.AutoSize = True
+        Me.lbl_project.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_project.Location = New System.Drawing.Point(10, 98)
+        Me.lbl_project.Name = "lbl_project"
+        Me.lbl_project.Size = New System.Drawing.Size(82, 16)
+        Me.lbl_project.TabIndex = 6
+        Me.lbl_project.Text = "Project Flag:"
         '
-        'Label2
+        'lbl_people
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(10, 61)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(87, 16)
-        Me.Label2.TabIndex = 5
-        Me.Label2.Text = "Assigned To:"
+        Me.lbl_people.AutoSize = True
+        Me.lbl_people.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_people.Location = New System.Drawing.Point(10, 61)
+        Me.lbl_people.Name = "lbl_people"
+        Me.lbl_people.Size = New System.Drawing.Size(87, 16)
+        Me.lbl_people.TabIndex = 5
+        Me.lbl_people.Text = "Assigned To:"
         '
-        'Label1
+        'lbl_context
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(10, 25)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(54, 16)
-        Me.Label1.TabIndex = 4
-        Me.Label1.Text = "Context:"
+        Me.lbl_context.AutoSize = True
+        Me.lbl_context.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_context.Location = New System.Drawing.Point(10, 25)
+        Me.lbl_context.Name = "lbl_context"
+        Me.lbl_context.Size = New System.Drawing.Size(54, 16)
+        Me.lbl_context.TabIndex = 4
+        Me.lbl_context.Text = "Context:"
         '
-        'Topic_Selection
+        'topic_selection
         '
-        Me.Topic_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.Topic_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Topic_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Topic_Selection.Location = New System.Drawing.Point(160, 133)
-        Me.Topic_Selection.Name = "Topic_Selection"
-        Me.Topic_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.Topic_Selection.TabIndex = 3
-        Me.Topic_Selection.Text = "[Other Topics Flagged]"
+        Me.topic_selection.BackColor = System.Drawing.SystemColors.Window
+        Me.topic_selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.topic_selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.topic_selection.Location = New System.Drawing.Point(160, 133)
+        Me.topic_selection.Name = "topic_selection"
+        Me.topic_selection.Size = New System.Drawing.Size(390, 24)
+        Me.topic_selection.TabIndex = 3
+        Me.topic_selection.Text = "[Other Topics Flagged]"
         '
-        'Project_Selection
+        'project_selection
         '
-        Me.Project_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.Project_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Project_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Project_Selection.Location = New System.Drawing.Point(160, 97)
-        Me.Project_Selection.Name = "Project_Selection"
-        Me.Project_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.Project_Selection.TabIndex = 2
-        Me.Project_Selection.Text = "[Projects Flagged]"
+        Me.project_selection.BackColor = System.Drawing.SystemColors.Window
+        Me.project_selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.project_selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.project_selection.Location = New System.Drawing.Point(160, 97)
+        Me.project_selection.Name = "project_selection"
+        Me.project_selection.Size = New System.Drawing.Size(390, 24)
+        Me.project_selection.TabIndex = 2
+        Me.project_selection.Text = "[Projects Flagged]"
         '
-        'People_Selection
+        'people_selection
         '
-        Me.People_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.People_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.People_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.People_Selection.Location = New System.Drawing.Point(160, 60)
-        Me.People_Selection.Name = "People_Selection"
-        Me.People_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.People_Selection.TabIndex = 1
-        Me.People_Selection.Text = "[Assigned People Flagged]"
+        Me.people_selection.BackColor = System.Drawing.SystemColors.Window
+        Me.people_selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.people_selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.people_selection.Location = New System.Drawing.Point(160, 60)
+        Me.people_selection.Name = "people_selection"
+        Me.people_selection.Size = New System.Drawing.Size(390, 24)
+        Me.people_selection.TabIndex = 1
+        Me.people_selection.Text = "[Assigned People Flagged]"
         '
-        'Category_Selection
+        'category_selection
         '
-        Me.Category_Selection.BackColor = System.Drawing.SystemColors.Window
-        Me.Category_Selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.Category_Selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Category_Selection.Location = New System.Drawing.Point(160, 24)
-        Me.Category_Selection.Name = "Category_Selection"
-        Me.Category_Selection.Size = New System.Drawing.Size(390, 24)
-        Me.Category_Selection.TabIndex = 0
-        Me.Category_Selection.Text = "[Category Label]"
+        Me.category_selection.BackColor = System.Drawing.SystemColors.Window
+        Me.category_selection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.category_selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.category_selection.Location = New System.Drawing.Point(160, 24)
+        Me.category_selection.Name = "category_selection"
+        Me.category_selection.Size = New System.Drawing.Size(390, 24)
+        Me.category_selection.TabIndex = 0
+        Me.category_selection.Text = "[Category Label]"
         '
         'OK_Button
         '
@@ -342,54 +342,54 @@ Partial Class TaskViewer
         Me.Cancel_Button.Text = "Cancel"
         Me.Cancel_Button.UseVisualStyleBackColor = True
         '
-        'Label5
+        'lbl_taskname
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(12, 23)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(97, 16)
-        Me.Label5.TabIndex = 5
-        Me.Label5.Text = "Name Of Task:"
+        Me.lbl_taskname.AutoSize = True
+        Me.lbl_taskname.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_taskname.Location = New System.Drawing.Point(12, 23)
+        Me.lbl_taskname.Name = "lbl_taskname"
+        Me.lbl_taskname.Size = New System.Drawing.Size(97, 16)
+        Me.lbl_taskname.TabIndex = 5
+        Me.lbl_taskname.Text = "Name Of Task:"
         '
-        'Task_Name
+        'task_name
         '
-        Me.Task_Name.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Task_Name.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.Task_Name.Location = New System.Drawing.Point(12, 42)
-        Me.Task_Name.Name = "Task_Name"
-        Me.Task_Name.Size = New System.Drawing.Size(560, 22)
-        Me.Task_Name.TabIndex = 6
+        Me.task_name.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.task_name.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.task_name.Location = New System.Drawing.Point(12, 42)
+        Me.task_name.Name = "task_name"
+        Me.task_name.Size = New System.Drawing.Size(560, 22)
+        Me.task_name.TabIndex = 6
         '
-        'Label6
+        'lbl_priority
         '
-        Me.Label6.AutoSize = True
-        Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label6.Location = New System.Drawing.Point(12, 83)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(77, 16)
-        Me.Label6.TabIndex = 7
-        Me.Label6.Text = "Importance:"
+        Me.lbl_priority.AutoSize = True
+        Me.lbl_priority.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_priority.Location = New System.Drawing.Point(12, 83)
+        Me.lbl_priority.Name = "lbl_priority"
+        Me.lbl_priority.Size = New System.Drawing.Size(77, 16)
+        Me.lbl_priority.TabIndex = 7
+        Me.lbl_priority.Text = "Importance:"
         '
-        'Label7
+        'lbl_kbf
         '
-        Me.Label7.AutoSize = True
-        Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label7.Location = New System.Drawing.Point(12, 111)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(56, 16)
-        Me.Label7.TabIndex = 8
-        Me.Label7.Text = "Kanban:"
+        Me.lbl_kbf.AutoSize = True
+        Me.lbl_kbf.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_kbf.Location = New System.Drawing.Point(12, 111)
+        Me.lbl_kbf.Name = "lbl_kbf"
+        Me.lbl_kbf.Size = New System.Drawing.Size(56, 16)
+        Me.lbl_kbf.TabIndex = 8
+        Me.lbl_kbf.Text = "Kanban:"
         '
-        'Label8
+        'lbl_duration
         '
-        Me.Label8.AutoSize = True
-        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label8.Location = New System.Drawing.Point(12, 144)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(60, 16)
-        Me.Label8.TabIndex = 9
-        Me.Label8.Text = "Duration:"
+        Me.lbl_duration.AutoSize = True
+        Me.lbl_duration.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_duration.Location = New System.Drawing.Point(12, 144)
+        Me.lbl_duration.Name = "lbl_duration"
+        Me.lbl_duration.Size = New System.Drawing.Size(60, 16)
+        Me.lbl_duration.TabIndex = 9
+        Me.lbl_duration.Text = "Duration:"
         '
         'Priority_Box
         '
@@ -400,83 +400,83 @@ Partial Class TaskViewer
         Me.Priority_Box.Size = New System.Drawing.Size(121, 21)
         Me.Priority_Box.TabIndex = 10
         '
-        'KB_Selector
+        'kb_selector
         '
-        Me.KB_Selector.FormattingEnabled = True
-        Me.KB_Selector.Items.AddRange(New Object() {"Backlog", "Planned", "InProgress", "Complete"})
-        Me.KB_Selector.Location = New System.Drawing.Point(120, 111)
-        Me.KB_Selector.Name = "KB_Selector"
-        Me.KB_Selector.Size = New System.Drawing.Size(121, 21)
-        Me.KB_Selector.TabIndex = 11
+        Me.kb_selector.FormattingEnabled = True
+        Me.kb_selector.Items.AddRange(New Object() {"Backlog", "Planned", "InProgress", "Complete"})
+        Me.kb_selector.Location = New System.Drawing.Point(120, 111)
+        Me.kb_selector.Name = "kb_selector"
+        Me.kb_selector.Size = New System.Drawing.Size(121, 21)
+        Me.kb_selector.TabIndex = 11
         '
-        'Duration
+        'duration
         '
-        Me.Duration.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Duration.ForeColor = System.Drawing.SystemColors.WindowText
-        Me.Duration.Location = New System.Drawing.Point(120, 141)
-        Me.Duration.Name = "Duration"
-        Me.Duration.Size = New System.Drawing.Size(121, 22)
-        Me.Duration.TabIndex = 12
+        Me.duration.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.duration.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.duration.Location = New System.Drawing.Point(120, 141)
+        Me.duration.Name = "duration"
+        Me.duration.Size = New System.Drawing.Size(121, 22)
+        Me.duration.TabIndex = 12
         '
-        'DT_DueDate
+        'dt_duedate
         '
-        Me.DT_DueDate.Checked = False
-        Me.DT_DueDate.CustomFormat = "MM/dd/yyyy hh:mm tt"
-        Me.DT_DueDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DT_DueDate.Location = New System.Drawing.Point(388, 83)
-        Me.DT_DueDate.Name = "DT_DueDate"
-        Me.DT_DueDate.ShowCheckBox = True
-        Me.DT_DueDate.Size = New System.Drawing.Size(184, 20)
-        Me.DT_DueDate.TabIndex = 13
+        Me.dt_duedate.Checked = False
+        Me.dt_duedate.CustomFormat = "MM/dd/yyyy hh:mm tt"
+        Me.dt_duedate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dt_duedate.Location = New System.Drawing.Point(388, 83)
+        Me.dt_duedate.Name = "dt_duedate"
+        Me.dt_duedate.ShowCheckBox = True
+        Me.dt_duedate.Size = New System.Drawing.Size(184, 20)
+        Me.dt_duedate.TabIndex = 13
         '
-        'Label9
+        'lbl_duedate
         '
-        Me.Label9.AutoSize = True
-        Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label9.Location = New System.Drawing.Point(310, 83)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(67, 16)
-        Me.Label9.TabIndex = 14
-        Me.Label9.Text = "Due Date:"
+        Me.lbl_duedate.AutoSize = True
+        Me.lbl_duedate.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_duedate.Location = New System.Drawing.Point(310, 83)
+        Me.lbl_duedate.Name = "lbl_duedate"
+        Me.lbl_duedate.Size = New System.Drawing.Size(67, 16)
+        Me.lbl_duedate.TabIndex = 14
+        Me.lbl_duedate.Text = "Due Date:"
         '
-        'Label10
+        'lbl_reminder
         '
-        Me.Label10.AutoSize = True
-        Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label10.Location = New System.Drawing.Point(310, 114)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(69, 16)
-        Me.Label10.TabIndex = 15
-        Me.Label10.Text = "Reminder:"
+        Me.lbl_reminder.AutoSize = True
+        Me.lbl_reminder.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_reminder.Location = New System.Drawing.Point(310, 114)
+        Me.lbl_reminder.Name = "lbl_reminder"
+        Me.lbl_reminder.Size = New System.Drawing.Size(69, 16)
+        Me.lbl_reminder.TabIndex = 15
+        Me.lbl_reminder.Text = "Reminder:"
         '
-        'DT_Reminder
+        'dt_reminder
         '
-        Me.DT_Reminder.Checked = False
-        Me.DT_Reminder.CustomFormat = "MM/dd/yyyy hh:mm tt"
-        Me.DT_Reminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DT_Reminder.Location = New System.Drawing.Point(388, 112)
-        Me.DT_Reminder.Name = "DT_Reminder"
-        Me.DT_Reminder.ShowCheckBox = True
-        Me.DT_Reminder.Size = New System.Drawing.Size(184, 20)
-        Me.DT_Reminder.TabIndex = 16
+        Me.dt_reminder.Checked = False
+        Me.dt_reminder.CustomFormat = "MM/dd/yyyy hh:mm tt"
+        Me.dt_reminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dt_reminder.Location = New System.Drawing.Point(388, 112)
+        Me.dt_reminder.Name = "dt_reminder"
+        Me.dt_reminder.ShowCheckBox = True
+        Me.dt_reminder.Size = New System.Drawing.Size(184, 20)
+        Me.dt_reminder.TabIndex = 16
         '
         'TaskViewer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(584, 611)
-        Me.Controls.Add(Me.DT_Reminder)
-        Me.Controls.Add(Me.Label10)
-        Me.Controls.Add(Me.Label9)
-        Me.Controls.Add(Me.DT_DueDate)
-        Me.Controls.Add(Me.Duration)
-        Me.Controls.Add(Me.KB_Selector)
+        Me.Controls.Add(Me.dt_reminder)
+        Me.Controls.Add(Me.lbl_reminder)
+        Me.Controls.Add(Me.lbl_duedate)
+        Me.Controls.Add(Me.dt_duedate)
+        Me.Controls.Add(Me.duration)
+        Me.Controls.Add(Me.kb_selector)
         Me.Controls.Add(Me.Priority_Box)
-        Me.Controls.Add(Me.Label8)
-        Me.Controls.Add(Me.Label7)
-        Me.Controls.Add(Me.Label6)
-        Me.Controls.Add(Me.Task_Name)
-        Me.Controls.Add(Me.Label5)
+        Me.Controls.Add(Me.lbl_duration)
+        Me.Controls.Add(Me.lbl_kbf)
+        Me.Controls.Add(Me.lbl_priority)
+        Me.Controls.Add(Me.task_name)
+        Me.Controls.Add(Me.lbl_taskname)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OK_Button)
         Me.Controls.Add(Me.Frame1)
@@ -490,14 +490,14 @@ Partial Class TaskViewer
     End Sub
 
     Friend WithEvents Frame1 As Windows.Forms.Panel
-    Friend WithEvents Label4 As Windows.Forms.Label
-    Friend WithEvents Label3 As Windows.Forms.Label
-    Friend WithEvents Label2 As Windows.Forms.Label
-    Friend WithEvents Label1 As Windows.Forms.Label
-    Friend WithEvents Topic_Selection As Windows.Forms.Label
-    Friend WithEvents Project_Selection As Windows.Forms.Label
-    Friend WithEvents People_Selection As Windows.Forms.Label
-    Friend WithEvents Category_Selection As Windows.Forms.Label
+    Friend WithEvents lbl_topic As Windows.Forms.Label
+    Friend WithEvents lbl_project As Windows.Forms.Label
+    Friend WithEvents lbl_people As Windows.Forms.Label
+    Friend WithEvents lbl_context As Windows.Forms.Label
+    Friend WithEvents topic_selection As Windows.Forms.Label
+    Friend WithEvents project_selection As Windows.Forms.Label
+    Friend WithEvents people_selection As Windows.Forms.Label
+    Friend WithEvents category_selection As Windows.Forms.Label
     Friend WithEvents OK_Button As Windows.Forms.Button
     Friend WithEvents Cancel_Button As Windows.Forms.Button
     Friend WithEvents Cat_ReadingOther As Windows.Forms.Button
@@ -510,19 +510,19 @@ Partial Class TaskViewer
     Friend WithEvents Cat_Deskwork As Windows.Forms.Button
     Friend WithEvents Cat_Email As Windows.Forms.Button
     Friend WithEvents Cat_WaitingFor As Windows.Forms.Button
-    Friend WithEvents cbxBULLPIN As Windows.Forms.CheckBox
-    Friend WithEvents cbxTODAY As Windows.Forms.CheckBox
+    Friend WithEvents cbx_bullpin As Windows.Forms.CheckBox
+    Friend WithEvents cbx_today As Windows.Forms.CheckBox
     Friend WithEvents cbxFlag As Windows.Forms.CheckBox
-    Friend WithEvents Label5 As Windows.Forms.Label
-    Friend WithEvents Task_Name As Windows.Forms.TextBox
-    Friend WithEvents Label6 As Windows.Forms.Label
-    Friend WithEvents Label7 As Windows.Forms.Label
-    Friend WithEvents Label8 As Windows.Forms.Label
+    Friend WithEvents lbl_taskname As Windows.Forms.Label
+    Friend WithEvents task_name As Windows.Forms.TextBox
+    Friend WithEvents lbl_priority As Windows.Forms.Label
+    Friend WithEvents lbl_kbf As Windows.Forms.Label
+    Friend WithEvents lbl_duration As Windows.Forms.Label
     Friend WithEvents Priority_Box As Windows.Forms.ComboBox
-    Friend WithEvents KB_Selector As Windows.Forms.ComboBox
-    Friend WithEvents Duration As Windows.Forms.TextBox
-    Friend WithEvents DT_DueDate As Windows.Forms.DateTimePicker
-    Friend WithEvents Label9 As Windows.Forms.Label
-    Friend WithEvents Label10 As Windows.Forms.Label
-    Friend WithEvents DT_Reminder As Windows.Forms.DateTimePicker
+    Friend WithEvents kb_selector As Windows.Forms.ComboBox
+    Friend WithEvents duration As Windows.Forms.TextBox
+    Friend WithEvents dt_duedate As Windows.Forms.DateTimePicker
+    Friend WithEvents lbl_duedate As Windows.Forms.Label
+    Friend WithEvents lbl_reminder As Windows.Forms.Label
+    Friend WithEvents dt_reminder As Windows.Forms.DateTimePicker
 End Class
