@@ -207,6 +207,7 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
+    <Compile Include="Modules\KeyValuePairEnumerableExtensions.vb" />
     <Compile Include="Modules\AutoFile.vb" />
     <Compile Include="Classes\TagController.vb" />
     <Compile Include="Classes\TaskController.vb" />

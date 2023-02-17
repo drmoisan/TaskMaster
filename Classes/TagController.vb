@@ -1,9 +1,15 @@
 ﻿Imports System.Runtime.Remoting.Contexts
+Imports System.Windows
+Imports System.Windows.Forms
 Imports Microsoft.Office.Interop.Outlook
+Imports System
+Imports System.Linq
+Imports System.Collections.Generic
 
 Public Class TagController
 
     Private _viewer As TagViewer
+    Private _dict_original As SortedDictionary(Of String, Boolean)
     Private _dict_options As SortedDictionary(Of String, Boolean)
     Private _filtered_options As SortedDictionary(Of String, Boolean)
     Private _selections As List(Of String)
@@ -17,6 +23,8 @@ Public Class TagController
     Private _col_colorbox As Collection = New Collection
     Private _ismail As Boolean
     Public _exit_type As String
+    Private _cursor_position As Integer
+    Public int_focus As Integer
 
 
 #Region "Public Functions"
@@ -31,7 +39,13 @@ Public Class TagController
 
         _viewer = viewer_instance
         _obj_item = objItemObject
-        _dict_options = dictOptions
+        _dict_original = dictOptions
+        If _viewer.Hide_CCO.Checked = True Then
+            _dict_options = FilterCCO(dictOptions)
+        Else
+            _dict_options = dictOptions
+        End If
+
         _selections = selections
 
 
@@ -98,13 +112,17 @@ Public Class TagController
     End Sub
 
     Public Sub UpdateSelections()
+        ' Need to test function. Might not work
         _selections = _dict_options.Where(Function(x) x.Value = 1).Select(Function(x) x.Key)
         _filtered_selections = _filtered_options.Where(Function(x) x.Value = 1).Select(Function(x) x.Key)
     End Sub
 
     Public Sub SearchAndReload()
         RemoveControls()
-        Dim filtered_options = SearchSortedDictKeys(_dict_options, _viewer.TextBox1.Text)
+        'Dim filtered_options = SearchSortedDictKeys(_dict_options, _viewer.TextBox1.Text)
+        Dim filtered_options = _dict_options.Where(
+            Function(x) x.Key.Contains(_viewer.TextBox1.Text)).ToSortedDictionary
+
         LoadControls(filtered_options, _prefix)
     End Sub
 
@@ -140,10 +158,96 @@ Public Class TagController
         Next
         If col_people.Count > 0 Then FilterToSelected()
     End Sub
+
+    Public Function FilterCCO(
+            source_dict As SortedDictionary(Of String, Boolean)) _
+            As SortedDictionary(Of String, Boolean)
+
+        If Globals.ThisAddIn.CCOCatList Is Nothing Then
+            Flag_Fields_Categories.CCOCatList_Load()
+        End If
+        Dim exclude As List(Of String) = Globals.ThisAddIn.CCOCatList
+        Dim filtered_dict = (From x In source_dict
+                             Where Not exclude.Contains(x.Key)
+                             Select x).ToSortedDictionary()
+
+        Return filtered_dict
+    End Function
+
+    Public Sub ToggleCCO()
+        If _viewer.Hide_CCO.Checked = True Then
+            _dict_options = FilterCCO(_dict_options)
+        Else
+            _dict_options = _dict_original
+        End If
+        SearchAndReload()
+    End Sub
+
+    Public Sub New_Action()
+        MsgBox("Need to Implement New Action")
+    End Sub
+
 #End Region
 
 #Region "Public Keyboard Events"
+    Public Sub OptionsPanel_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs)
+        Select Case e.KeyCode
+            Case Keys.Down
+                e.IsInputKey = True
+            Case Keys.Up
+                e.IsInputKey = True
+        End Select
+    End Sub
 
+    Public Sub OptionsPanel_KeyDown(sender As Object, e As KeyEventArgs)
+        Select Case e.KeyCode
+            Case Keys.Down
+                Select_Ctrl_By_Number(1)
+            Case Keys.Up
+                Select_Ctrl_By_Number(-1)
+        End Select
+    End Sub
+
+    Public Sub TagViewer_KeyDown(sender As Object, e As KeyEventArgs)
+        Select Case e.KeyCode
+            Case Keys.Enter
+                OK_Action()
+        End Select
+    End Sub
+
+    Public Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs)
+        Select Case e.KeyCode
+            Case Keys.Right
+                _cursor_position = _viewer.TextBox1.SelectionStart
+        End Select
+    End Sub
+
+    Public Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs)
+        Select Case e.KeyCode
+            Case Keys.Right
+                If _viewer.TextBox1.SelectionStart = _cursor_position Then
+                    FilterToSelected()
+                End If
+            Case Keys.Down
+                Select_Ctrl_By_Number(1)
+            Case Keys.Enter
+                OK_Action()
+        End Select
+    End Sub
+
+    Public Sub Select_Ctrl_By_Number(increment As Integer)
+        Dim newpos As Integer = int_focus + increment
+        If newpos = 0 Then
+            _col_cbx_ctrl.Item(1).Focus()
+            _viewer.TextBox1.Select()
+            int_focus = newpos
+        ElseIf newpos <= _col_cbx_ctrl.Count Then
+            _col_cbx_ctrl.Item(newpos).Focus()
+            Dim cbx As Windows.Forms.CheckBox = _col_cbx_ctrl.Item(newpos)
+            ControlPaint.DrawFocusRectangle(Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle)
+            int_focus = newpos
+        End If
+    End Sub
 #End Region
 
 #Region "Private Helper Functions"
@@ -161,6 +265,7 @@ Public Class TagController
         Const cWt = 300
 
         _filtered_options = dict_options
+        int_focus = 0
 
         For i = 0 To _filtered_options.Count - 1
             strChkName = Format(i, "00") & " ChkBx"

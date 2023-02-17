@@ -1,4 +1,5 @@
 ﻿Option Explicit On
+Imports System.Drawing
 Imports System.Windows.Forms
 
 Public Class cCheckBoxClass
@@ -37,50 +38,38 @@ Public Class cCheckBoxClass
     End Sub
 
     Private Sub ctrlCB_KeyDown(sender As Object, e As KeyEventArgs) Handles ctrlCB.KeyDown
-        Dim newpos As Integer
         Select Case e.KeyCode
-        'Case vbKeyRight
-        '    newpos = lActivePos + 1
-        '    If newpos <= colLabelEvent.Count Then _
-        '        colLabelEvent(newpos).GenerateClick
-        'Case vbKeyLeft
-        '    newpos = lActivePos - 1
-        '    If newpos >= 1 Then _
-        '        colLabelEvent(newpos).GenerateClick
             Case Keys.Down
+                objUserForm.Select_Ctrl_By_Number(1)
 
-                newpos = objUserForm.intFocus + 1
-                If newpos <= objUserForm.colCheckbox.Count Then
-                    objUserForm.colCheckboxEvent.item(newpos).TrigByKeyChg = True
-                    objUserForm.colCheckbox.item(newpos).SetFocus
-                    objUserForm.intFocus = newpos
-                End If
-
-            'newpos = Tags.intFocus + 1
-            'If newpos <= Tags.colCheckbox.Count Then
-            '    Tags.colCheckboxEvent.Item(newpos).TrigByKeyChg = True
-            '    Tags.colCheckbox.Item(newpos).SetFocus
-            '    Tags.intFocus = newpos
-            'End If
             Case Keys.Up
-                'Case vbKeyUp
-                newpos = objUserForm.intFocus - 1
-                If newpos >= 1 Then
-                    objUserForm.colCheckboxEvent.item(newpos).TrigByKeyChg = True
-                    objUserForm.colCheckbox.item(newpos).SetFocus
-                    objUserForm.intFocus = newpos
-                End If
+                objUserForm.Select_Ctrl_By_Number(-1)
 
-                'newpos = Tags.intFocus - 1
-                'If newpos >= 1 Then
-                '    Tags.colCheckboxEvent.Item(newpos).TrigByKeyChg = True
-                '    Tags.colCheckbox.Item(newpos).SetFocus
-                '    Tags.intFocus = newpos
-                '
-                'End If
             Case Keys.Enter
-                objUserForm.Call_OK
+                objUserForm.OK_Action()
         End Select
     End Sub
 
+    Private Sub ctrlCB_GotFocus(sender As Object, e As EventArgs) Handles ctrlCB.GotFocus
+        Dim ctrl = TryCast(sender, Control)
+        Dim tmp_color As Drawing.Color = ctrl.BackColor
+        ctrl.BackColor = ctrl.ForeColor
+        ctrl.ForeColor = tmp_color
+    End Sub
+
+    Private Sub ctrlCB_LostFocus(sender As Object, e As EventArgs) Handles ctrlCB.LostFocus
+        Dim ctrl = TryCast(sender, Control)
+        Dim tmp_color As Drawing.Color = ctrl.BackColor
+        ctrl.BackColor = ctrl.ForeColor
+        ctrl.ForeColor = tmp_color
+    End Sub
+
+    Private Sub ctrlCB_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles ctrlCB.PreviewKeyDown
+        Select Case e.KeyCode
+            Case Keys.Down
+                e.IsInputKey = True
+            Case Keys.Up
+                e.IsInputKey = True
+        End Select
+    End Sub
 End Class

@@ -28,11 +28,11 @@ Partial Class TagViewer
         Me.button_new = New System.Windows.Forms.Button()
         Me.button_autoassign = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
+        Me.Hide_CCO = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'OptionsPanel
         '
-        Me.OptionsPanel.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.OptionsPanel.AutoScroll = True
         Me.OptionsPanel.Location = New System.Drawing.Point(29, 45)
         Me.OptionsPanel.Name = "OptionsPanel"
@@ -41,6 +41,7 @@ Partial Class TagViewer
         '
         'button_ok
         '
+        Me.button_ok.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.button_ok.Location = New System.Drawing.Point(66, 420)
         Me.button_ok.Name = "button_ok"
         Me.button_ok.Size = New System.Drawing.Size(70, 30)
@@ -50,6 +51,7 @@ Partial Class TagViewer
         '
         'button_cancel
         '
+        Me.button_cancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.button_cancel.Location = New System.Drawing.Point(150, 420)
         Me.button_cancel.Name = "button_cancel"
         Me.button_cancel.Size = New System.Drawing.Size(70, 30)
@@ -59,6 +61,7 @@ Partial Class TagViewer
         '
         'button_new
         '
+        Me.button_new.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.button_new.Location = New System.Drawing.Point(234, 420)
         Me.button_new.Name = "button_new"
         Me.button_new.Size = New System.Drawing.Size(70, 30)
@@ -68,6 +71,7 @@ Partial Class TagViewer
         '
         'button_autoassign
         '
+        Me.button_autoassign.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.button_autoassign.Location = New System.Drawing.Point(318, 420)
         Me.button_autoassign.Name = "button_autoassign"
         Me.button_autoassign.Size = New System.Drawing.Size(70, 30)
@@ -83,11 +87,24 @@ Partial Class TagViewer
         Me.TextBox1.Size = New System.Drawing.Size(272, 26)
         Me.TextBox1.TabIndex = 5
         '
+        'Hide_CCO
+        '
+        Me.Hide_CCO.AutoSize = True
+        Me.Hide_CCO.Checked = True
+        Me.Hide_CCO.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.Hide_CCO.Location = New System.Drawing.Point(349, 16)
+        Me.Hide_CCO.Name = "Hide_CCO"
+        Me.Hide_CCO.Size = New System.Drawing.Size(73, 17)
+        Me.Hide_CCO.TabIndex = 6
+        Me.Hide_CCO.Text = "Hide CCO"
+        Me.Hide_CCO.UseVisualStyleBackColor = True
+        '
         'TagViewer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(454, 461)
+        Me.Controls.Add(Me.Hide_CCO)
         Me.Controls.Add(Me.TextBox1)
         Me.Controls.Add(Me.button_autoassign)
         Me.Controls.Add(Me.button_new)
@@ -107,4 +124,5 @@ Partial Class TagViewer
     Friend WithEvents button_new As Windows.Forms.Button
     Friend WithEvents button_autoassign As Windows.Forms.Button
     Friend WithEvents TextBox1 As Windows.Forms.TextBox
+    Friend WithEvents Hide_CCO As Windows.Forms.CheckBox
 End Class
