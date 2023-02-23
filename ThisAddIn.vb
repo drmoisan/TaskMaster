@@ -32,6 +32,7 @@ Public Class ThisAddIn
     Public ppl_dict As PeopleDict(Of String, String)
     Public WithEvents IDList As cIDList
     Public DM_CurView As DataModel_ToDoTree
+    Public Cats As FlagParser
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
         _OlNS = Application.GetNamespace("MAPI")
@@ -212,6 +213,7 @@ Public Class ThisAddIn
         IDList.RePopulate()
         IDList.Save(FileName_IDList)
         WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", IDList.UsedIDList.ToArray)
+        Return 1
     End Function
 
 

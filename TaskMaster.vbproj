@@ -274,6 +274,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Ribbons\EmailRibbon.resx">
       <DependentUpon>EmailRibbon.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TaskViewer.resx">
       <DependentUpon>TaskViewer.vb</DependentUpon>

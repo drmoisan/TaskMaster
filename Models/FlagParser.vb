@@ -1,12 +1,17 @@
-﻿''' <summary>
-''' Class converts color categories to flags relevant to People, Projects, Topics, context, etc
+﻿Imports System
+Imports System.Collections
+
+
+''' <summary>
+''' Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
 ''' </summary>
 Public Class FlagParser
-    Private _people As String = ""
-    Private _projects As String = ""
-    Private _topics As String = ""
-    Public context As String = ""
-    Public kb As String = ""
+
+    Private _people As FlagDetails = New FlagDetails(My.Settings.Prefix_People)
+    Private _projects As FlagDetails = New FlagDetails(My.Settings.Prefix_Project)
+    Private _topics As FlagDetails = New FlagDetails(My.Settings.Prefix_Topic)
+    Private _context As FlagDetails = New FlagDetails(My.Settings.Prefix_Context)
+    Private _kb As FlagDetails = New FlagDetails(My.Settings.Prefix_KB)
     Public other As String = ""
     Public today As Boolean = False
     Public bullpin As Boolean = False
@@ -18,174 +23,212 @@ Public Class FlagParser
     ''' <param name="strCats_All"></param>
     ''' <param name="DeleteSearchSubString"></param>
     Public Sub New(ByRef strCats_All As String, Optional DeleteSearchSubString As Boolean = False)
-        Splitter(strCats_All, DeleteSearchSubString)
+        If strCats_All Is Nothing Then strCats_All = ""
+        'Splitter(strCats_All, DeleteSearchSubString)
+        InitFromString(strCats_All)
     End Sub
 
     ''' <summary>
-    ''' Property accesses the private variable _projects
-    ''' Set 
-    '''     Extract: Split comma delimited String to array of project names
-    '''     Transform: Iterate through array and append a prefix if not present 
-    '''     Load: Recombine in string and store value in _projects
-    ''' Get accesses the value stored in _projects
+    ''' Function tests to see if a string begins with a prefix
     ''' </summary>
-    ''' <param name="IncludePrefix">Determines whether the return value includes the category prefix</param>
+    ''' <param name="test_string"></param>
+    ''' <param name="prefix"></param>
+    ''' <returns>True if present. False if not present.</returns>
+    Private Function PrefixPresent(test_string As String, prefix As String) As Boolean
+        If Left(test_string, prefix.Length) = prefix Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Private Sub InitFromString(ByRef strCats_All As String)
+        Dim list_categories As List(Of String) = SplitToList(strCats_All, ",")
+        _people.List = FindMatches(list_categories, _people.prefix)
+        _projects.List = FindMatches(list_categories, _projects.prefix)
+        _topics.List = FindMatches(list_categories, _topics.prefix)
+        _context.List = FindMatches(list_categories, _context.prefix)
+        _kb.List = FindMatches(list_categories, _kb.prefix)
+
+        list_categories = list_categories.Except(_people.ListWithPrefix) _
+                                         .Except(_projects.ListWithPrefix) _
+                                         .Except(_topics.ListWithPrefix) _
+                                         .Except(_context.ListWithPrefix) _
+                                         .Except(_kb.ListWithPrefix) _
+                                         .ToList()
+
+        If list_categories.Contains(My.Settings.Prefix_Today) Then
+            today = True
+            list_categories.Remove(My.Settings.Prefix_Today)
+        Else
+            today = False
+        End If
+
+        If list_categories.Contains(My.Settings.Prefix_Bullpin) Then
+            bullpin = True
+            list_categories.Remove(My.Settings.Prefix_Bullpin)
+        Else
+            bullpin = False
+        End If
+
+        If list_categories.Count > 0 Then
+            other = String.Join(", ", list_categories)
+        Else
+            other = ""
+        End If
+
+    End Sub
+
+    Public Property KB(Optional IncludePrefix As Boolean = False) As String
+        Get
+            If IncludePrefix Then
+                Return _kb.WTAG
+            Else
+                Return _kb.NOTAG
+            End If
+        End Get
+        Set(value As String)
+            _kb.List = SplitToList(value, ",", _kb.prefix)
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Property accesses a private instance of FlagDetails. 
+    ''' SET splits a comma delimited String to a list excluding 
+    ''' the prefix which is passed to the FlagDetails class.
+    ''' </summary>
+    ''' <param name="IncludePrefix">Determines whether GET includes the category prefix</param>
+    ''' <returns>A string containing a comma separated Context names</returns>
+    Public Property Context(Optional IncludePrefix As Boolean = False) As String
+        Get
+            If IncludePrefix Then
+                Return _context.WTAG
+            Else
+                Return _context.NOTAG
+            End If
+        End Get
+        Set(value As String)
+            _context.List = SplitToList(value, ",", _context.prefix)
+        End Set
+    End Property
+
+    Public ReadOnly Property ContextList As List(Of String)
+        Get
+            Return _context.List
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Property accesses a private instance of FlagDetails. 
+    ''' SET splits a comma delimited String to a list excluding 
+    ''' the prefix which is passed to the FlagDetails class.
+    ''' </summary>
+    ''' <param name="IncludePrefix">Determines whether GET includes the category prefix</param>
     ''' <returns>A string containing a comma separated Project names</returns>
     Public Property Projects(Optional IncludePrefix As Boolean = False) As String
         Get
-            Dim Prefix As String = "Tag PROJECT "
-            Dim strReturn As String = _projects
-
-            If IncludePrefix = False Then
-                strReturn = SubStr_w_Delimeter(strReturn, Prefix, ", ", DeleteSearchSubString:=True)
-            End If
-            Return strReturn
-        End Get
-
-        Set(value As String)
-            Dim Prefix As String = "Tag PROJECT "
-
-            Dim strReturn As String = ""
-            If value = "" Then
-                strReturn = ""
-            ElseIf Left(value, Prefix.Length) <> Prefix Then
-                Dim strTmp() As String = value.Split(", ")
-                For i As Integer = LBound(strTmp) To UBound(strTmp)
-                    strReturn = strReturn & ", " & Prefix & Trim(strTmp(i))
-                Next
-                If strReturn.Length > 2 Then
-                    strReturn = Right(strReturn, strReturn.Length - 2)
-                End If
+            If IncludePrefix Then
+                Return _projects.WTAG
             Else
-                strReturn = value
+                Return _projects.NOTAG
             End If
-            _projects = strReturn
+        End Get
+        Set(value As String)
+            _projects.List = SplitToList(value, ",", _projects.prefix)
         End Set
     End Property
 
+    Public ReadOnly Property ProjectList As List(Of String)
+        Get
+            Return _projects.List
+        End Get
+    End Property
+
     ''' <summary>
-    ''' Property accesses the private variable _topics
-    ''' Set 
-    '''     Extract: Split comma delimited String to array of Topic names
-    '''     Transform: Iterate through array and append a prefix if not present 
-    '''     Load: Recombine in string and store value in _topics
-    ''' Get accesses the value stored in _topics
+    ''' Property accesses a private instance of FlagDetails. 
+    ''' SET splits a comma delimited String to a list excluding 
+    ''' the prefix which is passed to the FlagDetails class.
     ''' </summary>
-    ''' <param name="IncludePrefix">Determines whether the return value includes the category prefix</param>
+    ''' <param name="IncludePrefix">Determines whether GET includes the category prefix</param>
     ''' <returns>A string containing a comma separated Topic names</returns>
     Public Property Topics(Optional IncludePrefix As Boolean = False) As String
         Get
-            Dim Prefix As String = "Tag TOPIC "
-            Dim strReturn As String = _topics
-
-            If IncludePrefix = False Then
-                strReturn = SubStr_w_Delimeter(strReturn, Prefix, ", ", DeleteSearchSubString:=True)
-            End If
-            Return strReturn
-        End Get
-
-        Set(value As String)
-            Dim Prefix As String = "Tag TOPIC "
-
-            Dim strReturn As String = ""
-            If value = "" Then
-                strReturn = ""
-            ElseIf Left(value, Prefix.Length) <> Prefix Then
-                Dim strTmp() As String = value.Split(", ")
-                For i As Integer = LBound(strTmp) To UBound(strTmp)
-                    strReturn = strReturn & ", " & Prefix & Trim(strTmp(i))
-                Next
-                If strReturn.Length > 2 Then
-                    strReturn = Right(strReturn, strReturn.Length - 2)
-                End If
+            If IncludePrefix Then
+                Return _topics.WTAG
             Else
-                strReturn = value
+                Return _topics.NOTAG
             End If
-            _topics = strReturn
+        End Get
+        Set(value As String)
+            _topics.List = SplitToList(value, ",", _topics.prefix)
         End Set
+    End Property
+
+    Public ReadOnly Property TopicList As List(Of String)
+        Get
+            Return _topics.List
+        End Get
     End Property
 
     ''' <summary>
-    ''' Property accesses the private variable _people
-    ''' Set 
-    '''     Extract: Split comma delimited String to array of People names
-    '''     Transform: Iterate through array and append a prefix if not present 
-    '''     Load: Recombine in string and store value in _people
-    ''' Get accesses the value stored in _people
+    ''' Property accesses a private instance of FlagDetails. 
+    ''' SET splits a comma delimited String to a list excluding 
+    ''' the prefix which is passed to the FlagDetails class.
     ''' </summary>
-    ''' <param name="IncludePrefix"></param>
-    ''' <returns>A string containing a comma separated People names</returns>
+    ''' <param name="IncludePrefix">Determines whether GET includes the category prefix</param>
+    ''' <returns>A string containing a comma separated Topic names</returns>
     Public Property People(Optional IncludePrefix As Boolean = False) As String
         Get
-            Dim Prefix As String = "Tag PPL "
-            Dim strReturn As String = _people
-
-            If IncludePrefix = False Then
-                strReturn = SubStr_w_Delimeter(strReturn, Prefix, ", ", DeleteSearchSubString:=True)
-            End If
-            Return strReturn
-        End Get
-
-        Set(value As String)
-            Dim Prefix As String = "Tag PPL "
-
-            Dim strReturn As String = ""
-            If value = "" Then
-                strReturn = ""
-            ElseIf Left(value, Prefix.Length) <> Prefix Then
-                Dim strTmp() As String = value.Split(", ")
-                For i As Integer = LBound(strTmp) To UBound(strTmp)
-                    strReturn = strReturn & ", " & Prefix & Trim(strTmp(i))
-                Next
-                If strReturn.Length > 2 Then
-                    strReturn = Right(strReturn, strReturn.Length - 2)
-                End If
+            If IncludePrefix Then
+                Return _people.WTAG
             Else
-                strReturn = value
+                Return _people.NOTAG
             End If
-            _people = strReturn
+        End Get
+        Set(value As String)
+            _people.List = SplitToList(value, ",", _people.prefix)
         End Set
     End Property
+
+    Public ReadOnly Property PeopleList As List(Of String)
+        Get
+            Return _people.List
+        End Get
+    End Property
+
+    Private Function AppendDetails(base As String, details As FlagDetails, wtag As Boolean) As String
+        If details.WTAG.Length = 0 Then
+            Return base
+        Else
+            If wtag Then
+                Return base & ", " & details.WTAG
+            Else
+                Return base & ", " & details.NOTAG
+            End If
+        End If
+    End Function
 
     ''' <summary>
     ''' Function recombines flag settings in one comma delimited string representing color categories
     ''' </summary>
     ''' <returns>A string containing color categories</returns>
-    Public Function Combine() As String
-        Dim strTmp As String = ""
-        If _people.Length > 0 Then
-            strTmp = strTmp & ", " & _people
+    Public Function Combine(Optional wtag As Boolean = True) As String
+        Dim string_return As String = ""
+        string_return = AppendDetails(string_return, _people, wtag)
+        string_return = AppendDetails(string_return, _projects, wtag)
+        string_return = AppendDetails(string_return, _topics, wtag)
+        string_return = AppendDetails(string_return, _context, wtag)
+        string_return = AppendDetails(string_return, _kb, wtag)
+
+        If today Then string_return = string_return & ", " & "Tag A Top Priority Today"
+        If bullpin Then string_return = string_return & ", " & "Tag Bullpin Priorities"
+
+
+        If string_return.Length > 2 Then
+            string_return = Right(string_return, string_return.Length - 2)
         End If
 
-        If _projects.Length > 0 Then
-            strTmp = strTmp & ", " & _projects
-        End If
-
-        If _topics.Length > 0 Then
-            strTmp = strTmp & ", " & _topics
-        End If
-
-        If context.Length > 0 Then
-            strTmp = strTmp & ", " & context
-        End If
-
-        If kb.Length > 0 Then
-            strTmp = strTmp & ", " & kb
-        End If
-
-        If today = True Then
-            strTmp = strTmp & ", " & "Tag A Top Priority Today"
-        End If
-
-        If bullpin = True Then
-            strTmp = strTmp & ", " & "Tag Bullpin Priorities"
-        End If
-
-        If strTmp.Length > 2 Then
-            strTmp = Right(strTmp, strTmp.Length - 2)
-        End If
-
-        Return strTmp
+        Return string_return
     End Function
 
     ''' <summary>
@@ -194,10 +237,10 @@ Public Class FlagParser
     ''' <param name="strCats_All">String containing comma delimited color categories</param>
     ''' <param name="DeleteSearchSubString"></param>
     Public Sub Splitter(ByRef strCats_All As String, Optional DeleteSearchSubString As Boolean = False)
-        _people = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        _people.wtag = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", True)
 
-        _projects = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PROJECT "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        _projects.wtag = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PROJECT "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag PROJECT "), ", ", True)
 
         Dim strTemp As String = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag Bullpin Priorities"), ", ", DeleteSearchSubString:=False)
@@ -216,13 +259,13 @@ Public Class FlagParser
             today = False
         End If
 
-        _topics = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag TOPIC "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        _topics.wtag = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag TOPIC "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag TOPIC "), ", ", True)
 
         kb = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag KB "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag KB "), ", ", True)
 
-        context = other
+        Context = other
 
     End Sub
 
@@ -246,6 +289,57 @@ Public Class FlagParser
 
     End Function
 
+    Private Function SplitToList(MainString As String,
+                                 Delimiter As String,
+                                 Optional ReplaceString As String = "XXXXX") As List(Of String)
+        Dim list_return As List(Of String)
+        If MainString Is Nothing Then
+            list_return = New List(Of String)
+        ElseIf MainString = "" Then
+            list_return = New List(Of String)
+        Else
+            list_return = MainString.Split(Delimiter) _
+                                    .Select(Function(x) x _
+                                    .Replace(ReplaceString, "").Trim) _
+                                    .ToList()
+        End If
+        Return list_return
+    End Function
+
+    Private Function FindMatches(source As List(Of String),
+                                 substring As String,
+                                 Optional return_nonmatches As Boolean = False
+                                 ) As List(Of String)
+
+        Dim list_return As List(Of String)
+        If return_nonmatches Then
+            list_return = source.Where(
+                Function(x) x.IndexOf(substring, StringComparison.OrdinalIgnoreCase
+                ) = -1).Select(Function(x) x).ToList()
+        Else
+            list_return = source.Where(
+                Function(x) x.IndexOf(substring, StringComparison.OrdinalIgnoreCase
+                ) <> -1).Select(Function(x) x.Replace(substring, "")).ToList()
+        End If
+        Return list_return
+
+    End Function
+
+    Public Function SubStr_MatchList_w_Delimiter(
+        MainString As String,
+        SubString As String,
+        Delimiter As String,
+        Optional bNotSearchStr As Boolean = False,
+        Optional DeleteSearchSubString As Boolean = True
+        ) As List(Of String)
+
+        Dim str_array = MainString.Split(Delimiter)
+        Dim filtered_array = SearchArry4Str(str_array, SubString, bNotSearchStr,
+                                            DeleteSearchSubString:=DeleteSearchSubString)
+        Dim match_list As List(Of String) = TryCast(filtered_array, List(Of String))
+        Return match_list
+    End Function
+
     ''' <summary>
     ''' Extract: Function accepts a comma delimited string and converts to an array of strings
     ''' Transform: Function selects members of the array that match the substring
@@ -263,7 +357,6 @@ Public Class FlagParser
         Dim varTempStrAry As Object
         Dim varFiltStrAry As Object
         Dim strTempStr As String
-        Dim i As Integer
 
         varTempStrAry = strMainString.Split(strDelimiter)
         varFiltStrAry = SearchArry4Str(varTempStrAry, strSubString, bNotSearchStr, DeleteSearchSubString:=DeleteSearchSubString)
@@ -296,6 +389,7 @@ Public Class FlagParser
 
         If Len(Trim$(SearchStr)) <> 0 Then
 
+            ReDim strCats(0)
             m_Find = SearchStr
 
             'Make lower case
@@ -379,3 +473,102 @@ Public Class FlagParser
     End Function
 
 End Class
+
+
+Public Class FlagDetails
+    Private _list As RestrictedList(Of String)
+    Private _wtag As String
+    Private _notag As String
+    Public prefix As String
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(prefix As String)
+        Me.prefix = prefix
+    End Sub
+
+    Public Property List As List(Of String)
+        Get
+            Return _list
+        End Get
+        Set(value As List(Of String))
+            Dim TmpList As List(Of String)
+            If value Is Nothing Then
+                TmpList = New List(Of String)
+            ElseIf value.Count = 0 Then
+                TmpList = value
+            ElseIf Strings.Left(value(0), prefix.Length) = prefix Then
+                TmpList = value.Select(Function(x) x.Replace(prefix, "")).ToList()
+            Else
+                TmpList = value
+            End If
+            _list = New RestrictedList(Of String)(TmpList, Me)
+            ListChange_Refresh()
+        End Set
+    End Property
+
+    Public ReadOnly Property ListWithPrefix() As List(Of String)
+        Get
+            Return _list.Select(Function(x) prefix & x).ToList()
+        End Get
+    End Property
+
+    Private Sub ListChange_Refresh()
+        _wtag = String.Join(", ", _list.Select(Function(x) prefix & x))
+        _notag = String.Join(", ", _list)
+    End Sub
+
+    Public Property WTAG As String
+        Get
+            Return _wtag
+        End Get
+        Set(value As String)
+            _wtag = value
+        End Set
+    End Property
+
+    Public Property NOTAG As String
+        Get
+            Return _notag
+        End Get
+        Set(value As String)
+            _notag = value
+        End Set
+    End Property
+
+    Private NotInheritable Class RestrictedList(Of T) : Inherits List(Of T)
+        'Implements ICloneable
+
+        Private outer As FlagDetails
+
+        Public Sub New(ByVal wrapped_list As List(Of T), outer As FlagDetails)
+            MyBase.New(wrapped_list)
+            If wrapped_list Is Nothing Then
+                Throw New ArgumentNullException("wrapped_list")
+            End If
+            Me.outer = outer
+        End Sub
+
+        Public Overloads Sub Add(ByVal item As T)
+            MyBase.Add(item)
+            outer.ListChange_Refresh()
+        End Sub
+
+        Public Overloads Sub Remove(ByVal item As T)
+            MyBase.Remove(item)
+            outer.ListChange_Refresh()
+        End Sub
+
+        'Public Function ToClonedList() As List(Of T)
+        '    Dim ClonedList As List(Of T) = TryCast(Me.Clone(), List(Of T))
+        '    Return ClonedList
+        'End Function
+
+        'Private Function Clone() As Object Implements ICloneable.Clone
+        '    Return MyBase.MemberwiseClone()
+        'End Function
+    End Class
+
+End Class
+

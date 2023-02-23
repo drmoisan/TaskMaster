@@ -26,6 +26,7 @@ Module Util
                 Dim filename2 As String = Left(filename, Len(filename) - 3) & "csv"
                 Dim tmp_dict As Dictionary(Of String, String) = LoadDictCSV(staging_path, filename2)
                 dict_return = New PeopleDict(Of String, String)(tmp_dict)
+                WriteDictPPL_XML(dict_return, filepath)
             Else
                 dict_return = New PeopleDict(Of String, String)()
             End If
@@ -78,13 +79,21 @@ Module Util
 
     Private Function LoadDictPPL_XML(filepath As String) As PeopleDict(Of String, String)
         Dim serializer As XmlSerializer = New XmlSerializer(GetType(PeopleDict(Of String, String)))
-        Dim textReader As TextReader = New StreamReader(filepath)
-        Dim dictPPL As PeopleDict(Of String, String) =
+        Dim dictPPL As PeopleDict(Of String, String)
+        Using textReader As TextReader = New StreamReader(filepath)
+            dictPPL =
             CType(serializer.Deserialize(textReader),
             PeopleDict(Of String, String))
-        textReader.Close()
+        End Using
         Return dictPPL
     End Function
+
+    Private Sub WriteDictPPL_XML(dictPPL As PeopleDict(Of String, String), filepath As String)
+        Dim serializer As XmlSerializer = New XmlSerializer(GetType(PeopleDict(Of String, String)))
+        Using textWriter As TextWriter = New StreamWriter(filepath)
+            serializer.Serialize(textWriter, dictPPL)
+        End Using
+    End Sub
 
     Public Function Mail_IsItEncrypted(item As mailItem) As Boolean
 
@@ -108,5 +117,6 @@ Module Util
                              Function(x) x.Value)
         Return New SortedDictionary(Of String, Boolean)(filtered_cats)
     End Function
+
 
 End Module

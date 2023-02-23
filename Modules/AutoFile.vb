@@ -9,8 +9,6 @@ Module AutoFile
     Public Function CaptureEmailAddresses(OlMail As MailItem) As Collection
         Dim i As Integer
         Dim j As Integer
-        Dim k As Integer
-
         Dim strAddresses() As String
         Dim blContains As Boolean
         Dim colEmails As Collection = New Collection
@@ -136,8 +134,7 @@ Module AutoFile
         Dim OlPA As Outlook.PropertyAccessor
         Dim OlParent As Outlook.Folder
         Dim OlProperty As Outlook.UserProperty
-        Dim i As Integer
-        Dim lngLastVerbExec As Long
+        Dim lngLastVerbExec As Integer
         Const Last_Verb_Reply_All = 103
         Const Last_Verb_Reply_Sender = 102
         Const Last_Verb_Reply_Forward = 104
@@ -251,9 +248,9 @@ Module AutoFile
             OlPA = OlMail.PropertyAccessor
 
             Try
-                Dim tmp_property As Object = OlPA.GetProperty(PR_LAST_VERB_EXECUTED)
-                If tmp_property <> "" Then
-                    lngLastVerbExec = tmp_property
+                Dim prop_tmp_int As Integer = OlPA.GetProperty(PR_LAST_VERB_EXECUTED)
+                If prop_tmp_int <> 0 Then
+                    lngLastVerbExec = prop_tmp_int
                 Else
                     lngLastVerbExec = 0
                 End If
@@ -281,7 +278,7 @@ Module AutoFile
         Dim OlMail As Outlook.MailItem
         Dim colEmail As Collection
         Dim colPPL As Collection = New Collection
-        Dim strMissing As String
+        Dim strMissing As String = ""
         Dim strTmp As String
 
         Dim ppl_dict As Dictionary(Of String, String) =

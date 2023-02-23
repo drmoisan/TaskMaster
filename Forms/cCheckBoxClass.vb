@@ -21,12 +21,14 @@ Public Class cCheckBoxClass
     Friend Function Init(objUF As Object, strPrefix As String)
         objUserForm = objUF
         strTagPrefix = strPrefix
+        Return True
     End Function
 
     Private Sub ctrlCB_Click() Handles ctrlCB.Click
         If Not TrigByKeyChg Then
             strTemp = strTagPrefix & ctrlCB.Text
             objUserForm.ToggleChoice(strTemp)
+            objUserForm.FocusCheckbox(ctrlCB)
         ElseIf TrigByValChg Then
             TrigByKeyChg = False
             TrigByValChg = False

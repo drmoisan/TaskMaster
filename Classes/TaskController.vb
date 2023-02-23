@@ -7,12 +7,12 @@ Imports System.Collections.Generic
 
 Public Class TaskController
 
-    Private _viewer As TaskViewer
-    Private _todo_list As List(Of ToDoItem)
-    Private _active As ToDoItem
+    Private ReadOnly _viewer As TaskViewer
+    Private ReadOnly _todo_list As List(Of ToDoItem)
+    Private ReadOnly _active As ToDoItem
     Private _options As FlagsToSet
-    Private _dict_categories As SortedDictionary(Of String, Boolean)
-    Private _exit_type As String
+    Private ReadOnly _dict_categories As SortedDictionary(Of String, Boolean)
+    Private _exit_type As String = "Cancel"
 
     <Flags>
     Public Enum FlagsToSet
@@ -64,7 +64,6 @@ Public Class TaskController
 
     End Sub
 
-
     ''' <summary>
     ''' Function loads the latest values stored in _active into the task viewer
     ''' </summary>
@@ -106,45 +105,169 @@ Public Class TaskController
     End Sub
 
     Public Sub Assign_People()
-        Dim prefix As String = "Tag PPL "
+        Dim prefix As String = My.Settings.Prefix_People
 
         Dim filtered_cats = (From x In _dict_categories
                              Where x.Key.Contains(prefix)
-                             Select x).ToDictionary(
-                             Function(x) x.Key,
-                             Function(x) x.Value)
-        Dim filtered_cats_sorted As SortedDictionary(Of String, Boolean) =
-            New SortedDictionary(Of String, Boolean)(filtered_cats)
-
-        'Dim filtered_categories2 = _dict_categories.Where(
-        '    Function(x) x.Key.Contains(prefix)).[Select](Function(x) x)
-        'Dim filtered = filtered_categories.ToDictionary(Function(x) x.Key, Function(x) x.Value)
-
-        'Dim viewer As TagViewer = New TagViewer
+                             Select x).ToSortedDictionary()
 
         Dim selections As List(Of String) = Array.ConvertAll(
             _active.TagPeople.Split(","), Function(x) x.Trim()).ToList()
+        selections.Remove("")
 
         Using viewer As TagViewer = New TagViewer
             Dim controller As TagController = New TagController(
                 viewer_instance:=viewer,
-                dictOptions:=filtered_cats_sorted,
+                dictOptions:=filtered_cats,
                 selections:=selections,
                 tag_prefix:=prefix,
                 objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.TagPeople = controller.SelectionString()
+                _viewer.people_selection.Text = _active.TagPeople(False)
             End If
         End Using
 
-        _viewer.people_selection.Text = _active.TagPeople
+
+    End Sub
+
+    Public Sub Assign_Context()
+        Dim prefix As String = My.Settings.Prefix_Context
+
+        Dim filtered_cats = (From x In _dict_categories
+                             Where x.Key.Contains(prefix)
+                             Select x).ToSortedDictionary()
+
+        Dim selections As List(Of String) = Array.ConvertAll(
+            _active.TagContext.Split(","), Function(x) x.Trim()).ToList()
+        selections.Remove("")
+
+        Using viewer As TagViewer = New TagViewer
+            Dim controller As TagController = New TagController(
+                viewer_instance:=viewer,
+                dictOptions:=filtered_cats,
+                selections:=selections,
+                tag_prefix:=prefix,
+                objItemObject:=_active.object_item)
+            viewer.ShowDialog()
+            If controller._exit_type <> "Cancel" Then
+                _active.TagContext = controller.SelectionString()
+                _viewer.category_selection.Text = _active.TagContext(False)
+            End If
+        End Using
+
+    End Sub
+
+    Public Sub Assign_Project()
+        Dim prefix As String = My.Settings.Prefix_Project
+
+        Dim filtered_cats = (From x In _dict_categories
+                             Where x.Key.Contains(prefix)
+                             Select x).ToSortedDictionary()
+
+        Dim selections As List(Of String) = Array.ConvertAll(
+            _active.TagProject.Split(","), Function(x) x.Trim()).ToList()
+        selections.Remove("")
+
+        Using viewer As TagViewer = New TagViewer
+            Dim controller As TagController = New TagController(
+                viewer_instance:=viewer,
+                dictOptions:=filtered_cats,
+                selections:=selections,
+                tag_prefix:=prefix,
+                objItemObject:=_active.object_item)
+            viewer.ShowDialog()
+            If controller._exit_type <> "Cancel" Then
+                _active.TagProject = controller.SelectionString()
+                _viewer.category_selection.Text = _active.TagProject(False)
+            End If
+        End Using
+    End Sub
+
+    Public Sub Assign_Topic()
+        Dim prefix As String = My.Settings.Prefix_Topic
+
+        Dim filtered_cats = (From x In _dict_categories
+                             Where x.Key.Contains(prefix)
+                             Select x).ToSortedDictionary()
+
+        Dim selections As List(Of String) = Array.ConvertAll(
+            _active.TagTopic.Split(","), Function(x) x.Trim()).ToList()
+        selections.Remove("")
+
+        Using viewer As TagViewer = New TagViewer
+            Dim controller As TagController = New TagController(
+                viewer_instance:=viewer,
+                dictOptions:=filtered_cats,
+                selections:=selections,
+                tag_prefix:=prefix,
+                objItemObject:=_active.object_item)
+            viewer.ShowDialog()
+            If controller._exit_type <> "Cancel" Then
+                _active.TagTopic = controller.SelectionString()
+                _viewer.topic_selection.Text = _active.TagTopic(False)
+            End If
+        End Using
+    End Sub
+
+    Public Sub Assign_KB()
+        _active.KB = _viewer.kb_selector.SelectedItem.ToString()
+    End Sub
+
+    Public Sub Assign_Priority()
+        Dim TmpStr As String = _viewer.Priority_Box.SelectedItem.ToString()
+        If TmpStr = "High" Then
+            _active.Priority = OlImportance.olImportanceHigh
+        ElseIf TmpStr = "Low" Then
+            _active.Priority = OlImportance.olImportanceLow
+        Else
+            _active.Priority = OlImportance.olImportanceNormal
+        End If
+    End Sub
+
+    Public Sub OK_Action()
+        If _viewer.category_selection.Text <> "[Category Label]" Or
+            _viewer.people_selection.Text <> "[Assigned People Flagged]" Or
+            _viewer.project_selection.Text <> "[ Projects Flagged ]" Or
+            _viewer.topic_selection.Text <> "[Other Topics Tagged]" Then
+
+            Dim duration As Integer
+            Try
+                duration = CInt(_viewer.duration.Text)
+                If duration < 0 Then
+                    Throw New ArgumentOutOfRangeException("Duration cannot be negative")
+                End If
+            Catch ex As InvalidCastException
+                MsgBox("Could not convert to integer. Please put a positive integer in the duration box")
+                duration = -1
+            Catch ex As ArgumentOutOfRangeException
+                MsgBox(ex.Message)
+                duration = -1
+            End Try
+
+            If duration >= 0 Then
+                _active.TotalWork = duration
+                _viewer.Hide()
+                ApplyChanges()
+                _viewer.Dispose()
+            End If
+
+        End If
     End Sub
 
     Public Sub Cancel_Action()
         _viewer.Hide()
         _exit_type = "Cancel"
         _viewer.Dispose()
+    End Sub
+
+    Public Sub Today_Change()
+        _active.Today = _viewer.cbx_today.Checked
+    End Sub
+
+    Public Sub Bullpin_Change()
+        _active.Bullpin = _viewer.cbx_bullpin.Checked
     End Sub
 
     Private Sub ActivateOptions()
@@ -265,6 +388,10 @@ Public Class TaskController
 
     End Sub
 
+    Public Sub FlagAsTask_Change()
+        _active.FlagAsTask = _viewer.cbxFlag.Checked
+    End Sub
+
     Public Property Options As FlagsToSet
         Get
             Return _options
@@ -274,5 +401,128 @@ Public Class TaskController
             ActivateOptions()
         End Set
     End Property
+
+#Region "Shortcuts"
+    Public Sub Shortcut_Personal()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Personal"
+        _active.TagContext = My.Settings.Prefix_Context & "Personal"
+        _viewer.project_selection.Text = My.Settings.Prefix_Project & "Personal - Other"
+        _active.TagProject = My.Settings.Prefix_Project & "Personal - Other"
+    End Sub
+
+    Public Sub Shortcut_Meeting()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Meeting"
+        _active.TagContext = My.Settings.Prefix_Context & "Meeting"
+    End Sub
+
+    Public Sub Shortcut_Email()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Email"
+        _active.TagContext = My.Settings.Prefix_Context & "Email"
+    End Sub
+
+    Public Sub Shortcut_Calls()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Calls"
+        _active.TagContext = My.Settings.Prefix_Context & "Calls"
+    End Sub
+
+    Public Sub Shortcut_PreRead()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "PreRead"
+        _active.TagContext = My.Settings.Prefix_Context & "PreRead"
+    End Sub
+
+    Public Sub Shortcut_WaitingFor()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Waiting For"
+        _active.TagContext = My.Settings.Prefix_Context & "Waiting For"
+    End Sub
+
+    Public Sub Shortcut_Unprocessed()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Reading - .Unprocessed > 2 Minutes"
+        _active.TagContext = My.Settings.Prefix_Context & "Reading - .Unprocessed > 2 Minutes"
+    End Sub
+
+    Public Sub Shortcut_ReadingBusiness()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Reading - Business"
+        _active.TagContext = My.Settings.Prefix_Context & "Reading - Business"
+    End Sub
+
+    Public Sub Shortcut_ReadingNews()
+        _viewer.category_selection.Text = My.Settings.Prefix_Context & "Reading - News | Articles | Other"
+        _active.TagContext = My.Settings.Prefix_Context & "Reading - News | Articles | Other"
+
+        _viewer.project_selection.Text = My.Settings.Prefix_Project & "Routine - Reading"
+        _active.TagProject = My.Settings.Prefix_Project & "Routine - Reading"
+
+        _viewer.task_name.Text = "READ: " & _viewer.task_name.Text
+        _active.TaskSubject = _viewer.task_name.Text
+
+        _viewer.duration.Text = "15"
+        _active.TotalWork = 15
+        _viewer.duration.Focus()
+    End Sub
+
+#End Region
+
+    Private Sub ApplyChanges()
+        For Each todo As ToDoItem In _todo_list
+            ApplyChangesToItem(todo)
+        Next
+    End Sub
+
+    Private Sub ApplyChangesToItem(current As ToDoItem)
+        current.FlagAsTask = True
+        current.IsReadOnly = True
+
+        If _options.HasFlag(FlagsToSet.context) Then
+            current.TagContext = _active.TagContext
+        End If
+
+        If _options.HasFlag(FlagsToSet.people) Then
+            current.TagPeople = _active.TagPeople
+        End If
+
+        If _options.HasFlag(FlagsToSet.projects) Then
+            current.TagProject = _active.TagProject
+        End If
+
+        If _options.HasFlag(FlagsToSet.topics) Then
+            current.TagTopic = _active.TagTopic
+        End If
+
+        If _options.HasFlag(FlagsToSet.today) Then
+            current.Today = _active.Today
+        End If
+
+
+        If _options.HasFlag(FlagsToSet.bullpin) Then
+            current.Bullpin = _active.Bullpin
+        End If
+
+        If _options.HasFlag(FlagsToSet.kbf) Then
+            current.KB = _active.KB
+        End If
+
+        current.WriteFlagsBatch()
+        current.IsReadOnly = False
+
+        If _options.HasFlag(FlagsToSet.priority) Then
+            current.Priority = _active.Priority
+        End If
+
+        If _options.HasFlag(FlagsToSet.taskname) Then
+            current.TaskSubject = _active.TaskSubject
+        End If
+
+        If _options.HasFlag(FlagsToSet.worktime) Then
+            current.TotalWork = _active.TotalWork
+        End If
+
+        If _options.HasFlag(FlagsToSet.duedate) Then
+            current.DueDate = _active.DueDate
+        End If
+
+        If _options.HasFlag(FlagsToSet.reminder) Then
+            current.ReminderTime = _active.ReminderTime
+        End If
+    End Sub
 
 End Class

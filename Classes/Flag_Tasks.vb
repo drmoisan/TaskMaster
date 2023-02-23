@@ -2,11 +2,10 @@
 Imports Microsoft.Office.Interop.Outlook
 
 Public Class Flag_Tasks
-    Private _ToDoSelection As List(Of ToDoItem)
-    Private _OlExplorer As Explorer = Globals.ThisAddIn.Application.ActiveExplorer()
-    Private _ItemCollection As Collection
+    Private ReadOnly _todoSelection As List(Of ToDoItem)
+    Private ReadOnly _olExplorer As Explorer = Globals.ThisAddIn.Application.ActiveExplorer()
     Private WithEvents _viewer As TaskViewer
-    Private _controller As TaskController
+    Private ReadOnly _controller As TaskController
 
 
 
@@ -15,9 +14,9 @@ Public Class Flag_Tasks
                    Optional hWndCaller As IntPtr = Nothing,
                    Optional strNameOfFunctionCalling As String = "")
 
-        _ToDoSelection = InitializeToDoList(ItemCollection)
+        _todoSelection = InitializeToDoList(ItemCollection)
         _viewer = New TaskViewer()
-        _controller = New TaskController(_viewer, _ToDoSelection)
+        _controller = New TaskController(_viewer, _todoSelection)
     End Sub
 
     Public Sub Run()
@@ -32,7 +31,16 @@ Public Class Flag_Tasks
         If ItemCollection Is Nothing Then ItemCollection = GetSelection()
         Dim ToDoSelection As List(Of ToDoItem) = New List(Of ToDoItem)()
         For Each ObjItem In ItemCollection
-            Dim tmpToDo As ToDoItem = New ToDoItem(Item:=ObjItem, OnDemand:=True)
+            Dim tmpToDo As ToDoItem
+            If TypeOf ObjItem Is MailItem Then
+                Dim OlMail As MailItem = ObjItem
+                tmpToDo = New ToDoItem(OlMail)
+            ElseIf TypeOf ObjItem Is TaskItem Then
+                Dim OlTask As TaskItem = ObjItem
+                tmpToDo = New ToDoItem(OlTask)
+            Else
+                tmpToDo = New ToDoItem(ObjItem, OnDemand:=True)
+            End If
             ToDoSelection.Add(tmpToDo)
         Next
         Return ToDoSelection
@@ -44,7 +52,7 @@ Public Class Flag_Tasks
     ''' <returns>Collection of Outlook Items</returns>
     Private Function GetSelection() As Collection
         Dim ItemCollection As Collection = New Collection
-        For Each obj In _OlExplorer.Selection
+        For Each obj In _olExplorer.Selection
             ItemCollection.Add(obj)
         Next obj
         Return ItemCollection

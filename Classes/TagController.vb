@@ -8,21 +8,21 @@ Imports System.Collections.Generic
 
 Public Class TagController
 
-    Private _viewer As TagViewer
-    Private _dict_original As SortedDictionary(Of String, Boolean)
+    Private ReadOnly _viewer As TagViewer
+    Private ReadOnly _dict_original As SortedDictionary(Of String, Boolean)
     Private _dict_options As SortedDictionary(Of String, Boolean)
     Private _filtered_options As SortedDictionary(Of String, Boolean)
     Private _selections As List(Of String)
     Private _filtered_selections As List(Of String)
-    Private _obj_item As Object
-    Private _ol_mail As MailItem
-    Private _obj_caller As Object
-    Private _prefix As String
-    Private _col_cbx_ctrl As Collection = New Collection
-    Private _col_cbx_event As Collection = New Collection
-    Private _col_colorbox As Collection = New Collection
-    Private _ismail As Boolean
-    Public _exit_type As String
+    Private ReadOnly _obj_item As Object
+    Private ReadOnly _ol_mail As MailItem
+    Private ReadOnly _obj_caller As Object
+    Private ReadOnly _prefix As String
+    Private ReadOnly _col_cbx_ctrl As List(Of Object) = New List(Of Object)
+    Private ReadOnly _col_cbx_event As List(Of Object) = New List(Of Object)
+    Private ReadOnly _col_colorbox As List(Of Object) = New List(Of Object)
+    Private ReadOnly _ismail As Boolean
+    Public _exit_type As String = "Cancel"
     Private _cursor_position As Integer
     Public int_focus As Integer
 
@@ -71,30 +71,32 @@ Public Class TagController
 
         Dim _add_prefix As Boolean = False
 
-        If Len(_prefix) > 0 Then
-            If Len(_selections(0)) > Len(_prefix) Then
-                If Left(_selections(0), Len(_prefix)) <> _prefix Then
+        If _selections.Count > 0 Then
+            If Len(_prefix) > 0 Then
+                If Len(_selections(0)) > Len(_prefix) Then
+                    If Left(_selections(0), Len(_prefix)) <> _prefix Then
+                        _add_prefix = True
+                    End If
+                Else
                     _add_prefix = True
                 End If
-            Else
-                _add_prefix = True
             End If
-        End If
 
-        For Each rawchoice As String In _selections
-            Dim choice As String = rawchoice
-            If _add_prefix Then choice = String.Concat(_prefix, choice)
-            If _dict_options.Keys.Contains(choice) Then
-                _dict_options(choice) = Not _dict_options(choice)
-            Else
-                Dim tmp_response As MsgBoxResult = MsgBox(choice & " does not exist. Would you like to add it?", vbYesNo)
-                If tmp_response = vbYes Then
-                    If AddColorCategory(_prefix, rawchoice) Then
-                        _dict_options.Add(choice, True)
+            For Each rawchoice As String In _selections
+                Dim choice As String = rawchoice
+                If _add_prefix Then choice = String.Concat(_prefix, choice)
+                If _dict_options.Keys.Contains(choice) Then
+                    _dict_options(choice) = Not _dict_options(choice)
+                Else
+                    Dim tmp_response As MsgBoxResult = MsgBox(choice & " does not exist. Would you like to add it?", vbYesNo)
+                    If tmp_response = vbYes Then
+                        If AddColorCategory(_prefix, rawchoice) Then
+                            _dict_options.Add(choice, True)
+                        End If
                     End If
                 End If
-            End If
-        Next
+            Next
+        End If
 
         LoadControls(_dict_options, _prefix)
     End Sub
@@ -119,17 +121,20 @@ Public Class TagController
 
     Public Sub SearchAndReload()
         RemoveControls()
-        'Dim filtered_options = SearchSortedDictKeys(_dict_options, _viewer.TextBox1.Text)
+
         Dim filtered_options = _dict_options.Where(
-            Function(x) x.Key.Contains(_viewer.TextBox1.Text)).ToSortedDictionary
+            Function(x) x.Key.IndexOf(
+            _viewer.TextBox1.Text,
+            StringComparison.OrdinalIgnoreCase) >= 0).ToSortedDictionary
 
         LoadControls(filtered_options, _prefix)
     End Sub
 
     Public Function SelectionString() As String
-        'Dim tmp = _dict_options.Where(Function(x) x.Value = True).[Select](Function(x) x.Key)
-        Dim tmp = _dict_options.Where(Function(item) item.Value).[Select](Function(item) item.Key).ToList()
-        Return String.Join(", ", tmp.ToArray())
+        Dim Tmp = _dict_options.Where(Function(item) item.Value) _
+                               .[Select](Function(item) item.Key) _
+                               .ToList()
+        Return String.Join(", ", Tmp)
     End Function
 
 #End Region
@@ -167,9 +172,15 @@ Public Class TagController
             Flag_Fields_Categories.CCOCatList_Load()
         End If
         Dim exclude As List(Of String) = Globals.ThisAddIn.CCOCatList
+        'Dim filtered_dict = (From x In source_dict
+        '                     Where Not exclude.Contains(x.Key)
+        '                     Select x).ToSortedDictionary()
         Dim filtered_dict = (From x In source_dict
-                             Where Not exclude.Contains(x.Key)
+                             Where exclude.IndexOf(x.Key,
+                                 StringComparison.OrdinalIgnoreCase) < 0
                              Select x).ToSortedDictionary()
+
+
 
         Return filtered_dict
     End Function
@@ -187,6 +198,10 @@ Public Class TagController
         MsgBox("Need to Implement New Action")
     End Sub
 
+    Public Sub FocusCheckbox(ctrl As Windows.Forms.Control)
+        int_focus = _col_cbx_ctrl.IndexOf(ctrl)
+        Select_Ctrl_By_Number(0)
+    End Sub
 #End Region
 
 #Region "Public Keyboard Events"
@@ -237,11 +252,10 @@ Public Class TagController
 
     Public Sub Select_Ctrl_By_Number(increment As Integer)
         Dim newpos As Integer = int_focus + increment
-        If newpos = 0 Then
-            _col_cbx_ctrl.Item(1).Focus()
+        If newpos = -1 Then
             _viewer.TextBox1.Select()
             int_focus = newpos
-        ElseIf newpos <= _col_cbx_ctrl.Count Then
+        ElseIf newpos <= (_col_cbx_ctrl.Count - 1) Then
             _col_cbx_ctrl.Item(newpos).Focus()
             Dim cbx As Windows.Forms.CheckBox = _col_cbx_ctrl.Item(newpos)
             ControlPaint.DrawFocusRectangle(Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle)
@@ -257,7 +271,6 @@ Public Class TagController
         Dim ctrlCB As Windows.Forms.CheckBox
         Dim strChkName As String
         Dim clsCheckBox As cCheckBoxClass
-        Dim ctrlLbl As Windows.Forms.Label
 
         Const cHt_var = 18
         Const cHt_fxd = 6
@@ -302,8 +315,8 @@ Public Class TagController
 
             '_viewer.OptionsPanel.ScrollHeight = ctrlCB.Top + cHt_var
             Try
-                _col_cbx_ctrl.Add(ctrlCB, ctrlCB.Text)
-                _col_cbx_event.Add(clsCheckBox, ctrlCB.Text)
+                _col_cbx_ctrl.Add(ctrlCB)
+                _col_cbx_event.Add(clsCheckBox)
             Catch
                 MsgBox("Error saving checkbox control and event to collection")
                 Return False
@@ -314,15 +327,18 @@ Public Class TagController
     End Function
 
     Private Sub RemoveControls()
-        Do While _col_cbx_ctrl.Count > 0
-            _viewer.OptionsPanel.Controls.Remove(_col_cbx_ctrl.Item(1))
-            _col_cbx_ctrl.Remove(1)
-            _col_cbx_event.Remove(1)
-        Loop
-        Do While _col_colorbox.Count > 0
-            _viewer.OptionsPanel.Controls.Remove(_col_colorbox.Item(1))
-            _col_colorbox.Remove(1)
-        Loop
+        Dim max As Integer = _col_cbx_ctrl.Count - 1
+        For i = max To 0 Step -1
+            _viewer.OptionsPanel.Controls.Remove(_col_cbx_ctrl.Item(i))
+            _col_cbx_ctrl.Remove(i)
+            _col_cbx_event.Remove(i)
+        Next i
+
+        max = _col_colorbox.Count - 1
+        For i = max To 0 Step -1
+            _viewer.OptionsPanel.Controls.Remove(_col_colorbox.Item(i))
+            _col_colorbox.Remove(i)
+        Next i
     End Sub
 
     Private Sub AddOption(strOption As String, Optional blClickTrue As Boolean = False)

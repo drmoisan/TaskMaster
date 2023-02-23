@@ -33,7 +33,7 @@ Partial Class TaskViewer
         Me.Cat_ReadingBusiness = New System.Windows.Forms.Button()
         Me.Cat_Calls = New System.Windows.Forms.Button()
         Me.Cat_Internet = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Cat_PreRead = New System.Windows.Forms.Button()
         Me.Cat_Agenda = New System.Windows.Forms.Button()
         Me.lbl_topic = New System.Windows.Forms.Label()
         Me.Cat_Deskwork = New System.Windows.Forms.Button()
@@ -73,7 +73,7 @@ Partial Class TaskViewer
         Me.Frame1.Controls.Add(Me.Cat_ReadingBusiness)
         Me.Frame1.Controls.Add(Me.Cat_Calls)
         Me.Frame1.Controls.Add(Me.Cat_Internet)
-        Me.Frame1.Controls.Add(Me.Button1)
+        Me.Frame1.Controls.Add(Me.Cat_PreRead)
         Me.Frame1.Controls.Add(Me.Cat_Agenda)
         Me.Frame1.Controls.Add(Me.lbl_topic)
         Me.Frame1.Controls.Add(Me.Cat_Deskwork)
@@ -203,17 +203,17 @@ Partial Class TaskViewer
         Me.Cat_Internet.Text = "@Internet"
         Me.Cat_Internet.UseVisualStyleBackColor = False
         '
-        'Button1
+        'Cat_PreRead
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Button1.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Button1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Button1.Location = New System.Drawing.Point(424, 166)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(126, 34)
-        Me.Button1.TabIndex = 9
-        Me.Button1.Text = "@ Meeting"
-        Me.Button1.UseVisualStyleBackColor = False
+        Me.Cat_PreRead.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Cat_PreRead.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Cat_PreRead.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Cat_PreRead.Location = New System.Drawing.Point(424, 166)
+        Me.Cat_PreRead.Name = "Cat_PreRead"
+        Me.Cat_PreRead.Size = New System.Drawing.Size(126, 34)
+        Me.Cat_PreRead.TabIndex = 9
+        Me.Cat_PreRead.Text = "PreRead"
+        Me.Cat_PreRead.UseVisualStyleBackColor = False
         '
         'Cat_Agenda
         '
@@ -505,7 +505,7 @@ Partial Class TaskViewer
     Friend WithEvents Cat_ReadingBusiness As Windows.Forms.Button
     Friend WithEvents Cat_Calls As Windows.Forms.Button
     Friend WithEvents Cat_Internet As Windows.Forms.Button
-    Friend WithEvents Button1 As Windows.Forms.Button
+    Friend WithEvents Cat_PreRead As Windows.Forms.Button
     Friend WithEvents Cat_Agenda As Windows.Forms.Button
     Friend WithEvents Cat_Deskwork As Windows.Forms.Button
     Friend WithEvents Cat_Email As Windows.Forms.Button

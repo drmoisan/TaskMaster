@@ -55,4 +55,8 @@ Public Class TagViewer
     Private Sub OptionsPanel_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles OptionsPanel.PreviewKeyDown
         _controller.OptionsPanel_PreviewKeyDown(sender, e)
     End Sub
+
+    Private Sub Hide_CCO_CheckedChanged(sender As Object, e As EventArgs) Handles Hide_CCO.CheckedChanged
+        If Not _controller Is Nothing Then _controller.ToggleCCO()
+    End Sub
 End Class

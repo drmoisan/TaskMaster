@@ -155,7 +155,6 @@ Module Flag_Fields_Categories
             .Add("Tag PPL Paulina Corona")
             .Add("Tag PPL Paula Santilli")
             .Add("Tag PPL Gonzalo Muente")
-            .Add("Tag PPL David Harris")
             .Add("Tag PPL Ricardo Arias")
             .Add("Tag PPL Leonardo Aio")
             .Add("Tag PPL Pedro Escalante")

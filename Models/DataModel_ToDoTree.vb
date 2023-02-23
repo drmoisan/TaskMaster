@@ -129,7 +129,7 @@ Public Class DataModel_ToDoTree
         End If
     End Function
 
-    Public Function AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As cIDList) As TreeNode(Of ToDoItem)
+    Public Sub AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As cIDList)
         Parent.Children.Add(Child)
         Dim strSeed As String
         If Parent.Children.Count > 1 Then
@@ -145,7 +145,7 @@ Public Class DataModel_ToDoTree
             ReNumberChildrenIDs(Child.Children, IDList)
         End If
         IDList.Save()
-    End Function
+    End Sub
 
     Public Sub ReNumberIDs(IDList As cIDList)
         'WriteTreeToDisk()

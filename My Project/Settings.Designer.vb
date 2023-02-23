@@ -15,7 +15,7 @@ Option Explicit On
 Namespace My
     
     <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0"),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0"),  _
      Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
     Partial Public NotInheritable Class MySettings
         Inherits Global.System.Configuration.ApplicationSettingsBase
@@ -84,6 +84,90 @@ Namespace My
             End Get
             Set
                 Me("Default_Task_Length") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Tag PPL ")>  _
+        Public Property Prefix_People() As String
+            Get
+                Return CType(Me("Prefix_People"),String)
+            End Get
+            Set
+                Me("Prefix_People") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("_@")>  _
+        Public Property Prefix_Context() As String
+            Get
+                Return CType(Me("Prefix_Context"),String)
+            End Get
+            Set
+                Me("Prefix_Context") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Tag TOPIC ")>  _
+        Public Property Prefix_Topic() As String
+            Get
+                Return CType(Me("Prefix_Topic"),String)
+            End Get
+            Set
+                Me("Prefix_Topic") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Tag PROJECT ")>  _
+        Public Property Prefix_Project() As String
+            Get
+                Return CType(Me("Prefix_Project"),String)
+            End Get
+            Set
+                Me("Prefix_Project") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Tag A Top Priority Today")>  _
+        Public Property Prefix_Today() As String
+            Get
+                Return CType(Me("Prefix_Today"),String)
+            End Get
+            Set
+                Me("Prefix_Today") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Tag Bullpin Priorities")>  _
+        Public Property Prefix_Bullpin() As String
+            Get
+                Return CType(Me("Prefix_Bullpin"),String)
+            End Get
+            Set
+                Me("Prefix_Bullpin") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Tag KB ")>  _
+        Public Property Prefix_KB() As String
+            Get
+                Return CType(Me("Prefix_KB"),String)
+            End Get
+            Set
+                Me("Prefix_KB") = value
             End Set
         End Property
     End Class
