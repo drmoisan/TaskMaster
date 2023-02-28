@@ -13,130 +13,319 @@ Imports System.Diagnostics
 Imports Microsoft.Office.Core
 Imports System.Linq.Expressions
 Imports System.Runtime.Serialization.Formatters.Binary
+Imports System.Net
 
-
+<Serializable()>
 Public Class ToDoItem
+    Implements ICloneable
+
+    Const PA_TOTAL_WORK As String =
+            "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003"
+
     Private OlObject As Object
     Private _ToDoID As String = ""
     Public _TaskSubject As String = ""
     Public _MetaTaskSubject As String = ""
     Public _MetaTaskLvl As String = ""
-    Private _TagContext As String = ""
     Private _TagProgram As String = ""
-    Private _TagProject As String = ""
-    Private _TagPeople As String = ""
-    Private _TagTopic As String = ""
     Private _Priority As Outlook.OlImportance
     Private _TaskCreateDate As Date
     Private _StartDate As Date
     Private _Complete As Boolean
-    Private _KB As String = ""
+    Private _TotalWork As Integer = 0
     Private _ActiveBranch As Boolean = False
     Private _ExpandChildren As String = ""
     Private _ExpandChildrenState As String = ""
     Private _EC2 As Boolean
     Private _VisibleTreeState As Integer
+    Private _readonly As Boolean = False
+    Private _flags As FlagParser
+    Private _flagAsTask As Boolean = True
+
+
+    Public Function Clone() As Object Implements System.ICloneable.Clone
+        Dim cloned_todo As ToDoItem = New ToDoItem(OlObject, True)
+        With cloned_todo
+            ._ToDoID = _ToDoID
+            ._TaskSubject = _TaskSubject
+            ._MetaTaskSubject = _MetaTaskSubject
+            ._MetaTaskLvl = _MetaTaskLvl
+            ._TagProgram = _TagProgram
+            ._Priority = _Priority
+            ._StartDate = _StartDate
+            ._Complete = _Complete
+            ._TotalWork = _TotalWork
+            ._ActiveBranch = _ActiveBranch
+            ._ExpandChildren = _ExpandChildren
+            ._ExpandChildrenState = _ExpandChildrenState
+            ._EC2 = _EC2
+            ._VisibleTreeState = _VisibleTreeState
+            ._readonly = _readonly
+        End With
+        Return cloned_todo
+    End Function
+
+    ''' <summary>
+    ''' Gets and Sets a flag that when true, prevents saving changes to the underlying Outlook object
+    ''' </summary>
+    ''' <returns>Boolean</returns>
+    Public Property IsReadOnly As Boolean
+        Get
+            Return _readonly
+        End Get
+        Set(value As Boolean)
+            _readonly = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Saves all internal variables to the Outlook Object
+    ''' </summary>
+    Public Sub ForceSave()
+        ' Save the current state of the read only flag
+        Dim tmp_readonly_state As Boolean = _readonly
+
+        ' Activate saving
+        _readonly = False
+
+        WriteFlagsBatch()
+
+        ToDoID = _ToDoID
+        TaskSubject = _TaskSubject
+        MetaTaskSubject = _MetaTaskSubject
+        MetaTaskLvl = _MetaTaskLvl
+        TagProgram = _TagProgram
+        Priority = _Priority
+        StartDate = _StartDate
+        Complete = _Complete
+        TotalWork = _TotalWork
+        ActiveBranch = _ActiveBranch
+        ExpandChildren = _ExpandChildren
+        ExpandChildrenState = _ExpandChildrenState
+        EC2 = _EC2
+        VisibleTreeState = _VisibleTreeState
+
+        If TypeOf (OlObject) Is MailItem Then
+            Dim OlMail As MailItem = OlObject
+            If OlMail.FlagStatus = OlFlagStatus.olNoFlag And _flagAsTask Then
+                OlMail.MarkAsTask(OlMarkInterval.olMarkNoDate)
+            ElseIf OlMail.FlagStatus = OlFlagStatus.olFlagMarked And Not _flagAsTask Then
+                OlMail.ClearTaskFlag()
+            End If
+            OlMail.Save()
+        End If
+
+        ' Return read only variable to its original state
+        _readonly = tmp_readonly_state
+    End Sub
 
     Public Sub New(OlMail As Outlook.MailItem)
         OlObject = OlMail
-        If OlMail.TaskSubject.Length <> 0 Then
-            _TaskSubject = OlMail.TaskSubject
-        Else
-            _TaskSubject = OlMail.Subject
-        End If
-        _TagContext = CustomField("TagContext")
-        _TagProgram = CustomField("TagProgram")
-        _TagProject = CustomField("TagProject")
-        _TagPeople = CustomField("TagPeople")
-        _TagTopic = CustomField("TagTopic")
-        _KB = CustomField("KBF")
-        _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
-        _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
-        _ExpandChildren = CustomField("EC")
-        _ExpandChildrenState = CustomField("EcState")
-        _Priority = OlMail.Importance
-        _TaskCreateDate = OlMail.CreationTime
-        _StartDate = OlMail.TaskStartDate
-        _Complete = (OlMail.FlagStatus = OlFlagStatus.olFlagComplete)
+
+        InitializeMail(OlMail)
+        _flags = New FlagParser(OlMail.Categories)
+        InitializeCustomFields(OlObject)
+
     End Sub
+
+    Public Sub New(OlMail As Outlook.MailItem, OnDemand As Boolean)
+        OlObject = OlMail
+
+        If OnDemand = False Then
+            InitializeMail(OlMail)
+            _flags = New FlagParser(OlMail.Categories)
+            InitializeCustomFields(OlObject)
+        End If
+    End Sub
+
     Public Sub New(OlTask As Outlook.TaskItem)
         OlObject = OlTask
 
-        _TaskSubject = OlTask.Subject
-        _TagContext = CustomField("TagContext")
-        _TagProgram = CustomField("TagProgram")
-        _TagProject = CustomField("TagProject")
-        _TagPeople = CustomField("TagPeople")
-        _TagTopic = CustomField("TagTopic")
-        _KB = CustomField("KBF")
-        _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
-        _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
-        _ExpandChildren = CustomField("EC")
-        _ExpandChildrenState = CustomField("EcState")
-        _Priority = OlTask.Importance
-        _TaskCreateDate = OlTask.CreationTime
-        _StartDate = OlTask.StartDate
-        _Complete = OlTask.Complete
+        InitializeTask(OlTask)
+        _flags = New FlagParser(OlTask.Categories)
+        InitializeCustomFields(OlObject)
+
     End Sub
-    Public Sub New(OlMail As Outlook.MailItem, OnDemand As Boolean)
-        OlObject = OlMail
-        If OnDemand = False Then
-            If OlMail.TaskSubject.Length <> 0 Then
-                _TaskSubject = OlMail.TaskSubject
-            Else
-                _TaskSubject = OlMail.Subject
-            End If
-            _TagContext = CustomField("TagContext")
-            _TagProgram = CustomField("TagProgram")
-            _TagProject = CustomField("TagProject")
-            _TagPeople = CustomField("TagPeople")
-            _TagTopic = CustomField("TagTopic")
-            _KB = CustomField("KBF")
-            _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
-            _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
-            _ExpandChildren = CustomField("EC")
-            _ExpandChildrenState = CustomField("EcState")
-            _Priority = OlMail.Importance
-            _TaskCreateDate = OlMail.CreationTime
-            _StartDate = OlMail.TaskStartDate
-            _Complete = (OlMail.FlagStatus = OlFlagStatus.olFlagComplete)
-        End If
-    End Sub
+
     Public Sub New(OlTask As Outlook.TaskItem, OnDemand As Boolean)
         OlObject = OlTask
+
         If OnDemand = False Then
-            _TaskSubject = OlTask.Subject
-            _TagContext = CustomField("TagContext")
-            _TagProgram = CustomField("TagProgram")
-            _TagProject = CustomField("TagProject")
-            _TagPeople = CustomField("TagPeople")
-            _TagTopic = CustomField("TagTopic")
-            _KB = CustomField("KBF")
-            _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
-            _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
-            _ExpandChildren = CustomField("EC")
-            _ExpandChildrenState = CustomField("EcState")
-            _Priority = OlTask.Importance
-            _TaskCreateDate = OlTask.CreationTime
-            _StartDate = OlTask.StartDate
-            _Complete = OlTask.Complete
+            InitializeTask(OlTask)
+            _flags = New FlagParser(OlTask.Categories)
+            InitializeCustomFields(OlObject)
         End If
     End Sub
+
     Public Sub New(Item As Object, OnDemand As Boolean)
 
         OlObject = Item
+        _flags = New FlagParser(Item.Categories)
         If OnDemand = False Then
             MsgBox("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand")
         End If
     End Sub
+
     Public Sub New(strID As String)
         _ToDoID = strID
     End Sub
+
+    Private Sub InitializeMail(OlMail As MailItem)
+        With OlMail
+            If OlMail.TaskSubject.Length <> 0 Then
+                _TaskSubject = .TaskSubject
+            Else
+                _TaskSubject = .Subject
+            End If
+            _Priority = .Importance
+            _TaskCreateDate = .CreationTime
+            _StartDate = .TaskStartDate
+            _Complete = (.FlagStatus = OlFlagStatus.olFlagComplete)
+            If PA_FieldExists(PA_TOTAL_WORK) Then
+                _TotalWork = .PropertyAccessor.GetProperty(PA_TOTAL_WORK)
+            Else
+                _TotalWork = 0
+            End If
+        End With
+    End Sub
+
+    Private Sub InitializeTask(OlTask As TaskItem)
+        With OlTask
+            _TaskSubject = .Subject
+            _Priority = .Importance
+            _TaskCreateDate = .CreationTime
+            _StartDate = .StartDate
+            _Complete = .Complete
+            _TotalWork = .TotalWork
+        End With
+    End Sub
+
+    Private Sub InitializeCustomFields(Item As Object)
+        _TagProgram = CustomField("TagProgram")
+        _ActiveBranch = CustomField("AB", OlUserPropertyType.olYesNo)
+        _EC2 = CustomField("EC2", OlUserPropertyType.olYesNo)
+        _ExpandChildren = CustomField("EC")
+        _ExpandChildrenState = CustomField("EcState")
+    End Sub
+
+    Public Sub WriteFlagsBatch()
+        OlObject.Categories = _flags.Combine()
+        OlObject.Save()
+        CustomField("TagContext", OlUserPropertyType.olKeywords) = _flags.Context(False)
+        CustomField("TagPeople", OlUserPropertyType.olKeywords) = _flags.People(False)
+        'TODO: Assign ToDoID if project assignment changes
+        'TODO: If ID exists and project reassigned, move any children
+        CustomField("TagProject", OlUserPropertyType.olKeywords) = _flags.Projects(False)
+        CustomField("TagTopic", OlUserPropertyType.olKeywords) = _flags.Topics(False)
+        CustomField("KB") = _flags.KB(False)
+    End Sub
+
+    Public ReadOnly Property object_item As Object
+        Get
+            Return OlObject
+        End Get
+    End Property
+
+    Public Property FlagAsTask As Boolean
+        Get
+            Return _flagAsTask
+        End Get
+        Set(value As Boolean)
+            If Not OlObject Is Nothing Then
+                If TypeOf (OlObject) Is MailItem Then
+                    _flagAsTask = value
+                    If Not _readonly Then
+                        Dim OlMail As MailItem = OlObject
+                        If OlMail.FlagStatus = OlFlagStatus.olNoFlag And value Then
+                            OlMail.MarkAsTask(OlMarkInterval.olMarkNoDate)
+                        ElseIf OlMail.FlagStatus = OlFlagStatus.olFlagMarked And Not value Then
+                            OlMail.ClearTaskFlag()
+                        End If
+                        OlMail.Save()
+                    End If
+                ElseIf TypeOf (OlObject) Is TaskItem Then
+                    _flagAsTask = True
+                Else
+                    _flagAsTask = False
+                End If
+            End If
+        End Set
+
+    End Property
 
     Public ReadOnly Property TaskCreateDate As Date
         Get
             TaskCreateDate = _TaskCreateDate
         End Get
+    End Property
+
+    Public Property Bullpin As Boolean
+        Get
+            Return _flags.bullpin
+        End Get
+        Set(value As Boolean)
+            _flags.bullpin = value
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    OlObject.Categories = _flags.Combine()
+                    OlObject.Save
+                End If
+            End If
+        End Set
+    End Property
+
+    Public Property Today As Boolean
+        Get
+            Return _flags.today
+        End Get
+        Set(value As Boolean)
+            _flags.today = value
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    OlObject.Categories = _flags.Combine()
+                    OlObject.Save
+                End If
+            End If
+        End Set
+    End Property
+
+    Public Property ReminderTime As Date
+        Get
+            Return OlObject.ReminderTime
+        End Get
+        Set(value As Date)
+            If Not _readonly Then
+                OlObject.ReminderTime = value
+                OlObject.Save()
+            End If
+        End Set
+    End Property
+
+    Public Property DueDate As Date
+        Get
+            If TypeOf OlObject Is MailItem Then
+                Dim OlMail As MailItem = OlObject
+                Return OlMail.TaskDueDate
+            ElseIf TypeOf OlObject Is TaskItem Then
+                Dim OlTask As TaskItem = OlObject
+                Return OlTask.DueDate
+            Else
+                Return DateValue("1/1/4501")
+            End If
+        End Get
+        Set(value As Date)
+            If Not _readonly Then
+                If TypeOf OlObject Is MailItem Then
+                    Dim OlMail As MailItem = OlObject
+                    OlMail.TaskDueDate = value
+                    OlMail.Save()
+                ElseIf TypeOf OlObject Is TaskItem Then
+                    Dim OlTask As TaskItem = OlObject
+                    OlTask.DueDate = value
+                    OlTask.Save()
+                End If
+            End If
+        End Set
     End Property
 
     Public Property StartDate As Date
@@ -164,15 +353,17 @@ Public Class ToDoItem
         End Get
         Set(value As Outlook.OlImportance)
             _Priority = value
-            If OlObject Is Nothing Then
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                OlMail.Importance = _Priority
-                OlMail.Save()
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                OlTask.Importance = _Priority
-                OlTask.Save()
+            If Not _readonly Then
+                If OlObject Is Nothing Then
+                ElseIf TypeOf OlObject Is MailItem Then
+                    Dim OlMail As MailItem = OlObject
+                    OlMail.Importance = _Priority
+                    OlMail.Save()
+                ElseIf TypeOf OlObject Is TaskItem Then
+                    Dim OlTask As TaskItem = OlObject
+                    OlTask.Importance = _Priority
+                    OlTask.Save()
+                End If
             End If
         End Set
     End Property
@@ -195,21 +386,23 @@ Public Class ToDoItem
             Return _Complete
         End Get
         Set(value As Boolean)
-            If OlObject Is Nothing Then
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                If value = True Then
-                    OlMail.FlagStatus = OlFlagStatus.olFlagComplete
-                Else
-                    OlMail.FlagStatus = OlFlagStatus.olFlagMarked
-                End If
-                OlMail.Save()
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                OlTask.Complete = value
-                OlTask.Save()
-            End If
             _Complete = value
+            If Not _readonly Then
+                If OlObject Is Nothing Then
+                ElseIf TypeOf OlObject Is MailItem Then
+                    Dim OlMail As MailItem = OlObject
+                    If value = True Then
+                        OlMail.FlagStatus = OlFlagStatus.olFlagComplete
+                    Else
+                        OlMail.FlagStatus = OlFlagStatus.olFlagMarked
+                    End If
+                    OlMail.Save()
+                ElseIf TypeOf OlObject Is TaskItem Then
+                    Dim OlTask As TaskItem = OlObject
+                    OlTask.Complete = value
+                    OlTask.Save()
+                End If
+            End If
         End Set
     End Property
 
@@ -232,64 +425,46 @@ Public Class ToDoItem
         End Get
         Set(value As String)
             _TaskSubject = value
-            If OlObject Is Nothing Then
-            ElseIf TypeOf OlObject Is MailItem Then
-                Dim OlMail As MailItem = OlObject
-                OlMail.TaskSubject = _TaskSubject
-                OlMail.Save()
-            ElseIf TypeOf OlObject Is TaskItem Then
-                Dim OlTask As TaskItem = OlObject
-                OlTask.Subject = _TaskSubject
-                OlTask.Save()
+            If Not _readonly Then
+                If OlObject Is Nothing Then
+                ElseIf TypeOf OlObject Is MailItem Then
+                    Dim OlMail As MailItem = OlObject
+                    OlMail.TaskSubject = _TaskSubject
+                    OlMail.Save()
+                ElseIf TypeOf OlObject Is TaskItem Then
+                    Dim OlTask As TaskItem = OlObject
+                    OlTask.Subject = _TaskSubject
+                    OlTask.Save()
+                End If
             End If
         End Set
     End Property
 
-    Public Property TagPeople As String
+    Public Property People(Optional IncludePrefix As Boolean = False) As String
         Get
-            If _TagPeople.Length <> 0 Then
-                Return _TagPeople
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagPeople = CustomField("TagPeople")
-                Return _TagPeople
-            End If
+            EnsureInitialized(CallerName:="People")
+            Return _flags.People(IncludePrefix)
         End Get
         Set(value As String)
-
-            If Not OlObject Is Nothing Then
-                _TagPeople = value
-                CustomField("TagPeople") = value
-                Dim Flg As Flags = New Flags(OlObject.Categories)
-                Flg.People = value
-                OlObject.Categories = Flg.Combine()
-                OlObject.Save
-            End If
+            ' Set People and sanitize value
+            _flags.People = value
+            If Not _readonly Then SaveCatsToObj("TagPeople", _flags.People(False))
         End Set
     End Property
 
-    Public Property TagProject As String
-        Get
-            If _TagProject.Length <> 0 Then
-                Return _TagProject
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagProject = CustomField("TagProject")
-                Return _TagProject
-            End If
 
+
+    Public Property Project(Optional IncludePrefix As Boolean = False) As String
+        Get
+            EnsureInitialized(CallerName:="Project")
+            Return _flags.Projects(IncludePrefix)
         End Get
         Set(value As String)
-            _TagProject = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagProject") = value
-                Dim Flg As Flags = New Flags(OlObject.Categories)
-                Flg.Projects = value
-                OlObject.Categories = Flg.Combine()
-                OlObject.Save
-            End If
+            ' Set Projects and sanitize value
+            'TODO: Assign ToDoID if project assignment changes
+            'TODO: If ID exists and project reassigned, move any children 
+            _flags.Projects = value
+            If Not _readonly Then SaveCatsToObj("TagProject", _flags.Projects(False))
         End Set
     End Property
 
@@ -307,74 +482,108 @@ Public Class ToDoItem
         End Get
         Set(value As String)
             _TagProgram = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagProgram", OlUserPropertyType.olKeywords) = value
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    CustomField("TagProgram", OlUserPropertyType.olKeywords) = value
+                End If
             End If
         End Set
     End Property
 
-    Public Property TagContext As String
+    Public Property Context(Optional IncludePrefix As Boolean = False) As String
         Get
-            If _TagContext.Length <> 0 Then
-                Return _TagContext
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagContext = CustomField("TagContext")
-                Return _TagContext
-            End If
-
+            EnsureInitialized(CallerName:="Context")
+            Return _flags.Context(IncludePrefix)
         End Get
         Set(value As String)
-            _TagContext = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagContext") = value
-            End If
+            ' Set Context and sanitize value
+            _flags.Context = value
+            If Not _readonly Then SaveCatsToObj("TagContext", _flags.Context(False))
         End Set
     End Property
 
-    Public Property TagTopic As String
+    Public Property Topic(Optional IncludePrefix As Boolean = False) As String
         Get
-            If _TagTopic.Length <> 0 Then
-                Return _TagTopic
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _TagTopic = CustomField("TagTopic")
-                Return _TagTopic
-            End If
-
+            EnsureInitialized(CallerName:="Topic")
+            Return _flags.Topics(IncludePrefix)
         End Get
         Set(value As String)
-            _TagTopic = value
-            If Not OlObject Is Nothing Then
-                CustomField("TagTopic") = value
-                Dim Flg As Flags = New Flags(OlObject.Categories)
-                Flg.Topics = value
-                OlObject.Categories = Flg.Combine()
-                OlObject.Save
-            End If
+            ' Set Context and sanitize value
+            _flags.Topics = value
+            If Not _readonly Then SaveCatsToObj("TagTopic", _flags.Topics(False))
         End Set
     End Property
-    Public Property KB As String
-        Get
-            If _KB.Length <> 0 Then
-                Return _KB
-            ElseIf OlObject Is Nothing Then
-                Return ""
-            Else
-                _KB = CustomField("KBF")
-                Return _TagTopic
-            End If
 
+    Public Property KB(Optional IncludePrefix As Boolean = False) As String
+        Get
+            EnsureInitialized(CallerName:="KB")
+            Return _flags.KB(IncludePrefix)
         End Get
         Set(value As String)
-            _KB = value
-            If Not OlObject Is Nothing Then
-                CustomField("KBF") = value
+            ' Set Context and sanitize value
+            _flags.KB = value
+            If Not _readonly Then SaveCatsToObj("KB", _flags.KB(False))
+        End Set
+    End Property
+
+    Private Sub SaveCatsToObj(FieldName As String, FieldValue As String)
+        If Not OlObject Is Nothing Then
+            CustomField(FieldName, OlUserPropertyType.olKeywords) = FieldValue
+            OlObject.Categories = _flags.Combine()
+            OlObject.Save
+        End If
+    End Sub
+
+    Private Sub EnsureInitialized(CallerName As String)
+        If _flags Is Nothing Then
+            If OlObject Is Nothing Then Throw New ArgumentNullException(
+                "Cannot get property " & CallerName & " if both _flags AND olObject are Null")
+            _flags = New FlagParser(OlObject.Categories)
+        End If
+    End Sub
+
+    Public Property TotalWork As Integer
+        Get
+            If _TotalWork = 0 Then
+                If OlObject Is Nothing Then
+                    _TotalWork = 0
+                ElseIf TypeOf OlObject Is MailItem Then
+                    Dim OlMail As MailItem = OlObject
+                    If PA_FieldExists(PA_TOTAL_WORK) Then
+                        _TotalWork = OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK)
+                    Else
+                        _TotalWork = 0
+                    End If
+
+                ElseIf TypeOf OlObject Is TaskItem Then
+                    Dim OlTask As TaskItem = OlObject
+                    _TotalWork = OlTask.TotalWork
+
+                Else
+                    _TotalWork = 0
+                End If
+            End If
+            Return _TotalWork
+
+        End Get
+
+        Set(value As Integer)
+            _TotalWork = value
+            If Not _readonly Then
+                If OlObject Is Nothing Then
+                ElseIf TypeOf OlObject Is MailItem Then
+                    Dim OlMail As MailItem = OlObject
+                    OlMail.PropertyAccessor.SetProperty(PA_TOTAL_WORK, value)
+                    OlMail.Save()
+                ElseIf TypeOf OlObject Is TaskItem Then
+                    Dim OlTask As TaskItem = OlObject
+                    OlTask.TotalWork = value
+                    OlTask.Save()
+                End If
             End If
         End Set
     End Property
+
     Public Property ToDoID As String
         Get
             If _ToDoID.Length <> 0 Then
@@ -388,9 +597,11 @@ Public Class ToDoItem
         End Get
         Set(strID As String)
             _ToDoID = strID
-            If Not OlObject Is Nothing Then
-                CustomField("ToDoID") = strID
-                SplitID()
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    CustomField("ToDoID") = strID
+                    SplitID()
+                End If
             End If
         End Set
     End Property
@@ -428,7 +639,7 @@ Public Class ToDoItem
         Set(intVTS As Integer)
             If Not OlObject Is Nothing Then
                 _VisibleTreeState = intVTS
-                CustomField("VTS", OlUserPropertyType.olInteger) = intVTS
+                If Not _readonly Then CustomField("VTS", OlUserPropertyType.olInteger) = intVTS
             End If
         End Set
     End Property
@@ -452,8 +663,10 @@ Public Class ToDoItem
         End Get
         Set(blActive As Boolean)
             _ActiveBranch = blActive
-            If Not OlObject Is Nothing Then
-                CustomField("AB", OlUserPropertyType.olYesNo) = blActive
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    CustomField("AB", OlUserPropertyType.olYesNo) = blActive
+                End If
             End If
         End Set
     End Property
@@ -477,7 +690,7 @@ Public Class ToDoItem
         End Get
         Set(blValue As Boolean)
             _EC2 = blValue
-            CustomField("EC2", OlUserPropertyType.olYesNo) = blValue
+            If Not _readonly Then CustomField("EC2", OlUserPropertyType.olYesNo) = blValue
             _ExpandChildren = ""
             _ExpandChildrenState = ""
         End Set
@@ -514,8 +727,10 @@ Public Class ToDoItem
         End Get
         Set(strState As String)
             _ExpandChildren = strState
-            If Not OlObject Is Nothing Then
-                CustomField("EC") = strState
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    CustomField("EC") = strState
+                End If
             End If
         End Set
     End Property
@@ -533,8 +748,10 @@ Public Class ToDoItem
         End Get
         Set(strState As String)
             _ExpandChildrenState = strState
-            If Not OlObject Is Nothing Then
-                CustomField("EcState") = strState
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    CustomField("EcState") = strState
+                End If
             End If
         End Set
     End Property
@@ -554,7 +771,7 @@ Public Class ToDoItem
                     If i <= strToDoID_Len Then
                         strFieldValue = Mid(strToDoID, i - 1, 2)
                     End If
-                    CustomField(strField) = strFieldValue
+                    If Not _readonly Then CustomField(strField) = strFieldValue
                 Next
             End If
         Catch
@@ -579,8 +796,10 @@ Public Class ToDoItem
         End Get
         Set(strLvl As String)
             _MetaTaskLvl = strLvl
-            If Not OlObject Is Nothing Then
-                CustomField("Meta Task Level") = strLvl
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    CustomField("Meta Task Level") = strLvl
+                End If
             End If
         End Set
     End Property
@@ -598,9 +817,11 @@ Public Class ToDoItem
         End Get
         Set(strID As String)
             _MetaTaskSubject = strID
-            If Not OlObject Is Nothing Then
-                'CustomFieldID_Set("Meta Task Subject", strID, SpecificItem:=OlObject)
-                CustomField("Meta Task Subject") = strID
+            If Not _readonly Then
+                If Not OlObject Is Nothing Then
+                    'CustomFieldID_Set("Meta Task Subject", strID, SpecificItem:=OlObject)
+                    CustomField("Meta Task Subject") = strID
+                End If
             End If
         End Set
     End Property
@@ -617,6 +838,18 @@ Public Class ToDoItem
         Get
             Dim prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
             Return Replace(OlObject.Parent.FolderPath, prefix, "")
+        End Get
+    End Property
+
+    Public ReadOnly Property PA_FieldExists(PA_Schema As String) As Boolean
+        Get
+            Try
+                Dim OlPA As Outlook.PropertyAccessor = OlObject.PropertyAccessor
+                Dim OlProperty As Object = OlPA.GetProperty(PA_Schema)
+                Return True
+            Catch
+                Return False
+            End Try
         End Get
     End Property
 
@@ -657,6 +890,7 @@ Public Class ToDoItem
                     objProperty = OlObject.UserProperties.Add(FieldName, OlFieldType)
                     objProperty.Value = value
                     OlObject.Save()
+
                 Catch e As System.Exception
                     Debug.WriteLine("Exception in Set User Property: " & FieldName)
                     Debug.WriteLine(e.Message)

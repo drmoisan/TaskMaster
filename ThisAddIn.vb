@@ -5,6 +5,7 @@ Imports System.IO
 Imports System
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Security.Authentication.ExtendedProtection
+Imports Microsoft.VisualBasic.FileIO
 
 
 Public Class ThisAddIn
@@ -19,14 +20,19 @@ Public Class ThisAddIn
     'Private WithEvents OlExplorer As Outlook.Explorer
 
     Private ribTM As TaskMasterRibbon
+    Private ribEM As EmailRibbon
     Dim FileName_ProjectList As String
     Dim FileName_IDList As String
     Dim FileName_ProjInfo As String
+    Public ReadOnly filename_dictppl As String = "pplkey.xml"
+    Public ReadOnly staging_path As String = SpecialDirectories.MyDocuments
     Const AppDataFolder = "TaskMaster"
     'Public ProjDict As ProjectList
     Public ProjInfo As ProjectInfo
+    Public ppl_dict As PeopleDict(Of String, String)
     Public WithEvents IDList As cIDList
     Public DM_CurView As DataModel_ToDoTree
+    Public Cats As FlagParser
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
         _OlNS = Application.GetNamespace("MAPI")
@@ -53,6 +59,8 @@ Public Class ThisAddIn
             ProjInfo.Save(FileName_ProjInfo)
         End If
 
+        ppl_dict = Util.GetDict(staging_path, filename_dictppl)
+
         FileName_IDList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "UsedIDList.bin")
 
         If File.Exists(FileName_IDList) Then
@@ -78,6 +86,7 @@ Public Class ThisAddIn
         OlReminders = Application.Reminders
         'ToDoPST_HookEvents()
     End Sub
+
     Public Sub Events_Unhook()
         OlToDoItems = Nothing
         OlInboxItems = Nothing
@@ -88,8 +97,8 @@ Public Class ThisAddIn
     Private Sub Access_Ribbons_By_Explorer()
         Dim ribbonCollection As ThisRibbonCollection = Globals.Ribbons _
             (Globals.ThisAddIn.Application.ActiveExplorer())
-        ribTM = ribbonCollection.Ribbon1                                    'Grab handle on on Ribbon
-
+        ribTM = ribbonCollection.Ribbon_TM
+        ribEM = ribbonCollection.Ribbon_EM
     End Sub
 
     Private Function GetOutlookPSTFolderByPath(ByVal FolderPath As String) As Outlook.Folder
@@ -133,6 +142,7 @@ Public Class ThisAddIn
             Return Nothing
         End Try
     End Function
+
     Private Sub ToDoPST_HookEvents()
         Dim ns As Outlook.[NameSpace] = Nothing
         Dim stores As Outlook.Stores = Nothing
@@ -157,6 +167,7 @@ Public Class ThisAddIn
             End If
         Next
     End Sub
+
     Private Sub ToDoPST_UnHookEvents()
 
         Dim max As Integer = listToDoItems.Count
@@ -168,6 +179,7 @@ Public Class ThisAddIn
         Next
 
     End Sub
+
     Private Sub Debug_OutputNsStores()
         Dim ns As Outlook.[NameSpace] = Nothing
         Dim stores As Outlook.Stores = Nothing
@@ -205,11 +217,11 @@ Public Class ThisAddIn
         IDList.RePopulate()
         IDList.Save(FileName_IDList)
         WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", IDList.UsedIDList.ToArray)
+        Return 1
     End Function
 
-
-
     Public Sub WriteToCSV(filename As String, strOutput() As String, Optional overwrite As Boolean = False)
+        'CLEANUP: Determine if ThisAddIn.WriteToCSV function is needed. If so, move it to a library
         If overwrite Or IO.File.Exists(filename) = False Then
             Using sw As StreamWriter = New StreamWriter(filename)
                 For i As Long = LBound(strOutput) To UBound(strOutput)
@@ -225,7 +237,9 @@ Public Class ThisAddIn
         End If
 
     End Sub
+
     Public Sub WriteToCSV(filename As String, strOutput As String, Optional overwrite As Boolean = False)
+        'CLEANUP: Determine if ThisAddIn.WriteToCSV function is needed. If so, move it to a library
         If overwrite Or IO.File.Exists(filename) = False Then
             Using sw As StreamWriter = New StreamWriter(filename)
                 sw.WriteLine(strOutput)
@@ -239,15 +253,19 @@ Public Class ThisAddIn
     End Sub
 
     Public Sub CompressToDoIDs()
+        'DOC: Add documentation to CompressToDoIDs
+        'TESTING: Add integration testing for CompressToDoIDs
+        'CLEANUP: Move CompressToDoIDs to either a Module or include in ToDoTree DataModel
         Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree()
+        'QUESTION: Does DataModel_ToDoTree.LoadOptions.vbLoadAll require all items to be visible in the current view?
         DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadAll)
         'DM.WriteTreeToDisk()
         DM.ReNumberIDs(IDList)
         DM.WriteTreeToDisk()
     End Sub
 
-
     Public Function CustomFieldID_GetValue(objItem As Object, ByVal UserDefinedFieldName As String) As String
+        'QUESTION: Is ThisAddin.CustomFieldID_GetValue called? Seems duplicated.
         Dim OlMail As Outlook.MailItem
         Dim OlTask As Outlook.TaskItem
         Dim OlAppt As Outlook.AppointmentItem
@@ -287,6 +305,7 @@ Public Class ThisAddIn
     End Function
 
     Public Function FlattenArry(varBranch() As Object) As String
+        'CLEANUP: Move to a library 
         Dim i As Integer
         Dim strTemp As String
 
@@ -309,7 +328,7 @@ Public Class ThisAddIn
                                Optional ByRef SpecificItem As Object = Nothing,
                                Optional ByVal olUPType As Outlook.OlUserPropertyType =
                                Outlook.OlUserPropertyType.olText) As Boolean
-
+        'QUESTION: Duplicate function??? ThisAddin.CustomFieldID_Set
         Dim myCollection As Object
         Dim Msg As Outlook.MailItem
         Dim oTask As Outlook.TaskItem
@@ -365,7 +384,8 @@ Public Class ThisAddIn
         Dim strFilter As String
         Dim oStore As Outlook.Store
         Dim objItem As Object
-
+        'QUESTION: ThisAddin.GetListOfItemsInView_ToDo When is this called? Is it needed?
+        'CLEANUP: ThisAddin.GetListOfItemsInView_ToDo Move to a Class, Module or a Library depending on how it is used. 
 
         objView = Application.ActiveExplorer.CurrentView
         strFilter = "@SQL=" & objView.Filter
@@ -386,6 +406,7 @@ Public Class ThisAddIn
         'GetItemsInView_ToDo = OlItems
         Return ListObjects
     End Function
+
     Public Function GetItemsInView_ToDo() As Items
         Dim OlItems As Items
         Dim objView As View
@@ -393,6 +414,7 @@ Public Class ThisAddIn
         Dim strFilter As String
         Dim oStore As Outlook.Store
 
+        'QUESTION: Depricated? Previous function was GetList. Do we need both?
         objView = Application.ActiveExplorer.CurrentView
         strFilter = "@SQL=" & objView.Filter
 
@@ -408,12 +430,11 @@ Public Class ThisAddIn
         GetItemsInView_ToDo = OlItems
     End Function
 
-
-
     Public Function IsChild(strParent As String, strChild As String) As Integer
         Dim i As Integer = 0
         Dim count As Integer = 0
         Dim unbroken As Boolean = True
+        'QUESTION: Duplicate? If not, move to a class, module or library.
         For i = 1 To strParent.Length / 2
             If unbroken Then
                 If Mid(strParent, i * 2 - 1, 2) = Mid(strChild, i * 2 - 1, 2) Then
@@ -425,9 +446,10 @@ Public Class ThisAddIn
         Next
         IsChild = count
     End Function
+
     Public Function FindParent(itms As Collection, strChild As String) As Object
         Dim strParent As String
-
+        'QUESTION: Duplicate? If not, move to a class, module or library.
         Try
             strParent = Left(strChild, strChild.Length - 2)
             FindParent = itms(strParent)
@@ -437,10 +459,12 @@ Public Class ThisAddIn
         End Try
 
     End Function
+
     Public Sub Refresh_ToDoID_Splits()
         Dim objItem As Object
         Dim todo As ToDoItem
         Dim OlItems As Items = GetItemsInView_ToDo()
+        'QUESTION: Duplicate? If not, move to a class, module or library.
         For Each objItem In OlItems
             todo = New ToDoItem(objItem, OnDemand:=True)
             todo.SplitID()
@@ -449,7 +473,7 @@ Public Class ThisAddIn
 
     Private Sub H_ItemChange(Item As Object) Handles PSTtoDo.ItemChange
         Static blIsRunning As Boolean
-
+        'TODO: Morph Functionality to handle proactively rather than reactively
         If blIsRunning = False Then
 
             blIsRunning = True
@@ -474,7 +498,7 @@ Public Class ThisAddIn
                     If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
 
                         'Get Project Name
-                        strProject = todo.TagProject
+                        strProject = todo.Project
 
                         'If IsArray(objProperty_Project.Value) Then
                         '    strProject = FlattenArry(objProperty_Project.Value)
@@ -492,7 +516,7 @@ Public Class ThisAddIn
 
                                 If strToDoID.Length = 2 Then
                                     ' Change the Item's todoid to be a node of the project
-                                    If todo.TagContext <> "Tag PROJECTS" Then
+                                    If todo.Context <> "Tag PROJECTS" Then
                                         strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                                         todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                                         todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
@@ -520,7 +544,7 @@ Public Class ThisAddIn
                         End If
 
                     ElseIf strToDoID.Length = 0 Then
-                        strProject = todo.TagProject
+                        strProject = todo.Project
                         'If IsArray(objProperty_Project.Value) Then
                         '    strProject = FlattenArry(objProperty_Project.Value)
                         'Else
@@ -639,7 +663,7 @@ Public Class ThisAddIn
 
     Private Sub OlToDoItems_ItemChange(Item As Object) Handles OlToDoItems.ItemChange
 
-
+        'TODO: Morph Functionality to handle proactively rather than reactively
         'If blItemChangeRunning = False Then
 
         'blItemChangeRunning = True
@@ -688,14 +712,14 @@ Public Class ThisAddIn
                 Next
             End If
             todo.EC_Change = False
-            End If
+        End If
 
-            'AUTOCODE ToDoID based on Project
-            'Check to see if the project exists before attempting to autocode the id
-            If Not objProperty_Project Is Nothing Then
+        'AUTOCODE ToDoID based on Project
+        'Check to see if the project exists before attempting to autocode the id
+        If Not objProperty_Project Is Nothing Then
 
             'Get Project Name
-            strProject = todo.TagProject
+            strProject = todo.Project
 
             'Code the Program name
             If ProjInfo.Contains_ProjectName(strProject) Then
@@ -718,7 +742,7 @@ Public Class ThisAddIn
 
                             If strToDoID.Length = 2 Then
                                 ' Change the Item's todoid to be a node of the project
-                                If todo.TagContext <> "@PROJECTS" Then
+                                If todo.Context <> "@PROJECTS" Then
                                     strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                                     todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                     IDList.Save(FileName_IDList)
@@ -741,7 +765,7 @@ Public Class ThisAddIn
                     End If
 
                 ElseIf strToDoID.Length = 0 Then
-                    strProject = todo.TagProject
+                    strProject = todo.Project
                     If ProjInfo.Contains_ProjectName(strProject) Then
                         strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                         todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
@@ -834,6 +858,7 @@ Public Class ThisAddIn
     End Sub
 
     Private Function OlToDoItem_IsMarkedComplete(Item As Object) As Boolean
+        'QUESTION: Duplicate Function??? I beleive this is already in the ToDoItem class
         If TypeOf Item Is Outlook.MailItem Then
             Dim OlMail = Item
             If OlMail.FlagStatus = OlFlagStatus.olFlagComplete Then
@@ -855,28 +880,17 @@ Public Class ThisAddIn
     End Function
 
 
-    'Public Sub SaveDict()
-    '    If Not Directory.Exists(Path.GetDirectoryName(FileName_ProjectList)) Then
-    '        Directory.CreateDirectory(Path.GetDirectoryName(FileName_ProjectList))
-    '    End If
-    '    Dim TestFileStream As Stream = File.Create(FileName_ProjectList)
-    '    Dim serializer As New BinaryFormatter
-    '    serializer.Serialize(TestFileStream, ProjDict)
-    '    TestFileStream.Close()
-    'End Sub
-
-
 
     Private Sub OlToDoItems_ItemAdd(Item As Object) Handles OlToDoItems.ItemAdd
-
+        'CLEANUP: Move this to a class, module or library
         Dim todo As ToDoItem = New ToDoItem(Item, OnDemand:=True)
         If todo.ToDoID.Length = 0 Then
-            If todo.TagProject.Length <> 0 Then
-                If ProjInfo.Contains_ProjectName(todo.TagProject) Then
-                    Dim strProjectToDo As String = ProjInfo.Find_ByProjectName(todo.TagProject).First().ProjectID
+            If todo.Project.Length <> 0 Then
+                If ProjInfo.Contains_ProjectName(todo.Project) Then
+                    Dim strProjectToDo As String = ProjInfo.Find_ByProjectName(todo.Project).First().ProjectID
                     'Add the next ToDoID available in that branch
                     todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                    todo.TagProgram = ProjInfo.Find_ByProjectName(todo.TagProject).First().ProgramName
+                    todo.TagProgram = ProjInfo.Find_ByProjectName(todo.Project).First().ProgramName
                     IDList.Save(FileName_IDList)
                     todo.SplitID()
                 End If
@@ -893,9 +907,11 @@ Public Class ThisAddIn
 
     End Sub
 
-    Public Sub FixToDoIDs()
-
-
+    ''' <summary>
+    ''' This is a helper procedure to migrate ToDoIDs from one framework to another
+    ''' </summary>
+    Public Sub MigrateToDoIDs()
+        'TODO: Move MigrateToDoIDs to a class, module, or library
         Dim ToDoItems As Outlook.Items = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
         Dim max As Long = ToDoItems.Count
         Dim j As Long = 0
@@ -905,7 +921,7 @@ Public Class ThisAddIn
             If Item.CustomField("NewID") <> "Done" Then
                 Dim strToDoID As String = Item.ToDoID
                 If strToDoID.Length > 0 Then
-                    Dim strToDoIDnew As String = FixToDoID(strToDoID)
+                    Dim strToDoIDnew As String = SubstituteCharsInID(strToDoID)
                     Item.ToDoID = strToDoIDnew
                     Item.CustomField("NewID") = "Done"
                 End If
@@ -920,7 +936,7 @@ Public Class ThisAddIn
 
     End Sub
 
-    Private Function FixToDoID(strToDoID As String) As String
+    Private Function SubstituteCharsInID(strToDoID As String) As String
         'Dim charsorig As String = "0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
         'Dim charsnew As String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
         '"0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
@@ -942,7 +958,7 @@ Public Class ThisAddIn
 
 
     Public Sub TestProjectInfo()
-
+        'TODO: Migrate Function To Unit Test
         'Dim ftmp As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), AppDataFolder, "ProjInfo.csv")
         'For Each entry As ProjectInfoEntry In ProjInfo
         '    WriteToCSV(ftmp, entry.ToCSV)
@@ -1007,36 +1023,4 @@ Public Class ThisAddIn
 
     '    End If
     'End Sub
-End Class
-
-Public Class Conditions
-    Private _ConversationID As String
-    Private _People As String
-    Public Sub New()
-
-    End Sub
-    Public Sub New(objItem As Object)
-        If TypeOf objItem Is MailItem Then
-            Dim OlMail As MailItem = objItem
-            _ConversationID = OlMail.ConversationID
-            _People = Globals.ThisAddIn.CustomFieldID_GetValue(objItem, "TagPeople")
-        End If
-    End Sub
-
-    Public Property ConversationID
-        Get
-            ConversationID = _ConversationID
-        End Get
-        Set(value)
-            _ConversationID = value
-        End Set
-    End Property
-    Public Property People
-        Get
-            People = _People
-        End Get
-        Set(value)
-            _People = value
-        End Set
-    End Property
 End Class

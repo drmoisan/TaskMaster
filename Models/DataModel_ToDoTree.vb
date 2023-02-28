@@ -129,7 +129,7 @@ Public Class DataModel_ToDoTree
         End If
     End Function
 
-    Public Function AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As cIDList) As TreeNode(Of ToDoItem)
+    Public Sub AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As cIDList)
         Parent.Children.Add(Child)
         Dim strSeed As String
         If Parent.Children.Count > 1 Then
@@ -145,7 +145,7 @@ Public Class DataModel_ToDoTree
             ReNumberChildrenIDs(Child.Children, IDList)
         End If
         IDList.Save()
-    End Function
+    End Sub
 
     Public Sub ReNumberIDs(IDList As cIDList)
         'WriteTreeToDisk()
@@ -243,7 +243,7 @@ Public Class DataModel_ToDoTree
     Public Sub HideEmptyHeadersInView()
         Dim action As Action(Of TreeNode(Of ToDoItem)) = Sub(node)
                                                              If node.ChildCount = 0 Then
-                                                                 If IsHeader(node.Value.TagContext) Then
+                                                                 If IsHeader(node.Value.Context) Then
                                                                      node.Value.ActiveBranch = False
                                                                  End If
                                                              End If
@@ -648,7 +648,7 @@ End Class
 '            End If
 '        End Set
 '    End Property
-'    Public Property KB As String
+'    Public Property kb As String
 '        Get
 '            If _KB.Length <> 0 Then
 '                Return _KB

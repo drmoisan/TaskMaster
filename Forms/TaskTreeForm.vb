@@ -125,6 +125,7 @@ Public Class TaskTreeForm
         DM = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem))) 'Added for the second use of function which was appending
         DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView)
         ToDoTree = DM.ListOfToDoTree
+        Return True
     End Function
 
     'Friend Function Init_DataModel()

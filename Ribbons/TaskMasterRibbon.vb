@@ -4,6 +4,7 @@ Public Class TaskMasterRibbon
     Private frmTTF As TaskTreeForm
     Private blHook As Boolean = True
 
+    'COMPLETE: 2023-02-24 Hook up FlagTask button to the class
     Private Sub btn_RefreshMax_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_RefreshMax.Click
         Globals.ThisAddIn.RefreshIDList()
         MsgBox("ID Refresh Complete")
@@ -31,7 +32,7 @@ Public Class TaskMasterRibbon
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As RibbonControlEventArgs) Handles Button1.Click
-        'Globals.ThisAddIn.FixToDoIDs()
+        'Globals.ThisAddIn.MigrateToDoIDs()
     End Sub
 
     Private Sub BTN_Hook_Click(sender As Object, e As RibbonControlEventArgs) Handles BTN_Hook.Click
@@ -52,5 +53,10 @@ Public Class TaskMasterRibbon
         Dim DMtmp = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem)))
         DMtmp.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView)
         DMtmp.HideEmptyHeadersInView()
+    End Sub
+
+    Private Sub BTN_FlagTask_Click(sender As Object, e As RibbonControlEventArgs) Handles BTN_FlagTask.Click
+        Dim FT As Flag_Tasks = New Flag_Tasks()
+        FT.Run()
     End Sub
 End Class
