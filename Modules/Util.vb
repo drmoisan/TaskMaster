@@ -3,8 +3,9 @@ Imports System.Runtime
 Imports System.Xml.Serialization
 Imports Microsoft.Office.Interop.Outlook
 Imports Microsoft.VisualBasic.FileIO
+Imports System.Runtime.CompilerServices
 
-Module Util
+Public Module Util
     Public Sub WriteDictPPL(filepath As String, ppldict As Dictionary(Of String, String))
         Dim serializer As XmlSerializer = New XmlSerializer(GetType(PeopleDict(Of String, String)))
         Dim textWriter As TextWriter = New StreamWriter(filepath)
@@ -95,7 +96,7 @@ Module Util
         End Using
     End Sub
 
-    Public Function Mail_IsItEncrypted(item As mailItem) As Boolean
+    Public Function Mail_IsItEncrypted(item As MailItem) As Boolean
 
         If item.MessageClass = "IPM.Note.SMIME" Or item.MessageClass = "IPM.Note.Secure" Or item.MessageClass = "IPM.Note.Secure.Sign" Or item.MessageClass = "IPM.Outlook.Recall" Then
             Return True
@@ -118,5 +119,13 @@ Module Util
         Return New SortedDictionary(Of String, Boolean)(filtered_cats)
     End Function
 
+    <Extension()>
+    Public Function ToSortedDictionary(Of K, V)(ByVal existing As Dictionary(Of K, V)) As SortedDictionary(Of K, V)
+        Return New SortedDictionary(Of K, V)(existing)
+    End Function
 
+    '<Extension()>
+    'Public Function ToSortedDictionary(Of K, V)(ByVal existing As IEnumerable(Of KeyValuePair(Of K, V))) As SortedDictionary(Of K, V)
+    '    Return New SortedDictionary(Of K, V)(existing.ToDictionary())
+    'End Function
 End Module

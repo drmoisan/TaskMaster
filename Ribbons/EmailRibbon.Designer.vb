@@ -66,7 +66,7 @@
         'FT_EM
         '
         Me.FT_EM.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.FT_EM.Label = "CUSTOM CONTROL DROPPED IN HERE"
+        Me.FT_EM.Label = "Flag Task"
         Me.FT_EM.Name = "FT_EM"
         Me.FT_EM.OfficeImageId = "FlagMessage"
         Me.FT_EM.ShowImage = True

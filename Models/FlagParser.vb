@@ -82,9 +82,9 @@ Public Class FlagParser
     Public Property KB(Optional IncludePrefix As Boolean = False) As String
         Get
             If IncludePrefix Then
-                Return _kb.WTAG
+                Return _kb.WithPrefix
             Else
-                Return _kb.NOTAG
+                Return _kb.NoPrefix
             End If
         End Get
         Set(value As String)
@@ -102,9 +102,9 @@ Public Class FlagParser
     Public Property Context(Optional IncludePrefix As Boolean = False) As String
         Get
             If IncludePrefix Then
-                Return _context.WTAG
+                Return _context.WithPrefix
             Else
-                Return _context.NOTAG
+                Return _context.NoPrefix
             End If
         End Get
         Set(value As String)
@@ -128,9 +128,9 @@ Public Class FlagParser
     Public Property Projects(Optional IncludePrefix As Boolean = False) As String
         Get
             If IncludePrefix Then
-                Return _projects.WTAG
+                Return _projects.WithPrefix
             Else
-                Return _projects.NOTAG
+                Return _projects.NoPrefix
             End If
         End Get
         Set(value As String)
@@ -154,9 +154,9 @@ Public Class FlagParser
     Public Property Topics(Optional IncludePrefix As Boolean = False) As String
         Get
             If IncludePrefix Then
-                Return _topics.WTAG
+                Return _topics.WithPrefix
             Else
-                Return _topics.NOTAG
+                Return _topics.NoPrefix
             End If
         End Get
         Set(value As String)
@@ -180,9 +180,9 @@ Public Class FlagParser
     Public Property People(Optional IncludePrefix As Boolean = False) As String
         Get
             If IncludePrefix Then
-                Return _people.WTAG
+                Return _people.WithPrefix
             Else
-                Return _people.NOTAG
+                Return _people.NoPrefix
             End If
         End Get
         Set(value As String)
@@ -197,13 +197,13 @@ Public Class FlagParser
     End Property
 
     Private Function AppendDetails(base As String, details As FlagDetails, wtag As Boolean) As String
-        If details.WTAG.Length = 0 Then
+        If details.WithPrefix.Length = 0 Then
             Return base
         Else
             If wtag Then
-                Return base & ", " & details.WTAG
+                Return base & ", " & details.WithPrefix
             Else
-                Return base & ", " & details.NOTAG
+                Return base & ", " & details.NoPrefix
             End If
         End If
     End Function
@@ -237,10 +237,10 @@ Public Class FlagParser
     ''' <param name="strCats_All">String containing comma delimited color categories</param>
     ''' <param name="DeleteSearchSubString"></param>
     Public Sub Splitter(ByRef strCats_All As String, Optional DeleteSearchSubString As Boolean = False)
-        _people.wtag = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        _people.WithPrefix = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PPL "), ", ", True)
 
-        _projects.wtag = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PROJECT "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        _projects.WithPrefix = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag PROJECT "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag PROJECT "), ", ", True)
 
         Dim strTemp As String = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag Bullpin Priorities"), ", ", DeleteSearchSubString:=False)
@@ -259,10 +259,10 @@ Public Class FlagParser
             today = False
         End If
 
-        _topics.wtag = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag TOPIC "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        _topics.WithPrefix = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag TOPIC "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag TOPIC "), ", ", True)
 
-        kb = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag KB "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
+        KB = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag KB "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag KB "), ", ", True)
 
         Context = other
@@ -519,7 +519,7 @@ Public Class FlagDetails
         _notag = String.Join(", ", _list)
     End Sub
 
-    Public Property WTAG As String
+    Public Property WithPrefix As String
         Get
             Return _wtag
         End Get
@@ -528,7 +528,7 @@ Public Class FlagDetails
         End Set
     End Property
 
-    Public Property NOTAG As String
+    Public Property NoPrefix As String
         Get
             Return _notag
         End Get

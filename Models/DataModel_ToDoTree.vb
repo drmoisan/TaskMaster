@@ -243,7 +243,7 @@ Public Class DataModel_ToDoTree
     Public Sub HideEmptyHeadersInView()
         Dim action As Action(Of TreeNode(Of ToDoItem)) = Sub(node)
                                                              If node.ChildCount = 0 Then
-                                                                 If IsHeader(node.Value.TagContext) Then
+                                                                 If IsHeader(node.Value.Context) Then
                                                                      node.Value.ActiveBranch = False
                                                                  End If
                                                              End If

@@ -4,7 +4,6 @@ Public Class TagViewer
     Private _controller As TagController
 
     Public Sub New()
-
         ' This call is required by the designer.
         InitializeComponent()
 
@@ -21,7 +20,7 @@ Public Class TagViewer
     End Sub
 
     Private Sub button_new_Click(sender As Object, e As EventArgs) Handles button_new.Click
-        _controller.New_Action()
+        _controller.AddColorCategory()
     End Sub
 
     Private Sub button_autoassign_Click(sender As Object, e As EventArgs) Handles button_autoassign.Click

@@ -213,6 +213,8 @@ Public Class ToDoItem
         OlObject.Save()
         CustomField("TagContext", OlUserPropertyType.olKeywords) = _flags.Context(False)
         CustomField("TagPeople", OlUserPropertyType.olKeywords) = _flags.People(False)
+        'TODO: Assign ToDoID if project assignment changes
+        'TODO: If ID exists and project reassigned, move any children
         CustomField("TagProject", OlUserPropertyType.olKeywords) = _flags.Projects(False)
         CustomField("TagTopic", OlUserPropertyType.olKeywords) = _flags.Topics(False)
         CustomField("KB") = _flags.KB(False)
@@ -366,8 +368,6 @@ Public Class ToDoItem
         End Set
     End Property
 
-
-
     Public Property Complete As Boolean
         Get
             If OlObject Is Nothing Then
@@ -440,9 +440,9 @@ Public Class ToDoItem
         End Set
     End Property
 
-    Public Property TagPeople(Optional IncludePrefix As Boolean = False) As String
+    Public Property People(Optional IncludePrefix As Boolean = False) As String
         Get
-            EnsureInitialized(CallerName:="TagPeople")
+            EnsureInitialized(CallerName:="People")
             Return _flags.People(IncludePrefix)
         End Get
         Set(value As String)
@@ -454,13 +454,15 @@ Public Class ToDoItem
 
 
 
-    Public Property TagProject(Optional IncludePrefix As Boolean = False) As String
+    Public Property Project(Optional IncludePrefix As Boolean = False) As String
         Get
-            EnsureInitialized(CallerName:="TagProject")
+            EnsureInitialized(CallerName:="Project")
             Return _flags.Projects(IncludePrefix)
         End Get
         Set(value As String)
             ' Set Projects and sanitize value
+            'TODO: Assign ToDoID if project assignment changes
+            'TODO: If ID exists and project reassigned, move any children 
             _flags.Projects = value
             If Not _readonly Then SaveCatsToObj("TagProject", _flags.Projects(False))
         End Set
@@ -488,9 +490,9 @@ Public Class ToDoItem
         End Set
     End Property
 
-    Public Property TagContext(Optional IncludePrefix As Boolean = False) As String
+    Public Property Context(Optional IncludePrefix As Boolean = False) As String
         Get
-            EnsureInitialized(CallerName:="TagContext")
+            EnsureInitialized(CallerName:="Context")
             Return _flags.Context(IncludePrefix)
         End Get
         Set(value As String)
@@ -500,9 +502,9 @@ Public Class ToDoItem
         End Set
     End Property
 
-    Public Property TagTopic(Optional IncludePrefix As Boolean = False) As String
+    Public Property Topic(Optional IncludePrefix As Boolean = False) As String
         Get
-            EnsureInitialized(CallerName:="TagTopic")
+            EnsureInitialized(CallerName:="Topic")
             Return _flags.Topics(IncludePrefix)
         End Get
         Set(value As String)

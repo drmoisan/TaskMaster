@@ -168,7 +168,7 @@
         'Button1
         '
         Me.Button1.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge
-        Me.Button1.Label = "FixToDoIDs"
+        Me.Button1.Label = "MigrateToDoIDs"
         Me.Button1.Name = "Button1"
         Me.Button1.ShowImage = True
         '

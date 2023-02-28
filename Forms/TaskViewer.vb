@@ -1,20 +1,43 @@
 ﻿Imports System.Windows
+Imports System.Windows.Forms
+Imports Microsoft.Office.Interop.Outlook
+Imports System.Diagnostics
 
 Public Class TaskViewer
+
+    Private WithEvents _mouseFilter As MouseDownFilter
+    Private _controller As TaskController
+
     Public Sub New()
 
         ' This call is required by the designer.
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+        Me.KeyPreview = True
+
+        'Attach Handler to capture mouseclick anywhere on form
+        _mouseFilter = New MouseDownFilter(Me)
+        System.Windows.Forms.Application.AddMessageFilter(_mouseFilter)
 
     End Sub
 
-    Private _controller As TaskController
 
     Public Sub SetController(controller As TaskController)
         _controller = controller
     End Sub
+
+    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, ByVal keyData As Keys) As Boolean
+        If keyData.HasFlag(Keys.Alt) Then
+            'If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
+            Dim sender As Object = Control.FromHandle(msg.HWnd)
+            Dim e As KeyEventArgs = New KeyEventArgs(keyData)
+            _controller.KeyboardHandler_KeyDown(sender, e)
+            Return True
+        End If
+
+        Return MyBase.ProcessCmdKey(msg, keyData)
+    End Function
 
     Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
         _controller.Cancel_Action()
@@ -36,11 +59,11 @@ Public Class TaskViewer
         _controller.Assign_Topic()
     End Sub
 
-    Private Sub Cat_Deskwork_Click(sender As Object, e As EventArgs) Handles Cat_Deskwork.Click
+    Private Sub Cat_Personal_Click(sender As Object, e As EventArgs) Handles Cat_Personal.Click
         _controller.Shortcut_Personal()
     End Sub
 
-    Private Sub Cat_Agenda_Click(sender As Object, e As EventArgs) Handles Cat_Agenda.Click
+    Private Sub Cat_Meeting_Click(sender As Object, e As EventArgs) Handles Cat_Meeting.Click
         _controller.Shortcut_Meeting()
     End Sub
 
@@ -49,7 +72,7 @@ Public Class TaskViewer
     End Sub
 
     Private Sub Cat_Internet_Click(sender As Object, e As EventArgs) Handles Cat_Internet.Click
-
+        'TODO: Cat_Internet_Click -> hook function to controller
     End Sub
 
     Private Sub Cat_Calls_Click(sender As Object, e As EventArgs) Handles Cat_Calls.Click
@@ -64,7 +87,7 @@ Public Class TaskViewer
         _controller.Shortcut_Email()
     End Sub
 
-    Private Sub Cat_ReadingOther_Click(sender As Object, e As EventArgs) Handles Cat_ReadingOther.Click
+    Private Sub Cat_ReadingNews_Click(sender As Object, e As EventArgs) Handles Cat_News.Click
         _controller.Shortcut_ReadingNews()
     End Sub
 
@@ -98,5 +121,38 @@ Public Class TaskViewer
 
     Private Sub cbxFlag_CheckedChanged(sender As Object, e As EventArgs) Handles cbxFlag.CheckedChanged
         If Not _controller Is Nothing Then _controller.FlagAsTask_Change()
+    End Sub
+
+    Private Sub TaskViewer_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If Not _controller Is Nothing Then
+            Debug.WriteLine(e.KeyCode.ToChar())
+            Dim consumed As Boolean = _controller.KeyboardHandler_KeyDown(sender, e)
+            If consumed Then
+                e.Handled = True
+                e.SuppressKeyPress = True
+            Else
+                e.Handled = False
+            End If
+        End If
+    End Sub
+
+    Private Sub _mouseFilter_FormClicked(sender As Object, e As EventArgs) Handles _mouseFilter.FormClicked
+        If Not _controller Is Nothing Then _controller.MouseFilter_FormClicked(sender, e)
+    End Sub
+
+    Private Sub task_name_KeyDown(sender As Object, e As KeyEventArgs) Handles task_name.KeyDown
+        'Debug.WriteLine("task_name_keydown fired with " & e.KeyCode.ToChar)
+    End Sub
+
+    Private Sub task_name_KeyUp(sender As Object, e As KeyEventArgs) Handles task_name.KeyUp
+        'Debug.WriteLine("task_name_keyup fired with " & e.KeyCode.ToChar)
+    End Sub
+
+    Private Sub task_name_KeyPress(sender As Object, e As KeyPressEventArgs) Handles task_name.KeyPress
+        'Debug.WriteLine("task_name_keypress fired with " & e.KeyChar)
+        If _controller.SuppressKeystrokes Then
+            e.Handled = True
+            'Debug.WriteLine("task_name_keypress suppressed keystrokes")
+        End If
     End Sub
 End Class

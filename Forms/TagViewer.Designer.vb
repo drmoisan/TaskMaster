@@ -141,7 +141,7 @@ Partial Class TagViewer
         Me.TableLayoutTopPanel.Name = "TableLayoutTopPanel"
         Me.TableLayoutTopPanel.RowCount = 1
         Me.TableLayoutTopPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutTopPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutTopPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutTopPanel.Size = New System.Drawing.Size(448, 30)
         Me.TableLayoutTopPanel.TabIndex = 6
         '

@@ -2,7 +2,7 @@
 Imports System.Drawing
 Imports System.Windows.Forms
 
-Public Class cCheckBoxClass
+Public Class CheckBoxController
 
 
     'By declaring Public WithEvents we can handle
@@ -42,10 +42,22 @@ Public Class cCheckBoxClass
     Private Sub ctrlCB_KeyDown(sender As Object, e As KeyEventArgs) Handles ctrlCB.KeyDown
         Select Case e.KeyCode
             Case Keys.Down
-                objUserForm.Select_Ctrl_By_Number(1)
+                objUserForm.Select_Ctrl_By_Offset(1)
 
             Case Keys.Up
-                objUserForm.Select_Ctrl_By_Number(-1)
+                objUserForm.Select_Ctrl_By_Offset(-1)
+
+            Case Keys.End
+                objUserForm.Select_Last_Control()
+
+            Case Keys.Home
+                objUserForm.Select_First_Control()
+
+            Case Keys.PageDown
+                objUserForm.Select_PageDown()
+
+            Case Keys.PageUp
+                objUserForm.Select_PageUp()
 
             Case Keys.Enter
                 objUserForm.OK_Action()

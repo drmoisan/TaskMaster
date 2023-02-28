@@ -2,16 +2,18 @@
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip
 Imports Microsoft.Office.Interop.Outlook
 Imports System.IO
-Module AutoFile
+Imports System.Text.RegularExpressions
+
+Public Module AutoFile
     Const NumberOfFields = 13
     Private dict_remap As Dictionary(Of String, String)
 
-    Public Function CaptureEmailAddresses(OlMail As MailItem) As Collection
+    Public Function CaptureEmailAddresses(OlMail As MailItem) As List(Of String)
         Dim i As Integer
         Dim j As Integer
         Dim strAddresses() As String
         Dim blContains As Boolean
-        Dim colEmails As Collection = New Collection
+        Dim emailAddressList As List(Of String) = New List(Of String)
 
         Dim strEmail() As String = CaptureEmailDetails(OlMail)
 
@@ -22,7 +24,7 @@ Module AutoFile
                     For j = 0 To UBound(strAddresses)
                         blContains = False
 
-                        For Each strTmp In colEmails
+                        For Each strTmp In emailAddressList
 
                             If LCase(Trim(strTmp)) = LCase(Trim(strAddresses(j))) Then
                                 blContains = True
@@ -31,7 +33,7 @@ Module AutoFile
 
                         If blContains = False Then
                             If StrComp(strAddresses(j), "dan.moisan@planetpartnership.com", vbTextCompare) <> 0 Then
-                                colEmails.Add(LCase(Trim(strAddresses(j))))
+                                emailAddressList.Add(LCase(Trim(strAddresses(j))))
                             End If
                         End If
 
@@ -39,7 +41,7 @@ Module AutoFile
                 End If
             Next i
         End If
-        Return colEmails
+        Return emailAddressList
     End Function
 
     Public Function CaptureEmailRecipients(OlMail As MailItem) As String()
@@ -276,7 +278,7 @@ Module AutoFile
                                  Optional blExcludeFlagged As Boolean = True
                                  ) As Collection
         Dim OlMail As Outlook.MailItem
-        Dim colEmail As Collection
+        Dim emailAddressList As List(Of String)
         Dim colPPL As Collection = New Collection
         Dim strMissing As String = ""
         Dim strTmp As String
@@ -288,12 +290,11 @@ Module AutoFile
         If TypeOf objItem Is MailItem Then
             OlMail = objItem
             If Util.Mail_IsItEncrypted(OlMail) = False Then
-                colEmail = CaptureEmailAddresses(OlMail)
-                For i = colEmail.Count To 1 Step -1
-                    strTmp = colEmail(i)
+                emailAddressList = CaptureEmailAddresses(OlMail)
+                For i = emailAddressList.Count - 1 To 0 Step -1
+                    strTmp = emailAddressList(i)
                     If ppl_dict.ContainsKey(strTmp) Then
-                        'If dictPPL.Exists(strTmp) Then
-                        'Category_AppendToMail OlMail, dictPPL(strTmp)
+
                         If blExcludeFlagged Then
                             If Not Category_IsAlreadySelected(objItem, ppl_dict(strTmp)) Then
                                 colPPL.Add(ppl_dict(strTmp))
@@ -330,4 +331,80 @@ Module AutoFile
         Return blSelected
     End Function
 
+    Public Function dictPPL_AddMissingEntries(OlMail As Outlook.MailItem) As Collection
+
+        Dim addressList As List(Of String) = New List(Of String)
+        Dim strTmp3 As String
+        Dim blNew As Boolean
+        Dim catTmp As Outlook.Category
+        Dim colReturnCatNames As Collection
+        Dim objRegex As Regex
+        Dim _viewer As TagViewer
+        Dim dictNAMES As SortedDictionary(Of String, Boolean) = New SortedDictionary(Of String, Boolean)
+
+
+        Dim ppl_dict As Dictionary(Of String, String) =
+            Globals.ThisAddIn.ppl_dict
+
+
+        dictNAMES = ppl_dict.GroupBy(Function(x) x.Value).ToDictionary(Function(y) y.Key, Function(z) False).ToSortedDictionary()
+
+        blNew = False
+
+        colReturnCatNames = New Collection
+
+        If Util.Mail_IsItEncrypted(OlMail) = False Then
+            addressList = CaptureEmailAddresses(OlMail)
+        End If
+
+        ' Discard any email addresses from the email that
+        ' are already in the people dictionary
+        addressList = addressList.Where(Function(x) Not ppl_dict.ContainsKey(x)) _
+                                 .Select(Function(x) x) _
+                                 .ToList()
+
+        For Each address As String In addressList
+
+            Dim vbR As MsgBoxResult = MsgBox("Add entry for " & address, vbYesNo)
+            If vbR = vbYes Then
+                objRegex = New Regex("([a-zA-z\d]+)\.([a-zA-z\d]+)@([a-zA-z\d]+)\.com",
+                                     RegexOptions.Multiline)
+
+                Dim newPplTag As String = StrConv(objRegex.Replace(address, UCase("$1 $2")), vbProperCase)
+
+                'Check if it is a new address for existing contact
+                _viewer = New TagViewer
+
+                Dim _controller As New TagController(_viewer, dictNAMES, New List(Of String))
+
+                _viewer.button_new.Enabled = False
+                _viewer.button_autoassign.Enabled = False
+                _viewer.TextBox1.Text = newPplTag
+                _viewer.ShowDialog()
+                strTmp3 = _controller.SelectionString()
+
+                If strTmp3 <> "" Then
+                    ppl_dict.Add(address, strTmp3)
+                    blNew = True
+                    colReturnCatNames.Add(strTmp3)
+                Else
+                    newPplTag = InputBox("Enter name for " & address, DefaultResponse:=newPplTag)
+                    catTmp = Category_Create(My.Settings.Prefix_People, newPplTag)
+
+                    If Not catTmp Is Nothing Then
+                        ppl_dict.Add(address, My.Settings.Prefix_People & newPplTag)
+                        blNew = True
+                        colReturnCatNames.Add(My.Settings.Prefix_People & newPplTag)
+                    End If
+                End If
+            End If
+        Next
+        If blNew Then
+            Util.WriteDictPPL(Path.Combine(Globals.ThisAddIn.staging_path, Globals.ThisAddIn.filename_dictppl), ppl_dict)
+        End If
+
+
+        Return colReturnCatNames
+
+    End Function
 End Module

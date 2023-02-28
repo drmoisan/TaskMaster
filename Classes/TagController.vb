@@ -15,11 +15,11 @@ Public Class TagController
     Private _selections As List(Of String)
     Private _filtered_selections As List(Of String)
     Private ReadOnly _obj_item As Object
-    Private ReadOnly _ol_mail As MailItem
+    Private ReadOnly _olMail As MailItem
     Private ReadOnly _obj_caller As Object
     Private ReadOnly _prefix As String
-    Private ReadOnly _col_cbx_ctrl As List(Of Object) = New List(Of Object)
-    Private ReadOnly _col_cbx_event As List(Of Object) = New List(Of Object)
+    Private _col_cbx_ctrl As List(Of Object) = New List(Of Object)
+    Private _col_cbx_event As List(Of Object) = New List(Of Object)
     Private ReadOnly _col_colorbox As List(Of Object) = New List(Of Object)
     Private ReadOnly _ismail As Boolean
     Public _exit_type As String = "Cancel"
@@ -51,11 +51,11 @@ Public Class TagController
 
         If Not _obj_item Is Nothing Then
             If TypeOf _obj_item Is MailItem Then
-                _ol_mail = _obj_item
+                _olMail = _obj_item
                 _ismail = True
             Else
                 _ismail = False
-                _ol_mail = Nothing
+                _olMail = Nothing
             End If
         End If
 
@@ -194,13 +194,25 @@ Public Class TagController
         SearchAndReload()
     End Sub
 
-    Public Sub New_Action()
-        MsgBox("Need to Implement New Action")
+    Public Sub AddColorCategory()
+        Dim blAltEntry As Boolean = True
+
+        If _prefix = My.Settings.Prefix_People Then
+            Dim vbR As MsgBoxResult = MsgBox("Auto-add new from email addresses?", vbYesNo)
+            If vbR = vbYes Then
+                blAltEntry = False
+                Dim colPPL As Collection = AutoFile.dictPPL_AddMissingEntries(_olMail)
+                For Each newCategory As String In colPPL
+                    AddOption(newCategory, blClickTrue:=True)
+                Next newCategory
+                If colPPL.Count > 0 Then FilterToSelected()
+            End If
+        End If
     End Sub
 
     Public Sub FocusCheckbox(ctrl As Windows.Forms.Control)
         int_focus = _col_cbx_ctrl.IndexOf(ctrl)
-        Select_Ctrl_By_Number(0)
+        Select_Ctrl_By_Offset(0)
     End Sub
 #End Region
 
@@ -217,9 +229,9 @@ Public Class TagController
     Public Sub OptionsPanel_KeyDown(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.Down
-                Select_Ctrl_By_Number(1)
+                Select_Ctrl_By_Offset(1)
             Case Keys.Up
-                Select_Ctrl_By_Number(-1)
+                Select_Ctrl_By_Offset(-1)
         End Select
     End Sub
 
@@ -234,6 +246,8 @@ Public Class TagController
         Select Case e.KeyCode
             Case Keys.Right
                 _cursor_position = _viewer.TextBox1.SelectionStart
+            Case Keys.Down
+                Select_Ctrl_By_Offset(1)
         End Select
     End Sub
 
@@ -243,14 +257,12 @@ Public Class TagController
                 If _viewer.TextBox1.SelectionStart = _cursor_position Then
                     FilterToSelected()
                 End If
-            Case Keys.Down
-                Select_Ctrl_By_Number(1)
             Case Keys.Enter
                 OK_Action()
         End Select
     End Sub
 
-    Public Sub Select_Ctrl_By_Number(increment As Integer)
+    Public Sub Select_Ctrl_By_Offset(increment As Integer)
         Dim newpos As Integer = int_focus + increment
         If newpos = -1 Then
             _viewer.TextBox1.Select()
@@ -262,6 +274,89 @@ Public Class TagController
             int_focus = newpos
         End If
     End Sub
+
+    Public Sub Select_Last_Control()
+        Select_Ctrl_By_Position(_col_cbx_ctrl.Count - 1)
+    End Sub
+
+    Public Sub Select_First_Control()
+        Select_Ctrl_By_Position(0)
+    End Sub
+
+    Public Sub Select_PageDown()
+
+        If _viewer.OptionsPanel.VerticalScroll.Maximum > _viewer.OptionsPanel.Height Then
+            Dim start As Integer = Math.Max(int_focus, 0)
+            Dim y As Integer = _viewer.OptionsPanel.Height
+            Dim filteredIEnumerable = _col_cbx_ctrl.[Select](Function(n, i) New With
+                                                    {Key .Value = n, Key .Index = i}) _
+                                                    .Where(Function(p) p.Index > int_focus And
+                                                    p.Value.Bottom > y)
+
+            If filteredIEnumerable.Count = 0 Then
+                Select_Last_Control()
+
+            Else
+                Dim idx As Integer = filteredIEnumerable.First().Index
+
+                Select_Ctrl_By_Position(idx)
+
+                Dim y_scroll As Integer = _col_cbx_ctrl.Item(idx).Top _
+                                          - _viewer.OptionsPanel.AutoScrollPosition.Y
+
+                _viewer.OptionsPanel.AutoScrollPosition = New Drawing.Point(
+                    _viewer.OptionsPanel.AutoScrollPosition.X, y_scroll)
+
+            End If
+
+        End If
+    End Sub
+
+    Public Sub Select_PageUp()
+
+        If _viewer.OptionsPanel.VerticalScroll.Maximum > _viewer.OptionsPanel.Height Then
+            Dim start As Integer = Math.Max(int_focus, 0)
+            Dim idx_top As Integer
+
+            Dim filteredIEnumerable = _col_cbx_ctrl.[Select](Function(n, i) New With
+                                                    {Key .Value = n, Key .Index = i}) _
+                                                    .Where(Function(p) p.Value.Top < 0)
+
+            If filteredIEnumerable.Count = 0 Then
+                Select_First_Control()
+
+            Else
+                idx_top = filteredIEnumerable.Last().Index
+                Select_Ctrl_By_Position(idx_top)
+                Dim y_scroll As Integer = -1 * _viewer.OptionsPanel.AutoScrollPosition.Y _
+                    - (_viewer.OptionsPanel.Height - _col_cbx_ctrl(idx_top).Height)
+
+                _viewer.OptionsPanel.AutoScrollPosition = New Drawing.Point(
+                    _viewer.OptionsPanel.AutoScrollPosition.X, y_scroll)
+
+            End If
+
+        End If
+    End Sub
+
+    Public Sub Select_Ctrl_By_Position(position As Integer)
+        If position < -1 Or position > _col_cbx_ctrl.Count - 1 Then
+            Throw New ArgumentOutOfRangeException("Cannot select control with postition " & position)
+
+        ElseIf position = -1 Then
+            _viewer.TextBox1.Select()
+            int_focus = position
+
+        Else
+            _col_cbx_ctrl.Item(position).Focus()
+            Dim cbx As Windows.Forms.CheckBox = _col_cbx_ctrl.Item(position)
+            ControlPaint.DrawFocusRectangle(Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle)
+            int_focus = position
+        End If
+    End Sub
+
+
+
 #End Region
 
 #Region "Private Helper Functions"
@@ -270,7 +365,7 @@ Public Class TagController
                                  prefix As String) As Boolean
         Dim ctrlCB As Windows.Forms.CheckBox
         Dim strChkName As String
-        Dim clsCheckBox As cCheckBoxClass
+        Dim clsCheckBox As CheckBoxController
 
         Const cHt_var = 18
         Const cHt_fxd = 6
@@ -278,7 +373,9 @@ Public Class TagController
         Const cWt = 300
 
         _filtered_options = dict_options
-        int_focus = 0
+        int_focus = -1
+        _col_cbx_ctrl = New List(Of Object)
+        _col_cbx_event = New List(Of Object)
 
         For i = 0 To _filtered_options.Count - 1
             strChkName = Format(i, "00") & " ChkBx"
@@ -298,7 +395,7 @@ Public Class TagController
             ctrlCB.Checked = _filtered_options.Values(i)
 
             Try
-                clsCheckBox = New cCheckBoxClass
+                clsCheckBox = New CheckBoxController
                 clsCheckBox.Init(Me, prefix)
                 clsCheckBox.ctrlCB = ctrlCB
             Catch
@@ -359,18 +456,18 @@ Public Class TagController
     End Sub
 
     Private Function GetSelections() As List(Of String)
-        Return From x In _dict_options Where x.Value = True Select x.Key
+        Return (From x In _dict_options Where x.Value = True Select x.Key).ToList()
     End Function
 
     Private Function AddColorCategory(prefix As String, rawchoice As String) As Boolean
         Dim choice As String = String.Concat(prefix, rawchoice)
 
         Dim olcolor As OlCategoryColor = OlCategoryColor.olCategoryColorNone
-        If prefix = "Tag PPL " Then
+        If prefix = My.Settings.Prefix_People Then
             olcolor = OlCategoryColor.olCategoryColorDarkGray
-        ElseIf prefix = "Tag PROJECT " Then
+        ElseIf prefix = My.Settings.Prefix_Project Then
             olcolor = OlCategoryColor.olCategoryColorTeal
-        ElseIf prefix = "Tag TOPIC " Then
+        ElseIf prefix = My.Settings.Prefix_Topic Then
             olcolor = OlCategoryColor.olCategoryColorDarkTeal
         End If
 

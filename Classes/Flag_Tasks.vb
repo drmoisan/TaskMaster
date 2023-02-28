@@ -20,7 +20,7 @@ Public Class Flag_Tasks
     End Sub
 
     Public Sub Run()
-        _controller.LoadValues()
+        _controller.LoadInitialValues()
         _viewer.Show()
     End Sub
 
