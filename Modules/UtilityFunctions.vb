@@ -1,3 +1,0 @@
-﻿Module UtilityFunctions
-
-End Module
