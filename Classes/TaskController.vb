@@ -6,6 +6,10 @@ Imports System.Collections.Generic
 Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Imports System.Diagnostics
+Imports UtilitiesVB
+Imports ToDoModel
+Imports Tags
+
 
 Public Class TaskController
 
@@ -30,8 +34,8 @@ Public Class TaskController
     Private _altActive As Boolean = False
     Private _altLevel As Integer = 0
     Private _keyCapture As String = ""
-
-
+    Private _defaults As ToDoDefaults
+    Private _autoAssign As IAutoAssign
 
     <Flags>
     Public Enum FlagsToSet
@@ -67,12 +71,16 @@ Public Class TaskController
     ''' <param name="flag_options">Enumeration of fields to activate</param>
     Public Sub New(form_instance As TaskViewer,
                    ToDoSelection As List(Of ToDoItem),
+                   Defaults As ToDoDefaults,
+                   AutoAssign As IAutoAssign,
                    Optional flag_options As FlagsToSet = FlagsToSet.all)
 
         'Save parameters to internal variables
         _viewer = form_instance
         _todo_list = ToDoSelection
         _options = flag_options
+        _defaults = Defaults
+        _autoAssign = AutoAssign
 
         'Activate this controller within the viewer
         With form_instance
@@ -88,7 +96,7 @@ Public Class TaskController
 
         'All color categories in Outlook.Namespace are loaded to a sorted dictionary
         _dict_categories = New SortedDictionary(Of String, Boolean)
-        For Each cat As Category In Globals.ThisAddIn._OlNS.Categories
+        For Each cat As Category In Globals.ThisAddIn.OlNS.Categories
             _dict_categories.Add(cat.Name, False)
         Next
 
@@ -205,7 +213,7 @@ Public Class TaskController
     ''' Loads a TagViewer with categories relevant to People for assigment
     ''' </summary>
     Public Sub Assign_People()
-        Dim prefix As String = My.Settings.Prefix_People
+        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "People").Value
 
         Dim filtered_cats = (From x In _dict_categories
                              Where x.Key.Contains(prefix)
@@ -216,12 +224,13 @@ Public Class TaskController
         selections.Remove("")
 
         Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(
-                viewer_instance:=viewer,
-                dictOptions:=filtered_cats,
-                selections:=selections,
-                tag_prefix:=prefix,
-                objItemObject:=_active.object_item)
+            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+                                                                dictOptions:=filtered_cats,
+                                                                autoAssigner:=_autoAssign,
+                                                                prefixes:=_defaults.PrefixList,
+                                                                selections:=selections,
+                                                                prefix_key:=prefix,
+                                                                objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.People = controller.SelectionString()
@@ -236,7 +245,7 @@ Public Class TaskController
     ''' Loads a TagViewer with categories relevant to Context for assigment
     ''' </summary>
     Public Sub Assign_Context()
-        Dim prefix As String = My.Settings.Prefix_Context
+        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "Context").Value
 
         Dim filtered_cats = (From x In _dict_categories
                              Where x.Key.Contains(prefix)
@@ -247,12 +256,13 @@ Public Class TaskController
         selections.Remove("")
 
         Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(
-                viewer_instance:=viewer,
-                dictOptions:=filtered_cats,
-                selections:=selections,
-                tag_prefix:=prefix,
-                objItemObject:=_active.object_item)
+            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+                                                                dictOptions:=filtered_cats,
+                                                                autoAssigner:=_autoAssign,
+                                                                prefixes:=_defaults.PrefixList,
+                                                                selections:=selections,
+                                                                prefix_key:=prefix,
+                                                                objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.Context = controller.SelectionString()
@@ -263,7 +273,7 @@ Public Class TaskController
     End Sub
 
     Public Sub Assign_Project()
-        Dim prefix As String = My.Settings.Prefix_Project
+        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "Project").Value
 
         Dim filtered_cats = (From x In _dict_categories
                              Where x.Key.Contains(prefix)
@@ -274,12 +284,13 @@ Public Class TaskController
         selections.Remove("")
 
         Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(
-                viewer_instance:=viewer,
-                dictOptions:=filtered_cats,
-                selections:=selections,
-                tag_prefix:=prefix,
-                objItemObject:=_active.object_item)
+            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+                                                                dictOptions:=filtered_cats,
+                                                                autoAssigner:=_autoAssign,
+                                                                prefixes:=_defaults.PrefixList,
+                                                                selections:=selections,
+                                                                prefix_key:=prefix,
+                                                                objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.Project = controller.SelectionString()
@@ -292,7 +303,7 @@ Public Class TaskController
     ''' Loads a TagViewer with categories relevant to Topics for assigment
     ''' </summary>
     Public Sub Assign_Topic()
-        Dim prefix As String = My.Settings.Prefix_Topic
+        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "Topic").Value
 
         Dim filtered_cats = (From x In _dict_categories
                              Where x.Key.Contains(prefix)
@@ -303,12 +314,13 @@ Public Class TaskController
         selections.Remove("")
 
         Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(
-                viewer_instance:=viewer,
-                dictOptions:=filtered_cats,
-                selections:=selections,
-                tag_prefix:=prefix,
-                objItemObject:=_active.object_item)
+            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+                                                                dictOptions:=filtered_cats,
+                                                                autoAssigner:=_autoAssign,
+                                                                prefixes:=_defaults.PrefixList,
+                                                                selections:=selections,
+                                                                prefix_key:=prefix,
+                                                                objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.Topic = controller.SelectionString()

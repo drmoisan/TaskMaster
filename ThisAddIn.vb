@@ -6,9 +6,12 @@ Imports System
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Security.Authentication.ExtendedProtection
 Imports Microsoft.VisualBasic.FileIO
-
+Imports ToDoModel
+Imports UtilitiesVB
 
 Public Class ThisAddIn
+
+    Private _globals As ApplicationGlobals
 
     Public CCOCatList As List(Of String)
     Public WithEvents OlToDoItems As Outlook.Items
@@ -16,66 +19,42 @@ Public Class ThisAddIn
     Public listToDoItems As List(Of Outlook.Items) = New List(Of Outlook.Items)
     Public WithEvents OlInboxItems As Outlook.Items
     Private WithEvents OlReminders As Outlook.Reminders
-    Public _OlNS As Outlook.NameSpace
+    Public OlNS As Outlook.NameSpace
     'Private WithEvents OlExplorer As Outlook.Explorer
 
     Private ribTM As TaskMasterRibbon
     Private ribEM As EmailRibbon
     Dim FileName_ProjectList As String
     Dim FileName_IDList As String
-    Dim FileName_ProjInfo As String
-    Public ReadOnly filename_dictppl As String = "pplkey.xml"
-    Public ReadOnly staging_path As String = SpecialDirectories.MyDocuments
+    Dim FileName_ProjInfo2 As String
+    Private ReadOnly FileName_ProjInfo As String = "ProjInfo.bin"
+    Public ReadOnly FilenameDictPpl As String = "pplkey.xml"
+    Public ReadOnly StagingPath As String = SpecialDirectories.MyDocuments
+    Public EmailRoot As String
     Const AppDataFolder = "TaskMaster"
     'Public ProjDict As ProjectList
     Public ProjInfo As ProjectInfo
-    Public ppl_dict As PeopleDict(Of String, String)
-    Public WithEvents IDList As cIDList
+    Public DictPPL As PeopleDict(Of String, String)
+    Public WithEvents IDList As IDListClass
     Public DM_CurView As DataModel_ToDoTree
     Public Cats As FlagParser
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
-        _OlNS = Application.GetNamespace("MAPI")
+        _globals = New ApplicationGlobals(Application)
 
-        'OlExplorer = Application.ActiveExplorer
-        OlToDoItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
-        OlInboxItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderInbox).Items
-        OlReminders = Application.Reminders
+        With _globals
+            OlNS = .NamespaceMAPI
+            OlToDoItems = .OlToDoFolder.Items
+            OlInboxItems = .OlInbox.Items
+            OlReminders = .OlReminders
+            ProjInfo = .ProjInfo
+            DictPPL = .DictPPL
+            IDList = .IDList
 
 
-        FileName_ProjInfo = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "ProjInfo.bin")
-
-        If File.Exists(FileName_ProjInfo) Then
-            Dim TestFileStream As Stream = File.OpenRead(FileName_ProjInfo)
-            Dim deserializer As New BinaryFormatter
-            ProjInfo = CType(deserializer.Deserialize(TestFileStream), ProjectInfo)
-            TestFileStream.Close()
-
-            ProjInfo.pFileName = FileName_ProjInfo
-            ProjInfo.Sort()
-
-        Else
-            ProjInfo = New ProjectInfo
-            ProjInfo.Save(FileName_ProjInfo)
-        End If
-
-        ppl_dict = Util.GetDict(staging_path, filename_dictppl)
-
-        FileName_IDList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppDataFolder, "UsedIDList.bin")
-
-        If File.Exists(FileName_IDList) Then
-            Dim TestFileStream As Stream = File.OpenRead(FileName_IDList)
-            Dim deserializer As New BinaryFormatter
-            IDList = CType(deserializer.Deserialize(TestFileStream), cIDList)
-            IDList.pFileName = FileName_IDList
-            TestFileStream.Close()
-        Else
-            IDList = New cIDList(New List(Of String))
-            IDList.RePopulate()
-            IDList.Save(FileName_IDList)
-
-        End If
-
+            Dim rootFolder As Outlook.Folder = Application.Session.DefaultStore.GetRootFolder()
+            EmailRoot = rootFolder.FolderPath
+        End With
         Access_Ribbons_By_Explorer()
     End Sub
 
@@ -213,7 +192,7 @@ Public Class ThisAddIn
     End Sub
 
     Public Function RefreshIDList() As Long
-        IDList = New cIDList(New List(Of String))
+        IDList = New IDListClass(New List(Of String))
         IDList.RePopulate()
         IDList.Save(FileName_IDList)
         WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", IDList.UsedIDList.ToArray)
@@ -264,63 +243,6 @@ Public Class ThisAddIn
         DM.WriteTreeToDisk()
     End Sub
 
-    Public Function CustomFieldID_GetValue(objItem As Object, ByVal UserDefinedFieldName As String) As String
-        'QUESTION: Is ThisAddin.CustomFieldID_GetValue called? Seems duplicated.
-        Dim OlMail As Outlook.MailItem
-        Dim OlTask As Outlook.TaskItem
-        Dim OlAppt As Outlook.AppointmentItem
-        Dim objProperty As Outlook.UserProperty
-
-
-        If TypeOf objItem Is Outlook.MailItem Then
-            OlMail = objItem
-            objProperty = OlMail.UserProperties.Find(UserDefinedFieldName)
-
-        ElseIf TypeOf objItem Is Outlook.TaskItem Then
-            OlTask = objItem
-            objProperty = OlTask.UserProperties.Find(UserDefinedFieldName)
-        ElseIf TypeOf objItem Is Outlook.AppointmentItem Then
-            OlAppt = objItem
-            objProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
-        Else
-            objProperty = Nothing
-            MsgBox("Unsupported object type")
-        End If
-
-        If objProperty Is Nothing Then
-            CustomFieldID_GetValue = ""
-        Else
-            If IsArray(objProperty.Value) Then
-                CustomFieldID_GetValue = FlattenArry(objProperty.Value)
-            Else
-                CustomFieldID_GetValue = objProperty.Value
-            End If
-        End If
-
-        OlMail = Nothing
-        OlTask = Nothing
-        OlAppt = Nothing
-        objProperty = Nothing
-
-    End Function
-
-    Public Function FlattenArry(varBranch() As Object) As String
-        'CLEANUP: Move to a library 
-        Dim i As Integer
-        Dim strTemp As String
-
-        strTemp = ""
-
-        For i = 0 To UBound(varBranch)
-            If IsArray(varBranch(i)) Then
-                strTemp = strTemp & ", " & FlattenArry(varBranch(i))
-            Else
-                strTemp = strTemp & ", " & varBranch(i)
-            End If
-        Next i
-        If strTemp.Length <> 0 Then strTemp = Right(strTemp, Len(strTemp) - 2)
-        FlattenArry = strTemp
-    End Function
 
     Public Function CustomFieldID_Set(ByVal UserDefinedFieldName As String,
                                Optional ByVal Value As String = "",
@@ -536,7 +458,7 @@ Public Class ThisAddIn
                                         'ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                         'SaveDict()
                                         Dim strProgram As String = InputBox("What is the program name for " & strProject & "?", DefaultResponse:="")
-                                        ProjInfo.Add(New ProjectInfoEntry(strProject, strToDoID, strProgram))
+                                        ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
                                         ProjInfo.Save()
                                     End If
                                 End If
@@ -757,7 +679,7 @@ Public Class ThisAddIn
                                 Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
                                 If response = vbYes Then
                                     Dim strProgram As String = InputBox("What is the program name for " & strProject & "?", DefaultResponse:="")
-                                    ProjInfo.Add(New ProjectInfoEntry(strProject, strToDoID, strProgram))
+                                    ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
                                     ProjInfo.Save()
                                 End If
                             End If
@@ -879,8 +801,6 @@ Public Class ThisAddIn
 
     End Function
 
-
-
     Private Sub OlToDoItems_ItemAdd(Item As Object) Handles OlToDoItems.ItemAdd
         'CLEANUP: Move this to a class, module or library
         Dim todo As ToDoItem = New ToDoItem(Item, OnDemand:=True)
@@ -956,7 +876,6 @@ Public Class ThisAddIn
 
     End Function
 
-
     Public Sub TestProjectInfo()
         'TODO: Migrate Function To Unit Test
         'Dim ftmp As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), AppDataFolder, "ProjInfo.csv")
@@ -964,52 +883,52 @@ Public Class ThisAddIn
         '    WriteToCSV(ftmp, entry.ToCSV)
         'Next
         If ProjInfo.Contains_ProgramName("Digital Transformation LATAM") Then
-            Dim lst As New List(Of ProjectInfoEntry)
+            Dim lst As New List(Of ToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProgramName("Digital Transformation LATAM")
-            For Each entry As ProjectInfoEntry In lst
+            For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProgramName("Pete") Then
-            Dim lst As List(Of ProjectInfoEntry)
+            Dim lst As List(Of ToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProgramName("Digital Transformation LATAM")
-            For Each entry As ProjectInfoEntry In lst
+            For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectID("1308") Then
-            Dim lst As List(Of ProjectInfoEntry)
+            Dim lst As List(Of ToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectID("1308")
-            For Each entry As ProjectInfoEntry In lst
+            For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectID("980H") Then
-            Dim lst As List(Of ProjectInfoEntry)
+            Dim lst As List(Of ToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectID("980H")
-            For Each entry As ProjectInfoEntry In lst
+            For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectID("abcd") Then
-            Dim lst As List(Of ProjectInfoEntry)
+            Dim lst As List(Of ToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectID("abcd")
-            For Each entry As ProjectInfoEntry In lst
+            For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         '5 CCO Org Design and Functions
         If ProjInfo.Contains_ProjectName("5 CCO Org Design and Functions") Then
-            Dim lst As List(Of ProjectInfoEntry)
+            Dim lst As List(Of ToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectName("5 CCO Org Design and Functions")
-            For Each entry As ProjectInfoEntry In lst
+            For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectName("pete") Then
-            Dim lst As List(Of ProjectInfoEntry)
+            Dim lst As List(Of ToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProgramName("5 CCO Org Design and Functions")
-            For Each entry As ProjectInfoEntry In lst
+            For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If

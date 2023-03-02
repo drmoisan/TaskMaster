@@ -204,67 +204,6 @@ Module Flag_Fields_Categories
 
     End Sub
 
-    Public Function Category_Create(strPrefix As String, strNewCat As String) As Category
 
-        Dim objNameSpace As Outlook.NameSpace
-        Dim objCategory As Category
-        Dim OlColor As OlCategoryColor
-        Dim strTemp As String
-
-        On Error GoTo ErrorHandler
-
-
-        If strNewCat <> "" Then
-            objNameSpace = Globals.ThisAddIn._OlNS
-            If strPrefix <> "" Then
-                If Len(strNewCat) > Len(strPrefix) Then
-                    If Left(strNewCat, Len(strPrefix)) <> strPrefix Then
-                        strTemp = strPrefix & strNewCat
-                    Else
-                        strTemp = strNewCat
-                    End If
-                Else
-                    strTemp = strPrefix & strNewCat
-                End If
-            Else
-                strTemp = strNewCat
-            End If
-
-            If strPrefix = "Tag PPL " Then
-                OlColor = OlCategoryColor.olCategoryColorDarkGray
-            ElseIf strPrefix = "Tag PROJECT " Then
-                OlColor = OlCategoryColor.olCategoryColorTeal
-            ElseIf strPrefix = "Tag TOPIC " Then
-                OlColor = OlCategoryColor.olCategoryColorDarkTeal
-            Else
-                OlColor = OlCategoryColor.olCategoryColorNone
-            End If
-
-            On Error Resume Next
-            objCategory = objNameSpace.Categories.Add(strTemp, OlColor,
-            OlCategoryShortcutKey.olCategoryShortcutKeyNone)
-
-            If Err.Number = 0 Then
-                Category_Create = objCategory
-            Else
-                Err.Clear()
-
-                For Each objCategory In objNameSpace.Categories
-                    If objCategory.Name = strTemp Then
-                        Category_Create = objCategory
-                        Exit Function
-                    End If
-                Next objCategory
-            End If
-        Else
-            Category_Create = Nothing
-        End If
-
-        Exit Function
-
-ErrorHandler:
-        MsgBox("Error, can't create category " & strTemp & ". " & Err.Description)
-        Category_Create = Nothing
-    End Function
 
 End Module

@@ -17,7 +17,7 @@ Namespace My
     <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0"),  _
      Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-    Partial Public NotInheritable Class MySettings
+    Partial Friend NotInheritable Class MySettings
         Inherits Global.System.Configuration.ApplicationSettingsBase
         
         Private Shared defaultInstance As MySettings = CType(Global.System.Configuration.ApplicationSettingsBase.Synchronized(New MySettings()),MySettings)
@@ -52,27 +52,6 @@ Namespace My
 #End If
                 Return defaultInstance
             End Get
-        End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
-        Public ReadOnly Property MaxToDo() As Long
-            Get
-                Return CType(Me("MaxToDo"),Long)
-            End Get
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("15")>  _
-        Public Property Default_Task_Length() As Integer
-            Get
-                Return CType(Me("Default_Task_Length"),Integer)
-            End Get
-            Set
-                Me("Default_Task_Length") = value
-            End Set
         End Property
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
@@ -161,41 +140,26 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Archive")>  _
-        Public Property Archive_Root() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("15")>  _
+        Public Property Default_Task_Length() As String
             Get
-                Return CType(Me("Archive_Root"),String)
+                Return CType(Me("Default_Task_Length"),String)
             End Get
             Set
-                Me("Archive_Root") = value
+                Me("Default_Task_Length") = value
             End Set
         End Property
         
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("ProjInfo.bin")>  _
-        Public ReadOnly Property FileName_ProjInfo() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public Property MaxToDo() As Long
             Get
-                Return CType(Me("FileName_ProjInfo"),String)
+                Return CType(Me("MaxToDo"),Long)
             End Get
-        End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("pplkey.xml")>  _
-        Public ReadOnly Property FilenameDictPpl() As String
-            Get
-                Return CType(Me("FilenameDictPpl"),String)
-            End Get
-        End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("UsedIDList.bin")>  _
-        Public ReadOnly Property FileName_IDList() As String
-            Get
-                Return CType(Me("FileName_IDList"),String)
-            End Get
+            Set
+                Me("MaxToDo") = value
+            End Set
         End Property
     End Class
 End Namespace
@@ -208,9 +172,9 @@ Namespace My
     Friend Module MySettingsProperty
         
         <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
-        Friend ReadOnly Property Settings() As Global.TaskMaster.My.MySettings
+        Friend ReadOnly Property Settings() As Global.ToDoModel.My.MySettings
             Get
-                Return Global.TaskMaster.My.MySettings.Default
+                Return Global.ToDoModel.My.MySettings.Default
             End Get
         End Property
     End Module
