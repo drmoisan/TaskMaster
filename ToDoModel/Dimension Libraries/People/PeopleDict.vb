@@ -1,6 +1,4 @@
-﻿
-
-Imports System.Xml
+﻿Imports System.Xml
 Imports System.Xml.Schema
 Imports System.Xml.Serialization
 Imports UtilitiesVB
@@ -9,6 +7,10 @@ Imports UtilitiesVB
 Public Class PeopleDict(Of TKey, TValue)
     Inherits Dictionary(Of TKey, TValue)
     Implements IXmlSerializable, IPeopleDict
+
+    Public Sub New()
+
+    End Sub
 
     Public Sub New(dict As Dictionary(Of TKey, TValue))
         For Each pair As KeyValuePair(Of TKey, TValue) In dict
@@ -42,6 +44,10 @@ Public Class PeopleDict(Of TKey, TValue)
 
     Public Function GetSchema() As XmlSchema Implements IXmlSerializable.GetSchema, IPeopleDict.GetSchema
         Return Nothing
+    End Function
+
+    Public Function ToDictionary() As Dictionary(Of TKey, TValue)
+        Return Me.ToDictionary()
     End Function
 
 End Class

@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{91AA7C42-F0AB-4802-AA8B-0C73EA6EA3C9}</ProjectGuid>
+    <ProjectGuid>{D620A8F6-AFAE-4753-834D-4035DF396CDB}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ToDoModel</RootNamespace>
-    <AssemblyName>ToDoModel</AssemblyName>
+    <RootNamespace>CleanProjectToTest</RootNamespace>
+    <AssemblyName>CleanProjectToTest</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -19,7 +19,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>ToDoModel.xml</DocumentationFile>
+    <DocumentationFile>CleanProjectToTest.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -28,7 +28,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>ToDoModel.xml</DocumentationFile>
+    <DocumentationFile>CleanProjectToTest.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -54,9 +54,6 @@
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.6.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Common, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.16.170.0\lib\net462\Microsoft.TeamFoundation.Common.dll</HintPath>
     </Reference>
@@ -77,8 +74,6 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -97,16 +92,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common Functions\CaptureEmailAddressesModule.vb" />
-    <Compile Include="Common Functions\CaptureEmailDetailsModule.vb" />
-    <Compile Include="FileOperationsPST.vb" />
-    <Compile Include="Dimension Libraries\ID\IDListUtilities.vb" />
-    <Compile Include="Common Functions\AutoFile.vb" />
-    <Compile Include="Common Functions\GetFields.vb" />
-    <Compile Include="Dimension Libraries\ID\BaseChanger.vb" />
-    <Compile Include="Dimension Libraries\ID\ListOfIDs.vb" />
-    <Compile Include="DataModel_ToDoTree.vb" />
-    <Compile Include="FlagParser.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -122,15 +107,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Dimension Libraries\People\PeopleDict.vb" />
-    <Compile Include="Dimension Libraries\Project\ToDoProjectInfoEntry.vb" />
-    <Compile Include="Dimension Libraries\Project\ProjectList.vb" />
-    <Compile Include="Dimension Libraries\People\PeopleDictUtilities.vb" />
-    <Compile Include="ToDoDefaults.vb" />
-    <Compile Include="ToDoItem.vb" />
-    <Compile Include="Dimension Libraries\Project\ToDoProjectInfo.vb" />
-    <Compile Include="Dimension Libraries\Project\ToDoProjectInfoUtilities.vb" />
-    <Compile Include="TreeNodeOfT.vb" />
+    <Compile Include="TestSerDic.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -154,10 +131,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tags\Tags.vbproj">
-      <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
-      <Name>Tags</Name>
-    </ProjectReference>
     <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
       <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>
       <Name>UtilitiesVB</Name>

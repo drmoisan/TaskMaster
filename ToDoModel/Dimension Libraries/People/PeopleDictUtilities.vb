@@ -10,7 +10,7 @@ Public Module PeopleDictUtilities
         textWriter.Close()
     End Sub
 
-    Public Function GetDictPPL(staging_path As String, filename As String) As Dictionary(Of String, String)
+    Public Function GetDictPPL(staging_path As String, filename As String) As PeopleDict(Of String, String)
         Dim filepath As String = Path.Combine(staging_path, filename)
         Dim dict_return As PeopleDict(Of String, String)
 
