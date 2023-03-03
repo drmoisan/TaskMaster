@@ -1,11 +1,13 @@
-﻿
+﻿Imports UtilitiesVB
+
 <Serializable()>
 Public Class ToDoProjectInfoEntry
-    Implements IEquatable(Of ToDoProjectInfoEntry), IComparable(Of ToDoProjectInfoEntry)
+    Implements IEquatable(Of IToDoProjectInfoEntry),
+        IComparable(Of IToDoProjectInfoEntry), IToDoProjectInfoEntry
 
-    Public Property ProjectName As String
-    Public Property ProjectID As String
-    Public Property ProgramName As String
+    Public Property ProjectName As String Implements IToDoProjectInfoEntry.ProjectName
+    Public Property ProjectID As String Implements IToDoProjectInfoEntry.ProjectID
+    Public Property ProgramName As String Implements IToDoProjectInfoEntry.ProgramName
 
     Public Sub New(ByVal ProjName As String, ProjID As String, ProgName As String)
         ProjectName = ProjName
@@ -13,12 +15,18 @@ Public Class ToDoProjectInfoEntry
         ProgramName = ProgName
     End Sub
 
-    Public Overloads Function Equals(other As ToDoProjectInfoEntry) As Boolean Implements IEquatable(Of ToDoProjectInfoEntry).Equals
-        If other Is Nothing Then Return False
-        Return (Me.ProjectName.Equals(other.ProjectName))
+    Public Overloads Function Equals(other As IToDoProjectInfoEntry) _
+        As Boolean Implements IEquatable(Of IToDoProjectInfoEntry).Equals,
+        IToDoProjectInfoEntry.Equals
+
+        If other Is Nothing Then
+            Return False
+        Else
+            Return (Me.ProjectName.Equals(other.ProjectName))
+        End If
     End Function
 
-    Public Overrides Function Equals(obj As Object) As Boolean
+    Public Overrides Function Equals(obj As Object) As Boolean Implements IToDoProjectInfoEntry.Equals
         If obj Is Nothing Then Return False
 
         Dim other As ToDoProjectInfoEntry = TryCast(obj, ToDoProjectInfoEntry)
@@ -29,7 +37,7 @@ Public Class ToDoProjectInfoEntry
         End If
     End Function
 
-    Public Function CompareTo(other As ToDoProjectInfoEntry) As Integer Implements IComparable(Of ToDoProjectInfoEntry).CompareTo
+    Public Function CompareTo(other As IToDoProjectInfoEntry) As Integer Implements IComparable(Of IToDoProjectInfoEntry).CompareTo, IToDoProjectInfoEntry.CompareTo
         If other Is Nothing Then
             Return 1
         Else
@@ -46,7 +54,7 @@ Public Class ToDoProjectInfoEntry
         End If
     End Function
 
-    Public Function ToCSV() As String
+    Public Function ToCSV() As String Implements IToDoProjectInfoEntry.ToCSV
         Return ProjectID + "," + ProjectName + "," + ProgramName
     End Function
 End Class

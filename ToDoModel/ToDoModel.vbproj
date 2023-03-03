@@ -44,11 +44,39 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.5.6.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.6.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.6.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.16.170.0\lib\net462\Microsoft.TeamFoundation.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.Common, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.16.170.0\lib\net462\Microsoft.VisualStudio.Services.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.WebApi, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.16.170.0\lib\net462\Microsoft.VisualStudio.Services.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.6.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -69,11 +97,15 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IDListUtilities.vb" />
-    <Compile Include="Modules\AutoFile.vb" />
-    <Compile Include="Fields.vb" />
-    <Compile Include="Modules\BaseChanger.vb" />
-    <Compile Include="IDListClass.vb" />
+    <Compile Include="Common Functions\CaptureEmailAddressesModule.vb" />
+    <Compile Include="Common Functions\CaptureEmailDetailsModule.vb" />
+    <Compile Include="Dimension Libraries\People\TestSerDic.vb" />
+    <Compile Include="FileOperationsPST.vb" />
+    <Compile Include="Dimension Libraries\ID\IDListUtilities.vb" />
+    <Compile Include="Common Functions\AutoFile.vb" />
+    <Compile Include="Common Functions\GetFields.vb" />
+    <Compile Include="Dimension Libraries\ID\BaseChanger.vb" />
+    <Compile Include="Dimension Libraries\ID\ListOfIDs.vb" />
     <Compile Include="DataModel_ToDoTree.vb" />
     <Compile Include="FlagParser.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -91,15 +123,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="PeopleDict.vb" />
-    <Compile Include="ToDoProjectInfoEntry.vb" />
-    <Compile Include="ProjectList.vb" />
+    <Compile Include="Dimension Libraries\People\PeopleDict.vb" />
+    <Compile Include="Dimension Libraries\Project\ToDoProjectInfoEntry.vb" />
+    <Compile Include="Dimension Libraries\Project\ProjectList.vb" />
+    <Compile Include="Dimension Libraries\People\PeopleDictUtilities.vb" />
     <Compile Include="ToDoDefaults.vb" />
     <Compile Include="ToDoItem.vb" />
-    <Compile Include="ToDoProjectInfo.vb" />
-    <Compile Include="ToDoProjectInfoUtilities.vb" />
+    <Compile Include="Dimension Libraries\Project\ToDoProjectInfo.vb" />
+    <Compile Include="Dimension Libraries\Project\ToDoProjectInfoUtilities.vb" />
     <Compile Include="TreeNodeOfT.vb" />
-    <Compile Include="Modules\ToDoFileUtilities.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -120,6 +152,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tags\Tags.vbproj">

@@ -1,7 +1,7 @@
 ﻿Imports Microsoft.Office.Interop
 Imports UtilitiesVB
 
-Public Module Fields
+Public Module GetFields
     Public Function CustomFieldID_GetValue(objItem As Object, ByVal UserDefinedFieldName As String) As String
         Dim OlMail As Outlook.MailItem
         Dim OlTask As Outlook.TaskItem

@@ -29,7 +29,7 @@ Public Class DataModel_ToDoTree
     Public Sub New(DM_ToDoTree As List(Of TreeNode(Of ToDoItem)))
         ToDoTree = DM_ToDoTree
     End Sub
-    Public Sub LoadTree(LoadType As LoadOptions)
+    Public Sub LoadTree(LoadType As LoadOptions, Application As Application)
         Dim objItem As Object
 
         Dim strTemp As String
@@ -40,7 +40,7 @@ Public Class DataModel_ToDoTree
 
         Try
             '***STEP 1: LOAD RAW [ITEMS] TO A LIST AND SORT THEM***
-            Dim TreeItems As List(Of Object) = GetToDoList(LoadType)
+            Dim TreeItems As List(Of Object) = GetToDoList(LoadType, Application)
             TreeItems = MergeSort(Of Object)(TreeItems, AddressOf CompareItemsByToDoID)
 
             colItems = New Collection
@@ -129,7 +129,7 @@ Public Class DataModel_ToDoTree
         End If
     End Function
 
-    Public Sub AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As IDListClass)
+    Public Sub AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As ListOfIDs)
         Parent.Children.Add(Child)
         Dim strSeed As String
         If Parent.Children.Count > 1 Then
@@ -147,7 +147,7 @@ Public Class DataModel_ToDoTree
         IDList.Save()
     End Sub
 
-    Public Sub ReNumberIDs(IDList As IDListClass)
+    Public Sub ReNumberIDs(IDList As ListOfIDs)
         'WriteTreeToDisk()
 
 
@@ -158,7 +158,7 @@ Public Class DataModel_ToDoTree
         Next
         'WriteTreeToDisk()
     End Sub
-    Public Sub ReNumberChildrenIDs(Children As List(Of TreeNode(Of ToDoItem)), IDList As IDListClass)
+    Public Sub ReNumberChildrenIDs(Children As List(Of TreeNode(Of ToDoItem)), IDList As ListOfIDs)
 
         Dim i As Integer
         Dim max As Integer = Children.Count - 1
@@ -198,7 +198,9 @@ Public Class DataModel_ToDoTree
         Return Nothing
 
     End Function
-    Public Function GetToDoList(LoadType As LoadOptions) As List(Of Object)
+    Public Function GetToDoList(LoadType As LoadOptions,
+                                Application As Application) As List(Of Object)
+
         Dim OlItems As Items
         Dim objView As View
         Dim OlFolder As Folder
@@ -207,10 +209,10 @@ Public Class DataModel_ToDoTree
         Dim objItem As Object
         Dim ListObjects As List(Of Object) = New List(Of Object)
 
-        objView = Globals.ThisAddIn.Application.ActiveExplorer.CurrentView
+        objView = Application.ActiveExplorer.CurrentView
         strFilter = "@SQL=" & objView.Filter
 
-        For Each oStore In Globals.ThisAddIn.Application.Session.Stores
+        For Each oStore In Application.Session.Stores
             OlItems = Nothing
             OlFolder = oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo)
             If strFilter = "@SQL=" Or LoadType = LoadOptions.vbLoadAll Then
@@ -255,8 +257,8 @@ Public Class DataModel_ToDoTree
     End Sub
 
     Private Function CompareItemsByToDoID(ByVal objItemLeft As Object, ByVal objItemRight As Object)
-        Dim ToDoIDLeft As String = Globals.ThisAddIn.CustomFieldID_GetValue(objItemLeft, "ToDoID")
-        Dim ToDoIDRight As String = Globals.ThisAddIn.CustomFieldID_GetValue(objItemRight, "ToDoID")
+        Dim ToDoIDLeft As String = CustomFieldID_GetValue(objItemLeft, "ToDoID")
+        Dim ToDoIDRight As String = CustomFieldID_GetValue(objItemRight, "ToDoID")
         Dim LngLeft As Long = ConvertToDecimal(125, ToDoIDLeft)
         Dim LngRight As Long = ConvertToDecimal(125, ToDoIDRight)
 

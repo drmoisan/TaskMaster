@@ -3,12 +3,12 @@
 Imports System.Xml
 Imports System.Xml.Schema
 Imports System.Xml.Serialization
-
+Imports UtilitiesVB
 
 <XmlRoot("PeopleDictionary")>
 Public Class PeopleDict(Of TKey, TValue)
     Inherits Dictionary(Of TKey, TValue)
-    Implements IXmlSerializable
+    Implements IXmlSerializable, IPeopleDict
 
     Public Sub New(dict As Dictionary(Of TKey, TValue))
         For Each pair As KeyValuePair(Of TKey, TValue) In dict
@@ -16,11 +16,7 @@ Public Class PeopleDict(Of TKey, TValue)
         Next
     End Sub
 
-    Public Sub New()
-
-    End Sub
-
-    Public Sub ReadXml(reader As XmlReader) Implements IXmlSerializable.ReadXml
+    Public Sub ReadXml(reader As XmlReader) Implements IXmlSerializable.ReadXml, IPeopleDict.ReadXml
         If reader.IsEmptyElement Then
             Return
         End If
@@ -35,7 +31,7 @@ Public Class PeopleDict(Of TKey, TValue)
         End While
     End Sub
 
-    Public Sub WriteXml(writer As XmlWriter) Implements IXmlSerializable.WriteXml
+    Public Sub WriteXml(writer As XmlWriter) Implements IXmlSerializable.WriteXml, IPeopleDict.WriteXml
         For Each key In Me.Keys
             writer.WriteStartElement("Person")
             writer.WriteAttributeString("Email", key.ToString())
@@ -44,7 +40,7 @@ Public Class PeopleDict(Of TKey, TValue)
         Next
     End Sub
 
-    Public Function GetSchema() As XmlSchema Implements IXmlSerializable.GetSchema
+    Public Function GetSchema() As XmlSchema Implements IXmlSerializable.GetSchema, IPeopleDict.GetSchema
         Return Nothing
     End Function
 

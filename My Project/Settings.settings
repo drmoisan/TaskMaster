@@ -41,5 +41,8 @@
     <Setting Name="FileName_IDList" Type="System.String" Scope="Application">
       <Value Profile="(Default)">UsedIDList.bin</Value>
     </Setting>
+    <Setting Name="FileName_DictRemap" Type="System.String" Scope="User">
+      <Value Profile="(Default)">dictRemap.csv</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

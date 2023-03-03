@@ -270,7 +270,6 @@ Public Class TagController
         If colCatName.Count > 0 Then FilterToSelected()
     End Sub
 
-
     Public Sub FocusCheckbox(ctrl As Windows.Forms.Control)
         int_focus = _col_cbx_ctrl.IndexOf(ctrl)
         Select_Ctrl_By_Offset(0)

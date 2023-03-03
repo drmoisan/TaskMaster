@@ -197,6 +197,18 @@ Namespace My
                 Return CType(Me("FileName_IDList"),String)
             End Get
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("dictRemap.csv")>  _
+        Public Property FileName_DictRemap() As String
+            Get
+                Return CType(Me("FileName_DictRemap"),String)
+            End Get
+            Set
+                Me("FileName_DictRemap") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

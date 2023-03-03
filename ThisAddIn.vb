@@ -15,8 +15,8 @@ Public Class ThisAddIn
 
     Public CCOCatList As List(Of String)
     Public WithEvents OlToDoItems As Outlook.Items
-    Public WithEvents PSTtoDo As Outlook.Items
-    Public listToDoItems As List(Of Outlook.Items) = New List(Of Outlook.Items)
+    Public WithEvents ListOfPSTtodo As List(Of Outlook.Items) = New List(Of Outlook.Items)
+    Public WithEvents listToDoItems As List(Of Outlook.Items) = New List(Of Outlook.Items)
     Public WithEvents OlInboxItems As Outlook.Items
     Private WithEvents OlReminders As Outlook.Reminders
     Public OlNS As Outlook.NameSpace
@@ -35,7 +35,7 @@ Public Class ThisAddIn
     'Public ProjDict As ProjectList
     Public ProjInfo As ProjectInfo
     Public DictPPL As PeopleDict(Of String, String)
-    Public WithEvents IDList As IDListClass
+    Public WithEvents IDList As ListOfIDs
     Public DM_CurView As DataModel_ToDoTree
     Public Cats As FlagParser
 
@@ -43,34 +43,33 @@ Public Class ThisAddIn
         _globals = New ApplicationGlobals(Application)
 
         With _globals
-            OlNS = .NamespaceMAPI
-            OlToDoItems = .OlToDoFolder.Items
-            OlInboxItems = .OlInbox.Items
-            OlReminders = .OlReminders
-            ProjInfo = .ProjInfo
-            DictPPL = .DictPPL
-            IDList = .IDList
+            OlNS = .Ol.NamespaceMAPI
+            OlToDoItems = .Ol.ToDoFolder.Items
+            OlInboxItems = .Ol.Inbox.Items
+            OlReminders = .Ol.OlReminders
+            ProjInfo = .ToDo.ProjInfo
+            DictPPL = .ToDo.DictPPL
+            IDList = .ToDo.IDList
+            EmailRoot = .Ol.EmailRootPath
 
-
-            Dim rootFolder As Outlook.Folder = Application.Session.DefaultStore.GetRootFolder()
-            EmailRoot = rootFolder.FolderPath
         End With
         Access_Ribbons_By_Explorer()
     End Sub
 
     Public Sub Events_Hook()
         'Debug_OutputNsStores()
-        OlToDoItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items
-        OlInboxItems = Application.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderInbox).Items
-        OlReminders = Application.Reminders
-        'ToDoPST_HookEvents()
+        With _globals
+            OlToDoItems = .Ol.ToDoFolder.Items
+            OlInboxItems = .Ol.Inbox.Items
+            OlReminders = .Ol.OlReminders
+        End With
+
     End Sub
 
     Public Sub Events_Unhook()
         OlToDoItems = Nothing
         OlInboxItems = Nothing
         OlReminders = Nothing
-        'ToDoPST_UnHookEvents()
     End Sub
 
     Private Sub Access_Ribbons_By_Explorer()
@@ -80,91 +79,11 @@ Public Class ThisAddIn
         ribEM = ribbonCollection.Ribbon_EM
     End Sub
 
-    Private Function GetOutlookPSTFolderByPath(ByVal FolderPath As String) As Outlook.Folder
-        If Left(FolderPath, 2) = "\\" Then
-            FolderPath = Right(FolderPath, Len(FolderPath) - 2)
-        End If
-        Dim FoldersArray() As String = FolderPath.Split("\")
-
-        Try
-            Dim OlFolder As Outlook.Folder = Application.Session.Folders(FoldersArray(0))
-            Dim OlFolders As Outlook.Folders = OlFolder.Folders
-            Debug.WriteLine(OlFolder.FolderPath & " has " & OlFolders.Count.ToString & " folders")
-            For Each OlFolder In OlFolders
-                Debug.WriteLine(OlFolder.FolderPath)
-            Next
-
-            For i As Integer = 1 To UBound(FoldersArray)
-                OlFolder = OlFolder.Folders(FoldersArray(i))
-            Next
-            Return OlFolder
-        Catch
-            Debug.WriteLine(Err.Description)
-            Debug.WriteLine("Folder Does Not Exist")
-            Return Nothing
-        End Try
-
-    End Function
-
-    Private Function GetSearchFolder(store As Outlook.Store, name As String) As Folder
-        Try
-            Dim searchfolders As Folders = store.GetSearchFolders
-            For Each OlFolder As Folder In searchfolders
-                Debug.WriteLine(OlFolder.Name)
-                If OlFolder.Name = name Then
-                    Return OlFolder
-                End If
-            Next
-            Return Nothing
-        Catch
-            Debug.WriteLine(Err.Description)
-            Return Nothing
-        End Try
-    End Function
-
-    Private Sub ToDoPST_HookEvents()
-        Dim ns As Outlook.[NameSpace] = Nothing
-        Dim stores As Outlook.Stores = Nothing
-        Dim store As Outlook.Store = Nothing
-
-
-
-        ns = Application.Session
-        stores = ns.Stores
-
-        For i As Integer = 1 To stores.Count
-            store = stores(i)
-            If Right(store.FilePath, 3) = "pst" Then
-                'Dim OlFolder As Outlook.Folder = GetOutlookPSTFolderByPath(store.GetRootFolder().FolderPath + "\search folders\FLAGGED")
-                Dim OlFolder As Outlook.Folder = GetSearchFolder(store, "FLAGGED")
-                'Dim items As Outlook.Items = OlFolder.Items
-                PSTtoDo = OlFolder.Items
-                'AddHandler items.ItemChange, AddressOf H_ItemChange
-                'AddHandler items.ItemAdd, AddressOf H_ItemChange
-                'listToDoItems.Add(items)
-                'storeList += String.Format("{0} - {1}{2}", store.DisplayName, (If(store.IsDataFileStore, ".pst", ".ost")), Environment.NewLine)
-            End If
-        Next
-    End Sub
-
-    Private Sub ToDoPST_UnHookEvents()
-
-        Dim max As Integer = listToDoItems.Count
-        For i As Integer = max To 1 Step -1
-            Dim items As Outlook.Items = listToDoItems.Item(i)
-            RemoveHandler items.ItemChange, AddressOf OlToDoItems_ItemChange
-            RemoveHandler items.ItemAdd, AddressOf OlToDoItems_ItemAdd
-            listToDoItems.Remove(items)
-        Next
-
-    End Sub
-
     Private Sub Debug_OutputNsStores()
         Dim ns As Outlook.[NameSpace] = Nothing
         Dim stores As Outlook.Stores = Nothing
         Dim store As Outlook.Store = Nothing
         Dim storeList As String = String.Empty
-
 
         ns = Application.Session
         stores = ns.Stores
@@ -188,12 +107,11 @@ Public Class ThisAddIn
 
         Debug.WriteLine(storeList)
 
-
     End Sub
 
     Public Function RefreshIDList() As Long
-        IDList = New IDListClass(New List(Of String))
-        IDList.RePopulate()
+        IDList = New ListOfIDs(New List(Of String))
+        IDList.RePopulate(Application)
         IDList.Save(FileName_IDList)
         WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", IDList.UsedIDList.ToArray)
         Return 1
@@ -237,7 +155,7 @@ Public Class ThisAddIn
         'CLEANUP: Move CompressToDoIDs to either a Module or include in ToDoTree DataModel
         Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree()
         'QUESTION: Does DataModel_ToDoTree.LoadOptions.vbLoadAll require all items to be visible in the current view?
-        DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadAll)
+        DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadAll, Application)
         'DM.WriteTreeToDisk()
         DM.ReNumberIDs(IDList)
         DM.WriteTreeToDisk()
@@ -393,185 +311,7 @@ Public Class ThisAddIn
         Next
     End Sub
 
-    Private Sub H_ItemChange(Item As Object) Handles PSTtoDo.ItemChange
-        Static blIsRunning As Boolean
-        'TODO: Morph Functionality to handle proactively rather than reactively
-        If blIsRunning = False Then
 
-            blIsRunning = True
-            Dim todo As ToDoItem = New ToDoItem(Item, OnDemand:=True)
-            Dim objProperty_ToDoID As Outlook.UserProperty = Item.UserProperties.Find("ToDoID")
-            Dim objProperty_Project As Outlook.UserProperty = Item.UserProperties.Find("TagProject")
-            Dim strToDoID As String = ""
-            Dim strToDoID_root As String = ""
-            Dim strProject As String = ""
-            Dim strProjectToDo As String = ""
-
-
-            'AUTOCODE ToDoID based on Project
-            'Check to see if the project exists before attempting to autocode the id
-            If Not objProperty_Project Is Nothing Then
-
-                'Check to see whether there is an existing ID
-                If Not objProperty_ToDoID Is Nothing Then
-                    strToDoID = objProperty_ToDoID.Value
-
-                    'Don't autocode branches that existed to another project previously
-                    If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
-
-                        'Get Project Name
-                        strProject = todo.Project
-
-                        'If IsArray(objProperty_Project.Value) Then
-                        '    strProject = FlattenArry(objProperty_Project.Value)
-                        'Else
-                        '    strProject = objProperty_Project.Value
-                        'End If
-
-                        'Check to see if the Project name returned a value before attempting to autocode
-                        If strProject.Length <> 0 Then
-
-                            'Check to ensure it is in the dictionary before autocoding
-                            If ProjInfo.Contains_ProjectName(strProject) Then
-                                'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                                'strProjectToDo = ProjDict.ProjectDictionary(strProject)
-
-                                If strToDoID.Length = 2 Then
-                                    ' Change the Item's todoid to be a node of the project
-                                    If todo.Context <> "Tag PROJECTS" Then
-                                        strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
-                                        todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
-                                        todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                        'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                        'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                        IDList.Save(FileName_IDList)
-                                        'Split_ToDoID(objItem:=Item)
-                                        todo.SplitID()
-                                    End If
-                                End If
-
-
-                            Else 'If it is not in the dictionary, see if this is a project we should add
-                                If strToDoID.Length = 4 Then
-                                    Dim response As MsgBoxResult = MsgBox("Add Project " & strProject & " to the Master List?", vbYesNo)
-                                    If response = vbYes Then
-                                        'ProjDict.ProjectDictionary.Add(strProject, strToDoID)
-                                        'SaveDict()
-                                        Dim strProgram As String = InputBox("What is the program name for " & strProject & "?", DefaultResponse:="")
-                                        ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
-                                        ProjInfo.Save()
-                                    End If
-                                End If
-                            End If
-                        End If
-
-                    ElseIf strToDoID.Length = 0 Then
-                        strProject = todo.Project
-                        'If IsArray(objProperty_Project.Value) Then
-                        '    strProject = FlattenArry(objProperty_Project.Value)
-                        'Else
-                        '    strProject = objProperty_Project.Value
-                        'End If
-                        If ProjInfo.Contains_ProjectName(strProject) Then
-                            strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
-                            todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
-                            'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                            'strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                            todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                            'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                            'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                            IDList.Save(FileName_IDList)
-                            'Split_ToDoID(objItem:=Item)
-                            todo.SplitID()
-                        End If
-
-                    End If
-                Else 'In this case, the project name exists but the todo id does not
-                    'Get Project Name
-                    If IsArray(objProperty_Project.Value) Then
-                        strProject = FlattenArry(objProperty_Project.Value)
-                    Else
-                        strProject = objProperty_Project.Value
-                    End If
-
-                    'If the project name is in our dictionary, autoadd the ToDoID to this item
-                    If strProject.Length <> 0 Then
-                        'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                        If ProjInfo.Contains_ProjectName(strProject) Then
-                            'strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                            strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
-                            'Add the next ToDoID available in that branch
-                            todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                            todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
-                            'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                            'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                            IDList.Save(FileName_IDList)
-                            'Split_ToDoID(objItem:=Item)
-                            todo.SplitID()
-                            '***NEED CODE HERE***
-                            '***NEED CODE HERE***
-                            '***NEED CODE HERE***
-                        End If
-                    End If
-                End If
-
-
-            End If
-
-            'If OlToDoItem_IsMarkedComplete(Item) Then
-            'Check to see if todo was just marked complete 
-            'If So, adjust Kan Ban fields and categories
-            If todo.Complete Then
-                If InStr(Item.Categories, "Tag KB Completed") = False Then
-                    Dim strCats As String = Replace(Replace(Item.Categories, "Tag KB Backlog", ""), ",,", ",")
-                    strCats = Replace(Replace(strCats, "Tag KB InProgress", ""), ",,", ",")
-                    strCats = Replace(Replace(strCats, "Tag KB Planned", ""), ",,", ",")
-                    While Left(strCats, 1) = ","
-                        strCats = Right(strCats, strCats.Length - 1)
-                    End While
-                    If strCats.Length > 0 Then
-                        strCats += ", Tag KB Completed"
-                    Else
-                        strCats += "Tag KB Completed"
-                    End If
-                    Item.Categories = strCats
-                    Item.Save
-                    todo.KB = "Completed"
-                End If
-            ElseIf todo.KB = "Completed" Then
-                Dim strCats As String = Item.Categories
-
-                'Strip Completed from categories
-                If InStr(strCats, "Tag KB Completed") = True Then
-                    strCats = Replace(Replace(strCats, "Tag KB Completed", ""), ",,", ",")
-                End If
-                Dim strReplace As String = ""
-                Dim strKB As String = ""
-
-                If InStr(strCats, "Tag A Top Priority Today") = True Then
-                    strReplace = "Tag KB InProgress"
-                    strKB = "InProgress"
-                ElseIf InStr(strCats, "Tag Bullpin Priorities") = True Then
-                    strReplace = "Tag KB Planned"
-                    strKB = "Planned"
-                Else
-                    strReplace = "Tag KB Backlog"
-                    strKB = "Backlog"
-                End If
-                If strCats.Length > 0 Then
-                    strCats += ", " & strReplace
-                Else
-                    strCats = strReplace
-                End If
-                Item.Categories = strCats
-                Item.Save
-                todo.KB = strKB
-
-            End If
-            blIsRunning = False
-        End If
-
-    End Sub
 
     Private blItemChangeRunning As Boolean = False
 
@@ -883,35 +623,35 @@ Public Class ThisAddIn
         '    WriteToCSV(ftmp, entry.ToCSV)
         'Next
         If ProjInfo.Contains_ProgramName("Digital Transformation LATAM") Then
-            Dim lst As New List(Of ToDoProjectInfoEntry)
+            Dim lst As New List(Of IToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProgramName("Digital Transformation LATAM")
             For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProgramName("Pete") Then
-            Dim lst As List(Of ToDoProjectInfoEntry)
+            Dim lst As List(Of IToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProgramName("Digital Transformation LATAM")
             For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectID("1308") Then
-            Dim lst As List(Of ToDoProjectInfoEntry)
+            Dim lst As List(Of IToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectID("1308")
             For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectID("980H") Then
-            Dim lst As List(Of ToDoProjectInfoEntry)
+            Dim lst As List(Of IToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectID("980H")
             For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectID("abcd") Then
-            Dim lst As List(Of ToDoProjectInfoEntry)
+            Dim lst As List(Of IToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectID("abcd")
             For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
@@ -919,14 +659,14 @@ Public Class ThisAddIn
         End If
         '5 CCO Org Design and Functions
         If ProjInfo.Contains_ProjectName("5 CCO Org Design and Functions") Then
-            Dim lst As List(Of ToDoProjectInfoEntry)
+            Dim lst As List(Of IToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProjectName("5 CCO Org Design and Functions")
             For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)
             Next
         End If
         If ProjInfo.Contains_ProjectName("pete") Then
-            Dim lst As List(Of ToDoProjectInfoEntry)
+            Dim lst As List(Of IToDoProjectInfoEntry)
             lst = ProjInfo.Find_ByProgramName("5 CCO Org Design and Functions")
             For Each entry As ToDoProjectInfoEntry In lst
                 Debug.WriteLine(entry.ToCSV)

@@ -2,9 +2,11 @@
 Imports System.IO
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports Microsoft.Office.Interop.Outlook
+Imports UtilitiesVB
 
 <Serializable()>
-Public Class IDListClass
+Public Class ListOfIDs
+    Implements IListOfIDs
 
     Public UsedIDList As List(Of String)
     Private PMaxIDLength As Long
@@ -14,10 +16,10 @@ Public Class IDListClass
         Me.UsedIDList = listUsedID
     End Sub
 
-    Public Sub RePopulate()
+    Public Sub RePopulate(Application As Application) Implements IListOfIDs.RePopulate
         Dim ObjItem As Object = New Object
         Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree
-        Dim ToDoList As List(Of Object) = DM.GetToDoList(DataModel_ToDoTree.LoadOptions.vbLoadAll)
+        Dim ToDoList As List(Of Object) = DM.GetToDoList(DataModel_ToDoTree.LoadOptions.vbLoadAll, Application)
         UsedIDList = New List(Of String)
         For Each ObjItem In ToDoList
             Dim strID As String = CustomFieldID_GetValue(ObjItem, "ToDoID")
@@ -38,7 +40,7 @@ Public Class IDListClass
     '    Dim ToDoTree As List(Of TreeNode(Of ToDoItem)) = DM.ListOfToDoTree
     'End Sub
 
-    Public ReadOnly Property MaxIDLength As Long
+    Public ReadOnly Property MaxIDLength As Long Implements IListOfIDs.MaxIDLength
         Get
             If PMaxIDLength = 0 Then
                 Dim maxLen As Long = 0
@@ -54,7 +56,7 @@ Public Class IDListClass
         End Get
     End Property
 
-    Public Function GetNextAvailableToDoID(strSeed As String) As String
+    Public Function GetNextAvailableToDoID(strSeed As String) As String Implements IListOfIDs.GetNextAvailableToDoID
         Dim blContinue As Boolean = True
         Dim lngMaxID As BigInteger = ConvertToDecimal(125, strSeed)
         Dim strMaxID As String = ""
@@ -71,7 +73,7 @@ Public Class IDListClass
         Return strMaxID
     End Function
 
-    Public Function GetMaxToDoID() As String
+    Public Function GetMaxToDoID() As String Implements IListOfIDs.GetMaxToDoID
         Dim strMaxID = UsedIDList.Max()
         Dim lngMaxID As BigInteger = ConvertToDecimal(125, strMaxID)
         lngMaxID += 1
@@ -82,7 +84,7 @@ Public Class IDListClass
         Return strMaxID
     End Function
 
-    Public Sub Save(FileName_IDList As String)
+    Public Sub Save(FileName_IDList As String) Implements IListOfIDs.Save
         If Not Directory.Exists(Path.GetDirectoryName(FileName_IDList)) Then
             Directory.CreateDirectory(Path.GetDirectoryName(FileName_IDList))
         End If
@@ -93,7 +95,7 @@ Public Class IDListClass
         pFileName = FileName_IDList
     End Sub
 
-    Public Sub Save()
+    Public Sub Save() Implements IListOfIDs.Save
         If pFileName.Length > 0 Then
             Dim TestFileStream As Stream = File.Create(pFileName)
             Dim serializer As New BinaryFormatter
@@ -104,7 +106,7 @@ Public Class IDListClass
         End If
     End Sub
 
-    Public Function ConvertToBase(nbase As Integer, ByVal num As BigInteger, Optional intMinDigits As Integer = 2) As String
+    Public Function ConvertToBase(nbase As Integer, ByVal num As BigInteger, Optional intMinDigits As Integer = 2) As String Implements IListOfIDs.ConvertToBase
         Dim chars As String
         Dim r As BigInteger
         Dim newNumber As String
@@ -138,7 +140,7 @@ Public Class IDListClass
         End If
     End Function
 
-    Public Function ConvertToDecimal(nbase As Integer, ByVal strBase As String) As BigInteger
+    Public Function ConvertToDecimal(nbase As Integer, ByVal strBase As String) As BigInteger Implements IListOfIDs.ConvertToDecimal
         Dim chars As String
         Dim i As Integer
         Dim intLoc As Integer
@@ -198,7 +200,7 @@ Public Class IDListClass
 
     End Function
 
-    Public Function FlattenArry(varBranch() As Object) As String
+    Public Function FlattenArry(varBranch() As Object) As String Implements IListOfIDs.FlattenArry
         Dim i As Integer
         Dim strTemp As String
 

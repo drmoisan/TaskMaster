@@ -14,18 +14,21 @@ Public Class Flag_Tasks
     Private _defaultsToDo As ToDoDefaults
     Private _autoAssign As AutoAssign
     Private _flagsToSet As TaskController.FlagsToSet
+    Private _globals As IApplicationGlobals
 
 
-    Public Sub New(Optional ItemCollection As Collection = Nothing,
+    Public Sub New(globals As IApplicationGlobals,
+                   Optional ItemCollection As Collection = Nothing,
                    Optional blFile As Boolean = True,
                    Optional hWndCaller As IntPtr = Nothing,
                    Optional strNameOfFunctionCalling As String = "")
 
+        _globals = globals
         _todoSelection = InitializeToDoList(ItemCollection)
         _flagsToSet = GetFlagsToSet(_todoSelection.Count)
         _viewer = New TaskViewer()
         _defaultsToDo = New ToDoDefaults()
-        _autoAssign = New AutoAssign()
+        _autoAssign = New AutoAssign(globals)
         _controller = New TaskController(_viewer,
                                          _todoSelection,
                                          _defaultsToDo,
@@ -82,6 +85,12 @@ Public Class Flag_Tasks
     Private Class AutoAssign
         Implements IAutoAssign
 
+        Dim _globals As IApplicationGlobals
+
+        Public Sub New(globals As IApplicationGlobals)
+            _globals = globals
+        End Sub
+
         Public ReadOnly Property FilterList As List(Of String) Implements IAutoAssign.FilterList
             Get
                 If Globals.ThisAddIn.CCOCatList Is Nothing Then
@@ -93,10 +102,11 @@ Public Class Flag_Tasks
 
         Public Function AutoFind(objItem As Object) As Collection Implements IAutoAssign.AutoFind
             Return AutoFile.AutoFindPeople(objItem:=objItem,
-                                           ppl_dict:=Globals.ThisAddIn.DictPPL,
-                                           emailRootFolder:=Globals.ThisAddIn.EmailRoot,
-                                           stagingPath:=Globals.ThisAddIn.StagingPath,
+                                           ppl_dict:=_globals.ToDo.DictPPL,
+                                           emailRootFolder:=_globals.Ol.EmailRootPath,
+                                           dictRemap:=_globals.ToDo.DictRemap,
                                            blExcludeFlagged:=False)
+
         End Function
 
         Public Function AddChoicesToDict(olMail As MailItem,
@@ -104,12 +114,13 @@ Public Class Flag_Tasks
                                          prefixKey As String) As Collection Implements IAutoAssign.AddChoicesToDict
 
             Return AutoFile.dictPPL_AddMissingEntries(OlMail:=olMail,
-                                ppl_dict:=Globals.ThisAddIn.DictPPL,
+                                ppl_dict:=_globals.ToDo.DictPPL,
+                                dictRemap:=_globals.ToDo.DictRemap,
                                 prefixes:=prefixes,
                                 prefixKey:=prefixKey,
-                                emailRootFolder:=Globals.ThisAddIn.EmailRoot,
-                                stagingPath:=Globals.ThisAddIn.StagingPath,
-                                filename_dictppl:=Globals.ThisAddIn.FilenameDictPpl)
+                                emailRootFolder:=_globals.Ol.EmailRootPath,
+                                stagingPath:=_globals.FS.StagingPath,
+                                filename_dictppl:=_globals.ToDo.FnameDictPeople)
 
         End Function
 
