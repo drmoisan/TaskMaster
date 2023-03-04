@@ -4,7 +4,7 @@ Imports ToDoModel
 Imports System.IO
 Imports Microsoft.VisualBasic.FileIO
 Imports UtilitiesVB
-
+Imports Newtonsoft.Json
 
 Public Class ApplicationGlobals
     Implements IApplicationGlobals
@@ -42,7 +42,7 @@ Public Class ApplicationGlobals
         Implements IToDoObjects
 
         Private _projInfo As ProjectInfo
-        Private _dictPPL As PeopleDict(Of String, String)
+        Private _dictPPL As Dictionary(Of String, String)
         Private _IDList As ListOfIDs
         Private _parent As ApplicationGlobals
         Private _dictRemap As Dictionary(Of String, String)
@@ -57,7 +57,7 @@ Public Class ApplicationGlobals
             End Get
         End Property
 
-        Public ReadOnly Property FnameProjectInfo As String Implements IToDoObjects.FnameProjectInfo
+        Public ReadOnly Property ProjInfo_Filename As String Implements IToDoObjects.ProjInfo_Filename
             Get
                 Return My.Settings.FileName_ProjInfo
             End Get
@@ -72,20 +72,27 @@ Public Class ApplicationGlobals
             End Get
         End Property
 
-        Public ReadOnly Property FnameDictPeople As String Implements IToDoObjects.FnameDictPeople
+
+        Public ReadOnly Property DictPPL_Filename As String Implements IToDoObjects.DictPPL_Filename
             Get
                 Return My.Settings.FilenameDictPpl
             End Get
         End Property
 
-        Public ReadOnly Property DictPPL As IPeopleDict Implements IToDoObjects.DictPPL
+        Public ReadOnly Property DictPPL As Dictionary(Of String, String) Implements IToDoObjects.DictPPL
             Get
                 If _dictPPL Is Nothing Then
-                    _dictPPL = GetDictPPL(Parent.FS.StagingPath, My.Settings.FilenameDictPpl)
+                    _dictPPL = LoadDictJSON(Parent.FS.StagingPath, DictPPL_Filename)
                 End If
                 Return _dictPPL
             End Get
         End Property
+
+        Public Sub DictPPL_Save() Implements IToDoObjects.DictPPL_Save
+            File.WriteAllText(
+                Path.Combine(Parent.FS.StagingPath, DictPPL_Filename),
+                JsonConvert.SerializeObject(_dictPPL, Formatting.Indented))
+        End Sub
 
         Public ReadOnly Property FnameIDList As String Implements IToDoObjects.FnameIDList
             Get
@@ -97,8 +104,8 @@ Public Class ApplicationGlobals
             Get
                 If _IDList Is Nothing Then
                     _IDList = LoadIDList(Path.Combine(Parent.FS.AppData,
-                                         My.Settings.FileName_IDList),
-                                         _parent.Ol.App)
+                    My.Settings.FileName_IDList),
+                    _parent.Ol.App)
                 End If
                 Return _IDList
             End Get
@@ -119,6 +126,47 @@ Public Class ApplicationGlobals
             End Get
         End Property
 
+        Private Function LoadDictCSV(fpath As String,
+                                     filename As String) _
+                                     As Dictionary(Of String, String)
+            Dim dict As Dictionary(Of String, String) = UtilitiesVB.LoadDictCSV(fpath, filename.Split(".")(0) & ".csv")
+            If Not dict Is Nothing Then WriteDictJSON(dict, Path.Combine(fpath, filename))
+            Return dict
+        End Function
+
+        Private Function LoadDictJSON(fpath As String,
+                                      filename As String) _
+                                      As Dictionary(Of String, String)
+
+            Dim filepath As String = Path.Combine(fpath, filename)
+            Dim dict As Dictionary(Of String, String) = Nothing
+            Dim response As MsgBoxResult = MsgBoxResult.Ignore
+
+            Try
+                dict = JsonConvert.DeserializeObject(Of Dictionary(Of String, String)) _
+                        (File.ReadAllText(Path.Combine(Parent.FS.StagingPath, DictPPL_Filename)))
+            Catch ex As FileNotFoundException
+                response = MsgBox(filepath & "not found. Load from CSV?", vbYesNo)
+            Catch ex As System.Exception
+                response = MsgBox(filepath & "encountered a problem. " & ex.Message & "Load from CSV?", vbYesNo)
+            Finally
+                If response = vbYes Then
+                    dict = LoadDictCSV(fpath, filename)
+                ElseIf response = vbNo Then
+                    response = MsgBox("Start a new blank dictionary?", vbYesNo)
+                    If response = vbYes Then
+                        dict = New Dictionary(Of String, String)
+                    Else
+                        Throw New ArgumentNullException("Cannot proceed without dictionary: " & filename)
+                    End If
+                End If
+            End Try
+            Return dict
+        End Function
+
+        Public Sub WriteDictJSON(dict As Dictionary(Of String, String), filepath As String)
+            File.WriteAllText(filepath, JsonConvert.SerializeObject(dict, Formatting.Indented))
+        End Sub
     End Class
 
     Public Class OlObjectsClass

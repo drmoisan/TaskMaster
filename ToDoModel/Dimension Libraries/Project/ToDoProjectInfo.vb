@@ -7,7 +7,7 @@ Public Class ProjectInfo
     Inherits List(Of IToDoProjectInfoEntry)
     Implements IProjectInfo
 
-    Public pFileName As String = ""
+    Public FileName As String = ""
 
     Public Sub Save(FileName_IDList As String) Implements IProjectInfo.Save
         If Not Directory.Exists(Path.GetDirectoryName(FileName_IDList)) Then
@@ -17,12 +17,12 @@ Public Class ProjectInfo
         Dim serializer As New BinaryFormatter
         serializer.Serialize(TestFileStream, Me)
         TestFileStream.Close()
-        pFileName = FileName_IDList
+        FileName = FileName_IDList
     End Sub
 
     Public Sub Save() Implements IProjectInfo.Save
-        If pFileName.Length > 0 Then
-            Dim TestFileStream As Stream = File.Create(pFileName)
+        If FileName.Length > 0 Then
+            Dim TestFileStream As Stream = File.Create(FileName)
             Dim serializer As New BinaryFormatter
             serializer.Serialize(TestFileStream, Me)
             TestFileStream.Close()

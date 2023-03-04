@@ -3,11 +3,10 @@ Imports System.CodeDom
 Imports System.Collections
 Imports System.Diagnostics
 Imports System.Drawing
-Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Windows.Forms
 Imports BrightIdeasSoftware
-Imports Microsoft.Office.Interop.Outlook
+Imports ToDoModel
 
 
 Public Class TaskTreeForm
@@ -123,7 +122,7 @@ Public Class TaskTreeForm
 
     Friend Function Init_DataModel()
         DM = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem))) 'Added for the second use of function which was appending
-        DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView)
+        DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView, Globals.ThisAddIn.Application)
         ToDoTree = DM.ListOfToDoTree
         Return True
     End Function
@@ -222,8 +221,8 @@ Public Class TaskTreeForm
 
     'MergeSort(coll, Function(p, q) p.F.CompareTo(q.F))
     Private Function CompareItemsByToDoID(ByVal objItemLeft As Object, ByVal objItemRight As Object)
-        Dim ToDoIDLeft As String = Globals.ThisAddIn.CustomFieldID_GetValue(objItemLeft, "ToDoID")
-        Dim ToDoIDRight As String = Globals.ThisAddIn.CustomFieldID_GetValue(objItemRight, "ToDoID")
+        Dim ToDoIDLeft As String = CustomFieldID_GetValue(objItemLeft, "ToDoID")
+        Dim ToDoIDRight As String = CustomFieldID_GetValue(objItemRight, "ToDoID")
         Dim LngLeft As Long = ConvertToDecimal(125, ToDoIDLeft)
         Dim LngRight As Long = ConvertToDecimal(125, ToDoIDRight)
 

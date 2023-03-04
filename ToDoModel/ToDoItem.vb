@@ -761,7 +761,7 @@ Public Class ToDoItem
             Dim strToDoID As String = ToDoID
             Dim strToDoID_Len As Long = strToDoID.Length
             If strToDoID_Len > 0 Then
-                Dim maxlen As Long = Globals.ThisAddIn.IDList.MaxIDLength
+                Dim maxlen As Long = My.Settings.MaxIDLength
 
                 For i = 2 To maxlen Step 2
                     strField = "ToDoIdLvl" & (i / 2)
@@ -834,8 +834,10 @@ Public Class ToDoItem
 
     Public ReadOnly Property InFolder() As String
         Get
-            Dim prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
-            Return Replace(OlObject.Parent.FolderPath, prefix, "")
+            'Dim prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
+            'Return Replace(OlObject.Parent.FolderPath, prefix, "")
+            Dim ary = OlObject.Parent.FolderPath.ToString().Split("\")
+            Return ary(UBound(ary))
         End Get
     End Property
 

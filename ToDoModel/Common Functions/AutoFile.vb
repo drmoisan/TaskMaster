@@ -91,7 +91,7 @@ Public Module AutoFile
 
 
     Public Function AutoFindPeople(objItem As Object,
-                                   ppl_dict As IPeopleDict,
+                                   ppl_dict As Dictionary(Of String, String),
                                    emailRootFolder As String,
                                    dictRemap As Dictionary(Of String, String),
                                    Optional blNotifyMissing As Boolean = True,
@@ -146,14 +146,17 @@ Public Module AutoFile
         Return blSelected
     End Function
 
+    Delegate Sub DictPPL_Save()
+
     Public Function dictPPL_AddMissingEntries(OlMail As Outlook.MailItem,
-                                              ppl_dict As IPeopleDict,
+                                              ppl_dict As Dictionary(Of String, String),
                                               prefixes As List(Of IPrefix),
                                               prefixKey As String,
                                               emailRootFolder As String,
                                               stagingPath As String,
                                               dictRemap As Dictionary(Of String, String),
-                                              filename_dictppl As String) As Collection
+                                              filename_dictppl As String,
+                                              dictPPLSave As DictPPL_Save) As Collection
 
         Dim addressList As List(Of String) = New List(Of String)
         Dim strTmp3 As String
@@ -225,7 +228,8 @@ Public Module AutoFile
             End If
         Next
         If blNew Then
-            WriteDictPPL(Path.Combine(stagingPath, filename_dictppl), ppl_dict)
+            dictPPLSave()
+            'WriteDictPPL(Path.Combine(stagingPath, filename_dictppl), ppl_dict)
         End If
 
 

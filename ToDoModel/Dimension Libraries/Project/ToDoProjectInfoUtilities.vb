@@ -19,7 +19,7 @@ Public Module ToDoProjectInfoUtilities
                 Throw ex
             End Try
 
-            ProjInfo.pFileName = filePath
+            ProjInfo.FileName = filePath
             ProjInfo.Sort()
             Return ProjInfo
         Else

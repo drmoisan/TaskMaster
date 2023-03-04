@@ -2,7 +2,7 @@
 Imports System.Diagnostics
 Imports System.Numerics
 
-Module BaseChanger
+Public Module BaseChanger
     Public Function ConvertToBase(nbase As Integer, ByVal num As BigInteger, Optional intMinDigits As Integer = 2) As String
         Dim chars As String
         Dim r As Long

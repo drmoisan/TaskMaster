@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports ToDoModel
 
 Public Class ProjectInfoWindow
     Public pi As ProjectInfo
@@ -47,7 +48,7 @@ Public Class ProjectInfoWindow
             If e.KeyData = Windows.Forms.Keys.Delete Then
                 Dim selection As System.Collections.ArrayList = Me.olvProjInfo.SelectedObjects
                 If Not selection Is Nothing Then
-                    For Each entry As ProjectInfoEntry In selection
+                    For Each entry As ToDoProjectInfoEntry In selection
                         pi.Remove(entry)
                     Next
                     pi.Save()

@@ -120,7 +120,8 @@ Public Class Flag_Tasks
                                 prefixKey:=prefixKey,
                                 emailRootFolder:=_globals.Ol.EmailRootPath,
                                 stagingPath:=_globals.FS.StagingPath,
-                                filename_dictppl:=_globals.ToDo.FnameDictPeople)
+                                filename_dictppl:=_globals.ToDo.DictPPL_Filename,
+                                dictPPLSave:=AddressOf _globals.ToDo.DictPPL_Save)
 
         End Function
 

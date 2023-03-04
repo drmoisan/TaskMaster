@@ -1,7 +1,6 @@
 ﻿Imports System
 Imports System.ComponentModel
 Imports System.Drawing
-Imports BrightIdeasSoftware
 Imports System.Collections
 Imports System.IO
 Imports Microsoft.Office.Interop.Outlook
@@ -9,7 +8,6 @@ Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Collections.ObjectModel
 Imports System.Diagnostics
-Imports Microsoft.Office.Core
 Imports System.Linq.Expressions
 
 Public Class TreeNode(Of T)

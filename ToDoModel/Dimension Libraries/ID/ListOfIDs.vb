@@ -69,7 +69,11 @@ Public Class ListOfIDs
             End If
         End While
         UsedIDList.Add(strMaxID)
-        If strMaxID.Length > PMaxIDLength Then PMaxIDLength = strMaxID.Length
+        If strMaxID.Length > PMaxIDLength Then
+            PMaxIDLength = strMaxID.Length
+            My.Settings.MaxIDLength = PMaxIDLength
+            My.Settings.Save()
+        End If
         Return strMaxID
     End Function
 
@@ -79,7 +83,11 @@ Public Class ListOfIDs
         lngMaxID += 1
         strMaxID = ConvertToBase(125, lngMaxID)
         UsedIDList.Add(strMaxID)
-        If strMaxID.Length > PMaxIDLength Then PMaxIDLength = strMaxID.Length
+        If strMaxID.Length > PMaxIDLength Then
+            PMaxIDLength = strMaxID.Length
+            My.Settings.MaxIDLength = PMaxIDLength
+            My.Settings.Save()
+        End If
 
         Return strMaxID
     End Function

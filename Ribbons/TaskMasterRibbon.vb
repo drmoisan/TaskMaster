@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.Office.Tools.Ribbon
+Imports ToDoModel
 
 Public Class TaskMasterRibbon
     Private frmTTF As TaskTreeForm
@@ -51,12 +52,12 @@ Public Class TaskMasterRibbon
 
     Private Sub btnHideHeadersNoChildren_Click(sender As Object, e As RibbonControlEventArgs) Handles btnHideHeadersNoChildren.Click
         Dim DMtmp = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem)))
-        DMtmp.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView)
+        DMtmp.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadInView, Globals.ThisAddIn.Application)
         DMtmp.HideEmptyHeadersInView()
     End Sub
 
     Private Sub BTN_FlagTask_Click(sender As Object, e As RibbonControlEventArgs) Handles BTN_FlagTask.Click
-        Dim FT As Flag_Tasks = New Flag_Tasks()
+        Dim FT As Flag_Tasks = New Flag_Tasks(Globals.ThisAddIn._globals)
         FT.Run()
     End Sub
 End Class

@@ -1,4 +1,5 @@
 ﻿Public Interface IProjectInfo
+    Inherits IList
     Sub Save()
     Sub Save(FileName_IDList As String)
     Function Contains_ProgramName(StrProgramName As String) As Boolean

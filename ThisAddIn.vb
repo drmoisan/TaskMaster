@@ -11,7 +11,7 @@ Imports UtilitiesVB
 
 Public Class ThisAddIn
 
-    Private _globals As ApplicationGlobals
+    Public _globals As ApplicationGlobals
 
     Public CCOCatList As List(Of String)
     Public WithEvents OlToDoItems As Outlook.Items
@@ -34,7 +34,7 @@ Public Class ThisAddIn
     Const AppDataFolder = "TaskMaster"
     'Public ProjDict As ProjectList
     Public ProjInfo As ProjectInfo
-    Public DictPPL As PeopleDict(Of String, String)
+    Public DictPPL As Dictionary(Of String, String)
     Public WithEvents IDList As ListOfIDs
     Public DM_CurView As DataModel_ToDoTree
     Public Cats As FlagParser

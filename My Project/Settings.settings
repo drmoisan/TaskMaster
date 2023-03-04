@@ -36,7 +36,7 @@
       <Value Profile="(Default)">ProjInfo.bin</Value>
     </Setting>
     <Setting Name="FilenameDictPpl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">pplkey.xml</Value>
+      <Value Profile="(Default)">pplkey.json</Value>
     </Setting>
     <Setting Name="FileName_IDList" Type="System.String" Scope="Application">
       <Value Profile="(Default)">UsedIDList.bin</Value>

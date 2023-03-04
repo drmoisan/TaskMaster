@@ -213,10 +213,10 @@ Public Class TaskController
     ''' Loads a TagViewer with categories relevant to People for assigment
     ''' </summary>
     Public Sub Assign_People()
-        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "People").Value
+        Dim prefix = _defaults.PrefixList.Find(Function(x) x.Key = "People")
 
         Dim filtered_cats = (From x In _dict_categories
-                             Where x.Key.Contains(prefix)
+                             Where x.Key.Contains(prefix.Value)
                              Select x).ToSortedDictionary()
 
         Dim selections As List(Of String) = Array.ConvertAll(
@@ -229,7 +229,7 @@ Public Class TaskController
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
-                                                                prefix_key:=prefix,
+                                                                prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
@@ -245,10 +245,10 @@ Public Class TaskController
     ''' Loads a TagViewer with categories relevant to Context for assigment
     ''' </summary>
     Public Sub Assign_Context()
-        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "Context").Value
+        Dim prefix = _defaults.PrefixList.Find(Function(x) x.Key = "Context")
 
         Dim filtered_cats = (From x In _dict_categories
-                             Where x.Key.Contains(prefix)
+                             Where x.Key.Contains(prefix.Value)
                              Select x).ToSortedDictionary()
 
         Dim selections As List(Of String) = Array.ConvertAll(
@@ -261,7 +261,7 @@ Public Class TaskController
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
-                                                                prefix_key:=prefix,
+                                                                prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
@@ -273,10 +273,10 @@ Public Class TaskController
     End Sub
 
     Public Sub Assign_Project()
-        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "Project").Value
+        Dim prefix = _defaults.PrefixList.Find(Function(x) x.Key = "Project")
 
         Dim filtered_cats = (From x In _dict_categories
-                             Where x.Key.Contains(prefix)
+                             Where x.Key.Contains(prefix.Value)
                              Select x).ToSortedDictionary()
 
         Dim selections As List(Of String) = Array.ConvertAll(
@@ -289,7 +289,7 @@ Public Class TaskController
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
-                                                                prefix_key:=prefix,
+                                                                prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
@@ -303,10 +303,10 @@ Public Class TaskController
     ''' Loads a TagViewer with categories relevant to Topics for assigment
     ''' </summary>
     Public Sub Assign_Topic()
-        Dim prefix As String = _defaults.PrefixList.Find(Function(x) x.Key = "Topic").Value
+        Dim prefix = _defaults.PrefixList.Find(Function(x) x.Key = "Topic")
 
         Dim filtered_cats = (From x In _dict_categories
-                             Where x.Key.Contains(prefix)
+                             Where x.Key.Contains(prefix.Value)
                              Select x).ToSortedDictionary()
 
         Dim selections As List(Of String) = Array.ConvertAll(
@@ -319,7 +319,7 @@ Public Class TaskController
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
-                                                                prefix_key:=prefix,
+                                                                prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
             viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then

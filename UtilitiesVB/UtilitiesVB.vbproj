@@ -79,7 +79,6 @@
     <Compile Include="Interfaces\IFileSystemFolderPaths.vb" />
     <Compile Include="Interfaces\IListOfIDs.vb" />
     <Compile Include="Interfaces\IOlObjects.vb" />
-    <Compile Include="Interfaces\IPeopleDict.vb" />
     <Compile Include="Interfaces\IProjectInfo.vb" />
     <Compile Include="Interfaces\IToDoObjects.vb" />
     <Compile Include="Interfaces\IToDoProjectInfoEntry.vb" />

@@ -123,7 +123,7 @@ Partial Class ProjectInfoWindow
         '
         'ProjectInfoBindingSource
         '
-        Me.ProjectInfoBindingSource.DataSource = GetType(TaskMaster.ProjectInfo)
+        Me.ProjectInfoBindingSource.DataSource = GetType(ToDoModel.ProjectInfo)
         '
         'ProjectInfoWindow
         '

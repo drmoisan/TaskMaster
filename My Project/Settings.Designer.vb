@@ -182,7 +182,7 @@ Namespace My
         
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("pplkey.xml")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("pplkey.json")>  _
         Public ReadOnly Property FilenameDictPpl() As String
             Get
                 Return CType(Me("FilenameDictPpl"),String)

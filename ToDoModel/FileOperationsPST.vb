@@ -2,8 +2,18 @@
 Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB
 
-Public Module FileOperationsPST
-    Public Function GetOutlookPSTFolderByPath(ByVal FolderPath As String,
+Public Class FileOperationsPST
+    Private _globals As IApplicationGlobals
+    Private _emailFolderPST As Outlook.Folder
+    Private _handlerList As List(Of PSTEvents)
+
+    Public Sub New(appGlobals As IApplicationGlobals, EmailFolderpathPST As String)
+        _globals = appGlobals
+        _emailFolderPST = GetOutlookPSTFolderByPath(EmailFolderpathPST, _globals.Ol.App)
+        _handlerList = InstantiateHandlers()
+    End Sub
+
+    Private Function GetOutlookPSTFolderByPath(ByVal FolderPath As String,
                                               Application As Outlook.Application) As Outlook.Folder
         If Left(FolderPath, 2) = "\\" Then
             FolderPath = Right(FolderPath, Len(FolderPath) - 2)
@@ -30,42 +40,34 @@ Public Module FileOperationsPST
 
     End Function
 
-    Private Sub ToDoPST_HookEvents(Application As Outlook.Application, listToDoItems As List(Of Outlook.Items))
-        Dim ns As Outlook.[NameSpace] = Nothing
-        Dim stores As Outlook.Stores = Nothing
-        Dim store As Outlook.Store = Nothing
+    Public Sub HookEvents()
+        For Each handler As PSTEvents In _handlerList
+            handler.HookEvents()
+        Next
+    End Sub
 
+    Public Sub UnHookEvents()
+        For Each handler As PSTEvents In _handlerList
+            handler.UnHookEvents()
+        Next
+    End Sub
 
+    Private Function InstantiateHandlers() As List(Of PSTEvents)
+        Dim olSession As Outlook.NameSpace = _globals.Ol.App.Session
+        Dim stores As Outlook.Stores = olSession.Stores
+        Dim handlerList As List(Of PSTEvents) = New List(Of PSTEvents)
 
-        ns = Application.Session
-        stores = ns.Stores
-
-        For i As Integer = 1 To stores.Count
-            store = stores(i)
+        For Each store As Outlook.Store In stores
             If Right(store.FilePath, 3) = "pst" Then
-                'Dim OlFolder As Outlook.Folder = GetOutlookPSTFolderByPath(store.GetRootFolder().FolderPath + "\search folders\FLAGGED")
                 Dim OlFolder As Outlook.Folder = GetSearchFolder(store, "FLAGGED")
                 Dim items As Outlook.Items = OlFolder.Items
-                'PSTtoDo = OlFolder.Items
-                AddHandler items.ItemChange, AddressOf H_ItemChange
-                AddHandler items.ItemAdd, AddressOf H_ItemChange
-                listToDoItems.Add(items)
-                'storeList += String.Format("{0} - {1}{2}", store.DisplayName, (If(store.IsDataFileStore, ".pst", ".ost")), Environment.NewLine)
+                Dim handlerPST As PSTEvents = New PSTEvents(store, items, _globals)
+                handlerList.Add(handlerPST)
             End If
         Next
-    End Sub
 
-    Private Sub ToDoPST_UnHookEvents()
-
-        Dim max As Integer = listToDoItems.Count
-        For i As Integer = max To 1 Step -1
-            Dim items As Outlook.Items = listToDoItems.Item(i)
-            RemoveHandler items.ItemChange, AddressOf OlToDoItems_ItemChange
-            RemoveHandler items.ItemAdd, AddressOf OlToDoItems_ItemAdd
-            listToDoItems.Remove(items)
-        Next
-
-    End Sub
+        Return handlerList
+    End Function
 
     Private Class PSTEvents
         Private WithEvents _itemsPST As Outlook.Items
@@ -140,7 +142,7 @@ Public Module FileOperationsPST
                                             todo.ToDoID = _globals.ToDo.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                             'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                             'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                            _globals.ToDo.IDList.Save(FileName_IDList)
+                                            _globals.ToDo.IDList.Save(_globals.ToDo.FnameIDList)
                                             'Split_ToDoID(objItem:=Item)
                                             todo.SplitID()
                                         End If
@@ -154,8 +156,8 @@ Public Module FileOperationsPST
                                             'ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                             'SaveDict()
                                             Dim strProgram As String = InputBox("What is the program name for " & strProject & "?", DefaultResponse:="")
-                                            ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
-                                            ProjInfo.Save()
+                                            _globals.ToDo.ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
+                                            _globals.ToDo.ProjInfo.Save()
                                         End If
                                     End If
                                 End If
@@ -168,15 +170,15 @@ Public Module FileOperationsPST
                             'Else
                             '    strProject = objProperty_Project.Value
                             'End If
-                            If ProjInfo.Contains_ProjectName(strProject) Then
-                                strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
-                                todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
+                            If _globals.ToDo.ProjInfo.Contains_ProjectName(strProject) Then
+                                strProjectToDo = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
+                                todo.TagProgram = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                                 'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                 'strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                                todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                todo.ToDoID = _globals.ToDo.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                IDList.Save(FileName_IDList)
+                                _globals.ToDo.IDList.Save(_globals.ToDo.FnameIDList)
                                 'Split_ToDoID(objItem:=Item)
                                 todo.SplitID()
                             End If
@@ -193,15 +195,15 @@ Public Module FileOperationsPST
                         'If the project name is in our dictionary, autoadd the ToDoID to this item
                         If strProject.Length <> 0 Then
                             'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                            If ProjInfo.Contains_ProjectName(strProject) Then
+                            If _globals.ToDo.ProjInfo.Contains_ProjectName(strProject) Then
                                 'strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                                strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
+                                strProjectToDo = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                                 'Add the next ToDoID available in that branch
-                                todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
+                                todo.ToDoID = _globals.ToDo.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                todo.TagProgram = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                                 'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                IDList.Save(FileName_IDList)
+                                _globals.ToDo.IDList.Save(_globals.ToDo.FnameIDList)
                                 'Split_ToDoID(objItem:=Item)
                                 todo.SplitID()
                                 '***NEED CODE HERE***
@@ -288,4 +290,4 @@ Public Module FileOperationsPST
     End Function
 
 
-End Module
+End Class
