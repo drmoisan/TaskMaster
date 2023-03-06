@@ -1,5 +1,5 @@
-﻿Imports Microsoft.Office.Interop.Outlook
-Imports Microsoft.Office.Interop
+﻿Imports Microsoft.Office.Interop
+Imports Microsoft.Office.Interop.Outlook
 
 Public Module CreateCategoryModule
     Public Function CreateCategory(OlNS As Outlook.NameSpace, prefix As IPrefix, newCatName As String) As Category

@@ -1,6 +1,4 @@
-﻿Imports System
-
-Public Class ComparatorExample
+﻿Public Class ComparatorExample
 
 End Class
 

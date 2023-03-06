@@ -108,10 +108,10 @@ Public Class FileOperationsPST
 
                 'AUTOCODE ToDoID based on Project
                 'Check to see if the project exists before attempting to autocode the id
-                If Not objProperty_Project Is Nothing Then
+                If objProperty_Project IsNot Nothing Then
 
                     'Check to see whether there is an existing ID
-                    If Not objProperty_ToDoID Is Nothing Then
+                    If objProperty_ToDoID IsNot Nothing Then
                         strToDoID = objProperty_ToDoID.Value
 
                         'Don't autocode branches that existed to another project previously

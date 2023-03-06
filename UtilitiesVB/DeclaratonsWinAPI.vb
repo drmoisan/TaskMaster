@@ -1,6 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-
-Public Module DeclaratonsWinAPI
+﻿Public Module DeclaratonsWinAPI
 
     Public Enum WindowLongFlags As Integer
         GWL_EXSTYLE = -20

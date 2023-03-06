@@ -1,8 +1,4 @@
-﻿Imports System
-Imports System.Collections
-
-
-''' <summary>
+﻿''' <summary>
 ''' Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
 ''' </summary>
 Public Class FlagParser

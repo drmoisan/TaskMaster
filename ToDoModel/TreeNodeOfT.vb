@@ -1,16 +1,4 @@
-﻿Imports System
-Imports System.ComponentModel
-Imports System.Drawing
-Imports System.Collections
-Imports System.IO
-Imports Microsoft.Office.Interop.Outlook
-Imports System.Collections.Generic
-Imports System.Linq
-Imports System.Collections.ObjectModel
-Imports System.Diagnostics
-Imports System.Linq.Expressions
-
-Public Class TreeNode(Of T)
+﻿Public Class TreeNode(Of T)
     Private _Parent As TreeNode(Of T)
     Private ReadOnly _value As T
     Private _children As List(Of TreeNode(Of T)) = New List(Of TreeNode(Of T))()

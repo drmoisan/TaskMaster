@@ -1,9 +1,5 @@
 ﻿Imports System.IO
-Imports System.Runtime
-Imports System.Xml.Serialization
-Imports Microsoft.Office.Interop.Outlook
 Imports Microsoft.VisualBasic.FileIO
-Imports System.Runtime.CompilerServices
 
 Public Module CSVDictUtilities
 

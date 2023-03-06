@@ -1,7 +1,5 @@
-﻿Imports System.Windows
+﻿Imports System.Diagnostics
 Imports System.Windows.Forms
-Imports Microsoft.Office.Interop.Outlook
-Imports System.Diagnostics
 Imports UtilitiesVB
 
 Public Class TaskViewer
@@ -121,11 +119,11 @@ Public Class TaskViewer
     End Sub
 
     Private Sub cbxFlag_CheckedChanged(sender As Object, e As EventArgs) Handles cbxFlag.CheckedChanged
-        If Not _controller Is Nothing Then _controller.FlagAsTask_Change()
+        If _controller IsNot Nothing Then _controller.FlagAsTask_Change()
     End Sub
 
     Private Sub TaskViewer_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        If Not _controller Is Nothing Then
+        If _controller IsNot Nothing Then
             Debug.WriteLine(e.KeyCode.ToChar())
             Dim consumed As Boolean = _controller.KeyboardHandler_KeyDown(sender, e)
             If consumed Then
@@ -138,7 +136,7 @@ Public Class TaskViewer
     End Sub
 
     Private Sub _mouseFilter_FormClicked(sender As Object, e As EventArgs) Handles _mouseFilter.FormClicked
-        If Not _controller Is Nothing Then _controller.MouseFilter_FormClicked(sender, e)
+        If _controller IsNot Nothing Then _controller.MouseFilter_FormClicked(sender, e)
     End Sub
 
     Private Sub task_name_KeyDown(sender As Object, e As KeyEventArgs) Handles task_name.KeyDown

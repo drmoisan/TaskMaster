@@ -1,16 +1,5 @@
-﻿Imports System
-Imports System.ComponentModel
-Imports System.Drawing
-Imports System.Numerics
-Imports System.Collections
-Imports System.IO
+﻿Imports System.IO
 Imports Microsoft.Office.Interop.Outlook
-Imports System.Collections.Generic
-Imports System.Linq
-Imports System.Collections.ObjectModel
-Imports System.Diagnostics
-Imports System.Linq.Expressions
-Imports System.Runtime.Serialization.Formatters.Binary
 
 
 Public Class DataModel_ToDoTree
@@ -91,7 +80,7 @@ Public Class DataModel_ToDoTree
                     While blContinue
                         NodeParent = FindChildByID(strParentID, ToDoTree)
                         'NodeParent = F
-                        If Not NodeParent Is Nothing Then
+                        If NodeParent IsNot Nothing Then
                             NodeParent.InsertChild(ToDoNode)
                             ToDoTree.Remove(ToDoNode)
                             blContinue = False
@@ -187,7 +176,7 @@ Public Class DataModel_ToDoTree
                 Return node
             Else
                 rnode = FindChildByID(ID, node.Children)
-                If Not rnode Is Nothing Then
+                If rnode IsNot Nothing Then
                     Return rnode
                 End If
             End If
@@ -325,7 +314,7 @@ Public Class DataModel_ToDoTree
         LoopTreeToWrite(ToDoTree, filename, "")
     End Sub
     Private Sub LoopTreeToWrite(nodes As List(Of TreeNode(Of ToDoItem)), filename As String, lineprefix As String)
-        If Not nodes Is Nothing Then
+        If nodes IsNot Nothing Then
             For Each node As TreeNode(Of ToDoItem) In nodes
                 AppendLineToCSV(filename, lineprefix & node.Value.ToDoID & " " & node.Value.TaskSubject)
                 LoopTreeToWrite(node.Children, filename, lineprefix & node.Value.ToDoID & ",")

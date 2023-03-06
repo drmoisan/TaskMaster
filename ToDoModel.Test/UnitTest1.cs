@@ -1,17 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using CleanProjectToTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 //using Microsoft.VisualStudio.Services.Common;
 using System.IO;
-using System;
-using Microsoft.ReportingServices.Diagnostics.Internal;
-using CleanProjectToTest;
-using System.Collections.Generic;
 
 namespace ToDoModel.Test
 {
     [TestClass]
     public class PeopleDictTest
     {
-        
+
         [TestMethod]
         public void Test_WriteDictJSON()
         {

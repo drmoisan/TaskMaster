@@ -1,6 +1,4 @@
-﻿Imports System
-Imports System.CodeDom
-Imports System.Collections
+﻿Imports System.Collections
 Imports System.Diagnostics
 Imports System.Drawing
 Imports System.IO
@@ -560,7 +558,7 @@ Public Class TaskTreeForm
                 Return node
             Else
                 rnode = FindChildByID(ID, node.Children)
-                If Not rnode Is Nothing Then
+                If rnode IsNot Nothing Then
                     Return rnode
                 End If
             End If
@@ -607,7 +605,7 @@ Public Class TaskTreeForm
         LoopTreeToWrite(ToDoTree, filename, "")
     End Sub
     Public Sub LoopTreeToWrite(nodes As List(Of TreeNode(Of ToDoItem)), filename As String, lineprefix As String)
-        If Not nodes Is Nothing Then
+        If nodes IsNot Nothing Then
             For Each node As TreeNode(Of ToDoItem) In nodes
                 AppendLineToCSV(filename, lineprefix & node.Value.ToDoID & " " & node.Value.TaskSubject)
                 LoopTreeToWrite(node.Children, filename, lineprefix & node.Value.ToDoID & ",")
@@ -623,11 +621,11 @@ Public Class TaskTreeForm
     Private Sub TreeListView1_ItemActivate(sender As Object, e As EventArgs) Handles TreeListView1.ItemActivate
         Dim item = TreeListView1.GetItem(TreeListView1.SelectedIndex).RowObject
         Dim node As TreeNode(Of ToDoItem) = TryCast(item, TreeNode(Of ToDoItem))
-        If Not node Is Nothing Then
+        If node IsNot Nothing Then
             Dim objItem As Object = node.Value.GetItem()
             If TypeOf objItem Is Outlook.MailItem Then
                 Dim OlMail As Outlook.MailItem = TryCast(objItem, Outlook.MailItem)
-                If Not OlMail Is Nothing Then
+                If OlMail IsNot Nothing Then
                     Dim OlExplorer As Outlook.Explorer = Globals.ThisAddIn.Application.ActiveExplorer
                     If OlExplorer.IsItemSelectableInView(OlMail) Then
                         OlExplorer.ClearSelection()
@@ -639,7 +637,7 @@ Public Class TaskTreeForm
                 End If
             ElseIf TypeOf objItem Is Outlook.TaskItem Then
                 Dim OlTask As Outlook.TaskItem = TryCast(objItem, Outlook.TaskItem)
-                If Not OlTask Is Nothing Then
+                If OlTask IsNot Nothing Then
                     Dim OlExplorer As Outlook.Explorer = Globals.ThisAddIn.Application.ActiveExplorer
                     If OlExplorer.IsItemSelectableInView(OlTask) Then
                         OlExplorer.ClearSelection()

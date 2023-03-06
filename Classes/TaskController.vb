@@ -1,14 +1,8 @@
-﻿Imports System.Runtime.Remoting.Contexts
+﻿Imports System.Windows.Forms
 Imports Microsoft.Office.Interop.Outlook
-Imports System
-Imports System.Linq
-Imports System.Collections.Generic
-Imports System.Windows.Forms
-Imports System.Runtime.InteropServices
-Imports System.Diagnostics
-Imports UtilitiesVB
-Imports ToDoModel
 Imports Tags
+Imports ToDoModel
+Imports UtilitiesVB
 
 
 Public Class TaskController

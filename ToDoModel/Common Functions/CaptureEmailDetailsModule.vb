@@ -1,5 +1,4 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
-Imports UtilitiesVB
 
 Public Module CaptureEmailDetailsModule
     Const NumberOfFields = 13
@@ -119,7 +118,7 @@ Public Module CaptureEmailDetailsModule
             folderPath = Right(folderPath, Len(folderPath) - root_length - 1)
 
             'If folder has been remapped, put the target folder
-            If Not dict_remap Is Nothing Then
+            If dict_remap IsNot Nothing Then
                 If dict_remap.ContainsKey(folderPath) Then
                     folderPath = dict_remap(folderPath)
                 End If

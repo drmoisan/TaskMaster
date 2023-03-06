@@ -1,7 +1,6 @@
-﻿Imports Microsoft.VisualBasic
-Imports Microsoft.Office.Interop.Outlook
-Imports ToDoModel
+﻿Imports Microsoft.Office.Interop.Outlook
 Imports Tags
+Imports ToDoModel
 Imports UtilitiesVB
 
 Public Class Flag_Tasks

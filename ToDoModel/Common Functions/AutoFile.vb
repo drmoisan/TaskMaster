@@ -1,11 +1,8 @@
-﻿Imports System.Diagnostics
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip
-Imports Microsoft.Office.Interop.Outlook
+﻿Imports System.Text.RegularExpressions
 Imports Microsoft.Office.Interop
-Imports System.IO
-Imports System.Text.RegularExpressions
-Imports UtilitiesVB
+Imports Microsoft.Office.Interop.Outlook
 Imports Tags
+Imports UtilitiesVB
 
 Public Module AutoFile
 

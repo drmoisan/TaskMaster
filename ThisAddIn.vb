@@ -1,10 +1,7 @@
 ﻿Option Explicit On
-Imports Microsoft.Office.Interop.Outlook
 Imports System.Diagnostics
 Imports System.IO
-Imports System
-Imports System.Runtime.Serialization.Formatters.Binary
-Imports System.Security.Authentication.ExtendedProtection
+Imports Microsoft.Office.Interop.Outlook
 Imports Microsoft.VisualBasic.FileIO
 Imports ToDoModel
 Imports UtilitiesVB
@@ -178,7 +175,7 @@ Public Class ThisAddIn
 
 
         Try
-            If Not SpecificItem Is Nothing Then
+            If SpecificItem IsNot Nothing Then
                 If TypeOf SpecificItem Is MailItem Then
                     oMail = SpecificItem
                     objProperty = oMail.UserProperties.Find(UserDefinedFieldName)
@@ -378,7 +375,7 @@ Public Class ThisAddIn
 
         'AUTOCODE ToDoID based on Project
         'Check to see if the project exists before attempting to autocode the id
-        If Not objProperty_Project Is Nothing Then
+        If objProperty_Project IsNot Nothing Then
 
             'Get Project Name
             strProject = todo.Project
@@ -392,7 +389,7 @@ Public Class ThisAddIn
             End If
 
             'Check to see whether there is an existing ID
-            If Not objProperty_ToDoID Is Nothing Then
+            If objProperty_ToDoID IsNot Nothing Then
                 strToDoID = objProperty_ToDoID.Value
 
                 'Don't autocode branches that existed in another project previously
@@ -577,7 +574,7 @@ Public Class ThisAddIn
         Dim j As Long = 0
         For i As Long = 1 To max
             Dim Item As ToDoItem = New ToDoItem(ToDoItems.Item(i), True)
-            j = j + 1
+            j += 1
             If Item.CustomField("NewID") <> "Done" Then
                 Dim strToDoID As String = Item.ToDoID
                 If strToDoID.Length > 0 Then

@@ -1,13 +1,9 @@
-﻿Imports System
-'Imports Microsoft.VisualStudio.Services.Common
-Imports System.Runtime.Serialization
+﻿'Imports Microsoft.VisualStudio.Services.Common
 'Imports System.Xml
 'Imports System.Xml.Schema
 'Imports System.Xml.Serialization
-Imports UtilitiesVB
 Imports System.IO
 Imports Newtonsoft.Json
-Imports Microsoft.VisualBasic.Devices
 
 Public Module TestSerDic
 

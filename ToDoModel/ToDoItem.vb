@@ -1,17 +1,4 @@
-﻿Imports System
-Imports System.ComponentModel
-Imports System.Drawing
-Imports System.Numerics
-Imports System.Collections
-Imports System.IO
-Imports Microsoft.Office.Interop.Outlook
-Imports System.Collections.Generic
-Imports System.Linq
-Imports System.Collections.ObjectModel
-Imports System.Diagnostics
-Imports System.Linq.Expressions
-Imports System.Runtime.Serialization.Formatters.Binary
-Imports System.Net
+﻿Imports Microsoft.Office.Interop.Outlook
 
 <Serializable()>
 Public Class ToDoItem
@@ -229,7 +216,7 @@ Public Class ToDoItem
             Return _flagAsTask
         End Get
         Set(value As Boolean)
-            If Not OlObject Is Nothing Then
+            If OlObject IsNot Nothing Then
                 If TypeOf (OlObject) Is MailItem Then
                     _flagAsTask = value
                     If Not _readonly Then
@@ -264,7 +251,7 @@ Public Class ToDoItem
         Set(value As Boolean)
             _flags.bullpin = value
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     OlObject.Categories = _flags.Combine()
                     OlObject.Save
                 End If
@@ -279,7 +266,7 @@ Public Class ToDoItem
         Set(value As Boolean)
             _flags.today = value
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     OlObject.Categories = _flags.Combine()
                     OlObject.Save
                 End If
@@ -481,7 +468,7 @@ Public Class ToDoItem
         Set(value As String)
             _TagProgram = value
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     CustomField("TagProgram", OlUserPropertyType.olKeywords) = value
                 End If
             End If
@@ -525,7 +512,7 @@ Public Class ToDoItem
     End Property
 
     Private Sub SaveCatsToObj(FieldName As String, FieldValue As String)
-        If Not OlObject Is Nothing Then
+        If OlObject IsNot Nothing Then
             CustomField(FieldName, OlUserPropertyType.olKeywords) = FieldValue
             OlObject.Categories = _flags.Combine()
             OlObject.Save
@@ -596,7 +583,7 @@ Public Class ToDoItem
         Set(strID As String)
             _ToDoID = strID
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     CustomField("ToDoID") = strID
                     SplitID()
                 End If
@@ -612,7 +599,7 @@ Public Class ToDoItem
             If value = True Then
                 VisibleTreeState = VisibleTreeState Or Math.Pow(2, Lvl - 1)
             Else
-                VisibleTreeState = VisibleTreeState - (VisibleTreeState And Math.Pow(2, Lvl - 1))
+                VisibleTreeState -= (VisibleTreeState And Math.Pow(2, Lvl - 1))
             End If
         End Set
     End Property
@@ -635,7 +622,7 @@ Public Class ToDoItem
             End If
         End Get
         Set(intVTS As Integer)
-            If Not OlObject Is Nothing Then
+            If OlObject IsNot Nothing Then
                 _VisibleTreeState = intVTS
                 If Not _readonly Then CustomField("VTS", OlUserPropertyType.olInteger) = intVTS
             End If
@@ -662,7 +649,7 @@ Public Class ToDoItem
         Set(blActive As Boolean)
             _ActiveBranch = blActive
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     CustomField("AB", OlUserPropertyType.olYesNo) = blActive
                 End If
             End If
@@ -726,7 +713,7 @@ Public Class ToDoItem
         Set(strState As String)
             _ExpandChildren = strState
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     CustomField("EC") = strState
                 End If
             End If
@@ -747,7 +734,7 @@ Public Class ToDoItem
         Set(strState As String)
             _ExpandChildrenState = strState
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     CustomField("EcState") = strState
                 End If
             End If
@@ -795,7 +782,7 @@ Public Class ToDoItem
         Set(strLvl As String)
             _MetaTaskLvl = strLvl
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     CustomField("Meta Task Level") = strLvl
                 End If
             End If
@@ -816,7 +803,7 @@ Public Class ToDoItem
         Set(strID As String)
             _MetaTaskSubject = strID
             If Not _readonly Then
-                If Not OlObject Is Nothing Then
+                If OlObject IsNot Nothing Then
                     'CustomFieldID_Set("Meta Task Subject", strID, SpecificItem:=OlObject)
                     CustomField("Meta Task Subject") = strID
                 End If

@@ -1,11 +1,4 @@
-﻿Imports System
-Imports System.Collections
-Imports System.Diagnostics
-Imports System.Windows.Forms
-Imports Microsoft.Office.Interop.Outlook
-
-
-Module Flag_Fields_Categories
+﻿Module Flag_Fields_Categories
     Public Sub CCOCatList_Load()
         Globals.ThisAddIn.CCOCatList = New List(Of String)
 

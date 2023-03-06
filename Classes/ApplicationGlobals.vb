@@ -1,10 +1,10 @@
-﻿Imports Microsoft.Office.Interop.Outlook
+﻿Imports System.IO
 Imports Microsoft.Office.Interop
-Imports ToDoModel
-Imports System.IO
+Imports Microsoft.Office.Interop.Outlook
 Imports Microsoft.VisualBasic.FileIO
-Imports UtilitiesVB
 Imports Newtonsoft.Json
+Imports ToDoModel
+Imports UtilitiesVB
 
 Public Class ApplicationGlobals
     Implements IApplicationGlobals
@@ -130,7 +130,7 @@ Public Class ApplicationGlobals
                                      filename As String) _
                                      As Dictionary(Of String, String)
             Dim dict As Dictionary(Of String, String) = UtilitiesVB.LoadDictCSV(fpath, filename.Split(".")(0) & ".csv")
-            If Not dict Is Nothing Then WriteDictJSON(dict, Path.Combine(fpath, filename))
+            If dict IsNot Nothing Then WriteDictJSON(dict, Path.Combine(fpath, filename))
             Return dict
         End Function
 

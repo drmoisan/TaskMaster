@@ -56,6 +56,6 @@ Public Class TagViewer
     End Sub
 
     Private Sub Hide_Archive_CheckedChanged(sender As Object, e As EventArgs) Handles Hide_Archive.CheckedChanged
-        If Not _controller Is Nothing Then _controller.ToggleArchive()
+        If _controller IsNot Nothing Then _controller.ToggleArchive()
     End Sub
 End Class

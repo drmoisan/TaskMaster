@@ -1,5 +1,5 @@
-﻿Imports System.Numerics
-Imports System.IO
+﻿Imports System.IO
+Imports System.Numerics
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB

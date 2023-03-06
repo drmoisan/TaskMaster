@@ -1,10 +1,5 @@
-﻿Imports System.Runtime.Remoting.Contexts
-Imports System.Windows
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
 Imports Microsoft.Office.Interop.Outlook
-Imports System
-Imports System.Linq
-Imports System.Collections.Generic
 Imports UtilitiesVB
 
 Public Class TagController
@@ -57,7 +52,7 @@ Public Class TagController
         _selections = selections
 
 
-        If Not _obj_item Is Nothing Then
+        If _obj_item IsNot Nothing Then
             If TypeOf _obj_item Is MailItem Then
                 _olMail = _obj_item
                 _isMail = True
@@ -80,7 +75,7 @@ Public Class TagController
 
         End If
 
-        If (Not autoAssigner Is Nothing) And _isMail Then
+        If (autoAssigner IsNot Nothing) And _isMail Then
             _viewer.button_autoassign.Visible = True
             _viewer.button_autoassign.Enabled = True
         Else
@@ -232,7 +227,7 @@ Public Class TagController
         Dim colCatName As Collection = New Collection()
 
         'Check to see if can be automatically created
-        If (Not _autoAssigner Is Nothing) And _isMail Then
+        If (_autoAssigner IsNot Nothing) And _isMail Then
             'Ask user if they want to auto-add
             Dim vbR As MsgBoxResult = MsgBox("Auto-add new from email details?", vbYesNo)
 
@@ -260,7 +255,7 @@ Public Class TagController
             End If
             If categoryName <> "" Then
                 Dim newCategory As Category = _autoAssigner.AddColorCategory(_prefix, categoryName)
-                If Not newCategory Is Nothing Then
+                If newCategory IsNot Nothing Then
                     AddOption(newCategory.Name, blClickTrue:=True)
                     colCatName.Add(newCategory.Name)
                 End If
