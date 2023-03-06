@@ -10,15 +10,9 @@ Public Module CreateCategoryModule
 
         If newCatName <> "" Then
             If prefix.Value <> "" Then
-                If Len(newCatName) > Len(prefix) Then
-                    If Left(newCatName, Len(prefix.Value)) <> prefix.Value Then
-                        strTemp = prefix.Value & newCatName
-                    Else
-                        strTemp = newCatName
-                    End If
-                Else
-                    strTemp = prefix.Value & newCatName
-                End If
+                strTemp = If(Len(newCatName) > Len(prefix),
+                    If(Left(newCatName, Len(prefix.Value)) <> prefix.Value, prefix.Value & newCatName, newCatName),
+                    prefix.Value & newCatName)
             Else
                 strTemp = newCatName
             End If
@@ -28,7 +22,7 @@ Public Module CreateCategoryModule
             For Each objCategory In OlNS.Categories
                 If objCategory.Name = strTemp Then
                     exists = True
-                    MsgBox("Color category " & strTemp & " already exists. Cannot add a duplicate.")
+                    Dim unused1 = MsgBox("Color category " & strTemp & " already exists. Cannot add a duplicate.")
                     Return objCategory
                 End If
             Next objCategory
@@ -45,7 +39,7 @@ Public Module CreateCategoryModule
                 End Try
             End If
         Else
-            MsgBox("Error: Parameter " & NameOf(newCatName) & " must have a value to create a category.")
+            Dim unused = MsgBox("Error: Parameter " & NameOf(newCatName) & " must have a value to create a category.")
         End If
 
         Return objCategory

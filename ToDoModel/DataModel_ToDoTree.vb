@@ -8,13 +8,11 @@ Public Class DataModel_ToDoTree
         vbLoadInView = 1
     End Enum
 
-    Private ToDoTree As List(Of TreeNode(Of ToDoItem)) = New List(Of TreeNode(Of ToDoItem))
-
     Public Sub New()
-        ToDoTree = New List(Of TreeNode(Of ToDoItem))
+        ListOfToDoTree = New List(Of TreeNode(Of ToDoItem))
     End Sub
     Public Sub New(DM_ToDoTree As List(Of TreeNode(Of ToDoItem)))
-        ToDoTree = DM_ToDoTree
+        ListOfToDoTree = DM_ToDoTree
     End Sub
     Public Sub LoadTree(LoadType As LoadOptions, Application As Application)
         Dim objItem As Object
@@ -51,7 +49,7 @@ Public Class DataModel_ToDoTree
                 'Add the temporary ToDoItem to the tree, assigning an ID if missing
                 'If tmpToDo.ToDoID = "nothing" Then
                 'ToDoTree.AddChild(tmpToDo)
-                ToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo))
+                ListOfToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo))
                 'Else
                 'ToDoTree.AddChild(tmpToDo, tmpToDo.ToDoID)
                 'ToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo, tmpToDo.ToDoID))
@@ -59,12 +57,12 @@ Public Class DataModel_ToDoTree
             Next
 
             '***STEP 3: MAKE TREE HIERARCHICAL
-            Dim max As Integer = ToDoTree.Count - 1
+            Dim max As Integer = ListOfToDoTree.Count - 1
             Dim i As Integer
 
             'Loop through the tree from the end to the beginning
             For i = max To 0 Step -1
-                ToDoNode = ToDoTree(i)
+                ToDoNode = ListOfToDoTree(i)
 
                 'If the ID is bigger than 2 digits, it is a child of someone. 
                 'So in that case link it to the proper parent
@@ -78,11 +76,11 @@ Public Class DataModel_ToDoTree
                     Dim blContinue As Boolean = True
 
                     While blContinue
-                        NodeParent = FindChildByID(strParentID, ToDoTree)
+                        NodeParent = FindChildByID(strParentID, ListOfToDoTree)
                         'NodeParent = F
                         If NodeParent IsNot Nothing Then
-                            NodeParent.InsertChild(ToDoNode)
-                            ToDoTree.Remove(ToDoNode)
+                            Dim unused2 = NodeParent.InsertChild(ToDoNode)
+                            Dim unused1 = ListOfToDoTree.Remove(ToDoNode)
                             blContinue = False
                         End If
                         If strParentID.Length > 2 Then
@@ -97,35 +95,23 @@ Public Class DataModel_ToDoTree
 
         Catch
             Debug.WriteLine(Err.Description)
-            MsgBox(Err.Description)
+            Dim unused = MsgBox(Err.Description)
         End Try
     End Sub
-    Public ReadOnly Property ListOfToDoTree As List(Of TreeNode(Of ToDoItem))
-        Get
-            Return ToDoTree
-        End Get
-    End Property
+    Public ReadOnly Property ListOfToDoTree As List(Of TreeNode(Of ToDoItem)) = New List(Of TreeNode(Of ToDoItem))
 
 
 
     Public Function CompareToDoID(item As ToDoItem, strToDoID As String) As Boolean
-        If item.ToDoID = strToDoID Then
-            Return True
-        Else
-            Return False
-        End If
+        Return item.ToDoID = strToDoID
     End Function
 
     Public Sub AddChild(ByVal Child As TreeNode(Of ToDoItem), Parent As TreeNode(Of ToDoItem), IDList As ListOfIDs)
         Parent.Children.Add(Child)
-        Dim strSeed As String
-        If Parent.Children.Count > 1 Then
-            strSeed = Parent.Children(Parent.Children.Count - 2).Value.ToDoID
-        Else
-            strSeed = Parent.Value.ToDoID & "00"
-        End If
+        Dim strSeed = If(Parent.Children.Count > 1, Parent.Children(Parent.Children.Count - 2).Value.ToDoID, Parent.Value.ToDoID & "00")
+
         If IDList.UsedIDList.Contains(Child.Value.ToDoID) Then
-            IDList.UsedIDList.Remove(Child.Value.ToDoID)
+            Dim unused = IDList.UsedIDList.Remove(Child.Value.ToDoID)
         End If
         Child.Value.ToDoID = IDList.GetNextAvailableToDoID(strSeed)
         If Child.Children.Count > 0 Then
@@ -138,7 +124,7 @@ Public Class DataModel_ToDoTree
         'WriteTreeToDisk()
 
 
-        For Each RootNode In ToDoTree
+        For Each RootNode In ListOfToDoTree
             For Each Child In RootNode.Children
                 If Child.Children.Count > 0 Then ReNumberChildrenIDs(Child.Children, IDList)
             Next
@@ -152,7 +138,7 @@ Public Class DataModel_ToDoTree
         If max >= 0 Then
             Dim strParentID As String = Children(i).Parent.Value.ToDoID
             For i = 0 To max
-                If IDList.UsedIDList.Contains(Children(i).Value.ToDoID) Then IDList.UsedIDList.Remove(Children(i).Value.ToDoID)
+                If IDList.UsedIDList.Contains(Children(i).Value.ToDoID) Then Dim unused = IDList.UsedIDList.Remove(Children(i).Value.ToDoID)
             Next i
             For i = 0 To max
                 Dim NextID As String = IDList.GetNextAvailableToDoID(strParentID & "00")
@@ -194,7 +180,7 @@ Public Class DataModel_ToDoTree
         Dim strFilter As String
         Dim oStore As [Store]
         Dim objItem As Object
-        Dim ListObjects As List(Of Object) = New List(Of Object)
+        Dim ListObjects As New List(Of Object)
 
         objView = Application.ActiveExplorer.CurrentView
         strFilter = "@SQL=" & objView.Filter
@@ -202,11 +188,7 @@ Public Class DataModel_ToDoTree
         For Each oStore In Application.Session.Stores
             OlItems = Nothing
             OlFolder = oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo)
-            If strFilter = "@SQL=" Or LoadType = LoadOptions.vbLoadAll Then
-                OlItems = OlFolder.Items
-            Else
-                OlItems = OlFolder.Items.Restrict(strFilter)
-            End If
+            OlItems = If(strFilter = "@SQL=" Or LoadType = LoadOptions.vbLoadAll, OlFolder.Items, OlFolder.Items.Restrict(strFilter))
             For Each objItem In OlItems
                 ListObjects.Add(objItem)
             Next
@@ -260,9 +242,9 @@ Public Class DataModel_ToDoTree
         End If
     End Function
     Private Function MergeSort(Of T)(ByVal coll As IList(Of T), ByVal comparison As Comparison(Of T)) As IList(Of T)
-        Dim Result As List(Of T) = New List(Of T)()
-        Dim Left As Queue(Of T) = New Queue(Of T)()
-        Dim Right As Queue(Of T) = New Queue(Of T)()
+        Dim Result As New List(Of T)()
+        Dim Left As New Queue(Of T)()
+        Dim Right As New Queue(Of T)()
         If coll.Count <= 1 Then Return coll
         Dim midpoint As Integer = coll.Count / 2
 
@@ -283,7 +265,7 @@ Public Class DataModel_ToDoTree
     Private Function Merge(Of T)(ByVal Left As Queue(Of T), ByVal Right As Queue(Of T), ByVal comparison As Comparison(Of T)) As List(Of T)
         'Dim cmp As Integer = comparison(coll(i), coll(j))
 
-        Dim Result As List(Of T) = New List(Of T)()
+        Dim Result As New List(Of T)()
 
         While Left.Count > 0 AndAlso Right.Count > 0
             Dim cmp As Integer = comparison(Left.Peek(), Right.Peek())
@@ -307,11 +289,11 @@ Public Class DataModel_ToDoTree
     Public Sub WriteTreeToDisk()
         Dim filename As String = "C:\Users\03311352\Documents\DebugTreeDump.csv"
 
-        Using sw As StreamWriter = New StreamWriter(filename)
+        Using sw As New StreamWriter(filename)
             sw.WriteLine("File Dump")
         End Using
 
-        LoopTreeToWrite(ToDoTree, filename, "")
+        LoopTreeToWrite(ListOfToDoTree, filename, "")
     End Sub
     Private Sub LoopTreeToWrite(nodes As List(Of TreeNode(Of ToDoItem)), filename As String, lineprefix As String)
         If nodes IsNot Nothing Then

@@ -7,78 +7,22 @@ Public Class CsvSerializer(Of T As {Class, New})
     Implements IFormatter
 
     Private ReadOnly _properties As List(Of PropertyInfo)
-    Private _ignoreEmptyLines As Boolean = True
-    Private _ignoreReferenceTypesExceptString As Boolean = True
-    Private _newlineReplacement As String = (ChrW(&H254)).ToString()
-    Private _replacement As String = (ChrW(&H255)).ToString()
-    Private _rowNumberColumnTitle As String = "RowNumber"
-    Private _separator As Char = ","c
-    Private _useLineNumbers As Boolean = True
 
-    Public Property IgnoreEmptyLines As Boolean
-        Get
-            Return _ignoreEmptyLines
-        End Get
-        Set(ByVal value As Boolean)
-            _ignoreEmptyLines = value
-        End Set
-    End Property
+    Public Property IgnoreEmptyLines As Boolean = True
 
-    Public Property IgnoreReferenceTypesExceptString As Boolean
-        Get
-            Return _ignoreReferenceTypesExceptString
-        End Get
-        Set(ByVal value As Boolean)
-            _ignoreReferenceTypesExceptString = value
-        End Set
-    End Property
+    Public Property IgnoreReferenceTypesExceptString As Boolean = True
 
-    Public Property NewlineReplacement As String
-        Get
-            Return _newlineReplacement
-        End Get
-        Set(ByVal value As String)
-            _newlineReplacement = value
-        End Set
-    End Property
+    Public Property NewlineReplacement As String = ChrW(&H254).ToString()
 
-    Public Property Replacement As String
-        Get
-            Return _replacement
-        End Get
-        Set(ByVal value As String)
-            _replacement = value
-        End Set
-    End Property
+    Public Property Replacement As String = ChrW(&H255).ToString()
 
-    Public Property RowNumberColumnTitle As String
-        Get
-            Return _rowNumberColumnTitle
-        End Get
-        Set(ByVal value As String)
-            _rowNumberColumnTitle = value
-        End Set
-    End Property
+    Public Property RowNumberColumnTitle As String = "RowNumber"
 
-    Public Property Separator As Char
-        Get
-            Return _separator
-        End Get
-        Set(ByVal value As Char)
-            _separator = value
-        End Set
-    End Property
+    Public Property Separator As Char = ","c
 
     Public Property UseEofLiteral As Boolean
 
-    Public Property UseLineNumbers As Boolean
-        Get
-            Return _useLineNumbers
-        End Get
-        Set(ByVal value As Boolean)
-            _useLineNumbers = value
-        End Set
-    End Property
+    Public Property UseLineNumbers As Boolean = True
 
     Public Property UseTextQualifier As Boolean
 
@@ -183,11 +127,11 @@ Public Class CsvSerializer(Of T As {Class, New})
         Dim values = New List(Of String)()
 
         If Separator <> ","c Then
-            sb.AppendLine("sep=" & Separator)
+            Dim unused3 = sb.AppendLine("sep=" & Separator)
         End If
 
         Dim data = CType(graph, List(Of T))
-        sb.AppendLine(GetHeader())
+        Dim unused2 = sb.AppendLine(GetHeader())
         Dim row = 1
 
         For Each item In data
@@ -208,7 +152,7 @@ Public Class CsvSerializer(Of T As {Class, New})
                 values.Add(value)
             Next
 
-            sb.AppendLine(String.Join(Separator.ToString(), values.ToArray()))
+            Dim unused1 = sb.AppendLine(String.Join(Separator.ToString(), values.ToArray()))
         Next
 
         If UseEofLiteral Then
@@ -219,7 +163,7 @@ Public Class CsvSerializer(Of T As {Class, New})
             End If
 
             values.Add("EOF")
-            sb.AppendLine(String.Join(Separator.ToString(), values.ToArray()))
+            Dim unused = sb.AppendLine(String.Join(Separator.ToString(), values.ToArray()))
         End If
 
         Using sw = New StreamWriter(stream)

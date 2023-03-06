@@ -19,33 +19,25 @@ Public Class ToDoProjectInfoEntry
         As Boolean Implements IEquatable(Of IToDoProjectInfoEntry).Equals,
         IToDoProjectInfoEntry.Equals
 
-        If other Is Nothing Then
-            Return False
-        Else
-            Return (Me.ProjectName.Equals(other.ProjectName))
-        End If
+        Return other IsNot Nothing AndAlso ProjectName.Equals(other.ProjectName)
     End Function
 
     Public Overrides Function Equals(obj As Object) As Boolean Implements IToDoProjectInfoEntry.Equals
         If obj Is Nothing Then Return False
 
         Dim other As ToDoProjectInfoEntry = TryCast(obj, ToDoProjectInfoEntry)
-        If other Is Nothing Then
-            Return False
-        Else
-            Return Equals(other)
-        End If
+        Return other IsNot Nothing AndAlso Equals(other)
     End Function
 
     Public Function CompareTo(other As IToDoProjectInfoEntry) As Integer Implements IComparable(Of IToDoProjectInfoEntry).CompareTo, IToDoProjectInfoEntry.CompareTo
         If other Is Nothing Then
             Return 1
         Else
-            Dim x As Integer = String.CompareOrdinal(Me.ProjectID, other.ProjectID)
+            Dim x As Integer = String.CompareOrdinal(ProjectID, other.ProjectID)
             If x = 0 Then
-                If Me.ProjectID.Length < other.ProjectID.Length Then
+                If ProjectID.Length < other.ProjectID.Length Then
                     x = -1
-                ElseIf Me.ProjectID.Length > other.ProjectID.Length Then
+                ElseIf ProjectID.Length > other.ProjectID.Length Then
                     x = 1
                 End If
             End If

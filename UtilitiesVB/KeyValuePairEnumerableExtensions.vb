@@ -12,7 +12,7 @@ Public Module KeyValuePairEnumerableExtensions
     ''' <returns>A Sorted Dictionary</returns>
     <Extension()>
     Public Function ToSortedDictionary(Of TKey, TValue)(ByVal l As IEnumerable(Of KeyValuePair(Of TKey, TValue))) As SortedDictionary(Of TKey, TValue)
-        Dim result As SortedDictionary(Of TKey, TValue) = New SortedDictionary(Of TKey, TValue)()
+        Dim result As New SortedDictionary(Of TKey, TValue)()
 
         For Each e In l
             result(e.Key) = e.Value
@@ -31,7 +31,7 @@ Public Module KeyValuePairEnumerableExtensions
     ''' <returns>A Sorted Dictionary</returns>
     <Extension()>
     Public Function ToDictionary(Of TKey, TValue)(ByVal l As IEnumerable(Of KeyValuePair(Of TKey, TValue))) As Dictionary(Of TKey, TValue)
-        Dim result As Dictionary(Of TKey, TValue) = New Dictionary(Of TKey, TValue)()
+        Dim result As New Dictionary(Of TKey, TValue)()
 
         For Each e In l
             result(e.Key) = e.Value

@@ -10,10 +10,10 @@ Public Class Flag_Tasks
     Private ReadOnly _olExplorer As Explorer = Globals.ThisAddIn.Application.ActiveExplorer()
     Private WithEvents _viewer As TaskViewer
     Private ReadOnly _controller As TaskController
-    Private _defaultsToDo As ToDoDefaults
-    Private _autoAssign As AutoAssign
-    Private _flagsToSet As TaskController.FlagsToSet
-    Private _globals As IApplicationGlobals
+    Private ReadOnly _defaultsToDo As ToDoDefaults
+    Private ReadOnly _autoAssign As AutoAssign
+    Private ReadOnly _flagsToSet As TaskController.FlagsToSet
+    Private ReadOnly _globals As IApplicationGlobals
 
 
     Public Sub New(globals As IApplicationGlobals,
@@ -43,7 +43,7 @@ Public Class Flag_Tasks
 
     Private Function InitializeToDoList(ItemCollection As Collection) As List(Of ToDoItem)
         If ItemCollection Is Nothing Then ItemCollection = GetSelection()
-        Dim ToDoSelection As List(Of ToDoItem) = New List(Of ToDoItem)()
+        Dim ToDoSelection As New List(Of ToDoItem)()
         For Each ObjItem In ItemCollection
             Dim tmpToDo As ToDoItem
             If TypeOf ObjItem Is MailItem Then
@@ -65,7 +65,7 @@ Public Class Flag_Tasks
     ''' </summary>
     ''' <returns>Collection of Outlook Items</returns>
     Private Function GetSelection() As Collection
-        Dim ItemCollection As Collection = New Collection
+        Dim ItemCollection As New Collection
         For Each obj In _olExplorer.Selection
             ItemCollection.Add(obj)
         Next obj
@@ -74,9 +74,9 @@ Public Class Flag_Tasks
 
     Private Function GetFlagsToSet(selectionCount As Integer) As TaskController.FlagsToSet
         If selectionCount > 1 Then
+            Dim unused = MsgBox("GetFlagsToSet Not Implemented. Setting all Flags.")
             Return TaskController.FlagsToSet.all
         Else
-            MsgBox("GetFlagsToSet Not Implemented. Setting all Flags.")
             Return TaskController.FlagsToSet.all
         End If
     End Function
@@ -84,7 +84,7 @@ Public Class Flag_Tasks
     Private Class AutoAssign
         Implements IAutoAssign
 
-        Dim _globals As IApplicationGlobals
+        Private ReadOnly _globals As IApplicationGlobals
 
         Public Sub New(globals As IApplicationGlobals)
             _globals = globals

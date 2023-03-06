@@ -9,9 +9,9 @@ Imports UtilitiesVB
 Public Class ApplicationGlobals
     Implements IApplicationGlobals
 
-    Private _fs As FileSystemFolderPaths
-    Private _olObjects As OlObjectsClass
-    Private _toDoObjects As ToDoObjects
+    Private ReadOnly _fs As FileSystemFolderPaths
+    Private ReadOnly _olObjects As OlObjectsClass
+    Private ReadOnly _toDoObjects As ToDoObjects
 
     Public Sub New(OlApp As Application)
         _fs = New FileSystemFolderPaths
@@ -44,7 +44,7 @@ Public Class ApplicationGlobals
         Private _projInfo As ProjectInfo
         Private _dictPPL As Dictionary(Of String, String)
         Private _IDList As ListOfIDs
-        Private _parent As ApplicationGlobals
+        Private ReadOnly _parent As ApplicationGlobals
         Private _dictRemap As Dictionary(Of String, String)
 
         Public Sub New(ParentInstance As ApplicationGlobals)
@@ -172,22 +172,17 @@ Public Class ApplicationGlobals
     Public Class OlObjectsClass
         Implements IOlObjects
 
-        Private _olApp As Outlook.Application
         Private _olEmailRootPath As String
 
         Public Sub New(OlApp As Application)
-            _olApp = OlApp
+            App = OlApp
         End Sub
 
         Public ReadOnly Property App As Application Implements IOlObjects.App
-            Get
-                Return _olApp
-            End Get
-        End Property
 
         Public ReadOnly Property NamespaceMAPI As Outlook.NameSpace Implements IOlObjects.NamespaceMAPI
             Get
-                Return _olApp.Application.GetNamespace("MAPI")
+                Return App.Application.GetNamespace("MAPI")
             End Get
         End Property
 
@@ -205,13 +200,13 @@ Public Class ApplicationGlobals
 
         Public ReadOnly Property OlReminders As Outlook.Reminders Implements IOlObjects.OlReminders
             Get
-                Return _olApp.Reminders
+                Return App.Reminders
             End Get
         End Property
 
         Public ReadOnly Property OlEmailRoot As Folder Implements IOlObjects.OlEmailRoot
             Get
-                Return _olApp.Session.DefaultStore.GetRootFolder()
+                Return App.Session.DefaultStore.GetRootFolder()
             End Get
         End Property
 

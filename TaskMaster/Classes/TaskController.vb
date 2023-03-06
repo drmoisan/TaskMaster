@@ -9,11 +9,11 @@ Public Class TaskController
 
     Declare Auto Function PostMessage Lib "user32.dll" (
         ByVal hWnd As IntPtr,
-        ByVal msg As Int32,
-        ByVal wParam As Int32,
-        ByVal lParam As Int32) As Boolean
+        ByVal msg As Integer,
+        ByVal wParam As Integer,
+        ByVal lParam As Integer) As Boolean
 
-    Const WM_LBUTTONDOWN As Int32 = &H201
+    Private Const WM_LBUTTONDOWN As Integer = &H201
 
     Private WithEvents _viewer As TaskViewer
     Private ReadOnly _todo_list As List(Of ToDoItem)
@@ -21,15 +21,15 @@ Public Class TaskController
     Private _options As FlagsToSet
     Private ReadOnly _dict_categories As SortedDictionary(Of String, Boolean)
     Private _exit_type As String = "Cancel"
-    Private _xlCtrlCaptions As Dictionary(Of Label, String)
-    Private _xlCtrlLookup As Dictionary(Of Label, Control)
-    Private _xlCtrlOptions As Dictionary(Of Label, Boolean)
+    Private ReadOnly _xlCtrlCaptions As Dictionary(Of Label, String)
+    Private ReadOnly _xlCtrlLookup As Dictionary(Of Label, Control)
+    Private ReadOnly _xlCtrlOptions As Dictionary(Of Label, Boolean)
     Private _xlCtrlsActive As Dictionary(Of Label, Char)
     Private _altActive As Boolean = False
     Private _altLevel As Integer = 0
-    Private _keyCapture As String = ""
-    Private _defaults As ToDoDefaults
-    Private _autoAssign As IAutoAssign
+    Private ReadOnly _keyCapture As String = ""
+    Private ReadOnly _defaults As ToDoDefaults
+    Private ReadOnly _autoAssign As IAutoAssign
 
     <Flags>
     Public Enum FlagsToSet
@@ -121,11 +121,7 @@ Public Class TaskController
                 _viewer.Priority_Box.SelectedItem = "Normal"
         End Select
 
-        If _active.KB = "" Then
-            _viewer.kb_selector.SelectedItem = "Backlog"
-        Else
-            _viewer.kb_selector.SelectedItem = _active.KB
-        End If
+        _viewer.kb_selector.SelectedItem = If(_active.KB = "", "Backlog", _active.KB)
 
         If _active.TotalWork = 0 Then _active.TotalWork = My.Settings.Default_Task_Length
         _viewer.duration.Text = CStr(_active.TotalWork)
@@ -215,17 +211,17 @@ Public Class TaskController
 
         Dim selections As List(Of String) = Array.ConvertAll(
             _active.People.Split(","), Function(x) x.Trim()).ToList()
-        selections.Remove("")
+        Dim unused1 = selections.Remove("")
 
-        Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+        Using viewer As New TagViewer
+            Dim controller As New TagController(viewer_instance:=viewer,
                                                                 dictOptions:=filtered_cats,
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
                                                                 prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
-            viewer.ShowDialog()
+            Dim unused = viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.People = controller.SelectionString()
                 _viewer.people_selection.Text = _active.People(False)
@@ -247,17 +243,17 @@ Public Class TaskController
 
         Dim selections As List(Of String) = Array.ConvertAll(
             _active.Context.Split(","), Function(x) x.Trim()).ToList()
-        selections.Remove("")
+        Dim unused1 = selections.Remove("")
 
-        Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+        Using viewer As New TagViewer
+            Dim controller As New TagController(viewer_instance:=viewer,
                                                                 dictOptions:=filtered_cats,
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
                                                                 prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
-            viewer.ShowDialog()
+            Dim unused = viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.Context = controller.SelectionString()
                 _viewer.category_selection.Text = _active.Context(False)
@@ -275,17 +271,17 @@ Public Class TaskController
 
         Dim selections As List(Of String) = Array.ConvertAll(
             _active.Project.Split(","), Function(x) x.Trim()).ToList()
-        selections.Remove("")
+        Dim unused1 = selections.Remove("")
 
-        Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+        Using viewer As New TagViewer
+            Dim controller As New TagController(viewer_instance:=viewer,
                                                                 dictOptions:=filtered_cats,
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
                                                                 prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
-            viewer.ShowDialog()
+            Dim unused = viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.Project = controller.SelectionString()
                 _viewer.project_selection.Text = _active.Project(False)
@@ -305,17 +301,17 @@ Public Class TaskController
 
         Dim selections As List(Of String) = Array.ConvertAll(
             _active.Topic.Split(","), Function(x) x.Trim()).ToList()
-        selections.Remove("")
+        Dim unused1 = selections.Remove("")
 
-        Using viewer As TagViewer = New TagViewer
-            Dim controller As TagController = New TagController(viewer_instance:=viewer,
+        Using viewer As New TagViewer
+            Dim controller As New TagController(viewer_instance:=viewer,
                                                                 dictOptions:=filtered_cats,
                                                                 autoAssigner:=_autoAssign,
                                                                 prefixes:=_defaults.PrefixList,
                                                                 selections:=selections,
                                                                 prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
-            viewer.ShowDialog()
+            Dim unused = viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.Topic = controller.SelectionString()
                 _viewer.topic_selection.Text = _active.Topic(False)
@@ -414,7 +410,7 @@ Public Class TaskController
         SetFlag("Routine - Reading", FlagsToSet.projects)
         SetFlag("READ: " & _viewer.task_name.Text, FlagsToSet.taskname)
         SetFlag("15", FlagsToSet.worktime)
-        _viewer.duration.Focus()
+        Dim unused = _viewer.duration.Focus()
     End Sub
 
 #End Region
@@ -429,7 +425,7 @@ Public Class TaskController
             _altLevel = tup.level
             Return True
         ElseIf _altActive Then
-            If (e.KeyCode >= Keys.A And e.KeyCode <= Keys.Z) Then
+            If e.KeyCode >= Keys.A And e.KeyCode <= Keys.Z Then
                 Dim tup = RecurseXl(_xlCtrlsActive,
                                     _altActive,
                                     Char.ToUpper(e.KeyCode.ToChar()),
@@ -461,14 +457,10 @@ Public Class TaskController
     ''' <returns>True if any value set in Context, People, Project or Topic. Else returns False</returns>
     Private ReadOnly Property AnyCategorySelected() As Boolean
         Get
-            If _viewer.category_selection.Text <> "[Category Label]" Or
+            Return _viewer.category_selection.Text <> "[Category Label]" Or
             _viewer.people_selection.Text <> "[Assigned People Flagged]" Or
             _viewer.project_selection.Text <> "[ Projects Flagged ]" Or
-            _viewer.topic_selection.Text <> "[Other Topics Tagged]" Then
-                Return True
-            Else
-                Return False
-            End If
+            _viewer.topic_selection.Text <> "[Other Topics Tagged]"
         End Get
     End Property
 
@@ -554,17 +546,9 @@ Public Class TaskController
             _viewer.lbl_duration.Enabled = False
         End If
 
-        If _options.HasFlag(FlagsToSet.today) Then
-            _viewer.cbx_today.Enabled = True
-        Else
-            _viewer.cbx_today.Enabled = False
-        End If
+        _viewer.cbx_today.Enabled = _options.HasFlag(FlagsToSet.today)
 
-        If _options.HasFlag(FlagsToSet.bullpin) Then
-            _viewer.cbx_bullpin.Enabled = True
-        Else
-            _viewer.cbx_bullpin.Enabled = False
-        End If
+        _viewer.cbx_bullpin.Enabled = _options.HasFlag(FlagsToSet.bullpin)
 
 
         If _options.HasFlag(FlagsToSet.kbf) Then
@@ -636,10 +620,10 @@ Public Class TaskController
                 Throw New ArgumentOutOfRangeException("Duration cannot be negative")
             End If
         Catch ex As InvalidCastException
-            MsgBox("Could not convert to integer. Please put a positive integer in the duration box")
+            Dim unused1 = MsgBox("Could not convert to integer. Please put a positive integer in the duration box")
             duration = -1
         Catch ex As ArgumentOutOfRangeException
-            MsgBox(ex.Message)
+            Dim unused = MsgBox(ex.Message)
             duration = -1
         End Try
 
@@ -704,28 +688,28 @@ Public Class TaskController
 
     Private Sub ExecuteXlAction(lbl As Label)
         Dim ctrl As Control = _xlCtrlLookup(lbl)
-        If TypeOf (ctrl) Is Button Then
+        If TypeOf ctrl Is Button Then
             Dim btn As Button = TryCast(ctrl, Button)
             btn.PerformClick()
-        ElseIf TypeOf (ctrl) Is TextBox Then
+        ElseIf TypeOf ctrl Is TextBox Then
             Dim txt As TextBox = TryCast(ctrl, TextBox)
             txt.Select()
             txt.SelectionStart = txt.Text.Length
 
-        ElseIf TypeOf (ctrl) Is ComboBox Then
+        ElseIf TypeOf ctrl Is ComboBox Then
             Dim combo As ComboBox = ctrl
             combo.Select()
             combo.DroppedDown = True
 
-        ElseIf TypeOf (ctrl) Is DateTimePicker Then
+        ElseIf TypeOf ctrl Is DateTimePicker Then
             Dim dt As DateTimePicker = ctrl
 
-            Dim x As Int32 = dt.Width - 10
-            Dim y As Int32 = dt.Height / 2
-            Dim lParam As Int32 = x + y * &H10000
-            PostMessage(dt.Handle, WM_LBUTTONDOWN, 1, lParam)
+            Dim x As Integer = dt.Width - 10
+            Dim y As Integer = dt.Height / 2
+            Dim lParam As Integer = x + (y * &H10000)
+            Dim unused = PostMessage(dt.Handle, WM_LBUTTONDOWN, 1, lParam)
 
-        ElseIf TypeOf (ctrl) Is Label Then
+        ElseIf TypeOf ctrl Is Label Then
 
             If lbl.Equals(_viewer.xl_people) Then
                 Assign_People()

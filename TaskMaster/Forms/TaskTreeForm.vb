@@ -10,10 +10,10 @@ Imports ToDoModel
 Public Class TaskTreeForm
 
     'Public ToDoTree As TreeNode(Of ToDoItem)
-    Public ToDoTree As List(Of TreeNode(Of ToDoItem)) = New List(Of TreeNode(Of ToDoItem))
-    Public DM As DataModel_ToDoTree = New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem)))
-    Private rs As New Resizer
-    Private rscol As New Resizer
+    Public ToDoTree As New List(Of TreeNode(Of ToDoItem))
+    Public DM As New DataModel_ToDoTree(New List(Of TreeNode(Of ToDoItem)))
+    Private ReadOnly rs As New Resizer
+    Private ReadOnly rscol As New Resizer
     Private expanded As Boolean = False
     Private filtercompleted As Boolean = True
 
@@ -27,14 +27,14 @@ Public Class TaskTreeForm
         TreeListView1.Sort(OlvToDoID, SortOrder.Ascending)
 
 
-        Dim sink1 = CType(Me.TreeListView1.DropSink, SimpleDropSink)
+        Dim sink1 = CType(TreeListView1.DropSink, SimpleDropSink)
         sink1.AcceptExternal = True
         sink1.CanDropBetween = True
         sink1.CanDropOnBackground = True
 
         rs.FindAllControls(Me)
-        rs.SetResizeDimensions(Me.SplitContainer1, Resizer.ResizeDimensions.None, True)
-        rs.SetResizeDimensions(Me.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position Or Resizer.ResizeDimensions.Size, True)
+        Dim unused1 = rs.SetResizeDimensions(SplitContainer1, Resizer.ResizeDimensions.None, True)
+        Dim unused = rs.SetResizeDimensions(SplitContainer1.Panel2, Resizer.ResizeDimensions.Position Or Resizer.ResizeDimensions.Size, True)
         rs.PrintDict()
     End Sub
 
@@ -235,9 +235,9 @@ Public Class TaskTreeForm
         End If
     End Function
     Private Function MergeSort(Of T)(ByVal coll As IList(Of T), ByVal comparison As Comparison(Of T)) As IList(Of T)
-        Dim Result As List(Of T) = New List(Of T)()
-        Dim Left As Queue(Of T) = New Queue(Of T)()
-        Dim Right As Queue(Of T) = New Queue(Of T)()
+        Dim Result As New List(Of T)()
+        Dim Left As New Queue(Of T)()
+        Dim Right As New Queue(Of T)()
         If coll.Count <= 1 Then Return coll
         Dim midpoint As Integer = coll.Count / 2
 
@@ -260,7 +260,7 @@ Public Class TaskTreeForm
     Private Function Merge(Of T)(ByVal Left As Queue(Of T), ByVal Right As Queue(Of T), ByVal comparison As Comparison(Of T)) As List(Of T)
         'Dim cmp As Integer = comparison(coll(i), coll(j))
 
-        Dim Result As List(Of T) = New List(Of T)()
+        Dim Result As New List(Of T)()
 
         While Left.Count > 0 AndAlso Right.Count > 0
             Dim cmp As Integer = comparison(Left.Peek(), Right.Peek())
@@ -370,7 +370,7 @@ Public Class TaskTreeForm
             For Each x As TreeNode(Of ToDoItem) In toMove
 
                 If x.Parent IsNot Nothing Then
-                    x.Parent.RemoveChild(x)             'Data Model: Remove pointer to node from parent.children list
+                    Dim unused1 = x.Parent.RemoveChild(x)             'Data Model: Remove pointer to node from parent.children list
                     'x.Parent.Children.Remove(x)         'Data Model: Remove pointer to node from parent.children list
                     'x.Parent = Nothing                  'Data Model: Set the pointer to the parent inside the node to nothing
                     sourceTree.AddObject(x)             'TreeListView: Add the node to the source tree as a Root node
@@ -383,7 +383,7 @@ Public Class TaskTreeForm
                 If x.Parent Is Nothing Then             'Data Model: If the node was a root in the old tree
                     sourceTree.RemoveObject(x)          'TreeListView: Delete the pointer in the tree to the node
                 Else                                    'Data Model: If the node was NOT a root in the old tree
-                    x.Parent.RemoveChild(x)             'Data Model: Grab the parent node and delete the pointer from the list of children
+                    Dim unused = x.Parent.RemoveChild(x)             'Data Model: Grab the parent node and delete the pointer from the list of children
                 End If
 
                 x.Parent = Nothing                      'Data Model: Delete the pointer in the node to the parent
@@ -419,12 +419,12 @@ Public Class TaskTreeForm
                 'sourceRootsChanged = True               'TreeListView: 
                 'sourceRoots.Remove(x)                   'TreeListView: Remove node from roots
                 If DM.ListOfToDoTree.Contains(x) Then
-                    DM.ListOfToDoTree.Remove(x)         'Data Model: Remove node from roots
+                    Dim unused2 = DM.ListOfToDoTree.Remove(x)         'Data Model: Remove node from roots
                 Else
-                    MsgBox("Error in MoveObjectsToSibling: TreeListView and DataModel out of sync at roots")
+                    Dim unused1 = MsgBox("Error in MoveObjectsToSibling: TreeListView and DataModel out of sync at roots")
                 End If
             Else
-                x.Parent.RemoveChild(x)                 'Data Model: Remove Child from old Parent
+                Dim unused = x.Parent.RemoveChild(x)                 'Data Model: Remove Child from old Parent
                 'TreeListView: Where is the action here? Is this automatic?
                 'TreeListView: If it is automatic, why did I have to change for the roots?
             End If
@@ -440,12 +440,8 @@ Public Class TaskTreeForm
             'DataModel: Nothing here. Is this dealt with?
             DM.ListOfToDoTree.AddRange(toMove)
             Dim i
-            Dim strSeed As String = ""
-            If DM.ListOfToDoTree.Count > toMove.Count Then
-                strSeed = DM.ListOfToDoTree(DM.ListOfToDoTree.Count - toMove.Count - 2).Value.ToDoID
-            Else
-                strSeed = "00"
-            End If
+            Dim strSeed = If(DM.ListOfToDoTree.Count > toMove.Count, DM.ListOfToDoTree(DM.ListOfToDoTree.Count - toMove.Count - 2).Value.ToDoID, "00")
+
             For i = DM.ListOfToDoTree.Count - toMove.Count - 1 To DM.ListOfToDoTree.Count - 1
                 strSeed = Globals.ThisAddIn.IDList.GetNextAvailableToDoID(strSeed)
                 DM.ListOfToDoTree(i).Value.ToDoID = strSeed
@@ -506,12 +502,12 @@ Public Class TaskTreeForm
             If x.Parent Is Nothing Then
                 sourceTree.RemoveObject(x)              'TreeListView: Remove from Visual Tree
                 If DM.ListOfToDoTree.Contains(x) Then
-                    DM.ListOfToDoTree.Remove(x)         'Data Model: Remove node from roots
+                    Dim unused2 = DM.ListOfToDoTree.Remove(x)         'Data Model: Remove node from roots
                 Else
-                    MsgBox("Error in MoveObjectsToChildren: TreeListView and DataModel out of sync at roots")
+                    Dim unused1 = MsgBox("Error in MoveObjectsToChildren: TreeListView and DataModel out of sync at roots")
                 End If
             Else
-                x.Parent.Children.Remove(x)             'Data Model: Remove pointer to child from parent
+                Dim unused = x.Parent.Children.Remove(x)             'Data Model: Remove pointer to child from parent
                 '***NO REFERENCE TO TREELISTVIEW. INCONSISTENT WITH TREATMENT OF ROOTS
             End If
 
@@ -597,7 +593,7 @@ Public Class TaskTreeForm
     Public Sub WriteTreeToDisk()
         Dim filename As String = "C:\Users\03311352\Documents\DebugTreeDump.csv"
 
-        Using sw As StreamWriter = New StreamWriter(filename)
+        Using sw As New StreamWriter(filename)
             sw.WriteLine("File Dump")
         End Using
 
@@ -661,11 +657,9 @@ Public Class TaskTreeForm
         'node = TryCast(e.Model.Value, TreeNode(Of ToDoItem))
         Dim objToDo As ToDoItem = TryCast(e.Model.Value, ToDoItem)
         'If e.Model.Value.Complete Then
-        If objToDo.Complete Then
-            e.Item.Font = New Font(e.Item.Font, e.Item.Font.Style Or FontStyle.Strikeout)
-        Else
-            e.Item.Font = New Font(e.Item.Font, e.Item.Font.Style And Not FontStyle.Strikeout)
-        End If
+        e.Item.Font = If(objToDo.Complete,
+            New Font(e.Item.Font, e.Item.Font.Style Or FontStyle.Strikeout),
+            New Font(e.Item.Font, e.Item.Font.Style And Not FontStyle.Strikeout))
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles But_ExpandCollapse.Click
@@ -696,7 +690,7 @@ Public Class TaskTreeForm
     End Sub
 
     Private Sub But_ReloadTree_Click(sender As Object, e As EventArgs) Handles But_ReloadTree.Click
-        Init_DataModel()
+        Dim unused = Init_DataModel()
         TreeListView1.Roots = DM.ListOfToDoTree
         TreeListView1.RebuildAll(preserveState:=False)
     End Sub

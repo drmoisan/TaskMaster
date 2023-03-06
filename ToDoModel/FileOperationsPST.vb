@@ -3,9 +3,9 @@ Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB
 
 Public Class FileOperationsPST
-    Private _globals As IApplicationGlobals
-    Private _emailFolderPST As Outlook.Folder
-    Private _handlerList As List(Of PSTEvents)
+    Private ReadOnly _globals As IApplicationGlobals
+    Private ReadOnly _emailFolderPST As Outlook.Folder
+    Private ReadOnly _handlerList As List(Of PSTEvents)
 
     Public Sub New(appGlobals As IApplicationGlobals, EmailFolderpathPST As String)
         _globals = appGlobals
@@ -55,13 +55,13 @@ Public Class FileOperationsPST
     Private Function InstantiateHandlers() As List(Of PSTEvents)
         Dim olSession As Outlook.NameSpace = _globals.Ol.App.Session
         Dim stores As Outlook.Stores = olSession.Stores
-        Dim handlerList As List(Of PSTEvents) = New List(Of PSTEvents)
+        Dim handlerList As New List(Of PSTEvents)
 
         For Each store As Outlook.Store In stores
             If Right(store.FilePath, 3) = "pst" Then
                 Dim OlFolder As Outlook.Folder = GetSearchFolder(store, "FLAGGED")
                 Dim items As Outlook.Items = OlFolder.Items
-                Dim handlerPST As PSTEvents = New PSTEvents(store, items, _globals)
+                Dim handlerPST As New PSTEvents(store, items, _globals)
                 handlerList.Add(handlerPST)
             End If
         Next
@@ -71,8 +71,8 @@ Public Class FileOperationsPST
 
     Private Class PSTEvents
         Private WithEvents _itemsPST As Outlook.Items
-        Private _store As Outlook.Store
-        Private _globals As IApplicationGlobals
+        Private ReadOnly _store As Outlook.Store
+        Private ReadOnly _globals As IApplicationGlobals
 
         Public Sub New(Store As Outlook.Store, ItemsPST As Outlook.Items, Globals As IApplicationGlobals)
             _itemsPST = ItemsPST
@@ -97,22 +97,20 @@ Public Class FileOperationsPST
             If blIsRunning = False Then
 
                 blIsRunning = True
-                Dim todo As ToDoItem = New ToDoItem(Item, OnDemand:=True)
+                Dim todo As New ToDoItem(Item, OnDemand:=True)
                 Dim objProperty_ToDoID As Outlook.UserProperty = Item.UserProperties.Find("ToDoID")
                 Dim objProperty_Project As Outlook.UserProperty = Item.UserProperties.Find("TagProject")
-                Dim strToDoID As String = ""
-                Dim strToDoID_root As String = ""
-                Dim strProject As String = ""
-                Dim strProjectToDo As String = ""
 
 
                 'AUTOCODE ToDoID based on Project
                 'Check to see if the project exists before attempting to autocode the id
                 If objProperty_Project IsNot Nothing Then
 
+                    Dim strProject As String
+                    Dim strProjectToDo As String
                     'Check to see whether there is an existing ID
                     If objProperty_ToDoID IsNot Nothing Then
-                        strToDoID = objProperty_ToDoID.Value
+                        Dim strToDoID As String = objProperty_ToDoID.Value
 
                         'Don't autocode branches that existed to another project previously
                         If strToDoID.Length <> 0 And strToDoID.Length <= 4 Then
@@ -156,7 +154,7 @@ Public Class FileOperationsPST
                                             'ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                             'SaveDict()
                                             Dim strProgram As String = InputBox("What is the program name for " & strProject & "?", DefaultResponse:="")
-                                            _globals.ToDo.ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
+                                            Dim unused2 = _globals.ToDo.ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
                                             _globals.ToDo.ProjInfo.Save()
                                         End If
                                     End If
@@ -186,11 +184,7 @@ Public Class FileOperationsPST
                         End If
                     Else 'In this case, the project name exists but the todo id does not
                         'Get Project Name
-                        If IsArray(objProperty_Project.Value) Then
-                            strProject = FlattenArry(objProperty_Project.Value)
-                        Else
-                            strProject = objProperty_Project.Value
-                        End If
+                        strProject = If(IsArray(objProperty_Project.Value), FlattenArry(objProperty_Project.Value), DirectCast(objProperty_Project.Value, String))
 
                         'If the project name is in our dictionary, autoadd the ToDoID to this item
                         If strProject.Length <> 0 Then
@@ -233,7 +227,7 @@ Public Class FileOperationsPST
                             strCats += "Tag KB Completed"
                         End If
                         Item.Categories = strCats
-                        Item.Save
+                        Dim unused1 = Item.Save
                         todo.KB = "Completed"
                     End If
                 ElseIf todo.KB = "Completed" Then
@@ -243,9 +237,9 @@ Public Class FileOperationsPST
                     If InStr(strCats, "Tag KB Completed") = True Then
                         strCats = Replace(Replace(strCats, "Tag KB Completed", ""), ",,", ",")
                     End If
-                    Dim strReplace As String = ""
-                    Dim strKB As String = ""
 
+                    Dim strReplace As String
+                    Dim strKB As String
                     If InStr(strCats, "Tag A Top Priority Today") = True Then
                         strReplace = "Tag KB InProgress"
                         strKB = "InProgress"
@@ -262,7 +256,7 @@ Public Class FileOperationsPST
                         strCats = strReplace
                     End If
                     Item.Categories = strCats
-                    Item.Save
+                    Dim unused = Item.Save
                     todo.KB = strKB
 
                 End If

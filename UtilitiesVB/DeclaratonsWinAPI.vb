@@ -13,7 +13,7 @@
         DWLP_DLGPROC = &H4
     End Enum
 
-    Enum GetAncestor_Flags
+    Public Enum GetAncestor_Flags
         GetParent = 1
         GetRoot = 2
         GetRootOwner = 3
@@ -37,8 +37,8 @@
 
     Public Declare Function SendMessage Lib "user32" Alias "SendMessageA" _
         (ByVal hwnd As IntPtr,
-         wMsg As Int32,
-         wParam As Int32,
+         wMsg As Integer,
+         wParam As Integer,
          lParam As IntPtr) As IntPtr
 
     Public Declare Function DrawMenuBar Lib "user32" (ByVal hwnd As IntPtr) As Boolean

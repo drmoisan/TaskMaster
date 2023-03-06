@@ -2,7 +2,7 @@
 Imports Microsoft.Office.Interop.Outlook
 
 Public Module ExplorerActions
-    Function GetCurrentItem(OlApp As Outlook.Application) As Object
+    Public Function GetCurrentItem(OlApp As Outlook.Application) As Object
 
         Dim oMail As MailItem
         Dim obj As Object

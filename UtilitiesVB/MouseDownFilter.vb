@@ -4,8 +4,8 @@ Public Class MouseDownFilter
     Implements IMessageFilter
 
     Public Event FormClicked As EventHandler
-    Private WM_LBUTTONDOWN As Integer = &H201
-    Private form As Form = Nothing
+    Private ReadOnly WM_LBUTTONDOWN As Integer = &H201
+    Private ReadOnly form As Form = Nothing
 
     Declare Auto Function IsChild Lib "user32.dll" (
         ByVal hWndParent As IntPtr,

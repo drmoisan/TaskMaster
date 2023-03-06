@@ -13,7 +13,7 @@ Public Class TaskViewer
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        Me.KeyPreview = True
+        KeyPreview = True
 
         'Attach Handler to capture mouseclick anywhere on form
         _mouseFilter = New MouseDownFilter(Me)
@@ -30,8 +30,8 @@ Public Class TaskViewer
         If keyData.HasFlag(Keys.Alt) Then
             'If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
             Dim sender As Object = Control.FromHandle(msg.HWnd)
-            Dim e As KeyEventArgs = New KeyEventArgs(keyData)
-            _controller.KeyboardHandler_KeyDown(sender, e)
+            Dim e As New KeyEventArgs(keyData)
+            Dim unused = _controller.KeyboardHandler_KeyDown(sender, e)
             Return True
         End If
 

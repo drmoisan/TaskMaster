@@ -8,7 +8,7 @@ Public Class TagViewer
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        Me.KeyPreview = False
+        KeyPreview = False
     End Sub
 
     Public Sub SetController(controller As TagController)

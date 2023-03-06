@@ -6,7 +6,7 @@ Public Class ProjectList
     Public ProjectDictionary As Dictionary(Of String, String)
 
     Public Sub New(ByVal dictProjectList As Dictionary(Of String, String))
-        Me.ProjectDictionary = dictProjectList
+        ProjectDictionary = dictProjectList
     End Sub
 
     Public Sub ToCSV(FileName As String)

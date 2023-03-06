@@ -5,8 +5,7 @@ Imports Tags
 Imports UtilitiesVB
 
 Public Module AutoFile
-
-    Const NumberOfFields = 13
+    Private Const NumberOfFields = 13
 
     Public Function CaptureEmailRecipients(OlMail As MailItem) As String()
         Dim strAry() As String
@@ -95,7 +94,7 @@ Public Module AutoFile
                                    Optional blExcludeFlagged As Boolean = True) As Collection
         Dim OlMail As [MailItem]
         Dim emailAddressList As List(Of String)
-        Dim colPPL As Collection = New Collection
+        Dim colPPL As New Collection
         Dim strMissing As String = ""
         Dim strTmp As String
 
@@ -120,7 +119,7 @@ Public Module AutoFile
                 Next i
                 If Len(strMissing) > 0 And blNotifyMissing Then
                     strMissing = Right(strMissing, Len(strMissing) - 2)
-                    MsgBox("Recipients not in list of people: " & strMissing)
+                    Dim unused = MsgBox("Recipients not in list of people: " & strMissing)
                 End If
             End If
         End If
@@ -143,7 +142,7 @@ Public Module AutoFile
         Return blSelected
     End Function
 
-    Delegate Sub DictPPL_Save()
+    Public Delegate Sub DictPPL_Save()
 
     Public Function dictPPL_AddMissingEntries(OlMail As Outlook.MailItem,
                                               ppl_dict As Dictionary(Of String, String),
@@ -155,11 +154,11 @@ Public Module AutoFile
                                               filename_dictppl As String,
                                               dictPPLSave As DictPPL_Save) As Collection
 
-        Dim addressList As List(Of String) = New List(Of String)
+        Dim addressList As New List(Of String)
         Dim strTmp3 As String
         Dim blNew As Boolean = False
         'Dim catTmp As Outlook.Category
-        Dim colReturnCatNames As Collection = New Collection
+        Dim colReturnCatNames As New Collection
         Dim objRegex As Regex
         Dim _viewer As TagViewer
         Dim dictNAMES As SortedDictionary(Of String, Boolean)
@@ -186,8 +185,9 @@ Public Module AutoFile
                                      RegexOptions.Multiline)
 
                 Dim newPplTag As String = StrConv(objRegex.Replace(address, UCase("$1 $2")), vbProperCase)
-                Dim selections As List(Of String) = New List(Of String)
-                selections.Add(newPplTag)
+                Dim selections As New List(Of String) From {
+                    newPplTag
+                }
 
                 'Check if it is a new address for existing contact
                 _viewer = New TagViewer
@@ -198,13 +198,13 @@ Public Module AutoFile
                                                      prefixes:=prefixes,
                                                      selections:=selections,
                                                      prefix_key:=prefixKey,
-                                                     objItemObject:=OlMail)
-
-                _controller.ButtonNewActive = False
-                _controller.ButtonAutoAssignActive = False
+                                                     objItemObject:=OlMail) With {
+                    .ButtonNewActive = False,
+                    .ButtonAutoAssignActive = False
+                                                     }
                 _controller.SetSearchText(newPplTag)
 
-                _viewer.ShowDialog()
+                Dim unused = _viewer.ShowDialog()
                 strTmp3 = _controller.SelectionString()
 
                 If strTmp3 <> "" Then

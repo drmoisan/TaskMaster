@@ -7,8 +7,8 @@ Public Class TaskMasterRibbon
 
     'COMPLETE: 2023-02-24 Hook up FlagTask button to the class
     Private Sub btn_RefreshMax_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_RefreshMax.Click
-        Globals.ThisAddIn.RefreshIDList()
-        MsgBox("ID Refresh Complete")
+        Dim unused1 = Globals.ThisAddIn.RefreshIDList()
+        Dim unused = MsgBox("ID Refresh Complete")
     End Sub
 
     Private Sub btn_SplitToDoID_Click(sender As Object, e As RibbonControlEventArgs) Handles btn_SplitToDoID.Click
@@ -17,19 +17,19 @@ Public Class TaskMasterRibbon
 
     Private Sub Btn_TreeListView_Click(sender As Object, e As RibbonControlEventArgs) Handles Btn_TreeListView.Click
         frmTTF = New TaskTreeForm
-        frmTTF.Init_DataModel()
+        Dim unused = frmTTF.Init_DataModel()
         frmTTF.Show()
     End Sub
 
     Private Sub but_Dictionary_Click(sender As Object, e As RibbonControlEventArgs) Handles but_Dictionary.Click
-        Dim projinfoview As ProjectInfoWindow = New ProjectInfoWindow(Globals.ThisAddIn.ProjInfo)
+        Dim projinfoview As New ProjectInfoWindow(Globals.ThisAddIn.ProjInfo)
         projinfoview.Show()
 
     End Sub
 
     Private Sub but_CompressIDs_Click(sender As Object, e As RibbonControlEventArgs) Handles but_CompressIDs.Click
         Globals.ThisAddIn.CompressToDoIDs()
-        MsgBox("ID Compression Complete")
+        Dim unused = MsgBox("ID Compression Complete")
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As RibbonControlEventArgs) Handles Button1.Click
@@ -40,13 +40,13 @@ Public Class TaskMasterRibbon
         If blHook = True Then
             Globals.ThisAddIn.Events_Unhook()
             blHook = False
-            Me.BTN_Hook.Label = "Hook Events"
-            MsgBox("Events Disconnected")
+            BTN_Hook.Label = "Hook Events"
+            Dim unused1 = MsgBox("Events Disconnected")
         Else
             Globals.ThisAddIn.Events_Hook()
-            Me.BTN_Hook.Label = "UnHook Events"
+            BTN_Hook.Label = "UnHook Events"
             blHook = True
-            MsgBox("Hooked Events")
+            Dim unused = MsgBox("Hooked Events")
         End If
     End Sub
 
@@ -57,7 +57,7 @@ Public Class TaskMasterRibbon
     End Sub
 
     Private Sub BTN_FlagTask_Click(sender As Object, e As RibbonControlEventArgs) Handles BTN_FlagTask.Click
-        Dim FT As Flag_Tasks = New Flag_Tasks(Globals.ThisAddIn._globals)
+        Dim FT As New Flag_Tasks(Globals.ThisAddIn._globals)
         FT.Run()
     End Sub
 End Class

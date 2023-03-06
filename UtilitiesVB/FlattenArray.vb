@@ -7,11 +7,7 @@
         strTemp = ""
 
         For i = 0 To UBound(varBranch)
-            If IsArray(varBranch(i)) Then
-                strTemp = strTemp & ", " & FlattenArry(varBranch(i))
-            Else
-                strTemp = strTemp & ", " & varBranch(i)
-            End If
+            strTemp = If(IsArray(varBranch(i)), strTemp & ", " & FlattenArry(varBranch(i)), DirectCast(strTemp & ", " & varBranch(i), String))
         Next i
         If strTemp.Length <> 0 Then strTemp = Right(strTemp, Len(strTemp) - 2)
         FlattenArry = strTemp

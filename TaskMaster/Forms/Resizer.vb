@@ -56,7 +56,7 @@ Public Class Resizer
     ' ctrlDict
     ' Dictionary of (control name, control info) for all processed controls
     '-------------------------------------------------------------------------
-    Private ctrlDict As Dictionary(Of String, ControlInfo) = New Dictionary(Of String, ControlInfo)
+    Private ReadOnly ctrlDict As New Dictionary(Of String, ControlInfo)
 
     '----------------------------------------------------------------------------------------
     ' FindAllControls
@@ -80,17 +80,18 @@ Public Class Resizer
                         Dim parentHeight = ctl.Parent.Height
                         Dim parentWidth = ctl.Parent.Width
 
-                        Dim c As New ControlInfo
-                        c.name = ctl.Name
-                        c.parentName = ctl.Parent.Name
-                        c.topOffsetPercent = Convert.ToDouble(ctl.Top) / Convert.ToDouble(parentHeight)
-                        c.leftOffsetPercent = Convert.ToDouble(ctl.Left) / Convert.ToDouble(parentWidth)
-                        c.heightPercent = Convert.ToDouble(ctl.Height) / Convert.ToDouble(parentHeight)
-                        c.widthPercent = Convert.ToDouble(ctl.Width) / Convert.ToDouble(parentWidth)
-                        c.originalFontSize = ctl.Font.Size
-                        c.originalHeight = ctl.Height
-                        c.originalWidth = ctl.Width
-                        c.ResizeType = ResizeDimensions.All
+                        Dim c As New ControlInfo With {
+                            .name = ctl.Name,
+                            .parentName = ctl.Parent.Name,
+                            .topOffsetPercent = Convert.ToDouble(ctl.Top) / Convert.ToDouble(parentHeight),
+                            .leftOffsetPercent = Convert.ToDouble(ctl.Left) / Convert.ToDouble(parentWidth),
+                            .heightPercent = Convert.ToDouble(ctl.Height) / Convert.ToDouble(parentHeight),
+                            .widthPercent = Convert.ToDouble(ctl.Width) / Convert.ToDouble(parentWidth),
+                            .originalFontSize = ctl.Font.Size,
+                            .originalHeight = ctl.Height,
+                            .originalWidth = ctl.Width,
+                            .ResizeType = ResizeDimensions.All
+                        }
                         ctrlDict.Add(c.name, c)
                         Debug.WriteLine(strLeader & c.name)
                     Else
@@ -167,17 +168,17 @@ Public Class Resizer
 
                             '-- If found, adjust the current control based on control relative
                             '-- size and position information stored in the dictionary
-                            If (ret) Then
+                            If ret Then
                                 '-- Size
-                                If (c.ResizeType And ResizeDimensions.Size_Width) Then ctl.Width = Int(parentWidth * c.widthPercent)
-                                If (c.ResizeType And ResizeDimensions.Size_Height) Then ctl.Height = Int(parentHeight * c.heightPercent)
+                                If c.ResizeType And ResizeDimensions.Size_Width Then ctl.Width = Int(parentWidth * c.widthPercent)
+                                If c.ResizeType And ResizeDimensions.Size_Height Then ctl.Height = Int(parentHeight * c.heightPercent)
 
                                 '-- Position
-                                If (c.ResizeType And ResizeDimensions.Position_Top) Then ctl.Top = Int(parentHeight * c.topOffsetPercent)
-                                If (c.ResizeType And ResizeDimensions.Position_Left) Then ctl.Left = Int(parentWidth * c.leftOffsetPercent)
+                                If c.ResizeType And ResizeDimensions.Position_Top Then ctl.Top = Int(parentHeight * c.topOffsetPercent)
+                                If c.ResizeType And ResizeDimensions.Position_Left Then ctl.Left = Int(parentWidth * c.leftOffsetPercent)
 
                                 '-- Font
-                                If (c.ResizeType And ResizeDimensions.Font) Then
+                                If c.ResizeType And ResizeDimensions.Font Then
                                     f = ctl.Font
                                     fontRatioW = ctl.Width / c.originalWidth
                                     fontRatioH = ctl.Height / c.originalHeight

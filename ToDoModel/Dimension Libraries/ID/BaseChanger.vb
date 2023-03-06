@@ -13,7 +13,7 @@ Public Module BaseChanger
         maxBase = Len(chars)
 
         ' check if we can convert to this base
-        If (nbase > maxBase) Then
+        If nbase > maxBase Then
             ConvertToBase = ""
         Else
 
@@ -27,8 +27,8 @@ Public Module BaseChanger
 
             newNumber = Mid(chars, num + 1, 1) & newNumber
 
-            For i = 1 To (Len(newNumber) Mod intMinDigits)
-                newNumber = CStr(0) & newNumber
+            For i = 1 To Len(newNumber) Mod intMinDigits
+                newNumber = 0 & newNumber
             Next i
 
             ConvertToBase = newNumber
@@ -40,10 +40,10 @@ Public Module BaseChanger
         Dim i As Long
         Dim lngLoc As Long
         Dim lngTmp As Long
-        Dim bigint As BigInteger = New BigInteger
+        Dim bigint As New BigInteger
 
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
-        bigint.Equals(0)
+        Dim unused = bigint.Equals(0)
 
         Try
             For i = 1 To Len(strBase)

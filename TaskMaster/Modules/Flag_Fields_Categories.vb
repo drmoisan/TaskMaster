@@ -1,4 +1,4 @@
-﻿Module Flag_Fields_Categories
+﻿Friend Module Flag_Fields_Categories
     Public Sub CCOCatList_Load()
         Globals.ThisAddIn.CCOCatList = New List(Of String)
 

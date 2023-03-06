@@ -9,7 +9,7 @@ Public Module CaptureEmailAddressesModule
         Dim j As Integer
         Dim strAddresses() As String
         Dim blContains As Boolean
-        Dim emailAddressList As List(Of String) = New List(Of String)
+        Dim emailAddressList As New List(Of String)
 
         Dim strEmail() As String = CaptureEmailDetails(OlMail, emailRootFolder, dictRemap)
 

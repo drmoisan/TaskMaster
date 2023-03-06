@@ -15,14 +15,14 @@ Public Class TagController
     Private ReadOnly _obj_caller As Object
     Private ReadOnly _prefix As IPrefix
     Private ReadOnly _prefixes As List(Of IPrefix)
-    Private _col_cbx_ctrl As List(Of Object) = New List(Of Object)
-    Private _col_cbx_event As List(Of Object) = New List(Of Object)
-    Private ReadOnly _col_colorbox As List(Of Object) = New List(Of Object)
+    Private _col_cbx_ctrl As New List(Of Object)
+    Private _col_cbx_event As New List(Of Object)
+    Private ReadOnly _col_colorbox As New List(Of Object)
     Private ReadOnly _isMail As Boolean
     Public _exit_type As String = "Cancel"
     Private _cursor_position As Integer
     Public int_focus As Integer
-    Private _autoAssigner As IAutoAssign
+    Private ReadOnly _autoAssigner As IAutoAssign
 
 
 
@@ -43,11 +43,7 @@ Public Class TagController
         _viewer = viewer_instance
         _obj_item = objItemObject
         _dict_original = dictOptions
-        If _viewer.Hide_Archive.Checked = True Then
-            _dict_options = FilterArchive(dictOptions)
-        Else
-            _dict_options = dictOptions
-        End If
+        _dict_options = If(_viewer.Hide_Archive.Checked = True, FilterArchive(dictOptions), dictOptions)
 
         _selections = selections
 
@@ -110,7 +106,7 @@ Public Class TagController
             Next
         End If
 
-        LoadControls(_dict_options, _prefix.Value)
+        Dim unused = LoadControls(_dict_options, _prefix.Value)
     End Sub
 
     Public Sub ToggleChoice(str_choice As String)
@@ -139,7 +135,7 @@ Public Class TagController
             _viewer.TextBox1.Text,
             StringComparison.OrdinalIgnoreCase) >= 0).ToSortedDictionary
 
-        LoadControls(filtered_options, _prefix.Value)
+        Dim unused = LoadControls(filtered_options, _prefix.Value)
     End Sub
 
     Public Function SelectionString() As String
@@ -214,17 +210,13 @@ Public Class TagController
     End Function
 
     Public Sub ToggleArchive()
-        If _viewer.Hide_Archive.Checked = True Then
-            _dict_options = FilterArchive(_dict_options)
-        Else
-            _dict_options = _dict_original
-        End If
+        _dict_options = If(_viewer.Hide_Archive.Checked = True, FilterArchive(_dict_options), _dict_original)
         SearchAndReload()
     End Sub
 
     Public Sub AddColorCategory(Optional categoryName As String = "")
         Dim autoAdded As Boolean = False
-        Dim colCatName As Collection = New Collection()
+        Dim colCatName As New Collection()
 
         'Check to see if can be automatically created
         If (_autoAssigner IsNot Nothing) And _isMail Then
@@ -323,7 +315,7 @@ Public Class TagController
             _viewer.TextBox1.Select()
             int_focus = newpos
         ElseIf newpos <= (_col_cbx_ctrl.Count - 1) Then
-            _col_cbx_ctrl.Item(newpos).Focus()
+            Dim unused = _col_cbx_ctrl.Item(newpos).Focus()
             Dim cbx As Windows.Forms.CheckBox = _col_cbx_ctrl.Item(newpos)
             ControlPaint.DrawFocusRectangle(Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle)
             int_focus = newpos
@@ -383,7 +375,7 @@ Public Class TagController
             Else
                 idx_top = filteredIEnumerable.Last().Index
                 Select_Ctrl_By_Position(idx_top)
-                Dim y_scroll As Integer = -1 * _viewer.OptionsPanel.AutoScrollPosition.Y _
+                Dim y_scroll As Integer = (-1 * _viewer.OptionsPanel.AutoScrollPosition.Y) _
                     - (_viewer.OptionsPanel.Height - _col_cbx_ctrl(idx_top).Height)
 
                 _viewer.OptionsPanel.AutoScrollPosition = New Drawing.Point(
@@ -403,7 +395,7 @@ Public Class TagController
             int_focus = position
 
         Else
-            _col_cbx_ctrl.Item(position).Focus()
+            Dim unused = _col_cbx_ctrl.Item(position).Focus()
             Dim cbx As Windows.Forms.CheckBox = _col_cbx_ctrl.Item(position)
             ControlPaint.DrawFocusRectangle(Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle)
             int_focus = position
@@ -438,7 +430,7 @@ Public Class TagController
             Try
                 _viewer.OptionsPanel.Controls.Add(ctrlCB)
             Catch
-                MsgBox("Error adding checkbox in Tags.LoadControls")
+                Dim unused3 = MsgBox("Error adding checkbox in Tags.LoadControls")
                 Return False
                 Exit Function
             End Try
@@ -451,10 +443,10 @@ Public Class TagController
 
             Try
                 clsCheckBox = New CheckBoxController
-                clsCheckBox.Init(Me, prefix)
+                Dim unused2 = clsCheckBox.Init(Me, prefix)
                 clsCheckBox.ctrlCB = ctrlCB
             Catch
-                MsgBox("Error wiring checkbox event in Tags.LoadControls")
+                Dim unused1 = MsgBox("Error wiring checkbox event in Tags.LoadControls")
                 Return False
                 Exit Function
             End Try
@@ -470,7 +462,7 @@ Public Class TagController
                 _col_cbx_ctrl.Add(ctrlCB)
                 _col_cbx_event.Add(clsCheckBox)
             Catch
-                MsgBox("Error saving checkbox control and event to collection")
+                Dim unused = MsgBox("Error saving checkbox control and event to collection")
                 Return False
                 Exit Function
             End Try
@@ -482,14 +474,14 @@ Public Class TagController
         Dim max As Integer = _col_cbx_ctrl.Count - 1
         For i = max To 0 Step -1
             _viewer.OptionsPanel.Controls.Remove(_col_cbx_ctrl.Item(i))
-            _col_cbx_ctrl.Remove(i)
-            _col_cbx_event.Remove(i)
+            Dim unused2 = _col_cbx_ctrl.Remove(i)
+            Dim unused1 = _col_cbx_event.Remove(i)
         Next i
 
         max = _col_colorbox.Count - 1
         For i = max To 0 Step -1
             _viewer.OptionsPanel.Controls.Remove(_col_colorbox.Item(i))
-            _col_colorbox.Remove(i)
+            Dim unused = _col_colorbox.Remove(i)
         Next i
     End Sub
 
@@ -507,7 +499,7 @@ Public Class TagController
                    Function(x) x.Key,
                    Function(x) x.Value)
         _filtered_options = New SortedDictionary(Of String, Boolean)(tmp)
-        LoadControls(_filtered_options, _prefix.Value)
+        Dim unused = LoadControls(_filtered_options, _prefix.Value)
     End Sub
 
     Private Function GetSelections() As List(Of String)
@@ -517,42 +509,17 @@ Public Class TagController
     Private Class PrefixItem
         Implements IPrefix
 
-        Private _key As String
-        Private _value As String
-        Private _color As OlCategoryColor
-
         Public Sub New(key As String, value As String, color As OlCategoryColor)
-            _key = key
-            _value = value
-            _color = color
+            Me.Key = key
+            Me.Value = value
+            Me.Color = color
         End Sub
 
         Public Property Key As String Implements IPrefix.Key
-            Get
-                Return _key
-            End Get
-            Set(value As String)
-                _key = value
-            End Set
-        End Property
 
         Public Property Value As String Implements IPrefix.Value
-            Get
-                Return _value
-            End Get
-            Set(value As String)
-                _value = value
-            End Set
-        End Property
 
         Public Property Color As OlCategoryColor Implements IPrefix.Color
-            Get
-                Return _color
-            End Get
-            Set(value As OlCategoryColor)
-                _color = value
-            End Set
-        End Property
     End Class
 
 #End Region

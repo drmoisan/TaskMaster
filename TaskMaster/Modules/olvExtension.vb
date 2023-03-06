@@ -11,7 +11,7 @@ Friend Module OlvExtension
         Next
         If colswidth <> 0 Then
             For Each c As OLVColumn In olv.Columns
-                c.Width = CInt(Math.Round(CDbl(c.Width) * CDbl(containerwidth) / CDbl(colswidth)))
+                c.Width = CInt(Math.Round(c.Width * CDbl(containerwidth) / colswidth))
             Next
         End If
     End Sub

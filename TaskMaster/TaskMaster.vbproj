@@ -306,19 +306,19 @@
     <Content Include="NSPathTemplate.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ObjectListViewDemo\ObjectListView\ObjectListView2012.csproj">
+    <ProjectReference Include="..\..\ObjectListViewDemo\ObjectListView\ObjectListView2012.csproj">
       <Project>{18feda0c-d147-4286-b39a-01204808106a}</Project>
       <Name>ObjectListView2012</Name>
     </ProjectReference>
-    <ProjectReference Include="Tags\Tags.vbproj">
+    <ProjectReference Include="..\Tags\Tags.vbproj">
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>
     </ProjectReference>
-    <ProjectReference Include="ToDoModel\ToDoModel.vbproj">
+    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
       <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
       <Name>ToDoModel</Name>
     </ProjectReference>
-    <ProjectReference Include="UtilitiesVB\UtilitiesVB.vbproj">
+    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
       <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>
       <Name>UtilitiesVB</Name>
     </ProjectReference>

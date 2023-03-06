@@ -13,14 +13,16 @@ Public Class ListOfIDs
     Public pFileName As String = ""
 
     Public Sub New(ByVal listUsedID As List(Of String))
-        Me.UsedIDList = listUsedID
+        UsedIDList = listUsedID
     End Sub
 
     Public Sub RePopulate(Application As Application) Implements IListOfIDs.RePopulate
-        Dim ObjItem As Object = New Object
-        Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree
+        Dim unused As New Object
+        Dim DM As New DataModel_ToDoTree
         Dim ToDoList As List(Of Object) = DM.GetToDoList(DataModel_ToDoTree.LoadOptions.vbLoadAll, Application)
         UsedIDList = New List(Of String)
+
+        Dim ObjItem As Object
         For Each ObjItem In ToDoList
             Dim strID As String = CustomFieldID_GetValue(ObjItem, "ToDoID")
             If UsedIDList.Contains(strID) = False And strID.Length <> 0 Then
@@ -28,9 +30,6 @@ Public Class ListOfIDs
                 If strID.Length > PMaxIDLength Then PMaxIDLength = strID.Length
             End If
         Next
-
-        ToDoList = Nothing
-        DM = Nothing
     End Sub
 
     'Public Sub CondenseIDs()
@@ -94,7 +93,7 @@ Public Class ListOfIDs
 
     Public Sub Save(FileName_IDList As String) Implements IListOfIDs.Save
         If Not Directory.Exists(Path.GetDirectoryName(FileName_IDList)) Then
-            Directory.CreateDirectory(Path.GetDirectoryName(FileName_IDList))
+            Dim unused = Directory.CreateDirectory(Path.GetDirectoryName(FileName_IDList))
         End If
         Dim TestFileStream As Stream = File.Create(FileName_IDList)
         Dim serializer As New BinaryFormatter
@@ -110,7 +109,7 @@ Public Class ListOfIDs
             serializer.Serialize(TestFileStream, Me)
             TestFileStream.Close()
         Else
-            MsgBox("Can't save. IDList FileName not set yet")
+            Dim unused = MsgBox("Can't save. IDList FileName not set yet")
         End If
     End Sub
 
@@ -126,7 +125,7 @@ Public Class ListOfIDs
         maxBase = Len(chars)
 
         ' check if we can convert to this base
-        If (nbase > maxBase) Then
+        If nbase > maxBase Then
             ConvertToBase = ""
         Else
 
@@ -140,8 +139,8 @@ Public Class ListOfIDs
 
             newNumber = Mid(chars, num + 1, 1) & newNumber
 
-            For i = 1 To (Len(newNumber) Mod intMinDigits)
-                newNumber = CStr(0) & newNumber
+            For i = 1 To Len(newNumber) Mod intMinDigits
+                newNumber = 0 & newNumber
             Next i
 
             ConvertToBase = newNumber
@@ -188,18 +187,12 @@ Public Class ListOfIDs
             objProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
         Else
             objProperty = Nothing
-            MsgBox("Unsupported object type")
+            Dim unused = MsgBox("Unsupported object type")
         End If
 
-        If objProperty Is Nothing Then
-            Return ""
-        Else
-            If IsArray(objProperty.Value) Then
-                Return FlattenArry(objProperty.Value)
-            Else
-                Return objProperty.Value
-            End If
-        End If
+        Return If(objProperty Is Nothing,
+            "",
+            If(IsArray(objProperty.Value), FlattenArry(objProperty.Value), DirectCast(objProperty.Value, String)))
 
         OlMail = Nothing
         OlTask = Nothing
@@ -215,11 +208,7 @@ Public Class ListOfIDs
         strTemp = ""
 
         For i = 0 To UBound(varBranch)
-            If IsArray(varBranch(i)) Then
-                strTemp = strTemp & ", " & FlattenArry(varBranch(i))
-            Else
-                strTemp = strTemp & ", " & varBranch(i)
-            End If
+            strTemp = If(IsArray(varBranch(i)), strTemp & ", " & FlattenArry(varBranch(i)), DirectCast(strTemp & ", " & varBranch(i), String))
         Next i
         If strTemp.Length <> 0 Then strTemp = Right(strTemp, Len(strTemp) - 2)
         FlattenArry = strTemp

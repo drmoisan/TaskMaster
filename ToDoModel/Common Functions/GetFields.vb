@@ -21,23 +21,11 @@ Public Module GetFields
             objProperty = OlAppt.UserProperties.Find(UserDefinedFieldName)
         Else
             objProperty = Nothing
-            MsgBox("Unsupported object type")
+            Dim unused = MsgBox("Unsupported object type")
         End If
 
-        If objProperty Is Nothing Then
-            CustomFieldID_GetValue = ""
-        Else
-            If IsArray(objProperty.Value) Then
-                CustomFieldID_GetValue = FlattenArry(objProperty.Value)
-            Else
-                CustomFieldID_GetValue = objProperty.Value
-            End If
-        End If
-
-        OlMail = Nothing
-        OlTask = Nothing
-        OlAppt = Nothing
-        objProperty = Nothing
-
+        CustomFieldID_GetValue = If(objProperty Is Nothing,
+            "",
+            If(IsArray(objProperty.Value), FlattenArry(objProperty.Value), DirectCast(objProperty.Value, String)))
     End Function
 End Module

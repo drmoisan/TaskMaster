@@ -4,10 +4,10 @@
 Public Class ToDoItem
     Implements ICloneable
 
-    Const PA_TOTAL_WORK As String =
+    Private Const PA_TOTAL_WORK As String =
             "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003"
 
-    Private OlObject As Object
+    Private ReadOnly OlObject As Object
     Private _ToDoID As String = ""
     Public _TaskSubject As String = ""
     Public _MetaTaskSubject As String = ""
@@ -29,7 +29,7 @@ Public Class ToDoItem
 
 
     Public Function Clone() As Object Implements System.ICloneable.Clone
-        Dim cloned_todo As ToDoItem = New ToDoItem(OlObject, True)
+        Dim cloned_todo As New ToDoItem(OlObject, True)
         With cloned_todo
             ._ToDoID = _ToDoID
             ._TaskSubject = _TaskSubject
@@ -90,7 +90,7 @@ Public Class ToDoItem
         EC2 = _EC2
         VisibleTreeState = _VisibleTreeState
 
-        If TypeOf (OlObject) Is MailItem Then
+        If TypeOf OlObject Is MailItem Then
             Dim OlMail As MailItem = OlObject
             If OlMail.FlagStatus = OlFlagStatus.olNoFlag And _flagAsTask Then
                 OlMail.MarkAsTask(OlMarkInterval.olMarkNoDate)
@@ -147,7 +147,7 @@ Public Class ToDoItem
         OlObject = Item
         _flags = New FlagParser(Item.Categories)
         If OnDemand = False Then
-            MsgBox("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand")
+            Dim unused = MsgBox("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand")
         End If
     End Sub
 
@@ -157,20 +157,12 @@ Public Class ToDoItem
 
     Private Sub InitializeMail(OlMail As MailItem)
         With OlMail
-            If OlMail.TaskSubject.Length <> 0 Then
-                _TaskSubject = .TaskSubject
-            Else
-                _TaskSubject = .Subject
-            End If
+            _TaskSubject = If(OlMail.TaskSubject.Length <> 0, .TaskSubject, .Subject)
             _Priority = .Importance
             _TaskCreateDate = .CreationTime
             _StartDate = .TaskStartDate
-            _Complete = (.FlagStatus = OlFlagStatus.olFlagComplete)
-            If PA_FieldExists(PA_TOTAL_WORK) Then
-                _TotalWork = .PropertyAccessor.GetProperty(PA_TOTAL_WORK)
-            Else
-                _TotalWork = 0
-            End If
+            _Complete = .FlagStatus = OlFlagStatus.olFlagComplete
+            _TotalWork = If(PA_FieldExists(PA_TOTAL_WORK), DirectCast(.PropertyAccessor.GetProperty(PA_TOTAL_WORK), Integer), 0)
         End With
     End Sub
 
@@ -195,7 +187,7 @@ Public Class ToDoItem
 
     Public Sub WriteFlagsBatch()
         OlObject.Categories = _flags.Combine()
-        OlObject.Save()
+        Dim unused = OlObject.Save()
         CustomField("TagContext", OlUserPropertyType.olKeywords) = _flags.Context(False)
         CustomField("TagPeople", OlUserPropertyType.olKeywords) = _flags.People(False)
         'TODO: Assign ToDoID if project assignment changes
@@ -217,7 +209,7 @@ Public Class ToDoItem
         End Get
         Set(value As Boolean)
             If OlObject IsNot Nothing Then
-                If TypeOf (OlObject) Is MailItem Then
+                If TypeOf OlObject Is MailItem Then
                     _flagAsTask = value
                     If Not _readonly Then
                         Dim OlMail As MailItem = OlObject
@@ -228,7 +220,7 @@ Public Class ToDoItem
                         End If
                         OlMail.Save()
                     End If
-                ElseIf TypeOf (OlObject) Is TaskItem Then
+                ElseIf TypeOf OlObject Is TaskItem Then
                     _flagAsTask = True
                 Else
                     _flagAsTask = False
@@ -253,7 +245,7 @@ Public Class ToDoItem
             If Not _readonly Then
                 If OlObject IsNot Nothing Then
                     OlObject.Categories = _flags.Combine()
-                    OlObject.Save
+                    Dim unused = OlObject.Save
                 End If
             End If
         End Set
@@ -268,7 +260,7 @@ Public Class ToDoItem
             If Not _readonly Then
                 If OlObject IsNot Nothing Then
                     OlObject.Categories = _flags.Combine()
-                    OlObject.Save
+                    Dim unused = OlObject.Save
                 End If
             End If
         End Set
@@ -281,7 +273,7 @@ Public Class ToDoItem
         Set(value As Date)
             If Not _readonly Then
                 OlObject.ReminderTime = value
-                OlObject.Save()
+                Dim unused = OlObject.Save()
             End If
         End Set
     End Property
@@ -359,11 +351,7 @@ Public Class ToDoItem
                 _Complete = False
             ElseIf TypeOf OlObject Is MailItem Then
                 Dim OlMail As MailItem = OlObject
-                If (OlMail.FlagStatus = OlFlagStatus.olFlagComplete) Then
-                    _Complete = True
-                Else
-                    _Complete = False
-                End If
+                _Complete = OlMail.FlagStatus = OlFlagStatus.olFlagComplete
             ElseIf TypeOf OlObject Is TaskItem Then
                 Dim OlTask As TaskItem = OlObject
                 _Complete = OlTask.Complete
@@ -376,11 +364,7 @@ Public Class ToDoItem
                 If OlObject Is Nothing Then
                 ElseIf TypeOf OlObject Is MailItem Then
                     Dim OlMail As MailItem = OlObject
-                    If value = True Then
-                        OlMail.FlagStatus = OlFlagStatus.olFlagComplete
-                    Else
-                        OlMail.FlagStatus = OlFlagStatus.olFlagMarked
-                    End If
+                    OlMail.FlagStatus = If(value = True, OlFlagStatus.olFlagComplete, OlFlagStatus.olFlagMarked)
                     OlMail.Save()
                 ElseIf TypeOf OlObject Is TaskItem Then
                     Dim OlTask As TaskItem = OlObject
@@ -515,7 +499,7 @@ Public Class ToDoItem
         If OlObject IsNot Nothing Then
             CustomField(FieldName, OlUserPropertyType.olKeywords) = FieldValue
             OlObject.Categories = _flags.Combine()
-            OlObject.Save
+            Dim unused = OlObject.Save
         End If
     End Sub
 
@@ -534,11 +518,7 @@ Public Class ToDoItem
                     _TotalWork = 0
                 ElseIf TypeOf OlObject Is MailItem Then
                     Dim OlMail As MailItem = OlObject
-                    If PA_FieldExists(PA_TOTAL_WORK) Then
-                        _TotalWork = OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK)
-                    Else
-                        _TotalWork = 0
-                    End If
+                    _TotalWork = If(PA_FieldExists(PA_TOTAL_WORK), DirectCast(OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK), Integer), 0)
 
                 ElseIf TypeOf OlObject Is TaskItem Then
                     Dim OlTask As TaskItem = OlObject
@@ -593,13 +573,13 @@ Public Class ToDoItem
     '_VisibleTreeState
     Public Property VisibleTreeStateLVL(ByVal Lvl As Integer) As Boolean
         Get
-            Return ((Math.Pow(2, Lvl - 1) & VisibleTreeState) > 0)
+            Return (Math.Pow(2, Lvl - 1) & VisibleTreeState) > 0
         End Get
         Set(value As Boolean)
             If value = True Then
                 VisibleTreeState = VisibleTreeState Or Math.Pow(2, Lvl - 1)
             Else
-                VisibleTreeState -= (VisibleTreeState And Math.Pow(2, Lvl - 1))
+                VisibleTreeState -= VisibleTreeState And Math.Pow(2, Lvl - 1)
             End If
         End Set
     End Property
@@ -687,11 +667,7 @@ Public Class ToDoItem
                 ExpandChildren = "-"
             End If
 
-            If ExpandChildrenState = ExpandChildren Then
-                Return False
-            Else
-                Return True
-            End If
+            Return ExpandChildrenState <> ExpandChildren
         End Get
         Set(blValue As Boolean)
             If blValue = False Then
@@ -843,11 +819,7 @@ Public Class ToDoItem
     Public ReadOnly Property CustomFieldExists(FieldName As String) As Boolean
         Get
             Dim objProperty As [UserProperty] = OlObject.UserProperties.Find(FieldName)
-            If objProperty Is Nothing Then
-                Return False
-            Else
-                Return True
-            End If
+            Return objProperty IsNot Nothing
         End Get
     End Property
     Public Property CustomField(FieldName As String, Optional ByVal OlFieldType As [OlUserPropertyType] = [OlUserPropertyType].olText)
@@ -863,11 +835,7 @@ Public Class ToDoItem
                 End If
 
             Else
-                If IsArray(objProperty.Value) Then
-                    Return FlattenArry(objProperty.Value)
-                Else
-                    Return objProperty.Value
-                End If
+                Return If(IsArray(objProperty.Value), FlattenArry(objProperty.Value), objProperty.Value)
             End If
         End Get
         Set(value)
@@ -876,7 +844,7 @@ Public Class ToDoItem
                 Try
                     objProperty = OlObject.UserProperties.Add(FieldName, OlFieldType)
                     objProperty.Value = value
-                    OlObject.Save()
+                    Dim unused1 = OlObject.Save()
 
                 Catch e As System.Exception
                     Debug.WriteLine("Exception in Set User Property: " & FieldName)
@@ -887,7 +855,7 @@ Public Class ToDoItem
                 End Try
             Else
                 objProperty.Value = value
-                OlObject.Save()
+                Dim unused = OlObject.Save()
             End If
 
         End Set
@@ -901,11 +869,7 @@ Public Class ToDoItem
         strTemp = ""
 
         For i = 0 To UBound(varBranch)
-            If IsArray(varBranch(i)) Then
-                strTemp = strTemp & ", " & FlattenArry(varBranch(i))
-            Else
-                strTemp = strTemp & ", " & varBranch(i)
-            End If
+            strTemp = If(IsArray(varBranch(i)), strTemp & ", " & FlattenArry(varBranch(i)), DirectCast(strTemp & ", " & varBranch(i), String))
         Next i
         If strTemp.Length <> 0 Then strTemp = Right(strTemp, Len(strTemp) - 2)
         FlattenArry = strTemp

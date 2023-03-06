@@ -12,10 +12,10 @@ Public Module ToDoProjectInfoUtilities
                     ProjInfo = CType(deserializer.Deserialize(TestFileStream), ProjectInfo)
                 End Using
             Catch ex As UnauthorizedAccessException
-                MsgBox("Unexpected Access Error. Duplicate Instance Running?")
+                Dim unused1 = MsgBox("Unexpected Access Error. Duplicate Instance Running?")
                 Throw ex
             Catch ex As IOException
-                MsgBox("Unexpected IO Error. Is Project Info File Corrupt?")
+                Dim unused = MsgBox("Unexpected IO Error. Is Project Info File Corrupt?")
                 Throw ex
             End Try
 

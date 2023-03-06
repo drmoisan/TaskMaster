@@ -13,10 +13,10 @@ Public Module IDListUtilities
                     IDList = CType(deserializer.Deserialize(TestFileStream), ListOfIDs)
                 End Using
             Catch ex As UnauthorizedAccessException
-                MsgBox("Unexpected Access Error. Duplicate Instance Running?")
+                Dim unused1 = MsgBox("Unexpected Access Error. Duplicate Instance Running?")
                 Throw ex
             Catch ex As IOException
-                MsgBox("Unexpected IO Error. Is IDList File Corrupt?")
+                Dim unused = MsgBox("Unexpected IO Error. Is IDList File Corrupt?")
                 Throw ex
             End Try
 

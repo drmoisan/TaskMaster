@@ -2,7 +2,7 @@
 
 Public Class ProjectInfoWindow
     Public pi As ProjectInfo
-    Private rs As New Resizer
+    Private ReadOnly rs As New Resizer
     Private blEditingCell As Boolean = False
 
     Public Sub New(ProjInfo As ProjectInfo)
@@ -20,38 +20,38 @@ Public Class ProjectInfoWindow
         olvProjInfo.SetObjects(pi)
 
         rs.FindAllControls(Me)
-        rs.SetResizeDimensions(Me.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position, True)
-        rs.SetResizeDimensions(Me.SplitContainer1, Resizer.ResizeDimensions.None, True)
-        rs.SetResizeDimensions(Me.SplitContainer1.Panel1, Resizer.ResizeDimensions.Position Or Resizer.ResizeDimensions.Size, True)
+        Dim unused2 = rs.SetResizeDimensions(SplitContainer1.Panel2, Resizer.ResizeDimensions.Position, True)
+        Dim unused1 = rs.SetResizeDimensions(SplitContainer1, Resizer.ResizeDimensions.None, True)
+        Dim unused = rs.SetResizeDimensions(SplitContainer1.Panel1, Resizer.ResizeDimensions.Position Or Resizer.ResizeDimensions.Size, True)
         rs.PrintDict()
     End Sub
 
     Private Sub BTN_OK_Click(sender As Object, e As EventArgs) Handles BTN_OK.Click
         pi.Save()
-        Me.Close()
+        Close()
     End Sub
 
     Private Sub BTN_CANCEL_Click(sender As Object, e As EventArgs) Handles BTN_CANCEL.Click
-        Me.Close()
+        Close()
     End Sub
 
     Private Sub ProjectInfoWindow_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         rs.ResizeAllControls(Me)
         'TreeListView1.AutoResizeColumns()
-        Me.olvProjInfo.AutoScaleColumnsToContainer()
+        olvProjInfo.AutoScaleColumnsToContainer()
     End Sub
 
     Private Sub olvProjInfo_KeyUp(sender As Object, e As Windows.Forms.KeyEventArgs) Handles olvProjInfo.KeyUp
 
         If blEditingCell = False Then
             If e.KeyData = Windows.Forms.Keys.Delete Then
-                Dim selection As System.Collections.ArrayList = Me.olvProjInfo.SelectedObjects
+                Dim selection As System.Collections.ArrayList = olvProjInfo.SelectedObjects
                 If selection IsNot Nothing Then
                     For Each entry As ToDoProjectInfoEntry In selection
-                        pi.Remove(entry)
+                        Dim unused = pi.Remove(entry)
                     Next
                     pi.Save()
-                    Me.olvProjInfo.RemoveObjects(Me.olvProjInfo.SelectedObjects)
+                    olvProjInfo.RemoveObjects(olvProjInfo.SelectedObjects)
                 End If
             End If
         End If

@@ -5,7 +5,7 @@ Public Module CSVDictUtilities
 
     Public Function LoadDictCSV(stagingPath, filename) As Dictionary(Of String, String)
         Dim filepath As String = Path.Combine(stagingPath, filename)
-        Dim dictString As Dictionary(Of String, String) = New Dictionary(Of String, String)
+        Dim dictString As New Dictionary(Of String, String)
 
         Try
             Using MyReader As New TextFieldParser(filepath)
@@ -20,15 +20,15 @@ Public Module CSVDictUtilities
                         Dim value As Object = currentRow(1)
                         dictString.Add(key, value)
                     Catch ex As MalformedLineException
-                        MsgBox("Line " & ex.Message &
+                        Dim unused2 = MsgBox("Line " & ex.Message &
                     "is not valid and will be skipped.")
                     End Try
                 End While
             End Using
         Catch e As FileNotFoundException
-            MsgBox("File not found error -> " & filepath)
+            Dim unused1 = MsgBox("File not found error -> " & filepath)
         Catch e As FieldAccessException
-            MsgBox("File is in use -> " & filepath)
+            Dim unused = MsgBox("File is in use -> " & filepath)
         End Try
 
         Return dictString

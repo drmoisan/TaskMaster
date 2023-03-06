@@ -26,8 +26,8 @@ Public Class CheckBoxController
     Private Sub ctrlCB_Click() Handles ctrlCB.Click
         If Not TrigByKeyChg Then
             strTemp = strTagPrefix & ctrlCB.Text
-            objUserForm.ToggleChoice(strTemp)
-            objUserForm.FocusCheckbox(ctrlCB)
+            Dim unused1 = objUserForm.ToggleChoice(strTemp)
+            Dim unused = objUserForm.FocusCheckbox(ctrlCB)
         ElseIf TrigByValChg Then
             TrigByKeyChg = False
             TrigByValChg = False
@@ -41,25 +41,25 @@ Public Class CheckBoxController
     Private Sub ctrlCB_KeyDown(sender As Object, e As KeyEventArgs) Handles ctrlCB.KeyDown
         Select Case e.KeyCode
             Case Keys.Down
-                objUserForm.Select_Ctrl_By_Offset(1)
+                Dim unused6 = objUserForm.Select_Ctrl_By_Offset(1)
 
             Case Keys.Up
-                objUserForm.Select_Ctrl_By_Offset(-1)
+                Dim unused5 = objUserForm.Select_Ctrl_By_Offset(-1)
 
             Case Keys.End
-                objUserForm.Select_Last_Control()
+                Dim unused4 = objUserForm.Select_Last_Control()
 
             Case Keys.Home
-                objUserForm.Select_First_Control()
+                Dim unused3 = objUserForm.Select_First_Control()
 
             Case Keys.PageDown
-                objUserForm.Select_PageDown()
+                Dim unused2 = objUserForm.Select_PageDown()
 
             Case Keys.PageUp
-                objUserForm.Select_PageUp()
+                Dim unused1 = objUserForm.Select_PageUp()
 
             Case Keys.Enter
-                objUserForm.OK_Action()
+                Dim unused = objUserForm.OK_Action()
         End Select
     End Sub
 

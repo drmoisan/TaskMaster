@@ -3,11 +3,11 @@
 ''' </summary>
 Public Class FlagParser
 
-    Private _people As FlagDetails = New FlagDetails(My.Settings.Prefix_People)
-    Private _projects As FlagDetails = New FlagDetails(My.Settings.Prefix_Project)
-    Private _topics As FlagDetails = New FlagDetails(My.Settings.Prefix_Topic)
-    Private _context As FlagDetails = New FlagDetails(My.Settings.Prefix_Context)
-    Private _kb As FlagDetails = New FlagDetails(My.Settings.Prefix_KB)
+    Private ReadOnly _people As New FlagDetails(My.Settings.Prefix_People)
+    Private ReadOnly _projects As New FlagDetails(My.Settings.Prefix_Project)
+    Private ReadOnly _topics As New FlagDetails(My.Settings.Prefix_Topic)
+    Private ReadOnly _context As New FlagDetails(My.Settings.Prefix_Context)
+    Private ReadOnly _kb As New FlagDetails(My.Settings.Prefix_KB)
     Public other As String = ""
     Public today As Boolean = False
     Public bullpin As Boolean = False
@@ -31,11 +31,7 @@ Public Class FlagParser
     ''' <param name="prefix"></param>
     ''' <returns>True if present. False if not present.</returns>
     Private Function PrefixPresent(test_string As String, prefix As String) As Boolean
-        If Left(test_string, prefix.Length) = prefix Then
-            Return True
-        Else
-            Return False
-        End If
+        Return Left(test_string, prefix.Length) = prefix
     End Function
 
     Private Sub InitFromString(ByRef strCats_All As String)
@@ -55,33 +51,25 @@ Public Class FlagParser
 
         If list_categories.Contains(My.Settings.Prefix_Today) Then
             today = True
-            list_categories.Remove(My.Settings.Prefix_Today)
+            Dim unused1 = list_categories.Remove(My.Settings.Prefix_Today)
         Else
             today = False
         End If
 
         If list_categories.Contains(My.Settings.Prefix_Bullpin) Then
             bullpin = True
-            list_categories.Remove(My.Settings.Prefix_Bullpin)
+            Dim unused = list_categories.Remove(My.Settings.Prefix_Bullpin)
         Else
             bullpin = False
         End If
 
-        If list_categories.Count > 0 Then
-            other = String.Join(", ", list_categories)
-        Else
-            other = ""
-        End If
+        other = If(list_categories.Count > 0, String.Join(", ", list_categories), "")
 
     End Sub
 
     Public Property KB(Optional IncludePrefix As Boolean = False) As String
         Get
-            If IncludePrefix Then
-                Return _kb.WithPrefix
-            Else
-                Return _kb.NoPrefix
-            End If
+            Return If(IncludePrefix, _kb.WithPrefix, _kb.NoPrefix)
         End Get
         Set(value As String)
             _kb.List = SplitToList(value, ",", _kb.prefix)
@@ -97,11 +85,7 @@ Public Class FlagParser
     ''' <returns>A string containing a comma separated Context names</returns>
     Public Property Context(Optional IncludePrefix As Boolean = False) As String
         Get
-            If IncludePrefix Then
-                Return _context.WithPrefix
-            Else
-                Return _context.NoPrefix
-            End If
+            Return If(IncludePrefix, _context.WithPrefix, _context.NoPrefix)
         End Get
         Set(value As String)
             _context.List = SplitToList(value, ",", _context.prefix)
@@ -123,11 +107,7 @@ Public Class FlagParser
     ''' <returns>A string containing a comma separated Project names</returns>
     Public Property Projects(Optional IncludePrefix As Boolean = False) As String
         Get
-            If IncludePrefix Then
-                Return _projects.WithPrefix
-            Else
-                Return _projects.NoPrefix
-            End If
+            Return If(IncludePrefix, _projects.WithPrefix, _projects.NoPrefix)
         End Get
         Set(value As String)
             _projects.List = SplitToList(value, ",", _projects.prefix)
@@ -149,11 +129,7 @@ Public Class FlagParser
     ''' <returns>A string containing a comma separated Topic names</returns>
     Public Property Topics(Optional IncludePrefix As Boolean = False) As String
         Get
-            If IncludePrefix Then
-                Return _topics.WithPrefix
-            Else
-                Return _topics.NoPrefix
-            End If
+            Return If(IncludePrefix, _topics.WithPrefix, _topics.NoPrefix)
         End Get
         Set(value As String)
             _topics.List = SplitToList(value, ",", _topics.prefix)
@@ -175,11 +151,7 @@ Public Class FlagParser
     ''' <returns>A string containing a comma separated Topic names</returns>
     Public Property People(Optional IncludePrefix As Boolean = False) As String
         Get
-            If IncludePrefix Then
-                Return _people.WithPrefix
-            Else
-                Return _people.NoPrefix
-            End If
+            Return If(IncludePrefix, _people.WithPrefix, _people.NoPrefix)
         End Get
         Set(value As String)
             _people.List = SplitToList(value, ",", _people.prefix)
@@ -193,15 +165,7 @@ Public Class FlagParser
     End Property
 
     Private Function AppendDetails(base As String, details As FlagDetails, wtag As Boolean) As String
-        If details.WithPrefix.Length = 0 Then
-            Return base
-        Else
-            If wtag Then
-                Return base & ", " & details.WithPrefix
-            Else
-                Return base & ", " & details.NoPrefix
-            End If
-        End If
+        Return If(details.WithPrefix.Length = 0, base, If(wtag, base & ", " & details.WithPrefix, base & ", " & details.NoPrefix))
     End Function
 
     ''' <summary>
@@ -241,19 +205,11 @@ Public Class FlagParser
 
         Dim strTemp As String = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag Bullpin Priorities"), ", ", DeleteSearchSubString:=False)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag Bullpin Priorities"), ", ", True)
-        If strTemp <> "" Then
-            bullpin = True
-        Else
-            bullpin = False
-        End If
+        bullpin = strTemp <> ""
 
         strTemp = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag A Top Priority Today"), ", ", DeleteSearchSubString:=False)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag A Top Priority Today"), ", ", True)
-        If strTemp <> "" Then
-            today = True
-        Else
-            today = False
-        End If
+        today = strTemp <> ""
 
         _topics.WithPrefix = SubStr_w_Delimeter(strCats_All, AddWildcards("Tag TOPIC "), ", ", DeleteSearchSubString:=DeleteSearchSubString)
         other = SubStr_w_Delimeter(other, AddWildcards("Tag TOPIC "), ", ", True)
@@ -279,7 +235,7 @@ Public Class FlagParser
         Dim strTemp As String
         strTemp = strOriginal
         If b_Leading Then strTemp = charWC & strTemp
-        If b_Trailing Then strTemp = strTemp & charWC
+        If b_Trailing Then strTemp &= charWC
 
         AddWildcards = strTemp
 
@@ -307,16 +263,13 @@ Public Class FlagParser
                                  Optional return_nonmatches As Boolean = False
                                  ) As List(Of String)
 
-        Dim list_return As List(Of String)
-        If return_nonmatches Then
-            list_return = source.Where(
+        Dim list_return = If(return_nonmatches,
+            source.Where(
                 Function(x) x.IndexOf(substring, StringComparison.OrdinalIgnoreCase
-                ) = -1).Select(Function(x) x).ToList()
-        Else
-            list_return = source.Where(
+                ) = -1).Select(Function(x) x).ToList(),
+            source.Where(
                 Function(x) x.IndexOf(substring, StringComparison.OrdinalIgnoreCase
-                ) <> -1).Select(Function(x) x.Replace(substring, "")).ToList()
-        End If
+                ) <> -1).Select(Function(x) x.Replace(substring, "")).ToList())
         Return list_return
 
     End Function
@@ -395,7 +348,7 @@ Public Class FlagParser
             m_Find = Replace(m_Find, "%", "*")
 
             'Determine if wildcards are present in search string
-            m_Wildcard = (InStr(m_Find, "*"))
+            m_Wildcard = InStr(m_Find, "*")
 
             intFoundCt = 0
 
@@ -408,24 +361,13 @@ Public Class FlagParser
 
                 'Skip over blank entries
                 If varStrArry(i) <> "" Then
-                    If m_Wildcard Then
-                        If bNotSearchStr = False Then
-                            boolFound = (LCase$(varStrArry(i)) Like m_Find)
-                        Else
-                            boolFound = Not (LCase$(varStrArry(i)) Like m_Find)
-                        End If
-                    Else
-                        If bNotSearchStr = False Then
-                            boolFound = (LCase$(varStrArry(i)) = m_Find)
-                        Else
-                            boolFound = Not (LCase$(varStrArry(i)) = m_Find)
-                        End If
-                    End If
+                    boolFound = If(m_Wildcard,
+                        If(bNotSearchStr = False, DirectCast(LCase$(varStrArry(i)) Like m_Find, Boolean), DirectCast(Not LCase$(varStrArry(i)) Like m_Find, Boolean)),
+                        If(bNotSearchStr = False, DirectCast(LCase$(varStrArry(i)) = m_Find, Boolean), DirectCast(Not LCase$(varStrArry(i)) = m_Find, Boolean)))
                 End If
 
                 If boolFound Then
-                    boolFound = False
-                    intFoundCt = intFoundCt + 1
+                    intFoundCt += 1
                     ReDim Preserve strCats(intFoundCt)
                     strTemp = varStrArry(i)
                     If DeleteSearchSubString Then strTemp = Replace(strTemp, strSearchNoWC, "", , , vbTextCompare)
@@ -433,11 +375,7 @@ Public Class FlagParser
                 End If
             Next i
 
-            If intFoundCt = 0 Then
-                SearchArry4Str = ""
-            Else
-                SearchArry4Str = strCats
-            End If
+            SearchArry4Str = If(intFoundCt = 0, "", strCats)
 
         Else
             SearchArry4Str = varStrArry
@@ -473,8 +411,6 @@ End Class
 
 Public Class FlagDetails
     Private _list As RestrictedList(Of String)
-    Private _wtag As String
-    Private _notag As String
     Public prefix As String
 
     Public Sub New()
@@ -511,32 +447,18 @@ Public Class FlagDetails
     End Property
 
     Private Sub ListChange_Refresh()
-        _wtag = String.Join(", ", _list.Select(Function(x) prefix & x))
-        _notag = String.Join(", ", _list)
+        WithPrefix = String.Join(", ", _list.Select(Function(x) prefix & x))
+        NoPrefix = String.Join(", ", _list)
     End Sub
 
     Public Property WithPrefix As String
-        Get
-            Return _wtag
-        End Get
-        Set(value As String)
-            _wtag = value
-        End Set
-    End Property
 
     Public Property NoPrefix As String
-        Get
-            Return _notag
-        End Get
-        Set(value As String)
-            _notag = value
-        End Set
-    End Property
 
     Private NotInheritable Class RestrictedList(Of T) : Inherits List(Of T)
         'Implements ICloneable
 
-        Private outer As FlagDetails
+        Private ReadOnly outer As FlagDetails
 
         Public Sub New(ByVal wrapped_list As List(Of T), outer As FlagDetails)
             MyBase.New(wrapped_list)
@@ -552,7 +474,7 @@ Public Class FlagDetails
         End Sub
 
         Public Overloads Sub Remove(ByVal item As T)
-            MyBase.Remove(item)
+            Dim unused = MyBase.Remove(item)
             outer.ListChange_Refresh()
         End Sub
 

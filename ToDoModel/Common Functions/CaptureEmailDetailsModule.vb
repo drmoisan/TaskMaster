@@ -1,8 +1,8 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
 
 Public Module CaptureEmailDetailsModule
-    Const NumberOfFields = 13
-    Private dict_remap As Dictionary(Of String, String)
+    Private Const NumberOfFields = 13
+    Private ReadOnly dict_remap As Dictionary(Of String, String)
 
     Public Function CaptureEmailDetails(OlMail As MailItem,
                                        emailRootFolder As String,
@@ -42,7 +42,8 @@ Public Module CaptureEmailDetailsModule
         Const Last_Verb_Reply_All = 103
         Const Last_Verb_Reply_Sender = 102
         Const Last_Verb_Reply_Forward = 104
-        Dim action As String = ""
+        Dim action As String
+
         If OlMail.IsMarkedAsTask = True Then
             action = "Task"
         Else
@@ -50,11 +51,7 @@ Public Module CaptureEmailDetailsModule
 
             Try
                 Dim prop_tmp_int As Integer = OlPA.GetProperty(PR_LAST_VERB_EXECUTED)
-                If prop_tmp_int <> 0 Then
-                    lngLastVerbExec = prop_tmp_int
-                Else
-                    lngLastVerbExec = 0
-                End If
+                lngLastVerbExec = If(prop_tmp_int <> 0, prop_tmp_int, 0)
             Catch
                 lngLastVerbExec = 0
             End Try
@@ -90,7 +87,8 @@ Public Module CaptureEmailDetailsModule
     End Function
 
     Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
-        Dim senderAddress As String = ""
+        Dim senderAddress As String
+
         If OlMail.Sender.Type = "EX" Then
             Dim OlPA As PropertyAccessor = OlMail.Sender.PropertyAccessor
             Try
@@ -110,9 +108,8 @@ Public Module CaptureEmailDetailsModule
     End Function
 
     Private Function GetEmailFolderPath(OlMail As MailItem, emailRootFolder As String) As String
-        Dim folderPath As String = ""
         Dim OlParent As Folder = OlMail.Parent
-        folderPath = OlParent.FolderPath
+        Dim folderPath As String = OlParent.FolderPath
         Dim root_length As Integer = Len(emailRootFolder)
         If Len(folderPath) > root_length Then
             folderPath = Right(folderPath, Len(folderPath) - root_length - 1)
@@ -129,11 +126,7 @@ Public Module CaptureEmailDetailsModule
 
     Private Function GetTriage(OlMail As MailItem) As String
         Dim OlProperty As UserProperty = OlMail.UserProperties.Find("Triage")
-        If OlProperty Is Nothing Then
-            Return ""
-        Else
-            Return OlProperty.Value
-        End If
+        Return If(OlProperty Is Nothing, "", DirectCast(OlProperty.Value, String))
     End Function
 
     Private Function GetRecipients(OlMail As MailItem,
@@ -163,12 +156,12 @@ Public Module CaptureEmailDetailsModule
         If Len(recipientsCC) > 2 Then recipientsCC = Right(recipientsCC, Len(recipientsCC) - 2)
         If Len(recipientsTo) > 2 Then recipientsTo = Right(recipientsTo, Len(recipientsTo) - 2)
 
-        Return (recipientsTo:=recipientsTo, recipientsCC:=recipientsCC)
+        Return (recipientsTo, recipientsCC)
     End Function
 
     Private Function ExtractRecipient(PR_SMTP_ADDRESS As String, OlRecipient As Recipient) As String
-        Dim StrSMTPAddress As String = ""
         Dim OlPA As PropertyAccessor = OlRecipient.PropertyAccessor
+        Dim StrSMTPAddress As String
         Try
             StrSMTPAddress = OlPA.GetProperty(PR_SMTP_ADDRESS)
         Catch

@@ -1,56 +1,35 @@
 ﻿Public Class TreeNode(Of T)
-    Private _Parent As TreeNode(Of T)
-    Private ReadOnly _value As T
-    Private _children As List(Of TreeNode(Of T)) = New List(Of TreeNode(Of T))()
     'Public ID As String
 
     Public Sub New(ByVal value As T)
-        _value = value
+        Me.Value = value
     End Sub
 
     Default Public ReadOnly Property Item(ByVal i As Integer) As TreeNode(Of T)
         Get
-            Return _children(i)
+            Return Children(i)
         End Get
     End Property
 
 
     Public Property Parent As TreeNode(Of T)
-        Get
-            Return _Parent
-        End Get
-        Set(value As TreeNode(Of T))
-            _Parent = value
-        End Set
-    End Property
 
     Public ReadOnly Property Value As T
-        Get
-            Return _value
-        End Get
-    End Property
 
     Public Function IsAncestor(ByVal model As TreeNode(Of T)) As Boolean
         If Me Is model Then Return True
-        If _Parent Is Nothing Then Return False
-        Return _Parent.IsAncestor(model)
+        If Parent Is Nothing Then Return False
+        Return Parent.IsAncestor(model)
     End Function
 
     Public ReadOnly Property ChildCount As Integer
         Get
-            Return _children.Count
+            Return Children.Count
         End Get
     End Property
 
 
-    Public Property Children As List(Of TreeNode(Of T))
-        Get
-            Return _children
-        End Get
-        Set(value As List(Of TreeNode(Of T)))
-            _children = value
-        End Set
-    End Property
+    Public Property Children As New List(Of TreeNode(Of T))()
 
 
     Public Function AddChild(ByVal value As T) As TreeNode(Of T)
@@ -58,20 +37,20 @@
             .Parent = Me
             }
         'node.ID = NextChildID()
-        _children.Add(node)
+        Children.Add(node)
         Return node
     End Function
     Public Function AddChild(ByVal node As TreeNode(Of T)) As TreeNode(Of T)
         'node.Parent = Me
         'node.ID = NextChildID()
-        _children.Add(node)
+        Children.Add(node)
         Return node
     End Function
 
     Public Function InsertChild(ByVal node As TreeNode(Of T)) As TreeNode(Of T)
         node.Parent = Me
         'node.ID = strID
-        _children.Insert(0, node)
+        Children.Insert(0, node)
         Return node
     End Function
     Public Function AddChild(ByVal value As T, ByVal strID As String) As TreeNode(Of T)
@@ -79,7 +58,7 @@
                 .Parent = Me
             }
         'node.ID = strID
-        _children.Add(node)
+        Children.Add(node)
         Return node
     End Function
     Public Function AddChildren(ParamArray values As T()) As TreeNode(Of T)()
@@ -87,13 +66,13 @@
     End Function
 
     Public Function RemoveChild(ByVal node As TreeNode(Of T)) As Boolean
-        Return _children.Remove(node)
+        Return Children.Remove(node)
     End Function
 
     Public Sub Traverse(ByVal action As Action(Of T))
         action(Value)
 
-        For Each child In _children
+        For Each child In Children
             child.Traverse(action)
         Next
     End Sub
@@ -101,7 +80,7 @@
     Public Sub Traverse(ByVal action As Action(Of TreeNode(Of T)))
         action(Me)
 
-        For Each child In _children
+        For Each child In Children
             child.Traverse(action)
         Next
     End Sub
@@ -110,7 +89,7 @@
         Dim node As TreeNode(Of T)
 
         For Each node In Children
-            If comparator(_value, StringToCompare) Then
+            If comparator(Value, StringToCompare) Then
                 Return node
             End If
         Next
@@ -121,7 +100,7 @@
         Dim node As TreeNode(Of T)
 
         For Each node In Children
-            If comparator(_value, T2) Then
+            If comparator(Value, T2) Then
                 Return node
             End If
         Next
@@ -129,6 +108,6 @@
     End Function
 
     Public Function Flatten() As IEnumerable(Of T)
-        Return {Value}.Concat(_children.SelectMany(Function(x) x.Flatten()))
+        Return {Value}.Concat(Children.SelectMany(Function(x) x.Flatten()))
     End Function
 End Class
