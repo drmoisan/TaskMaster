@@ -1,14 +1,17 @@
 ﻿Option Explicit On
 Imports System.Diagnostics
 Imports System.IO
+Imports Microsoft.Office.Core
 Imports Microsoft.Office.Interop.Outlook
+Imports Microsoft.Office.Interop
+Imports Microsoft.Office.Tools
 Imports Microsoft.VisualBasic.FileIO
 Imports ToDoModel
 Imports UtilitiesVB
 
 Public Class ThisAddIn
 
-    Public _globals As ApplicationGlobals
+    Private _globals As ApplicationGlobals
 
     Public CCOCatList As List(Of String)
     Public WithEvents OlToDoItems As Outlook.Items
@@ -19,8 +22,11 @@ Public Class ThisAddIn
     Public OlNS As Outlook.NameSpace
     'Private WithEvents OlExplorer As Outlook.Explorer
 
-    Private _ribTM As TaskMasterRibbon
-    Private _ribEM As EmailRibbon
+    Private _ribbonController As RibbonController
+    'Private _taskRibbonViewer As TaskRibbonViewer
+    'Friend _taskRibbonController As TaskRibbonController
+    'Private _emailRibbonViewer As EmailRibbonViewer
+    'Private _emailRibbonController As EmailRibbonController
     Private ReadOnly _filenameProjectList As String
     Private ReadOnly _filenameIDList As String
     Private ReadOnly _filenameProjInfo2 As String
@@ -33,7 +39,7 @@ Public Class ThisAddIn
     Public ProjInfo As ProjectInfo
     Public DictPPL As Dictionary(Of String, String)
     Public WithEvents IDList As ListOfIDs
-    Public DM_CurView As DataModel_ToDoTree
+    Public DM_CurView As TreeOfToDoItems
     Public Cats As FlagParser
 
     Private Sub ThisAddIn_Startup() Handles Me.Startup
@@ -48,9 +54,10 @@ Public Class ThisAddIn
             DictPPL = .ToDo.DictPPL
             IDList = .ToDo.IDList
             EmailRoot = .Ol.EmailRootPath
-
         End With
-        Access_Ribbons_By_Explorer()
+
+        _ribbonController.SetGlobals(_globals)
+        'Access_Ribbons_By_Explorer()
     End Sub
 
     Public Sub Events_Hook()
@@ -63,23 +70,37 @@ Public Class ThisAddIn
 
     End Sub
 
+    Protected Overrides Function CreateRibbonExtensibilityObject() As Microsoft.Office.Core.IRibbonExtensibility
+        _ribbonController = New RibbonController()
+        Return New RibbonViewer(_ribbonController)
+    End Function
+
     Public Sub Events_Unhook()
         OlToDoItems = Nothing
         OlInboxItems = Nothing
         OlReminders = Nothing
     End Sub
 
-    Private Sub Access_Ribbons_By_Explorer()
-        Dim ribbonCollection As ThisRibbonCollection = Globals.Ribbons _
-            (Globals.ThisAddIn.Application.ActiveExplorer())
-        _ribTM = ribbonCollection.Ribbon_TM
-        _ribEM = ribbonCollection.Ribbon_EM
-    End Sub
+    'Private Sub Access_Ribbons_By_Explorer()
+    '    Dim ribbonCollection As ThisRibbonCollection = Globals.Ribbons _
+    '        (Globals.ThisAddIn.Application.ActiveExplorer())
+
+    '    '_taskRibbonController = New TaskRibbonController(_globals)
+    '    '_taskRibbonViewer = ribbonCollection.Ribbon_TM
+
+    '    '_taskRibbonViewer.SetController(_taskRibbonController)
+    '    '_taskRibbonController = New TaskRibbonController(_taskRibbonViewer, _globals)
+    '    '_taskRibbonController.Activate()
+
+    '    _emailRibbonViewer = ribbonCollection.Ribbon_EM
+    '    _emailRibbonController = New EmailRibbonController(_emailRibbonViewer, _globals)
+    '    '_emailRibbonController.Activate()
+    'End Sub
 
     Private Sub Debug_OutputNsStores()
         Dim storeList As String = String.Empty
 
-        Dim ns As [NameSpace] = Application.Session
+        Dim ns As Outlook.NameSpace = Application.Session
         Dim stores As Stores = ns.Stores
 
         For i As Integer = 1 To stores.Count
@@ -103,13 +124,7 @@ Public Class ThisAddIn
 
     End Sub
 
-    Public Function RefreshIDList() As Long
-        IDList = New ListOfIDs(New List(Of String))
-        IDList.RePopulate(Application)
-        IDList.Save(_filenameIDList)
-        WriteToCSV("C:\Users\03311352\Documents\UsedIDList.csv", IDList.UsedIDList.ToArray)
-        Return 1
-    End Function
+
 
     Public Sub WriteToCSV(filename As String, strOutput() As String, Optional overwrite As Boolean = False)
         'CLEANUP: Determine if ThisAddIn.WriteToCSV function is needed. If so, move it to a library
@@ -141,18 +156,6 @@ Public Class ThisAddIn
             End Using
         End If
 
-    End Sub
-
-    Public Sub CompressToDoIDs()
-        'DOC: Add documentation to CompressToDoIDs
-        'TESTING: Add integration testing for CompressToDoIDs
-        'CLEANUP: Move CompressToDoIDs to either a Module or include in ToDoTree DataModel
-        Dim DM As New DataModel_ToDoTree()
-        'QUESTION: Does DataModel_ToDoTree.LoadOptions.vbLoadAll require all items to be visible in the current view?
-        DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadAll, Application)
-        'DM.WriteTreeToDisk()
-        DM.ReNumberIDs(IDList)
-        DM.WriteTreeToDisk()
     End Sub
 
 

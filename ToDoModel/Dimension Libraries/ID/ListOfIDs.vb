@@ -18,8 +18,8 @@ Public Class ListOfIDs
 
     Public Sub RePopulate(Application As Application) Implements IListOfIDs.RePopulate
         Dim unused As New Object
-        Dim DM As New DataModel_ToDoTree
-        Dim ToDoList As List(Of Object) = DM.GetToDoList(DataModel_ToDoTree.LoadOptions.vbLoadAll, Application)
+        Dim DM As New TreeOfToDoItems
+        Dim ToDoList As List(Of Object) = DM.GetToDoList(TreeOfToDoItems.LoadOptions.vbLoadAll, Application)
         UsedIDList = New List(Of String)
 
         Dim ObjItem As Object

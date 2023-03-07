@@ -210,62 +210,24 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
-    <Compile Include="Classes\ApplicationGlobals.vb" />
-    <Compile Include="Classes\TaskController.vb" />
-    <Compile Include="Classes\Flag_Tasks.vb" />
-    <Compile Include="Classes\CsvSerializer.vb" />
-    <Compile Include="Forms\TaskViewer.Designer.vb">
-      <DependentUpon>TaskViewer.vb</DependentUpon>
+    <Compile Include="aRefactored\ApplicationGlobals.vb" />
+    <Compile Include="aRefactored\FlagTasks.vb" />
+    <Compile Include="Ribbon\RibbonController.vb" />
+    <Compile Include="Ribbon\RibbonViewer.vb">
+      <XmlRibbon>true</XmlRibbon>
     </Compile>
-    <Compile Include="Forms\TaskViewer.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Modules\Flag_Fields_Categories.vb" />
-    <Compile Include="Modules\olvExtension.vb" />
-    <Compile Include="Forms\ProjectInfoWindow.Designer.vb">
-      <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ProjectInfoWindow.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Models\ComparatorExample.vb" />
-    <Compile Include="Forms\Resizer.vb" />
-    <Compile Include="Forms\TaskTreeForm.Designer.vb">
+    <Compile Include="TaskTree\TaskTreeController.vb" />
+    <Compile Include="TaskTree\TaskTreeForm.Designer.vb">
       <DependentUpon>TaskTreeForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TaskTreeForm.vb">
+    <Compile Include="TaskTree\TaskTreeForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Ribbons\EmailRibbon.Designer.vb">
-      <DependentUpon>EmailRibbon.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Ribbons\EmailRibbon.vb">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Settings.vb" />
-    <Compile Include="Ribbons\TaskMasterRibbon.Designer.vb">
-      <DependentUpon>TaskMasterRibbon.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Ribbons\TaskMasterRibbon.vb">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ThisAddIn.vb">
       <SubType>Code</SubType>
     </Compile>
-    <EmbeddedResource Include="Ribbons\EmailRibbon.resx">
-      <DependentUpon>EmailRibbon.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TaskViewer.resx">
-      <DependentUpon>TaskViewer.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ProjectInfoWindow.resx">
-      <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Ribbons\TaskMasterRibbon.resx">
-      <DependentUpon>TaskMasterRibbon.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TaskTreeForm.resx">
+    <EmbeddedResource Include="TaskTree\TaskTreeForm.resx">
       <DependentUpon>TaskTreeForm.vb</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
@@ -304,6 +266,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NSPathTemplate.ico" />
+    <EmbeddedResource Include="Ribbon\RibbonViewer.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ObjectListViewDemo\ObjectListView\ObjectListView2012.csproj">
@@ -314,6 +277,10 @@
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TaskVisualization\TaskVisualization.vbproj">
+      <Project>{cd11d1cb-dd70-4413-b278-263f5474c4b5}</Project>
+      <Name>TaskVisualization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
       <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
       <Name>ToDoModel</Name>
@@ -323,9 +290,7 @@
       <Name>UtilitiesVB</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Examples\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

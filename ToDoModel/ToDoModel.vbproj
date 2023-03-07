@@ -71,6 +71,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.6.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
@@ -97,15 +98,16 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common Functions\CaptureEmailAddressesModule.vb" />
-    <Compile Include="Common Functions\CaptureEmailDetailsModule.vb" />
-    <Compile Include="FileOperationsPST.vb" />
+    <Compile Include="Email Utilities\CaptureEmailAddressesModule.vb" />
+    <Compile Include="Email Utilities\CaptureEmailDetailsModule.vb" />
+    <Compile Include="Defaults And Prefixes\Load_CCO_Categories.vb" />
+    <Compile Include="Common Functions\FileOperationsPST.vb" />
     <Compile Include="Dimension Libraries\ID\IDListUtilities.vb" />
-    <Compile Include="Common Functions\AutoFile.vb" />
+    <Compile Include="Email Utilities\AutoFile.vb" />
     <Compile Include="Common Functions\GetFields.vb" />
     <Compile Include="Dimension Libraries\ID\BaseChanger.vb" />
     <Compile Include="Dimension Libraries\ID\ListOfIDs.vb" />
-    <Compile Include="DataModel_ToDoTree.vb" />
+    <Compile Include="TreeOfToDoItems.vb" />
     <Compile Include="FlagParser.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -124,7 +126,13 @@
     </Compile>
     <Compile Include="Dimension Libraries\Project\ToDoProjectInfoEntry.vb" />
     <Compile Include="Dimension Libraries\Project\ProjectList.vb" />
-    <Compile Include="ToDoDefaults.vb" />
+    <Compile Include="Dimension Libraries\Project\ProjectInfoWindow.Designer.vb">
+      <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Dimension Libraries\Project\ProjectInfoWindow.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Defaults And Prefixes\ToDoDefaults.vb" />
     <Compile Include="ToDoItem.vb" />
     <Compile Include="Dimension Libraries\Project\ToDoProjectInfo.vb" />
     <Compile Include="Dimension Libraries\Project\ToDoProjectInfoUtilities.vb" />
@@ -136,6 +144,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dimension Libraries\Project\ProjectInfoWindow.resx">
+      <DependentUpon>ProjectInfoWindow.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +163,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ObjectListViewDemo\ObjectListView\ObjectListView2012.csproj">
+      <Project>{18feda0c-d147-4286-b39a-01204808106a}</Project>
+      <Name>ObjectListView2012</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tags\Tags.vbproj">
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>

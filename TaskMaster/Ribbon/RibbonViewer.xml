@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI onLoad="Ribbon_Load" xmlns="http://schemas.microsoft.com/office/2006/01/customui">
+    <ribbon>
+        <tabs>
+            <tab idMso="TabTasks">
+                <group id="Group1" label="Task Master">
+                    <button id="BtnLoadTree" imageMso="OutlineShowDetail" onAction="BtnLoadTree_Click" label="Load Tree" size="large" />
+                    <button id="BtnFlagTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
+                    <menu id="ViewMenu" imageMso="FindDialog" label="View" size="large" itemSize="large">
+                        <button id="BtnHideHeadersNoChildren" imageMso="ReviewShowOrHideComment" onAction="BtnHideHeadersNoChildren_Click" label="Hide Empty Headers" />
+                    </menu>
+                    <menu id="UtilitiesMenu" label="Utilities" size="large" itemSize="large">
+                        <button id="BtnRefreshIDList" imageMso="AccessRefreshAllLists" onAction="BtnRefreshIDList_Click" label="Refresh IDList" />
+                        <button id="BtnSplitToDoID" imageMso="ConvertTextToTable" onAction="BtnSplitToDoID_Click" label="Split ToDoID" />
+                        <button id="BtnReviseProjectInfo" imageMso="EditQuery" onAction="BtnReviseProjectInfo_Click" label="Revise Dictionary" />
+                        <button id="BtnCompressIDs" imageMso="ReviewCombineRevisions" onAction="BtnCompressIDs_Click" label="Compress IDs" />
+                        <button id="BtnHookToggle" imageMso="PositionAbsoluteMarks" onAction="BtnHookToggle_Click" getLabel="GetHookButtonText" />
+                        <button id="BtnMigrateIDs" onAction="BtnMigrateIDs_Click" label="MigrateToDoIDs" />
+                    </menu>
+                </group>
+            </tab>
+            <tab idMso="TabMail">
+              <group id="Group2" label="Task Master">
+                <button id="FlagAsTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
+              </group>
+            </tab>
+        </tabs>
+    </ribbon>
+</customUI>

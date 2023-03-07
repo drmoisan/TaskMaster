@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2090BE3A-1105-4900-A481-EC1795A32BC0}</ProjectGuid>
+    <ProjectGuid>{9A725171-D1FA-44AC-9425-20F6551AFF69}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>UtilitiesVB</RootNamespace>
-    <AssemblyName>UtilitiesVB</AssemblyName>
+    <RootNamespace>TaskViewer</RootNamespace>
+    <AssemblyName>TaskViewer</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -19,7 +19,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>UtilitiesVB.xml</DocumentationFile>
+    <DocumentationFile>TaskViewer.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -28,7 +28,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>UtilitiesVB.xml</DocumentationFile>
+    <DocumentationFile>TaskViewer.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -50,7 +50,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -70,24 +69,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base Functionality Extensions\MergeSortImplementations.vb" />
-    <Compile Include="Common Outlook Functions\CreateCategory.vb" />
-    <Compile Include="To Depricate\CSVDictUtilities.vb" />
-    <Compile Include="To Depricate\CsvSerializer.vb" />
-    <Compile Include="Windows Forms\DeclaratonsWinAPI.vb" />
-    <Compile Include="Common Outlook Functions\ExplorerActions.vb" />
-    <Compile Include="Base Functionality Extensions\ExtToChar.vb" />
-    <Compile Include="To Depricate\FlattenArray.vb" />
-    <Compile Include="Solution Interfaces\IApplicationGlobals.vb" />
-    <Compile Include="Solution Interfaces\IFileSystemFolderPaths.vb" />
-    <Compile Include="Solution Interfaces\IListOfIDs.vb" />
-    <Compile Include="Solution Interfaces\IOlObjects.vb" />
-    <Compile Include="Solution Interfaces\IProjectInfo.vb" />
-    <Compile Include="Solution Interfaces\IToDoObjects.vb" />
-    <Compile Include="Solution Interfaces\IToDoProjectInfoEntry.vb" />
-    <Compile Include="Base Functionality Extensions\KeyValuePairEnumerableExtensions.vb" />
-    <Compile Include="Common Outlook Functions\MailEncrypted.vb" />
-    <Compile Include="Windows Forms\MouseDownFilter.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -103,10 +84,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Solution Interfaces\PrefixInterface.vb" />
-    <Compile Include="Windows Forms\OlvExtension.vb" />
-    <Compile Include="Windows Forms\Resizer.vb" />
-    <Compile Include="Base Functionality Extensions\ToSortedDictionary.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -128,9 +105,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ObjectListViewDemo\ObjectListView\ObjectListView2012.csproj">
-      <Project>{18feda0c-d147-4286-b39a-01204808106a}</Project>
-      <Name>ObjectListView2012</Name>
+    <ProjectReference Include="..\Tags\Tags.vbproj">
+      <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
+      <Name>Tags</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
+      <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
+      <Name>ToDoModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
+      <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>
+      <Name>UtilitiesVB</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
