@@ -42,6 +42,7 @@ Partial Class TaskTreeForm
         Me.OlvColumn5 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn7 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.OlvColumn8 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
+        Me.OlvColumn9 = CType(New BrightIdeasSoftware.OLVColumn(), BrightIdeasSoftware.OLVColumn)
         Me.ContextMenuStrip1.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -136,8 +137,9 @@ Partial Class TaskTreeForm
         Me.TLV.AllColumns.Add(Me.OlvTaskSubject)
         Me.TLV.AllColumns.Add(Me.OlvToDoID)
         Me.TLV.AllColumns.Add(Me.OlvColumn1)
-        Me.TLV.AllColumns.Add(Me.OlvColumn2)
         Me.TLV.AllColumns.Add(Me.OlvColumn3)
+        Me.TLV.AllColumns.Add(Me.OlvColumn2)
+        Me.TLV.AllColumns.Add(Me.OlvColumn9)
         Me.TLV.AllColumns.Add(Me.OlvColumn6)
         Me.TLV.AllColumns.Add(Me.OlvColumn4)
         Me.TLV.AllColumns.Add(Me.OlvColumn5)
@@ -149,7 +151,7 @@ Partial Class TaskTreeForm
         Me.TLV.CellEditUseWholeCell = False
         Me.TLV.CheckBoxes = True
         Me.TLV.CheckedAspectName = "Value.Complete"
-        Me.TLV.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.OlvTaskSubject, Me.OlvToDoID, Me.OlvColumn2, Me.OlvColumn3, Me.OlvColumn6, Me.OlvColumn4, Me.OlvColumn7, Me.OlvColumn8})
+        Me.TLV.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.OlvTaskSubject, Me.OlvToDoID, Me.OlvColumn3, Me.OlvColumn2, Me.OlvColumn9, Me.OlvColumn6, Me.OlvColumn4, Me.OlvColumn7, Me.OlvColumn8})
         Me.TLV.Cursor = System.Windows.Forms.Cursors.Default
         Me.TLV.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TLV.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -182,7 +184,7 @@ Partial Class TaskTreeForm
         '
         'OlvColumn1
         '
-        Me.OlvColumn1.AspectName = "Value.TagProject"
+        Me.OlvColumn1.AspectName = "Value.Project"
         Me.OlvColumn1.DisplayIndex = 1
         Me.OlvColumn1.IsVisible = False
         Me.OlvColumn1.Text = "Project"
@@ -190,13 +192,13 @@ Partial Class TaskTreeForm
         '
         'OlvColumn2
         '
-        Me.OlvColumn2.AspectName = "Value.TagTopic"
+        Me.OlvColumn2.AspectName = "Value.Topic"
         Me.OlvColumn2.Text = "Topic"
         Me.OlvColumn2.Width = 94
         '
         'OlvColumn3
         '
-        Me.OlvColumn3.AspectName = "Value.TagPeople"
+        Me.OlvColumn3.AspectName = "Value.People"
         Me.OlvColumn3.Text = "People"
         Me.OlvColumn3.Width = 122
         '
@@ -230,6 +232,12 @@ Partial Class TaskTreeForm
         Me.OlvColumn8.AspectName = "Value.InFolder"
         Me.OlvColumn8.Text = "In Folder"
         Me.OlvColumn8.Width = 103
+        '
+        'OlvColumn9
+        '
+        Me.OlvColumn9.AspectName = "Value.Context"
+        Me.OlvColumn9.Text = "Context"
+        Me.OlvColumn9.Width = 112
         '
         'TaskTreeForm
         '
@@ -268,4 +276,5 @@ Partial Class TaskTreeForm
     Friend WithEvents OlvColumn7 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvColumn8 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents TLV As BrightIdeasSoftware.TreeListView
+    Friend WithEvents OlvColumn9 As BrightIdeasSoftware.OLVColumn
 End Class
