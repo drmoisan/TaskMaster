@@ -20,7 +20,7 @@ Public Class ThisAddIn
     'Private WithEvents OlExplorer As Outlook.Explorer
 
     Private ribTM As TaskMasterRibbon
-    Private ribEM As EmailRibbon
+    'Private ribEM As EmailRibbon
     Dim FileName_ProjectList As String
     Dim FileName_IDList As String
     Dim FileName_ProjInfo As String
@@ -98,7 +98,7 @@ Public Class ThisAddIn
         Dim ribbonCollection As ThisRibbonCollection = Globals.Ribbons _
             (Globals.ThisAddIn.Application.ActiveExplorer())
         ribTM = ribbonCollection.Ribbon_TM
-        ribEM = ribbonCollection.Ribbon_EM
+        'ribEM = ribbonCollection.Ribbon_EM
     End Sub
 
     Private Function GetOutlookPSTFolderByPath(ByVal FolderPath As String) As Outlook.Folder
