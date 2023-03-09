@@ -125,8 +125,11 @@ Public Class FlagTasks
 
         End Function
 
-        Public Function AddColorCategory(prefix As IPrefix, categoryName As String) As Category Implements IAutoAssign.AddColorCategory
-            Return CreateCategory(OlNS:=Globals.ThisAddIn.OlNS,
+        Public Function AddColorCategory(prefix As IPrefix,
+                                         categoryName As String) _
+                                         As Category Implements IAutoAssign.AddColorCategory
+
+            Return CreateCategory(OlNS:=_globals.Ol.NamespaceMAPI,
                                   prefix:=prefix,
                                   newCatName:=categoryName)
         End Function
