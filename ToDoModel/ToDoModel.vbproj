@@ -110,6 +110,7 @@
     <Compile Include="Common Functions\GetFields.vb" />
     <Compile Include="Dimension Libraries\ID\BaseChanger.vb" />
     <Compile Include="Dimension Libraries\ID\ListOfIDs.vb" />
+    <Compile Include="Outlook Todo Utilities\ToDoEvents.vb" />
     <Compile Include="TreeOfToDoItems.vb" />
     <Compile Include="FlagParser.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

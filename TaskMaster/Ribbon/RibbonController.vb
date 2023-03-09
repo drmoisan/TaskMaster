@@ -25,7 +25,7 @@ Public Class RibbonController
     End Sub
 
     Friend Sub SplitToDoID()
-        Globals.ThisAddIn.Refresh_ToDoID_Splits()
+        Refresh_ToDoID_Splits(_globals.Ol.App)
     End Sub
 
     Friend Sub LoadTaskTree()

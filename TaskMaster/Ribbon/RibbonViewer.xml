@@ -9,7 +9,7 @@
                     <menu id="ViewMenu" imageMso="FindDialog" label="View" size="large" itemSize="large">
                         <button id="BtnHideHeadersNoChildren" imageMso="ReviewShowOrHideComment" onAction="BtnHideHeadersNoChildren_Click" label="Hide Empty Headers" />
                     </menu>
-                    <menu id="UtilitiesMenu" label="Utilities" size="large" itemSize="large">
+                    <menu id="UtilitiesMenu" imageMso="CurrentViewSettings" label="Utilities" size="large" itemSize="large">
                         <button id="BtnRefreshIDList" imageMso="AccessRefreshAllLists" onAction="BtnRefreshIDList_Click" label="Refresh IDList" />
                         <button id="BtnSplitToDoID" imageMso="ConvertTextToTable" onAction="BtnSplitToDoID_Click" label="Split ToDoID" />
                         <button id="BtnReviseProjectInfo" imageMso="EditQuery" onAction="BtnReviseProjectInfo_Click" label="Revise Dictionary" />
