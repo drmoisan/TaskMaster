@@ -8,51 +8,126 @@ Imports UtilitiesVB
 Public Class ListOfIDs
     Implements IListOfIDs
 
-    Public UsedIDList As List(Of String)
-    Private PMaxIDLength As Long
-    Public pFileName As String = ""
+    Private _usedIDList As List(Of String)
+    Private _maxIDLength As Long
+    Private _filepath As String = ""
 
     Public Sub New(ByVal listUsedID As List(Of String))
         UsedIDList = listUsedID
     End Sub
 
-    Public Sub RePopulate(Application As Application) Implements IListOfIDs.RePopulate
+    Public Sub New(FilePath As String, OlApp As Application)
+        LoadFromFile(FilePath:=FilePath, OlApp:=OlApp)
+    End Sub
+
+    Public Sub New()
+        _usedIDList = New List(Of String)
+    End Sub
+
+    Public Shared Function LoadFromFile(FilePath As String, OlApp As Application) As ListOfIDs
+        Dim tmpIDList As ListOfIDs = New ListOfIDs
+
+        If File.Exists(FilePath) Then
+            Dim deserializer As New BinaryFormatter
+            Try
+                Using TestFileStream As Stream = File.OpenRead(FilePath)
+                    tmpIDList = CType(deserializer.Deserialize(TestFileStream), ListOfIDs)
+                End Using
+
+            Catch ex As UnauthorizedAccessException
+                tmpIDList = ProcessFileError(OlApp,
+                    "Unexpected File Access Error. Recreate the list?")
+
+            Catch ex As IOException
+                tmpIDList = ProcessFileError(OlApp,
+                    "Unexpected IO Error. Is IDList File Corrupt?")
+
+            Catch ex As InvalidCastException
+                tmpIDList = ProcessFileError(OlApp,
+                    "File exists but cannot cast to ListOfIDs. Recreate the list?")
+            End Try
+
+        Else
+            tmpIDList = ProcessFileError(OlApp,
+                "File " & FilePath & " does not exist. Recreate the List?")
+        End If
+
+        tmpIDList.Filepath = FilePath
+        Return tmpIDList
+    End Function
+
+    Private Shared Function ProcessFileError(OlApp As Application, msg As String) As ListOfIDs
+        Dim tmpIDList As ListOfIDs = New ListOfIDs()
+        Dim result As MsgBoxResult = MsgBox(msg, vbYesNo)
+        If result = MsgBoxResult.Yes Then
+            tmpIDList.RefreshIDList(OlApp)
+        Else
+            MsgBox("Returning an empty list of ToDoIDs")
+        End If
+        Return tmpIDList
+    End Function
+
+    Public Sub RefreshIDList(Application As Application) Implements IListOfIDs.RefreshIDList
         Dim unused As New Object
-        Dim DM As New TreeOfToDoItems
-        Dim ToDoList As List(Of Object) = DM.GetToDoList(TreeOfToDoItems.LoadOptions.vbLoadAll, Application)
+        Dim _dataModel As New TreeOfToDoItems
+        Dim _toDoList As List(Of Object)
         UsedIDList = New List(Of String)
 
-        Dim ObjItem As Object
-        For Each ObjItem In ToDoList
-            Dim strID As String = CustomFieldID_GetValue(ObjItem, "ToDoID")
+        _toDoList = _dataModel.GetToDoList(TreeOfToDoItems.LoadOptions.vbLoadAll, Application)
+
+        For Each _objItem As Object In _toDoList
+            Dim strID As String = CustomFieldID_GetValue(_objItem, "ToDoID")
             If UsedIDList.Contains(strID) = False And strID.Length <> 0 Then
                 UsedIDList.Add(strID)
-                If strID.Length > PMaxIDLength Then PMaxIDLength = strID.Length
+                If strID.Length > _maxIDLength Then _maxIDLength = strID.Length
             End If
         Next
     End Sub
 
-    'Public Sub CondenseIDs()
-    '    Dim DM As DataModel_ToDoTree = New DataModel_ToDoTree
-    '    DM.LoadTree(DataModel_ToDoTree.LoadOptions.vbLoadAll)
-
-    '    Dim ToDoTree As List(Of TreeNode(Of ToDoItem)) = DM.ListOfToDoTree
-    'End Sub
+    ''' <summary>
+    ''' Function Invokes the DataModel_ToDoTree.ReNumberIDs() method at the root level which 
+    ''' recursively calls DataModel_ToDoTree.ReNumberChildrenIDs() and then invokes the
+    ''' ListOfIDs.Save() Method
+    ''' </summary>
+    ''' <param name="OlApp">Pointer to Outlook Application</param>
+    Public Sub CompressToDoIDs(OlApp As Application) Implements IListOfIDs.CompressToDoIDs
+        Dim _dataModel As New TreeOfToDoItems()
+        _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, OlApp)
+        _dataModel.ReNumberIDs(Me)
+    End Sub
 
     Public ReadOnly Property MaxIDLength As Long Implements IListOfIDs.MaxIDLength
         Get
-            If PMaxIDLength = 0 Then
+            If _maxIDLength = 0 Then
                 Dim maxLen As Long = 0
                 For Each strID As String In UsedIDList
                     If strID.Length > maxLen Then
                         maxLen = strID.Length
                     End If
                 Next
-                PMaxIDLength = maxLen
+                _maxIDLength = maxLen
             End If
-            Return PMaxIDLength
+            Return _maxIDLength
 
         End Get
+    End Property
+
+    Public Property UsedIDList As List(Of String) Implements IListOfIDs.UsedIDList
+        Get
+            Return _usedIDList
+        End Get
+        Set(value As List(Of String))
+            _usedIDList = value
+        End Set
+    End Property
+
+    Public Property Filepath As String Implements IListOfIDs.Filepath
+        Get
+            Return _filepath
+        End Get
+        Set(value As String)
+            _filepath = value
+        End Set
     End Property
 
     Public Function GetNextAvailableToDoID(strSeed As String) As String Implements IListOfIDs.GetNextAvailableToDoID
@@ -68,9 +143,9 @@ Public Class ListOfIDs
             End If
         End While
         UsedIDList.Add(strMaxID)
-        If strMaxID.Length > PMaxIDLength Then
-            PMaxIDLength = strMaxID.Length
-            My.Settings.MaxIDLength = PMaxIDLength
+        If strMaxID.Length > _maxIDLength Then
+            _maxIDLength = strMaxID.Length
+            My.Settings.MaxIDLength = _maxIDLength
             My.Settings.Save()
         End If
         Return strMaxID
@@ -82,32 +157,34 @@ Public Class ListOfIDs
         lngMaxID += 1
         strMaxID = ConvertToBase(125, lngMaxID)
         UsedIDList.Add(strMaxID)
-        If strMaxID.Length > PMaxIDLength Then
-            PMaxIDLength = strMaxID.Length
-            My.Settings.MaxIDLength = PMaxIDLength
+        If strMaxID.Length > _maxIDLength Then
+            _maxIDLength = strMaxID.Length
+            My.Settings.MaxIDLength = _maxIDLength
             My.Settings.Save()
         End If
 
         Return strMaxID
     End Function
 
-    Public Sub Save(FileName_IDList As String) Implements IListOfIDs.Save
-        If Not Directory.Exists(Path.GetDirectoryName(FileName_IDList)) Then
-            Dim unused = Directory.CreateDirectory(Path.GetDirectoryName(FileName_IDList))
+    Public Sub Save(Filepath As String) Implements IListOfIDs.Save
+        If Not Directory.Exists(Path.GetDirectoryName(Filepath)) Then
+            Directory.CreateDirectory(Path.GetDirectoryName(Filepath))
         End If
-        Dim TestFileStream As Stream = File.Create(FileName_IDList)
+
         Dim serializer As New BinaryFormatter
-        serializer.Serialize(TestFileStream, Me)
-        TestFileStream.Close()
-        pFileName = FileName_IDList
+        Using TestFileStream As Stream = File.Create(Filepath)
+            serializer.Serialize(TestFileStream, Me)
+        End Using
+
+        Me.Filepath = Filepath
     End Sub
 
     Public Sub Save() Implements IListOfIDs.Save
-        If pFileName.Length > 0 Then
-            Dim TestFileStream As Stream = File.Create(pFileName)
+        If Filepath.Length > 0 Then
             Dim serializer As New BinaryFormatter
-            serializer.Serialize(TestFileStream, Me)
-            TestFileStream.Close()
+            Using TestFileStream As Stream = File.Create(Filepath)
+                serializer.Serialize(TestFileStream, Me)
+            End Using
         Else
             Dim unused = MsgBox("Can't save. IDList FileName not set yet")
         End If

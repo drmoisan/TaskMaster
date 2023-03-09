@@ -3,7 +3,7 @@
 <Serializable()>
 Public Class ToDoProjectInfoEntry
     Implements IEquatable(Of IToDoProjectInfoEntry),
-        IComparable(Of IToDoProjectInfoEntry), IToDoProjectInfoEntry
+        IComparable, IComparable(Of IToDoProjectInfoEntry), IToDoProjectInfoEntry
 
     Public Property ProjectName As String Implements IToDoProjectInfoEntry.ProjectName
     Public Property ProjectID As String Implements IToDoProjectInfoEntry.ProjectID
@@ -46,7 +46,19 @@ Public Class ToDoProjectInfoEntry
         End If
     End Function
 
+    Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
+        If obj Is Nothing Then Return 1
+        Dim other As IToDoProjectInfoEntry = TryCast(obj, IToDoProjectInfoEntry)
+
+        If other IsNot Nothing Then
+            Return CompareTo(other)
+        Else
+            Throw New ArgumentException("Object cannot be cast to IToDoProjectInfoEntry")
+        End If
+    End Function
+
     Public Function ToCSV() As String Implements IToDoProjectInfoEntry.ToCSV
         Return ProjectID + "," + ProjectName + "," + ProgramName
     End Function
+
 End Class

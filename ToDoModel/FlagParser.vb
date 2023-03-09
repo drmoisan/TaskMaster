@@ -292,7 +292,7 @@ Public Class FlagParser
     ''' <summary>
     ''' Extract: Function accepts a comma delimited string and converts to an array of strings
     ''' Transform: Function selects members of the array that match the substring
-    ''' Load: Function returns a comma delimited string containing matching elements
+    ''' LoadFromFile: Function returns a comma delimited string containing matching elements
     ''' </summary>
     ''' <param name="strMainString">A comma delimited string that will be searched</param>
     ''' <param name="strSubString">Target substring to find</param>

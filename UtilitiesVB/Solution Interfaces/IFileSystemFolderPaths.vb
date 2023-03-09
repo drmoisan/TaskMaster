@@ -1,9 +1,9 @@
 ﻿Public Interface IFileSystemFolderPaths
-    ReadOnly Property AppData As String
-    ReadOnly Property Flow As String
-    ReadOnly Property MyD As String
-    ReadOnly Property PreReads As String
-    ReadOnly Property Root As String
-    ReadOnly Property StagingPath As String
+    ReadOnly Property FldrAppData As String
+    ReadOnly Property FldrFlow As String
+    ReadOnly Property FldrMyD As String
+    ReadOnly Property FldrPreReads As String
+    ReadOnly Property FldrRoot As String
+    ReadOnly Property FldrStaging As String
     Sub Reload()
 End Interface

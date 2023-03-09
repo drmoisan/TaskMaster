@@ -28,7 +28,7 @@ Public Class ThisAddIn
     'Private _emailRibbonViewer As EmailRibbonViewer
     'Private _emailRibbonController As EmailRibbonController
     Private ReadOnly _filenameProjectList As String
-    Private ReadOnly _filenameIDList As String
+
     Private ReadOnly _filenameProjInfo2 As String
     Private ReadOnly _filenameProjInfo As String = "ProjInfo.bin"
     Public ReadOnly FilenameDictPpl As String = "pplkey.xml"
@@ -50,9 +50,9 @@ Public Class ThisAddIn
             OlToDoItems = .Ol.ToDoFolder.Items
             OlInboxItems = .Ol.Inbox.Items
             OlReminders = .Ol.OlReminders
-            ProjInfo = .ToDo.ProjInfo
-            DictPPL = .ToDo.DictPPL
-            IDList = .ToDo.IDList
+            ProjInfo = .TD.ProjInfo
+            DictPPL = .TD.DictPPL
+            IDList = .TD.IDList
             EmailRoot = .Ol.EmailRootPath
         End With
 
@@ -384,7 +384,7 @@ Public Class ThisAddIn
                                 If todo.Context <> "@PROJECTS" Then
                                     strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                                     todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                    IDList.Save(_filenameIDList)
+                                    IDList.Save()
                                     todo.SplitID()
                                     todo.EC2 = True
                                 End If
@@ -409,7 +409,7 @@ Public Class ThisAddIn
                         strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                         todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                         todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                        IDList.Save(_filenameIDList)
+                        IDList.Save()
                         todo.SplitID()
                     End If
 
@@ -426,7 +426,7 @@ Public Class ThisAddIn
                         'Add the next ToDoID available in that branch
                         todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                         todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName
-                        IDList.Save(_filenameIDList)
+                        IDList.Save()
                         todo.SplitID()
                         todo.EC2 = True
                     End If
@@ -516,7 +516,7 @@ Public Class ThisAddIn
                     'Add the next ToDoID available in that branch
                     todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                     todo.TagProgram = ProjInfo.Find_ByProjectName(todo.Project).First().ProgramName
-                    IDList.Save(_filenameIDList)
+                    IDList.Save()
                     todo.SplitID()
                 End If
             Else

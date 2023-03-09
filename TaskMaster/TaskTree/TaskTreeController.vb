@@ -135,7 +135,7 @@ Public Class TaskTreeController
                     Dim unused1 = x.Parent.RemoveChild(x)             'Data Model: Remove pointer to node from parent.children list
                     'x.Parent.Children.Remove(x)         'Data Model: Remove pointer to node from parent.children list
                     'x.Parent = Nothing                  'Data Model: Set the pointer to the parent inside the node to nothing
-                    sourceTree.AddObject(x)             'TreeListView: Add the node to the source tree as a Root node
+                    sourceTree.AddObject(x)             'TreeListView: Add the node to the source tree as a FldrRoot node
                 End If
             Next
         Else                                            'Data Model: If the destination tree is different than the source tree

@@ -102,9 +102,9 @@ Public Class FlagTasks
 
         Public Function AutoFind(objItem As Object) As Collection Implements IAutoAssign.AutoFind
             Return AutoFile.AutoFindPeople(objItem:=objItem,
-                                           ppl_dict:=_globals.ToDo.DictPPL,
+                                           ppl_dict:=_globals.TD.DictPPL,
                                            emailRootFolder:=_globals.Ol.EmailRootPath,
-                                           dictRemap:=_globals.ToDo.DictRemap,
+                                           dictRemap:=_globals.TD.DictRemap,
                                            blExcludeFlagged:=False)
 
         End Function
@@ -114,14 +114,14 @@ Public Class FlagTasks
                                          prefixKey As String) As Collection Implements IAutoAssign.AddChoicesToDict
 
             Return AutoFile.dictPPL_AddMissingEntries(OlMail:=olMail,
-                                ppl_dict:=_globals.ToDo.DictPPL,
-                                dictRemap:=_globals.ToDo.DictRemap,
+                                ppl_dict:=_globals.TD.DictPPL,
+                                dictRemap:=_globals.TD.DictRemap,
                                 prefixes:=prefixes,
                                 prefixKey:=prefixKey,
                                 emailRootFolder:=_globals.Ol.EmailRootPath,
-                                stagingPath:=_globals.FS.StagingPath,
-                                filename_dictppl:=_globals.ToDo.DictPPL_Filename,
-                                dictPPLSave:=AddressOf _globals.ToDo.DictPPL_Save)
+                                stagingPath:=_globals.FS.FldrStaging,
+                                filename_dictppl:=_globals.TD.DictPPL_Filename,
+                                dictPPLSave:=AddressOf _globals.TD.DictPPL_Save)
 
         End Function
 

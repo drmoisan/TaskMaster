@@ -19,7 +19,8 @@ Public Class RibbonController
     End Sub
 
     Friend Sub RefreshIDList()
-        _globals.ToDo.IDList_Refresh()
+        '_globals.TD.IDList_Refresh()
+        _globals.TD.IDList.RefreshIDList(_globals.Ol.App)
         MsgBox("ID Refresh Complete")
     End Sub
 
@@ -41,8 +42,7 @@ Public Class RibbonController
     End Sub
 
     Friend Sub CompressIDs()
-
-        CompressToDoIDs(IDList:=_globals.ToDo.IDList, Application:=_globals.Ol.App)
+        _globals.TD.IDList.CompressToDoIDs(_globals.Ol.App)
         MsgBox("ID Compression Complete")
     End Sub
 

@@ -106,7 +106,7 @@ Public Class TaskController
     ''' </summary>
     Public Sub LoadInitialValues()
 
-        'Load values into viewer by field
+        'LoadFromFile values into viewer by field
         _viewer.TaskName.Text = _active.TaskSubject
         If _active.Context <> "" Then _viewer.CategorySelection.Text = _active.Context
         If _active.People <> "" Then _viewer.PeopleSelection.Text = _active.People

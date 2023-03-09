@@ -31,7 +31,7 @@ Public Module TestSerDic
     '        dict_return = LoadDictPPL_XML(filepath)
     '    Else
     '        Dim tmpresult As MsgBoxResult = MsgBox(
-    '            filepath & " was not loaded. Load from legacy csv?",
+    '            filepath & " was not loaded. LoadFromFile from legacy csv?",
     '            vbYesNo)
     '        If tmpresult = MsgBoxResult.Yes Then
     '            Dim filename2 As String = Left(filename, Len(filename) - 3) & "csv"

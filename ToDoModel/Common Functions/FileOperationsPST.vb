@@ -128,19 +128,19 @@ Public Class FileOperationsPST
                             If strProject.Length <> 0 Then
 
                                 'Check to ensure it is in the dictionary before autocoding
-                                If _globals.ToDo.ProjInfo.Contains_ProjectName(strProject) Then
+                                If _globals.TD.ProjInfo.Contains_ProjectName(strProject) Then
                                     'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                     'strProjectToDo = ProjDict.ProjectDictionary(strProject)
 
                                     If strToDoID.Length = 2 Then
                                         ' Change the Item's todoid to be a node of the project
                                         If todo.Context <> "Tag PROJECTS" Then
-                                            strProjectToDo = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
-                                            todo.TagProgram = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
-                                            todo.ToDoID = _globals.ToDo.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                            strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
+                                            todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
+                                            todo.ToDoID = _globals.TD.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                             'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                             'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                            _globals.ToDo.IDList.Save(_globals.ToDo.FnameIDList)
+                                            _globals.TD.IDList.Save(_globals.TD.FnameIDList)
                                             'Split_ToDoID(objItem:=Item)
                                             todo.SplitID()
                                         End If
@@ -154,8 +154,8 @@ Public Class FileOperationsPST
                                             'ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                             'SaveDict()
                                             Dim strProgram As String = InputBox("What is the program name for " & strProject & "?", DefaultResponse:="")
-                                            Dim unused2 = _globals.ToDo.ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
-                                            _globals.ToDo.ProjInfo.Save()
+                                            Dim unused2 = _globals.TD.ProjInfo.Add(New ToDoProjectInfoEntry(strProject, strToDoID, strProgram))
+                                            _globals.TD.ProjInfo.Save()
                                         End If
                                     End If
                                 End If
@@ -168,15 +168,15 @@ Public Class FileOperationsPST
                             'Else
                             '    strProject = objProperty_Project.Value
                             'End If
-                            If _globals.ToDo.ProjInfo.Contains_ProjectName(strProject) Then
-                                strProjectToDo = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
-                                todo.TagProgram = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
+                            If _globals.TD.ProjInfo.Contains_ProjectName(strProject) Then
+                                strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
+                                todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                                 'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                 'strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                                todo.ToDoID = _globals.ToDo.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                todo.ToDoID = _globals.TD.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                _globals.ToDo.IDList.Save(_globals.ToDo.FnameIDList)
+                                _globals.TD.IDList.Save(_globals.TD.FnameIDList)
                                 'Split_ToDoID(objItem:=Item)
                                 todo.SplitID()
                             End If
@@ -189,15 +189,15 @@ Public Class FileOperationsPST
                         'If the project name is in our dictionary, autoadd the ToDoID to this item
                         If strProject.Length <> 0 Then
                             'If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                            If _globals.ToDo.ProjInfo.Contains_ProjectName(strProject) Then
+                            If _globals.TD.ProjInfo.Contains_ProjectName(strProject) Then
                                 'strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                                strProjectToDo = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
+                                strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID
                                 'Add the next ToDoID available in that branch
-                                todo.ToDoID = _globals.ToDo.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
-                                todo.TagProgram = _globals.ToDo.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
+                                todo.ToDoID = _globals.TD.IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName
                                 'strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
                                 'CustomFieldID_Set("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                _globals.ToDo.IDList.Save(_globals.ToDo.FnameIDList)
+                                _globals.TD.IDList.Save(_globals.TD.FnameIDList)
                                 'Split_ToDoID(objItem:=Item)
                                 todo.SplitID()
                                 '***NEED CODE HERE***

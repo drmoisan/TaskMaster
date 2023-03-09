@@ -47,7 +47,6 @@ Public Class TagController
 
         _selections = selections
 
-
         If _obj_item IsNot Nothing Then
             If TypeOf _obj_item Is MailItem Then
                 _olMail = _obj_item
@@ -420,7 +419,7 @@ Public Class TagController
         Const cWt = 300
 
         _filtered_options = dict_options
-        int_focus = -1
+        int_focus = 0
         _col_cbx_ctrl = New List(Of Object)
         _col_cbx_event = New List(Of Object)
 

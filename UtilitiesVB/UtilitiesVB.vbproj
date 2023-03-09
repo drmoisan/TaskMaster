@@ -47,6 +47,9 @@
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
+      <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -72,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Base Functionality Extensions\MergeSortImplementations.vb" />
     <Compile Include="Common Outlook Functions\CreateCategory.vb" />
+    <Compile Include="Solution Interfaces\IToDoObj.vb" />
     <Compile Include="To Depricate\CSVDictUtilities.vb" />
     <Compile Include="To Depricate\CsvSerializer.vb" />
     <Compile Include="Windows Forms\DeclaratonsWinAPI.vb" />
@@ -126,12 +130,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ObjectListViewDemo\ObjectListView\ObjectListView2012.csproj">
-      <Project>{18feda0c-d147-4286-b39a-01204808106a}</Project>
-      <Name>ObjectListView2012</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

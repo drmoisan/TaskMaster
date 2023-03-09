@@ -31,7 +31,7 @@ Public Class ApplicationGlobals
         End Get
     End Property
 
-    Public ReadOnly Property ToDo As IToDoObjects Implements IApplicationGlobals.ToDo
+    Public ReadOnly Property TD As IToDoObjects Implements IApplicationGlobals.TD
         Get
             Return _toDoObjects
         End Get
@@ -46,6 +46,7 @@ Public Class ApplicationGlobals
         Private _IDList As ListOfIDs
         Private ReadOnly _parent As ApplicationGlobals
         Private _dictRemap As Dictionary(Of String, String)
+
 
         Public Sub New(ParentInstance As ApplicationGlobals)
             _parent = ParentInstance
@@ -66,7 +67,7 @@ Public Class ApplicationGlobals
         Public ReadOnly Property ProjInfo As IProjectInfo Implements IToDoObjects.ProjInfo
             Get
                 If _projInfo Is Nothing Then
-                    _projInfo = LoadToDoProjectInfo(Path.Combine(Parent.FS.AppData, My.Settings.FileName_ProjInfo))
+                    _projInfo = LoadToDoProjectInfo(Path.Combine(Parent.FS.FldrAppData, My.Settings.FileName_ProjInfo))
                 End If
                 Return _projInfo
             End Get
@@ -82,7 +83,7 @@ Public Class ApplicationGlobals
         Public ReadOnly Property DictPPL As Dictionary(Of String, String) Implements IToDoObjects.DictPPL
             Get
                 If _dictPPL Is Nothing Then
-                    _dictPPL = LoadDictJSON(Parent.FS.StagingPath, DictPPL_Filename)
+                    _dictPPL = LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename)
                 End If
                 Return _dictPPL
             End Get
@@ -90,7 +91,7 @@ Public Class ApplicationGlobals
 
         Public Sub DictPPL_Save() Implements IToDoObjects.DictPPL_Save
             File.WriteAllText(
-                Path.Combine(Parent.FS.StagingPath, DictPPL_Filename),
+                Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename),
                 JsonConvert.SerializeObject(_dictPPL, Formatting.Indented))
         End Sub
 
@@ -100,20 +101,23 @@ Public Class ApplicationGlobals
             End Get
         End Property
 
+        'Public ReadOnly Property IDList_Filepath As String Implements IToDoObjects.IDList_Filepath
+        '    Get
+        '        Return Path.Combine(Parent.FS.FldrAppData, My.Settings.FileName_IDList)
+        '    End Get
+        'End Property
+
         Public ReadOnly Property IDList As IListOfIDs Implements IToDoObjects.IDList
             Get
                 If _IDList Is Nothing Then
-                    _IDList = LoadIDList(Path.Combine(Parent.FS.AppData,
-                    My.Settings.FileName_IDList),
-                    _parent.Ol.App)
+                    _IDList = New ListOfIDs(
+                        Path.Combine(Parent.FS.FldrAppData,
+                                     My.Settings.FileName_IDList),
+                        _parent.Ol.App)
                 End If
                 Return _IDList
             End Get
         End Property
-
-        Public Sub IDList_Refresh() Implements IToDoObjects.IDList_Refresh
-            _IDList = ToDoModel.RefreshIDList(FilePath:=FnameIDList, Application:=Parent.Ol.App)
-        End Sub
 
         Public ReadOnly Property FnameDictRemap As String Implements IToDoObjects.FnameDictRemap
             Get
@@ -124,7 +128,7 @@ Public Class ApplicationGlobals
         Public ReadOnly Property DictRemap As Dictionary(Of String, String) Implements IToDoObjects.DictRemap
             Get
                 If _dictRemap Is Nothing Then
-                    _dictRemap = LoadDictCSV(Parent.FS.StagingPath, My.Settings.FileName_DictRemap)
+                    _dictRemap = LoadDictCSV(Parent.FS.FldrStaging, My.Settings.FileName_DictRemap)
                 End If
                 Return _dictRemap
             End Get
@@ -148,7 +152,7 @@ Public Class ApplicationGlobals
 
             Try
                 dict = JsonConvert.DeserializeObject(Of Dictionary(Of String, String)) _
-                        (File.ReadAllText(Path.Combine(Parent.FS.StagingPath, DictPPL_Filename)))
+                        (File.ReadAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename)))
             Catch ex As FileNotFoundException
                 response = MsgBox(filepath & "not found. Load from CSV?", vbYesNo)
             Catch ex As System.Exception
@@ -244,47 +248,61 @@ Public Class ApplicationGlobals
             LoadFolders()
         End Sub
 
+        Private Sub CreateMissingPaths(filepath As String)
+            If Not Directory.Exists(filepath) Then
+                Directory.CreateDirectory(filepath)
+            End If
+        End Sub
+
         Private Sub LoadFolders()
-            _appStaging = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+            _appStaging = Path.Combine(Environment.GetFolderPath(
+                                       Environment.SpecialFolder.LocalApplicationData),
+                                       "TaskMaster")
+            CreateMissingPaths(_appStaging)
+
             _stagingPath = SpecialDirectories.MyDocuments
             _myD = SpecialDirectories.MyDocuments
             _oneDrive = Environment.GetEnvironmentVariable("OneDriveCommercial")
             _flow = Path.Combine(_oneDrive, "Email attachments from Flow")
+            CreateMissingPaths(_flow)
+
             _prereads = Path.Combine(_oneDrive, "_  Workflow", "_ Pre-Reads")
+            CreateMissingPaths(_prereads)
+
             _remap = Path.Combine(_stagingPath, "dictRemap.csv")
         End Sub
 
-        Public ReadOnly Property AppData As String Implements IFileSystemFolderPaths.AppData
+        Public ReadOnly Property FldrAppData As String Implements IFileSystemFolderPaths.FldrAppData
             Get
                 Return _appStaging
             End Get
         End Property
 
-        Public ReadOnly Property StagingPath As String Implements IFileSystemFolderPaths.StagingPath
+        Public ReadOnly Property FldrStaging As String Implements IFileSystemFolderPaths.FldrStaging
             Get
                 Return _stagingPath
             End Get
         End Property
 
-        Public ReadOnly Property MyD As String Implements IFileSystemFolderPaths.MyD
+        Public ReadOnly Property FldrMyD As String Implements IFileSystemFolderPaths.FldrMyD
             Get
                 Return _myD
             End Get
         End Property
 
-        Public ReadOnly Property Root As String Implements IFileSystemFolderPaths.Root
+        Public ReadOnly Property FldrRoot As String Implements IFileSystemFolderPaths.FldrRoot
             Get
                 Return _oneDrive
             End Get
         End Property
 
-        Public ReadOnly Property Flow As String Implements IFileSystemFolderPaths.Flow
+        Public ReadOnly Property FldrFlow As String Implements IFileSystemFolderPaths.FldrFlow
             Get
                 Return _flow
             End Get
         End Property
 
-        Public ReadOnly Property PreReads As String Implements IFileSystemFolderPaths.PreReads
+        Public ReadOnly Property FldrPreReads As String Implements IFileSystemFolderPaths.FldrPreReads
             Get
                 Return _prereads
             End Get
@@ -292,6 +310,7 @@ Public Class ApplicationGlobals
 
 
     End Class
+
 
 #Region "Legacy Definitions and Constants"
 
