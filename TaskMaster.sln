@@ -19,6 +19,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TaskVisualization", "TaskVi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskMaster.Test", "TaskMaster.Test\TaskMaster.Test.csproj", "{F535E5EC-CFBC-40F4-AB2E-7159F53FDB44}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QuickFiler", "QuickFiler\QuickFiler.vbproj", "{DDEE892E-8013-434B-A327-B5422D22EB75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,14 @@ Global
 		{F535E5EC-CFBC-40F4-AB2E-7159F53FDB44}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F535E5EC-CFBC-40F4-AB2E-7159F53FDB44}.Release|x86.ActiveCfg = Release|Any CPU
 		{F535E5EC-CFBC-40F4-AB2E-7159F53FDB44}.Release|x86.Build.0 = Release|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Debug|x86.Build.0 = Debug|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDEE892E-8013-434B-A327-B5422D22EB75}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
