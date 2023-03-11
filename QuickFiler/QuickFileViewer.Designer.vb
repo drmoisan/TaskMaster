@@ -23,13 +23,15 @@ Partial Class QuickFileViewer
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.TableLayoutL1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.TableLayoutL2B = New System.Windows.Forms.TableLayoutPanel()
         Me.Button_OK = New System.Windows.Forms.Button()
         Me.BUTTON_CANCEL = New System.Windows.Forms.Button()
         Me.Button_Undo = New System.Windows.Forms.Button()
         Me.spn_EmailPerLoad = New System.Windows.Forms.NumericUpDown()
+        Me.PanelMain = New System.Windows.Forms.Panel()
+        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.TableLayoutL1.SuspendLayout()
-        Me.TableLayoutPanel1.SuspendLayout()
+        Me.TableLayoutL2B.SuspendLayout()
         CType(Me.spn_EmailPerLoad, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -37,7 +39,8 @@ Partial Class QuickFileViewer
         '
         Me.TableLayoutL1.ColumnCount = 1
         Me.TableLayoutL1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutL1.Controls.Add(Me.TableLayoutPanel1, 0, 1)
+        Me.TableLayoutL1.Controls.Add(Me.TableLayoutL2B, 0, 1)
+        Me.TableLayoutL1.Controls.Add(Me.PanelMain, 0, 0)
         Me.TableLayoutL1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutL1.Location = New System.Drawing.Point(0, 0)
         Me.TableLayoutL1.Name = "TableLayoutL1"
@@ -47,28 +50,29 @@ Partial Class QuickFileViewer
         Me.TableLayoutL1.Size = New System.Drawing.Size(919, 161)
         Me.TableLayoutL1.TabIndex = 0
         '
-        'TableLayoutPanel1
+        'TableLayoutL2B
         '
-        Me.TableLayoutPanel1.ColumnCount = 7
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Controls.Add(Me.Button_OK, 2, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.BUTTON_CANCEL, 3, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.Button_Undo, 4, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.spn_EmailPerLoad, 5, 0)
-        Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 108)
-        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 1
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(913, 50)
-        Me.TableLayoutPanel1.TabIndex = 0
+        Me.TableLayoutL2B.ColumnCount = 7
+        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140.0!))
+        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160.0!))
+        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160.0!))
+        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60.0!))
+        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80.0!))
+        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutL2B.Controls.Add(Me.Button_OK, 2, 0)
+        Me.TableLayoutL2B.Controls.Add(Me.BUTTON_CANCEL, 3, 0)
+        Me.TableLayoutL2B.Controls.Add(Me.Button_Undo, 4, 0)
+        Me.TableLayoutL2B.Controls.Add(Me.spn_EmailPerLoad, 5, 0)
+        Me.TableLayoutL2B.Controls.Add(Me.TextBox1, 0, 0)
+        Me.TableLayoutL2B.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutL2B.Location = New System.Drawing.Point(3, 108)
+        Me.TableLayoutL2B.Name = "TableLayoutL2B"
+        Me.TableLayoutL2B.RowCount = 1
+        Me.TableLayoutL2B.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutL2B.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutL2B.Size = New System.Drawing.Size(913, 50)
+        Me.TableLayoutL2B.TabIndex = 0
         '
         'Button_OK
         '
@@ -112,6 +116,25 @@ Partial Class QuickFileViewer
         Me.spn_EmailPerLoad.Size = New System.Drawing.Size(66, 41)
         Me.spn_EmailPerLoad.TabIndex = 3
         '
+        'PanelMain
+        '
+        Me.PanelMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.PanelMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PanelMain.Location = New System.Drawing.Point(3, 3)
+        Me.PanelMain.Name = "PanelMain"
+        Me.PanelMain.Size = New System.Drawing.Size(913, 99)
+        Me.PanelMain.TabIndex = 1
+        '
+        'TextBox1
+        '
+        Me.TextBox1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBox1.Location = New System.Drawing.Point(7, 3)
+        Me.TextBox1.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
+        Me.TextBox1.Name = "TextBox1"
+        Me.TextBox1.Size = New System.Drawing.Size(142, 40)
+        Me.TextBox1.TabIndex = 4
+        '
         'QuickFileViewer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -121,16 +144,19 @@ Partial Class QuickFileViewer
         Me.Name = "QuickFileViewer"
         Me.Text = "Quick File"
         Me.TableLayoutL1.ResumeLayout(False)
-        Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.TableLayoutL2B.ResumeLayout(False)
+        Me.TableLayoutL2B.PerformLayout()
         CType(Me.spn_EmailPerLoad, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents TableLayoutL1 As Windows.Forms.TableLayoutPanel
-    Friend WithEvents TableLayoutPanel1 As Windows.Forms.TableLayoutPanel
+    Friend WithEvents TableLayoutL2B As Windows.Forms.TableLayoutPanel
     Friend WithEvents Button_OK As Windows.Forms.Button
     Friend WithEvents BUTTON_CANCEL As Windows.Forms.Button
     Friend WithEvents Button_Undo As Windows.Forms.Button
     Friend WithEvents spn_EmailPerLoad As Windows.Forms.NumericUpDown
+    Friend WithEvents PanelMain As Windows.Forms.Panel
+    Friend WithEvents TextBox1 As Windows.Forms.TextBox
 End Class

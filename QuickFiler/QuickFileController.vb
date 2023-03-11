@@ -1,9 +1,10 @@
-﻿Imports Microsoft.Office.Interop.Outlook
-Imports System.Windows.Forms
+﻿Imports System.Collections.Generic
 Imports System.Linq
-Imports System.Collections.Generic
-Imports UtilitiesVB
+Imports System.Windows.Forms
+Imports Microsoft.Office.Interop.Outlook
+Imports Microsoft.Office.Interop
 Imports ToDoModel
+Imports UtilitiesVB
 
 Public Class QuickFileController
 
@@ -11,13 +12,15 @@ Public Class QuickFileController
     Private lFormHandle As Long
     Private lStyle As Long
 
+    Friend WithEvents frm As Windows.Forms.Panel
+
     Public WithEvents focusListener As FormFocusListener
     Private StopWatch As cStopWatch
     Private BoolRemoteMouseApp As Boolean
-    Const Modal = 0, Modeless = 1
+    Private Const Modal = 0, Modeless = 1
 
-    Private ht, wt As Long
-    Private Const GWL_STYLE As Long = (-16) 'Sets a new window style  As LongPtr in 64bit version
+    Private ReadOnly ht, wt As Long
+    Private Const GWL_STYLE As Long = -16 'Sets a new window style  As LongPtr in 64bit version
     Private Const WS_SYSMENU As Long = &H80000 'Windows style   As LongPtr in 64bit version
     Private Const WS_THICKFRAME = &H40000 'Style that is apparently resizble
     Private Const WS_MINIMIZEBOX As Long = &H20000   'As LongPtr in 64bit version
@@ -30,12 +33,12 @@ Public Class QuickFileController
     Private Const GA_PARENT = 1
     Private Const GA_ROOTOWNER = 3
 
-    Private strTagOptions As Object
-    Private strFilteredOptions As Object
-    Private intFilteredMax As Integer
-    Private intMaxOptions As Integer
-    Private boolTagChoice() As Boolean
-    Private boolFilteredChoice() As Boolean
+    Private ReadOnly strTagOptions As Object
+    Private ReadOnly strFilteredOptions As Object
+    Private ReadOnly intFilteredMax As Integer
+    Private ReadOnly intMaxOptions As Integer
+    Private ReadOnly boolTagChoice() As Boolean
+    Private ReadOnly boolFilteredChoice() As Boolean
     Public colCheckbox As Collection
     Public colCheckboxEvent As Collection
     Public blFrmKll As Boolean
@@ -47,10 +50,10 @@ Public Class QuickFileController
     Private lngAcceleratorDialogueTop As Long
     Private lngAcceleratorDialogueLeft As Long
     Private intAccActiveMail As Integer
-    'Public blShowInConversations        As Boolean
-    Public objView As Microsoft.Office.Interop.Outlook.[View]
+    Public blShowInConversations As Boolean
+    Public objView As Microsoft.Office.Interop.Outlook.View
     Private objView_Mem As String
-    Public objViewTemp As Microsoft.Office.Interop.Outlook.[View]
+    Public objViewTemp As Microsoft.Office.Interop.Outlook.View
     Public InitType As InitTypeEnum
 
 
@@ -64,100 +67,100 @@ Public Class QuickFileController
     Public blConvView As Boolean
 
     'Left and Width Constants
-    Const Top_Offset As Long = 6
-    Const Top_Offset_C As Long = 0
+    Private Const Top_Offset As Long = 6
+    Private Const Top_Offset_C As Long = 0
 
-    Const Left_frm As Long = 12
-    Const Left_lbl1 As Long = 6
-    Const Left_lbl2 As Long = 6
-    Const Left_lbl3 As Long = 6
-    Const Left_lbl4 As Long = 6
-    Const Left_lbl5 As Long = 372           'Folder:
-    Const Left_lblSender As Long = 66            '<SENDER>
-    Const Left_lblSender_C As Long = 6             '<SENDER> Compact view
-    Const Right_Aligned As Long = 648
+    Private Const Left_frm As Long = 12
+    Private Const Left_lbl1 As Long = 6
+    Private Const Left_lbl2 As Long = 6
+    Private Const Left_lbl3 As Long = 6
+    Private Const Left_lbl4 As Long = 6
+    Private Const Left_lbl5 As Long = 372           'Folder:
+    Private Const Left_lblSender As Long = 66            '<SENDER>
+    Private Const Left_lblSender_C As Long = 6             '<SENDER> Compact view
+    Private Const Right_Aligned As Long = 648
 
-    Const Left_lblTriage As Long = 181           'X Triage placeholder
-    Const Left_lblActionable As Long = 198           '<ACTIONABL>
+    Private Const Left_lblTriage As Long = 181           'X Triage placeholder
+    Private Const Left_lblActionable As Long = 198           '<ACTIONABL>
 
-    Const Left_lblSubject As Long = 66            '<SUBJECT>
-    Const Left_lblSubject_C As Long = 6             '<SUBJECT> Compact view
+    Private Const Left_lblSubject As Long = 66            '<SUBJECT>
+    Private Const Left_lblSubject_C As Long = 6             '<SUBJECT> Compact view
 
-    Const Left_lblBody As Long = 66            '<BODY>
-    Const Left_lblBody_C As Long = 6             '<BODY> Compact view
+    Private Const Left_lblBody As Long = 66            '<BODY>
+    Private Const Left_lblBody_C As Long = 6             '<BODY> Compact view
 
-    Const Left_lblSentOn As Long = 66            '<SENTON>
-    Const Left_lblSentOn_C As Long = 200           '<SENTON> Compact view
+    Private Const Left_lblSentOn As Long = 66            '<SENTON>
+    Private Const Left_lblSentOn_C As Long = 200           '<SENTON> Compact view
 
-    Const Left_lblConvCt As Long = 290           'Count of Conversation Members
-    Const Left_lblConvCt_C As Long = 320           'Count of Conversation Members Compact view
+    Private Const Left_lblConvCt As Long = 290           'Count of Conversation Members
+    Private Const Left_lblConvCt_C As Long = 320           'Count of Conversation Members Compact view
 
-    Const Left_lblPos As Long = 6             'ACCELERATOR Email Position
-    Const Left_cbxFolder As Long = 372           'Combo box containing Folder Suggestions
-    Const Left_inpt As Long = 408           'Input for folder search
+    Private Const Left_lblPos As Long = 6             'ACCELERATOR Email Position
+    Private Const Left_cbxFolder As Long = 372           'Combo box containing Folder Suggestions
+    Private Const Left_inpt As Long = 408           'Input for folder search
 
-    Const Left_chbxGPConv As Long = 210           'Checkbox to Group Conversations
-    Const Left_chbxGPConv_C As Long = 372           'Checkbox to Group Conversations
+    Private Const Left_chbxGPConv As Long = 210           'Checkbox to Group Conversations
+    Private Const Left_chbxGPConv_C As Long = 372           'Checkbox to Group Conversations
 
-    Const Left_cbDelItem As Long = 588           'Delete email
-    Const Left_cbKllItem As Long = 618           'Remove mail from Processing
-    Const Left_cbFlagItem As Long = 569           'Flag as Task
-    Const Left_lblAcF As Long = 363           'ACCELERATOR F for Folder Search
-    Const Left_lblAcD As Long = 363           'ACCELERATOR D for Folder Dropdown
+    Private Const Left_cbDelItem As Long = 588           'Delete email
+    Private Const Left_cbKllItem As Long = 618           'Remove mail from Processing
+    Private Const Left_cbFlagItem As Long = 569           'Flag as Task
+    Private Const Left_lblAcF As Long = 363           'ACCELERATOR F for Folder Search
+    Private Const Left_lblAcD As Long = 363           'ACCELERATOR D for Folder Dropdown
 
-    Const Left_lblAcC As Long = 384           'ACCELERATOR C for Grouping Conversations
-    Const Left_lblAcC_C As Long = 548           'ACCELERATOR C for Grouping Conversations
+    Private Const Left_lblAcC As Long = 384           'ACCELERATOR C for Grouping Conversations
+    Private Const Left_lblAcC_C As Long = 548           'ACCELERATOR C for Grouping Conversations
 
-    Const Left_lblAcX As Long = 594           'ACCELERATOR X for Delete email
-    Const Left_lblAcR As Long = 624           'ACCELERATOR R for remove item from list
-    Const Left_lblAcT As Long = 330           'ACCELERATOR T for Task ... Flag item and make it a task
+    Private Const Left_lblAcX As Long = 594           'ACCELERATOR X for Delete email
+    Private Const Left_lblAcR As Long = 624           'ACCELERATOR R for remove item from list
+    Private Const Left_lblAcT As Long = 330           'ACCELERATOR T for Task ... Flag item and make it a task
 
-    Const Left_lblAcO As Long = 50            'ACCELERATOR O for Open Email
-    Const Left_lblAcO_C As Long = 0            'ACCELERATOR O for Open Email
+    Private Const Left_lblAcO As Long = 50            'ACCELERATOR O for Open Email
+    Private Const Left_lblAcO_C As Long = 0            'ACCELERATOR O for Open Email
 
-    Const Width_frm As Long = 655
-    Const Width_lbl1 As Long = 54
-    Const Width_lbl2 As Long = 54
-    Const Width_lbl3 As Long = 54
-    Const Width_lbl4 As Long = 52
-    Const Width_lbl5 As Long = 78            'Folder:
-    Const Width_lblSender As Long = 138           '<SENDER>
-    Const Width_lblSender_C As Long = 174           '<SENDER> Compact view
-    Const Width_lblTriage As Long = 11            'X Triage placeholder
-    Const Width_lblActionable As Long = 72            '<ACTIONABL>
+    Private Const Width_frm As Long = 655
+    Private Const Width_lbl1 As Long = 54
+    Private Const Width_lbl2 As Long = 54
+    Private Const Width_lbl3 As Long = 54
+    Private Const Width_lbl4 As Long = 52
+    Private Const Width_lbl5 As Long = 78            'Folder:
+    Private Const Width_lblSender As Long = 138           '<SENDER>
+    Private Const Width_lblSender_C As Long = 174           '<SENDER> Compact view
+    Private Const Width_lblTriage As Long = 11            'X Triage placeholder
+    Private Const Width_lblActionable As Long = 72            '<ACTIONABL>
 
-    Const Width_lblSubject As Long = 294           '<SUBJECT>
-    Const Width_lblSubject_C As Long = 354           '<SUBJECT> Compact view
+    Private Const Width_lblSubject As Long = 294           '<SUBJECT>
+    Private Const Width_lblSubject_C As Long = 354           '<SUBJECT> Compact view
 
-    Const Width_lblBody As Long = 294           '<BODY>
-    Const Width_lblBody_C As Long = 354           '<BODY> Compact view
+    Private Const Width_lblBody As Long = 294           '<BODY>
+    Private Const Width_lblBody_C As Long = 354           '<BODY> Compact view
 
-    Const Width_lblSentOn As Long = 80            '<SENTON>
-    Const Width_lblConvCt As Long = 30            'Count of Conversation Members
-    Const Width_lblPos As Long = 20            'ACCELERATOR Email Position
-    Const Width_cbxFolder As Long = 276           'Combo box containing Folder Suggestions
-    Const Width_inpt As Long = 156           'Input for folder search
-    Const Width_chbxGPConv As Long = 96            'Checkbox to Group Conversations
-    Const Width_cb As Long = 25            'Command buttons for: Delete email, Remove mail from Processing, and Flag as Task
-    Const Width_lblAc As Long = 14            'ACCELERATOR Width
-    Const Width_lblAcF As Long = 14            'ACCELERATOR F for Folder Search
-    Const Width_lblAcD As Long = 14            'ACCELERATOR D for Folder Dropdown
-    Const Width_lblAcC As Long = 14            'ACCELERATOR C for Grouping Conversations
-    Const Width_lblAcX As Long = 14            'ACCELERATOR X for Delete email
-    Const Width_lblAcR As Long = 14            'ACCELERATOR R for remove item from list
-    Const Width_lblAcT As Long = 14            'ACCELERATOR T for Task ... Flag item and make it a task
-    Const Width_lblAcO As Long = 14            'ACCELERATOR O for Open Email
+    Private Const Width_lblSentOn As Long = 80            '<SENTON>
+    Private Const Width_lblConvCt As Long = 30            'Count of Conversation Members
+    Private Const Width_lblPos As Long = 20            'ACCELERATOR Email Position
+    Private Const Width_cbxFolder As Long = 276           'Combo box containing Folder Suggestions
+    Private Const Width_inpt As Long = 156           'Input for folder search
+    Private Const Width_chbxGPConv As Long = 96            'Checkbox to Group Conversations
+    Private Const Width_cb As Long = 25            'Command buttons for: Delete email, Remove mail from Processing, and Flag as Task
+    Private Const Width_lblAc As Long = 14            'ACCELERATOR Width
+    Private Const Width_lblAcF As Long = 14            'ACCELERATOR F for Folder Search
+    Private Const Width_lblAcD As Long = 14            'ACCELERATOR D for Folder Dropdown
+    Private Const Width_lblAcC As Long = 14            'ACCELERATOR C for Grouping Conversations
+    Private Const Width_lblAcX As Long = 14            'ACCELERATOR X for Delete email
+    Private Const Width_lblAcR As Long = 14            'ACCELERATOR R for remove item from list
+    Private Const Width_lblAcT As Long = 14            'ACCELERATOR T for Task ... Flag item and make it a task
+    Private Const Width_lblAcO As Long = 14            'ACCELERATOR O for Open Email
 
-    Const Height_UserForm As Long = 149          'Minimum height of Userform
-    Const Width_UserForm As Long = 699.75        'Minimum width of Userform
-    Const Width_FrameMain As Long = 683           'Minimum width of FrameMain
+    Private Const Height_UserForm As Long = 149          'Minimum height of Userform
+    Private Const Width_UserForm As Long = 699.75        'Minimum width of Userform
+    Private Const Width_PanelMain As Long = 683           'Minimum width of _viewer.PanelMain
 
     Private Height_UserForm_Max As Long
     Private Height_UserForm_Min As Long
-    Private Height_FrameMain_Max As Long
-    Private Height_FrameMain_Min As Long
-    Private lngFrameMain_SC_Top As Long
-    Private lngFrameMain_SC_Bottom As Long
+    Private Height_PanelMain_Max As Long
+    Private Height_PanelMain_Min As Long
+    Private lngPanelMain_SC_Top As Long
+    Private ReadOnly lngPanelMain_SC_Bottom As Long
 
     Private lngTop_OK_BUTTON_Min As Long
     Private lngTop_CANCEL_BUTTON_Min As Long
@@ -167,7 +170,7 @@ Public Class QuickFileController
     Private Const OK_width As Long = 120
     Private Const UNDO_left As Long = 480
     Private Const UNDO_width As Long = 42
-    Private lngTop_CommandButton1_Min As Long
+    Private ReadOnly lngTop_CommandButton1_Min As Long
     Private lngTop_AcceleratorDialogue_Min As Long
     Private lngTop_spn_Min As Long
     Private Const spn_left As Long = 606
@@ -175,28 +178,31 @@ Public Class QuickFileController
     Private lng_lbl_EmailPerLoad_left As Long
 
     'Frame Design Constants
-    Const frmHt = 72
-    Const frmWd = 655
-    Const frmLt = 12
-    Const frmSp = 6
+    Private Const frmHt = 72
+    Private Const frmWd = 655
+    Private Const frmLt = 12
+    Private Const frmSp = 6
     Public colEmailsInFolder As Collection
-    Private ActiveExlorer As [Explorer]
-    Private OlApp As Microsoft.Office.Interop.Outlook.Application
+    Private ReadOnly ActiveExlorer As Outlook.Explorer
+    Private ReadOnly _olApp As Outlook.Application
+    Private _viewer As QuickFileViewer
 
-    Public Sub New(OlApp As Microsoft.Office.Interop.Outlook.Application)
-        Me.OlApp = OlApp
+    Public Sub New(OlApp As Outlook.Application,
+                   Viewer As QuickFileViewer)
+        _olApp = OlApp
+        _viewer = Viewer
         ActiveExlorer = OlApp.ActiveExplorer()
     End Sub
 
     Public Sub LoadEmailDataBase(Optional colEmailsToLoad As Collection = Nothing)
-        Dim OlFolder As [Folder]
+        Dim OlFolder As Folder
         Dim objCurView As Microsoft.Office.Interop.Outlook.View
         Dim strFilter As String
-        Dim OlItems As [Items]
+        Dim OlItems As Items
 
 
         If colEmailsToLoad Is Nothing Then
-            colEmailsToLoad = New Collection
+            Dim unused As New Collection
             OlFolder = ActiveExlorer.CurrentFolder
             objCurView = ActiveExlorer.CurrentView
             strFilter = objCurView.Filter
@@ -226,7 +232,7 @@ Public Class QuickFileController
 
         i = 0
         For Each objItem In colTemp
-            i = i + 1
+            i += 1
             strLine = ""
             If TypeOf objItem Is [MailItem] Then
                 OlMail = objItem
@@ -256,7 +262,7 @@ Public Class QuickFileController
     End Function
 
     Private Sub EliminateDuplicateConversationIDs(ByRef colTemp As Collection)
-        Dim dictID As Dictionary(Of String, Integer) = New Dictionary(Of String, Integer)
+        Dim dictID As New Dictionary(Of String, Integer)
         Dim i As Long
         Dim max As Long
 
@@ -275,44 +281,28 @@ Public Class QuickFileController
             objItem = colTemp(i)
             'Debug.Print dictID(objItem.ConversationID)
             If dictID(objItem.ConversationID) > 0 Then
-                colTemp.Remove(objItem)
+                Dim unused = colTemp.Remove(objItem)
                 dictID(objItem.ConversationID) = dictID(objItem.ConversationID) - 1
             End If
         Next i
     End Sub
 
     Public Sub Iterate()
-
-        Dim MailCurrent As [MailItem]
-        Dim dblItemCount As Double
         Dim i As Double
-        Dim j As Double
         Dim max As Double
-        Dim intItemsPerPage As Integer
-        Dim strCurConvs() As String
 
         Dim colEmails As Collection
-        Dim cQFC As QfcController
-        Dim items As [Items]
-        Dim bExit As Boolean
-        Dim bCollectionFull As Boolean
-        Dim strConvId_last As String
-        Dim QF As QuickFileViewer
 
 
 
         colEmails = New Collection
-        If intEmailsPerIteration < colEmailsInFolder.Count Then
-            max = intEmailsPerIteration
-        Else
-            max = colEmailsInFolder.Count
-        End If
+        max = If(intEmailsPerIteration < colEmailsInFolder.Count, intEmailsPerIteration, colEmailsInFolder.Count)
 
         For i = 1 To max
             colEmails.Add(colEmailsInFolder(i))
         Next i
         For i = max To 1 Step -1
-            colEmailsInFolder.Remove(colEmailsInFolder(i))
+            Dim unused = colEmailsInFolder.Remove(colEmailsInFolder(i))
         Next i
         StopWatch = New cStopWatch
         StopWatch.Start()
@@ -338,78 +328,53 @@ Public Class QuickFileController
 
         For Each objItem In colEmails
             If TypeOf objItem Is MailItem Then
-                intUniqueItemCounter = intUniqueItemCounter + 1
+                intUniqueItemCounter += 1
                 Mail = objItem
                 QF = New QfcController
                 colCtrls = New Collection
                 LoadGroupOfCtrls(colCtrls, intUniqueItemCounter)
                 QF.InitCtrls(Mail, colCtrls, intUniqueItemCounter, BoolRemoteMouseApp, Caller:=Me, hwnd:=lFormHandle, InitTypeE:=InitType)
 
-                colQFClass.Add QF
-            DoEvents
+                colQFClass.Add(QF)
+                _olApp.DoEvents()
             End If
         Next objItem
 
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & "Completed initializing all emails in form. About to run conversation enumeration"
-    ShowWindow lFormHandle, SW_SHOWMAXIMIZED
+        ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
 
 
 
-    If InitType And InitSort Then
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
             'ToggleOffline
             For Each QF In colQFClass
-                QF.Init_FolderSuggestions
-                QF.CountMailsInConv
+                QF.Init_FolderSuggestions()
+                QF.CountMailsInConv()
                 'DoEvents
             Next QF
             'ToggleOffline
         End If
 
 
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & "Completed conversation enumeration. About to force focus on userform"
 
-    intAccActiveMail = 0
+
+        intAccActiveMail = 0
 
         If blSuppressEvents Then
             blSuppressEvents = False
             UserForm_Resize()
             blSuppressEvents = True
         Else
-            DoEvents
+            _olApp.DoEvents
             UserForm_Resize()
         End If
 
 
         'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
-        EnableWindow OlApp_hWnd, Modal
-    'EnableWindow lFormHandle, Modeless
-        FrameMain.SetFocus
+        EnableWindow(OlApp_hWnd, Modal)
+        'EnableWindow lFormHandle, Modeless
+        _viewer.PanelMain.Focus()
 
 
-        '************Standard Error Handling Footer**************
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & "Finished subroutine"
-    Exit Sub
-
-ErrorHandler:
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-
-    ErrHandler_Execute SubNm, ttrace, errcapt, errRaised, DebugLVL
-
-    'errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        Stop
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Stop
-            Resume
-        End If
 
     End Sub
 
@@ -420,29 +385,11 @@ ErrorHandler:
     Optional blGroupConversation As Boolean = True,
     Optional blWideView As Boolean = False)
 
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "LoadGroupOfCtrls"
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
-
-
-        Dim frm As MSForms.frame
+        'Dim frm As MSForms.frame
         Dim lbl1 As MSForms.Label
         Dim lbl2 As MSForms.Label
         Dim lbl3 As MSForms.Label
-        Dim lbl4 As MSForms.Label
         Dim lbl5 As MSForms.Label
         Dim lblSender As MSForms.Label
         Dim lblSubject As MSForms.Label
@@ -478,33 +425,31 @@ ErrorHandler:
 
         blDebug = False
 
-        If blWideView Then
-            lngTopOff = Top_Offset
-        Else
-            lngTopOff = Top_Offset_C
-        End If
+        lngTopOff = If(blWideView, Top_Offset, Top_Offset_C)
         'Button_OK.top = Button_OK.top + frmHt + frmSp
         'BUTTON_CANCEL.top = BUTTON_CANCEL.top + frmHt + frmSp
 
         If intPosition = 0 Then intPosition = intItemNumber
 
-        If (intItemNumber * (frmHt + frmSp) + frmSp) > FrameMain.Height Then      'Was Height_FrameMain_Max but I replaced with Me.Height
-            FrameMain.ScrollHeight = intItemNumber * (frmHt + frmSp) + frmSp 'FrameMain.ScrollHeight + frmHt + frmSp
+        If ((intItemNumber * (frmHt + frmSp)) + frmSp) > _viewer.PanelMain.Height Then      'Was Height_PanelMain_Max but I replaced with Me.Height
+            _viewer.PanelMain.AutoScroll = True
+            '_viewer.PanelMain.ScrollHeight = (intItemNumber * (frmHt + frmSp)) + frmSp 'PanelMain.ScrollHeight + frmHt + frmSp
         End If
 
         'Min Me Size is frmSp * 2 + frmHt
-        frm = FrameMain.controls.Add("Forms.Frame.1", "frm0" & intItemNumber, True)
+        frm = New System.Windows.Forms.Panel()
+        _viewer.PanelMain.Controls.Add(frm)
         With frm
             .Height = frmHt
-            .Top = (frmSp + frmHt) * (intPosition - 1) + frmSp
+            .Top = ((frmSp + frmHt) * (intPosition - 1)) + frmSp
             .Left = frmLt
             .Width = frmWd
             .TabStop = False
 
         End With
-        colCtrls.Add frm, "frm"
+        colCtrls.Add(frm, "frm")
 
-    'If intBefore And intAfter Then
+        'If intBefore And intAfter Then
         '    colFrames.Add frm, "frm0" & intItemNumber, intBefore, intAfter
         'ElseIf intBefore Then
         '    colFrames.Add frm, "frm0" & intItemNumber, intBefore
@@ -912,11 +857,7 @@ If InitType And InitSort Then
                 .Width = 36
                 .Caption = "<#>"
                 .Font.Name = "Tahoma"
-                If blWideView Then
-                    .Font.Size = 12
-                Else
-                    .Font.Size = 16
-                End If
+                .Font.Size = If(blWideView, 12, 16)
 
                 .Enabled = blGroupConversation
 
@@ -929,11 +870,7 @@ End If
             .Height = 20
             .Top = lngTopOff
 
-            If blWideView Then
-                .Left = 6
-            Else
-                .Left = 0
-            End If
+            .Left = If(blWideView, 6, 0)
 
             .Width = 20
             .Caption = "<Pos#>"
@@ -1165,83 +1102,46 @@ If InitType And InitSort Then
                 .ForeColor = &H8000000E
                 .Visible = blDebug
             End With
-            colCtrls.Add lblAcM, "lblAcM"
-End If
+            colCtrls.Add(lblAcM, "lblAcM")
+        End If
 
-        Temp = SF_Stack.Pop
-
-        If blDebug Then Stop
+        p
 
     End Sub
 
     Private Sub RemoveControls()
 
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "RemoveControls"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
 
         Dim QF As QfcController
         Dim i As Integer
-        Dim max As Integer
 
         'max = colQFClass.Count
         'For i = max To 1 Step -1
-        If Not colQFClass Is Nothing Then
+        If colQFClass IsNot Nothing Then
             Do While colQFClass.Count > 0
                 i = colQFClass.Count
                 QF = colQFClass(i)
-                QF.ctrlsRemove                                  'Remove controls on the frame
-                FrameMain.controls.Remove QF.frm.Name           'Remove the frame
-                QF.kill                                         'Remove the variables linking to events
+                QF.ctrlsRemove()                                  'Remove controls on the frame
+                _viewer.PanelMain.Controls.Remove(QF.frm)           'Remove the frame
+                QF.kill()                                         'Remove the variables linking to events
 
-                'FrameMain.Controls.Remove colFrames(i).Name
+                'PanelMain.Controls.Remove colFrames(i).Name
                 colQFClass.Remove i
     Loop
         End If
 
         QF = Nothing                                    'Free up the QfcController class memory
 
-        FrameMain.ScrollHeight = Height_FrameMain_Max
+        '_viewer.PanelMain.ScrollHeight = Height_PanelMain_Max
 
-        Temp = SF_Stack.Pop
+
 
     End Sub
 
-    Sub MoveDownControlGroups(intPosition As Integer, intMoves As Integer)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "MoveDownControlGroups"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
-
+    Public Sub MoveDownControlGroups(intPosition As Integer, intMoves As Integer)
 
         Dim i As Integer
         Dim QF As QfcController
-        Dim intItemCount As Integer
         Dim ctlFrame As MSForms.frame
         Dim blDebug As Boolean
 
@@ -1251,97 +1151,32 @@ End If
 
             'Shift items downward if there are any
             QF = colQFClass(i)
-            QF.intMyPosition = QF.intMyPosition + intMoves
+            QF.intMyPosition += intMoves
             ctlFrame = QF.frm
-            ctlFrame.Top = ctlFrame.Top + intMoves * (frmHt + frmSp)
+            ctlFrame.Top = ctlFrame.Top + (intMoves * (frmHt + frmSp))
         Next i
-        'FrameMain.ScrollHeight = max((intMoves + colQFClass.Count) * (frmHt + frmSp), Height_FrameMain_Max)
+        'PanelMain.ScrollHeight = max((intMoves + colQFClass.Count) * (frmHt + frmSp), Height_PanelMain_Max)
 
-        Temp = SF_Stack.Pop
+
     End Sub
 
-    Sub ToggleRemoteMouseLabels()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "ToggleRemoteMouseLabels"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-        Dim ttrace As String
-        Dim errcapt As Variant
-
-        '*******************END Error Header*********************
-
+    Public Sub ToggleRemoteMouseLabels()
         BoolRemoteMouseApp = Not BoolRemoteMouseApp
 
         Dim QF As QfcController
 
         For Each QF In colQFClass
-            QF.ToggleRemoteMouseAppLabels
+            QF.ToggleRemoteMouseAppLabels()
         Next QF
 
-        '************Standard Error Handling Footer**************
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-        Exit Sub
-
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        Stop
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Stop
-            Resume
-        End If
-
-        '*******************END Standard Error Footer*********************
-
     End Sub
-    Sub MoveDownPix(intPosition As Integer, intPix As Integer)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "MoveDownPix"
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
+    Public Sub MoveDownPix(intPosition As Integer, intPix As Integer)
 
 
         Dim i As Integer
         Dim QF As QfcController
-        Dim intItemCount As Integer
-        Dim ctlFrame As MSForms.frame
+        Dim ctlFrame As Windows.Forms.Panel
         Dim blDebug As Boolean
 
         blDebug = False
@@ -1353,35 +1188,17 @@ ErrorHandler:
             ctlFrame = QF.frm
             ctlFrame.Top = ctlFrame.Top + intPix
         Next i
-        FrameMain.ScrollHeight = max(max(intPix, 0) + (colQFClass.Count * (frmHt + frmSp)), FrameMain.Height)
+        '_viewer.PanelMain.ScrollHeight = max(max(intPix, 0) + (colQFClass.Count * (frmHt + frmSp)), _viewer.PanelMain.Height)
 
-        Temp = SF_Stack.Pop
+
     End Sub
 
-
-    Sub AddEmailControlGroup(Optional objItem As Object,
+    Public Sub AddEmailControlGroup(Optional objItem As Object,
     Optional posInsert As Integer = 0,
     Optional blGroupConversation As Boolean = True,
     Optional ConvCt As Integer = 0,
     Optional varList As Variant,
     Optional blChild As Boolean)
-
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "AddEmailControlGroup"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
 
 
         Dim Mail As [MailItem]
@@ -1390,14 +1207,14 @@ ErrorHandler:
         Dim items As [Items]
         Dim i As Integer
 
-        intUniqueItemCounter = intUniqueItemCounter + 1
+        intUniqueItemCounter += 1
 
         If objItem Is Nothing Then
             items = folderCurrent.Items
             objItem = items(max - intEmailPosition)
         End If
 
-        If posInsert = 0 Then posInsert = (colQFClass.Count + 1)
+        If posInsert = 0 Then posInsert = colQFClass.Count + 1
 
         If TypeOf objItem Is MailItem Then
             Mail = objItem
@@ -1410,7 +1227,7 @@ ErrorHandler:
         If blChild Then QF.blConChild = True
             If IsArray(varList) = True Then
                 If UBound(varList) = 0 Then
-                    QF.Init_FolderSuggestions
+                    QF.Init_FolderSuggestions()
                 Else
                     QF.Init_FolderSuggestions varList
             End If
@@ -1432,27 +1249,11 @@ ErrorHandler:
 
         End If
 
-        Temp = SF_Stack.Pop
+
 
     End Sub
 
-    Sub ConvToggle_Group(selItems As Collection, intOrigPosition As Integer)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "ConvToggle_Group"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
+    Public Sub ConvToggle_Group(selItems As Collection, intOrigPosition As Integer)
 
 
         Dim objEmail As [MailItem]
@@ -1481,31 +1282,12 @@ ErrorHandler:
             RemoveSpecificControlGroup(intPosition)
         Next objItem
 
-        Temp = SF_Stack.Pop
+
 
     End Sub
 
-    Sub ConvToggle_UnGroup(selItems As Collection, intPosition As Integer, ConvCt As Integer, varList As Variant)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "ConvToggle_UnGroup"
-        Dim Temp As Variant
+    Public Sub ConvToggle_UnGroup(selItems As Collection, intPosition As Integer, ConvCt As Integer, varList As Variant)
 
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
-
-
-        Dim objEmail As [MailItem]
-        Dim objItem As Object
         Dim i As Integer
         Dim QF As QfcController
         Dim blDebug As Boolean
@@ -1521,10 +1303,11 @@ ErrorHandler:
             Next i
         End If
 
-        MoveDownControlGroups intPosition + 1, selItems.Count
-    For i = 1 To selItems.Count
-            AddEmailControlGroup selItems(i), intPosition + i, False, ConvCt, varList, True
-    Next i
+        MoveDownControlGroups(intPosition + 1, selItems.Count)
+
+        For i = 1 To selItems.Count
+            AddEmailControlGroup(selItems(i), intPosition + i, False, ConvCt, varList, True)
+        Next i
 
         If blDebug Then
             'Print data after movement
@@ -1535,26 +1318,11 @@ ErrorHandler:
             Next i
         End If
         UserForm_Resize()
-        Temp = SF_Stack.Pop
+
 
     End Sub
     Private Function DoesCollectionHaveConvID(objItem As Object, col As Collection) As Integer
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "DoesCollectionHaveConvID"
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
 
 
         Dim objItemInCol As Object
@@ -1566,7 +1334,7 @@ ErrorHandler:
 
         If TypeOf objItem Is MailItem Then
             objMail = objItem
-            If Not col Is Nothing Then
+            If col IsNot Nothing Then
                 For i = 1 To col.Count
                     objItemInCol = col(i)
                     If TypeOf objItemInCol Is MailItem Then
@@ -1577,27 +1345,12 @@ ErrorHandler:
             End If
         End If
 
-        Temp = SF_Stack.Pop
+
 
     End Function
 
     Private Function GetEmailPositionInCollection(objMail As [MailItem]) As Integer
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "GetEmailPositionInCollection"
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
 
 
         Dim QF As QfcController
@@ -1609,28 +1362,11 @@ ErrorHandler:
             If QF.Mail.EntryID = objMail.EntryID Then GetEmailPositionInCollection = i
         Next i
 
-        Temp = SF_Stack.Pop
+
 
     End Function
 
-    Sub RemoveSpecificControlGroup(intPosition As Integer)
-
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "RemoveSpecificControlGroup"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
+    Public Sub RemoveSpecificControlGroup(intPosition As Integer)
 
         Dim blDebug As Boolean
         Dim QF As QfcController
@@ -1652,9 +1388,9 @@ ErrorHandler:
         intDeletedMyPos = QF.intMyPosition
 
 
-        QF.ctrlsRemove                                  'Run the method that removes controls from the frame
-2    FrameMain.controls.Remove QF.frm.Name           'Remove the specific frame
-    QF.kill                                         'Remove the variables linking to events
+        QF.ctrlsRemove()                                  'Run the method that removes controls from the frame
+        _viewer.PanelMain.controls.Remove(QF.frm.Name)           'Remove the specific frame
+        QF.kill()                                         'Remove the variables linking to events
 
         If blDebug Then
             'Print data before movement
@@ -1673,15 +1409,15 @@ ErrorHandler:
         If intPosition < intItemCount Then
             For i = intPosition + 1 To intItemCount
                 QF = colQFClass(i)
-                QF.intMyPosition = QF.intMyPosition - 1
+                QF.intMyPosition -= 1
                 ctlFrame = QF.frm
                 ctlFrame.Top = ctlFrame.Top - frmHt - frmSp
             Next i
-            FrameMain.ScrollHeight = max(FrameMain.ScrollHeight - frmHt - frmSp, Height_FrameMain_Max)
+            _viewer.PanelMain.ScrollHeight = max(PanelMain.ScrollHeight - frmHt - frmSp, Height_PanelMain_Max)
         End If
 
         colQFClass.Remove intPosition
-    intEmailStart = intEmailStart + 1
+    intEmailStart += 1
 
         If blDebug Then
             'Print data after movement
@@ -1694,34 +1430,13 @@ ErrorHandler:
 
         QF = Nothing
 
-        Temp = SF_Stack.Pop
+
 
     End Sub
 
 
     Private Sub AcceleratorDialogue_Change()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "AcceleratorDialogue_Change"
 
-        '************Standard Error Handling Header**************
-        On Error GoTo ErrorHandler
-
-        Dim errcapt As Variant
-        Dim ttrace As String
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-        ttrace = "Inside " & SubNm
-
-        '*******************END Error Header*********************
 
         Dim strToParse As String
         Dim i As Integer
@@ -1732,514 +1447,325 @@ ErrorHandler:
         Dim QF As QfcController
         Dim blExpanded As Boolean
         Dim strTemp As String
-        Dim DebugLVL As DebugLevelEnum
 
-        DebugLVL = vbProcedure + vbCommand
 
-        strTemp = "If Not blSuppressEvents Then"
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-If Not blSuppressEvents Then
-            strTemp = "If Not blSuppressEvents Then IS TRUE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "intLastNum = 0"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-    intLastNum = 0
-            strTemp = "strToParse = AcceleratorDialogue.Value"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-    strToParse = AcceleratorDialogue.Value
-            strTemp = "If strToParse <> '' Then"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-    If strToParse <> "" Then
-                strTemp = "If strToParse <> '' Then IS TRUE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "intLen = Len(strToParse)"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        intLen = Len(strToParse)
-                strTemp = "SKIPPING LOOP For i = 1 To intLen"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        For i = 1 To intLen
+
+
+
+        If Not blSuppressEvents Then
+
+
+            intLastNum = 0
+
+            strToParse = AcceleratorDialogue.Value
+
+            If strToParse <> "" Then
+
+
+                intLen = Len(strToParse)
+
+                For i = 1 To intLen
                     If IsNumeric(Mid(strToParse, i, 1)) Then
                         intLastNum = i
                     Else
                         Exit For
                     End If
                 Next i
-                strTemp = "If intLastNum > 0 Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If intLastNum > 0 Then
-                    strTemp = "If intLastNum > 0 Then IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "intAccTmpMail = CInt(Mid(strToParse, 1, intLastNum))"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-            intAccTmpMail = CInt(Mid(strToParse, 1, intLastNum))
+                If intLastNum > 0 Then
 
-                    strTemp = "If intAccTmpMail <> intAccActiveMail Then"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If intAccTmpMail <> intAccActiveMail Then
-                        strTemp = "If intAccTmpMail <> intAccActiveMail Then IS TRUE"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "If intAccActiveMail <> 0 And intAccActiveMail <= colQFClass.Count Then"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                If intAccActiveMail <> 0 And intAccActiveMail <= colQFClass.Count Then
-                            strTemp = "If intAccActiveMail <> 0 And intAccActiveMail <= colQFClass.Count Then IS TRUE"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "QF = colQFClass(intAccActiveMail)"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    QF = colQFClass(intAccActiveMail)
-                            strTemp = "If QF.blExpanded Then"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    If QF.blExpanded Then
-                                strTemp = "If QF.blExpanded Then IS TRUE"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-                                                                                                    strTemp = "MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
-                                                                                                    strTemp = "QF.ExpandCtrls1"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.ExpandCtrls1
-                                strTemp = "blExpanded = True"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        blExpanded = True
+
+                    intAccTmpMail = CInt(Mid(strToParse, 1, intLastNum))
+
+
+                    If intAccTmpMail <> intAccActiveMail Then
+
+
+                        If intAccActiveMail <> 0 And intAccActiveMail <= colQFClass.Count Then
+
+
+                            QF = colQFClass(intAccActiveMail)
+
+                            If QF.blExpanded Then
+
+
+
+                                MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
+
+                        QF.ExpandCtrls1()
+
+                                blExpanded = True
                             End If
-                            strTemp = "QF.Accel_FocusToggle"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    QF.Accel_FocusToggle
+
+                            QF.Accel_FocusToggle()
 
                         End If
 
-                        strTemp = "If intAccTmpMail <> 0 And intAccTmpMail <= colQFClass.Count Then"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                If intAccTmpMail <> 0 And intAccTmpMail <= colQFClass.Count Then
-                            strTemp = "If intAccTmpMail <> 0 And intAccTmpMail <= colQFClass.Count Then IS TRUE"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "QF = colQFClass(intAccTmpMail)"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    QF = colQFClass(intAccTmpMail)
-                            strTemp = "QF.Accel_FocusToggle"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    QF.Accel_FocusToggle
-                            strTemp = "If blExpanded Then"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    If blExpanded Then
-                                strTemp = "If blExpanded Then IS TRUE"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "MoveDownPix intAccTmpMail + 1, QF.frm.Height"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-                        MoveDownPix intAccTmpMail + 1, QF.frm.Height
-                                                                                                    strTemp = "QF.ExpandCtrls1"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.ExpandCtrls1
-                                strTemp = "blExpanded = False"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        blExpanded = False
+                        If intAccTmpMail <> 0 And intAccTmpMail <= colQFClass.Count Then
+
+
+                            QF = colQFClass(intAccTmpMail)
+
+                            QF.Accel_FocusToggle()
+
+                            If blExpanded Then
+
+
+
+                                MoveDownPix intAccTmpMail + 1, QF.frm.Height
+
+                        QF.ExpandCtrls1()
+
+                                blExpanded = False
                             End If
-                            strTemp = "ScrollIntoView_MF QF.frm.Top, QF.frm.Top + QF.frm.Height"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    ScrollIntoView_MF QF.frm.Top, QF.frm.Top + QF.frm.Height
+
+                            ScrollIntoView_MF QF.frm.Top, QF.frm.Top + QF.frm.Height
 
                 End If
 
-                        strTemp = "ScrollIntoView_MF QF.frm.Top, QF.frm.Top + QF.frm.Height"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                If intAccTmpMail <= colQFClass.Count Then
-                            strTemp = "ScrollIntoView_MF QF.frm.Top, QF.frm.Top + QF.frm.Height IS TRUE"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "intAccActiveMail = intAccTmpMail"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    intAccActiveMail = intAccTmpMail
+
+                        If intAccTmpMail <= colQFClass.Count Then
+
+
+                            intAccActiveMail = intAccTmpMail
                         End If
 
                     End If
-                    strTemp = "If intLen > intLastNum And intAccActiveMail <> 0 And intAccActiveMail <= colQFClass.Count Then"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If intLen > intLastNum And intAccActiveMail <> 0 And intAccActiveMail <= colQFClass.Count Then
-                        strTemp = "If intLen > intLastNum Then IS TRUE"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "strCommand = UCase(Mid(strToParse, intLastNum + 1, 1))"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                strCommand = UCase(Mid(strToParse, intLastNum + 1, 1))
-                        strTemp = "If blSuppressEvents = False Then"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                If blSuppressEvents = False Then
-                            strTemp = "If blSuppressEvents = False Then IS TRUE"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "blSuppressEvents = True"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    blSuppressEvents = True
-                            strTemp = "AcceleratorDialogue.Value = intAccActiveMail"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    AcceleratorDialogue.Value = intAccActiveMail
-                            strTemp = "blSuppressEvents = False"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    blSuppressEvents = False
+
+                    If intLen > intLastNum And intAccActiveMail <> 0 And intAccActiveMail <= colQFClass.Count Then
+
+
+                        strCommand = UCase(Mid(strToParse, intLastNum + 1, 1))
+
+                        If blSuppressEvents = False Then
+
+
+                            blSuppressEvents = True
+
+                            AcceleratorDialogue.Value = intAccActiveMail
+
+                            blSuppressEvents = False
                         Else
-                            strTemp = "If intLen > intLastNum Then IS FALSE"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "AcceleratorDialogue.Value = intAccActiveMail"
-                            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                    AcceleratorDialogue.Value = intAccActiveMail
+
+
+                            AcceleratorDialogue.Value = intAccActiveMail
                         End If
-                        strTemp = "QF = colQFClass(intAccActiveMail)"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                QF = colQFClass(intAccActiveMail)
-                        strTemp = "Select Case strCommand"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                Select Case strCommand
+
+                        QF = colQFClass(intAccActiveMail)
+
+                        Select Case strCommand
                             Case "O"
-                                strTemp = "Case 'O'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        toggleAcceleratorDialogue()
-                                strTemp = "EnableWindow lFormHandle, Modeless"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        EnableWindow OlApp_hWnd, Modeless
+
+
+                                toggleAcceleratorDialogue()
+
+                                EnableWindow OlApp_hWnd, Modeless
                         'EnableWindow lFormHandle, Modeless
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        If ActiveExplorer.CurrentFolder.DefaultItemType <> olMailItem Then
+
+                                If ActiveExplorer.CurrentFolder.DefaultItemType <> olMailItem Then
                             Set ActiveExplorer.NavigationPane.CurrentModule = ActiveExplorer.NavigationPane.Modules.GetNavigationModule(olModuleMail)
                         End If
 
-                                If (InitType And InitSort) And AreConversationsGrouped Then ExplConvView_ToggleOff()                      'Modal
+                                If InitType And InitSort And AreConversationsGrouped Then ExplConvView_ToggleOff()                      'Modal
                                 QF.KB strCommand
 
-                                                                                                    strTemp = "QFD_Minimize"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+
                         QFD_Minimize()
-                                strTemp = "If blShowAsConversations Then ExplConvView_ToggleOn"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        If (InitType And InitSort) And blShowAsConversations Then ExplConvView_ToggleOn()
+
+                                If InitType And InitSort And blShowAsConversations Then ExplConvView_ToggleOn()
                         'ToggleShowAsConversation 1
                         'SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
                             Case "C"
-                                strTemp = "Case 'C'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        toggleAcceleratorDialogue()
-                                strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                toggleAcceleratorDialogue()
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "T"
-                                strTemp = "Case 'T'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        toggleAcceleratorDialogue()
-                                strTemp = "EnableWindow lFormHandle, Modeless"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        EnableWindow OlApp_hWnd, Modeless
+
+
+                                toggleAcceleratorDialogue()
+
+                                EnableWindow OlApp_hWnd, Modeless
                         'EnableWindow lFormHandle, Modeless
-                                strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "F"
-                                strTemp = "Case 'F'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        toggleAcceleratorDialogue()
-                                strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                toggleAcceleratorDialogue()
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "D"
-                                strTemp = "Case 'D'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        toggleAcceleratorDialogue()
-                                strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                toggleAcceleratorDialogue()
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "X"
-                                strTemp = "Case 'X'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        toggleAcceleratorDialogue()
-                                strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                toggleAcceleratorDialogue()
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "R"
-                                strTemp = "Case 'R'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        toggleAcceleratorDialogue()
-                                strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                toggleAcceleratorDialogue()
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "A"
-                                strTemp = "Case 'A'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "W"
-                                strTemp = "Case 'W'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "M"
-                                strTemp = "Case 'M'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "QF.KB strCommand"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF.KB strCommand
+
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB strCommand
                     Case "E"
-                                strTemp = "Case 'E'"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "QF = colQFClass(intAccActiveMail)"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        QF = colQFClass(intAccActiveMail)
-                                strTemp = "If QF.blExpanded Then"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        If QF.blExpanded Then
-                                    strTemp = "If QF.blExpanded Then IS TRUE"
-                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5"
-                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                            MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
-                                                                                                    strTemp = "QF.ExpandCtrls1"
-                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                            QF.ExpandCtrls1
+
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                If QF.blExpanded Then
+
+
+                                    MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
+
+                            QF.ExpandCtrls1()
                                 Else
-                                    strTemp = "Case 'Else'"
-                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "MoveDownPix intAccActiveMail + 1, QF.frm.Height"
-                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                            MoveDownPix intAccActiveMail + 1, QF.frm.Height
-                                                                                                    strTemp = "QF.ExpandCtrls1"
-                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                            QF.ExpandCtrls1
+
+
+                                    MoveDownPix intAccActiveMail + 1, QF.frm.Height
+
+                            QF.ExpandCtrls1()
                                 End If
                                 '                                                                                                    strTemp = "AcceleratorDialogue.Value = Left(AcceleratorDialogue.Value, Len(AcceleratorDialogue.Value) - 1)"
                                 '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                                 '                        AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
                             Case Else
-                                strTemp = "Case Else"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "blSuppressEvents = True"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        blSuppressEvents = True
+
+
+                                blSuppressEvents = True
                                 '                                                                                                    strTemp = "AcceleratorDialogue.Value = Left(AcceleratorDialogue.Value, Len(AcceleratorDialogue.Value) - 1)"
                                 '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                                 '                        AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
-                                strTemp = "blSuppressEvents = False"
-                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                        blSuppressEvents = False
+
+                                blSuppressEvents = False
                         End Select
                     End If
-                    strTemp = "End If 'intLen > intLastNum Then"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-        End If
-                strTemp = "End If 'intLastNum > 0 Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-    Else
-                strTemp = "If strToParse <> '' Then FALSE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "If intAccActiveMail <> 0 Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If intAccActiveMail <> 0 Then
-                    strTemp = "If intAccActiveMail <> 0 Then IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "colQFClass(intAccActiveMail).Accel_FocusToggle"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            colQFClass(intAccActiveMail).Accel_FocusToggle
-                    strTemp = "intAccActiveMail = 0"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            intAccActiveMail = 0
+                End If
+
+
+            Else
+
+
+                If intAccActiveMail <> 0 Then
+
+
+                    colQFClass(intAccActiveMail).Accel_FocusToggle
+
+                    intAccActiveMail = 0
                 End If
             End If
         Else
-            strTemp = "If Not blSuppressEvents Then IS FALSE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-End If 'Suppress Events
 
-        '************Standard Error Handling Footer**************
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-        Exit Sub
-
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        Stop
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            Stop
-            reactivateAfterDebug
-            Err.Clear()
-            Resume
         End If
 
-        '*******************END Standard Error Footer*********************
+
 
 
     End Sub
 
 
 
-    Private Sub AcceleratorDialogue_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "AcceleratorDialogue_KeyDown"
+    Private Sub AcceleratorDialogue_KeyDown(sender As Object, e As KeyEventArgs)
 
-        '************Standard Error Handling Header**************
-        On Error GoTo ErrorHandler
 
-        Dim errcapt As Variant
-        Dim ttrace As String
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-        ttrace = "Inside " & SubNm
-
-        '*******************END Error Header*********************
-
-        Dim QF As QfcController
-        Dim blExpanded As Boolean
-        Dim DebugLVL As DebugLevelEnum
-        Dim strTemp As String
-
-        DebugLVL = vbProcedure '+ vbCommand
-
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired AcceleratorDialogue_KeyDown"
-
-        strTemp = "Select Case KeyCode " & KeyCode
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-    Select Case KeyCode
+        Select Case KeyCode
             Case 18
-                strTemp = "Case 18"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            'Debug.Print "Alt Key Pressed"
-                strTemp = "toggleAcceleratorDialogue"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            toggleAcceleratorDialogue()
+
+                'Debug.Print "Alt Key Pressed"
+
+                toggleAcceleratorDialogue()
 
             Case vbKeyDown
-                strTemp = "Case 18"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "If AreConversationsGrouped Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If AreConversationsGrouped Then
-                    strTemp = "If AreConversationsGrouped Then IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-'Modal                                                                                                    strTemp = "ExplConvView_ToggleOff"
+
+
+                If AreConversationsGrouped Then
+
+                    'Modal                                                                                                    strTemp = "ExplConvView_ToggleOff"
                     'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                     'Modal                ExplConvView_ToggleOff
                     '            Else
                     '                                                                                                    strTemp = "If AreConversationsGrouped Then IS FALSE"
                     '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                 End If
-                strTemp = "End If 'AreConversationsGrouped Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "If intAccActiveMail < colQFClass.Count Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If intAccActiveMail < colQFClass.Count Then
-                    strTemp = "If intAccActiveMail < colQFClass.Count Then IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "AcceleratorDialogue.Value = intAccActiveMail + 1"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                AcceleratorDialogue.Value = intAccActiveMail + 1
-                End If
-                strTemp = "End If 'intAccActiveMail < colQFClass.Count Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-        Case vbKeyUp
-                strTemp = "Case vbKeyUp"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "If AreConversationsGrouped Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If AreConversationsGrouped Then
-                    strTemp = "If AreConversationsGrouped Then IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-'Modal                                                                                                    strTemp = "ExplConvView_ToggleOff"
+
+                If intAccActiveMail < colQFClass.Count Then
+
+
+                    AcceleratorDialogue.Value = intAccActiveMail + 1
+                End If
+
+
+            Case vbKeyUp
+
+
+                If AreConversationsGrouped Then
+
+                    'Modal                                                                                                    strTemp = "ExplConvView_ToggleOff"
                     'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                     'Modal                ExplConvView_ToggleOff
                 End If
-                strTemp = "End If 'AreConversationsGrouped Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-                                                                                                    strTemp = "If intAccActiveMail > 1 Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If intAccActiveMail > 1 Then
-                    strTemp = "If intAccActiveMail > 1 Then IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "AcceleratorDialogue.Value = intAccActiveMail - 1"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                AcceleratorDialogue.Value = intAccActiveMail - 1
+
+
+                If intAccActiveMail > 1 Then
+
+
+                    AcceleratorDialogue.Value = intAccActiveMail - 1
                 End If
-                strTemp = "End If 'intAccActiveMail > 1 Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-                                                                                                    strTemp = "AcceleratorDialogue.SetFocus"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            AcceleratorDialogue.SetFocus
+
+
+                AcceleratorDialogue.SetFocus
 
             Case vbKeyA
-                strTemp = "Case vbKeyA ... Shift value is " & CStr(Shift)
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If (Shift And acShiftMask = acShiftMask) And (Shift And acCtrlMask = acCtrlMask) Then
-                    strTemp = "If (Shift And acShiftMask = acShiftMask) And (Shift And acCtrlMask = acCtrlMask) IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "ToggleRemoteMouseLabels"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                ToggleRemoteMouseLabels()
+
+                If Shift And acShiftMask = acShiftMask And Shift And acCtrlMask = acCtrlMask Then
+
+
+                    ToggleRemoteMouseLabels()
 
                 End If
                 '        Case Else
@@ -2247,63 +1773,54 @@ ErrorHandler:
                 '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
         End Select
-        strTemp = "End Select"
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-'************Standard Error Handling Footer**************
-        Temp = SF_Stack.Pop
-        Exit Sub
 
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        Stop
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Resume Next
-        End If
 
-        '*******************END Standard Error Footer*********************
 
 
     End Sub
 
 
-    Private Sub AcceleratorDialogue_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub AcceleratorDialogue_KeyUp(sender As Object, e As KeyEventArgs)
         Dim QF As QfcController
         Dim blExpanded As Boolean
 
-        Select Case KeyCode
+        Select Case e.KeyCode
             Case 18
-                If AcceleratorDialogue.Visible Then
-                    AcceleratorDialogue.SetFocus
-                    AcceleratorDialogue.SelStart = AcceleratorDialogue.TextLength
+                If sender.Visible Then
+                    sender.SetFocus
+                    sender.SelStart = sender.TextLength
                 Else
-                    FrameMain.SetFocus
+                    _viewer.PanelMain.Focus()
                 End If
-                SendKeys "{ESC}"
-        Case vbKeyRight
-                If AcceleratorDialogue.Visible And intAccActiveMail <> 0 Then
+                SendKeys.Send("{ESC}")
+            Case Keys.Right
+                If sender.Visible And intAccActiveMail <> 0 Then
                     QF = colQFClass(intAccActiveMail)
-                    If QF.lblConvCt <> "1" And QF.chk = True Then
+                    If QF.lblConvCt.Text <> "1" And QF.chk.Checked = True Then
+                        If QF.blExpanded Then
+                            blExpanded = True
+                            MoveDownPix(intAccActiveMail + 1, QF.frm.Height * -0.5)
+                            QF.ExpandCtrls1()
+                        End If
+                        toggleAcceleratorDialogue()
+                        QF.KB("C")
+                        toggleAcceleratorDialogue()
+
+                        If blExpanded Then
+                            MoveDownPix(intAccActiveMail + 1, QF.frm.Height)
+                            QF.ExpandCtrls1()
+                        End If
+                    End If
+                End If
+            Case Keys.Left
+                If sender.Visible And intAccActiveMail <> 0 Then
+                    QF = colQFClass(intAccActiveMail)
+                    If QF.lblConvCt.Text <> "1" And QF.chk.Checked = False Then
                         If QF.blExpanded Then
                             blExpanded = True
                             MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
-                        QF.ExpandCtrls1
+                        QF.ExpandCtrls1()
                         End If
                         toggleAcceleratorDialogue()
                         QF.KB "C"
@@ -2311,56 +1828,17 @@ ErrorHandler:
 
                         If blExpanded Then
                             MoveDownPix intAccActiveMail + 1, QF.frm.Height
-                        QF.ExpandCtrls1
-                        End If
-                    End If
-                End If
-            Case vbKeyLeft
-                If AcceleratorDialogue.Visible And intAccActiveMail <> 0 Then
-                    QF = colQFClass(intAccActiveMail)
-                    If QF.lblConvCt <> "1" And QF.chk = False Then
-                        If QF.blExpanded Then
-                            blExpanded = True
-                            MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
-                        QF.ExpandCtrls1
-                        End If
-                        toggleAcceleratorDialogue()
-                        QF.KB "C"
-                    toggleAcceleratorDialogue()
-
-                        If blExpanded Then
-                            MoveDownPix intAccActiveMail + 1, QF.frm.Height
-                        QF.ExpandCtrls1
+                        QF.ExpandCtrls1()
                         End If
 
                     End If
-                    AcceleratorDialogue.SelStart = AcceleratorDialogue.TextLength
+                    sender.SelStart = sender.TextLength
                 End If
             Case Else
         End Select
     End Sub
 
     Private Sub BUTTON_CANCEL_Click()
-
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "BUTTON_CANCEL_Click"
-        Dim Temp As Variant
-        Dim ttrace As String
-        Dim errcapt As Variant
-
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
 
         'ExplConvView_ToggleOn
         If blShowAsConversations Then
@@ -2370,43 +1848,19 @@ ErrorHandler:
         'ToggleShowAsConversation 1
         RemoveControls()
         blFrmKll = True
-        'ErrHandler_Execute SubNm, ttrace, errcapt, errRaised, vbProcedure
-        Unload QuickFileDyn
 
-    On Error Resume Next
-        Temp = SF_Stack.Pop
+        Unload QuickFileDyn
 
     End Sub
 
     Private Sub BUTTON_CANCEL_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        Dim DebugLVL As DebugLevelEnum
-        DebugLVL = vbProcedure
 
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired BUTTON_CANCEL_KeyDown"
 
         KeyDownHandler KeyCode, Shift
 
 End Sub
 
     Private Sub Button_OK_Click()
-
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "Button_OK_Click"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
-
 
         Dim QF As QfcController
         Dim blReadyForMove As Boolean
@@ -2436,19 +1890,19 @@ End Sub
                     colMailJustMoved = New Collection
 
                     For Each QF In colQFClass
-                        QF.MoveMail
+                        QF.MoveMail()
                     Next QF
 
                     'QuickFileMetrics_WRITE "9999QuickFileMetrics.csv"
-                    QuickFileMetrics_WRITE "9999TimeWritingEmail.csv"
-            RemoveControls()
+                    QuickFileMetrics_WRITE("9999TimeWritingEmail.csv")
+                    RemoveControls()
                     Iterate()
                     blSuppressEvents = False
                 Else
-                    MsgBox strNotifications, vbOKOnly + vbCritical, "Error Notification"
-        End If
+                    MsgBox(strNotifications, vbOKOnly + vbCritical, "Error Notification")
+                End If
 
-                AcceleratorDialogue.Value = ""
+                _viewer.AcceleratorDialogue.Value = ""
                 intAccActiveMail = 0
 
                 blRunningModalCode = False
@@ -2460,16 +1914,13 @@ End Sub
             Unload Me
 End If
 
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-        'Debug.Print "tmp"
+
 
     End Sub
 
 
     Private Sub Button_OK_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        Dim DebugLVL As DebugLevelEnum
-        DebugLVL = vbProcedure
+
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired Button_OK_KeyDown"
 
@@ -2483,16 +1934,12 @@ End Sub
 
     Private Sub Button_Undo_Click()
         Dim i As Integer
-        Dim oMail As MailItem
-        Dim oMailTmp As MailItem
         Dim oMail_Old As MailItem
         Dim oMail_Current As MailItem
         Dim objTemp As Object
         Dim oFolder_Current As [Folder]
         Dim oFolder_Old As [Folder]
-        Dim oItemFolder As [Folder]
         Dim colItems As Collection
-        Dim col As Collection
         Dim vbUndoResponse As VbMsgBoxResult
         Dim vbRepeatResponse As VbMsgBoxResult
 
@@ -2561,28 +2008,27 @@ End Sub
                 MovedMails_Stack.Pop(i - 1)
                 End If
             End If
-            i = i - 2
+            i -= 2
             vbRepeatResponse = MsgBox("Continue Undoing Moves?", vbYesNo)
     Wend
     
     
 End Sub
 
-    Private Sub FrameMain_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        Dim DebugLVL As DebugLevelEnum
-        DebugLVL = vbProcedure
+    Private Sub _viewer_PanelMain_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
 
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired FrameMain_KeyDown"
+
+        'If DebugLVL And vbProcedure Then Debug.Print "Fired _viewer.PanelMain_KeyDown"
 
         KeyDownHandler KeyCode, Shift
 End Sub
 
-    Private Sub FrameMain_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        'MsgBox ("KeyPress FrameMain")
+    Private Sub _viewer_PanelMain_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+        'MsgBox ("KeyPress _viewer.PanelMain")
         KeyPressHandler KeyAscii
 End Sub
 
-    Private Sub FrameMain_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub _viewer_PanelMain_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
         KeyUpHandler KeyCode, Shift
 End Sub
 
@@ -2613,7 +2059,7 @@ End Sub
 
     Private Sub UserForm_Activate()
 
-        If Not StopWatch Is Nothing Then
+        If StopWatch IsNot Nothing Then
             If StopWatch.isPaused = True Then
                 StopWatch.reStart()
             End If
@@ -2621,28 +2067,7 @@ End Sub
     End Sub
 
     Public Sub toggleAcceleratorDialogue()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "toggleAcceleratorDialogue"
 
-        '************Standard Error Handling Header**************
-        On Error GoTo ErrorHandler
-
-        Dim errcapt As Variant
-        Dim ttrace As String
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-        ttrace = "Inside " & SubNm
-
-        '*******************END Error Header*********************
 
 
 
@@ -2661,70 +2086,52 @@ End Sub
         '
         'End If
 
-        strTemp = "For i = 1 To colQFClass.Count"
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-    If Not colQFClass Is Nothing Then
+
+        If colQFClass IsNot Nothing Then
             For i = 1 To colQFClass.Count
-                strTemp = "For i = 1 To colQFClass.Count = i = " & i
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                strTemp = "QF = colQFClass(i)"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        QF = colQFClass(i)
 
-                strTemp = "If QF.blExpanded And i <> colQFClass.Count Then MoveDownPix i + 1, QF.frm.Height * -0.5"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If QF.blExpanded And i <> colQFClass.Count Then MoveDownPix i + 1, QF.frm.Height * -0.5
-                                                                                strTemp = "QF.Accel_Toggle"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        QF.Accel_Toggle
+
+                QF = colQFClass(i)
+
+
+                If QF.blExpanded And i <> colQFClass.Count Then MoveDownPix i + 1, QF.frm.Height * -0.5
+
+        QF.Accel_Toggle()
             Next i
         End If
 
-        strTemp = "If AcceleratorDialogue.Visible = True Then"
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-    If AcceleratorDialogue.Visible = True Then
-            strTemp = "If AcceleratorDialogue.Visible = True Then IS TRUE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                strTemp = "AcceleratorDialogue.Visible = False"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        AcceleratorDialogue.Visible = False
+
+        If AcceleratorDialogue.Visible = True Then
+
+
+            AcceleratorDialogue.Visible = False
             'Modal                                                                                strTemp = "ExplConvView_ToggleOn"
             'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
             'Modal        ExplConvView_ToggleOn
-            strTemp = "FrameMain.SetFocus"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        FrameMain.SetFocus
+
+            _viewer.PanelMain.Focus()
         Else
-            strTemp = "If AcceleratorDialogue.Visible = True Then IS FALSE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                strTemp = "If AreConversationsGrouped Then ExplConvView_ToggleOff"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If AreConversationsGrouped Then
+
+
+            If AreConversationsGrouped Then
                 'ToggleShowAsConversation -1
-                strTemp = "AreConversationsGrouped = TRUE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-'Modal                                                                                strTemp = "ExplConvView_ToggleOff"
+
+                'Modal                                                                                strTemp = "ExplConvView_ToggleOff"
                 'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                 'Modal            ExplConvView_ToggleOff
             Else
-                strTemp = "AreConversationsGrouped = FALSE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        End If
+
+            End If
             AcceleratorDialogue.Visible = True
-            strTemp = "If intAccActiveMail <> 0 Then"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                strTemp = "VARIABLE: intAccActiveMail == " & intAccActiveMail
-            If DebugLVL And vbVariable Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If intAccActiveMail <> 0 Then
-                strTemp = "If intAccActiveMail <> 0 Then IS TRUE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                strTemp = "AcceleratorDialogue.Value = intAccActiveMail"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            AcceleratorDialogue.Value = intAccActiveMail
-                strTemp = "QF = colQFClass(intAccActiveMail)"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            On Error Resume Next
+
+
+            If intAccActiveMail <> 0 Then
+
+
+                AcceleratorDialogue.Value = intAccActiveMail
+
+                On Error Resume Next
                 QF = colQFClass(intAccActiveMail)
                 If Err.Number <> 0 Then
                     Err.Clear()
@@ -2732,54 +2139,21 @@ End Sub
                     QF = colQFClass(intAccActiveMail)
                 End If
                 On Error GoTo ErrorHandler
-                strTemp = "QF.Accel_FocusToggle"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            QF.Accel_FocusToggle
+
+                QF.Accel_FocusToggle()
             Else
-                strTemp = "If intAccActiveMail <> 0 Then IS FALSE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        End If
+
+            End If
             'Modal                                                                                strTemp = "SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&"
             'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
             'Modal        SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
-            strTemp = "AcceleratorDialogue.SetFocus"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        AcceleratorDialogue.SetFocus
+
+            AcceleratorDialogue.SetFocus
             AcceleratorDialogue.SelStart = AcceleratorDialogue.TextLength
         End If
 
         QF = Nothing
 
-        '************Standard Error Handling Footer**************
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-        Exit Sub
-
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        Stop
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Stop
-            Resume
-        End If
-
-        '*******************END Standard Error Footer*********************
 
 
     End Sub
@@ -2787,23 +2161,22 @@ ErrorHandler:
     Private Sub ScrollIntoView_MF(lngItemTop As Long, lngItemBottom As Long)
         Dim DiffY As Long
 
-        If lngItemTop < lngFrameMain_SC_Top Then
-            'Diffy = lngItemTop - lngFrameMain_SC_Top
-            'FrameMain.Scroll , Diffy
-            'lngFrameMain_SC_Top = lngFrameMain_SC_Top = Diffy
-            lngFrameMain_SC_Top = lngItemTop - frmSp
-            FrameMain.ScrollTop = lngFrameMain_SC_Top
-        ElseIf (frmSp + lngItemBottom) > (lngFrameMain_SC_Top + FrameMain.Height) Then
-            DiffY = (frmSp + lngItemBottom) - (lngFrameMain_SC_Top + FrameMain.Height)
-            'FrameMain.Scroll yAction:=CInt(Diffy)
-            lngFrameMain_SC_Top = lngFrameMain_SC_Top + DiffY
-            FrameMain.ScrollTop = lngFrameMain_SC_Top
+        If lngItemTop < lngPanelMain_SC_Top Then
+            'Diffy = lngItemTop - lngPanelMain_SC_Top
+            'PanelMain.Scroll , Diffy
+            'lngPanelMain_SC_Top = lngPanelMain_SC_Top = Diffy
+            lngPanelMain_SC_Top = lngItemTop - frmSp
+            _viewer.PanelMain.ScrollTop = lngPanelMain_SC_Top
+        ElseIf (frmSp + lngItemBottom) > (lngPanelMain_SC_Top + _viewer.PanelMain.Height) Then
+            DiffY = frmSp + lngItemBottom - (lngPanelMain_SC_Top + _viewer.PanelMain.Height)
+            'PanelMain.Scroll yAction:=CInt(Diffy)
+            lngPanelMain_SC_Top += DiffY
+            _viewer.PanelMain.ScrollTop = lngPanelMain_SC_Top
         End If
     End Sub
 
 
     Private Sub focusListener_ChangeFocus(ByVal gotFocus As Boolean)
-        Dim tn As String, AC As Chart
         If gotFocus Then
             'Debug.Print "Gained Focus"
             'tn = TypeName(selection)
@@ -2840,37 +2213,16 @@ ErrorHandler:
         Dim objPropertyNew As [UserProperty]
         Dim objPropertyExisting As [UserProperty]
 
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "QuickFileDyn.Initialize"
 
-        '************Standard Error Handling Header**************
-        On Error GoTo ErrorHandler
-
-        Dim errcapt As Variant
-        Dim ttrace As String
-        Dim Tempv As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-        ttrace = "Inside " & SubNm
-
-        '*******************END Error Header*********************
 
 
         blSuppressEvents = True                                     'Suppress events until the form is initialized
         InitType = InitSort
         folderCurrent = Application.ActiveExplorer.CurrentFolder
-        lngFrameMain_SC_Top = 0
+        lngPanelMain_SC_Top = 0
 
         Height_UserForm_Min = Me.Height + frmHt + frmSp
-        Height_FrameMain_Min = frmHt + frmSp
+        Height_PanelMain_Min = frmHt + frmSp
 
         lngHeightDifference = Height_UserForm_Min - Me.Height
 
@@ -2912,16 +2264,16 @@ ErrorHandler:
         spn_EmailPerLoad.Top = spn_EmailPerLoad.Top + lngHeightDifference
         lbl_EmailPerLoad.Top = lbl_EmailPerLoad.Top + lngHeightDifference
 
-        Height_FrameMain_Max = FrameMain.Height + lngHeightDifference
-        FrameMain.Height = Height_FrameMain_Max
-        FrameMain.ScrollHeight = Height_FrameMain_Max
-        FrameMain.ZOrder 0
+        Height_PanelMain_Max = _viewer.PanelMain.Height + lngHeightDifference
+        _viewer.PanelMain.Height = Height_PanelMain_Max
+        _viewer.PanelMain.ScrollHeight = Height_PanelMain_Max
+        _viewer.PanelMain.ZOrder 0
 
     'CommandButton1.TabStop = False
         Button_OK.TabStop = False
         BUTTON_CANCEL.TabStop = False
         Button_Undo.TabStop = False
-        FrameMain.TabStop = False
+        _viewer.PanelMain.TabStop = False
         AcceleratorDialogue.TabStop = True
         spn_EmailPerLoad.TabStop = False
 
@@ -2953,7 +2305,7 @@ ErrorHandler:
         'Now lets set up our New window the SetWindowLong function changes
         'the attributes of the specified window , given as lFormHandle,
         'GWL_STYLE = New windows style, and our Newly defined style = lStyle
-        SetWindowLong lFormHandle, GWL_STYLE, (lStyle)
+        SetWindowLong lFormHandle, GWL_STYLE, lStyle
 
     'Remove >'&LT; if you want to show form Maximised
         'ShowWindow lFormHandle, SW_SHOWMAXIMIZED 'Shows Form Maximized
@@ -2979,8 +2331,8 @@ ErrorHandler:
     blSuppressEvents = True
         intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
         intEmailPosition = 0    'Reverse sort is 0   'Regular sort is 1
-        'intEmailsPerIteration = CInt(Round((Height_FrameMain_Max / (frmHt + frmSp)), 0))
-        intEmailsPerIteration = CInt(Round((FrameMain.Height / (frmHt + frmSp)), 0))
+        'intEmailsPerIteration = CInt(Round((Height_PanelMain_Max / (frmHt + frmSp)), 0))
+        intEmailsPerIteration = CInt(Round(PanelMain.Height / (frmHt + frmSp), 0))
         spn_EmailPerLoad.Value = intEmailsPerIteration
         lbl_EmailPerLoad.Caption = intEmailsPerIteration
 
@@ -3007,35 +2359,8 @@ ErrorHandler:
     blSuppressEvents = False                                        'End suppression of events
 
 
-        '************Standard Error Handling Footer**************
-        On Error Resume Next
-        Tempv = SF_Stack.Pop
-        Exit Sub
 
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Stop
-            Resume
-        End If
 
-        '*******************END Standard Error Footer*********************
 
 
     End Sub
@@ -3045,30 +2370,21 @@ ErrorHandler:
     Private Sub UserForm_Resize()
         Dim intDiffy As Integer
         Dim intDiffx As Integer
-        Dim intChgx As Integer
         Dim i As Integer
         Dim QF As QfcController
 
         'MsgBox "App Width " & Me.Width & vbCrLf & "Screen Width " & ScreenWidth * PointsPerPixel
         If Not blSuppressEvents Then
 
-            If Me.Width >= Width_UserForm - 100 Then
-                intDiffx = Me.Width - Width_UserForm
-            Else
-                intDiffx = 0
-            End If
+            intDiffx = If(Me.Width >= Width_UserForm - 100, Me.Width - Width_UserForm, 0)
 
-            If Me.Height >= Height_UserForm_Min Then
-                intDiffy = Me.Height - Height_UserForm_Min
-            Else
-                intDiffy = 0
-            End If
+            intDiffy = If(Me.Height >= Height_UserForm_Min, Me.Height - Height_UserForm_Min, 0)
 
-            FrameMain.Width = Width_FrameMain + intDiffx
-            FrameMain.Height = Height_FrameMain_Min + intDiffy
+            _viewer.PanelMain.Width = Width_PanelMain + intDiffx
+            _viewer.PanelMain.Height = Height_PanelMain_Min + intDiffy
 
             Button_OK.Top = lngTop_OK_BUTTON_Min + intDiffy
-            Button_OK.Left = OK_left + intDiffx / 2
+            Button_OK.Left = OK_left + (intDiffx / 2)
             BUTTON_CANCEL.Top = lngTop_CANCEL_BUTTON_Min + intDiffy
             BUTTON_CANCEL.Left = Button_OK.Left + CANCEL_left - OK_left
             Button_Undo.Top = lngTop_UNDO_BUTTON_Min + intDiffy
@@ -3080,7 +2396,7 @@ ErrorHandler:
             lbl_EmailPerLoad.Top = lngTop_lbl_EmailPerLoad_Min + intDiffy
             lbl_EmailPerLoad.Left = lng_lbl_EmailPerLoad_left + intDiffx
 
-            If Not colQFClass Is Nothing Then
+            If colQFClass IsNot Nothing Then
                 For i = 1 To colQFClass.Count
                     QF = colQFClass(i)
                     If QF.blConChild Then
@@ -3120,8 +2436,6 @@ End Sub
 
     Public Sub KeyPressHandler(ByVal KeyAscii As MSForms.ReturnInteger)
         If Not blSuppressEvents Then
-            Dim vbMsgResponse As VbMsgBoxResult
-
             Select Case KeyAscii
                 Case vbKeyReturn
                     Button_OK_Click()
@@ -3145,7 +2459,7 @@ End Sub
                         AcceleratorDialogue.SetFocus
                         AcceleratorDialogue.SelStart = AcceleratorDialogue.TextLength
                     Else
-                        FrameMain.SetFocus
+                        _viewer.PanelMain.Focus()
                     End If
                     SendKeys "{ESC}"
         Case vbKeyUp
@@ -3158,28 +2472,7 @@ End Sub
     End Sub
 
     Public Sub KeyDownHandler(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "KeyDownHandler"
 
-        '************Standard Error Handling Header**************
-        On Error GoTo ErrorHandler
-
-        Dim errcapt As Variant
-        Dim ttrace As String
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-        ttrace = "Inside " & SubNm
-
-        '*******************END Error Header*********************
 
         Dim strTemp As String
         Dim DebugLVL As DebugLevelEnum
@@ -3190,86 +2483,39 @@ End Sub
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired KeyDownHandler " & KeyCode
 
-        strTemp = "If Not blSuppressEvents Then"
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-If Not blSuppressEvents Then
-            strTemp = "If Not blSuppressEvents Then IS TRUE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "Select Case KeyCode"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-    Select Case KeyCode
+
+        If Not blSuppressEvents Then
+
+
+            Select Case KeyCode
                 Case 18
-                    strTemp = "Case 18"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "toggleAcceleratorDialogue"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            toggleAcceleratorDialogue()
-                    strTemp = "If AcceleratorDialogue.Visible Then"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If AcceleratorDialogue.Visible Then
-                        strTemp = "If AcceleratorDialogue.Visible Then IS TRUE"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "AcceleratorDialogue.SetFocus"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                AcceleratorDialogue.SetFocus
+
+
+                    toggleAcceleratorDialogue()
+
+                    If AcceleratorDialogue.Visible Then
+
+
+                        AcceleratorDialogue.SetFocus
 
                     Else
-                        strTemp = "If AcceleratorDialogue.Visible Then IS FALSE"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "FrameMain.SetFocus"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                FrameMain.SetFocus
+
+
+                        _viewer.PanelMain.Focus()
                     End If
                 Case Else
-                    strTemp = "KeyDownHandler Case = Else"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "If AcceleratorDialogue.Visible Then"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If AcceleratorDialogue.Visible Then
-                        strTemp = "AcceleratorDialogue.Visible IS TRUE"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "AcceleratorDialogue_KeyDown KeyCode, Shift"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                AcceleratorDialogue_KeyDown KeyCode, Shift
+
+
+                    If AcceleratorDialogue.Visible Then
+
+
+                        AcceleratorDialogue_KeyDown KeyCode, Shift
             Else
-                        strTemp = "AcceleratorDialogue.Visible IS FALSE"
-                        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            End If
+
+                    End If
             End Select
         End If
-        strTemp = "End of KeyDownHandler " & KeyCode
-        'If DebugLVL And vbProcedure Then Debug.Print "End of KeyDownHandler " & KeyCode
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-'************Standard Error Handling Footer**************
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-        Exit Sub
-
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        Stop
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Resume Next
-        End If
-
-        '*******************END Standard Error Footer*********************
 
 
     End Sub
@@ -3283,7 +2529,7 @@ ErrorHandler:
         lFormHandle = FindWindow("ThunderDFrame", Me.Caption)
 
         'EnableWindow lFormHandle, Modal
-        If Not StopWatch Is Nothing Then
+        If StopWatch IsNot Nothing Then
             If StopWatch.isPaused = False Then
                 StopWatch.Pause()
             End If
@@ -3318,201 +2564,73 @@ End Sub
         If Err.Number = 0 Then
             'objView.Reset
             objView.Apply()
-            If Not objViewTemp Is Nothing Then objViewTemp.Delete()
+            If objViewTemp IsNot Nothing Then objViewTemp.Delete()
             blShowInConversations = False
         Else
             Err.Clear()
             objViewTemp = ActiveExplorer.CurrentView.Parent("tmpNoConversation")
-            If Not objViewTemp Is Nothing Then objViewTemp.Delete()
+            If objViewTemp IsNot Nothing Then objViewTemp.Delete()
         End If
     End Sub
+
     Public Sub ExplConvView_ToggleOff()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "ExplConvView_ToggleOff"
-
-        '************ALTERED Error Handling Header**************
-        On Error GoTo ErrorHandler
-
-        Dim errcapt As Variant
-        Dim ttrace As String
-        Dim Temp As Variant
-        Dim DebugLVL As DebugLevelEnum
-
-        DebugLVL = vbProcedure + vbCommand
-
-        If DebugLVL And vbProcedure Then
-            If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-            If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-            SF_Stack.Push SubNm
-        strSubs = SF_Stack.GetString(True)
-            TraceStack.Push strSubs
-
-        SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-            ttrace = "Inside " & SubNm
-        End If
-
-        '*******************END Error Header*********************
 
         Dim strTemp As String
 
-        strTemp = "If ActiveExplorer.CommandBars.GetPressedMso('ShowInConversations') Then"
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-    If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
-            strTemp = "If ActiveExplorer.CommandBars.GetPressedMso('ShowInConversations') Then IS TRUE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+        If _olApp.ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
+            blShowInConversations = True
+            objView = ActiveExplorer.CurrentView
 
-                                                                                                    strTemp = "blShowInConversations = True"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+            If objView.Name = "tmpNoConversation" Then
+                If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
 
-        blShowInConversations = True
-            strTemp = "objView = ActiveExplorer.CurrentView"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+                    objView.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare
+                    objView.Save()
+                    objView.Apply()
+                End If
 
-        objView = ActiveExplorer.CurrentView
-
-            strTemp = "If objView.Name = 'tmpNoConversation' Then"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If objView.Name = "tmpNoConversation" Then
-
-                strTemp = "If objView.Name = 'tmpNoConversation' Then IS TRUE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "If ActiveExplorer.CommandBars.GetPressedMso('ShowInConversations') Then"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
-                    strTemp = "If ActiveExplorer.CommandBars.GetPressedMso('ShowInConversations') Then IS TRUE"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "objView.XML = Replace(objView.XML, '<upgradetoconv>1</upgradetoconv>', '', 1, , vbTextCompare)"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                objView.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare)
-                    strTemp = "objView.Save"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                objView.Save()
-                    'objView.Reset
-                    strTemp = "objView.Apply"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                objView.Apply()
-
-                    strTemp = "End If 'objView.Name = 'tmpNoConversation' Then"
-                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
             End If
-            Else
-                strTemp = "If objView.Name = 'tmpNoConversation' Then IS FALSE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        End If
-            strTemp = "End If 'objView.Name = 'tmpNoConversation' Then"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
+            objView_Mem = objView.Name
+            If objView_Mem = "tmpNoConversation" Then objView_Mem = View_Wide
 
-                                                                                                    strTemp = "objView_Mem = objView.Name"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        objView_Mem = objView.Name
-            strTemp = "If objView_Mem = 'tmpNoConversation' Then objView_Mem = View_Wide"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If objView_Mem = "tmpNoConversation" Then objView_Mem = View_Wide
-            strTemp = "If objView_Mem = 'tmpNoConversation' Then objView_Mem = View_Wide IS TRUE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        On Error Resume Next
-            strTemp = "objViewTemp = objView.Parent('tmpNoConversation')"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        objViewTemp = objView.Parent("tmpNoConversation")
-            strTemp = "If objViewTemp Is Nothing Then"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If objViewTemp Is Nothing Then
-                strTemp = "If objViewTemp Is Nothing Then IS TRUE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "objViewTemp = objView.Copy('tmpNoConversation', olViewSaveOptionThisFolderOnlyMe)"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            objViewTemp = objView.Copy("tmpNoConversation", olViewSaveOptionThisFolderOnlyMe)
-                strTemp = "objViewTemp.XML = Replace(objView.XML, '<upgradetoconv>1</upgradetoconv>', '', 1, , vbTextCompare)"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            objViewTemp.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare)
-                strTemp = "objViewTemp.Save"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    If DebugLVL And vbVariable Then TraceStack.Push objViewTemp.XML
-            objViewTemp.Save()
-            Else
-                strTemp = "If objViewTemp Is Nothing Then IS FALSE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        End If
-            strTemp = "End If 'objViewTemp Is Nothing Then IS FALSE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+            'On Error Resume Next
 
-        On Error GoTo ErrorHandler
-            'objViewTemp.Reset
-            strTemp = "objViewTemp.Apply"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        objViewTemp.Apply()
+            objViewTemp = objView.Parent("tmpNoConversation")
 
-            If DebugLVL And vbVariable Then
-                TraceStack.Push "objViewTemp Variable Details"
-            TraceStack.Push objViewTemp.XML
-        End If
-            strTemp = "If blSuppressEvents Then"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-        If blSuppressEvents Then
-                strTemp = "If blSuppressEvents Then IS TRUE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "DoEvents"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            DoEvents
-            Else
-                strTemp = "If blSuppressEvents Then IS FALSE"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                                                                                    strTemp = "blSuppressEvents = True"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            blSuppressEvents = True
-                strTemp = "DoEvents"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            DoEvents
-                strTemp = "blSuppressEvents = False"
-                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            blSuppressEvents = False
+            If objViewTemp Is Nothing Then
+                objViewTemp = objView.Copy("tmpNoConversation", olViewSaveOptionThisFolderOnlyMe)
+                objViewTemp.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare)
+                objViewTemp.Save()
+
             End If
-            strTemp = "End If 'blSuppressEvents Then"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
 
-'Modal                                                                                                    strTemp = "SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&"
+
+            'On Error GoTo ErrorHandler
+
+
+            objViewTemp.Apply()
+
+
+
+
+            If blSuppressEvents Then
+                _olApp.DoEvents()
+            Else
+                blSuppressEvents = True
+                _olApp.DoEvents()
+                blSuppressEvents = False
+            End If
+
+
+            'Modal                                                                                                    strTemp = "SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&"
             'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
             'Modal        SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
 
-        Else
-            strTemp = "If ActiveExplorer.CommandBars.GetPressedMso('ShowInConversations') Then IS FALSE"
-            If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-    End If
 
-        '************ALTERED Error Handling Footer**************
-        On Error Resume Next
-        If DebugLVL And vbProcedure Then Temp = SF_Stack.Pop
-        Exit Sub
-
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Stop
-            Resume
         End If
 
-        '*******************END Standard Error Footer*********************
 
 
     End Sub
@@ -3544,29 +2662,6 @@ ErrorHandler:
         'tmpDebugLevel = DebugLevel
 
 
-        '************ALTERED Error Handling Header**************
-        On Error GoTo ErrorHandler
-
-        Dim errcapt As Variant
-        Dim ttrace As String
-        Dim Temp As Variant
-        Dim DebugLVL As DebugLevelEnum
-
-        DebugLVL = vbProcedure '+ vbCommand + vbVariable
-
-        If DebugLVL And vbProcedure Then
-            If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-            If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-            SF_Stack.Push SubNm
-        strSubs = SF_Stack.GetString(True)
-            TraceStack.Push strSubs
-
-        SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-            ttrace = "Inside " & SubNm
-        End If
-
-        '*******************END Error Header*********************
 
 
 
@@ -3619,7 +2714,7 @@ ErrorHandler:
         OlStartTime = DateAdd("S", -Duration, OlEndTime)
 
         If colQFClass.Count > 0 Then
-            Duration = Duration / colQFClass.Count
+            Duration /= colQFClass.Count
         End If
 
         durationText = Format(Duration, "##0")
@@ -3647,13 +2742,13 @@ ErrorHandler:
             QF = colQFClass(k)
             'If Mail_IsItEncrypted(QF.mail) = False Then
             On Error Resume Next
-            If infoMail.Init_wMail(QF.Mail, OlEndTime:=OlEndTime, lngDurationSec:=CLng(Duration)) Then
+            If infoMail.Init_wMail(QF.Mail, OlEndTime:=OlEndTime, lngDurationSec:=Duration) Then
                 If OlAppointment.Body = "" Then
                     OlAppointment.Body = infoMail.ToString
-                    OlAppointment.Save
+                    OlAppointment.Save()
                 Else
                     OlAppointment.Body = OlAppointment.Body & vbCrLf & infoMail.ToString
-                    OlAppointment.Save
+                    OlAppointment.Save()
                 End If
             End If
             dataLine = dataLineBeg & xComma(QF.lblSubject.Caption)
@@ -3680,37 +2775,6 @@ ErrorHandler:
 
         Write_TextFile filename, strOutput, FileSystem_MyD
 '    a.Close
-
-        '************ALTERED Error Handling Footer**************
-        On Error Resume Next
-        If DebugLVL And vbProcedure Then Temp = SF_Stack.Pop
-        Exit Sub
-
-ErrorHandler:
-        ExplConvView_Cleanup()
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-    TraceStack.Push "BREAK - PROCEDURE COMMANDS EXECUTED BEFORE ERROR:"
-    TraceStack.Push ttrace
-    TraceStack.Push "END BREAK - PROCEDURE COMMANDS OUTPUT. RESUME PROCEDURE TRACING"
-    Debug.Print ttrace
-    errRaised = True
-        Deactivate_Email_Timing_And_Velocity
-        Tracing_WRITE
-        errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-        Stop
-        errcapt = MsgBox("What should happen next?", vbRetryCancel + vbExclamation)
-        If errcapt = vbCancel Then
-            'Resume PROC_EXIT
-        Else
-            reactivateAfterDebug
-            Err.Clear()
-            Stop
-            Resume
-        End If
-
-        '*******************END Standard Error Footer*********************
 
 
 
