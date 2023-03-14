@@ -173,6 +173,18 @@ Namespace My
                 Me("MaxIDLength") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("3")>  _
+        Public Property MaxFolders_ConvID() As Integer
+            Get
+                Return CType(Me("MaxFolders_ConvID"),Integer)
+            End Get
+            Set
+                Me("MaxFolders_ConvID") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

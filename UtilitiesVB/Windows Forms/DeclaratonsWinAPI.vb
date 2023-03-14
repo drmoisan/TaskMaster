@@ -19,6 +19,10 @@
         GetRootOwner = 3
     End Enum
 
+    Public Const SM_CXSCREEN = 0 'Screen width
+    Public Const SM_CYSCREEN = 1 'Screen height
+
+
     Public Declare Function SetWindowLongPtr Lib "user32" Alias "SetWindowLongPtrA" _
         (ByVal hWnd As Long,
          ByVal nIndex As WindowLongFlags,
@@ -50,5 +54,16 @@
     Public Declare Function GetAncestor Lib "user32" _
         (ByVal hwnd As IntPtr,
          ByVal gaFlags As GetAncestor_Flags) As IntPtr
+
+    Public Declare Auto Function GetSystemMetrics Lib "user32.dll" _
+        (ByVal smIndex As Integer) As Integer
+
+    Public Function ScreenWidth() As Long
+        ScreenWidth = GetSystemMetrics(SM_CXSCREEN)
+    End Function
+
+    Public Function ScreenHeight() As Long
+        ScreenHeight = GetSystemMetrics(SM_CYSCREEN)
+    End Function
 
 End Module

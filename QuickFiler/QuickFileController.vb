@@ -1,8 +1,9 @@
 ﻿Imports System.Collections.Generic
+Imports System.Drawing
 Imports System.Linq
 Imports System.Windows.Forms
-Imports Microsoft.Office.Interop.Outlook
 Imports Microsoft.Office.Interop
+Imports Microsoft.Office.Interop.Outlook
 Imports ToDoModel
 Imports UtilitiesVB
 
@@ -170,7 +171,7 @@ Public Class QuickFileController
     Private Const OK_width As Long = 120
     Private Const UNDO_left As Long = 480
     Private Const UNDO_width As Long = 42
-    Private ReadOnly lngTop_CommandButton1_Min As Long
+    Private ReadOnly lngTop_Button1_Min As Long
     Private lngTop_AcceleratorDialogue_Min As Long
     Private lngTop_spn_Min As Long
     Private Const spn_left As Long = 606
@@ -182,17 +183,177 @@ Public Class QuickFileController
     Private Const frmWd = 655
     Private Const frmLt = 12
     Private Const frmSp = 6
-    Public colEmailsInFolder As Collection
-    Private ReadOnly ActiveExlorer As Outlook.Explorer
-    Private ReadOnly _olApp As Outlook.Application
-    Private _viewer As QuickFileViewer
 
-    Public Sub New(OlApp As Outlook.Application,
+
+    Public colEmailsInFolder As Collection
+    Private ReadOnly ActiveExplorer As Outlook.Explorer
+    Private _olObjects As IOlObjects
+    Private ReadOnly _olApp As Outlook.Application
+    Private ReadOnly _viewer As QuickFileViewer
+    Private _movedMails As cStackObject
+
+    Public Sub New(AppOlObjects As IOlObjects,
                    Viewer As QuickFileViewer)
-        _olApp = OlApp
+        _olObjects = AppOlObjects
+        _olApp = _olObjects.App
         _viewer = Viewer
-        ActiveExlorer = OlApp.ActiveExplorer()
+        ActiveExplorer = _olObjects.App.ActiveExplorer()
+        _movedMails = _olObjects.MovedMails_Stack
+
+        Dim lngPreviousHeight As Long
+        Dim lngHeightDifference As Long
+
+
+        blSuppressEvents = True                                     'Suppress events until the form is initialized
+        InitType = InitTypeEnum.InitSort
+        folderCurrent = ActiveExplorer.CurrentFolder
+        lngPanelMain_SC_Top = 0
+
+        Height_UserForm_Min = _viewer.Height + frmHt + frmSp
+        Height_PanelMain_Min = frmHt + frmSp
+
+        lngHeightDifference = Height_UserForm_Min - _viewer.Height
+
+        'Button1.top = Button1.top + lngHeightDifference
+        _viewer.Button_OK.Top = _viewer.Button_OK.Top + lngHeightDifference
+        _viewer.BUTTON_CANCEL.Top = _viewer.BUTTON_CANCEL.Top + lngHeightDifference
+        _viewer.Button_Undo.Top = _viewer.Button_Undo.Top + lngHeightDifference
+        lngAcceleratorDialogueTop = _viewer.AcceleratorDialogue.Top + lngHeightDifference
+        _viewer.AcceleratorDialogue.Top = lngAcceleratorDialogueTop
+        _viewer.spn_EmailPerLoad.Top = _viewer.spn_EmailPerLoad.Top + lngHeightDifference
+        lngTop_spn_Min = _viewer.spn_EmailPerLoad.Top
+        lngAcceleratorDialogueLeft = _viewer.AcceleratorDialogue.Left
+
+
+
+        lngTop_OK_BUTTON_Min = _viewer.Button_OK.Top
+        lngTop_CANCEL_BUTTON_Min = _viewer.BUTTON_CANCEL.Top
+        lngTop_UNDO_BUTTON_Min = _viewer.Button_Undo.Top
+        'lngTop_Button1_Min = Button1.top
+        lngTop_AcceleratorDialogue_Min = _viewer.AcceleratorDialogue.Top
+
+        'MsgBox "App Width " & Me.Width & vbCrLf & "Screen Width " & ScreenWidth * PointsPerPixel
+
+        Height_UserForm_Max = ScreenHeight()
+
+        lngPreviousHeight = _viewer.Height
+        _viewer.Height = Height_UserForm_Max
+        lngHeightDifference = _viewer.Height - lngPreviousHeight
+
+        'Button1.top = Button1.top + lngHeightDifference
+        _viewer.Button_OK.Top = _viewer.Button_OK.Top + lngHeightDifference
+        _viewer.BUTTON_CANCEL.Top = _viewer.BUTTON_CANCEL.Top + lngHeightDifference
+        _viewer.Button_Undo.Top = _viewer.Button_Undo.Top + lngHeightDifference
+        lngAcceleratorDialogueTop = _viewer.AcceleratorDialogue.Top + lngHeightDifference
+        _viewer.AcceleratorDialogue.Top = lngAcceleratorDialogueTop
+        lngAcceleratorDialogueLeft = _viewer.AcceleratorDialogue.Left
+        _viewer.spn_EmailPerLoad.Top = _viewer.spn_EmailPerLoad.Top + lngHeightDifference
+
+
+        Height_PanelMain_Max = _viewer.PanelMain.Height + lngHeightDifference
+        _viewer.PanelMain.Height = Height_PanelMain_Max
+
+
+
+        'Button1.TabStop = False
+        _viewer.Button_OK.TabStop = False
+        _viewer.BUTTON_CANCEL.TabStop = False
+        _viewer.Button_Undo.TabStop = False
+        _viewer.PanelMain.TabStop = False
+        _viewer.AcceleratorDialogue.TabStop = True
+        _viewer.spn_EmailPerLoad.TabStop = False
+
+
+        'Lets find the UserForm Handle the function below retrieves the handle
+        'to the top-level window whose class name ("ThunderDFrame" for Excel)
+        'and window name (me.caption or UserformName caption) match the specified strings.
+        lFormHandle = FindWindow("ThunderDFrame", _viewer.Text)
+        'OlApp_hWnd = FindWindow(olAppCLSN, vbNullString) 'Grabs handle on everything including vba
+        'Dim OlApp_hWnd2 As LongPtr
+        'OlApp_hWnd2 = GetAncestor(lFormHandle, GA_ROOTOWNER)
+        OlApp_hWnd = GetAncestor(lFormHandle, GA_PARENT)
+
+
+        'Debug.Print "lFormHandle " & lFormHandle
+        'Debug.Print "OlApp_hWnd " & OlApp_hWnd
+        'Debug.Print "OlApp_hWnd2 " & OlApp_hWnd2
+        'Stop
+        'The GetWindowLong function retrieves information about the specified window.
+        'The function also retrieves the 32-bit (long) value at the specified offset
+        'into the extra window memory of a window.
+        lStyle = GetWindowLong(lFormHandle, GWL_STYLE)
+        'lStyle is the New window style so lets set it up with the following
+        'lStyle = lStyle Or WS_SYSMENU 'SystemMenu
+        lStyle = lStyle Or WS_THICKFRAME 'Resizeable
+        lStyle = lStyle Or WS_MINIMIZEBOX 'With MinimizeBox
+        lStyle = lStyle Or WS_MAXIMIZEBOX 'and MaximizeBox
+
+        'Now lets set up our New window the SetWindowLong function changes
+        'the attributes of the specified window , given as lFormHandle,
+        'GWL_STYLE = New windows style, and our Newly defined style = lStyle
+        SetWindowLongPtr(lFormHandle, GWL_STYLE, lStyle)
+
+        'Remove >'&LT; if you want to show form Maximised
+        'ShowWindow lFormHandle, SW_SHOWMAXIMIZED 'Shows Form Maximized
+
+        'The DrawMenuBar function redraws the menu bar of the specified window.
+        'We need this as we have changed the menu bar after Windows has created it.
+        'All we need is the Handle.
+        Dim unused3 = DrawMenuBar(lFormHandle)
+        'blShowAsConversations
+        If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
+
+        End If
+
+
+        'If blShowAsConversations Then
+        '    'ToggleShowAsConversation -1
+        '    ExplConvView_ToggleOff
+        '    DoEvents
+        'End If
+
+        'Initialize Folder Suggestions and calculate emails per page
+
+        Folder_Suggestions_Reload
+        blSuppressEvents = False
+        Dim unused2 = ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
+        blSuppressEvents = True
+        intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
+        intEmailPosition = 0    'Reverse sort is 0   'Regular sort is 1
+        'intEmailsPerIteration = CInt(Round((Height_PanelMain_Max / (frmHt + frmSp)), 0))
+        intEmailsPerIteration = CInt(Math.Round(PanelMain.Height / (frmHt + frmSp), 0))
+        _viewer.spn_EmailPerLoad.Value = intEmailsPerIteration
+
+        '***********************************************************************************
+        '************New code to listen for window lost focus*******************************
+        '    ' Set our event extender
+        '    focusListener = New FormFocusListener
+        '    'subclass the userform to catch WM_NCACTIVATE msgs
+        '    #If VBA7 Then
+        '        Dim lhWnd As LongPtr
+        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
+        '        lPrevWnd = SetWindowLongPtr(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
+        '    #Else
+        '        Dim lhWnd As Long
+        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
+        '        lPrevWnd = SetWindowLong(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
+        '    #End If
+        '**********************End listen code**********************************************
+        '***********************************************************************************
+
+        'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
+        Dim unused1 = EnableWindow(OlApp_hWnd, Modal)
+        Dim unused = EnableWindow(lFormHandle, Modeless)
+        blSuppressEvents = False                                        'End suppression of events
+
+
+
+
+
+
     End Sub
+
+
 
     Public Sub LoadEmailDataBase(Optional colEmailsToLoad As Collection = Nothing)
         Dim OlFolder As Folder
@@ -203,8 +364,8 @@ Public Class QuickFileController
 
         If colEmailsToLoad Is Nothing Then
             Dim unused As New Collection
-            OlFolder = ActiveExlorer.CurrentFolder
-            objCurView = ActiveExlorer.CurrentView
+            OlFolder = ActiveExplorer.CurrentFolder
+            objCurView = ActiveExplorer.CurrentView
             strFilter = objCurView.Filter
             If strFilter <> "" Then
                 strFilter = "@SQL=" & strFilter
@@ -336,11 +497,11 @@ Public Class QuickFileController
                 QF.InitCtrls(Mail, colCtrls, intUniqueItemCounter, BoolRemoteMouseApp, Caller:=Me, hwnd:=lFormHandle, InitTypeE:=InitType)
 
                 colQFClass.Add(QF)
-                _olApp.DoEvents()
+                Dim unused4 = _olApp.DoEvents()
             End If
         Next objItem
 
-        ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
+        Dim unused3 = ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
 
 
 
@@ -364,15 +525,15 @@ Public Class QuickFileController
             UserForm_Resize()
             blSuppressEvents = True
         Else
-            _olApp.DoEvents
+            Dim unused2 = _olApp.DoEvents
             UserForm_Resize()
         End If
 
 
         'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
-        EnableWindow(OlApp_hWnd, Modal)
+        Dim unused1 = EnableWindow(OlApp_hWnd, Modal)
         'EnableWindow lFormHandle, Modeless
-        _viewer.PanelMain.Focus()
+        Dim unused = _viewer.PanelMain.Focus()
 
 
 
@@ -386,36 +547,36 @@ Public Class QuickFileController
     Optional blWideView As Boolean = False)
 
 
-        'Dim frm As MSForms.frame
-        Dim lbl1 As MSForms.Label
-        Dim lbl2 As MSForms.Label
-        Dim lbl3 As MSForms.Label
-        Dim lbl5 As MSForms.Label
-        Dim lblSender As MSForms.Label
-        Dim lblSubject As MSForms.Label
-        Dim lblBody As MSForms.Label
-        Dim lblSentOn As MSForms.Label
-        Dim lblConvCt As MSForms.Label
-        Dim lblPos As MSForms.Label
-        Dim cbxFolder As MSForms.combobox
-        Dim inpt As MSForms.textbox
-        Dim chbxGPConv As MSForms.checkbox
-        Dim chbxSaveAttach As MSForms.checkbox
-        Dim chbxSaveMail As MSForms.checkbox
-        Dim chbxDelFlow As MSForms.checkbox
-        Dim cbDelItem As MSForms.commandbutton
-        Dim cbKllItem As MSForms.commandbutton
-        Dim cbFlagItem As MSForms.commandbutton
-        Dim lblAcF As MSForms.Label
-        Dim lblAcD As MSForms.Label
-        Dim lblAcC As MSForms.Label
-        Dim lblAcX As MSForms.Label
-        Dim lblAcR As MSForms.Label
-        Dim lblAcT As MSForms.Label
-        Dim lblAcO As MSForms.Label
-        Dim lblAcA As MSForms.Label
-        Dim lblAcW As MSForms.Label
-        Dim lblAcM As MSForms.Label
+        'Dim frm As Windows.Forms.frame
+        Dim lbl1 As Windows.Forms.Label
+        Dim lbl2 As Windows.Forms.Label
+        Dim lbl3 As Windows.Forms.Label
+        Dim lbl5 As Windows.Forms.Label
+        Dim lblSender As Windows.Forms.Label
+        Dim lblSubject As Windows.Forms.Label
+        Dim lblBody As Windows.Forms.Label
+        Dim lblSentOn As Windows.Forms.Label
+        Dim lblConvCt As Windows.Forms.Label
+        Dim lblPos As Windows.Forms.Label
+        Dim cbxFolder As Windows.Forms.ComboBox
+        Dim inpt As Windows.Forms.TextBox
+        Dim chbxGPConv As Windows.Forms.CheckBox
+        Dim chbxSaveAttach As Windows.Forms.CheckBox
+        Dim chbxSaveMail As Windows.Forms.CheckBox
+        Dim chbxDelFlow As Windows.Forms.CheckBox
+        Dim cbDelItem As Windows.Forms.Button
+        Dim cbKllItem As Windows.Forms.Button
+        Dim cbFlagItem As Windows.Forms.Button
+        Dim lblAcF As Windows.Forms.Label
+        Dim lblAcD As Windows.Forms.Label
+        Dim lblAcC As Windows.Forms.Label
+        Dim lblAcX As Windows.Forms.Label
+        Dim lblAcR As Windows.Forms.Label
+        Dim lblAcT As Windows.Forms.Label
+        Dim lblAcO As Windows.Forms.Label
+        Dim lblAcA As Windows.Forms.Label
+        Dim lblAcW As Windows.Forms.Label
+        Dim lblAcM As Windows.Forms.Label
 
 
         Dim lngTopOff As Long
@@ -461,69 +622,66 @@ Public Class QuickFileController
 
 
         If blWideView Then
-        Set lbl1 = frm.controls.Add("Forms.Label.1", "lbl1" & intItemNumber, True)
-        With lbl1
+            lbl1 = New Windows.Forms.Label
+            frm.Controls.Add(lbl1)
+            With lbl1
                 .Height = 12
                 .Top = lngTopOff
                 .Left = 6
                 .Width = 54
-                .Caption = "From:"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
-
+                .Text = "From:"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             End With
-            colCtrls.Add lbl1, "lbl1"
-    End If  'blWideView
+            colCtrls.Add(lbl1, "lbl1")
+        End If  'blWideView
 
         If blWideView Then
-        Set lbl2 = frm.controls.Add("Forms.Label.1", "lbl2" & intItemNumber, True)
-        With lbl2
+            lbl2 = New Windows.Forms.Label
+            frm.Controls.Add(lbl2)
+            With lbl2
                 .Height = 12
                 .Top = lngTopOff + 24
                 .Left = 6
                 .Width = 54
-                .Caption = "Subject:"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "Subject:"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             End With
-            colCtrls.Add lbl2, "lbl2"
-    End If  'blWideView
+            colCtrls.Add(lbl2, "lbl2")
+        End If  'blWideView
 
         If blWideView Then
-        Set lbl3 = frm.controls.Add("Forms.Label.1", "lbl3" & intItemNumber, True)
-        With lbl3
+            lbl3 = New Windows.Forms.Label
+            frm.Controls.Add(lbl3)
+            With lbl3
                 .Height = 12
                 .Top = lngTopOff + 36
                 .Left = 6
                 .Width = 54
-                .Caption = "Body:"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "Body:"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             End With
-            colCtrls.Add lbl3, "lbl3"
-    End If
+            colCtrls.Add(lbl3, "lbl3")
+        End If
 
-        If InitType And InitSort Then
-    'TURN OFF IF CONDIT REMINDER
-        Set lbl5 = frm.controls.Add("Forms.Label.1", "lbl5" & intItemNumber, True)
-    With lbl5
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            'TURN OFF IF CONDIT REMINDER
+            lbl5 = New Windows.Forms.Label
+            frm.Controls.Add(lbl5)
+
+            With lbl5
                 .Height = 12
                 .Top = lngTopOff
                 .Left = 372
                 .Width = 78
-                .Caption = "Folder:"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "Folder:"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             End With
-            colCtrls.Add lbl5, "lbl5"
-    End If
+            colCtrls.Add(lbl5, "lbl5")
+        End If
 
+        lblSender = New Windows.Forms.Label
+        frm.Controls.Add(lblSender)
 
-        lblSender = frm.controls.Add("Forms.Label.1", "lblSender" & intItemNumber, True)
         With lblSender
             .Height = 12
             .Top = lngTopOff
@@ -537,16 +695,15 @@ Public Class QuickFileController
             End If  'blWideView
 
 
-            .Caption = "<SENDER>"
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "<SENDER>"
+            .Font = New Font(.Font.FontFamily, 10)
         End With
-        colCtrls.Add lblSender, "lblSender"
+        colCtrls.Add(lblSender, "lblSender")
 
 
+        Dim lblTriage As Windows.Forms.Label = New Windows.Forms.Label
+        frm.Controls.Add(lblTriage)
 
-    Dim lblTriage As MSForms.Label
-        lblTriage = frm.controls.Add("Forms.Label.1", "lblTriage" & intItemNumber, True)
         With lblTriage
             .Height = 12
             .Top = lngTopOff
@@ -560,17 +717,16 @@ Public Class QuickFileController
             End If  'blWideView
 
 
-            .Caption = "ABC"
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "ABC"
+            .Font = New Font(.Font.FontFamily, 10)
         End With
-        colCtrls.Add lblTriage, "lblTriage"
+        colCtrls.Add(lblTriage, "lblTriage")
 
 
 
+        Dim lblActionable As Windows.Forms.Label = New Windows.Forms.Label
+        frm.Controls.Add(lblActionable)
 
-    Dim lblActionable As MSForms.Label
-        lblActionable = frm.controls.Add("Forms.Label.1", "lblActionable" & intItemNumber, True)
         With lblActionable
             .Height = 12
             .Top = lngTopOff
@@ -584,45 +740,43 @@ Public Class QuickFileController
             End If
 
 
-            .Caption = "<ACTIONABL>"
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "<ACTIONABL>"
+            .Font = New Font(.Font.FontFamily, 10)
         End With
-        colCtrls.Add lblActionable, "lblActionable"
+        colCtrls.Add(lblActionable, "lblActionable")
 
 
 
+        lblSubject = New Windows.Forms.Label
+        frm.Controls.Add(lblSubject)
 
-    lblSubject = frm.controls.Add("Forms.Label.1", "lblSubject" & intItemNumber, True)
         With lblSubject
             If blWideView Then
                 .Height = 12
                 .Top = lngTopOff + 24
                 .Left = Left_lblSubject
                 .Width = Width_lblSubject
-                .Font.Size = 10
+                .Font = New Font(.Font.FontFamily, 10)
             ElseIf InitType And InitConditionalReminder Then
                 .Height = 18
                 .Top = lngTopOff + 12
                 .Left = Left_lblSubject_C
                 .Width = frmWd - .Left - .Left
-                .Font.Size = 16
+                .Font = New Font(.Font.FontFamily, 16)
             Else
                 .Height = 18
                 .Top = lngTopOff + 12
                 .Left = Left_lblSubject_C
                 .Width = Width_lblSubject_C
-                .Font.Size = 16
+                .Font = New Font(.Font.FontFamily, 16)
             End If
 
-            .Caption = "<SUBJECT>"
-            .Font.Name = "Tahoma"
-
+            .Text = "<SUBJECT>"
         End With
-        colCtrls.Add lblSubject, "lblSubject"
+        colCtrls.Add(lblSubject, "lblSubject")
 
-
-    lblBody = frm.controls.Add("Forms.Label.1", "lblBody" & intItemNumber, True)
+        lblBody = New Windows.Forms.Label
+        frm.Controls.Add(lblBody)
         With lblBody
 
             If blWideView Then
@@ -643,15 +797,14 @@ Public Class QuickFileController
 
             End If
 
-            .Caption = "<BODY>"
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "<BODY>"
+            .Font = New Font(.Font.FontFamily, 10)
             .WordWrap = True
         End With
-        colCtrls.Add lblBody, "lblBody"
+        colCtrls.Add(lblBody, "lblBody")
 
-
-    lblSentOn = frm.controls.Add("Forms.Label.1", "lblSentOn" & intItemNumber, True)
+        lblSentOn = New Windows.Forms.Label
+        frm.Controls.Add(lblSentOn)
         With lblSentOn
             .Height = 12
             If blWideView Then
@@ -665,54 +818,51 @@ Public Class QuickFileController
             End If
 
             .Width = 156
-            .Caption = "<SENTON>"
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "<SENTON>"
+            .Font = New Font(.Font.FontFamily, 10)
         End With
-        colCtrls.Add lblSentOn, "lblSentOn"
+        colCtrls.Add(lblSentOn, "lblSentOn")
 
-
-    If InitType And InitSort Then
-            cbxFolder = frm.controls.Add("Forms.ComboBox.1", "cbxFolder" & intItemNumber, True)
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            cbxFolder = New Windows.Forms.ComboBox
+            frm.Controls.Add(cbxFolder)
             With cbxFolder
                 .Height = 24
                 .Top = 20 + lngTopOff
                 .Left = Left_cbxFolder
                 .Width = Width_cbxFolder
-                .Font.Name = "Tahoma"
-                .Font.Size = 8
+                .Font = New Font(.Font.FontFamily, 8)
                 .TabStop = False
             End With
-            colCtrls.Add cbxFolder, "cbxFolder"
-    End If
+            colCtrls.Add(cbxFolder, "cbxFolder")
+        End If
 
 
-        If InitType And InitSort Then
-            inpt = frm.controls.Add("Forms.Textbox.1", "inpt" & intItemNumber, True)
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            inpt = New Windows.Forms.TextBox
+            frm.Controls.Add(inpt)
             With inpt
                 .Height = 18
                 .Top = lngTopOff
                 .Left = 408
                 .Width = Width_inpt
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Font = New Font(.Font.FontFamily, 10)
                 .TabStop = False
-                .BackColor = &H8000000F
+                .BackColor = SystemColors.Control
+
             End With
-            colCtrls.Add inpt, "inpt"
+            colCtrls.Add(inpt, "inpt")
 
 
 
-
-
-    chbxSaveMail = frm.controls.Add("Forms.Checkbox.1", "chbxSaveMail" & intItemNumber, True)
+            chbxSaveMail = New Windows.Forms.CheckBox
+            frm.Controls.Add(chbxSaveMail)
             With chbxSaveMail
 
                 .Height = 16
                 .Width = 37
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
-                .Caption = " Mail"
+                .Font = New Font(.Font.FontFamily, 10)
+                .Text = " Mail"
                 .Value = False
                 .TabStop = False
                 If blWideView Then
@@ -722,17 +872,16 @@ Public Class QuickFileController
                     .Left = Right_Aligned - .Width
                 End If
             End With
-            colCtrls.Add chbxSaveMail, "chbxSaveMail"
+            colCtrls.Add(chbxSaveMail, "chbxSaveMail")
 
-
-    chbxDelFlow = frm.controls.Add("Forms.Checkbox.1", "chbxDelFlow" & intItemNumber, True)
+            chbxDelFlow = New Windows.Forms.CheckBox
+            frm.Controls.Add(chbxDelFlow)
             With chbxDelFlow
 
                 .Height = 16
                 .Width = 45
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
-                .Caption = " Flow"
+                .Font = New Font(.Font.FontFamily, 10)
+                .Text = " Flow"
                 .Value = False
                 .TabStop = False
 
@@ -744,17 +893,16 @@ Public Class QuickFileController
                 End If
 
             End With
-            colCtrls.Add chbxDelFlow, "chbxDelFlow"
+            colCtrls.Add(chbxDelFlow, "chbxDelFlow")
 
-
-    chbxSaveAttach = frm.controls.Add("Forms.Checkbox.1", "chbxSaveAttach" & intItemNumber, True)
+            chbxSaveAttach = New Windows.Forms.CheckBox
+            frm.Controls.Add(chbxSaveAttach)
             With chbxSaveAttach
 
                 .Height = 16
                 .Width = 50
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
-                .Caption = " Attach"
+                .Font = New Font(.Font.FontFamily, 10)
+                .Text = " Attach"
                 .Value = True
                 .TabStop = False
 
@@ -766,15 +914,14 @@ Public Class QuickFileController
                 End If
 
             End With
-            colCtrls.Add chbxSaveAttach, "chbxSaveAttach"
-
-    chbxGPConv = frm.controls.Add("Forms.Checkbox.1", "chbxGPConv" & intItemNumber, True)
+            colCtrls.Add(chbxSaveAttach, "chbxSaveAttach")
+            chbxGPConv = New Windows.Forms.CheckBox
+            frm.Controls.Add(chbxGPConv)
             With chbxGPConv
                 .Height = 16
                 .Width = 81
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
-                .Caption = "  Conversation"
+                .Font = New Font(.Font.FontFamily, 10)
+                .Text = "  Conversation"
                 .Value = blGroupConversation
                 .TabStop = False
                 If blWideView Then
@@ -785,64 +932,57 @@ Public Class QuickFileController
                     .Left = chbxSaveAttach.Left - .Width - 1
                 End If
             End With
-            colCtrls.Add chbxGPConv, "chbxGPConv"
+            colCtrls.Add(chbxGPConv, "chbxGPConv")
+        End If
 
-End If
-
-        cbFlagItem = frm.controls.Add("Forms.CommandButton.1", "cbFlagItem" & intItemNumber, True)
+        cbFlagItem = New Windows.Forms.Button
+        frm.Controls.Add(cbFlagItem)
         With cbFlagItem
             .Height = 18
             .Top = lngTopOff
             .Left = Left_cbFlagItem
             .Width = Width_cb
-            .Font.Name = "Tahoma"
-            .Font.Size = 8
-            .Caption = "|>"
-            .BackColor = &H8000000F
-            .ForeColor = &H80000012
+            .Font = New Font(.Font.FontFamily, 8)
+            .Text = "|>"
+            .BackColor = SystemColors.Control
+            .ForeColor = SystemColors.ControlText
             .TabStop = False
         End With
-        colCtrls.Add cbFlagItem, "cbFlagItem"
+        colCtrls.Add(cbFlagItem, "cbFlagItem")
 
-
-    cbKllItem = frm.controls.Add("Forms.CommandButton.1", "cbKllItem" & intItemNumber, True)
+        cbKllItem = New Windows.Forms.Button
+        frm.Controls.Add(cbKllItem)
         With cbKllItem
             .Height = 18
             .Top = lngTopOff
             .Left = cbFlagItem.Left + Width_cb + 2
             .Width = Width_cb
-            .Font.Name = "Tahoma"
-            .Font.Size = 8
-            .Caption = "-->"
-            .BackColor = &H8000000F
-            .ForeColor = &H80000012
+            .Font = New Font(.Font.FontFamily, 8)
+            .Text = "-->"
+            .BackColor = SystemColors.Control
+            .ForeColor = SystemColors.ControlText
             .TabStop = False
         End With
-        colCtrls.Add cbKllItem, "cbKllItem"
+        colCtrls.Add(cbKllItem, "cbKllItem")
 
-
-    cbDelItem = frm.controls.Add("Forms.CommandButton.1", "cbDelItem" & intItemNumber, True)
+        cbKllItem = New Windows.Forms.Button
+        frm.Controls.Add(cbKllItem)
         With cbDelItem
             .Height = 18
             .Top = lngTopOff
             .Left = cbKllItem.Left + Width_cb + 2
             .Width = Width_cb
-            .Font.Name = "Tahoma"
-            .Font.Size = 8
-            .Caption = "X"
-            .BackColor = &HC0&
-            .ForeColor = &H8000000E
+            .Font = New Font(.Font.FontFamily, 8)
+            .Text = "X"
+            .BackColor = Color.Red
+            .ForeColor = Color.White
             .TabStop = False
         End With
-        colCtrls.Add cbDelItem, "cbDelItem"
+        colCtrls.Add(cbDelItem, "cbDelItem")
 
-
-
-
-
-
-If InitType And InitSort Then
-            lblConvCt = frm.controls.Add("Forms.Label.1", "lblConvCt" & intItemNumber, True)
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            lblConvCt = New Windows.Forms.Label
+            frm.Controls.Add(lblConvCt)
             With lblConvCt
                 .Height = 18
                 .TextAlign = fmTextAlignRight
@@ -855,17 +995,21 @@ If InitType And InitSort Then
                     .Top = lngTopOff + 12
                 End If
                 .Width = 36
-                .Caption = "<#>"
-                .Font.Name = "Tahoma"
-                .Font.Size = If(blWideView, 12, 16)
+                .Text = "<#>"
+                If blWideView Then
+                    .Font = New Font(.Font.FontFamily, 12)
+                Else
+                    .Font = New Font(.Font.FontFamily, 16)
+                End If
 
                 .Enabled = blGroupConversation
 
             End With
-            colCtrls.Add lblConvCt, "lblConvCt"
-End If
+            colCtrls.Add(lblConvCt, "lblConvCt")
+        End If
 
-        lblPos = frm.controls.Add("Forms.Label.1", "lblPos" & intItemNumber, True)
+        lblPos = New Windows.Forms.Label
+        frm.Controls.Add(lblPos)
         With lblPos
             .Height = 20
             .Top = lngTopOff
@@ -873,136 +1017,128 @@ End If
             .Left = If(blWideView, 6, 0)
 
             .Width = 20
-            .Caption = "<Pos#>"
-            .Font.Bold = True
-            .Font.Name = "Tahoma"
-            .Font.Size = 14
-            .BackColor = &H8000000D
-            .ForeColor = &H8000000E
+            .Text = "<Pos#>"
+            .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
+            .BackColor = SystemColors.ControlText
+            .ForeColor = SystemColors.Control
             .Enabled = False
             .Visible = blDebug
         End With
-        colCtrls.Add lblPos, "lblPos"
+        colCtrls.Add(lblPos, "lblPos")
 
-If InitType And InitSort Then
-            lblAcF = frm.controls.Add("Forms.Label.1", "lblAcF" & intItemNumber, True)
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            lblAcF = New Windows.Forms.Label
+            frm.Controls.Add(lblAcF)
             With lblAcF
                 .Height = 14
                 .Top = max(lngTopOff - 2, 0)
                 .Left = 363
                 .Width = 14
-                .Caption = "F"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "F"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = fmBorderStyleSingle
                 .TextAlign = fmTextAlignCenter
                 .SpecialEffect = fmSpecialEffectBump
-                .BackColor = &H80000012
-                .ForeColor = &H8000000E
+                .BackColor = SystemColors.ControlText
+                .ForeColor = SystemColors.Control
                 .Visible = blDebug
 
             End With
-            colCtrls.Add lblAcF, "lblAcF"
+            colCtrls.Add(lblAcF, "lblAcF")
 
-    lblAcD = frm.controls.Add("Forms.Label.1", "lblAcD" & intItemNumber, True)
+            lblAcD = New Windows.Forms.Label
+            frm.Controls.Add(lblAcD)
             With lblAcD
                 .Height = 14
                 .Top = 20 + lngTopOff
                 .Left = 363
                 .Width = 14
-                .Caption = "D"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "D"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = fmBorderStyleSingle
                 .TextAlign = fmTextAlignCenter
                 .SpecialEffect = fmSpecialEffectBump
-                .BackColor = &H80000012
-                .ForeColor = &H8000000E
+                .BackColor = SystemColors.ControlText
+                .ForeColor = SystemColors.Control
                 .Visible = blDebug
             End With
-            colCtrls.Add lblAcD, "lblAcD"
+            colCtrls.Add(lblAcD, "lblAcD")
 
-    lblAcC = frm.controls.Add("Forms.Label.1", "lblAcC" & intItemNumber, True)
+            lblAcC = New Windows.Forms.Label
+            frm.Controls.Add(lblAcC)
             With lblAcC
                 .Height = 14
                 .Top = lngTopOff + 47
                 .Left = chbxGPConv.Left + 12
                 .Width = 14
-                .Caption = "C"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "C"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = fmBorderStyleSingle
                 .TextAlign = fmTextAlignCenter
                 .SpecialEffect = fmSpecialEffectBump
-                .BackColor = &H80000012
-                .ForeColor = &H8000000E
+                .BackColor = SystemColors.ControlText
+                .ForeColor = SystemColors.Control
                 .Visible = blDebug
             End With
-            colCtrls.Add lblAcC, "lblAcC"
-End If
+            colCtrls.Add(lblAcC, "lblAcC")
+        End If
 
-
-        lblAcR = frm.controls.Add("Forms.Label.1", "lblAcR" & intItemNumber, True)
+        lblAcR = New Windows.Forms.Label
+        frm.Controls.Add(lblAcR)
         With lblAcR
             .Height = 14
             .Top = 2 + lngTopOff
             .Left = cbKllItem.Left + 6
             .Width = 14
-            .Caption = "R"
-            .Font.Bold = True
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "R"
+            .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             .BorderStyle = fmBorderStyleSingle
             .TextAlign = fmTextAlignCenter
             .SpecialEffect = fmSpecialEffectBump
-            .BackColor = &H80000012
-            .ForeColor = &H8000000E
+            .BackColor = SystemColors.ControlText
+            .ForeColor = SystemColors.Control
             .Visible = blDebug
         End With
-        colCtrls.Add lblAcR, "lblAcR"
+        colCtrls.Add(lblAcR, "lblAcR")
 
-    lblAcX = frm.controls.Add("Forms.Label.1", "lblAcX" & intItemNumber, True)
+        lblAcX = New Windows.Forms.Label
+        frm.Controls.Add(lblAcX)
         With lblAcX
             .Height = 14
             .Top = 2 + lngTopOff
             .Left = cbDelItem.Left + 6
             .Width = 14
-            .Caption = "X"
-            .Font.Bold = True
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "X"
+            .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             .BorderStyle = fmBorderStyleSingle
             .TextAlign = fmTextAlignCenter
             .SpecialEffect = fmSpecialEffectBump
-            .BackColor = &H80000012
-            .ForeColor = &H8000000E
+            .BackColor = SystemColors.ControlText
+            .ForeColor = SystemColors.Control
             .Visible = blDebug
         End With
-        colCtrls.Add lblAcX, "lblAcX"
+        colCtrls.Add(lblAcX, "lblAcX")
 
-    lblAcT = frm.controls.Add("Forms.Label.1", "lblAcT" & intItemNumber, True)
+        lblAcT = New Windows.Forms.Label
+        frm.Controls.Add(lblAcT)
         With lblAcT
             .Height = 14
             .Top = 2 + lngTopOff
             .Left = cbFlagItem.Left + 6
             .Width = 14
-            .Caption = "T"
-            .Font.Bold = True
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "T"
+            .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             .BorderStyle = fmBorderStyleSingle
             .TextAlign = fmTextAlignCenter
             .SpecialEffect = fmSpecialEffectBump
-            .BackColor = &H80000012
-            .ForeColor = &H8000000E
+            .BackColor = SystemColors.ControlText
+            .ForeColor = SystemColors.Control
             .Visible = blDebug
         End With
-        colCtrls.Add lblAcT, "lblAcT"
+        colCtrls.Add(lblAcT, "lblAcT")
 
-    lblAcO = frm.controls.Add("Forms.Label.1", "lblAcO" & intItemNumber, True)
+        lblAcO = New Windows.Forms.Label
+        frm.Controls.Add(lblAcO)
         With lblAcO
             .Height = 14
 
@@ -1014,22 +1150,20 @@ End If
                 .Left = Left_lblAcO_C
             End If
             .Width = 14
-            .Caption = "O"
-            .Font.Bold = True
-            .Font.Name = "Tahoma"
-            .Font.Size = 10
+            .Text = "O"
+            .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             .BorderStyle = fmBorderStyleSingle
             .TextAlign = fmTextAlignCenter
             .SpecialEffect = fmSpecialEffectBump
-            .BackColor = &H80000012
-            .ForeColor = &H8000000E
+            .BackColor = SystemColors.ControlText
+            .ForeColor = SystemColors.Control
             .Visible = blDebug
         End With
-        colCtrls.Add lblAcO, "lblAcO"
+        colCtrls.Add(lblAcO, "lblAcO")
 
-
-If InitType And InitSort Then
-            lblAcA = frm.controls.Add("Forms.Label.1", "lblAcA" & intItemNumber, True)
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            lblAcA = New Windows.Forms.Label
+            frm.Controls.Add(lblAcA)
             With lblAcA
                 .Height = 14
 
@@ -1041,20 +1175,19 @@ If InitType And InitSort Then
                     .Left = chbxSaveAttach.Left + 10
                 End If
                 .Width = 14
-                .Caption = "A"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "A"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = fmBorderStyleSingle
                 .TextAlign = fmTextAlignCenter
                 .SpecialEffect = fmSpecialEffectBump
-                .BackColor = &H80000012
-                .ForeColor = &H8000000E
+                .BackColor = SystemColors.ControlText
+                .ForeColor = SystemColors.Control
                 .Visible = blDebug
             End With
-            colCtrls.Add lblAcA, "lblAcA"
+            colCtrls.Add(lblAcA, "lblAcA")
 
-    lblAcW = frm.controls.Add("Forms.Label.1", "lblAcW" & intItemNumber, True)
+            lblAcW = New Windows.Forms.Label
+            frm.Controls.Add(lblAcW)
             With lblAcW
                 .Height = 14
 
@@ -1066,20 +1199,19 @@ If InitType And InitSort Then
                     .Left = chbxDelFlow.Left + 29
                 End If
                 .Width = 14
-                .Caption = "W"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "W"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = fmBorderStyleSingle
                 .TextAlign = fmTextAlignCenter
                 .SpecialEffect = fmSpecialEffectBump
-                .BackColor = &H80000012
-                .ForeColor = &H8000000E
+                .BackColor = SystemColors.ControlText
+                .ForeColor = SystemColors.Control
                 .Visible = blDebug
             End With
-            colCtrls.Add lblAcW, "lblAcW"
+            colCtrls.Add(lblAcW, "lblAcW")
 
-    lblAcM = frm.controls.Add("Forms.Label.1", "lblAcM" & intItemNumber, True)
+            lblAcM = New Windows.Forms.Label
+            frm.Controls.Add(lblAcM)
             With lblAcM
                 .Height = 14
 
@@ -1091,21 +1223,19 @@ If InitType And InitSort Then
                     .Left = chbxSaveMail.Left + 10
                 End If
                 .Width = 14
-                .Caption = "M"
-                .Font.Bold = True
-                .Font.Name = "Tahoma"
-                .Font.Size = 10
+                .Text = "M"
+                .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = fmBorderStyleSingle
                 .TextAlign = fmTextAlignCenter
                 .SpecialEffect = fmSpecialEffectBump
-                .BackColor = &H80000012
-                .ForeColor = &H8000000E
+                .BackColor = SystemColors.ControlText
+                .ForeColor = SystemColors.Control
                 .Visible = blDebug
             End With
             colCtrls.Add(lblAcM, "lblAcM")
         End If
 
-        p
+
 
     End Sub
 
@@ -1126,11 +1256,10 @@ If InitType And InitSort Then
                 QF.kill()                                         'Remove the variables linking to events
 
                 'PanelMain.Controls.Remove colFrames(i).Name
-                colQFClass.Remove i
-    Loop
+                colQFClass.Remove(i)
+            Loop
         End If
 
-        QF = Nothing                                    'Free up the QfcController class memory
 
         '_viewer.PanelMain.ScrollHeight = Height_PanelMain_Max
 
@@ -1142,10 +1271,7 @@ If InitType And InitSort Then
 
         Dim i As Integer
         Dim QF As QfcController
-        Dim ctlFrame As MSForms.frame
-        Dim blDebug As Boolean
-
-        blDebug = False
+        Dim ctlFrame As Windows.Forms.Panel
 
         For i = colQFClass.Count To intPosition Step -1
 
@@ -1177,28 +1303,20 @@ If InitType And InitSort Then
         Dim i As Integer
         Dim QF As QfcController
         Dim ctlFrame As Windows.Forms.Panel
-        Dim blDebug As Boolean
-
-        blDebug = False
 
         For i = colQFClass.Count To intPosition Step -1
 
             'Shift items downward if there are any
             QF = colQFClass(i)
             ctlFrame = QF.frm
-            ctlFrame.Top = ctlFrame.Top + intPix
+            ctlFrame.Top += intPix
         Next i
         '_viewer.PanelMain.ScrollHeight = max(max(intPix, 0) + (colQFClass.Count * (frmHt + frmSp)), _viewer.PanelMain.Height)
 
 
     End Sub
 
-    Public Sub AddEmailControlGroup(Optional objItem As Object,
-    Optional posInsert As Integer = 0,
-    Optional blGroupConversation As Boolean = True,
-    Optional ConvCt As Integer = 0,
-    Optional varList As Variant,
-    Optional blChild As Boolean)
+    Public Sub AddEmailControlGroup(Optional objItem As Object = Nothing, Optional posInsert As Integer = 0, Optional blGroupConversation As Boolean = True, Optional ConvCt As Integer = 0, Optional varList As Object = Nothing, Optional blChild As Boolean = False)
 
 
         Dim Mail As [MailItem]
@@ -1221,26 +1339,25 @@ If InitType And InitSort Then
             QF = New QfcController
             colCtrls = New Collection
 
-            LoadGroupOfCtrls colCtrls, intUniqueItemCounter, posInsert, blGroupConversation
-
-        QF.InitCtrls Mail, colCtrls, posInsert, BoolRemoteMouseApp, Me
-        If blChild Then QF.blConChild = True
+            LoadGroupOfCtrls(colCtrls, intUniqueItemCounter, posInsert, blGroupConversation)
+            QF.InitCtrls(Mail, colCtrls, posInsert, BoolRemoteMouseApp, Me)
+            If blChild Then QF.blConChild = True
             If IsArray(varList) = True Then
                 If UBound(varList) = 0 Then
                     QF.Init_FolderSuggestions()
                 Else
-                    QF.Init_FolderSuggestions varList
-            End If
+                    QF.Init_FolderSuggestions(varList)
+                End If
             Else
-                QF.Init_FolderSuggestions varList
-        End If
-            QF.CountMailsInConv ConvCt
+                QF.Init_FolderSuggestions(varList)
+            End If
+            QF.CountMailsInConv(ConvCt)
 
-        If posInsert > colQFClass.Count Then
-                colQFClass.Add QF
-        Else
-                colQFClass.Add QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert
-        End If
+            If posInsert > colQFClass.Count Then
+                colQFClass.Add(QF)
+            Else
+                colQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
+            End If
 
             For i = 1 To colQFClass.Count
                 QF = colQFClass(i)
@@ -1286,7 +1403,7 @@ If InitType And InitSort Then
 
     End Sub
 
-    Public Sub ConvToggle_UnGroup(selItems As Collection, intPosition As Integer, ConvCt As Integer, varList As Variant)
+    Public Sub ConvToggle_UnGroup(selItems As Collection, intPosition As Integer, ConvCt As Integer, varList As Object)
 
         Dim i As Integer
         Dim QF As QfcController
@@ -1372,7 +1489,7 @@ If InitType And InitSort Then
         Dim QF As QfcController
         Dim intItemCount As Integer
         Dim i As Integer
-        Dim ctlFrame As MSForms.frame
+        Dim ctlFrame As Windows.Forms.Panel
         Dim strDeletedSub As String
         Dim strDeletedDte As String
         Dim intDeletedMyPos As Integer
@@ -1389,19 +1506,20 @@ If InitType And InitSort Then
 
 
         QF.ctrlsRemove()                                  'Run the method that removes controls from the frame
-        _viewer.PanelMain.controls.Remove(QF.frm.Name)           'Remove the specific frame
+        _viewer.PanelMain.Controls.Remove(QF.frm)           'Remove the specific frame
         QF.kill()                                         'Remove the variables linking to events
 
         If blDebug Then
             'Print data before movement
-            Debug.Print "DEBUG DATA BEFORE MOVEMENT"
-        For i = 1 To intItemCount
+            Debug.Print("DEBUG DATA BEFORE MOVEMENT")
+
+            For i = 1 To intItemCount
                 If i = intPosition Then
-                    Debug.Print i & "  " & intDeletedMyPos & "  " & strDeletedDte & "  " & strDeletedSub
-            Else
+                    Debug.Print(i & "  " & intDeletedMyPos & "  " & strDeletedDte & "  " & strDeletedSub)
+                Else
                     QF = colQFClass(i)
-                    Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject
-            End If
+                    Debug.Print(i & "  " & QF.intMyPosition & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject)
+                End If
             Next i
         End If
 
@@ -1416,16 +1534,17 @@ If InitType And InitSort Then
             _viewer.PanelMain.ScrollHeight = max(PanelMain.ScrollHeight - frmHt - frmSp, Height_PanelMain_Max)
         End If
 
-        colQFClass.Remove intPosition
-    intEmailStart += 1
+        colQFClass.Remove(intPosition)
+        intEmailStart += 1
 
         If blDebug Then
             'Print data after movement
-            Debug.Print "DEBUG DATA POST MOVEMENT"
-        For i = 1 To colQFClass.Count
+            Debug.Print("DEBUG DATA POST MOVEMENT")
+
+            For i = 1 To colQFClass.Count
                 QF = colQFClass(i)
-                Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject
-        Next i
+                Debug.Print(i & "  " & QF.intMyPosition & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject)
+            Next i
         End If
 
         QF = Nothing
@@ -1446,7 +1565,6 @@ If InitType And InitSort Then
         Dim strCommand As String
         Dim QF As QfcController
         Dim blExpanded As Boolean
-        Dim strTemp As String
 
 
 
@@ -1491,9 +1609,8 @@ If InitType And InitSort Then
 
 
 
-                                MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
-
-                        QF.ExpandCtrls1()
+                                MoveDownPix(intAccActiveMail + 1, QF.frm.Height * -0.5)
+                                QF.ExpandCtrls1()
 
                                 blExpanded = True
                             End If
@@ -1514,16 +1631,13 @@ If InitType And InitSort Then
 
 
 
-                                MoveDownPix intAccTmpMail + 1, QF.frm.Height
+                                MoveDownPix(intAccTmpMail + 1, QF.frm.Height)
+                                QF.ExpandCtrls1()
 
-                        QF.ExpandCtrls1()
-
-                                blExpanded = False
                             End If
 
-                            ScrollIntoView_MF QF.frm.Top, QF.frm.Top + QF.frm.Height
-
-                End If
+                            ScrollIntoView_MF(QF.frm.Top, QF.frm.Top + QF.frm.Height)
+                        End If
 
 
                         If intAccTmpMail <= colQFClass.Count Then
@@ -1561,20 +1675,19 @@ If InitType And InitSort Then
 
                                 toggleAcceleratorDialogue()
 
-                                EnableWindow OlApp_hWnd, Modeless
-                        'EnableWindow lFormHandle, Modeless
+                                Dim unused2 = EnableWindow(OlApp_hWnd, Modeless)
+                                'EnableWindow lFormHandle, Modeless
 
                                 If ActiveExplorer.CurrentFolder.DefaultItemType <> olMailItem Then
-                            Set ActiveExplorer.NavigationPane.CurrentModule = ActiveExplorer.NavigationPane.Modules.GetNavigationModule(olModuleMail)
-                        End If
+                                    ActiveExplorer.NavigationPane.CurrentModule = ActiveExplorer.NavigationPane.Modules.GetNavigationModule(olModuleMail)
+                                End If
 
-                                If InitType And InitSort And AreConversationsGrouped Then ExplConvView_ToggleOff()                      'Modal
-                                QF.KB strCommand
+                                If InitType.HasFlag(InitTypeEnum.InitSort) And AreConversationsGrouped Then ExplConvView_ToggleOff()                      'Modal
+                                QF.KB(strCommand)
 
+                                QFD_Minimize()
 
-                        QFD_Minimize()
-
-                                If InitType And InitSort And blShowAsConversations Then ExplConvView_ToggleOn()
+                                If InitType.HasFlag(InitTypeEnum.InitSort) And blShowAsConversations Then ExplConvView_ToggleOn()
                         'ToggleShowAsConversation 1
                         'SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
                             Case "C"
@@ -1584,69 +1697,69 @@ If InitType And InitSort Then
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "T"
+                                QF.KB(strCommand)
+                            Case "T"
 
 
                                 toggleAcceleratorDialogue()
 
-                                EnableWindow OlApp_hWnd, Modeless
-                        'EnableWindow lFormHandle, Modeless
+                                Dim unused1 = EnableWindow(OlApp_hWnd, Modeless)
+                                'EnableWindow lFormHandle, Modeless
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "F"
-
-
-                                toggleAcceleratorDialogue()
-
-                                QF = colQFClass(intAccActiveMail)
-
-                                QF.KB strCommand
-                    Case "D"
+                                QF.KB(strCommand)
+                            Case "F"
 
 
                                 toggleAcceleratorDialogue()
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "X"
+                                QF.KB(strCommand)
+                            Case "D"
 
 
                                 toggleAcceleratorDialogue()
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "R"
+                                QF.KB(strCommand)
+                            Case "X"
 
 
                                 toggleAcceleratorDialogue()
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "A"
+                                QF.KB(strCommand)
+                            Case "R"
+
+
+                                toggleAcceleratorDialogue()
+
+                                QF = colQFClass(intAccActiveMail)
+
+                                QF.KB(strCommand)
+                            Case "A"
 
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "W"
+                                QF.KB(strCommand)
+                            Case "W"
 
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "M"
+                                QF.KB(strCommand)
+                            Case "M"
 
 
                                 QF = colQFClass(intAccActiveMail)
 
-                                QF.KB strCommand
-                    Case "E"
+                                QF.KB(strCommand)
+                            Case "E"
 
 
                                 QF = colQFClass(intAccActiveMail)
@@ -1654,15 +1767,13 @@ If InitType And InitSort Then
                                 If QF.blExpanded Then
 
 
-                                    MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
-
-                            QF.ExpandCtrls1()
+                                    MoveDownPix(intAccActiveMail + 1, QF.frm.Height * -0.5)
+                                    QF.ExpandCtrls1()
                                 Else
 
 
-                                    MoveDownPix intAccActiveMail + 1, QF.frm.Height
-
-                            QF.ExpandCtrls1()
+                                    MoveDownPix(intAccActiveMail + 1, QF.frm.Height)
+                                    QF.ExpandCtrls1()
                                 End If
                                 '                                                                                                    strTemp = "AcceleratorDialogue.Value = Left(AcceleratorDialogue.Value, Len(AcceleratorDialogue.Value) - 1)"
                                 '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
@@ -1689,7 +1800,7 @@ If InitType And InitSort Then
                 If intAccActiveMail <> 0 Then
 
 
-                    colQFClass(intAccActiveMail).Accel_FocusToggle
+                    Dim unused = colQFClass(intAccActiveMail).Accel_FocusToggle
 
                     intAccActiveMail = 0
                 End If
@@ -1788,10 +1899,10 @@ If InitType And InitSort Then
         Select Case e.KeyCode
             Case 18
                 If sender.Visible Then
-                    sender.SetFocus
+                    Dim unused1 = sender.SetFocus
                     sender.SelStart = sender.TextLength
                 Else
-                    _viewer.PanelMain.Focus()
+                    Dim unused = _viewer.PanelMain.Focus()
                 End If
                 SendKeys.Send("{ESC}")
             Case Keys.Right
@@ -1819,16 +1930,16 @@ If InitType And InitSort Then
                     If QF.lblConvCt.Text <> "1" And QF.chk.Checked = False Then
                         If QF.blExpanded Then
                             blExpanded = True
-                            MoveDownPix intAccActiveMail + 1, QF.frm.Height * -0.5
-                        QF.ExpandCtrls1()
+                            MoveDownPix(intAccActiveMail + 1, QF.frm.Height * -0.5)
+                            QF.ExpandCtrls1()
                         End If
                         toggleAcceleratorDialogue()
-                        QF.KB "C"
-                    toggleAcceleratorDialogue()
+                        QF.KB("C")
+                        toggleAcceleratorDialogue()
 
                         If blExpanded Then
-                            MoveDownPix intAccActiveMail + 1, QF.frm.Height
-                        QF.ExpandCtrls1()
+                            MoveDownPix(intAccActiveMail + 1, QF.frm.Height)
+                            QF.ExpandCtrls1()
                         End If
 
                     End If
@@ -1849,25 +1960,22 @@ If InitType And InitSort Then
         RemoveControls()
         blFrmKll = True
 
-        Unload QuickFileDyn
-
+        Unload(QuickFileDyn)
     End Sub
 
-    Private Sub BUTTON_CANCEL_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub BUTTON_CANCEL_KeyDown(sender As Object, e As KeyEventArgs)
 
 
-        KeyDownHandler KeyCode, Shift
-
-End Sub
+        KeyDownHandler(KeyCode, Shift)
+    End Sub
 
     Private Sub Button_OK_Click()
 
         Dim QF As QfcController
         Dim blReadyForMove As Boolean
         Dim strNotifications As String
-        Dim oMailTmp As [MailItem]
 
-        If InitType And InitSort Then
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
             If blRunningModalCode = False Then
                 blRunningModalCode = True
 
@@ -1899,7 +2007,7 @@ End Sub
                     Iterate()
                     blSuppressEvents = False
                 Else
-                    MsgBox(strNotifications, vbOKOnly + vbCritical, "Error Notification")
+                    Dim unused = MsgBox(strNotifications, vbOKOnly + vbCritical, "Error Notification")
                 End If
 
                 _viewer.AcceleratorDialogue.Value = ""
@@ -1907,29 +2015,29 @@ End Sub
 
                 blRunningModalCode = False
             Else
-                MyBoxMsg "Can't Execute While Running Modal Code"
-    End If
+                MyBoxMsg("Can't Execute While Running Modal Code")
+            End If
 
         Else
-            Unload Me
-End If
+            Unload(Me)
+        End If
 
 
 
     End Sub
 
 
-    Private Sub Button_OK_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub Button_OK_KeyDown(sender As Object, e As KeyEventArgs)
 
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired Button_OK_KeyDown"
 
-        KeyDownHandler KeyCode, Shift
-End Sub
+        KeyDownHandler(KeyCode, Shift)
+    End Sub
 
-    Private Sub Button_OK_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        KeyUpHandler KeyCode, Shift
-End Sub
+    Private Sub Button_OK_KeyUp(sender As Object, e As KeyEventArgs)
+        KeyUpHandler(KeyCode, Shift)
+    End Sub
 
 
     Private Sub Button_Undo_Click()
@@ -1940,8 +2048,8 @@ End Sub
         Dim oFolder_Current As [Folder]
         Dim oFolder_Old As [Folder]
         Dim colItems As Collection
-        Dim vbUndoResponse As VbMsgBoxResult
-        Dim vbRepeatResponse As VbMsgBoxResult
+        Dim vbUndoResponse As MsgBoxResult
+        Dim vbRepeatResponse As MsgBoxResult
 
         '    If Not colMailJustMoved Is Nothing Then
         '        If colMailJustMoved.Count <> 0 Then
@@ -1981,21 +2089,21 @@ End Sub
         '    End If  'If Not colMailJustMoved Is Nothing
         '
 
-        If MovedMails_Stack Is Nothing Then MovedMails_Stack = New cStackObject
+        If _movedMails Is Nothing Then _movedMails = New cStackObject
         vbRepeatResponse = vbYes
 
-        i = MovedMails_Stack.Count
-        colItems = MovedMails_Stack.ToCollection
+        i = _movedMails.Count
+        colItems = _movedMails.ToCollection()
 
         While (i > 1) And (vbRepeatResponse = vbYes)
             objTemp = colItems(i)
-            'objTemp = MovedMails_Stack.Pop
+            'objTemp = _movedMails.Pop
             If TypeOf objTemp Is MailItem Then oMail_Current = objTemp
-            'objTemp = MovedMails_Stack.Pop
+            'objTemp = _movedMails.Pop
             objTemp = colItems(i - 1)
             If TypeOf objTemp Is MailItem Then oMail_Old = objTemp
 
-            'oMail_Old = MovedMails_Stack.Pop
+            'oMail_Old = _movedMails.Pop
             If (Mail_IsItEncrypted(oMail_Current) = False) And (Mail_IsItEncrypted(oMail_Old) = False) Then
                 oFolder_Current = oMail_Current.Parent
                 oFolder_Old = oMail_Old.Parent
@@ -2003,34 +2111,33 @@ End Sub
                 Format(oMail_Current.SentOn, "mm/dd/yyyy") & vbCrLf &
                 oMail_Current.Subject, vbYesNo)
                 If vbUndoResponse = vbYes And oFolder_Current <> oFolder_Old Then
-                    oMail_Current.Move oFolder_Old
-                MovedMails_Stack.Pop i
-                MovedMails_Stack.Pop(i - 1)
+                    Dim unused = oMail_Current.Move(oFolder_Old)
+
+                    _movedMails.Pop(i)
+                    _movedMails.Pop(i - 1)
                 End If
             End If
             i -= 2
             vbRepeatResponse = MsgBox("Continue Undoing Moves?", vbYesNo)
-    Wend
-    
-    
-End Sub
+        End While
+    End Sub
 
-    Private Sub _viewer_PanelMain_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub _viewer_PanelMain_KeyDown(sender As Object, e As KeyEventArgs)
 
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired _viewer.PanelMain_KeyDown"
 
-        KeyDownHandler KeyCode, Shift
-End Sub
+        KeyDownHandler(KeyCode, Shift)
+    End Sub
 
-    Private Sub _viewer_PanelMain_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+    Private Sub _viewer_PanelMain_KeyPress(sender As Object, e As KeyPressEventArgs)
         'MsgBox ("KeyPress _viewer.PanelMain")
-        KeyPressHandler KeyAscii
-End Sub
+        KeyPressHandler(KeyAscii)
+    End Sub
 
-    Private Sub _viewer_PanelMain_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        KeyUpHandler KeyCode, Shift
-End Sub
+    Private Sub _viewer_PanelMain_KeyUp(sender As Object, e As KeyEventArgs)
+        KeyUpHandler(KeyCode, Shift)
+    End Sub
 
     Private Sub SpinButton1_Change()
 
@@ -2047,15 +2154,10 @@ End Sub
         End If
     End Sub
 
-    Private Sub spn_EmailPerLoad_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        Dim DebugLVL As DebugLevelEnum
-        DebugLVL = vbProcedure
+    Private Sub spn_EmailPerLoad_KeyDown(sender As Object, e As KeyEventArgs)
 
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired BUTTON_CANCEL_KeyDown"
-
-        KeyDownHandler KeyCode, Shift
-
-End Sub
+        KeyDownHandler(KeyCode, Shift)
+    End Sub
 
     Private Sub UserForm_Activate()
 
@@ -2073,20 +2175,6 @@ End Sub
 
         Dim QF As QfcController
         Dim i As Integer
-        Dim DebugLVL As DebugLevelEnum
-        Dim strTemp As String
-
-        DebugLVL = vbCommand + vbVariable
-
-        'If DebugLVL AndvbProcedure Or DebugLVL = vbCommand Then
-        '
-        '    SubNm = "toggleAcceleratorDialogue"
-        '    ErrHandler_Init SubNm, ttrace, DebugLVL
-        '    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-        '
-        'End If
-
-
 
         If colQFClass IsNot Nothing Then
             For i = 1 To colQFClass.Count
@@ -2095,9 +2183,8 @@ End Sub
                 QF = colQFClass(i)
 
 
-                If QF.blExpanded And i <> colQFClass.Count Then MoveDownPix i + 1, QF.frm.Height * -0.5
-
-        QF.Accel_Toggle()
+                If QF.blExpanded And i <> colQFClass.Count Then MoveDownPix(i + 1, QF.frm.Height * -0.5)
+                QF.Accel_Toggle()
             Next i
         End If
 
@@ -2110,7 +2197,7 @@ End Sub
             'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
             'Modal        ExplConvView_ToggleOn
 
-            _viewer.PanelMain.Focus()
+            Dim unused = _viewer.PanelMain.Focus()
         Else
 
 
@@ -2138,7 +2225,7 @@ End Sub
                     intAccActiveMail = 1
                     QF = colQFClass(intAccActiveMail)
                 End If
-                On Error GoTo ErrorHandler
+
 
                 QF.Accel_FocusToggle()
             Else
@@ -2190,180 +2277,13 @@ End Sub
             '    PasteButton.Enabled = readyToPaste 'TRUE if curve has been copied
             'End If
         Else
-            Debug.Print "Lost Focus"
-'        'GoingAway
+            Debug.Print("Lost Focus")
+            '        'GoingAway
             AAA
         End If
     End Sub
 
-    Private Sub UserForm_Error(ByVal Number As Integer, ByVal Description As MSForms.ReturnString, ByVal SCode As Long, ByVal Source As String, ByVal HelpFile As String, ByVal HelpContext As Long, ByVal CancelDisplay As MSForms.ReturnBoolean)
 
-    End Sub
-
-    Private Sub UserForm_Initialize()
-        Dim lngPreviousHeight As Long
-        Dim lngHeightDifference As Long
-        Dim items As [Items]
-        Dim objItem As Object
-        Dim oMail As MailItem
-        Dim colTemp As Collection
-        Dim intSort() As Integer
-        Dim i As Integer
-        Dim j As Integer
-        Dim objPropertyNew As [UserProperty]
-        Dim objPropertyExisting As [UserProperty]
-
-
-
-
-        blSuppressEvents = True                                     'Suppress events until the form is initialized
-        InitType = InitSort
-        folderCurrent = Application.ActiveExplorer.CurrentFolder
-        lngPanelMain_SC_Top = 0
-
-        Height_UserForm_Min = Me.Height + frmHt + frmSp
-        Height_PanelMain_Min = frmHt + frmSp
-
-        lngHeightDifference = Height_UserForm_Min - Me.Height
-
-        'CommandButton1.top = CommandButton1.top + lngHeightDifference
-        Button_OK.Top = Button_OK.Top + lngHeightDifference
-        BUTTON_CANCEL.Top = BUTTON_CANCEL.Top + lngHeightDifference
-        Button_Undo.Top = Button_Undo.Top + lngHeightDifference
-        lngAcceleratorDialogueTop = AcceleratorDialogue.Top + lngHeightDifference
-        AcceleratorDialogue.Top = lngAcceleratorDialogueTop
-        spn_EmailPerLoad.Top = spn_EmailPerLoad.Top + lngHeightDifference
-        lngTop_spn_Min = spn_EmailPerLoad.Top
-        lngAcceleratorDialogueLeft = AcceleratorDialogue.Left
-        lbl_EmailPerLoad.Top = lbl_EmailPerLoad.Top + lngHeightDifference
-        lngTop_lbl_EmailPerLoad_Min = lbl_EmailPerLoad.Top
-        lng_lbl_EmailPerLoad_left = lbl_EmailPerLoad.Left
-
-
-        lngTop_OK_BUTTON_Min = Button_OK.Top
-        lngTop_CANCEL_BUTTON_Min = BUTTON_CANCEL.Top
-        lngTop_UNDO_BUTTON_Min = Button_Undo.Top
-        'lngTop_CommandButton1_Min = CommandButton1.top
-        lngTop_AcceleratorDialogue_Min = AcceleratorDialogue.Top
-
-        'MsgBox "App Width " & Me.Width & vbCrLf & "Screen Width " & ScreenWidth * PointsPerPixel
-
-        Height_UserForm_Max = ScreenHeight * PointsPerPixel * 0.85
-
-        lngPreviousHeight = Me.Height
-        Me.Height = Height_UserForm_Max
-        lngHeightDifference = Me.Height - lngPreviousHeight
-
-        'CommandButton1.top = CommandButton1.top + lngHeightDifference
-        Button_OK.Top = Button_OK.Top + lngHeightDifference
-        BUTTON_CANCEL.Top = BUTTON_CANCEL.Top + lngHeightDifference
-        Button_Undo.Top = Button_Undo.Top + lngHeightDifference
-        lngAcceleratorDialogueTop = AcceleratorDialogue.Top + lngHeightDifference
-        AcceleratorDialogue.Top = lngAcceleratorDialogueTop
-        lngAcceleratorDialogueLeft = AcceleratorDialogue.Left
-        spn_EmailPerLoad.Top = spn_EmailPerLoad.Top + lngHeightDifference
-        lbl_EmailPerLoad.Top = lbl_EmailPerLoad.Top + lngHeightDifference
-
-        Height_PanelMain_Max = _viewer.PanelMain.Height + lngHeightDifference
-        _viewer.PanelMain.Height = Height_PanelMain_Max
-        _viewer.PanelMain.ScrollHeight = Height_PanelMain_Max
-        _viewer.PanelMain.ZOrder 0
-
-    'CommandButton1.TabStop = False
-        Button_OK.TabStop = False
-        BUTTON_CANCEL.TabStop = False
-        Button_Undo.TabStop = False
-        _viewer.PanelMain.TabStop = False
-        AcceleratorDialogue.TabStop = True
-        spn_EmailPerLoad.TabStop = False
-
-
-        'Lets find the UserForm Handle the function below retrieves the handle
-        'to the top-level window whose class name ("ThunderDFrame" for Excel)
-        'and window name (me.caption or UserformName caption) match the specified strings.
-        lFormHandle = FindWindow("ThunderDFrame", Me.Caption)
-        'OlApp_hWnd = FindWindow(olAppCLSN, vbNullString) 'Grabs handle on everything including vba
-        'Dim OlApp_hWnd2 As LongPtr
-        'OlApp_hWnd2 = GetAncestor(lFormHandle, GA_ROOTOWNER)
-        OlApp_hWnd = GetAncestor(lFormHandle, GA_PARENT)
-
-
-        'Debug.Print "lFormHandle " & lFormHandle
-        'Debug.Print "OlApp_hWnd " & OlApp_hWnd
-        'Debug.Print "OlApp_hWnd2 " & OlApp_hWnd2
-        'Stop
-        'The GetWindowLong function retrieves information about the specified window.
-        'The function also retrieves the 32-bit (long) value at the specified offset
-        'into the extra window memory of a window.
-        lStyle = GetWindowLong(lFormHandle, GWL_STYLE)
-        'lStyle is the New window style so lets set it up with the following
-        'lStyle = lStyle Or WS_SYSMENU 'SystemMenu
-        lStyle = lStyle Or WS_THICKFRAME 'Resizeable
-        lStyle = lStyle Or WS_MINIMIZEBOX 'With MinimizeBox
-        lStyle = lStyle Or WS_MAXIMIZEBOX 'and MaximizeBox
-
-        'Now lets set up our New window the SetWindowLong function changes
-        'the attributes of the specified window , given as lFormHandle,
-        'GWL_STYLE = New windows style, and our Newly defined style = lStyle
-        SetWindowLong lFormHandle, GWL_STYLE, lStyle
-
-    'Remove >'&LT; if you want to show form Maximised
-        'ShowWindow lFormHandle, SW_SHOWMAXIMIZED 'Shows Form Maximized
-
-        'The DrawMenuBar function redraws the menu bar of the specified window.
-        'We need this as we have changed the menu bar after Windows has created it.
-        'All we need is the Handle.
-        DrawMenuBar lFormHandle
-    'blShowAsConversations
-        blShowAsConversations = AreConversationsGrouped
-
-        'If blShowAsConversations Then
-        '    'ToggleShowAsConversation -1
-        '    ExplConvView_ToggleOff
-        '    DoEvents
-        'End If
-
-        'Initialize Folder Suggestions and calculate emails per page
-
-        Folder_Suggestions_Reload
-        blSuppressEvents = False
-        ShowWindow lFormHandle, SW_SHOWMAXIMIZED
-    blSuppressEvents = True
-        intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
-        intEmailPosition = 0    'Reverse sort is 0   'Regular sort is 1
-        'intEmailsPerIteration = CInt(Round((Height_PanelMain_Max / (frmHt + frmSp)), 0))
-        intEmailsPerIteration = CInt(Round(PanelMain.Height / (frmHt + frmSp), 0))
-        spn_EmailPerLoad.Value = intEmailsPerIteration
-        lbl_EmailPerLoad.Caption = intEmailsPerIteration
-
-        '***********************************************************************************
-        '************New code to listen for window lost focus*******************************
-        '    ' Set our event extender
-        '    focusListener = New FormFocusListener
-        '    'subclass the userform to catch WM_NCACTIVATE msgs
-        '    #If VBA7 Then
-        '        Dim lhWnd As LongPtr
-        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
-        '        lPrevWnd = SetWindowLongPtr(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
-        '    #Else
-        '        Dim lhWnd As Long
-        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
-        '        lPrevWnd = SetWindowLong(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
-        '    #End If
-        '**********************End listen code**********************************************
-        '***********************************************************************************
-
-        'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
-        EnableWindow OlApp_hWnd, Modal                                   'Make Window Modal
-        EnableWindow lFormHandle, Modeless
-    blSuppressEvents = False                                        'End suppression of events
-
-
-
-
-
-
-    End Sub
 
 
 
@@ -2389,7 +2309,7 @@ End Sub
             BUTTON_CANCEL.Left = Button_OK.Left + CANCEL_left - OK_left
             Button_Undo.Top = lngTop_UNDO_BUTTON_Min + intDiffy
             Button_Undo.Left = Button_OK.Left + UNDO_left - OK_left
-            'CommandButton1.top = lngTop_CommandButton1_Min + intDiffy
+            'Button1.top = lngTop_Button1_Min + intDiffy
             AcceleratorDialogue.Top = lngTop_AcceleratorDialogue_Min + intDiffy
             spn_EmailPerLoad.Top = lngTop_spn_Min + intDiffy
             spn_EmailPerLoad.Left = spn_left + intDiffx
@@ -2402,14 +2322,12 @@ End Sub
                     If QF.blConChild Then
                         QF.frm.Left = frmLt * 2
                         QF.frm.Width = Width_frm + intDiffx - frmLt
-                        QF.ResizeCtrls intDiffx - frmLt
-            Else
+                        QF.ResizeCtrls(intDiffx - frmLt)
+                    Else
                         QF.frm.Width = Width_frm + intDiffx
-                        QF.ResizeCtrls intDiffx
-            End If
+                        QF.ResizeCtrls(intDiffx)
+                    End If
                 Next i
-
-                QF = Nothing
             End If
 
         End If 'blSupressEvents
@@ -2417,24 +2335,20 @@ End Sub
     End Sub
 
 
-    Private Sub UserForm_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        If Not blSuppressEvents Then KeyPressHandler KeyAscii
-End Sub
+    Private Sub UserForm_KeyPress(sender As Object, e As KeyPressEventArgs)
+        If Not blSuppressEvents Then KeyPressHandler(KeyAscii)
+    End Sub
 
-    Private Sub UserForm_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        If Not blSuppressEvents Then KeyUpHandler KeyCode, Shift
-End Sub
+    Private Sub UserForm_KeyUp(sender As Object, e As KeyEventArgs)
+        If Not blSuppressEvents Then KeyUpHandler(KeyCode, Shift)
+    End Sub
 
-    Private Sub UserForm_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        Dim DebugLVL As DebugLevelEnum
-        DebugLVL = vbProcedure
-
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired UserForm_KeyDown"
-        If Not blSuppressEvents Then KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub UserForm_KeyDown(sender As Object, e As KeyEventArgs)
+        If Not blSuppressEvents Then KeyDownHandler(KeyCode, Shift)
+    End Sub
 
 
-    Public Sub KeyPressHandler(ByVal KeyAscii As MSForms.ReturnInteger)
+    Public Sub KeyPressHandler(sender As Object, e As KeyPressEventArgs)
         If Not blSuppressEvents Then
             Select Case KeyAscii
                 Case vbKeyReturn
@@ -2451,7 +2365,7 @@ End Sub
         End If
     End Sub
 
-    Public Sub KeyUpHandler(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Public Sub KeyUpHandler(sender As Object, e As KeyEventArgs)
         If Not blSuppressEvents Then
             Select Case KeyCode
                 Case 18
@@ -2459,10 +2373,10 @@ End Sub
                         AcceleratorDialogue.SetFocus
                         AcceleratorDialogue.SelStart = AcceleratorDialogue.TextLength
                     Else
-                        _viewer.PanelMain.Focus()
+                        Dim unused = _viewer.PanelMain.Focus()
                     End If
-                    SendKeys "{ESC}"
-        Case vbKeyUp
+                    SendKeys("{ESC}")
+                Case vbKeyUp
                     If AcceleratorDialogue.Visible Then AcceleratorDialogue.SetFocus
                 Case vbKeyDown
                     If AcceleratorDialogue.Visible Then AcceleratorDialogue.SetFocus
@@ -2471,18 +2385,7 @@ End Sub
         End If
     End Sub
 
-    Public Sub KeyDownHandler(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-
-
-        Dim strTemp As String
-        Dim DebugLVL As DebugLevelEnum
-        DebugLVL = vbProcedure + vbCommand
-
-
-
-
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired KeyDownHandler " & KeyCode
-
+    Public Sub KeyDownHandler(sender As Object, e As KeyEventArgs)
 
         If Not blSuppressEvents Then
 
@@ -2501,7 +2404,7 @@ End Sub
                     Else
 
 
-                        _viewer.PanelMain.Focus()
+                        Dim unused = _viewer.PanelMain.Focus()
                     End If
                 Case Else
 
@@ -2509,8 +2412,8 @@ End Sub
                     If AcceleratorDialogue.Visible Then
 
 
-                        AcceleratorDialogue_KeyDown KeyCode, Shift
-            Else
+                        AcceleratorDialogue_KeyDown(KeyCode, Shift)
+                    Else
 
                     End If
             End Select
@@ -2534,12 +2437,11 @@ End Sub
                 StopWatch.Pause()
             End If
         End If
-        EnableWindow OlApp_hWnd, Modeless
-    'EnableWindow lFormHandle, Modeless
-        ShowWindow lFormHandle, SW_FORCEMINIMIZE
-    ShowWindow lFormHandle, SW_FORCEMINIMIZE
-
-End Sub
+        Dim unused2 = EnableWindow(OlApp_hWnd, Modeless)
+        'EnableWindow lFormHandle, Modeless
+        Dim unused1 = ShowWindow(lFormHandle, SW_FORCEMINIMIZE)
+        Dim unused = ShowWindow(lFormHandle, SW_FORCEMINIMIZE)
+    End Sub
 
     Public Sub QFD_Maximize()
 
@@ -2549,10 +2451,10 @@ End Sub
         'and window name (me.caption or UserformName caption) match the specified strings.
         lFormHandle = FindWindow("ThunderDFrame", Me.Caption)
 
-        ShowWindow lFormHandle, SW_SHOWMAXIMIZED
-'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
-        EnableWindow OlApp_hWnd, Modal
-    'EnableWindow lFormHandle, Modeless
+        Dim unused1 = ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
+        'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
+        Dim unused = EnableWindow(OlApp_hWnd, Modal)
+        'EnableWindow lFormHandle, Modeless
 
 
     End Sub
@@ -2574,10 +2476,6 @@ End Sub
     End Sub
 
     Public Sub ExplConvView_ToggleOff()
-
-        Dim strTemp As String
-
-
         If _olApp.ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
             blShowInConversations = True
             objView = ActiveExplorer.CurrentView
@@ -2585,7 +2483,7 @@ End Sub
             If objView.Name = "tmpNoConversation" Then
                 If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
 
-                    objView.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare
+                    objView.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare)
                     objView.Save()
                     objView.Apply()
                 End If
@@ -2616,10 +2514,10 @@ End Sub
 
 
             If blSuppressEvents Then
-                _olApp.DoEvents()
+                Dim unused1 = _olApp.DoEvents()
             Else
                 blSuppressEvents = True
-                _olApp.DoEvents()
+                Dim unused = _olApp.DoEvents()
                 blSuppressEvents = False
             End If
 
@@ -2655,15 +2553,6 @@ End Sub
 
 
     Private Sub QuickFileMetrics_WRITE(filename As String, Optional FileWriteType As Integer = 8)
-        Dim tmpDebugLevel As DebugLevelEnum
-
-        Dim SubNm As String
-        SubNm = "QuickFileDyn.QuickFileMetrics_WRITE"
-        'tmpDebugLevel = DebugLevel
-
-
-
-
 
         Dim objFSO As Object       ' Computer's file system object.
         Dim objShell As Object       ' Windows Shell application object.
@@ -2764,7 +2653,7 @@ End Sub
             'If DebugLVL And vbCommand Then Debug.Print SubNm & " dataline = " & dataLine
             strOutput(k) = dataLine
             '        a.WriteLine (dataLine)
-            On Error GoTo ErrorHandler
+
             'Add to Email Calendar
 
 
@@ -2773,8 +2662,8 @@ End Sub
 
         Next k
 
-        Write_TextFile filename, strOutput, FileSystem_MyD
-'    a.Close
+        Write_TextFile(filename, strOutput, FileSystem_MyD)
+        '    a.Close
 
 
 

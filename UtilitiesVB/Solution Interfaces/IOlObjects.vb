@@ -8,4 +8,6 @@ Public Interface IOlObjects
     ReadOnly Property OlEmailRoot As Folder
     ReadOnly Property OlReminders As Reminders
     ReadOnly Property ToDoFolder As Folder
+    Property ShowInConversations As Boolean
+    Property MovedMails_Stack As cStackObject
 End Interface

@@ -81,13 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="cFolderHandler.vb" />
-    <Compile Include="cStopWatch.vb" />
-    <Compile Include="cSuggestions.vb" />
+    <Compile Include="cInfoMail.vb" />
     <Compile Include="FormFocusListener.vb" />
     <Compile Include="Enums.vb" />
     <Compile Include="ModuleMailItemsSort.vb" />
     <Compile Include="QfcController.vb" />
-    <Compile Include="QfcInterface.vb" />
     <Compile Include="QuickFileViewer.Designer.vb">
       <DependentUpon>QuickFileViewer.vb</DependentUpon>
     </Compile>

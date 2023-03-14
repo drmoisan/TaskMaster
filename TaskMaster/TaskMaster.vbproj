@@ -213,9 +213,12 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
-    <Compile Include="aRefactored\ApplicationGlobals.vb" />
-    <Compile Include="aRefactored\FlagTasks.vb" />
-    <Compile Include="aRefactored\ToDoObj.vb" />
+    <Compile Include="AppGlobals\AppFileSystemFolderPaths.vb" />
+    <Compile Include="AppGlobals\ApplicationGlobals.vb" />
+    <Compile Include="AppGlobals\AppOlObjects.vb" />
+    <Compile Include="AppGlobals\AppToDoObjects.vb" />
+    <Compile Include="FlagTasks.vb" />
+    <Compile Include="ToDoObj.vb" />
     <Compile Include="Ribbon\RibbonController.vb" />
     <Compile Include="Ribbon\RibbonViewer.vb">
       <XmlRibbon>true</XmlRibbon>

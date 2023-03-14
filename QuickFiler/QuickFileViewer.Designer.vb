@@ -28,8 +28,8 @@ Partial Class QuickFileViewer
         Me.BUTTON_CANCEL = New System.Windows.Forms.Button()
         Me.Button_Undo = New System.Windows.Forms.Button()
         Me.spn_EmailPerLoad = New System.Windows.Forms.NumericUpDown()
+        Me.AcceleratorDialogue = New System.Windows.Forms.TextBox()
         Me.PanelMain = New System.Windows.Forms.Panel()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.TableLayoutL1.SuspendLayout()
         Me.TableLayoutL2B.SuspendLayout()
         CType(Me.spn_EmailPerLoad, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -64,13 +64,13 @@ Partial Class QuickFileViewer
         Me.TableLayoutL2B.Controls.Add(Me.BUTTON_CANCEL, 3, 0)
         Me.TableLayoutL2B.Controls.Add(Me.Button_Undo, 4, 0)
         Me.TableLayoutL2B.Controls.Add(Me.spn_EmailPerLoad, 5, 0)
-        Me.TableLayoutL2B.Controls.Add(Me.TextBox1, 0, 0)
+        Me.TableLayoutL2B.Controls.Add(Me.AcceleratorDialogue, 0, 0)
         Me.TableLayoutL2B.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutL2B.Location = New System.Drawing.Point(3, 108)
         Me.TableLayoutL2B.Name = "TableLayoutL2B"
         Me.TableLayoutL2B.RowCount = 1
         Me.TableLayoutL2B.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutL2B.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutL2B.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
         Me.TableLayoutL2B.Size = New System.Drawing.Size(913, 50)
         Me.TableLayoutL2B.TabIndex = 0
         '
@@ -116,6 +116,16 @@ Partial Class QuickFileViewer
         Me.spn_EmailPerLoad.Size = New System.Drawing.Size(66, 41)
         Me.spn_EmailPerLoad.TabIndex = 3
         '
+        'AcceleratorDialogue
+        '
+        Me.AcceleratorDialogue.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.AcceleratorDialogue.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AcceleratorDialogue.Location = New System.Drawing.Point(7, 3)
+        Me.AcceleratorDialogue.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
+        Me.AcceleratorDialogue.Name = "AcceleratorDialogue"
+        Me.AcceleratorDialogue.Size = New System.Drawing.Size(142, 40)
+        Me.AcceleratorDialogue.TabIndex = 4
+        '
         'PanelMain
         '
         Me.PanelMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
@@ -124,16 +134,6 @@ Partial Class QuickFileViewer
         Me.PanelMain.Name = "PanelMain"
         Me.PanelMain.Size = New System.Drawing.Size(913, 99)
         Me.PanelMain.TabIndex = 1
-        '
-        'TextBox1
-        '
-        Me.TextBox1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TextBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBox1.Location = New System.Drawing.Point(7, 3)
-        Me.TextBox1.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(142, 40)
-        Me.TextBox1.TabIndex = 4
         '
         'QuickFileViewer
         '
@@ -158,5 +158,5 @@ Partial Class QuickFileViewer
     Friend WithEvents Button_Undo As Windows.Forms.Button
     Friend WithEvents spn_EmailPerLoad As Windows.Forms.NumericUpDown
     Friend WithEvents PanelMain As Windows.Forms.Panel
-    Friend WithEvents TextBox1 As Windows.Forms.TextBox
+    Friend WithEvents AcceleratorDialogue As Windows.Forms.TextBox
 End Class

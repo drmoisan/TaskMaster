@@ -110,6 +110,12 @@
     <Compile Include="Common Functions\GetFields.vb" />
     <Compile Include="Dimension Libraries\ID\BaseChanger.vb" />
     <Compile Include="Dimension Libraries\ID\ListOfIDs.vb" />
+    <Compile Include="Email Utilities\Conversation_To_Folder.vb" />
+    <Compile Include="Email Utilities\cStopWatch.vb" />
+    <Compile Include="Email Utilities\cSuggestions.vb" />
+    <Compile Include="Email Utilities\CTFIncidenceModule.vb" />
+    <Compile Include="Email Utilities\CTF_Incidence.vb" />
+    <Compile Include="Email Utilities\FolderSuggestionsModule.vb" />
     <Compile Include="Outlook Todo Utilities\ToDoEvents.vb" />
     <Compile Include="TreeOfToDoItems.vb" />
     <Compile Include="FlagParser.vb" />

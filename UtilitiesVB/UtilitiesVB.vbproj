@@ -75,9 +75,11 @@
   <ItemGroup>
     <Compile Include="Base Functionality Extensions\MergeSortImplementations.vb" />
     <Compile Include="Common Outlook Functions\CreateCategory.vb" />
+    <Compile Include="To Depricate\cStackObject.vb" />
     <Compile Include="Solution Interfaces\IToDoObj.vb" />
     <Compile Include="To Depricate\CSVDictUtilities.vb" />
     <Compile Include="To Depricate\CsvSerializer.vb" />
+    <Compile Include="To Depricate\FileIO2.vb" />
     <Compile Include="Windows Forms\DeclaratonsWinAPI.vb" />
     <Compile Include="Common Outlook Functions\ExplorerActions.vb" />
     <Compile Include="Base Functionality Extensions\ExtToChar.vb" />

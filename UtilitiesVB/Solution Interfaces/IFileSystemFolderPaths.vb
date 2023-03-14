@@ -5,5 +5,6 @@
     ReadOnly Property FldrPreReads As String
     ReadOnly Property FldrRoot As String
     ReadOnly Property FldrStaging As String
+    ReadOnly Property FldrPythonStaging As String
     Sub Reload()
 End Interface
