@@ -38,8 +38,8 @@ Module ModuleMailItemsSort
         StrTriageOpts(3) = "C"
 
         colTemp = New Collection
-        'OlFolder = ActiveExplorer.CurrentFolder
-        'objCurView = ActiveExplorer.CurrentView
+        'OlFolder = _activeExplorer.CurrentFolder
+        'objCurView = _activeExplorer.CurrentView
         'strFilter = objCurView.Filter
         'If strFilter <> "" Then
         '    strFilter = "@SQL=" & strFilter

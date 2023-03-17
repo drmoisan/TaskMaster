@@ -44,5 +44,47 @@
     <Setting Name="FileName_DictRemap" Type="System.String" Scope="User">
       <Value Profile="(Default)">dictRemap.csv</Value>
     </Setting>
+    <Setting Name="ConversationExponent" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="ConversationWeight" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="SubjectExponent" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="SmithWatterman_GapPenalty" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="SmithWatterman_MatchScore" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="SmithWatterman_MismatchScore" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MaxRecents" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="FileName_Recents" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999RecentsFile.json</Value>
+    </Setting>
+    <Setting Name="File_CTF_Inc" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Inc.json</Value>
+    </Setting>
+    <Setting Name="File_CTF_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Map.json</Value>
+    </Setting>
+    <Setting Name="File_Subject_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999Subject_Map.json</Value>
+    </Setting>
+    <Setting Name="File_Common_Words" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CommonWords.json</Value>
+    </Setting>
+    <Setting Name="File_ConditionalReminders" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999ConditionalReminders.json</Value>
+    </Setting>
+    <Setting Name="FileName_CategoryFilters" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999CategoryFilters.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

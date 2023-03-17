@@ -12,6 +12,7 @@ Public Class AppFileSystemFolderPaths
     Private _flow As String
     Private _prereads As String
     Private _remap As String
+    Private _fldrPythonStaging As String
 
     Public Sub New()
         LoadFolders()
@@ -43,6 +44,7 @@ Public Class AppFileSystemFolderPaths
         CreateMissingPaths(_prereads)
 
         _remap = Path.Combine(_stagingPath, "dictRemap.csv")
+        _fldrPythonStaging = Path.Combine(_flow, "Combined", "data")
     End Sub
 
     Public ReadOnly Property FldrAppData As String Implements IFileSystemFolderPaths.FldrAppData
@@ -81,5 +83,12 @@ Public Class AppFileSystemFolderPaths
         End Get
     End Property
 
-
+    Public Property FldrPythonStaging As String Implements IFileSystemFolderPaths.FldrPythonStaging
+        Get
+            Return _fldrPythonStaging
+        End Get
+        Set(value As String)
+            _fldrPythonStaging = value
+        End Set
+    End Property
 End Class

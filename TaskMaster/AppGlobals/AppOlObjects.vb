@@ -1,10 +1,12 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB
+Imports System.IO
 
 Public Class AppOlObjects
     Implements IOlObjects
 
     Private _olEmailRootPath As String
+    Private _olArchiveRootPath As String
     Private _movedMails_Stack As cStackObject
 
     Public Sub New(OlApp As Application)
@@ -47,6 +49,15 @@ Public Class AppOlObjects
         Get
             If _olEmailRootPath Is Nothing Then
                 _olEmailRootPath = OlEmailRoot.FolderPath
+            End If
+            Return _olEmailRootPath
+        End Get
+    End Property
+
+    Public ReadOnly Property ArchiveRootPath As String Implements IOlObjects.ArchiveRootPath
+        Get
+            If _olArchiveRootPath Is Nothing Then
+                _olArchiveRootPath = Path.Combine(OlEmailRoot.FolderPath, "Archive")
             End If
             Return _olEmailRootPath
         End Get

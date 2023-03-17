@@ -185,6 +185,90 @@ Namespace My
                 Me("MaxFolders_ConvID") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999CTF_Inc.txt")>  _
+        Public Property File_CTF_Inc() As String
+            Get
+                Return CType(Me("File_CTF_Inc"),String)
+            End Get
+            Set
+                Me("File_CTF_Inc") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999CTF_Map.txt")>  _
+        Public Property File_CTF_Map() As String
+            Get
+                Return CType(Me("File_CTF_Map"),String)
+            End Get
+            Set
+                Me("File_CTF_Map") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999Subject_Map.txt")>  _
+        Public Property File_Subject_Map() As String
+            Get
+                Return CType(Me("File_Subject_Map"),String)
+            End Get
+            Set
+                Me("File_Subject_Map") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999CommonWords.txt")>  _
+        Public Property File_Common_Words() As String
+            Get
+                Return CType(Me("File_Common_Words"),String)
+            End Get
+            Set
+                Me("File_Common_Words") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("999999ConditionalReminders.txt")>  _
+        Public Property File_ConditionalReminders() As String
+            Get
+                Return CType(Me("File_ConditionalReminders"),String)
+            End Get
+            Set
+                Me("File_ConditionalReminders") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("3")>  _
+        Public Property MaxFolders_Subject() As Integer
+            Get
+                Return CType(Me("MaxFolders_Subject"),Integer)
+            End Get
+            Set
+                Me("MaxFolders_Subject") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("5")>  _
+        Public Property MaxSuggestions() As Integer
+            Get
+                Return CType(Me("MaxSuggestions"),Integer)
+            End Get
+            Set
+                Me("MaxSuggestions") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

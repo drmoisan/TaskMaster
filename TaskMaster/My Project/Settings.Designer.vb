@@ -209,6 +209,174 @@ Namespace My
                 Me("FileName_DictRemap") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("3")>  _
+        Public Property ConversationExponent() As Long
+            Get
+                Return CType(Me("ConversationExponent"),Long)
+            End Get
+            Set
+                Me("ConversationExponent") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("10000")>  _
+        Public Property ConversationWeight() As String
+            Get
+                Return CType(Me("ConversationWeight"),String)
+            End Get
+            Set
+                Me("ConversationWeight") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property SubjectExponent() As String
+            Get
+                Return CType(Me("SubjectExponent"),String)
+            End Get
+            Set
+                Me("SubjectExponent") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("-1")>  _
+        Public Property SmithWatterman_GapPenalty() As String
+            Get
+                Return CType(Me("SmithWatterman_GapPenalty"),String)
+            End Get
+            Set
+                Me("SmithWatterman_GapPenalty") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property SmithWatterman_MatchScore() As String
+            Get
+                Return CType(Me("SmithWatterman_MatchScore"),String)
+            End Get
+            Set
+                Me("SmithWatterman_MatchScore") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public Property SmithWatterman_MismatchScore() As String
+            Get
+                Return CType(Me("SmithWatterman_MismatchScore"),String)
+            End Get
+            Set
+                Me("SmithWatterman_MismatchScore") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("5")>  _
+        Public Property MaxRecents() As Long
+            Get
+                Return CType(Me("MaxRecents"),Long)
+            End Get
+            Set
+                Me("MaxRecents") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999RecentsFile.json")>  _
+        Public Property FileName_Recents() As String
+            Get
+                Return CType(Me("FileName_Recents"),String)
+            End Get
+            Set
+                Me("FileName_Recents") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999CTF_Inc.json")>  _
+        Public Property File_CTF_Inc() As String
+            Get
+                Return CType(Me("File_CTF_Inc"),String)
+            End Get
+            Set
+                Me("File_CTF_Inc") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999CTF_Map.json")>  _
+        Public Property File_CTF_Map() As String
+            Get
+                Return CType(Me("File_CTF_Map"),String)
+            End Get
+            Set
+                Me("File_CTF_Map") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999Subject_Map.json")>  _
+        Public Property File_Subject_Map() As String
+            Get
+                Return CType(Me("File_Subject_Map"),String)
+            End Get
+            Set
+                Me("File_Subject_Map") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999CommonWords.json")>  _
+        Public Property File_Common_Words() As String
+            Get
+                Return CType(Me("File_Common_Words"),String)
+            End Get
+            Set
+                Me("File_Common_Words") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("999999ConditionalReminders.json")>  _
+        Public Property File_ConditionalReminders() As String
+            Get
+                Return CType(Me("File_ConditionalReminders"),String)
+            End Get
+            Set
+                Me("File_ConditionalReminders") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("999999CategoryFilters.json")>  _
+        Public Property FileName_CategoryFilters() As String
+            Get
+                Return CType(Me("FileName_CategoryFilters"),String)
+            End Get
+            Set
+                Me("FileName_CategoryFilters") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

@@ -2,6 +2,7 @@
 Imports System.IO
 Imports ToDoModel
 Imports UtilitiesVB
+Imports UtilitiesCS
 
 Public Class AppToDoObjects
     Implements IToDoObjects
@@ -11,7 +12,7 @@ Public Class AppToDoObjects
     Private _IDList As ListOfIDs
     Private ReadOnly _parent As ApplicationGlobals
     Private _dictRemap As Dictionary(Of String, String)
-
+    Private _catFilters As SerializableList(Of String)
 
     Public Sub New(ParentInstance As ApplicationGlobals)
         _parent = ParentInstance
@@ -90,6 +91,27 @@ Public Class AppToDoObjects
                 _dictRemap = LoadDictCSV(Parent.FS.FldrStaging, My.Settings.FileName_DictRemap)
             End If
             Return _dictRemap
+        End Get
+    End Property
+
+    Public ReadOnly Property CategoryFilters As ISerializableList(Of String) Implements IToDoObjects.CategoryFilters
+        Get
+            If _catFilters Is Nothing Then
+                Dim _catFilters = New SerializableList(Of String)
+                With _catFilters
+                    .Filename = My.Settings.FileName_CategoryFilters
+                    .Folderpath = Parent.FS.FldrAppData
+                    If File.Exists(.Folderpath) Then
+                        .Deserialize()
+                    Else
+                        Dim tempList = New SerializableList(Of String)(CCOCatList_Load())
+                        tempList.Folderpath = .Folderpath
+                        _catFilters = tempList
+                        .Serialize()
+                    End If
+                End With
+            End If
+            Return _catFilters
         End Get
     End Property
 

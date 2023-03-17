@@ -1,5 +1,10 @@
-﻿Imports System.Windows.Forms
+﻿Imports System.Drawing
+Imports System.Windows.Forms
 Imports Microsoft.Office.Interop.Outlook
+Imports Microsoft.Office.Interop
+Imports ToDoModel
+Imports UtilitiesVB
+Imports TaskVisualization
 
 
 Public Class QfcController
@@ -19,29 +24,30 @@ Public Class QfcController
     Private WithEvents cbTmp As Button
     Public WithEvents frm As Panel
     Public Mail As MailItem
-    Private fldrOriginal As MAPIFolder
+    Private fldrOriginal As Folder
     Public intMyPosition As Integer
     Private fldrTarget As Folder
     Private lblTmp As Label
     Public lblConvCt As Label            'Count of Conversation Members
     Private lblMyPosition As Label            'ACCELERATOR Email Position
-    Private suggestions As Email_AutoCategorize.suggestions
+    Private _suggestions = New cSuggestions()
+    'Private _suggestions As Email_AutoCategorize._suggestions
     Private strFolders() As String
     Private colCtrls As Collection
     Private selItems_InClass As Collection
     Private blAccel_FocusToggle As Boolean
     Private intEnterCounter As Integer
     Private intComboRightCtr As Integer
-    Private Structure ctrlPosition
-        Private blInOrigPos As Boolean
-        Private topOriginal As Long
-        Private topNew As Long
-        Private leftOriginal As Long
-        Private leftNew As Long
-        Private heightOriginal As Long
-        Private heightNew As Long
-        Private widthOriginal As Long
-        Private widthNew As Long
+    Public Structure ctrlPosition
+        Public blInOrigPos As Boolean
+        Public topOriginal As Long
+        Public topNew As Long
+        Public leftOriginal As Long
+        Public leftNew As Long
+        Public heightOriginal As Long
+        Public heightNew As Long
+        Public widthOriginal As Long
+        Public widthNew As Long
     End Structure
 
     Private chbxSaveAttach As CheckBox
@@ -132,160 +138,147 @@ Public Class QfcController
     Private pos_lblAcA As ctrlPosition                     'A Accelerator X% Left Position
     Private pos_lblAcW As ctrlPosition                     'W Accelerator X% Left Position
     Private pos_lblAcM As ctrlPosition                     'M Accelerator X% Left Position
+    Private opt As Windows.Forms.RadioButton
+    Private spn As Windows.Forms.NumericUpDown
+
+
     Private fldrHandler As cFolderHandler
-    Private hWndCaller As LongPtr
+    Private hWndCaller As IntPtr
 
     Private p_BoolRemoteMouseApp As Boolean
     Private conv As cConversation
 
+    Private _globals As IApplicationGlobals
+    Private _activeExplorer As Outlook.Explorer
 
-    Friend Sub InitCtrls(m_mail As mailItem,
+    Public Sub New(m_mail As MailItem,
         col As Collection,
         intPositionArg As Integer,
         BoolRemoteMouseApp As Boolean,
         Caller As Object,
-        Optional hwnd As LongPtr,
-        Optional InitTypeE As InitTypeEnum = InitSort)
+        AppGlobals As IApplicationGlobals,
+        Optional hwnd As IntPtr = Nothing,
+        Optional InitTypeE As InitTypeEnum = InitTypeEnum.InitSort)
 
         'Procedure Naming
-        Dim SubNm As String
-        SubNm = "InitCtrls"
 
-        '************Standard Error Handling Header**************
-        On Error GoTo ErrorHandler
+        _globals = AppGlobals
+        _activeExplorer = AppGlobals.Ol.App.ActiveExplorer
 
-        Dim errcapt As Variant
-        Dim errRaised As Boolean
-        Dim ttrace As String
-        Dim Temp As Variant
-        Dim DebugLVL As DebugLevelEnum
-
-        DebugLVL = vbCommand
-
-        ErrorHandlingCode.ErrHandler_Init SubNm, ttrace, DebugLVL
-
-'*******************END Error Header*********************
-
-        Dim ctlTmp As MSForms.control
-        Dim i As Integer
+        Dim ctlTmp As Windows.Forms.Control
         Dim strBodyText As String
-        Dim Sel As Collection
 
         InitType = InitTypeE
-    Set oParent = Caller
-    intMyPosition = intPositionArg        'call back position in collection
-    Set Mail = m_mail
-    Set fldrOriginal = Mail.Parent
-    hWndCaller = hwnd
-    Set colCtrls = col
-    For Each ctlTmp In col
+        oParent = Caller
+        intMyPosition = intPositionArg        'call back position in collection
+        Mail = m_mail
+        fldrOriginal = Mail.Parent
+        hWndCaller = hwnd
+        colCtrls = col
+        For Each ctlTmp In col
             Select Case TypeName(ctlTmp)
                 Case "Frame"
-                Set frm = ctlTmp
-            Case "CheckBox"
-                    Select Case ctlTmp.Caption
+                    frm = ctlTmp
+                Case "CheckBox"
+                    Select Case ctlTmp.Text
                         Case "  Conversation"
-                        Set chk = ctlTmp
-                    Case " Attach"
-                        Set chbxSaveAttach = ctlTmp
-                    Case " Flow"
-                        Set chbxDelFlow = ctlTmp
-                    Case " Mail"
-                        Set chbxSaveMail = ctlTmp
-                End Select
+                            chk = ctlTmp
+                        Case " Attach"
+                            chbxSaveAttach = ctlTmp
+                        Case " Flow"
+                            chbxDelFlow = ctlTmp
+                        Case " Mail"
+                            chbxSaveMail = ctlTmp
+                    End Select
                 Case "ComboBox"
-                Set cbo = ctlTmp
-            Case "ListBox"
-                Set lst = ctlTmp
-            Case "OptionButton"
-                Set opt = ctlTmp
-            Case "SpinButton"
-                Set spn = ctlTmp
-            Case "TextBox"
-                Set txt = ctlTmp
-            Case "Label"
-                Set lblTmp = ctlTmp
-                Select Case lblTmp.Caption
+                    cbo = ctlTmp
+                Case "ListBox"
+                    lst = ctlTmp
+                Case "OptionButton"
+                    opt = ctlTmp
+                Case "SpinButton"
+                    spn = ctlTmp
+                Case "TextBox"
+                    txt = ctlTmp
+                Case "Label"
+                    lblTmp = ctlTmp
+                    Select Case lblTmp.Text
                         Case "From:"
-                        Set lbl1 = lblTmp
-                    Case "Subject:"
-                        Set lbl2 = lblTmp
-                    Case "Body:"
-                        Set lbl3 = lblTmp
-                    Case "Sent On:"
-                        Set lbl4 = lblTmp
-                    Case "Folder:"
-                        Set lbl5 = lblTmp
-                    Case "<SENDER>"
-                            If Mail.Sent = True Then
-                                lblTmp.Caption = Mail.Sender
-                            Else
-                                lblTmp.Caption = "Draft Message"
-                            End If
-                        Set lblSender = lblTmp
-                    Case "<SUBJECT>"
-                            lblTmp.Caption = Mail.Subject
-                        Set lblSubject = lblTmp
-                    Case "ABC"
-                            lblTmp.Caption = CustomFieldID_GetValue(Mail, "Triage")
-                        Set lblTriage = lblTmp
-                    Case "<ACTIONABL>"
-                            lblTmp.Caption = CustomFieldID_GetValue(Mail, "Actionable")
-                        Set lblActionable = lblTmp
-                    Case "<#>"
-                        Set lblConvCt = lblTmp
-                    Case "<Pos#>"
-                        Set lblMyPosition = lblTmp
-                    Case "<BODY>"
+                            lbl1 = lblTmp
+                        Case "Subject:"
+                            lbl2 = lblTmp
+                        Case "Body:"
+                            lbl3 = lblTmp
+                        Case "Sent On:"
+                            lbl4 = lblTmp
+                        Case "Folder:"
+                            lbl5 = lblTmp
+                        Case "<SENDER>"
+                            lblTmp.Text = If(Mail.Sent = True, DirectCast(Mail.Sender.ToString(), String), "Draft Message")
+                            lblSender = lblTmp
+                        Case "<SUBJECT>"
+                            lblTmp.Text = Mail.Subject
+                            lblSubject = lblTmp
+                        Case "ABC"
+                            lblTmp.Text = CustomFieldID_GetValue(Mail, "Triage")
+                            lblTriage = lblTmp
+                        Case "<ACTIONABL>"
+                            lblTmp.Text = CustomFieldID_GetValue(Mail, "Actionable")
+                            lblActionable = lblTmp
+                        Case "<#>"
+                            lblConvCt = lblTmp
+                        Case "<Pos#>"
+                            lblMyPosition = lblTmp
+                        Case "<BODY>"
                             strBodyText = Replace(Mail.Body, vbCrLf, " ")
                             strBodyText = Replace(strBodyText, "  ", " ")
                             strBodyText = Replace(strBodyText, "  ", " ") & "<EOM>"
-                            lblTmp.Caption = strBodyText
-                        Set bdy = lblTmp
-                        Set lblBody = lblTmp
-                    Case "<SENTON>"
-                            lblTmp.Caption = Format(Mail.SentOn, "MM/DD/YY HH:MM")
-                        Set lblSentOn = lblTmp
-                    Case "F"
-                        Set lblAcF = lblTmp
-                        
-                    Case "D"
-                        Set lblAcD = lblTmp
-                    Case "C"
-                        Set lblAcC = lblTmp
-                    Case "X"
-                        Set lblAcX = lblTmp
-                    Case "R"
-                        Set lblAcR = lblTmp
-                    Case "T"
-                        Set lblAcT = lblTmp
-                    Case "O"
-                        Set lblAcO = lblTmp
-                    Case "A"
-                        Set lblAcA = lblTmp
-                    Case "W"
-                        Set lblAcW = lblTmp
-                    Case "M"
-                        Set lblAcM = lblTmp
-                End Select
+                            lblTmp.Text = strBodyText
+                            bdy = lblTmp
+                            lblBody = lblTmp
+                        Case "<SENTON>"
+                            lblTmp.Text = Format(Mail.SentOn, "MM/DD/YY HH:MM")
+                            lblSentOn = lblTmp
+                        Case "F"
+                            lblAcF = lblTmp
+
+                        Case "D"
+                            lblAcD = lblTmp
+                        Case "C"
+                            lblAcC = lblTmp
+                        Case "X"
+                            lblAcX = lblTmp
+                        Case "R"
+                            lblAcR = lblTmp
+                        Case "T"
+                            lblAcT = lblTmp
+                        Case "O"
+                            lblAcO = lblTmp
+                        Case "A"
+                            lblAcA = lblTmp
+                        Case "W"
+                            lblAcW = lblTmp
+                        Case "M"
+                            lblAcM = lblTmp
+                    End Select
                 Case "CommandButton"
-                Set cbTmp = ctlTmp
-                If cbTmp.Caption = "X" Then
-                    Set cbDel = ctlTmp
-                ElseIf cbTmp.Caption = "-->" Then
-                    Set cbKll = ctlTmp
-                ElseIf cbTmp.Caption = "|>" Then
-                    Set cbFlag = ctlTmp
-                End If
+                    cbTmp = ctlTmp
+                    If cbTmp.Text = "X" Then
+                        cbDel = ctlTmp
+                    ElseIf cbTmp.Text = "-->" Then
+                        cbKll = ctlTmp
+                    ElseIf cbTmp.Text = "|>" Then
+                        cbFlag = ctlTmp
+                    End If
             End Select
 
         Next ctlTmp
 
         If Mail.UnRead = True Then
-            lblSubject.ForeColor = &H800000
-            lblSubject.Font.Bold = True
-            lblSender.ForeColor = &H800000
-            lblSender.Font.Bold = True
+            lblSubject.ForeColor = Drawing.Color.Blue
+            lblSubject.Font = New Font(lblSubject.Font, FontStyle.Bold)
+            lblSender.ForeColor = Drawing.Color.Blue
+            lblSender.Font = New Font(lblSender.Font, FontStyle.Bold)
         End If
         lblSubject_Width = lblSubject.Width
         lblBody_Width = lblBody.Width
@@ -308,7 +301,7 @@ Public Class QfcController
 
 
 
-        If InitType And InitSort Then
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
             lbl5_Left = lbl5.Left
             lblAcF_Left = lblAcF.Left
             lblAcD_Left = lblAcD.Left
@@ -333,34 +326,7 @@ Public Class QfcController
 
         If BoolRemoteMouseApp Then ToggleRemoteMouseAppLabels()
 
-        '************Standard Error Handling Footer**************
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-        If DebugLVL And vbCommand Then TraceStack.Push SubNm & "Finished subroutine"
-    Exit Sub
 
-ErrorHandler:
-        SF_Stack.Push "ErrorHandler: " & SubNm
-    TraceStack.Push SF_Stack.GetString(True)
-    TraceStack.Push "Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source
-
-    ErrHandler_Execute SubNm, ttrace, errcapt, errRaised, DebugLVL
-
-    errcapt = MsgBox("Error in " & SubNm & ": " & Err.Number & " -> " & Err.Description & " ->" & Err.Source, vbOKOnly + vbCritical)
-
-        errcapt = MsgBox("What should happen next?", vbAbortRetryIgnore + vbExclamation)
-        If errcapt = vbAbort Then
-            End
-            'Resume PROC_EXIT
-        ElseIf errcapt = vbRetry Then
-            reactivateAfterDebug
-            Err.Clear()
-            Stop
-            Resume
-        ElseIf errcapt = vbIgnore Then
-            Err.Clear()
-            Resume Next
-        End If
 
 
     End Sub
@@ -369,90 +335,74 @@ ErrorHandler:
         p_BoolRemoteMouseApp = Not p_BoolRemoteMouseApp
         If p_BoolRemoteMouseApp Then
 
-            lblAcX.Caption = "^-"       'ACCELERATOR X for Delete email
-            lblAcX.Width = lblAcX.Width * 2
-            lblAcR.Caption = "F3"       'ACCELERATOR R for remove item from list
-            lblAcT.Caption = "F2"       'ACCELERATOR T for Task ... Flag item and make it a task
-            lblAcO.Caption = "^0"       'ACCELERATOR O for Open Email
-            lblAcO.Width = lblAcO.Width * 2
-            lblAcM.Width = lblAcM.Width * 2
-            If InitType And InitSort Then
-                lblAcF.Caption = "F1"   'ACCELERATOR F for Folder Search
-                lblAcD.Caption = "F4"   'ACCELERATOR D for Folder Dropdown
-                lblAcC.Caption = "F7"   'ACCELERATOR C for Grouping Conversations
-                lblAcA.Caption = "F8"   'ACCELERATOR A for Save Attachments
-                lblAcW.Caption = "F9"   'ACCELERATOR W for Delete Flow
-                lblAcM.Caption = "^="   'ACCELERATOR M for Save Mail
+            lblAcX.Text = "^-"       'ACCELERATOR X for Delete email
+            lblAcX.Width *= 2
+            lblAcR.Text = "F3"       'ACCELERATOR R for remove item from list
+            lblAcT.Text = "F2"       'ACCELERATOR T for Task ... Flag item and make it a task
+            lblAcO.Text = "^0"       'ACCELERATOR O for Open Email
+            lblAcO.Width *= 2
+            lblAcM.Width *= 2
+            If InitType.HasFlag(InitTypeEnum.InitSort) Then
+                lblAcF.Text = "F1"   'ACCELERATOR F for Folder Search
+                lblAcD.Text = "F4"   'ACCELERATOR D for Folder Dropdown
+                lblAcC.Text = "F7"   'ACCELERATOR C for Grouping Conversations
+                lblAcA.Text = "F8"   'ACCELERATOR A for Save Attachments
+                lblAcW.Text = "F9"   'ACCELERATOR W for Delete Flow
+                lblAcM.Text = "^="   'ACCELERATOR M for Save Mail
             End If
         Else
-            lblAcX.Caption = "X"        'ACCELERATOR X for Delete email
-            lblAcX.Width = lblAcX.Width / 2
-            lblAcR.Caption = "R"        'ACCELERATOR R for remove item from list
-            lblAcT.Caption = "T"        'ACCELERATOR T for Task ... Flag item and make it a task
-            lblAcO.Caption = "O"        'ACCELERATOR O for Open Email
-            lblAcO.Width = lblAcO.Width / 2
-            lblAcM.Width = lblAcM.Width / 2
-            If InitType And InitSort Then
-                lblAcF.Caption = "F"   'ACCELERATOR F for Folder Search
-                lblAcD.Caption = "D"   'ACCELERATOR D for Folder Dropdown
-                lblAcC.Caption = "C"   'ACCELERATOR C for Grouping Conversations
-                lblAcA.Caption = "A"   'ACCELERATOR A for Save Attachments
-                lblAcW.Caption = "W"   'ACCELERATOR W for Delete Flow
-                lblAcM.Caption = "M"   'ACCELERATOR M for Save Mail
+            lblAcX.Text = "X"        'ACCELERATOR X for Delete email
+            lblAcX.Width /= 2
+            lblAcR.Text = "R"        'ACCELERATOR R for remove item from list
+            lblAcT.Text = "T"        'ACCELERATOR T for Task ... Flag item and make it a task
+            lblAcO.Text = "O"        'ACCELERATOR O for Open Email
+            lblAcO.Width /= 2
+            lblAcM.Width /= 2
+            If InitType.HasFlag(InitTypeEnum.InitSort) Then
+                lblAcF.Text = "F"   'ACCELERATOR F for Folder Search
+                lblAcD.Text = "D"   'ACCELERATOR D for Folder Dropdown
+                lblAcC.Text = "C"   'ACCELERATOR C for Grouping Conversations
+                lblAcA.Text = "A"   'ACCELERATOR A for Save Attachments
+                lblAcW.Text = "W"   'ACCELERATOR W for Delete Flow
+                lblAcM.Text = "M"   'ACCELERATOR M for Save Mail
             End If
         End If
     End Sub
 
-    Friend Sub Init_FolderSuggestions(Optional varList As Variant)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "Init_FolderSuggestions"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
-
+    Friend Sub Init_FolderSuggestions(Optional varList As Object = Nothing)
 
         Dim i As Integer
         Dim objProperty As UserProperty
 
         If Not IsArray(varList) Then
-		Set objProperty = Mail.UserProperties.find("FolderKey")
-		If Not objProperty Is Nothing Then varList = objProperty.Value
+            objProperty = Mail.UserProperties.Find("FolderKey")
+            If objProperty IsNot Nothing Then varList = objProperty.Value
         End If
-        If IsArray(varList) And IsArrayAllocated(varList) Then
-            ReDim strFolders(UBound(varList)) As String
-			'For i = LBound(varList) To UBound(varList)
-			'    strFolders(i) = varList(i)
-			'Next i
-			'strFolders = varList
-			'cbo.List = strFolders
-			cbo.List = varList
-            cbo.Value = cbo.List(0)
+        If IsArray(varList) Then
+            If varList.IsAllocated() Then
+
+                'For i = LBound(varList) To UBound(varList)
+                cbo.Items.AddRange(varList)
+                'Next i
+            End If
+
+
         Else
+            'TODO: cSuggestions and cFolderHandler are to mixed up with functionality. Need to clean up.
+            _suggestions = Folder_Suggestions(Mail, _globals, False)
 
-            suggestions = Email_AutoCategorize.Folder_Suggestions2(Mail, False)
-
-            If suggestions.Count > 0 Then
-                ReDim Preserve strFolders(suggestions.Count)
-                For i = 1 To suggestions.Count
-                    strFolders(i) = suggestions.FolderList(i)
+            If _suggestions.Count > 0 Then
+                ReDim Preserve strFolders(_suggestions.Count)
+                For i = 1 To _suggestions.Count
+                    strFolders(i) = _suggestions.FolderList(i)
                 Next i
-                cbo.List = strFolders
-                cbo.Value = cbo.List(1)
+                cbo.Items.AddRange(strFolders)
+                cbo.SelectedIndex = 1
             Else
-                Call Email_SortToExistingFolder.FindFolder("", True)
-                cbo.List = Email_SortToExistingFolder.FolderList
-                If cbo.ListCount >= 2 Then cbo.Value = cbo.List(2)
+                fldrHandler = New cFolderHandler(_globals)
+                cbo.Items.AddRange(fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=Mail))
+
+                If cbo.Items.Count >= 2 Then cbo.SelectedIndex = 2
             End If
 
         End If
@@ -467,100 +417,33 @@ ErrorHandler:
 
         'Call Email_SortToExistingFolder.FindFolder("", True, objItem:=mail)
 
-        Temp = SF_Stack.Pop
+
 
 
     End Sub
 
     Friend Sub CountMailsInConv(Optional ct As Integer = 0)
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "CountMailsInConv"
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
 
 
         'Dim Sel As Collection
 
         If ct <> 0 Then
-            lblConvCt.Caption = CStr(ct)
+            lblConvCt.Text = CStr(ct)
         Else
-        Set conv = New cConversation
-        Set conv.item = Mail
-        Set selItems_InClass = conv.ToCollection(True)
-        'Set Sel = New Collection
-        'Sel.Add Mail
-        'Set selItems_InClass = Email_SortToExistingFolder.DemoConversation(selItems_InClass, Sel)
-        lblConvCt.Caption = CStr(selItems_InClass.Count)
+            conv = New cConversation(_globals.Ol.App) With {.item = Mail}
+            selItems_InClass = conv.ToCollection(True)
+            'Set Sel = New Collection
+            'Sel.Add Mail
+            'Set selItems_InClass = Email_SortToExistingFolder.DemoConversation(selItems_InClass, Sel)
+            lblConvCt.Text = CStr(selItems_InClass.Count)
         End If
 
 
-        Temp = SF_Stack.Pop
-        'Debug.Print ""
+
     End Sub
 
-
-    'Property Set ctl(PassedControl As MSForms.Control)
-    'Set m_PassedControl = PassedControl
-    '
-    'Select Case TypeName(PassedControl)
-    'Case "CheckBox"
-    '    Set chk = PassedControl
-    'Case "ComboBox"
-    '    Set cbo = PassedControl
-    'Case "ListBox"
-    '    Set lst = PassedControl
-    'Case "OptionButton"
-    '    Set opt = PassedControl
-    'Case "SpinButton"
-    '    Set spn = PassedControl
-    'Case "TextBox"
-    '    Set txt = PassedControl
-    '
-    'End Select
-    'End Property
-    '
-    'Private Sub cbo_Change()
-    'PrintControlName
-    'End Sub
-    '
-    'Private Sub chk_Click()
-    'PrintControlName
-    'End Sub
-    '
-    'Private Sub lst_Change()
-    'PrintControlName
-    'End Sub
-    '
-    'Private Sub opt_Click()
-    'PrintControlName
-    'End Sub
-    '
-    'Private Sub spn_Change()
-    'PrintControlName
-    'End Sub
-    '
-    'Private Sub txt_Change()
-    'PrintControlName
-    'End Sub
-    '
-    'Sub PrintControlName()
-    'Debug.Print m_PassedControl.Name
-    'End Sub
-    '
-
-    Sub Accel_Toggle()
+    Public Sub Accel_Toggle()
         If lblMyPosition.Enabled = True Then
             If blAccel_FocusToggle Then
                 If blExpanded = True Then ExpandCtrls1()
@@ -569,128 +452,128 @@ ErrorHandler:
             lblMyPosition.Enabled = False
             lblMyPosition.Visible = False
         Else
-            lblMyPosition.Caption = intMyPosition
+            lblMyPosition.Text = intMyPosition
             lblMyPosition.Enabled = True
             lblMyPosition.Visible = True
         End If
     End Sub
 
-    Sub Accel_FocusToggle()
-        Dim ctlTmp As MSForms.control
+    Public Sub Accel_FocusToggle()
+        Dim ctlTmp As Windows.Forms.Control
 
         If blAccel_FocusToggle Then
             blAccel_FocusToggle = False
             For Each ctlTmp In colCtrls
                 Select Case TypeName(ctlTmp)
                     Case "Frame"
-                        ctlTmp.BackColor = &H8000000F
+                        ctlTmp.BackColor = Drawing.Color.Blue
                     Case "CheckBox"
-                        ctlTmp.BackColor = &H8000000F
+                        ctlTmp.BackColor = Drawing.Color.Blue
                     Case "Label"
-                        If Len(ctlTmp.Caption) <= 2 Then
+                        If Len(ctlTmp.Text) <= 2 Then
                             ctlTmp.Visible = False
                         Else
-                            ctlTmp.BackColor = &H8000000F
+                            ctlTmp.BackColor = Drawing.Color.Blue
                         End If
                     Case "TextBox"
-                        ctlTmp.BackColor = &H8000000F
+                        ctlTmp.BackColor = Drawing.Color.Blue
                 End Select
             Next ctlTmp
-            If InitType And InitSort Then
+            If InitType.HasFlag(InitTypeEnum.InitSort) Then
                 lblConvCt.Visible = True
-                lblConvCt.BackColor = &H8000000F
+                lblConvCt.BackColor = Drawing.Color.Blue
                 lblTriage.Visible = True
-                lblTriage.BackColor = &H8000000F
+                lblTriage.BackColor = Drawing.Color.Blue
             End If
             lblMyPosition.Visible = True
-            lblMyPosition.BackColor = &H8000000D
+            lblMyPosition.BackColor = Drawing.Color.LightBlue
 
         Else
             blAccel_FocusToggle = True
             For Each ctlTmp In colCtrls
                 Select Case TypeName(ctlTmp)
                     Case "Frame"
-                        ctlTmp.BackColor = &HFFFFC0
+                        ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
                     Case "CheckBox"
-                        ctlTmp.BackColor = &HFFFFC0
+                        ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
                     Case "Label"
-                        If Len(ctlTmp.Caption) <= 2 Then
+                        If Len(ctlTmp.Text) <= 2 Then
                             ctlTmp.Visible = True
                         Else
-                            ctlTmp.BackColor = &HFFFFC0
+                            ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
                         End If
                     Case "TextBox"
-                        ctlTmp.BackColor = &HFFFFC0
+                        ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
                 End Select
             Next ctlTmp
-            If InitType And InitSort Then
-                lblConvCt.BackColor = &HFFFFC0
-                lblTriage.BackColor = &HFFFFC0
+            If InitType.HasFlag(InitTypeEnum.InitSort) Then
+                lblConvCt.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
+                lblTriage.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
             End If
-            lblMyPosition.BackColor = &H8000&
-            'Modal        With ActiveExplorer
+            lblMyPosition.BackColor = Drawing.Color.FromArgb(&H8000&)
+            'Modal        With _activeExplorer
             'Modal            .ClearSelection
             'Modal            If .IsItemSelectableInView(mail) Then .AddToSelection mail
             'Modal            'DoEvents
             'Modal        End With
         End If
     End Sub
-    Sub Mail_Activate()
+
+    Public Sub Mail_Activate()
         Dim objModule As Outlook.MailModule
 
         On Error Resume Next
-        With ActiveExplorer
+        With _activeExplorer
 
 
-            If .CurrentFolder.DefaultItemType <> olMailItem Then
-                Set .NavigationPane.CurrentModule = .NavigationPane.Modules.GetNavigationModule(olModuleMail)
+            If .CurrentFolder.DefaultItemType <> OlItemType.olMailItem Then
+                .NavigationPane.CurrentModule = .NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail)
             End If
             If .CurrentView <> "tmpNoConversation" Then
                 .CurrentView = "tmpNoConversation"
             End If
             .ClearSelection
-            If .IsItemSelectableInView(Mail) Then .AddToSelection Mail
+            If .IsItemSelectableInView(Mail) Then .AddToSelection(Mail)
             'DoEvents
         End With
         If Err.Number <> 0 Then
-            MsgBox("Error in QF.Mail_Activate: " & Err.Description)
-            Deactivate_Email_Timing_And_Velocity
+            Dim unused = MsgBox("Error in QF.Mail_Activate: " & Err.Description)
+            'Deactivate_Email_Timing_And_Velocity
             Stop
             Err.Clear()
         End If
     End Sub
-    Sub KB(AccelCode As String)
-        Dim f As Outlook.MAPIFolder
 
+    Public Sub KB(AccelCode As String)
         Select Case AccelCode
             Case "O"
 
-                lblSubject.ForeColor = &H80000012
-                lblSubject.Font.Bold = False
-                lblSender.ForeColor = &H80000012
-                lblSender.Font.Bold = False
-                If InitType And InitSort Then
+                lblSubject.ForeColor = Drawing.Color.FromArgb(&H80000012)
+                lblSender.ForeColor = Drawing.Color.FromArgb(&H80000012)
+                lblSubject.Font = New Font(lblSubject.Font, FontStyle.Regular)
+                lblSender.Font = New Font(lblSender.Font, FontStyle.Regular)
+                If InitType.HasFlag(InitTypeEnum.InitSort) Then
                     Mail_Activate()       'For modal code
                 Else
-                    Mail.Display
+                    Mail.Display()
                 End If
             'oParent.QFD_Minimize
             'Email_SortToExistingFolder.MailsSelect Email_SortToExistingFolder.MailToCollection(Mail)
 
             Case "C"
-                If InitType And InitSort Then chk.Value = Not chk.Value
+                If InitType.HasFlag(InitTypeEnum.InitSort) Then chk.Checked = Not chk.Checked
             Case "A"
-                If InitType And InitSort Then chbxSaveAttach.Value = Not chbxSaveAttach.Value
+                If InitType.HasFlag(InitTypeEnum.InitSort) Then chbxSaveAttach.Checked = Not chbxSaveAttach.Checked
             Case "W"
-                If InitType And InitSort Then chbxDelFlow.Value = Not chbxDelFlow.Value
+                If InitType.HasFlag(InitTypeEnum.InitSort) Then chbxDelFlow.Checked = Not chbxDelFlow.Checked
             Case "M"
-                If InitType And InitSort Then chbxSaveMail.Value = Not chbxSaveMail.Value
+                If InitType.HasFlag(InitTypeEnum.InitSort) Then chbxSaveMail.Checked = Not chbxSaveMail.Checked
             Case "T"
                 cbFlag_Click()
             Case "F"
-                If InitType And InitSort Then txt.SetFocus
+                If InitType.HasFlag(InitTypeEnum.InitSort) Then txt.Focus()
             Case "D"
-                If InitType And InitSort Then cbo.SetFocus
+                If InitType.HasFlag(InitTypeEnum.InitSort) Then cbo.Focus()
             Case "X"
                 cbDel_Click()
             Case "R"
@@ -698,10 +581,7 @@ ErrorHandler:
         End Select
     End Sub
 
-    Sub ResizeCtrls(intPxChg As Integer)
-        Dim ctlTmp As MSForms.control
-        Dim i As Integer
-        Dim strBodyText As String
+    Public Sub ResizeCtrls(intPxChg As Integer)
         Dim X1pct As Double
         Dim X2pct As Double
         Dim X3pct As Double
@@ -714,12 +594,12 @@ ErrorHandler:
         X3pct = X1pct / 2
         X2pct = 1 - X1pct
 
-        X1pct = X1pct * intPxChg
-        X2pct = X2pct * intPxChg
-        X3pct = X3pct * intPxChg
-        X1px = Round(X1pct, 0)
-        X2px = Round(X2pct, 0)
-        X3px = Round(X3pct, 0)
+        X1pct *= intPxChg
+        X2pct *= intPxChg
+        X3pct *= intPxChg
+        X1px = Math.Round(X1pct, 0)
+        X2px = Math.Round(X2pct, 0)
+        X3px = Math.Round(X3pct, 0)
 
         lblSubject.Width = lblSubject_Width + X1px                      'Subject Width X%
         cbFlag.Left = cbFlag_Left + X1px + X2px                         'Task button X% + Y% left position
@@ -733,7 +613,7 @@ ErrorHandler:
         lblTriage.Left = lblTriage_Left + X3px                          'Triage left position + X3px
 
 
-        If InitType And InitSort Then
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
             txt.Left = txt_Left + X1px                                  'Folder search box X% left position Y% Width
             txt.Width = txt_Width + X2px                                'Folder search box X% left position Y% Width
             lbl5.Left = lbl5_Left + X1px                                'Folder label X% left position
@@ -777,14 +657,14 @@ ErrorHandler:
 
     End Sub
 
-    Sub ExpandCtrls1()
+    Public Sub ExpandCtrls1()
 
         Dim lngShift As Long
         'Private pos_lblAcC          As ctrlPosition
         'Private pos_lblAcD          As ctrlPosition
         'Private pos_lblAcO          As ctrlPosition
 
-        If InitType And InitSort Then
+        If InitType.HasFlag(InitTypeEnum.InitSort) Then
             If blExpanded = False Then
                 blExpanded = True
                 frm.Height = frm.Height * 2
@@ -815,7 +695,7 @@ ErrorHandler:
                     lblBody.Top = .topNew
 
                     pos_lblAcO.topOriginal = lblAcO.Top
-                    lblAcO.Top = lblAcO.Top + lngShift
+                    lblAcO.Top += lngShift
 
                     .heightOriginal = lblBody.Height
                     .heightNew = frm.Height - .topNew - 5
@@ -825,7 +705,7 @@ ErrorHandler:
                     lblBody.Width = .widthNew
                 End With
 
-                chk.Caption = ""
+                chk.Text = ""
                 pos_chk.leftOriginal = chk.Left
                 chk.Left = lblConvCt.Left - 10
                 pos_lblAcC.leftOriginal = lblAcC.Left
@@ -880,7 +760,7 @@ ErrorHandler:
                 lblBody.Width = pos_body.widthOriginal
                 lblAcO.Top = pos_lblAcO.topOriginal
 
-                chk.Caption = "  Conversation"
+                chk.Text = "  Conversation"
                 chk.Left = pos_chk.leftOriginal
                 chk.Top = pos_chk.topOriginal
                 chk.Width = pos_chk.widthOriginal
@@ -922,31 +802,16 @@ ErrorHandler:
 
     End Sub
 
-    Sub MoveMail()
-
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "MoveMail"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
+    Public Sub MoveMail()
 
 
 
-        Dim selItems As Collection
+
+
+        Dim selItems = New Collection()
         Dim loc As String
         Dim myFolder As Outlook.Folder
-        Dim MSG As mailItem
+        Dim MSG As MailItem
         Dim Sel As Collection
         Dim Attchments As Boolean
         Dim blRepullConv As Boolean
@@ -954,12 +819,12 @@ ErrorHandler:
 
         blRepullConv = False
 
-        If Not Mail Is Nothing Then
-            If chk.Value = True Then
-                If Not selItems_InClass Is Nothing Then
-                    If selItems_InClass.Count = CInt(lblConvCt.Caption) And selItems_InClass.Count <> 0 Then
-                    Set selItems = selItems_InClass
-                Else
+        If Mail IsNot Nothing Then
+            If chk.Checked = True Then
+                If selItems_InClass IsNot Nothing Then
+                    If selItems_InClass.Count = CInt(lblConvCt.Text) And selItems_InClass.Count <> 0 Then
+                        selItems = selItems_InClass
+                    Else
                         blRepullConv = True
                     End If
                 Else
@@ -967,283 +832,229 @@ ErrorHandler:
                 End If
 
                 If blRepullConv Then
-                'Set selItems = New Collection
-                'Set Sel = New Collection
-                'Sel.Add Mail
-                'Set selItems = Email_SortToExistingFolder.DemoConversation(selItems, Sel)
-                
-                Set conv = New cConversation
-                Set conv.item = Mail
-                Set selItems = conv.ToCollection(True)
-            End If
-            Else
-            Set selItems = New Collection
-            selItems.Add Mail
-        End If
+                    'Set selItems = New Collection
+                    'Set Sel = New Collection
+                    'Sel.Add Mail
+                    'Set selItems = Email_SortToExistingFolder.DemoConversation(selItems, Sel)
 
-            If cbo.Value = "Trash to Delete" Then
-                Attchments = False
+                    conv = New cConversation(_globals.Ol.App) With {.item = Mail}
+                    selItems = conv.ToCollection(True)
+                End If
             Else
-                Attchments = chbxSaveAttach.Value
+                selItems = New Collection From {
+                    Mail
+                }
             End If
+
+            Attchments = If(cbo.SelectedItem = "Trash to Delete", False, chbxSaveAttach.Checked)
 
             blDoMove = True
             On Error Resume Next
-            If fldrOriginal <> Mail.Parent Then blDoMove = False
+            If fldrOriginal IsNot Mail.Parent Then blDoMove = False
             If Err.Number <> 0 Then
                 Err.Clear()
                 blDoMove = False
             End If
 
             If blDoMove Then
-                Email_SortToExistingFolder.Load_CTF_AND_Subjects_AND_Recents
-                Email_SortToExistingFolder.MASTER_SortEmailsToExistingFolder selItems:=selItems,
+                Load_CTF_AND_Subjects_AND_Recents()
+                MASTER_SortEmailsToExistingFolder(selItems:=selItems,
                     Pictures_Checkbox:=False,
-                    SortFolder:=cbo.Value,
-                    Save_MSG:=chbxSaveMail.Value,
+                    SortFolder:=cbo.SelectedItem,
+                    Save_MSG:=chbxSaveMail.Checked,
                     Attchments:=Attchments,
-                    Remove_Flow_File:=chbxDelFlow.Value
-            Email_SortToExistingFolder.Cleanup_Files
+                    Remove_Flow_File:=chbxDelFlow.Checked,
+                    OlArchiveRootPath:=_globals.Ol.ArchiveRootPath)
+                Cleanup_Files()
             End If 'blDoMove
 
-
-
         End If
-
-        On Error Resume Next
-        Temp = SF_Stack.Pop
-
 
     End Sub
 
     Public Sub ctrlsRemove()
 
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "ctrlsRemove"
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
 
         Do While colCtrls.Count > 1
-            frm.controls.Remove colCtrls.Item(colCtrls.Count).Name
-        colCtrls.Remove colCtrls.Count
-    Loop
+            frm.Controls.Remove(colCtrls.Item(colCtrls.Count).Name)
+            colCtrls.Remove(colCtrls.Count)
+        Loop
 
-    Set fldrHandler = Nothing
-    Temp = SF_Stack.Pop
+        fldrHandler = Nothing
+
     End Sub
 
     Public Sub kill()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "kill"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
 
 
-'*******************END Error Header*********************
-    
-    
-    Set m_PassedControl = Nothing
-    Set chk = Nothing
-    Set cbo = Nothing
-    Set lst = Nothing
-    Set opt = Nothing
-    Set spn = Nothing
-    Set txt = Nothing
-    Set frm = Nothing
-    Set cbKll = Nothing
-    Set Mail = Nothing
-    Set fldrTarget = Nothing
-    Set lblTmp = Nothing
-    'Set suggestions = Nothing
-    'Set strFolders = Nothing
-    Set colCtrls = Nothing
-    Set fldrHandler = Nothing
 
-    Temp = SF_Stack.Pop
+        m_PassedControl = Nothing
+        chk = Nothing
+        cbo = Nothing
+        lst = Nothing
+        opt = Nothing
+        spn = Nothing
+        txt = Nothing
+        frm = Nothing
+        cbKll = Nothing
+        Mail = Nothing
+        fldrTarget = Nothing
+        lblTmp = Nothing
+        'Set _suggestions = Nothing
+        'Set strFolders = Nothing
+        colCtrls = Nothing
+        fldrHandler = Nothing
+
+
 
     End Sub
 
     Private Sub bdy_Click()
-        lblSubject.ForeColor = &H80000012
-        lblSubject.Font.Bold = False
-        lblSender.ForeColor = &H80000012
-        lblSender.Font.Bold = False
-        Mail.Display
-        oParent.QFD_Minimize
-        If blShowAsConversations Then oParent.ExplConvView_ToggleOn
+        lblSubject.ForeColor = Drawing.Color.FromArgb(&H80000012)
+        lblSubject.Font = New Font(lblSubject.Font, FontStyle.Regular)
+        lblSender.ForeColor = Drawing.Color.FromArgb(&H80000012)
+        lblSender.Font = New Font(lblSender.Font, FontStyle.Regular)
+        Mail.Display()
+        Dim unused1 = oParent.QFD_Minimize
+        'TODO: Pass a handler to this class with a known interface
+        If oParent.blShowInConversations Then Dim unused = oParent.ExplConvView_ToggleOn
     End Sub
 
     Private Sub cbDel_Click()
-        cbo.Value = "Trash to Delete"
+        cbo.SelectedItem = "Trash to Delete"
     End Sub
 
 
-    Private Sub cbDel_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub cbDel_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub cbDel_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        KeyPressHandler_Class KeyAscii
-End Sub
+    Private Sub cbDel_KeyPress(sender As Object, e As KeyPressEventArgs)
+        KeyPressHandler_Class(sender, e)
+    End Sub
 
-    Private Sub cbDel_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub cbDel_KeyUp(sender As Object, e As KeyEventArgs)
         'Select Case KeyCode
         '    Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '    Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '    Case Else
         'End Select
     End Sub
 
     Private Sub cbFlag_Click()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "cbFlag_Click"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
-
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
-
-
-
 
         Dim Sel As Collection
-    
-    Set Sel = New Collection
-    Sel.Add Mail
-    Flag_Task Sel, False, hWndCaller:=hWndCaller
-    cbFlag.Caption = "!"
 
-        Temp = SF_Stack.Pop
+        Sel = New Collection From {
+            Mail
+        }
+        Dim flagTask = New TaskVisualization.FlagTasks(AppGlobals:=_globals,
+                                                       ItemCollection:=Sel,
+                                                       blFile:=False, hWndCaller:=hWndCaller)
+        flagTask.Run()
+        cbFlag.Text = "!"
+
     End Sub
 
-    Private Sub cbFlag_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub cbFlag_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub cbFlag_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        KeyPressHandler_Class KeyAscii
-End Sub
+    Private Sub cbFlag_KeyPress(sender As Object, e As KeyPressEventArgs)
+        KeyPressHandler_Class(sender, e)
+    End Sub
 
-    Private Sub cbFlag_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub cbFlag_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '        Case Else
+        oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
     Private Sub cbKll_Click()
-        oParent.RemoveSpecificControlGroup intMyPosition
-End Sub
+        Dim unused = oParent.RemoveSpecificControlGroup(intMyPosition)
+    End Sub
 
-    Private Sub cbKll_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub cbKll_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub cbKll_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        KeyPressHandler_Class KeyAscii
-End Sub
+    Private Sub cbKll_KeyPress(sender As Object, e As KeyPressEventArgs)
+        KeyPressHandler_Class(sender, e)
+    End Sub
 
-    Private Sub cbKll_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub cbKll_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '        Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
-    Private Sub cbo_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        Select Case KeyCode
-            Case vbKeyReturn
+    Private Sub cbo_KeyDown(sender As Object, e As KeyEventArgs)
+        Select Case e.KeyCode
+            Case Keys.Return
                 If intEnterCounter = 1 Then
                     intEnterCounter = 0
-                    oParent.KeyPressHandler KeyCode
-            Else
+                    oParent.KeyPressHandler(sender, e)
+                Else
                     intEnterCounter = 1
                     intComboRightCtr = 0
                 End If
             Case Else
-                oParent.KeyDownHandler KeyCode, Shift
-    End Select
+                oParent.KeyDownHandler(sender, e)
+        End Select
     End Sub
 
 
 
-    Private Sub cbo_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        Select Case KeyCode
-            Case 18
-                oParent.KeyUpHandler KeyCode, Shift
-        Case vbKeyEscape
+    Private Sub cbo_KeyUp(sender As Object, e As KeyEventArgs)
+        Select Case e.KeyCode
+            Case Keys.Alt
+                oParent.KeyUpHandler(sender, e)
+            Case Keys.Escape
                 intEnterCounter = 0
                 intComboRightCtr = 0
-            Case vbKeyRight
+            Case Keys.Right
                 intEnterCounter = 0
                 If intComboRightCtr = 0 Then
-                    cbo.DropDown
+                    cbo.DropDown()
                     intComboRightCtr = 1
                 ElseIf intComboRightCtr = 1 Then
 
-                    Email_SortToExistingFolder.InitializeSortToExisting InitType:="Sort",
+                    InitializeSortToExisting(InitType:="Sort",
                         QuickLoad:=False,
                         WholeConversation:=False,
                         strSeed:=cbo.Value,
-                        objItem:=Mail
-                cbKll_Click()
+                        objItem:=Mail)
+                    cbKll_Click()
                 Else
-                    MsgBox "Error in intComboRightCtr ... setting to 0 and continuing"
-                intComboRightCtr = 0
+                    Dim unused = MsgBox("Error in intComboRightCtr ... setting to 0 and continuing")
+                    intComboRightCtr = 0
                 End If
             Case vbKeyLeft
                 intEnterCounter = 0
                 intComboRightCtr = 0
-            Case vbKeyDown
+            Case Keys.Down
                 intEnterCounter = 0
-            Case vbKeyUp
+            Case Keys.Up
                 intEnterCounter = 0
         End Select
     End Sub
 
 
-    Private Sub cbTmp_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub cbTmp_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub cbTmp_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyUpHandler KeyCode, Shift
-End Sub
+    Private Sub cbTmp_KeyUp(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyUpHandler(sender, e)
+    End Sub
 
     Private Sub chk_Click()
         'Procedure Naming
@@ -1251,14 +1062,13 @@ End Sub
         SubNm = "chk_Click"
         Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
+        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
+        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
 
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
+        SF_Stack.Push(SubNm)
+        strSubs = SF_Stack.GetString(True)
+        TraceStack.Push(strSubs)
+        SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
 
 
         '*******************END Error Header*********************
@@ -1266,24 +1076,21 @@ End Sub
 
 
         Dim selItems As Collection
-        Dim Sel As Collection
         Dim objItem As Object
-        Dim objMail As Outlook.mailItem
+        Dim objMail As Outlook.MailItem
         Dim i As Integer
-        Dim strHashMail, strHashTest As String
-        Dim intIDX As Integer
         Dim varList As Variant
-    
-    'Create a collection with all of the mail items in the conversation in the current folder
-    Set selItems = New Collection
-    
-    If selItems_InClass Is Nothing Then CountMailsInConv()
+
+        'Create a collection with all of the mail items in the conversation in the current folder
+        selItems = New Collection
+
+        If selItems_InClass Is Nothing Then CountMailsInConv()
 
         For i = 1 To selItems_InClass.Count
-        Set objItem = selItems_InClass(i)
-        Set objMail = objItem
-        If objMail.EntryID <> Mail.EntryID Then selItems.Add objItem
-    Next i
+            objItem = selItems_InClass(i)
+            objMail = objItem
+            If objMail.EntryID <> Mail.EntryID Then selItems.Add(objItem)
+        Next i
 
 
         'Set sel = New Collection
@@ -1296,85 +1103,85 @@ End Sub
         '    If objMail.EntryID = mail.EntryID Then selItems.Remove i
         'Next i
 
-        If chk.Value = True Then
-            oParent.ConvToggle_Group selItems, intMyPosition
-        lblConvCt.Enabled = True
+        If chk.Checked = True Then
+            oParent.ConvToggle_Group(selItems, intMyPosition)
+            lblConvCt.Enabled = True
         Else
-            varList = cbo.List
-            oParent.ConvToggle_UnGroup selItems, intMyPosition, CInt(lblConvCt.Caption), varList
-        lblConvCt.Enabled = False
+            varList = cbo.Items
+            oParent.ConvToggle_UnGroup(selItems, intMyPosition, CInt(lblConvCt.Text), varList)
+            lblConvCt.Enabled = False
         End If
 
 
         Temp = SF_Stack.Pop
     End Sub
 
-    Private Sub chk_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub chk_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub chk_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub chk_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-'        Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
-    Private Sub frm_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub frm_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
     Private Sub frm_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        oParent.KeyPressHandler KeyAscii
-End Sub
+        Dim unused = oParent.KeyPressHandler(KeyAscii)
+    End Sub
 
-    Private Sub frm_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub frm_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '        Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
-    Private Sub lst_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub lst_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub lst_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub lst_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '        Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
-    Private Sub opt_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub opt_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub opt_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub opt_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '        Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
-    Private Sub spn_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
-        oParent.KeyDownHandler KeyCode, Shift
-End Sub
+    Private Sub spn_KeyDown(sender As Object, e As KeyEventArgs)
+        Dim unused = oParent.KeyDownHandler(sender, e)
+    End Sub
 
-    Private Sub spn_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub spn_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '        Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
@@ -1384,14 +1191,13 @@ End Sub
         SubNm = "chk_Click"
         Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then Set SF_Stack = New cStackGeneric
-    If TraceStack Is Nothing Then Set TraceStack = New cStackGeneric
-    
-    SF_Stack.Push SubNm
-    strSubs = SF_Stack.GetString(True)
-        TraceStack.Push strSubs
+        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
+        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
 
-    SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
+        SF_Stack.Push(SubNm)
+        strSubs = SF_Stack.GetString(True)
+        TraceStack.Push(strSubs)
+        SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
 
 
         '*******************END Error Header*********************
@@ -1406,37 +1212,37 @@ End Sub
     End Sub
 
 
-    Private Sub KeyPressHandler_Class(ByVal KeyAscii As MSForms.ReturnInteger)
+    Private Sub KeyPressHandler_Class(sender As Object, e As KeyPressEventArgs)
         Select Case KeyAscii
             Case vbKeyReturn
-                oParent.KeyPressHandler KeyAscii
-        Case vbKeyTab
-                oParent.KeyPressHandler KeyAscii
-        Case vbKeyEscape
-                oParent.KeyPressHandler KeyAscii
-    End Select
+                Dim unused2 = oParent.KeyPressHandler(KeyAscii)
+            Case vbKeyTab
+                Dim unused1 = oParent.KeyPressHandler(KeyAscii)
+            Case vbKeyEscape
+                Dim unused = oParent.KeyPressHandler(KeyAscii)
+        End Select
 
     End Sub
 
 
-    Private Sub txt_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub txt_KeyDown(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        oParent.KeyDownHandler KeyCode, Shift
-    '        Case Else
+        Dim unused = oParent.KeyDownHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 
     Private Sub txt_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        oParent.KeyPressHandler KeyAscii
-End Sub
+        Dim unused = oParent.KeyPressHandler(KeyAscii)
+    End Sub
 
-    Private Sub txt_KeyUp(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
+    Private Sub txt_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler KeyCode, Shift
-    '        Case Else
+        Dim unused = oParent.KeyUpHandler(sender, e)
+        '        Case Else
         '    End Select
     End Sub
 End Class

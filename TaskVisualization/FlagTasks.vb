@@ -7,7 +7,7 @@ Imports TaskVisualization
 Public Class FlagTasks
 
     Private ReadOnly _todoSelection As List(Of ToDoItem)
-    Private ReadOnly _olExplorer As Explorer = Globals.ThisAddIn.Application.ActiveExplorer()
+    Private ReadOnly _olExplorer As Explorer
     Private WithEvents _viewer As TaskViewer
     Private ReadOnly _controller As TaskController
     Private ReadOnly _defaultsToDo As ToDoDefaults
@@ -23,6 +23,7 @@ Public Class FlagTasks
                    Optional strNameOfFunctionCalling As String = "")
 
         _globals = AppGlobals
+        _olExplorer = AppGlobals.Ol.App.ActiveExplorer
         _todoSelection = InitializeToDoList(ItemCollection)
         _flagsToSet = GetFlagsToSet(_todoSelection.Count)
         _viewer = New TaskViewer()
@@ -93,10 +94,7 @@ Public Class FlagTasks
 
         Public ReadOnly Property FilterList As List(Of String) Implements IAutoAssign.FilterList
             Get
-                If Globals.ThisAddIn.CCOCatList Is Nothing Then
-                    Globals.ThisAddIn.CCOCatList = CCOCatList_Load()
-                End If
-                Return Globals.ThisAddIn.CCOCatList
+                Return _globals.TD.CategoryFilters.ToList()
             End Get
         End Property
 

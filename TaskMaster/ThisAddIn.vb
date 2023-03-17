@@ -13,7 +13,7 @@ Public Class ThisAddIn
 
     Private _globals As ApplicationGlobals
 
-    Public CCOCatList As List(Of String)
+    Public CatFilterList As List(Of String)
     Private WithEvents OlToDoItems As Outlook.Items
     Private WithEvents ListOfPSTtodo As New List(Of Outlook.Items)
     Private WithEvents ListToDoItems As New List(Of Outlook.Items)
@@ -21,11 +21,9 @@ Public Class ThisAddIn
     Private WithEvents OlReminders As Outlook.Reminders
     Private OlNS As Outlook.NameSpace
 
-
     Private _ribbonController As RibbonController
 
     Private ReadOnly _filenameProjectList As String
-
     Private ReadOnly _filenameProjInfo2 As String
     Private ReadOnly _filenameProjInfo As String = "ProjInfo.bin"
     Public ReadOnly FilenameDictPpl As String = "pplkey.xml"

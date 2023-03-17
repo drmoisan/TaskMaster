@@ -1,4 +1,7 @@
-﻿Public Module CTFIncidenceModule
+﻿Imports System.IO
+Imports UtilitiesVB
+
+Public Module CTFIncidenceModule
     Public CTF_Inc() As CTF_Incidence
     Public CTF_Inc_Ct As Integer = 0
 
@@ -46,7 +49,7 @@
 
 
 
-    Private Function CTF_Incidence_FIND(ConvID As String) As Integer
+    Public Function CTF_Incidence_FIND(ConvID As String) As Integer
         Dim i As Integer
 
         CTF_Incidence_FIND = 0
@@ -83,69 +86,65 @@
     '****This Subroutine Writes to the File System the conversation id's with the Folders that have the most emails from the conversation in them********
     '****************************************************************************************************************************************************
 
-    Public Sub CTF_Incidence_Text_File_WRITE()
-        Dim LOC_TXT_FILE As String
-        Dim a
+    Public Sub CTF_Incidence_Text_File_WRITE(FolderPaths As IFileSystemFolderPaths)
+
+        Dim listOutput As New List(Of String)
+        listOutput.Add("This file contains a mapping of folders to email conversations based on incidence")
+
         Dim i, j As Integer
-
-
-
-        Dim objShell = CreateObject("Shell.Application")
-        Dim objFSO = CreateObject("Scripting.FileSystemObject")
-
-        DELETE_TextFile(File_CTF_Inc, FileSystem_FLOW & "\Combined\data\")
-        LOC_TXT_FILE = FileSystem_FLOW & "\Combined\data\" & File_CTF_Inc
-        a = objFSO.CreateTextFile(LOC_TXT_FILE, True)
-        Dim unused5 = a.WriteLine("This file contains a mapping of folders to email conversations based on incidence")
-
         For i = 1 To CTF_Inc_Ct
-            Dim unused4 = a.WriteLine(CTF_Inc(i).Email_Conversation_ID)
-            Dim unused3 = a.WriteLine(CTF_Inc(i).Folder_Count)
+            listOutput.Add(CTF_Inc(i).Email_Conversation_ID)
+            listOutput.Add(CTF_Inc(i).Folder_Count)
             For j = 1 To CTF_Inc(i).Folder_Count
-                Dim unused2 = a.WriteLine(CTF_Inc(i).Email_Folder(j))
-                Dim unused1 = a.WriteLine(CTF_Inc(i).Email_Conversation_Count(j))
+                listOutput.Add(CTF_Inc(i).Email_Folder(j))
+                listOutput.Add(CTF_Inc(i).Email_Conversation_Count(j))
             Next j
         Next i
 
-        Dim unused = a.Close
-
+        Dim filepath As String = Path.Combine(FolderPaths.FldrPythonStaging, My.Settings.File_CTF_Inc)
+        Using sw As New StreamWriter(filepath, False, System.Text.Encoding.ASCII)
+            For Each line In listOutput
+                sw.WriteLine(line)
+            Next
+        End Using
 
     End Sub
 
-    Public Sub CTF_Incidence_Text_File_READ()
-
-        Dim objFSO As Object       ' Computer's file system object.
-        Dim LOC_TXT_FILE As String
-        Dim oFS
-        Dim Temp As String
-        Dim i As Integer
+    Public Sub CTF_Incidence_Text_File_READ(FolderPaths As IFileSystemFolderPaths)
 
         'INITIALIZE VARIABLES
-        objShell = CreateObject("Shell.Application")
-        objFSO = CreateObject("Scripting.FileSystemObject")
+        Dim i As Integer
         CTF_Inc_Ct = 0
         ReDim CTF_Inc(0)
-        LOC_TXT_FILE = FileSystem_FLOW & "\Combined\data\" & File_CTF_Inc
+        Dim filepath As String = Path.Combine(FolderPaths.FldrPythonStaging, My.Settings.File_CTF_Inc)
 
         'OPEN FILE IF IT EXISTS AND READ IT IN
-        If objFSO.FileExists(LOC_TXT_FILE) = True Then
-            oFS = objFSO.OpenTextFile(LOC_TXT_FILE)
+        If File.Exists(filepath) Then
+            Dim filecontents = System.IO.File.ReadAllLines(filepath, Text.Encoding.ASCII)
+            Dim lines As New Queue(Of String)(filecontents.Skip(1))
+            Dim listCTF As New List(Of CTF_Incidence)
+            listCTF.Add(New CTF_Incidence())
 
-            Temp = oFS.ReadLine
-            Do Until oFS.AtEndOfStream
-                CTF_Inc_Ct += 1
-                ReDim Preserve CTF_Inc(CTF_Inc_Ct)
-                CTF_Inc(CTF_Inc_Ct).Email_Conversation_ID = oFS.ReadLine
-                CTF_Inc(CTF_Inc_Ct).Folder_Count = oFS.ReadLine
-                For i = 1 To CTF_Inc(CTF_Inc_Ct).Folder_Count
-                    CTF_Inc(CTF_Inc_Ct).Email_Folder(i) = oFS.ReadLine
-                    CTF_Inc(CTF_Inc_Ct).Email_Conversation_Count(i) = oFS.ReadLine
-                Next i
-            Loop
+            While lines.Count > 0
+                Dim tmpCTF_Inc As New CTF_Incidence()
+                With tmpCTF_Inc
+                    .Email_Conversation_ID = lines.Dequeue()
+                    .Folder_Count = lines.Dequeue()
+                    For i = 1 To .Folder_Count
+                        .Email_Folder(i) = lines.Dequeue()
+                        .Email_Conversation_Count(i) = lines.Dequeue()
+                    Next
+                End With
+                listCTF.Add(tmpCTF_Inc)
+            End While
+            'ReDim CTF_Inc(listCTF.Count)
+            CTF_Inc = listCTF.ToArray()
+            CTF_Inc_Ct = listCTF.Count
+            'Need to set CTF_Inc_Ct
         Else
-            Temp = MsgBox("Index file not found. Please run indexer.", vbCritical)
+            MsgBox("Index file not found. Please run indexer.", vbCritical)
         End If
-        Dim unused = oFS.Close
+
 
     End Sub
 

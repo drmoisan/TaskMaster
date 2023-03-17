@@ -12,11 +12,13 @@ Public Class ApplicationGlobals
     Private ReadOnly _fs As AppFileSystemFolderPaths
     Private ReadOnly _olObjects As AppOlObjects
     Private ReadOnly _toDoObjects As AppToDoObjects
+    Private _autoFileObjects As AppAutoFileObjects
 
     Public Sub New(OlApp As Application)
         _fs = New AppFileSystemFolderPaths
         _olObjects = New AppOlObjects(OlApp)
         _toDoObjects = New AppToDoObjects(Me)
+        _autoFileObjects = New AppAutoFileObjects(Me)
     End Sub
 
     Public ReadOnly Property FS As IFileSystemFolderPaths Implements IApplicationGlobals.FS
@@ -35,6 +37,13 @@ Public Class ApplicationGlobals
         Get
             Return _toDoObjects
         End Get
+    End Property
+
+    Public ReadOnly Property AF As IAppAutoFileObjects Implements IApplicationGlobals.AF
+        Get
+            Return _autoFileObjects
+        End Get
+
     End Property
 
 #Region "Legacy Definitions and Constants"

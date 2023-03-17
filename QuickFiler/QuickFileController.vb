@@ -186,18 +186,19 @@ Public Class QuickFileController
 
 
     Public colEmailsInFolder As Collection
-    Private ReadOnly ActiveExplorer As Outlook.Explorer
+    Private ReadOnly _activeExplorer As Outlook.Explorer
     Private _olObjects As IOlObjects
     Private ReadOnly _olApp As Outlook.Application
     Private ReadOnly _viewer As QuickFileViewer
     Private _movedMails As cStackObject
+    Private blRunningModalCode As Boolean = False
 
     Public Sub New(AppOlObjects As IOlObjects,
                    Viewer As QuickFileViewer)
         _olObjects = AppOlObjects
         _olApp = _olObjects.App
         _viewer = Viewer
-        ActiveExplorer = _olObjects.App.ActiveExplorer()
+        _activeExplorer = _olObjects.App.ActiveExplorer()
         _movedMails = _olObjects.MovedMails_Stack
 
         Dim lngPreviousHeight As Long
@@ -206,7 +207,7 @@ Public Class QuickFileController
 
         blSuppressEvents = True                                     'Suppress events until the form is initialized
         InitType = InitTypeEnum.InitSort
-        folderCurrent = ActiveExplorer.CurrentFolder
+        folderCurrent = _activeExplorer.CurrentFolder
         lngPanelMain_SC_Top = 0
 
         Height_UserForm_Min = _viewer.Height + frmHt + frmSp
@@ -300,13 +301,13 @@ Public Class QuickFileController
         'We need this as we have changed the menu bar after Windows has created it.
         'All we need is the Handle.
         Dim unused3 = DrawMenuBar(lFormHandle)
-        'blShowAsConversations
-        If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
+        'blShowInConversations
+        If _activeExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
 
         End If
 
 
-        'If blShowAsConversations Then
+        'If blShowInConversations Then
         '    'ToggleShowAsConversation -1
         '    ExplConvView_ToggleOff
         '    DoEvents
@@ -314,14 +315,14 @@ Public Class QuickFileController
 
         'Initialize Folder Suggestions and calculate emails per page
 
-        Folder_Suggestions_Reload
+        Folder_Suggestions_Reload()
         blSuppressEvents = False
         Dim unused2 = ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
         blSuppressEvents = True
         intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
         intEmailPosition = 0    'Reverse sort is 0   'Regular sort is 1
         'intEmailsPerIteration = CInt(Round((Height_PanelMain_Max / (frmHt + frmSp)), 0))
-        intEmailsPerIteration = CInt(Math.Round(PanelMain.Height / (frmHt + frmSp), 0))
+        intEmailsPerIteration = CInt(Math.Round(_viewer.PanelMain.Height / (frmHt + frmSp), 0))
         _viewer.spn_EmailPerLoad.Value = intEmailsPerIteration
 
         '***********************************************************************************
@@ -364,8 +365,8 @@ Public Class QuickFileController
 
         If colEmailsToLoad Is Nothing Then
             Dim unused As New Collection
-            OlFolder = ActiveExplorer.CurrentFolder
-            objCurView = ActiveExplorer.CurrentView
+            OlFolder = _activeExplorer.CurrentFolder
+            objCurView = _activeExplorer.CurrentView
             strFilter = objCurView.Filter
             If strFilter <> "" Then
                 strFilter = "@SQL=" & strFilter
@@ -491,13 +492,12 @@ Public Class QuickFileController
             If TypeOf objItem Is MailItem Then
                 intUniqueItemCounter += 1
                 Mail = objItem
-                QF = New QfcController
                 colCtrls = New Collection
                 LoadGroupOfCtrls(colCtrls, intUniqueItemCounter)
-                QF.InitCtrls(Mail, colCtrls, intUniqueItemCounter, BoolRemoteMouseApp, Caller:=Me, hwnd:=lFormHandle, InitTypeE:=InitType)
+                QF = New QfcController(Mail, colCtrls, intUniqueItemCounter, BoolRemoteMouseApp, Caller:=Me, AppGlobals:=_globals, hwnd:=lFormHandle, InitTypeE:=InitType)
 
                 colQFClass.Add(QF)
-                Dim unused4 = _olApp.DoEvents()
+                _olApp.DoEvents()
             End If
         Next objItem
 
@@ -554,7 +554,7 @@ Public Class QuickFileController
         Dim lbl5 As Windows.Forms.Label
         Dim lblSender As Windows.Forms.Label
         Dim lblSubject As Windows.Forms.Label
-        Dim lblBody As Windows.Forms.Label
+        Dim txtboxBody As Windows.Forms.TextBox
         Dim lblSentOn As Windows.Forms.Label
         Dim lblConvCt As Windows.Forms.Label
         Dim lblPos As Windows.Forms.Label
@@ -757,7 +757,7 @@ Public Class QuickFileController
                 .Left = Left_lblSubject
                 .Width = Width_lblSubject
                 .Font = New Font(.Font.FontFamily, 10)
-            ElseIf InitType And InitConditionalReminder Then
+            ElseIf InitType.HasFlag(InitTypeEnum.InitConditionalReminder) Then
                 .Height = 18
                 .Top = lngTopOff + 12
                 .Left = Left_lblSubject_C
@@ -775,16 +775,16 @@ Public Class QuickFileController
         End With
         colCtrls.Add(lblSubject, "lblSubject")
 
-        lblBody = New Windows.Forms.Label
-        frm.Controls.Add(lblBody)
-        With lblBody
+        txtboxBody = New Windows.Forms.TextBox
+        frm.Controls.Add(txtboxBody)
+        With txtboxBody
 
             If blWideView Then
                 .Top = lngTopOff + 36
                 .Left = Left_lblBody
                 .Width = Width_lblBody
                 .Height = 30 + 6 - lngTopOff
-            ElseIf InitType And InitConditionalReminder Then
+            ElseIf InitType.HasFlag(InitTypeEnum.InitConditionalReminder) Then
                 .Top = lngTopOff + 30
                 .Left = Left_lblBody_C
                 .Width = frmWd - .Left - .Left
@@ -801,7 +801,7 @@ Public Class QuickFileController
             .Font = New Font(.Font.FontFamily, 10)
             .WordWrap = True
         End With
-        colCtrls.Add(lblBody, "lblBody")
+        colCtrls.Add(txtboxBody, "lblBody")
 
         lblSentOn = New Windows.Forms.Label
         frm.Controls.Add(lblSentOn)
@@ -810,11 +810,11 @@ Public Class QuickFileController
             If blWideView Then
                 .Top = lngTopOff + 12
                 .Left = Left_lblSentOn
-                .TextAlign = fmTextAlignLeft
+                .TextAlign = ContentAlignment.TopLeft 'fmTextAlignLeft
             Else
                 .Top = lngTopOff
                 .Left = Left_lblSentOn_C
-                .TextAlign = fmTextAlignRight
+                .TextAlign = ContentAlignment.TopRight 'fmTextAlignRight
             End If
 
             .Width = 156
@@ -863,7 +863,7 @@ Public Class QuickFileController
                 .Width = 37
                 .Font = New Font(.Font.FontFamily, 10)
                 .Text = " Mail"
-                .Value = False
+                .Checked = False
                 .TabStop = False
                 If blWideView Then
 
@@ -882,7 +882,7 @@ Public Class QuickFileController
                 .Width = 45
                 .Font = New Font(.Font.FontFamily, 10)
                 .Text = " Flow"
-                .Value = False
+                .Checked = False
                 .TabStop = False
 
                 If blWideView Then
@@ -903,7 +903,7 @@ Public Class QuickFileController
                 .Width = 50
                 .Font = New Font(.Font.FontFamily, 10)
                 .Text = " Attach"
-                .Value = True
+                .Checked = True
                 .TabStop = False
 
                 If blWideView Then
@@ -922,7 +922,7 @@ Public Class QuickFileController
                 .Width = 81
                 .Font = New Font(.Font.FontFamily, 10)
                 .Text = "  Conversation"
-                .Value = blGroupConversation
+                .Checked = blGroupConversation
                 .TabStop = False
                 If blWideView Then
                     .Top = lngTopOff
@@ -985,7 +985,7 @@ Public Class QuickFileController
             frm.Controls.Add(lblConvCt)
             With lblConvCt
                 .Height = 18
-                .TextAlign = fmTextAlignRight
+                .TextAlign = ContentAlignment.TopRight 'fmTextAlignRight
 
                 If blWideView Then
                     .Left = Left_lblConvCt
@@ -1036,9 +1036,9 @@ Public Class QuickFileController
                 .Width = 14
                 .Text = "F"
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-                .BorderStyle = fmBorderStyleSingle
-                .TextAlign = fmTextAlignCenter
-                .SpecialEffect = fmSpecialEffectBump
+                .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+                .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
@@ -1055,9 +1055,9 @@ Public Class QuickFileController
                 .Width = 14
                 .Text = "D"
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-                .BorderStyle = fmBorderStyleSingle
-                .TextAlign = fmTextAlignCenter
-                .SpecialEffect = fmSpecialEffectBump
+                .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+                .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
@@ -1073,9 +1073,9 @@ Public Class QuickFileController
                 .Width = 14
                 .Text = "C"
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-                .BorderStyle = fmBorderStyleSingle
-                .TextAlign = fmTextAlignCenter
-                .SpecialEffect = fmSpecialEffectBump
+                .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+                .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
@@ -1092,9 +1092,9 @@ Public Class QuickFileController
             .Width = 14
             .Text = "R"
             .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-            .BorderStyle = fmBorderStyleSingle
-            .TextAlign = fmTextAlignCenter
-            .SpecialEffect = fmSpecialEffectBump
+            .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+            .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+            '.SpecialEffect = fmSpecialEffectBump
             .BackColor = SystemColors.ControlText
             .ForeColor = SystemColors.Control
             .Visible = blDebug
@@ -1110,9 +1110,9 @@ Public Class QuickFileController
             .Width = 14
             .Text = "X"
             .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-            .BorderStyle = fmBorderStyleSingle
-            .TextAlign = fmTextAlignCenter
-            .SpecialEffect = fmSpecialEffectBump
+            .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+            .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+            '.SpecialEffect = fmSpecialEffectBump
             .BackColor = SystemColors.ControlText
             .ForeColor = SystemColors.Control
             .Visible = blDebug
@@ -1128,9 +1128,9 @@ Public Class QuickFileController
             .Width = 14
             .Text = "T"
             .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-            .BorderStyle = fmBorderStyleSingle
-            .TextAlign = fmTextAlignCenter
-            .SpecialEffect = fmSpecialEffectBump
+            .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+            .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+            '.SpecialEffect = fmSpecialEffectBump
             .BackColor = SystemColors.ControlText
             .ForeColor = SystemColors.Control
             .Visible = blDebug
@@ -1146,15 +1146,15 @@ Public Class QuickFileController
                 .Top = 36 + lngTopOff
                 .Left = Left_lblAcO_C
             Else
-                .Top = lblBody.Top
+                .Top = txtboxBody.Top
                 .Left = Left_lblAcO_C
             End If
             .Width = 14
             .Text = "O"
             .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-            .BorderStyle = fmBorderStyleSingle
-            .TextAlign = fmTextAlignCenter
-            .SpecialEffect = fmSpecialEffectBump
+            .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+            .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+            '.SpecialEffect = fmSpecialEffectBump
             .BackColor = SystemColors.ControlText
             .ForeColor = SystemColors.Control
             .Visible = blDebug
@@ -1177,9 +1177,9 @@ Public Class QuickFileController
                 .Width = 14
                 .Text = "A"
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-                .BorderStyle = fmBorderStyleSingle
-                .TextAlign = fmTextAlignCenter
-                .SpecialEffect = fmSpecialEffectBump
+                .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+                .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
@@ -1201,9 +1201,9 @@ Public Class QuickFileController
                 .Width = 14
                 .Text = "W"
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-                .BorderStyle = fmBorderStyleSingle
-                .TextAlign = fmTextAlignCenter
-                .SpecialEffect = fmSpecialEffectBump
+                .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+                .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
@@ -1225,9 +1225,9 @@ Public Class QuickFileController
                 .Width = 14
                 .Text = "M"
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
-                .BorderStyle = fmBorderStyleSingle
-                .TextAlign = fmTextAlignCenter
-                .SpecialEffect = fmSpecialEffectBump
+                .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
+                .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
+                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
@@ -1329,7 +1329,7 @@ Public Class QuickFileController
 
         If objItem Is Nothing Then
             items = folderCurrent.Items
-            objItem = items(max - intEmailPosition)
+            objItem = items(max() - intEmailPosition)
         End If
 
         If posInsert = 0 Then posInsert = colQFClass.Count + 1
@@ -1340,7 +1340,7 @@ Public Class QuickFileController
             colCtrls = New Collection
 
             LoadGroupOfCtrls(colCtrls, intUniqueItemCounter, posInsert, blGroupConversation)
-            QF.InitCtrls(Mail, colCtrls, posInsert, BoolRemoteMouseApp, Me)
+            QF = New QfcController(Mail, colCtrls, posInsert, BoolRemoteMouseApp, Me)
             If blChild Then QF.blConChild = True
             If IsArray(varList) = True Then
                 If UBound(varList) = 0 Then
@@ -1356,7 +1356,8 @@ Public Class QuickFileController
             If posInsert > colQFClass.Count Then
                 colQFClass.Add(QF)
             Else
-                colQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
+                'colQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
+                colQFClass.Add(QF, posInsert)
             End If
 
             For i = 1 To colQFClass.Count
@@ -1531,7 +1532,7 @@ Public Class QuickFileController
                 ctlFrame = QF.frm
                 ctlFrame.Top = ctlFrame.Top - frmHt - frmSp
             Next i
-            _viewer.PanelMain.ScrollHeight = max(PanelMain.ScrollHeight - frmHt - frmSp, Height_PanelMain_Max)
+            _viewer.PanelMain.ScrollHeight = max(_viewer.PanelMain.ScrollHeight - frmHt - frmSp, Height_PanelMain_Max)
         End If
 
         colQFClass.Remove(intPosition)
@@ -1575,7 +1576,7 @@ Public Class QuickFileController
 
             intLastNum = 0
 
-            strToParse = AcceleratorDialogue.Value
+            strToParse = _viewer.AcceleratorDialogue.Text
 
             If strToParse <> "" Then
 
@@ -1658,13 +1659,13 @@ Public Class QuickFileController
 
                             blSuppressEvents = True
 
-                            AcceleratorDialogue.Value = intAccActiveMail
+                            _viewer.AcceleratorDialogue.Text = intAccActiveMail
 
                             blSuppressEvents = False
                         Else
 
 
-                            AcceleratorDialogue.Value = intAccActiveMail
+                            _viewer.AcceleratorDialogue.Text = intAccActiveMail
                         End If
 
                         QF = colQFClass(intAccActiveMail)
@@ -1678,16 +1679,16 @@ Public Class QuickFileController
                                 Dim unused2 = EnableWindow(OlApp_hWnd, Modeless)
                                 'EnableWindow lFormHandle, Modeless
 
-                                If ActiveExplorer.CurrentFolder.DefaultItemType <> olMailItem Then
-                                    ActiveExplorer.NavigationPane.CurrentModule = ActiveExplorer.NavigationPane.Modules.GetNavigationModule(olModuleMail)
+                                If _activeExplorer.CurrentFolder.DefaultItemType <> olMailItem Then
+                                    _activeExplorer.NavigationPane.CurrentModule = _activeExplorer.NavigationPane.Modules.GetNavigationModule(olModuleMail)
                                 End If
 
-                                If InitType.HasFlag(InitTypeEnum.InitSort) And AreConversationsGrouped Then ExplConvView_ToggleOff()                      'Modal
+                                If InitType.HasFlag(InitTypeEnum.InitSort) And AreConversationsGrouped(_activeExplorer) Then ExplConvView_ToggleOff()                      'Modal
                                 QF.KB(strCommand)
 
                                 QFD_Minimize()
 
-                                If InitType.HasFlag(InitTypeEnum.InitSort) And blShowAsConversations Then ExplConvView_ToggleOn()
+                                If InitType.HasFlag(InitTypeEnum.InitSort) And blShowInConversations Then ExplConvView_ToggleOn()
                         'ToggleShowAsConversation 1
                         'SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
                             Case "C"
@@ -1777,14 +1778,14 @@ Public Class QuickFileController
                                 End If
                                 '                                                                                                    strTemp = "AcceleratorDialogue.Value = Left(AcceleratorDialogue.Value, Len(AcceleratorDialogue.Value) - 1)"
                                 '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                '                        AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
+                                '                        _viewer.AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
                             Case Else
 
 
                                 blSuppressEvents = True
                                 '                                                                                                    strTemp = "AcceleratorDialogue.Value = Left(AcceleratorDialogue.Value, Len(AcceleratorDialogue.Value) - 1)"
                                 '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                '                        AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
+                                '                        _viewer.AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
 
                                 blSuppressEvents = False
                         End Select
@@ -1821,19 +1822,19 @@ Public Class QuickFileController
 
 
 
-        Select Case KeyCode
-            Case 18
+        Select Case e.KeyCode
+            Case Keys.Alt
 
                 'Debug.Print "Alt Key Pressed"
 
                 toggleAcceleratorDialogue()
 
-            Case vbKeyDown
+            Case Keys.Down
 
 
-                If AreConversationsGrouped Then
+                If AreConversationsGrouped(_activeExplorer) Then
 
-                    'Modal                                                                                                    strTemp = "ExplConvView_ToggleOff"
+
                     'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                     'Modal                ExplConvView_ToggleOff
                     '            Else
@@ -1845,14 +1846,14 @@ Public Class QuickFileController
                 If intAccActiveMail < colQFClass.Count Then
 
 
-                    AcceleratorDialogue.Value = intAccActiveMail + 1
+                    _viewer.AcceleratorDialogue.Text = intAccActiveMail + 1
                 End If
 
 
-            Case vbKeyUp
+            Case Keys.Up
 
 
-                If AreConversationsGrouped Then
+                If AreConversationsGrouped(_activeExplorer) Then
 
                     'Modal                                                                                                    strTemp = "ExplConvView_ToggleOff"
                     'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
@@ -1864,12 +1865,12 @@ Public Class QuickFileController
                 If intAccActiveMail > 1 Then
 
 
-                    AcceleratorDialogue.Value = intAccActiveMail - 1
+                    _viewer.AcceleratorDialogue.Text = intAccActiveMail - 1
                 End If
 
 
 
-                AcceleratorDialogue.SetFocus
+                _viewer.AcceleratorDialogue.Focus()
 
             Case vbKeyA
 
@@ -1899,7 +1900,7 @@ Public Class QuickFileController
         Select Case e.KeyCode
             Case 18
                 If sender.Visible Then
-                    Dim unused1 = sender.SetFocus
+                    Dim unused1 = sender.Focus()
                     sender.SelStart = sender.TextLength
                 Else
                     Dim unused = _viewer.PanelMain.Focus()
@@ -1952,7 +1953,8 @@ Public Class QuickFileController
     Private Sub BUTTON_CANCEL_Click()
 
         'ExplConvView_ToggleOn
-        If blShowAsConversations Then
+
+        If blShowInConversations Then
             'ExplConvView_ToggleOn
             ExplConvView_Cleanup()
         End If
@@ -1960,13 +1962,11 @@ Public Class QuickFileController
         RemoveControls()
         blFrmKll = True
 
-        Unload(QuickFileDyn)
+        _viewer.Dispose()
     End Sub
 
     Private Sub BUTTON_CANCEL_KeyDown(sender As Object, e As KeyEventArgs)
-
-
-        KeyDownHandler(KeyCode, Shift)
+        KeyDownHandler(sender, e)
     End Sub
 
     Private Sub Button_OK_Click()
@@ -1983,7 +1983,7 @@ Public Class QuickFileController
                 strNotifications = "Can't complete actions! Not all emails assigned to folder" & vbCrLf
 
                 For Each QF In colQFClass
-                    If QF.cbo.Value = "" Then
+                    If QF.cbo.SelectedValue = "" Then
                         blReadyForMove = False
                         strNotifications = strNotifications & QF.intMyPosition &
                         "  " & Format(QF.Mail.SentOn, "mm\\dd\\yyyy") &
@@ -2010,16 +2010,17 @@ Public Class QuickFileController
                     Dim unused = MsgBox(strNotifications, vbOKOnly + vbCritical, "Error Notification")
                 End If
 
-                _viewer.AcceleratorDialogue.Value = ""
+                _viewer.AcceleratorDialogue.Text = ""
                 intAccActiveMail = 0
 
                 blRunningModalCode = False
             Else
-                MyBoxMsg("Can't Execute While Running Modal Code")
+                'MyBoxMsg("Can't Execute While Running Modal Code")
+                MsgBox("Can't Execute While Running Modal Code")
             End If
 
         Else
-            Unload(Me)
+            _viewer.Dispose()
         End If
 
 
@@ -2032,11 +2033,11 @@ Public Class QuickFileController
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired Button_OK_KeyDown"
 
-        KeyDownHandler(KeyCode, Shift)
+        KeyDownHandler(sender, e)
     End Sub
 
     Private Sub Button_OK_KeyUp(sender As Object, e As KeyEventArgs)
-        KeyUpHandler(KeyCode, Shift)
+        KeyUpHandler(sender, e)
     End Sub
 
 
@@ -2054,7 +2055,7 @@ Public Class QuickFileController
         '    If Not colMailJustMoved Is Nothing Then
         '        If colMailJustMoved.Count <> 0 Then
         '
-        '            oFolderCurrent = Application.ActiveExplorer.CurrentFolder
+        '            oFolderCurrent = Application._activeExplorer.CurrentFolder
         '
         '            For i = 1 To colMailJustMoved.Count
         '                If TypeOf colMailJustMoved(i) Is mailItem Then
@@ -2110,7 +2111,7 @@ Public Class QuickFileController
                 vbUndoResponse = MsgBox("Undo Move of email?" & vbCrLf & "Sent On: " &
                 Format(oMail_Current.SentOn, "mm/dd/yyyy") & vbCrLf &
                 oMail_Current.Subject, vbYesNo)
-                If vbUndoResponse = vbYes And oFolder_Current <> oFolder_Old Then
+                If vbUndoResponse = vbYes And (oFolder_Current IsNot oFolder_Old) Then
                     Dim unused = oMail_Current.Move(oFolder_Old)
 
                     _movedMails.Pop(i)
@@ -2127,16 +2128,16 @@ Public Class QuickFileController
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired _viewer.PanelMain_KeyDown"
 
-        KeyDownHandler(KeyCode, Shift)
+        KeyDownHandler(sender, e)
     End Sub
 
     Private Sub _viewer_PanelMain_KeyPress(sender As Object, e As KeyPressEventArgs)
         'MsgBox ("KeyPress _viewer.PanelMain")
-        KeyPressHandler(KeyAscii)
+        KeyPressHandler(sender, e)
     End Sub
 
     Private Sub _viewer_PanelMain_KeyUp(sender As Object, e As KeyEventArgs)
-        KeyUpHandler(KeyCode, Shift)
+        KeyUpHandler(sender, e)
     End Sub
 
     Private Sub SpinButton1_Change()
@@ -2156,7 +2157,7 @@ Public Class QuickFileController
 
     Private Sub spn_EmailPerLoad_KeyDown(sender As Object, e As KeyEventArgs)
 
-        KeyDownHandler(KeyCode, Shift)
+        KeyDownHandler(sender, e)
     End Sub
 
     Private Sub UserForm_Activate()
@@ -2189,10 +2190,10 @@ Public Class QuickFileController
         End If
 
 
-        If AcceleratorDialogue.Visible = True Then
+        If _viewer.AcceleratorDialogue.Visible = True Then
 
 
-            AcceleratorDialogue.Visible = False
+            _viewer.AcceleratorDialogue.Visible = False
             'Modal                                                                                strTemp = "ExplConvView_ToggleOn"
             'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
             'Modal        ExplConvView_ToggleOn
@@ -2201,7 +2202,7 @@ Public Class QuickFileController
         Else
 
 
-            If AreConversationsGrouped Then
+            If AreConversationsGrouped(_activeExplorer) Then
                 'ToggleShowAsConversation -1
 
                 'Modal                                                                                strTemp = "ExplConvView_ToggleOff"
@@ -2210,13 +2211,13 @@ Public Class QuickFileController
             Else
 
             End If
-            AcceleratorDialogue.Visible = True
+            _viewer.AcceleratorDialogue.Visible = True
 
 
             If intAccActiveMail <> 0 Then
 
 
-                AcceleratorDialogue.Value = intAccActiveMail
+                _viewer.AcceleratorDialogue.Text = intAccActiveMail
 
                 On Error Resume Next
                 QF = colQFClass(intAccActiveMail)
@@ -2235,8 +2236,8 @@ Public Class QuickFileController
             'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
             'Modal        SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
 
-            AcceleratorDialogue.SetFocus
-            AcceleratorDialogue.SelStart = AcceleratorDialogue.TextLength
+            _viewer.AcceleratorDialogue.Focus()
+            _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
         End If
 
         QF = Nothing
@@ -2279,7 +2280,7 @@ Public Class QuickFileController
         Else
             Debug.Print("Lost Focus")
             '        'GoingAway
-            AAA
+
         End If
     End Sub
 
@@ -2296,25 +2297,24 @@ Public Class QuickFileController
         'MsgBox "App Width " & Me.Width & vbCrLf & "Screen Width " & ScreenWidth * PointsPerPixel
         If Not blSuppressEvents Then
 
-            intDiffx = If(Me.Width >= Width_UserForm - 100, Me.Width - Width_UserForm, 0)
+            intDiffx = If(_viewer.Width >= Width_UserForm - 100, _viewer.Width - Width_UserForm, 0)
 
-            intDiffy = If(Me.Height >= Height_UserForm_Min, Me.Height - Height_UserForm_Min, 0)
+            intDiffy = If(_viewer.Height >= Height_UserForm_Min, _viewer.Height - Height_UserForm_Min, 0)
 
             _viewer.PanelMain.Width = Width_PanelMain + intDiffx
             _viewer.PanelMain.Height = Height_PanelMain_Min + intDiffy
 
-            Button_OK.Top = lngTop_OK_BUTTON_Min + intDiffy
-            Button_OK.Left = OK_left + (intDiffx / 2)
-            BUTTON_CANCEL.Top = lngTop_CANCEL_BUTTON_Min + intDiffy
-            BUTTON_CANCEL.Left = Button_OK.Left + CANCEL_left - OK_left
-            Button_Undo.Top = lngTop_UNDO_BUTTON_Min + intDiffy
-            Button_Undo.Left = Button_OK.Left + UNDO_left - OK_left
+            _viewer.Button_OK.Top = lngTop_OK_BUTTON_Min + intDiffy
+            _viewer.Button_OK.Left = OK_left + (intDiffx / 2)
+            _viewer.BUTTON_CANCEL.Top = lngTop_CANCEL_BUTTON_Min + intDiffy
+            _viewer.BUTTON_CANCEL.Left = _viewer.Button_OK.Left + CANCEL_left - OK_left
+            _viewer.Button_Undo.Top = lngTop_UNDO_BUTTON_Min + intDiffy
+            _viewer.Button_Undo.Left = _viewer.Button_OK.Left + UNDO_left - OK_left
             'Button1.top = lngTop_Button1_Min + intDiffy
-            AcceleratorDialogue.Top = lngTop_AcceleratorDialogue_Min + intDiffy
-            spn_EmailPerLoad.Top = lngTop_spn_Min + intDiffy
-            spn_EmailPerLoad.Left = spn_left + intDiffx
-            lbl_EmailPerLoad.Top = lngTop_lbl_EmailPerLoad_Min + intDiffy
-            lbl_EmailPerLoad.Left = lng_lbl_EmailPerLoad_left + intDiffx
+            _viewer.AcceleratorDialogue.Top = lngTop_AcceleratorDialogue_Min + intDiffy
+            _viewer.spn_EmailPerLoad.Top = lngTop_spn_Min + intDiffy
+            _viewer.spn_EmailPerLoad.Left = spn_left + intDiffx
+
 
             If colQFClass IsNot Nothing Then
                 For i = 1 To colQFClass.Count
@@ -2336,29 +2336,21 @@ Public Class QuickFileController
 
 
     Private Sub UserForm_KeyPress(sender As Object, e As KeyPressEventArgs)
-        If Not blSuppressEvents Then KeyPressHandler(KeyAscii)
+        If Not blSuppressEvents Then KeyPressHandler(sender, e)
     End Sub
 
     Private Sub UserForm_KeyUp(sender As Object, e As KeyEventArgs)
-        If Not blSuppressEvents Then KeyUpHandler(KeyCode, Shift)
+        If Not blSuppressEvents Then KeyUpHandler(sender, e)
     End Sub
 
     Private Sub UserForm_KeyDown(sender As Object, e As KeyEventArgs)
-        If Not blSuppressEvents Then KeyDownHandler(KeyCode, Shift)
+        If Not blSuppressEvents Then KeyDownHandler(sender, e)
     End Sub
 
 
     Public Sub KeyPressHandler(sender As Object, e As KeyPressEventArgs)
         If Not blSuppressEvents Then
-            Select Case KeyAscii
-                Case vbKeyReturn
-                    Button_OK_Click()
-                Case vbKeyTab
-                    toggleAcceleratorDialogue()
-                    If AcceleratorDialogue.Visible Then AcceleratorDialogue.SetFocus
-                    '        Case vbKeyEscape
-                    '            vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
-                    '            If vbMsgResponse = vbOK Then BUTTON_CANCEL_Click
+            Select Case e.KeyChar
 
                 Case Else
             End Select
@@ -2367,19 +2359,19 @@ Public Class QuickFileController
 
     Public Sub KeyUpHandler(sender As Object, e As KeyEventArgs)
         If Not blSuppressEvents Then
-            Select Case KeyCode
+            Select Case e.KeyCode
                 Case 18
-                    If AcceleratorDialogue.Visible Then
-                        AcceleratorDialogue.SetFocus
-                        AcceleratorDialogue.SelStart = AcceleratorDialogue.TextLength
+                    If _viewer.AcceleratorDialogue.Visible Then
+                        _viewer.AcceleratorDialogue.Focus()
+                        _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
                     Else
                         Dim unused = _viewer.PanelMain.Focus()
                     End If
-                    SendKeys("{ESC}")
-                Case vbKeyUp
-                    If AcceleratorDialogue.Visible Then AcceleratorDialogue.SetFocus
-                Case vbKeyDown
-                    If AcceleratorDialogue.Visible Then AcceleratorDialogue.SetFocus
+                    SendKeys.Send("{ESC}")
+                Case Keys.Up
+                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
+                Case Keys.Down
+                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
                 Case Else
             End Select
         End If
@@ -2390,16 +2382,24 @@ Public Class QuickFileController
         If Not blSuppressEvents Then
 
 
-            Select Case KeyCode
+            Select Case e.KeyCode
+                Case Keys.Enter
+                    Button_OK_Click()
+                Case Keys.Tab
+                    toggleAcceleratorDialogue()
+                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
+                    '        Case vbKeyEscape
+                    '            vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
+                    '            If vbMsgResponse = vbOK Then BUTTON_CANCEL_Click
                 Case 18
 
 
                     toggleAcceleratorDialogue()
 
-                    If AcceleratorDialogue.Visible Then
+                    If _viewer.AcceleratorDialogue.Visible Then
 
 
-                        AcceleratorDialogue.SetFocus
+                        _viewer.AcceleratorDialogue.Focus()
 
                     Else
 
@@ -2409,10 +2409,10 @@ Public Class QuickFileController
                 Case Else
 
 
-                    If AcceleratorDialogue.Visible Then
+                    If _viewer.AcceleratorDialogue.Visible Then
 
 
-                        AcceleratorDialogue_KeyDown(KeyCode, Shift)
+                        AcceleratorDialogue_KeyDown(sender, e)
                     Else
 
                     End If
@@ -2429,7 +2429,7 @@ Public Class QuickFileController
         'Lets find the UserForm Handle the function below retrieves the handle
         'to the top-level window whose class name ("ThunderDFrame" for Excel)
         'and window name (me.caption or UserformName caption) match the specified strings.
-        lFormHandle = FindWindow("ThunderDFrame", Me.Caption)
+        lFormHandle = FindWindow("ThunderDFrame", _viewer.Text)
 
         'EnableWindow lFormHandle, Modal
         If StopWatch IsNot Nothing Then
@@ -2449,7 +2449,7 @@ Public Class QuickFileController
         'Lets find the UserForm Handle the function below retrieves the handle
         'to the top-level window whose class name ("ThunderDFrame" for Excel)
         'and window name (me.caption or UserformName caption) match the specified strings.
-        lFormHandle = FindWindow("ThunderDFrame", Me.Caption)
+        lFormHandle = FindWindow("ThunderDFrame", _viewer.Text)
 
         Dim unused1 = ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
         'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
@@ -2462,7 +2462,7 @@ Public Class QuickFileController
     Public Sub ExplConvView_Cleanup()
 
         On Error Resume Next
-        objView = ActiveExplorer.CurrentFolder.Views(objView_Mem)
+        objView = _activeExplorer.CurrentFolder.Views(objView_Mem)
         If Err.Number = 0 Then
             'objView.Reset
             objView.Apply()
@@ -2470,7 +2470,7 @@ Public Class QuickFileController
             blShowInConversations = False
         Else
             Err.Clear()
-            objViewTemp = ActiveExplorer.CurrentView.Parent("tmpNoConversation")
+            objViewTemp = _activeExplorer.CurrentView.Parent("tmpNoConversation")
             If objViewTemp IsNot Nothing Then objViewTemp.Delete()
         End If
     End Sub
@@ -2478,10 +2478,10 @@ Public Class QuickFileController
     Public Sub ExplConvView_ToggleOff()
         If _olApp.ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
             blShowInConversations = True
-            objView = ActiveExplorer.CurrentView
+            objView = _activeExplorer.CurrentView
 
             If objView.Name = "tmpNoConversation" Then
-                If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
+                If _activeExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
 
                     objView.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare)
                     objView.Save()
@@ -2536,7 +2536,7 @@ Public Class QuickFileController
     Public Sub ExplConvView_ToggleOn()
 
         If blShowInConversations Then
-            objView = ActiveExplorer.CurrentFolder.Views(objView_Mem)
+            objView = _activeExplorer.CurrentFolder.Views(objView_Mem)
             'objView.Reset
             objView.Apply()
             'objViewTemp.Delete
@@ -2547,7 +2547,7 @@ Public Class QuickFileController
 
 
     Private Sub UserForm_Terminate()
-        If blShowAsConversations Then ExplConvView_ToggleOn()
+        If blShowInConversations Then ExplConvView_ToggleOn()
         'ToggleShowAsConversation 1
     End Sub
 

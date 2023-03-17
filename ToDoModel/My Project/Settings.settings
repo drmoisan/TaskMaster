@@ -35,5 +35,26 @@
     <Setting Name="MaxFolders_ConvID" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
     </Setting>
+    <Setting Name="File_CTF_Inc" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Inc.txt</Value>
+    </Setting>
+    <Setting Name="File_CTF_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Map.txt</Value>
+    </Setting>
+    <Setting Name="File_Subject_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999Subject_Map.txt</Value>
+    </Setting>
+    <Setting Name="File_Common_Words" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CommonWords.txt</Value>
+    </Setting>
+    <Setting Name="File_ConditionalReminders" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999ConditionalReminders.txt</Value>
+    </Setting>
+    <Setting Name="MaxFolders_Subject" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="MaxSuggestions" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

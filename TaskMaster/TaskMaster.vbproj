@@ -213,11 +213,11 @@
   -->
   <ItemGroup>
     <AppDesigner Include="My Project\" />
+    <Compile Include="AppGlobals\AppAutoFileObjects.vb" />
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.vb" />
     <Compile Include="AppGlobals\ApplicationGlobals.vb" />
     <Compile Include="AppGlobals\AppOlObjects.vb" />
     <Compile Include="AppGlobals\AppToDoObjects.vb" />
-    <Compile Include="FlagTasks.vb" />
     <Compile Include="ToDoObj.vb" />
     <Compile Include="Ribbon\RibbonController.vb" />
     <Compile Include="Ribbon\RibbonViewer.vb">
@@ -287,6 +287,10 @@
     <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
       <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
       <Name>ToDoModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
+      <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
+      <Name>UtilitiesCS</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
       <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>

@@ -85,6 +85,17 @@ Public Module AutoFile
 
     End Function
 
+    Public Function AreConversationsGrouped(ActiveExplorer As Outlook.Explorer) As Boolean
+        Dim blTemp As Boolean
+        If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
+            blTemp = True
+        Else
+            blTemp = False
+        End If
+
+        AreConversationsGrouped = blTemp
+    End Function
+
 
     Public Function AutoFindPeople(objItem As Object,
                                    ppl_dict As Dictionary(Of String, String),

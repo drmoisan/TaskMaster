@@ -1,19 +1,13 @@
 ﻿Public Class cSuggestions
 
-    Private intCount As Integer
-    Private strFolderList() As String
+    Private _count As Integer
+    Private _strFolderArray() As String
     Private lngValor() As Long
     Const MaxSuggestions = 5
 
-    'Public Property Set Class(cls As cSuggestions)
-    '    intCount = cls.Count
-    '    strFolderList = cls.FolderList
-    '    lngValor = cls.Valor
-    'End Property
-
     Public ReadOnly Property Count() As Integer
         Get
-            Return intCount
+            Return _count
         End Get
     End Property
 
@@ -28,16 +22,16 @@
 
     Public Property FolderList() As String()
         Get
-            FolderList = strFolderList
+            FolderList = _strFolderArray
         End Get
         Set(value As String())
-            strFolderList = value
+            _strFolderArray = value
         End Set
     End Property
 
     Public ReadOnly Property FolderList_ItemByIndex(idx As Integer) As String
         Get
-            Return strFolderList(idx)
+            Return _strFolderArray(idx)
         End Get
 
     End Property
@@ -47,8 +41,8 @@
 
         Dim i As Integer
         find = 0
-        For i = 1 To UBound(strFolderList)
-            If strFolderList(i) = strFolderName Then find = i
+        For i = 1 To UBound(_strFolderArray)
+            If _strFolderArray(i) = strFolderName Then find = i
         Next i
 
     End Function
@@ -56,14 +50,14 @@
     Public Sub ADD_END(fldr As String)
         Dim i As Integer
 
-        intCount = intCount + 1
-        ReDim Preserve strFolderList(intCount)
-        ReDim Preserve lngValor(intCount)
+        _count = _count + 1
+        ReDim Preserve _strFolderArray(_count)
+        ReDim Preserve lngValor(_count)
 
-        strFolderList(intCount) = fldr
-        lngValor(intCount) = 0
+        _strFolderArray(_count) = fldr
+        lngValor(_count) = 0
 
-        For i = 1 To intCount
+        For i = 1 To _count
             lngValor(i) = lngValor(i) + 1
         Next i
     End Sub
@@ -76,11 +70,11 @@
 
         added = False
 
-        If intCount = 0 Then                                                       '
-            ReDim strFolderList(1)
+        If _count = 0 Then                                                       '
+            ReDim _strFolderArray(1)
             ReDim lngValor(1)
-            intCount = 1
-            strFolderList(1) = fldr
+            _count = 1
+            _strFolderArray(1) = fldr
             lngValor(1) = Val
 
         Else
@@ -91,29 +85,29 @@
                 '_____________________________________________________________________
                 '------ Case where we add a new folder entry--------------------------
 
-                If intCount < mxsug Then                                  'If there are less results than the max, add a result
-                    intCount = intCount + 1
-                    ReDim Preserve strFolderList(intCount)
-                    ReDim Preserve lngValor(intCount)
+                If _count < mxsug Then                                  'If there are less results than the max, add a result
+                    _count = _count + 1
+                    ReDim Preserve _strFolderArray(_count)
+                    ReDim Preserve lngValor(_count)
                 End If
 
-                For i = 1 To intCount - 1                                          'Put the result into the right sequence based on
+                For i = 1 To _count - 1                                          'Put the result into the right sequence based on
                     If Val > lngValor(i) Then                                       'highest score to lowest score
                         added = True
-                        For j = intCount - 1 To i Step -1                          'Loop shifts every entry down one for middle insertion
-                            strFolderList(j + 1) = strFolderList(j)
+                        For j = _count - 1 To i Step -1                          'Loop shifts every entry down one for middle insertion
+                            _strFolderArray(j + 1) = _strFolderArray(j)
                             lngValor(j + 1) = lngValor(j)
                         Next j
-                        strFolderList(i) = fldr
+                        _strFolderArray(i) = fldr
                         lngValor(i) = Val
                         Exit For
                     End If
                 Next i
 
                 If added = False Then                                                   'If it was not at the beginning or in the middle,
-                    If Val > lngValor(intCount) Then                            'Check to see if it goes at the end
-                        strFolderList(intCount) = fldr                          'and replace the last entry if it is better
-                        lngValor(intCount) = Val
+                    If Val > lngValor(_count) Then                            'Check to see if it goes at the end
+                        _strFolderArray(_count) = fldr                          'and replace the last entry if it is better
+                        lngValor(_count) = Val
                     End If
                 End If
                 '_____________________________________________________________________
@@ -130,9 +124,9 @@
                             tempVal = lngValor(i - 1)
                             lngValor(i - 1) = lngValor(i)
                             lngValor(i) = tempVal
-                            tempStr = strFolderList(i - 1)
-                            strFolderList(i - 1) = strFolderList(i)
-                            strFolderList(i) = tempStr
+                            tempStr = _strFolderArray(i - 1)
+                            _strFolderArray(i - 1) = _strFolderArray(i)
+                            _strFolderArray(i) = tempStr
                         Else
                             Exit For                                                'Stop reordering when it is in order
                         End If
@@ -153,8 +147,8 @@
 
     Public Sub PrintDebug()
         Dim i As Integer
-        For i = 1 To intCount
-            Debug.WriteLine("Folder: " & strFolderList(i) & "   Value: " & lngValor(i))
+        For i = 1 To _count
+            Debug.WriteLine("Folder: " & _strFolderArray(i) & "   Value: " & lngValor(i))
         Next i
     End Sub
 
