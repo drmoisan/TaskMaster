@@ -81,7 +81,9 @@ Public Class RibbonViewer
         MsgBox("Not Implemented")
     End Sub
 
-
+    Public Sub QuickFiler_Click(ByVal control As Office.IRibbonControl)
+        _controller.LoadQuickFiler()
+    End Sub
 #End Region
 
 #Region "Helpers"

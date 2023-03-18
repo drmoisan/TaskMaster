@@ -86,5 +86,11 @@
     <Setting Name="FileName_CategoryFilters" Type="System.String" Scope="User">
       <Value Profile="(Default)">999999CategoryFilters.json</Value>
     </Setting>
+    <Setting Name="View_Wide" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Main View</Value>
+    </Setting>
+    <Setting Name="View_Compact" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Compact</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

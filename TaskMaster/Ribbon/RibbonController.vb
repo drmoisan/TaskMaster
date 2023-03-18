@@ -1,6 +1,8 @@
 ﻿Imports Microsoft.Office.Tools.Ribbon
 Imports ToDoModel
 Imports UtilitiesVB
+Imports QuickFiler
+Imports TaskVisualization
 
 Public Class RibbonController
     Private _viewer As RibbonViewer
@@ -34,6 +36,13 @@ Public Class RibbonController
         dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals.Ol.App)
         Dim taskTreeController As TaskTreeController = New TaskTreeController(taskTreeViewer, dataModel)
         taskTreeViewer.Show()
+    End Sub
+
+    Friend Sub LoadQuickFiler()
+        Dim _viewer = New QuickFileViewer()
+        Dim _controller = New QuickFileController(_globals, _viewer)
+        _viewer.Show()
+        _controller.SetAPIOptions()
     End Sub
 
     Friend Sub ReviseProjectInfo()

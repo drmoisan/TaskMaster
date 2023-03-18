@@ -11,4 +11,5 @@ Public Interface IOlObjects
     ReadOnly Property ToDoFolder As Folder
     Property ShowInConversations As Boolean
     Property MovedMails_Stack As cStackObject
+    ReadOnly Property View_Wide As String
 End Interface

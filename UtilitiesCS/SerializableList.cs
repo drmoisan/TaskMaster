@@ -200,7 +200,7 @@ namespace UtilitiesCS
 
                 _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 response = MessageBox.Show("Not Found", filepath +
                     " not found. Load from CSV?", MessageBoxButtons.YesNo);

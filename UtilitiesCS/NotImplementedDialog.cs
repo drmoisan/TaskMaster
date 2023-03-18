@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS
 {
-    public class NotImplementedDialog
+    public static class NotImplementedDialog
     {
         private delegate DialogResult ResponseDelegate();
 

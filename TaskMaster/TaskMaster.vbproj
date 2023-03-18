@@ -137,7 +137,7 @@
   <ItemGroup>
     <Reference Include="Accessibility" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
       <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
@@ -218,7 +218,7 @@
     <Compile Include="AppGlobals\ApplicationGlobals.vb" />
     <Compile Include="AppGlobals\AppOlObjects.vb" />
     <Compile Include="AppGlobals\AppToDoObjects.vb" />
-    <Compile Include="ToDoObj.vb" />
+    <Compile Include="AppGlobals\ToDoObj.vb" />
     <Compile Include="Ribbon\RibbonController.vb" />
     <Compile Include="Ribbon\RibbonViewer.vb">
       <XmlRibbon>true</XmlRibbon>
@@ -242,6 +242,7 @@
     <None Include="My Project\DataSources\ProjectInfo.datasource" />
     <None Include="My Project\DataSources\ProjectInfoWindow.datasource" />
     <None Include="packages.config" />
+    <None Include="TaskMaster_1_TemporaryKey.pfx" />
     <None Include="TaskMaster_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.vb</DependentUpon>
@@ -276,6 +277,10 @@
     <EmbeddedResource Include="Ribbon\RibbonViewer.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QuickFiler\QuickFiler.vbproj">
+      <Project>{ddee892e-8013-434b-a327-b5422d22eb75}</Project>
+      <Name>QuickFiler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tags\Tags.vbproj">
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>
@@ -315,11 +320,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>
-    </ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>BEAD7788F7A6A4B03DF44BF81A95E5C636B80B28</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>710ACB74613C31F8391F694D01DACE37A672FA11</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a Visual Basic project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

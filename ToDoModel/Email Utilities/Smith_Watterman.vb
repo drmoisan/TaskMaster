@@ -38,6 +38,10 @@ Public Module Smith_Watterman
         ElseIf SWOptions = SW_Options.ByLetters Then
             words_X = StrToChars(Str_X)
             words_Y = StrToChars(Str_Y)
+        Else
+            'Default is bywords
+            words_X = Split(Str_X, " ")
+            words_Y = Split(Str_Y, " ")
         End If
 
         LenX = UBound(words_X)

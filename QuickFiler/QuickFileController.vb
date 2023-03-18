@@ -271,6 +271,51 @@ Public Class QuickFileController
         _viewer.spn_EmailPerLoad.TabStop = False
 
 
+        'blShowInConversations
+        If _activeExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
+            blShowInConversations = True
+        End If
+
+
+        'If blShowInConversations Then
+        '    'ToggleShowAsConversation -1
+        '    ExplConvView_ToggleOff
+        '    DoEvents
+        'End If
+
+        'Initialize Folder Suggestions and calculate emails per page
+
+        Folder_Suggestions_Reload()
+        blSuppressEvents = False
+        blSuppressEvents = True
+        intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
+        intEmailPosition = 0    'Reverse sort is 0   'Regular sort is 1
+        'intEmailsPerIteration = CInt(Round((Height_PanelMain_Max / (frmHt + frmSp)), 0))
+        intEmailsPerIteration = CInt(Math.Round(_viewer.PanelMain.Height / (frmHt + frmSp), 0))
+        _viewer.spn_EmailPerLoad.Value = intEmailsPerIteration
+
+        '***********************************************************************************
+        '************New code to listen for window lost focus*******************************
+        '    ' Set our event extender
+        '    focusListener = New FormFocusListener
+        '    'subclass the userform to catch WM_NCACTIVATE msgs
+        '    #If VBA7 Then
+        '        Dim lhWnd As LongPtr
+        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
+        '        lPrevWnd = SetWindowLongPtr(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
+        '    #Else
+        '        Dim lhWnd As Long
+        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
+        '        lPrevWnd = SetWindowLong(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
+        '    #End If
+        '**********************End listen code**********************************************
+        '***********************************************************************************
+
+        blSuppressEvents = False                                        'End suppression of events
+
+    End Sub
+
+    Public Sub SetAPIOptions()
         'Lets find the UserForm Handle the function below retrieves the handle
         'to the top-level window whose class name ("ThunderDFrame" for Excel)
         'and window name (me.caption or UserformName caption) match the specified strings.
@@ -306,61 +351,14 @@ Public Class QuickFileController
         'The DrawMenuBar function redraws the menu bar of the specified window.
         'We need this as we have changed the menu bar after Windows has created it.
         'All we need is the Handle.
-        Dim unused3 = DrawMenuBar(lFormHandle)
-        'blShowInConversations
-        If _activeExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
-
-        End If
-
-
-        'If blShowInConversations Then
-        '    'ToggleShowAsConversation -1
-        '    ExplConvView_ToggleOff
-        '    DoEvents
-        'End If
-
-        'Initialize Folder Suggestions and calculate emails per page
-
-        Folder_Suggestions_Reload()
-        blSuppressEvents = False
-        Dim unused2 = ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
-        blSuppressEvents = True
-        intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
-        intEmailPosition = 0    'Reverse sort is 0   'Regular sort is 1
-        'intEmailsPerIteration = CInt(Round((Height_PanelMain_Max / (frmHt + frmSp)), 0))
-        intEmailsPerIteration = CInt(Math.Round(_viewer.PanelMain.Height / (frmHt + frmSp), 0))
-        _viewer.spn_EmailPerLoad.Value = intEmailsPerIteration
-
-        '***********************************************************************************
-        '************New code to listen for window lost focus*******************************
-        '    ' Set our event extender
-        '    focusListener = New FormFocusListener
-        '    'subclass the userform to catch WM_NCACTIVATE msgs
-        '    #If VBA7 Then
-        '        Dim lhWnd As LongPtr
-        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
-        '        lPrevWnd = SetWindowLongPtr(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
-        '    #Else
-        '        Dim lhWnd As Long
-        '        lhWnd = FindWindow("ThunderDFrame", Me.Caption)
-        '        lPrevWnd = SetWindowLong(lhWnd, GWL_WNDPROC, AddressOf myWindowProc)
-        '    #End If
-        '**********************End listen code**********************************************
-        '***********************************************************************************
-
+        DrawMenuBar(lFormHandle)
+        ShowWindow(lFormHandle, SW_SHOWMAXIMIZED)
         'Modal    SendMessage lFormHandle, WM_SETFOCUS, 0&, 0&
-        Dim unused1 = EnableWindow(OlApp_hWnd, Modal)
-        Dim unused = EnableWindow(lFormHandle, Modeless)
-        blSuppressEvents = False                                        'End suppression of events
-
-
-
-
+        EnableWindow(OlApp_hWnd, Modal)
+        EnableWindow(lFormHandle, Modeless)
 
 
     End Sub
-
-
 
     Public Sub LoadEmailDataBase(Optional colEmailsToLoad As Collection = Nothing)
         Dim OlFolder As Folder
@@ -1538,7 +1536,7 @@ Public Class QuickFileController
                 ctlFrame = QF.frm
                 ctlFrame.Top = ctlFrame.Top - frmHt - frmSp
             Next i
-            _viewer.PanelMain.ScrollHeight = max(_viewer.PanelMain.ScrollHeight - frmHt - frmSp, Height_PanelMain_Max)
+            '_viewer.PanelMain.ScrollHeight = max(_viewer.PanelMain.ScrollHeight - frmHt - frmSp, Height_PanelMain_Max)
         End If
 
         colQFClass.Remove(intPosition)
@@ -1642,8 +1640,8 @@ Public Class QuickFileController
                                 QF.ExpandCtrls1()
 
                             End If
-
-                            ScrollIntoView_MF(QF.frm.Top, QF.frm.Top + QF.frm.Height)
+                            _viewer.PanelMain.ScrollControlIntoView(QF.frm)
+                            'ScrollIntoView_MF(QF.frm.Top, QF.frm.Top + QF.frm.Height)
                         End If
 
 
@@ -1878,9 +1876,10 @@ Public Class QuickFileController
 
                 _viewer.AcceleratorDialogue.Focus()
 
-            Case vbKeyA
+            Case Keys.A
 
-                If Shift And acShiftMask = acShiftMask And Shift And acCtrlMask = acCtrlMask Then
+                If ((Control.ModifierKeys And Keys.Shift) = Keys.Shift) And
+                    ((Control.ModifierKeys And Keys.Control) = Keys.Control) Then
 
 
                     ToggleRemoteMouseLabels()
@@ -2155,9 +2154,9 @@ Public Class QuickFileController
     End Sub
 
     Private Sub spn_EmailPerLoad_Change()
-        If spn_EmailPerLoad.Value >= 0 Then
-            intEmailsPerIteration = spn_EmailPerLoad.Value
-            lbl_EmailPerLoad.Caption = intEmailsPerIteration
+        If _viewer.spn_EmailPerLoad.Value >= 0 Then
+            intEmailsPerIteration = _viewer.spn_EmailPerLoad.Value
+
         End If
     End Sub
 
@@ -2252,22 +2251,22 @@ Public Class QuickFileController
 
     End Sub
 
-    Private Sub ScrollIntoView_MF(lngItemTop As Long, lngItemBottom As Long)
-        Dim DiffY As Long
+    'Private Sub ScrollIntoView_MF(lngItemTop As Long, lngItemBottom As Long)
+    '    Dim DiffY As Long
 
-        If lngItemTop < lngPanelMain_SC_Top Then
-            'Diffy = lngItemTop - lngPanelMain_SC_Top
-            'PanelMain.Scroll , Diffy
-            'lngPanelMain_SC_Top = lngPanelMain_SC_Top = Diffy
-            lngPanelMain_SC_Top = lngItemTop - frmSp
-            _viewer.PanelMain.ScrollTop = lngPanelMain_SC_Top
-        ElseIf (frmSp + lngItemBottom) > (lngPanelMain_SC_Top + _viewer.PanelMain.Height) Then
-            DiffY = frmSp + lngItemBottom - (lngPanelMain_SC_Top + _viewer.PanelMain.Height)
-            'PanelMain.Scroll yAction:=CInt(Diffy)
-            lngPanelMain_SC_Top += DiffY
-            _viewer.PanelMain.ScrollTop = lngPanelMain_SC_Top
-        End If
-    End Sub
+    '    If lngItemTop < lngPanelMain_SC_Top Then
+    '        'Diffy = lngItemTop - lngPanelMain_SC_Top
+    '        'PanelMain.Scroll , Diffy
+    '        'lngPanelMain_SC_Top = lngPanelMain_SC_Top = Diffy
+    '        lngPanelMain_SC_Top = lngItemTop - frmSp
+    '        _viewer.PanelMain.ScrollTop = lngPanelMain_SC_Top
+    '    ElseIf (frmSp + lngItemBottom) > (lngPanelMain_SC_Top + _viewer.PanelMain.Height) Then
+    '        DiffY = frmSp + lngItemBottom - (lngPanelMain_SC_Top + _viewer.PanelMain.Height)
+    '        'PanelMain.Scroll yAction:=CInt(Diffy)
+    '        lngPanelMain_SC_Top += DiffY
+    '        _viewer.PanelMain.ScrollTop = lngPanelMain_SC_Top
+    '    End If
+    'End Sub
 
 
     Private Sub focusListener_ChangeFocus(ByVal gotFocus As Boolean)
@@ -2497,14 +2496,14 @@ Public Class QuickFileController
             End If
 
             objView_Mem = objView.Name
-            If objView_Mem = "tmpNoConversation" Then objView_Mem = View_Wide
+            If objView_Mem = "tmpNoConversation" Then objView_Mem = _globals.Ol.View_Wide
 
             'On Error Resume Next
 
             objViewTemp = objView.Parent("tmpNoConversation")
 
             If objViewTemp Is Nothing Then
-                objViewTemp = objView.Copy("tmpNoConversation", olViewSaveOptionThisFolderOnlyMe)
+                objViewTemp = objView.Copy("tmpNoConversation", OlViewSaveOption.olViewSaveOptionThisFolderOnlyMe)
                 objViewTemp.XML = Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, , vbTextCompare)
                 objViewTemp.Save()
 

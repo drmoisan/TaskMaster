@@ -219,7 +219,6 @@
     <Compile Include="Solution Interfaces\IToDoObj.vb" />
     <Compile Include="To Depricate\CSVDictUtilities.vb" />
     <Compile Include="To Depricate\FileIO2.vb" />
-    <Compile Include="To Depricate\NotImplementedDialogModule.vb" />
     <Compile Include="To Depricate\StringManipulation.vb" />
     <Compile Include="Windows Forms\DeclaratonsWinAPI.vb" />
     <Compile Include="Common Outlook Functions\ExplorerActions.vb" />

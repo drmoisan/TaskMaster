@@ -15,6 +15,18 @@ Public Class AppOlObjects
 
     Public ReadOnly Property App As Application Implements IOlObjects.App
 
+    Public ReadOnly Property View_Wide As String Implements IOlObjects.View_Wide
+        Get
+            Return My.Settings.View_Wide
+        End Get
+    End Property
+
+    Public ReadOnly Property View_Compact
+        Get
+            Return My.Settings.View_Wide
+        End Get
+    End Property
+
     Public ReadOnly Property NamespaceMAPI As Outlook.NameSpace Implements IOlObjects.NamespaceMAPI
         Get
             Return App.Application.GetNamespace("MAPI")

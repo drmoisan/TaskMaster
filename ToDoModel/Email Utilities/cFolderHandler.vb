@@ -144,7 +144,7 @@ Public Class cFolderHandler
                         ReDim Preserve _folderList(UpBound)
                         _folderList(UpBound - Result.Count) = "========= SUGGESTIONS ========="
                         For i = 1 To Result.Count
-                            _folderList(UpBound - Result.Count + i) = Result._folderList_ItemByIndex(i)
+                            _folderList(UpBound - Result.Count + i) = Result.FolderList_ItemByIndex(i)
                         Next i
                     End If
 

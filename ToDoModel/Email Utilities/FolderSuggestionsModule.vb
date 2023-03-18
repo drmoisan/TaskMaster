@@ -10,7 +10,7 @@ Public Module FolderSuggestionsModule
 
 
         Dim Inc_Num As Integer
-        Dim Matrix(,) As Object
+        Dim Matrix(,) As Object = Nothing
         Dim SubjectStripped As String
 
 
@@ -48,33 +48,12 @@ Public Module FolderSuggestionsModule
                 Val = (Val ^ _globals.AF.LngConvCtPwr) * CLng(_globals.AF.Conversation_Weight)
 
 
-                'Add the folder to the suggestions list with the appropriate weight
-                'Call Suggestions_ADD(Result, .Email_Folder(i), Val)
                 Result.Add(.Email_Folder(i), Val)
-                'If InBackground Then DoEvents
             Next i
-            'These lines written for refiling old emails that were deleted by retention policy and then recovered
-            '        If .Folder_Count = 0 Then
-            '            Suggestions_ADD Result, "Trash to Delete", 10000
-            '            strWrite = "convID, " & _
-            '                    ", " & _
-            '                    ", " & _
-            '                    ", " & _
-            '                    ", " & _
-            '                    "Trash to Delete" & ", " & _
-            '                    47 & ", " & _
-            '                    10000
-            '            stackDebug.Push strWrite
-            '        End If
         End With
 
         objProperty = MSG.UserProperties.Find("AutoFile")
         If Not objProperty Is Nothing Then Result.Add(objProperty.Value, (4 ^ _globals.AF.LngConvCtPwr) * CLng(_globals.AF.Conversation_Weight))
-
-
-        'For i = 1 To Result.Count
-        '    Debug.Print "Result " & i & " " & Result.FolderList(i) & "   " & Result.Valor(i)
-        'Next i
 
         SubjectStripped = StripCommonWords(MSG.Subject) 'Eliminate common words from the subject
 
@@ -95,12 +74,13 @@ Public Module FolderSuggestionsModule
                     '                StopWatch_Main.Pause
 
                     varFldrSubs = Split(.Email_Folder, "\")
-                    If IsArray(varFldrSubs) Then strTmpFldr = varFldrSubs(UBound(varFldrSubs))
-                    'strTmpFldr = UCase(Replace(.Email_Folder, "\", " "))   'logic wrong here. should eliminate all before the last backslash
+                    If IsArray(varFldrSubs) Then
+                        strTmpFldr = varFldrSubs(UBound(varFldrSubs))
+                    Else
+                        strTmpFldr = varFldrSubs
+                    End If
+
                     Val1 = Smith_Watterman.SW_Calc(SubjectStripped, strTmpFldr, Matrix, AppGlobals.AF, SW_Options.ByWords)
-
-                    '                StopWatch_Main.reStart
-
                     Val = Val1 * Val1 + Val
                 End If
                 'SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .Email_Subject, Matrix)
@@ -110,14 +90,7 @@ Public Module FolderSuggestionsModule
 
 
                 If Val > 5 Then
-
-                    '                StopWatch_Main.Pause
-
-                    'Call Suggestions_ADD(Result, .Email_Folder, Val)
                     Result.Add(.Email_Folder, Val)
-
-                    '                StopWatch_Main.reStart
-
                 End If
             End With
         Next i
