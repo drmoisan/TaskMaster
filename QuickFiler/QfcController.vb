@@ -142,7 +142,7 @@ Public Class QfcController
     Private spn As Windows.Forms.NumericUpDown
 
 
-    Private fldrHandler As cFolderHandler
+    Private _fldrHandler As cFolderHandler
     Private hWndCaller As IntPtr
 
     Private p_BoolRemoteMouseApp As Boolean
@@ -399,16 +399,16 @@ Public Class QfcController
                 cbo.Items.AddRange(strFolders)
                 cbo.SelectedIndex = 1
             Else
-                fldrHandler = New cFolderHandler(_globals)
-                cbo.Items.AddRange(fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=Mail))
+                _fldrHandler = New cFolderHandler(_globals)
+                cbo.Items.AddRange(_fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=Mail))
 
                 If cbo.Items.Count >= 2 Then cbo.SelectedIndex = 2
             End If
 
         End If
 
-        '    Set fldrHandler = New cFolderHandler
-        '    cbo.List = fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=mail)
+        '    Set _fldrHandler = New cFolderHandler
+        '    cbo.List = _fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=mail)
         '    If cbo.ListCount >= 2 Then cbo.Value = cbo.List(2)
 
         '    Set objProperty = mail.UserProperties.FIND("AutoFile")
@@ -532,12 +532,12 @@ Public Class QfcController
             If .CurrentView <> "tmpNoConversation" Then
                 .CurrentView = "tmpNoConversation"
             End If
-            .ClearSelection
+            .ClearSelection()
             If .IsItemSelectableInView(Mail) Then .AddToSelection(Mail)
             'DoEvents
         End With
         If Err.Number <> 0 Then
-            Dim unused = MsgBox("Error in QF.Mail_Activate: " & Err.Description)
+            MsgBox("Error in QF.Mail_Activate: " & Err.Description)
             'Deactivate_Email_Timing_And_Velocity
             Stop
             Err.Clear()
@@ -881,7 +881,7 @@ Public Class QfcController
             colCtrls.Remove(colCtrls.Count)
         Loop
 
-        fldrHandler = Nothing
+        _fldrHandler = Nothing
 
     End Sub
 
@@ -904,7 +904,7 @@ Public Class QfcController
         'Set _suggestions = Nothing
         'Set strFolders = Nothing
         colCtrls = Nothing
-        fldrHandler = Nothing
+        _fldrHandler = Nothing
 
 
 
@@ -918,7 +918,7 @@ Public Class QfcController
         Mail.Display()
         Dim unused1 = oParent.QFD_Minimize
         'TODO: Pass a handler to this class with a known interface
-        If oParent.blShowInConversations Then Dim unused = oParent.ExplConvView_ToggleOn
+        If oParent.blShowInConversations Then oParent.ExplConvView_ToggleOn
     End Sub
 
     Private Sub cbDel_Click()
@@ -927,7 +927,7 @@ Public Class QfcController
 
 
     Private Sub cbDel_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub cbDel_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -938,7 +938,7 @@ Public Class QfcController
         'Select Case KeyCode
         '    Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '    Case Else
         'End Select
     End Sub
@@ -959,7 +959,7 @@ Public Class QfcController
     End Sub
 
     Private Sub cbFlag_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub cbFlag_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -976,11 +976,11 @@ Public Class QfcController
     End Sub
 
     Private Sub cbKll_Click()
-        Dim unused = oParent.RemoveSpecificControlGroup(intMyPosition)
+        oParent.RemoveSpecificControlGroup(intMyPosition)
     End Sub
 
     Private Sub cbKll_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub cbKll_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -991,7 +991,7 @@ Public Class QfcController
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
@@ -1023,21 +1023,21 @@ Public Class QfcController
             Case Keys.Right
                 intEnterCounter = 0
                 If intComboRightCtr = 0 Then
-                    cbo.DropDown()
+                    cbo.DroppedDown = True
                     intComboRightCtr = 1
                 ElseIf intComboRightCtr = 1 Then
 
                     InitializeSortToExisting(InitType:="Sort",
                         QuickLoad:=False,
                         WholeConversation:=False,
-                        strSeed:=cbo.Value,
+                        strSeed:=cbo.SelectedItem,
                         objItem:=Mail)
                     cbKll_Click()
                 Else
-                    Dim unused = MsgBox("Error in intComboRightCtr ... setting to 0 and continuing")
+                    MsgBox("Error in intComboRightCtr ... setting to 0 and continuing")
                     intComboRightCtr = 0
                 End If
-            Case vbKeyLeft
+            Case Keys.Left
                 intEnterCounter = 0
                 intComboRightCtr = 0
             Case Keys.Down
@@ -1049,37 +1049,20 @@ Public Class QfcController
 
 
     Private Sub cbTmp_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub cbTmp_KeyUp(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
     End Sub
 
     Private Sub chk_Click()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "chk_Click"
-        Dim Temp As Variant
-
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
-
-        SF_Stack.Push(SubNm)
-        strSubs = SF_Stack.GetString(True)
-        TraceStack.Push(strSubs)
-        SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
-
-
-        '*******************END Error Header*********************
-
-
 
         Dim selItems As Collection
         Dim objItem As Object
         Dim objMail As Outlook.MailItem
         Dim i As Integer
-        Dim varList As Variant
+        Dim varList As String()
 
         'Create a collection with all of the mail items in the conversation in the current folder
         selItems = New Collection
@@ -1107,120 +1090,95 @@ Public Class QfcController
             oParent.ConvToggle_Group(selItems, intMyPosition)
             lblConvCt.Enabled = True
         Else
-            varList = cbo.Items
+            varList = cbo.Items.Cast(Of Object)().[Select](Function(item) item.ToString()).ToArray()
             oParent.ConvToggle_UnGroup(selItems, intMyPosition, CInt(lblConvCt.Text), varList)
             lblConvCt.Enabled = False
         End If
 
 
-        Temp = SF_Stack.Pop
+
     End Sub
 
     Private Sub chk_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub chk_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub frm_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
-    Private Sub frm_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        Dim unused = oParent.KeyPressHandler(KeyAscii)
+    Private Sub frm_KeyPress(sender As Object, e As KeyPressEventArgs)
+        oParent.KeyPressHandler(sender, e)
     End Sub
 
     Private Sub frm_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub lst_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub lst_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub opt_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub opt_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub spn_KeyDown(sender As Object, e As KeyEventArgs)
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
     End Sub
 
     Private Sub spn_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub txt_Change()
-        'Procedure Naming
-        Dim SubNm As String
-        SubNm = "chk_Click"
-        Dim Temp As Variant
 
-        If SF_Stack Is Nothing Then SF_Stack = New cStackGeneric
-        If TraceStack Is Nothing Then TraceStack = New cStackGeneric
+        cbo.Items.Clear()
+        cbo.Items.AddRange(_fldrHandler.FindFolder("*" & txt.Text & "*", True, ReCalcSuggestions:=False, objItem:=Mail))
 
-        SF_Stack.Push(SubNm)
-        strSubs = SF_Stack.GetString(True)
-        TraceStack.Push(strSubs)
-        SubNm = Format(Now(), "hh:mm:ss") & " " & SubNm & " "
+        If cbo.Items.Count >= 2 Then cbo.SelectedIndex = 1
 
-
-        '*******************END Error Header*********************
-
-        '    cbo.List = fldrHandler.FindFolder("*" & txt.Value & "*", True, ReCalcSuggestions:=False, objItem:=mail)
-        Call Email_SortToExistingFolder.FindFolder("*" & txt.Value & "*", True)
-        cbo.List = Email_SortToExistingFolder.FolderList
-        If cbo.ListCount >= 2 Then cbo.Value = cbo.List(1)
-
-        On Error Resume Next
-        Temp = SF_Stack.Pop
     End Sub
 
 
     Private Sub KeyPressHandler_Class(sender As Object, e As KeyPressEventArgs)
-        Select Case KeyAscii
-            Case vbKeyReturn
-                Dim unused2 = oParent.KeyPressHandler(KeyAscii)
-            Case vbKeyTab
-                Dim unused1 = oParent.KeyPressHandler(KeyAscii)
-            Case vbKeyEscape
-                Dim unused = oParent.KeyPressHandler(KeyAscii)
-        End Select
 
     End Sub
 
@@ -1228,20 +1186,20 @@ Public Class QfcController
     Private Sub txt_KeyDown(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        Dim unused = oParent.KeyDownHandler(sender, e)
+        oParent.KeyDownHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
-    Private Sub txt_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
-        Dim unused = oParent.KeyPressHandler(KeyAscii)
+    Private Sub txt_KeyPress(sender As Object, e As KeyPressEventArgs)
+        oParent.KeyPressHandler(sender, e)
     End Sub
 
     Private Sub txt_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
         'oParent.toggleAcceleratorDialogue
-        Dim unused = oParent.KeyUpHandler(sender, e)
+        oParent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub

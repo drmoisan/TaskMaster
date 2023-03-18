@@ -53,6 +53,7 @@
       <DependentUpon>MyBoxTemplate.cs</DependentUpon>
     </Compile>
     <Compile Include="ISerializableList.cs" />
+    <Compile Include="NotImplementedDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableList.cs" />
     <Compile Include="MyBox.cs" />

@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.Generic
 Imports System.Drawing
+Imports System.IO
 Imports System.Linq
 Imports System.Windows.Forms
 Imports Microsoft.Office.Interop
@@ -184,18 +185,23 @@ Public Class QuickFileController
     Private Const frmLt = 12
     Private Const frmSp = 6
 
-
     Public colEmailsInFolder As Collection
+    Private blRunningModalCode As Boolean = False
+
+    'Global variables
+    Private _globals As IApplicationGlobals
     Private ReadOnly _activeExplorer As Outlook.Explorer
     Private _olObjects As IOlObjects
     Private ReadOnly _olApp As Outlook.Application
     Private ReadOnly _viewer As QuickFileViewer
     Private _movedMails As cStackObject
-    Private blRunningModalCode As Boolean = False
 
-    Public Sub New(AppOlObjects As IOlObjects,
+
+
+    Public Sub New(AppGlobals As IApplicationGlobals,
                    Viewer As QuickFileViewer)
-        _olObjects = AppOlObjects
+        _globals = AppGlobals
+        _olObjects = AppGlobals.Ol
         _olApp = _olObjects.App
         _viewer = Viewer
         _activeExplorer = _olObjects.App.ActiveExplorer()
@@ -1336,11 +1342,11 @@ Public Class QuickFileController
 
         If TypeOf objItem Is MailItem Then
             Mail = objItem
-            QF = New QfcController
+
             colCtrls = New Collection
 
             LoadGroupOfCtrls(colCtrls, intUniqueItemCounter, posInsert, blGroupConversation)
-            QF = New QfcController(Mail, colCtrls, posInsert, BoolRemoteMouseApp, Me)
+            QF = New QfcController(Mail, colCtrls, posInsert, BoolRemoteMouseApp, Me, _globals)
             If blChild Then QF.blConChild = True
             If IsArray(varList) = True Then
                 If UBound(varList) = 0 Then
@@ -1679,8 +1685,8 @@ Public Class QuickFileController
                                 Dim unused2 = EnableWindow(OlApp_hWnd, Modeless)
                                 'EnableWindow lFormHandle, Modeless
 
-                                If _activeExplorer.CurrentFolder.DefaultItemType <> olMailItem Then
-                                    _activeExplorer.NavigationPane.CurrentModule = _activeExplorer.NavigationPane.Modules.GetNavigationModule(olModuleMail)
+                                If _activeExplorer.CurrentFolder.DefaultItemType <> OlItemType.olMailItem Then
+                                    _activeExplorer.NavigationPane.CurrentModule = _activeExplorer.NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail)
                                 End If
 
                                 If InitType.HasFlag(InitTypeEnum.InitSort) And AreConversationsGrouped(_activeExplorer) Then ExplConvView_ToggleOff()                      'Modal
@@ -2360,7 +2366,7 @@ Public Class QuickFileController
     Public Sub KeyUpHandler(sender As Object, e As KeyEventArgs)
         If Not blSuppressEvents Then
             Select Case e.KeyCode
-                Case 18
+                Case Keys.Alt
                     If _viewer.AcceleratorDialogue.Visible Then
                         _viewer.AcceleratorDialogue.Focus()
                         _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
@@ -2587,16 +2593,8 @@ Public Class QuickFileController
 
 
 
-        LOC_TXT_FILE = FileSystem_MyD & filename
-        'If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable LOC_TXT_FILE = " & LOC_TXT_FILE
-        'If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable FileWriteType = " & FileWriteType
+        LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename)
 
-        ' If DebugLVL And vbCommand Then Debug.Print SubNm & " If FileWriteType = 8 Then "
-        '    If FileWriteType = 8 Then
-        '        a = objFSO.OpenTextFile(LOC_TXT_FILE, FileWriteType, 0)
-        '    Else
-        '        a = objFSO.CreateTextFile(LOC_TXT_FILE, True)
-        '    End If
 
         Duration = StopWatch.timeElapsed
         OlEndTime = Now()
@@ -2614,15 +2612,15 @@ Public Class QuickFileController
         'dataLineBeg = dataLineBeg & durationText & "," & durationMinutesText & ","
 
         infoMail = New cInfoMail
-        OlEmailCalendar = GetCalendar("Email Time")
-        OlAppointment = OlEmailCalendar.Items.Add(olAppointmentItem)
+        OlEmailCalendar = GetCalendar("Email Time", _olApp.Session)
+        OlAppointment = OlEmailCalendar.Items.Add(New Outlook.AppointmentItem)
         With OlAppointment
             .Subject = "Quick Filed " & colQFClass.Count & " emails"
             .Start = OlStartTime
             .End = OlEndTime
             .Categories = "@ Email"
             .ReminderSet = False
-            .Sensitivity = olPrivate
+            .Sensitivity = OlSensitivity.olPrivate
             .Save()
         End With
 
@@ -2640,15 +2638,15 @@ Public Class QuickFileController
                     OlAppointment.Save()
                 End If
             End If
-            dataLine = dataLineBeg & xComma(QF.lblSubject.Caption)
+            dataLine = dataLineBeg & xComma(QF.lblSubject.Text)
             dataLine = dataLine & "," & "QuickFiled"
             dataLine = dataLine & "," & durationText
             dataLine = dataLine & "," & durationMinutesText
             dataLine = dataLine & "," & xComma(QF.strlblTo)
-            dataLine = dataLine & "," & xComma(QF.lblSender.Caption)
+            dataLine = dataLine & "," & xComma(QF.lblSender.Text)
             dataLine = dataLine & "," & "Email"
-            dataLine = dataLine & "," & xComma(QF.cbo.Value)           'Target Folder
-            dataLine = dataLine & "," & QF.lblSentOn
+            dataLine = dataLine & "," & xComma(QF.cbo.SelectedItem.ToString())           'Target Folder
+            dataLine = dataLine & "," & QF.lblSentOn.Text
             dataLine = dataLine & "," & Format(QF.Mail.SentOn, "hh:mm")
             'If DebugLVL And vbCommand Then Debug.Print SubNm & " dataline = " & dataLine
             strOutput(k) = dataLine
@@ -2662,7 +2660,7 @@ Public Class QuickFileController
 
         Next k
 
-        Write_TextFile(filename, strOutput, FileSystem_MyD)
+        Write_TextFile(filename, strOutput, _globals.FS.FldrMyD)
         '    a.Close
 
 
