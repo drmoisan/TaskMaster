@@ -1,8 +1,9 @@
 ﻿Public Class cStopWatch
 
 
-    Private Declare Function getFrequency Lib "kernel32" _
-    Alias "QueryPerformanceFrequency" (cyFrequency As Decimal) As Long
+
+    'Private Declare Function getFrequency Lib "kernel32" _
+    '    Alias "QueryPerformanceFrequency" (ByRef cyFrequency As Decimal) As Long
 
 
 

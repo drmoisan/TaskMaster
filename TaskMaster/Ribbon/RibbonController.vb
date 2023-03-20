@@ -41,8 +41,8 @@ Public Class RibbonController
     Friend Sub LoadQuickFiler()
         Dim _viewer = New QuickFileViewer()
         Dim _controller = New QuickFileController(_globals, _viewer)
-        _viewer.Show()
-        _controller.SetAPIOptions()
+
+        '_controller.SetAPIOptions()
     End Sub
 
     Friend Sub ReviseProjectInfo()

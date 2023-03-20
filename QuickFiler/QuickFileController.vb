@@ -200,16 +200,17 @@ Public Class QuickFileController
 
     Public Sub New(AppGlobals As IApplicationGlobals,
                    Viewer As QuickFileViewer)
+        _viewer = Viewer
+        _viewer.SetController(Me)
+
         _globals = AppGlobals
         _olObjects = AppGlobals.Ol
         _olApp = _olObjects.App
-        _viewer = Viewer
         _activeExplorer = _olObjects.App.ActiveExplorer()
         _movedMails = _olObjects.MovedMails_Stack
 
         Dim lngPreviousHeight As Long
         Dim lngHeightDifference As Long
-
 
         blSuppressEvents = True                                     'Suppress events until the form is initialized
         InitType = InitTypeEnum.InitSort
@@ -260,8 +261,6 @@ Public Class QuickFileController
         Height_PanelMain_Max = _viewer.PanelMain.Height + lngHeightDifference
         _viewer.PanelMain.Height = Height_PanelMain_Max
 
-
-
         'Button1.TabStop = False
         _viewer.Button_OK.TabStop = False
         _viewer.BUTTON_CANCEL.TabStop = False
@@ -269,7 +268,6 @@ Public Class QuickFileController
         _viewer.PanelMain.TabStop = False
         _viewer.AcceleratorDialogue.TabStop = True
         _viewer.spn_EmailPerLoad.TabStop = False
-
 
         'blShowInConversations
         If _activeExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
@@ -285,7 +283,7 @@ Public Class QuickFileController
 
         'Initialize Folder Suggestions and calculate emails per page
 
-        Folder_Suggestions_Reload()
+        'Folder_Suggestions_Reload()
         blSuppressEvents = False
         blSuppressEvents = True
         intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
@@ -312,6 +310,10 @@ Public Class QuickFileController
         '***********************************************************************************
 
         blSuppressEvents = False                                        'End suppression of events
+
+        LoadEmailDataBase()
+        _viewer.Show()
+        Iterate()
 
     End Sub
 
@@ -454,7 +456,7 @@ Public Class QuickFileController
     End Sub
 
     Public Sub Iterate()
-        Dim i As Double
+        Dim i As Integer
         Dim max As Double
 
         Dim colEmails As Collection
@@ -468,7 +470,8 @@ Public Class QuickFileController
             colEmails.Add(colEmailsInFolder(i))
         Next i
         For i = max To 1 Step -1
-            Dim unused = colEmailsInFolder.Remove(colEmailsInFolder(i))
+            'colEmailsInFolder.Remove(colEmailsInFolder(i))
+            colEmailsInFolder.Remove(i)
         Next i
         StopWatch = New cStopWatch
         StopWatch.Start()
@@ -1488,7 +1491,7 @@ Public Class QuickFileController
 
     End Function
 
-    Public Sub RemoveSpecificControlGroup(intPosition As Integer)
+    Friend Sub RemoveSpecificControlGroup(intPosition As Integer)
 
         Dim blDebug As Boolean
         Dim QF As QfcController
@@ -1559,7 +1562,7 @@ Public Class QuickFileController
     End Sub
 
 
-    Private Sub AcceleratorDialogue_Change()
+    Friend Sub AcceleratorDialogue_Change()
 
 
         Dim strToParse As String
@@ -1822,7 +1825,7 @@ Public Class QuickFileController
 
 
 
-    Private Sub AcceleratorDialogue_KeyDown(sender As Object, e As KeyEventArgs)
+    Friend Sub AcceleratorDialogue_KeyDown(sender As Object, e As KeyEventArgs)
 
 
 
@@ -1898,7 +1901,7 @@ Public Class QuickFileController
     End Sub
 
 
-    Private Sub AcceleratorDialogue_KeyUp(sender As Object, e As KeyEventArgs)
+    Friend Sub AcceleratorDialogue_KeyUp(sender As Object, e As KeyEventArgs)
         Dim QF As QfcController
         Dim blExpanded As Boolean
 
@@ -1955,7 +1958,7 @@ Public Class QuickFileController
         End Select
     End Sub
 
-    Private Sub BUTTON_CANCEL_Click()
+    Friend Sub BUTTON_CANCEL_Click()
 
         'ExplConvView_ToggleOn
 
@@ -1970,11 +1973,11 @@ Public Class QuickFileController
         _viewer.Dispose()
     End Sub
 
-    Private Sub BUTTON_CANCEL_KeyDown(sender As Object, e As KeyEventArgs)
+    Friend Sub BUTTON_CANCEL_KeyDown(sender As Object, e As KeyEventArgs)
         KeyDownHandler(sender, e)
     End Sub
 
-    Private Sub Button_OK_Click()
+    Friend Sub Button_OK_Click()
 
         Dim QF As QfcController
         Dim blReadyForMove As Boolean
@@ -2033,7 +2036,7 @@ Public Class QuickFileController
     End Sub
 
 
-    Private Sub Button_OK_KeyDown(sender As Object, e As KeyEventArgs)
+    Friend Sub Button_OK_KeyDown(sender As Object, e As KeyEventArgs)
 
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired Button_OK_KeyDown"
@@ -2041,12 +2044,12 @@ Public Class QuickFileController
         KeyDownHandler(sender, e)
     End Sub
 
-    Private Sub Button_OK_KeyUp(sender As Object, e As KeyEventArgs)
+    Friend Sub Button_OK_KeyUp(sender As Object, e As KeyEventArgs)
         KeyUpHandler(sender, e)
     End Sub
 
 
-    Private Sub Button_Undo_Click()
+    Friend Sub Button_Undo_Click()
         Dim i As Integer
         Dim oMail_Old As MailItem
         Dim oMail_Current As MailItem
@@ -2128,7 +2131,7 @@ Public Class QuickFileController
         End While
     End Sub
 
-    Private Sub _viewer_PanelMain_KeyDown(sender As Object, e As KeyEventArgs)
+    Friend Sub PanelMain_KeyDown(sender As Object, e As KeyEventArgs)
 
 
         'If DebugLVL And vbProcedure Then Debug.Print "Fired _viewer.PanelMain_KeyDown"
@@ -2136,32 +2139,22 @@ Public Class QuickFileController
         KeyDownHandler(sender, e)
     End Sub
 
-    Private Sub _viewer_PanelMain_KeyPress(sender As Object, e As KeyPressEventArgs)
+    Friend Sub PanelMain_KeyPress(sender As Object, e As KeyPressEventArgs)
         'MsgBox ("KeyPress _viewer.PanelMain")
         KeyPressHandler(sender, e)
     End Sub
 
-    Private Sub _viewer_PanelMain_KeyUp(sender As Object, e As KeyEventArgs)
+    Friend Sub PanelMain_KeyUp(sender As Object, e As KeyEventArgs)
         KeyUpHandler(sender, e)
     End Sub
 
-    Private Sub SpinButton1_Change()
-
-    End Sub
-
-    Private Sub lbl_EmailPerLoad_Click()
-
-    End Sub
-
-    Private Sub spn_EmailPerLoad_Change()
+    Friend Sub spn_EmailPerLoad_Change()
         If _viewer.spn_EmailPerLoad.Value >= 0 Then
             intEmailsPerIteration = _viewer.spn_EmailPerLoad.Value
-
         End If
     End Sub
 
     Private Sub spn_EmailPerLoad_KeyDown(sender As Object, e As KeyEventArgs)
-
         KeyDownHandler(sender, e)
     End Sub
 
@@ -2175,9 +2168,6 @@ Public Class QuickFileController
     End Sub
 
     Public Sub toggleAcceleratorDialogue()
-
-
-
 
         Dim QF As QfcController
         Dim i As Integer

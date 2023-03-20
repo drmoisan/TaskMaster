@@ -1,6 +1,7 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB
-
+Imports UtilitiesCS
+Imports System.Reflection
 
 Public Module FolderSuggestionsModule
     Public Function Folder_Suggestions(MSG As MailItem,
@@ -114,7 +115,11 @@ Public Module FolderSuggestionsModule
 
 
     Public Sub Folder_Suggestions_Reload()
-        Throw New NotImplementedException("Folder_Suggestions_Reload not implemented yet")
+
+        If NotImplementedDialog.StopAtNotImplemented(MethodBase.GetCurrentMethod().Name) Then
+            Throw New NotImplementedException("Folder_Suggestions_Reload not implemented yet")
+        End If
+
 
         'Dim blOld As Boolean
         'blOld = False

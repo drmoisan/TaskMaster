@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 
 namespace UtilitiesCS
 {
+    
     [Serializable()]
     public class SerializableList<T> : IList<T>, ISerializableList<T>
     {
