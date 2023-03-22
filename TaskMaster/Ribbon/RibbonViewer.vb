@@ -84,6 +84,10 @@ Public Class RibbonViewer
     Public Sub QuickFiler_Click(ByVal control As Office.IRibbonControl)
         _controller.LoadQuickFiler()
     End Sub
+
+    Public Sub QuickFilerOrig_Click(ByVal control As Office.IRibbonControl)
+        _controller.LoadQuickFiler()
+    End Sub
 #End Region
 
 #Region "Helpers"

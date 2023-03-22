@@ -1,4 +1,5 @@
-﻿Imports ToDoModel
+﻿Imports System.Windows.Forms
+Imports BrightIdeasSoftware
 Imports UtilitiesVB
 
 Public Class ProjectInfoWindow
@@ -21,9 +22,9 @@ Public Class ProjectInfoWindow
         olvProjInfo.SetObjects(pi)
 
         rs.FindAllControls(Me)
-        Dim unused2 = rs.SetResizeDimensions(SplitContainer1.Panel2, Resizer.ResizeDimensions.Position, True)
-        Dim unused1 = rs.SetResizeDimensions(SplitContainer1, Resizer.ResizeDimensions.None, True)
-        Dim unused = rs.SetResizeDimensions(SplitContainer1.Panel1, Resizer.ResizeDimensions.Position Or Resizer.ResizeDimensions.Size, True)
+        rs.SetResizeDimensions(SplitContainer1.Panel2, Resizer.ResizeDimensions.Position, True)
+        rs.SetResizeDimensions(SplitContainer1, Resizer.ResizeDimensions.None, True)
+        rs.SetResizeDimensions(SplitContainer1.Panel1, Resizer.ResizeDimensions.Position Or Resizer.ResizeDimensions.Size, True)
         rs.PrintDict()
     End Sub
 
@@ -42,10 +43,10 @@ Public Class ProjectInfoWindow
         olvProjInfo.AutoScaleColumnsToContainer()
     End Sub
 
-    Private Sub olvProjInfo_KeyUp(sender As Object, e As Windows.Forms.KeyEventArgs) Handles olvProjInfo.KeyUp
+    Private Sub olvProjInfo_KeyUp(sender As Object, e As KeyEventArgs) Handles olvProjInfo.KeyUp
 
         If blEditingCell = False Then
-            If e.KeyData = Windows.Forms.Keys.Delete Then
+            If e.KeyData = Keys.Delete Then
                 Dim selection As System.Collections.ArrayList = olvProjInfo.SelectedObjects
                 If selection IsNot Nothing Then
                     For Each entry As ToDoProjectInfoEntry In selection

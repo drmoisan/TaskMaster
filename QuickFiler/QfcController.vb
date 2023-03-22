@@ -17,7 +17,7 @@ Public Class QfcController
     Public WithEvents cbo As ComboBox         'Combo box containing Folder Suggestions
     Private WithEvents lst As ListBox
     Private WithEvents txt As TextBox          'Input for folder search
-    Private WithEvents bdy As Label
+    Private WithEvents bdy As TextBox
     Private WithEvents cbKll As Button    'Remove mail from Processing
     Private WithEvents cbDel As Button    'Delete email
     Private WithEvents cbFlag As Button    'Flag as Task
@@ -65,7 +65,7 @@ Public Class QfcController
 
     Public lblSender As Label            '<SENDER>
     Public lblSubject As Label            '<SUBJECT>
-    Public lblBody As Label            '<BODY>
+    Public txtboxBody As TextBox            '<BODY>
     Public strlblTo As String                   '<TO>
 
 
@@ -138,8 +138,8 @@ Public Class QfcController
     Private pos_lblAcA As ctrlPosition                     'A Accelerator X% Left Position
     Private pos_lblAcW As ctrlPosition                     'W Accelerator X% Left Position
     Private pos_lblAcM As ctrlPosition                     'M Accelerator X% Left Position
-    Private opt As Windows.Forms.RadioButton
-    Private spn As Windows.Forms.NumericUpDown
+    Private opt As System.Windows.Forms.RadioButton
+    Private spn As System.Windows.Forms.NumericUpDown
 
 
     Private _fldrHandler As cFolderHandler
@@ -165,7 +165,7 @@ Public Class QfcController
         _globals = AppGlobals
         _activeExplorer = AppGlobals.Ol.App.ActiveExplorer
 
-        Dim ctlTmp As Windows.Forms.Control
+        Dim ctlTmp As System.Windows.Forms.Control
         Dim strBodyText As String
 
         InitType = InitTypeE
@@ -177,7 +177,7 @@ Public Class QfcController
         colCtrls = col
         For Each ctlTmp In col
             Select Case TypeName(ctlTmp)
-                Case "Frame"
+                Case "Panel"
                     frm = ctlTmp
                 Case "CheckBox"
                     Select Case ctlTmp.Text
@@ -199,7 +199,17 @@ Public Class QfcController
                 Case "SpinButton"
                     spn = ctlTmp
                 Case "TextBox"
-                    txt = ctlTmp
+                    If ctlTmp.Text = "<BODY>" Then
+                        strBodyText = Replace(Mail.Body, vbCrLf, " ")
+                        strBodyText = Replace(strBodyText, "  ", " ")
+                        strBodyText = Replace(strBodyText, "  ", " ") & "<EOM>"
+                        ctlTmp.Text = strBodyText
+                        bdy = ctlTmp
+                        txtboxBody = ctlTmp
+                    Else
+                        txt = ctlTmp
+                    End If
+
                 Case "Label"
                     lblTmp = ctlTmp
                     Select Case lblTmp.Text
@@ -214,7 +224,7 @@ Public Class QfcController
                         Case "Folder:"
                             lbl5 = lblTmp
                         Case "<SENDER>"
-                            lblTmp.Text = If(Mail.Sent = True, DirectCast(Mail.Sender.ToString(), String), "Draft Message")
+                            lblTmp.Text = If(Mail.Sent = True, GetSenderAddress(Mail), "Draft Message")
                             lblSender = lblTmp
                         Case "<SUBJECT>"
                             lblTmp.Text = Mail.Subject
@@ -230,14 +240,9 @@ Public Class QfcController
                         Case "<Pos#>"
                             lblMyPosition = lblTmp
                         Case "<BODY>"
-                            strBodyText = Replace(Mail.Body, vbCrLf, " ")
-                            strBodyText = Replace(strBodyText, "  ", " ")
-                            strBodyText = Replace(strBodyText, "  ", " ") & "<EOM>"
-                            lblTmp.Text = strBodyText
-                            bdy = lblTmp
-                            lblBody = lblTmp
+
                         Case "<SENTON>"
-                            lblTmp.Text = Format(Mail.SentOn, "MM/DD/YY HH:MM")
+                            lblTmp.Text = Format(Mail.SentOn, "MM/dd/yy HH:MM")
                             lblSentOn = lblTmp
                         Case "F"
                             lblAcF = lblTmp
@@ -261,7 +266,7 @@ Public Class QfcController
                         Case "M"
                             lblAcM = lblTmp
                     End Select
-                Case "CommandButton"
+                Case "Button"
                     cbTmp = ctlTmp
                     If cbTmp.Text = "X" Then
                         cbDel = ctlTmp
@@ -281,7 +286,7 @@ Public Class QfcController
             lblSender.Font = New Font(lblSender.Font, FontStyle.Bold)
         End If
         lblSubject_Width = lblSubject.Width
-        lblBody_Width = lblBody.Width
+        lblBody_Width = txtboxBody.Width
         cbFlag_Left = cbFlag.Left
         lblAcT_Left = lblAcT.Left
 
@@ -379,7 +384,7 @@ Public Class QfcController
             If objProperty IsNot Nothing Then varList = objProperty.Value
         End If
         If IsArray(varList) Then
-            If varList.IsAllocated() Then
+            If IsAllocated(varList) Then
 
                 'For i = LBound(varList) To UBound(varList)
                 cbo.Items.AddRange(varList)
@@ -459,7 +464,7 @@ Public Class QfcController
     End Sub
 
     Public Sub Accel_FocusToggle()
-        Dim ctlTmp As Windows.Forms.Control
+        Dim ctlTmp As System.Windows.Forms.Control
 
         If blAccel_FocusToggle Then
             blAccel_FocusToggle = False
@@ -637,7 +642,7 @@ Public Class QfcController
                 lngTmp = chk.Left
                 chk.Left = lblConvCt.Left - 10
                 lblAcC.Left = lblAcC.Left + chk.Left - lngTmp
-                lblBody.Width = frm.Width - lblBody.Left - 5
+                txtboxBody.Width = frm.Width - txtboxBody.Left - 5
                 pos_body.widthOriginal = lblBody_Width + X1px            'Body Width X%
 
             Else
@@ -647,12 +652,12 @@ Public Class QfcController
                 lblAcD.Left = lblAcD_Left + X1px                         'D Accelerator X% left position
                 lblAcC.Left = lblAcC_Left + X1px + X2px                  'Conversation accelerator X% Left position
                 chk.Left = chk_Left + X1px + X2px                        'Conversation checkbox X% Left Position
-                lblBody.Width = lblBody_Width + X1px                     'Body Width X%
+                txtboxBody.Width = lblBody_Width + X1px                     'Body Width X%
 
             End If
 
         Else
-            lblBody.Width = lblBody_Width + X1px + X2px                   'Body Width X%
+            txtboxBody.Width = lblBody_Width + X1px + X2px                   'Body Width X%
         End If
 
     End Sub
@@ -678,7 +683,7 @@ Public Class QfcController
                 lblAcD.Top = pos_lblAcD.topOriginal + lngShift
 
                 pos_cbo.leftOriginal = cbo.Left
-                cbo.Left = lblBody.Left
+                cbo.Left = txtboxBody.Left
 
                 pos_lblAcD.leftOriginal = lblAcD.Left
                 lblAcD.Left = max(0, cbo.Left - pos_cbo.leftOriginal + pos_lblAcD.leftOriginal)
@@ -687,22 +692,22 @@ Public Class QfcController
                 pos_cbo.widthNew = pos_cbo.leftOriginal - cbo.Left + pos_cbo.widthOriginal - lngBlock_Width
                 cbo.Width = pos_cbo.widthNew
 
-                lngShift = cbo.Top + cbo.Height - lblBody.Top + 1
+                lngShift = cbo.Top + cbo.Height - txtboxBody.Top + 1
 
                 With pos_body
-                    .topOriginal = lblBody.Top
+                    .topOriginal = txtboxBody.Top
                     .topNew = .topOriginal + lngShift
-                    lblBody.Top = .topNew
+                    txtboxBody.Top = .topNew
 
                     pos_lblAcO.topOriginal = lblAcO.Top
                     lblAcO.Top += lngShift
 
-                    .heightOriginal = lblBody.Height
+                    .heightOriginal = txtboxBody.Height
                     .heightNew = frm.Height - .topNew - 5
-                    lblBody.Height = .heightNew
-                    .widthOriginal = lblBody.Width
-                    .widthNew = frm.Width - lblBody.Left - 5
-                    lblBody.Width = .widthNew
+                    txtboxBody.Height = .heightNew
+                    .widthOriginal = txtboxBody.Width
+                    .widthNew = frm.Width - txtboxBody.Left - 5
+                    txtboxBody.Width = .widthNew
                 End With
 
                 chk.Text = ""
@@ -755,9 +760,9 @@ Public Class QfcController
                 lblAcD.Top = pos_lblAcD.topOriginal
                 lblAcD.Left = pos_lblAcD.leftOriginal
 
-                lblBody.Top = pos_body.topOriginal
-                lblBody.Height = pos_body.heightOriginal
-                lblBody.Width = pos_body.widthOriginal
+                txtboxBody.Top = pos_body.topOriginal
+                txtboxBody.Height = pos_body.heightOriginal
+                txtboxBody.Width = pos_body.widthOriginal
                 lblAcO.Top = pos_lblAcO.topOriginal
 
                 chk.Text = "  Conversation"
@@ -781,18 +786,18 @@ Public Class QfcController
                 blExpanded = True
                 frm.Height = frm.Height * 2
                 With pos_body
-                    .topOriginal = lblBody.Top
+                    .topOriginal = txtboxBody.Top
                     pos_lblAcO.topOriginal = lblAcO.Top
-                    .heightOriginal = lblBody.Height
+                    .heightOriginal = txtboxBody.Height
                     .heightNew = frm.Height - .topOriginal - 5
-                    lblBody.Height = .heightNew
+                    txtboxBody.Height = .heightNew
                 End With
             Else
                 blExpanded = False
                 frm.Height = frm.Height / 2
                 With pos_body
-                    lblBody.Top = pos_body.topOriginal
-                    lblBody.Height = pos_body.heightOriginal
+                    txtboxBody.Top = pos_body.topOriginal
+                    txtboxBody.Height = pos_body.heightOriginal
                     lblAcO.Top = pos_lblAcO.topOriginal
                 End With
             End If

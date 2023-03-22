@@ -143,10 +143,10 @@ Partial Class ProjectInfoWindow
 
     End Sub
 
-    Friend WithEvents SplitContainer1 As Windows.Forms.SplitContainer
-    Friend WithEvents ProjectInfoBindingSource As Windows.Forms.BindingSource
-    Friend WithEvents BTN_CANCEL As Windows.Forms.Button
-    Friend WithEvents BTN_OK As Windows.Forms.Button
+    Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
+    Friend WithEvents ProjectInfoBindingSource As System.Windows.Forms.BindingSource
+    Friend WithEvents BTN_CANCEL As System.Windows.Forms.Button
+    Friend WithEvents BTN_OK As System.Windows.Forms.Button
     Friend WithEvents olvProjInfo As BrightIdeasSoftware.ObjectListView
     Friend WithEvents OlvProjectID As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvProjectName As BrightIdeasSoftware.OLVColumn

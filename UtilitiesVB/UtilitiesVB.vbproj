@@ -220,7 +220,6 @@
     <Compile Include="To Depricate\CSVDictUtilities.vb" />
     <Compile Include="To Depricate\FileIO2.vb" />
     <Compile Include="To Depricate\StringManipulation.vb" />
-    <Compile Include="Windows Forms\DeclaratonsWinAPI.vb" />
     <Compile Include="Common Outlook Functions\ExplorerActions.vb" />
     <Compile Include="Base Functionality Extensions\ExtToChar.vb" />
     <Compile Include="To Depricate\FlattenArray.vb" />

@@ -259,20 +259,20 @@ Partial Class TaskTreeForm
     End Sub
     Friend WithEvents OlvToDoID As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvTaskSubject As BrightIdeasSoftware.OLVColumn
-    Friend WithEvents ImageList1 As Windows.Forms.ImageList
+    Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
     Friend WithEvents OlvColumn1 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvColumn2 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvColumn3 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvColumn4 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvColumn5 As BrightIdeasSoftware.OLVColumn
-    Friend WithEvents ContextMenuStrip1 As Windows.Forms.ContextMenuStrip
-    Friend WithEvents ToolStripMenuItem1 As Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents OlvColumn6 As BrightIdeasSoftware.OLVColumn
-    Friend WithEvents FlowLayoutPanel1 As Windows.Forms.FlowLayoutPanel
-    Friend WithEvents But_ReloadTree As Windows.Forms.Button
-    Friend WithEvents But_ExpandCollapse As Windows.Forms.Button
-    Friend WithEvents But_ShowHideComplete As Windows.Forms.Button
-    Friend WithEvents SplitContainer1 As Windows.Forms.SplitContainer
+    Friend WithEvents FlowLayoutPanel1 As System.Windows.Forms.FlowLayoutPanel
+    Friend WithEvents But_ReloadTree As System.Windows.Forms.Button
+    Friend WithEvents But_ExpandCollapse As System.Windows.Forms.Button
+    Friend WithEvents But_ShowHideComplete As System.Windows.Forms.Button
+    Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
     Friend WithEvents OlvColumn7 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents OlvColumn8 As BrightIdeasSoftware.OLVColumn
     Friend WithEvents TLV As BrightIdeasSoftware.TreeListView

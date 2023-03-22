@@ -1,19 +1,21 @@
-﻿Public Class cStopWatch
+﻿Imports Windows.Win32
+
+Public Class cStopWatch
 
 
 
-    Private Declare Function getFrequency Lib "kernel32" _
-        Alias "QueryPerformanceFrequency" (ByRef cyFrequency As Decimal) As Long
+    'Private Declare Function getFrequency Lib "kernel32" _
+    '    Alias "QueryPerformanceFrequency" (ByRef cyFrequency As Decimal) As Long
 
 
 
-#If VBA7 Then
-    Private Declare PtrSafe Function getTickCount Lib "kernel32" _
-    Alias "QueryPerformanceCounter" (cyTickCount As Currency) As LongPtr
-#Else
-    Private Declare Function getTickCount Lib "kernel32" _
-    Alias "QueryPerformanceCounter" (cyTickCount As Decimal) As Long
-#End If
+    '#If VBA7 Then
+    '    Private Declare PtrSafe Function getTickCount Lib "kernel32" _
+    '    Alias "QueryPerformanceCounter" (cyTickCount As Currency) As LongPtr
+    '#Else
+    '    Private Declare Function getTickCount Lib "kernel32" _
+    '    Alias "QueryPerformanceCounter" (cyTickCount As Decimal) As Long
+    '#End If
 
     Private pStart As Double                    ' When the current timing session started (since last pause)
     Private pCum As Double                      ' cumulative time passed so far
@@ -24,15 +26,24 @@
 
     Private Function cMicroTimer() As Double
         ' Returns seconds.
-        Dim cyTicks1 As Decimal
-        Static cyFrequency As Decimal
+        'Dim cyTicks1 As Decimal
+        Dim lpPerformanceCount As Long
+        Static lpFrequency As Long
+        'Static cyFrequency As Decimal
         cMicroTimer = 0
         ' Get frequency.
-        If cyFrequency = 0 Then getFrequency(cyFrequency)
+        If lpFrequency = 0 Then PInvoke.QueryPerformanceFrequency(lpFrequency)
+        'If cyFrequency = 0 Then getFrequency(cyFrequency)
         ' Get ticks.
-        getTickCount(cyTicks1)
+        PInvoke.QueryPerformanceCounter(lpPerformanceCount)
+        'getTickCount(cyTicks1)
         ' Seconds
-        If cyFrequency Then cMicroTimer = cyTicks1 / cyFrequency
+        Dim result As Double = 0
+        If lpFrequency <> 0 Then
+            result = CDbl(lpPerformanceCount) / CDbl(lpFrequency)
+        End If
+        Return result
+        'If cyFrequency Then cMicroTimer = cyTicks1 / cyFrequency
     End Function
 
     Public Sub Start()

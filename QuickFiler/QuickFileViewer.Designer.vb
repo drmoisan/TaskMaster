@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class QuickFileViewer
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,148 +20,169 @@ Partial Class QuickFileViewer
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.TableLayoutL1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.TableLayoutL2B = New System.Windows.Forms.TableLayoutPanel()
-        Me.Button_OK = New System.Windows.Forms.Button()
-        Me.BUTTON_CANCEL = New System.Windows.Forms.Button()
-        Me.Button_Undo = New System.Windows.Forms.Button()
-        Me.spn_EmailPerLoad = New System.Windows.Forms.NumericUpDown()
+        Me.L1v = New System.Windows.Forms.TableLayoutPanel()
+        Me.L1v2L2h = New System.Windows.Forms.TableLayoutPanel()
+        Me.L1v2L2h3_ButtonOK = New System.Windows.Forms.Button()
+        Me.L1v2L2h4_ButtonCancel = New System.Windows.Forms.Button()
+        Me.L1v2L2h4_ButtonUndo = New System.Windows.Forms.Button()
+        Me.L1v2L2h5_SpnEmailPerLoad = New System.Windows.Forms.NumericUpDown()
+        Me.L1v1L2_PanelMain = New System.Windows.Forms.Panel()
+        Me.L1v1L2L3v = New System.Windows.Forms.TableLayoutPanel()
         Me.AcceleratorDialogue = New System.Windows.Forms.TextBox()
-        Me.PanelMain = New System.Windows.Forms.Panel()
-        Me.TableLayoutL1.SuspendLayout()
-        Me.TableLayoutL2B.SuspendLayout()
-        CType(Me.spn_EmailPerLoad, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.L1v.SuspendLayout()
+        Me.L1v2L2h.SuspendLayout()
+        CType(Me.L1v2L2h5_SpnEmailPerLoad, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.L1v1L2_PanelMain.SuspendLayout()
         Me.SuspendLayout()
         '
-        'TableLayoutL1
+        'L1v
         '
-        Me.TableLayoutL1.ColumnCount = 1
-        Me.TableLayoutL1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutL1.Controls.Add(Me.TableLayoutL2B, 0, 1)
-        Me.TableLayoutL1.Controls.Add(Me.PanelMain, 0, 0)
-        Me.TableLayoutL1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TableLayoutL1.Location = New System.Drawing.Point(0, 0)
-        Me.TableLayoutL1.Margin = New System.Windows.Forms.Padding(6)
-        Me.TableLayoutL1.Name = "TableLayoutL1"
-        Me.TableLayoutL1.RowCount = 2
-        Me.TableLayoutL1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutL1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 108.0!))
-        Me.TableLayoutL1.Size = New System.Drawing.Size(1838, 310)
-        Me.TableLayoutL1.TabIndex = 0
+        Me.L1v.ColumnCount = 1
+        Me.L1v.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.L1v.Controls.Add(Me.L1v2L2h, 0, 1)
+        Me.L1v.Controls.Add(Me.L1v1L2_PanelMain, 0, 0)
+        Me.L1v.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.L1v.Location = New System.Drawing.Point(0, 0)
+        Me.L1v.Name = "L1v"
+        Me.L1v.RowCount = 2
+        Me.L1v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.L1v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56.0!))
+        Me.L1v.Size = New System.Drawing.Size(919, 274)
+        Me.L1v.TabIndex = 0
         '
-        'TableLayoutL2B
+        'L1v2L2h
         '
-        Me.TableLayoutL2B.ColumnCount = 7
-        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 280.0!))
-        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 320.0!))
-        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 320.0!))
-        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120.0!))
-        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160.0!))
-        Me.TableLayoutL2B.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutL2B.Controls.Add(Me.Button_OK, 2, 0)
-        Me.TableLayoutL2B.Controls.Add(Me.BUTTON_CANCEL, 3, 0)
-        Me.TableLayoutL2B.Controls.Add(Me.Button_Undo, 4, 0)
-        Me.TableLayoutL2B.Controls.Add(Me.spn_EmailPerLoad, 5, 0)
-        Me.TableLayoutL2B.Controls.Add(Me.AcceleratorDialogue, 0, 0)
-        Me.TableLayoutL2B.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TableLayoutL2B.Location = New System.Drawing.Point(6, 208)
-        Me.TableLayoutL2B.Margin = New System.Windows.Forms.Padding(6)
-        Me.TableLayoutL2B.Name = "TableLayoutL2B"
-        Me.TableLayoutL2B.RowCount = 1
-        Me.TableLayoutL2B.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutL2B.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 96.0!))
-        Me.TableLayoutL2B.Size = New System.Drawing.Size(1826, 96)
-        Me.TableLayoutL2B.TabIndex = 0
+        Me.L1v2L2h.ColumnCount = 7
+        Me.L1v2L2h.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.L1v2L2h.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140.0!))
+        Me.L1v2L2h.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160.0!))
+        Me.L1v2L2h.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160.0!))
+        Me.L1v2L2h.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60.0!))
+        Me.L1v2L2h.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80.0!))
+        Me.L1v2L2h.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.L1v2L2h.Controls.Add(Me.AcceleratorDialogue, 0, 0)
+        Me.L1v2L2h.Controls.Add(Me.L1v2L2h3_ButtonOK, 2, 0)
+        Me.L1v2L2h.Controls.Add(Me.L1v2L2h4_ButtonCancel, 3, 0)
+        Me.L1v2L2h.Controls.Add(Me.L1v2L2h4_ButtonUndo, 4, 0)
+        Me.L1v2L2h.Controls.Add(Me.L1v2L2h5_SpnEmailPerLoad, 5, 0)
+        Me.L1v2L2h.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.L1v2L2h.Location = New System.Drawing.Point(3, 221)
+        Me.L1v2L2h.Name = "L1v2L2h"
+        Me.L1v2L2h.RowCount = 1
+        Me.L1v2L2h.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.L1v2L2h.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
+        Me.L1v2L2h.Size = New System.Drawing.Size(913, 50)
+        Me.L1v2L2h.TabIndex = 0
         '
-        'Button_OK
+        'L1v2L2h3_ButtonOK
         '
-        Me.Button_OK.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Button_OK.Location = New System.Drawing.Point(607, 6)
-        Me.Button_OK.Margin = New System.Windows.Forms.Padding(14, 6, 14, 6)
-        Me.Button_OK.Name = "Button_OK"
-        Me.Button_OK.Size = New System.Drawing.Size(292, 84)
-        Me.Button_OK.TabIndex = 0
-        Me.Button_OK.Text = "OK"
-        Me.Button_OK.UseVisualStyleBackColor = True
+        Me.L1v2L2h3_ButtonOK.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.L1v2L2h3_ButtonOK.Location = New System.Drawing.Point(303, 3)
+        Me.L1v2L2h3_ButtonOK.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
+        Me.L1v2L2h3_ButtonOK.Name = "L1v2L2h3_ButtonOK"
+        Me.L1v2L2h3_ButtonOK.Size = New System.Drawing.Size(146, 44)
+        Me.L1v2L2h3_ButtonOK.TabIndex = 0
+        Me.L1v2L2h3_ButtonOK.Text = "OK"
+        Me.L1v2L2h3_ButtonOK.UseVisualStyleBackColor = True
         '
-        'BUTTON_CANCEL
+        'L1v2L2h4_ButtonCancel
         '
-        Me.BUTTON_CANCEL.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.BUTTON_CANCEL.Location = New System.Drawing.Point(927, 6)
-        Me.BUTTON_CANCEL.Margin = New System.Windows.Forms.Padding(14, 6, 14, 6)
-        Me.BUTTON_CANCEL.Name = "BUTTON_CANCEL"
-        Me.BUTTON_CANCEL.Size = New System.Drawing.Size(292, 84)
-        Me.BUTTON_CANCEL.TabIndex = 1
-        Me.BUTTON_CANCEL.Text = "CANCEL"
-        Me.BUTTON_CANCEL.UseVisualStyleBackColor = True
+        Me.L1v2L2h4_ButtonCancel.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.L1v2L2h4_ButtonCancel.Location = New System.Drawing.Point(463, 3)
+        Me.L1v2L2h4_ButtonCancel.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
+        Me.L1v2L2h4_ButtonCancel.Name = "L1v2L2h4_ButtonCancel"
+        Me.L1v2L2h4_ButtonCancel.Size = New System.Drawing.Size(146, 44)
+        Me.L1v2L2h4_ButtonCancel.TabIndex = 1
+        Me.L1v2L2h4_ButtonCancel.Text = "CANCEL"
+        Me.L1v2L2h4_ButtonCancel.UseVisualStyleBackColor = True
         '
-        'Button_Undo
+        'L1v2L2h4_ButtonUndo
         '
-        Me.Button_Undo.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Button_Undo.Location = New System.Drawing.Point(1239, 6)
-        Me.Button_Undo.Margin = New System.Windows.Forms.Padding(6)
-        Me.Button_Undo.Name = "Button_Undo"
-        Me.Button_Undo.Size = New System.Drawing.Size(108, 84)
-        Me.Button_Undo.TabIndex = 2
-        Me.Button_Undo.Text = "Undo"
-        Me.Button_Undo.UseVisualStyleBackColor = True
+        Me.L1v2L2h4_ButtonUndo.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.L1v2L2h4_ButtonUndo.Location = New System.Drawing.Point(619, 3)
+        Me.L1v2L2h4_ButtonUndo.Name = "L1v2L2h4_ButtonUndo"
+        Me.L1v2L2h4_ButtonUndo.Size = New System.Drawing.Size(54, 44)
+        Me.L1v2L2h4_ButtonUndo.TabIndex = 2
+        Me.L1v2L2h4_ButtonUndo.Text = "Undo"
+        Me.L1v2L2h4_ButtonUndo.UseVisualStyleBackColor = True
         '
-        'spn_EmailPerLoad
+        'L1v2L2h5_SpnEmailPerLoad
         '
-        Me.spn_EmailPerLoad.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.spn_EmailPerLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 22.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.spn_EmailPerLoad.Location = New System.Drawing.Point(1367, 11)
-        Me.spn_EmailPerLoad.Margin = New System.Windows.Forms.Padding(14, 6, 14, 6)
-        Me.spn_EmailPerLoad.Name = "spn_EmailPerLoad"
-        Me.spn_EmailPerLoad.Size = New System.Drawing.Size(132, 74)
-        Me.spn_EmailPerLoad.TabIndex = 3
+        Me.L1v2L2h5_SpnEmailPerLoad.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.L1v2L2h5_SpnEmailPerLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 22.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.L1v2L2h5_SpnEmailPerLoad.Location = New System.Drawing.Point(683, 4)
+        Me.L1v2L2h5_SpnEmailPerLoad.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
+        Me.L1v2L2h5_SpnEmailPerLoad.Name = "L1v2L2h5_SpnEmailPerLoad"
+        Me.L1v2L2h5_SpnEmailPerLoad.Size = New System.Drawing.Size(66, 41)
+        Me.L1v2L2h5_SpnEmailPerLoad.TabIndex = 3
+        '
+        'L1v1L2_PanelMain
+        '
+        Me.L1v1L2_PanelMain.AutoScroll = True
+        Me.L1v1L2_PanelMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.L1v1L2_PanelMain.Controls.Add(Me.L1v1L2L3v)
+        Me.L1v1L2_PanelMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.L1v1L2_PanelMain.Location = New System.Drawing.Point(3, 3)
+        Me.L1v1L2_PanelMain.Name = "L1v1L2_PanelMain"
+        Me.L1v1L2_PanelMain.Size = New System.Drawing.Size(913, 212)
+        Me.L1v1L2_PanelMain.TabIndex = 1
+        '
+        'L1v1L2L3v
+        '
+        Me.L1v1L2L3v.AutoSize = True
+        Me.L1v1L2L3v.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.L1v1L2L3v.ColumnCount = 1
+        Me.L1v1L2L3v.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.L1v1L2L3v.Dock = System.Windows.Forms.DockStyle.Top
+        Me.L1v1L2L3v.Location = New System.Drawing.Point(0, 0)
+        Me.L1v1L2L3v.Margin = New System.Windows.Forms.Padding(0)
+        Me.L1v1L2L3v.Name = "L1v1L2L3v"
+        Me.L1v1L2L3v.Padding = New System.Windows.Forms.Padding(10)
+        Me.L1v1L2L3v.RowCount = 4
+        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0!))
+        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0!))
+        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0!))
+        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.L1v1L2L3v.Size = New System.Drawing.Size(894, 350)
+        Me.L1v1L2L3v.TabIndex = 1
         '
         'AcceleratorDialogue
         '
         Me.AcceleratorDialogue.Dock = System.Windows.Forms.DockStyle.Fill
         Me.AcceleratorDialogue.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AcceleratorDialogue.Location = New System.Drawing.Point(14, 6)
-        Me.AcceleratorDialogue.Margin = New System.Windows.Forms.Padding(14, 6, 14, 6)
+        Me.AcceleratorDialogue.Location = New System.Drawing.Point(7, 3)
+        Me.AcceleratorDialogue.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
         Me.AcceleratorDialogue.Name = "AcceleratorDialogue"
-        Me.AcceleratorDialogue.Size = New System.Drawing.Size(285, 73)
-        Me.AcceleratorDialogue.TabIndex = 4
-        '
-        'PanelMain
-        '
-        Me.PanelMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.PanelMain.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelMain.Location = New System.Drawing.Point(6, 6)
-        Me.PanelMain.Margin = New System.Windows.Forms.Padding(6)
-        Me.PanelMain.Name = "PanelMain"
-        Me.PanelMain.Size = New System.Drawing.Size(1826, 190)
-        Me.PanelMain.TabIndex = 1
+        Me.AcceleratorDialogue.Size = New System.Drawing.Size(142, 40)
+        Me.AcceleratorDialogue.TabIndex = 5
         '
         'QuickFileViewer
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 25.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1838, 310)
-        Me.Controls.Add(Me.TableLayoutL1)
-        Me.Margin = New System.Windows.Forms.Padding(6)
+        Me.ClientSize = New System.Drawing.Size(919, 274)
+        Me.Controls.Add(Me.L1v)
         Me.Name = "QuickFileViewer"
         Me.Text = "Quick File"
-        Me.TableLayoutL1.ResumeLayout(False)
-        Me.TableLayoutL2B.ResumeLayout(False)
-        Me.TableLayoutL2B.PerformLayout()
-        CType(Me.spn_EmailPerLoad, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.L1v.ResumeLayout(False)
+        Me.L1v2L2h.ResumeLayout(False)
+        Me.L1v2L2h.PerformLayout()
+        CType(Me.L1v2L2h5_SpnEmailPerLoad, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.L1v1L2_PanelMain.ResumeLayout(False)
+        Me.L1v1L2_PanelMain.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents TableLayoutL1 As Windows.Forms.TableLayoutPanel
-    Friend WithEvents TableLayoutL2B As Windows.Forms.TableLayoutPanel
-    Friend WithEvents Button_OK As Windows.Forms.Button
-    Friend WithEvents BUTTON_CANCEL As Windows.Forms.Button
-    Friend WithEvents Button_Undo As Windows.Forms.Button
-    Friend WithEvents spn_EmailPerLoad As Windows.Forms.NumericUpDown
-    Friend WithEvents PanelMain As Windows.Forms.Panel
-    Friend WithEvents AcceleratorDialogue As Windows.Forms.TextBox
+    Friend WithEvents L1v As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents L1v2L2h As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents L1v2L2h3_ButtonOK As System.Windows.Forms.Button
+    Friend WithEvents L1v2L2h4_ButtonCancel As System.Windows.Forms.Button
+    Friend WithEvents L1v2L2h4_ButtonUndo As System.Windows.Forms.Button
+    Friend WithEvents L1v2L2h5_SpnEmailPerLoad As System.Windows.Forms.NumericUpDown
+    Friend WithEvents L1v1L2_PanelMain As System.Windows.Forms.Panel
+    Friend WithEvents L1v1L2L3v As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents AcceleratorDialogue As System.Windows.Forms.TextBox
 End Class

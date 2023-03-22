@@ -3,6 +3,8 @@
 Public Module CaptureEmailDetailsModule
     Private Const NumberOfFields = 13
     Private ReadOnly dict_remap As Dictionary(Of String, String)
+    Const PR_SMTP_ADDRESS As String =
+        "http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
     Public Function CaptureEmailDetails(OlMail As MailItem,
                                        emailRootFolder As String,
@@ -12,8 +14,8 @@ Public Module CaptureEmailDetailsModule
 
         ReDim strAry(NumberOfFields)
 
-        Const PR_SMTP_ADDRESS As String =
-        "http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
+        'Const PR_SMTP_ADDRESS As String =
+        '"http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
         Const PR_LAST_VERB_EXECUTED As String = "http://schemas.microsoft.com/mapi/proptag/0x10810003"
 
@@ -24,7 +26,7 @@ Public Module CaptureEmailDetailsModule
         Dim recipients = GetRecipients(OlMail, PR_SMTP_ADDRESS)
         strAry(5) = recipients.recipientsTo
         strAry(6) = recipients.recipientsCC
-        strAry(4) = GetSenderAddress(OlMail, PR_SMTP_ADDRESS)
+        strAry(4) = GetSenderAddress(OlMail)
         strAry(7) = OlMail.Subject
         strAry(8) = OlMail.Body
         strAry(9) = Right(strAry(4), Len(strAry(4)) - InStr(strAry(4), "@"))
@@ -86,7 +88,8 @@ Public Module CaptureEmailDetailsModule
         Return attachmentNames
     End Function
 
-    Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
+    'Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
+    Public Function GetSenderAddress(OlMail As MailItem) As String
         Dim senderAddress As String
 
         If OlMail.Sender.Type = "EX" Then

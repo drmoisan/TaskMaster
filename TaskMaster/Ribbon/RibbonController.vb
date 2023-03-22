@@ -45,6 +45,13 @@ Public Class RibbonController
         '_controller.SetAPIOptions()
     End Sub
 
+    Friend Sub LoadQuickFilerOrig()
+        Dim _viewer = New QuickFileViewerOrig()
+        Dim _controller = New QuickFileControllerOrig(_globals, _viewer)
+
+        '_controller.SetAPIOptions()
+    End Sub
+
     Friend Sub ReviseProjectInfo()
         Dim _projInfoView As New ProjectInfoWindow(Globals.ThisAddIn.ProjInfo)
         _projInfoView.Show()

@@ -44,9 +44,13 @@ namespace UtilitiesCS
         private void Button1_Click(object sender, EventArgs e)
         {
             string key = _map.Keys.ToList()[0];
-            
-            //var parameterArray = new object[] {DialogResult}
-            
+            var result = _map[key].DynamicInvoke();
+            this.DialogResult = (DialogResult)result;
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            string key = _map.Keys.ToList()[1];
             var result = _map[key].DynamicInvoke();
             this.DialogResult = (DialogResult)result;
         }

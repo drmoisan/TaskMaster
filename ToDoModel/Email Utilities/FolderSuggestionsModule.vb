@@ -118,6 +118,8 @@ Public Module FolderSuggestionsModule
 
         If NotImplementedDialog.StopAtNotImplemented(MethodBase.GetCurrentMethod().Name) Then
             Throw New NotImplementedException("Folder_Suggestions_Reload not implemented yet")
+        Else
+            Debug.WriteLine("Continuing execution without reloading Folder Suggestions")
         End If
 
 

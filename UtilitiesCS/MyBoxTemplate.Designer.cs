@@ -77,6 +77,7 @@
             this.Button2.TabIndex = 1;
             this.Button2.Text = "button2";
             this.Button2.UseVisualStyleBackColor = true;
+            this.Button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // Button1
             // 

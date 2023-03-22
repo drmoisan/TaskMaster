@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class TaskViewer
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class TaskViewer
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.Frame1 = New System.Windows.Forms.Panel()
         Me.XlScBullpin = New System.Windows.Forms.Label()
@@ -136,7 +136,7 @@ Partial Class TaskViewer
         Me.XlScBullpin.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScBullpin.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScBullpin.Location = New System.Drawing.Point(438, 274)
-        Me.XlScBullpin.Name = "xl_sc_bullpin"
+        Me.XlScBullpin.Name = "XlScBullpin"
         Me.XlScBullpin.Size = New System.Drawing.Size(17, 16)
         Me.XlScBullpin.TabIndex = 38
         Me.XlScBullpin.Text = "B"
@@ -148,7 +148,7 @@ Partial Class TaskViewer
         Me.XlScToday.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScToday.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScToday.Location = New System.Drawing.Point(352, 274)
-        Me.XlScToday.Name = "xl_sc_today"
+        Me.XlScToday.Name = "XlScToday"
         Me.XlScToday.Size = New System.Drawing.Size(17, 16)
         Me.XlScToday.TabIndex = 37
         Me.XlScToday.Text = "T"
@@ -160,7 +160,7 @@ Partial Class TaskViewer
         Me.XlScWaiting.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScWaiting.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScWaiting.Location = New System.Drawing.Point(20, 255)
-        Me.XlScWaiting.Name = "xl_sc_waiting"
+        Me.XlScWaiting.Name = "XlScWaiting"
         Me.XlScWaiting.Size = New System.Drawing.Size(21, 16)
         Me.XlScWaiting.TabIndex = 36
         Me.XlScWaiting.Text = "W"
@@ -172,7 +172,7 @@ Partial Class TaskViewer
         Me.XlScUnprocessed.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScUnprocessed.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScUnprocessed.Location = New System.Drawing.Point(419, 255)
-        Me.XlScUnprocessed.Name = "xl_sc_unprocessed"
+        Me.XlScUnprocessed.Name = "XlScUnprocessed"
         Me.XlScUnprocessed.Size = New System.Drawing.Size(18, 16)
         Me.XlScUnprocessed.TabIndex = 35
         Me.XlScUnprocessed.Text = "U"
@@ -184,7 +184,7 @@ Partial Class TaskViewer
         Me.XlScNews.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScNews.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScNews.Location = New System.Drawing.Point(284, 255)
-        Me.XlScNews.Name = "xl_sc_news"
+        Me.XlScNews.Name = "XlScNews"
         Me.XlScNews.Size = New System.Drawing.Size(18, 16)
         Me.XlScNews.TabIndex = 34
         Me.XlScNews.Text = "N"
@@ -196,7 +196,7 @@ Partial Class TaskViewer
         Me.XlScEmail.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScEmail.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScEmail.Location = New System.Drawing.Point(166, 255)
-        Me.XlScEmail.Name = "xl_sc_email"
+        Me.XlScEmail.Name = "XlScEmail"
         Me.XlScEmail.Size = New System.Drawing.Size(17, 16)
         Me.XlScEmail.TabIndex = 33
         Me.XlScEmail.Text = "E"
@@ -208,7 +208,7 @@ Partial Class TaskViewer
         Me.XlScReadingbusiness.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScReadingbusiness.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScReadingbusiness.Location = New System.Drawing.Point(430, 216)
-        Me.XlScReadingbusiness.Name = "xl_sc_readingbusiness"
+        Me.XlScReadingbusiness.Name = "XlScReadingbusiness"
         Me.XlScReadingbusiness.Size = New System.Drawing.Size(18, 16)
         Me.XlScReadingbusiness.TabIndex = 32
         Me.XlScReadingbusiness.Text = "R"
@@ -220,7 +220,7 @@ Partial Class TaskViewer
         Me.XlScCalls.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScCalls.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScCalls.Location = New System.Drawing.Point(301, 216)
-        Me.XlScCalls.Name = "xl_sc_calls"
+        Me.XlScCalls.Name = "XlScCalls"
         Me.XlScCalls.Size = New System.Drawing.Size(17, 16)
         Me.XlScCalls.TabIndex = 31
         Me.XlScCalls.Text = "C"
@@ -232,7 +232,7 @@ Partial Class TaskViewer
         Me.XlScInternet.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScInternet.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScInternet.Location = New System.Drawing.Point(166, 215)
-        Me.XlScInternet.Name = "xl_sc_internet"
+        Me.XlScInternet.Name = "XlScInternet"
         Me.XlScInternet.Size = New System.Drawing.Size(11, 16)
         Me.XlScInternet.TabIndex = 30
         Me.XlScInternet.Text = "I"
@@ -244,7 +244,7 @@ Partial Class TaskViewer
         Me.XlScPreread.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScPreread.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScPreread.Location = New System.Drawing.Point(430, 175)
-        Me.XlScPreread.Name = "xl_sc_preread"
+        Me.XlScPreread.Name = "XlScPreread"
         Me.XlScPreread.Size = New System.Drawing.Size(17, 16)
         Me.XlScPreread.TabIndex = 29
         Me.XlScPreread.Text = "P"
@@ -256,7 +256,7 @@ Partial Class TaskViewer
         Me.XlScMeeting.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScMeeting.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScMeeting.Location = New System.Drawing.Point(301, 175)
-        Me.XlScMeeting.Name = "xl_sc_meeting"
+        Me.XlScMeeting.Name = "XlScMeeting"
         Me.XlScMeeting.Size = New System.Drawing.Size(19, 16)
         Me.XlScMeeting.TabIndex = 28
         Me.XlScMeeting.Text = "M"
@@ -268,7 +268,7 @@ Partial Class TaskViewer
         Me.XlScPersonal.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlScPersonal.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlScPersonal.Location = New System.Drawing.Point(166, 174)
-        Me.XlScPersonal.Name = "xl_sc_personal"
+        Me.XlScPersonal.Name = "XlScPersonal"
         Me.XlScPersonal.Size = New System.Drawing.Size(17, 16)
         Me.XlScPersonal.TabIndex = 27
         Me.XlScPersonal.Text = "P"
@@ -280,7 +280,7 @@ Partial Class TaskViewer
         Me.XlTopic.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlTopic.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlTopic.Location = New System.Drawing.Point(6, 134)
-        Me.XlTopic.Name = "xl_topic"
+        Me.XlTopic.Name = "XlTopic"
         Me.XlTopic.Size = New System.Drawing.Size(17, 16)
         Me.XlTopic.TabIndex = 22
         Me.XlTopic.Text = "T"
@@ -292,7 +292,7 @@ Partial Class TaskViewer
         Me.XlProject.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlProject.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlProject.Location = New System.Drawing.Point(6, 98)
-        Me.XlProject.Name = "xl_project"
+        Me.XlProject.Name = "XlProject"
         Me.XlProject.Size = New System.Drawing.Size(17, 16)
         Me.XlProject.TabIndex = 21
         Me.XlProject.Text = "P"
@@ -304,7 +304,7 @@ Partial Class TaskViewer
         Me.XlPeople.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlPeople.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlPeople.Location = New System.Drawing.Point(6, 60)
-        Me.XlPeople.Name = "xl_people"
+        Me.XlPeople.Name = "XlPeople"
         Me.XlPeople.Size = New System.Drawing.Size(17, 16)
         Me.XlPeople.TabIndex = 20
         Me.XlPeople.Text = "P"
@@ -316,7 +316,7 @@ Partial Class TaskViewer
         Me.XlContext.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlContext.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlContext.Location = New System.Drawing.Point(6, 25)
-        Me.XlContext.Name = "xl_context"
+        Me.XlContext.Name = "XlContext"
         Me.XlContext.Size = New System.Drawing.Size(17, 16)
         Me.XlContext.TabIndex = 17
         Me.XlContext.Text = "C"
@@ -327,7 +327,7 @@ Partial Class TaskViewer
         Me.ShortcutWaitingFor.BackColor = System.Drawing.Color.DarkMagenta
         Me.ShortcutWaitingFor.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.ShortcutWaitingFor.Location = New System.Drawing.Point(13, 246)
-        Me.ShortcutWaitingFor.Name = "Cat_WaitingFor"
+        Me.ShortcutWaitingFor.Name = "ShortcutWaitingFor"
         Me.ShortcutWaitingFor.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutWaitingFor.TabIndex = 19
         Me.ShortcutWaitingFor.Text = "Waiting For"
@@ -337,7 +337,7 @@ Partial Class TaskViewer
         '
         Me.CbxBullpin.AutoSize = True
         Me.CbxBullpin.Location = New System.Drawing.Point(424, 290)
-        Me.CbxBullpin.Name = "cbx_bullpin"
+        Me.CbxBullpin.Name = "CbxBullpin"
         Me.CbxBullpin.Size = New System.Drawing.Size(113, 17)
         Me.CbxBullpin.TabIndex = 18
         Me.CbxBullpin.Text = "BULLPIN Priorities"
@@ -347,7 +347,7 @@ Partial Class TaskViewer
         '
         Me.CbxToday.AutoSize = True
         Me.CbxToday.Location = New System.Drawing.Point(292, 290)
-        Me.CbxToday.Name = "cbx_today"
+        Me.CbxToday.Name = "CbxToday"
         Me.CbxToday.Size = New System.Drawing.Size(110, 17)
         Me.CbxToday.TabIndex = 17
         Me.CbxToday.Text = "Complete TODAY"
@@ -359,7 +359,7 @@ Partial Class TaskViewer
         Me.CbxFlagAsTask.Checked = True
         Me.CbxFlagAsTask.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CbxFlagAsTask.Location = New System.Drawing.Point(160, 290)
-        Me.CbxFlagAsTask.Name = "cbxFlag"
+        Me.CbxFlagAsTask.Name = "CbxFlagAsTask"
         Me.CbxFlagAsTask.Size = New System.Drawing.Size(114, 17)
         Me.CbxFlagAsTask.TabIndex = 16
         Me.CbxFlagAsTask.Text = "Flag For Follow Up"
@@ -370,7 +370,7 @@ Partial Class TaskViewer
         Me.ShortcutEmail.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.ShortcutEmail.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.ShortcutEmail.Location = New System.Drawing.Point(160, 246)
-        Me.ShortcutEmail.Name = "Cat_Email"
+        Me.ShortcutEmail.Name = "ShortcutEmail"
         Me.ShortcutEmail.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutEmail.TabIndex = 15
         Me.ShortcutEmail.Text = "Email"
@@ -382,7 +382,7 @@ Partial Class TaskViewer
         Me.ShortcutNews.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.ShortcutNews.ForeColor = System.Drawing.SystemColors.ControlText
         Me.ShortcutNews.Location = New System.Drawing.Point(292, 246)
-        Me.ShortcutNews.Name = "Cat_News"
+        Me.ShortcutNews.Name = "ShortcutNews"
         Me.ShortcutNews.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutNews.TabIndex = 14
         Me.ShortcutNews.Text = "News | Articles | Other"
@@ -394,7 +394,7 @@ Partial Class TaskViewer
         Me.ShortcutUnprocessed.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.ShortcutUnprocessed.ForeColor = System.Drawing.SystemColors.ControlText
         Me.ShortcutUnprocessed.Location = New System.Drawing.Point(424, 246)
-        Me.ShortcutUnprocessed.Name = "Cat_Unprocessed"
+        Me.ShortcutUnprocessed.Name = "ShortcutUnprocessed"
         Me.ShortcutUnprocessed.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutUnprocessed.TabIndex = 13
         Me.ShortcutUnprocessed.Text = "Unprocessed > 2min"
@@ -406,7 +406,7 @@ Partial Class TaskViewer
         Me.ShortcutReadingBusiness.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.ShortcutReadingBusiness.ForeColor = System.Drawing.SystemColors.ControlText
         Me.ShortcutReadingBusiness.Location = New System.Drawing.Point(424, 206)
-        Me.ShortcutReadingBusiness.Name = "Cat_ReadingBusiness"
+        Me.ShortcutReadingBusiness.Name = "ShortcutReadingBusiness"
         Me.ShortcutReadingBusiness.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutReadingBusiness.TabIndex = 12
         Me.ShortcutReadingBusiness.Text = "Reading - Business"
@@ -418,7 +418,7 @@ Partial Class TaskViewer
         Me.ShortcutCalls.BackColor = System.Drawing.Color.Blue
         Me.ShortcutCalls.ForeColor = System.Drawing.SystemColors.ButtonFace
         Me.ShortcutCalls.Location = New System.Drawing.Point(292, 206)
-        Me.ShortcutCalls.Name = "Cat_Calls"
+        Me.ShortcutCalls.Name = "ShortcutCalls"
         Me.ShortcutCalls.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutCalls.TabIndex = 11
         Me.ShortcutCalls.Text = "Calls"
@@ -429,7 +429,7 @@ Partial Class TaskViewer
         Me.ShortcutInternet.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.ShortcutInternet.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(0, Byte), Integer))
         Me.ShortcutInternet.Location = New System.Drawing.Point(160, 206)
-        Me.ShortcutInternet.Name = "Cat_Internet"
+        Me.ShortcutInternet.Name = "ShortcutInternet"
         Me.ShortcutInternet.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutInternet.TabIndex = 10
         Me.ShortcutInternet.Text = "Internet"
@@ -441,7 +441,7 @@ Partial Class TaskViewer
         Me.ShortcutPreRead.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.ShortcutPreRead.ForeColor = System.Drawing.SystemColors.ControlText
         Me.ShortcutPreRead.Location = New System.Drawing.Point(424, 166)
-        Me.ShortcutPreRead.Name = "Cat_PreRead"
+        Me.ShortcutPreRead.Name = "ShortcutPreRead"
         Me.ShortcutPreRead.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutPreRead.TabIndex = 9
         Me.ShortcutPreRead.Text = "PreRead"
@@ -453,7 +453,7 @@ Partial Class TaskViewer
         Me.ShortcutMeeting.BackColor = System.Drawing.Color.Blue
         Me.ShortcutMeeting.ForeColor = System.Drawing.SystemColors.ButtonFace
         Me.ShortcutMeeting.Location = New System.Drawing.Point(292, 166)
-        Me.ShortcutMeeting.Name = "Cat_Meeting"
+        Me.ShortcutMeeting.Name = "ShortcutMeeting"
         Me.ShortcutMeeting.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutMeeting.TabIndex = 8
         Me.ShortcutMeeting.Text = "Meeting"
@@ -464,7 +464,7 @@ Partial Class TaskViewer
         Me.LblTopic.AutoSize = True
         Me.LblTopic.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblTopic.Location = New System.Drawing.Point(25, 134)
-        Me.LblTopic.Name = "lbl_topic"
+        Me.LblTopic.Name = "LblTopic"
         Me.LblTopic.Size = New System.Drawing.Size(73, 16)
         Me.LblTopic.TabIndex = 7
         Me.LblTopic.Text = "Topic Tag:"
@@ -474,7 +474,7 @@ Partial Class TaskViewer
         Me.ShortcutPersonal.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.ShortcutPersonal.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(0, Byte), Integer))
         Me.ShortcutPersonal.Location = New System.Drawing.Point(160, 166)
-        Me.ShortcutPersonal.Name = "Cat_Personal"
+        Me.ShortcutPersonal.Name = "ShortcutPersonal"
         Me.ShortcutPersonal.Size = New System.Drawing.Size(126, 34)
         Me.ShortcutPersonal.TabIndex = 1
         Me.ShortcutPersonal.Text = "PERSONAL"
@@ -485,7 +485,7 @@ Partial Class TaskViewer
         Me.LblProject.AutoSize = True
         Me.LblProject.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblProject.Location = New System.Drawing.Point(25, 98)
-        Me.LblProject.Name = "lbl_project"
+        Me.LblProject.Name = "LblProject"
         Me.LblProject.Size = New System.Drawing.Size(82, 16)
         Me.LblProject.TabIndex = 6
         Me.LblProject.Text = "Project Flag:"
@@ -495,7 +495,7 @@ Partial Class TaskViewer
         Me.LblPeople.AutoSize = True
         Me.LblPeople.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblPeople.Location = New System.Drawing.Point(25, 61)
-        Me.LblPeople.Name = "lbl_people"
+        Me.LblPeople.Name = "LblPeople"
         Me.LblPeople.Size = New System.Drawing.Size(84, 16)
         Me.LblPeople.TabIndex = 5
         Me.LblPeople.Text = "People Flag:"
@@ -505,7 +505,7 @@ Partial Class TaskViewer
         Me.LblContext.AutoSize = True
         Me.LblContext.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblContext.Location = New System.Drawing.Point(25, 25)
-        Me.LblContext.Name = "lbl_context"
+        Me.LblContext.Name = "LblContext"
         Me.LblContext.Size = New System.Drawing.Size(84, 16)
         Me.LblContext.TabIndex = 4
         Me.LblContext.Text = "Context Flag:"
@@ -516,7 +516,7 @@ Partial Class TaskViewer
         Me.TopicSelection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TopicSelection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TopicSelection.Location = New System.Drawing.Point(160, 133)
-        Me.TopicSelection.Name = "topic_selection"
+        Me.TopicSelection.Name = "TopicSelection"
         Me.TopicSelection.Size = New System.Drawing.Size(390, 24)
         Me.TopicSelection.TabIndex = 3
         Me.TopicSelection.Text = "[Other Topics Flagged]"
@@ -527,7 +527,7 @@ Partial Class TaskViewer
         Me.ProjectSelection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ProjectSelection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ProjectSelection.Location = New System.Drawing.Point(160, 97)
-        Me.ProjectSelection.Name = "project_selection"
+        Me.ProjectSelection.Name = "ProjectSelection"
         Me.ProjectSelection.Size = New System.Drawing.Size(390, 24)
         Me.ProjectSelection.TabIndex = 2
         Me.ProjectSelection.Text = "[Projects Flagged]"
@@ -538,7 +538,7 @@ Partial Class TaskViewer
         Me.PeopleSelection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.PeopleSelection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.PeopleSelection.Location = New System.Drawing.Point(160, 60)
-        Me.PeopleSelection.Name = "people_selection"
+        Me.PeopleSelection.Name = "PeopleSelection"
         Me.PeopleSelection.Size = New System.Drawing.Size(390, 24)
         Me.PeopleSelection.TabIndex = 1
         Me.PeopleSelection.Text = "[Assigned People Flagged]"
@@ -549,7 +549,7 @@ Partial Class TaskViewer
         Me.CategorySelection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.CategorySelection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.CategorySelection.Location = New System.Drawing.Point(160, 24)
-        Me.CategorySelection.Name = "category_selection"
+        Me.CategorySelection.Name = "CategorySelection"
         Me.CategorySelection.Size = New System.Drawing.Size(390, 24)
         Me.CategorySelection.TabIndex = 0
         Me.CategorySelection.Text = "[Category Label]"
@@ -558,7 +558,7 @@ Partial Class TaskViewer
         '
         Me.OKButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.OKButton.Location = New System.Drawing.Point(138, 530)
-        Me.OKButton.Name = "OK_Button"
+        Me.OKButton.Name = "OKButton"
         Me.OKButton.Size = New System.Drawing.Size(145, 57)
         Me.OKButton.TabIndex = 1
         Me.OKButton.Text = "OK"
@@ -579,7 +579,7 @@ Partial Class TaskViewer
         Me.LblTaskname.AutoSize = True
         Me.LblTaskname.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblTaskname.Location = New System.Drawing.Point(12, 23)
-        Me.LblTaskname.Name = "lbl_taskname"
+        Me.LblTaskname.Name = "LblTaskname"
         Me.LblTaskname.Size = New System.Drawing.Size(97, 16)
         Me.LblTaskname.TabIndex = 1
         Me.LblTaskname.Text = "Name Of Task:"
@@ -589,7 +589,7 @@ Partial Class TaskViewer
         Me.TaskName.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TaskName.ForeColor = System.Drawing.SystemColors.WindowText
         Me.TaskName.Location = New System.Drawing.Point(12, 42)
-        Me.TaskName.Name = "task_name"
+        Me.TaskName.Name = "TaskName"
         Me.TaskName.Size = New System.Drawing.Size(560, 22)
         Me.TaskName.TabIndex = 2
         '
@@ -598,7 +598,7 @@ Partial Class TaskViewer
         Me.LblPriority.AutoSize = True
         Me.LblPriority.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblPriority.Location = New System.Drawing.Point(12, 83)
-        Me.LblPriority.Name = "lbl_priority"
+        Me.LblPriority.Name = "LblPriority"
         Me.LblPriority.Size = New System.Drawing.Size(77, 16)
         Me.LblPriority.TabIndex = 3
         Me.LblPriority.Text = "Importance:"
@@ -608,7 +608,7 @@ Partial Class TaskViewer
         Me.LblKbf.AutoSize = True
         Me.LblKbf.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblKbf.Location = New System.Drawing.Point(12, 111)
-        Me.LblKbf.Name = "lbl_kbf"
+        Me.LblKbf.Name = "LblKbf"
         Me.LblKbf.Size = New System.Drawing.Size(56, 16)
         Me.LblKbf.TabIndex = 5
         Me.LblKbf.Text = "Kanban:"
@@ -618,7 +618,7 @@ Partial Class TaskViewer
         Me.LblDuration.AutoSize = True
         Me.LblDuration.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblDuration.Location = New System.Drawing.Point(12, 144)
-        Me.LblDuration.Name = "lbl_duration"
+        Me.LblDuration.Name = "LblDuration"
         Me.LblDuration.Size = New System.Drawing.Size(76, 16)
         Me.LblDuration.TabIndex = 7
         Me.LblDuration.Text = "Work Time:"
@@ -629,7 +629,7 @@ Partial Class TaskViewer
         Me.PriorityBox.FormattingEnabled = True
         Me.PriorityBox.Items.AddRange(New Object() {"High", "Normal", "Low"})
         Me.PriorityBox.Location = New System.Drawing.Point(120, 82)
-        Me.PriorityBox.Name = "Priority_Box"
+        Me.PriorityBox.Name = "PriorityBox"
         Me.PriorityBox.Size = New System.Drawing.Size(121, 21)
         Me.PriorityBox.TabIndex = 4
         '
@@ -639,7 +639,7 @@ Partial Class TaskViewer
         Me.KbSelector.FormattingEnabled = True
         Me.KbSelector.Items.AddRange(New Object() {"Backlog", "Planned", "InProgress", "Complete"})
         Me.KbSelector.Location = New System.Drawing.Point(120, 111)
-        Me.KbSelector.Name = "kb_selector"
+        Me.KbSelector.Name = "KbSelector"
         Me.KbSelector.Size = New System.Drawing.Size(121, 21)
         Me.KbSelector.TabIndex = 6
         '
@@ -648,7 +648,7 @@ Partial Class TaskViewer
         Me.Duration.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Duration.ForeColor = System.Drawing.SystemColors.WindowText
         Me.Duration.Location = New System.Drawing.Point(120, 141)
-        Me.Duration.Name = "duration"
+        Me.Duration.Name = "Duration"
         Me.Duration.Size = New System.Drawing.Size(121, 22)
         Me.Duration.TabIndex = 8
         '
@@ -658,7 +658,7 @@ Partial Class TaskViewer
         Me.DtDuedate.CustomFormat = "MM/dd/yyyy hh:mm tt"
         Me.DtDuedate.Format = System.Windows.Forms.DateTimePickerFormat.Custom
         Me.DtDuedate.Location = New System.Drawing.Point(388, 83)
-        Me.DtDuedate.Name = "dt_duedate"
+        Me.DtDuedate.Name = "DtDuedate"
         Me.DtDuedate.ShowCheckBox = True
         Me.DtDuedate.Size = New System.Drawing.Size(184, 20)
         Me.DtDuedate.TabIndex = 10
@@ -668,7 +668,7 @@ Partial Class TaskViewer
         Me.LblDuedate.AutoSize = True
         Me.LblDuedate.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblDuedate.Location = New System.Drawing.Point(310, 83)
-        Me.LblDuedate.Name = "lbl_duedate"
+        Me.LblDuedate.Name = "LblDuedate"
         Me.LblDuedate.Size = New System.Drawing.Size(67, 16)
         Me.LblDuedate.TabIndex = 9
         Me.LblDuedate.Text = "Due Date:"
@@ -678,7 +678,7 @@ Partial Class TaskViewer
         Me.LblReminder.AutoSize = True
         Me.LblReminder.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LblReminder.Location = New System.Drawing.Point(310, 114)
-        Me.LblReminder.Name = "lbl_reminder"
+        Me.LblReminder.Name = "LblReminder"
         Me.LblReminder.Size = New System.Drawing.Size(69, 16)
         Me.LblReminder.TabIndex = 11
         Me.LblReminder.Text = "Reminder:"
@@ -689,7 +689,7 @@ Partial Class TaskViewer
         Me.DtReminder.CustomFormat = "MM/dd/yyyy hh:mm tt"
         Me.DtReminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom
         Me.DtReminder.Location = New System.Drawing.Point(388, 112)
-        Me.DtReminder.Name = "dt_reminder"
+        Me.DtReminder.Name = "DtReminder"
         Me.DtReminder.ShowCheckBox = True
         Me.DtReminder.Size = New System.Drawing.Size(184, 20)
         Me.DtReminder.TabIndex = 12
@@ -701,7 +701,7 @@ Partial Class TaskViewer
         Me.XlTaskname.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlTaskname.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlTaskname.Location = New System.Drawing.Point(7, 23)
-        Me.XlTaskname.Name = "xl_taskname"
+        Me.XlTaskname.Name = "XlTaskname"
         Me.XlTaskname.Size = New System.Drawing.Size(18, 16)
         Me.XlTaskname.TabIndex = 13
         Me.XlTaskname.Text = "N"
@@ -713,7 +713,7 @@ Partial Class TaskViewer
         Me.XlImportance.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlImportance.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlImportance.Location = New System.Drawing.Point(6, 82)
-        Me.XlImportance.Name = "xl_importance"
+        Me.XlImportance.Name = "XlImportance"
         Me.XlImportance.Size = New System.Drawing.Size(11, 16)
         Me.XlImportance.TabIndex = 14
         Me.XlImportance.Text = "I"
@@ -725,7 +725,7 @@ Partial Class TaskViewer
         Me.XlKanban.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlKanban.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlKanban.Location = New System.Drawing.Point(6, 111)
-        Me.XlKanban.Name = "xl_kanban"
+        Me.XlKanban.Name = "XlKanban"
         Me.XlKanban.Size = New System.Drawing.Size(16, 16)
         Me.XlKanban.TabIndex = 15
         Me.XlKanban.Text = "K"
@@ -737,7 +737,7 @@ Partial Class TaskViewer
         Me.XlWorktime.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlWorktime.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlWorktime.Location = New System.Drawing.Point(6, 143)
-        Me.XlWorktime.Name = "xl_worktime"
+        Me.XlWorktime.Name = "XlWorktime"
         Me.XlWorktime.Size = New System.Drawing.Size(21, 16)
         Me.XlWorktime.TabIndex = 16
         Me.XlWorktime.Text = "W"
@@ -749,7 +749,7 @@ Partial Class TaskViewer
         Me.XlOk.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlOk.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlOk.Location = New System.Drawing.Point(191, 550)
-        Me.XlOk.Name = "xl_ok"
+        Me.XlOk.Name = "XlOk"
         Me.XlOk.Size = New System.Drawing.Size(18, 16)
         Me.XlOk.TabIndex = 23
         Me.XlOk.Text = "O"
@@ -761,7 +761,7 @@ Partial Class TaskViewer
         Me.XlCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlCancel.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlCancel.Location = New System.Drawing.Point(341, 550)
-        Me.XlCancel.Name = "xl_cancel"
+        Me.XlCancel.Name = "XlCancel"
         Me.XlCancel.Size = New System.Drawing.Size(17, 16)
         Me.XlCancel.TabIndex = 24
         Me.XlCancel.Text = "C"
@@ -773,7 +773,7 @@ Partial Class TaskViewer
         Me.XlReminder.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlReminder.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlReminder.Location = New System.Drawing.Point(305, 114)
-        Me.XlReminder.Name = "xl_reminder"
+        Me.XlReminder.Name = "XlReminder"
         Me.XlReminder.Size = New System.Drawing.Size(18, 16)
         Me.XlReminder.TabIndex = 25
         Me.XlReminder.Text = "R"
@@ -785,7 +785,7 @@ Partial Class TaskViewer
         Me.XlDuedate.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XlDuedate.ForeColor = System.Drawing.SystemColors.ControlLightLight
         Me.XlDuedate.Location = New System.Drawing.Point(305, 82)
-        Me.XlDuedate.Name = "xl_duedate"
+        Me.XlDuedate.Name = "XlDuedate"
         Me.XlDuedate.Size = New System.Drawing.Size(18, 16)
         Me.XlDuedate.TabIndex = 26
         Me.XlDuedate.Text = "D"
@@ -827,64 +827,64 @@ Partial Class TaskViewer
 
     End Sub
 
-    Friend WithEvents Frame1 As Windows.Forms.Panel
-    Friend WithEvents LblTopic As Windows.Forms.Label
-    Friend WithEvents LblProject As Windows.Forms.Label
-    Friend WithEvents LblPeople As Windows.Forms.Label
-    Friend WithEvents LblContext As Windows.Forms.Label
-    Friend WithEvents TopicSelection As Windows.Forms.Label
-    Friend WithEvents ProjectSelection As Windows.Forms.Label
-    Friend WithEvents PeopleSelection As Windows.Forms.Label
-    Friend WithEvents CategorySelection As Windows.Forms.Label
-    Friend WithEvents OKButton As Windows.Forms.Button
-    Friend WithEvents Cancel_Button As Windows.Forms.Button
-    Friend WithEvents ShortcutNews As Windows.Forms.Button
-    Friend WithEvents ShortcutUnprocessed As Windows.Forms.Button
-    Friend WithEvents ShortcutReadingBusiness As Windows.Forms.Button
-    Friend WithEvents ShortcutCalls As Windows.Forms.Button
-    Friend WithEvents ShortcutInternet As Windows.Forms.Button
-    Friend WithEvents ShortcutPreRead As Windows.Forms.Button
-    Friend WithEvents ShortcutMeeting As Windows.Forms.Button
-    Friend WithEvents ShortcutPersonal As Windows.Forms.Button
-    Friend WithEvents ShortcutEmail As Windows.Forms.Button
-    Friend WithEvents ShortcutWaitingFor As Windows.Forms.Button
-    Friend WithEvents CbxBullpin As Windows.Forms.CheckBox
-    Friend WithEvents CbxToday As Windows.Forms.CheckBox
-    Friend WithEvents CbxFlagAsTask As Windows.Forms.CheckBox
-    Friend WithEvents LblTaskname As Windows.Forms.Label
-    Friend WithEvents TaskName As Windows.Forms.TextBox
-    Friend WithEvents LblPriority As Windows.Forms.Label
-    Friend WithEvents LblKbf As Windows.Forms.Label
-    Friend WithEvents LblDuration As Windows.Forms.Label
-    Friend WithEvents PriorityBox As Windows.Forms.ComboBox
-    Friend WithEvents KbSelector As Windows.Forms.ComboBox
-    Friend WithEvents Duration As Windows.Forms.TextBox
-    Friend WithEvents DtDuedate As Windows.Forms.DateTimePicker
-    Friend WithEvents LblDuedate As Windows.Forms.Label
-    Friend WithEvents LblReminder As Windows.Forms.Label
-    Friend WithEvents DtReminder As Windows.Forms.DateTimePicker
-    Friend WithEvents XlTopic As Windows.Forms.Label
-    Friend WithEvents XlProject As Windows.Forms.Label
-    Friend WithEvents XlPeople As Windows.Forms.Label
-    Friend WithEvents XlContext As Windows.Forms.Label
-    Friend WithEvents XlTaskname As Windows.Forms.Label
-    Friend WithEvents XlImportance As Windows.Forms.Label
-    Friend WithEvents XlKanban As Windows.Forms.Label
-    Friend WithEvents XlWorktime As Windows.Forms.Label
-    Friend WithEvents XlOk As Windows.Forms.Label
-    Friend WithEvents XlCancel As Windows.Forms.Label
-    Friend WithEvents XlReminder As Windows.Forms.Label
-    Friend WithEvents XlDuedate As Windows.Forms.Label
-    Friend WithEvents XlScBullpin As Windows.Forms.Label
-    Friend WithEvents XlScToday As Windows.Forms.Label
-    Friend WithEvents XlScWaiting As Windows.Forms.Label
-    Friend WithEvents XlScUnprocessed As Windows.Forms.Label
-    Friend WithEvents XlScNews As Windows.Forms.Label
-    Friend WithEvents XlScEmail As Windows.Forms.Label
-    Friend WithEvents XlScReadingbusiness As Windows.Forms.Label
-    Friend WithEvents XlScCalls As Windows.Forms.Label
-    Friend WithEvents XlScInternet As Windows.Forms.Label
-    Friend WithEvents XlScPreread As Windows.Forms.Label
-    Friend WithEvents XlScMeeting As Windows.Forms.Label
-    Friend WithEvents XlScPersonal As Windows.Forms.Label
+    Friend WithEvents Frame1 As System.Windows.Forms.Panel
+    Friend WithEvents LblTopic As System.Windows.Forms.Label
+    Friend WithEvents LblProject As System.Windows.Forms.Label
+    Friend WithEvents LblPeople As System.Windows.Forms.Label
+    Friend WithEvents LblContext As System.Windows.Forms.Label
+    Friend WithEvents TopicSelection As System.Windows.Forms.Label
+    Friend WithEvents ProjectSelection As System.Windows.Forms.Label
+    Friend WithEvents PeopleSelection As System.Windows.Forms.Label
+    Friend WithEvents CategorySelection As System.Windows.Forms.Label
+    Friend WithEvents OKButton As System.Windows.Forms.Button
+    Friend WithEvents Cancel_Button As System.Windows.Forms.Button
+    Friend WithEvents ShortcutNews As System.Windows.Forms.Button
+    Friend WithEvents ShortcutUnprocessed As System.Windows.Forms.Button
+    Friend WithEvents ShortcutReadingBusiness As System.Windows.Forms.Button
+    Friend WithEvents ShortcutCalls As System.Windows.Forms.Button
+    Friend WithEvents ShortcutInternet As System.Windows.Forms.Button
+    Friend WithEvents ShortcutPreRead As System.Windows.Forms.Button
+    Friend WithEvents ShortcutMeeting As System.Windows.Forms.Button
+    Friend WithEvents ShortcutPersonal As System.Windows.Forms.Button
+    Friend WithEvents ShortcutEmail As System.Windows.Forms.Button
+    Friend WithEvents ShortcutWaitingFor As System.Windows.Forms.Button
+    Friend WithEvents CbxBullpin As System.Windows.Forms.CheckBox
+    Friend WithEvents CbxToday As System.Windows.Forms.CheckBox
+    Friend WithEvents CbxFlagAsTask As System.Windows.Forms.CheckBox
+    Friend WithEvents LblTaskname As System.Windows.Forms.Label
+    Friend WithEvents TaskName As System.Windows.Forms.TextBox
+    Friend WithEvents LblPriority As System.Windows.Forms.Label
+    Friend WithEvents LblKbf As System.Windows.Forms.Label
+    Friend WithEvents LblDuration As System.Windows.Forms.Label
+    Friend WithEvents PriorityBox As System.Windows.Forms.ComboBox
+    Friend WithEvents KbSelector As System.Windows.Forms.ComboBox
+    Friend WithEvents Duration As System.Windows.Forms.TextBox
+    Friend WithEvents DtDuedate As System.Windows.Forms.DateTimePicker
+    Friend WithEvents LblDuedate As System.Windows.Forms.Label
+    Friend WithEvents LblReminder As System.Windows.Forms.Label
+    Friend WithEvents DtReminder As System.Windows.Forms.DateTimePicker
+    Friend WithEvents XlTopic As System.Windows.Forms.Label
+    Friend WithEvents XlProject As System.Windows.Forms.Label
+    Friend WithEvents XlPeople As System.Windows.Forms.Label
+    Friend WithEvents XlContext As System.Windows.Forms.Label
+    Friend WithEvents XlTaskname As System.Windows.Forms.Label
+    Friend WithEvents XlImportance As System.Windows.Forms.Label
+    Friend WithEvents XlKanban As System.Windows.Forms.Label
+    Friend WithEvents XlWorktime As System.Windows.Forms.Label
+    Friend WithEvents XlOk As System.Windows.Forms.Label
+    Friend WithEvents XlCancel As System.Windows.Forms.Label
+    Friend WithEvents XlReminder As System.Windows.Forms.Label
+    Friend WithEvents XlDuedate As System.Windows.Forms.Label
+    Friend WithEvents XlScBullpin As System.Windows.Forms.Label
+    Friend WithEvents XlScToday As System.Windows.Forms.Label
+    Friend WithEvents XlScWaiting As System.Windows.Forms.Label
+    Friend WithEvents XlScUnprocessed As System.Windows.Forms.Label
+    Friend WithEvents XlScNews As System.Windows.Forms.Label
+    Friend WithEvents XlScEmail As System.Windows.Forms.Label
+    Friend WithEvents XlScReadingbusiness As System.Windows.Forms.Label
+    Friend WithEvents XlScCalls As System.Windows.Forms.Label
+    Friend WithEvents XlScInternet As System.Windows.Forms.Label
+    Friend WithEvents XlScPreread As System.Windows.Forms.Label
+    Friend WithEvents XlScMeeting As System.Windows.Forms.Label
+    Friend WithEvents XlScPersonal As System.Windows.Forms.Label
 End Class
