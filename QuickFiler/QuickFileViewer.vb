@@ -8,7 +8,7 @@ Public Class QuickFileViewer
     End Sub
 
     Private Sub Button_OK_Click(sender As Object, e As EventArgs) Handles L1v2L2h3_ButtonOK.Click
-        _controller.Button_OK_Click()
+        _controller.ButtonOK_Click()
     End Sub
 
     Private Sub Button_OK_KeyDown(sender As Object, e As KeyEventArgs) Handles L1v2L2h3_ButtonOK.KeyDown
@@ -20,7 +20,7 @@ Public Class QuickFileViewer
     End Sub
 
     Private Sub Button_Undo_Click(sender As Object, e As EventArgs) Handles L1v2L2h4_ButtonUndo.Click
-        _controller.Button_Undo_Click()
+        _controller.ButtonUndo_Click()
     End Sub
 
     Private Sub PanelMain_KeyDown(sender As Object, e As KeyEventArgs) Handles L1v1L2_PanelMain.KeyDown
@@ -36,6 +36,18 @@ Public Class QuickFileViewer
     End Sub
 
     Private Sub spn_EmailPerLoad_ValueChanged(sender As Object, e As EventArgs) Handles L1v2L2h5_SpnEmailPerLoad.ValueChanged
-        _controller.spn_EmailPerLoad_Change()
+        _controller.SpnEmailPerLoad_Change()
+    End Sub
+
+    Private Sub QuickFileViewer_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+        _controller.Viewer_Activate()
+    End Sub
+
+    Private Sub QuickFileViewer_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
+        _controller.Form_Dispose()
+    End Sub
+
+    Private Sub L1v2L2h4_ButtonCancel_Click(sender As Object, e As EventArgs) Handles L1v2L2h4_ButtonCancel.Click
+        _controller.ButtonCancel_Click()
     End Sub
 End Class

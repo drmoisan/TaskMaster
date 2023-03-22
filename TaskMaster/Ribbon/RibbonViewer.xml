@@ -22,7 +22,6 @@
             <tab idMso="TabMail">
               <group id="Group2" label="Task Master">
                 <button id="FlagAsTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
-                <button id="QuickFilerOrig" imageMso="UpdateFolder" onAction="QuickFilerOrig_Click" label="Quick Filer Original" size="large" />
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
               </group>
             </tab>

@@ -59,11 +59,11 @@ Public Class QuickFileController
     Private _movedMails As cStackObject
     Public InitType As InitTypeEnum
 
-    'Public Collections
+    'Collections
     Public ColQFClass As Collection
     Public ColFrames As Collection
     Public ColMailJustMoved As Collection
-    Public ColEmailsInFolder As Collection
+    Private _colEmailsInFolder As Collection
     Friend WithEvents Frm As Panel
 
     'Window Handles
@@ -72,13 +72,18 @@ Public Class QuickFileController
 #End Region
 
     Public Sub New(AppGlobals As IApplicationGlobals,
-                   Viewer As QuickFileViewer)
+                   Viewer As QuickFileViewer,
+                   ColEmailsInFolder As Collection)
 
         'Link viewer to controller
         _viewer = Viewer
         _viewer.SetController(Me)
 
-        'Set private global variables 
+        'Link model to controller
+        _colEmailsInFolder = ColEmailsInFolder
+        InitializeModelProcessingMetrics()
+
+        'Link controller to global variables 
         _globals = AppGlobals
         With AppGlobals
             _olObjects = .Ol
@@ -93,22 +98,20 @@ Public Class QuickFileController
         _olAppHWnd = PInvoke.GetAncestor(_lFormHandle, UI.WindowsAndMessaging.GET_ANCESTOR_FLAGS.GA_PARENT)
 
         InitializeFormConfigurations()
-        Folder_Suggestions_Reload()
+        _viewer.Show()
 
+        Iterate()
+    End Sub
+
+    Private Sub InitializeModelProcessingMetrics()
         _intEmailStart = 0       'Reverse sort is 0   'Regular sort is 1
         _intEmailPosition = 0    'Reverse sort is 0   'Regular sort is 1
-        ColEmailsInFolder = LoadEmailDataBase()
-
-        _blSuppressEvents = False                                        'End suppression of events
-
-        _viewer.Show()
-        Iterate()
-
     End Sub
 
     Private Sub InitializeFormConfigurations()
         'Set conversation state variable with initial state
         BlShowInConversations = CurrentConversationState
+        If BlShowInConversations Then _objViewMem = _activeExplorer.CurrentView.Name
 
         'Suppress events while initializing form
         _blSuppressEvents = True
@@ -123,6 +126,8 @@ Public Class QuickFileController
         'Calculate the emails per page based on screen settings
         _intEmailsPerIteration = CInt(Math.Round(_heightPanelMainMax / (frmHt + frmSp), 0))
         _viewer.L1v2L2h5_SpnEmailPerLoad.Value = _intEmailsPerIteration
+
+        _blSuppressEvents = False
     End Sub
 
     Private ReadOnly Property CurrentConversationState As Boolean
@@ -134,7 +139,6 @@ Public Class QuickFileController
             End If
         End Get
     End Property
-
 
     Private Sub RemoveControlsTabstops()
         'Set defaults for controls on main form
@@ -190,120 +194,34 @@ Public Class QuickFileController
         Return _viewer.L1v1L2_PanelMain.Height
     End Function
 
-    Public Function LoadEmailDataBase(Optional colEmailsToLoad As Collection = Nothing) As Collection
-        Dim OlFolder As Folder
-        Dim objCurView As Microsoft.Office.Interop.Outlook.View
-        Dim strFilter As String
-        Dim OlItems As Items
-        'TODO: Move this to Model Component of the MVC
-
-        If colEmailsToLoad Is Nothing Then
-            Dim unused As New Collection
-            OlFolder = _activeExplorer.CurrentFolder
-            objCurView = _activeExplorer.CurrentView
-            strFilter = objCurView.Filter
-            If strFilter <> "" Then
-                strFilter = "@SQL=" & strFilter
-                OlItems = OlFolder.Items.Restrict(strFilter)
-            Else
-                OlItems = OlFolder.Items
-            End If
-            Return MailItemsSort(OlItems,
-                                SortOptionsEnum.DateRecentFirst +
-                                SortOptionsEnum.TriageImportantFirst +
-                                SortOptionsEnum.ConversationUniqueOnly)
-        Else
-            Return colEmailsToLoad
-        End If
-
-    End Function
-
-    Private Sub DebugOutPutEmailCollection(colTemp As Collection)
-        Dim objItem As Object
-        Dim OlMail As [MailItem]
-        Dim OlAppt As [MeetingItem]
-        Dim strLine As String
-        Dim i As Integer
-
-        i = 0
-        For Each objItem In colTemp
-            i += 1
-            strLine = ""
-            If TypeOf objItem Is [MailItem] Then
-                OlMail = objItem
-                With OlMail
-                    strLine = i & " " & CustomFieldID_GetValue(objItem, "Triage") & " " & Format(.SentOn, "General Date") & " " & .Subject
-                End With
-            ElseIf TypeOf objItem Is [AppointmentItem] Then
-                OlAppt = objItem
-                With OlAppt
-                    strLine = i & " " & CustomFieldID_GetValue(objItem, "Triage") & " " & Format(.SentOn, "General Date") & " " & .Subject
-                End With
-            End If
-            Debug.WriteLine(strLine)
-        Next objItem
-    End Sub
-
-    Private Function ItemsToCollection(OlItems As Items) As Collection
-        Dim colTemp As Collection
-        colTemp = New Collection
-
-        Dim objItem As Object
-        For Each objItem In OlItems
-            colTemp.Add(objItem)
-        Next objItem
-        ItemsToCollection = colTemp
-
-    End Function
-
-    Private Sub EliminateDuplicateConversationIDs(ByRef colTemp As Collection)
-        Dim dictID As New Dictionary(Of String, Integer)
-        Dim i As Long
-        Dim max As Long
-
-        Dim objItem As Object
-        For Each objItem In colTemp
-            If dictID.ContainsKey(objItem.ConversationID) Then
-                dictID(objItem.ConversationID) = dictID(objItem.ConversationID) + 1
-            Else
-                dictID.Add(objItem.ConversationID, 0)
-            End If
-        Next objItem
-
-        max = colTemp.Count
-
-        For i = max To 1 Step -1
-            objItem = colTemp(i)
-            'Debug.Print dictID(objItem.ConversationID)
-            If dictID(objItem.ConversationID) > 0 Then
-                Dim unused = colTemp.Remove(objItem)
-                dictID(objItem.ConversationID) = dictID(objItem.ConversationID) - 1
-            End If
-        Next i
-    End Sub
 
     Public Sub Iterate()
+        _stopWatch = New cStopWatch
+        _stopWatch.Start()
+        Dim colEmails As Collection = DequeNextEmailGroup(_colEmailsInFolder, _intEmailsPerIteration)
+        LoadControlsAndHandlers(colEmails)
+    End Sub
+
+    Private Function DequeNextEmailGroup(ByRef MasterQueue As Collection, Quantity As Integer) As Collection
         Dim i As Integer
         Dim max As Double
 
         Dim colEmails As Collection
 
         colEmails = New Collection
-        max = If(_intEmailsPerIteration < ColEmailsInFolder.Count, _intEmailsPerIteration, ColEmailsInFolder.Count)
+        max = If(Quantity < MasterQueue.Count, Quantity, MasterQueue.Count)
 
         For i = 1 To max
-            colEmails.Add(ColEmailsInFolder(i))
+            colEmails.Add(MasterQueue(i))
         Next i
         For i = max To 1 Step -1
-            ColEmailsInFolder.Remove(i)
+            MasterQueue.Remove(i)
         Next i
-        _stopWatch = New cStopWatch
-        _stopWatch.Start()
-        Init(colEmails)
 
-    End Sub
+        Return colEmails
+    End Function
 
-    Public Sub Init(colEmails As Collection)
+    Public Sub LoadControlsAndHandlers(colEmails As Collection)
         Dim objItem As Object
         Dim Mail As [MailItem]
         Dim QF As QfcController
@@ -360,12 +278,79 @@ Public Class QuickFileController
         'EnableWindow(_olAppHWnd, Modal)
         'EnableWindow _lFormHandle, Modeless
         _viewer.L1v1L2_PanelMain.Focus()
+    End Sub
 
+#Region "Data Model Manipulation"
 
+    Private Sub EliminateDuplicateConversationIDs(ByRef colTemp As Collection)
+        Dim dictID As New Dictionary(Of String, Integer)
+        Dim i As Long
+        Dim max As Long
 
+        Dim objItem As Object
+        For Each objItem In colTemp
+            If dictID.ContainsKey(objItem.ConversationID) Then
+                dictID(objItem.ConversationID) = dictID(objItem.ConversationID) + 1
+            Else
+                dictID.Add(objItem.ConversationID, 0)
+            End If
+        Next objItem
+
+        max = colTemp.Count
+
+        For i = max To 1 Step -1
+            objItem = colTemp(i)
+            'Debug.Print dictID(objItem.ConversationID)
+            If dictID(objItem.ConversationID) > 0 Then
+                Dim unused = colTemp.Remove(objItem)
+                dictID(objItem.ConversationID) = dictID(objItem.ConversationID) - 1
+            End If
+        Next i
+    End Sub
+
+    Private Function ItemsToCollection(OlItems As Items) As Collection
+        Dim colTemp As Collection
+        colTemp = New Collection
+
+        Dim objItem As Object
+        For Each objItem In OlItems
+            colTemp.Add(objItem)
+        Next objItem
+        ItemsToCollection = colTemp
+
+    End Function
+
+    Private Sub DebugOutPutEmailCollection(colTemp As Collection)
+        Dim objItem As Object
+        Dim OlMail As MailItem
+        Dim OlAppt As MeetingItem
+        Dim strLine As String
+        Dim i As Integer
+
+        i = 0
+        For Each objItem In colTemp
+            i += 1
+            strLine = ""
+            If TypeOf objItem Is [MailItem] Then
+                OlMail = objItem
+                With OlMail
+                    strLine = i & " " & CustomFieldID_GetValue(objItem, "Triage") & " " & Format(.SentOn, "General Date") & " " & .Subject
+                End With
+            ElseIf TypeOf objItem Is [AppointmentItem] Then
+                OlAppt = objItem
+                With OlAppt
+                    strLine = i & " " & CustomFieldID_GetValue(objItem, "Triage") & " " & Format(.SentOn, "General Date") & " " & .Subject
+                End With
+            End If
+            Debug.WriteLine(strLine)
+        Next objItem
     End Sub
 
 
+
+#End Region
+
+#Region "Control Group UI Operations"
     Private Sub LoadGroupOfCtrls(ByRef colCtrls As Collection,
     intItemNumber As Integer,
     Optional intPosition As Integer = 0,
@@ -1254,6 +1239,7 @@ Public Class QuickFileController
 
 
     End Sub
+
     Private Function DoesCollectionHaveConvID(objItem As Object, col As Collection) As Integer
 
 
@@ -1364,14 +1350,105 @@ Public Class QuickFileController
         End If
 
         QF = Nothing
+    End Sub
+
+    Public Sub toggleAcceleratorDialogue()
+        Dim QF As QfcController
+        Dim i As Integer
+
+        If ColQFClass IsNot Nothing Then
+            For i = 1 To ColQFClass.Count
+                QF = ColQFClass(i)
+                If QF.blExpanded And i <> ColQFClass.Count Then MoveDownPix(i + 1, QF.frm.Height * -0.5)
+                QF.Accel_Toggle()
+            Next i
+        End If
+
+        If _viewer.AcceleratorDialogue.Visible = True Then
+            _viewer.AcceleratorDialogue.Visible = False
+            'Modal                                                                                strTemp = "ExplConvView_ToggleOn"
+            'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+            'Modal        ExplConvView_ToggleOn
+            Dim unused = _viewer.L1v1L2_PanelMain.Focus()
+        Else
+            If AreConversationsGrouped(_activeExplorer) Then
+                'ToggleShowAsConversation -1
+                'Modal                                                                                strTemp = "ExplConvView_ToggleOff"
+                'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+                'Modal            ExplConvView_ToggleOff
+            End If
+            _viewer.AcceleratorDialogue.Visible = True
+            If _intAccActiveMail <> 0 Then
+                _viewer.AcceleratorDialogue.Text = _intAccActiveMail
+                Try
+                    QF = ColQFClass(_intAccActiveMail)
+                Catch ex As System.Exception
+                    _intAccActiveMail = 1
+                    QF = ColQFClass(_intAccActiveMail)
+                End Try
+                QF.Accel_FocusToggle()
+            End If
+            'Modal                                                                                strTemp = "SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&"
+            'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
+            'Modal        SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&
+
+            _viewer.AcceleratorDialogue.Focus()
+            _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
+        End If
+
+        QF = Nothing
+    End Sub
+
+    Private Sub FormResize()
+        Dim intDiffy As Integer
+        Dim intDiffx As Integer
+        Dim i As Integer
+        Dim QF As QfcController
+
+        'MsgBox "App Width " & Me.Width & vbCrLf & "Screen Width " & ScreenWidth * PointsPerPixel
+        If Not _blSuppressEvents Then
+
+            intDiffx = If(_viewer.Width >= Width_UserForm - 100, _viewer.Width - Width_UserForm, 0)
+
+            intDiffy = If(_viewer.Height >= _heightFormMin, _viewer.Height - _heightFormMin, 0)
+
+            _viewer.L1v1L2_PanelMain.Width = Width_PanelMain + intDiffx
+            _viewer.L1v1L2_PanelMain.Height = _heightPanelMainMin + intDiffy
+
+            _viewer.L1v2L2h3_ButtonOK.Top = _lngTopButtonOkMin + intDiffy
+            _viewer.L1v2L2h3_ButtonOK.Left = OK_left + (intDiffx / 2)
+            _viewer.L1v2L2h4_ButtonCancel.Top = _lngTopButtonCancelMin + intDiffy
+            _viewer.L1v2L2h4_ButtonCancel.Left = _viewer.L1v2L2h3_ButtonOK.Left + CANCEL_left - OK_left
+            _viewer.L1v2L2h4_ButtonUndo.Top = _lngTopButtonUndoMin + intDiffy
+            _viewer.L1v2L2h4_ButtonUndo.Left = _viewer.L1v2L2h3_ButtonOK.Left + UNDO_left - OK_left
+            'Button1.top = lngTop_Button1_Min + intDiffy
+            _viewer.AcceleratorDialogue.Top = _lngTopAcceleratorDialogueMin + intDiffy
+            _viewer.L1v2L2h5_SpnEmailPerLoad.Top = _lngTopSpnMin + intDiffy
+            _viewer.L1v2L2h5_SpnEmailPerLoad.Left = spn_left + intDiffx
 
 
+            If ColQFClass IsNot Nothing Then
+                For i = 1 To ColQFClass.Count
+                    QF = ColQFClass(i)
+                    If QF.blConChild Then
+                        QF.frm.Left = frmLt * 2
+                        QF.frm.Width = Width_frm + intDiffx - frmLt
+                        QF.ResizeCtrls(intDiffx - frmLt)
+                    Else
+                        QF.frm.Width = Width_frm + intDiffx
+                        QF.ResizeCtrls(intDiffx)
+                    End If
+                Next i
+            End If
+
+        End If 'blSupressEvents
 
     End Sub
 
+#End Region
 
+#Region "Keyboard event handlers"
     Friend Sub AcceleratorDialogue_Change()
-
 
         Dim strToParse As String
         Dim i As Integer
@@ -1382,22 +1459,11 @@ Public Class QuickFileController
         Dim QF As QfcController
         Dim blExpanded As Boolean
 
-
-
-
-
         If Not _blSuppressEvents Then
-
-
             intLastNum = 0
-
             strToParse = _viewer.AcceleratorDialogue.Text
-
             If strToParse <> "" Then
-
-
                 intLen = Len(strToParse)
-
                 For i = 1 To intLen
                     If IsNumeric(Mid(strToParse, i, 1)) Then
                         intLastNum = i
@@ -1405,81 +1471,40 @@ Public Class QuickFileController
                         Exit For
                     End If
                 Next i
-
                 If intLastNum > 0 Then
-
-
-
                     intAccTmpMail = CInt(Mid(strToParse, 1, intLastNum))
-
-
                     If intAccTmpMail <> _intAccActiveMail Then
-
-
                         If _intAccActiveMail <> 0 And _intAccActiveMail <= ColQFClass.Count Then
-
-
                             QF = ColQFClass(_intAccActiveMail)
-
                             If QF.blExpanded Then
-
-
-
                                 MoveDownPix(_intAccActiveMail + 1, QF.frm.Height * -0.5)
                                 QF.ExpandCtrls1()
-
                                 blExpanded = True
                             End If
-
                             QF.Accel_FocusToggle()
-
                         End If
-
-
                         If intAccTmpMail <> 0 And intAccTmpMail <= ColQFClass.Count Then
-
-
                             QF = ColQFClass(intAccTmpMail)
-
                             QF.Accel_FocusToggle()
-
                             If blExpanded Then
-
-
-
                                 MoveDownPix(intAccTmpMail + 1, QF.frm.Height)
                                 QF.ExpandCtrls1()
-
                             End If
                             _viewer.L1v1L2_PanelMain.ScrollControlIntoView(QF.frm)
                             'ScrollIntoView_MF(QF.Frm.Top, QF.Frm.Top + QF.Frm.Height)
                         End If
 
-
                         If intAccTmpMail <= ColQFClass.Count Then
-
-
                             _intAccActiveMail = intAccTmpMail
                         End If
-
                     End If
-
                     If intLen > intLastNum And _intAccActiveMail <> 0 And _intAccActiveMail <= ColQFClass.Count Then
-
-
                         strCommand = UCase(Mid(strToParse, intLastNum + 1, 1))
-
                         If _blSuppressEvents = False Then
-
-
                             _blSuppressEvents = True
-
                             _viewer.AcceleratorDialogue.Text = _intAccActiveMail
-
                             _blSuppressEvents = False
                         Else
-
-
                             _viewer.AcceleratorDialogue.Text = _intAccActiveMail
                         End If
 
@@ -1487,227 +1512,114 @@ Public Class QuickFileController
 
                         Select Case strCommand
                             Case "O"
-
-
                                 toggleAcceleratorDialogue()
-
                                 'EnableWindow(_olAppHWnd, Modeless)
                                 'EnableWindow _lFormHandle, Modeless
-
                                 If _activeExplorer.CurrentFolder.DefaultItemType <> OlItemType.olMailItem Then
                                     _activeExplorer.NavigationPane.CurrentModule = _activeExplorer.NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail)
                                 End If
-
                                 If InitType.HasFlag(InitTypeEnum.InitSort) And AreConversationsGrouped(_activeExplorer) Then ExplConvView_ToggleOff()                      'Modal
                                 QF.KB(strCommand)
-
                                 QFD_Minimize()
-
                                 If InitType.HasFlag(InitTypeEnum.InitSort) And BlShowInConversations Then ExplConvView_ToggleOn()
                         'ToggleShowAsConversation 1
                         'SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&
                             Case "C"
-
-
                                 toggleAcceleratorDialogue()
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "T"
-
-
                                 toggleAcceleratorDialogue()
-
                                 'EnableWindow(_olAppHWnd, Modeless)
                                 'EnableWindow _lFormHandle, Modeless
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "F"
-
-
                                 toggleAcceleratorDialogue()
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "D"
-
-
                                 toggleAcceleratorDialogue()
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "X"
-
-
                                 toggleAcceleratorDialogue()
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "R"
-
-
                                 toggleAcceleratorDialogue()
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "A"
-
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "W"
-
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "M"
-
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 QF.KB(strCommand)
                             Case "E"
-
-
                                 QF = ColQFClass(_intAccActiveMail)
-
                                 If QF.blExpanded Then
-
-
                                     MoveDownPix(_intAccActiveMail + 1, QF.frm.Height * -0.5)
                                     QF.ExpandCtrls1()
                                 Else
-
-
                                     MoveDownPix(_intAccActiveMail + 1, QF.frm.Height)
                                     QF.ExpandCtrls1()
                                 End If
-                                '                                                                                                    strTemp = "AcceleratorDialogue.Value = Left(AcceleratorDialogue.Value, Len(AcceleratorDialogue.Value) - 1)"
-                                '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                '                        _viewer.AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
                             Case Else
-
-
-                                _blSuppressEvents = True
-                                '                                                                                                    strTemp = "AcceleratorDialogue.Value = Left(AcceleratorDialogue.Value, Len(AcceleratorDialogue.Value) - 1)"
-                                '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                                '                        _viewer.AcceleratorDialogue.value = Left(AcceleratorDialogue.value, Len(AcceleratorDialogue.value) - 1)
-
-                                _blSuppressEvents = False
                         End Select
                     End If
-
-
                 End If
-
-
             Else
-
-
                 If _intAccActiveMail <> 0 Then
-
-
                     Dim unused = ColQFClass(_intAccActiveMail).Accel_FocusToggle
-
                     _intAccActiveMail = 0
                 End If
             End If
         Else
 
-
         End If
-
-
-
 
     End Sub
 
-
-
     Friend Sub AcceleratorDialogue_KeyDown(sender As Object, e As KeyEventArgs)
-
-
-
         Select Case e.KeyCode
             Case Keys.Alt
-
                 'Debug.Print "Alt Key Pressed"
-
                 toggleAcceleratorDialogue()
-
             Case Keys.Down
-
-
                 If AreConversationsGrouped(_activeExplorer) Then
-
-
                     'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                     'Modal                ExplConvView_ToggleOff
                     '            Else
                     '                                                                                                    strTemp = "If AreConversationsGrouped Then IS FALSE"
                     '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                 End If
-
-
                 If _intAccActiveMail < ColQFClass.Count Then
-
-
                     _viewer.AcceleratorDialogue.Text = _intAccActiveMail + 1
                 End If
-
-
             Case Keys.Up
-
-
                 If AreConversationsGrouped(_activeExplorer) Then
-
                     'Modal                                                                                                    strTemp = "ExplConvView_ToggleOff"
                     'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
                     'Modal                ExplConvView_ToggleOff
                 End If
-
-
-
                 If _intAccActiveMail > 1 Then
-
-
                     _viewer.AcceleratorDialogue.Text = _intAccActiveMail - 1
                 End If
-
-
-
                 _viewer.AcceleratorDialogue.Focus()
-
             Case Keys.A
-
                 If ((Control.ModifierKeys And Keys.Shift) = Keys.Shift) And
                     ((Control.ModifierKeys And Keys.Control) = Keys.Control) Then
-
-
                     ToggleRemoteMouseLabels()
-
                 End If
                 '        Case Else
                 '                                                                                                    strTemp = "Case Else"
                 '                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-
         End Select
-
-
-
-
-
     End Sub
-
 
     Friend Sub AcceleratorDialogue_KeyUp(sender As Object, e As KeyEventArgs)
         Dim QF As QfcController
@@ -1766,10 +1678,110 @@ Public Class QuickFileController
         End Select
     End Sub
 
-    Friend Sub BUTTON_CANCEL_Click()
+    Friend Sub ButtonCancel_KeyDown(sender As Object, e As KeyEventArgs)
+        KeyDownHandler(sender, e)
+    End Sub
 
+    Friend Sub Button_OK_KeyDown(sender As Object, e As KeyEventArgs)
+        'If DebugLVL And vbProcedure Then Debug.Print "Fired Button_OK_KeyDown"
+        KeyDownHandler(sender, e)
+    End Sub
+
+    Friend Sub Button_OK_KeyUp(sender As Object, e As KeyEventArgs)
+        KeyUpHandler(sender, e)
+    End Sub
+
+    Friend Sub PanelMain_KeyDown(sender As Object, e As KeyEventArgs)
+        KeyDownHandler(sender, e)
+    End Sub
+
+    Friend Sub PanelMain_KeyPress(sender As Object, e As KeyPressEventArgs)
+        KeyPressHandler(sender, e)
+    End Sub
+
+    Friend Sub PanelMain_KeyUp(sender As Object, e As KeyEventArgs)
+        KeyUpHandler(sender, e)
+    End Sub
+
+    Private Sub SpnEmailPerLoad_KeyDown(sender As Object, e As KeyEventArgs)
+        KeyDownHandler(sender, e)
+    End Sub
+
+    Private Sub UserForm_KeyPress(sender As Object, e As KeyPressEventArgs)
+        If Not _blSuppressEvents Then KeyPressHandler(sender, e)
+    End Sub
+
+    Private Sub UserForm_KeyUp(sender As Object, e As KeyEventArgs)
+        If Not _blSuppressEvents Then KeyUpHandler(sender, e)
+    End Sub
+
+    Private Sub UserForm_KeyDown(sender As Object, e As KeyEventArgs)
+        If Not _blSuppressEvents Then KeyDownHandler(sender, e)
+    End Sub
+
+    Public Sub KeyPressHandler(sender As Object, e As KeyPressEventArgs)
+        If Not _blSuppressEvents Then
+            Select Case e.KeyChar
+
+                Case Else
+            End Select
+        End If
+    End Sub
+
+    Public Sub KeyUpHandler(sender As Object, e As KeyEventArgs)
+        If Not _blSuppressEvents Then
+            Select Case e.KeyCode
+                Case Keys.Alt
+                    If _viewer.AcceleratorDialogue.Visible Then
+                        _viewer.AcceleratorDialogue.Focus()
+                        _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
+                    Else
+                        Dim unused = _viewer.L1v1L2_PanelMain.Focus()
+                    End If
+                    SendKeys.Send("{ESC}")
+                Case Keys.Up
+                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
+                Case Keys.Down
+                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
+                Case Else
+            End Select
+        End If
+    End Sub
+
+    Public Sub KeyDownHandler(sender As Object, e As KeyEventArgs)
+
+        If Not _blSuppressEvents Then
+            Select Case e.KeyCode
+                Case Keys.Enter
+                    ButtonOK_Click()
+                Case Keys.Tab
+                    toggleAcceleratorDialogue()
+                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
+                    '        Case vbKeyEscape
+                    '            vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
+                    '            If vbMsgResponse = vbOK Then ButtonCancel_Click
+                Case Keys.Alt
+                    toggleAcceleratorDialogue()
+                    If _viewer.AcceleratorDialogue.Visible Then
+                        _viewer.AcceleratorDialogue.Focus()
+                    Else
+                        Dim unused = _viewer.L1v1L2_PanelMain.Focus()
+                    End If
+                Case Else
+                    If _viewer.AcceleratorDialogue.Visible Then
+                        AcceleratorDialogue_KeyDown(sender, e)
+                    Else
+                    End If
+            End Select
+        End If
+    End Sub
+
+#End Region
+
+#Region "Other Event Handlers"
+
+    Friend Sub ButtonCancel_Click()
         'ExplConvView_ToggleOn
-
         If BlShowInConversations Then
             'ExplConvView_ToggleOn
             ExplConvView_Cleanup()
@@ -1781,11 +1793,7 @@ Public Class QuickFileController
         _viewer.Dispose()
     End Sub
 
-    Friend Sub BUTTON_CANCEL_KeyDown(sender As Object, e As KeyEventArgs)
-        KeyDownHandler(sender, e)
-    End Sub
-
-    Friend Sub Button_OK_Click()
+    Friend Sub ButtonOK_Click()
 
         Dim QF As QfcController
         Dim blReadyForMove As Boolean
@@ -1838,26 +1846,9 @@ Public Class QuickFileController
         Else
             _viewer.Dispose()
         End If
-
-
-
     End Sub
 
-
-    Friend Sub Button_OK_KeyDown(sender As Object, e As KeyEventArgs)
-
-
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired Button_OK_KeyDown"
-
-        KeyDownHandler(sender, e)
-    End Sub
-
-    Friend Sub Button_OK_KeyUp(sender As Object, e As KeyEventArgs)
-        KeyUpHandler(sender, e)
-    End Sub
-
-
-    Friend Sub Button_Undo_Click()
+    Friend Sub ButtonUndo_Click()
         Dim i As Integer
         Dim oMail_Old As MailItem = Nothing
         Dim oMail_Current As MailItem = Nothing
@@ -1867,44 +1858,6 @@ Public Class QuickFileController
         Dim colItems As Collection
         Dim vbUndoResponse As MsgBoxResult
         Dim vbRepeatResponse As MsgBoxResult
-
-        '    If Not ColMailJustMoved Is Nothing Then
-        '        If ColMailJustMoved.Count <> 0 Then
-        '
-        '            oFolderCurrent = Application._activeExplorer.CurrentFolder
-        '
-        '            For i = 1 To ColMailJustMoved.Count
-        '                If TypeOf ColMailJustMoved(i) Is mailItem Then
-        '                    oMail = ColMailJustMoved(i)
-        '                    If Mail_IsItEncrypted(oMail) = False Then
-        '                        vbUndoResponse = MsgBox("Undo Move of email: " & oMail.Subject & "?", vbYesNo)
-        '                        If vbUndoResponse = vbYes Then
-        '                            colItems = New Collection
-        '                            col = New Collection
-        '                            col.Add oMail
-        '
-        '                            On Error Resume Next
-        '                            colItems = Email_SortToExistingFolder.DemoConversation(colItems, col)
-        '
-        '                            If Err.Number <> 0 Or colItems.Count = 0 Then
-        '                                Err.Clear
-        '                                colItems = New Collection
-        '                                colItems.Add oMail
-        '                            End If
-        '
-        '                            For Each oMailTmp In colItems
-        '                                oItemFolder = oMailTmp.Parent
-        '                                If oItemFolder <> oFolderCurrent Then
-        '                                    oMailTmp.Move oFolderCurrent
-        '                                End If
-        '                            Next oMailTmp
-        '                        End If   'If vbUndoResponse = vbYes
-        '                    End If    'If Mail_IsItEncrypted(oMail) = False
-        '                End If   'If TypeOf ColMailJustMoved(i) Is mailItem
-        '            Next i
-        '        End If  'If ColMailJustMoved.Count <> 0
-        '    End If  'If Not ColMailJustMoved Is Nothing
-        '
 
         If _movedMails Is Nothing Then _movedMails = New cStackObject
         vbRepeatResponse = vbYes
@@ -1939,133 +1892,19 @@ Public Class QuickFileController
         End While
     End Sub
 
-    Friend Sub PanelMain_KeyDown(sender As Object, e As KeyEventArgs)
-
-
-        'If DebugLVL And vbProcedure Then Debug.Print "Fired _viewer.L1v1L2_PanelMain_KeyDown"
-
-        KeyDownHandler(sender, e)
-    End Sub
-
-    Friend Sub PanelMain_KeyPress(sender As Object, e As KeyPressEventArgs)
-        'MsgBox ("KeyPress _viewer.L1v1L2_PanelMain")
-        KeyPressHandler(sender, e)
-    End Sub
-
-    Friend Sub PanelMain_KeyUp(sender As Object, e As KeyEventArgs)
-        KeyUpHandler(sender, e)
-    End Sub
-
-    Friend Sub spn_EmailPerLoad_Change()
+    Friend Sub SpnEmailPerLoad_Change()
         If _viewer.L1v2L2h5_SpnEmailPerLoad.Value >= 0 Then
             _intEmailsPerIteration = _viewer.L1v2L2h5_SpnEmailPerLoad.Value
         End If
     End Sub
 
-    Private Sub spn_EmailPerLoad_KeyDown(sender As Object, e As KeyEventArgs)
-        KeyDownHandler(sender, e)
-    End Sub
-
-    Private Sub UserForm_Activate()
-
+    Friend Sub Viewer_Activate()
         If _stopWatch IsNot Nothing Then
             If _stopWatch.isPaused = True Then
                 _stopWatch.reStart()
             End If
         End If
     End Sub
-
-    Public Sub toggleAcceleratorDialogue()
-
-        Dim QF As QfcController
-        Dim i As Integer
-
-        If ColQFClass IsNot Nothing Then
-            For i = 1 To ColQFClass.Count
-
-
-                QF = ColQFClass(i)
-
-
-                If QF.blExpanded And i <> ColQFClass.Count Then MoveDownPix(i + 1, QF.frm.Height * -0.5)
-                QF.Accel_Toggle()
-            Next i
-        End If
-
-
-        If _viewer.AcceleratorDialogue.Visible = True Then
-
-
-            _viewer.AcceleratorDialogue.Visible = False
-            'Modal                                                                                strTemp = "ExplConvView_ToggleOn"
-            'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            'Modal        ExplConvView_ToggleOn
-
-            Dim unused = _viewer.L1v1L2_PanelMain.Focus()
-        Else
-
-
-            If AreConversationsGrouped(_activeExplorer) Then
-                'ToggleShowAsConversation -1
-
-                'Modal                                                                                strTemp = "ExplConvView_ToggleOff"
-                'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-                'Modal            ExplConvView_ToggleOff
-            Else
-
-            End If
-            _viewer.AcceleratorDialogue.Visible = True
-
-
-            If _intAccActiveMail <> 0 Then
-
-
-                _viewer.AcceleratorDialogue.Text = _intAccActiveMail
-
-                On Error Resume Next
-                QF = ColQFClass(_intAccActiveMail)
-                If Err.Number <> 0 Then
-                    Err.Clear()
-                    _intAccActiveMail = 1
-                    QF = ColQFClass(_intAccActiveMail)
-                End If
-
-
-                QF.Accel_FocusToggle()
-            Else
-
-            End If
-            'Modal                                                                                strTemp = "SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&"
-            'Modal                                                                                If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            'Modal        SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&
-
-            _viewer.AcceleratorDialogue.Focus()
-            _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
-        End If
-
-        QF = Nothing
-
-
-
-    End Sub
-
-    'Private Sub ScrollIntoView_MF(lngItemTop As Long, lngItemBottom As Long)
-    '    Dim DiffY As Long
-
-    '    If lngItemTop < _lngPanelMainSCTop Then
-    '        'Diffy = lngItemTop - _lngPanelMainSCTop
-    '        'PanelMain.Scroll , Diffy
-    '        '_lngPanelMainSCTop = _lngPanelMainSCTop = Diffy
-    '        _lngPanelMainSCTop = lngItemTop - frmSp
-    '        _viewer.L1v1L2_PanelMain.ScrollTop = _lngPanelMainSCTop
-    '    ElseIf (frmSp + lngItemBottom) > (_lngPanelMainSCTop + _viewer.L1v1L2_PanelMain.Height) Then
-    '        DiffY = frmSp + lngItemBottom - (_lngPanelMainSCTop + _viewer.L1v1L2_PanelMain.Height)
-    '        'PanelMain.Scroll yAction:=CInt(Diffy)
-    '        _lngPanelMainSCTop += DiffY
-    '        _viewer.L1v1L2_PanelMain.ScrollTop = _lngPanelMainSCTop
-    '    End If
-    'End Sub
-
 
     Private Sub focusListener_ChangeFocus(ByVal gotFocus As Boolean)
         If gotFocus Then
@@ -2087,180 +1926,25 @@ Public Class QuickFileController
         End If
     End Sub
 
-
-
-
-
-    Private Sub FormResize()
-        Dim intDiffy As Integer
-        Dim intDiffx As Integer
-        Dim i As Integer
-        Dim QF As QfcController
-
-        'MsgBox "App Width " & Me.Width & vbCrLf & "Screen Width " & ScreenWidth * PointsPerPixel
-        If Not _blSuppressEvents Then
-
-            intDiffx = If(_viewer.Width >= Width_UserForm - 100, _viewer.Width - Width_UserForm, 0)
-
-            intDiffy = If(_viewer.Height >= _heightFormMin, _viewer.Height - _heightFormMin, 0)
-
-            _viewer.L1v1L2_PanelMain.Width = Width_PanelMain + intDiffx
-            _viewer.L1v1L2_PanelMain.Height = _heightPanelMainMin + intDiffy
-
-            _viewer.L1v2L2h3_ButtonOK.Top = _lngTopButtonOkMin + intDiffy
-            _viewer.L1v2L2h3_ButtonOK.Left = OK_left + (intDiffx / 2)
-            _viewer.L1v2L2h4_ButtonCancel.Top = _lngTopButtonCancelMin + intDiffy
-            _viewer.L1v2L2h4_ButtonCancel.Left = _viewer.L1v2L2h3_ButtonOK.Left + CANCEL_left - OK_left
-            _viewer.L1v2L2h4_ButtonUndo.Top = _lngTopButtonUndoMin + intDiffy
-            _viewer.L1v2L2h4_ButtonUndo.Left = _viewer.L1v2L2h3_ButtonOK.Left + UNDO_left - OK_left
-            'Button1.top = lngTop_Button1_Min + intDiffy
-            _viewer.AcceleratorDialogue.Top = _lngTopAcceleratorDialogueMin + intDiffy
-            _viewer.L1v2L2h5_SpnEmailPerLoad.Top = _lngTopSpnMin + intDiffy
-            _viewer.L1v2L2h5_SpnEmailPerLoad.Left = spn_left + intDiffx
-
-
-            If ColQFClass IsNot Nothing Then
-                For i = 1 To ColQFClass.Count
-                    QF = ColQFClass(i)
-                    If QF.blConChild Then
-                        QF.frm.Left = frmLt * 2
-                        QF.frm.Width = Width_frm + intDiffx - frmLt
-                        QF.ResizeCtrls(intDiffx - frmLt)
-                    Else
-                        QF.frm.Width = Width_frm + intDiffx
-                        QF.ResizeCtrls(intDiffx)
-                    End If
-                Next i
-            End If
-
-        End If 'blSupressEvents
-
+    Friend Sub Form_Dispose()
+        ExplConvView_ReturnState()
     End Sub
 
+#End Region
 
-    Private Sub UserForm_KeyPress(sender As Object, e As KeyPressEventArgs)
-        If Not _blSuppressEvents Then KeyPressHandler(sender, e)
-    End Sub
-
-    Private Sub UserForm_KeyUp(sender As Object, e As KeyEventArgs)
-        If Not _blSuppressEvents Then KeyUpHandler(sender, e)
-    End Sub
-
-    Private Sub UserForm_KeyDown(sender As Object, e As KeyEventArgs)
-        If Not _blSuppressEvents Then KeyDownHandler(sender, e)
-    End Sub
-
-
-    Public Sub KeyPressHandler(sender As Object, e As KeyPressEventArgs)
-        If Not _blSuppressEvents Then
-            Select Case e.KeyChar
-
-                Case Else
-            End Select
-        End If
-    End Sub
-
-    Public Sub KeyUpHandler(sender As Object, e As KeyEventArgs)
-        If Not _blSuppressEvents Then
-            Select Case e.KeyCode
-                Case Keys.Alt
-                    If _viewer.AcceleratorDialogue.Visible Then
-                        _viewer.AcceleratorDialogue.Focus()
-                        _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
-                    Else
-                        Dim unused = _viewer.L1v1L2_PanelMain.Focus()
-                    End If
-                    SendKeys.Send("{ESC}")
-                Case Keys.Up
-                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
-                Case Keys.Down
-                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
-                Case Else
-            End Select
-        End If
-    End Sub
-
-    Public Sub KeyDownHandler(sender As Object, e As KeyEventArgs)
-
-        If Not _blSuppressEvents Then
-
-
-            Select Case e.KeyCode
-                Case Keys.Enter
-                    Button_OK_Click()
-                Case Keys.Tab
-                    toggleAcceleratorDialogue()
-                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
-                    '        Case vbKeyEscape
-                    '            vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
-                    '            If vbMsgResponse = vbOK Then BUTTON_CANCEL_Click
-                Case 18
-
-
-                    toggleAcceleratorDialogue()
-
-                    If _viewer.AcceleratorDialogue.Visible Then
-
-
-                        _viewer.AcceleratorDialogue.Focus()
-
-                    Else
-
-
-                        Dim unused = _viewer.L1v1L2_PanelMain.Focus()
-                    End If
-                Case Else
-
-
-                    If _viewer.AcceleratorDialogue.Visible Then
-
-
-                        AcceleratorDialogue_KeyDown(sender, e)
-                    Else
-
-                    End If
-            End Select
-        End If
-
-
-
-    End Sub
+#Region "Outlook View UI Actions"
 
     Public Sub QFD_Minimize()
-
-
-        'Lets find the UserForm Handle the function below retrieves the handle
-        'to the top-level window whose class name ("ThunderDFrame" for Excel)
-        'and window name (me.caption or UserformName caption) match the specified strings.
-        '_lFormHandle = FindWindow("ThunderDFrame", _viewer.Text)
-
-        'EnableWindow _lFormHandle, Modal
         If _stopWatch IsNot Nothing Then
             If _stopWatch.isPaused = False Then
                 _stopWatch.Pause()
             End If
         End If
-        'EnableWindow(_olAppHWnd, Modeless)
-        'EnableWindow _lFormHandle, Modeless
-        'ShowWindow(_lFormHandle, SW_FORCEMINIMIZE)
         _viewer.WindowState = FormWindowState.Minimized
     End Sub
 
     Public Sub QFD_Maximize()
-
-
-        'Lets find the UserForm Handle the function below retrieves the handle
-        'to the top-level window whose class name ("ThunderDFrame" for Excel)
-        'and window name (me.caption or UserformName caption) match the specified strings.
-        '_lFormHandle = FindWindow("ThunderDFrame", _viewer.Text)
-
         _viewer.WindowState = FormWindowState.Maximized
-        'ShowWindow(_lFormHandle, SW_SHOWMAXIMIZED)
-        'Modal    SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&
-        'EnableWindow(_olAppHWnd, Modal)
-        'EnableWindow _lFormHandle, Modeless
-
-
     End Sub
 
     Public Sub ExplConvView_Cleanup()
@@ -2297,8 +1981,6 @@ Public Class QuickFileController
             _objViewMem = ObjView.Name
             If _objViewMem = "tmpNoConversation" Then _objViewMem = _globals.Ol.View_Wide
 
-            'On Error Resume Next
-
             ObjViewTemp = ObjView.Parent("tmpNoConversation")
 
             If ObjViewTemp Is Nothing Then
@@ -2307,16 +1989,7 @@ Public Class QuickFileController
                 ObjViewTemp.Save()
 
             End If
-
-
-            'On Error GoTo ErrorHandler
-
-
             ObjViewTemp.Apply()
-
-
-
-
             If _blSuppressEvents Then
                 Dim unused1 = _olApp.DoEvents()
             Else
@@ -2324,16 +1997,7 @@ Public Class QuickFileController
                 Dim unused = _olApp.DoEvents()
                 _blSuppressEvents = False
             End If
-
-
-            'Modal                                                                                                    strTemp = "SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&"
-            'Modal                                                                                                    If DebugLVL And vbCommand Then TraceStack.Push SubNm & strTemp Else ttrace = ttrace & vbCrLf & SubNm & strTemp
-            'Modal        SendMessage _lFormHandle, WM_SETFOCUS, 0&, 0&
-
-
         End If
-
-
 
     End Sub
 
@@ -2349,11 +2013,13 @@ Public Class QuickFileController
 
     End Sub
 
-
-    Private Sub UserForm_Terminate()
+    Friend Sub ExplConvView_ReturnState()
         If BlShowInConversations Then ExplConvView_ToggleOn()
-        'ToggleShowAsConversation 1
     End Sub
+
+#End Region
+
+
 
 
     Private Sub QuickFileMetrics_WRITE(filename As String, Optional FileWriteType As Integer = 8)
@@ -2385,14 +2051,7 @@ Public Class QuickFileController
 
         dataLineBeg = curDateText & "," & curTimeText & ","
 
-        'Append it to the text file
-        objShell = CreateObject("Shell.Application")
-        objFSO = CreateObject("Scripting.FileSystemObject")
-
-
-
         LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename)
-
 
         Duration = _stopWatch.timeElapsed
         OlEndTime = Now()
@@ -2446,22 +2105,10 @@ Public Class QuickFileController
             dataLine = dataLine & "," & xComma(QF.cbo.SelectedItem.ToString())           'Target Folder
             dataLine = dataLine & "," & QF.lblSentOn.Text
             dataLine = dataLine & "," & Format(QF.Mail.SentOn, "hh:mm")
-            'If DebugLVL And vbCommand Then Debug.Print SubNm & " dataline = " & dataLine
             strOutput(k) = dataLine
-            '        a.WriteLine (dataLine)
-
-            'Add to Email Calendar
-
-
-
-            'End If
-
         Next k
 
         Write_TextFile(filename, strOutput, _globals.FS.FldrMyD)
-        '    a.Close
-
-
 
     End Sub
 

@@ -882,7 +882,7 @@ Public Class QfcController
 
 
         Do While colCtrls.Count > 1
-            frm.Controls.Remove(colCtrls.Item(colCtrls.Count).Name)
+            frm.Controls.Remove(colCtrls.Item(colCtrls.Count))
             colCtrls.Remove(colCtrls.Count)
         Loop
 

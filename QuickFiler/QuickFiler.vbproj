@@ -104,24 +104,16 @@
     <Compile Include="cInfoMail.vb" />
     <Compile Include="FormFocusListener.vb" />
     <Compile Include="Enums.vb" />
-    <Compile Include="ModuleMailItemsSort.vb" />
-    <Compile Include="Original\QfcControllerOrig.vb" />
     <Compile Include="QfcController.vb" />
     <Compile Include="QuickFileController.vb" />
     <Compile Include="QuickFileControllerConstants.vb" />
+    <Compile Include="QuickFileHomeController.vb" />
     <Compile Include="QuickFileViewer.Designer.vb">
       <DependentUpon>QuickFileViewer.vb</DependentUpon>
     </Compile>
     <Compile Include="QuickFileViewer.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Original\QuickFileViewerOrig.Designer.vb">
-      <DependentUpon>QuickFileViewerOrig.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Original\QuickFileViewerOrig.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Original\QuickFileControllerOrig.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -147,9 +139,6 @@
   <ItemGroup>
     <EmbeddedResource Include="QuickFileViewer.resx">
       <DependentUpon>QuickFileViewer.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Original\QuickFileViewerOrig.resx">
-      <DependentUpon>QuickFileViewerOrig.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

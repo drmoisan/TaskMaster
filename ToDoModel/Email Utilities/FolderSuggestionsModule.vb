@@ -113,8 +113,36 @@ Public Module FolderSuggestionsModule
 
     End Function
 
+    Public Function LoadEmailDataBase(activeExplorer As Explorer, Optional colEmailsToLoad As Collection = Nothing) As Collection
+        Dim OlFolder As Folder
+        Dim objCurView As Microsoft.Office.Interop.Outlook.View
+        Dim strFilter As String
+        Dim OlItems As Items
+        'TODO: Move this to Model Component of the MVC
 
-    Public Sub Folder_Suggestions_Reload()
+        If colEmailsToLoad Is Nothing Then
+            Dim unused As New Collection
+            OlFolder = activeExplorer.CurrentFolder
+            objCurView = activeExplorer.CurrentView
+            strFilter = objCurView.Filter
+            If strFilter <> "" Then
+                strFilter = "@SQL=" & strFilter
+                OlItems = OlFolder.Items.Restrict(strFilter)
+            Else
+                OlItems = OlFolder.Items
+            End If
+            Return MailItemsSort(OlItems,
+                                SortOptionsEnum.DateRecentFirst +
+                                SortOptionsEnum.TriageImportantFirst +
+                                SortOptionsEnum.ConversationUniqueOnly)
+        Else
+            Return colEmailsToLoad
+        End If
+
+    End Function
+
+
+    Public Sub ReloadFolderSuggestionStagingFiles()
 
         If NotImplementedDialog.StopAtNotImplemented(MethodBase.GetCurrentMethod().Name) Then
             Throw New NotImplementedException("Folder_Suggestions_Reload not implemented yet")

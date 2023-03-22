@@ -3,7 +3,7 @@ Imports ToDoModel
 Imports UtilitiesVB
 
 
-Module ModuleMailItemsSort
+Public Module ModuleMailItemsSort
     Public Function MailItemsSort(OlItems As Items, options As SortOptionsEnum) As Collection
         Dim strFilter As String
         Dim strFilter2 As String

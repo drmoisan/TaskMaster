@@ -8,6 +8,7 @@ Public Class RibbonController
     Private _viewer As RibbonViewer
     Private _globals As IApplicationGlobals
     Private blHook As Boolean = True
+    Private _quickfile As QuickFileHomeController
 
     Public Sub New()
     End Sub
@@ -39,17 +40,12 @@ Public Class RibbonController
     End Sub
 
     Friend Sub LoadQuickFiler()
-        Dim _viewer = New QuickFileViewer()
-        Dim _controller = New QuickFileController(_globals, _viewer)
-
-        '_controller.SetAPIOptions()
-    End Sub
-
-    Friend Sub LoadQuickFilerOrig()
-        Dim _viewer = New QuickFileViewerOrig()
-        Dim _controller = New QuickFileControllerOrig(_globals, _viewer)
-
-        '_controller.SetAPIOptions()
+        Dim loaded As Boolean = False
+        If _quickfile IsNot Nothing Then loaded = _quickfile.Loaded
+        If loaded = False Then
+            _quickfile = New QuickFileHomeController(_globals)
+            _quickfile.Run()
+        End If
     End Sub
 
     Friend Sub ReviseProjectInfo()

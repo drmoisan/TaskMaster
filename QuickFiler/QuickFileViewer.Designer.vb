@@ -24,13 +24,13 @@ Partial Class QuickFileViewer
     Private Sub InitializeComponent()
         Me.L1v = New System.Windows.Forms.TableLayoutPanel()
         Me.L1v2L2h = New System.Windows.Forms.TableLayoutPanel()
+        Me.AcceleratorDialogue = New System.Windows.Forms.TextBox()
         Me.L1v2L2h3_ButtonOK = New System.Windows.Forms.Button()
         Me.L1v2L2h4_ButtonCancel = New System.Windows.Forms.Button()
         Me.L1v2L2h4_ButtonUndo = New System.Windows.Forms.Button()
         Me.L1v2L2h5_SpnEmailPerLoad = New System.Windows.Forms.NumericUpDown()
         Me.L1v1L2_PanelMain = New System.Windows.Forms.Panel()
         Me.L1v1L2L3v = New System.Windows.Forms.TableLayoutPanel()
-        Me.AcceleratorDialogue = New System.Windows.Forms.TextBox()
         Me.L1v.SuspendLayout()
         Me.L1v2L2h.SuspendLayout()
         CType(Me.L1v2L2h5_SpnEmailPerLoad, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -75,6 +75,16 @@ Partial Class QuickFileViewer
         Me.L1v2L2h.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
         Me.L1v2L2h.Size = New System.Drawing.Size(913, 50)
         Me.L1v2L2h.TabIndex = 0
+        '
+        'AcceleratorDialogue
+        '
+        Me.AcceleratorDialogue.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.AcceleratorDialogue.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AcceleratorDialogue.Location = New System.Drawing.Point(7, 3)
+        Me.AcceleratorDialogue.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
+        Me.AcceleratorDialogue.Name = "AcceleratorDialogue"
+        Me.AcceleratorDialogue.Size = New System.Drawing.Size(142, 40)
+        Me.AcceleratorDialogue.TabIndex = 5
         '
         'L1v2L2h3_ButtonOK
         '
@@ -147,16 +157,6 @@ Partial Class QuickFileViewer
         Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.L1v1L2L3v.Size = New System.Drawing.Size(894, 350)
         Me.L1v1L2L3v.TabIndex = 1
-        '
-        'AcceleratorDialogue
-        '
-        Me.AcceleratorDialogue.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.AcceleratorDialogue.Font = New System.Drawing.Font("Microsoft Sans Serif", 21.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.AcceleratorDialogue.Location = New System.Drawing.Point(7, 3)
-        Me.AcceleratorDialogue.Margin = New System.Windows.Forms.Padding(7, 3, 7, 3)
-        Me.AcceleratorDialogue.Name = "AcceleratorDialogue"
-        Me.AcceleratorDialogue.Size = New System.Drawing.Size(142, 40)
-        Me.AcceleratorDialogue.TabIndex = 5
         '
         'QuickFileViewer
         '
