@@ -43,9 +43,13 @@ Public Class RibbonController
         Dim loaded As Boolean = False
         If _quickfile IsNot Nothing Then loaded = _quickfile.Loaded
         If loaded = False Then
-            _quickfile = New QuickFileHomeController(_globals)
+            _quickfile = New QuickFileHomeController(_globals, AddressOf ReleaseQuickFiler)
             _quickfile.Run()
         End If
+    End Sub
+
+    Private Sub ReleaseQuickFiler()
+        _quickfile = Nothing
     End Sub
 
     Friend Sub ReviseProjectInfo()

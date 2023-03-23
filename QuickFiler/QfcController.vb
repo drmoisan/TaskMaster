@@ -280,9 +280,9 @@ Public Class QfcController
         Next ctlTmp
 
         If Mail.UnRead = True Then
-            lblSubject.ForeColor = Drawing.Color.Blue
+            lblSubject.ForeColor = Drawing.Color.DarkBlue
             lblSubject.Font = New Font(lblSubject.Font, FontStyle.Bold)
-            lblSender.ForeColor = Drawing.Color.Blue
+            lblSender.ForeColor = Drawing.Color.DarkBlue
             lblSender.Font = New Font(lblSender.Font, FontStyle.Bold)
         End If
         lblSubject_Width = lblSubject.Width
@@ -388,6 +388,7 @@ Public Class QfcController
 
                 'For i = LBound(varList) To UBound(varList)
                 cbo.Items.AddRange(varList)
+                cbo.SelectedIndex = 0
                 'Next i
             End If
 
@@ -456,10 +457,13 @@ Public Class QfcController
             End If
             lblMyPosition.Enabled = False
             lblMyPosition.Visible = False
+            lblMyPosition.SendToBack()
         Else
             lblMyPosition.Text = intMyPosition
             lblMyPosition.Enabled = True
             lblMyPosition.Visible = True
+            lblMyPosition.BackColor = Drawing.Color.Blue
+            lblMyPosition.BringToFront()
         End If
     End Sub
 
@@ -470,52 +474,57 @@ Public Class QfcController
             blAccel_FocusToggle = False
             For Each ctlTmp In colCtrls
                 Select Case TypeName(ctlTmp)
-                    Case "Frame"
-                        ctlTmp.BackColor = Drawing.Color.Blue
+                    Case "Panel"
+                        ctlTmp.BackColor = Drawing.SystemColors.Control
                     Case "CheckBox"
-                        ctlTmp.BackColor = Drawing.Color.Blue
+                        ctlTmp.BackColor = Drawing.SystemColors.Control
                     Case "Label"
                         If Len(ctlTmp.Text) <= 2 Then
                             ctlTmp.Visible = False
+                            ctlTmp.SendToBack()
                         Else
-                            ctlTmp.BackColor = Drawing.Color.Blue
+                            ctlTmp.BackColor = Drawing.SystemColors.Control
                         End If
                     Case "TextBox"
-                        ctlTmp.BackColor = Drawing.Color.Blue
+                        ctlTmp.BackColor = Drawing.SystemColors.Control
                 End Select
             Next ctlTmp
             If InitType.HasFlag(InitTypeEnum.InitSort) Then
                 lblConvCt.Visible = True
-                lblConvCt.BackColor = Drawing.Color.Blue
+                lblConvCt.BackColor = Drawing.SystemColors.Control
+                lblConvCt.BringToFront()
                 lblTriage.Visible = True
-                lblTriage.BackColor = Drawing.Color.Blue
+                lblTriage.BackColor = Drawing.SystemColors.Control
+                lblTriage.BringToFront()
             End If
             lblMyPosition.Visible = True
-            lblMyPosition.BackColor = Drawing.Color.LightBlue
+            lblMyPosition.BackColor = Drawing.Color.Blue
+            lblMyPosition.BringToFront()
 
         Else
             blAccel_FocusToggle = True
             For Each ctlTmp In colCtrls
                 Select Case TypeName(ctlTmp)
-                    Case "Frame"
-                        ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
+                    Case "Panel"
+                        ctlTmp.BackColor = Drawing.Color.PaleTurquoise
                     Case "CheckBox"
-                        ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
+                        ctlTmp.BackColor = Drawing.Color.PaleTurquoise
                     Case "Label"
                         If Len(ctlTmp.Text) <= 2 Then
                             ctlTmp.Visible = True
+                            ctlTmp.BringToFront()
                         Else
-                            ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
+                            ctlTmp.BackColor = Drawing.Color.PaleTurquoise
                         End If
                     Case "TextBox"
-                        ctlTmp.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
+                        ctlTmp.BackColor = Drawing.Color.PaleTurquoise
                 End Select
             Next ctlTmp
             If InitType.HasFlag(InitTypeEnum.InitSort) Then
-                lblConvCt.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
-                lblTriage.BackColor = Drawing.Color.FromArgb(&HFFFFC0)
+                lblConvCt.BackColor = Drawing.Color.PaleTurquoise
+                lblTriage.BackColor = Drawing.Color.PaleTurquoise
             End If
-            lblMyPosition.BackColor = Drawing.Color.FromArgb(&H8000&)
+            lblMyPosition.BackColor = Drawing.Color.DarkGreen
             'Modal        With _activeExplorer
             'Modal            .ClearSelection
             'Modal            If .IsItemSelectableInView(mail) Then .AddToSelection mail

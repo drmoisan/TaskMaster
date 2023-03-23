@@ -85,6 +85,7 @@ Partial Class QuickFileViewer
         Me.AcceleratorDialogue.Name = "AcceleratorDialogue"
         Me.AcceleratorDialogue.Size = New System.Drawing.Size(142, 40)
         Me.AcceleratorDialogue.TabIndex = 5
+        Me.AcceleratorDialogue.Visible = False
         '
         'L1v2L2h3_ButtonOK
         '
@@ -150,12 +151,12 @@ Partial Class QuickFileViewer
         Me.L1v1L2L3v.Margin = New System.Windows.Forms.Padding(0)
         Me.L1v1L2L3v.Name = "L1v1L2L3v"
         Me.L1v1L2L3v.Padding = New System.Windows.Forms.Padding(10)
-        Me.L1v1L2L3v.RowCount = 4
-        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0!))
-        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0!))
-        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0!))
+        Me.L1v1L2L3v.RowCount = 1
         Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.L1v1L2L3v.Size = New System.Drawing.Size(894, 350)
+        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1.0!))
+        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1.0!))
+        Me.L1v1L2L3v.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1.0!))
+        Me.L1v1L2L3v.Size = New System.Drawing.Size(911, 20)
         Me.L1v1L2L3v.TabIndex = 1
         '
         'QuickFileViewer

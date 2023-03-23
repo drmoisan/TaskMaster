@@ -17,7 +17,7 @@
 #End Region
 
 #Region "Form and Control Constants"
-    Friend Const Top_Offset As Long = 6
+    Friend Const Top_Offset As Long = 16
     Friend Const Top_Offset_C As Long = 0
     Friend Const Left_frm As Long = 12
     Friend Const Left_lbl1 As Long = 6
@@ -40,7 +40,7 @@
     Friend Const Left_lblConvCt_C As Long = 320           'Count of Conversation Members Compact view
     Friend Const Left_lblPos As Long = 6             'ACCELERATOR Email Position
     Friend Const Left_cbxFolder As Long = 372           'Combo box containing Folder Suggestions
-    Friend Const Left_inpt As Long = 408           'Input for folder search
+    Friend Const Left_inpt As Long = 438           'Input for folder search 408 to 438
     Friend Const Left_chbxGPConv As Long = 210           'Checkbox to Group Conversations
     Friend Const Left_chbxGPConv_C As Long = 372           'Checkbox to Group Conversations
     Friend Const Left_cbDelItem As Long = 588           'Delete email
@@ -72,8 +72,8 @@
     Friend Const Width_lblSentOn As Long = 80            '<SENTON>
     Friend Const Width_lblConvCt As Long = 30            'Count of Conversation Members
     Friend Const Width_lblPos As Long = 20            'ACCELERATOR Email Position
-    Friend Const Width_cbxFolder As Long = 276           'Combo box containing Folder Suggestions
-    Friend Const Width_inpt As Long = 156           'Input for folder search
+    Friend Const Width_cbxFolder As Long = 276           'Combo box containing Folder Suggestions 
+    Friend Const Width_inpt As Long = 126           'Input for folder search 156 to 126
     Friend Const Width_chbxGPConv As Long = 96            'Checkbox to Group Conversations
     Friend Const Width_cb As Long = 25            'Command buttons for: Delete email, Remove mail from Processing, and Flag as Task
     Friend Const Width_lblAc As Long = 14            'ACCELERATOR Width

@@ -31,6 +31,7 @@ Partial Class Form1
         Me.ControlGroup3 = New QuickFiler.ControlGroup()
         Me.ControlGroup1 = New QuickFiler.ControlGroup()
         Me.ControlGroup2 = New QuickFiler.ControlGroup()
+        Me.ButtonAdd = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.MainPanel.SuspendLayout()
         Me.MainLayoutPanel.SuspendLayout()
@@ -112,6 +113,7 @@ Partial Class Form1
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100.0!))
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100.0!))
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel2.Controls.Add(Me.ButtonAdd, 0, 0)
         Me.TableLayoutPanel2.Controls.Add(Me.Button2, 2, 0)
         Me.TableLayoutPanel2.Controls.Add(Me.Button1, 1, 0)
         Me.TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
@@ -159,6 +161,17 @@ Partial Class Form1
         Me.ControlGroup2.Size = New System.Drawing.Size(1137, 104)
         Me.ControlGroup2.TabIndex = 1
         '
+        'ButtonAdd
+        '
+        Me.ButtonAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ButtonAdd.Location = New System.Drawing.Point(380, 3)
+        Me.ButtonAdd.Name = "ButtonAdd"
+        Me.ButtonAdd.Padding = New System.Windows.Forms.Padding(6)
+        Me.ButtonAdd.Size = New System.Drawing.Size(111, 49)
+        Me.ButtonAdd.TabIndex = 4
+        Me.ButtonAdd.Text = "Add Control Group"
+        Me.ButtonAdd.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -186,4 +199,5 @@ Partial Class Form1
     Friend WithEvents MainPanel As Windows.Forms.Panel
     Friend WithEvents MainLayoutPanel As Windows.Forms.TableLayoutPanel
     Friend WithEvents TableLayoutPanel2 As Windows.Forms.TableLayoutPanel
+    Friend WithEvents ButtonAdd As Windows.Forms.Button
 End Class

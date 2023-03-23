@@ -69,11 +69,18 @@ Public Class QuickFileController
     'Window Handles
     Private _olAppHWnd As IntPtr
     Private _lFormHandle As IntPtr
+
+    'Cleanup
+    Delegate Sub ParentCleanupFunction()
+    Private _parentCleanup As ParentCleanupFunction
 #End Region
+
+
 
     Public Sub New(AppGlobals As IApplicationGlobals,
                    Viewer As QuickFileViewer,
-                   ColEmailsInFolder As Collection)
+                   ColEmailsInFolder As Collection,
+                   ParentCleanup As ParentCleanupFunction)
 
         'Link viewer to controller
         _viewer = Viewer
@@ -82,6 +89,8 @@ Public Class QuickFileController
         'Link model to controller
         _colEmailsInFolder = ColEmailsInFolder
         InitializeModelProcessingMetrics()
+
+        _parentCleanup = ParentCleanup
 
         'Link controller to global variables 
         _globals = AppGlobals
@@ -193,7 +202,6 @@ Public Class QuickFileController
 
         Return _viewer.L1v1L2_PanelMain.Height
     End Function
-
 
     Public Sub Iterate()
         _stopWatch = New cStopWatch
@@ -413,10 +421,11 @@ Public Class QuickFileController
         _viewer.L1v1L2_PanelMain.Controls.Add(Frm)
         With Frm
             .Height = frmHt
-            .Top = ((frmSp + frmHt) * (intPosition - 1)) + frmSp
+            .Top = ((frmSp + frmHt) * (intPosition - 1)) + frmSp + 16
             .Left = frmLt
             .Width = frmWd
             .TabStop = False
+            .BorderStyle = BorderStyle.FixedSingle
 
         End With
         colCtrls.Add(Frm, "frm")
@@ -472,7 +481,7 @@ Public Class QuickFileController
                 .Height = 16
                 .Top = lngTopOff
                 .Left = 372
-                .Width = 78
+                .Width = 60
                 .Text = "Folder:"
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
             End With
@@ -588,18 +597,21 @@ Public Class QuickFileController
                 .Top = lngTopOff + 40
                 .Left = Left_lblBody_C
                 .Width = frmWd - .Left - .Left
-                .Height = 36 + 8 - lngTopOff
+                .Height = 48 + 8 - lngTopOff
             Else
                 .Top = lngTopOff + 40
                 .Left = Left_lblBody_C
                 .Width = Width_lblBody_C
-                .Height = 36 + 8 - lngTopOff
+                .Height = 48 + 8 - lngTopOff
 
             End If
 
             .Text = "<BODY>"
             .Font = New Font(.Font.FontFamily, 10)
             .WordWrap = True
+            .Multiline = True
+            .ReadOnly = True
+            .BorderStyle = BorderStyle.None
         End With
         colCtrls.Add(txtboxBody, "lblBody")
 
@@ -633,6 +645,7 @@ Public Class QuickFileController
                 .Width = Width_cbxFolder
                 .Font = New Font(.Font.FontFamily, 8)
                 .TabStop = False
+                .DropDownStyle = ComboBoxStyle.DropDownList
             End With
             colCtrls.Add(cbxFolder, "cbxFolder")
         End If
@@ -644,7 +657,7 @@ Public Class QuickFileController
             With inpt
                 .Height = 24
                 .Top = lngTopOff
-                .Left = 408
+                .Left = Left_inpt
                 .Width = Width_inpt
                 .Font = New Font(.Font.FontFamily, 10)
                 .TabStop = False
@@ -1628,8 +1641,9 @@ Public Class QuickFileController
         Select Case e.KeyCode
             Case 18
                 If sender.Visible Then
-                    Dim unused1 = sender.Focus()
-                    sender.SelStart = sender.TextLength
+                    sender.Focus()
+                    Dim txtbox As TextBox = DirectCast(sender, TextBox)
+                    txtbox.SelectionStart = txtbox.TextLength
                 Else
                     Dim unused = _viewer.L1v1L2_PanelMain.Focus()
                 End If
@@ -1679,12 +1693,12 @@ Public Class QuickFileController
     End Sub
 
     Friend Sub ButtonCancel_KeyDown(sender As Object, e As KeyEventArgs)
-        KeyDownHandler(sender, e)
+        KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Friend Sub Button_OK_KeyDown(sender As Object, e As KeyEventArgs)
         'If DebugLVL And vbProcedure Then Debug.Print "Fired Button_OK_KeyDown"
-        KeyDownHandler(sender, e)
+        KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Friend Sub Button_OK_KeyUp(sender As Object, e As KeyEventArgs)
@@ -1692,7 +1706,7 @@ Public Class QuickFileController
     End Sub
 
     Friend Sub PanelMain_KeyDown(sender As Object, e As KeyEventArgs)
-        KeyDownHandler(sender, e)
+        KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Friend Sub PanelMain_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -1704,7 +1718,7 @@ Public Class QuickFileController
     End Sub
 
     Private Sub SpnEmailPerLoad_KeyDown(sender As Object, e As KeyEventArgs)
-        KeyDownHandler(sender, e)
+        KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub UserForm_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -1716,7 +1730,7 @@ Public Class QuickFileController
     End Sub
 
     Private Sub UserForm_KeyDown(sender As Object, e As KeyEventArgs)
-        If Not _blSuppressEvents Then KeyDownHandler(sender, e)
+        If Not _blSuppressEvents Then KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Public Sub KeyPressHandler(sender As Object, e As KeyPressEventArgs)
@@ -1748,37 +1762,48 @@ Public Class QuickFileController
         End If
     End Sub
 
-    Public Sub KeyDownHandler(sender As Object, e As KeyEventArgs)
+    Public Sub KeyboardHandler_KeyDown(sender As Object, e As KeyEventArgs)
 
         If Not _blSuppressEvents Then
-            Select Case e.KeyCode
-                Case Keys.Enter
-                    ButtonOK_Click()
-                Case Keys.Tab
-                    toggleAcceleratorDialogue()
-                    If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
-                    '        Case vbKeyEscape
-                    '            vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
-                    '            If vbMsgResponse = vbOK Then ButtonCancel_Click
-                Case Keys.Alt
-                    toggleAcceleratorDialogue()
-                    If _viewer.AcceleratorDialogue.Visible Then
-                        _viewer.AcceleratorDialogue.Focus()
-                    Else
-                        Dim unused = _viewer.L1v1L2_PanelMain.Focus()
-                    End If
-                Case Else
-                    If _viewer.AcceleratorDialogue.Visible Then
-                        AcceleratorDialogue_KeyDown(sender, e)
-                    Else
-                    End If
-            End Select
+
+            If e.Alt Then
+                toggleAcceleratorDialogue()
+                If _viewer.AcceleratorDialogue.Visible Then
+                    _viewer.AcceleratorDialogue.Focus()
+                Else
+                    _viewer.L1v1L2_PanelMain.Focus()
+                End If
+
+            Else
+                Select Case e.KeyCode
+                    Case Keys.Enter
+                        ButtonOK_Click()
+                    Case Keys.Tab
+                        toggleAcceleratorDialogue()
+                        If _viewer.AcceleratorDialogue.Visible Then _viewer.AcceleratorDialogue.Focus()
+                        '        Case vbKeyEscape
+                        '            vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
+                        '            If vbMsgResponse = vbOK Then ButtonCancel_Click
+                    Case Else
+                        If _viewer.AcceleratorDialogue.Visible Then
+                            AcceleratorDialogue_KeyDown(sender, e)
+                        Else
+                        End If
+                End Select
+            End If
         End If
     End Sub
 
 #End Region
 
 #Region "Other Event Handlers"
+
+    Friend Sub Cleanup()
+        ExplConvView_ReturnState()
+        _olAppHWnd = Nothing
+        _lFormHandle = Nothing
+        _parentCleanup.Invoke()
+    End Sub
 
     Friend Sub ButtonCancel_Click()
         'ExplConvView_ToggleOn
@@ -1790,7 +1815,7 @@ Public Class QuickFileController
         RemoveControls()
         BlFrmKll = True
 
-        _viewer.Dispose()
+        _viewer.Close()
     End Sub
 
     Friend Sub ButtonOK_Click()
@@ -1844,7 +1869,7 @@ Public Class QuickFileController
             End If
 
         Else
-            _viewer.Dispose()
+            _viewer.Close()
         End If
     End Sub
 
@@ -1926,9 +1951,9 @@ Public Class QuickFileController
         End If
     End Sub
 
-    Friend Sub Form_Dispose()
-        ExplConvView_ReturnState()
-    End Sub
+    'Friend Sub Form_Dispose()
+    '    Cleanup()
+    'End Sub
 
 #End Region
 
