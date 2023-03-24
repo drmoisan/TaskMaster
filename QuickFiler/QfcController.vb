@@ -10,34 +10,34 @@ Imports TaskVisualization
 Public Class QfcController
 
 
-    Private oParent As Object
-    Private InitType As InitTypeEnum
-    Private m_PassedControl As Control
+    Private _parent As QfcGroupOperationsLegacy
+    Private _initType As InitTypeEnum
+    Private _mPassedControl As Control
     Public WithEvents chk As CheckBox         'Checkbox to Group Conversations
     Public WithEvents cbo As ComboBox         'Combo box containing Folder Suggestions
-    Private WithEvents lst As ListBox
-    Private WithEvents txt As TextBox          'Input for folder search
-    Private WithEvents bdy As TextBox
-    Private WithEvents cbKll As Button    'Remove mail from Processing
-    Private WithEvents cbDel As Button    'Delete email
-    Private WithEvents cbFlag As Button    'Flag as Task
-    Private WithEvents cbTmp As Button
+    Private WithEvents _lst As ListBox
+    Private WithEvents _txt As TextBox          'Input for folder search
+    Private WithEvents _bdy As TextBox
+    Private WithEvents _cbKll As Button    'Remove mail from Processing
+    Private WithEvents _cbDel As Button    'Delete email
+    Private WithEvents _cbFlag As Button    'Flag as Task
+    Private WithEvents _cbTmp As Button
     Public WithEvents frm As Panel
     Public Mail As MailItem
-    Private fldrOriginal As Folder
+    Private _fldrOriginal As Folder
     Public intMyPosition As Integer
-    Private fldrTarget As Folder
-    Private lblTmp As Label
+    Private _fldrTarget As Folder
+    Private _lblTmp As Label
     Public lblConvCt As Label            'Count of Conversation Members
-    Private lblMyPosition As Label            'ACCELERATOR Email Position
+    Private _lblMyPosition As Label            'ACCELERATOR Email Position
     Private _suggestions = New cSuggestions()
     'Private _suggestions As Email_AutoCategorize._suggestions
-    Private strFolders() As String
-    Private colCtrls As Collection
-    Private selItems_InClass As Collection
-    Private blAccel_FocusToggle As Boolean
-    Private intEnterCounter As Integer
-    Private intComboRightCtr As Integer
+    Private _strFolders() As String
+    Private _colCtrls As Collection
+    Private _selItemsInClass As Collection
+    Private _blAccelFocusToggle As Boolean
+    Private _intEnterCounter As Integer
+    Private _intComboRightCtr As Integer
     Public Structure ctrlPosition
         Public blInOrigPos As Boolean
         Public topOriginal As Long
@@ -50,23 +50,23 @@ Public Class QfcController
         Public widthNew As Long
     End Structure
 
-    Private chbxSaveAttach As CheckBox
-    Private chbxSaveMail As CheckBox
-    Private chbxDelFlow As CheckBox
+    Private _chbxSaveAttach As CheckBox
+    Private _chbxSaveMail As CheckBox
+    Private _chbxDelFlow As CheckBox
 
     Public blExpanded As Boolean
-    Public blConChild As Boolean
+    Public blHasChild As Boolean
 
-    Private lbl1 As Label            'From:
-    Private lbl2 As Label            'Subject:
-    Private lbl3 As Label            'Body:
-    Private lbl4 As Label            'Sent On:
-    Private lbl5 As Label            'Folder:
+    Private _lbl1 As Label            'From:
+    Private _lbl2 As Label            'Subject:
+    Private _lbl3 As Label            'Body:
+    Private _lbl4 As Label            'Sent On:
+    Private _lbl5 As Label            'Folder:
 
-    Public lblSender As Label            '<SENDER>
-    Public lblSubject As Label            '<SUBJECT>
-    Public txtboxBody As TextBox            '<BODY>
-    Public strlblTo As String                   '<TO>
+    Public LblSender As Label            '<SENDER>
+    Public LblSubject As Label            '<SUBJECT>
+    Public TxtBoxBody As TextBox            '<BODY>
+    Public StrlblTo As String                   '<TO>
 
 
 
@@ -151,30 +151,38 @@ Public Class QfcController
     Private _globals As IApplicationGlobals
     Private _activeExplorer As Outlook.Explorer
 
-    Public Sub New(m_mail As MailItem,
+    Friend Sub New(m_mail As MailItem,
         col As Collection,
         intPositionArg As Integer,
         BoolRemoteMouseApp As Boolean,
-        Caller As Object,
+        Caller As QfcGroupOperationsLegacy,
         AppGlobals As IApplicationGlobals,
         Optional hwnd As IntPtr = Nothing,
         Optional InitTypeE As InitTypeEnum = InitTypeEnum.InitSort)
 
-        'Procedure Naming
+        'QFD_Minimize
+        'KeyDownHandler
+        'KeyUpHandler
+        'KeyPressHandler
+        'toggleAcceleratorDialogue
+        'RemoveSpecificControlGroup
+        'ExplConvView_ToggleOn
+        'ConvToggle_Group
+        'ConvToggle_UnGroup
 
         _globals = AppGlobals
-        _activeExplorer = AppGlobals.Ol.App.ActiveExplorer
+        _activeExplorer = AppGlobals.Ol.App.ActiveExplorer()
 
         Dim ctlTmp As System.Windows.Forms.Control
         Dim strBodyText As String
 
-        InitType = InitTypeE
-        oParent = Caller
+        _initType = InitTypeE
+        _parent = Caller
         intMyPosition = intPositionArg        'call back position in collection
         Mail = m_mail
-        fldrOriginal = Mail.Parent
+        _fldrOriginal = Mail.Parent
         hWndCaller = hwnd
-        colCtrls = col
+        _colCtrls = col
         For Each ctlTmp In col
             Select Case TypeName(ctlTmp)
                 Case "Panel"
@@ -184,16 +192,16 @@ Public Class QfcController
                         Case "  Conversation"
                             chk = ctlTmp
                         Case " Attach"
-                            chbxSaveAttach = ctlTmp
+                            _chbxSaveAttach = ctlTmp
                         Case " Flow"
-                            chbxDelFlow = ctlTmp
+                            _chbxDelFlow = ctlTmp
                         Case " Mail"
-                            chbxSaveMail = ctlTmp
+                            _chbxSaveMail = ctlTmp
                     End Select
                 Case "ComboBox"
                     cbo = ctlTmp
                 Case "ListBox"
-                    lst = ctlTmp
+                    _lst = ctlTmp
                 Case "OptionButton"
                     opt = ctlTmp
                 Case "SpinButton"
@@ -204,90 +212,90 @@ Public Class QfcController
                         strBodyText = Replace(strBodyText, "  ", " ")
                         strBodyText = Replace(strBodyText, "  ", " ") & "<EOM>"
                         ctlTmp.Text = strBodyText
-                        bdy = ctlTmp
-                        txtboxBody = ctlTmp
+                        _bdy = ctlTmp
+                        TxtBoxBody = ctlTmp
                     Else
-                        txt = ctlTmp
+                        _txt = ctlTmp
                     End If
 
                 Case "Label"
-                    lblTmp = ctlTmp
-                    Select Case lblTmp.Text
+                    _lblTmp = ctlTmp
+                    Select Case _lblTmp.Text
                         Case "From:"
-                            lbl1 = lblTmp
+                            _lbl1 = _lblTmp
                         Case "Subject:"
-                            lbl2 = lblTmp
+                            _lbl2 = _lblTmp
                         Case "Body:"
-                            lbl3 = lblTmp
+                            _lbl3 = _lblTmp
                         Case "Sent On:"
-                            lbl4 = lblTmp
+                            _lbl4 = _lblTmp
                         Case "Folder:"
-                            lbl5 = lblTmp
+                            _lbl5 = _lblTmp
                         Case "<SENDER>"
-                            lblTmp.Text = If(Mail.Sent = True, GetSenderAddress(Mail), "Draft Message")
-                            lblSender = lblTmp
+                            _lblTmp.Text = If(Mail.Sent = True, GetSenderAddress(Mail), "Draft Message")
+                            LblSender = _lblTmp
                         Case "<SUBJECT>"
-                            lblTmp.Text = Mail.Subject
-                            lblSubject = lblTmp
+                            _lblTmp.Text = Mail.Subject
+                            LblSubject = _lblTmp
                         Case "ABC"
-                            lblTmp.Text = CustomFieldID_GetValue(Mail, "Triage")
-                            lblTriage = lblTmp
+                            _lblTmp.Text = CustomFieldID_GetValue(Mail, "Triage")
+                            lblTriage = _lblTmp
                         Case "<ACTIONABL>"
-                            lblTmp.Text = CustomFieldID_GetValue(Mail, "Actionable")
-                            lblActionable = lblTmp
+                            _lblTmp.Text = CustomFieldID_GetValue(Mail, "Actionable")
+                            lblActionable = _lblTmp
                         Case "<#>"
-                            lblConvCt = lblTmp
+                            lblConvCt = _lblTmp
                         Case "<Pos#>"
-                            lblMyPosition = lblTmp
+                            _lblMyPosition = _lblTmp
                         Case "<BODY>"
 
                         Case "<SENTON>"
-                            lblTmp.Text = Format(Mail.SentOn, "MM/dd/yy HH:MM")
-                            lblSentOn = lblTmp
+                            _lblTmp.Text = Format(Mail.SentOn, "MM/dd/yy HH:MM")
+                            lblSentOn = _lblTmp
                         Case "F"
-                            lblAcF = lblTmp
+                            lblAcF = _lblTmp
 
                         Case "D"
-                            lblAcD = lblTmp
+                            lblAcD = _lblTmp
                         Case "C"
-                            lblAcC = lblTmp
+                            lblAcC = _lblTmp
                         Case "X"
-                            lblAcX = lblTmp
+                            lblAcX = _lblTmp
                         Case "R"
-                            lblAcR = lblTmp
+                            lblAcR = _lblTmp
                         Case "T"
-                            lblAcT = lblTmp
+                            lblAcT = _lblTmp
                         Case "O"
-                            lblAcO = lblTmp
+                            lblAcO = _lblTmp
                         Case "A"
-                            lblAcA = lblTmp
+                            lblAcA = _lblTmp
                         Case "W"
-                            lblAcW = lblTmp
+                            lblAcW = _lblTmp
                         Case "M"
-                            lblAcM = lblTmp
+                            lblAcM = _lblTmp
                     End Select
                 Case "Button"
-                    cbTmp = ctlTmp
-                    If cbTmp.Text = "X" Then
-                        cbDel = ctlTmp
-                    ElseIf cbTmp.Text = "-->" Then
-                        cbKll = ctlTmp
-                    ElseIf cbTmp.Text = "|>" Then
-                        cbFlag = ctlTmp
+                    _cbTmp = ctlTmp
+                    If _cbTmp.Text = "X" Then
+                        _cbDel = ctlTmp
+                    ElseIf _cbTmp.Text = "-->" Then
+                        _cbKll = ctlTmp
+                    ElseIf _cbTmp.Text = "|>" Then
+                        _cbFlag = ctlTmp
                     End If
             End Select
 
         Next ctlTmp
 
         If Mail.UnRead = True Then
-            lblSubject.ForeColor = Drawing.Color.DarkBlue
-            lblSubject.Font = New Font(lblSubject.Font, FontStyle.Bold)
-            lblSender.ForeColor = Drawing.Color.DarkBlue
-            lblSender.Font = New Font(lblSender.Font, FontStyle.Bold)
+            LblSubject.ForeColor = Drawing.Color.DarkBlue
+            LblSubject.Font = New Font(LblSubject.Font, FontStyle.Bold)
+            LblSender.ForeColor = Drawing.Color.DarkBlue
+            LblSender.Font = New Font(LblSender.Font, FontStyle.Bold)
         End If
-        lblSubject_Width = lblSubject.Width
-        lblBody_Width = txtboxBody.Width
-        cbFlag_Left = cbFlag.Left
+        lblSubject_Width = LblSubject.Width
+        lblBody_Width = TxtBoxBody.Width
+        cbFlag_Left = _cbFlag.Left
         lblAcT_Left = lblAcT.Left
 
         lblTriage_Width = lblTriage.Width
@@ -296,8 +304,8 @@ Public Class QfcController
         lblActionable_Width = lblActionable.Width
 
 
-        cbDel_Left = cbDel.Left
-        cbKll_Left = cbKll.Left
+        cbDel_Left = _cbDel.Left
+        cbKll_Left = _cbKll.Left
         lblAcX_Left = lblAcX.Left
         lblAcR_Left = lblAcR.Left
 
@@ -306,28 +314,28 @@ Public Class QfcController
 
 
 
-        If InitType.HasFlag(InitTypeEnum.InitSort) Then
-            lbl5_Left = lbl5.Left
+        If _initType.HasFlag(InitTypeEnum.InitSort) Then
+            lbl5_Left = _lbl5.Left
             lblAcF_Left = lblAcF.Left
             lblAcD_Left = lblAcD.Left
             cbo_Left = cbo.Left
             cbo_Width = cbo.Width
             lblAcC_Left = lblAcC.Left                       'Conversation accelerator X% Left position
             chk_Left = chk.Left                             'Conversation checkbox X% Left Position
-            chbxSaveAttach_Left = chbxSaveAttach.Left       'Checkbox Save Attachment X% Left Position
-            chbxSaveMail_Left = chbxSaveMail.Left           'Checkbox Save Mail X% Left Position
-            chbxDelFlow_Left = chbxDelFlow.Left             'Checkbox Delete Flow X% Left Position
+            chbxSaveAttach_Left = _chbxSaveAttach.Left       'Checkbox Save Attachment X% Left Position
+            chbxSaveMail_Left = _chbxSaveMail.Left           'Checkbox Save Mail X% Left Position
+            chbxDelFlow_Left = _chbxDelFlow.Left             'Checkbox Delete Flow X% Left Position
             lblAcA_Left = lblAcA.Left                       'A Accelerator X% Left Position
             lblAcW_Left = lblAcW.Left                       'W Accelerator X% Left Position
             lblAcM_Left = lblAcM.Left                       'M Accelerator X% Left Position
-            txt_Left = txt.Left
-            txt_Width = txt.Width
+            txt_Left = _txt.Left
+            txt_Width = _txt.Width
             lblConvCt_Left = lblConvCt.Left                 'Conversation Count X% Left Position
         End If
 
         lngBlock_Width = frm.Width - chbxSaveAttach_Left 'Width of block of right justified controls
 
-        strlblTo = Mail.To
+        StrlblTo = Mail.To
 
         If BoolRemoteMouseApp Then ToggleRemoteMouseAppLabels()
 
@@ -347,7 +355,7 @@ Public Class QfcController
             lblAcO.Text = "^0"       'ACCELERATOR O for Open Email
             lblAcO.Width *= 2
             lblAcM.Width *= 2
-            If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            If _initType.HasFlag(InitTypeEnum.InitSort) Then
                 lblAcF.Text = "F1"   'ACCELERATOR F for Folder Search
                 lblAcD.Text = "F4"   'ACCELERATOR D for Folder Dropdown
                 lblAcC.Text = "F7"   'ACCELERATOR C for Grouping Conversations
@@ -363,7 +371,7 @@ Public Class QfcController
             lblAcO.Text = "O"        'ACCELERATOR O for Open Email
             lblAcO.Width /= 2
             lblAcM.Width /= 2
-            If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            If _initType.HasFlag(InitTypeEnum.InitSort) Then
                 lblAcF.Text = "F"   'ACCELERATOR F for Folder Search
                 lblAcD.Text = "D"   'ACCELERATOR D for Folder Dropdown
                 lblAcC.Text = "C"   'ACCELERATOR C for Grouping Conversations
@@ -398,11 +406,11 @@ Public Class QfcController
             _suggestions = Folder_Suggestions(Mail, _globals, False)
 
             If _suggestions.Count > 0 Then
-                ReDim Preserve strFolders(_suggestions.Count)
+                ReDim Preserve _strFolders(_suggestions.Count)
                 For i = 1 To _suggestions.Count
-                    strFolders(i) = _suggestions.FolderList(i)
+                    _strFolders(i) = _suggestions.FolderList(i)
                 Next i
-                cbo.Items.AddRange(strFolders)
+                cbo.Items.AddRange(_strFolders)
                 cbo.SelectedIndex = 1
             Else
                 _fldrHandler = New cFolderHandler(_globals)
@@ -418,7 +426,7 @@ Public Class QfcController
         '    If cbo.ListCount >= 2 Then cbo.Value = cbo.List(2)
 
         '    Set objProperty = mail.UserProperties.FIND("AutoFile")
-        '    If Not objProperty Is Nothing Then txt.Value = objProperty.Value
+        '    If Not objProperty Is Nothing Then _txt.Value = objProperty.Value
 
 
         'Call Email_SortToExistingFolder.FindFolder("", True, objItem:=mail)
@@ -438,11 +446,11 @@ Public Class QfcController
             lblConvCt.Text = CStr(ct)
         Else
             conv = New cConversation(_globals.Ol.App) With {.item = Mail}
-            selItems_InClass = conv.ToCollection(True)
+            _selItemsInClass = conv.ToCollection(True)
             'Set Sel = New Collection
             'Sel.Add Mail
-            'Set selItems_InClass = Email_SortToExistingFolder.DemoConversation(selItems_InClass, Sel)
-            lblConvCt.Text = CStr(selItems_InClass.Count)
+            'Set _selItemsInClass = Email_SortToExistingFolder.DemoConversation(_selItemsInClass, Sel)
+            lblConvCt.Text = CStr(_selItemsInClass.Count)
         End If
 
 
@@ -450,29 +458,29 @@ Public Class QfcController
     End Sub
 
     Public Sub Accel_Toggle()
-        If lblMyPosition.Enabled = True Then
-            If blAccel_FocusToggle Then
+        If _lblMyPosition.Enabled = True Then
+            If _blAccelFocusToggle Then
                 If blExpanded = True Then ExpandCtrls1()
                 Accel_FocusToggle()
             End If
-            lblMyPosition.Enabled = False
-            lblMyPosition.Visible = False
-            lblMyPosition.SendToBack()
+            _lblMyPosition.Enabled = False
+            _lblMyPosition.Visible = False
+            _lblMyPosition.SendToBack()
         Else
-            lblMyPosition.Text = intMyPosition
-            lblMyPosition.Enabled = True
-            lblMyPosition.Visible = True
-            lblMyPosition.BackColor = Drawing.Color.Blue
-            lblMyPosition.BringToFront()
+            _lblMyPosition.Text = intMyPosition
+            _lblMyPosition.Enabled = True
+            _lblMyPosition.Visible = True
+            _lblMyPosition.BackColor = Drawing.Color.Blue
+            _lblMyPosition.BringToFront()
         End If
     End Sub
 
     Public Sub Accel_FocusToggle()
         Dim ctlTmp As System.Windows.Forms.Control
 
-        If blAccel_FocusToggle Then
-            blAccel_FocusToggle = False
-            For Each ctlTmp In colCtrls
+        If _blAccelFocusToggle Then
+            _blAccelFocusToggle = False
+            For Each ctlTmp In _colCtrls
                 Select Case TypeName(ctlTmp)
                     Case "Panel"
                         ctlTmp.BackColor = Drawing.SystemColors.Control
@@ -489,7 +497,7 @@ Public Class QfcController
                         ctlTmp.BackColor = Drawing.SystemColors.Control
                 End Select
             Next ctlTmp
-            If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            If _initType.HasFlag(InitTypeEnum.InitSort) Then
                 lblConvCt.Visible = True
                 lblConvCt.BackColor = Drawing.SystemColors.Control
                 lblConvCt.BringToFront()
@@ -497,13 +505,13 @@ Public Class QfcController
                 lblTriage.BackColor = Drawing.SystemColors.Control
                 lblTriage.BringToFront()
             End If
-            lblMyPosition.Visible = True
-            lblMyPosition.BackColor = Drawing.Color.Blue
-            lblMyPosition.BringToFront()
+            _lblMyPosition.Visible = True
+            _lblMyPosition.BackColor = Drawing.Color.Blue
+            _lblMyPosition.BringToFront()
 
         Else
-            blAccel_FocusToggle = True
-            For Each ctlTmp In colCtrls
+            _blAccelFocusToggle = True
+            For Each ctlTmp In _colCtrls
                 Select Case TypeName(ctlTmp)
                     Case "Panel"
                         ctlTmp.BackColor = Drawing.Color.PaleTurquoise
@@ -520,11 +528,11 @@ Public Class QfcController
                         ctlTmp.BackColor = Drawing.Color.PaleTurquoise
                 End Select
             Next ctlTmp
-            If InitType.HasFlag(InitTypeEnum.InitSort) Then
+            If _initType.HasFlag(InitTypeEnum.InitSort) Then
                 lblConvCt.BackColor = Drawing.Color.PaleTurquoise
                 lblTriage.BackColor = Drawing.Color.PaleTurquoise
             End If
-            lblMyPosition.BackColor = Drawing.Color.DarkGreen
+            _lblMyPosition.BackColor = Drawing.Color.DarkGreen
             'Modal        With _activeExplorer
             'Modal            .ClearSelection
             'Modal            If .IsItemSelectableInView(mail) Then .AddToSelection mail
@@ -562,32 +570,26 @@ Public Class QfcController
         Select Case AccelCode
             Case "O"
 
-                lblSubject.ForeColor = Drawing.Color.FromArgb(&H80000012)
-                lblSender.ForeColor = Drawing.Color.FromArgb(&H80000012)
-                lblSubject.Font = New Font(lblSubject.Font, FontStyle.Regular)
-                lblSender.Font = New Font(lblSender.Font, FontStyle.Regular)
-                If InitType.HasFlag(InitTypeEnum.InitSort) Then
-                    Mail_Activate()       'For modal code
-                Else
-                    Mail.Display()
-                End If
-            'oParent.QFD_Minimize
-            'Email_SortToExistingFolder.MailsSelect Email_SortToExistingFolder.MailToCollection(Mail)
+                LblSubject.ForeColor = Drawing.Color.FromArgb(&H80000012)
+                LblSender.ForeColor = Drawing.Color.FromArgb(&H80000012)
+                LblSubject.Font = New Font(LblSubject.Font, FontStyle.Regular)
+                LblSender.Font = New Font(LblSender.Font, FontStyle.Regular)
+
 
             Case "C"
-                If InitType.HasFlag(InitTypeEnum.InitSort) Then chk.Checked = Not chk.Checked
+                If _initType.HasFlag(InitTypeEnum.InitSort) Then chk.Checked = Not chk.Checked
             Case "A"
-                If InitType.HasFlag(InitTypeEnum.InitSort) Then chbxSaveAttach.Checked = Not chbxSaveAttach.Checked
+                If _initType.HasFlag(InitTypeEnum.InitSort) Then _chbxSaveAttach.Checked = Not _chbxSaveAttach.Checked
             Case "W"
-                If InitType.HasFlag(InitTypeEnum.InitSort) Then chbxDelFlow.Checked = Not chbxDelFlow.Checked
+                If _initType.HasFlag(InitTypeEnum.InitSort) Then _chbxDelFlow.Checked = Not _chbxDelFlow.Checked
             Case "M"
-                If InitType.HasFlag(InitTypeEnum.InitSort) Then chbxSaveMail.Checked = Not chbxSaveMail.Checked
+                If _initType.HasFlag(InitTypeEnum.InitSort) Then _chbxSaveMail.Checked = Not _chbxSaveMail.Checked
             Case "T"
                 cbFlag_Click()
             Case "F"
-                If InitType.HasFlag(InitTypeEnum.InitSort) Then txt.Focus()
+                If _initType.HasFlag(InitTypeEnum.InitSort) Then _txt.Focus()
             Case "D"
-                If InitType.HasFlag(InitTypeEnum.InitSort) Then cbo.Focus()
+                If _initType.HasFlag(InitTypeEnum.InitSort) Then cbo.Focus()
             Case "X"
                 cbDel_Click()
             Case "R"
@@ -615,11 +617,11 @@ Public Class QfcController
         X2px = Math.Round(X2pct, 0)
         X3px = Math.Round(X3pct, 0)
 
-        lblSubject.Width = lblSubject_Width + X1px                      'Subject Width X%
-        cbFlag.Left = cbFlag_Left + X1px + X2px                         'Task button X% + Y% left position
+        LblSubject.Width = lblSubject_Width + X1px                      'Subject Width X%
+        _cbFlag.Left = cbFlag_Left + X1px + X2px                         'Task button X% + Y% left position
         lblAcT.Left = lblAcT_Left + X1px + X2px                         'Task accelerator X% + Y% left position
-        cbDel.Left = cbDel_Left + X1px + X2px                           'Delete button X+Y% Left position
-        cbKll.Left = cbKll_Left + X1px + X2px                           'Kill button X+Y% Left position
+        _cbDel.Left = cbDel_Left + X1px + X2px                           'Delete button X+Y% Left position
+        _cbKll.Left = cbKll_Left + X1px + X2px                           'Kill button X+Y% Left position
         lblAcX.Left = lblAcX_Left + X1px + X2px
         lblAcR.Left = lblAcR_Left + X1px + X2px
         lblSentOn.Left = lblSentOn_Left + X1px                          'SentOn X% Left Position
@@ -627,15 +629,15 @@ Public Class QfcController
         lblTriage.Left = lblTriage_Left + X3px                          'Triage left position + X3px
 
 
-        If InitType.HasFlag(InitTypeEnum.InitSort) Then
-            txt.Left = txt_Left + X1px                                  'Folder search box X% left position Y% Width
-            txt.Width = txt_Width + X2px                                'Folder search box X% left position Y% Width
-            lbl5.Left = lbl5_Left + X1px                                'Folder label X% left position
+        If _initType.HasFlag(InitTypeEnum.InitSort) Then
+            _txt.Left = txt_Left + X1px                                  'Folder search box X% left position Y% Width
+            _txt.Width = txt_Width + X2px                                'Folder search box X% left position Y% Width
+            _lbl5.Left = lbl5_Left + X1px                                'Folder label X% left position
             lblAcF.Left = lblAcF_Left + X1px                            'F Accelerator X% left position
             lblConvCt.Left = lblConvCt_Left + X1px                      'Conversation Count X% Left Position
-            chbxSaveAttach.Left = chbxSaveAttach_Left + X1px + X2px     'Checkbox Save Attachment X% Left Position
-            chbxSaveMail.Left = chbxSaveMail_Left + X1px + X2px         'Checkbox Save Mail X% Left Position
-            chbxDelFlow.Left = chbxDelFlow_Left + X1px + X2px           'Checkbox Delete Flow X% Left Position
+            _chbxSaveAttach.Left = chbxSaveAttach_Left + X1px + X2px     'Checkbox Save Attachment X% Left Position
+            _chbxSaveMail.Left = chbxSaveMail_Left + X1px + X2px         'Checkbox Save Mail X% Left Position
+            _chbxDelFlow.Left = chbxDelFlow_Left + X1px + X2px           'Checkbox Delete Flow X% Left Position
             lblAcA.Left = lblAcA_Left + X1px + X2px                     'A Accelerator X% Left Position
             lblAcW.Left = lblAcW_Left + X1px + X2px                     'W Accelerator X% Left Position
             lblAcM.Left = lblAcM_Left + X1px + X2px                     'M Accelerator X% Left Position
@@ -651,7 +653,7 @@ Public Class QfcController
                 lngTmp = chk.Left
                 chk.Left = lblConvCt.Left - 10
                 lblAcC.Left = lblAcC.Left + chk.Left - lngTmp
-                txtboxBody.Width = frm.Width - txtboxBody.Left - 5
+                TxtBoxBody.Width = frm.Width - TxtBoxBody.Left - 5
                 pos_body.widthOriginal = lblBody_Width + X1px            'Body Width X%
 
             Else
@@ -661,12 +663,12 @@ Public Class QfcController
                 lblAcD.Left = lblAcD_Left + X1px                         'D Accelerator X% left position
                 lblAcC.Left = lblAcC_Left + X1px + X2px                  'Conversation accelerator X% Left position
                 chk.Left = chk_Left + X1px + X2px                        'Conversation checkbox X% Left Position
-                txtboxBody.Width = lblBody_Width + X1px                     'Body Width X%
+                TxtBoxBody.Width = lblBody_Width + X1px                     'Body Width X%
 
             End If
 
         Else
-            txtboxBody.Width = lblBody_Width + X1px + X2px                   'Body Width X%
+            TxtBoxBody.Width = lblBody_Width + X1px + X2px                   'Body Width X%
         End If
 
     End Sub
@@ -678,11 +680,11 @@ Public Class QfcController
         'Private pos_lblAcD          As ctrlPosition
         'Private pos_lblAcO          As ctrlPosition
 
-        If InitType.HasFlag(InitTypeEnum.InitSort) Then
+        If _initType.HasFlag(InitTypeEnum.InitSort) Then
             If blExpanded = False Then
                 blExpanded = True
                 frm.Height = frm.Height * 2
-                lngShift = lblSubject.Top + lblSubject.Height - cbo.Top + 1
+                lngShift = LblSubject.Top + LblSubject.Height - cbo.Top + 1
 
                 pos_cbo.topOriginal = cbo.Top
                 pos_cbo.topNew = pos_cbo.topOriginal + lngShift
@@ -692,7 +694,7 @@ Public Class QfcController
                 lblAcD.Top = pos_lblAcD.topOriginal + lngShift
 
                 pos_cbo.leftOriginal = cbo.Left
-                cbo.Left = txtboxBody.Left
+                cbo.Left = TxtBoxBody.Left
 
                 pos_lblAcD.leftOriginal = lblAcD.Left
                 lblAcD.Left = max(0, cbo.Left - pos_cbo.leftOriginal + pos_lblAcD.leftOriginal)
@@ -701,22 +703,22 @@ Public Class QfcController
                 pos_cbo.widthNew = pos_cbo.leftOriginal - cbo.Left + pos_cbo.widthOriginal - lngBlock_Width
                 cbo.Width = pos_cbo.widthNew
 
-                lngShift = cbo.Top + cbo.Height - txtboxBody.Top + 1
+                lngShift = cbo.Top + cbo.Height - TxtBoxBody.Top + 1
 
                 With pos_body
-                    .topOriginal = txtboxBody.Top
+                    .topOriginal = TxtBoxBody.Top
                     .topNew = .topOriginal + lngShift
-                    txtboxBody.Top = .topNew
+                    TxtBoxBody.Top = .topNew
 
                     pos_lblAcO.topOriginal = lblAcO.Top
                     lblAcO.Top += lngShift
 
-                    .heightOriginal = txtboxBody.Height
+                    .heightOriginal = TxtBoxBody.Height
                     .heightNew = frm.Height - .topNew - 5
-                    txtboxBody.Height = .heightNew
-                    .widthOriginal = txtboxBody.Width
-                    .widthNew = frm.Width - txtboxBody.Left - 5
-                    txtboxBody.Width = .widthNew
+                    TxtBoxBody.Height = .heightNew
+                    .widthOriginal = TxtBoxBody.Width
+                    .widthNew = frm.Width - TxtBoxBody.Left - 5
+                    TxtBoxBody.Width = .widthNew
                 End With
 
                 chk.Text = ""
@@ -735,14 +737,14 @@ Public Class QfcController
                 chk.Width = 10
 
 
-                pos_chbxSaveAttach.topOriginal = chbxSaveAttach.Top
-                chbxSaveAttach.Top = pos_cbo.topNew
+                pos_chbxSaveAttach.topOriginal = _chbxSaveAttach.Top
+                _chbxSaveAttach.Top = pos_cbo.topNew
 
-                pos_chbxSaveMail.topOriginal = chbxSaveMail.Top
-                chbxSaveMail.Top = pos_cbo.topNew
+                pos_chbxSaveMail.topOriginal = _chbxSaveMail.Top
+                _chbxSaveMail.Top = pos_cbo.topNew
 
-                pos_chbxDelFlow.topOriginal = chbxDelFlow.Top
-                chbxDelFlow.Top = pos_cbo.topNew
+                pos_chbxDelFlow.topOriginal = _chbxDelFlow.Top
+                _chbxDelFlow.Top = pos_cbo.topNew
 
                 pos_lblAcA.topOriginal = lblAcA.Top
                 lblAcA.Top = pos_cbo.topNew
@@ -769,9 +771,9 @@ Public Class QfcController
                 lblAcD.Top = pos_lblAcD.topOriginal
                 lblAcD.Left = pos_lblAcD.leftOriginal
 
-                txtboxBody.Top = pos_body.topOriginal
-                txtboxBody.Height = pos_body.heightOriginal
-                txtboxBody.Width = pos_body.widthOriginal
+                TxtBoxBody.Top = pos_body.topOriginal
+                TxtBoxBody.Height = pos_body.heightOriginal
+                TxtBoxBody.Width = pos_body.widthOriginal
                 lblAcO.Top = pos_lblAcO.topOriginal
 
                 chk.Text = "  Conversation"
@@ -781,9 +783,9 @@ Public Class QfcController
                 lblAcC.Left = pos_lblAcC.leftOriginal
                 lblAcC.Top = pos_lblAcC.topOriginal
 
-                chbxSaveAttach.Top = pos_chbxSaveAttach.topOriginal
-                chbxSaveMail.Top = pos_chbxSaveMail.topOriginal
-                chbxDelFlow.Top = pos_chbxDelFlow.topOriginal
+                _chbxSaveAttach.Top = pos_chbxSaveAttach.topOriginal
+                _chbxSaveMail.Top = pos_chbxSaveMail.topOriginal
+                _chbxDelFlow.Top = pos_chbxDelFlow.topOriginal
                 lblAcA.Top = pos_lblAcA.topOriginal
                 lblAcW.Top = pos_lblAcW.topOriginal
                 lblAcM.Top = pos_lblAcM.topOriginal
@@ -795,18 +797,18 @@ Public Class QfcController
                 blExpanded = True
                 frm.Height = frm.Height * 2
                 With pos_body
-                    .topOriginal = txtboxBody.Top
+                    .topOriginal = TxtBoxBody.Top
                     pos_lblAcO.topOriginal = lblAcO.Top
-                    .heightOriginal = txtboxBody.Height
+                    .heightOriginal = TxtBoxBody.Height
                     .heightNew = frm.Height - .topOriginal - 5
-                    txtboxBody.Height = .heightNew
+                    TxtBoxBody.Height = .heightNew
                 End With
             Else
                 blExpanded = False
                 frm.Height = frm.Height / 2
                 With pos_body
-                    txtboxBody.Top = pos_body.topOriginal
-                    txtboxBody.Height = pos_body.heightOriginal
+                    TxtBoxBody.Top = pos_body.topOriginal
+                    TxtBoxBody.Height = pos_body.heightOriginal
                     lblAcO.Top = pos_lblAcO.topOriginal
                 End With
             End If
@@ -817,9 +819,6 @@ Public Class QfcController
     End Sub
 
     Public Sub MoveMail()
-
-
-
 
 
         Dim selItems = New Collection()
@@ -835,9 +834,9 @@ Public Class QfcController
 
         If Mail IsNot Nothing Then
             If chk.Checked = True Then
-                If selItems_InClass IsNot Nothing Then
-                    If selItems_InClass.Count = CInt(lblConvCt.Text) And selItems_InClass.Count <> 0 Then
-                        selItems = selItems_InClass
+                If _selItemsInClass IsNot Nothing Then
+                    If _selItemsInClass.Count = CInt(lblConvCt.Text) And _selItemsInClass.Count <> 0 Then
+                        selItems = _selItemsInClass
                     Else
                         blRepullConv = True
                     End If
@@ -860,11 +859,11 @@ Public Class QfcController
                 }
             End If
 
-            Attchments = If(cbo.SelectedItem = "Trash to Delete", False, chbxSaveAttach.Checked)
+            Attchments = If(cbo.SelectedItem = "Trash to Delete", False, _chbxSaveAttach.Checked)
 
             blDoMove = True
             On Error Resume Next
-            If fldrOriginal IsNot Mail.Parent Then blDoMove = False
+            If _fldrOriginal IsNot Mail.Parent Then blDoMove = False
             If Err.Number <> 0 Then
                 Err.Clear()
                 blDoMove = False
@@ -875,9 +874,9 @@ Public Class QfcController
                 MASTER_SortEmailsToExistingFolder(selItems:=selItems,
                     Pictures_Checkbox:=False,
                     SortFolder:=cbo.SelectedItem,
-                    Save_MSG:=chbxSaveMail.Checked,
+                    Save_MSG:=_chbxSaveMail.Checked,
                     Attchments:=Attchments,
-                    Remove_Flow_File:=chbxDelFlow.Checked,
+                    Remove_Flow_File:=_chbxDelFlow.Checked,
                     OlArchiveRootPath:=_globals.Ol.ArchiveRootPath)
                 Cleanup_Files()
             End If 'blDoMove
@@ -890,9 +889,9 @@ Public Class QfcController
 
 
 
-        Do While colCtrls.Count > 1
-            frm.Controls.Remove(colCtrls.Item(colCtrls.Count))
-            colCtrls.Remove(colCtrls.Count)
+        Do While _colCtrls.Count > 1
+            frm.Controls.Remove(_colCtrls.Item(_colCtrls.Count))
+            _colCtrls.Remove(_colCtrls.Count)
         Loop
 
         _fldrHandler = Nothing
@@ -903,21 +902,21 @@ Public Class QfcController
 
 
 
-        m_PassedControl = Nothing
+        _mPassedControl = Nothing
         chk = Nothing
         cbo = Nothing
-        lst = Nothing
+        _lst = Nothing
         opt = Nothing
         spn = Nothing
-        txt = Nothing
+        _txt = Nothing
         frm = Nothing
-        cbKll = Nothing
+        _cbKll = Nothing
         Mail = Nothing
-        fldrTarget = Nothing
-        lblTmp = Nothing
+        _fldrTarget = Nothing
+        _lblTmp = Nothing
         'Set _suggestions = Nothing
-        'Set strFolders = Nothing
-        colCtrls = Nothing
+        'Set _strFolders = Nothing
+        _colCtrls = Nothing
         _fldrHandler = Nothing
 
 
@@ -925,14 +924,13 @@ Public Class QfcController
     End Sub
 
     Private Sub bdy_Click()
-        lblSubject.ForeColor = Drawing.Color.FromArgb(&H80000012)
-        lblSubject.Font = New Font(lblSubject.Font, FontStyle.Regular)
-        lblSender.ForeColor = Drawing.Color.FromArgb(&H80000012)
-        lblSender.Font = New Font(lblSender.Font, FontStyle.Regular)
+        LblSubject.ForeColor = Drawing.Color.FromArgb(&H80000012)
+        LblSubject.Font = New Font(LblSubject.Font, FontStyle.Regular)
+        LblSender.ForeColor = Drawing.Color.FromArgb(&H80000012)
+        LblSender.Font = New Font(LblSender.Font, FontStyle.Regular)
         Mail.Display()
-        Dim unused1 = oParent.QFD_Minimize
-        'TODO: Pass a handler to this class with a known interface
-        If oParent.blShowInConversations Then oParent.ExplConvView_ToggleOn
+        _parent.Parent.QFD_Minimize()
+        If _parent.Parent.BlShowInConversations Then _parent.Parent.ExplConvView_ToggleOn()
     End Sub
 
     Private Sub cbDel_Click()
@@ -941,7 +939,7 @@ Public Class QfcController
 
 
     Private Sub cbDel_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub cbDel_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -951,8 +949,8 @@ Public Class QfcController
     Private Sub cbDel_KeyUp(sender As Object, e As KeyEventArgs)
         'Select Case KeyCode
         '    Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '    Case Else
         'End Select
     End Sub
@@ -968,12 +966,12 @@ Public Class QfcController
                                                        ItemCollection:=Sel,
                                                        blFile:=False, hWndCaller:=hWndCaller)
         flagTask.Run()
-        cbFlag.Text = "!"
+        _cbFlag.Text = "!"
 
     End Sub
 
     Private Sub cbFlag_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub cbFlag_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -983,18 +981,18 @@ Public Class QfcController
     Private Sub cbFlag_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub cbKll_Click()
-        oParent.RemoveSpecificControlGroup(intMyPosition)
+        _parent.RemoveSpecificControlGroup(intMyPosition)
     End Sub
 
     Private Sub cbKll_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub cbKll_KeyPress(sender As Object, e As KeyPressEventArgs)
@@ -1004,8 +1002,8 @@ Public Class QfcController
     Private Sub cbKll_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
@@ -1013,15 +1011,15 @@ Public Class QfcController
     Private Sub cbo_KeyDown(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.Return
-                If intEnterCounter = 1 Then
-                    intEnterCounter = 0
-                    oParent.KeyPressHandler(sender, e)
+                If _intEnterCounter = 1 Then
+                    _intEnterCounter = 0
+                    _parent.Parent.KeyboardHandler_KeyDown(sender, e)
                 Else
-                    intEnterCounter = 1
-                    intComboRightCtr = 0
+                    _intEnterCounter = 1
+                    _intComboRightCtr = 0
                 End If
             Case Else
-                oParent.KeyDownHandler(sender, e)
+                _parent.Parent.KeyboardHandler_KeyDown(sender, e)
         End Select
     End Sub
 
@@ -1030,16 +1028,16 @@ Public Class QfcController
     Private Sub cbo_KeyUp(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.Alt
-                oParent.KeyUpHandler(sender, e)
+                _parent.Parent.KeyUpHandler(sender, e)
             Case Keys.Escape
-                intEnterCounter = 0
-                intComboRightCtr = 0
+                _intEnterCounter = 0
+                _intComboRightCtr = 0
             Case Keys.Right
-                intEnterCounter = 0
-                If intComboRightCtr = 0 Then
+                _intEnterCounter = 0
+                If _intComboRightCtr = 0 Then
                     cbo.DroppedDown = True
-                    intComboRightCtr = 1
-                ElseIf intComboRightCtr = 1 Then
+                    _intComboRightCtr = 1
+                ElseIf _intComboRightCtr = 1 Then
 
                     InitializeSortToExisting(InitType:="Sort",
                         QuickLoad:=False,
@@ -1049,25 +1047,25 @@ Public Class QfcController
                     cbKll_Click()
                 Else
                     MsgBox("Error in intComboRightCtr ... setting to 0 and continuing")
-                    intComboRightCtr = 0
+                    _intComboRightCtr = 0
                 End If
             Case Keys.Left
-                intEnterCounter = 0
-                intComboRightCtr = 0
+                _intEnterCounter = 0
+                _intComboRightCtr = 0
             Case Keys.Down
-                intEnterCounter = 0
+                _intEnterCounter = 0
             Case Keys.Up
-                intEnterCounter = 0
+                _intEnterCounter = 0
         End Select
     End Sub
 
 
     Private Sub cbTmp_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub cbTmp_KeyUp(sender As Object, e As KeyEventArgs)
-        oParent.KeyUpHandler(sender, e)
+        _parent.Parent.KeyUpHandler(sender, e)
     End Sub
 
     Private Sub chk_Click()
@@ -1081,10 +1079,10 @@ Public Class QfcController
         'Create a collection with all of the mail items in the conversation in the current folder
         selItems = New Collection
 
-        If selItems_InClass Is Nothing Then CountMailsInConv()
+        If _selItemsInClass Is Nothing Then CountMailsInConv()
 
-        For i = 1 To selItems_InClass.Count
-            objItem = selItems_InClass(i)
+        For i = 1 To _selItemsInClass.Count
+            objItem = _selItemsInClass(i)
             objMail = objItem
             If objMail.EntryID <> Mail.EntryID Then selItems.Add(objItem)
         Next i
@@ -1101,11 +1099,11 @@ Public Class QfcController
         'Next i
 
         If chk.Checked = True Then
-            oParent.ConvToggle_Group(selItems, intMyPosition)
+            _parent.ConvToggle_Group(selItems, intMyPosition)
             lblConvCt.Enabled = True
         Else
             varList = cbo.Items.Cast(Of Object)().[Select](Function(item) item.ToString()).ToArray()
-            oParent.ConvToggle_UnGroup(selItems, intMyPosition, CInt(lblConvCt.Text), varList)
+            _parent.ConvToggle_UnGroup(selItems, intMyPosition, CInt(lblConvCt.Text), varList)
             lblConvCt.Enabled = False
         End If
 
@@ -1114,70 +1112,70 @@ Public Class QfcController
     End Sub
 
     Private Sub chk_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub chk_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub frm_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub frm_KeyPress(sender As Object, e As KeyPressEventArgs)
-        oParent.KeyPressHandler(sender, e)
+        _parent.Parent.KeyPressHandler(sender, e)
     End Sub
 
     Private Sub frm_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub lst_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub lst_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub opt_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub opt_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub spn_KeyDown(sender As Object, e As KeyEventArgs)
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
     End Sub
 
     Private Sub spn_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
@@ -1185,7 +1183,7 @@ Public Class QfcController
     Private Sub txt_Change()
 
         cbo.Items.Clear()
-        cbo.Items.AddRange(_fldrHandler.FindFolder("*" & txt.Text & "*", True, ReCalcSuggestions:=False, objItem:=Mail))
+        cbo.Items.AddRange(_fldrHandler.FindFolder("*" & _txt.Text & "*", True, ReCalcSuggestions:=False, objItem:=Mail))
 
         If cbo.Items.Count >= 2 Then cbo.SelectedIndex = 1
 
@@ -1200,21 +1198,23 @@ Public Class QfcController
     Private Sub txt_KeyDown(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        oParent.KeyDownHandler(sender, e)
+        _parent.Parent.KeyboardHandler_KeyDown(sender, e)
         '        Case Else
         '    End Select
     End Sub
 
     Private Sub txt_KeyPress(sender As Object, e As KeyPressEventArgs)
-        oParent.KeyPressHandler(sender, e)
+        _parent.Parent.KeyPressHandler(sender, e)
     End Sub
 
     Private Sub txt_KeyUp(sender As Object, e As KeyEventArgs)
         '    Select Case KeyCode
         '        Case 18
-        'oParent.toggleAcceleratorDialogue
-        oParent.KeyUpHandler(sender, e)
+        '_parent.toggleAcceleratorDialogue
+        _parent.Parent.KeyUpHandler(sender, e)
         '        Case Else
         '    End Select
     End Sub
+
+
 End Class

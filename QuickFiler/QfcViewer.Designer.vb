@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class ControlGroup
+Partial Class QfcViewer
     Inherits System.Windows.Forms.UserControl
 
     'UserControl overrides dispose to clean up the component list.
@@ -247,7 +247,7 @@ Partial Class ControlGroup
         Me.LblConvCt.TabIndex = 3
         Me.LblConvCt.Text = "<#>"
         '
-        'lblSubject
+        '_lblSubject
         '
         Me.lblSubject.AutoSize = True
         Me.lblSubject.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))

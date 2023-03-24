@@ -1,10 +1,10 @@
 ﻿Imports System.Drawing
 Imports System.Windows.Forms
 
-Public Class ControlGroup
+Public Class QfcViewer
     Private _tipsActive As Boolean = True
-    Private _tipsLabels As List(Of Label) = New List(Of Label)
-    Private _tipsColumns As Dictionary(Of ColumnStyle, Single) = New Dictionary(Of ColumnStyle, Single)
+    Private ReadOnly _tipsLabels As List(Of Label) = New List(Of Label)
+    Private ReadOnly _tipsColumns As Dictionary(Of ColumnStyle, Single) = New Dictionary(Of ColumnStyle, Single)
 
     Public Sub New()
 
@@ -34,12 +34,12 @@ Public Class ControlGroup
 
     Private Sub InitTipsColumns()
         With _tipsColumns
-            .add(Me.L1h1L2v.ColumnStyles.Item(0), 50)
-            .add(Me.L1h2L2v1h.ColumnStyles.Item(1), 20)
-            .add(Me.L1h2L2v2h.ColumnStyles.Item(1), 20)
-            .add(Me.L1h2L2v3h.ColumnStyles.Item(1), 20)
-            .add(Me.L1h2L2v3h.ColumnStyles.Item(5), 20)
-            .add(Me.L1h2L2v3h.ColumnStyles.Item(7), 20)
+            .Add(Me.L1h1L2v.ColumnStyles.Item(0), 50)
+            .Add(Me.L1h2L2v1h.ColumnStyles.Item(1), 20)
+            .Add(Me.L1h2L2v2h.ColumnStyles.Item(1), 20)
+            .Add(Me.L1h2L2v3h.ColumnStyles.Item(1), 20)
+            .Add(Me.L1h2L2v3h.ColumnStyles.Item(5), 20)
+            .Add(Me.L1h2L2v3h.ColumnStyles.Item(7), 20)
         End With
     End Sub
 

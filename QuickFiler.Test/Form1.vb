@@ -8,7 +8,7 @@
     End Sub
 
     Private Sub LoadControlGroup()
-        Dim _controlGroup As New QuickFiler.ControlGroup()
+        Dim _controlGroup As New QuickFiler.QfcViewer()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.TableLayoutPanel1.RowCount += 1
         Me.TableLayoutPanel1.RowStyles.Insert(Me.TableLayoutPanel1.RowCount - 2, New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0!))
@@ -18,7 +18,7 @@
 
     End Sub
 
-    Private Sub SetControlGroupOptions(group As ControlGroup)
+    Private Sub SetControlGroupOptions(group As QfcViewer)
         With group
             .AutoSize = True
             .AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink

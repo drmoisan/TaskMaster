@@ -4,9 +4,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("QuickFiler.Test")>
 <Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("PepsiCo Inc")>
+<Assembly: AssemblyCompany("")>
 <Assembly: AssemblyProduct("QuickFiler.Test")>
-<Assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")>
+<Assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>

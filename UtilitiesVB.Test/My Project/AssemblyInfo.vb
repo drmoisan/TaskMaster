@@ -4,9 +4,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("UtilitiesVB.Test")>
 <Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("PepsiCo Inc")>
+<Assembly: AssemblyCompany("")>
 <Assembly: AssemblyProduct("UtilitiesVB.Test")>
-<Assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")>
+<Assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>

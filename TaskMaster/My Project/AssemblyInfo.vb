@@ -11,7 +11,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("")>
 <Assembly: AssemblyProduct("TaskMaster")>
-<Assembly: AssemblyCopyright("Copyright ©  2020")>
+<Assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")>
 <Assembly: AssemblyTrademark("")>
 
 ' Setting ComVisible to false makes the types in this assembly not visible 

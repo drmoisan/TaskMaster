@@ -9,9 +9,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("ToDoModel")>
 <Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("PepsiCo Inc")>
+<Assembly: AssemblyCompany("")>
 <Assembly: AssemblyProduct("ToDoModel")>
-<Assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")>
+<Assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>

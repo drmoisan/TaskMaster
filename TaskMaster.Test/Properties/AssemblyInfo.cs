@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("TaskMaster.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PepsiCo Inc")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TaskMaster.Test")]
-[assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")]
+[assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

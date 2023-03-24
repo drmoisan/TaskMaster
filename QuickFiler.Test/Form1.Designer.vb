@@ -28,9 +28,9 @@ Partial Class Form1
         Me.MainPanel = New System.Windows.Forms.Panel()
         Me.MainLayoutPanel = New System.Windows.Forms.TableLayoutPanel()
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
-        Me.ControlGroup3 = New QuickFiler.ControlGroup()
-        Me.ControlGroup1 = New QuickFiler.ControlGroup()
-        Me.ControlGroup2 = New QuickFiler.ControlGroup()
+        Me.ControlGroup3 = New QuickFiler.QfcViewer()
+        Me.ControlGroup1 = New QuickFiler.QfcViewer()
+        Me.ControlGroup2 = New QuickFiler.QfcViewer()
         Me.ButtonAdd = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.MainPanel.SuspendLayout()
@@ -191,11 +191,11 @@ Partial Class Form1
     End Sub
 
     Friend WithEvents TableLayoutPanel1 As Windows.Forms.TableLayoutPanel
-    Friend WithEvents ControlGroup1 As ControlGroup
+    Friend WithEvents ControlGroup1 As QfcViewer
     Friend WithEvents Button2 As Windows.Forms.Button
     Friend WithEvents Button1 As Windows.Forms.Button
-    Friend WithEvents ControlGroup3 As ControlGroup
-    Friend WithEvents ControlGroup2 As ControlGroup
+    Friend WithEvents ControlGroup3 As QfcViewer
+    Friend WithEvents ControlGroup2 As QfcViewer
     Friend WithEvents MainPanel As Windows.Forms.Panel
     Friend WithEvents MainLayoutPanel As Windows.Forms.TableLayoutPanel
     Friend WithEvents TableLayoutPanel2 As Windows.Forms.TableLayoutPanel

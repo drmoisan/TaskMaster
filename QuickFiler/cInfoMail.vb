@@ -14,8 +14,8 @@ Public Class cInfoMail
     Public Categories As String
     Public strAction As String
     Public strProcName As String
-    Private col As Collection
-    Private dict As Dictionary(Of String, Long)
+    Private _col As Collection
+    Private _dict As Dictionary(Of String, Long)
 
 
     Private Sub SortDictionary()
@@ -26,27 +26,27 @@ Public Class cInfoMail
         objSortedList = CreateObject("System.Collections.SortedList")
         With objSortedList
             'With CreateObject("System.Collections.SortedList")
-            For Each key In dict
-                .Add(key, dict(key))
+            For Each key In _dict
+                .Add(key, _dict(key))
             Next
-            dict.Clear()
+            _dict.Clear()
             For i = .Keys.Count - 1 To 0 Step -1
-                dict.Add(.GetKey(i), .item(.GetKey(i)))
+                _dict.Add(.GetKey(i), .item(.GetKey(i)))
             Next
         End With
     End Sub
 
     Public Sub dict_new()
-        dict = New Dictionary(Of String, Long)
+        _dict = New Dictionary(Of String, Long)
     End Sub
     Public Sub dict_add(strKey As String, lngVal As Long)
-        'col.ADD lngVal, strKey
-        dict.Add(strKey, lngVal)
+        '_col.ADD lngVal, strKey
+        _dict.Add(strKey, lngVal)
     End Sub
 
     Public ReadOnly Property dict_ct() As Integer
         Get
-            Return dict.Count
+            Return _dict.Count
         End Get
     End Property
 
@@ -55,17 +55,17 @@ Public Class cInfoMail
             Dim i As Integer
             Dim key As String
             i = 0
-            If dict.Count = 0 Then
+            If _dict.Count = 0 Then
                 dict_strSum = ""
             Else
                 SortDictionary()
-                'Sort_Collections.sort col, New Sort_CReverseComparator
+                'Sort_Collections.sort _col, New Sort_CReverseComparator
                 dict_strSum = "Grouped Apps: "
-                For Each key In dict.Keys
+                For Each key In _dict.Keys
                     i = i + 1
                     If i < 3 Then
                         If i > 1 Then dict_strSum = dict_strSum & " | "
-                        dict_strSum = dict_strSum & key & " " & Format(dict(key) / 60, "#,##0.0") & " min"
+                        dict_strSum = dict_strSum & key & " " & Format(_dict(key) / 60, "#,##0.0") & " min"
                     End If
                 Next key
             End If
@@ -73,10 +73,10 @@ Public Class cInfoMail
     End Property
 
     Public Sub dict_upORadd(strKey As String, lngVal As Long)
-        If dict.ContainsKey(strKey) Then
-            dict(strKey) = dict(strKey) + lngVal
+        If _dict.ContainsKey(strKey) Then
+            _dict(strKey) = _dict(strKey) + lngVal
         Else
-            dict.Add(strKey, lngVal)
+            _dict.Add(strKey, lngVal)
         End If
     End Sub
     Friend Function Init(Optional lcl_Subject As String = "",

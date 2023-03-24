@@ -19,7 +19,7 @@ namespace UtilitiesCS
         //    this.TextMessage.Text = message;
 
         //}
-        private Dictionary<string, Delegate> _map;
+        private readonly Dictionary<string, Delegate> _map;
 
         //public MyBoxTemplate(string title, string message, Dictionary<string, Delegate> map)
         //{
