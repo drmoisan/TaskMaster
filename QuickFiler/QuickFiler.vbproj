@@ -106,6 +106,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AcceleratorParser.vb" />
     <Compile Include="cInfoMail.vb" />
     <Compile Include="FormFocusListener.vb" />
     <Compile Include="Enums.vb" />

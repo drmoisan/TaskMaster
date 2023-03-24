@@ -21,15 +21,6 @@ Friend Class QfcGroupOperationsLegacy
     Private _suppressAcceleratorEvents As Boolean = False
     Private _parent As QuickFileController
 
-    'Public Property _colQFClass As Collection
-    '    Get
-    '        Return _colQFClass
-    '    End Get
-    '    Set(value As Collection)
-    '        _colQFClass = value
-    '    End Set
-    'End Property
-
     Public Sub New(viewerInstance As QuickFileViewer,
                    InitType As InitTypeEnum,
                    AppGlobals As IApplicationGlobals,
@@ -40,18 +31,6 @@ Friend Class QfcGroupOperationsLegacy
         _globals = AppGlobals
         _parent = ParentObject
     End Sub
-
-    Friend ReadOnly Property Parent As QuickFileController
-        Get
-            Return _parent
-        End Get
-    End Property
-
-    Friend ReadOnly Property EmailsLoaded
-        Get
-            Return _colQFClass.Count
-        End Get
-    End Property
 
 #Region "Viewer Operations"
 
@@ -112,47 +91,10 @@ Friend Class QfcGroupOperationsLegacy
     Optional blGroupConversation As Boolean = True,
     Optional blWideView As Boolean = False)
 
-
-        Dim Frm As New Panel
-        Dim lbl1 As New Label
-        Dim lbl2 As New Label
-        Dim lbl3 As New Label
-        Dim lbl5 As New Label
-        Dim lblSender As New Label
-        Dim lblSubject As New Label
-        Dim txtboxBody As New TextBox
-        Dim lblSentOn As New Label
-        Dim lblConvCt As New Label
-        Dim lblPos As New Label
-        Dim cbxFolder As New ComboBox
-        Dim inpt As New TextBox
-        Dim chbxGPConv As New CheckBox
-        Dim chbxSaveAttach As New CheckBox
-        Dim chbxSaveMail As New CheckBox
-        Dim chbxDelFlow As New CheckBox
-        Dim cbDelItem As New Button
-        Dim cbKllItem As New Button
-        Dim cbFlagItem As New Button
-        Dim lblAcF As New Label
-        Dim lblAcD As New Label
-        Dim lblAcC As New Label
-        Dim lblAcX As New Label
-        Dim lblAcR As New Label
-        Dim lblAcT As New Label
-        Dim lblAcO As New Label
-        Dim lblAcA As New Label
-        Dim lblAcW As New Label
-        Dim lblAcM As New Label
-
-
         Dim lngTopOff As Long
-
-        Dim blDebug As Boolean
-
-        blDebug = False
+        Dim blDebug As Boolean = False
 
         lngTopOff = If(blWideView, Top_Offset, Top_Offset_C)
-
         If intPosition = 0 Then intPosition = intItemNumber
 
         If ((intItemNumber * (frmHt + frmSp)) + frmSp) > _viewer.L1v1L2_PanelMain.Height Then      'Was _heightPanelMainMax but I replaced with Me.Height
@@ -161,7 +103,7 @@ Friend Class QfcGroupOperationsLegacy
         End If
 
         'Min Me Size is frmSp * 2 + frmHt
-        Frm = New Panel()
+        Dim Frm As New Panel()
         _viewer.L1v1L2_PanelMain.Controls.Add(Frm)
         With Frm
             .Height = frmHt
@@ -175,7 +117,7 @@ Friend Class QfcGroupOperationsLegacy
         colCtrls.Add(Frm, "frm")
 
         If blWideView Then
-            lbl1 = New Label
+            Dim lbl1 As New Label
             Frm.Controls.Add(lbl1)
             With lbl1
                 .Height = 16
@@ -189,7 +131,7 @@ Friend Class QfcGroupOperationsLegacy
         End If  'blWideView
 
         If blWideView Then
-            lbl2 = New Label
+            Dim lbl2 As New Label()
             Frm.Controls.Add(lbl2)
             With lbl2
                 .Height = 16
@@ -203,7 +145,7 @@ Friend Class QfcGroupOperationsLegacy
         End If  'blWideView
 
         If blWideView Then
-            lbl3 = New Label
+            Dim lbl3 As New Label
             Frm.Controls.Add(lbl3)
             With lbl3
                 .Height = 16
@@ -218,7 +160,7 @@ Friend Class QfcGroupOperationsLegacy
 
         If _initType.HasFlag(InitTypeEnum.InitSort) Then
             'TURN OFF IF CONDITIONAL REMINDER
-            lbl5 = New Label
+            Dim lbl5 As New Label
             Frm.Controls.Add(lbl5)
 
             With lbl5
@@ -232,7 +174,7 @@ Friend Class QfcGroupOperationsLegacy
             colCtrls.Add(lbl5, "lbl5")
         End If
 
-        lblSender = New Label
+        Dim lblSender As New Label
         Frm.Controls.Add(lblSender)
 
         With lblSender
@@ -252,7 +194,6 @@ Friend Class QfcGroupOperationsLegacy
             .Font = New Font(.Font.FontFamily, 10)
         End With
         colCtrls.Add(lblSender, "lblSender")
-
 
         Dim lblTriage As New Label
         Frm.Controls.Add(lblTriage)
@@ -295,9 +236,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(lblActionable, "lblActionable")
 
-
-
-        lblSubject = New Label
+        Dim lblSubject As New Label
         Frm.Controls.Add(lblSubject)
 
         With lblSubject
@@ -325,7 +264,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(lblSubject, "lblSubject")
 
-        txtboxBody = New TextBox
+        Dim txtboxBody As New TextBox
         Frm.Controls.Add(txtboxBody)
         With txtboxBody
 
@@ -356,7 +295,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(txtboxBody, "lblBody")
 
-        lblSentOn = New Label
+        Dim lblSentOn As New Label
         Frm.Controls.Add(lblSentOn)
         With lblSentOn
             .Height = 16
@@ -377,7 +316,7 @@ Friend Class QfcGroupOperationsLegacy
         colCtrls.Add(lblSentOn, "lblSentOn")
 
         If _initType.HasFlag(InitTypeEnum.InitSort) Then
-            cbxFolder = New ComboBox
+            Dim cbxFolder As New ComboBox
             Frm.Controls.Add(cbxFolder)
             With cbxFolder
                 .Height = 24
@@ -391,9 +330,12 @@ Friend Class QfcGroupOperationsLegacy
             colCtrls.Add(cbxFolder, "cbxFolder")
         End If
 
-
+        Dim chbxGPConv As New CheckBox
+        Dim chbxSaveAttach As New CheckBox
+        Dim chbxDelFlow As New CheckBox
+        Dim chbxSaveMail As New CheckBox
+        Dim inpt As New TextBox
         If _initType.HasFlag(InitTypeEnum.InitSort) Then
-            inpt = New TextBox
             Frm.Controls.Add(inpt)
             With inpt
                 .Height = 24
@@ -407,9 +349,6 @@ Friend Class QfcGroupOperationsLegacy
             End With
             colCtrls.Add(inpt, "inpt")
 
-
-
-            chbxSaveMail = New CheckBox
             Frm.Controls.Add(chbxSaveMail)
             With chbxSaveMail
 
@@ -428,7 +367,6 @@ Friend Class QfcGroupOperationsLegacy
             End With
             colCtrls.Add(chbxSaveMail, "chbxSaveMail")
 
-            chbxDelFlow = New CheckBox
             Frm.Controls.Add(chbxDelFlow)
             With chbxDelFlow
 
@@ -449,7 +387,6 @@ Friend Class QfcGroupOperationsLegacy
             End With
             colCtrls.Add(chbxDelFlow, "chbxDelFlow")
 
-            chbxSaveAttach = New CheckBox
             Frm.Controls.Add(chbxSaveAttach)
             With chbxSaveAttach
 
@@ -469,7 +406,7 @@ Friend Class QfcGroupOperationsLegacy
 
             End With
             colCtrls.Add(chbxSaveAttach, "chbxSaveAttach")
-            chbxGPConv = New CheckBox
+
             Frm.Controls.Add(chbxGPConv)
             With chbxGPConv
                 .Height = 16
@@ -489,7 +426,7 @@ Friend Class QfcGroupOperationsLegacy
             colCtrls.Add(chbxGPConv, "chbxGPConv")
         End If
 
-        cbFlagItem = New Button
+        Dim cbFlagItem As New Button
         Frm.Controls.Add(cbFlagItem)
         With cbFlagItem
             .Height = 24
@@ -504,7 +441,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(cbFlagItem, "cbFlagItem")
 
-        cbKllItem = New Button
+        Dim cbKllItem As New Button
         Frm.Controls.Add(cbKllItem)
         With cbKllItem
             .Height = 24
@@ -519,7 +456,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(cbKllItem, "cbKllItem")
 
-        cbDelItem = New Button
+        Dim cbDelItem As New Button
         Frm.Controls.Add(cbDelItem)
         With cbDelItem
             .Height = 24
@@ -535,7 +472,7 @@ Friend Class QfcGroupOperationsLegacy
         colCtrls.Add(cbDelItem, "cbDelItem")
 
         If _initType.HasFlag(InitTypeEnum.InitSort) Then
-            lblConvCt = New Label
+            Dim lblConvCt As New Label
             Frm.Controls.Add(lblConvCt)
             With lblConvCt
                 .Height = 24
@@ -562,7 +499,7 @@ Friend Class QfcGroupOperationsLegacy
             colCtrls.Add(lblConvCt, "lblConvCt")
         End If
 
-        lblPos = New Label
+        Dim lblPos As New Label
         Frm.Controls.Add(lblPos)
         With lblPos
             .Height = 20
@@ -581,7 +518,7 @@ Friend Class QfcGroupOperationsLegacy
         colCtrls.Add(lblPos, "lblPos")
 
         If _initType.HasFlag(InitTypeEnum.InitSort) Then
-            lblAcF = New Label
+            Dim lblAcF As New Label
             Frm.Controls.Add(lblAcF)
             With lblAcF
                 .Height = 14
@@ -600,7 +537,7 @@ Friend Class QfcGroupOperationsLegacy
             End With
             colCtrls.Add(lblAcF, "lblAcF")
 
-            lblAcD = New Label
+            Dim lblAcD As New Label
             Frm.Controls.Add(lblAcD)
             With lblAcD
                 .Height = 14
@@ -618,7 +555,7 @@ Friend Class QfcGroupOperationsLegacy
             End With
             colCtrls.Add(lblAcD, "lblAcD")
 
-            lblAcC = New Label
+            Dim lblAcC As New Label
             Frm.Controls.Add(lblAcC)
             With lblAcC
                 .Height = 14
@@ -637,7 +574,7 @@ Friend Class QfcGroupOperationsLegacy
             colCtrls.Add(lblAcC, "lblAcC")
         End If
 
-        lblAcR = New Label
+        Dim lblAcR As New Label
         Frm.Controls.Add(lblAcR)
         With lblAcR
             .Height = 14
@@ -655,7 +592,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(lblAcR, "lblAcR")
 
-        lblAcX = New Label
+        Dim lblAcX As New Label
         Frm.Controls.Add(lblAcX)
         With lblAcX
             .Height = 14
@@ -673,7 +610,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(lblAcX, "lblAcX")
 
-        lblAcT = New Label
+        Dim lblAcT As New Label
         Frm.Controls.Add(lblAcT)
         With lblAcT
             .Height = 14
@@ -691,7 +628,7 @@ Friend Class QfcGroupOperationsLegacy
         End With
         colCtrls.Add(lblAcT, "lblAcT")
 
-        lblAcO = New Label
+        Dim lblAcO As New Label
         Frm.Controls.Add(lblAcO)
         With lblAcO
             .Height = 14
@@ -716,7 +653,7 @@ Friend Class QfcGroupOperationsLegacy
         colCtrls.Add(lblAcO, "lblAcO")
 
         If _initType.HasFlag(InitTypeEnum.InitSort) Then
-            lblAcA = New Label
+            Dim lblAcA As New Label
             Frm.Controls.Add(lblAcA)
             With lblAcA
                 .Height = 14
@@ -740,7 +677,7 @@ Friend Class QfcGroupOperationsLegacy
             End With
             colCtrls.Add(lblAcA, "lblAcA")
 
-            lblAcW = New Label
+            Dim lblAcW As New Label
             Frm.Controls.Add(lblAcW)
             With lblAcW
                 .Height = 14
@@ -757,14 +694,13 @@ Friend Class QfcGroupOperationsLegacy
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
                 .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
-                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
             End With
             colCtrls.Add(lblAcW, "lblAcW")
 
-            lblAcM = New Label
+            Dim lblAcM As New Label
             Frm.Controls.Add(lblAcM)
             With lblAcM
                 .Height = 14
@@ -781,7 +717,6 @@ Friend Class QfcGroupOperationsLegacy
                 .Font = New Font(.Font.FontFamily, 10, FontStyle.Bold)
                 .BorderStyle = BorderStyle.Fixed3D 'fmBorderStyleSingle
                 .TextAlign = ContentAlignment.TopCenter  'fmTextAlignCenter
-                '.SpecialEffect = fmSpecialEffectBump
                 .BackColor = SystemColors.ControlText
                 .ForeColor = SystemColors.Control
                 .Visible = blDebug
@@ -974,7 +909,6 @@ Friend Class QfcGroupOperationsLegacy
 
     Public Sub ConvToggle_Group(selItems As Collection, intOrigPosition As Integer)
 
-
         Dim objEmail As MailItem
         Dim objItem As Object
         Dim i As Integer
@@ -1000,9 +934,6 @@ Friend Class QfcGroupOperationsLegacy
             'If intPosition < intOrigPosition Then QF_Orig.intMyPosition = intPosition
             RemoveSpecificControlGroup(intPosition)
         Next objItem
-
-
-
     End Sub
 
     Public Sub ConvToggle_UnGroup(selItems As Collection, intPosition As Integer, ConvCt As Integer, varList As Object)
@@ -1097,141 +1028,12 @@ Friend Class QfcGroupOperationsLegacy
         QF = Nothing
     End Sub
 
-#End Region
-
-#Region "Properties and Helper Functions"
-
-    Private Function DoesCollectionHaveConvID(objItem As Object, col As Collection) As Integer
-
-
-
-        Dim objItemInCol As Object
-        Dim objMailInCol As [MailItem]
-        Dim objMail As [MailItem]
-        Dim i As Integer
-
-        DoesCollectionHaveConvID = 0
-
-        If TypeOf objItem Is MailItem Then
-            objMail = objItem
-            If col IsNot Nothing Then
-                For i = 1 To col.Count
-                    objItemInCol = col(i)
-                    If TypeOf objItemInCol Is MailItem Then
-                        objMailInCol = objItemInCol
-                        If objMailInCol.ConversationID = objMail.ConversationID Then DoesCollectionHaveConvID = i
-                    End If
-                Next i
-            End If
-        End If
-
-
-
-    End Function
-
-    Private Function GetEmailPositionInCollection(objMail As [MailItem]) As Integer
-
-
-
-        Dim QF As QfcController
-        Dim i As Integer
-
-        GetEmailPositionInCollection = 0
-        For i = 1 To _colQFClass.Count
-            QF = _colQFClass(i)
-            If QF.Mail.EntryID = objMail.EntryID Then GetEmailPositionInCollection = i
-        Next i
-
-
-
-    End Function
-
-#End Region
-
     Friend Sub ParseAcceleratorText()
-        Parse()
+        Dim parser As New AcceleratorParser(Me)
+        parser.ParseAndExecute(_viewer.AcceleratorDialogue.Text, _intActiveSelection)
     End Sub
 
-    Friend Sub Parse()
-
-        Dim intNewSelection As Integer
-        Dim blExpanded As Boolean = False
-        Dim strToParse As String = _viewer.AcceleratorDialogue.Text
-
-        If AnythingToParse(strToParse) Then
-            Dim idxLastNum As Integer = GetFinalNumericIndex(strToParse)
-            If SelectionDetected(idxLastNum) Then
-                intNewSelection = GetFinalNumeric(strToParse, idxLastNum)
-                If IsSelectionBelowMax(intNewSelection) Then
-                    If IsChange(intNewSelection) Then
-                        If IsAnythingActive() Then blExpanded = ToggleOffActiveItem(blExpanded)
-                        If intNewSelection > 0 Then ActivateByIndex(intNewSelection, blExpanded)
-                    End If
-
-                    If AdditionalInstructions(idxLastNum, strToParse) Then
-                        Dim strCommand As String = ExtractInstruction(idxLastNum, strToParse)
-                        ResetAcceleratorSilently()
-                        Dim QF As QfcController = _colQFClass(_intActiveSelection)
-
-                        Select Case strCommand
-                            Case "O"
-                                toggleAcceleratorDialogue()
-                                QF.KB(strCommand)
-                                _parent.OpenQFMail(QF.Mail)
-                            Case "C"
-                                toggleAcceleratorDialogue()
-                                QF.KB(strCommand)
-                            Case "T"
-                                toggleAcceleratorDialogue()
-                                QF.KB(strCommand)
-                            Case "F"
-                                toggleAcceleratorDialogue()
-                                QF.KB(strCommand)
-                            Case "D"
-                                toggleAcceleratorDialogue()
-                                QF.KB(strCommand)
-                            Case "X"
-                                toggleAcceleratorDialogue()
-                                QF.KB(strCommand)
-                            Case "R"
-                                toggleAcceleratorDialogue()
-                                QF.KB(strCommand)
-                            Case "A"
-                                QF.KB(strCommand)
-                            Case "W"
-                                QF.KB(strCommand)
-                            Case "M"
-                                QF.KB(strCommand)
-                            Case "E"
-                                If QF.blExpanded Then
-                                    MoveDownPix(_intActiveSelection + 1, QF.frm.Height * -0.5)
-                                    QF.ExpandCtrls1()
-                                Else
-                                    MoveDownPix(_intActiveSelection + 1, QF.frm.Height)
-                                    QF.ExpandCtrls1()
-                                End If
-                            Case Else
-                        End Select
-                    End If
-                Else
-                    ResetAcceleratorSilently()
-                End If
-
-            Else
-                blExpanded = ToggleOffActiveItem(blExpanded)
-            End If
-        Else
-            blExpanded = ToggleOffActiveItem(blExpanded)
-        End If
-
-
-    End Sub
-
-    Private Function ExtractInstruction(idxLastNum As Integer, strToParse As String) As String
-        Return UCase(Mid(strToParse, idxLastNum + 1, 1))
-    End Function
-
-    Private Sub ResetAcceleratorSilently()
+    Friend Sub ResetAcceleratorSilently()
         Dim blTemp As Boolean = _suppressAcceleratorEvents
         _suppressAcceleratorEvents = True
         If _intActiveSelection > 0 Then
@@ -1242,15 +1044,7 @@ Friend Class QfcGroupOperationsLegacy
         _suppressAcceleratorEvents = blTemp
     End Sub
 
-    Private Function AdditionalInstructions(idxLastNum As Integer, strToParse As String) As Boolean
-        If strToParse.Length > idxLastNum Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-
-    Private Sub ActivateByIndex(intNewSelection As Integer, blExpanded As Boolean)
+    Friend Function ActivateByIndex(intNewSelection As Integer, blExpanded As Boolean) As Integer
         If intNewSelection > 0 And intNewSelection <= _colQFClass.Count Then
             Dim QF As QfcController = _colQFClass(intNewSelection)
             QF.Accel_FocusToggle()
@@ -1260,26 +1054,14 @@ Friend Class QfcGroupOperationsLegacy
             End If
             _intActiveSelection = intNewSelection
             _viewer.L1v1L2_PanelMain.ScrollControlIntoView(QF.frm)
-        End If
-    End Sub
-
-    Private Function IsAnythingActive() As Boolean
-        If _intActiveSelection <> 0 Then
-            Return True
+            Return _intActiveSelection
         Else
-            Return False
+            'Procedure failed so return current selection unaltered
+            Return _intActiveSelection
         End If
     End Function
 
-    Private Function IsSelectionBelowMax(intNewSelection As Integer) As Boolean
-        If intNewSelection <= _colQFClass.Count Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-
-    Private Function ToggleOffActiveItem(parentBlExpanded As Boolean) As Boolean
+    Friend Function ToggleOffActiveItem(parentBlExpanded As Boolean) As Boolean
         Dim blExpanded As Boolean = parentBlExpanded
         If _intActiveSelection <> 0 Then
 
@@ -1295,60 +1077,6 @@ Friend Class QfcGroupOperationsLegacy
             _intActiveSelection = 0
         End If
         Return blExpanded
-    End Function
-
-    Private Function AnythingToParse(strToParse As String) As Boolean
-        If strToParse <> "" Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-
-    Private Function SelectionDetected(idxLastNum As Integer) As Boolean
-        If idxLastNum > 0 Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-
-    Private Function IsChange(intNewSelection As Integer) As Boolean
-        If intNewSelection <> _intActiveSelection Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-
-    Private Function GetFinalNumeric(strToParse As String, idxLastNum As Integer) As Integer
-        If idxLastNum > 0 Then
-            'Get last digit 
-            'TODO: Add support for multiple digit numbers 
-            Return CInt(Mid(strToParse, 1, idxLastNum))
-        Else
-            Return 0
-        End If
-    End Function
-
-    ''' <summary>
-    ''' Gets the index of the last number in a string. Returns 0 if none is found
-    ''' </summary>
-    ''' <param name="strToParse"></param>
-    ''' <returns></returns>
-    Private Function GetFinalNumericIndex(strToParse As String) As Integer
-        Dim i As Integer
-        Dim intLastNum As Integer = 0
-        Dim intLen As Integer = Len(strToParse)
-
-        For i = 1 To intLen
-            If IsNumeric(Mid(strToParse, i, 1)) Then
-                intLastNum = i
-            Else
-                Exit For
-            End If
-        Next i
-        Return intLastNum
     End Function
 
     Friend Sub SelectPreviousItem()
@@ -1412,6 +1140,85 @@ Friend Class QfcGroupOperationsLegacy
         End If
     End Sub
 
+    Friend Function IsSelectionBelowMax(intNewSelection As Integer) As Boolean
+        If intNewSelection <= _colQFClass.Count Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+#End Region
+
+#Region "Properties and Helper Functions"
+    Friend ReadOnly Property Parent As QuickFileController
+        Get
+            Return _parent
+        End Get
+    End Property
+
+    Friend ReadOnly Property EmailsLoaded
+        Get
+            Return _colQFClass.Count
+        End Get
+    End Property
+
+    Private Function DoesCollectionHaveConvID(objItem As Object, col As Collection) As Integer
+
+
+
+        Dim objItemInCol As Object
+        Dim objMailInCol As [MailItem]
+        Dim objMail As [MailItem]
+        Dim i As Integer
+
+        DoesCollectionHaveConvID = 0
+
+        If TypeOf objItem Is MailItem Then
+            objMail = objItem
+            If col IsNot Nothing Then
+                For i = 1 To col.Count
+                    objItemInCol = col(i)
+                    If TypeOf objItemInCol Is MailItem Then
+                        objMailInCol = objItemInCol
+                        If objMailInCol.ConversationID = objMail.ConversationID Then DoesCollectionHaveConvID = i
+                    End If
+                Next i
+            End If
+        End If
+
+
+
+    End Function
+
+    Private Function GetEmailPositionInCollection(objMail As [MailItem]) As Integer
+
+
+
+        Dim QF As QfcController
+        Dim i As Integer
+
+        GetEmailPositionInCollection = 0
+        For i = 1 To _colQFClass.Count
+            QF = _colQFClass(i)
+            If QF.Mail.EntryID = objMail.EntryID Then GetEmailPositionInCollection = i
+        Next i
+
+
+
+    End Function
+
+    Friend Function TryGetQfc(index) As QfcController
+        Try
+            Return _colQFClass(index)
+        Catch ex As System.Exception
+            Return Nothing
+        End Try
+    End Function
+
+#End Region
+
+#Region "Email Filing"
     Friend ReadOnly Property ReadyForMove() As Boolean
         Get
             Dim blReadyForMove As Boolean = True
@@ -1421,8 +1228,8 @@ Friend Class QfcGroupOperationsLegacy
                 If QF.cbo.SelectedValue = "" Then
                     blReadyForMove = False
                     strNotifications = strNotifications & QF.intMyPosition &
-                    "  " & Format(QF.Mail.SentOn, "mm\\dd\\yyyy") &
-                    "  " & QF.Mail.Subject & vbCrLf
+                "  " & Format(QF.Mail.SentOn, "mm\\dd\\yyyy") &
+                "  " & QF.Mail.Subject & vbCrLf
                 End If
             Next QF
             strNotifications = Mid(strNotifications, 1, Len(strNotifications) - 1)
@@ -1445,11 +1252,11 @@ Friend Class QfcGroupOperationsLegacy
     End Sub
 
     Friend Function GetMoveDiagnostics(durationText As String,
-                                       durationMinutesText As String,
-                                       Duration As Double,
-                                       dataLineBeg As String,
-                                       OlEndTime As Date,
-                                       ByRef OlAppointment As AppointmentItem) As String()
+                                    durationMinutesText As String,
+                                    Duration As Double,
+                                    dataLineBeg As String,
+                                    OlEndTime As Date,
+                                    ByRef OlAppointment As AppointmentItem) As String()
         Dim k As Integer
         Dim strOutput(EmailsLoaded) As String
         For k = 1 To EmailsLoaded
@@ -1488,5 +1295,6 @@ Friend Class QfcGroupOperationsLegacy
         xComma = GetStrippedText(strTmp)
         'xComma = StripAccents(strTmp)
     End Function
+#End Region
 
 End Class
