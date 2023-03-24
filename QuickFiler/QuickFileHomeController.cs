@@ -1,0 +1,57 @@
+﻿using ToDoModel;
+using UtilitiesVB;
+
+namespace QuickFiler
+{
+
+    public class QuickFileHomeController
+    {
+        private QuickFileViewer _viewer;
+        private QuickFileController _controller;
+        private IApplicationGlobals _globals;
+        public delegate void ParentCleanupFunction();
+        private ParentCleanupFunction _parentCleanup;
+
+        public QuickFileHomeController(IApplicationGlobals AppGlobals, ParentCleanupFunction ParentCleanup)
+        {
+            _globals = AppGlobals;
+            _parentCleanup = ParentCleanup;
+            _viewer = new QuickFileViewer();
+            // ReloadFolderSuggestionStagingFiles()
+            var colEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer());
+            _controller = new QuickFileController(_globals, _viewer, colEmailsInFolder, Cleanup);
+        }
+
+        public void Run()
+        {
+            // _viewer.Show()
+        }
+
+        public bool Loaded
+        {
+            get
+            {
+                if (_viewer is not null)
+                {
+                    // If _viewer.IsDisposed = False Then
+                    return true;
+                }
+                // Else
+                // Return False
+                // End If
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        internal void Cleanup()
+        {
+            _viewer = null;
+            _controller = null;
+            _globals = null;
+            _parentCleanup.Invoke();
+        }
+    }
+}

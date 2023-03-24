@@ -1,0 +1,255 @@
+﻿using System;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.CompilerServices;
+
+namespace QuickFiler
+{
+
+    internal class AcceleratorParser
+    {
+        private QfcGroupOperationsLegacy _parent;
+
+        internal AcceleratorParser(QfcGroupOperationsLegacy Parent)
+        {
+            _parent = Parent;
+        }
+
+        internal void ParseAndExecute(string strToParse, int _intActiveSelection)
+        {
+
+            int intNewSelection;
+            bool blExpanded = false;
+
+            if (AnythingToParse(strToParse))
+            {
+                int idxLastNum = GetFinalNumericIndex(strToParse);
+                if (SelectionDetected(idxLastNum))
+                {
+                    intNewSelection = GetFinalNumeric(strToParse, idxLastNum);
+                    if (_parent.IsSelectionBelowMax(intNewSelection))
+                    {
+                        if (IsChange(intNewSelection, _intActiveSelection))
+                        {
+                            if (IsAnythingActive(_intActiveSelection))
+                                blExpanded = _parent.ToggleOffActiveItem(blExpanded);
+                            if (intNewSelection > 0)
+                            {
+                                _parent.ActivateByIndex(intNewSelection, blExpanded);
+                            }
+                        }
+
+                        if (AdditionalInstructions(idxLastNum, strToParse))
+                        {
+                            string strCommand = ExtractInstruction(idxLastNum, strToParse);
+                            _parent.ResetAcceleratorSilently();
+                            var QF = _parent.TryGetQfc(_intActiveSelection);
+
+                            switch (strCommand ?? "")
+                            {
+                                case "O":
+                                    {
+                                        _parent.toggleAcceleratorDialogue();
+                                        QF.KB(strCommand);
+                                        _parent.Parent.OpenQFMail(QF.Mail);
+                                        break;
+                                    }
+                                case "C":
+                                    {
+                                        _parent.toggleAcceleratorDialogue();
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "T":
+                                    {
+                                        _parent.toggleAcceleratorDialogue();
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "F":
+                                    {
+                                        _parent.toggleAcceleratorDialogue();
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "D":
+                                    {
+                                        _parent.toggleAcceleratorDialogue();
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "X":
+                                    {
+                                        _parent.toggleAcceleratorDialogue();
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "R":
+                                    {
+                                        _parent.toggleAcceleratorDialogue();
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "A":
+                                    {
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "W":
+                                    {
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "M":
+                                    {
+                                        QF.KB(strCommand);
+                                        break;
+                                    }
+                                case "E":
+                                    {
+                                        if (QF.blExpanded)
+                                        {
+                                            _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.frm.Height * -0.5d));
+                                            QF.ExpandCtrls1();
+                                        }
+                                        else
+                                        {
+                                            _parent.MoveDownPix(_intActiveSelection + 1, QF.frm.Height);
+                                            QF.ExpandCtrls1();
+                                        }
+
+                                        break;
+                                    }
+
+                                default:
+                                    {
+                                        break;
+                                    }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _parent.ResetAcceleratorSilently();
+                    }
+                }
+
+                else
+                {
+                    blExpanded = _parent.ToggleOffActiveItem(blExpanded);
+                }
+            }
+            else
+            {
+                blExpanded = _parent.ToggleOffActiveItem(blExpanded);
+            }
+
+
+        }
+
+        private string ExtractInstruction(int idxLastNum, string strToParse)
+        {
+            return Strings.UCase(Strings.Mid(strToParse, idxLastNum + 1, 1));
+        }
+
+        private bool AdditionalInstructions(int idxLastNum, string strToParse)
+        {
+            if (strToParse.Length > idxLastNum)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool IsAnythingActive(int ActiveSelection)
+        {
+            if (ActiveSelection != 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool AnythingToParse(string strToParse)
+        {
+            if (!string.IsNullOrEmpty(strToParse))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool SelectionDetected(int idxLastNum)
+        {
+            if (idxLastNum > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool IsChange(int intNewSelection, int ActiveSelection)
+        {
+            if (intNewSelection != ActiveSelection)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private int GetFinalNumeric(string strToParse, int idxLastNum)
+        {
+            if (idxLastNum > 0)
+            {
+                // Get last digit 
+                // TODO: Add support for multiple digit numbers 
+                return Conversions.ToInteger(Strings.Mid(strToParse, 1, idxLastNum));
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
+    /// Gets the index of the last number in a string. Returns 0 if none is found
+    /// </summary>
+    /// <param name="strToParse"></param>
+    /// <returns></returns>
+        private int GetFinalNumericIndex(string strToParse)
+        {
+            int i;
+            int intLastNum = 0;
+            int intLen = Strings.Len(strToParse);
+
+            var loopTo = intLen;
+            for (i = 1; i <= loopTo; i++)
+            {
+                if (Information.IsNumeric(Strings.Mid(strToParse, i, 1)))
+                {
+                    intLastNum = i;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return intLastNum;
+        }
+
+    }
+}
