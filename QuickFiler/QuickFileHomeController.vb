@@ -12,7 +12,7 @@ Public Class QuickFileHomeController
         _globals = AppGlobals
         _parentCleanup = ParentCleanup
         _viewer = New QuickFileViewer()
-        ReloadFolderSuggestionStagingFiles()
+        'ReloadFolderSuggestionStagingFiles()
         Dim colEmailsInFolder As Collection = LoadEmailDataBase(_globals.Ol.App.ActiveExplorer())
         _controller = New QuickFileController(_globals, _viewer, colEmailsInFolder, AddressOf Cleanup)
     End Sub

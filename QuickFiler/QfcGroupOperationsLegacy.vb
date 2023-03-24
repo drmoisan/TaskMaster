@@ -5,7 +5,6 @@ Imports UtilitiesVB
 Imports ToDoModel
 Imports System.Data.SqlClient
 
-
 ''' <summary>
 ''' Class manages UI interactions with the collection of Qfc controllers and viewers
 ''' </summary>
@@ -42,11 +41,19 @@ Friend Class QfcGroupOperationsLegacy
         _parent = ParentObject
     End Sub
 
-    Public ReadOnly Property Parent As QuickFileController
+    Friend ReadOnly Property Parent As QuickFileController
         Get
             Return _parent
         End Get
     End Property
+
+    Friend ReadOnly Property EmailsLoaded
+        Get
+            Return _colQFClass.Count
+        End Get
+    End Property
+
+#Region "Viewer Operations"
 
     Friend Sub LoadControlsAndHandlers(colEmails As Collection)
         Dim objItem As Object
@@ -786,12 +793,6 @@ Friend Class QfcGroupOperationsLegacy
 
     End Sub
 
-    Friend ReadOnly Property EmailsLoaded
-        Get
-            Return _colQFClass.Count
-        End Get
-    End Property
-
     Friend Sub RemoveControls()
 
         Dim QF As QfcController
@@ -818,7 +819,7 @@ Friend Class QfcGroupOperationsLegacy
 
     End Sub
 
-    Public Sub MoveDownControlGroups(intPosition As Integer, intMoves As Integer)
+    Friend Sub MoveDownControlGroups(intPosition As Integer, intMoves As Integer)
 
         Dim i As Integer
         Dim QF As QfcController
@@ -828,7 +829,7 @@ Friend Class QfcGroupOperationsLegacy
 
             'Shift items downward if there are any
             QF = _colQFClass(i)
-            QF.intMyPosition += intMoves
+            QF.Position += intMoves
             ctlFrame = QF.frm
             ctlFrame.Top = ctlFrame.Top + (intMoves * (frmHt + frmSp))
         Next i
@@ -850,7 +851,6 @@ Friend Class QfcGroupOperationsLegacy
 
     Public Sub MoveDownPix(intPosition As Integer, intPix As Integer)
 
-
         Dim i As Integer
         Dim QF As QfcController
         Dim ctlFrame As Panel
@@ -862,30 +862,21 @@ Friend Class QfcGroupOperationsLegacy
             ctlFrame = QF.frm
             ctlFrame.Top += intPix
         Next i
-        '_viewer.L1v1L2_PanelMain.ScrollHeight = max(max(intPix, 0) + (_colQFClass.Count * (frmHt + frmSp)), _viewer.L1v1L2_PanelMain.Height)
-
 
     End Sub
 
     Public Sub AddEmailControlGroup(objItem As Object, Optional posInsert As Integer = 0, Optional blGroupConversation As Boolean = True, Optional ConvCt As Integer = 0, Optional varList As Object = Nothing, Optional blChild As Boolean = False)
 
-
         Dim Mail As MailItem
         Dim QF As QfcController
         Dim colCtrls As Collection
-        Dim i As Integer
 
         _intUniqueItemCounter += 1
-
         If posInsert = 0 Then posInsert = _colQFClass.Count + 1
-
         If TypeOf objItem Is MailItem Then
             Mail = objItem
-
             colCtrls = New Collection
-
             LoadGroupOfCtrls(colCtrls, _intUniqueItemCounter, posInsert, blGroupConversation)
-
             QF = New QfcController(Mail, colCtrls, posInsert, _boolRemoteMouseApp, Me, _globals)
             If blChild Then QF.blHasChild = True
             If IsArray(varList) = True Then
@@ -903,16 +894,82 @@ Friend Class QfcGroupOperationsLegacy
                 _colQFClass.Add(QF)
             Else
                 '_colQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
-                _colQFClass.Add(QF, posInsert)
+                _colQFClass.Add(QF, Before:=posInsert)
             End If
 
-            For i = 1 To _colQFClass.Count
-                QF = _colQFClass(i)
-                'Debug.Print "_colQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.mail.Subject
-            Next i
+            'For i = 1 To _colQFClass.Count
+            '    QF = _colQFClass(i)
+            '    Debug.WriteLine("_colQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.Mail.Subject)
+            'Next i
 
         End If
 
+    End Sub
+
+    Friend Sub RemoveSpecificControlGroup(intPosition As Integer)
+
+        Dim blDebug As Boolean
+        Dim QF As QfcController
+        Dim intItemCount As Integer
+        Dim i As Integer
+        Dim ctlFrame As Panel
+        Dim strDeletedSub As String
+        Dim strDeletedDte As String
+        Dim intDeletedMyPos As Integer
+
+        blDebug = False
+
+        intItemCount = _colQFClass.Count
+
+        QF = _colQFClass(intPosition)                'Set class equal to specific member of collection
+        On Error Resume Next
+        strDeletedSub = QF.Mail.Subject
+        strDeletedDte = Format(QF.Mail.SentOn, "mm\\dd\\yyyy hh:mm")
+        intDeletedMyPos = QF.Position
+
+
+        QF.ctrlsRemove()                                  'Run the method that removes controls from the frame
+        _viewer.L1v1L2_PanelMain.Controls.Remove(QF.frm)           'Remove the specific frame
+        QF.kill()                                         'Remove the variables linking to events
+
+        If blDebug Then
+            'Print data before movement
+            Debug.Print("DEBUG DATA BEFORE MOVEMENT")
+
+            For i = 1 To intItemCount
+                If i = intPosition Then
+                    Debug.Print(i & "  " & intDeletedMyPos & "  " & strDeletedDte & "  " & strDeletedSub)
+                Else
+                    QF = _colQFClass(i)
+                    Debug.Print(i & "  " & QF.Position & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject)
+                End If
+            Next i
+        End If
+
+        'Shift items upward if there are any
+        If intPosition < intItemCount Then
+            For i = intPosition + 1 To intItemCount
+                QF = _colQFClass(i)
+                QF.Position -= 1
+                ctlFrame = QF.frm
+                ctlFrame.Top = ctlFrame.Top - frmHt - frmSp
+            Next i
+            '_viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
+        End If
+
+        _colQFClass.Remove(intPosition)
+
+        If blDebug Then
+            'Print data after movement
+            Debug.Print("DEBUG DATA POST MOVEMENT")
+
+            For i = 1 To _colQFClass.Count
+                QF = _colQFClass(i)
+                Debug.Print(i & "  " & QF.Position & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject)
+            Next i
+        End If
+
+        QF = Nothing
     End Sub
 
     Public Sub ConvToggle_Group(selItems As Collection, intOrigPosition As Integer)
@@ -984,6 +1041,66 @@ Friend Class QfcGroupOperationsLegacy
 
     End Sub
 
+    Friend Sub ResizeChildren(intDiffx As Integer)
+        If _colQFClass IsNot Nothing Then
+            For Each QF As QfcController In _colQFClass
+                If QF.blHasChild Then
+                    QF.frm.Left = frmLt * 2
+                    QF.frm.Width = Width_frm + intDiffx - frmLt
+                    QF.ResizeCtrls(intDiffx - frmLt)
+                Else
+                    QF.frm.Width = Width_frm + intDiffx
+                    QF.ResizeCtrls(intDiffx)
+                End If
+            Next
+        End If
+    End Sub
+
+#End Region
+
+#Region "Keyboard UI"
+    Public Sub toggleAcceleratorDialogue()
+        Dim QF As QfcController
+        Dim i As Integer
+
+        If _colQFClass IsNot Nothing Then
+            For i = 1 To _colQFClass.Count
+                QF = _colQFClass(i)
+                If QF.blExpanded And i <> _colQFClass.Count Then MoveDownPix(i + 1, QF.frm.Height * -0.5)
+                QF.Accel_Toggle()
+            Next i
+        End If
+
+        If _viewer.AcceleratorDialogue.Visible = True Then
+            _viewer.AcceleratorDialogue.Visible = False
+            _viewer.L1v1L2_PanelMain.Focus()
+        Else
+            If AreConversationsGrouped(_globals.Ol.App.ActiveExplorer) Then
+
+            End If
+            _viewer.AcceleratorDialogue.Visible = True
+            If _intActiveSelection <> 0 Then
+                _viewer.AcceleratorDialogue.Text = _intActiveSelection
+                Try
+                    QF = _colQFClass(_intActiveSelection)
+                Catch ex As System.Exception
+                    _intActiveSelection = 1
+                    QF = _colQFClass(_intActiveSelection)
+                End Try
+                QF.Accel_FocusToggle()
+            End If
+
+            _viewer.AcceleratorDialogue.Focus()
+            _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
+        End If
+
+        QF = Nothing
+    End Sub
+
+#End Region
+
+#Region "Properties and Helper Functions"
+
     Private Function DoesCollectionHaveConvID(objItem As Object, col As Collection) As Integer
 
 
@@ -1029,126 +1146,13 @@ Friend Class QfcGroupOperationsLegacy
 
     End Function
 
-    Friend Sub RemoveSpecificControlGroup(intPosition As Integer)
-
-        Dim blDebug As Boolean
-        Dim QF As QfcController
-        Dim intItemCount As Integer
-        Dim i As Integer
-        Dim ctlFrame As Panel
-        Dim strDeletedSub As String
-        Dim strDeletedDte As String
-        Dim intDeletedMyPos As Integer
-
-        blDebug = False
-
-        intItemCount = _colQFClass.Count
-
-        QF = _colQFClass(intPosition)                'Set class equal to specific member of collection
-        On Error Resume Next
-        strDeletedSub = QF.Mail.Subject
-        strDeletedDte = Format(QF.Mail.SentOn, "mm\\dd\\yyyy hh:mm")
-        intDeletedMyPos = QF.intMyPosition
-
-
-        QF.ctrlsRemove()                                  'Run the method that removes controls from the frame
-        _viewer.L1v1L2_PanelMain.Controls.Remove(QF.frm)           'Remove the specific frame
-        QF.kill()                                         'Remove the variables linking to events
-
-        If blDebug Then
-            'Print data before movement
-            Debug.Print("DEBUG DATA BEFORE MOVEMENT")
-
-            For i = 1 To intItemCount
-                If i = intPosition Then
-                    Debug.Print(i & "  " & intDeletedMyPos & "  " & strDeletedDte & "  " & strDeletedSub)
-                Else
-                    QF = _colQFClass(i)
-                    Debug.Print(i & "  " & QF.intMyPosition & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject)
-                End If
-            Next i
-        End If
-
-        'Shift items upward if there are any
-        If intPosition < intItemCount Then
-            For i = intPosition + 1 To intItemCount
-                QF = _colQFClass(i)
-                QF.intMyPosition -= 1
-                ctlFrame = QF.frm
-                ctlFrame.Top = ctlFrame.Top - frmHt - frmSp
-            Next i
-            '_viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
-        End If
-
-        _colQFClass.Remove(intPosition)
-
-        If blDebug Then
-            'Print data after movement
-            Debug.Print("DEBUG DATA POST MOVEMENT")
-
-            For i = 1 To _colQFClass.Count
-                QF = _colQFClass(i)
-                Debug.Print(i & "  " & QF.intMyPosition & "  " & Format(QF.Mail.SentOn, "MM\\DD\\YY HH:MM") & "  " & QF.Mail.Subject)
-            Next i
-        End If
-
-        QF = Nothing
-    End Sub
-
-    Public Sub toggleAcceleratorDialogue()
-        Dim QF As QfcController
-        Dim i As Integer
-
-        If _colQFClass IsNot Nothing Then
-            For i = 1 To _colQFClass.Count
-                QF = _colQFClass(i)
-                If QF.blExpanded And i <> _colQFClass.Count Then MoveDownPix(i + 1, QF.frm.Height * -0.5)
-                QF.Accel_Toggle()
-            Next i
-        End If
-
-        If _viewer.AcceleratorDialogue.Visible = True Then
-            _viewer.AcceleratorDialogue.Visible = False
-            _viewer.L1v1L2_PanelMain.Focus()
-        Else
-            If AreConversationsGrouped(_globals.Ol.App.ActiveExplorer) Then
-
-            End If
-            _viewer.AcceleratorDialogue.Visible = True
-            If _intActiveSelection <> 0 Then
-                _viewer.AcceleratorDialogue.Text = _intActiveSelection
-                Try
-                    QF = _colQFClass(_intActiveSelection)
-                Catch ex As System.Exception
-                    _intActiveSelection = 1
-                    QF = _colQFClass(_intActiveSelection)
-                End Try
-                QF.Accel_FocusToggle()
-            End If
-
-            _viewer.AcceleratorDialogue.Focus()
-            _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
-        End If
-
-        QF = Nothing
-    End Sub
-
-    Friend Sub ResizeChildren(intDiffx As Integer)
-        If _colQFClass IsNot Nothing Then
-            For Each QF As QfcController In _colQFClass
-                If QF.blHasChild Then
-                    QF.frm.Left = frmLt * 2
-                    QF.frm.Width = Width_frm + intDiffx - frmLt
-                    QF.ResizeCtrls(intDiffx - frmLt)
-                Else
-                    QF.frm.Width = Width_frm + intDiffx
-                    QF.ResizeCtrls(intDiffx)
-                End If
-            Next
-        End If
-    End Sub
+#End Region
 
     Friend Sub ParseAcceleratorText()
+        Parse()
+    End Sub
+
+    Friend Sub Parse()
 
         Dim intNewSelection As Integer
         Dim blExpanded As Boolean = False
@@ -1351,16 +1355,17 @@ Friend Class QfcGroupOperationsLegacy
         If _intActiveSelection > 1 Then
             _viewer.AcceleratorDialogue.Text = _intActiveSelection - 1
         End If
-        '_viewer.AcceleratorDialogue.Focus()
+        _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
     End Sub
 
     Friend Sub SelectNextItem()
         If _intActiveSelection < _colQFClass.Count Then
             _viewer.AcceleratorDialogue.Text = _intActiveSelection + 1
         End If
+        _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength
     End Sub
 
-    Friend Sub EnumerateConversation()
+    Friend Sub MakeSpaceToEnumerateConversation()
         Dim blExpanded As Boolean = False
         If _intActiveSelection <> 0 Then
             Dim QF As QfcController = _colQFClass(_intActiveSelection)
@@ -1371,6 +1376,7 @@ Friend Class QfcGroupOperationsLegacy
                     QF.ExpandCtrls1()
                 End If
                 toggleAcceleratorDialogue()
+                'QF.KB toggles the conversation checkbox which triggers enumeration of conversation
                 QF.KB("C")
                 toggleAcceleratorDialogue()
 
@@ -1382,7 +1388,7 @@ Friend Class QfcGroupOperationsLegacy
         End If
     End Sub
 
-    Friend Sub GroupConversation()
+    Friend Sub RemoveSpaceToCollapseConversation()
         If _intActiveSelection <> 0 Then
             Dim blExpanded As Boolean = False
             Dim QF As QfcController = _colQFClass(_intActiveSelection)
@@ -1432,8 +1438,6 @@ Friend Class QfcGroupOperationsLegacy
         Else
             _intActiveSelection = 0
         End If
-
-        'ColMailJustMoved = New Collection
         For Each QF As QfcController In _colQFClass
             QF.MoveMail()
             MovedMails.Push(QF.Mail)
@@ -1467,7 +1471,7 @@ Friend Class QfcGroupOperationsLegacy
             dataLine = dataLine & "," & durationText
             dataLine = dataLine & "," & durationMinutesText
             dataLine = dataLine & "," & xComma(QF.StrlblTo)
-            dataLine = dataLine & "," & xComma(QF.LblSender.Text)
+            dataLine = dataLine & "," & xComma(QF.Sender)
             dataLine = dataLine & "," & "Email"
             dataLine = dataLine & "," & xComma(QF.cbo.SelectedItem.ToString())           'Target Folder
             dataLine = dataLine & "," & QF.lblSentOn.Text

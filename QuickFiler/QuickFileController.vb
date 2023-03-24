@@ -378,11 +378,11 @@ Public Class QuickFileController
             Select Case e.KeyCode
                 Case Keys.Right
                     If sender.Visible Then
-                        _legacy.EnumerateConversation()
+                        _legacy.MakeSpaceToEnumerateConversation()
                     End If
                 Case Keys.Left
                     If sender.Visible Then
-                        _legacy.GroupConversation()
+                        _legacy.RemoveSpaceToCollapseConversation()
                     End If
                 Case Else
             End Select

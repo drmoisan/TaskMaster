@@ -159,7 +159,7 @@ Partial Class QfcViewer
         Me.LblSentOn.TabIndex = 6
         Me.LblSentOn.Text = "<SENTON>"
         '
-        'LblSender
+        '_lblSender
         '
         Me.LblSender.AutoSize = True
         Me.LblSender.Location = New System.Drawing.Point(3, 0)

@@ -75,4 +75,8 @@ Public Class QuickFileViewer
     Private Sub AcceleratorDialogue_TextChanged(sender As Object, e As EventArgs) Handles AcceleratorDialogue.TextChanged
         _controller.AcceleratorDialogue_Change()
     End Sub
+
+    Private Sub QuickFileViewer_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        If _controller IsNot Nothing Then _controller.FormResize()
+    End Sub
 End Class
