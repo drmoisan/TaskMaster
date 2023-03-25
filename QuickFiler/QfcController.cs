@@ -6,11 +6,13 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+//using Microsoft.VisualBasic;
+//using Microsoft.VisualBasic.CompilerServices;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesVB;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace QuickFiler
 {
@@ -25,10 +27,12 @@ namespace QuickFiler
         #endregion
         #region QFC Specific Variables
         private int _intMyPosition;
-        private object _suggestions = new cSuggestions();
+        private cSuggestions _suggestions = new cSuggestions();
         private string[] _strFolders;
-        private Collection _colCtrls;
-        private Collection _selItemsInClass;
+        //TODO: Need to ensure references to _colCtrls are zero based
+        private List<Control> _colCtrls;
+        //TODO: Need to ensure references to _selItemsInClass are zero based
+        private List<MailItem> _selItemsInClass;
         private bool _blAccelFocusToggle;
         private int _intEnterCounter;
         private int _intComboRightCtr;
@@ -454,7 +458,14 @@ namespace QuickFiler
         // ConvToggle_UnGroup
         #endregion
 
-        internal QfcController(MailItem m_mail, Collection col, int intPositionArg, bool BoolRemoteMouseApp, QfcGroupOperationsLegacy Caller, IApplicationGlobals AppGlobals, IntPtr hwnd = default, Enums.InitTypeEnum InitTypeE = Enums.InitTypeEnum.InitSort)
+        internal QfcController(MailItem m_mail,
+                               List<Control> col,
+                               int intPositionArg,
+                               bool BoolRemoteMouseApp,
+                               QfcGroupOperationsLegacy Caller,
+                               IApplicationGlobals AppGlobals,
+                               IntPtr hwnd = default,
+                               Enums.InitTypeEnum InitTypeE = Enums.InitTypeEnum.InitSort)
         {
             _bdy.Click += (_, __) => bdy_Click();
             _cbDel.Click += (_, __) => cbDel_Click();
@@ -504,7 +515,8 @@ namespace QuickFiler
             _colCtrls = col;
             foreach (Control ctlTmp in col)
             {
-                switch (Information.TypeName(ctlTmp) ?? "")
+                
+                switch (ctlTmp.GetType().Name ?? "")
                 {
                     case "Panel":
                         {
@@ -553,9 +565,9 @@ namespace QuickFiler
                         {
                             if (ctlTmp.Text == "<BODY>")
                             {
-                                strBodyText = Strings.Replace(Mail.Body, Constants.vbCrLf, " ");
-                                strBodyText = Strings.Replace(strBodyText, "  ", " ");
-                                strBodyText = Strings.Replace(strBodyText, "  ", " ") + "<EOM>";
+                                strBodyText = Mail.Body.Replace(System.Environment.NewLine, " ");
+                                strBodyText = strBodyText.Replace("  ", " ");
+                                strBodyText = strBodyText.Replace("  ", " ") + "<EOM>";
                                 ctlTmp.Text = strBodyText;
                                 _bdy = (TextBox)ctlTmp;
                                 TxtBoxBody = (TextBox)ctlTmp;
@@ -858,28 +870,26 @@ namespace QuickFiler
             }
             if (varList is Array)
             {
-                if (Conversions.ToBoolean(IsAllocated(varList)))
+                Array varArray = varList as Array;
+                if (ArrayIsAllocated.IsAllocated(ref varArray))
                 {
-
                     // For i = LBound(varList) To UBound(varList)
                     cbo.Items.AddRange((object[])varList);
                     cbo.SelectedIndex = 0;
                     // Next i
                 }
             }
-
-
             else
             {
                 // TODO: cSuggestions and cFolderHandler are to mixed up with functionality. Need to clean up.
                 _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
 
-                if (Conversions.ToBoolean(Operators.ConditionalCompareObjectGreater(_suggestions.Count, 0, false)))
+                if (_suggestions.Count> 0)
                 {
-                    Array.Resize(ref _strFolders, Conversions.ToInteger(_suggestions.Count + 1));
-                    var loopTo = Conversions.ToInteger(_suggestions.Count);
+                    Array.Resize(ref _strFolders, _suggestions.Count + 1);
+                    var loopTo = _suggestions.Count;
                     for (i = 1; i <= loopTo; i++)
-                        _strFolders[i] = Conversions.ToString(_suggestions.FolderList(i));
+                        _strFolders[i] = _suggestions.FolderList[i];
                     cbo.Items.AddRange(_strFolders);
                     cbo.SelectedIndex = 1;
                 }
@@ -1070,41 +1080,22 @@ namespace QuickFiler
 
         public void Mail_Activate()
         {
-            MailModule objModule;
-            ;
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-            /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 27866
-
-
-                        Input:
-
-                                On Error Resume Next
-
-                         */
+            if (_activeExplorer.CurrentFolder.DefaultItemType != OlItemType.olMailItem)
             {
-                ref var withBlock = ref _activeExplorer;
-
-
-                if (withBlock.CurrentFolder.DefaultItemType != OlItemType.olMailItem)
-                {
-                    withBlock.NavigationPane.CurrentModule = withBlock.NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail);
-                }
-                if (Conversions.ToBoolean(Operators.ConditionalCompareObjectNotEqual(withBlock.CurrentView, "tmpNoConversation", false)))
-                {
-                    withBlock.CurrentView = "tmpNoConversation";
-                }
-                withBlock.ClearSelection();
-                if (withBlock.IsItemSelectableInView(Mail))
-                    withBlock.AddToSelection(Mail);
-                // DoEvents
+                _activeExplorer.NavigationPane.CurrentModule = _activeExplorer
+                    .NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail);
             }
-            if (Information.Err().Number != 0)
+            if (_activeExplorer.CurrentView.Name != "tmpNoConversation")
             {
-                Interaction.MsgBox("Error in QF.Mail_Activate: " + Information.Err().Description);
-                // Deactivate_Email_Timing_And_Velocity
-                Debugger.Break();
-                Information.Err().Clear();
+                _activeExplorer.CurrentView = "tmpNoConversation";
             }
+            _activeExplorer.ClearSelection();
+            try
+            {
+                if (_activeExplorer.IsItemSelectableInView(Mail))
+                    _activeExplorer.AddToSelection(Mail);
+            }
+            catch (System.Exception e) { MessageBox.Show("Error", "Error in QF.Mail_Activate: " + e.Message); }            
         }
 
         public void KB(string AccelCode)
@@ -1464,19 +1455,9 @@ namespace QuickFiler
                 {
                     selItems = new Collection() { Mail };
                 }
-
-                Attchments = Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(cbo.SelectedItem, "Trash to Delete", false)) ? false : _chbxSaveAttach.Checked;
+                Attchments = (cbo.SelectedItem as string != "Trash to Delete") ? false : _chbxSaveAttach.Checked;
 
                 blDoMove = true;
-                ;
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-                /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 43036
-
-
-                                Input:
-                                            On Error Resume Next
-
-                                 */
                 if (!object.ReferenceEquals(_fldrOriginal, Mail.Parent))
                     blDoMove = false;
                 if (Information.Err().Number != 0)

@@ -9,8 +9,8 @@ namespace QuickFiler
     public partial class QfcViewer
     {
         private bool _tipsActive = true;
-        private readonly List<Label> _tipsLabels = new List<Label>();
-        private readonly Dictionary<ColumnStyle, float> _tipsColumns = new Dictionary<ColumnStyle, float>();
+        private List<Label> _tipsLabels = new List<Label>();
+        private Dictionary<ColumnStyle, float> _tipsColumns = new Dictionary<ColumnStyle, float>();
 
         public QfcViewer()
         {

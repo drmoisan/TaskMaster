@@ -878,15 +878,7 @@ namespace QuickFiler
             intItemCount = _colQFClass.Count;
 
             QF = (QfcController)_colQFClass[intPosition];                // Set class equal to specific member of collection
-            ;
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-            /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 36545
 
-
-                        Input:
-                                On Error Resume Next
-
-                         */
             strDeletedSub = QF.Mail.Subject;
             strDeletedDte = Strings.Format(QF.Mail.SentOn, @"mm\\dd\\yyyy hh:mm");
             intDeletedMyPos = QF.Position;
@@ -1255,7 +1247,7 @@ namespace QuickFiler
             }
         }
 
-        internal object EmailsLoaded
+        internal int EmailsLoaded
         {
             get
             {
@@ -1266,8 +1258,6 @@ namespace QuickFiler
         private int DoesCollectionHaveConvID(object objItem, Collection col)
         {
             int DoesCollectionHaveConvIDRet = default;
-
-
 
             object objItemInCol;
             MailItem objMailInCol;
@@ -1345,19 +1335,19 @@ namespace QuickFiler
             get
             {
                 bool blReadyForMove = true;
-                string strNotifications = "Can't complete actions! Not all emails assigned to folder" + Constants.vbCrLf;
+                string strNotifications = "Can't complete actions! Not all emails assigned to folder" + System.Environment.NewLine;
 
-                foreach (var QF in _colQFClass)
+                foreach (QfcController QF in _colQFClass)
                 {
-                    if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(QF.cbo.SelectedValue, "", false)))
+                    if (QF.cbo.SelectedValue as string != "")
                     {
                         blReadyForMove = false;
-                        strNotifications = Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(strNotifications, QF.intMyPosition), "  "), Strings.Format(QF.Mail.SentOn, @"mm\\dd\\yyyy")), "  "), QF.Mail.Subject), Constants.vbCrLf));
+                        strNotifications = strNotifications + QF.Position + "  " + QF.Mail.SentOn.ToString("mm\\dd\\yyyy") + "  " + QF.Mail.Subject + System.Environment.NewLine;
                     }
                 }
                 strNotifications = Strings.Mid(strNotifications, 1, Strings.Len(strNotifications) - 1);
                 if (!blReadyForMove)
-                    Interaction.MsgBox(strNotifications, (MsgBoxStyle)((int)Constants.vbOKOnly + (int)Constants.vbCritical), "Error Notification");
+                    MessageBox.Show("Error Notification", strNotifications, MessageBoxButtons.OK);
                 return blReadyForMove;
             }
         }
@@ -1383,21 +1373,11 @@ namespace QuickFiler
         internal string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment)
         {
             int k;
-            var strOutput = new string[Conversions.ToInteger(EmailsLoaded + 1)];
+            string[] strOutput = new string[EmailsLoaded + 1];
             var loopTo = Conversions.ToInteger(EmailsLoaded);
             for (k = 1; k <= loopTo; k++)
             {
                 QfcController QF = (QfcController)_colQFClass[k];
-                ;
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-                /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 52916
-
-
-                                Input:
-
-                                            On Error Resume Next
-
-                                 */
                 var infoMail = new cInfoMail();
                 if (infoMail.Init_wMail(QF.Mail, OlEndTime: OlEndTime, lngDurationSec: (long)Math.Round(Duration)))
                 {
@@ -1408,7 +1388,7 @@ namespace QuickFiler
                     }
                     else
                     {
-                        OlAppointment.Body = OlAppointment.Body + Constants.vbCrLf + infoMail.ToString;
+                        OlAppointment.Body = OlAppointment.Body + System.Environment.NewLine + infoMail.ToString;
                         OlAppointment.Save();
                     }
                 }

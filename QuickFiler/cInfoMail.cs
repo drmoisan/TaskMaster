@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+//using Microsoft.VisualBasic;
+//using Microsoft.VisualBasic.CompilerServices;
+using UtilitiesVB;
 
 namespace QuickFiler
 {
@@ -27,18 +28,12 @@ namespace QuickFiler
         private Dictionary<string, long> _dict;
 
 
-        private void SortDictionary()
+        /// <summary>
+        /// This is actually a reverse sort. 
+        /// </summary>
+        private void ReverseSortDictionary()
         {
-            long i;
-            object objSortedList;
-
-            objSortedList = Interaction.CreateObject("System.Collections.SortedList");
-            // With CreateObject("System.Collections.SortedList")
-            foreach (var key in _dict)
-                objSortedList.Add(key, _dict[Conversions.ToString(key)]);
-            _dict.Clear();
-            for (i = Conversions.ToLong(Operators.SubtractObject(objSortedList.Keys.Count, 1)); i >= 0L; i += -1)
-                _dict.Add(Conversions.ToString(objSortedList.GetKey(i)), Conversions.ToLong(objSortedList.item(objSortedList.GetKey(i))));
+            _dict = (from entry in _dict orderby entry.Value descending select entry).ToDictionary();
         }
 
         public void dict_new()
@@ -72,7 +67,7 @@ namespace QuickFiler
                 }
                 else
                 {
-                    SortDictionary();
+                    ReverseSortDictionary();
                     // Sort_Collections.sort _col, New Sort_CReverseComparator
                     dict_strSumRet = "Grouped Apps: ";
                     foreach (var key in _dict.Keys)
@@ -102,21 +97,21 @@ namespace QuickFiler
                 _dict.Add(strKey, lngVal);
             }
         }
-        internal object Init(string lcl_Subject = "", DateTime lcl_EndDate = default, DateTime lcl_StartDate = default, long lcl_DurationSec = 0L, string lcl_SentTo = "", string lcl_SentCC = "", string lcl_SentFrom = "", string lcl_Body = "", OlImportance lcl_Importance = OlImportance.olImportanceNormal, Categories lcl_Categories = null, string lcl_strAction = "")
+        internal object Init(
+            string lcl_Subject = "",
+            DateTime lcl_EndDate = default,
+            DateTime lcl_StartDate = default,
+            long lcl_DurationSec = 0L,
+            string lcl_SentTo = "",
+            string lcl_SentCC = "",
+            string lcl_SentFrom = "",
+            string lcl_Body = "",
+            OlImportance lcl_Importance = OlImportance.olImportanceNormal,
+            Categories lcl_Categories = null,
+            string lcl_strAction = "")
         {
             object InitRet = default;
-            ;
 
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-            /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 3691
-
-
-                        Input:
-
-
-                                On Error Resume Next
-
-                         */
             Subject = lcl_Subject;
             EndDate = lcl_EndDate;
             StartDate = lcl_StartDate;
@@ -144,18 +139,6 @@ namespace QuickFiler
         internal bool Init_wMail(MailItem OlMail, DateTime OlEndTime = default, long lngDurationSec = 0L, string stringAction = "")
         {
             bool Init_wMailRet = default;
-            ;
-
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-            /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 4570
-
-
-                        Input:
-
-
-                                On Error Resume Next
-
-                         */
             Subject = OlMail.Subject;
             if (OlEndTime != default)
                 EndDate = OlEndTime;

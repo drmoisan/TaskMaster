@@ -5,15 +5,15 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+//using Microsoft.VisualBasic;
+//using Microsoft.VisualBasic.CompilerServices;
 using ToDoModel;
 using UtilitiesVB;
 using Windows.Win32;
 
 
 
-[assembly: log4net.Config.XmlConfigurator(Watch = true)]
+//[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
 namespace QuickFiler
 {
@@ -23,7 +23,7 @@ namespace QuickFiler
     {
 
         private bool _useOld = true;
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        //private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region State Variables
         // Private state variables
@@ -274,20 +274,18 @@ namespace QuickFiler
         private void EliminateDuplicateConversationIDs(ref Collection colTemp)
         {
             var dictID = new Dictionary<string, int>();
-            long i;
-            long max;
+            int i;
+            int max;
 
-            object objItem;
-            foreach (var currentObjItem in colTemp)
+            foreach (MailItem olMail in colTemp)
             {
-                objItem = currentObjItem;
-                if (dictID.ContainsKey(Conversions.ToString(objItem.ConversationID)))
+                if (dictID.ContainsKey(Conversions.ToString(olMail.ConversationID)))
                 {
-                    dictID[Conversions.ToString(objItem.ConversationID)] = dictID[Conversions.ToString(objItem.ConversationID)] + 1;
+                    dictID[Conversions.ToString(olMail.ConversationID)] = dictID[Conversions.ToString(olMail.ConversationID)] + 1;
                 }
                 else
                 {
-                    dictID.Add(Conversions.ToString(objItem.ConversationID), 0);
+                    dictID.Add(Conversions.ToString(olMail.ConversationID), 0);
                 }
             }
 
@@ -295,11 +293,11 @@ namespace QuickFiler
 
             for (i = max; i >= 1L; i += -1)
             {
-                objItem = colTemp[i];
-                // Debug.Print dictID(objItem.ConversationID)
+                MailItem objItem = (MailItem)colTemp[i];
+                // Debug.Print dictID(olMail.ConversationID)
                 if (dictID[Conversions.ToString(objItem.ConversationID)] > 0)
                 {
-                    var unused = colTemp.Remove(objItem);
+                    colTemp.Remove(i);
                     dictID[Conversions.ToString(objItem.ConversationID)] = dictID[Conversions.ToString(objItem.ConversationID)] - 1;
                 }
             }
@@ -405,14 +403,13 @@ namespace QuickFiler
 
         internal void AcceleratorDialogue_KeyUp(object sender, KeyEventArgs e)
         {
-
+            TextBox accelerator = sender as TextBox;
             if (e.Alt)
             {
-                if (Conversions.ToBoolean(sender.Visible))
+                if (accelerator.Visible)
                 {
-                    sender.Focus();
-                    TextBox txtbox = (TextBox)sender;
-                    txtbox.SelectionStart = txtbox.TextLength;
+                    accelerator.Focus();
+                    accelerator.SelectionStart = accelerator.TextLength;
                 }
                 else
                 {
@@ -426,7 +423,7 @@ namespace QuickFiler
                 {
                     case Keys.Right:
                         {
-                            if (Conversions.ToBoolean(sender.Visible))
+                            if (accelerator.Visible)
                             {
                                 _legacy.MakeSpaceToEnumerateConversation();
                             }
@@ -435,7 +432,7 @@ namespace QuickFiler
                         }
                     case Keys.Left:
                         {
-                            if (Conversions.ToBoolean(sender.Visible))
+                            if (accelerator.Visible)
                             {
                                 _legacy.RemoveSpaceToCollapseConversation();
                             }
@@ -684,17 +681,17 @@ namespace QuickFiler
             Folder oFolder_Current;
             Folder oFolder_Old;
             Collection colItems;
-            MsgBoxResult vbUndoResponse;
-            MsgBoxResult vbRepeatResponse;
+            DialogResult undoResponse;
+            DialogResult repeatResponse;
 
             if (_movedMails is null)
                 _movedMails = new cStackObject();
-            vbRepeatResponse = Constants.vbYes;
+            repeatResponse = Constants.vbYes;
 
             i = _movedMails.Count();
             colItems = _movedMails.ToCollection();
 
-            while (i > 1 & vbRepeatResponse == Constants.vbYes)
+            while (i > 1 & repeatResponse == Constants.vbYes)
             {
                 objTemp = colItems[i];
                 // objTemp = _movedMails.Pop
@@ -710,8 +707,11 @@ namespace QuickFiler
                 {
                     oFolder_Current = (Folder)oMail_Current.Parent;
                     oFolder_Old = (Folder)oMail_Old.Parent;
-                    vbUndoResponse = Interaction.MsgBox("Undo Move of email?" + Constants.vbCrLf + "Sent On: " + Strings.Format(oMail_Current.SentOn, "mm/dd/yyyy") + Constants.vbCrLf + oMail_Current.Subject, Constants.vbYesNo);
-                    if (vbUndoResponse == Constants.vbYes & !ReferenceEquals(oFolder_Current, oFolder_Old))
+                    undoResponse = MessageBox.Show("Undo Dialog", "Undo Move of email?" + Environment.NewLine + 
+                        "Sent On: " + oMail_Current.SentOn.ToString("mm\\dd\\yyyy") + System.Environment.NewLine + 
+                        oMail_Current.Subject, MessageBoxButtons.YesNo);
+
+                    if (undoResponse == DialogResult.Yes & (oFolder_Current.FolderPath != oFolder_Old.FolderPath))
                     {
                         var unused = oMail_Current.Move(oFolder_Old);
                         _movedMails.Pop(i);
@@ -719,7 +719,7 @@ namespace QuickFiler
                     }
                 }
                 i -= 2;
-                vbRepeatResponse = Interaction.MsgBox("Continue Undoing Moves?", Constants.vbYesNo);
+                repeatResponse = MessageBox.Show("Undo Dialog", "Continue Undoing Moves?", MessageBoxButtons.YesNo);
             }
         }
 
@@ -793,16 +793,7 @@ namespace QuickFiler
 
         public void ExplConvView_Cleanup()
         {
-            ;
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-            /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 28003
 
-
-                        Input:
-
-                                On Error Resume Next
-
-                         */
             ObjView = _activeExplorer.CurrentFolder.Views[_objViewMem];
             if (Information.Err().Number == 0)
             {
@@ -828,7 +819,7 @@ namespace QuickFiler
                 BlShowInConversations = true;
                 ObjView = (Microsoft.Office.Interop.Outlook.View)_activeExplorer.CurrentView;
 
-                if (ObjView == "tmpNoConversation")
+                if (ObjView.Name == "tmpNoConversation")
                 {
                     if (_activeExplorer.CommandBars.GetPressedMso("ShowInConversations"))
                     {
@@ -840,7 +831,7 @@ namespace QuickFiler
 
                 }
 
-                _objViewMem = ObjView;
+                _objViewMem = ObjView.Name;
                 if (_objViewMem == "tmpNoConversation")
                     _objViewMem = _globals.Ol.View_Wide;
 
@@ -854,29 +845,16 @@ namespace QuickFiler
 
                 }
                 ObjViewTemp.Apply();
-                if (_blSuppressEvents)
-                {
-                    var unused1 = _olApp.DoEvents();
-                }
-                else
-                {
-                    _blSuppressEvents = true;
-                    var unused = _olApp.DoEvents();
-                    _blSuppressEvents = false;
-                }
             }
 
         }
 
         public void ExplConvView_ToggleOn()
         {
-
             if (BlShowInConversations)
             {
                 ObjView = _activeExplorer.CurrentFolder.Views[_objViewMem];
-                // ObjView.Reset
                 ObjView.Apply();
-                // ObjViewTemp.Delete
                 BlShowInConversations = false;
             }
 

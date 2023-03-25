@@ -4,7 +4,6 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace QuickFiler
 {
-
     internal class AcceleratorParser
     {
         private QfcGroupOperationsLegacy _parent;
