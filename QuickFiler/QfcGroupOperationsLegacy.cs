@@ -3,10 +3,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+//using Microsoft.VisualBasic;
+//using Microsoft.VisualBasic.CompilerServices;
 using ToDoModel;
 using UtilitiesVB;
+using System.Collections.Generic;
 
 namespace QuickFiler
 {
@@ -19,8 +20,7 @@ namespace QuickFiler
         private readonly QuickFileViewer _viewer;
         private readonly Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
-        private Collection _colQFClass;
-        private Collection _colFrames;
+        private List<QfcController> _listQFClass;
         private int _intUniqueItemCounter;
         private int _intActiveSelection;
         private bool _boolRemoteMouseApp = false;
@@ -39,17 +39,16 @@ namespace QuickFiler
 
         #region Viewer Operations
 
-        internal void LoadControlsAndHandlers(Collection colEmails)
+        internal void LoadControlsAndHandlers(List<MailItem> colEmails)
         {
             MailItem Mail;
             QfcController QF;
-            Collection colCtrls;
+            List<Control> colCtrls;
             bool blDebug;
 
             blDebug = false;
 
-            _colQFClass = new Collection();
-            _colFrames = new Collection();
+            _listQFClass = new();
 
             _intUniqueItemCounter = 0;
 
@@ -59,11 +58,11 @@ namespace QuickFiler
                 {
                     _intUniqueItemCounter += 1;
                     Mail = (MailItem)objItem;
-                    colCtrls = new Collection();
+                    colCtrls = new();
                     LoadGroupOfCtrls(ref colCtrls, _intUniqueItemCounter);
 
                     QF = new QfcController(Mail, colCtrls, _intUniqueItemCounter, _boolRemoteMouseApp, Caller: this, AppGlobals: _globals, hwnd: _lFormHandle, InitTypeE: _initType);
-                    _colQFClass.Add(QF);
+                    _listQFClass.Add(QF);
                 }
             }
 
@@ -73,7 +72,7 @@ namespace QuickFiler
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
                 // ToggleOffline
-                foreach (QfcController currentQF in _colQFClass)
+                foreach (QfcController currentQF in _listQFClass)
                 {
                     QF = currentQF;
                     QF.Init_FolderSuggestions();
@@ -89,7 +88,7 @@ namespace QuickFiler
             _viewer.L1v1L2_PanelMain.Focus();
         }
 
-        internal void LoadGroupOfCtrls(ref Collection colCtrls, int intItemNumber, int intPosition = 0, bool blGroupConversation = true, bool blWideView = false)
+        internal void LoadGroupOfCtrls(ref List<Control> colCtrls, int intItemNumber, int intPosition = 0, bool blGroupConversation = true, bool blWideView = false)
         {
 
             long lngTopOff;
@@ -734,77 +733,66 @@ namespace QuickFiler
             QfcController QF;
             int i;
 
-            // max = _colQFClass.Count
+            // max = _listQFClass.Count
             // For i = max To 1 Step -1
-            if (_colQFClass is not null)
+            if (_listQFClass is not null)
             {
-                while (_colQFClass.Count > 0)
+                while (_listQFClass.Count > 0)
                 {
-                    i = _colQFClass.Count;
-                    QF = (QfcController)_colQFClass[i];
+                    i = _listQFClass.Count - 1;
+                    QF = (QfcController)_listQFClass[i];
                     QF.ctrlsRemove();                                  // Remove controls on the frame
                     _viewer.L1v1L2_PanelMain.Controls.Remove(QF.frm);           // Remove the frame
                     QF.kill();                                         // Remove the variables linking to events
 
                     // PanelMain.Controls.Remove _colFrames(i).Name
-                    _colQFClass.Remove(i);
+                    _listQFClass.RemoveAt(i);
                 }
             }
-
             // _viewer.L1v1L2_PanelMain.ScrollHeight = _heightPanelMainMax
-
-
-
         }
 
         internal void MoveDownControlGroups(int intPosition, int intMoves)
         {
-
             int i;
             QfcController QF;
             Panel ctlFrame;
 
             var loopTo = intPosition;
-            for (i = _colQFClass.Count; i >= loopTo; i -= 1)
+            for (i = _listQFClass.Count; i >= loopTo; i -= 1)
             {
-
                 // Shift items downward if there are any
-                QF = (QfcController)_colQFClass[i];
+                QF = (QfcController)_listQFClass[i];
                 QF.Position += intMoves;
                 ctlFrame = QF.frm;
                 ctlFrame.Top = ctlFrame.Top + intMoves * (QuickFileControllerConstants.frmHt + QuickFileControllerConstants.frmSp);
             }
-            // PanelMain.ScrollHeight = max((intMoves + _colQFClass.Count) * (frmHt + frmSp), _heightPanelMainMax)
-
-
+            // PanelMain.ScrollHeight = max((intMoves + _listQFClass.Count) * (frmHt + frmSp), _heightPanelMainMax)
         }
 
         public void ToggleRemoteMouseLabels()
         {
             _boolRemoteMouseApp = !_boolRemoteMouseApp;
 
-            foreach (QfcController QF in _colQFClass)
+            foreach (QfcController QF in _listQFClass)
                 QF.ToggleRemoteMouseAppLabels();
-
         }
 
         public void MoveDownPix(int intPosition, int intPix)
         {
-
             int i;
             QfcController QF;
             Panel ctlFrame;
 
             var loopTo = intPosition;
-            for (i = _colQFClass.Count; i >= loopTo; i -= 1)
+            for (i = _listQFClass.Count; i >= loopTo; i -= 1)
             {
 
                 // Shift items downward if there are any
-                QF = (QfcController)_colQFClass[i];
+                QF = (QfcController)_listQFClass[i];
                 ctlFrame = QF.frm;
                 ctlFrame.Top += intPix;
             }
-
         }
 
         public void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false)
@@ -812,22 +800,22 @@ namespace QuickFiler
 
             MailItem Mail;
             QfcController QF;
-            Collection colCtrls;
+            List<Control> listCtrls;
 
             _intUniqueItemCounter += 1;
             if (posInsert == 0)
-                posInsert = _colQFClass.Count + 1;
+                posInsert = _listQFClass.Count + 1;
             if (objItem is MailItem)
             {
                 Mail = (MailItem)objItem;
-                colCtrls = new Collection();
-                LoadGroupOfCtrls(ref colCtrls, _intUniqueItemCounter, posInsert, blGroupConversation);
-                QF = new QfcController(Mail, colCtrls, posInsert, _boolRemoteMouseApp, this, _globals);
+                listCtrls = new();
+                LoadGroupOfCtrls(ref listCtrls, _intUniqueItemCounter, posInsert, blGroupConversation);
+                QF = new QfcController(Mail, listCtrls, posInsert, _boolRemoteMouseApp, this, _globals);
                 if (blChild)
                     QF.blHasChild = true;
                 if (varList is Array == true)
                 {
-                    if (Information.UBound((Array)varList) == 0)
+                    if (UBound((Array)varList) == 0)
                     {
                         QF.Init_FolderSuggestions();
                     }
@@ -842,19 +830,19 @@ namespace QuickFiler
                 }
                 QF.CountMailsInConv(ConvCt);
 
-                if (posInsert > _colQFClass.Count)
+                if (posInsert > _listQFClass.Count)
                 {
-                    _colQFClass.Add(QF);
+                    _listQFClass.Add(QF);
                 }
                 else
                 {
-                    // _colQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
-                    _colQFClass.Add(QF, Before: posInsert);
+                    // _listQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
+                    _listQFClass.Add(QF, Before: posInsert);
                 }
 
-                // For i = 1 To _colQFClass.Count
-                // QF = _colQFClass(i)
-                // Debug.WriteLine("_colQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.Mail.Subject)
+                // For i = 1 To _listQFClass.Count
+                // QF = _listQFClass(i)
+                // Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.Mail.Subject)
                 // Next i
 
             }
@@ -875,9 +863,9 @@ namespace QuickFiler
 
             blDebug = false;
 
-            intItemCount = _colQFClass.Count;
+            intItemCount = _listQFClass.Count;
 
-            QF = (QfcController)_colQFClass[intPosition];                // Set class equal to specific member of collection
+            QF = (QfcController)_listQFClass[intPosition];                // Set class equal to specific member of collection
 
             strDeletedSub = QF.Mail.Subject;
             strDeletedDte = Strings.Format(QF.Mail.SentOn, @"mm\\dd\\yyyy hh:mm");
@@ -902,7 +890,7 @@ namespace QuickFiler
                     }
                     else
                     {
-                        QF = (QfcController)_colQFClass[i];
+                        QF = (QfcController)_listQFClass[i];
                         Debug.Print(i + "  " + QF.Position + "  " + Strings.Format(QF.Mail.SentOn, @"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
                     }
                 }
@@ -914,7 +902,7 @@ namespace QuickFiler
                 var loopTo1 = intItemCount;
                 for (i = intPosition + 1; i <= loopTo1; i++)
                 {
-                    QF = (QfcController)_colQFClass[i];
+                    QF = (QfcController)_listQFClass[i];
                     QF.Position -= 1;
                     ctlFrame = QF.frm;
                     ctlFrame.Top = ctlFrame.Top - QuickFileControllerConstants.frmHt - QuickFileControllerConstants.frmSp;
@@ -922,17 +910,17 @@ namespace QuickFiler
                 // _viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
             }
 
-            _colQFClass.Remove(intPosition);
+            _listQFClass.Remove(intPosition);
 
             if (blDebug)
             {
                 // Print data after movement
                 Debug.Print("DEBUG DATA POST MOVEMENT");
 
-                var loopTo2 = _colQFClass.Count;
+                var loopTo2 = _listQFClass.Count;
                 for (i = 1; i <= loopTo2; i++)
                 {
-                    QF = (QfcController)_colQFClass[i];
+                    QF = (QfcController)_listQFClass[i];
                     Debug.Print(i + "  " + QF.Position + "  " + Strings.Format(QF.Mail.SentOn, @"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
                 }
             }
@@ -940,7 +928,7 @@ namespace QuickFiler
             QF = null;
         }
 
-        public void ConvToggle_Group(Collection selItems, int intOrigPosition)
+        public void ConvToggle_Group(List<MailItem> selItems, int intOrigPosition)
         {
 
             MailItem objEmail;
@@ -952,14 +940,14 @@ namespace QuickFiler
 
             blDebug = true;
 
-            QF_Orig = (QfcController)_colQFClass[intOrigPosition];
+            QF_Orig = (QfcController)_listQFClass[intOrigPosition];
 
             if (blDebug)
             {
-                var loopTo = _colQFClass.Count;
+                var loopTo = _listQFClass.Count;
                 for (i = 1; i <= loopTo; i++)
-                    // Debug.Print "_colQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.mail.Subject
-                    QF = (QfcController)_colQFClass[i];
+                    // Debug.Print "_listQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.mail.Subject
+                    QF = (QfcController)_listQFClass[i];
             }
 
             foreach (var objItem in selItems)
@@ -971,7 +959,7 @@ namespace QuickFiler
             }
         }
 
-        public void ConvToggle_UnGroup(Collection selItems, int intPosition, int ConvCt, object varList)
+        public void ConvToggle_UnGroup(List<MailItem> selItems, int intPosition, int ConvCt, object varList)
         {
 
             int i;
@@ -984,10 +972,10 @@ namespace QuickFiler
             {
                 // Print data after movement
                 // Debug.Print "DEBUG DATA BEFORE UNGROUP"
-                var loopTo = _colQFClass.Count;
+                var loopTo = _listQFClass.Count;
                 for (i = 1; i <= loopTo; i++)
                     // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF.mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF.mail.Subject
-                    QF = (QfcController)_colQFClass[i];
+                    QF = (QfcController)_listQFClass[i];
             }
 
             MoveDownControlGroups(intPosition + 1, selItems.Count);
@@ -1000,10 +988,10 @@ namespace QuickFiler
             {
                 // Print data after movement
                 // Debug.Print "DEBUG DATA AFTER UNGROUP"
-                var loopTo2 = _colQFClass.Count;
+                var loopTo2 = _listQFClass.Count;
                 for (i = 1; i <= loopTo2; i++)
                     // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF.mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF.mail.Subject
-                    QF = (QfcController)_colQFClass[i];
+                    QF = (QfcController)_listQFClass[i];
             }
             _parent.FormResize(false);
 
@@ -1012,9 +1000,9 @@ namespace QuickFiler
 
         internal void ResizeChildren(int intDiffx)
         {
-            if (_colQFClass is not null)
+            if (_listQFClass is not null)
             {
-                foreach (QfcController QF in _colQFClass)
+                foreach (QfcController QF in _listQFClass)
                 {
                     if (QF.blHasChild)
                     {
@@ -1039,13 +1027,13 @@ namespace QuickFiler
             QfcController QF;
             int i;
 
-            if (_colQFClass is not null)
+            if (_listQFClass is not null)
             {
-                var loopTo = _colQFClass.Count;
+                var loopTo = _listQFClass.Count;
                 for (i = 1; i <= loopTo; i++)
                 {
-                    QF = (QfcController)_colQFClass[i];
-                    if (QF.blExpanded & i != _colQFClass.Count)
+                    QF = (QfcController)_listQFClass[i];
+                    if (QF.blExpanded & i != _listQFClass.Count)
                         MoveDownPix(i + 1, (int)Math.Round(QF.frm.Height * -0.5d));
                     QF.Accel_Toggle();
                 }
@@ -1068,12 +1056,12 @@ namespace QuickFiler
                     _viewer.AcceleratorDialogue.Text = _intActiveSelection.ToString();
                     try
                     {
-                        QF = (QfcController)_colQFClass[_intActiveSelection];
+                        QF = (QfcController)_listQFClass[_intActiveSelection];
                     }
                     catch (System.Exception ex)
                     {
                         _intActiveSelection = 1;
-                        QF = (QfcController)_colQFClass[_intActiveSelection];
+                        QF = (QfcController)_listQFClass[_intActiveSelection];
                     }
                     QF.Accel_FocusToggle();
                 }
@@ -1108,9 +1096,9 @@ namespace QuickFiler
 
         internal int ActivateByIndex(int intNewSelection, bool blExpanded)
         {
-            if (intNewSelection > 0 & intNewSelection <= _colQFClass.Count)
+            if (intNewSelection > 0 & intNewSelection <= _listQFClass.Count)
             {
-                QfcController QF = (QfcController)_colQFClass[intNewSelection];
+                QfcController QF = (QfcController)_listQFClass[intNewSelection];
                 QF.Accel_FocusToggle();
                 if (blExpanded)
                 {
@@ -1134,7 +1122,7 @@ namespace QuickFiler
             if (_intActiveSelection != 0)
             {
 
-                QfcController QF = (QfcController)_colQFClass[_intActiveSelection];
+                QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
                 if (QF.blExpanded)
                 {
                     MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.frm.Height * -0.5d));
@@ -1160,7 +1148,7 @@ namespace QuickFiler
 
         internal void SelectNextItem()
         {
-            if (_intActiveSelection < _colQFClass.Count)
+            if (_intActiveSelection < _listQFClass.Count)
             {
                 _viewer.AcceleratorDialogue.Text = (_intActiveSelection + 1).ToString();
             }
@@ -1172,7 +1160,7 @@ namespace QuickFiler
             bool blExpanded = false;
             if (_intActiveSelection != 0)
             {
-                QfcController QF = (QfcController)_colQFClass[_intActiveSelection];
+                QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
                 if (QF.lblConvCt.Text != "1" & QF.chk.Checked == true)
                 {
                     if (QF.blExpanded)
@@ -1200,7 +1188,7 @@ namespace QuickFiler
             if (_intActiveSelection != 0)
             {
                 bool blExpanded = false;
-                QfcController QF = (QfcController)_colQFClass[_intActiveSelection];
+                QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
                 if (QF.lblConvCt.Text != "1" & QF.chk.Checked == false)
                 {
                     if (QF.blExpanded)
@@ -1226,7 +1214,7 @@ namespace QuickFiler
 
         internal bool IsSelectionBelowMax(int intNewSelection)
         {
-            if (intNewSelection <= _colQFClass.Count)
+            if (intNewSelection <= _listQFClass.Count)
             {
                 return true;
             }
@@ -1251,11 +1239,11 @@ namespace QuickFiler
         {
             get
             {
-                return _colQFClass.Count;
+                return _listQFClass.Count;
             }
         }
 
-        private int DoesCollectionHaveConvID(object objItem, Collection col)
+        private int DoesCollectionHaveConvID(object objItem, List<MailItem> col)
         {
             int DoesCollectionHaveConvIDRet = default;
 
@@ -1301,10 +1289,10 @@ namespace QuickFiler
             int i;
 
             GetEmailPositionInCollectionRet = 0;
-            var loopTo = _colQFClass.Count;
+            var loopTo = _listQFClass.Count;
             for (i = 1; i <= loopTo; i++)
             {
-                QF = (QfcController)_colQFClass[i];
+                QF = (QfcController)_listQFClass[i];
                 if ((QF.Mail.EntryID ?? "") == (objMail.EntryID ?? ""))
                     GetEmailPositionInCollectionRet = i;
             }
@@ -1319,7 +1307,7 @@ namespace QuickFiler
         {
             try
             {
-                return (QfcController)_colQFClass[index];
+                return (QfcController)_listQFClass[index];
             }
             catch (System.Exception ex)
             {
@@ -1337,7 +1325,7 @@ namespace QuickFiler
                 bool blReadyForMove = true;
                 string strNotifications = "Can't complete actions! Not all emails assigned to folder" + System.Environment.NewLine;
 
-                foreach (QfcController QF in _colQFClass)
+                foreach (QfcController QF in _listQFClass)
                 {
                     if (QF.cbo.SelectedValue as string != "")
                     {
@@ -1363,7 +1351,7 @@ namespace QuickFiler
             {
                 _intActiveSelection = 0;
             }
-            foreach (QfcController QF in _colQFClass)
+            foreach (QfcController QF in _listQFClass)
             {
                 QF.MoveMail();
                 MovedMails.Push(QF.Mail);
@@ -1377,7 +1365,7 @@ namespace QuickFiler
             var loopTo = Conversions.ToInteger(EmailsLoaded);
             for (k = 1; k <= loopTo; k++)
             {
-                QfcController QF = (QfcController)_colQFClass[k];
+                QfcController QF = (QfcController)_listQFClass[k];
                 var infoMail = new cInfoMail();
                 if (infoMail.Init_wMail(QF.Mail, OlEndTime: OlEndTime, lngDurationSec: (long)Math.Round(Duration)))
                 {

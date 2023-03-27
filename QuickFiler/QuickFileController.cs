@@ -72,7 +72,7 @@ namespace QuickFiler
 
         // Collections
         private QfcGroupOperationsLegacy _legacy;
-        // Public _colQFClass As Collection
+        // Public _listQFClass As Collection
         // Public ColFrames As Collection
         // Public ColMailJustMoved As Collection
         private Collection _colEmailsInFolder;

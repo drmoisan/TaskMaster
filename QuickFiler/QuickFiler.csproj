@@ -64,7 +64,7 @@
     <Compile Include="QfcController.cs" />
     <Compile Include="QfcGroupOperationsLegacy.cs" />
     <Compile Include="QfcViewer.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="QfcViewer.Designer.cs">
       <DependentUpon>QfcViewer.cs</DependentUpon>

@@ -24,7 +24,7 @@ namespace QuickFiler
         public string Categories;
         public string strAction;
         public string strProcName;
-        private Collection _col;
+        //private Collection _col;
         private Dictionary<string, long> _dict;
 
 
