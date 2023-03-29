@@ -20,8 +20,7 @@ namespace QuickFiler
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
             _viewer = new QuickFileViewer();
-            // ReloadFolderSuggestionStagingFiles()
-            //List<MailItem> listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()) //as List<MailItem>;
+            
             var listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()); //as List<MailItem>;
             Queue<MailItem> MasterQueue = new Queue<MailItem>();
             foreach (MailItem email in listEmailsInFolder) 

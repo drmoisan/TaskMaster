@@ -53,90 +53,63 @@ namespace QuickFiler
         private Control _mPassedControl;
 
         // Checkbox to Group Conversations
-        private CheckBox _chk;                          // CONTROL WITH EVENTS
+        private CheckBox _conversationCb;               // CONTROL WITH EVENTS
         public virtual CheckBox ConversationCb          // PROPERTY used to assign the control and wire events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return _chk;
+                return _conversationCb;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (_chk != null)
+                if (_conversationCb != null)
                 {
-                    _chk.CheckedChanged -= (_, __) => chk_Click();
-                    _chk.KeyDown -= chk_KeyDown;
-                    _chk.KeyUp -= chk_KeyUp;
+                    _conversationCb.CheckedChanged -= chk_Click;
+                    _conversationCb.KeyDown -= chk_KeyDown;
+                    _conversationCb.KeyUp -= chk_KeyUp;
                 }
 
-                _chk = value;
-                if (_chk != null)
+                _conversationCb = value;
+                if (_conversationCb != null)
                 {
-                    _chk.CheckedChanged += (_, __) => chk_Click();
-                    _chk.KeyDown += chk_KeyDown;
-                    _chk.KeyUp += chk_KeyUp;
+                    _conversationCb.CheckedChanged += chk_Click;
+                    _conversationCb.KeyDown += chk_KeyDown;
+                    _conversationCb.KeyUp += chk_KeyUp;
                 }
             }
         }
 
         // Combo box containing Folder Suggestions
-        private ComboBox _cbo;                          // CONTROL WITH EVENTS
+        private ComboBox _folderCbo;                    // CONTROL WITH EVENTS
         public virtual ComboBox FolderCbo               // PROPERTY used to assign the control and wire events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return _cbo;
+                return _folderCbo;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (_cbo != null)
+                if (_folderCbo != null)
                 {
-                    _cbo.KeyDown -= cbo_KeyDown;
-                    _cbo.KeyUp -= cbo_KeyUp;
+                    _folderCbo.KeyDown -= cbo_KeyDown;
+                    _folderCbo.KeyUp -= cbo_KeyUp;
                 }
 
-                _cbo = value;
-                if (_cbo != null)
+                _folderCbo = value;
+                if (_folderCbo != null)
                 {
-                    _cbo.KeyDown += cbo_KeyDown;
-                    _cbo.KeyUp += cbo_KeyUp;
+                    _folderCbo.KeyDown += cbo_KeyDown;
+                    _folderCbo.KeyUp += cbo_KeyUp;
                 }
             }
         }
-        
-        private ListBox _lst;                          // CONTROL WITH EVENTS
-        private ListBox Lst                            // PROPERTY used to assign the control and wire events
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _lst;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                if (_lst != null)
-                {
-                    _lst.KeyDown -= lst_KeyDown;
-                    _lst.KeyUp -= lst_KeyUp;
-                }
-
-                _lst = value;
-                if (_lst != null)
-                {
-                    _lst.KeyDown += lst_KeyDown;
-                    _lst.KeyUp += lst_KeyUp;
-                }
-            }
-        }       
-
+          
         // Input for folder search
         private TextBox _searchTxt;                     // CONTROL WITH EVENTS
         private TextBox SearchTxt                       // PROPERTY used to assign the control and wire events
@@ -152,7 +125,7 @@ namespace QuickFiler
             {
                 if (_searchTxt != null)
                 {
-                    _searchTxt.TextChanged -= (_, __) => txt_Change();
+                    _searchTxt.TextChanged -= txt_Change;
                     _searchTxt.KeyDown -= txt_KeyDown;
                     _searchTxt.KeyPress -= txt_KeyPress;
                     _searchTxt.KeyUp -= txt_KeyUp;
@@ -161,7 +134,7 @@ namespace QuickFiler
                 _searchTxt = value;
                 if (_searchTxt != null)
                 {
-                    _searchTxt.TextChanged += (_, __) => txt_Change();
+                    _searchTxt.TextChanged += txt_Change;
                     _searchTxt.KeyDown += txt_KeyDown;
                     _searchTxt.KeyPress += txt_KeyPress;
                     _searchTxt.KeyUp += txt_KeyUp;
@@ -171,7 +144,7 @@ namespace QuickFiler
         
         // Body of the Email
         private TextBox _bdy;                          // CONTROL  Private body control with events assigned
-        private TextBox Bdy                            // PROPERTY Private body property to assign the control and wite events
+        private TextBox TxtBoxBody                     // PROPERTY Private body property to assign the control and wite events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -184,13 +157,13 @@ namespace QuickFiler
             {
                 if (_bdy != null)
                 {
-                    _bdy.Click -= (_, __) => bdy_Click();
+                    _bdy.Click -= bdy_Click;
                 }
 
                 _bdy = value;
                 if (_bdy != null)
                 {
-                    _bdy.Click += (_, __) => bdy_Click();
+                    _bdy.Click += bdy_Click;
                 }
             }
         }
@@ -210,7 +183,7 @@ namespace QuickFiler
             {
                 if (__cbKll != null)
                 {
-                    __cbKll.Click -= (_, __) => cbKll_Click();
+                    __cbKll.Click -= cbKll_Click;
                     __cbKll.KeyDown -= cbKll_KeyDown;
                     __cbKll.KeyPress -= cbKll_KeyPress;
                     __cbKll.KeyUp -= cbKll_KeyUp;
@@ -219,7 +192,7 @@ namespace QuickFiler
                 __cbKll = value;
                 if (__cbKll != null)
                 {
-                    __cbKll.Click += (_, __) => cbKll_Click();
+                    __cbKll.Click += cbKll_Click;
                     __cbKll.KeyDown += cbKll_KeyDown;
                     __cbKll.KeyPress += cbKll_KeyPress;
                     __cbKll.KeyUp += cbKll_KeyUp;
@@ -242,7 +215,7 @@ namespace QuickFiler
             {
                 if (__cbDel != null)
                 {
-                    __cbDel.Click -= (_, __) => cbDel_Click();
+                    __cbDel.Click -= cbDel_Click;
                     __cbDel.KeyDown -= cbDel_KeyDown;
                     __cbDel.KeyPress -= cbDel_KeyPress;
                     __cbDel.KeyUp -= cbDel_KeyUp;
@@ -251,7 +224,7 @@ namespace QuickFiler
                 __cbDel = value;
                 if (__cbDel != null)
                 {
-                    __cbDel.Click += (_, __) => cbDel_Click();
+                    __cbDel.Click += cbDel_Click;
                     __cbDel.KeyDown += cbDel_KeyDown;
                     __cbDel.KeyPress += cbDel_KeyPress;
                     __cbDel.KeyUp += cbDel_KeyUp;
@@ -273,7 +246,7 @@ namespace QuickFiler
             {
                 if (_flagTaskCb != null)
                 {
-                    _flagTaskCb.Click -= (_, __) => cbFlag_Click();
+                    _flagTaskCb.Click -= cbFlag_Click;
                     _flagTaskCb.KeyDown -= cbFlag_KeyDown;
                     _flagTaskCb.KeyPress -= cbFlag_KeyPress;
                     _flagTaskCb.KeyUp -= cbFlag_KeyUp;
@@ -282,7 +255,7 @@ namespace QuickFiler
                 _flagTaskCb = value;
                 if (_flagTaskCb != null)
                 {
-                    _flagTaskCb.Click += (_, __) => cbFlag_Click();
+                    _flagTaskCb.Click += cbFlag_Click;
                     _flagTaskCb.KeyDown += cbFlag_KeyDown;
                     _flagTaskCb.KeyPress += cbFlag_KeyPress;
                     _flagTaskCb.KeyUp += cbFlag_KeyUp;
@@ -377,7 +350,6 @@ namespace QuickFiler
         private CheckBox _chbxSaveAttach;
         private CheckBox _chbxSaveMail;
         private CheckBox _chbxDelFlow;
-        public TextBox TxtBoxBody;                // <BODY>
         #endregion
         
         #region Outlook Variables
@@ -547,11 +519,6 @@ namespace QuickFiler
                             FolderCbo = (ComboBox)ctlTmp;
                             break;
                         }
-                    case "ListBox":
-                        {
-                            Lst = (ListBox)ctlTmp;
-                            break;
-                        }
                     case "TextBox":
                         {
                             if (ctlTmp.Text == "<BODY>")
@@ -560,7 +527,7 @@ namespace QuickFiler
                                 strBodyText = strBodyText.Replace("  ", " ");
                                 strBodyText = strBodyText.Replace("  ", " ") + "<EOM>";
                                 ctlTmp.Text = strBodyText;
-                                Bdy = (TextBox)ctlTmp;
+                                TxtBoxBody = (TextBox)ctlTmp;
                                 TxtBoxBody = (TextBox)ctlTmp;
                             }
                             else
@@ -903,7 +870,6 @@ namespace QuickFiler
             _mPassedControl = null;
             ConversationCb = null;
             FolderCbo = null;
-            Lst = null;
             SearchTxt = null;
             Frm = null;
             CbKll = null;
@@ -1434,35 +1400,32 @@ namespace QuickFiler
 
         private void WireEventHandlers()
         {
-            Bdy.Click += (_, __) => bdy_Click();
-            CbDel.Click += (_, __) => cbDel_Click();
-            CbDel.KeyDown += cbDel_KeyDown;
-            CbDel.KeyPress += cbDel_KeyPress;
-            CbDel.KeyUp += cbDel_KeyUp;
-            FlagTaskCb.Click += (_, __) => cbFlag_Click();
-            FlagTaskCb.KeyDown += cbFlag_KeyDown;
-            FlagTaskCb.KeyPress += cbFlag_KeyPress;
-            FlagTaskCb.KeyUp += cbFlag_KeyUp;
-            CbKll.Click += (_, __) => cbKll_Click();
-            CbKll.KeyDown += cbKll_KeyDown;
-            CbKll.KeyPress += cbKll_KeyPress;
-            CbKll.KeyUp += cbKll_KeyUp;
-            FolderCbo.KeyDown += cbo_KeyDown;
-            FolderCbo.KeyUp += cbo_KeyUp;
-            CbTmp.KeyDown += cbTmp_KeyDown;
-            CbTmp.KeyUp += cbTmp_KeyUp;
-            ConversationCb.CheckedChanged += (_, __) => chk_Click();
-            ConversationCb.KeyDown += chk_KeyDown;
-            ConversationCb.KeyUp += chk_KeyUp;
-            Frm.KeyDown += frm_KeyDown;
-            Frm.KeyPress += frm_KeyPress;
-            Frm.KeyUp += frm_KeyUp;
-            Lst.KeyDown += lst_KeyDown;
-            Lst.KeyUp += lst_KeyUp;
-            SearchTxt.TextChanged += (_, __) => txt_Change();
-            SearchTxt.KeyDown += txt_KeyDown;
-            SearchTxt.KeyPress += txt_KeyPress;
-            SearchTxt.KeyUp += txt_KeyUp;
+            __cbDel.Click += cbDel_Click;
+            __cbDel.KeyDown += cbDel_KeyDown;
+            __cbDel.KeyPress += cbDel_KeyPress;
+            __cbDel.KeyUp += cbDel_KeyUp;
+            _flagTaskCb.Click += cbFlag_Click;
+            _flagTaskCb.KeyDown += cbFlag_KeyDown;
+            _flagTaskCb.KeyPress += cbFlag_KeyPress;
+            _flagTaskCb.KeyUp += cbFlag_KeyUp;
+            __cbKll.Click += cbKll_Click;
+            __cbKll.KeyDown += cbKll_KeyDown;
+            __cbKll.KeyPress += cbKll_KeyPress;
+            __cbKll.KeyUp += cbKll_KeyUp;
+            _folderCbo.KeyDown += cbo_KeyDown;
+            _folderCbo.KeyUp += cbo_KeyUp;
+            _cbTmp.KeyDown += cbTmp_KeyDown;
+            _cbTmp.KeyUp += cbTmp_KeyUp;
+            _conversationCb.CheckedChanged += chk_Click;
+            _conversationCb.KeyDown += chk_KeyDown;
+            _conversationCb.KeyUp += chk_KeyUp;
+            _frm.KeyDown += frm_KeyDown;
+            _frm.KeyPress += frm_KeyPress;
+            _frm.KeyUp += frm_KeyUp;
+            _searchTxt.TextChanged += txt_Change;
+            _searchTxt.KeyDown += txt_KeyDown;
+            _searchTxt.KeyPress += txt_KeyPress;
+            _searchTxt.KeyUp += txt_KeyUp;
         }
 
         public void KeyboardHandler(string AccelCode)
@@ -1506,7 +1469,7 @@ namespace QuickFiler
                     }
                 case "T":
                     {
-                        cbFlag_Click();
+                        FlagAsTask();
                         break;
                     }
                 case "F":
@@ -1523,18 +1486,18 @@ namespace QuickFiler
                     }
                 case "X":
                     {
-                        cbDel_Click();
+                        FolderCbo.SelectedItem = "Trash to Delete";
                         break;
                     }
                 case "R":
                     {
-                        cbKll_Click();
+                        _parent.RemoveSpecificControlGroup(Position);
                         break;
                     }
             }
         }
 
-        private void bdy_Click()
+        private void bdy_Click(object sender, EventArgs e)
         {
             LblSubject.ForeColor = Color.FromArgb(int.MinValue + 0x00000012);
             LblSubject.Font = new Font(LblSubject.Font, FontStyle.Regular);
@@ -1546,7 +1509,7 @@ namespace QuickFiler
                 _parent.Parent.ExplConvView_ToggleOn();
         }
 
-        private void cbDel_Click()
+        private void cbDel_Click(object sender, EventArgs e)
         {
             FolderCbo.SelectedItem = "Trash to Delete";
         }
@@ -1571,16 +1534,17 @@ namespace QuickFiler
             // End Select
         }
 
-        private void cbFlag_Click()
+        private void cbFlag_Click(object sender, EventArgs e)
         {
+            FlagAsTask();
+        }
 
-            //Collection Sel;
-
+        private void FlagAsTask()
+        {
             List<MailItem> Sel = new() { Mail };
             var flagTask = new FlagTasks(AppGlobals: _globals, ItemList: Sel, blFile: false, hWndCaller: hWndCaller);
             flagTask.Run();
             FlagTaskCb.Text = "!";
-
         }
 
         private void cbFlag_KeyDown(object sender, KeyEventArgs e)
@@ -1603,7 +1567,7 @@ namespace QuickFiler
             // End Select
         }
 
-        private void cbKll_Click()
+        private void cbKll_Click(object sender, EventArgs e)
         {
             _parent.RemoveSpecificControlGroup(Position);
         }
@@ -1687,7 +1651,7 @@ namespace QuickFiler
                                                                                WholeConversation: false, 
                                                                                strSeed: FolderCbo.SelectedItem as string, 
                                                                                objItem: Mail);
-                            cbKll_Click();
+                            _parent.RemoveSpecificControlGroup(Position);
                         }
                         else
                         {
@@ -1726,7 +1690,7 @@ namespace QuickFiler
             _parent.Parent.KeyUpHandler(sender, e);
         }
 
-        private void chk_Click()
+        private void chk_Click(object sender, EventArgs e)
         {
 
             List<MailItem> selItems = new();
@@ -1814,7 +1778,7 @@ namespace QuickFiler
             // End Select
         }
 
-        private void txt_Change()
+        private void txt_Change(object sender, EventArgs e)
         {
 
             FolderCbo.Items.Clear();
