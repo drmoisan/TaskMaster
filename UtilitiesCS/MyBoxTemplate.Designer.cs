@@ -32,9 +32,13 @@
             this.L2Bottom = new System.Windows.Forms.TableLayoutPanel();
             this.Button2 = new System.Windows.Forms.Button();
             this.Button1 = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.TextMessage = new System.Windows.Forms.TextBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.L1Vertical.SuspendLayout();
             this.L2Bottom.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // L1Vertical
@@ -42,7 +46,7 @@
             this.L1Vertical.ColumnCount = 1;
             this.L1Vertical.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1Vertical.Controls.Add(this.L2Bottom, 0, 1);
-            this.L1Vertical.Controls.Add(this.TextMessage, 0, 0);
+            this.L1Vertical.Controls.Add(this.panel1, 0, 0);
             this.L1Vertical.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1Vertical.Location = new System.Drawing.Point(0, 0);
             this.L1Vertical.Name = "L1Vertical";
@@ -91,18 +95,40 @@
             this.Button1.UseVisualStyleBackColor = true;
             this.Button1.Click += new System.EventHandler(this.Button1_Click);
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Controls.Add(this.TextMessage);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(235, 77);
+            this.panel1.TabIndex = 1;
+            // 
             // TextMessage
             // 
+            this.TextMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.TextMessage.BackColor = System.Drawing.SystemColors.Menu;
             this.TextMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TextMessage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TextMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextMessage.Location = new System.Drawing.Point(10, 10);
+            this.TextMessage.Location = new System.Drawing.Point(35, 7);
             this.TextMessage.Margin = new System.Windows.Forms.Padding(10);
             this.TextMessage.Multiline = true;
             this.TextMessage.Name = "TextMessage";
-            this.TextMessage.Size = new System.Drawing.Size(221, 63);
-            this.TextMessage.TabIndex = 1;
+            this.TextMessage.Size = new System.Drawing.Size(190, 63);
+            this.TextMessage.TabIndex = 2;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.Control;
+            this.pictureBox1.Image = global::UtilitiesCS.Properties.Resources.ExceptionPublic;
+            this.pictureBox1.Location = new System.Drawing.Point(6, 7);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(16, 16);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 3;
+            this.pictureBox1.TabStop = false;
             // 
             // MyBoxTemplate
             // 
@@ -113,8 +139,10 @@
             this.Name = "MyBoxTemplate";
             this.Text = "FormName";
             this.L1Vertical.ResumeLayout(false);
-            this.L1Vertical.PerformLayout();
             this.L2Bottom.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -125,6 +153,8 @@
         private System.Windows.Forms.TableLayoutPanel L2Bottom;
         private System.Windows.Forms.Button Button2;
         private System.Windows.Forms.Button Button1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TextBox TextMessage;
     }
 }

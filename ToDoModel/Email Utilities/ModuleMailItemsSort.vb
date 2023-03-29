@@ -4,7 +4,7 @@ Imports UtilitiesVB
 
 
 Public Module ModuleMailItemsSort
-    Public Function MailItemsSort(OlItems As Items, options As SortOptionsEnum) As Collection
+    Public Function MailItemsSort(OlItems As Items, options As SortOptionsEnum) As IList
         Dim strFilter As String
         Dim strFilter2 As String
         'Dim OlRow                   As Outlook.Row
@@ -17,7 +17,7 @@ Public Module ModuleMailItemsSort
         Dim OlMailTmp As MailItem
         Dim OlMailTmp2 As MailItem
         'Dim OlNameSpace             As Outlook.NameSpace
-        Dim colTemp As Collection
+        Dim listEmails As IList
         Dim StrTriageOpts(3) As String
         Dim i As Integer
         Dim j As Integer
@@ -37,7 +37,7 @@ Public Module ModuleMailItemsSort
         StrTriageOpts(2) = "B"
         StrTriageOpts(3) = "C"
 
-        colTemp = New Collection
+        listEmails = New List(Of MailItem)
         'OlFolder = _activeExplorer.CurrentFolder
         'objCurView = _activeExplorer.CurrentView
         'strFilter = objCurView.Filter
@@ -83,15 +83,15 @@ Public Module ModuleMailItemsSort
                         OlMailTmp = objItem
                         If Not Mail_IsItEncrypted(OlMailTmp) Then
                             If options And SortOptionsEnum.ConversationUniqueOnly Then
-                                For j = 1 To colTemp.Count
-                                    OlMailTmp2 = colTemp(j)
+                                For j = 0 To listEmails.Count - 1
+                                    OlMailTmp2 = listEmails(j)
                                     If OlMailTmp.ConversationID = OlMailTmp2.ConversationID Then
                                         BlUniqueConv = False
                                     End If
                                 Next j
                             End If 'Options And ConversationUniqueOnly Then
 
-                            If BlUniqueConv Then colTemp.Add(OlMailTmp)
+                            If BlUniqueConv Then listEmails.Add(OlMailTmp)
 
                         End If 'If Mail_IsItEncrypted
                     End If 'If TypeOf ObjItem Is mailItem Then
@@ -104,15 +104,15 @@ Public Module ModuleMailItemsSort
                     OlMailTmp = objItem
                     If Not Mail_IsItEncrypted(OlMailTmp) Then
                         If options And SortOptionsEnum.ConversationUniqueOnly Then
-                            For j = 1 To colTemp.Count
-                                OlMailTmp2 = colTemp(j)
+                            For j = 0 To listEmails.Count - 1
+                                OlMailTmp2 = listEmails(j)
                                 If OlMailTmp.ConversationID = OlMailTmp2.ConversationID Then
                                     BlUniqueConv = False
                                 End If
                             Next j
                         End If 'Options And ConversationUniqueOnly Then
 
-                        If BlUniqueConv Then colTemp.Add(OlMailTmp)
+                        If BlUniqueConv Then listEmails.Add(OlMailTmp)
 
                     End If 'If Mail_IsItEncrypted
                 End If 'If TypeOf ObjItem Is mailItem Then
@@ -125,21 +125,21 @@ Public Module ModuleMailItemsSort
                     OlMailTmp = objItem
                     If Not Mail_IsItEncrypted(OlMailTmp) Then
                         If options And SortOptionsEnum.ConversationUniqueOnly Then
-                            For j = 1 To colTemp.Count
-                                OlMailTmp2 = colTemp(j)
+                            For j = 1 To listEmails.Count
+                                OlMailTmp2 = listEmails(j)
                                 If OlMailTmp.ConversationID = OlMailTmp2.ConversationID Then
                                     BlUniqueConv = False
                                 End If
                             Next j
                         End If 'Options And ConversationUniqueOnly Then
 
-                        If BlUniqueConv Then colTemp.Add(OlMailTmp)
+                        If BlUniqueConv Then listEmails.Add(OlMailTmp)
                     End If 'Not Mail_IsItEncrypted(OlMailTmp) Then
                 End If 'If TypeOf ObjItem Is mailItem Then
             Next objItem
         End If
 
-        MailItemsSort = colTemp
+        Return listEmails
 
 
         OlFolder = Nothing

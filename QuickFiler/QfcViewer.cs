@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace QuickFiler
 {
-
-    public partial class QfcViewer
+    public partial class QfcViewer : Form
     {
         private bool _tipsActive = true;
         private List<Label> _tipsLabels = new List<Label>();
@@ -54,10 +58,10 @@ namespace QuickFiler
             }
         }
 
-        private void ControlGroup_Paint(object sender, PaintEventArgs e)
+        private void QfcViewer_Paint(object sender, PaintEventArgs e)
         {
 
-            if (BorderStyle == BorderStyle.FixedSingle)
+            if (this.FormBorderStyle == FormBorderStyle.FixedSingle)
             {
                 int thickness = 2;
                 int halfThickness = (int)Math.Round(thickness / 2d);
@@ -96,6 +100,6 @@ namespace QuickFiler
                     col.Width = _tipsColumns[col];
                 _tipsActive = true;
             }
-        }
+        }       
     }
 }

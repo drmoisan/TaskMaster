@@ -17,11 +17,8 @@ using Windows.Win32;
 
 namespace QuickFiler
 {
-
-
     public class QuickFileController
     {
-
         private bool _useOld = true;
         //private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -72,10 +69,7 @@ namespace QuickFiler
 
         // Collections
         private QfcGroupOperationsLegacy _legacy;
-        // Public _listQFClass As Collection
-        // Public ColFrames As Collection
-        // Public ColMailJustMoved As Collection
-        private Collection _colEmailsInFolder;
+        private Queue<MailItem> _queueEmailsInFolder;
         internal Panel Frm;
 
         // Window Handles
@@ -87,15 +81,18 @@ namespace QuickFiler
         private ParentCleanupMethod _parentCleanup;
         #endregion
 
-        public QuickFileController(IApplicationGlobals AppGlobals, QuickFileViewer Viewer, Collection ColEmailsInFolder, ParentCleanupMethod ParentCleanup)
+        public QuickFileController(
+            IApplicationGlobals AppGlobals,
+            QuickFileViewer Viewer,
+            Queue<MailItem> ListEmailsInFolder,
+            ParentCleanupMethod ParentCleanup)
         {
-
             // Link viewer to controller
             _viewer = Viewer;
             _viewer.SetController(this);
 
             // Link model to controller
-            _colEmailsInFolder = ColEmailsInFolder;
+            _queueEmailsInFolder = ListEmailsInFolder;
             InitializeModelProcessingMetrics();
 
             _parentCleanup = ParentCleanup;
@@ -125,7 +122,7 @@ namespace QuickFiler
         {
             _stopWatch = new cStopWatch();
             _stopWatch.Start();
-            var colEmails = DequeNextEmailGroup(ref _colEmailsInFolder, _intEmailsPerIteration);
+            var colEmails = DequeueNextEmailGroup(ref _queueEmailsInFolder, _intEmailsPerIteration);
             _legacy.LoadControlsAndHandlers(colEmails);
         }
 
@@ -139,7 +136,7 @@ namespace QuickFiler
             // Set conversation state variable with initial state
             BlShowInConversations = CurrentConversationState;
             if (BlShowInConversations)
-                _objViewMem = Conversions.ToString(_activeExplorer.CurrentView.Name);
+                _objViewMem = _activeExplorer.CurrentView.Name;
 
             // Suppress events while initializing form
             _blSuppressEvents = true;
@@ -271,51 +268,50 @@ namespace QuickFiler
 
         #region Data Model Manipulation
 
-        private void EliminateDuplicateConversationIDs(ref Collection colTemp)
+        private void EliminateDuplicateConversationIDs(ref List<MailItem> listEmails)
         {
+            //TODO: Convert listObjItems logic to List<T>
             var dictID = new Dictionary<string, int>();
             int i;
             int max;
 
-            foreach (MailItem olMail in colTemp)
+            foreach (MailItem olMail in listEmails)
             {
-                if (dictID.ContainsKey(Conversions.ToString(olMail.ConversationID)))
+                if (dictID.ContainsKey(olMail.ConversationID))
                 {
-                    dictID[Conversions.ToString(olMail.ConversationID)] = dictID[Conversions.ToString(olMail.ConversationID)] + 1;
+                    dictID[olMail.ConversationID] += 1;
                 }
                 else
                 {
-                    dictID.Add(Conversions.ToString(olMail.ConversationID), 0);
+                    //QUESTION: I believe this should be 1 so I updated the count
+                    dictID.Add(olMail.ConversationID, 1);
                 }
             }
 
-            max = colTemp.Count;
+            max = listEmails.Count -1;
 
-            for (i = max; i >= 1L; i += -1)
+            for (i = max; i >= 0; i += -1)
             {
-                MailItem objItem = (MailItem)colTemp[i];
+                MailItem objItem = (MailItem)listEmails[i];
                 // Debug.Print dictID(olMail.ConversationID)
-                if (dictID[Conversions.ToString(objItem.ConversationID)] > 0)
+                if (dictID[objItem.ConversationID] > 1)
                 {
-                    colTemp.Remove(i);
-                    dictID[Conversions.ToString(objItem.ConversationID)] = dictID[Conversions.ToString(objItem.ConversationID)] - 1;
+                    listEmails.RemoveAt(i);
+                    dictID[objItem.ConversationID] = dictID[objItem.ConversationID] - 1;
                 }
             }
         }
 
-        private Collection ItemsToCollection(Items OlItems)
+        private List<object> ItemsToCollection(Items OlItems)
         {
-            Collection ItemsToCollectionRet = default;
-            Collection colTemp;
-            colTemp = new Collection();
+            List<object> listObjItems = new List<object>();
             foreach (var objItem in OlItems)
-                colTemp.Add(objItem);
-            ItemsToCollectionRet = colTemp;
-            return ItemsToCollectionRet;
+                listObjItems.Add(objItem);
+            return listObjItems;
 
         }
 
-        private void DebugOutPutEmailCollection(Collection colTemp)
+        private void DebugOutPutEmailCollection(List<object> listObjItems)
         {
             MailItem OlMail;
             MeetingItem OlAppt;
@@ -323,41 +319,37 @@ namespace QuickFiler
             int i;
 
             i = 0;
-            foreach (var objItem in colTemp)
+            foreach (var objItem in listObjItems)
             {
                 i += 1;
                 strLine = "";
                 if (objItem is MailItem)
                 {
                     OlMail = (MailItem)objItem;
-                    strLine = i + " " + GetFields.CustomFieldID_GetValue(objItem, "Triage") + " " + Strings.Format(OlMail.SentOn, "General Date") + " " + OlMail.Subject;
+                    strLine = i + " " + GetFields.CustomFieldID_GetValue(objItem, "Triage") + " " + OlMail.SentOn.ToString("General Date") + " " + OlMail.Subject;
                 }
                 else if (objItem is AppointmentItem)
                 {
                     OlAppt = (MeetingItem)objItem;
-                    strLine = i + " " + GetFields.CustomFieldID_GetValue(objItem, "Triage") + " " + Strings.Format(OlAppt.SentOn, "General Date") + " " + OlAppt.Subject;
+                    strLine = i + " " + GetFields.CustomFieldID_GetValue(objItem, "Triage") + " " + OlAppt.SentOn.ToString("General Date") + " " + OlAppt.Subject;
                 }
                 Debug.WriteLine(strLine);
             }
         }
 
-        private Collection DequeNextEmailGroup(ref Collection MasterQueue, int Quantity)
+        private List<MailItem> DequeueNextEmailGroup(ref Queue<MailItem> MasterQueue, int Quantity)
         {
             int i;
             double max;
 
-            Collection colEmails;
+            List<MailItem> listEmails = new();
 
-            colEmails = new Collection();
             max = Quantity < MasterQueue.Count ? Quantity : MasterQueue.Count;
 
             var loopTo = (int)Math.Round(max);
             for (i = 1; i <= loopTo; i++)
-                colEmails.Add(MasterQueue[i]);
-            for (i = (int)Math.Round(max); i >= 1; i -= 1)
-                MasterQueue.Remove(i);
-
-            return colEmails;
+                listEmails.Add(MasterQueue.Dequeue());
+            return listEmails;
         }
 
         #endregion
@@ -663,7 +655,7 @@ namespace QuickFiler
                 }
                 else
                 {
-                    Interaction.MsgBox("Can't Execute While Running Modal Code");
+                    MessageBox.Show("Error","Can't Execute While Running Modal Code");
                 }
             }
             else
@@ -680,25 +672,24 @@ namespace QuickFiler
             object objTemp;
             Folder oFolder_Current;
             Folder oFolder_Old;
-            Collection colItems;
+            List<object> listItems;
             DialogResult undoResponse;
-            DialogResult repeatResponse;
+            DialogResult repeatResponse = DialogResult.Yes;
 
             if (_movedMails is null)
                 _movedMails = new cStackObject();
-            repeatResponse = Constants.vbYes;
 
-            i = _movedMails.Count();
-            colItems = _movedMails.ToCollection();
-
-            while (i > 1 & repeatResponse == Constants.vbYes)
+            i = _movedMails.Count()-1;
+            listItems = _movedMails.ToList();
+            
+            while (i > 0 & repeatResponse == DialogResult.Yes)
             {
-                objTemp = colItems[i];
+                objTemp = listItems[i];
                 // objTemp = _movedMails.Pop
                 if (objTemp is MailItem)
                     oMail_Current = (MailItem)objTemp;
                 // objTemp = _movedMails.Pop
-                objTemp = colItems[i - 1];
+                objTemp = listItems[i - 1];
                 if (objTemp is MailItem)
                     oMail_Old = (MailItem)objTemp;
 
@@ -795,17 +786,15 @@ namespace QuickFiler
         {
 
             ObjView = _activeExplorer.CurrentFolder.Views[_objViewMem];
-            if (Information.Err().Number == 0)
+            try
             {
-                // ObjView.Reset
                 ObjView.Apply();
                 if (ObjViewTemp is not null)
                     ObjViewTemp.Delete();
                 BlShowInConversations = false;
             }
-            else
+            catch (System.Exception)
             {
-                Information.Err().Clear();
                 ObjViewTemp = (Microsoft.Office.Interop.Outlook.View)_activeExplorer.CurrentView.Parent("tmpNoConversation");
                 if (ObjViewTemp is not null)
                     ObjViewTemp.Delete();
@@ -824,13 +813,11 @@ namespace QuickFiler
                     if (_activeExplorer.CommandBars.GetPressedMso("ShowInConversations"))
                     {
 
-                        ObjView.XML = Strings.Replace(ObjView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, Compare: Constants.vbTextCompare);
+                        ObjView.XML = ObjView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
                         ObjView.Save();
                         ObjView.Apply();
                     }
-
                 }
-
                 _objViewMem = ObjView.Name;
                 if (_objViewMem == "tmpNoConversation")
                     _objViewMem = _globals.Ol.View_Wide;
@@ -840,7 +827,7 @@ namespace QuickFiler
                 if (ObjViewTemp is null)
                 {
                     ObjViewTemp = ObjView.Copy("tmpNoConversation", OlViewSaveOption.olViewSaveOptionThisFolderOnlyMe);
-                    ObjViewTemp.XML = Strings.Replace(ObjView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, Compare: Constants.vbTextCompare);
+                    ObjViewTemp.XML = ObjView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
                     ObjViewTemp.Save();
 
                 }
@@ -881,17 +868,12 @@ namespace QuickFiler
 
         private void NavigateToOutlookFolder(MailItem olMail)
         {
-            if (Conversions.ToBoolean(Operators.ConditionalCompareObjectNotEqual(_globals.Ol.App.ActiveExplorer().CurrentFolder.FolderPath, olMail.Parent.FolderPath, false)))
+            if (_globals.Ol.App.ActiveExplorer().CurrentFolder.FolderPath != olMail.Parent.FolderPath)
             {
                 ExplConvView_ReturnState();
                 _globals.Ol.App.ActiveExplorer().CurrentFolder = (MAPIFolder)olMail.Parent;
                 BlShowInConversations = AutoFile.AreConversationsGrouped(_activeExplorer);
             }
-            // If _globals.Ol.App.ActiveExplorer.CurrentFolder.DefaultItemType <> OlItemType.olMailItem Then
-            // _globals.Ol.App.ActiveExplorer.NavigationPane.CurrentModule =
-            // _globals.Ol.App.ActiveExplorer.NavigationPane.Modules _
-            // .GetNavigationModule(OlNavigationModuleType.olModuleMail)
-            // End If
         }
 
         #endregion
@@ -912,10 +894,10 @@ namespace QuickFiler
 
 
             // Create a line of comma seperated valued to store data
-            curDateText = Strings.Format(DateTime.Now, "mm/dd/yyyy");
+            curDateText = DateTime.Now.ToString("mm/dd/yyyy");
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curDateText = " & curDateText
 
-            curTimeText = Strings.Format(DateTime.Now, "hh:mm");
+            curTimeText = DateTime.Now.ToString("hh:mm");
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curTimeText = " & curTimeText
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
@@ -924,29 +906,28 @@ namespace QuickFiler
 
             Duration = _stopWatch.timeElapsed;
             OlEndTime = DateTime.Now;
-            OlStartTime = DateAndTime.DateAdd("S", -Duration, OlEndTime);
+            OlStartTime = OlEndTime.Subtract(new TimeSpan(0,0,0,(int)Duration));
 
-            if (Conversions.ToBoolean(Operators.ConditionalCompareObjectGreater(_legacy.EmailsLoaded, 0, false)))
+            if (_legacy.EmailsLoaded > 0)
             {
-                Duration = Conversions.ToDouble(Duration / _legacy.EmailsLoaded);
+                Duration /= _legacy.EmailsLoaded;
             }
 
-            durationText = Strings.Format(Duration, "##0");
+            durationText = Duration.ToString("##0");
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
 
-            durationMinutesText = Strings.Format(Duration / 60d, "##0.00");
+            durationMinutesText = (Duration / 60d).ToString("##0.00");
 
             OlEmailCalendar = Calendar.GetCalendar("Email Time", _olApp.Session);
             OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add(new AppointmentItem());
             {
-                ref var withBlock = ref OlAppointment;
-                withBlock.Subject = Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject("Quick Filed ", _legacy.EmailsLoaded), " emails"));
-                withBlock.Start = OlStartTime;
-                withBlock.End = OlEndTime;
-                withBlock.Categories = "@ Email";
-                withBlock.ReminderSet = false;
-                withBlock.Sensitivity = OlSensitivity.olPrivate;
-                withBlock.Save();
+                OlAppointment.Subject = "Quick Filed " + _legacy.EmailsLoaded as string + " emails";
+                OlAppointment.Start = OlStartTime;
+                OlAppointment.End = OlEndTime;
+                OlAppointment.Categories = "@ Email";
+                OlAppointment.ReminderSet = false;
+                OlAppointment.Sensitivity = OlSensitivity.olPrivate;
+                OlAppointment.Save();
             }
 
             string[] strOutput = _legacy.GetMoveDiagnostics(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, ref OlAppointment);

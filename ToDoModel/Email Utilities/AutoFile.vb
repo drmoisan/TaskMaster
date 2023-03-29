@@ -103,7 +103,7 @@ Public Module AutoFile
                                    dictRemap As Dictionary(Of String, String),
                                    Optional blNotifyMissing As Boolean = True,
                                    Optional blExcludeFlagged As Boolean = True) As Collection
-        Dim OlMail As [MailItem]
+        Dim OlMail As MailItem
         Dim emailAddressList As List(Of String)
         Dim colPPL As New Collection
         Dim strMissing As String = ""
@@ -210,9 +210,9 @@ Public Module AutoFile
                                                      selections:=selections,
                                                      prefix_key:=prefixKey,
                                                      objItemObject:=OlMail) With {
-                    .ButtonNewActive = False,
-                    .ButtonAutoAssignActive = False
-                                                     }
+                                                        .ButtonNewActive = False,
+                                                        .ButtonAutoAssignActive = False
+                                                        }
                 _controller.SetSearchText(newPplTag)
 
                 Dim unused = _viewer.ShowDialog()

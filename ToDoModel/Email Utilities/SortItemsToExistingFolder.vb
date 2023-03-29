@@ -8,7 +8,7 @@ Public Module SortItemsToExistingFolder
         Throw New NotImplementedException
     End Sub
 
-    Public Sub MASTER_SortEmailsToExistingFolder(selItems As Collection,
+    Public Sub MASTER_SortEmailsToExistingFolder(selItems As IList,
                                                  Pictures_Checkbox As Boolean,
                                                  SortFolder As String,
                                                  Save_MSG As Boolean,

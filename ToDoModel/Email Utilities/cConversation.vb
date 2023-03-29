@@ -1,7 +1,8 @@
 ﻿Imports Microsoft.Office.Interop
+Imports Microsoft.Office.Interop.Outlook
 
 Public Class cConversation
-    Private pItem As Object
+    Private _item As Object
     Private pConversation As Outlook.Conversation
     Private pTable As Outlook.Table
     Private pCollection As Collection
@@ -15,12 +16,12 @@ Public Class cConversation
 
     Public WriteOnly Property item
         Set(value)
-            pItem = value
+            _item = value
             pConversation = value.GetConversation
             If pConversation IsNot Nothing Then
                 pTable = pConversation.GetTable
                 pTable.Columns.Add("http://schemas.microsoft.com/mapi/proptag/0x0e05001f")
-                pItem = value
+                _item = value
             End If
         End Set
     End Property
@@ -37,7 +38,7 @@ Public Class cConversation
 
     Public ReadOnly Property Count(Optional OnlySameFolder As Boolean = False) As Long
         Get
-            If pItem IsNot Nothing Then
+            If _item IsNot Nothing Then
                 If OnlySameFolder Then
                     pCollection = ToCollection(OnlySameFolder)
                     Count = pCollection.Count
@@ -50,27 +51,32 @@ Public Class cConversation
         End Get
     End Property
 
-    Public ReadOnly Property ToList(Optional OnlySameFolder As Boolean = False) As List(Of Object)
+    Public ReadOnly Property ToList(Optional OnlySameFolder As Boolean = False, Optional MailOnly As Boolean = True) As IList
         Get
-            If Not pItem Is Nothing Then
+            If Not _item Is Nothing Then
                 Dim oRow As Outlook.Row
                 Dim objItem As Object
-                Dim pList = New List(Of Object)
+                Dim listObjects As New List(Of Object)
+                Dim listEmail As New List(Of MailItem)
                 pTable.Sort("[ReceivedTime]", True)
 
                 Do Until pTable.EndOfTable
                     oRow = pTable.GetNextRow
                     ' Use EntryID and StoreID to open the item.
                     objItem = _olApp.Session.GetItemFromID(oRow("EntryID"))
-                    If OnlySameFolder Then
-                        If objItem.Parent.Name = pItem.Parent.Name Then
-                            pList.Add(objItem)
-                        End If
+                    If MailOnly Then
+                        AddEmailToList(OnlySameFolder, objItem, listEmail)
                     Else
-                        pList.Add(objItem)
+                        AddObjectToList(OnlySameFolder, objItem, listObjects)
                     End If
                 Loop
-                Return pList
+
+                If MailOnly Then
+                    Return listEmail
+                Else
+                    Return listObjects
+                End If
+
             Else
                 Return Nothing
             End If
@@ -78,9 +84,31 @@ Public Class cConversation
         End Get
     End Property
 
+    Private Sub AddObjectToList(OnlySameFolder As Boolean, objItem As Object, listObjects As List(Of Object))
+        If OnlySameFolder Then
+            If objItem.Parent.Name = _item.Parent.Name Then
+                listObjects.Add(objItem)
+            End If
+        Else
+            listObjects.Add(objItem)
+        End If
+    End Sub
+
+    Private Sub AddEmailToList(OnlySameFolder As Boolean, objItem As Object, ByRef listEmails As List(Of MailItem))
+        If TypeOf objItem Is MailItem Then
+            If OnlySameFolder Then
+                If objItem.Parent.Name = _item.Parent.Name Then
+                    listEmails.Add(objItem)
+                End If
+            Else
+                listEmails.Add(objItem)
+            End If
+        End If
+    End Sub
+
     Public ReadOnly Property ToCollection(Optional OnlySameFolder As Boolean = False) As Collection
         Get
-            If pItem IsNot Nothing Then
+            If _item IsNot Nothing Then
                 Dim oRow As Outlook.Row
                 Dim objItem As Object
                 pCollection = New Collection
@@ -91,7 +119,7 @@ Public Class cConversation
                     ' Use EntryID and StoreID to open the item.
                     objItem = _olApp.Session.GetItemFromID(oRow("EntryID"))
                     If OnlySameFolder Then
-                        If objItem.Parent.Name = pItem.Parent.Name Then
+                        If objItem.Parent.Name = _item.Parent.Name Then
                             pCollection.Add(objItem)
                         End If
                     Else

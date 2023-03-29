@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.Windows.SDK.Win32Docs, Version=0.1.12.49761, Culture=neutral, PublicKeyToken=7c40c7c34b1fcfe1, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Windows.SDK.Win32Docs.0.1.12-alpha\lib\netstandard2.0\Microsoft.Windows.SDK.Win32Docs.dll</HintPath>
     </Reference>
@@ -69,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSExtensions.cs" />
     <Compile Include="ExtraDeclarations.cs" />
     <Compile Include="MyBoxTemplate.cs">
       <SubType>Form</SubType>
@@ -79,6 +83,11 @@
     <Compile Include="ISerializableList.cs" />
     <Compile Include="NotImplementedDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SerializableList.cs" />
     <Compile Include="MyBox.cs" />
   </ItemGroup>
@@ -90,6 +99,10 @@
   <ItemGroup>
     <EmbeddedResource Include="MyBoxTemplate.resx">
       <DependentUpon>MyBoxTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NativeMethods.txt" />
+    <None Include="Resources\ExceptionPublic.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

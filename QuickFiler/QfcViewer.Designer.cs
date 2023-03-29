@@ -1,33 +1,31 @@
-﻿using System.Diagnostics;
-
-namespace QuickFiler
+﻿namespace QuickFiler
 {
-    public partial class QfcViewer : System.Windows.Forms.UserControl
+	partial class QfcViewer
     {
-
-        // UserControl overrides dispose to clean up the component list.
-        protected override void Dispose(bool disposing)
+		/// <summary>
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
+        
+		/// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing)
         {
-            try
-            {
-                if (disposing && components is not null)
-                {
-                    components.Dispose();
-                }
-            }
-            finally
-            {
-                base.Dispose(disposing);
-            }
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+			base.Dispose(disposing);   
         }
 
-        // Required by the Windows Form Designer
-        private System.ComponentModel.IContainer components;
-
-        // NOTE: The following procedure is required by the Windows Form Designer
-        // It can be modified using the Windows Form Designer.  
-        // Do not modify it using the code editor.
-        [DebuggerStepThrough()]
+        #region Windows Form Designer generated code
+		
+		/// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
         private void InitializeComponent()
         {
             this.L1h = new System.Windows.Forms.SplitContainer();
@@ -103,8 +101,8 @@ namespace QuickFiler
             // 
             this.L1h.Panel2.Controls.Add(this.L1h2L2v);
             this.L1h.Panel2MinSize = 575;
-            this.L1h.Size = new System.Drawing.Size(1094, 105);
-            this.L1h.SplitterDistance = 515;
+            this.L1h.Size = new System.Drawing.Size(1078, 112);
+            this.L1h.SplitterDistance = 498;
             this.L1h.TabIndex = 1;
             // 
             // L1h1L2v
@@ -126,7 +124,7 @@ namespace QuickFiler
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.L1h1L2v.Size = new System.Drawing.Size(515, 105);
+            this.L1h1L2v.Size = new System.Drawing.Size(498, 112);
             this.L1h1L2v.TabIndex = 0;
             // 
             // L1h1L2v1L3h
@@ -152,14 +150,14 @@ namespace QuickFiler
             this.L1h1L2v1L3h.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.L1h1L2v1L3h.RowCount = 1;
             this.L1h1L2v1L3h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v1L3h.Size = new System.Drawing.Size(465, 20);
+            this.L1h1L2v1L3h.Size = new System.Drawing.Size(448, 20);
             this.L1h1L2v1L3h.TabIndex = 0;
             // 
             // LblSentOn
             // 
             this.LblSentOn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.LblSentOn.AutoSize = true;
-            this.LblSentOn.Location = new System.Drawing.Point(392, 0);
+            this.LblSentOn.Location = new System.Drawing.Point(375, 0);
             this.LblSentOn.Margin = new System.Windows.Forms.Padding(0);
             this.LblSentOn.Name = "LblSentOn";
             this.LblSentOn.Padding = new System.Windows.Forms.Padding(3);
@@ -182,7 +180,7 @@ namespace QuickFiler
             // 
             this.lblCaptionTriage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblCaptionTriage.AutoSize = true;
-            this.lblCaptionTriage.Location = new System.Drawing.Point(97, 0);
+            this.lblCaptionTriage.Location = new System.Drawing.Point(89, 0);
             this.lblCaptionTriage.Margin = new System.Windows.Forms.Padding(0);
             this.lblCaptionTriage.Name = "lblCaptionTriage";
             this.lblCaptionTriage.Padding = new System.Windows.Forms.Padding(3);
@@ -195,7 +193,7 @@ namespace QuickFiler
             this.LblTriage.AutoSize = true;
             this.LblTriage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.LblTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblTriage.Location = new System.Drawing.Point(177, 3);
+            this.LblTriage.Location = new System.Drawing.Point(169, 3);
             this.LblTriage.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             this.LblTriage.Name = "LblTriage";
             this.LblTriage.Size = new System.Drawing.Size(17, 14);
@@ -205,7 +203,7 @@ namespace QuickFiler
             // LblCaptionPredicted
             // 
             this.LblCaptionPredicted.AutoSize = true;
-            this.LblCaptionPredicted.Location = new System.Drawing.Point(219, 0);
+            this.LblCaptionPredicted.Location = new System.Drawing.Point(211, 0);
             this.LblCaptionPredicted.Margin = new System.Windows.Forms.Padding(0);
             this.LblCaptionPredicted.Name = "LblCaptionPredicted";
             this.LblCaptionPredicted.Padding = new System.Windows.Forms.Padding(3);
@@ -217,7 +215,7 @@ namespace QuickFiler
             // 
             this.LblActionable.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.LblActionable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblActionable.Location = new System.Drawing.Point(283, 3);
+            this.LblActionable.Location = new System.Drawing.Point(275, 3);
             this.LblActionable.Margin = new System.Windows.Forms.Padding(3);
             this.LblActionable.Name = "LblActionable";
             this.LblActionable.Size = new System.Drawing.Size(87, 14);
@@ -239,7 +237,7 @@ namespace QuickFiler
             this.L1h1L2v2L3h.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.L1h1L2v2L3h.RowCount = 1;
             this.L1h1L2v2L3h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v2L3h.Size = new System.Drawing.Size(465, 30);
+            this.L1h1L2v2L3h.Size = new System.Drawing.Size(448, 30);
             this.L1h1L2v2L3h.TabIndex = 3;
             // 
             // LblConvCt
@@ -247,7 +245,7 @@ namespace QuickFiler
             this.LblConvCt.AutoSize = true;
             this.LblConvCt.Dock = System.Windows.Forms.DockStyle.Right;
             this.LblConvCt.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblConvCt.Location = new System.Drawing.Point(408, 0);
+            this.LblConvCt.Location = new System.Drawing.Point(391, 0);
             this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
             this.LblConvCt.Name = "LblConvCt";
             this.LblConvCt.Padding = new System.Windows.Forms.Padding(3);
@@ -277,7 +275,7 @@ namespace QuickFiler
             this.TxtboxBody.Multiline = true;
             this.TxtboxBody.Name = "TxtboxBody";
             this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(459, 49);
+            this.TxtboxBody.Size = new System.Drawing.Size(442, 56);
             this.TxtboxBody.TabIndex = 4;
             this.TxtboxBody.Text = "<BODY>";
             // 
@@ -328,7 +326,7 @@ namespace QuickFiler
             this.L1h2L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.L1h2L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.L1h2L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.L1h2L2v.Size = new System.Drawing.Size(575, 105);
+            this.L1h2L2v.Size = new System.Drawing.Size(576, 112);
             this.L1h2L2v.TabIndex = 0;
             // 
             // L1h2L2v1h
@@ -354,7 +352,7 @@ namespace QuickFiler
             this.L1h2L2v1h.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.L1h2L2v1h.RowCount = 1;
             this.L1h2L2v1h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h2L2v1h.Size = new System.Drawing.Size(575, 26);
+            this.L1h2L2v1h.Size = new System.Drawing.Size(576, 26);
             this.L1h2L2v1h.TabIndex = 0;
             // 
             // LblAcSearch
@@ -392,7 +390,7 @@ namespace QuickFiler
             this.TxtboxSearch.Location = new System.Drawing.Point(78, 1);
             this.TxtboxSearch.Margin = new System.Windows.Forms.Padding(0, 1, 0, 1);
             this.TxtboxSearch.Name = "TxtboxSearch";
-            this.TxtboxSearch.Size = new System.Drawing.Size(344, 24);
+            this.TxtboxSearch.Size = new System.Drawing.Size(345, 24);
             this.TxtboxSearch.TabIndex = 3;
             // 
             // L1h2L2v1h5Panel
@@ -401,7 +399,7 @@ namespace QuickFiler
             this.L1h2L2v1h5Panel.Controls.Add(this.LblAcDelete);
             this.L1h2L2v1h5Panel.Controls.Add(this.BtnDelItem);
             this.L1h2L2v1h5Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h2L2v1h5Panel.Location = new System.Drawing.Point(522, 0);
+            this.L1h2L2v1h5Panel.Location = new System.Drawing.Point(523, 0);
             this.L1h2L2v1h5Panel.Margin = new System.Windows.Forms.Padding(0);
             this.L1h2L2v1h5Panel.Name = "L1h2L2v1h5Panel";
             this.L1h2L2v1h5Panel.Size = new System.Drawing.Size(50, 26);
@@ -429,7 +427,7 @@ namespace QuickFiler
             this.BtnDelItem.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Red;
             this.BtnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.BtnDelItem.Image = global::QuickFiler.My.Resources.Resources.Delete;
+            this.BtnDelItem.Image = global::QuickFiler.Properties.Resources.Delete;
             this.BtnDelItem.Location = new System.Drawing.Point(0, 0);
             this.BtnDelItem.Margin = new System.Windows.Forms.Padding(0);
             this.BtnDelItem.Name = "BtnDelItem";
@@ -442,7 +440,7 @@ namespace QuickFiler
             this.L1h2L2v1h4Panel.Controls.Add(this.LblAcPopOut);
             this.L1h2L2v1h4Panel.Controls.Add(this.BtnPopOut);
             this.L1h2L2v1h4Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h2L2v1h4Panel.Location = new System.Drawing.Point(472, 0);
+            this.L1h2L2v1h4Panel.Location = new System.Drawing.Point(473, 0);
             this.L1h2L2v1h4Panel.Margin = new System.Windows.Forms.Padding(0);
             this.L1h2L2v1h4Panel.Name = "L1h2L2v1h4Panel";
             this.L1h2L2v1h4Panel.Size = new System.Drawing.Size(50, 26);
@@ -465,7 +463,7 @@ namespace QuickFiler
             // BtnPopOut
             // 
             this.BtnPopOut.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BtnPopOut.Image = global::QuickFiler.My.Resources.Resources.ApplicationFlyout;
+            this.BtnPopOut.Image = global::QuickFiler.Properties.Resources.ApplicationFlyout;
             this.BtnPopOut.Location = new System.Drawing.Point(0, 0);
             this.BtnPopOut.Margin = new System.Windows.Forms.Padding(0);
             this.BtnPopOut.Name = "BtnPopOut";
@@ -478,7 +476,7 @@ namespace QuickFiler
             this.L1h2L2v1h3Panel.Controls.Add(this.LblAcTask);
             this.L1h2L2v1h3Panel.Controls.Add(this.BtnFlagTask);
             this.L1h2L2v1h3Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h2L2v1h3Panel.Location = new System.Drawing.Point(422, 0);
+            this.L1h2L2v1h3Panel.Location = new System.Drawing.Point(423, 0);
             this.L1h2L2v1h3Panel.Margin = new System.Windows.Forms.Padding(0);
             this.L1h2L2v1h3Panel.Name = "L1h2L2v1h3Panel";
             this.L1h2L2v1h3Panel.Size = new System.Drawing.Size(50, 26);
@@ -501,7 +499,7 @@ namespace QuickFiler
             // BtnFlagTask
             // 
             this.BtnFlagTask.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BtnFlagTask.Image = global::QuickFiler.My.Resources.Resources.FlagDarkRed;
+            this.BtnFlagTask.Image = global::QuickFiler.Properties.Resources.FlagDarkRed;
             this.BtnFlagTask.Location = new System.Drawing.Point(0, 0);
             this.BtnFlagTask.Margin = new System.Windows.Forms.Padding(0);
             this.BtnFlagTask.Name = "BtnFlagTask";
@@ -526,7 +524,7 @@ namespace QuickFiler
             this.L1h2L2v2h.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.L1h2L2v2h.RowCount = 1;
             this.L1h2L2v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h2L2v2h.Size = new System.Drawing.Size(575, 31);
+            this.L1h2L2v2h.Size = new System.Drawing.Size(576, 31);
             this.L1h2L2v2h.TabIndex = 1;
             // 
             // LblAcFolder
@@ -565,7 +563,7 @@ namespace QuickFiler
             this.CboFolders.Location = new System.Drawing.Point(78, 2);
             this.CboFolders.Margin = new System.Windows.Forms.Padding(0, 2, 0, 2);
             this.CboFolders.Name = "CboFolders";
-            this.CboFolders.Size = new System.Drawing.Size(494, 28);
+            this.CboFolders.Size = new System.Drawing.Size(495, 28);
             this.CboFolders.TabIndex = 6;
             // 
             // L1h2L2v3h
@@ -594,7 +592,7 @@ namespace QuickFiler
             this.L1h2L2v3h.Name = "L1h2L2v3h";
             this.L1h2L2v3h.RowCount = 1;
             this.L1h2L2v3h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h2L2v3h.Size = new System.Drawing.Size(569, 34);
+            this.L1h2L2v3h.Size = new System.Drawing.Size(570, 41);
             this.L1h2L2v3h.TabIndex = 2;
             // 
             // LblAcConversation
@@ -638,7 +636,7 @@ namespace QuickFiler
             // 
             this.CbxEmailCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.CbxEmailCopy.AutoSize = true;
-            this.CbxEmailCopy.Location = new System.Drawing.Point(476, 3);
+            this.CbxEmailCopy.Location = new System.Drawing.Point(477, 3);
             this.CbxEmailCopy.Name = "CbxEmailCopy";
             this.CbxEmailCopy.Size = new System.Drawing.Size(90, 17);
             this.CbxEmailCopy.TabIndex = 6;
@@ -651,7 +649,7 @@ namespace QuickFiler
             this.LblSaveOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.LblSaveOptions.AutoSize = true;
             this.LblSaveOptions.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblSaveOptions.Location = new System.Drawing.Point(247, 4);
+            this.LblSaveOptions.Location = new System.Drawing.Point(248, 4);
             this.LblSaveOptions.Margin = new System.Windows.Forms.Padding(3, 4, 0, 3);
             this.LblSaveOptions.Name = "LblSaveOptions";
             this.LblSaveOptions.Size = new System.Drawing.Size(87, 13);
@@ -661,7 +659,7 @@ namespace QuickFiler
             // CbxAttachments
             // 
             this.CbxAttachments.AutoSize = true;
-            this.CbxAttachments.Location = new System.Drawing.Point(357, 3);
+            this.CbxAttachments.Location = new System.Drawing.Point(358, 3);
             this.CbxAttachments.Name = "CbxAttachments";
             this.CbxAttachments.Size = new System.Drawing.Size(85, 17);
             this.CbxAttachments.TabIndex = 12;
@@ -677,7 +675,7 @@ namespace QuickFiler
             this.LblAcAttachments.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcAttachments.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcAttachments.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcAttachments.Location = new System.Drawing.Point(334, 2);
+            this.LblAcAttachments.Location = new System.Drawing.Point(335, 2);
             this.LblAcAttachments.Margin = new System.Windows.Forms.Padding(0, 2, 0, 2);
             this.LblAcAttachments.Name = "LblAcAttachments";
             this.LblAcAttachments.Size = new System.Drawing.Size(19, 18);
@@ -692,7 +690,7 @@ namespace QuickFiler
             this.LblAcEmail.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcEmail.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcEmail.Location = new System.Drawing.Point(449, 2);
+            this.LblAcEmail.Location = new System.Drawing.Point(450, 2);
             this.LblAcEmail.Margin = new System.Windows.Forms.Padding(0, 2, 0, 2);
             this.LblAcEmail.Name = "LblAcEmail";
             this.LblAcEmail.Size = new System.Drawing.Size(19, 18);
@@ -704,11 +702,11 @@ namespace QuickFiler
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ClientSize = new System.Drawing.Size(1078, 112);
             this.Controls.Add(this.L1h);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "QfcViewer";
-            this.Size = new System.Drawing.Size(1094, 105);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.ControlGroup_Paint);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.QfcViewer_Paint);
             this.L1h.Panel1.ResumeLayout(false);
             this.L1h.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.L1h)).EndInit();
@@ -735,6 +733,9 @@ namespace QuickFiler
             this.ResumeLayout(false);
 
         }
+		
+		#endregion
+		
         internal System.Windows.Forms.SplitContainer L1h;
         internal System.Windows.Forms.TableLayoutPanel L1h2L2v;
         internal System.Windows.Forms.TableLayoutPanel L1h2L2v1h;

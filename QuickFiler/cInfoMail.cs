@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
+using ToDoModel;
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
 using UtilitiesVB;
@@ -15,7 +17,7 @@ namespace QuickFiler
         public string Subject;
         private DateTime _endDate;
         public DateTime StartDate;
-        private long _durationSec;
+        private int _durationSec;
         public string SentTo;
         public string SentCC;
         public string SentFrom;
@@ -77,7 +79,8 @@ namespace QuickFiler
                         {
                             if (i > 1)
                                 dict_strSumRet = dict_strSumRet + " | ";
-                            dict_strSumRet = dict_strSumRet + key + " " + Strings.Format(_dict[key] / 60d, "#,##0.0") + " min";
+                            dict_strSumRet = dict_strSumRet + key + " " + (_dict[key] / 60d).ToString("#,##0.0") + " min";
+                            //dict_strSumRet = dict_strSumRet + key + " " + Strings.Format(_dict[key] / 60d, "#,##0.0") + " min";
                         }
                     }
                 }
@@ -101,7 +104,7 @@ namespace QuickFiler
             string lcl_Subject = "",
             DateTime lcl_EndDate = default,
             DateTime lcl_StartDate = default,
-            long lcl_DurationSec = 0L,
+            int lcl_DurationSec = 0,
             string lcl_SentTo = "",
             string lcl_SentCC = "",
             string lcl_SentFrom = "",
@@ -110,62 +113,59 @@ namespace QuickFiler
             Categories lcl_Categories = null,
             string lcl_strAction = "")
         {
-            object InitRet = default;
+            int InitRet = default;
 
-            Subject = lcl_Subject;
-            EndDate = lcl_EndDate;
-            StartDate = lcl_StartDate;
-            DurationSec = lcl_DurationSec;
-            SentTo = lcl_SentTo;
-            SentCC = lcl_SentCC;
-            SentFrom = lcl_SentFrom;
-            Body = lcl_Body;
-            Importance = lcl_Importance;
-            Categories = lcl_Categories.ToString();
-            strAction = lcl_strAction;
-
-            if (Information.Err().Number == 0)
+            try
             {
-                InitRet = 1;
+                Subject = lcl_Subject;
+                EndDate = lcl_EndDate;
+                StartDate = lcl_StartDate;
+                DurationSec = lcl_DurationSec;
+                SentTo = lcl_SentTo;
+                SentCC = lcl_SentCC;
+                SentFrom = lcl_SentFrom;
+                Body = lcl_Body;
+                Importance = lcl_Importance;
+                Categories = lcl_Categories.ToString();
+                strAction = lcl_strAction;
+                return 1;
             }
-            else
+            catch (System.Exception)
             {
-                InitRet = 0;
+                return 0;
             }
-
-            return InitRet;
         }
 
-        internal bool Init_wMail(MailItem OlMail, DateTime OlEndTime = default, long lngDurationSec = 0L, string stringAction = "")
+        internal bool Init_wMail(MailItem OlMail, DateTime OlEndTime = default, int lngDurationSec = 0, string stringAction = "")
         {
-            bool Init_wMailRet = default;
-            Subject = OlMail.Subject;
-            if (OlEndTime != default)
-                EndDate = OlEndTime;
-            if (Conversions.ToBoolean(lngDurationSec))
-                DurationSec = lngDurationSec;
-            SentTo = OlMail.To;
-            SentCC = OlMail.CC;
-            SentFrom = OlMail.Sender.ToString();
-            Body = OlMail.Body;
-            Importance = OlMail.Importance;
-            Categories = OlMail.Categories;
-            if (!string.IsNullOrEmpty(stringAction))
-                strAction = stringAction;
-
-            if (Information.Err().Number == 0)
+            try
             {
-                Init_wMailRet = true;
+                bool Init_wMailRet = default;
+                Subject = OlMail.Subject;
+                if (OlEndTime != default)
+                    EndDate = OlEndTime;
+                if (lngDurationSec != 0)
+                    DurationSec = lngDurationSec;
+                var recipients = CaptureEmailDetailsModule.GetRecipients(OlMail);
+                SentTo = recipients.recipientsTo;
+                SentCC = recipients.recipientsCC;
+                SentFrom = OlMail.Sender.ToString();
+                Body = OlMail.Body;
+                Importance = OlMail.Importance;
+                Categories = OlMail.Categories;
+                if (!string.IsNullOrEmpty(stringAction))
+                    strAction = stringAction;
+                return true;
             }
-            else
+            catch (System.Exception e)
             {
-                Init_wMailRet = false;
-                Debug.WriteLine(Information.Err().Description);
-                Information.Err().Clear();
+                DialogResult result = MessageBox.Show("Error", e.Message + " Should we break",MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    throw e;
+                }
+                return false;
             }
-
-            return Init_wMailRet;
-
         }
 
         public DateTime EndDate
@@ -177,11 +177,11 @@ namespace QuickFiler
             set
             {
                 _endDate = value;
-                StartDate = DateAndTime.DateAdd("s", -_durationSec, _endDate);
+                StartDate = _endDate.Subtract(new TimeSpan(0,0, 0, _durationSec));
             }
         }
 
-        public long DurationSec
+        public int DurationSec
         {
             get
             {
@@ -190,7 +190,7 @@ namespace QuickFiler
             set
             {
                 _durationSec = value;
-                StartDate = DateAndTime.DateAdd("s", -_durationSec, _endDate);
+                StartDate = _endDate.Subtract(new TimeSpan(0, 0, 0, _durationSec));
             }
         }
 
@@ -201,27 +201,28 @@ namespace QuickFiler
                 string ToStringRet = default;
                 string strTemp;
                 double lngSeconds;
-                double lngSeconds2;
-                double lngMinutes;
+                int lngSeconds2;
+                int lngMinutes;
                 double lngMinutes2;
 
-                lngSeconds = DateAndTime.DateDiff("s", StartDate, _endDate);
-                lngMinutes = Math.Round(lngSeconds / 60d - 0.5d, 0);
-                lngSeconds2 = lngSeconds - lngMinutes * 60d;
-                lngMinutes2 = lngSeconds / 60d;
+                TimeSpan duration = _endDate.Subtract(StartDate);
+                lngSeconds = _endDate.Subtract(StartDate).TotalSeconds;
+                lngMinutes = duration.Minutes;
+                lngSeconds2 = duration.Seconds;
+                lngMinutes2 = duration.TotalMinutes;
 
                 if (strAction == "EventLog")
                 {
-                    strTemp = Strings.Format(StartDate, "General Date") + " TO " + Strings.Format(_endDate, "h:mm:ss AM/PM") + "| DUR: " + lngMinutes + " minutes " + lngSeconds2 + " seconds" + " |" + Strings.Format(lngMinutes2, "##0.0000") + " | " + "APP: " + Subject + " | " + "PROC: " + strProcName;
+                    strTemp = StartDate.ToString("General Date") + " TO " + _endDate.ToString("h:mm:ss AM/PM") + "| DUR: " + lngMinutes + " minutes " + lngSeconds2 + " seconds" + " |" + lngMinutes2.ToString("##0.0000") + " | " + "APP: " + Subject + " | " + "PROC: " + strProcName;
                 }
 
                 else if (strAction == "ToDo")
                 {
-                    strTemp = "|" + Strings.Format(_endDate, "General Date") + "| Duration: " + lngMinutes + " minutes " + lngSeconds2 + " seconds" + " |" + Strings.Format(lngMinutes2, "##0.0000") + " | Subject: " + Subject;
+                    strTemp = "|" + _endDate.ToString("General Date") + "| Duration: " + lngMinutes + " minutes " + lngSeconds2 + " seconds" + " |" + lngMinutes2.ToString("##0.0000") + " | Subject: " + Subject;
                 }
                 else
                 {
-                    strTemp = "|" + Strings.Format(_endDate, "General Date") + "| Duration: " + lngMinutes + " minutes " + lngSeconds2 + " seconds" + " |" + Strings.Format(lngMinutes2, "##0.0000") + "| Action: " + strAction + " | Subject: " + Subject + " | From: " + SentFrom + " | To: " + SentTo;
+                    strTemp = "|" + _endDate.ToString("General Date") + "| Duration: " + lngMinutes + " minutes " + lngSeconds2 + " seconds" + " |" + lngMinutes2.ToString("##0.0000") + "| Action: " + strAction + " | Subject: " + Subject + " | From: " + SentFrom + " | To: " + SentTo;
                 }
                 ToStringRet = strTemp;
                 return ToStringRet;

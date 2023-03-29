@@ -113,15 +113,14 @@ Public Module FolderSuggestionsModule
 
     End Function
 
-    Public Function LoadEmailDataBase(activeExplorer As Explorer, Optional colEmailsToLoad As Collection = Nothing) As Collection
+    Public Function LoadEmailDataBase(activeExplorer As Explorer, Optional listEmailsToLoad As IList = Nothing) As IList
         Dim OlFolder As Folder
         Dim objCurView As Microsoft.Office.Interop.Outlook.View
         Dim strFilter As String
         Dim OlItems As Items
         'TODO: Move this to Model Component of the MVC
 
-        If colEmailsToLoad Is Nothing Then
-            Dim unused As New Collection
+        If listEmailsToLoad Is Nothing Then
             OlFolder = activeExplorer.CurrentFolder
             objCurView = activeExplorer.CurrentView
             strFilter = objCurView.Filter
@@ -132,11 +131,12 @@ Public Module FolderSuggestionsModule
                 OlItems = OlFolder.Items
             End If
             Return MailItemsSort(OlItems,
-                                SortOptionsEnum.DateRecentFirst +
-                                SortOptionsEnum.TriageImportantFirst +
-                                SortOptionsEnum.ConversationUniqueOnly)
+                                 SortOptionsEnum.DateRecentFirst +
+                                 SortOptionsEnum.TriageImportantFirst +
+                                 SortOptionsEnum.ConversationUniqueOnly)
+
         Else
-            Return colEmailsToLoad
+            Return listEmailsToLoad
         End If
 
     End Function

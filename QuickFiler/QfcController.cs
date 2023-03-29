@@ -24,7 +24,16 @@ namespace QuickFiler
         #region Global Variables, Window Handles and Collections
         private QfcGroupOperationsLegacy _parent;
         private Enums.InitTypeEnum _initType;
+        private cFolderHandler _fldrHandler;
+        private IntPtr hWndCaller;
+
+        private bool p_BoolRemoteMouseApp;
+        private cConversation conv;
+
+        private IApplicationGlobals _globals;
+        private Explorer _activeExplorer;
         #endregion
+
         #region QFC Specific Variables
         private int _intMyPosition;
         private cSuggestions _suggestions = new cSuggestions();
@@ -39,11 +48,13 @@ namespace QuickFiler
         public bool blExpanded;
         public bool blHasChild;
         #endregion
+        
         #region UI Controls WithEvents
         private Control _mPassedControl;
-        private CheckBox _chk;
 
-        public virtual CheckBox chk         // Checkbox to Group Conversations
+        // Checkbox to Group Conversations
+        private CheckBox _chk;                          // CONTROL WITH EVENTS
+        public virtual CheckBox ConversationCb          // PROPERTY used to assign the control and wire events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -70,9 +81,10 @@ namespace QuickFiler
                 }
             }
         }
-        private ComboBox _cbo;
 
-        public virtual ComboBox cbo         // Combo box containing Folder Suggestions
+        // Combo box containing Folder Suggestions
+        private ComboBox _cbo;                          // CONTROL WITH EVENTS
+        public virtual ComboBox FolderCbo               // PROPERTY used to assign the control and wire events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -97,92 +109,95 @@ namespace QuickFiler
                 }
             }
         }
-        private ListBox __lst;
-
-        private ListBox _lst
+        
+        private ListBox _lst;                          // CONTROL WITH EVENTS
+        private ListBox Lst                            // PROPERTY used to assign the control and wire events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return __lst;
+                return _lst;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (__lst != null)
+                if (_lst != null)
                 {
-                    __lst.KeyDown -= lst_KeyDown;
-                    __lst.KeyUp -= lst_KeyUp;
+                    _lst.KeyDown -= lst_KeyDown;
+                    _lst.KeyUp -= lst_KeyUp;
                 }
 
-                __lst = value;
-                if (__lst != null)
+                _lst = value;
+                if (_lst != null)
                 {
-                    __lst.KeyDown += lst_KeyDown;
-                    __lst.KeyUp += lst_KeyUp;
+                    _lst.KeyDown += lst_KeyDown;
+                    _lst.KeyUp += lst_KeyUp;
                 }
             }
-        }
-        private TextBox __txt;
+        }       
 
-        private TextBox _txt          // Input for folder search
+        // Input for folder search
+        private TextBox _searchTxt;                     // CONTROL WITH EVENTS
+        private TextBox SearchTxt                       // PROPERTY used to assign the control and wire events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return __txt;
+                return _searchTxt;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (__txt != null)
+                if (_searchTxt != null)
                 {
-                    __txt.TextChanged -= (_, __) => txt_Change();
-                    __txt.KeyDown -= txt_KeyDown;
-                    __txt.KeyPress -= txt_KeyPress;
-                    __txt.KeyUp -= txt_KeyUp;
+                    _searchTxt.TextChanged -= (_, __) => txt_Change();
+                    _searchTxt.KeyDown -= txt_KeyDown;
+                    _searchTxt.KeyPress -= txt_KeyPress;
+                    _searchTxt.KeyUp -= txt_KeyUp;
                 }
 
-                __txt = value;
-                if (__txt != null)
+                _searchTxt = value;
+                if (_searchTxt != null)
                 {
-                    __txt.TextChanged += (_, __) => txt_Change();
-                    __txt.KeyDown += txt_KeyDown;
-                    __txt.KeyPress += txt_KeyPress;
-                    __txt.KeyUp += txt_KeyUp;
+                    _searchTxt.TextChanged += (_, __) => txt_Change();
+                    _searchTxt.KeyDown += txt_KeyDown;
+                    _searchTxt.KeyPress += txt_KeyPress;
+                    _searchTxt.KeyUp += txt_KeyUp;
                 }
             }
         }
-        private TextBox __bdy;
-
-        private TextBox _bdy
+        
+        // Body of the Email
+        private TextBox _bdy;                          // CONTROL  Private body control with events assigned
+        private TextBox Bdy                            // PROPERTY Private body property to assign the control and wite events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return __bdy;
+                return _bdy;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (__bdy != null)
+                if (_bdy != null)
                 {
-                    __bdy.Click -= (_, __) => bdy_Click();
+                    _bdy.Click -= (_, __) => bdy_Click();
                 }
 
-                __bdy = value;
-                if (__bdy != null)
+                _bdy = value;
+                if (_bdy != null)
                 {
-                    __bdy.Click += (_, __) => bdy_Click();
+                    _bdy.Click += (_, __) => bdy_Click();
                 }
             }
         }
-        private Button __cbKll;
 
-        private Button _cbKll    // Remove mail from Processing
+        // Button to remove email from Processing
+        private Button __cbKll;                         // CONTROL  Private body control with events assigned
+        private Button CbKll                           // PROPERTY Private body property to assign the control and wite events
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -211,9 +226,10 @@ namespace QuickFiler
                 }
             }
         }
-        private Button __cbDel;
 
-        private Button _cbDel    // Delete email
+        // Button to delete email
+        private Button __cbDel;                         // CONTROL  Private body control with events assigned
+        private Button CbDel    
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -242,67 +258,67 @@ namespace QuickFiler
                 }
             }
         }
-        private Button __cbFlag;
 
-        private Button _cbFlag    // Flag as Task
+        private Button _flagTaskCb;
+        private Button FlagTaskCb    // Flag as Task
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return __cbFlag;
+                return _flagTaskCb;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (__cbFlag != null)
+                if (_flagTaskCb != null)
                 {
-                    __cbFlag.Click -= (_, __) => cbFlag_Click();
-                    __cbFlag.KeyDown -= cbFlag_KeyDown;
-                    __cbFlag.KeyPress -= cbFlag_KeyPress;
-                    __cbFlag.KeyUp -= cbFlag_KeyUp;
+                    _flagTaskCb.Click -= (_, __) => cbFlag_Click();
+                    _flagTaskCb.KeyDown -= cbFlag_KeyDown;
+                    _flagTaskCb.KeyPress -= cbFlag_KeyPress;
+                    _flagTaskCb.KeyUp -= cbFlag_KeyUp;
                 }
 
-                __cbFlag = value;
-                if (__cbFlag != null)
+                _flagTaskCb = value;
+                if (_flagTaskCb != null)
                 {
-                    __cbFlag.Click += (_, __) => cbFlag_Click();
-                    __cbFlag.KeyDown += cbFlag_KeyDown;
-                    __cbFlag.KeyPress += cbFlag_KeyPress;
-                    __cbFlag.KeyUp += cbFlag_KeyUp;
+                    _flagTaskCb.Click += (_, __) => cbFlag_Click();
+                    _flagTaskCb.KeyDown += cbFlag_KeyDown;
+                    _flagTaskCb.KeyPress += cbFlag_KeyPress;
+                    _flagTaskCb.KeyUp += cbFlag_KeyUp;
                 }
             }
         }
-        private Button __cbTmp;
 
-        private Button _cbTmp
+        private Button _cbTmp;
+        private Button CbTmp
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return __cbTmp;
+                return _cbTmp;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (__cbTmp != null)
+                if (_cbTmp != null)
                 {
-                    __cbTmp.KeyDown -= cbTmp_KeyDown;
-                    __cbTmp.KeyUp -= cbTmp_KeyUp;
+                    _cbTmp.KeyDown -= cbTmp_KeyDown;
+                    _cbTmp.KeyUp -= cbTmp_KeyUp;
                 }
 
-                __cbTmp = value;
-                if (__cbTmp != null)
+                _cbTmp = value;
+                if (_cbTmp != null)
                 {
-                    __cbTmp.KeyDown += cbTmp_KeyDown;
-                    __cbTmp.KeyUp += cbTmp_KeyUp;
+                    _cbTmp.KeyDown += cbTmp_KeyDown;
+                    _cbTmp.KeyUp += cbTmp_KeyUp;
                 }
             }
         }
+        
         private Panel _frm;
-
-        public virtual Panel frm
+        public virtual Panel Frm
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -330,6 +346,7 @@ namespace QuickFiler
             }
         }
         #endregion
+        
         #region UI Controls - Others Without Events
         public Label lblConvCt;                   // Count of Conversation Members
         private Label _lblMyPosition;             // ACCELERATOR Email Position
@@ -362,24 +379,25 @@ namespace QuickFiler
         private CheckBox _chbxDelFlow;
         public TextBox TxtBoxBody;                // <BODY>
         #endregion
+        
         #region Outlook Variables
         public MailItem Mail;
         private Folder _fldrOriginal;
         private Folder _fldrTarget;
-
         #endregion
+
         #region Resizing Variables
         public struct ctrlPosition
         {
             public bool blInOrigPos;
-            public long topOriginal;
-            public long topNew;
-            public long leftOriginal;
-            public long leftNew;
-            public long heightOriginal;
-            public long heightNew;
-            public long widthOriginal;
-            public long widthNew;
+            public int topOriginal;
+            public int topNew;
+            public int leftOriginal;
+            public int leftNew;
+            public int heightOriginal;
+            public int heightNew;
+            public int widthOriginal;
+            public int widthNew;
         }
 
         private ctrlPosition pos_chbxSaveAttach;  // Checkbox Save Attachment X% Left Position
@@ -397,50 +415,37 @@ namespace QuickFiler
         private ctrlPosition pos_lblAcO;
 
 
-        private long lblSubject_Width;
-        private long lblBody_Width;               // Body Width
-        private long cbFlag_Left;                 // Task button X% left position
-        private long lblAcT_Left;                 // Task accelerator X% left position
-        private long lbl5_Left;                   // Folder label X% left position
-        private long txt_Left;                    // Folder search box X% left position Y% Width
-        private long txt_Width;                   // Folder search box X% left position Y% Width
-        private long lblAcF_Left;                 // F Accelerator X% left position
-        private long lblAcD_Left;                 // D Accelerator X% left position
-        private long cbo_Left;                    // Dropdown box X% Left position Y% Width
-        private long cbo_Width;                   // Dropdown box X% Left position Y% Width
-        private long cbDel_Left;                  // Delete button X+Y% Left position
-        private long cbKll_Left;
-        private long lblAcX_Left;
-        private long lblAcR_Left;
-        private long lblAcC_Left;                 // Conversation accelerator X% Left position
-        private long chk_Left;                    // Conversation checkbox X% Left Position
-        private long lblConvCt_Left;              // Conversation Count X% Left Position
-        private long chbxSaveAttach_Left;         // Checkbox Save Attachment X% Left Position
-        private long chbxSaveMail_Left;           // Checkbox Save Mail X% Left Position
-        private long chbxDelFlow_Left;            // Checkbox Delete Flow X% Left Position
-        private long lblAcA_Left;                 // A Accelerator X% Left Position
-        private long lblAcW_Left;                 // W Accelerator X% Left Position
-        private long lblAcM_Left;                 // M Accelerator X% Left Position
-        private long lngBlock_Width;              // Width of block of controls that need to be right justified
-        private long lblActionable_Left;
-        private long lblActionable_Width;
-        private long lblSentOn_Left;
-        private long lblTriage_Left;
-        private long lblTriage_Width;
+        private int lblSubject_Width;
+        private int lblBody_Width;               // Body Width
+        private int cbFlag_Left;                 // Task button X% left position
+        private int lblAcT_Left;                 // Task accelerator X% left position
+        private int lbl5_Left;                   // Folder label X% left position
+        private int txt_Left;                    // Folder search box X% left position Y% Width
+        private int txt_Width;                   // Folder search box X% left position Y% Width
+        private int lblAcF_Left;                 // F Accelerator X% left position
+        private int lblAcD_Left;                 // D Accelerator X% left position
+        private int cbo_Left;                    // Dropdown box X% Left position Y% Width
+        private int cbo_Width;                   // Dropdown box X% Left position Y% Width
+        private int cbDel_Left;                  // Delete button X+Y% Left position
+        private int cbKll_Left;
+        private int lblAcX_Left;
+        private int lblAcR_Left;
+        private int lblAcC_Left;                 // Conversation accelerator X% Left position
+        private int chk_Left;                    // Conversation checkbox X% Left Position
+        private int lblConvCt_Left;              // Conversation Count X% Left Position
+        private int chbxSaveAttach_Left;         // Checkbox Save Attachment X% Left Position
+        private int chbxSaveMail_Left;           // Checkbox Save Mail X% Left Position
+        private int chbxDelFlow_Left;            // Checkbox Delete Flow X% Left Position
+        private int lblAcA_Left;                 // A Accelerator X% Left Position
+        private int lblAcW_Left;                 // W Accelerator X% Left Position
+        private int lblAcM_Left;                 // M Accelerator X% Left Position
+        private int lngBlock_Width;              // Width of block of controls that need to be right justified
+        private int lblActionable_Left;
+        private int lblActionable_Width;
+        private int lblSentOn_Left;
+        private int lblTriage_Left;
+        private int lblTriage_Width;
         #endregion
-
-        // Private opt As System.Windows.Forms.RadioButton
-        // Private spn As System.Windows.Forms.NumericUpDown
-
-
-        private cFolderHandler _fldrHandler;
-        private IntPtr hWndCaller;
-
-        private bool p_BoolRemoteMouseApp;
-        private cConversation conv;
-
-        private IApplicationGlobals _globals;
-        private Explorer _activeExplorer;
 
         #region Notes
         // The following functions are needed that reside at a higher level in the process
@@ -458,8 +463,9 @@ namespace QuickFiler
         // ConvToggle_UnGroup
         #endregion
 
+        #region Main Class Functions
         internal QfcController(MailItem m_mail,
-                               List<Control> col,
+                               List<Control> controlList,
                                int intPositionArg,
                                bool BoolRemoteMouseApp,
                                QfcGroupOperationsLegacy Caller,
@@ -467,60 +473,45 @@ namespace QuickFiler
                                IntPtr hwnd = default,
                                Enums.InitTypeEnum InitTypeE = Enums.InitTypeEnum.InitSort)
         {
-            _bdy.Click += (_, __) => bdy_Click();
-            _cbDel.Click += (_, __) => cbDel_Click();
-            _cbDel.KeyDown += cbDel_KeyDown;
-            _cbDel.KeyPress += cbDel_KeyPress;
-            _cbDel.KeyUp += cbDel_KeyUp;
-            _cbFlag.Click += (_, __) => cbFlag_Click();
-            _cbFlag.KeyDown += cbFlag_KeyDown;
-            _cbFlag.KeyPress += cbFlag_KeyPress;
-            _cbFlag.KeyUp += cbFlag_KeyUp;
-            _cbKll.Click += (_, __) => cbKll_Click();
-            _cbKll.KeyDown += cbKll_KeyDown;
-            _cbKll.KeyPress += cbKll_KeyPress;
-            _cbKll.KeyUp += cbKll_KeyUp;
-            cbo.KeyDown += cbo_KeyDown;
-            cbo.KeyUp += cbo_KeyUp;
-            _cbTmp.KeyDown += cbTmp_KeyDown;
-            _cbTmp.KeyUp += cbTmp_KeyUp;
-            chk.CheckedChanged += (_, __) => chk_Click();
-            chk.KeyDown += chk_KeyDown;
-            chk.KeyUp += chk_KeyUp;
-            frm.KeyDown += frm_KeyDown;
-            frm.KeyPress += frm_KeyPress;
-            frm.KeyUp += frm_KeyUp;
-            _lst.KeyDown += lst_KeyDown;
-            _lst.KeyUp += lst_KeyUp;
-            _txt.TextChanged += (_, __) => txt_Change();
-            _txt.KeyDown += txt_KeyDown;
-            _txt.KeyPress += txt_KeyPress;
-            _txt.KeyUp += txt_KeyUp;
-
             // Wire global and delegate variables and handles
             _globals = AppGlobals;
             _parent = Caller;
             _activeExplorer = AppGlobals.Ol.App.ActiveExplorer();
             _initType = InitTypeE;
             hWndCaller = hwnd;
-
-            // Wire email specific variables
-            _intMyPosition = intPositionArg;        // call back position in collection
+            _intMyPosition = intPositionArg;
             Mail = m_mail;
 
+            //Resolve control and wire handlers
+            ResolveControlAssignments(controlList);
+            WireEventHandlers();
+            EmailFormatting();
+            SetInitialControlSizePosition();
+
+            
+
+            StrlblTo = Mail.To;
+
+            if (BoolRemoteMouseApp)
+                ToggleRemoteMouseAppLabels();
+        }
+
+        
+        private void ResolveControlAssignments(List<Control> controlList)
+        {
             // Resolve controls in collection to their specific control
             // TODO: Simplify control resolution. It is overengineered
             _fldrOriginal = (Folder)Mail.Parent;
             string strBodyText;
-            _colCtrls = col;
-            foreach (Control ctlTmp in col)
+            _colCtrls = controlList;
+            foreach (Control ctlTmp in controlList)
             {
-                
+                Debug.WriteLine(ctlTmp.GetType().Name);
                 switch (ctlTmp.GetType().Name ?? "")
                 {
                     case "Panel":
                         {
-                            frm = (Panel)ctlTmp;
+                            Frm = (Panel)ctlTmp;
                             break;
                         }
                     case "CheckBox":
@@ -529,7 +520,7 @@ namespace QuickFiler
                             {
                                 case "  Conversation":
                                     {
-                                        chk = (CheckBox)ctlTmp;
+                                        ConversationCb = (CheckBox)ctlTmp;
                                         break;
                                     }
                                 case " Attach":
@@ -553,12 +544,12 @@ namespace QuickFiler
                         }
                     case "ComboBox":
                         {
-                            cbo = (ComboBox)ctlTmp;
+                            FolderCbo = (ComboBox)ctlTmp;
                             break;
                         }
                     case "ListBox":
                         {
-                            _lst = (ListBox)ctlTmp;
+                            Lst = (ListBox)ctlTmp;
                             break;
                         }
                     case "TextBox":
@@ -569,12 +560,12 @@ namespace QuickFiler
                                 strBodyText = strBodyText.Replace("  ", " ");
                                 strBodyText = strBodyText.Replace("  ", " ") + "<EOM>";
                                 ctlTmp.Text = strBodyText;
-                                _bdy = (TextBox)ctlTmp;
+                                Bdy = (TextBox)ctlTmp;
                                 TxtBoxBody = (TextBox)ctlTmp;
                             }
                             else
                             {
-                                _txt = (TextBox)ctlTmp;
+                                SearchTxt = (TextBox)ctlTmp;
                             }
 
                             break;
@@ -651,7 +642,7 @@ namespace QuickFiler
 
                                 case "<SENTON>":
                                     {
-                                        _lblTmp.Text = Strings.Format(Mail.SentOn, "MM/dd/yy HH:MM");
+                                        _lblTmp.Text = Mail.SentOn.ToString("MM/dd/yy HH:MM");
                                         lblSentOn = _lblTmp;
                                         break;
                                     }
@@ -712,18 +703,18 @@ namespace QuickFiler
                         }
                     case "Button":
                         {
-                            _cbTmp = (Button)ctlTmp;
-                            if (_cbTmp.Text == "X")
+                            CbTmp = (Button)ctlTmp;
+                            if (CbTmp.Text == "X")
                             {
-                                _cbDel = (Button)ctlTmp;
+                                CbDel = (Button)ctlTmp;
                             }
-                            else if (_cbTmp.Text == "-->")
+                            else if (CbTmp.Text == "-->")
                             {
-                                _cbKll = (Button)ctlTmp;
+                                CbKll = (Button)ctlTmp;
                             }
-                            else if (_cbTmp.Text == "|>")
+                            else if (CbTmp.Text == "|>")
                             {
-                                _cbFlag = (Button)ctlTmp;
+                                FlagTaskCb = (Button)ctlTmp;
                             }
 
                             break;
@@ -731,65 +722,198 @@ namespace QuickFiler
                 }
 
             }
+        }
 
-            if (Mail.UnRead == true)
+        internal void Init_FolderSuggestions(object varList = null)
+        {
+
+            int i;
+            UserProperty objProperty;
+
+            if (!(varList is Array))
             {
-                LblSubject.ForeColor = Color.DarkBlue;
-                LblSubject.Font = new Font(LblSubject.Font, FontStyle.Bold);
-                _lblSender.ForeColor = Color.DarkBlue;
-                _lblSender.Font = new Font(_lblSender.Font, FontStyle.Bold);
+                objProperty = Mail.UserProperties.Find("FolderKey");
+                if (objProperty is not null)
+                    varList = objProperty;
             }
-            lblSubject_Width = LblSubject.Width;
-            lblBody_Width = TxtBoxBody.Width;
-            cbFlag_Left = _cbFlag.Left;
-            lblAcT_Left = lblAcT.Left;
-
-            lblTriage_Width = lblTriage.Width;
-            lblTriage_Left = lblTriage.Left;
-            lblActionable_Left = lblActionable.Left;
-            lblActionable_Width = lblActionable.Width;
-
-
-            cbDel_Left = _cbDel.Left;
-            cbKll_Left = _cbKll.Left;
-            lblAcX_Left = lblAcX.Left;
-            lblAcR_Left = lblAcR.Left;
-
-
-            lblSentOn_Left = lblSentOn.Left;                 // SentOn X% Left Position
-
-
-
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (varList is Array)
             {
-                lbl5_Left = _lbl5.Left;
-                lblAcF_Left = lblAcF.Left;
-                lblAcD_Left = lblAcD.Left;
-                cbo_Left = cbo.Left;
-                cbo_Width = cbo.Width;
-                lblAcC_Left = lblAcC.Left;                       // Conversation accelerator X% Left position
-                chk_Left = chk.Left;                             // Conversation checkbox X% Left Position
-                chbxSaveAttach_Left = _chbxSaveAttach.Left;       // Checkbox Save Attachment X% Left Position
-                chbxSaveMail_Left = _chbxSaveMail.Left;           // Checkbox Save Mail X% Left Position
-                chbxDelFlow_Left = _chbxDelFlow.Left;             // Checkbox Delete Flow X% Left Position
-                lblAcA_Left = lblAcA.Left;                       // A Accelerator X% Left Position
-                lblAcW_Left = lblAcW.Left;                       // W Accelerator X% Left Position
-                lblAcM_Left = lblAcM.Left;                       // M Accelerator X% Left Position
-                txt_Left = _txt.Left;
-                txt_Width = _txt.Width;
-                lblConvCt_Left = lblConvCt.Left;                 // Conversation Count X% Left Position
+                Array varArray = varList as Array;
+                if (ArrayIsAllocated.IsAllocated(ref varArray))
+                {
+                    // For i = LBound(varList) To UBound(varList)
+                    FolderCbo.Items.AddRange((object[])varList);
+                    FolderCbo.SelectedIndex = 0;
+                    // Next i
+                }
+            }
+            else
+            {
+                // TODO: cSuggestions and cFolderHandler are to mixed up with functionality. Need to clean up.
+                _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
+
+                if (_suggestions.Count > 0)
+                {
+                    Array.Resize(ref _strFolders, _suggestions.Count + 1);
+                    var loopTo = _suggestions.Count;
+                    for (i = 1; i <= loopTo; i++)
+                        _strFolders[i] = _suggestions.FolderList[i];
+                    FolderCbo.Items.AddRange(_strFolders);
+                    FolderCbo.SelectedIndex = 1;
+                }
+                else
+                {
+                    _fldrHandler = new cFolderHandler(_globals);
+                    FolderCbo.Items.AddRange(_fldrHandler.FindFolder("", true, ReCalcSuggestions: true, objItem: Mail));
+
+                    if (FolderCbo.Items.Count >= 2)
+                        FolderCbo.SelectedIndex = 2;
+                }
+
             }
 
-            lngBlock_Width = frm.Width - chbxSaveAttach_Left; // Width of block of right justified controls
+            // Set _fldrHandler = New cFolderHandler
+            // cbo.List = _fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=mail)
+            // If cbo.ListCount >= 2 Then cbo.Value = cbo.List(2)
 
-            StrlblTo = Mail.To;
-
-            if (BoolRemoteMouseApp)
-                ToggleRemoteMouseAppLabels();
-
-
+            // Set objProperty = mail.UserProperties.FIND("AutoFile")
+            // If Not objProperty Is Nothing Then _searchTxt.Value = objProperty.Value
 
 
+            // Call Email_SortToExistingFolder.FindFolder("", True, objItem:=mail)
+
+
+
+
+        }
+
+        internal void CountMailsInConv(int ct = 0)
+        {
+
+
+
+            // Dim Sel As Collection
+
+            if (ct != 0)
+            {
+                lblConvCt.Text = ct.ToString();
+            }
+            else
+            {
+                conv = new cConversation(_globals.Ol.App) { item = Mail };
+                _selItemsInClass = (List<MailItem>)conv.get_ToList(true, true);
+                // Set Sel = New Collection
+                // Sel.Add Mail
+                // Set _selItemsInClass = Email_SortToExistingFolder.DemoConversation(_selItemsInClass, Sel)
+                lblConvCt.Text = _selItemsInClass.Count.ToString();
+            }
+
+
+
+        }
+
+        public void MoveMail()
+        {
+            List<MailItem> selItems = new();
+            string loc;
+            Folder myFolder;
+            MailItem MSG;
+            //Collection Sel;
+            bool Attchments;
+            bool blRepullConv;
+            bool blDoMove;
+
+            blRepullConv = false;
+
+            if (Mail is not null)
+            {
+                if (ConversationCb.Checked == true)
+                {
+                    if (_selItemsInClass is not null)
+                    {
+                        if ((_selItemsInClass.Count == int.Parse(lblConvCt.Text)) & (_selItemsInClass.Count != 0))
+                        {
+                            selItems = _selItemsInClass;
+                        }
+                        else
+                        {
+                            blRepullConv = true;
+                        }
+                    }
+                    else
+                    {
+                        blRepullConv = true;
+                    }
+
+                    if (blRepullConv)
+                    {
+                        // Set selItems = New Collection
+                        // Set Sel = New Collection
+                        // Sel.Add Mail
+                        // Set selItems = Email_SortToExistingFolder.DemoConversation(selItems, Sel)
+
+                        conv = new cConversation(_globals.Ol.App) { item = Mail };
+                        selItems = (List<MailItem>)conv.get_ToList(true, true);
+                    }
+                }
+                else
+                {
+                    selItems.Add(Mail);
+                }
+                Attchments = (FolderCbo.SelectedItem as string != "Trash to Delete") ? false : _chbxSaveAttach.Checked;
+
+                blDoMove = true;
+                if (_fldrOriginal.FolderPath != Mail.Parent.FolderPath)
+                    blDoMove = false;
+
+                if (blDoMove)
+                {
+                    LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
+                    SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
+                                                                                Pictures_Checkbox: false,
+                                                                                SortFolder: FolderCbo.SelectedItem as string,
+                                                                                Save_MSG: _chbxSaveMail.Checked,
+                                                                                Attchments: Attchments,
+                                                                                Remove_Flow_File: _chbxDelFlow.Checked,
+                                                                                OlArchiveRootPath: _globals.Ol.ArchiveRootPath);
+                    SortItemsToExistingFolder.Cleanup_Files();
+                } // blDoMove
+
+            }
+
+        }
+
+        public void ctrlsRemove()
+        {
+
+
+
+            while (_colCtrls.Count > 0)
+            {
+                Frm.Controls.Remove((Control)_colCtrls[_colCtrls.Count]);
+                _colCtrls.RemoveAt(_colCtrls.Count - 1);
+            }
+
+            _fldrHandler = null;
+
+        }
+
+        public void kill()
+        {
+            _mPassedControl = null;
+            ConversationCb = null;
+            FolderCbo = null;
+            Lst = null;
+            SearchTxt = null;
+            Frm = null;
+            CbKll = null;
+            Mail = null;
+            _fldrTarget = null;
+            _lblTmp = null;
+            // Set _suggestions = Nothing
+            // Set _strFolders = Nothing
+            _colCtrls = null;
+            _fldrHandler = null;
         }
 
         internal string Sender
@@ -810,6 +934,454 @@ namespace QuickFiler
             {
                 _intMyPosition = value;
             }
+        }
+
+        #endregion
+
+        #region Formatting and Sizing Controls
+
+        private void EmailFormatting()
+        {
+            if (Mail.UnRead == true)
+            {
+                LblSubject.ForeColor = Color.DarkBlue;
+                LblSubject.Font = new Font(LblSubject.Font, FontStyle.Bold);
+                _lblSender.ForeColor = Color.DarkBlue;
+                _lblSender.Font = new Font(_lblSender.Font, FontStyle.Bold);
+            }
+        }
+
+        private void SetInitialControlSizePosition()
+        {
+            lblSubject_Width = LblSubject.Width;
+            lblBody_Width = TxtBoxBody.Width;
+            cbFlag_Left = FlagTaskCb.Left;
+            lblAcT_Left = lblAcT.Left;
+
+            lblTriage_Width = lblTriage.Width;
+            lblTriage_Left = lblTriage.Left;
+            lblActionable_Left = lblActionable.Left;
+            lblActionable_Width = lblActionable.Width;
+
+            cbDel_Left = CbDel.Left;
+            cbKll_Left = CbKll.Left;
+            lblAcX_Left = lblAcX.Left;
+            lblAcR_Left = lblAcR.Left;
+
+            lblSentOn_Left = lblSentOn.Left;                 // SentOn X% Left Position
+
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            {
+                lbl5_Left = _lbl5.Left;
+                lblAcF_Left = lblAcF.Left;
+                lblAcD_Left = lblAcD.Left;
+                cbo_Left = FolderCbo.Left;
+                cbo_Width = FolderCbo.Width;
+                lblAcC_Left = lblAcC.Left;                       // Conversation accelerator X% Left position
+                chk_Left = ConversationCb.Left;                             // Conversation checkbox X% Left Position
+                chbxSaveAttach_Left = _chbxSaveAttach.Left;       // Checkbox Save Attachment X% Left Position
+                chbxSaveMail_Left = _chbxSaveMail.Left;           // Checkbox Save Mail X% Left Position
+                chbxDelFlow_Left = _chbxDelFlow.Left;             // Checkbox Delete Flow X% Left Position
+                lblAcA_Left = lblAcA.Left;                       // A Accelerator X% Left Position
+                lblAcW_Left = lblAcW.Left;                       // W Accelerator X% Left Position
+                lblAcM_Left = lblAcM.Left;                       // M Accelerator X% Left Position
+                txt_Left = SearchTxt.Left;
+                txt_Width = SearchTxt.Width;
+                lblConvCt_Left = lblConvCt.Left;                 // Conversation Count X% Left Position
+            }
+
+            lngBlock_Width = Frm.Width - chbxSaveAttach_Left; // Width of block of right justified controls
+        }
+
+        public void Accel_Toggle()
+        {
+            if (_lblMyPosition.Enabled == true)
+            {
+                if (_blAccelFocusToggle)
+                {
+                    if (blExpanded == true)
+                        ExpandCtrls1();
+                    Accel_FocusToggle();
+                }
+                _lblMyPosition.Enabled = false;
+                _lblMyPosition.Visible = false;
+                _lblMyPosition.SendToBack();
+            }
+            else
+            {
+                _lblMyPosition.Text = _intMyPosition.ToString();
+                _lblMyPosition.Enabled = true;
+                _lblMyPosition.Visible = true;
+                _lblMyPosition.BackColor = Color.Blue;
+                _lblMyPosition.BringToFront();
+            }
+        }
+
+        public void Accel_FocusToggle()
+        {
+            Control ctlTmp;
+
+            if (_blAccelFocusToggle)
+            {
+                _blAccelFocusToggle = false;
+                foreach (Control currentCtlTmp in _colCtrls)
+                {
+                    ctlTmp = currentCtlTmp;
+                    //switch (Information.TypeName(ctlTmp) ?? "")
+                    switch (ctlTmp)
+                    {
+                        case Panel:
+                            {
+                                ctlTmp.BackColor = SystemColors.Control;
+                                break;
+                            }
+                        case CheckBox:
+                            {
+                                ctlTmp.BackColor = SystemColors.Control;
+                                break;
+                            }
+                        case Label:
+                            {
+                                if (ctlTmp.Text.Length <= 2)
+                                {
+                                    ctlTmp.Visible = false;
+                                    ctlTmp.SendToBack();
+                                }
+                                else
+                                {
+                                    ctlTmp.BackColor = SystemColors.Control;
+                                }
+
+                                break;
+                            }
+                        case TextBox:
+                            {
+                                ctlTmp.BackColor = SystemColors.Control;
+                                break;
+                            }
+                    }
+                }
+                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                {
+                    lblConvCt.Visible = true;
+                    lblConvCt.BackColor = SystemColors.Control;
+                    lblConvCt.BringToFront();
+                    lblTriage.Visible = true;
+                    lblTriage.BackColor = SystemColors.Control;
+                    lblTriage.BringToFront();
+                }
+                _lblMyPosition.Visible = true;
+                _lblMyPosition.BackColor = Color.Blue;
+                _lblMyPosition.BringToFront();
+            }
+
+            else
+            {
+                _blAccelFocusToggle = true;
+                foreach (Control currentCtlTmp1 in _colCtrls)
+                {
+                    ctlTmp = currentCtlTmp1;
+                    switch (ctlTmp)
+                    {
+                        case Panel:
+                            {
+                                ctlTmp.BackColor = Color.PaleTurquoise;
+                                break;
+                            }
+                        case CheckBox:
+                            {
+                                ctlTmp.BackColor = Color.PaleTurquoise;
+                                break;
+                            }
+                        case Label:
+                            {
+                                if (ctlTmp.Text.Length <= 2)
+                                {
+                                    ctlTmp.Visible = true;
+                                    ctlTmp.BringToFront();
+                                }
+                                else
+                                {
+                                    ctlTmp.BackColor = Color.PaleTurquoise;
+                                }
+
+                                break;
+                            }
+                        case TextBox:
+                            {
+                                ctlTmp.BackColor = Color.PaleTurquoise;
+                                break;
+                            }
+                    }
+                }
+                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                {
+                    lblConvCt.BackColor = Color.PaleTurquoise;
+                    lblTriage.BackColor = Color.PaleTurquoise;
+                }
+                _lblMyPosition.BackColor = Color.DarkGreen;
+                // Modal        With _activeExplorer
+                // Modal            .ClearSelection
+                // Modal            If .IsItemSelectableInView(mail) Then .AddToSelection mail
+                // Modal            'DoEvents
+                // Modal        End With
+            }
+        }
+
+        public void Mail_Activate()
+        {
+            if (_activeExplorer.CurrentFolder.DefaultItemType != OlItemType.olMailItem)
+            {
+                _activeExplorer.NavigationPane.CurrentModule = _activeExplorer
+                    .NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail);
+            }
+            if (_activeExplorer.CurrentView.Name != "tmpNoConversation")
+            {
+                _activeExplorer.CurrentView = "tmpNoConversation";
+            }
+            _activeExplorer.ClearSelection();
+            try
+            {
+                if (_activeExplorer.IsItemSelectableInView(Mail))
+                    _activeExplorer.AddToSelection(Mail);
+            }
+            catch (System.Exception e) { MessageBox.Show("Error", "Error in QF.Mail_Activate: " + e.Message); }            
+        }
+
+        public void ResizeCtrls(int intPxChg)
+        {
+            double X1pct;
+            double X2pct;
+            double X3pct;
+            int X1px;
+            int X2px;
+            int X3px;
+            int lngTmp;
+
+            X1pct = 0.6d;
+            X3pct = X1pct / 2d;
+            X2pct = 1d - X1pct;
+
+            X1pct *= intPxChg;
+            X2pct *= intPxChg;
+            X3pct *= intPxChg;
+            X1px = (int)Math.Round(Math.Round(X1pct, 0));
+            X2px = (int)Math.Round(Math.Round(X2pct, 0));
+            X3px = (int)Math.Round(Math.Round(X3pct, 0));
+
+            LblSubject.Width = (int)(lblSubject_Width + X1px);                      // Subject Width X%
+            FlagTaskCb.Left = (int)(cbFlag_Left + X1px + X2px);                         // Task button X% + Y% left position
+            lblAcT.Left = (int)(lblAcT_Left + X1px + X2px);                         // Task accelerator X% + Y% left position
+            CbDel.Left = (int)(cbDel_Left + X1px + X2px);                           // Delete button X+Y% Left position
+            CbKll.Left = (int)(cbKll_Left + X1px + X2px);                           // Kill button X+Y% Left position
+            lblAcX.Left = (int)(lblAcX_Left + X1px + X2px);
+            lblAcR.Left = (int)(lblAcR_Left + X1px + X2px);
+            lblSentOn.Left = (int)(lblSentOn_Left + X1px);                          // SentOn X% Left Position
+            lblActionable.Left = (int)(lblActionable_Left + X3px);                  // <ACTIONABL> left position + X3px
+            lblTriage.Left = (int)(lblTriage_Left + X3px);                          // Triage left position + X3px
+
+
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            {
+                SearchTxt.Left = (int)(txt_Left + X1px);                                  // Folder search box X% left position Y% Width
+                SearchTxt.Width = (int)(txt_Width + X2px);                                // Folder search box X% left position Y% Width
+                _lbl5.Left = (int)(lbl5_Left + X1px);                                // Folder label X% left position
+                lblAcF.Left = (int)(lblAcF_Left + X1px);                            // F Accelerator X% left position
+                lblConvCt.Left = (int)(lblConvCt_Left + X1px);                      // Conversation Count X% Left Position
+                _chbxSaveAttach.Left = (int)(chbxSaveAttach_Left + X1px + X2px);     // Checkbox Save Attachment X% Left Position
+                _chbxSaveMail.Left = (int)(chbxSaveMail_Left + X1px + X2px);         // Checkbox Save Mail X% Left Position
+                _chbxDelFlow.Left = (int)(chbxDelFlow_Left + X1px + X2px);           // Checkbox Delete Flow X% Left Position
+                lblAcA.Left = (int)(lblAcA_Left + X1px + X2px);                     // A Accelerator X% Left Position
+                lblAcW.Left = (int)(lblAcW_Left + X1px + X2px);                     // W Accelerator X% Left Position
+                lblAcM.Left = (int)(lblAcM_Left + X1px + X2px);                     // M Accelerator X% Left Position
+
+                if (blExpanded)
+                {
+
+                    FolderCbo.Width = (int)(Frm.Width - FolderCbo.Left - lngBlock_Width - 5L);
+                    pos_cbo.leftOriginal = cbo_Left + X1px;                   // Dropdown box X% Left position Y% Width
+                    pos_cbo.widthOriginal = cbo_Width + X2px;                 // Dropdown box X% Left position Y% Width
+                    pos_lblAcD.leftOriginal = lblAcD_Left + X1px;             // D Accelerator X% left position
+                    pos_lblAcC.leftOriginal = lblAcC_Left + X1px;             // Conversation accelerator X% Left position
+                    pos_chk.leftOriginal = chk_Left + X1px;                   // Conversation checkbox X% Left Position
+                    lngTmp = ConversationCb.Left;
+                    ConversationCb.Left = lblConvCt.Left - 10;
+                    lblAcC.Left = (int)(lblAcC.Left + ConversationCb.Left - lngTmp);
+                    TxtBoxBody.Width = Frm.Width - TxtBoxBody.Left - 5;
+                    pos_body.widthOriginal = lblBody_Width + X1px;            // Body Width X%
+                }
+
+                else
+                {
+
+                    FolderCbo.Left = (int)(cbo_Left + X1px);                               // Dropdown box X% Left position Y% Width
+                    FolderCbo.Width = (int)(cbo_Width + X2px);                             // Dropdown box X% Left position Y% Width
+                    lblAcD.Left = (int)(lblAcD_Left + X1px);                         // D Accelerator X% left position
+                    lblAcC.Left = (int)(lblAcC_Left + X1px + X2px);                  // Conversation accelerator X% Left position
+                    ConversationCb.Left = (int)(chk_Left + X1px + X2px);                        // Conversation checkbox X% Left Position
+                    TxtBoxBody.Width = (int)(lblBody_Width + X1px);
+
+                }                     // Body Width X%
+            }
+
+            else
+            {
+                TxtBoxBody.Width = (int)(lblBody_Width + X1px + X2px);
+            }                   // Body Width X%
+
+        }
+
+        public void ExpandCtrls1()
+        {
+
+            int lngShift;
+            // Private pos_lblAcC          As ctrlPosition
+            // Private pos_lblAcD          As ctrlPosition
+            // Private pos_lblAcO          As ctrlPosition
+
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            {
+                if (blExpanded == false)
+                {
+                    blExpanded = true;
+                    Frm.Height = Frm.Height * 2;
+                    lngShift = LblSubject.Top + LblSubject.Height - FolderCbo.Top + 1;
+
+                    pos_cbo.topOriginal = FolderCbo.Top;
+                    pos_cbo.topNew = pos_cbo.topOriginal + lngShift;
+                    FolderCbo.Top = (int)pos_cbo.topNew;
+
+                    pos_lblAcD.topOriginal = lblAcD.Top;
+                    lblAcD.Top = (int)(pos_lblAcD.topOriginal + lngShift);
+
+                    pos_cbo.leftOriginal = FolderCbo.Left;
+                    FolderCbo.Left = TxtBoxBody.Left;
+
+                    pos_lblAcD.leftOriginal = lblAcD.Left;
+                    lblAcD.Left = Math.Max(0, FolderCbo.Left - pos_cbo.leftOriginal + pos_lblAcD.leftOriginal);
+
+                    pos_cbo.widthOriginal = FolderCbo.Width;
+                    pos_cbo.widthNew = pos_cbo.leftOriginal - FolderCbo.Left + pos_cbo.widthOriginal - lngBlock_Width;
+                    FolderCbo.Width = (int)pos_cbo.widthNew;
+
+                    lngShift = FolderCbo.Top + FolderCbo.Height - TxtBoxBody.Top + 1;
+
+                    
+                        
+                    pos_body.topOriginal = TxtBoxBody.Top;
+                    pos_body.topNew = pos_body.topOriginal + lngShift;
+                    TxtBoxBody.Top = pos_body.topNew;
+
+                    pos_lblAcO.topOriginal = lblAcO.Top;
+                    lblAcO.Top = (lblAcO.Top + lngShift);
+
+                    pos_body.heightOriginal = TxtBoxBody.Height;
+                    pos_body.heightNew = Frm.Height - pos_body.topNew - 5;
+                    TxtBoxBody.Height = pos_body.heightNew;
+                    pos_body.widthOriginal = TxtBoxBody.Width;
+                    pos_body.widthNew = Frm.Width - TxtBoxBody.Left - 5;
+                    TxtBoxBody.Width = pos_body.widthNew;
+                   
+
+                    ConversationCb.Text = "";
+                    pos_chk.leftOriginal = ConversationCb.Left;
+                    ConversationCb.Left = lblConvCt.Left - 10;
+                    pos_lblAcC.leftOriginal = lblAcC.Left;
+                    lblAcC.Left = (ConversationCb.Left - pos_chk.leftOriginal + pos_lblAcC.leftOriginal);
+
+                    pos_chk.topOriginal = ConversationCb.Top;
+                    ConversationCb.Top = lblConvCt.Top;
+
+                    pos_lblAcC.topOriginal = lblAcC.Top;
+                    lblAcC.Top = lblConvCt.Top;
+
+                    pos_chk.widthOriginal = ConversationCb.Width;
+                    ConversationCb.Width = 10;
+
+
+                    pos_chbxSaveAttach.topOriginal = _chbxSaveAttach.Top;
+                    _chbxSaveAttach.Top = (int)pos_cbo.topNew;
+
+                    pos_chbxSaveMail.topOriginal = _chbxSaveMail.Top;
+                    _chbxSaveMail.Top = (int)pos_cbo.topNew;
+
+                    pos_chbxDelFlow.topOriginal = _chbxDelFlow.Top;
+                    _chbxDelFlow.Top = (int)pos_cbo.topNew;
+
+                    pos_lblAcA.topOriginal = lblAcA.Top;
+                    lblAcA.Top = (int)pos_cbo.topNew;
+
+                    pos_lblAcW.topOriginal = lblAcW.Top;
+                    lblAcW.Top = (int)pos_cbo.topNew;
+
+                    pos_lblAcM.topOriginal = lblAcM.Top;
+                    lblAcM.Top = (int)pos_cbo.topNew;
+                }
+
+
+
+
+
+
+                else
+                {
+                    blExpanded = false;
+                    Frm.Height = (int)Math.Round(Frm.Height / 2d);
+
+                    FolderCbo.Top = (int)pos_cbo.topOriginal;
+                    FolderCbo.Left = (int)pos_cbo.leftOriginal;
+                    FolderCbo.Width = (int)pos_cbo.widthOriginal;
+
+                    lblAcD.Top = (int)pos_lblAcD.topOriginal;
+                    lblAcD.Left = (int)pos_lblAcD.leftOriginal;
+
+                    TxtBoxBody.Top = (int)pos_body.topOriginal;
+                    TxtBoxBody.Height = (int)pos_body.heightOriginal;
+                    TxtBoxBody.Width = (int)pos_body.widthOriginal;
+                    lblAcO.Top = (int)pos_lblAcO.topOriginal;
+
+                    ConversationCb.Text = "  Conversation";
+                    ConversationCb.Left = (int)pos_chk.leftOriginal;
+                    ConversationCb.Top = (int)pos_chk.topOriginal;
+                    ConversationCb.Width = (int)pos_chk.widthOriginal;
+                    lblAcC.Left = (int)pos_lblAcC.leftOriginal;
+                    lblAcC.Top = (int)pos_lblAcC.topOriginal;
+
+                    _chbxSaveAttach.Top = (int)pos_chbxSaveAttach.topOriginal;
+                    _chbxSaveMail.Top = (int)pos_chbxSaveMail.topOriginal;
+                    _chbxDelFlow.Top = (int)pos_chbxDelFlow.topOriginal;
+                    lblAcA.Top = (int)pos_lblAcA.topOriginal;
+                    lblAcW.Top = (int)pos_lblAcW.topOriginal;
+                    lblAcM.Top = (int)pos_lblAcM.topOriginal;
+
+
+                }
+            }
+            else if (blExpanded == false)
+            {
+                blExpanded = true;
+                Frm.Height = Frm.Height * 2;
+                {
+                    pos_body.topOriginal = TxtBoxBody.Top;
+                    pos_lblAcO.topOriginal = lblAcO.Top;
+                    pos_body.heightOriginal = TxtBoxBody.Height;
+                    pos_body.heightNew = Frm.Height - pos_body.topOriginal - 5;
+                    TxtBoxBody.Height = (int)pos_body.heightNew;
+                }
+            }
+            else
+            {
+                blExpanded = false;
+                Frm.Height = (int)Math.Round(Frm.Height / 2d);
+                {
+                    TxtBoxBody.Top = (int)pos_body.topOriginal;
+                    TxtBoxBody.Height = (int)pos_body.heightOriginal;
+                    lblAcO.Top = (int)pos_lblAcO.topOriginal;
+                }
+
+
+            }
+
         }
 
         internal void ToggleRemoteMouseAppLabels()
@@ -856,249 +1428,44 @@ namespace QuickFiler
             }
         }
 
-        internal void Init_FolderSuggestions(object varList = null)
+        #endregion
+
+        #region Event Handlers
+
+        private void WireEventHandlers()
         {
-
-            int i;
-            UserProperty objProperty;
-
-            if (!(varList is Array))
-            {
-                objProperty = Mail.UserProperties.Find("FolderKey");
-                if (objProperty is not null)
-                    varList = objProperty;
-            }
-            if (varList is Array)
-            {
-                Array varArray = varList as Array;
-                if (ArrayIsAllocated.IsAllocated(ref varArray))
-                {
-                    // For i = LBound(varList) To UBound(varList)
-                    cbo.Items.AddRange((object[])varList);
-                    cbo.SelectedIndex = 0;
-                    // Next i
-                }
-            }
-            else
-            {
-                // TODO: cSuggestions and cFolderHandler are to mixed up with functionality. Need to clean up.
-                _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
-
-                if (_suggestions.Count> 0)
-                {
-                    Array.Resize(ref _strFolders, _suggestions.Count + 1);
-                    var loopTo = _suggestions.Count;
-                    for (i = 1; i <= loopTo; i++)
-                        _strFolders[i] = _suggestions.FolderList[i];
-                    cbo.Items.AddRange(_strFolders);
-                    cbo.SelectedIndex = 1;
-                }
-                else
-                {
-                    _fldrHandler = new cFolderHandler(_globals);
-                    cbo.Items.AddRange(_fldrHandler.FindFolder("", true, ReCalcSuggestions: true, objItem: Mail));
-
-                    if (cbo.Items.Count >= 2)
-                        cbo.SelectedIndex = 2;
-                }
-
-            }
-
-            // Set _fldrHandler = New cFolderHandler
-            // cbo.List = _fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=mail)
-            // If cbo.ListCount >= 2 Then cbo.Value = cbo.List(2)
-
-            // Set objProperty = mail.UserProperties.FIND("AutoFile")
-            // If Not objProperty Is Nothing Then _txt.Value = objProperty.Value
-
-
-            // Call Email_SortToExistingFolder.FindFolder("", True, objItem:=mail)
-
-
-
-
+            Bdy.Click += (_, __) => bdy_Click();
+            CbDel.Click += (_, __) => cbDel_Click();
+            CbDel.KeyDown += cbDel_KeyDown;
+            CbDel.KeyPress += cbDel_KeyPress;
+            CbDel.KeyUp += cbDel_KeyUp;
+            FlagTaskCb.Click += (_, __) => cbFlag_Click();
+            FlagTaskCb.KeyDown += cbFlag_KeyDown;
+            FlagTaskCb.KeyPress += cbFlag_KeyPress;
+            FlagTaskCb.KeyUp += cbFlag_KeyUp;
+            CbKll.Click += (_, __) => cbKll_Click();
+            CbKll.KeyDown += cbKll_KeyDown;
+            CbKll.KeyPress += cbKll_KeyPress;
+            CbKll.KeyUp += cbKll_KeyUp;
+            FolderCbo.KeyDown += cbo_KeyDown;
+            FolderCbo.KeyUp += cbo_KeyUp;
+            CbTmp.KeyDown += cbTmp_KeyDown;
+            CbTmp.KeyUp += cbTmp_KeyUp;
+            ConversationCb.CheckedChanged += (_, __) => chk_Click();
+            ConversationCb.KeyDown += chk_KeyDown;
+            ConversationCb.KeyUp += chk_KeyUp;
+            Frm.KeyDown += frm_KeyDown;
+            Frm.KeyPress += frm_KeyPress;
+            Frm.KeyUp += frm_KeyUp;
+            Lst.KeyDown += lst_KeyDown;
+            Lst.KeyUp += lst_KeyUp;
+            SearchTxt.TextChanged += (_, __) => txt_Change();
+            SearchTxt.KeyDown += txt_KeyDown;
+            SearchTxt.KeyPress += txt_KeyPress;
+            SearchTxt.KeyUp += txt_KeyUp;
         }
 
-        internal void CountMailsInConv(int ct = 0)
-        {
-
-
-
-            // Dim Sel As Collection
-
-            if (ct != 0)
-            {
-                lblConvCt.Text = ct.ToString();
-            }
-            else
-            {
-                conv = new cConversation(_globals.Ol.App) { item = Mail };
-                _selItemsInClass = conv.get_ToCollection(true);
-                // Set Sel = New Collection
-                // Sel.Add Mail
-                // Set _selItemsInClass = Email_SortToExistingFolder.DemoConversation(_selItemsInClass, Sel)
-                lblConvCt.Text = _selItemsInClass.Count.ToString();
-            }
-
-
-
-        }
-
-        public void Accel_Toggle()
-        {
-            if (_lblMyPosition.Enabled == true)
-            {
-                if (_blAccelFocusToggle)
-                {
-                    if (blExpanded == true)
-                        ExpandCtrls1();
-                    Accel_FocusToggle();
-                }
-                _lblMyPosition.Enabled = false;
-                _lblMyPosition.Visible = false;
-                _lblMyPosition.SendToBack();
-            }
-            else
-            {
-                _lblMyPosition.Text = _intMyPosition.ToString();
-                _lblMyPosition.Enabled = true;
-                _lblMyPosition.Visible = true;
-                _lblMyPosition.BackColor = Color.Blue;
-                _lblMyPosition.BringToFront();
-            }
-        }
-
-        public void Accel_FocusToggle()
-        {
-            Control ctlTmp;
-
-            if (_blAccelFocusToggle)
-            {
-                _blAccelFocusToggle = false;
-                foreach (Control currentCtlTmp in _colCtrls)
-                {
-                    ctlTmp = currentCtlTmp;
-                    switch (Information.TypeName(ctlTmp) ?? "")
-                    {
-                        case "Panel":
-                            {
-                                ctlTmp.BackColor = SystemColors.Control;
-                                break;
-                            }
-                        case "CheckBox":
-                            {
-                                ctlTmp.BackColor = SystemColors.Control;
-                                break;
-                            }
-                        case "Label":
-                            {
-                                if (Strings.Len(ctlTmp.Text) <= 2)
-                                {
-                                    ctlTmp.Visible = false;
-                                    ctlTmp.SendToBack();
-                                }
-                                else
-                                {
-                                    ctlTmp.BackColor = SystemColors.Control;
-                                }
-
-                                break;
-                            }
-                        case "TextBox":
-                            {
-                                ctlTmp.BackColor = SystemColors.Control;
-                                break;
-                            }
-                    }
-                }
-                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                {
-                    lblConvCt.Visible = true;
-                    lblConvCt.BackColor = SystemColors.Control;
-                    lblConvCt.BringToFront();
-                    lblTriage.Visible = true;
-                    lblTriage.BackColor = SystemColors.Control;
-                    lblTriage.BringToFront();
-                }
-                _lblMyPosition.Visible = true;
-                _lblMyPosition.BackColor = Color.Blue;
-                _lblMyPosition.BringToFront();
-            }
-
-            else
-            {
-                _blAccelFocusToggle = true;
-                foreach (Control currentCtlTmp1 in _colCtrls)
-                {
-                    ctlTmp = currentCtlTmp1;
-                    switch (Information.TypeName(ctlTmp) ?? "")
-                    {
-                        case "Panel":
-                            {
-                                ctlTmp.BackColor = Color.PaleTurquoise;
-                                break;
-                            }
-                        case "CheckBox":
-                            {
-                                ctlTmp.BackColor = Color.PaleTurquoise;
-                                break;
-                            }
-                        case "Label":
-                            {
-                                if (Strings.Len(ctlTmp.Text) <= 2)
-                                {
-                                    ctlTmp.Visible = true;
-                                    ctlTmp.BringToFront();
-                                }
-                                else
-                                {
-                                    ctlTmp.BackColor = Color.PaleTurquoise;
-                                }
-
-                                break;
-                            }
-                        case "TextBox":
-                            {
-                                ctlTmp.BackColor = Color.PaleTurquoise;
-                                break;
-                            }
-                    }
-                }
-                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                {
-                    lblConvCt.BackColor = Color.PaleTurquoise;
-                    lblTriage.BackColor = Color.PaleTurquoise;
-                }
-                _lblMyPosition.BackColor = Color.DarkGreen;
-                // Modal        With _activeExplorer
-                // Modal            .ClearSelection
-                // Modal            If .IsItemSelectableInView(mail) Then .AddToSelection mail
-                // Modal            'DoEvents
-                // Modal        End With
-            }
-        }
-
-        public void Mail_Activate()
-        {
-            if (_activeExplorer.CurrentFolder.DefaultItemType != OlItemType.olMailItem)
-            {
-                _activeExplorer.NavigationPane.CurrentModule = _activeExplorer
-                    .NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail);
-            }
-            if (_activeExplorer.CurrentView.Name != "tmpNoConversation")
-            {
-                _activeExplorer.CurrentView = "tmpNoConversation";
-            }
-            _activeExplorer.ClearSelection();
-            try
-            {
-                if (_activeExplorer.IsItemSelectableInView(Mail))
-                    _activeExplorer.AddToSelection(Mail);
-            }
-            catch (System.Exception e) { MessageBox.Show("Error", "Error in QF.Mail_Activate: " + e.Message); }            
-        }
-
-        public void KB(string AccelCode)
+        public void KeyboardHandler(string AccelCode)
         {
             switch (AccelCode ?? "")
             {
@@ -1116,7 +1483,7 @@ namespace QuickFiler
                 case "C":
                     {
                         if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            chk.Checked = !chk.Checked;
+                            ConversationCb.Checked = !ConversationCb.Checked;
                         break;
                     }
                 case "A":
@@ -1145,13 +1512,13 @@ namespace QuickFiler
                 case "F":
                     {
                         if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            _txt.Focus();
+                            SearchTxt.Focus();
                         break;
                     }
                 case "D":
                     {
                         if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            cbo.Focus();
+                            FolderCbo.Focus();
                         break;
                     }
                 case "X":
@@ -1165,349 +1532,6 @@ namespace QuickFiler
                         break;
                     }
             }
-        }
-
-        public void ResizeCtrls(int intPxChg)
-        {
-            double X1pct;
-            double X2pct;
-            double X3pct;
-            long X1px;
-            long X2px;
-            long X3px;
-            long lngTmp;
-
-            X1pct = 0.6d;
-            X3pct = X1pct / 2d;
-            X2pct = 1d - X1pct;
-
-            X1pct *= intPxChg;
-            X2pct *= intPxChg;
-            X3pct *= intPxChg;
-            X1px = (long)Math.Round(Math.Round(X1pct, 0));
-            X2px = (long)Math.Round(Math.Round(X2pct, 0));
-            X3px = (long)Math.Round(Math.Round(X3pct, 0));
-
-            LblSubject.Width = (int)(lblSubject_Width + X1px);                      // Subject Width X%
-            _cbFlag.Left = (int)(cbFlag_Left + X1px + X2px);                         // Task button X% + Y% left position
-            lblAcT.Left = (int)(lblAcT_Left + X1px + X2px);                         // Task accelerator X% + Y% left position
-            _cbDel.Left = (int)(cbDel_Left + X1px + X2px);                           // Delete button X+Y% Left position
-            _cbKll.Left = (int)(cbKll_Left + X1px + X2px);                           // Kill button X+Y% Left position
-            lblAcX.Left = (int)(lblAcX_Left + X1px + X2px);
-            lblAcR.Left = (int)(lblAcR_Left + X1px + X2px);
-            lblSentOn.Left = (int)(lblSentOn_Left + X1px);                          // SentOn X% Left Position
-            lblActionable.Left = (int)(lblActionable_Left + X3px);                  // <ACTIONABL> left position + X3px
-            lblTriage.Left = (int)(lblTriage_Left + X3px);                          // Triage left position + X3px
-
-
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-            {
-                _txt.Left = (int)(txt_Left + X1px);                                  // Folder search box X% left position Y% Width
-                _txt.Width = (int)(txt_Width + X2px);                                // Folder search box X% left position Y% Width
-                _lbl5.Left = (int)(lbl5_Left + X1px);                                // Folder label X% left position
-                lblAcF.Left = (int)(lblAcF_Left + X1px);                            // F Accelerator X% left position
-                lblConvCt.Left = (int)(lblConvCt_Left + X1px);                      // Conversation Count X% Left Position
-                _chbxSaveAttach.Left = (int)(chbxSaveAttach_Left + X1px + X2px);     // Checkbox Save Attachment X% Left Position
-                _chbxSaveMail.Left = (int)(chbxSaveMail_Left + X1px + X2px);         // Checkbox Save Mail X% Left Position
-                _chbxDelFlow.Left = (int)(chbxDelFlow_Left + X1px + X2px);           // Checkbox Delete Flow X% Left Position
-                lblAcA.Left = (int)(lblAcA_Left + X1px + X2px);                     // A Accelerator X% Left Position
-                lblAcW.Left = (int)(lblAcW_Left + X1px + X2px);                     // W Accelerator X% Left Position
-                lblAcM.Left = (int)(lblAcM_Left + X1px + X2px);                     // M Accelerator X% Left Position
-
-                if (blExpanded)
-                {
-
-                    cbo.Width = (int)(frm.Width - cbo.Left - lngBlock_Width - 5L);
-                    pos_cbo.leftOriginal = cbo_Left + X1px;                   // Dropdown box X% Left position Y% Width
-                    pos_cbo.widthOriginal = cbo_Width + X2px;                 // Dropdown box X% Left position Y% Width
-                    pos_lblAcD.leftOriginal = lblAcD_Left + X1px;             // D Accelerator X% left position
-                    pos_lblAcC.leftOriginal = lblAcC_Left + X1px;             // Conversation accelerator X% Left position
-                    pos_chk.leftOriginal = chk_Left + X1px;                   // Conversation checkbox X% Left Position
-                    lngTmp = chk.Left;
-                    chk.Left = lblConvCt.Left - 10;
-                    lblAcC.Left = (int)(lblAcC.Left + chk.Left - lngTmp);
-                    TxtBoxBody.Width = frm.Width - TxtBoxBody.Left - 5;
-                    pos_body.widthOriginal = lblBody_Width + X1px;            // Body Width X%
-                }
-
-                else
-                {
-
-                    cbo.Left = (int)(cbo_Left + X1px);                               // Dropdown box X% Left position Y% Width
-                    cbo.Width = (int)(cbo_Width + X2px);                             // Dropdown box X% Left position Y% Width
-                    lblAcD.Left = (int)(lblAcD_Left + X1px);                         // D Accelerator X% left position
-                    lblAcC.Left = (int)(lblAcC_Left + X1px + X2px);                  // Conversation accelerator X% Left position
-                    chk.Left = (int)(chk_Left + X1px + X2px);                        // Conversation checkbox X% Left Position
-                    TxtBoxBody.Width = (int)(lblBody_Width + X1px);
-
-                }                     // Body Width X%
-            }
-
-            else
-            {
-                TxtBoxBody.Width = (int)(lblBody_Width + X1px + X2px);
-            }                   // Body Width X%
-
-        }
-
-        public void ExpandCtrls1()
-        {
-
-            long lngShift;
-            // Private pos_lblAcC          As ctrlPosition
-            // Private pos_lblAcD          As ctrlPosition
-            // Private pos_lblAcO          As ctrlPosition
-
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-            {
-                if (blExpanded == false)
-                {
-                    blExpanded = true;
-                    frm.Height = frm.Height * 2;
-                    lngShift = LblSubject.Top + LblSubject.Height - cbo.Top + 1;
-
-                    pos_cbo.topOriginal = cbo.Top;
-                    pos_cbo.topNew = pos_cbo.topOriginal + lngShift;
-                    cbo.Top = (int)pos_cbo.topNew;
-
-                    pos_lblAcD.topOriginal = lblAcD.Top;
-                    lblAcD.Top = (int)(pos_lblAcD.topOriginal + lngShift);
-
-                    pos_cbo.leftOriginal = cbo.Left;
-                    cbo.Left = TxtBoxBody.Left;
-
-                    pos_lblAcD.leftOriginal = lblAcD.Left;
-                    lblAcD.Left = Conversions.ToInteger(Smith_Watterman.max(0, cbo.Left - pos_cbo.leftOriginal + pos_lblAcD.leftOriginal));
-
-                    pos_cbo.widthOriginal = cbo.Width;
-                    pos_cbo.widthNew = pos_cbo.leftOriginal - cbo.Left + pos_cbo.widthOriginal - lngBlock_Width;
-                    cbo.Width = (int)pos_cbo.widthNew;
-
-                    lngShift = cbo.Top + cbo.Height - TxtBoxBody.Top + 1;
-
-                    {
-                        ref var withBlock = ref pos_body;
-                        withBlock.topOriginal = TxtBoxBody.Top;
-                        withBlock.topNew = withBlock.topOriginal + lngShift;
-                        TxtBoxBody.Top = (int)withBlock.topNew;
-
-                        pos_lblAcO.topOriginal = lblAcO.Top;
-                        lblAcO.Top = (int)(lblAcO.Top + lngShift);
-
-                        withBlock.heightOriginal = TxtBoxBody.Height;
-                        withBlock.heightNew = frm.Height - withBlock.topNew - 5L;
-                        TxtBoxBody.Height = (int)withBlock.heightNew;
-                        withBlock.widthOriginal = TxtBoxBody.Width;
-                        withBlock.widthNew = frm.Width - TxtBoxBody.Left - 5;
-                        TxtBoxBody.Width = (int)withBlock.widthNew;
-                    }
-
-                    chk.Text = "";
-                    pos_chk.leftOriginal = chk.Left;
-                    chk.Left = lblConvCt.Left - 10;
-                    pos_lblAcC.leftOriginal = lblAcC.Left;
-                    lblAcC.Left = (int)(chk.Left - pos_chk.leftOriginal + pos_lblAcC.leftOriginal);
-
-                    pos_chk.topOriginal = chk.Top;
-                    chk.Top = lblConvCt.Top;
-
-                    pos_lblAcC.topOriginal = lblAcC.Top;
-                    lblAcC.Top = lblConvCt.Top;
-
-                    pos_chk.widthOriginal = chk.Width;
-                    chk.Width = 10;
-
-
-                    pos_chbxSaveAttach.topOriginal = _chbxSaveAttach.Top;
-                    _chbxSaveAttach.Top = (int)pos_cbo.topNew;
-
-                    pos_chbxSaveMail.topOriginal = _chbxSaveMail.Top;
-                    _chbxSaveMail.Top = (int)pos_cbo.topNew;
-
-                    pos_chbxDelFlow.topOriginal = _chbxDelFlow.Top;
-                    _chbxDelFlow.Top = (int)pos_cbo.topNew;
-
-                    pos_lblAcA.topOriginal = lblAcA.Top;
-                    lblAcA.Top = (int)pos_cbo.topNew;
-
-                    pos_lblAcW.topOriginal = lblAcW.Top;
-                    lblAcW.Top = (int)pos_cbo.topNew;
-
-                    pos_lblAcM.topOriginal = lblAcM.Top;
-                    lblAcM.Top = (int)pos_cbo.topNew;
-                }
-
-
-
-
-
-
-                else
-                {
-                    blExpanded = false;
-                    frm.Height = (int)Math.Round(frm.Height / 2d);
-
-                    cbo.Top = (int)pos_cbo.topOriginal;
-                    cbo.Left = (int)pos_cbo.leftOriginal;
-                    cbo.Width = (int)pos_cbo.widthOriginal;
-
-                    lblAcD.Top = (int)pos_lblAcD.topOriginal;
-                    lblAcD.Left = (int)pos_lblAcD.leftOriginal;
-
-                    TxtBoxBody.Top = (int)pos_body.topOriginal;
-                    TxtBoxBody.Height = (int)pos_body.heightOriginal;
-                    TxtBoxBody.Width = (int)pos_body.widthOriginal;
-                    lblAcO.Top = (int)pos_lblAcO.topOriginal;
-
-                    chk.Text = "  Conversation";
-                    chk.Left = (int)pos_chk.leftOriginal;
-                    chk.Top = (int)pos_chk.topOriginal;
-                    chk.Width = (int)pos_chk.widthOriginal;
-                    lblAcC.Left = (int)pos_lblAcC.leftOriginal;
-                    lblAcC.Top = (int)pos_lblAcC.topOriginal;
-
-                    _chbxSaveAttach.Top = (int)pos_chbxSaveAttach.topOriginal;
-                    _chbxSaveMail.Top = (int)pos_chbxSaveMail.topOriginal;
-                    _chbxDelFlow.Top = (int)pos_chbxDelFlow.topOriginal;
-                    lblAcA.Top = (int)pos_lblAcA.topOriginal;
-                    lblAcW.Top = (int)pos_lblAcW.topOriginal;
-                    lblAcM.Top = (int)pos_lblAcM.topOriginal;
-
-
-                }
-            }
-            else if (blExpanded == false)
-            {
-                blExpanded = true;
-                frm.Height = frm.Height * 2;
-                {
-                    ref var withBlock1 = ref pos_body;
-                    withBlock1.topOriginal = TxtBoxBody.Top;
-                    pos_lblAcO.topOriginal = lblAcO.Top;
-                    withBlock1.heightOriginal = TxtBoxBody.Height;
-                    withBlock1.heightNew = frm.Height - withBlock1.topOriginal - 5L;
-                    TxtBoxBody.Height = (int)withBlock1.heightNew;
-                }
-            }
-            else
-            {
-                blExpanded = false;
-                frm.Height = (int)Math.Round(frm.Height / 2d);
-                {
-                    ref var withBlock2 = ref pos_body;
-                    TxtBoxBody.Top = (int)pos_body.topOriginal;
-                    TxtBoxBody.Height = (int)pos_body.heightOriginal;
-                    lblAcO.Top = (int)pos_lblAcO.topOriginal;
-                }
-
-
-            }
-
-        }
-
-        public void MoveMail()
-        {
-
-
-            var selItems = new Collection();
-            string loc;
-            Folder myFolder;
-            MailItem MSG;
-            Collection Sel;
-            bool Attchments;
-            bool blRepullConv;
-            bool blDoMove;
-
-            blRepullConv = false;
-
-            if (Mail is not null)
-            {
-                if (chk.Checked == true)
-                {
-                    if (_selItemsInClass is not null)
-                    {
-                        if (_selItemsInClass.Count == Conversions.ToInteger(lblConvCt.Text) & _selItemsInClass.Count != 0)
-                        {
-                            selItems = _selItemsInClass;
-                        }
-                        else
-                        {
-                            blRepullConv = true;
-                        }
-                    }
-                    else
-                    {
-                        blRepullConv = true;
-                    }
-
-                    if (blRepullConv)
-                    {
-                        // Set selItems = New Collection
-                        // Set Sel = New Collection
-                        // Sel.Add Mail
-                        // Set selItems = Email_SortToExistingFolder.DemoConversation(selItems, Sel)
-
-                        conv = new cConversation(_globals.Ol.App) { item = Mail };
-                        selItems = conv.get_ToCollection(true);
-                    }
-                }
-                else
-                {
-                    selItems = new Collection() { Mail };
-                }
-                Attchments = (cbo.SelectedItem as string != "Trash to Delete") ? false : _chbxSaveAttach.Checked;
-
-                blDoMove = true;
-                if (!object.ReferenceEquals(_fldrOriginal, Mail.Parent))
-                    blDoMove = false;
-                if (Information.Err().Number != 0)
-                {
-                    Information.Err().Clear();
-                    blDoMove = false;
-                }
-
-                if (blDoMove)
-                {
-                    LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                    SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems, Pictures_Checkbox: false, SortFolder: Conversions.ToString(cbo.SelectedItem), Save_MSG: _chbxSaveMail.Checked, Attchments: Attchments, Remove_Flow_File: _chbxDelFlow.Checked, OlArchiveRootPath: _globals.Ol.ArchiveRootPath);
-                    SortItemsToExistingFolder.Cleanup_Files();
-                } // blDoMove
-
-            }
-
-        }
-
-        public void ctrlsRemove()
-        {
-
-
-
-            while (_colCtrls.Count > 1)
-            {
-                frm.Controls.Remove((Control)_colCtrls[_colCtrls.Count]);
-                _colCtrls.Remove(_colCtrls.Count);
-            }
-
-            _fldrHandler = null;
-
-        }
-
-        public void kill()
-        {
-            _mPassedControl = null;
-            chk = null;
-            cbo = null;
-            _lst = null;
-            _txt = null;
-            frm = null;
-            _cbKll = null;
-            Mail = null;
-            _fldrTarget = null;
-            _lblTmp = null;
-            // Set _suggestions = Nothing
-            // Set _strFolders = Nothing
-            _colCtrls = null;
-            _fldrHandler = null;
         }
 
         private void bdy_Click()
@@ -1524,9 +1548,8 @@ namespace QuickFiler
 
         private void cbDel_Click()
         {
-            cbo.SelectedItem = "Trash to Delete";
+            FolderCbo.SelectedItem = "Trash to Delete";
         }
-
 
         private void cbDel_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1551,12 +1574,12 @@ namespace QuickFiler
         private void cbFlag_Click()
         {
 
-            Collection Sel;
+            //Collection Sel;
 
-            Sel = new Collection() { Mail };
-            var flagTask = new FlagTasks(AppGlobals: _globals, ItemCollection: Sel, blFile: false, hWndCaller: hWndCaller);
+            List<MailItem> Sel = new() { Mail };
+            var flagTask = new FlagTasks(AppGlobals: _globals, ItemList: Sel, blFile: false, hWndCaller: hWndCaller);
             flagTask.Run();
-            _cbFlag.Text = "!";
+            FlagTaskCb.Text = "!";
 
         }
 
@@ -1633,8 +1656,6 @@ namespace QuickFiler
             }
         }
 
-
-
         private void cbo_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -1655,18 +1676,22 @@ namespace QuickFiler
                         _intEnterCounter = 0;
                         if (_intComboRightCtr == 0)
                         {
-                            cbo.DroppedDown = true;
+                            FolderCbo.DroppedDown = true;
                             _intComboRightCtr = 1;
                         }
                         else if (_intComboRightCtr == 1)
                         {
 
-                            SortItemsToExistingFolder.InitializeSortToExisting(InitType: "Sort", QuickLoad: false, WholeConversation: false, strSeed: Conversions.ToString(cbo.SelectedItem), objItem: Mail);
+                            SortItemsToExistingFolder.InitializeSortToExisting(InitType: "Sort", 
+                                                                               QuickLoad: false, 
+                                                                               WholeConversation: false, 
+                                                                               strSeed: FolderCbo.SelectedItem as string, 
+                                                                               objItem: Mail);
                             cbKll_Click();
                         }
                         else
                         {
-                            Interaction.MsgBox("Error in intComboRightCtr ... setting to 0 and continuing");
+                            MessageBox.Show("Error","Error in intComboRightCtr ... setting to 0 and continuing");
                             _intComboRightCtr = 0;
                         }
 
@@ -1691,7 +1716,6 @@ namespace QuickFiler
             }
         }
 
-
         private void cbTmp_KeyDown(object sender, KeyEventArgs e)
         {
             _parent.Parent.KeyboardHandler_KeyDown(sender, e);
@@ -1705,14 +1729,11 @@ namespace QuickFiler
         private void chk_Click()
         {
 
-            Collection selItems;
+            List<MailItem> selItems = new();
             object objItem;
             MailItem objMail;
             int i;
             string[] varList;
-
-            // Create a collection with all of the mail items in the conversation in the current folder
-            selItems = new Collection();
 
             if (_selItemsInClass is null)
                 CountMailsInConv();
@@ -1723,19 +1744,19 @@ namespace QuickFiler
                 objItem = _selItemsInClass[i];
                 objMail = (MailItem)objItem;
                 if ((objMail.EntryID ?? "") != (Mail.EntryID ?? ""))
-                    selItems.Add(objItem);
+                    selItems.Add(objMail);
             }
 
 
-            if (chk.Checked == true)
+            if (ConversationCb.Checked == true)
             {
                 _parent.ConvToggle_Group(selItems, _intMyPosition);
                 lblConvCt.Enabled = true;
             }
             else
             {
-                varList = cbo.Items.Cast<object>().Select(item => item.ToString()).ToArray();
-                _parent.ConvToggle_UnGroup(selItems, _intMyPosition, Conversions.ToInteger(lblConvCt.Text), varList);
+                varList = FolderCbo.Items.Cast<object>().Select(item => item.ToString()).ToArray();
+                _parent.ConvToggle_UnGroup(selItems, _intMyPosition, int.Parse(lblConvCt.Text), varList);
                 lblConvCt.Enabled = false;
             }
 
@@ -1796,20 +1817,18 @@ namespace QuickFiler
         private void txt_Change()
         {
 
-            cbo.Items.Clear();
-            cbo.Items.AddRange(_fldrHandler.FindFolder("*" + _txt.Text + "*", true, ReCalcSuggestions: false, objItem: Mail));
+            FolderCbo.Items.Clear();
+            FolderCbo.Items.AddRange(_fldrHandler.FindFolder("*" + SearchTxt.Text + "*", true, ReCalcSuggestions: false, objItem: Mail));
 
-            if (cbo.Items.Count >= 2)
-                cbo.SelectedIndex = 1;
+            if (FolderCbo.Items.Count >= 2)
+                FolderCbo.SelectedIndex = 1;
 
         }
-
 
         private void KeyPressHandler_Class(object sender, KeyPressEventArgs e)
         {
 
         }
-
 
         private void txt_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1835,6 +1854,6 @@ namespace QuickFiler
             // End Select
         }
 
-
+        #endregion
     }
 }

@@ -282,6 +282,10 @@
     <EmbeddedResource Include="Ribbon\RibbonViewer.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QuickFiler\QuickFiler.csproj">
+      <Project>{71735d4f-611a-4470-9170-4d9437534377}</Project>
+      <Name>QuickFiler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tags\Tags.vbproj">
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>

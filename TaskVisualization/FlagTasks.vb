@@ -2,32 +2,35 @@
 Imports Tags
 Imports ToDoModel
 Imports UtilitiesVB
+Imports UtilitiesCS
 Imports TaskVisualization
+Imports System.Runtime.CompilerServices
 
+<Assembly: InternalsVisibleTo("TaskVisualization.Test")>
 Public Class FlagTasks
 
     Private ReadOnly _todoSelection As List(Of ToDoItem)
     Private ReadOnly _olExplorer As Explorer
     Private WithEvents _viewer As TaskViewer
     Private ReadOnly _controller As TaskController
-    Private ReadOnly _defaultsToDo As ToDoDefaults
+    Private ReadOnly _defaultsToDo As New ToDoDefaults()
     Private ReadOnly _autoAssign As AutoAssign
     Private ReadOnly _flagsToSet As TaskController.FlagsToSet
     Private ReadOnly _globals As IApplicationGlobals
 
 
     Public Sub New(AppGlobals As IApplicationGlobals,
-                   Optional ItemCollection As Collection = Nothing,
+                   Optional ItemList As IList = Nothing,
                    Optional blFile As Boolean = True,
                    Optional hWndCaller As IntPtr = Nothing,
                    Optional strNameOfFunctionCalling As String = "")
 
         _globals = AppGlobals
         _olExplorer = AppGlobals.Ol.App.ActiveExplorer
-        _todoSelection = InitializeToDoList(ItemCollection)
+        _todoSelection = InitializeToDoList(ItemList)
         _flagsToSet = GetFlagsToSet(_todoSelection.Count)
         _viewer = New TaskViewer()
-        _defaultsToDo = New ToDoDefaults()
+        '_defaultsToDo = New ToDoDefaults()
         _autoAssign = New AutoAssign(AppGlobals)
         _controller = New TaskController(FormInstance:=_viewer,
                                          OlCategories:=AppGlobals.Ol.NamespaceMAPI.Categories,
@@ -40,13 +43,13 @@ Public Class FlagTasks
 
     Public Sub Run()
         _controller.LoadInitialValues()
-        _viewer.Show()
+        _viewer.ShowDialog()
     End Sub
 
-    Private Function InitializeToDoList(ItemCollection As Collection) As List(Of ToDoItem)
-        If ItemCollection Is Nothing Then ItemCollection = GetSelection()
+    Private Function InitializeToDoList(ItemList As IList) As List(Of ToDoItem)
+        If ItemList Is Nothing Then ItemList = GetSelection()
         Dim ToDoSelection As New List(Of ToDoItem)()
-        For Each ObjItem In ItemCollection
+        For Each ObjItem In ItemList
             Dim tmpToDo As ToDoItem
             If TypeOf ObjItem Is MailItem Then
                 Dim OlMail As MailItem = ObjItem
@@ -66,18 +69,54 @@ Public Class FlagTasks
     ''' Adds the Selection from the ActiveExplorer to a new Collection
     ''' </summary>
     ''' <returns>Collection of Outlook Items</returns>
-    Private Function GetSelection() As Collection
-        Dim ItemCollection As New Collection
+    Private Function GetSelection() As IList
+        Dim ItemList As New List(Of Object)
         For Each obj In _olExplorer.Selection
-            ItemCollection.Add(obj)
+            ItemList.Add(obj)
         Next obj
-        Return ItemCollection
+        Return ItemList
     End Function
 
     Private Function GetFlagsToSet(selectionCount As Integer) As TaskController.FlagsToSet
         If selectionCount > 1 Then
-            Dim unused = MsgBox("GetFlagsToSet Not Implemented. Setting all Flags.")
-            Return TaskController.FlagsToSet.all
+
+            Dim excludedMembers = {TaskController.FlagsToSet.all, TaskController.FlagsToSet.none}
+            Dim symbolsDict = [Enum].GetValues(GetType(TaskController.FlagsToSet)) _
+                                    .Cast(Of TaskController.FlagsToSet)() _
+                                    .ToList() _
+                                    .AsEnumerable() _
+                                    .Where(Function(x) excludedMembers.Contains(x) = False) _
+                                    .Select(Function(x) x) _
+                                    .ToDictionary(
+                                    Function(x) [Enum].GetName(GetType(TaskController.FlagsToSet), x),
+                                    Function(x) x)
+
+            Dim symbolSelectionDict = (From x In symbolsDict Select x.Key).ToDictionary(
+                Function(x) x, Function(x) False).ToSortedDictionary()
+
+            Dim listSelections As New List(Of String)
+
+            Using optionsViewer As New TagViewer
+                Dim flagController As New TagController(viewer_instance:=optionsViewer,
+                                                        dictOptions:=symbolSelectionDict,
+                                                        autoAssigner:=Nothing,
+                                                        prefixes:=_defaultsToDo.PrefixList)
+                optionsViewer.ShowDialog()
+                If flagController._exit_type <> "Cancel" Then
+                    listSelections = flagController.GetSelections()
+                End If
+            End Using
+            If listSelections.Count = 0 Then
+                Return TaskController.FlagsToSet.all
+            Else
+                Dim flag As TaskController.FlagsToSet
+                Dim flagsList = (From x In listSelections Where [Enum].TryParse(x, flag) Select [Enum].Parse(GetType(TaskController.FlagsToSet), x)).ToList().OfType(Of TaskController.FlagsToSet)()
+                'Dim flagsList2 = flagsList.OfType(Of TaskController.FlagsToSet)()
+                'Dim flagsList = (From x In symbolsDict Where listSelections.Contains(x.Key) Select x.Value).ToList()
+                'Dim selectedFlags As TaskController.FlagsToSet = GenericBitwise(Of TaskController.FlagsToSet).And(flagsList)
+                Dim selectedFlags As TaskController.FlagsToSet = GenericBitwise(Of TaskController.FlagsToSet).[Or](flagsList)
+                Return selectedFlags
+            End If
         Else
             Return TaskController.FlagsToSet.all
         End If

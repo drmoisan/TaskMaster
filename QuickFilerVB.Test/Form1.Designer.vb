@@ -129,7 +129,6 @@ Partial Class Form1
         '
         Me.ControlGroup3.AutoSize = True
         Me.ControlGroup3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.ControlGroup3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ControlGroup3.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ControlGroup3.Location = New System.Drawing.Point(13, 123)
         Me.ControlGroup3.Name = "ControlGroup3"
@@ -141,7 +140,6 @@ Partial Class Form1
         '
         Me.ControlGroup1.AutoSize = True
         Me.ControlGroup1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.ControlGroup1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ControlGroup1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ControlGroup1.Location = New System.Drawing.Point(13, 13)
         Me.ControlGroup1.Name = "ControlGroup1"
@@ -153,7 +151,6 @@ Partial Class Form1
         '
         Me.ControlGroup2.AutoSize = True
         Me.ControlGroup2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.ControlGroup2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.ControlGroup2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ControlGroup2.Location = New System.Drawing.Point(13, 233)
         Me.ControlGroup2.Name = "ControlGroup2"

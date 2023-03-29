@@ -104,7 +104,7 @@ Public Class ToDoItem
         _readonly = tmp_readonly_state
     End Sub
 
-    Public Sub New(OlMail As [MailItem])
+    Public Sub New(OlMail As MailItem)
         OlObject = OlMail
 
         InitializeMail(OlMail)
@@ -161,7 +161,7 @@ Public Class ToDoItem
             _Priority = .Importance
             _TaskCreateDate = .CreationTime
             _StartDate = .TaskStartDate
-            _Complete = .FlagStatus = OlFlagStatus.olFlagComplete
+            _Complete = .FlagStatus
             _TotalWork = If(PA_FieldExists(PA_TOTAL_WORK), DirectCast(.PropertyAccessor.GetProperty(PA_TOTAL_WORK), Integer), 0)
         End With
     End Sub
@@ -822,9 +822,9 @@ Public Class ToDoItem
             Return objProperty IsNot Nothing
         End Get
     End Property
-    Public Property CustomField(FieldName As String, Optional ByVal OlFieldType As [OlUserPropertyType] = [OlUserPropertyType].olText)
+    Public Property CustomField(FieldName As String, Optional ByVal OlFieldType As OlUserPropertyType = OlUserPropertyType.olText)
         Get
-            Dim objProperty As [UserProperty] = OlObject.UserProperties.Find(FieldName)
+            Dim objProperty As UserProperty = OlObject.UserProperties.Find(FieldName)
             If objProperty Is Nothing Then
                 If OlFieldType = OlUserPropertyType.olInteger Then
                     Return 0

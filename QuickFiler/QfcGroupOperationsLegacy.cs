@@ -114,7 +114,7 @@ namespace QuickFiler
             Frm.TabStop = false;
 
             Frm.BorderStyle = BorderStyle.FixedSingle;
-            colCtrls.Add(Frm, "frm");
+            colCtrls.Add(Frm);
 
             if (blWideView)
             {
@@ -126,7 +126,7 @@ namespace QuickFiler
                 lbl1.Width = 54;
                 lbl1.Text = "From:";
                 lbl1.Font = new Font(lbl1.Font.FontFamily, 10f, FontStyle.Bold);
-                colCtrls.Add(lbl1, "lbl1");
+                colCtrls.Add(lbl1);
             }  // blWideView
 
             if (blWideView)
@@ -139,7 +139,7 @@ namespace QuickFiler
                 lbl2.Width = 54;
                 lbl2.Text = "Subject:";
                 lbl2.Font = new Font(lbl2.Font.FontFamily, 10f, FontStyle.Bold);
-                colCtrls.Add(lbl2, "lbl2");
+                colCtrls.Add(lbl2);
             }  // blWideView
 
             if (blWideView)
@@ -152,7 +152,7 @@ namespace QuickFiler
                 lbl3.Width = 54;
                 lbl3.Text = "Body:";
                 lbl3.Font = new Font(lbl3.Font.FontFamily, 10f, FontStyle.Bold);
-                colCtrls.Add(lbl3, "lbl3");
+                colCtrls.Add(lbl3);
             }
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
@@ -167,7 +167,7 @@ namespace QuickFiler
                 lbl5.Width = 60;
                 lbl5.Text = "Folder:";
                 lbl5.Font = new Font(lbl5.Font.FontFamily, 10f, FontStyle.Bold);
-                colCtrls.Add(lbl5, "lbl5");
+                colCtrls.Add(lbl5);
             }
 
             var lblSender = new Label();
@@ -190,7 +190,7 @@ namespace QuickFiler
 
             lblSender.Text = "<SENDER>";
             lblSender.Font = new Font(lblSender.Font.FontFamily, 10f);
-            colCtrls.Add(lblSender, "lblSender");
+            colCtrls.Add(lblSender);
 
             var lblTriage = new Label();
             Frm.Controls.Add(lblTriage);
@@ -211,7 +211,7 @@ namespace QuickFiler
 
             lblTriage.Text = "ABC";
             lblTriage.Font = new Font(lblTriage.Font.FontFamily, 10f);
-            colCtrls.Add(lblTriage, "lblTriage");
+            colCtrls.Add(lblTriage);
 
             var lblActionable = new Label();
             Frm.Controls.Add(lblActionable);
@@ -233,7 +233,7 @@ namespace QuickFiler
 
             lblActionable.Text = "<ACTIONABL>";
             lblActionable.Font = new Font(lblActionable.Font.FontFamily, 10f);
-            colCtrls.Add(lblActionable, "lblActionable");
+            colCtrls.Add(lblActionable);
 
             var lblSubject = new Label();
             Frm.Controls.Add(lblSubject);
@@ -264,7 +264,7 @@ namespace QuickFiler
             }
 
             lblSubject.Text = "<SUBJECT>";
-            colCtrls.Add(lblSubject, "lblSubject");
+            colCtrls.Add(lblSubject);
 
             var txtboxBody = new TextBox();
             Frm.Controls.Add(txtboxBody);
@@ -298,7 +298,7 @@ namespace QuickFiler
             txtboxBody.Multiline = true;
             txtboxBody.ReadOnly = true;
             txtboxBody.BorderStyle = BorderStyle.None;
-            colCtrls.Add(txtboxBody, "lblBody");
+            colCtrls.Add(txtboxBody);
 
             var lblSentOn = new Label();
             Frm.Controls.Add(lblSentOn);
@@ -319,7 +319,7 @@ namespace QuickFiler
             lblSentOn.Width = 156;
             lblSentOn.Text = "<SENTON>";
             lblSentOn.Font = new Font(lblSentOn.Font.FontFamily, 10f);
-            colCtrls.Add(lblSentOn, "lblSentOn");
+            colCtrls.Add(lblSentOn);
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
@@ -332,7 +332,7 @@ namespace QuickFiler
                 cbxFolder.Font = new Font(cbxFolder.Font.FontFamily, 8f);
                 cbxFolder.TabStop = false;
                 cbxFolder.DropDownStyle = ComboBoxStyle.DropDownList;
-                colCtrls.Add(cbxFolder, "cbxFolder");
+                colCtrls.Add(cbxFolder);
             }
 
             var chbxGPConv = new CheckBox();
@@ -351,7 +351,7 @@ namespace QuickFiler
                 inpt.TabStop = false;
 
                 inpt.BackColor = SystemColors.Control;
-                colCtrls.Add(inpt, "inpt");
+                colCtrls.Add(inpt);
 
                 Frm.Controls.Add(chbxSaveMail);
 
@@ -370,7 +370,7 @@ namespace QuickFiler
                     chbxSaveMail.Top = (int)(47L + lngTopOff);
                     chbxSaveMail.Left = (int)(QuickFileControllerConstants.Right_Aligned - chbxSaveMail.Width);
                 }
-                colCtrls.Add(chbxSaveMail, "chbxSaveMail");
+                colCtrls.Add(chbxSaveMail);
 
                 Frm.Controls.Add(chbxDelFlow);
 
@@ -391,7 +391,7 @@ namespace QuickFiler
                     chbxDelFlow.Left = chbxSaveMail.Left - chbxDelFlow.Width - 1;
 
                 }
-                colCtrls.Add(chbxDelFlow, "chbxDelFlow");
+                colCtrls.Add(chbxDelFlow);
 
                 Frm.Controls.Add(chbxSaveAttach);
 
@@ -412,7 +412,7 @@ namespace QuickFiler
                     chbxSaveAttach.Left = chbxDelFlow.Left - chbxSaveAttach.Width - 1;
 
                 }
-                colCtrls.Add(chbxSaveAttach, "chbxSaveAttach");
+                colCtrls.Add(chbxSaveAttach);
 
                 Frm.Controls.Add(chbxGPConv);
                 chbxGPConv.Height = 16;
@@ -431,7 +431,7 @@ namespace QuickFiler
                     chbxGPConv.Top = (int)(47L + lngTopOff);
                     chbxGPConv.Left = chbxSaveAttach.Left - chbxGPConv.Width - 1;
                 }
-                colCtrls.Add(chbxGPConv, "chbxGPConv");
+                colCtrls.Add(chbxGPConv);
             }
 
             var cbFlagItem = new Button();
@@ -445,7 +445,7 @@ namespace QuickFiler
             cbFlagItem.BackColor = SystemColors.Control;
             cbFlagItem.ForeColor = SystemColors.ControlText;
             cbFlagItem.TabStop = false;
-            colCtrls.Add(cbFlagItem, "cbFlagItem");
+            colCtrls.Add(cbFlagItem);
 
             var cbKllItem = new Button();
             Frm.Controls.Add(cbKllItem);
@@ -458,7 +458,7 @@ namespace QuickFiler
             cbKllItem.BackColor = SystemColors.Control;
             cbKllItem.ForeColor = SystemColors.ControlText;
             cbKllItem.TabStop = false;
-            colCtrls.Add(cbKllItem, "cbKllItem");
+            colCtrls.Add(cbKllItem);
 
             var cbDelItem = new Button();
             Frm.Controls.Add(cbDelItem);
@@ -471,7 +471,7 @@ namespace QuickFiler
             cbDelItem.BackColor = Color.Red;
             cbDelItem.ForeColor = Color.White;
             cbDelItem.TabStop = false;
-            colCtrls.Add(cbDelItem, "cbDelItem");
+            colCtrls.Add(cbDelItem);
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
@@ -503,7 +503,7 @@ namespace QuickFiler
 
 
                 lblConvCt.Enabled = blGroupConversation;
-                colCtrls.Add(lblConvCt, "lblConvCt");
+                colCtrls.Add(lblConvCt);
             }
 
             var lblPos = new Label();
@@ -520,7 +520,7 @@ namespace QuickFiler
             lblPos.ForeColor = SystemColors.Control;
             lblPos.Enabled = false;
             lblPos.Visible = blDebug;
-            colCtrls.Add(lblPos, "lblPos");
+            colCtrls.Add(lblPos);
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
@@ -539,7 +539,7 @@ namespace QuickFiler
                 lblAcF.ForeColor = SystemColors.Control;
 
                 lblAcF.Visible = blDebug;
-                colCtrls.Add(lblAcF, "lblAcF");
+                colCtrls.Add(lblAcF);
 
                 var lblAcD = new Label();
                 Frm.Controls.Add(lblAcD);
@@ -555,7 +555,7 @@ namespace QuickFiler
                 lblAcD.BackColor = SystemColors.ControlText;
                 lblAcD.ForeColor = SystemColors.Control;
                 lblAcD.Visible = blDebug;
-                colCtrls.Add(lblAcD, "lblAcD");
+                colCtrls.Add(lblAcD);
 
                 var lblAcC = new Label();
                 Frm.Controls.Add(lblAcC);
@@ -571,7 +571,7 @@ namespace QuickFiler
                 lblAcC.BackColor = SystemColors.ControlText;
                 lblAcC.ForeColor = SystemColors.Control;
                 lblAcC.Visible = blDebug;
-                colCtrls.Add(lblAcC, "lblAcC");
+                colCtrls.Add(lblAcC);
             }
 
             var lblAcR = new Label();
@@ -588,7 +588,7 @@ namespace QuickFiler
             lblAcR.BackColor = SystemColors.ControlText;
             lblAcR.ForeColor = SystemColors.Control;
             lblAcR.Visible = blDebug;
-            colCtrls.Add(lblAcR, "lblAcR");
+            colCtrls.Add(lblAcR);
 
             var lblAcX = new Label();
             Frm.Controls.Add(lblAcX);
@@ -604,7 +604,7 @@ namespace QuickFiler
             lblAcX.BackColor = SystemColors.ControlText;
             lblAcX.ForeColor = SystemColors.Control;
             lblAcX.Visible = blDebug;
-            colCtrls.Add(lblAcX, "lblAcX");
+            colCtrls.Add(lblAcX);
 
             var lblAcT = new Label();
             Frm.Controls.Add(lblAcT);
@@ -620,7 +620,7 @@ namespace QuickFiler
             lblAcT.BackColor = SystemColors.ControlText;
             lblAcT.ForeColor = SystemColors.Control;
             lblAcT.Visible = blDebug;
-            colCtrls.Add(lblAcT, "lblAcT");
+            colCtrls.Add(lblAcT);
 
             var lblAcO = new Label();
             Frm.Controls.Add(lblAcO);
@@ -645,7 +645,7 @@ namespace QuickFiler
             lblAcO.BackColor = SystemColors.ControlText;
             lblAcO.ForeColor = SystemColors.Control;
             lblAcO.Visible = blDebug;
-            colCtrls.Add(lblAcO, "lblAcO");
+            colCtrls.Add(lblAcO);
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
@@ -672,7 +672,7 @@ namespace QuickFiler
                 lblAcA.BackColor = SystemColors.ControlText;
                 lblAcA.ForeColor = SystemColors.Control;
                 lblAcA.Visible = blDebug;
-                colCtrls.Add(lblAcA, "lblAcA");
+                colCtrls.Add(lblAcA);
 
                 var lblAcW = new Label();
                 Frm.Controls.Add(lblAcW);
@@ -696,7 +696,7 @@ namespace QuickFiler
                 lblAcW.BackColor = SystemColors.ControlText;
                 lblAcW.ForeColor = SystemColors.Control;
                 lblAcW.Visible = blDebug;
-                colCtrls.Add(lblAcW, "lblAcW");
+                colCtrls.Add(lblAcW);
 
                 var lblAcM = new Label();
                 Frm.Controls.Add(lblAcM);
@@ -720,7 +720,7 @@ namespace QuickFiler
                 lblAcM.BackColor = SystemColors.ControlText;
                 lblAcM.ForeColor = SystemColors.Control;
                 lblAcM.Visible = blDebug;
-                colCtrls.Add(lblAcM, "lblAcM");
+                colCtrls.Add(lblAcM);
             }
 
 
@@ -742,7 +742,7 @@ namespace QuickFiler
                     i = _listQFClass.Count - 1;
                     QF = (QfcController)_listQFClass[i];
                     QF.ctrlsRemove();                                  // Remove controls on the frame
-                    _viewer.L1v1L2_PanelMain.Controls.Remove(QF.frm);           // Remove the frame
+                    _viewer.L1v1L2_PanelMain.Controls.Remove(QF.Frm);           // Remove the frame
                     QF.kill();                                         // Remove the variables linking to events
 
                     // PanelMain.Controls.Remove _colFrames(i).Name
@@ -764,7 +764,7 @@ namespace QuickFiler
                 // Shift items downward if there are any
                 QF = (QfcController)_listQFClass[i];
                 QF.Position += intMoves;
-                ctlFrame = QF.frm;
+                ctlFrame = QF.Frm;
                 ctlFrame.Top = ctlFrame.Top + intMoves * (QuickFileControllerConstants.frmHt + QuickFileControllerConstants.frmSp);
             }
             // PanelMain.ScrollHeight = max((intMoves + _listQFClass.Count) * (frmHt + frmSp), _heightPanelMainMax)
@@ -790,7 +790,7 @@ namespace QuickFiler
 
                 // Shift items downward if there are any
                 QF = (QfcController)_listQFClass[i];
-                ctlFrame = QF.frm;
+                ctlFrame = QF.Frm;
                 ctlFrame.Top += intPix;
             }
         }
@@ -815,7 +815,7 @@ namespace QuickFiler
                     QF.blHasChild = true;
                 if (varList is Array == true)
                 {
-                    if (UBound((Array)varList) == 0)
+                    if (((Array)varList).GetUpperBound(0) == 0)
                     {
                         QF.Init_FolderSuggestions();
                     }
@@ -837,7 +837,7 @@ namespace QuickFiler
                 else
                 {
                     // _listQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
-                    _listQFClass.Add(QF, Before: posInsert);
+                    _listQFClass.Insert(posInsert, QF);
                 }
 
                 // For i = 1 To _listQFClass.Count
@@ -868,12 +868,12 @@ namespace QuickFiler
             QF = (QfcController)_listQFClass[intPosition];                // Set class equal to specific member of collection
 
             strDeletedSub = QF.Mail.Subject;
-            strDeletedDte = Strings.Format(QF.Mail.SentOn, @"mm\\dd\\yyyy hh:mm");
+            strDeletedDte = QF.Mail.SentOn.ToString(@"mm\\dd\\yyyy hh:mm");
             intDeletedMyPos = QF.Position;
 
 
             QF.ctrlsRemove();                                  // Run the method that removes controls from the frame
-            _viewer.L1v1L2_PanelMain.Controls.Remove(QF.frm);           // Remove the specific frame
+            _viewer.L1v1L2_PanelMain.Controls.Remove(QF.Frm);           // Remove the specific frame
             QF.kill();                                         // Remove the variables linking to events
 
             if (blDebug)
@@ -891,7 +891,7 @@ namespace QuickFiler
                     else
                     {
                         QF = (QfcController)_listQFClass[i];
-                        Debug.Print(i + "  " + QF.Position + "  " + Strings.Format(QF.Mail.SentOn, @"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
+                        Debug.Print(i + "  " + QF.Position + "  " + QF.Mail.SentOn.ToString(@"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
                     }
                 }
             }
@@ -904,13 +904,13 @@ namespace QuickFiler
                 {
                     QF = (QfcController)_listQFClass[i];
                     QF.Position -= 1;
-                    ctlFrame = QF.frm;
+                    ctlFrame = QF.Frm;
                     ctlFrame.Top = ctlFrame.Top - QuickFileControllerConstants.frmHt - QuickFileControllerConstants.frmSp;
                 }
                 // _viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
             }
 
-            _listQFClass.Remove(intPosition);
+            _listQFClass.RemoveAt(intPosition);
 
             if (blDebug)
             {
@@ -921,7 +921,7 @@ namespace QuickFiler
                 for (i = 1; i <= loopTo2; i++)
                 {
                     QF = (QfcController)_listQFClass[i];
-                    Debug.Print(i + "  " + QF.Position + "  " + Strings.Format(QF.Mail.SentOn, @"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
+                    Debug.Print(i + "  " + QF.Position + "  " + QF.Mail.SentOn.ToString(@"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
                 }
             }
 
@@ -1006,13 +1006,13 @@ namespace QuickFiler
                 {
                     if (QF.blHasChild)
                     {
-                        QF.frm.Left = QuickFileControllerConstants.frmLt * 2;
-                        QF.frm.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx - QuickFileControllerConstants.frmLt);
+                        QF.Frm.Left = QuickFileControllerConstants.frmLt * 2;
+                        QF.Frm.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx - QuickFileControllerConstants.frmLt);
                         QF.ResizeCtrls(intDiffx - QuickFileControllerConstants.frmLt);
                     }
                     else
                     {
-                        QF.frm.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx);
+                        QF.Frm.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx);
                         QF.ResizeCtrls(intDiffx);
                     }
                 }
@@ -1034,7 +1034,7 @@ namespace QuickFiler
                 {
                     QF = (QfcController)_listQFClass[i];
                     if (QF.blExpanded & i != _listQFClass.Count)
-                        MoveDownPix(i + 1, (int)Math.Round(QF.frm.Height * -0.5d));
+                        MoveDownPix(i + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
                     QF.Accel_Toggle();
                 }
             }
@@ -1102,11 +1102,11 @@ namespace QuickFiler
                 QF.Accel_FocusToggle();
                 if (blExpanded)
                 {
-                    MoveDownPix(intNewSelection + 1, QF.frm.Height);
+                    MoveDownPix(intNewSelection + 1, QF.Frm.Height);
                     QF.ExpandCtrls1();
                 }
                 _intActiveSelection = intNewSelection;
-                _viewer.L1v1L2_PanelMain.ScrollControlIntoView(QF.frm);
+                _viewer.L1v1L2_PanelMain.ScrollControlIntoView(QF.Frm);
                 return _intActiveSelection;
             }
             else
@@ -1125,7 +1125,7 @@ namespace QuickFiler
                 QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
                 if (QF.blExpanded)
                 {
-                    MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.frm.Height * -0.5d));
+                    MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
                     QF.ExpandCtrls1();
                     blExpanded = true;
                 }
@@ -1161,22 +1161,22 @@ namespace QuickFiler
             if (_intActiveSelection != 0)
             {
                 QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
-                if (QF.lblConvCt.Text != "1" & QF.chk.Checked == true)
+                if (QF.lblConvCt.Text != "1" & QF.ConversationCb.Checked == true)
                 {
                     if (QF.blExpanded)
                     {
                         blExpanded = true;
-                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.frm.Height * -0.5d));
+                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
                         QF.ExpandCtrls1();
                     }
                     toggleAcceleratorDialogue();
-                    // QF.KB toggles the conversation checkbox which triggers enumeration of conversation
-                    QF.KB("C");
+                    // QF.KeyboardHandler toggles the conversation checkbox which triggers enumeration of conversation
+                    QF.KeyboardHandler("C");
                     toggleAcceleratorDialogue();
 
                     if (blExpanded)
                     {
-                        MoveDownPix(_intActiveSelection + 1, QF.frm.Height);
+                        MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
                         QF.ExpandCtrls1();
                     }
                 }
@@ -1189,21 +1189,21 @@ namespace QuickFiler
             {
                 bool blExpanded = false;
                 QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
-                if (QF.lblConvCt.Text != "1" & QF.chk.Checked == false)
+                if (QF.lblConvCt.Text != "1" & QF.ConversationCb.Checked == false)
                 {
                     if (QF.blExpanded)
                     {
                         blExpanded = true;
-                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.frm.Height * -0.5d));
+                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
                         QF.ExpandCtrls1();
                     }
                     toggleAcceleratorDialogue();
-                    QF.KB("C");
+                    QF.KeyboardHandler("C");
                     toggleAcceleratorDialogue();
 
                     if (blExpanded)
                     {
-                        MoveDownPix(_intActiveSelection + 1, QF.frm.Height);
+                        MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
                         QF.ExpandCtrls1();
                     }
 
@@ -1303,7 +1303,7 @@ namespace QuickFiler
 
         }
 
-        internal QfcController TryGetQfc(object index)
+        internal QfcController TryGetQfc(int index)
         {
             try
             {
@@ -1327,13 +1327,13 @@ namespace QuickFiler
 
                 foreach (QfcController QF in _listQFClass)
                 {
-                    if (QF.cbo.SelectedValue as string != "")
+                    if (QF.FolderCbo.SelectedValue as string != "")
                     {
                         blReadyForMove = false;
                         strNotifications = strNotifications + QF.Position + "  " + QF.Mail.SentOn.ToString("mm\\dd\\yyyy") + "  " + QF.Mail.Subject + System.Environment.NewLine;
                     }
                 }
-                strNotifications = Strings.Mid(strNotifications, 1, Strings.Len(strNotifications) - 1);
+                strNotifications = strNotifications.Substring(1, strNotifications.Length - 1);
                 if (!blReadyForMove)
                     MessageBox.Show("Error Notification", strNotifications, MessageBoxButtons.OK);
                 return blReadyForMove;
@@ -1362,12 +1362,12 @@ namespace QuickFiler
         {
             int k;
             string[] strOutput = new string[EmailsLoaded + 1];
-            var loopTo = Conversions.ToInteger(EmailsLoaded);
+            var loopTo = EmailsLoaded;
             for (k = 1; k <= loopTo; k++)
             {
                 QfcController QF = (QfcController)_listQFClass[k];
                 var infoMail = new cInfoMail();
-                if (infoMail.Init_wMail(QF.Mail, OlEndTime: OlEndTime, lngDurationSec: (long)Math.Round(Duration)))
+                if (infoMail.Init_wMail(QF.Mail, OlEndTime: OlEndTime, lngDurationSec: (int)Math.Round(Duration)))
                 {
                     if (string.IsNullOrEmpty(OlAppointment.Body))
                     {
@@ -1387,9 +1387,9 @@ namespace QuickFiler
                 dataLine = dataLine + "," + xComma(QF.StrlblTo);
                 dataLine = dataLine + "," + xComma(QF.Sender);
                 dataLine = dataLine + "," + "Email";
-                dataLine = dataLine + "," + xComma(QF.cbo.SelectedItem.ToString());           // Target Folder
+                dataLine = dataLine + "," + xComma(QF.FolderCbo.SelectedItem.ToString());           // Target Folder
                 dataLine = dataLine + "," + QF.lblSentOn.Text;
-                dataLine = dataLine + "," + Strings.Format(QF.Mail.SentOn, "hh:mm");
+                dataLine = dataLine + "," + QF.Mail.SentOn.ToString("hh:mm");
                 strOutput[k] = dataLine;
             }
 
@@ -1401,8 +1401,8 @@ namespace QuickFiler
             string xCommaRet = default;
             string strTmp;
 
-            strTmp = Strings.Replace(str, ", ", "_");
-            strTmp = Strings.Replace(strTmp, ",", "_");
+            strTmp = str.Replace(", ", "_");
+            strTmp = strTmp.Replace(",", "_");
             xCommaRet = StringManipulation.GetStrippedText(strTmp);
             return xCommaRet;
             // xComma = StripAccents(strTmp)

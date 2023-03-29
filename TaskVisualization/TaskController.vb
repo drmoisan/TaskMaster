@@ -105,7 +105,7 @@ Public Class TaskController
     ''' Function prepares task viewer by activating desired controls and loading values to them
     ''' </summary>
     Public Sub LoadInitialValues()
-
+        '_viewer.Show()
         'LoadFromFile values into viewer by field
         _viewer.TaskName.Text = _active.TaskSubject
         If _active.Context <> "" Then _viewer.CategorySelection.Text = _active.Context
@@ -136,15 +136,14 @@ Public Class TaskController
             _viewer.DtDuedate.Checked = True
         End If
 
-        'Deactivate controls that are not set in _options
-        If _options <> FlagsToSet.all Then ActivateOptions()
-
         'Deactivate accelerator controls
         ToggleXl((From x In _xlCtrlLookup
-                  Where _xlCtrlOptions(x.Key)
                   Select x).ToDictionary(
                   Function(x) x.Key, Function(x) "A"c),
                   ForceState.force_off)
+
+        'Deactivate controls that are not set in _options
+        If _options <> FlagsToSet.all Then ActivateOptions()
 
     End Sub
 
@@ -212,7 +211,7 @@ Public Class TaskController
 
         Dim selections As List(Of String) = Array.ConvertAll(
             _active.People.Split(","), Function(x) x.Trim()).ToList()
-        Dim unused1 = selections.Remove("")
+        selections.Remove("")
 
         Using viewer As New TagViewer
             Dim controller As New TagController(viewer_instance:=viewer,
@@ -222,7 +221,7 @@ Public Class TaskController
                                                                 selections:=selections,
                                                                 prefix_key:=prefix.Key,
                                                                 objItemObject:=_active.object_item)
-            Dim unused = viewer.ShowDialog()
+            viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.People = controller.SelectionString()
                 _viewer.PeopleSelection.Text = _active.People(False)
@@ -248,13 +247,13 @@ Public Class TaskController
 
         Using viewer As New TagViewer
             Dim controller As New TagController(viewer_instance:=viewer,
-                                                                dictOptions:=filtered_cats,
-                                                                autoAssigner:=_autoAssign,
-                                                                prefixes:=_defaults.PrefixList,
-                                                                selections:=selections,
-                                                                prefix_key:=prefix.Key,
-                                                                objItemObject:=_active.object_item)
-            Dim unused = viewer.ShowDialog()
+                                                dictOptions:=filtered_cats,
+                                                autoAssigner:=_autoAssign,
+                                                prefixes:=_defaults.PrefixList,
+                                                selections:=selections,
+                                                prefix_key:=prefix.Key,
+                                                objItemObject:=_active.object_item)
+            viewer.ShowDialog()
             If controller._exit_type <> "Cancel" Then
                 _active.Context = controller.SelectionString()
                 _viewer.CategorySelection.Text = _active.Context(False)
@@ -492,6 +491,18 @@ Public Class TaskController
             _viewer.ShortcutNews.Enabled = False
             _viewer.ShortcutUnprocessed.Enabled = False
             _viewer.ShortcutWaitingFor.Enabled = False
+            _viewer.ShortcutPreRead.Enabled = False
+
+            _viewer.ShortcutMeeting.Visible = False
+            _viewer.ShortcutCalls.Visible = False
+            _viewer.ShortcutPersonal.Visible = False
+            _viewer.ShortcutEmail.Visible = False
+            _viewer.ShortcutInternet.Visible = False
+            _viewer.ShortcutReadingBusiness.Visible = False
+            _viewer.ShortcutNews.Visible = False
+            _viewer.ShortcutUnprocessed.Visible = False
+            _viewer.ShortcutWaitingFor.Visible = False
+            _viewer.ShortcutPreRead.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.context) Then
@@ -500,6 +511,9 @@ Public Class TaskController
         Else
             _viewer.CategorySelection.Enabled = False
             _viewer.LblContext.Enabled = False
+
+            _viewer.CategorySelection.Visible = False
+            _viewer.LblContext.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.people) Then
@@ -508,6 +522,9 @@ Public Class TaskController
         Else
             _viewer.PeopleSelection.Enabled = False
             _viewer.LblPeople.Enabled = False
+
+            _viewer.PeopleSelection.Visible = False
+            _viewer.LblPeople.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.projects) Then
@@ -516,6 +533,9 @@ Public Class TaskController
         Else
             _viewer.ProjectSelection.Enabled = False
             _viewer.LblProject.Enabled = False
+
+            _viewer.ProjectSelection.Visible = False
+            _viewer.LblProject.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.topics) Then
@@ -524,6 +544,9 @@ Public Class TaskController
         Else
             _viewer.TopicSelection.Enabled = False
             _viewer.LblTopic.Enabled = False
+
+            _viewer.TopicSelection.Visible = False
+            _viewer.LblTopic.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.priority) Then
@@ -532,6 +555,9 @@ Public Class TaskController
         Else
             _viewer.PriorityBox.Enabled = False
             _viewer.LblPriority.Enabled = False
+
+            _viewer.PriorityBox.Visible = False
+            _viewer.LblPriority.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.taskname) Then
@@ -540,6 +566,9 @@ Public Class TaskController
         Else
             _viewer.TaskName.Enabled = False
             _viewer.LblTaskname.Enabled = False
+
+            _viewer.TaskName.Visible = False
+            _viewer.LblTaskname.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.worktime) Then
@@ -548,11 +577,16 @@ Public Class TaskController
         Else
             _viewer.Duration.Enabled = False
             _viewer.LblDuration.Enabled = False
+
+            _viewer.Duration.Visible = False
+            _viewer.LblDuration.Visible = False
         End If
 
         _viewer.CbxToday.Enabled = _options.HasFlag(FlagsToSet.today)
+        _viewer.CbxToday.Visible = _options.HasFlag(FlagsToSet.today)
 
         _viewer.CbxBullpin.Enabled = _options.HasFlag(FlagsToSet.bullpin)
+        _viewer.CbxBullpin.Visible = _options.HasFlag(FlagsToSet.bullpin)
 
 
         If _options.HasFlag(FlagsToSet.kbf) Then
@@ -561,6 +595,9 @@ Public Class TaskController
         Else
             _viewer.KbSelector.Enabled = False
             _viewer.LblKbf.Enabled = False
+
+            _viewer.KbSelector.Visible = False
+            _viewer.LblKbf.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.duedate) Then
@@ -569,6 +606,9 @@ Public Class TaskController
         Else
             _viewer.DtDuedate.Enabled = False
             _viewer.LblDuedate.Enabled = False
+
+            _viewer.DtDuedate.Visible = False
+            _viewer.LblDuedate.Visible = False
         End If
 
         If _options.HasFlag(FlagsToSet.reminder) Then
@@ -577,7 +617,11 @@ Public Class TaskController
         Else
             _viewer.DtReminder.Enabled = False
             _viewer.LblReminder.Enabled = False
+
+            _viewer.DtReminder.Visible = False
+            _viewer.LblReminder.Visible = False
         End If
+
 
     End Sub
 

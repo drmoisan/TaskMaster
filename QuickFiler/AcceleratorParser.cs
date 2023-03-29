@@ -48,71 +48,71 @@ namespace QuickFiler
                                 case "O":
                                     {
                                         _parent.toggleAcceleratorDialogue();
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         _parent.Parent.OpenQFMail(QF.Mail);
                                         break;
                                     }
                                 case "C":
                                     {
                                         _parent.toggleAcceleratorDialogue();
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "T":
                                     {
                                         _parent.toggleAcceleratorDialogue();
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "F":
                                     {
                                         _parent.toggleAcceleratorDialogue();
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "D":
                                     {
                                         _parent.toggleAcceleratorDialogue();
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "X":
                                     {
                                         _parent.toggleAcceleratorDialogue();
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "R":
                                     {
                                         _parent.toggleAcceleratorDialogue();
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "A":
                                     {
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "W":
                                     {
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "M":
                                     {
-                                        QF.KB(strCommand);
+                                        QF.KeyboardHandler(strCommand);
                                         break;
                                     }
                                 case "E":
                                     {
                                         if (QF.blExpanded)
                                         {
-                                            _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.frm.Height * -0.5d));
+                                            _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
                                             QF.ExpandCtrls1();
                                         }
                                         else
                                         {
-                                            _parent.MoveDownPix(_intActiveSelection + 1, QF.frm.Height);
+                                            _parent.MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
                                             QF.ExpandCtrls1();
                                         }
 
@@ -147,7 +147,7 @@ namespace QuickFiler
 
         private string ExtractInstruction(int idxLastNum, string strToParse)
         {
-            return Strings.UCase(Strings.Mid(strToParse, idxLastNum + 1, 1));
+            return strToParse.Substring(idxLastNum + 1, 1).ToUpper();
         }
 
         private bool AdditionalInstructions(int idxLastNum, string strToParse)
@@ -216,7 +216,7 @@ namespace QuickFiler
             {
                 // Get last digit 
                 // TODO: Add support for multiple digit numbers 
-                return Conversions.ToInteger(Strings.Mid(strToParse, 1, idxLastNum));
+                return int.Parse(strToParse.Substring(idxLastNum, 1));
             }
             else
             {
@@ -233,21 +233,22 @@ namespace QuickFiler
         {
             int i;
             int intLastNum = 0;
-            int intLen = Strings.Len(strToParse);
+            int intLastIndex = 0;
+            int intLen = strToParse.Length;
 
             var loopTo = intLen;
             for (i = 1; i <= loopTo; i++)
             {
-                if (Information.IsNumeric(Strings.Mid(strToParse, i, 1)))
+                if (int.TryParse(strToParse.Substring(i, 1), out intLastNum))
                 {
-                    intLastNum = i;
+                    intLastIndex = i;
                 }
                 else
                 {
                     break;
                 }
             }
-            return intLastNum;
+            return intLastIndex;
         }
 
     }

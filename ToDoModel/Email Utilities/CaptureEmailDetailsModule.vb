@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
+Imports System.Globalization
 
 Public Module CaptureEmailDetailsModule
     Private Const NumberOfFields = 13
@@ -23,7 +24,7 @@ Public Module CaptureEmailDetailsModule
         strAry(2) = GetEmailFolderPath(OlMail, emailRootFolder)
         strAry(3) = Format(OlMail.SentOn, "YYYY-MM-DD\Th:mm:ss\+\0\0\:\0\0")
 
-        Dim recipients = GetRecipients(OlMail, PR_SMTP_ADDRESS)
+        Dim recipients = GetRecipients(OlMail)
         strAry(5) = recipients.recipientsTo
         strAry(6) = recipients.recipientsCC
         strAry(4) = GetSenderAddress(OlMail)
@@ -89,6 +90,25 @@ Public Module CaptureEmailDetailsModule
     End Function
 
     'Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
+    Public Function GetSenderName(OlMail As MailItem) As String
+        If OlMail.Sent = False Then
+            Return ""
+        Else
+            If OlMail.Sender.Type = "EX" Then
+                Try
+                    Dim OlPA As PropertyAccessor = OlMail.Sender.PropertyAccessor
+                    Dim senderAddress As String = OlPA.GetProperty(PR_SMTP_ADDRESS)
+                    Return CultureInfo.CurrentCulture.TextInfo.ToTitleCase((senderAddress.Split("@")(0)).Replace(".", " "))
+                Catch
+
+                End Try
+            Else
+                Return OlMail.Sender.Name
+            End If
+        End If
+
+    End Function
+
     Public Function GetSenderAddress(OlMail As MailItem) As String
         Dim senderAddress As String
 
@@ -132,8 +152,7 @@ Public Module CaptureEmailDetailsModule
         Return If(OlProperty Is Nothing, "", DirectCast(OlProperty.Value, String))
     End Function
 
-    Private Function GetRecipients(OlMail As MailItem,
-                                   PR_SMTP_ADDRESS As String) As _
+    Public Function GetRecipients(OlMail As MailItem) As _
                                    (recipientsTo As String,
                                    recipientsCC As String)
 

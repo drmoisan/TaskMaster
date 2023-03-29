@@ -21,7 +21,7 @@ Public Class TagController
     Private ReadOnly _isMail As Boolean
     Public _exit_type As String = "Cancel"
     Private _cursor_position As Integer
-    Public int_focus As Integer
+    Friend int_focus As Integer
     Private ReadOnly _autoAssigner As IAutoAssign
 
 
@@ -80,43 +80,45 @@ Public Class TagController
 
         Dim _addPrefix As Boolean = False
 
-        If _selections.Count > 0 Then
-            If Len(_prefix.Value) > 0 Then
-                If Len(_selections(0)) > Len(_prefix.Value) Then
-                    If Left(_selections(0), Len(_prefix.Value)) <> _prefix.Value Then
+        If selections IsNot Nothing Then
+            If _selections.Count > 0 Then
+                If Len(_prefix.Value) > 0 Then
+                    If Len(_selections(0)) > Len(_prefix.Value) Then
+                        If Left(_selections(0), Len(_prefix.Value)) <> _prefix.Value Then
+                            _addPrefix = True
+                        End If
+                    Else
                         _addPrefix = True
                     End If
-                Else
-                    _addPrefix = True
                 End If
-            End If
 
-            For Each rawchoice As String In _selections
-                Dim choice As String = rawchoice
-                If _addPrefix Then choice = String.Concat(_prefix.Value, choice)
-                If _dict_options.Keys.Contains(choice) Then
-                    _dict_options(choice) = Not _dict_options(choice)
-                Else
-                    Dim tmp_response As MsgBoxResult = MsgBox(choice & " does not exist. Would you like to add it?", vbYesNo)
-                    If tmp_response = vbYes Then
-                        AddColorCategory(rawchoice)
+                For Each rawchoice As String In _selections
+                    Dim choice As String = rawchoice
+                    If _addPrefix Then choice = String.Concat(_prefix.Value, choice)
+                    If _dict_options.Keys.Contains(choice) Then
+                        _dict_options(choice) = Not _dict_options(choice)
+                    Else
+                        Dim tmp_response As MsgBoxResult = MsgBox(choice & " does not exist. Would you like to add it?", vbYesNo)
+                        If tmp_response = vbYes Then
+                            AddColorCategory(rawchoice)
+                        End If
                     End If
-                End If
-            Next
+                Next
+            End If
         End If
 
-        Dim unused = LoadControls(_dict_options, _prefix.Value)
+        LoadControls(_dict_options, _prefix.Value)
     End Sub
 
     Public Sub ToggleChoice(str_choice As String)
         _dict_options(str_choice) = Not _dict_options(str_choice)
     End Sub
 
-    Public Sub ToggleOn(str_choice As String)
+    Friend Sub ToggleOn(str_choice As String)
         _dict_options(str_choice) = 1
     End Sub
 
-    Public Sub ToggleOff(str_choice As String)
+    Friend Sub ToggleOff(str_choice As String)
         _dict_options(str_choice) = 0
     End Sub
 
@@ -126,7 +128,7 @@ Public Class TagController
         _filtered_selections = _filtered_options.Where(Function(x) x.Value = 1).Select(Function(x) x.Key)
     End Sub
 
-    Public Sub SearchAndReload()
+    Friend Sub SearchAndReload()
         RemoveControls()
 
         Dim filtered_options = _dict_options.Where(
@@ -168,19 +170,19 @@ Public Class TagController
 #End Region
 
 #Region "Public Mouse Events"
-    Public Sub Cancel_Action()
+    Friend Sub Cancel_Action()
         _viewer.Hide()
         _exit_type = "Cancel"
         _viewer.Dispose()
     End Sub
 
-    Public Sub OK_Action()
+    Friend Sub OK_Action()
         _viewer.Hide()
         _exit_type = "Normal"
         _viewer.Dispose()
     End Sub
 
-    Public Sub AutoAssign()
+    Friend Sub AutoAssign()
         Dim col_choices As Collection = _autoAssigner.AutoFind(_obj_item)
         For Each str_choice As String In col_choices
             If _dict_options.ContainsKey(str_choice) Then
@@ -192,28 +194,32 @@ Public Class TagController
         If col_choices.Count > 0 Then FilterToSelected()
     End Sub
 
-    Public Function FilterArchive(
+    Friend Function FilterArchive(
             source_dict As SortedDictionary(Of String, Boolean)) _
             As SortedDictionary(Of String, Boolean)
 
-
-        Dim exclude As List(Of String) = _autoAssigner.FilterList
-        'Dim filtered_dict = (From x In source_dict
-        '                     Where Not exclude.Contains(x.Key)
-        '                     Select x).ToSortedDictionary()
-        Dim filtered_dict = (From x In source_dict
-                             Where exclude.IndexOf(x.Key,
+        If _autoAssigner IsNot Nothing Then
+            Dim exclude As List(Of String) = _autoAssigner.FilterList
+            'Dim filtered_dict = (From x In source_dict
+            '                     Where Not exclude.Contains(x.Key)
+            '                     Select x).ToSortedDictionary()
+            Dim filtered_dict = (From x In source_dict
+                                 Where exclude.IndexOf(x.Key,
                                  StringComparison.OrdinalIgnoreCase) < 0
-                             Select x).ToSortedDictionary()
-        Return filtered_dict
+                                 Select x).ToSortedDictionary()
+            Return filtered_dict
+        Else
+            Return source_dict
+        End If
+
     End Function
 
-    Public Sub ToggleArchive()
+    Friend Sub ToggleArchive()
         _dict_options = If(_viewer.Hide_Archive.Checked = True, FilterArchive(_dict_options), _dict_original)
         SearchAndReload()
     End Sub
 
-    Public Sub AddColorCategory(Optional categoryName As String = "")
+    Friend Sub AddColorCategory(Optional categoryName As String = "")
         Dim autoAdded As Boolean = False
         Dim colCatName As New Collection()
 
@@ -256,14 +262,14 @@ Public Class TagController
         If colCatName.Count > 0 Then FilterToSelected()
     End Sub
 
-    Public Sub FocusCheckbox(ctrl As Windows.Forms.Control)
+    Friend Sub FocusCheckbox(ctrl As Windows.Forms.Control)
         int_focus = _col_cbx_ctrl.IndexOf(ctrl)
         Select_Ctrl_By_Offset(0)
     End Sub
 #End Region
 
 #Region "Public Keyboard Events"
-    Public Sub OptionsPanel_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs)
+    Friend Sub OptionsPanel_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs)
         Select Case e.KeyCode
             Case Keys.Down
                 e.IsInputKey = True
@@ -272,7 +278,7 @@ Public Class TagController
         End Select
     End Sub
 
-    Public Sub OptionsPanel_KeyDown(sender As Object, e As KeyEventArgs)
+    Friend Sub OptionsPanel_KeyDown(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.Down
                 Select_Ctrl_By_Offset(1)
@@ -281,14 +287,14 @@ Public Class TagController
         End Select
     End Sub
 
-    Public Sub TagViewer_KeyDown(sender As Object, e As KeyEventArgs)
+    Friend Sub TagViewer_KeyDown(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.Enter
                 OK_Action()
         End Select
     End Sub
 
-    Public Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs)
+    Friend Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.Right
                 _cursor_position = _viewer.TextBox1.SelectionStart
@@ -297,7 +303,7 @@ Public Class TagController
         End Select
     End Sub
 
-    Public Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs)
+    Friend Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs)
         Select Case e.KeyCode
             Case Keys.Right
                 If _viewer.TextBox1.SelectionStart = _cursor_position Then
@@ -308,7 +314,7 @@ Public Class TagController
         End Select
     End Sub
 
-    Public Sub Select_Ctrl_By_Offset(increment As Integer)
+    Friend Sub Select_Ctrl_By_Offset(increment As Integer)
         Dim newpos As Integer = int_focus + increment
         If newpos = -1 Then
             _viewer.TextBox1.Select()
@@ -321,15 +327,15 @@ Public Class TagController
         End If
     End Sub
 
-    Public Sub Select_Last_Control()
+    Friend Sub Select_Last_Control()
         Select_Ctrl_By_Position(_col_cbx_ctrl.Count - 1)
     End Sub
 
-    Public Sub Select_First_Control()
+    Friend Sub Select_First_Control()
         Select_Ctrl_By_Position(0)
     End Sub
 
-    Public Sub Select_PageDown()
+    Friend Sub Select_PageDown()
 
         If _viewer.OptionsPanel.VerticalScroll.Maximum > _viewer.OptionsPanel.Height Then
             Dim start As Integer = Math.Max(int_focus, 0)
@@ -358,7 +364,7 @@ Public Class TagController
         End If
     End Sub
 
-    Public Sub Select_PageUp()
+    Friend Sub Select_PageUp()
 
         If _viewer.OptionsPanel.VerticalScroll.Maximum > _viewer.OptionsPanel.Height Then
             Dim start As Integer = Math.Max(int_focus, 0)
@@ -385,7 +391,7 @@ Public Class TagController
         End If
     End Sub
 
-    Public Sub Select_Ctrl_By_Position(position As Integer)
+    Friend Sub Select_Ctrl_By_Position(position As Integer)
         If position < -1 Or position > _col_cbx_ctrl.Count - 1 Then
             Throw New ArgumentOutOfRangeException("Cannot select control with postition " & position)
 
@@ -501,7 +507,7 @@ Public Class TagController
         Dim unused = LoadControls(_filtered_options, _prefix.Value)
     End Sub
 
-    Private Function GetSelections() As List(Of String)
+    Public Function GetSelections() As List(Of String)
         Return (From x In _dict_options Where x.Value = True Select x.Key).ToList()
     End Function
 

@@ -1,5 +1,8 @@
 ﻿using ToDoModel;
 using UtilitiesVB;
+using Microsoft.Office.Interop.Outlook;
+using System.Collections.Generic;
+using UtilitiesCS;
 
 namespace QuickFiler
 {
@@ -18,8 +21,14 @@ namespace QuickFiler
             _parentCleanup = ParentCleanup;
             _viewer = new QuickFileViewer();
             // ReloadFolderSuggestionStagingFiles()
-            var colEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer());
-            _controller = new QuickFileController(_globals, _viewer, colEmailsInFolder, Cleanup);
+            //List<MailItem> listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()) //as List<MailItem>;
+            var listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()); //as List<MailItem>;
+            Queue<MailItem> MasterQueue = new Queue<MailItem>();
+            foreach (MailItem email in listEmailsInFolder) 
+            { 
+                MasterQueue.Enqueue(email);
+            }
+            _controller = new QuickFileController(_globals, _viewer, MasterQueue, Cleanup);
         }
 
         public void Run()
