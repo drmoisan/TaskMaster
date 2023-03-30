@@ -6,23 +6,22 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-//using Microsoft.VisualBasic;
-//using Microsoft.VisualBasic.CompilerServices;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesVB;
 using System.Collections.Generic;
+using System.Collections;
 using System.Reflection;
 
 namespace QuickFiler
 {
 
 
-    public class QfcController
+    internal class QfcController
     {
 
         #region Global Variables, Window Handles and Collections
-        private QfcGroupOperationsLegacy _parent;
+        private IQfcControllerCallbacks _callbacks;
         private Enums.InitTypeEnum _initType;
         private cFolderHandler _fldrHandler;
         private IntPtr hWndCaller;
@@ -41,7 +40,7 @@ namespace QuickFiler
         //TODO: Need to ensure references to _colCtrls are zero based
         private List<Control> _colCtrls;
         //TODO: Need to ensure references to _selItemsInClass are zero based
-        private List<MailItem> _selItemsInClass;
+        private IList _selItemsInClass;
         private bool _blAccelFocusToggle;
         private int _intEnterCounter;
         private int _intComboRightCtr;
@@ -426,8 +425,8 @@ namespace QuickFiler
         // 
         // QFD_Minimize
         // KeyDownHandler
-        // KeyUpHandler
-        // KeyPressHandler
+        // KeyboardHandler_KeyUp
+        // KeyboardHandler_KeyPress
         // toggleAcceleratorDialogue
         // RemoveSpecificControlGroup
         // ExplConvView_ToggleOn
@@ -440,14 +439,14 @@ namespace QuickFiler
                                List<Control> controlList,
                                int intPositionArg,
                                bool BoolRemoteMouseApp,
-                               QfcGroupOperationsLegacy Caller,
+                               IQfcControllerCallbacks CallbackFunctions,
                                IApplicationGlobals AppGlobals,
                                IntPtr hwnd = default,
                                Enums.InitTypeEnum InitTypeE = Enums.InitTypeEnum.InitSort)
         {
             // Wire global and delegate variables and handles
             _globals = AppGlobals;
-            _parent = Caller;
+            _callbacks = CallbackFunctions;
             _activeExplorer = AppGlobals.Ol.App.ActiveExplorer();
             _initType = InitTypeE;
             hWndCaller = hwnd;
@@ -468,7 +467,10 @@ namespace QuickFiler
                 ToggleRemoteMouseAppLabels();
         }
 
-        
+        //temporary for getting tests running
+        // TODO: create interface for testing
+        internal QfcController() { }
+
         private void ResolveControlAssignments(List<Control> controlList)
         {
             // Resolve controls in collection to their specific control
@@ -701,7 +703,7 @@ namespace QuickFiler
             {
                 objProperty = Mail.UserProperties.Find("FolderKey");
                 if (objProperty is not null)
-                    varList = objProperty;
+                    varList = objProperty.Value;
             }
             if (varList is Array)
             {
@@ -768,10 +770,7 @@ namespace QuickFiler
             else
             {
                 conv = new cConversation(_globals.Ol.App) { item = Mail };
-                _selItemsInClass = (List<MailItem>)conv.get_ToList(true, true);
-                // Set Sel = New Collection
-                // Sel.Add Mail
-                // Set _selItemsInClass = Email_SortToExistingFolder.DemoConversation(_selItemsInClass, Sel)
+                _selItemsInClass = conv.get_ToList(true, true);
                 lblConvCt.Text = _selItemsInClass.Count.ToString();
             }
 
@@ -781,11 +780,8 @@ namespace QuickFiler
 
         public void MoveMail()
         {
-            List<MailItem> selItems = new();
-            string loc;
-            Folder myFolder;
-            MailItem MSG;
-            //Collection Sel;
+            IList selItems = new List<MailItem>();
+
             bool Attchments;
             bool blRepullConv;
             bool blDoMove;
@@ -820,7 +816,7 @@ namespace QuickFiler
                         // Set selItems = Email_SortToExistingFolder.DemoConversation(selItems, Sel)
 
                         conv = new cConversation(_globals.Ol.App) { item = Mail };
-                        selItems = (List<MailItem>)conv.get_ToList(true, true);
+                        selItems = conv.get_ToList(true, true);
                     }
                 }
                 else
@@ -1197,7 +1193,7 @@ namespace QuickFiler
 
         }
 
-        public void ExpandCtrls1()
+        public virtual void ExpandCtrls1()
         {
 
             int lngShift;
@@ -1428,7 +1424,7 @@ namespace QuickFiler
             _searchTxt.KeyUp += txt_KeyUp;
         }
 
-        public void KeyboardHandler(string AccelCode)
+        public virtual void KeyboardHandler(string AccelCode)
         {
             switch (AccelCode ?? "")
             {
@@ -1491,7 +1487,7 @@ namespace QuickFiler
                     }
                 case "R":
                     {
-                        _parent.RemoveSpecificControlGroup(Position);
+                        _callbacks.RemoveSpecificControlGroup(Position);
                         break;
                     }
             }
@@ -1504,9 +1500,9 @@ namespace QuickFiler
             _lblSender.ForeColor = Color.FromArgb(int.MinValue + 0x00000012);
             _lblSender.Font = new Font(_lblSender.Font, FontStyle.Regular);
             Mail.Display();
-            _parent.Parent.QFD_Minimize();
-            if (_parent.Parent.BlShowInConversations)
-                _parent.Parent.ExplConvView_ToggleOn();
+            _callbacks.QFD_Minimize();
+            if (_callbacks.BlShowInConversations)
+                _callbacks.ExplConvView_ToggleOn();
         }
 
         private void cbDel_Click(object sender, EventArgs e)
@@ -1516,7 +1512,7 @@ namespace QuickFiler
 
         private void cbDel_KeyDown(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
         }
 
         private void cbDel_KeyPress(object sender, KeyPressEventArgs e)
@@ -1528,8 +1524,8 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _parent.toggleAcceleratorDialogue
-            _parent.Parent.KeyUpHandler(sender, e);
+            // _callbacks.toggleAcceleratorDialogue
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }
@@ -1549,7 +1545,7 @@ namespace QuickFiler
 
         private void cbFlag_KeyDown(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
         }
 
         private void cbFlag_KeyPress(object sender, KeyPressEventArgs e)
@@ -1561,20 +1557,20 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _parent.toggleAcceleratorDialogue
-            _parent.Parent.KeyUpHandler(sender, e);
+            // _callbacks.toggleAcceleratorDialogue
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }
 
         private void cbKll_Click(object sender, EventArgs e)
         {
-            _parent.RemoveSpecificControlGroup(Position);
+            _callbacks.RemoveSpecificControlGroup(Position);
         }
 
         private void cbKll_KeyDown(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
         }
 
         private void cbKll_KeyPress(object sender, KeyPressEventArgs e)
@@ -1586,8 +1582,8 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _parent.toggleAcceleratorDialogue
-            _parent.Parent.KeyUpHandler(sender, e);
+            // _callbacks.toggleAcceleratorDialogue
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }
@@ -1601,7 +1597,7 @@ namespace QuickFiler
                         if (_intEnterCounter == 1)
                         {
                             _intEnterCounter = 0;
-                            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+                            _callbacks.KeyboardHandler_KeyDown(sender, e);
                         }
                         else
                         {
@@ -1614,7 +1610,7 @@ namespace QuickFiler
 
                 default:
                     {
-                        _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+                        _callbacks.KeyboardHandler_KeyDown(sender, e);
                         break;
                     }
             }
@@ -1626,7 +1622,7 @@ namespace QuickFiler
             {
                 case Keys.Alt:
                     {
-                        _parent.Parent.KeyUpHandler(sender, e);
+                        _callbacks.KeyboardHandler_KeyUp(sender, e);
                         break;
                     }
                 case Keys.Escape:
@@ -1651,7 +1647,7 @@ namespace QuickFiler
                                                                                WholeConversation: false, 
                                                                                strSeed: FolderCbo.SelectedItem as string, 
                                                                                objItem: Mail);
-                            _parent.RemoveSpecificControlGroup(Position);
+                            _callbacks.RemoveSpecificControlGroup(Position);
                         }
                         else
                         {
@@ -1682,12 +1678,12 @@ namespace QuickFiler
 
         private void cbTmp_KeyDown(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
         }
 
         private void cbTmp_KeyUp(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyUpHandler(sender, e);
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
         }
 
         private void chk_Click(object sender, EventArgs e)
@@ -1714,13 +1710,13 @@ namespace QuickFiler
 
             if (ConversationCb.Checked == true)
             {
-                _parent.ConvToggle_Group(selItems, _intMyPosition);
+                _callbacks.ConvToggle_Group(selItems, _intMyPosition);
                 lblConvCt.Enabled = true;
             }
             else
             {
                 varList = FolderCbo.Items.Cast<object>().Select(item => item.ToString()).ToArray();
-                _parent.ConvToggle_UnGroup(selItems, _intMyPosition, int.Parse(lblConvCt.Text), varList);
+                _callbacks.ConvToggle_UnGroup(selItems, _intMyPosition, int.Parse(lblConvCt.Text), varList);
                 lblConvCt.Enabled = false;
             }
 
@@ -1730,50 +1726,50 @@ namespace QuickFiler
 
         private void chk_KeyDown(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
         }
 
         private void chk_KeyUp(object sender, KeyEventArgs e)
         {
             // Select Case KeyCode
             // Case 18
-            // _parent.toggleAcceleratorDialogue
-            _parent.Parent.KeyUpHandler(sender, e);
+            // _callbacks.toggleAcceleratorDialogue
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }
 
         private void frm_KeyDown(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
         }
 
         private void frm_KeyPress(object sender, KeyPressEventArgs e)
         {
-            _parent.Parent.KeyPressHandler(sender, e);
+            _callbacks.KeyboardHandler_KeyPress(sender, e);
         }
 
         private void frm_KeyUp(object sender, KeyEventArgs e)
         {
             // Select Case KeyCode
             // Case 18
-            // _parent.toggleAcceleratorDialogue
-            _parent.Parent.KeyUpHandler(sender, e);
+            // _callbacks.toggleAcceleratorDialogue
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }
 
         private void lst_KeyDown(object sender, KeyEventArgs e)
         {
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
         }
 
         private void lst_KeyUp(object sender, KeyEventArgs e)
         {
             // Select Case KeyCode
             // Case 18
-            // _parent.toggleAcceleratorDialogue
-            _parent.Parent.KeyUpHandler(sender, e);
+            // _callbacks.toggleAcceleratorDialogue
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }
@@ -1798,22 +1794,22 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            _parent.Parent.KeyboardHandler_KeyDown(sender, e);
+            _callbacks.KeyboardHandler_KeyDown(sender, e);
             // Case Else
             // End Select
         }
 
         private void txt_KeyPress(object sender, KeyPressEventArgs e)
         {
-            _parent.Parent.KeyPressHandler(sender, e);
+            _callbacks.KeyboardHandler_KeyPress(sender, e);
         }
 
         private void txt_KeyUp(object sender, KeyEventArgs e)
         {
             // Select Case KeyCode
             // Case 18
-            // _parent.toggleAcceleratorDialogue
-            _parent.Parent.KeyUpHandler(sender, e);
+            // _callbacks.toggleAcceleratorDialogue
+            _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }

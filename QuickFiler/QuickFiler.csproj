@@ -58,6 +58,8 @@
     <Compile Include="cInfoMail.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="FormFocusListener.cs" />
+    <Compile Include="IAcceleratorCallbacks.cs" />
+    <Compile Include="IQfcControllerCallbacks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

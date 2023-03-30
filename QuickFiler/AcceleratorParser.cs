@@ -1,21 +1,22 @@
 ﻿using System;
+using System.Diagnostics.Eventing.Reader;
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
 
 namespace QuickFiler
 {
+    
     internal class AcceleratorParser
     {
-        private QfcGroupOperationsLegacy _parent;
+        private IAcceleratorCallbacks _parent;
 
-        internal AcceleratorParser(QfcGroupOperationsLegacy Parent)
+        internal AcceleratorParser(IAcceleratorCallbacks Parent)
         {
             _parent = Parent;
         }
 
         internal void ParseAndExecute(string strToParse, int _intActiveSelection)
         {
-
             int intNewSelection;
             bool blExpanded = false;
 
@@ -31,118 +32,111 @@ namespace QuickFiler
                         {
                             if (IsAnythingActive(_intActiveSelection))
                                 blExpanded = _parent.ToggleOffActiveItem(blExpanded);
-                            if (intNewSelection > 0)
+                            if (IsActivatingNode(intNewSelection))
                             {
-                                _parent.ActivateByIndex(intNewSelection, blExpanded);
+                                _intActiveSelection = _parent.ActivateByIndex(intNewSelection, blExpanded);
                             }
+                            else { _intActiveSelection = intNewSelection; }
                         }
 
-                        if (AdditionalInstructions(idxLastNum, strToParse))
+                        if (AdditionalInstructions(idxLastNum, strToParse)) 
                         {
-                            string strCommand = ExtractInstruction(idxLastNum, strToParse);
-                            _parent.ResetAcceleratorSilently();
-                            var QF = _parent.TryGetQfc(_intActiveSelection);
-
-                            switch (strCommand ?? "")
+                            if (IsAnythingActive(_intActiveSelection))
                             {
-                                case "O":
-                                    {
-                                        _parent.toggleAcceleratorDialogue();
-                                        QF.KeyboardHandler(strCommand);
-                                        _parent.Parent.OpenQFMail(QF.Mail);
-                                        break;
-                                    }
-                                case "C":
-                                    {
-                                        _parent.toggleAcceleratorDialogue();
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "T":
-                                    {
-                                        _parent.toggleAcceleratorDialogue();
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "F":
-                                    {
-                                        _parent.toggleAcceleratorDialogue();
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "D":
-                                    {
-                                        _parent.toggleAcceleratorDialogue();
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "X":
-                                    {
-                                        _parent.toggleAcceleratorDialogue();
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "R":
-                                    {
-                                        _parent.toggleAcceleratorDialogue();
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "A":
-                                    {
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "W":
-                                    {
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "M":
-                                    {
-                                        QF.KeyboardHandler(strCommand);
-                                        break;
-                                    }
-                                case "E":
-                                    {
-                                        if (QF.blExpanded)
+                                string strCommand = ExtractInstruction(idxLastNum, strToParse);
+                                _parent.ResetAcceleratorSilently();
+                                var QF = _parent.TryGetQfc(_intActiveSelection);
+                                switch (strCommand ?? "")
+                                {
+                                    case "O":
                                         {
-                                            _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
-                                            QF.ExpandCtrls1();
+                                            _parent.toggleAcceleratorDialogue();
+                                            QF.KeyboardHandler(strCommand);
+                                            _parent.OpenQFMail(QF.Mail);
+                                            break;
                                         }
-                                        else
+                                    case "C":
                                         {
-                                            _parent.MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
-                                            QF.ExpandCtrls1();
+                                            _parent.toggleAcceleratorDialogue();
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "T":
+                                        {
+                                            _parent.toggleAcceleratorDialogue();
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "F":
+                                        {
+                                            _parent.toggleAcceleratorDialogue();
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "D":
+                                        {
+                                            _parent.toggleAcceleratorDialogue();
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "X":
+                                        {
+                                            _parent.toggleAcceleratorDialogue();
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "R":
+                                        {
+                                            _parent.toggleAcceleratorDialogue();
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "A":
+                                        {
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "W":
+                                        {
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "M":
+                                        {
+                                            QF.KeyboardHandler(strCommand);
+                                            break;
+                                        }
+                                    case "E":
+                                        {
+                                            if (QF.blExpanded)
+                                            {
+                                                _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
+                                                QF.ExpandCtrls1();
+                                            }
+                                            else
+                                            {
+                                                _parent.MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
+                                                QF.ExpandCtrls1();
+                                            }
+
+                                            break;
                                         }
 
-                                        break;
-                                    }
-
-                                default:
-                                    {
-                                        break;
-                                    }
+                                    default:
+                                        {
+                                            break;
+                                        }
+                                }
                             }
+                            else { _parent.ResetAcceleratorSilently(); }
                         }
                     }
-                    else
-                    {
-                        _parent.ResetAcceleratorSilently();
-                    }
+                    else { _parent.ResetAcceleratorSilently();}
                 }
 
-                else
-                {
-                    blExpanded = _parent.ToggleOffActiveItem(blExpanded);
-                }
+                else { blExpanded = _parent.ToggleOffActiveItem(blExpanded);}
             }
-            else
-            {
-                blExpanded = _parent.ToggleOffActiveItem(blExpanded);
-            }
-
-
+            else { blExpanded = _parent.ToggleOffActiveItem(blExpanded); }
         }
 
         private string ExtractInstruction(int idxLastNum, string strToParse)
@@ -152,7 +146,7 @@ namespace QuickFiler
 
         private bool AdditionalInstructions(int idxLastNum, string strToParse)
         {
-            if (strToParse.Length > idxLastNum)
+            if (strToParse.Length - 1 > idxLastNum)
             {
                 return true;
             }
@@ -162,6 +156,11 @@ namespace QuickFiler
             }
         }
 
+        private bool IsActivatingNode(int NewSelection)
+        {
+            return (NewSelection != 0) ? true : false; 
+        }
+        
         private bool IsAnythingActive(int ActiveSelection)
         {
             if (ActiveSelection != 0)
@@ -188,7 +187,7 @@ namespace QuickFiler
 
         private bool SelectionDetected(int idxLastNum)
         {
-            if (idxLastNum > 0)
+            if (idxLastNum > -1)
             {
                 return true;
             }
@@ -212,7 +211,7 @@ namespace QuickFiler
 
         private int GetFinalNumeric(string strToParse, int idxLastNum)
         {
-            if (idxLastNum > 0)
+            if (idxLastNum > -1)
             {
                 // Get last digit 
                 // TODO: Add support for multiple digit numbers 
@@ -233,11 +232,11 @@ namespace QuickFiler
         {
             int i;
             int intLastNum = 0;
-            int intLastIndex = 0;
+            int intLastIndex = -1;
             int intLen = strToParse.Length;
 
-            var loopTo = intLen;
-            for (i = 1; i <= loopTo; i++)
+            var loopTo = intLen - 1;
+            for (i = 0; i <= loopTo; i++)
             {
                 if (int.TryParse(strToParse.Substring(i, 1), out intLastNum))
                 {

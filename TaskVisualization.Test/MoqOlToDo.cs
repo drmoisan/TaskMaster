@@ -9,6 +9,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Diagnostics.Eventing.Reader;
 using ToDoModel;
+using System.Security.Cryptography;
 
 namespace TaskVisualization.Test
 {
@@ -81,11 +82,25 @@ namespace TaskVisualization.Test
         internal UserProperties MockUserProperties()
         {
             var mockUserProperties = new Mock<UserProperties>();
-            //mockUserProperties.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object>()).Returns(FindProperty(It.IsAny<string>(), It.IsAny<object>()));
-            //mockUserProperties.Setup(x => x.Find(It.IsAny<string>()).Returns(FindProperty);
-            //mockUserProperties.Setup(x => x.Find("TagProgram").Returns(MockProperty<string>("TestProgram", "TagProgram", OlUserPropertyType.olText));
             mockUserProperties.As<IEnumerable>().Setup(x => x.GetEnumerator()).Returns(UserPropertyCollection());
-            //mockUserProperties.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object[]>()).Returns(FindProperty(It.IsAny<string>(), It.IsAny<object[]>())));
+            //mockUserProperties.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object[]>()))
+            //    .Returns(FindProperty(It.IsAny<string>(), It.IsAny<object[]>()));
+            //mockUserProperties.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object[]>()))
+            //    .Returns((string y, object z) => FindProperty(y,z));
+            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "TagProgram"), It.IsAny<object[]>()))
+                .Returns(MockProperty<string>("TestProgram", "TagProgram", OlUserPropertyType.olText));
+            
+            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "AB"), It.IsAny<object[]>()))
+                .Returns(MockProperty<Boolean>(true, "AB", OlUserPropertyType.olYesNo));
+
+            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EC2"), It.IsAny<object[]>()))
+                .Returns(MockProperty<Boolean>(true, "EC2", OlUserPropertyType.olYesNo));
+
+            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EC"), It.IsAny<object[]>()))
+                .Returns(MockProperty<string>("+", "EC", OlUserPropertyType.olText));
+
+            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EcState"), It.IsAny<object[]>()))
+                .Returns(MockProperty<string>("+", "EcState", OlUserPropertyType.olText));
 
             return mockUserProperties.Object;
         }
@@ -109,7 +124,7 @@ namespace TaskVisualization.Test
             email.Setup(x => x.Categories).Returns(categoryNames);
             email.Setup(x => x.PropertyAccessor).Returns(MockPA());
             email.Setup(x => x.UserProperties).Returns(MockUserProperties());
-            email.Setup(x => x.UserProperties.Find(It.IsAny<string>(), It.IsAny<object[]>())).Returns(FindProperty(It.IsAny<string>(), It.IsAny<object[]>()));
+            //email.Setup(x => x.UserProperties.Find(It.IsAny<string>(), It.IsAny<object[]>())).Returns(FindProperty(It.IsAny<string>(), It.IsAny<object[]>()));
 
             return email;
         }

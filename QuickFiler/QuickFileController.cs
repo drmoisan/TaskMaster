@@ -37,7 +37,7 @@ namespace QuickFiler
 
         // Public state variables
         public bool BlFrmKll;
-        public bool BlShowInConversations;
+        private bool blShowInConversations;
         #endregion
         #region Outlook View Variables
         public Microsoft.Office.Interop.Outlook.View ObjView;
@@ -169,6 +169,8 @@ namespace QuickFiler
                 }
             }
         }
+
+        public bool BlShowInConversations { get => blShowInConversations; set => blShowInConversations = value; }
 
         #endregion
 
@@ -454,7 +456,7 @@ namespace QuickFiler
 
         internal void Button_OK_KeyUp(object sender, KeyEventArgs e)
         {
-            KeyUpHandler(sender, e);
+            KeyboardHandler_KeyUp(sender, e);
         }
 
         internal void PanelMain_KeyDown(object sender, KeyEventArgs e)
@@ -464,12 +466,12 @@ namespace QuickFiler
 
         internal void PanelMain_KeyPress(object sender, KeyPressEventArgs e)
         {
-            KeyPressHandler(sender, e);
+            KeyboardHandler_KeyPress(sender, e);
         }
 
         internal void PanelMain_KeyUp(object sender, KeyEventArgs e)
         {
-            KeyUpHandler(sender, e);
+            KeyboardHandler_KeyUp(sender, e);
         }
 
         private void SpnEmailPerLoad_KeyDown(object sender, KeyEventArgs e)
@@ -480,13 +482,13 @@ namespace QuickFiler
         private void UserForm_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!_blSuppressEvents)
-                KeyPressHandler(sender, e);
+                KeyboardHandler_KeyPress(sender, e);
         }
 
         private void UserForm_KeyUp(object sender, KeyEventArgs e)
         {
             if (!_blSuppressEvents)
-                KeyUpHandler(sender, e);
+                KeyboardHandler_KeyUp(sender, e);
         }
 
         private void UserForm_KeyDown(object sender, KeyEventArgs e)
@@ -495,7 +497,7 @@ namespace QuickFiler
                 KeyboardHandler_KeyDown(sender, e);
         }
 
-        public void KeyPressHandler(object sender, KeyPressEventArgs e)
+        public void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!_blSuppressEvents)
             {
@@ -509,7 +511,7 @@ namespace QuickFiler
             }
         }
 
-        public void KeyUpHandler(object sender, KeyEventArgs e)
+        public void KeyboardHandler_KeyUp(object sender, KeyEventArgs e)
         {
             if (!_blSuppressEvents)
             {
