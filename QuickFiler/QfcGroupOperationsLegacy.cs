@@ -1046,16 +1046,18 @@ namespace QuickFiler
                 {
                     _viewer.AcceleratorDialogue.Text = _intActiveSelection.ToString();
                     QfcController QF;
-                    try
+                    QF = TryGetQfc(_intActiveSelection - 1);
+                    if (QF != null)
                     {
-                        QF = _listQFClass[_intActiveSelection];
+                        QF.Accel_FocusToggle();
                     }
-                    catch (System.Exception)
-                    {
-                        _intActiveSelection = 1;
-                        QF = _listQFClass[_intActiveSelection];
+                    else
+                    { 
+                        _intActiveSelection = 0;
+                        ResetAcceleratorSilently();
                     }
-                    QF.Accel_FocusToggle();
+                    
+                    
                 }
 
                 _viewer.AcceleratorDialogue.Focus();
@@ -1100,7 +1102,7 @@ namespace QuickFiler
         {
             if (intNewSelection > 0 & intNewSelection <= _listQFClass.Count)
             {
-                QfcController QF = (QfcController)_listQFClass[intNewSelection];
+                QfcController QF = (QfcController)_listQFClass[intNewSelection - 1];
                 QF.Accel_FocusToggle();
                 if (blExpanded)
                 {
@@ -1118,17 +1120,17 @@ namespace QuickFiler
             bool blExpanded = parentBlExpanded;
             if (_intActiveSelection != 0)
             {
-
-                QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
+                //adjusted to _intActiveSelection -1 to accommodate zero based
+                QfcController QF = (QfcController)_listQFClass[_intActiveSelection -1];
                 if (QF.blExpanded)
                 {
-                    MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
+                    MoveDownPix(_intActiveSelection + 1 -1, (int)Math.Round(QF.Frm.Height * -0.5d));
                     QF.ExpandCtrls1();
                     blExpanded = true;
                 }
                 QF.Accel_FocusToggle();
 
-
+                //QUESTION: This assignment worries me and will be out of sync 
                 _intActiveSelection = 0;
             }
             return blExpanded;
@@ -1136,7 +1138,7 @@ namespace QuickFiler
 
         internal void SelectPreviousItem()
         {
-            if (_intActiveSelection > 1)
+            if (_intActiveSelection > 0)
             {
                 _viewer.AcceleratorDialogue.Text = (_intActiveSelection - 1).ToString();
             }

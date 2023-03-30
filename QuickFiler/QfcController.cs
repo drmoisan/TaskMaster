@@ -853,7 +853,7 @@ namespace QuickFiler
 
             while (_colCtrls.Count > 0)
             {
-                Frm.Controls.Remove((Control)_colCtrls[_colCtrls.Count]);
+                Frm.Controls.Remove((Control)_colCtrls[_colCtrls.Count - 1]);
                 _colCtrls.RemoveAt(_colCtrls.Count - 1);
             }
 

@@ -370,16 +370,19 @@ namespace QuickFiler
             {
                 case Keys.Alt:
                     {
+                        e.Handled = true;
                         _legacy.toggleAcceleratorDialogue();
                         break;
                     }
                 case Keys.Down:
                     {
+                        e.Handled = true;
                         _legacy.SelectNextItem();
                         break;
                     }
                 case Keys.Up:
                     {
+                        e.Handled = true;
                         _legacy.SelectPreviousItem();
                         break;
                     }
@@ -861,9 +864,26 @@ namespace QuickFiler
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & AutoFile.AreConversationsGrouped(_activeExplorer))
                 ExplConvView_ToggleOff();
             QFD_Minimize();
-            _activeExplorer.ClearSelection();
             if (_activeExplorer.IsItemSelectableInView(OlMail))
+            {
+                _activeExplorer.ClearSelection();
                 _activeExplorer.AddToSelection(OlMail);
+
+                MAPIFolder tmp = _activeExplorer.CurrentFolder;
+                MAPIFolder drafts = _globals.Ol.NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderDrafts);
+                _activeExplorer.CurrentFolder = drafts;
+                _activeExplorer.CurrentFolder.Display();
+                _activeExplorer.CurrentFolder = tmp;
+                _activeExplorer.CurrentFolder.Display();
+                
+                
+            }
+            else 
+            {
+                DialogResult result = MessageBox.Show("Error", 
+                    "Selected message is not in view. Would you like to open it?",MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes) { OlMail.Display();}
+             }
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & BlShowInConversations)
                 ExplConvView_ToggleOn();
         }

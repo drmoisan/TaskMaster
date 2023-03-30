@@ -45,7 +45,7 @@ namespace QuickFiler
                             {
                                 string strCommand = ExtractInstruction(idxLastNum, strToParse);
                                 _parent.ResetAcceleratorSilently();
-                                var QF = _parent.TryGetQfc(_intActiveSelection);
+                                var QF = _parent.TryGetQfc(_intActiveSelection - 1);
                                 switch (strCommand ?? "")
                                 {
                                     case "O":
