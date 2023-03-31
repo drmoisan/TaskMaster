@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Outlook;
+using System;
 using System.Diagnostics.Eventing.Reader;
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
@@ -45,77 +46,77 @@ namespace QuickFiler
                             {
                                 string strCommand = ExtractInstruction(idxLastNum, strToParse);
                                 _parent.ResetAcceleratorSilently();
-                                var QF = _parent.TryGetQfc(_intActiveSelection - 1);
+                                IQfcItemController QF = _parent.TryGetQfc(_intActiveSelection - 1);
                                 switch (strCommand ?? "")
                                 {
                                     case "O":
                                         {
-                                            _parent.toggleAcceleratorDialogue();
-                                            QF.KeyboardHandler(strCommand);
+                                            _parent.ToggleKeyboardDialog();
+                                            QF.ApplyReadEmailFormat();
                                             _parent.OpenQFMail(QF.Mail);
                                             break;
                                         }
                                     case "C":
                                         {
-                                            _parent.toggleAcceleratorDialogue();
-                                            QF.KeyboardHandler(strCommand);
+                                            _parent.ToggleKeyboardDialog();
+                                            QF.ToggleConversationCheckbox();
                                             break;
                                         }
                                     case "T":
                                         {
-                                            _parent.toggleAcceleratorDialogue();
-                                            QF.KeyboardHandler(strCommand);
+                                            _parent.ToggleKeyboardDialog();
+                                            QF.FlagAsTask();
                                             break;
                                         }
                                     case "F":
                                         {
-                                            _parent.toggleAcceleratorDialogue();
-                                            QF.KeyboardHandler(strCommand);
+                                            _parent.ToggleKeyboardDialog();
+                                            QF.JumpToSearchTextbox();
                                             break;
                                         }
                                     case "D":
                                         {
-                                            _parent.toggleAcceleratorDialogue();
-                                            QF.KeyboardHandler(strCommand);
+                                            _parent.ToggleKeyboardDialog();
+                                            QF.JumpToFolderDropDown();
                                             break;
                                         }
                                     case "X":
                                         {
-                                            _parent.toggleAcceleratorDialogue();
-                                            QF.KeyboardHandler(strCommand);
+                                            _parent.ToggleKeyboardDialog();
+                                            QF.MarkItemForDeletion();
                                             break;
                                         }
                                     case "R":
                                         {
-                                            _parent.toggleAcceleratorDialogue();
-                                            QF.KeyboardHandler(strCommand);
+                                            _parent.ToggleKeyboardDialog();
+                                            _parent.RemoveSpecificControlGroup(_intActiveSelection - 1);
                                             break;
                                         }
                                     case "A":
                                         {
-                                            QF.KeyboardHandler(strCommand);
+                                            QF.ToggleSaveAttachments();
                                             break;
                                         }
                                     case "W":
                                         {
-                                            QF.KeyboardHandler(strCommand);
+                                            QF.ToggleDeleteFlow();
                                             break;
                                         }
                                     case "M":
                                         {
-                                            QF.KeyboardHandler(strCommand);
+                                            QF.ToggleSaveCopyOfMail();
                                             break;
                                         }
                                     case "E":
                                         {
-                                            if (QF.blExpanded)
+                                            if (QF.BlExpanded)
                                             {
-                                                _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
+                                                _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Height * -0.5d));
                                                 QF.ExpandCtrls1();
                                             }
                                             else
                                             {
-                                                _parent.MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
+                                                _parent.MoveDownPix(_intActiveSelection + 1, QF.Height);
                                                 QF.ExpandCtrls1();
                                             }
 

@@ -1,11 +1,7 @@
 ﻿Imports System.Collections.Generic
 
-Public Class cStackObject
-    Private _colObj As Collection
-
-    Private Sub Class_Initialize()
-        _colObj = New Collection
-    End Sub
+Public Class StackObjectVB
+    Private _colObj As New Collection
 
     Public Sub Push(obj As Object)
         _colObj.Add(obj)
@@ -39,8 +35,6 @@ Public Class cStackObject
         Return listObj
     End Function
 
-    Private Sub Class_Terminate()
-        _colObj = Nothing
-    End Sub
+
 
 End Class

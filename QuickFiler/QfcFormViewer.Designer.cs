@@ -3,9 +3,8 @@ using System.Diagnostics;
 
 namespace QuickFiler
 {
-    public partial class QuickFileViewer : System.Windows.Forms.Form
+    public partial class QfcFormViewer : System.Windows.Forms.Form
     {
-
         // Form overrides dispose to clean up the component list.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing)
@@ -33,7 +32,7 @@ namespace QuickFiler
         {
             this.L1v = new System.Windows.Forms.TableLayoutPanel();
             this.L1v2L2h = new System.Windows.Forms.TableLayoutPanel();
-            this.AcceleratorDialogue = new System.Windows.Forms.TextBox();
+            this.KeyboardDialog = new System.Windows.Forms.TextBox();
             this.L1v2L2h3_ButtonOK = new System.Windows.Forms.Button();
             this.L1v2L2h4_ButtonCancel = new System.Windows.Forms.Button();
             this.L1v2L2h4_ButtonUndo = new System.Windows.Forms.Button();
@@ -71,7 +70,7 @@ namespace QuickFiler
             this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.L1v2L2h.Controls.Add(this.AcceleratorDialogue, 0, 0);
+            this.L1v2L2h.Controls.Add(this.KeyboardDialog, 0, 0);
             this.L1v2L2h.Controls.Add(this.L1v2L2h3_ButtonOK, 2, 0);
             this.L1v2L2h.Controls.Add(this.L1v2L2h4_ButtonCancel, 3, 0);
             this.L1v2L2h.Controls.Add(this.L1v2L2h4_ButtonUndo, 4, 0);
@@ -85,19 +84,19 @@ namespace QuickFiler
             this.L1v2L2h.Size = new System.Drawing.Size(913, 50);
             this.L1v2L2h.TabIndex = 0;
             // 
-            // AcceleratorDialogue
+            // KeyboardDialog
             // 
-            this.AcceleratorDialogue.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AcceleratorDialogue.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AcceleratorDialogue.Location = new System.Drawing.Point(7, 3);
-            this.AcceleratorDialogue.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
-            this.AcceleratorDialogue.Name = "AcceleratorDialogue";
-            this.AcceleratorDialogue.Size = new System.Drawing.Size(142, 40);
-            this.AcceleratorDialogue.TabIndex = 5;
-            this.AcceleratorDialogue.Visible = false;
-            this.AcceleratorDialogue.TextChanged += new System.EventHandler(this.AcceleratorDialogue_TextChanged);
-            this.AcceleratorDialogue.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AcceleratorDialogue_KeyDown);
-            this.AcceleratorDialogue.KeyUp += new System.Windows.Forms.KeyEventHandler(this.AcceleratorDialogue_KeyUp);
+            this.KeyboardDialog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.KeyboardDialog.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.KeyboardDialog.Location = new System.Drawing.Point(7, 3);
+            this.KeyboardDialog.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.KeyboardDialog.Name = "KeyboardDialog";
+            this.KeyboardDialog.Size = new System.Drawing.Size(142, 40);
+            this.KeyboardDialog.TabIndex = 5;
+            this.KeyboardDialog.Visible = false;
+            this.KeyboardDialog.TextChanged += new System.EventHandler(this.AcceleratorDialogue_TextChanged);
+            this.KeyboardDialog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AcceleratorDialogue_KeyDown);
+            this.KeyboardDialog.KeyUp += new System.Windows.Forms.KeyEventHandler(this.AcceleratorDialogue_KeyUp);
             // 
             // L1v2L2h3_ButtonOK
             // 
@@ -178,13 +177,13 @@ namespace QuickFiler
             this.L1v1L2L3v.Size = new System.Drawing.Size(911, 20);
             this.L1v1L2L3v.TabIndex = 1;
             // 
-            // QuickFileViewer
+            // QfcFormViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(919, 274);
             this.Controls.Add(this.L1v);
-            this.Name = "QuickFileViewer";
+            this.Name = "QfcFormViewer";
             this.Text = "Quick File";
             this.Activated += new System.EventHandler(this.QuickFileViewer_Activated);
             this.Closing += new System.ComponentModel.CancelEventHandler(this.QuickFileViewer_Closing);
@@ -207,6 +206,6 @@ namespace QuickFiler
         internal System.Windows.Forms.NumericUpDown L1v2L2h5_SpnEmailPerLoad;
         internal System.Windows.Forms.Panel L1v1L2_PanelMain;
         internal System.Windows.Forms.TableLayoutPanel L1v1L2L3v;
-        internal System.Windows.Forms.TextBox AcceleratorDialogue;
+        internal System.Windows.Forms.TextBox KeyboardDialog;
     }
 }

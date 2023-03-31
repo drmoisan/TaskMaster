@@ -28,7 +28,7 @@ namespace QuickFiler.Test
             mock.Verify(x => x.ActivateByIndex(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(ActivateByIndex)); 
             mock.Verify(x => x.MoveDownPix(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(MoveDownPix));
             mock.Verify(x => x.ResetAcceleratorSilently(), Times.Exactly(ResetAcceleratorSilently)); 
-            mock.Verify(x => x.toggleAcceleratorDialogue(), Times.Exactly(ToggleAcceleratorDialogue));
+            mock.Verify(x => x.ToggleKeyboardDialog(), Times.Exactly(ToggleAcceleratorDialogue));
             mock.Verify(x => x.ToggleOffActiveItem(It.IsAny<bool>()), Times.Exactly(ToggleOffActiveItem));
             mock.Verify(x => x.OpenQFMail(It.IsAny<MailItem>()), Times.Exactly(OpenQFMail));
             mock.Verify(x => x.TryGetQfc(It.IsAny<int>()), Times.Exactly(TryGetQfc));
@@ -38,19 +38,17 @@ namespace QuickFiler.Test
         public void Initialize() 
         {
 
-            //// Create Mock of Panel for QF.frm.Height call
-            //Mock<Panel> frm = new Mock<Panel>();
-            //frm.Setup(x => x.Height).Returns(90);
-
-
-            Panel frm = new Panel();
-            frm.Height = 90;
-
             // Create Mock of QF for TryGetQfc function of AcceleratorMock
-            Mock<QfcController> qfc = new Mock<QfcController>();
-            qfc.Setup(x => x.KeyboardHandler(It.IsAny<string>()));
+            Mock<IQfcItemController> qfc = new Mock<IQfcItemController>();
+            qfc.Setup(x => x.FlagAsTask());
+            qfc.Setup(x => x.ApplyReadEmailFormat());
+            qfc.Setup(x => x.JumpToSearchTextbox());
+            qfc.Setup(x => x.MarkItemForDeletion());
+            qfc.Setup(x => x.ToggleDeleteFlow());
+            qfc.Setup(x => x.ToggleSaveCopyOfMail());
+            qfc.Setup(x => x.ToggleConversationCheckbox());
             qfc.Setup(x => x.ExpandCtrls1());
-            qfc.Setup(x => x.Frm).Returns(frm);
+            qfc.Setup(x => x.Height).Returns(90);
 
             // Create Instance of callbacks mock
             mock = new Mock<IAcceleratorCallbacks>();
@@ -58,7 +56,7 @@ namespace QuickFiler.Test
             mock.Setup(x => x.ActivateByIndex(It.IsAny<int>(), It.IsAny<bool>())).Returns((int a, bool b) => { return a; });
             mock.Setup(x => x.MoveDownPix(It.IsAny<int>(), It.IsAny<int>()));
             mock.Setup(x => x.ResetAcceleratorSilently());
-            mock.Setup(x => x.toggleAcceleratorDialogue());
+            mock.Setup(x => x.ToggleKeyboardDialog());
             mock.Setup(x => x.ToggleOffActiveItem(It.IsAny<bool>())).Returns(false);
             mock.Setup(x => x.OpenQFMail(It.IsAny<MailItem>()));
             mock.Setup(x => x.TryGetQfc(It.IsAny<int>())).Returns(qfc.Object);
@@ -195,7 +193,7 @@ namespace QuickFiler.Test
              * _parent.IsSelectionBelowMax	=>	
              * _parent.ResetAcceleratorSilently =>
              * _parent.TryGetQfc =>	
-             * _parent.toggleAcceleratorDialogue */
+             * _parent.ToggleKeyboardDialog */
 
             AcceleratorParser parser = new AcceleratorParser(mock.Object);
             parser.ParseAndExecute(strToParse: "2C", _intActiveSelection: 2);
@@ -228,7 +226,7 @@ namespace QuickFiler.Test
              ***** _parent.ActivateByIndex	=>	
              ***** _parent.ResetAcceleratorSilently => 
              ***** _parent.TryGetQfc => 
-             ***** _parent.toggleAcceleratorDialogue
+             ***** _parent.ToggleKeyboardDialog
              */
 
             AcceleratorParser parser = new AcceleratorParser(mock.Object);
@@ -387,7 +385,7 @@ namespace QuickFiler.Test
              * _parent.ActivateByIndex =>
              * _parent.ResetAcceleratorSilently => 
              * _parent.TryGetQfc	=>	
-             * _parent.toggleAcceleratorDialogue
+             * _parent.ToggleKeyboardDialog
              */
 
             AcceleratorParser parser = new AcceleratorParser(mock.Object);

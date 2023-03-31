@@ -49,7 +49,7 @@ namespace QuickFiler
         internal const long Left_chbxGPConv = 210L;           // Checkbox to Group Conversations
         internal const long Left_chbxGPConv_C = 372L;           // Checkbox to Group Conversations
         internal const long Left_cbDelItem = 588L;           // Delete email
-        internal const long Left_cbKllItem = 618L;           // Remove mail from Processing
+        internal const long Left_cbKllItem = 618L;           // Remove _mail from Processing
         internal const long Left_cbFlagItem = 569L;           // Flag as Task
         internal const long Left_lblAcF = 363L;           // ACCELERATOR F for Folder Search
         internal const long Left_lblAcD = 363L;           // ACCELERATOR D for Folder Dropdown
@@ -80,7 +80,7 @@ namespace QuickFiler
         internal const long Width_cbxFolder = 276L;           // Combo box containing Folder Suggestions 
         internal const long Width_inpt = 126L;           // Input for folder search 156 to 126
         internal const long Width_chbxGPConv = 96L;            // Checkbox to Group Conversations
-        internal const long Width_cb = 25L;            // Command buttons for: Delete email, Remove mail from Processing, and Flag as Task
+        internal const long Width_cb = 25L;            // Command buttons for: Delete email, Remove _mail from Processing, and Flag as Task
         internal const long Width_lblAc = 14L;            // ACCELERATOR Width
         internal const long Width_lblAcF = 14L;            // ACCELERATOR F for Folder Search
         internal const long Width_lblAcD = 14L;            // ACCELERATOR D for Folder Dropdown

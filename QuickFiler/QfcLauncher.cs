@@ -7,19 +7,19 @@ using UtilitiesCS;
 namespace QuickFiler
 {
 
-    public class QuickFileHomeController
+    public class QfcLauncher
     {
-        private QuickFileViewer _viewer;
+        private QfcFormViewer _viewer;
         private QuickFileController _controller;
         private IApplicationGlobals _globals;
         public delegate void ParentCleanupFunction();
         private ParentCleanupFunction _parentCleanup;
 
-        public QuickFileHomeController(IApplicationGlobals AppGlobals, ParentCleanupFunction ParentCleanup)
+        public QfcLauncher(IApplicationGlobals AppGlobals, ParentCleanupFunction ParentCleanup)
         {
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
-            _viewer = new QuickFileViewer();
+            _viewer = new QfcFormViewer();
             
             var listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()); //as List<MailItem>;
             Queue<MailItem> MasterQueue = new Queue<MailItem>();

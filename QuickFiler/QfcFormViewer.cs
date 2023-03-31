@@ -5,11 +5,11 @@ using System.Windows.Forms;
 namespace QuickFiler
 {
 
-    public partial class QuickFileViewer
+    public partial class QfcFormViewer
     {
         private QuickFileController _controller;
 
-        public QuickFileViewer()
+        public QfcFormViewer()
         {
             InitializeComponent();
         }
@@ -90,17 +90,17 @@ namespace QuickFiler
 
         private void AcceleratorDialogue_KeyDown(object sender, KeyEventArgs e)
         {
-            _controller.AcceleratorDialogue_KeyDown(sender, e);
+            _controller.KeyboardDialog_KeyDown(sender, e);
         }
 
         private void AcceleratorDialogue_KeyUp(object sender, KeyEventArgs e)
         {
-            _controller.AcceleratorDialogue_KeyUp(sender, e);
+            _controller.KeyboardDialog_KeyUp(sender, e);
         }
 
         private void AcceleratorDialogue_TextChanged(object sender, EventArgs e)
         {
-            _controller.AcceleratorDialogue_Change();
+            _controller.KeyboardDialog_Change();
         }
 
         private void QuickFileViewer_Resize(object sender, EventArgs e)

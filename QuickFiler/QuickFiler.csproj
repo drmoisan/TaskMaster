@@ -60,46 +60,51 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AcceleratorParser.cs" />
-    <Compile Include="cInfoMail.cs" />
-    <Compile Include="Enums.cs" />
-    <Compile Include="FormFocusListener.cs" />
-    <Compile Include="IAcceleratorCallbacks.cs" />
-    <Compile Include="IQfcControllerCallbacks.cs" />
+    <Compile Include="Interfaces\IQfcItemController.cs" />
+    <Compile Include="Legacy\AcceleratorParser.cs" />
+    <Compile Include="Helper Classes\cInfoMail.cs" />
+    <Compile Include="Helper Classes\Enums.cs" />
+    <Compile Include="Helper Classes\FormFocusListener.cs" />
+    <Compile Include="Legacy\IAcceleratorCallbacks.cs" />
+    <Compile Include="Legacy\IQfcControllerCallbacks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="QfcController.cs" />
-    <Compile Include="QfcGroupOperationsLegacy.cs" />
-    <Compile Include="QfcViewer.cs">
+    <Compile Include="Legacy\QfcController.cs" />
+    <Compile Include="QfcFormController.cs" />
+    <Compile Include="Legacy\QfcGroupOperationsLegacy.cs" />
+    <Compile Include="QfcItemController.cs" />
+    <Compile Include="QfcItemViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="QfcViewer.Designer.cs">
-      <DependentUpon>QfcViewer.cs</DependentUpon>
+    <Compile Include="QfcItemViewer.Designer.cs">
+      <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="QuickFileController.cs" />
-    <Compile Include="QuickFileControllerConstants.cs" />
-    <Compile Include="QuickFileHomeController.cs" />
-    <Compile Include="QuickFileViewer.cs">
+    <Compile Include="Legacy\QuickFileController.cs" />
+    <Compile Include="Legacy\QuickFileControllerConstants.cs" />
+    <Compile Include="QfcKeyboardHandler.cs" />
+    <Compile Include="QfcLauncher.cs" />
+    <Compile Include="QfcFormViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="QuickFileViewer.Designer.cs">
-      <DependentUpon>QuickFileViewer.cs</DependentUpon>
+    <Compile Include="QfcFormViewer.Designer.cs">
+      <DependentUpon>QfcFormViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="QfcDatamodel.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="QfcViewer.resx">
-      <DependentUpon>QfcViewer.cs</DependentUpon>
+    <EmbeddedResource Include="QfcItemViewer.resx">
+      <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="QuickFileViewer.resx">
-      <DependentUpon>QuickFileViewer.cs</DependentUpon>
+    <EmbeddedResource Include="QfcFormViewer.resx">
+      <DependentUpon>QfcFormViewer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +151,7 @@
       <Name>UtilitiesVB</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

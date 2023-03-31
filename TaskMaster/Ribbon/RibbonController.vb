@@ -8,7 +8,7 @@ Public Class RibbonController
     Private _viewer As RibbonViewer
     Private _globals As IApplicationGlobals
     Private blHook As Boolean = True
-    Private _quickfile As QuickFileHomeController
+    Private _quickfile As QfcLauncher
 
     Public Sub New()
     End Sub
@@ -43,7 +43,7 @@ Public Class RibbonController
         Dim loaded As Boolean = False
         If _quickfile IsNot Nothing Then loaded = _quickfile.Loaded
         If loaded = False Then
-            _quickfile = New QuickFileHomeController(_globals, AddressOf ReleaseQuickFiler)
+            _quickfile = New QfcLauncher(_globals, AddressOf ReleaseQuickFiler)
             _quickfile.Run()
         End If
     End Sub

@@ -10,6 +10,6 @@ Public Interface IOlObjects
     ReadOnly Property OlReminders As Reminders
     ReadOnly Property ToDoFolder As Folder
     Property ShowInConversations As Boolean
-    Property MovedMails_Stack As cStackObject
+    Property MovedMails_Stack As StackObjectVB
     ReadOnly Property View_Wide As String
 End Interface

@@ -7,7 +7,7 @@ Public Class AppOlObjects
 
     Private _olEmailRootPath As String
     Private _olArchiveRootPath As String
-    Private _movedMails_Stack As cStackObject
+    Private _movedMails_Stack As StackObjectVB
 
     Public Sub New(OlApp As Application)
         App = OlApp
@@ -75,11 +75,11 @@ Public Class AppOlObjects
         End Get
     End Property
 
-    Public Property MovedMails_Stack As cStackObject Implements IOlObjects.MovedMails_Stack
+    Public Property MovedMails_Stack As StackObjectVB Implements IOlObjects.MovedMails_Stack
         Get
             Return _movedMails_Stack
         End Get
-        Set(value As cStackObject)
+        Set(value As StackObjectVB)
             _movedMails_Stack = value
         End Set
     End Property

@@ -17,7 +17,7 @@ namespace QuickFiler
 {
 
 
-    internal class QfcController
+    internal class QfcController: IQfcItemController
     {
 
         #region Global Variables, Window Handles and Collections
@@ -44,10 +44,12 @@ namespace QuickFiler
         private bool _blAccelFocusToggle;
         private int _intEnterCounter;
         private int _intComboRightCtr;
-        public bool blExpanded;
-        public bool blHasChild;
+        private bool _blExpanded;
+        public bool BlExpanded { get => _blExpanded; }
+        private bool _blHasChild;
+        public bool BlHasChild { get => _blHasChild; set => _blHasChild = value; }
         #endregion
-        
+
         #region UI Controls WithEvents
         private Control _mPassedControl;
 
@@ -289,34 +291,35 @@ namespace QuickFiler
             }
         }
         
-        private Panel _frm;
-        public virtual Panel Frm
+        private Panel _itemPanel;
+        public virtual Panel ItemPanel
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return _frm;
+                return _itemPanel;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (_frm != null)
+                if (_itemPanel != null)
                 {
-                    _frm.KeyDown -= frm_KeyDown;
-                    _frm.KeyPress -= frm_KeyPress;
-                    _frm.KeyUp -= frm_KeyUp;
+                    _itemPanel.KeyDown -= frm_KeyDown;
+                    _itemPanel.KeyPress -= frm_KeyPress;
+                    _itemPanel.KeyUp -= frm_KeyUp;
                 }
 
-                _frm = value;
-                if (_frm != null)
+                _itemPanel = value;
+                if (_itemPanel != null)
                 {
-                    _frm.KeyDown += frm_KeyDown;
-                    _frm.KeyPress += frm_KeyPress;
-                    _frm.KeyUp += frm_KeyUp;
+                    _itemPanel.KeyDown += frm_KeyDown;
+                    _itemPanel.KeyPress += frm_KeyPress;
+                    _itemPanel.KeyUp += frm_KeyUp;
                 }
             }
         }
+        public int Height {get { return _itemPanel.Height; }}
         #endregion
         
         #region UI Controls - Others Without Events
@@ -350,9 +353,10 @@ namespace QuickFiler
         private CheckBox _chbxSaveMail;
         private CheckBox _chbxDelFlow;
         #endregion
-        
+
         #region Outlook Variables
-        public MailItem Mail;
+        private MailItem _mail;
+        public MailItem Mail { get => _mail; set => _mail = value; }
         private Folder _fldrOriginal;
         private Folder _fldrTarget;
         #endregion
@@ -427,7 +431,7 @@ namespace QuickFiler
         // KeyDownHandler
         // KeyboardHandler_KeyUp
         // KeyboardHandler_KeyPress
-        // toggleAcceleratorDialogue
+        // ToggleKeyboardDialog
         // RemoveSpecificControlGroup
         // ExplConvView_ToggleOn
         // ConvToggle_Group
@@ -485,7 +489,7 @@ namespace QuickFiler
                 {
                     case "Panel":
                         {
-                            Frm = (Panel)ctlTmp;
+                            ItemPanel = (Panel)ctlTmp;
                             break;
                         }
                     case "CheckBox":
@@ -693,7 +697,7 @@ namespace QuickFiler
             }
         }
 
-        internal void Init_FolderSuggestions(object varList = null)
+        public void PopulateFolderCombobox(object varList = null)
         {
 
             int i;
@@ -718,7 +722,7 @@ namespace QuickFiler
             }
             else
             {
-                // TODO: cSuggestions and cFolderHandler are to mixed up with functionality. Need to clean up.
+                // TODO: cSuggestions and cFolderHandler are too mixed up with functionality. Need to clean up.
                 _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
 
                 if (_suggestions.Count > 0)
@@ -742,14 +746,14 @@ namespace QuickFiler
             }
 
             // Set _fldrHandler = New cFolderHandler
-            // cbo.List = _fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=mail)
+            // cbo.List = _fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=_mail)
             // If cbo.ListCount >= 2 Then cbo.Value = cbo.List(2)
 
-            // Set objProperty = mail.UserProperties.FIND("AutoFile")
+            // Set objProperty = _mail.UserProperties.FIND("AutoFile")
             // If Not objProperty Is Nothing Then _searchTxt.Value = objProperty.Value
 
 
-            // Call Email_SortToExistingFolder.FindFolder("", True, objItem:=mail)
+            // Call Email_SortToExistingFolder.FindFolder("", True, objItem:=_mail)
 
 
 
@@ -853,7 +857,7 @@ namespace QuickFiler
 
             while (_colCtrls.Count > 0)
             {
-                Frm.Controls.Remove((Control)_colCtrls[_colCtrls.Count - 1]);
+                ItemPanel.Controls.Remove((Control)_colCtrls[_colCtrls.Count - 1]);
                 _colCtrls.RemoveAt(_colCtrls.Count - 1);
             }
 
@@ -867,7 +871,7 @@ namespace QuickFiler
             ConversationCb = null;
             FolderCbo = null;
             SearchTxt = null;
-            Frm = null;
+            ItemPanel = null;
             CbKll = null;
             Mail = null;
             _fldrTarget = null;
@@ -897,6 +901,9 @@ namespace QuickFiler
                 _intMyPosition = value;
             }
         }
+
+        
+
 
         #endregion
 
@@ -952,7 +959,7 @@ namespace QuickFiler
                 lblConvCt_Left = lblConvCt.Left;                 // Conversation Count X% Left Position
             }
 
-            lngBlock_Width = Frm.Width - chbxSaveAttach_Left; // Width of block of right justified controls
+            lngBlock_Width = ItemPanel.Width - chbxSaveAttach_Left; // Width of block of right justified controls
         }
 
         public void Accel_Toggle()
@@ -961,7 +968,7 @@ namespace QuickFiler
             {
                 if (_blAccelFocusToggle)
                 {
-                    if (blExpanded == true)
+                    if (_blExpanded == true)
                         ExpandCtrls1();
                     Accel_FocusToggle();
                 }
@@ -1084,7 +1091,7 @@ namespace QuickFiler
                 _lblMyPosition.BackColor = Color.DarkGreen;
                 // Modal        With _activeExplorer
                 // Modal            .ClearSelection
-                // Modal            If .IsItemSelectableInView(mail) Then .AddToSelection mail
+                // Modal            If .IsItemSelectableInView(_mail) Then .AddToSelection _mail
                 // Modal            'DoEvents
                 // Modal        End With
             }
@@ -1157,10 +1164,10 @@ namespace QuickFiler
                 lblAcW.Left = (int)(lblAcW_Left + X1px + X2px);                     // W Accelerator X% Left Position
                 lblAcM.Left = (int)(lblAcM_Left + X1px + X2px);                     // M Accelerator X% Left Position
 
-                if (blExpanded)
+                if (_blExpanded)
                 {
 
-                    FolderCbo.Width = (int)(Frm.Width - FolderCbo.Left - lngBlock_Width - 5L);
+                    FolderCbo.Width = (int)(ItemPanel.Width - FolderCbo.Left - lngBlock_Width - 5L);
                     pos_cbo.leftOriginal = cbo_Left + X1px;                   // Dropdown box X% Left position Y% Width
                     pos_cbo.widthOriginal = cbo_Width + X2px;                 // Dropdown box X% Left position Y% Width
                     pos_lblAcD.leftOriginal = lblAcD_Left + X1px;             // D Accelerator X% left position
@@ -1169,7 +1176,7 @@ namespace QuickFiler
                     lngTmp = ConversationCb.Left;
                     ConversationCb.Left = lblConvCt.Left - 10;
                     lblAcC.Left = (int)(lblAcC.Left + ConversationCb.Left - lngTmp);
-                    TxtBoxBody.Width = Frm.Width - TxtBoxBody.Left - 5;
+                    TxtBoxBody.Width = ItemPanel.Width - TxtBoxBody.Left - 5;
                     pos_body.widthOriginal = lblBody_Width + X1px;            // Body Width X%
                 }
 
@@ -1203,10 +1210,10 @@ namespace QuickFiler
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
-                if (blExpanded == false)
+                if (_blExpanded == false)
                 {
-                    blExpanded = true;
-                    Frm.Height = Frm.Height * 2;
+                    _blExpanded = true;
+                    ItemPanel.Height = ItemPanel.Height * 2;
                     lngShift = LblSubject.Top + LblSubject.Height - FolderCbo.Top + 1;
 
                     pos_cbo.topOriginal = FolderCbo.Top;
@@ -1238,10 +1245,10 @@ namespace QuickFiler
                     lblAcO.Top = (lblAcO.Top + lngShift);
 
                     pos_body.heightOriginal = TxtBoxBody.Height;
-                    pos_body.heightNew = Frm.Height - pos_body.topNew - 5;
+                    pos_body.heightNew = ItemPanel.Height - pos_body.topNew - 5;
                     TxtBoxBody.Height = pos_body.heightNew;
                     pos_body.widthOriginal = TxtBoxBody.Width;
-                    pos_body.widthNew = Frm.Width - TxtBoxBody.Left - 5;
+                    pos_body.widthNew = ItemPanel.Width - TxtBoxBody.Left - 5;
                     TxtBoxBody.Width = pos_body.widthNew;
                    
 
@@ -1287,8 +1294,8 @@ namespace QuickFiler
 
                 else
                 {
-                    blExpanded = false;
-                    Frm.Height = (int)Math.Round(Frm.Height / 2d);
+                    _blExpanded = false;
+                    ItemPanel.Height = (int)Math.Round(ItemPanel.Height / 2d);
 
                     FolderCbo.Top = (int)pos_cbo.topOriginal;
                     FolderCbo.Left = (int)pos_cbo.leftOriginal;
@@ -1319,22 +1326,22 @@ namespace QuickFiler
 
                 }
             }
-            else if (blExpanded == false)
+            else if (_blExpanded == false)
             {
-                blExpanded = true;
-                Frm.Height = Frm.Height * 2;
+                _blExpanded = true;
+                ItemPanel.Height = ItemPanel.Height * 2;
                 {
                     pos_body.topOriginal = TxtBoxBody.Top;
                     pos_lblAcO.topOriginal = lblAcO.Top;
                     pos_body.heightOriginal = TxtBoxBody.Height;
-                    pos_body.heightNew = Frm.Height - pos_body.topOriginal - 5;
+                    pos_body.heightNew = ItemPanel.Height - pos_body.topOriginal - 5;
                     TxtBoxBody.Height = (int)pos_body.heightNew;
                 }
             }
             else
             {
-                blExpanded = false;
-                Frm.Height = (int)Math.Round(Frm.Height / 2d);
+                _blExpanded = false;
+                ItemPanel.Height = (int)Math.Round(ItemPanel.Height / 2d);
                 {
                     TxtBoxBody.Top = (int)pos_body.topOriginal;
                     TxtBoxBody.Height = (int)pos_body.heightOriginal;
@@ -1393,6 +1400,7 @@ namespace QuickFiler
         #endregion
 
         #region Event Handlers
+        #endregion
 
         private void WireEventHandlers()
         {
@@ -1415,9 +1423,9 @@ namespace QuickFiler
             _conversationCb.CheckedChanged += chk_Click;
             _conversationCb.KeyDown += chk_KeyDown;
             _conversationCb.KeyUp += chk_KeyUp;
-            _frm.KeyDown += frm_KeyDown;
-            _frm.KeyPress += frm_KeyPress;
-            _frm.KeyUp += frm_KeyUp;
+            _itemPanel.KeyDown += frm_KeyDown;
+            _itemPanel.KeyPress += frm_KeyPress;
+            _itemPanel.KeyUp += frm_KeyUp;
             _searchTxt.TextChanged += txt_Change;
             _searchTxt.KeyDown += txt_KeyDown;
             _searchTxt.KeyPress += txt_KeyPress;
@@ -1430,67 +1438,105 @@ namespace QuickFiler
             {
                 case "O":
                     {
-
-                        LblSubject.ForeColor = Color.FromArgb(int.MinValue + 0x00000012);
-                        _lblSender.ForeColor = Color.FromArgb(int.MinValue + 0x00000012);
-                        LblSubject.Font = new Font(LblSubject.Font, FontStyle.Regular);
-                        _lblSender.Font = new Font(_lblSender.Font, FontStyle.Regular);
+                        ApplyReadEmailFormat(); //covered
                         break;
                     }
 
-
                 case "C":
                     {
-                        if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            ConversationCb.Checked = !ConversationCb.Checked;
+                        ToggleConversationCheckbox();//redirected
                         break;
                     }
                 case "A":
                     {
-                        if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            _chbxSaveAttach.Checked = !_chbxSaveAttach.Checked;
+                        ToggleSaveAttachments(); // Redirected
                         break;
                     }
                 case "W":
                     {
-                        if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            _chbxDelFlow.Checked = !_chbxDelFlow.Checked;
+                        ToggleDeleteFlow(); //redirected
                         break;
                     }
                 case "M":
                     {
-                        if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            _chbxSaveMail.Checked = !_chbxSaveMail.Checked;
+                        ToggleSaveCopyOfMail(); //redirected
                         break;
                     }
                 case "T":
                     {
-                        FlagAsTask();
+                        FlagAsTask(); //covered
                         break;
                     }
                 case "F":
                     {
-                        if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            SearchTxt.Focus();
+                        JumpToSearchTextbox(); //redirected
                         break;
                     }
                 case "D":
                     {
-                        if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
-                            FolderCbo.Focus();
+                        JumpToFolderDropDown(); //redirected
                         break;
                     }
                 case "X":
                     {
-                        FolderCbo.SelectedItem = "Trash to Delete";
+                        MarkItemForDeletion(); //redirect
                         break;
                     }
                 case "R":
                     {
-                        _callbacks.RemoveSpecificControlGroup(Position);
+                        _callbacks.RemoveSpecificControlGroup(Position); // redirected
                         break;
                     }
             }
+        }
+
+        public void ToggleConversationCheckbox()
+        {
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                ConversationCb.Checked = !ConversationCb.Checked;
+        }
+
+        public void ToggleSaveCopyOfMail()
+        {
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                _chbxSaveMail.Checked = !_chbxSaveMail.Checked;
+        }
+
+        public void ToggleDeleteFlow()
+        {
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                _chbxDelFlow.Checked = !_chbxDelFlow.Checked;
+        }
+
+        public void ToggleSaveAttachments()
+        {
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                _chbxSaveAttach.Checked = !_chbxSaveAttach.Checked;
+        }
+
+        public void MarkItemForDeletion()
+        {
+            FolderCbo.SelectedItem = "Trash to Delete";
+        }
+
+        public void JumpToFolderDropDown()
+        {
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                FolderCbo.Focus();
+        }
+
+        public void JumpToSearchTextbox()
+        {
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                SearchTxt.Focus();
+        }
+
+        public void ApplyReadEmailFormat()
+        {
+            LblSubject.ForeColor = Color.FromArgb(int.MinValue + 0x00000012);
+            _lblSender.ForeColor = Color.FromArgb(int.MinValue + 0x00000012);
+            LblSubject.Font = new Font(LblSubject.Font, FontStyle.Regular);
+            _lblSender.Font = new Font(_lblSender.Font, FontStyle.Regular);
         }
 
         private void bdy_Click(object sender, EventArgs e)
@@ -1524,7 +1570,7 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _callbacks.toggleAcceleratorDialogue
+            // _callbacks.ToggleKeyboardDialog
             _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
@@ -1535,7 +1581,7 @@ namespace QuickFiler
             FlagAsTask();
         }
 
-        private void FlagAsTask()
+        public void FlagAsTask()
         {
             List<MailItem> Sel = new() { Mail };
             var flagTask = new FlagTasks(AppGlobals: _globals, ItemList: Sel, blFile: false, hWndCaller: hWndCaller);
@@ -1557,7 +1603,7 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _callbacks.toggleAcceleratorDialogue
+            // _callbacks.ToggleKeyboardDialog
             _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
@@ -1582,7 +1628,7 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _callbacks.toggleAcceleratorDialogue
+            // _callbacks.ToggleKeyboardDialog
             _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
@@ -1733,7 +1779,7 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _callbacks.toggleAcceleratorDialogue
+            // _callbacks.ToggleKeyboardDialog
             _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
@@ -1753,7 +1799,7 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _callbacks.toggleAcceleratorDialogue
+            // _callbacks.ToggleKeyboardDialog
             _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
@@ -1768,7 +1814,7 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _callbacks.toggleAcceleratorDialogue
+            // _callbacks.ToggleKeyboardDialog
             _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
@@ -1808,12 +1854,12 @@ namespace QuickFiler
         {
             // Select Case KeyCode
             // Case 18
-            // _callbacks.toggleAcceleratorDialogue
+            // _callbacks.ToggleKeyboardDialog
             _callbacks.KeyboardHandler_KeyUp(sender, e);
             // Case Else
             // End Select
         }
-
-        #endregion
+               
+        
     }
 }

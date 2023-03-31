@@ -17,7 +17,7 @@ namespace QuickFiler
     /// </summary>
     internal class QfcGroupOperationsLegacy : IAcceleratorCallbacks, IQfcControllerCallbacks
     {
-        private readonly QuickFileViewer _viewer;
+        private readonly QfcFormViewer _viewer;
         private readonly Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private List<QfcController> _listQFClass;
@@ -25,10 +25,10 @@ namespace QuickFiler
         private int _intActiveSelection;
         private bool _boolRemoteMouseApp = false;
         private IntPtr _lFormHandle;
-        private bool _suppressAcceleratorEvents = false;
+        private bool _suppressKeyboardEvents = false;
         private QuickFileController _parent;
 
-        public QfcGroupOperationsLegacy(QuickFileViewer viewerInstance, Enums.InitTypeEnum InitType, IApplicationGlobals AppGlobals, QuickFileController ParentObject)
+        public QfcGroupOperationsLegacy(QfcFormViewer viewerInstance, Enums.InitTypeEnum InitType, IApplicationGlobals AppGlobals, QuickFileController ParentObject)
         {
 
             _viewer = viewerInstance;
@@ -75,7 +75,7 @@ namespace QuickFiler
                 foreach (QfcController currentQF in _listQFClass)
                 {
                     QF = currentQF;
-                    QF.Init_FolderSuggestions();
+                    QF.PopulateFolderCombobox();
                     QF.CountMailsInConv();
                     // DoEvents
                 }
@@ -742,7 +742,7 @@ namespace QuickFiler
                     i = _listQFClass.Count - 1;
                     QF = (QfcController)_listQFClass[i];
                     QF.ctrlsRemove();                                  // Remove controls on the frame
-                    _viewer.L1v1L2_PanelMain.Controls.Remove(QF.Frm);           // Remove the frame
+                    _viewer.L1v1L2_PanelMain.Controls.Remove(QF.ItemPanel);           // Remove the frame
                     QF.kill();                                         // Remove the variables linking to events
 
                     // PanelMain.Controls.Remove _colFrames(i).Name
@@ -764,7 +764,7 @@ namespace QuickFiler
                 // Shift items downward if there are any
                 QF = (QfcController)_listQFClass[i];
                 QF.Position += intMoves;
-                ctlFrame = QF.Frm;
+                ctlFrame = QF.ItemPanel;
                 ctlFrame.Top = ctlFrame.Top + intMoves * (QuickFileControllerConstants.frmHt + QuickFileControllerConstants.frmSp);
             }
             // PanelMain.ScrollHeight = max((intMoves + _listQFClass.Count) * (frmHt + frmSp), _heightPanelMainMax)
@@ -790,7 +790,7 @@ namespace QuickFiler
 
                 // Shift items downward if there are any
                 QF = (QfcController)_listQFClass[i];
-                ctlFrame = QF.Frm;
+                ctlFrame = QF.ItemPanel;
                 ctlFrame.Top += intPix;
             }
         }
@@ -812,21 +812,21 @@ namespace QuickFiler
                 LoadGroupOfCtrls(ref listCtrls, _intUniqueItemCounter, posInsert, blGroupConversation);
                 QF = new QfcController(Mail, listCtrls, posInsert, _boolRemoteMouseApp, this, _globals);
                 if (blChild)
-                    QF.blHasChild = true;
+                    QF.BlHasChild = true;
                 if (varList is Array == true)
                 {
                     if (((Array)varList).GetUpperBound(0) == 0)
                     {
-                        QF.Init_FolderSuggestions();
+                        QF.PopulateFolderCombobox();
                     }
                     else
                     {
-                        QF.Init_FolderSuggestions(varList);
+                        QF.PopulateFolderCombobox(varList);
                     }
                 }
                 else
                 {
-                    QF.Init_FolderSuggestions(varList);
+                    QF.PopulateFolderCombobox(varList);
                 }
                 QF.CountMailsInConv(ConvCt);
 
@@ -873,7 +873,7 @@ namespace QuickFiler
 
 
             QF.ctrlsRemove();                                  // Run the method that removes controls from the frame
-            _viewer.L1v1L2_PanelMain.Controls.Remove(QF.Frm);           // Remove the specific frame
+            _viewer.L1v1L2_PanelMain.Controls.Remove(QF.ItemPanel);           // Remove the specific frame
             QF.kill();                                         // Remove the variables linking to events
 
             if (blDebug)
@@ -904,7 +904,7 @@ namespace QuickFiler
                 {
                     QF = (QfcController)_listQFClass[i];
                     QF.Position -= 1;
-                    ctlFrame = QF.Frm;
+                    ctlFrame = QF.ItemPanel;
                     ctlFrame.Top = ctlFrame.Top - QuickFileControllerConstants.frmHt - QuickFileControllerConstants.frmSp;
                 }
                 // _viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
@@ -946,7 +946,7 @@ namespace QuickFiler
             {
                 var loopTo = _listQFClass.Count;
                 for (i = 1; i <= loopTo; i++)
-                    // Debug.Print "_listQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.mail.Subject
+                    // Debug.Print "_listQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF._mail.Subject
                     QF = (QfcController)_listQFClass[i];
             }
 
@@ -974,7 +974,7 @@ namespace QuickFiler
                 // Debug.Print "DEBUG DATA BEFORE UNGROUP"
                 var loopTo = _listQFClass.Count;
                 for (i = 1; i <= loopTo; i++)
-                    // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF.mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF.mail.Subject
+                    // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF._mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF._mail.Subject
                     QF = (QfcController)_listQFClass[i];
             }
 
@@ -990,7 +990,7 @@ namespace QuickFiler
                 // Debug.Print "DEBUG DATA AFTER UNGROUP"
                 var loopTo2 = _listQFClass.Count;
                 for (i = 1; i <= loopTo2; i++)
-                    // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF.mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF.mail.Subject
+                    // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF._mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF._mail.Subject
                     QF = (QfcController)_listQFClass[i];
             }
             _parent.FormResize(false);
@@ -1010,15 +1010,15 @@ namespace QuickFiler
             {
                 foreach (QfcController QF in _listQFClass)
                 {
-                    if (QF.blHasChild)
+                    if (QF.BlHasChild)
                     {
-                        QF.Frm.Left = QuickFileControllerConstants.frmLt * 2;
-                        QF.Frm.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx - QuickFileControllerConstants.frmLt);
+                        QF.ItemPanel.Left = QuickFileControllerConstants.frmLt * 2;
+                        QF.ItemPanel.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx - QuickFileControllerConstants.frmLt);
                         QF.ResizeCtrls(intDiffx - QuickFileControllerConstants.frmLt);
                     }
                     else
                     {
-                        QF.Frm.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx);
+                        QF.ItemPanel.Width = (int)(QuickFileControllerConstants.Width_frm + intDiffx);
                         QF.ResizeCtrls(intDiffx);
                     }
                 }
@@ -1030,22 +1030,22 @@ namespace QuickFiler
         #endregion
 
         #region Keyboard UI
-        public void toggleAcceleratorDialogue()
+        public void ToggleKeyboardDialog()
         {
             ToggleEachQfc();
 
-            if (_viewer.AcceleratorDialogue.Visible == true)
+            if (_viewer.KeyboardDialog.Visible == true)
             {
-                _viewer.AcceleratorDialogue.Visible = false;
+                _viewer.KeyboardDialog.Visible = false;
                 _viewer.L1v1L2_PanelMain.Focus();
             }
             else
             {
-                _viewer.AcceleratorDialogue.Visible = true;
+                _viewer.KeyboardDialog.Visible = true;
                 if (_intActiveSelection != 0)
                 {
-                    _viewer.AcceleratorDialogue.Text = _intActiveSelection.ToString();
-                    QfcController QF;
+                    _viewer.KeyboardDialog.Text = _intActiveSelection.ToString();
+                    IQfcItemController QF;
                     QF = TryGetQfc(_intActiveSelection - 1);
                     if (QF != null)
                     {
@@ -1060,8 +1060,8 @@ namespace QuickFiler
                     
                 }
 
-                _viewer.AcceleratorDialogue.Focus();
-                _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength;
+                _viewer.KeyboardDialog.Focus();
+                _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
             }
         }
 
@@ -1071,31 +1071,31 @@ namespace QuickFiler
             foreach (QfcController QF in _listQFClass)
             {
                 i++;
-                if (QF.blExpanded & i != _listQFClass.Count)
-                    MoveDownPix(i + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
+                if (QF.BlExpanded & i != _listQFClass.Count)
+                    MoveDownPix(i + 1, (int)Math.Round(QF.ItemPanel.Height * -0.5d));
                 QF.Accel_Toggle();
             }
         }
 
-        internal void ParseAcceleratorText()
+        internal void ParseKeyboardText()
         {
             var parser = new AcceleratorParser(this);
-            parser.ParseAndExecute(_viewer.AcceleratorDialogue.Text, _intActiveSelection);
+            parser.ParseAndExecute(_viewer.KeyboardDialog.Text, _intActiveSelection);
         }
 
         public void ResetAcceleratorSilently()
         {
-            bool blTemp = _suppressAcceleratorEvents;
-            _suppressAcceleratorEvents = true;
+            bool blTemp = _suppressKeyboardEvents;
+            _suppressKeyboardEvents = true;
             if (_intActiveSelection > 0)
             {
-                _viewer.AcceleratorDialogue.Text = _intActiveSelection.ToString();
+                _viewer.KeyboardDialog.Text = _intActiveSelection.ToString();
             }
             else
             {
-                _viewer.AcceleratorDialogue.Text = "";
+                _viewer.KeyboardDialog.Text = "";
             }
-            _suppressAcceleratorEvents = blTemp;
+            _suppressKeyboardEvents = blTemp;
         }
 
         public int ActivateByIndex(int intNewSelection, bool blExpanded)
@@ -1106,11 +1106,11 @@ namespace QuickFiler
                 QF.Accel_FocusToggle();
                 if (blExpanded)
                 {
-                    MoveDownPix(intNewSelection + 1, QF.Frm.Height);
+                    MoveDownPix(intNewSelection + 1, QF.ItemPanel.Height);
                     QF.ExpandCtrls1();
                 }
                 _intActiveSelection = intNewSelection;
-                _viewer.L1v1L2_PanelMain.ScrollControlIntoView(QF.Frm);
+                _viewer.L1v1L2_PanelMain.ScrollControlIntoView(QF.ItemPanel);
             }
             return _intActiveSelection;
         }
@@ -1122,9 +1122,9 @@ namespace QuickFiler
             {
                 //adjusted to _intActiveSelection -1 to accommodate zero based
                 QfcController QF = (QfcController)_listQFClass[_intActiveSelection -1];
-                if (QF.blExpanded)
+                if (QF.BlExpanded)
                 {
-                    MoveDownPix(_intActiveSelection + 1 -1, (int)Math.Round(QF.Frm.Height * -0.5d));
+                    MoveDownPix(_intActiveSelection + 1 -1, (int)Math.Round(QF.ItemPanel.Height * -0.5d));
                     QF.ExpandCtrls1();
                     blExpanded = true;
                 }
@@ -1140,18 +1140,18 @@ namespace QuickFiler
         {
             if (_intActiveSelection > 0)
             {
-                _viewer.AcceleratorDialogue.Text = (_intActiveSelection - 1).ToString();
+                _viewer.KeyboardDialog.Text = (_intActiveSelection - 1).ToString();
             }
-            _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength;
+            _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
         }
 
         internal void SelectNextItem()
         {
             if (_intActiveSelection < _listQFClass.Count)
             {
-                _viewer.AcceleratorDialogue.Text = (_intActiveSelection + 1).ToString();
+                _viewer.KeyboardDialog.Text = (_intActiveSelection + 1).ToString();
             }
-            _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength;
+            _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
         }
 
         internal void MakeSpaceToEnumerateConversation()
@@ -1162,20 +1162,20 @@ namespace QuickFiler
                 QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
                 if (QF.lblConvCt.Text != "1" & QF.ConversationCb.Checked == true)
                 {
-                    if (QF.blExpanded)
+                    if (QF.BlExpanded)
                     {
                         blExpanded = true;
-                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
+                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.ItemPanel.Height * -0.5d));
                         QF.ExpandCtrls1();
                     }
-                    toggleAcceleratorDialogue();
+                    ToggleKeyboardDialog();
                     // QF.KeyboardHandler toggles the conversation checkbox which triggers enumeration of conversation
-                    QF.KeyboardHandler("C");
-                    toggleAcceleratorDialogue();
+                    QF.ToggleConversationCheckbox();
+                    ToggleKeyboardDialog();
 
                     if (blExpanded)
                     {
-                        MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
+                        MoveDownPix(_intActiveSelection + 1, QF.ItemPanel.Height);
                         QF.ExpandCtrls1();
                     }
                 }
@@ -1190,24 +1190,24 @@ namespace QuickFiler
                 QfcController QF = (QfcController)_listQFClass[_intActiveSelection];
                 if (QF.lblConvCt.Text != "1" & QF.ConversationCb.Checked == false)
                 {
-                    if (QF.blExpanded)
+                    if (QF.BlExpanded)
                     {
                         blExpanded = true;
-                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Frm.Height * -0.5d));
+                        MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.ItemPanel.Height * -0.5d));
                         QF.ExpandCtrls1();
                     }
-                    toggleAcceleratorDialogue();
-                    QF.KeyboardHandler("C");
-                    toggleAcceleratorDialogue();
+                    ToggleKeyboardDialog();
+                    QF.ToggleConversationCheckbox();
+                    ToggleKeyboardDialog();
 
                     if (blExpanded)
                     {
-                        MoveDownPix(_intActiveSelection + 1, QF.Frm.Height);
+                        MoveDownPix(_intActiveSelection + 1, QF.ItemPanel.Height);
                         QF.ExpandCtrls1();
                     }
 
                 }
-                _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength;
+                _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
             }
         }
 
@@ -1312,27 +1312,15 @@ namespace QuickFiler
             }
 
             return GetEmailPositionInCollectionRet;
-
-
-
         }
 
-        public QfcController TryGetQfc(int index)
+        public IQfcItemController TryGetQfc(int index)
         {
-            try
-            {
-                return (QfcController)_listQFClass[index];
-            }
-            catch (System.Exception ex)
-            {
-                return null;
-            }
+            try {return _listQFClass[index];}
+            catch {return null;}
         }
 
-        public void OpenQFMail(MailItem olMail)
-        {
-            _parent.OpenQFMail(olMail);
-        }
+        public void OpenQFMail(MailItem olMail) {_parent.OpenQFMail(olMail);}
 
         #endregion
 
@@ -1359,12 +1347,12 @@ namespace QuickFiler
             }
         }
 
-        internal void MoveEmails(ref cStackObject MovedMails)
+        internal void MoveEmails(ref StackObjectVB MovedMails)
         {
-            if (_viewer.AcceleratorDialogue.Visible == true)
+            if (_viewer.KeyboardDialog.Visible == true)
             {
-                _viewer.AcceleratorDialogue.Text = "";
-                toggleAcceleratorDialogue();
+                _viewer.KeyboardDialog.Text = "";
+                ToggleKeyboardDialog();
             }
             else
             {

@@ -11,13 +11,11 @@ using ToDoModel;
 using UtilitiesVB;
 using Windows.Win32;
 
-
-
 //[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
 namespace QuickFiler
 {
-    public class QuickFileController
+    public class QuickFileController 
     {
         private bool _useOld = true;
         //private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -63,8 +61,8 @@ namespace QuickFiler
         private readonly Explorer _activeExplorer;
         private readonly IOlObjects _olObjects;
         private readonly Microsoft.Office.Interop.Outlook.Application _olApp;
-        private readonly QuickFileViewer _viewer;
-        private cStackObject _movedMails;
+        private readonly QfcFormViewer _viewer;
+        private StackObjectVB _movedMails;
         private Enums.InitTypeEnum _initType;
 
         // Collections
@@ -83,7 +81,7 @@ namespace QuickFiler
 
         public QuickFileController(
             IApplicationGlobals AppGlobals,
-            QuickFileViewer Viewer,
+            QfcFormViewer Viewer,
             Queue<MailItem> ListEmailsInFolder,
             ParentCleanupMethod ParentCleanup)
         {
@@ -183,7 +181,7 @@ namespace QuickFiler
             _viewer.L1v2L2h4_ButtonCancel.TabStop = false;
             _viewer.L1v2L2h4_ButtonUndo.TabStop = false;
             _viewer.L1v1L2_PanelMain.TabStop = false;
-            _viewer.AcceleratorDialogue.TabStop = true;
+            _viewer.KeyboardDialog.TabStop = true;
             _viewer.L1v2L2h5_SpnEmailPerLoad.TabStop = false;
         }
 
@@ -195,7 +193,7 @@ namespace QuickFiler
             _lngTopButtonOkMin = _viewer.L1v2L2h3_ButtonOK.Top;
             _lngTopButtonCancelMin = _viewer.L1v2L2h4_ButtonCancel.Top;
             _lngTopButtonUndoMin = _viewer.L1v2L2h4_ButtonUndo.Top;
-            _lngTopAcceleratorDialogueMin = _viewer.AcceleratorDialogue.Top;
+            _lngTopAcceleratorDialogueMin = _viewer.KeyboardDialog.Top;
             var _screen = Screen.FromControl(_viewer);
             _heightFormMax = _screen.WorkingArea.Height;
         }
@@ -209,11 +207,11 @@ namespace QuickFiler
             _viewer.L1v2L2h3_ButtonOK.Top = (int)(_viewer.L1v2L2h3_ButtonOK.Top + lngHeightDifference);
             _viewer.L1v2L2h4_ButtonCancel.Top = (int)(_viewer.L1v2L2h4_ButtonCancel.Top + lngHeightDifference);
             _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_viewer.L1v2L2h4_ButtonUndo.Top + lngHeightDifference);
-            _lngAcceleratorDialogueTop = _viewer.AcceleratorDialogue.Top + lngHeightDifference;
-            _viewer.AcceleratorDialogue.Top = (int)_lngAcceleratorDialogueTop;
+            _lngAcceleratorDialogueTop = _viewer.KeyboardDialog.Top + lngHeightDifference;
+            _viewer.KeyboardDialog.Top = (int)_lngAcceleratorDialogueTop;
             _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference);
             _lngTopSpnMin = _viewer.L1v2L2h5_SpnEmailPerLoad.Top;
-            _lngAcceleratorDialogueLeft = _viewer.AcceleratorDialogue.Left;
+            _lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
 
             // Resize form
             lngPreviousHeight = _viewer.Height;
@@ -222,9 +220,9 @@ namespace QuickFiler
             _viewer.L1v2L2h3_ButtonOK.Top = (int)(_viewer.L1v2L2h3_ButtonOK.Top + lngHeightDifference);
             _viewer.L1v2L2h4_ButtonCancel.Top = (int)(_viewer.L1v2L2h4_ButtonCancel.Top + lngHeightDifference);
             _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_viewer.L1v2L2h4_ButtonUndo.Top + lngHeightDifference);
-            _lngAcceleratorDialogueTop = _viewer.AcceleratorDialogue.Top + lngHeightDifference;
-            _viewer.AcceleratorDialogue.Top = (int)_lngAcceleratorDialogueTop;
-            _lngAcceleratorDialogueLeft = _viewer.AcceleratorDialogue.Left;
+            _lngAcceleratorDialogueTop = _viewer.KeyboardDialog.Top + lngHeightDifference;
+            _viewer.KeyboardDialog.Top = (int)_lngAcceleratorDialogueTop;
+            _lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
             _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference);
 
             // Set Max Size of the main panel based on resizing
@@ -256,7 +254,7 @@ namespace QuickFiler
                 _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_lngTopButtonUndoMin + intDiffy);
                 _viewer.L1v2L2h4_ButtonUndo.Left = (int)(_viewer.L1v2L2h3_ButtonOK.Left + QuickFileControllerConstants.UNDO_left - QuickFileControllerConstants.OK_left);
                 // Button1.top = lngTop_Button1_Min + intDiffy
-                _viewer.AcceleratorDialogue.Top = (int)(_lngTopAcceleratorDialogueMin + intDiffy);
+                _viewer.KeyboardDialog.Top = (int)(_lngTopAcceleratorDialogueMin + intDiffy);
                 _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_lngTopSpnMin + intDiffy);
                 _viewer.L1v2L2h5_SpnEmailPerLoad.Left = (int)(QuickFileControllerConstants.spn_left + intDiffx);
 
@@ -290,7 +288,7 @@ namespace QuickFiler
                 }
             }
 
-            max = listEmails.Count -1;
+            max = listEmails.Count - 1;
 
             for (i = max; i >= 0; i += -1)
             {
@@ -358,20 +356,20 @@ namespace QuickFiler
 
 
         #region Keyboard event handlers
-        internal void AcceleratorDialogue_Change()
+        internal void KeyboardDialog_Change()
         {
             if (!_blSuppressEvents)
-                _legacy.ParseAcceleratorText();
+                _legacy.ParseKeyboardText();
         }
 
-        internal void AcceleratorDialogue_KeyDown(object sender, KeyEventArgs e)
+        internal void KeyboardDialog_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
                 case Keys.Alt:
                     {
                         e.Handled = true;
-                        _legacy.toggleAcceleratorDialogue();
+                        _legacy.ToggleKeyboardDialog();
                         break;
                     }
                 case Keys.Down:
@@ -398,7 +396,7 @@ namespace QuickFiler
             }
         }
 
-        internal void AcceleratorDialogue_KeyUp(object sender, KeyEventArgs e)
+        internal void KeyboardDialog_KeyUp(object sender, KeyEventArgs e)
         {
             TextBox accelerator = sender as TextBox;
             if (e.Alt)
@@ -522,10 +520,10 @@ namespace QuickFiler
                 {
                     case Keys.Alt:
                         {
-                            if (_viewer.AcceleratorDialogue.Visible)
+                            if (_viewer.KeyboardDialog.Visible)
                             {
-                                _viewer.AcceleratorDialogue.Focus();
-                                _viewer.AcceleratorDialogue.SelectionStart = _viewer.AcceleratorDialogue.TextLength;
+                                _viewer.KeyboardDialog.Focus();
+                                _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
                             }
                             else
                             {
@@ -536,14 +534,14 @@ namespace QuickFiler
                         }
                     case Keys.Up:
                         {
-                            if (_viewer.AcceleratorDialogue.Visible)
-                                _viewer.AcceleratorDialogue.Focus();
+                            if (_viewer.KeyboardDialog.Visible)
+                                _viewer.KeyboardDialog.Focus();
                             break;
                         }
                     case Keys.Down:
                         {
-                            if (_viewer.AcceleratorDialogue.Visible)
-                                _viewer.AcceleratorDialogue.Focus();
+                            if (_viewer.KeyboardDialog.Visible)
+                                _viewer.KeyboardDialog.Focus();
                             break;
                         }
 
@@ -563,10 +561,10 @@ namespace QuickFiler
 
                 if (e.Alt)
                 {
-                    _legacy.toggleAcceleratorDialogue();
-                    if (_viewer.AcceleratorDialogue.Visible)
+                    _legacy.ToggleKeyboardDialog();
+                    if (_viewer.KeyboardDialog.Visible)
                     {
-                        _viewer.AcceleratorDialogue.Focus();
+                        _viewer.KeyboardDialog.Focus();
                     }
                     else
                     {
@@ -585,20 +583,20 @@ namespace QuickFiler
                             }
                         case Keys.Tab:
                             {
-                                _legacy.toggleAcceleratorDialogue();
+                                _legacy.ToggleKeyboardDialog();
                                 // Case vbKeyEscape
                                 // vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
                                 // If vbMsgResponse = vbOK Then ButtonCancel_Click
-                                if (_viewer.AcceleratorDialogue.Visible)
-                                    _viewer.AcceleratorDialogue.Focus();
+                                if (_viewer.KeyboardDialog.Visible)
+                                    _viewer.KeyboardDialog.Focus();
                                 break;
                             }
 
                         default:
                             {
-                                if (_viewer.AcceleratorDialogue.Visible)
+                                if (_viewer.KeyboardDialog.Visible)
                                 {
-                                    AcceleratorDialogue_KeyDown(sender, e);
+                                    KeyboardDialog_KeyDown(sender, e);
                                 }
                                 else
                                 {
@@ -660,7 +658,7 @@ namespace QuickFiler
                 }
                 else
                 {
-                    MessageBox.Show("Error","Can't Execute While Running Modal Code");
+                    MessageBox.Show("Error", "Can't Execute While Running Modal Code");
                 }
             }
             else
@@ -682,11 +680,11 @@ namespace QuickFiler
             DialogResult repeatResponse = DialogResult.Yes;
 
             if (_movedMails is null)
-                _movedMails = new cStackObject();
+                _movedMails = new StackObjectVB();
 
-            i = _movedMails.Count()-1;
+            i = _movedMails.Count() - 1;
             listItems = _movedMails.ToList();
-            
+
             while (i > 0 & repeatResponse == DialogResult.Yes)
             {
                 objTemp = listItems[i];
@@ -703,8 +701,8 @@ namespace QuickFiler
                 {
                     oFolder_Current = (Folder)oMail_Current.Parent;
                     oFolder_Old = (Folder)oMail_Old.Parent;
-                    undoResponse = MessageBox.Show("Undo Dialog", "Undo Move of email?" + Environment.NewLine + 
-                        "Sent On: " + oMail_Current.SentOn.ToString("mm\\dd\\yyyy") + System.Environment.NewLine + 
+                    undoResponse = MessageBox.Show("Undo Dialog", "Undo Move of email?" + Environment.NewLine +
+                        "Sent On: " + oMail_Current.SentOn.ToString("mm\\dd\\yyyy") + System.Environment.NewLine +
                         oMail_Current.Subject, MessageBoxButtons.YesNo);
 
                     if (undoResponse == DialogResult.Yes & (oFolder_Current.FolderPath != oFolder_Old.FolderPath))
@@ -875,15 +873,15 @@ namespace QuickFiler
                 _activeExplorer.CurrentFolder.Display();
                 _activeExplorer.CurrentFolder = tmp;
                 _activeExplorer.CurrentFolder.Display();
-                
-                
+
+
             }
-            else 
+            else
             {
-                DialogResult result = MessageBox.Show("Error", 
-                    "Selected message is not in view. Would you like to open it?",MessageBoxButtons.YesNo);
-                if (result == DialogResult.Yes) { OlMail.Display();}
-             }
+                DialogResult result = MessageBox.Show("Error",
+                    "Selected message is not in view. Would you like to open it?", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes) { OlMail.Display(); }
+            }
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & BlShowInConversations)
                 ExplConvView_ToggleOn();
         }
@@ -928,7 +926,7 @@ namespace QuickFiler
 
             Duration = _stopWatch.timeElapsed;
             OlEndTime = DateTime.Now;
-            OlStartTime = OlEndTime.Subtract(new TimeSpan(0,0,0,(int)Duration));
+            OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
 
             if (_legacy.EmailsLoaded > 0)
             {

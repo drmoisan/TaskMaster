@@ -11,10 +11,11 @@ namespace QuickFiler
         bool IsSelectionBelowMax(int intNewSelection);
         void MoveDownPix(int intPosition, int intPix);
         void ResetAcceleratorSilently();
-        void toggleAcceleratorDialogue();
+        void ToggleKeyboardDialog();
         bool ToggleOffActiveItem(bool parentBlExpanded);
         void ToggleRemoteMouseLabels();
         void OpenQFMail(MailItem olMail);
-        QfcController TryGetQfc(int index);
+        void RemoveSpecificControlGroup(int intPosition);
+        IQfcItemController TryGetQfc(int index);
     }
 }
