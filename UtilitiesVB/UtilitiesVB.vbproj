@@ -231,7 +231,7 @@
     <Compile Include="Solution Interfaces\IToDoObjects.vb" />
     <Compile Include="Solution Interfaces\IToDoProjectInfoEntry.vb" />
     <Compile Include="Base Functionality Extensions\KeyValuePairEnumerableExtensions.vb" />
-    <Compile Include="Common Outlook Functions\MailEncrypted.vb" />
+    <Compile Include="Common Outlook Functions\MailResolution.vb" />
     <Compile Include="Windows Forms\MouseDownFilter.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

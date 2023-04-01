@@ -23,7 +23,7 @@ namespace QuickFiler
         #region Global Variables, Window Handles and Collections
         private IQfcControllerCallbacks _callbacks;
         private Enums.InitTypeEnum _initType;
-        private cFolderHandler _fldrHandler;
+        private FolderHandler _fldrHandler;
         private IntPtr hWndCaller;
 
         private bool p_BoolRemoteMouseApp;
@@ -36,7 +36,7 @@ namespace QuickFiler
         #region QFC Specific Variables
         private int _intMyPosition;
         private cSuggestions _suggestions = new cSuggestions();
-        private string[] _strFolders;
+        //private string[] _strFolders;
         //TODO: Need to ensure references to _colCtrls are zero based
         private List<Control> _colCtrls;
         //TODO: Need to ensure references to _selItemsInClass are zero based
@@ -698,52 +698,54 @@ namespace QuickFiler
         }
 
         public void PopulateFolderCombobox(object varList = null)
-        {
+        {            
+            if (varList is null) { _fldrHandler = new FolderHandler(_globals, _mail, FolderHandler.Options.FromField); }
+            else { _fldrHandler = new FolderHandler(_globals, varList, FolderHandler.Options.FromArrayOrString); }
 
-            int i;
-            UserProperty objProperty;
+            FolderCbo.Items.AddRange(_fldrHandler.FolderList);
+            FolderCbo.SelectedIndex = 0;
 
-            if (!(varList is Array))
-            {
-                objProperty = Mail.UserProperties.Find("FolderKey");
-                if (objProperty is not null)
-                    varList = objProperty.Value;
-            }
-            if (varList is Array)
-            {
-                Array varArray = varList as Array;
-                if (ArrayIsAllocated.IsAllocated(ref varArray))
-                {
-                    // For i = LBound(varList) To UBound(varList)
-                    FolderCbo.Items.AddRange((object[])varList);
-                    FolderCbo.SelectedIndex = 0;
-                    // Next i
-                }
-            }
-            else
-            {
-                // TODO: cSuggestions and cFolderHandler are too mixed up with functionality. Need to clean up.
-                _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
+            //FolderCbo.Items.AddRange((object[])_fldrHandler.FolderList);
 
-                if (_suggestions.Count > 0)
-                {
-                    Array.Resize(ref _strFolders, _suggestions.Count + 1);
-                    var loopTo = _suggestions.Count;
-                    for (i = 1; i <= loopTo; i++)
-                        _strFolders[i] = _suggestions.FolderList[i];
-                    FolderCbo.Items.AddRange(_strFolders);
-                    FolderCbo.SelectedIndex = 1;
-                }
-                else
-                {
-                    _fldrHandler = new cFolderHandler(_globals);
-                    FolderCbo.Items.AddRange(_fldrHandler.FindFolder("", true, ReCalcSuggestions: true, objItem: Mail));
 
-                    if (FolderCbo.Items.Count >= 2)
-                        FolderCbo.SelectedIndex = 2;
-                }
+            //if (varList is Array)
+            //{
+            //    Array varArray = varList as Array;
+            //    if (ArrayIsAllocated.IsAllocated(ref varArray))
+            //    {
 
-            }
+            //        //FolderCbo.Items.AddRange((object[])varList);
+            //        //FolderCbo.SelectedIndex = 0;
+
+            //    }
+            //}
+            //else
+            //{
+            //    // TODO: Move this module to cFolderSuggestions and load a _folderHandler instead
+            //    _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
+
+            //    if (_suggestions.Count > 0)
+            //    {
+            //        Array.Resize(ref _strFolders, _suggestions.Count + 1);
+            //        var loopTo = _suggestions.Count;
+            //        for (i = 1; i <= loopTo; i++)
+            //            _strFolders[i] = _suggestions.FolderSuggestionsArray[i];
+            //        FolderCbo.Items.AddRange(_strFolders);
+            //        FolderCbo.SelectedIndex = 1;
+            //    }
+            //    else
+            //    {
+            //        //_fldrHandler = new cFolderHandler(_globals);
+            //        FolderCbo.Items.AddRange(_fldrHandler.FindFolder(SearchString: "", 
+            //                                                         ReloadCTFStagingFiles: false, 
+            //                                                         ReCalcSuggestions: true, 
+            //                                                         objItem: Mail));
+
+            //        if (FolderCbo.Items.Count >= 2)
+            //            FolderCbo.SelectedIndex = 2;
+            //    }
+
+            //}
 
             // Set _fldrHandler = New cFolderHandler
             // cbo.List = _fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=_mail)
@@ -754,10 +756,6 @@ namespace QuickFiler
 
 
             // Call Email_SortToExistingFolder.FindFolder("", True, objItem:=_mail)
-
-
-
-
         }
 
         internal void CountMailsInConv(int ct = 0)
@@ -1824,11 +1822,13 @@ namespace QuickFiler
         {
 
             FolderCbo.Items.Clear();
-            FolderCbo.Items.AddRange(_fldrHandler.FindFolder("*" + SearchTxt.Text + "*", true, ReCalcSuggestions: false, objItem: Mail));
+            FolderCbo.Items.AddRange(_fldrHandler.FindFolder(SearchString: "*" + SearchTxt.Text + "*", 
+                                                             ReloadCTFStagingFiles: false, 
+                                                             ReCalcSuggestions: false, 
+                                                             objItem: Mail));
 
             if (FolderCbo.Items.Count >= 2)
                 FolderCbo.SelectedIndex = 1;
-
         }
 
         private void KeyPressHandler_Class(object sender, KeyPressEventArgs e)

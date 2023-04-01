@@ -102,7 +102,7 @@ Public Module FolderSuggestionsModule
         '    strTmp = Replace(strTmp, ".", " ")
         '    strTmp = Replace(strTmp, "_", " ")
         '    Val = Smith_Watterman.SW_Calc(SubjectStripped, strTmp, Matrix)
-        '    If Val > 10 Then Call Suggestions_ADD(Result, strFlist(i), Val)
+        '    If Val > 10 Then Call Suggestions_ADD(Suggestions, strFlist(i), Val)
         'Next i
 
 

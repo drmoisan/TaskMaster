@@ -111,7 +111,7 @@ Public Module AutoFile
 
         If TypeOf objItem Is MailItem Then
             OlMail = objItem
-            If Mail_IsItEncrypted(OlMail) = False Then
+            If IsMailUnReadable(OlMail) = False Then
                 emailAddressList = CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap)
                 For i = emailAddressList.Count - 1 To 0 Step -1
                     strTmp = emailAddressList(i)
@@ -178,7 +178,7 @@ Public Module AutoFile
             .ToDictionary(Function(y) y.Key, Function(z) False) _
             .ToSortedDictionary()
 
-        If Mail_IsItEncrypted(OlMail) = False Then
+        If IsMailUnReadable(OlMail) = False Then
             addressList = CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap)
         End If
 

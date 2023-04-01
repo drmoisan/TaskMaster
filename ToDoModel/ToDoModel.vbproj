@@ -114,7 +114,7 @@
     <Compile Include="Dimension Libraries\ID\BaseChanger.vb" />
     <Compile Include="Dimension Libraries\ID\ListOfIDs.vb" />
     <Compile Include="Email Utilities\cConversation.vb" />
-    <Compile Include="Email Utilities\cFolderHandler.vb" />
+    <Compile Include="Email Utilities\FolderHandler.vb" />
     <Compile Include="Email Utilities\CommonWordsModule.vb" />
     <Compile Include="Email Utilities\Conversation_To_Folder.vb" />
     <Compile Include="Email Utilities\cStopWatch.vb" />

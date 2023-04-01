@@ -125,14 +125,12 @@ Public Class TaskTreeController
     End Sub
 
 
-
-
     Friend Sub MoveObjectsToRoots(ByVal targetTree As TreeListView, ByVal sourceTree As TreeListView, ByVal toMove As IList)
         If sourceTree Is targetTree Then                'Data Model: Check to see if the desination tree roots are in the same tree
             For Each x As TreeNode(Of ToDoItem) In toMove
 
                 If x.Parent IsNot Nothing Then
-                    Dim unused1 = x.Parent.RemoveChild(x)             'Data Model: Remove pointer to node from parent.children list
+                    x.Parent.RemoveChild(x)             'Data Model: Remove pointer to node from parent.children list
                     'x.Parent.Children.Remove(x)         'Data Model: Remove pointer to node from parent.children list
                     'x.Parent = Nothing                  'Data Model: Set the pointer to the parent inside the node to nothing
                     sourceTree.AddObject(x)             'TreeListView: Add the node to the source tree as a FldrRoot node
@@ -145,7 +143,7 @@ Public Class TaskTreeController
                 If x.Parent Is Nothing Then             'Data Model: If the node was a root in the old tree
                     sourceTree.RemoveObject(x)          'TreeListView: Delete the pointer in the tree to the node
                 Else                                    'Data Model: If the node was NOT a root in the old tree
-                    Dim unused = x.Parent.RemoveChild(x)             'Data Model: Grab the parent node and delete the pointer from the list of children
+                    x.Parent.RemoveChild(x)             'Data Model: Grab the parent node and delete the pointer from the list of children
                 End If
 
                 x.Parent = Nothing                      'Data Model: Delete the pointer in the node to the parent
@@ -215,38 +213,9 @@ Public Class TaskTreeController
             target.Parent.Children.InsertRange(idx, toMove.Cast(Of TreeNode(Of ToDoItem))()) 'DataModel: Inserted into new data model tree. 
             _dataModel.ReNumberChildrenIDs(target.Parent.Children, Globals.ThisAddIn.IDList)         'DataModel: Renumber IDs of new branch order
 
-            ''Renumber IDs for inserted node
-            ''Eliminate current top level IDs from UsedIDList
-            'Dim i
-            'For i = idx To (target.Parent.Children.Count - 1)
-            '    Dim tmpNode As TreeNode(Of ToDoItem) = target.Parent.Children.Item(i)
-            '    Dim tmpID As String = tmpNode.ID
-            '    If Globals.ThisAddIn.UsedIDList.Contains(tmpID) = True Then
-            '        Globals.ThisAddIn.UsedIDList.Remove(tmpID)
-            '    End If
-            'Next
-            ''Assign new IDs for children and then substitute ID Prefx in grandchildren
-            'For i = idx To (target.Parent.Children.Count - 1)
-            '    Dim tmpNode As TreeNode(Of ToDoItem) = target.Parent.Children.Item(i)
-            '    Dim tmpID As String = tmpNode.ID
-            '    tmpNode.ID = tmpNode.Parent.NextChildID
-            '    tmpNode.Value.ToDoID = tmpNode.ID
-            '    If Globals.ThisAddIn.UsedIDList.Contains(tmpID) = True Then
-            '        Globals.ThisAddIn.UsedIDList.Remove(tmpID)
-            '    End If
-            '    For Each y As TreeNode(Of ToDoItem) In tmpNode.Children
-            '        SubstituteIDPrefix(y, tmpID, tmpNode.ID)
-            '    Next
-            'Next
         End If
 
-        'Update TreeListView with new
-        'If targetTree Is sourceTree Then
-        '    If sourceRootsChanged OrElse targetRootsChanged Then sourceTree.Roots = sourceRoots
-        'Else
-        '    If sourceRootsChanged Then sourceTree.Roots = sourceRoots
-        '    If targetRootsChanged Then targetTree.Roots = targetRoots
-        'End If
+
     End Sub
 
     Friend Sub MoveObjectsToChildren(ByVal targetTree As TreeListView,

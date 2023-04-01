@@ -13,16 +13,39 @@ namespace QuickFiler.Test
     {
         internal static Mock<IAcceleratorCallbacks> mock;
         internal static AcceleratorParser parser;
+        internal static Mock<IQfcItemController> qfc;
 
-        private static void VerifyFunctionCalls(
-            int IsSelectionBelowMax,
-            int ActivateByIndex,
-            int MoveDownPix,
-            int ResetAcceleratorSilently,
-            int ToggleAcceleratorDialogue,
-            int ToggleOffActiveItem,
-            int OpenQFMail,
-            int TryGetQfc) 
+        private static void VerifyQfcCalls(int FlagAsTask = 0,
+                                           int ApplyReadEmailFormat = 0,
+                                           int JumpToSearchTextbox = 0,
+                                           int MarkItemForDeletion = 0,
+                                           int ToggleDeleteFlow = 0,
+                                           int ToggleSaveCopyOfMail = 0,
+                                           int ToggleConversationCheckbox = 0,
+                                           int ExpandCtrls1 = 0,
+                                           int Height = 0, 
+                                           int BlExpanded = 0) 
+        {
+            qfc.Verify(x => x.FlagAsTask(), Times.Exactly(FlagAsTask));
+            qfc.Verify(x => x.ApplyReadEmailFormat(), Times.Exactly(ApplyReadEmailFormat));
+            qfc.Verify(x => x.JumpToSearchTextbox(), Times.Exactly(JumpToSearchTextbox));
+            qfc.Verify(x => x.MarkItemForDeletion(), Times.Exactly(MarkItemForDeletion));
+            qfc.Verify(x => x.ToggleDeleteFlow(), Times.Exactly(ToggleDeleteFlow));
+            qfc.Verify(x => x.ToggleSaveCopyOfMail(), Times.Exactly(ToggleSaveCopyOfMail));
+            qfc.Verify(x => x.ToggleConversationCheckbox(), Times.Exactly(ToggleConversationCheckbox));
+            qfc.Verify(x => x.ExpandCtrls1(), Times.Exactly(ExpandCtrls1));
+            qfc.Verify(x => x.Height,Times.Exactly(Height));
+            qfc.VerifyGet(x => x.BlExpanded, Times.Exactly(BlExpanded));
+        }
+        
+        private static void VerifyFunctionCalls(int IsSelectionBelowMax = 0,
+                                                int ActivateByIndex = 0,
+                                                int MoveDownPix = 0,
+                                                int ResetAcceleratorSilently = 0,
+                                                int ToggleAcceleratorDialogue = 0,
+                                                int ToggleOffActiveItem = 0,
+                                                int OpenQFMail = 0,
+                                                int TryGetQfc = 0) 
         {
             mock.Verify(x => x.IsSelectionBelowMax(It.IsAny<int>()), Times.Exactly(IsSelectionBelowMax));
             mock.Verify(x => x.ActivateByIndex(It.IsAny<int>(), It.IsAny<bool>()), Times.Exactly(ActivateByIndex)); 
@@ -34,12 +57,9 @@ namespace QuickFiler.Test
             mock.Verify(x => x.TryGetQfc(It.IsAny<int>()), Times.Exactly(TryGetQfc));
         }
 
-        [TestInitialize()]
-        public void Initialize() 
+        public static void SetupMockQfc(bool BlExpanded=false)
         {
-
-            // Create Mock of QF for TryGetQfc function of AcceleratorMock
-            Mock<IQfcItemController> qfc = new Mock<IQfcItemController>();
+            qfc = new Mock<IQfcItemController>();
             qfc.Setup(x => x.FlagAsTask());
             qfc.Setup(x => x.ApplyReadEmailFormat());
             qfc.Setup(x => x.JumpToSearchTextbox());
@@ -49,7 +69,18 @@ namespace QuickFiler.Test
             qfc.Setup(x => x.ToggleConversationCheckbox());
             qfc.Setup(x => x.ExpandCtrls1());
             qfc.Setup(x => x.Height).Returns(90);
+            qfc.SetupGet(x => x.BlExpanded).Returns(BlExpanded).Verifiable();
+        }
+        
 
+
+        [TestInitialize()]
+        public void Initialize() 
+        {
+
+            // Create Mock of QF for TryGetQfc function of AcceleratorMock
+            SetupMockQfc();
+            
             // Create Instance of callbacks mock
             mock = new Mock<IAcceleratorCallbacks>();
             mock.Setup(x => x.IsSelectionBelowMax(It.IsAny<int>())).Returns((int a) => { return (a < 6); });
@@ -70,14 +101,8 @@ namespace QuickFiler.Test
         {
             // 15	"", 0	[ N1 ]							_parent.ToggleOffActiveItem
             parser.ParseAndExecute(strToParse: "", _intActiveSelection: 0);
-            VerifyFunctionCalls(IsSelectionBelowMax: 0,
-                                ActivateByIndex: 0,
-                                MoveDownPix: 0,
-                                ResetAcceleratorSilently: 0,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 1,
-                                OpenQFMail: 0,
-                                TryGetQfc: 0);
+            VerifyFunctionCalls(ToggleOffActiveItem: 1);
+            VerifyQfcCalls();
         }
 
         [TestMethod]
@@ -85,14 +110,8 @@ namespace QuickFiler.Test
         {
             // 14	"e", 0	[ Y1 N2 ]						_parent.ToggleOffActiveItem	
             parser.ParseAndExecute(strToParse: "e", _intActiveSelection: 0);
-            VerifyFunctionCalls(IsSelectionBelowMax: 0,
-                                ActivateByIndex: 0,
-                                MoveDownPix: 0,
-                                ResetAcceleratorSilently: 0,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 1,
-                                OpenQFMail: 0,
-                                TryGetQfc: 0);
+            VerifyFunctionCalls(ToggleOffActiveItem: 1);
+            VerifyQfcCalls();
         }
 
         [TestMethod]
@@ -100,14 +119,8 @@ namespace QuickFiler.Test
         {
             //13	"8", 0	[ Y1 Y2 N3 ]					_parent.IsSelectionBelowMax	=>	_parent.ResetAcceleratorSilently'
             parser.ParseAndExecute(strToParse: "8", _intActiveSelection: 0);
-            VerifyFunctionCalls(IsSelectionBelowMax: 1,
-                                ActivateByIndex: 0,
-                                MoveDownPix: 0,
-                                ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
-                                TryGetQfc: 0);
+            VerifyFunctionCalls(IsSelectionBelowMax: 1,ResetAcceleratorSilently: 1);
+            VerifyQfcCalls();
         }
 
         [TestMethod]
@@ -115,14 +128,8 @@ namespace QuickFiler.Test
         {
             //12	"3", 3	[ Y1 Y2 Y3 N4 N5 ]				_parent.IsSelectionBelowMax	
             parser.ParseAndExecute(strToParse: "3", _intActiveSelection: 3);
-            VerifyFunctionCalls(IsSelectionBelowMax: 1,
-                                ActivateByIndex: 0,
-                                MoveDownPix: 0,
-                                ResetAcceleratorSilently: 0,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
-                                TryGetQfc: 0);
+            VerifyFunctionCalls(IsSelectionBelowMax: 1);
+            VerifyQfcCalls();
         }
 
         [TestMethod]
@@ -130,14 +137,8 @@ namespace QuickFiler.Test
         {
             //11	"0E",0	[ Y1 Y2 Y3 N4 Y5 N6 ]			_parent.IsSelectionBelowMax	=>	_parent.ResetAcceleratorSilently
             parser.ParseAndExecute(strToParse: "0E", _intActiveSelection: 0);
-            VerifyFunctionCalls(IsSelectionBelowMax: 1,
-                                ActivateByIndex: 0,
-                                MoveDownPix: 0,
-                                ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
-                                TryGetQfc: 0);
+            VerifyFunctionCalls(IsSelectionBelowMax: 1, ResetAcceleratorSilently: 1);
+            VerifyQfcCalls();
         }
 
         [TestMethod]
@@ -154,13 +155,10 @@ namespace QuickFiler.Test
             AcceleratorParser parser = new AcceleratorParser(mock.Object);
             parser.ParseAndExecute(strToParse: "2E", _intActiveSelection: 2);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
-                                ActivateByIndex: 0,
                                 MoveDownPix: 1,
                                 ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(BlExpanded: 1, ExpandCtrls1: 1, Height: 1);
         }
 
         [TestMethod]
@@ -176,13 +174,9 @@ namespace QuickFiler.Test
             AcceleratorParser parser = new AcceleratorParser(mock.Object);
             parser.ParseAndExecute(strToParse: "2W", _intActiveSelection: 2);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
-                                ActivateByIndex: 0,
-                                MoveDownPix: 0,
                                 ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(ToggleDeleteFlow: 1);
         }
 
         [TestMethod]
@@ -198,13 +192,10 @@ namespace QuickFiler.Test
             AcceleratorParser parser = new AcceleratorParser(mock.Object);
             parser.ParseAndExecute(strToParse: "2C", _intActiveSelection: 2);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
-                                ActivateByIndex: 0,
-                                MoveDownPix: 0,
                                 ResetAcceleratorSilently: 1,
                                 ToggleAcceleratorDialogue: 1,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(ToggleConversationCheckbox: 1);
         }
         
         [TestMethod]
@@ -233,12 +224,10 @@ namespace QuickFiler.Test
             parser.ParseAndExecute(strToParse: "2C", _intActiveSelection: 0);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
                                 ActivateByIndex: 1,
-                                MoveDownPix: 0,
                                 ResetAcceleratorSilently: 1,
                                 ToggleAcceleratorDialogue: 1,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(ToggleConversationCheckbox: 1);
         }
 
         [TestMethod]
@@ -267,12 +256,9 @@ namespace QuickFiler.Test
             parser.ParseAndExecute(strToParse: "2W", _intActiveSelection: 0);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
                                 ActivateByIndex: 1,
-                                MoveDownPix: 0,
                                 ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(ToggleDeleteFlow: 1);
         }
 
         [TestMethod]
@@ -295,10 +281,8 @@ namespace QuickFiler.Test
                                 ActivateByIndex: 1,
                                 MoveDownPix: 1,
                                 ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(BlExpanded: 1, Height: 1, ExpandCtrls1: 1);
         }
 
         [TestMethod]
@@ -327,12 +311,9 @@ namespace QuickFiler.Test
             parser.ParseAndExecute(strToParse: "2Z", _intActiveSelection: 0);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
                                 ActivateByIndex: 1,
-                                MoveDownPix: 0,
                                 ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 0,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls();
         }
 
         [TestMethod]
@@ -358,12 +339,8 @@ namespace QuickFiler.Test
             parser.ParseAndExecute(strToParse: "3", _intActiveSelection: 2);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
                                 ActivateByIndex: 1,
-                                MoveDownPix: 0,
-                                ResetAcceleratorSilently: 0,
-                                ToggleAcceleratorDialogue: 0,
-                                ToggleOffActiveItem: 1,
-                                OpenQFMail: 0,
-                                TryGetQfc: 0);
+                                ToggleOffActiveItem: 1);
+            VerifyQfcCalls();
         }
 
         [TestMethod]
@@ -392,12 +369,11 @@ namespace QuickFiler.Test
             parser.ParseAndExecute(strToParse: "3T", _intActiveSelection: 2);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
                                 ActivateByIndex: 1,
-                                MoveDownPix: 0,
                                 ResetAcceleratorSilently: 1,
                                 ToggleAcceleratorDialogue: 1,
                                 ToggleOffActiveItem: 1,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(FlagAsTask: 1);
         }
 
         [TestMethod]
@@ -425,12 +401,10 @@ namespace QuickFiler.Test
             parser.ParseAndExecute(strToParse: "3W", _intActiveSelection: 2);
             VerifyFunctionCalls(IsSelectionBelowMax: 1,
                                 ActivateByIndex: 1,
-                                MoveDownPix: 0,
                                 ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
                                 ToggleOffActiveItem: 1,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(ToggleDeleteFlow: 1);
         }
 
         [TestMethod]
@@ -462,10 +436,9 @@ namespace QuickFiler.Test
                                 ActivateByIndex: 1,
                                 MoveDownPix: 1,
                                 ResetAcceleratorSilently: 1,
-                                ToggleAcceleratorDialogue: 0,
                                 ToggleOffActiveItem: 1,
-                                OpenQFMail: 0,
                                 TryGetQfc: 1);
+            VerifyQfcCalls(BlExpanded:1, Height: 1, ExpandCtrls1: 1);
         }
     }
 }

@@ -697,7 +697,7 @@ namespace QuickFiler
                     oMail_Old = (MailItem)objTemp;
 
                 // oMail_Old = _movedMails.Pop
-                if (MailEncrypted.Mail_IsItEncrypted(oMail_Current) == false & MailEncrypted.Mail_IsItEncrypted(oMail_Old) == false)
+                if (MailResolution.IsMailUnReadable(oMail_Current) == false & MailResolution.IsMailUnReadable(oMail_Old) == false)
                 {
                     oFolder_Current = (Folder)oMail_Current.Parent;
                     oFolder_Old = (Folder)oMail_Old.Parent;

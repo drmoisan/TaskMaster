@@ -81,7 +81,7 @@ Public Module ModuleMailItemsSort
                     BlUniqueConv = True
                     If TypeOf objItem Is MailItem Then
                         OlMailTmp = objItem
-                        If Not Mail_IsItEncrypted(OlMailTmp) Then
+                        If Not IsMailUnReadable(OlMailTmp) Then
                             If options And SortOptionsEnum.ConversationUniqueOnly Then
                                 For j = 0 To listEmails.Count - 1
                                     OlMailTmp2 = listEmails(j)
@@ -93,7 +93,7 @@ Public Module ModuleMailItemsSort
 
                             If BlUniqueConv Then listEmails.Add(OlMailTmp)
 
-                        End If 'If Mail_IsItEncrypted
+                        End If 'If IsMailUnReadable
                     End If 'If TypeOf ObjItem Is mailItem Then
                 Next objItem 'For Each ObjItem In OlItemsTmp
             Next i 'For i = 1 To 4
@@ -102,7 +102,7 @@ Public Module ModuleMailItemsSort
                 BlUniqueConv = True
                 If TypeOf objItem Is MailItem Then
                     OlMailTmp = objItem
-                    If Not Mail_IsItEncrypted(OlMailTmp) Then
+                    If Not IsMailUnReadable(OlMailTmp) Then
                         If options And SortOptionsEnum.ConversationUniqueOnly Then
                             For j = 0 To listEmails.Count - 1
                                 OlMailTmp2 = listEmails(j)
@@ -114,7 +114,7 @@ Public Module ModuleMailItemsSort
 
                         If BlUniqueConv Then listEmails.Add(OlMailTmp)
 
-                    End If 'If Mail_IsItEncrypted
+                    End If 'If IsMailUnReadable
                 End If 'If TypeOf ObjItem Is mailItem Then
             Next objItem 'For Each ObjItem In OlItemsRemainder
 
@@ -123,7 +123,7 @@ Public Module ModuleMailItemsSort
                 BlUniqueConv = True
                 If TypeOf objItem Is MailItem Then
                     OlMailTmp = objItem
-                    If Not Mail_IsItEncrypted(OlMailTmp) Then
+                    If Not IsMailUnReadable(OlMailTmp) Then
                         If options And SortOptionsEnum.ConversationUniqueOnly Then
                             For j = 1 To listEmails.Count
                                 OlMailTmp2 = listEmails(j)
@@ -134,7 +134,7 @@ Public Module ModuleMailItemsSort
                         End If 'Options And ConversationUniqueOnly Then
 
                         If BlUniqueConv Then listEmails.Add(OlMailTmp)
-                    End If 'Not Mail_IsItEncrypted(OlMailTmp) Then
+                    End If 'Not IsMailUnReadable(OlMailTmp) Then
                 End If 'If TypeOf ObjItem Is mailItem Then
             Next objItem
         End If
