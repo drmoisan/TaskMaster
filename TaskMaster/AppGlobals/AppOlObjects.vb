@@ -71,7 +71,7 @@ Public Class AppOlObjects
             If _olArchiveRootPath Is Nothing Then
                 _olArchiveRootPath = Path.Combine(OlEmailRoot.FolderPath, "Archive")
             End If
-            Return _olEmailRootPath
+            Return _olArchiveRootPath
         End Get
     End Property
 

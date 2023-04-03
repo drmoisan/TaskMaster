@@ -703,7 +703,7 @@ namespace QuickFiler
             else { _fldrHandler = new FolderHandler(_globals, varList, FolderHandler.Options.FromArrayOrString); }
 
             FolderCbo.Items.AddRange(_fldrHandler.FolderList);
-            FolderCbo.SelectedIndex = 0;
+            FolderCbo.SelectedIndex = 1;
 
             //FolderCbo.Items.AddRange((object[])_fldrHandler.FolderList);
 
@@ -1112,7 +1112,10 @@ namespace QuickFiler
                 if (_activeExplorer.IsItemSelectableInView(Mail))
                     _activeExplorer.AddToSelection(Mail);
             }
-            catch (System.Exception e) { MessageBox.Show("Error", "Error in QF.Mail_Activate: " + e.Message); }            
+            catch (System.Exception e) 
+            { 
+                MessageBox.Show("Error in QF.Mail_Activate: " + e.Message, "Error",MessageBoxButtons.OK,MessageBoxIcon.Error); 
+            }            
         }
 
         public void ResizeCtrls(int intPxChg)
@@ -1402,6 +1405,35 @@ namespace QuickFiler
 
         private void WireEventHandlers()
         {
+            // Remove any existing wirings to prevent duplication
+            __cbDel.Click -= cbDel_Click;
+            __cbDel.KeyDown -= cbDel_KeyDown;
+            __cbDel.KeyPress -= cbDel_KeyPress;
+            __cbDel.KeyUp -= cbDel_KeyUp;
+            _flagTaskCb.Click -= cbFlag_Click;
+            _flagTaskCb.KeyDown -= cbFlag_KeyDown;
+            _flagTaskCb.KeyPress -= cbFlag_KeyPress;
+            _flagTaskCb.KeyUp -= cbFlag_KeyUp;
+            __cbKll.Click -= cbKll_Click;
+            __cbKll.KeyDown -= cbKll_KeyDown;
+            __cbKll.KeyPress -= cbKll_KeyPress;
+            __cbKll.KeyUp -= cbKll_KeyUp;
+            _folderCbo.KeyDown -= cbo_KeyDown;
+            _folderCbo.KeyUp -= cbo_KeyUp;
+            _cbTmp.KeyDown -= cbTmp_KeyDown;
+            _cbTmp.KeyUp -= cbTmp_KeyUp;
+            _conversationCb.CheckedChanged -= chk_Click;
+            _conversationCb.KeyDown -= chk_KeyDown;
+            _conversationCb.KeyUp -= chk_KeyUp;
+            _itemPanel.KeyDown -= frm_KeyDown;
+            _itemPanel.KeyPress -= frm_KeyPress;
+            _itemPanel.KeyUp -= frm_KeyUp;
+            _searchTxt.TextChanged -= txt_Change;
+            _searchTxt.KeyDown -= txt_KeyDown;
+            _searchTxt.KeyPress -= txt_KeyPress;
+            _searchTxt.KeyUp -= txt_KeyUp;
+
+            // Map new wirings
             __cbDel.Click += cbDel_Click;
             __cbDel.KeyDown += cbDel_KeyDown;
             __cbDel.KeyPress += cbDel_KeyPress;
@@ -1520,7 +1552,11 @@ namespace QuickFiler
         public void JumpToFolderDropDown()
         {
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            {
                 FolderCbo.Focus();
+                FolderCbo.DroppedDown = true;
+                _intEnterCounter = 0;
+            }
         }
 
         public void JumpToSearchTextbox()
@@ -1647,6 +1683,7 @@ namespace QuickFiler
                         {
                             _intEnterCounter = 1;
                             _intComboRightCtr = 0;
+                            e.Handled = true;
                         }
 
                         break;
@@ -1695,7 +1732,10 @@ namespace QuickFiler
                         }
                         else
                         {
-                            MessageBox.Show("Error","Error in intComboRightCtr ... setting to 0 and continuing");
+                            MessageBox.Show("Error in intComboRightCtr ... setting to 0 and continuing", 
+                                            "Error", 
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Error);
                             _intComboRightCtr = 0;
                         }
 

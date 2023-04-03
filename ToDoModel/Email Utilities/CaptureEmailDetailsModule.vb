@@ -100,7 +100,7 @@ Public Module CaptureEmailDetailsModule
                     Dim senderAddress As String = OlPA.GetProperty(PR_SMTP_ADDRESS)
                     Return CultureInfo.CurrentCulture.TextInfo.ToTitleCase((senderAddress.Split("@")(0)).Replace(".", " "))
                 Catch
-
+                    Return ""
                 End Try
             Else
                 Return OlMail.Sender.Name
@@ -123,7 +123,6 @@ Public Module CaptureEmailDetailsModule
                     senderAddress = ""
                 End Try
             End Try
-
         Else
             senderAddress = OlMail.SenderEmailAddress
         End If

@@ -8,10 +8,10 @@ using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesVB;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace QuickFiler
 {
-
     /// <summary>
     /// Class manages UI interactions with the collection of Qfc controllers and viewers
     /// </summary>
@@ -44,10 +44,7 @@ namespace QuickFiler
             MailItem Mail;
             QfcController QF;
             List<Control> colCtrls;
-            bool blDebug;
-
-            blDebug = false;
-
+            
             _listQFClass = new();
 
             _intUniqueItemCounter = 0;
@@ -1334,15 +1331,18 @@ namespace QuickFiler
 
                 foreach (QfcController QF in _listQFClass)
                 {
-                    if (QF.FolderCbo.SelectedValue as string != "")
+                    string[] headers = {"======= SEARCH RESULTS =======", 
+                                        "======= RECENT SELECTIONS ========", 
+                                        "========= SUGGESTIONS =========" };
+                    if ((QF.FolderCbo.SelectedItem is null) || headers.Contains(QF.FolderCbo.SelectedItem as string))
                     {
                         blReadyForMove = false;
-                        strNotifications = strNotifications + QF.Position + "  " + QF.Mail.SentOn.ToString("mm\\dd\\yyyy") + "  " + QF.Mail.Subject + System.Environment.NewLine;
+                        strNotifications = strNotifications + QF.Position + "  " + QF.Mail.SentOn.ToString("MM/dd/yyyy") + 
+                            "  " + QF.Mail.Subject + System.Environment.NewLine;
                     }
                 }
-                strNotifications = strNotifications.Substring(1, strNotifications.Length - 1);
                 if (!blReadyForMove)
-                    MessageBox.Show("Error Notification", strNotifications, MessageBoxButtons.OK);
+                    MessageBox.Show("Error Notification", strNotifications, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return blReadyForMove;
             }
         }

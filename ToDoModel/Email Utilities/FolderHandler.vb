@@ -117,30 +117,33 @@ Public Class FolderHandler
     ''' </summary>
     ''' <param name="SearchString"></param>
     ''' <param name="ReloadCTFStagingFiles"></param>
-    ''' <param name="strEmailFolderPath"></param>
+    ''' <param name="EmailSearchRoot"></param>
     ''' <param name="ReCalcSuggestions"></param>
     ''' <param name="objItem"></param>
     ''' <returns></returns>
     Public Function FindFolder(SearchString As String,
                                objItem As Object,
                                Optional ReloadCTFStagingFiles As Boolean = True,
-                               Optional strEmailFolderPath As String = "",
+                               Optional EmailSearchRoot As String = "ARCHIVEROOT",
                                Optional ReCalcSuggestions As Boolean = False) As String()
 
-        Dim folders As Outlook.Folders
-
+        If EmailSearchRoot = "ARCHIVEROOT" Then
+            EmailSearchRoot = _globals.Ol.ArchiveRootPath
+        End If
         ReDim _folderList(0)
+        _folderList(0) = "======= SEARCH RESULTS ======="
         'TODO: Either use the embedded UBound or pass as reference. It is hard to know where it is changed
         _upBound = 0
 
-        folders = GetMatchingFolders(SearchString, strEmailFolderPath)
+        GetMatchingFolders(SearchString, EmailSearchRoot)
 
         If ReCalcSuggestions Then
             RecalculateSuggestions(objItem, ReloadCTFStagingFiles)
-            AddSuggestions()
         End If
+        AddSuggestions()
         AddRecents()
-        FindFolder = _folderList
+
+        Return _folderList
 
 
     End Function
@@ -219,7 +222,6 @@ Public Class FolderHandler
     End Sub
 
     Private Function GetMatchingFolders(Name As String, strEmailFolderPath As String) As Folders
-        Dim folders As New Folders
         _matchedFolder = Nothing
         _searchString = ""
         _wildcardFlag = False
@@ -232,11 +234,15 @@ Public Class FolderHandler
             _searchString = Replace(_searchString, "%", "*")
             _wildcardFlag = (InStr(_searchString, "*"))
 
-            folders = GetFolder(strEmailFolderPath).Folders
+            Dim folders = GetFolder(strEmailFolderPath).Folders
             LoopFolders(folders, strEmailFolderPath)
+
+            Return folders
+        Else
+            Return Nothing
         End If
 
-        Return folders
+
     End Function
 
     Public Function GetFolder(ByVal FolderPath As String) As Outlook.Folder

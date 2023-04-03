@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace UtilitiesCS
 {
+    public delegate List<T> CSVLoader<T>(string filepath);
+
     public interface ISerializableList<T>
     {
         T this[int index] { get; set; }
@@ -17,7 +20,9 @@ namespace UtilitiesCS
         bool Contains(T item);
         void CopyTo(T[] array, int arrayIndex);
         void Deserialize();
-        void Deserialize(string filepath);
+        void Deserialize(bool askUserOnError);
+        void Deserialize(string filepath, CSVLoader<T> backupLoader, bool askUserOnError);
+        void Deserialize(string filepath, bool askUserOnError);
         IEnumerator<T> GetEnumerator();
         int IndexOf(T item);
         void Insert(int index, T item);

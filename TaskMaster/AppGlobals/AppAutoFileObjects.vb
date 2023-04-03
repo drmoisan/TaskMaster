@@ -92,7 +92,7 @@ Public Class AppAutoFileObjects
                 With _recentsList
                     .Folderpath = _parent.FS.FldrFlow
                     .Filename = My.Settings.FileName_Recents
-                    .Deserialize(_parent.FS.FldrFlow)
+                    .Deserialize(askUserOnError:=False)
                 End With
             End If
             Return _recentsList

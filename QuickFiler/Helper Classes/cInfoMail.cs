@@ -159,7 +159,7 @@ namespace QuickFiler
             }
             catch (System.Exception e)
             {
-                DialogResult result = MessageBox.Show("Error", e.Message + " Should we break",MessageBoxButtons.YesNo);
+                DialogResult result = MessageBox.Show(e.Message + " Should we break", "Error",MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                 if (result == DialogResult.Yes)
                 {
                     throw e;

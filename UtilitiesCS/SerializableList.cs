@@ -9,14 +9,16 @@ using System.Windows.Forms;
 using Newtonsoft;
 using Newtonsoft.Json;
 
+
 namespace UtilitiesCS
 {
-    
     [Serializable()]
     public class SerializableList<T> : IList<T>, ISerializableList<T>
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private List<T> _innerList;
         private IEnumerable<T> _lazyLoader;
+        
 
         public SerializableList()
         {
@@ -137,8 +139,15 @@ namespace UtilitiesCS
             set
             {
                 _filepath = value;
+                var fileExtension = Path.GetExtension(value);
                 _folderpath = Path.GetDirectoryName(_filepath);
                 _filename = Path.GetFileName(_filepath);
+                if ((value != "") && (fileExtension == "") && Directory.Exists(value))
+                {
+                    throw new ArgumentException(
+                        $"{value} is a Folder Path and was passed to the field named 'Filepath'. " +
+                        "Either pass this to the 'FileName' field or include a folderpath.");
+                }
             }
         }
 
@@ -187,10 +196,15 @@ namespace UtilitiesCS
 
         public void Deserialize()
         {
-            if (Filepath != "") Deserialize(Filepath);
+            if (Filepath != "") Deserialize(Filepath, true);
         }
 
-        public void Deserialize(string filepath)
+        public void Deserialize(bool askUserOnError)
+        {
+            if (Filepath != "") Deserialize(Filepath, askUserOnError);
+        }
+
+        public void Deserialize(string filepath, CSVLoader<T> backupLoader, bool askUserOnError)
         {
             if (_filepath != filepath) this.Filepath = filepath;
 
@@ -198,38 +212,115 @@ namespace UtilitiesCS
 
             try
             {
-
                 _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException e)
             {
-                response = MessageBox.Show("Not Found", filepath +
-                    " not found. Load from CSV?", MessageBoxButtons.YesNo);
+                log.Error(e.Message);
+                if (askUserOnError)
+                {
+                    response = MessageBox.Show($"{filepath} not found. Load from CSV?",
+                                               "File Not Found", 
+                                               MessageBoxButtons.YesNo, 
+                                               MessageBoxIcon.Error);
+                }
+                else
+                {
+                    response = DialogResult.Yes;
+                }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                response = MessageBox.Show(
-                    "Error", filepath + " encountered a problem. " + ex.Message +
-                    " Load from CSV?", MessageBoxButtons.YesNo);
+                log.Error(e.Message);
+                if (askUserOnError)
+                {
+                response = MessageBox.Show($"{filepath} encountered a problem. {e.Message} " +
+                                           " Load from CSV?",
+                                           "Error!",
+                                           MessageBoxButtons.YesNo,
+                                           MessageBoxIcon.Error);
+                }
+                else
+                {
+                    response = DialogResult.Yes;
+                }
             }
             finally
             {
                 if (response == DialogResult.Yes)
                 {
                     //BUGFIX: Add CSV_Read function
-                    throw new NotImplementedException();
+                    log.Debug($"Attempting to load {Path.GetFileName(filepath)} from CSV");
+                    
+                    var folder = Path.GetDirectoryName(filepath);
+                    var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";
+                    _innerList = backupLoader(Path.Combine(folder, filename));
                 }
                 else if (response == DialogResult.No)
                 {
-                    response = MessageBox.Show("Need a list to continue", "Create a new List?", MessageBoxButtons.YesNo);
+                    if (askUserOnError)
+                    {
+                        response = MessageBox.Show("Need a list to continue. " + 
+                                                   "Create a new List Or Stop Execution?", 
+                                                   "Error",
+                                                   MessageBoxButtons.YesNo,
+                                                   MessageBoxIcon.Error);
+                    }
+                    else { response = DialogResult.Yes; }
+
                     if (response == DialogResult.Yes)
                     {
                         _innerList = new List<T> { };
                     }
-                    else throw new ArgumentNullException("Must have a list or create one to continue executing");
+                    else { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
                 }
             }
 
+        }
+
+        public void Deserialize(string filepath, bool askUserOnError)
+        {
+            if (_filepath != filepath) this.Filepath = filepath;
+
+            DialogResult response = DialogResult.Ignore;
+
+            try
+            {
+                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+            }
+            catch (FileNotFoundException)
+            {
+                log.Error($"File {filepath} does not exist.");
+                if (askUserOnError)
+                {
+                    response = MessageBox.Show($"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
+                                               "File Not Found",
+                                               MessageBoxButtons.YesNo,
+                                               MessageBoxIcon.Error);
+                }
+                else { response = DialogResult.Yes; }
+            }
+            catch (Exception e)
+            {
+                log.Error($"Error! {e.Message}");
+                if (askUserOnError)
+                {
+                    response = MessageBox.Show(filepath + " encountered a problem. " + 
+                                               e.Message + " Create a new list? Excecution will stop if answer is no.", 
+                                               "Error", 
+                                               MessageBoxButtons.YesNo, 
+                                               MessageBoxIcon.Error);
+                }
+                else { response = DialogResult.Yes; }
+            }
+            finally
+            {
+                if (response == DialogResult.Yes)
+                {
+                    _innerList = new List<T> { };
+                }
+                else throw new ArgumentNullException("Must have a list or create one to continue executing");                
+            }
         }
 
         public List<T> ToList() { return _innerList; }

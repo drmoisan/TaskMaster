@@ -638,7 +638,6 @@ namespace QuickFiler
 
         internal void ButtonOK_Click()
         {
-
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
                 if (_blRunningModalCode == false)
@@ -658,7 +657,7 @@ namespace QuickFiler
                 }
                 else
                 {
-                    MessageBox.Show("Error", "Can't Execute While Running Modal Code");
+                    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
@@ -701,9 +700,9 @@ namespace QuickFiler
                 {
                     oFolder_Current = (Folder)oMail_Current.Parent;
                     oFolder_Old = (Folder)oMail_Old.Parent;
-                    undoResponse = MessageBox.Show("Undo Dialog", "Undo Move of email?" + Environment.NewLine +
-                        "Sent On: " + oMail_Current.SentOn.ToString("mm\\dd\\yyyy") + System.Environment.NewLine +
-                        oMail_Current.Subject, MessageBoxButtons.YesNo);
+                    undoResponse = MessageBox.Show("Undo Move of email?" + Environment.NewLine +
+                        "Sent On: " + oMail_Current.SentOn.ToString("MM/dd/yyyy") + System.Environment.NewLine +
+                        oMail_Current.Subject, "Undo Dialog", MessageBoxButtons.YesNo);
 
                     if (undoResponse == DialogResult.Yes & (oFolder_Current.FolderPath != oFolder_Old.FolderPath))
                     {
@@ -713,7 +712,7 @@ namespace QuickFiler
                     }
                 }
                 i -= 2;
-                repeatResponse = MessageBox.Show("Undo Dialog", "Continue Undoing Moves?", MessageBoxButtons.YesNo);
+                repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
             }
         }
 
@@ -878,8 +877,8 @@ namespace QuickFiler
             }
             else
             {
-                DialogResult result = MessageBox.Show("Error",
-                    "Selected message is not in view. Would you like to open it?", MessageBoxButtons.YesNo);
+                DialogResult result = MessageBox.Show("Selected message is not in view. Would you like to open it?",
+                    "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                 if (result == DialogResult.Yes) { OlMail.Display(); }
             }
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & BlShowInConversations)
