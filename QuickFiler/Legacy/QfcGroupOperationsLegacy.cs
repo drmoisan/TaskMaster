@@ -792,7 +792,7 @@ namespace QuickFiler
             }
         }
 
-        public void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false)
+        public void AddEmailControlGroup(object objItem, int insertAtIndex = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false)
         {
 
             MailItem Mail;
@@ -800,14 +800,14 @@ namespace QuickFiler
             List<Control> listCtrls;
 
             _intUniqueItemCounter += 1;
-            if (posInsert == 0)
-                posInsert = _listQFClass.Count + 1;
+            if (insertAtIndex == 0)
+                insertAtIndex = _listQFClass.Count + 1;
             if (objItem is MailItem)
             {
                 Mail = (MailItem)objItem;
                 listCtrls = new();
-                LoadGroupOfCtrls(ref listCtrls, _intUniqueItemCounter, posInsert, blGroupConversation);
-                QF = new QfcController(Mail, listCtrls, posInsert, _boolRemoteMouseApp, this, _globals);
+                LoadGroupOfCtrls(ref listCtrls, _intUniqueItemCounter, insertAtIndex, blGroupConversation);
+                QF = new QfcController(Mail, listCtrls, insertAtIndex, _boolRemoteMouseApp, this, _globals);
                 if (blChild)
                     QF.BlHasChild = true;
                 if (varList is Array == true)
@@ -827,26 +827,26 @@ namespace QuickFiler
                 }
                 QF.CountMailsInConv(ConvCt);
 
-                if (posInsert > _listQFClass.Count)
+                if (insertAtIndex > _listQFClass.Count)
                 {
                     _listQFClass.Add(QF);
                 }
                 else
                 {
-                    // _listQFClass.Add(QF, QF.Mail.Subject & QF.Mail.SentOn & QF.Mail.Sender, posInsert)
-                    _listQFClass.Insert(posInsert, QF);
+                    // _listQFClass.Add(qf, qf.Mail.Subject & qf.Mail.SentOn & qf.Mail.Sender, insertAtIndex)
+                    _listQFClass.Insert(insertAtIndex, QF);
                 }
 
                 // For i = 1 To _listQFClass.Count
-                // QF = _listQFClass(i)
-                // Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF.Mail.Subject)
+                // qf = _listQFClass(i)
+                // Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & qf.intMyPosition & "   " & qf.Mail.Subject)
                 // Next i
 
             }
 
         }
 
-        public void RemoveSpecificControlGroup(int intPosition)
+        public void RemoveSpecificControlGroup(int index)
         {
 
             bool blDebug;
@@ -862,7 +862,7 @@ namespace QuickFiler
 
             intItemCount = _listQFClass.Count;
 
-            QF = (QfcController)_listQFClass[intPosition];                // Set class equal to specific member of collection
+            QF = (QfcController)_listQFClass[index];                // Set class equal to specific member of collection
 
             strDeletedSub = QF.Mail.Subject;
             strDeletedDte = QF.Mail.SentOn.ToString(@"mm\\dd\\yyyy hh:mm");
@@ -878,26 +878,26 @@ namespace QuickFiler
                 // Print data before movement
                 Debug.Print("DEBUG DATA BEFORE MOVEMENT");
 
-                var loopTo = intItemCount;
-                for (i = 1; i <= loopTo; i++)
+                var loopTo = intItemCount-1;
+                for (i = 0; i <= loopTo; i++)
                 {
-                    if (i == intPosition)
+                    if (i == index)
                     {
-                        Debug.Print(i + "  " + intDeletedMyPos + "  " + strDeletedDte + "  " + strDeletedSub);
+                        Debug.WriteLine(i + "  " + intDeletedMyPos + "  " + strDeletedDte + "  " + strDeletedSub);
                     }
                     else
                     {
                         QF = (QfcController)_listQFClass[i];
-                        Debug.Print(i + "  " + QF.Position + "  " + QF.Mail.SentOn.ToString(@"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
+                        Debug.WriteLine(i + "  " + QF.Position + "  " + QF.Mail.SentOn.ToString(@"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
                     }
                 }
             }
 
             // Shift items upward if there are any
-            if (intPosition < intItemCount)
+            if (index < intItemCount-1)
             {
-                var loopTo1 = intItemCount;
-                for (i = intPosition + 1; i <= loopTo1; i++)
+                var loopTo1 = intItemCount-1;
+                for (i = index + 1; i <= loopTo1; i++)
                 {
                     QF = (QfcController)_listQFClass[i];
                     QF.Position -= 1;
@@ -907,15 +907,15 @@ namespace QuickFiler
                 // _viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
             }
 
-            _listQFClass.RemoveAt(intPosition);
-
+            _listQFClass.RemoveAt(index);
+            
             if (blDebug)
             {
                 // Print data after movement
                 Debug.Print("DEBUG DATA POST MOVEMENT");
 
-                var loopTo2 = _listQFClass.Count;
-                for (i = 1; i <= loopTo2; i++)
+                var loopTo2 = _listQFClass.Count -1;
+                for (i = 0; i <= loopTo2; i++)
                 {
                     QF = (QfcController)_listQFClass[i];
                     Debug.Print(i + "  " + QF.Position + "  " + QF.Mail.SentOn.ToString(@"MM\\DD\\YY HH:MM") + "  " + QF.Mail.Subject);
@@ -925,61 +925,57 @@ namespace QuickFiler
             QF = null;
         }
 
-        public void ConvToggle_Group(List<MailItem> selItems, int intOrigPosition)
+        public void ConvToggle_Group(List<MailItem> selItems, int indexOriginal)
         {
 
             MailItem objEmail;
-            int i;
-            QfcController QF;
-            QfcController QF_Orig;
-            int intPosition;
-            bool blDebug;
-
-            blDebug = true;
-
-            QF_Orig = (QfcController)_listQFClass[intOrigPosition];
+            
+            
+            bool blDebug = true;
+            QfcController qfOriginal = _listQFClass[indexOriginal];
 
             if (blDebug)
             {
-                var loopTo = _listQFClass.Count;
-                for (i = 1; i <= loopTo; i++)
-                    // Debug.Print "_listQFClass(" & i & ")   MyPosition " & QF.intMyPosition & "   " & QF._mail.Subject
-                    QF = (QfcController)_listQFClass[i];
+                int i = 0;
+                foreach (QfcController qfTemp in _listQFClass)
+                {
+                    Debug.WriteLine($"_listQFClass({i++})   MyPosition {qfTemp.Position}     {qfTemp.Mail.Subject}");
+                }
             }
 
             foreach (var objItem in selItems)
             {
                 objEmail = (MailItem)objItem;
-                intPosition = GetEmailPositionInCollection(objEmail);
-                // If intPosition < intOrigPosition Then QF_Orig.intMyPosition = intPosition
-                RemoveSpecificControlGroup(intPosition);
+                int index = GetEmailIndexInCollection(objEmail);
+                if (_listQFClass[index] != qfOriginal)
+                {
+                    RemoveSpecificControlGroup(index);
+                }
             }
         }
 
-        public void ConvToggle_UnGroup(List<MailItem> selItems, int intPosition, int ConvCt, object varList)
+        public void ConvToggle_UnGroup(List<MailItem> selItems, int qfIndex, int convCt, object varList)
         {
-
             int i;
             QfcController QF;
             bool blDebug;
 
             blDebug = false;
-
             if (blDebug)
             {
                 // Print data after movement
                 // Debug.Print "DEBUG DATA BEFORE UNGROUP"
-                var loopTo = _listQFClass.Count;
-                for (i = 1; i <= loopTo; i++)
-                    // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF._mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF._mail.Subject
+                var loopTo = _listQFClass.Count-1;
+                for (i = 0; i <= loopTo; i++)
+                    // Debug.Print i & "  " & qf.intMyPosition & "  " & Format(qf._mail.SentOn, "MM\DD\YY HH:MM") & "  " & qf._mail.Subject
                     QF = (QfcController)_listQFClass[i];
             }
 
-            MoveDownControlGroups(intPosition + 1, selItems.Count);
+            MoveDownControlGroups(qfIndex + 1, selItems.Count);
 
             var loopTo1 = selItems.Count;
             for (i = 1; i <= loopTo1; i++)
-                AddEmailControlGroup(selItems[i], intPosition + i, false, ConvCt, varList, true);
+                AddEmailControlGroup(selItems[i], qfIndex + i, false, convCt, varList, true);
 
             if (blDebug)
             {
@@ -987,7 +983,7 @@ namespace QuickFiler
                 // Debug.Print "DEBUG DATA AFTER UNGROUP"
                 var loopTo2 = _listQFClass.Count;
                 for (i = 1; i <= loopTo2; i++)
-                    // Debug.Print i & "  " & QF.intMyPosition & "  " & Format(QF._mail.SentOn, "MM\DD\YY HH:MM") & "  " & QF._mail.Subject
+                    // Debug.Print i & "  " & qf.intMyPosition & "  " & Format(qf._mail.SentOn, "MM\DD\YY HH:MM") & "  " & qf._mail.Subject
                     QF = (QfcController)_listQFClass[i];
             }
             _parent.FormResize(false);
@@ -1166,7 +1162,7 @@ namespace QuickFiler
                         QF.ExpandCtrls1();
                     }
                     ToggleKeyboardDialog();
-                    // QF.KeyboardHandler toggles the conversation checkbox which triggers enumeration of conversation
+                    // qf.KeyboardHandler toggles the conversation checkbox which triggers enumeration of conversation
                     QF.ToggleConversationCheckbox();
                     ToggleKeyboardDialog();
 
@@ -1290,31 +1286,24 @@ namespace QuickFiler
 
         }
 
-        private int GetEmailPositionInCollection(MailItem objMail)
+        private int GetEmailIndexInCollection(MailItem objMail)
         {
-            int GetEmailPositionInCollectionRet = default;
-
-
-
-            QfcController QF;
-            int i;
-
-            GetEmailPositionInCollectionRet = 0;
-            var loopTo = _listQFClass.Count;
-            for (i = 1; i <= loopTo; i++)
-            {
-                QF = (QfcController)_listQFClass[i];
-                if ((QF.Mail.EntryID ?? "") == (objMail.EntryID ?? ""))
-                    GetEmailPositionInCollectionRet = i;
-            }
-
-            return GetEmailPositionInCollectionRet;
+            int idx = _listQFClass.FindIndex(startIndex: 0, count: 1, match: qf => qf.Mail == objMail);
+            return idx;
         }
 
         public IQfcItemController TryGetQfc(int index)
         {
-            try {return _listQFClass[index];}
-            catch {return null;}
+            QfcController qf = null;
+            try 
+            {
+                qf = _listQFClass[index];
+            }
+            catch (System.Exception) 
+            {
+                qf = null;
+            }
+            return qf;
         }
 
         public void OpenQFMail(MailItem olMail) {_parent.OpenQFMail(olMail);}

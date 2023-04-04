@@ -39,6 +39,7 @@ namespace QuickFiler
         //private string[] _strFolders;
         //TODO: Need to ensure references to _colCtrls are zero based
         private List<Control> _colCtrls;
+        internal int ControlCount { get { return _colCtrls.Count; } }
         //TODO: Need to ensure references to _selItemsInClass are zero based
         private IList _selItemsInClass;
         private bool _blAccelFocusToggle;
@@ -833,7 +834,7 @@ namespace QuickFiler
 
                 if (blDoMove)
                 {
-                    LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
+                    //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
                     SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
                                                                                 Pictures_Checkbox: false,
                                                                                 SortFolder: FolderCbo.SelectedItem as string,
@@ -899,6 +900,8 @@ namespace QuickFiler
                 _intMyPosition = value;
             }
         }
+
+        public int Index { get { return Position - 1; }}
 
         
 
@@ -1514,7 +1517,7 @@ namespace QuickFiler
                     }
                 case "R":
                     {
-                        _callbacks.RemoveSpecificControlGroup(Position); // redirected
+                        _callbacks.RemoveSpecificControlGroup(Index); // redirected
                         break;
                     }
             }
@@ -1546,6 +1549,11 @@ namespace QuickFiler
 
         public void MarkItemForDeletion()
         {
+            if (!FolderCbo.Items.Contains("Trash to Delete"))
+            {
+                FolderCbo.Items.Add("Trash to Delete");
+            }
+
             FolderCbo.SelectedItem = "Trash to Delete";
         }
 
@@ -1587,7 +1595,7 @@ namespace QuickFiler
 
         private void cbDel_Click(object sender, EventArgs e)
         {
-            FolderCbo.SelectedItem = "Trash to Delete";
+            MarkItemForDeletion();
         }
 
         private void cbDel_KeyDown(object sender, KeyEventArgs e)
@@ -1645,7 +1653,7 @@ namespace QuickFiler
 
         private void cbKll_Click(object sender, EventArgs e)
         {
-            _callbacks.RemoveSpecificControlGroup(Position);
+            _callbacks.RemoveSpecificControlGroup(Index);
         }
 
         private void cbKll_KeyDown(object sender, KeyEventArgs e)
@@ -1728,7 +1736,7 @@ namespace QuickFiler
                                                                                WholeConversation: false, 
                                                                                strSeed: FolderCbo.SelectedItem as string, 
                                                                                objItem: Mail);
-                            _callbacks.RemoveSpecificControlGroup(Position);
+                            _callbacks.RemoveSpecificControlGroup(Index);
                         }
                         else
                         {

@@ -12,7 +12,7 @@ namespace QuickFiler
         void KeyboardHandler_KeyUp(object sender, KeyEventArgs e);
         void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e);
         void QFD_Minimize();
-        void RemoveSpecificControlGroup(int intPosition);
+        void RemoveSpecificControlGroup(int index);
         public bool BlShowInConversations { get; set; }
         void ExplConvView_ToggleOn();
         void ExplConvView_ToggleOff();  

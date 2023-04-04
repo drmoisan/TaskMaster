@@ -15,7 +15,7 @@ namespace QuickFiler
         bool ToggleOffActiveItem(bool parentBlExpanded);
         void ToggleRemoteMouseLabels();
         void OpenQFMail(MailItem olMail);
-        void RemoveSpecificControlGroup(int intPosition);
+        void RemoveSpecificControlGroup(int index);
         IQfcItemController TryGetQfc(int index);
     }
 }
