@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFiler.Test", "QuickFil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskVisualization.Test", "TaskVisualization.Test\TaskVisualization.Test.csproj", "{EEDAFFF0-EC43-4B95-A10B-27A9CC3C3667}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailIntelligence", "EmailIntelligence\EmailIntelligence.csproj", "{6B8006B4-9EB2-466E-A178-3E69FF42E16E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -176,6 +178,14 @@ Global
 		{EEDAFFF0-EC43-4B95-A10B-27A9CC3C3667}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEDAFFF0-EC43-4B95-A10B-27A9CC3C3667}.Release|x86.ActiveCfg = Release|Any CPU
 		{EEDAFFF0-EC43-4B95-A10B-27A9CC3C3667}.Release|x86.Build.0 = Release|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Debug|x86.Build.0 = Debug|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Release|x86.ActiveCfg = Release|Any CPU
+		{6B8006B4-9EB2-466E-A178-3E69FF42E16E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

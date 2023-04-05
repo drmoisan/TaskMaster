@@ -7,4 +7,5 @@
     ReadOnly Property FldrStaging As String
     ReadOnly Property FldrPythonStaging As String
     Sub Reload()
+    ReadOnly Property Filenames As IAppStagingFilenames
 End Interface

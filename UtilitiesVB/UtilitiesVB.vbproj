@@ -214,6 +214,7 @@
     <Compile Include="Common Outlook Functions\Calendar.vb" />
     <Compile Include="Common Outlook Functions\CreateCategory.vb" />
     <Compile Include="Common Outlook Functions\NavigateOlFolders.vb" />
+    <Compile Include="Solution Interfaces\IAppStagingFilenames.vb" />
     <Compile Include="Solution Interfaces\IAppAutoFileObjects.vb" />
     <Compile Include="To Depricate\StackObjectVB.vb" />
     <Compile Include="Solution Interfaces\IToDoObj.vb" />

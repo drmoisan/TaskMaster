@@ -11,6 +11,7 @@ Public Class AppAutoFileObjects
     Private _recentsList As SerializableList(Of String)
     Private _parent As ApplicationGlobals
 
+
     Public Sub New(ParentInstance As ApplicationGlobals)
         _parent = ParentInstance
     End Sub
@@ -74,7 +75,6 @@ Public Class AppAutoFileObjects
         End Set
     End Property
 
-
     Public Property MaxRecents As Long Implements IAppAutoFileObjects.MaxRecents
         Get
             Return My.Settings.MaxRecents
@@ -108,4 +108,6 @@ Public Class AppAutoFileObjects
             _recentsList.Serialize()
         End Set
     End Property
+
+
 End Class

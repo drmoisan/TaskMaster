@@ -59,9 +59,9 @@ Public Module FolderSuggestionsModule
         SubjectStripped = StripCommonWords(MSG.Subject) 'Eliminate common words from the subject
 
 
-        For i = 1 To Subject_Map_Ct   'Loop through every subject of every email ever received
+        For i = 1 To SubjectMapCt   'Loop through every subject of every email ever received
             'If InBackground Then DoEvents
-            With Subject_Map(i)
+            With SubjectMap(i)
 
 
                 SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .Email_Subject, Matrix, AppGlobals.AF, SW_Options.ByWords)
@@ -71,7 +71,7 @@ Public Module FolderSuggestionsModule
                 '    "   .Email_Subject: " & .Email_Subject & "  .EmailFolder " & .Email_Folder
 
                 Val = (SWVal ^ AppGlobals.AF.LngConvCtPwr) * .Email_Subject_Count
-                If .Email_Folder <> Subject_Map(i - 1).Email_Folder Then
+                If .Email_Folder <> SubjectMap(i - 1).Email_Folder Then
                     '                StopWatch_Main.Pause
 
                     varFldrSubs = Split(.Email_Folder, "\")
@@ -86,7 +86,7 @@ Public Module FolderSuggestionsModule
                 End If
                 'SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .Email_Subject, Matrix)
                 'SWVal = SWVal * .Email_Subject_Count
-                'If Val > 0 Then Debug.Print (Val & ", Message Subject: " & msg.Subject & ", Subject2: " & Subject_Map(i).Email_Subject & " Folder: " & Subject_Map(i).Email_Folder)
+                'If Val > 0 Then Debug.Print (Val & ", Message Subject: " & msg.Subject & ", Subject2: " & SubjectMap(i).Email_Subject & " Folder: " & SubjectMap(i).Email_Folder)
 
 
 

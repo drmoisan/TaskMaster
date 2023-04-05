@@ -1294,13 +1294,14 @@ namespace QuickFiler
 
         public IQfcItemController TryGetQfc(int index)
         {
-            QfcController qf = null;
+            QfcController qf;
             try 
             {
                 qf = _listQFClass[index];
             }
-            catch (System.Exception) 
+            catch (System.ArgumentOutOfRangeException e) 
             {
+                Debug.WriteLine(e.Message);
                 qf = null;
             }
             return qf;

@@ -13,9 +13,11 @@ Public Class AppFileSystemFolderPaths
     Private _prereads As String
     Private _remap As String
     Private _fldrPythonStaging As String
+    Private _filenames As IAppStagingFilenames
 
     Public Sub New()
         LoadFolders()
+        _filenames = New AppStagingFilenames()
     End Sub
 
     Public Sub Reload() Implements IFileSystemFolderPaths.Reload
@@ -91,4 +93,11 @@ Public Class AppFileSystemFolderPaths
             _fldrPythonStaging = value
         End Set
     End Property
+
+    Public ReadOnly Property Filenames As IAppStagingFilenames Implements IFileSystemFolderPaths.Filenames
+        Get
+            Return _filenames
+        End Get
+    End Property
+
 End Class

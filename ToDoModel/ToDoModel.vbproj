@@ -124,6 +124,7 @@
     <Compile Include="Email Utilities\FolderSuggestionsModule.vb" />
     <Compile Include="Email Utilities\Load_CTF_AND_Subjects_AND_Recents.vb" />
     <Compile Include="Email Utilities\ModuleMailItemsSort.vb" />
+    <Compile Include="Email Utilities\SaveAttachmentsModule.vb" />
     <Compile Include="Email Utilities\Smith_Watterman.vb" />
     <Compile Include="Email Utilities\SortItemsToExistingFolder.vb" />
     <Compile Include="Email Utilities\SubjectMapModule.vb" />

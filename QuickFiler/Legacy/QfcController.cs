@@ -841,7 +841,8 @@ namespace QuickFiler
                                                                                 Save_MSG: _chbxSaveMail.Checked,
                                                                                 Attchments: Attchments,
                                                                                 Remove_Flow_File: _chbxDelFlow.Checked,
-                                                                                OlArchiveRootPath: _globals.Ol.ArchiveRootPath);
+                                                                                OlArchiveRootPath: _globals.Ol.ArchiveRootPath,
+                                                                                AppGlobals: _globals);
                     SortItemsToExistingFolder.Cleanup_Files();
                 } // blDoMove
 

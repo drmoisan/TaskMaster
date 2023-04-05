@@ -5,7 +5,7 @@ Public Module CTFIncidenceModule
     Public CTF_Inc() As CTF_Incidence
     Public CTF_Inc_Ct As Integer = 0
 
-    Private Sub CTF_Inc_Position_ADD(Inc_Num As Integer, CTF_Map As Conversation_To_Folder)
+    Public Sub CTF_Inc_Position_ADD(Inc_Num As Integer, CTF_Map As Conversation_To_Folder)
         Dim i, j As Integer                                                                                                     'Variables to hold loop counters
         Dim added As Boolean
 
@@ -63,7 +63,7 @@ Public Module CTFIncidenceModule
 
     End Function
 
-    Private Sub CTF_Incidence_INIT(Inc_Num As Integer)
+    Public Sub CTF_Incidence_INIT(Inc_Num As Integer)
         Dim i As Integer
 
         For i = 1 To My.Settings.MaxFolders_ConvID                                                      'Loop through the number of Folders we are saving
@@ -73,7 +73,7 @@ Public Module CTFIncidenceModule
         Next i
     End Sub
 
-    Private Sub CTF_Incidence_SET(Inc_Num As Integer, Inc_Position As Integer, Folder_Count As Integer, Map As Conversation_To_Folder)
+    Public Sub CTF_Incidence_SET(Inc_Num As Integer, Inc_Position As Integer, Folder_Count As Integer, Map As Conversation_To_Folder)
         CTF_Inc(Inc_Num).Folder_Count = Folder_Count
         CTF_Inc(Inc_Num).Email_Conversation_ID = Map.Email_Conversation_ID
         CTF_Inc(Inc_Num).Email_Conversation_Count(Inc_Position) = Map.Email_Conversation_Count

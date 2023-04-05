@@ -181,11 +181,11 @@ Public Class cSuggestions
         Dim varFldrSubs As Object
 
         SubjectStripped = StripCommonWords(OlMail.Subject) 'Eliminate common words from the subject
-        For i = 1 To Subject_Map_Ct   'Loop through every subject of every email ever received
-            With Subject_Map(i)
+        For i = 1 To SubjectMapCt   'Loop through every subject of every email ever received
+            With SubjectMap(i)
                 SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .Email_Subject, Matrix, AppGlobals.AF, SW_Options.ByWords)
                 Val = (SWVal ^ AppGlobals.AF.LngConvCtPwr) * .Email_Subject_Count
-                If .Email_Folder <> Subject_Map(i - 1).Email_Folder Then
+                If .Email_Folder <> SubjectMap(i - 1).Email_Folder Then
                     varFldrSubs = Split(.Email_Folder, "\")
                     If IsArray(varFldrSubs) Then
                         strTmpFldr = varFldrSubs(UBound(varFldrSubs))

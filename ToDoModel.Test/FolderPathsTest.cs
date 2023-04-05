@@ -10,6 +10,8 @@ namespace ToDoModel.Test
 {
     internal class FolderPathsTest : IFileSystemFolderPaths
     {
+        public IAppStagingFilenames Filenames => throw new NotImplementedException();
+
         string IFileSystemFolderPaths.FldrAppData => throw new NotImplementedException();
 
         string IFileSystemFolderPaths.FldrFlow => throw new NotImplementedException();

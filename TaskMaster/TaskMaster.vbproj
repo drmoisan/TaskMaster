@@ -222,6 +222,7 @@
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.vb" />
     <Compile Include="AppGlobals\ApplicationGlobals.vb" />
     <Compile Include="AppGlobals\AppOlObjects.vb" />
+    <Compile Include="AppGlobals\AppStagingFilenames.vb" />
     <Compile Include="AppGlobals\AppToDoObjects.vb" />
     <Compile Include="AppGlobals\ToDoObj.vb" />
     <Compile Include="Ribbon\RibbonController.vb" />
