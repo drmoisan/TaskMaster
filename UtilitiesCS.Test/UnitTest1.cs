@@ -27,7 +27,7 @@ namespace UtilitiesCS.Test
 
 
             //MyBoxTemplate _box = new MyBoxTemplate();
-            MyBoxTemplate _box = new MyBoxTemplate(title, message, map);
+            MyBoxViewer _box = new MyBoxViewer(title, message, map);
             DialogResult result = _box.ShowDialog();
             Assert.IsTrue(result == DialogResult.OK);
 

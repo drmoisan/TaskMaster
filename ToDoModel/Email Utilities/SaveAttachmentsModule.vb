@@ -6,6 +6,8 @@ Imports UtilitiesVB
 Imports System.IO
 
 Public Module SaveAttachmentsModule
+    Public strFolderNotToCreate As String
+
     Public Function SaveAttachmentsFromSelection(AppGlobals As IApplicationGlobals,
                                                  SavePath As String,
                                                  Optional DELFILE As Boolean = False,
@@ -58,7 +60,7 @@ Public Module SaveAttachmentsModule
         '    On Error Resume Next
 
 
-        If IsMissing(selItems) Then
+        If selItems Is Nothing Then
             selItems = _globals.Ol.App.ActiveExplorer.Selection
         End If
 
@@ -293,37 +295,5 @@ Public Module SaveAttachmentsModule
     End Sub
 
 
-    Private Sub FolderNotFound()
 
-    End Sub
-
-
-
-    Function openFileSystemDialog() As String
-        Dim fd As Office.FileDialog
-
-        fd = Application.FileDialog(msoFileDialogFilePicker)
-
-        With fd
-
-            .AllowMultiSelect = False
-
-            ' Set the title of the dialog box.
-            .Title = "Please select the file."
-
-            ' Clear out the current filters, and add our own.
-            '.Filters.Clear
-            '.Filters.Add "Excel 2003", "*.xls"
-            '.Filters.Add "All Files", "*.*"
-
-            ' Show the dialog box. If the .Show method returns True, the
-            ' user picked at least one file. If the .Show method returns
-            ' False, the user clicked Cancel.
-            If .Show = True Then
-                openFileSystemDialog = .SelectedItems(1) 'replace txtFileName with your textbox
-            Else
-                openFileSystemDialog = ""
-            End If
-        End With
-    End Function
 End Module

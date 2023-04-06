@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS
 {
-    public partial class MyBoxTemplate : Form
+    public partial class MyBoxViewer : Form
     {
         //public MyBoxTemplate()
         //{
@@ -31,7 +31,7 @@ namespace UtilitiesCS
         //    Button2.Text = keys[1];
         //    this._map = map;
         //}
-        public MyBoxTemplate(string title, string message, Dictionary<string, Delegate> map)
+        public MyBoxViewer(string title, string message, Dictionary<string, Delegate> map)
         {
             InitializeComponent();
             this.Text = title;

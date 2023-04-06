@@ -1,6 +1,6 @@
 ﻿namespace UtilitiesCS
 {
-    partial class MyBoxTemplate
+    partial class MyBoxViewer
     {
         /// <summary>
         /// Required designer variable.

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UtilitiesCS.Properties {
+namespace SVGControl.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace UtilitiesCS.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UtilitiesCS.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SVGControl.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,41 +61,11 @@ namespace UtilitiesCS.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ExceptionPublic {
-            get {
-                object obj = ResourceManager.GetObject("ExceptionPublic", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] ExclamationPoint {
+        internal static byte[] Image {
             get {
-                object obj = ResourceManager.GetObject("ExclamationPoint", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] OpenFolder {
-            get {
-                object obj = ResourceManager.GetObject("OpenFolder", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] SearchFolderClosed {
-            get {
-                object obj = ResourceManager.GetObject("SearchFolderClosed", resourceCulture);
+                object obj = ResourceManager.GetObject("Image", resourceCulture);
                 return ((byte[])(obj));
             }
         }

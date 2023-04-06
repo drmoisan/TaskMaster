@@ -21,7 +21,7 @@ namespace UtilitiesCS
                 { "Throw Exception", new ResponseDelegate(ThrowException) },
                 { "Keep Running", new ResponseDelegate(KeepRunning) }
             };
-            MyBoxTemplate _box = new(title, message, map);
+            MyBoxViewer _box = new(title, message, map);
             DialogResult result = _box.ShowDialog();
             if (result == DialogResult.Yes) {return true;}
             else { return false; }
