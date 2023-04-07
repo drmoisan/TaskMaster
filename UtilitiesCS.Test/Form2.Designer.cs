@@ -28,22 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
             SVGControl.SVGImage svgImage1 = new SVGControl.SVGImage();
             this.buttonSVG1 = new SVGControl.ButtonSVG();
             this.SuspendLayout();
             // 
             // buttonSVG1
             // 
-            this.buttonSVG1.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG1.Image")));
-            svgImage1.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS.Test\\Resources\\Abs" +
-    "tractCube.svg";
+            svgImage1.ImagePath = null;
             svgImage1.Margin = new System.Windows.Forms.Padding(3);
-            svgImage1.Size = new System.Drawing.Size(377, 178);
+            svgImage1.Size = new System.Drawing.Size(144, 63);
             this.buttonSVG1.ImageSVG = svgImage1;
-            this.buttonSVG1.Location = new System.Drawing.Point(308, 163);
+            this.buttonSVG1.Location = new System.Drawing.Point(198, 145);
             this.buttonSVG1.Name = "buttonSVG1";
-            this.buttonSVG1.Size = new System.Drawing.Size(383, 184);
+            this.buttonSVG1.Size = new System.Drawing.Size(150, 69);
             this.buttonSVG1.TabIndex = 0;
             this.buttonSVG1.Text = "buttonSVG1";
             this.buttonSVG1.UseVisualStyleBackColor = true;

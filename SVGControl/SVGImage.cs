@@ -14,6 +14,7 @@ using System.Drawing.Printing;
 using System.Diagnostics;
 using Svg;
 using Fizzler;
+using System.Globalization;
 
 namespace SVGControl
 {
@@ -24,8 +25,8 @@ namespace SVGControl
         AllowStretching = 2
     }
         
-    [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class SVGImage : ExpandableObjectConverter, INotifyPropertyChanged
+    [TypeConverter(typeof(SVGOptionsConverter))]
+    public class SVGImage : INotifyPropertyChanged
     {
         public SVGImage() { }
 
@@ -97,27 +98,27 @@ namespace SVGControl
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            if (destinationType == typeof(string))
-            {
-                return true;
-            }
+        //public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        //{
+        //    if (destinationType == typeof(string))
+        //    {
+        //        return true;
+        //    }
 
-            return base.CanConvertTo(context, destinationType);
-        }
+        //    return base.CanConvertTo(context, destinationType);
+        //}
 
-        public override object ConvertTo(ITypeDescriptorContext context,
-                                         System.Globalization.CultureInfo culture,
-                                         object value,
-                                         Type destinationType)
-        {
-            if (destinationType == typeof(string))
-            {
-                return "";
-            }
-            return base.ConvertTo(context, culture, value, destinationType); 
-        }
+        //public override object ConvertTo(ITypeDescriptorContext context,
+        //                                 System.Globalization.CultureInfo culture,
+        //                                 object value,
+        //                                 Type destinationType)
+        //{
+        //    if (destinationType == typeof(string))
+        //    {
+        //        return "";
+        //    }
+        //    return base.ConvertTo(context, culture, value, destinationType); 
+        //}
 
         private Size CalcInnerSize(Size outer, Padding margin) 
         {
@@ -170,6 +171,27 @@ namespace SVGControl
                 }
             }
             return proportions;
+        }
+    }
+
+    public class SVGOptionsConverter : ExpandableObjectConverter
+    {
+        public override object ConvertTo(
+            ITypeDescriptorContext context,
+            CultureInfo culture,
+            object value,
+            Type destinationType)
+        {
+            if (destinationType == typeof(string))
+            {
+                return "";
+            }
+
+            return base.ConvertTo(
+                context,
+                culture,
+                value,
+                destinationType);
         }
     }
 }
