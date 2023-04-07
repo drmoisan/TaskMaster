@@ -10,55 +10,50 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace SVGControl
 {
-    [Designer(typeof(SVGControlDesigner))]
     public partial class ButtonSVG : Button
     {
-        private Image _image = null;
-        private string _imagePath = "";
+        
         private SVGParser _parser;
+        private String _imagePath = "";
 
         public ButtonSVG()
         {
             InitializeComponent();
-            _parser = new SVGParser();
-        }
-        
-        //public new Image Image 
-        public object SVGImage
-        {
-            get { return _image; }
-            set 
-            {
-                if (value != null)
-                {
-                var val = ObjectToByteArray(value);
-                _image = _parser.GetBitmapFromSVG(val,this.Size);
-                }
-                else
-                {
-                    _image = null;
-                }
-            } 
+            
+            ImageSVG = new SVGImage(base.Size,
+                                    new Padding(3),
+                                    SVGControl.AutoSize.MaintainAspectRatio);
+            ImageSVG.ImagePath = @"C:\Users\03311352\source\repos\drmoisan\TaskMaster\UtilitiesCS.Test\Resources\AbstractCube.svg";
+            base.Image = ImageSVG.Render();
+            ImageSVG.PropertyChanged += ImageSVG_PropertyChanged;
         }
 
-        //[Browsable(false)]
-        public new Image Image
+        //[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        //[Browsable(true)]
+        //[EditorBrowsable(EditorBrowsableState.Always)]
+        public SVGImage ImageSVG { get; set; }
+
+        private void ImageSVG_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            get { return _image; }
+            base.Image = ImageSVG.Render();
+            //this.Image = ImageSVG.Render();
         }
+
 
         public static byte[] ObjectToByteArray(Object obj)
         {
             BinaryFormatter bf = new BinaryFormatter();
             using (var ms = new MemoryStream())
             {
-                bf.Serialize(ms, obj);
+                if (obj!=null)
+                    bf.Serialize(ms, obj);
                 return ms.ToArray();
             }
         }
-
+                
     }
 }

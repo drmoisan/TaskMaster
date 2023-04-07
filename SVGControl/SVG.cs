@@ -80,17 +80,6 @@ namespace SVGControl
             
         }
 
-        //private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        //{
-        //    if (_imagePath != string.Empty)
-        //    {
-        //        this.pictureBox1.Image = SVGParser.GetBitmapFromSVG(_imagePath, pictureBox1.Size);
-        //    }
-        //    else
-        //    {
-        //        this.pictureBox1.Image = this.pictureBox1.InitialImage;
-        //    }
-
-        //}
+        
     }
 }

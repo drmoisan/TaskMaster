@@ -9,6 +9,7 @@
     <RootNamespace>SVGControl</RootNamespace>
     <AssemblyName>SVGControl</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>9.0</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
@@ -72,7 +73,7 @@
     <Compile Include="ButtonSVG.Designer.cs">
       <DependentUpon>ButtonSVG.cs</DependentUpon>
     </Compile>
-    <Compile Include="ImagePickerClass.cs" />
+    <Compile Include="SVGImage.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -85,7 +86,8 @@
       <DependentUpon>SVG.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SVGControlDesigner.cs" />
+    <Compile Include="ToDelete\SVGControlDesigner.cs" />
+    <Compile Include="SVGFileNameEditor.cs" />
     <Compile Include="SVGParser.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
@@ -107,5 +109,9 @@
   <ItemGroup>
     <None Include="Resources\Image.svg" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AbstractCube.svg" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

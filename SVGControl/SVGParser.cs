@@ -25,7 +25,8 @@ namespace SVGControl
         public Bitmap GetBitmapFromSVG(string filePath)
         {
             SvgDocument document = GetSvgDocument(filePath);
-            AdjustSize(document);
+            if (TargetSize != null)
+                AdjustSize(document);
             Bitmap bmp = document.Draw();
             return bmp;
         }

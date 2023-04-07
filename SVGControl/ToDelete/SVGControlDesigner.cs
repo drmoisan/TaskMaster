@@ -18,7 +18,7 @@ namespace SVGControl
                 if (verbs == null)
                 {
                     verbs = base.Verbs;
-                    verbs.Add(new DesignerVerb("Edit SVGImage", (s, e) => ShowSelectResource()));
+                    verbs.Add(new DesignerVerb("Edit ImageSVG", (s, e) => ShowSelectResource()));
                 }
                 return verbs;
             }
@@ -27,9 +27,9 @@ namespace SVGControl
         {
             var editorServiceContext = typeof(ControlDesigner).Assembly.GetTypes()
                 .Where(x => x.Name == "EditorServiceContext").FirstOrDefault();
-            var editValue = editorServiceContext.GetMethod("EditValue SVGImage",
+            var editValue = editorServiceContext.GetMethod("EditValue",
                 System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-            editValue.Invoke(null, new object[] { this, this.Component, "SVGImage" });
+            editValue.Invoke(null, new object[] { this, this.Component, "ImageSVG" });
         }
     }
 }
