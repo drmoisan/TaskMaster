@@ -38,22 +38,23 @@
             this.buttonSVG1.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG1.Image")));
             svgImage1.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS.Test\\Resources\\Abs" +
     "tractCube.svg";
-            svgImage1.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
-            svgImage1.Size = new System.Drawing.Size(144, 56);
+            svgImage1.Margin = new System.Windows.Forms.Padding(3);
+            svgImage1.Size = new System.Drawing.Size(377, 178);
             this.buttonSVG1.ImageSVG = svgImage1;
-            this.buttonSVG1.Location = new System.Drawing.Point(83, 81);
+            this.buttonSVG1.Location = new System.Drawing.Point(308, 163);
             this.buttonSVG1.Name = "buttonSVG1";
-            this.buttonSVG1.Size = new System.Drawing.Size(150, 69);
+            this.buttonSVG1.Size = new System.Drawing.Size(383, 184);
             this.buttonSVG1.TabIndex = 0;
             this.buttonSVG1.Text = "buttonSVG1";
             this.buttonSVG1.UseVisualStyleBackColor = true;
             // 
             // Form2
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(452, 290);
+            this.ClientSize = new System.Drawing.Size(904, 558);
             this.Controls.Add(this.buttonSVG1);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "Form2";
             this.Text = "Form2";
             this.ResumeLayout(false);

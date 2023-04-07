@@ -78,7 +78,7 @@
     <Compile Include="Legacy\QfcGroupOperationsLegacy.cs" />
     <Compile Include="QfcItemController.cs" />
     <Compile Include="QfcItemViewer.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="QfcItemViewer.Designer.cs">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>

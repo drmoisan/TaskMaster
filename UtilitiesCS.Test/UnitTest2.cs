@@ -93,5 +93,13 @@ namespace UtilitiesCS.Test
                 return false;
             }
         }
+
+        [TestMethod]
+        public void TestMethod5()
+        {
+            Form2 frm = new Form2();
+            frm.ShowDialog();
+        }
+
     }
 }

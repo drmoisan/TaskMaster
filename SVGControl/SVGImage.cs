@@ -25,7 +25,7 @@ namespace SVGControl
     }
         
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class SVGImage : TypeConverter, INotifyPropertyChanged
+    public class SVGImage : ExpandableObjectConverter, INotifyPropertyChanged
     {
         public SVGImage() { }
 
@@ -70,7 +70,11 @@ namespace SVGControl
         internal Size Outer 
         {
             get { return _outer; }
-            set { _outer = value; }
+            set 
+            { 
+                _outer = value;
+                Size = CalcInnerSize(Outer, _margin);
+            }
         }
 
         [NotifyParentProperty(true)]

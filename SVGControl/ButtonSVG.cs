@@ -27,8 +27,8 @@ namespace SVGControl
             ImageSVG = new SVGImage(base.Size,
                                     new Padding(3),
                                     SVGControl.AutoSize.MaintainAspectRatio);
-            ImageSVG.ImagePath = @"C:\Users\03311352\source\repos\drmoisan\TaskMaster\UtilitiesCS.Test\Resources\AbstractCube.svg";
-            base.Image = ImageSVG.Render();
+            //ImageSVG.ImagePath = @"C:\Users\03311352\source\repos\drmoisan\TaskMaster\UtilitiesCS.Test\Resources\AbstractCube.svg";
+            //base.Image = ImageSVG.Render();
             ImageSVG.PropertyChanged += ImageSVG_PropertyChanged;
         }
 
@@ -37,12 +37,27 @@ namespace SVGControl
         //[EditorBrowsable(EditorBrowsableState.Always)]
         public SVGImage ImageSVG { get; set; }
 
+        
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (ImageSVG.ImagePath != null) 
+            {
+                ImageSVG.Outer = e.ClipRectangle.Size;
+                
+                base.Image = ImageSVG.Render();
+                base.Invalidate();
+            }
+            base.OnPaint(e);
+        }
+
         private void ImageSVG_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.Image = ImageSVG.Render();
+            
             //this.Image = ImageSVG.Render();
         }
 
+        
 
         public static byte[] ObjectToByteArray(Object obj)
         {
