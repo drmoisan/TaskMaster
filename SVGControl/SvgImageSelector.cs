@@ -15,6 +15,7 @@ using System.Diagnostics;
 using Svg;
 using Fizzler;
 using System.Globalization;
+using System.Diagnostics.Eventing.Reader;
 
 namespace SVGControl
 {
@@ -25,12 +26,12 @@ namespace SVGControl
         AllowStretching = 2
     }
         
-    [TypeConverter(typeof(SVGOptionsConverter))]
-    public class SVGImage : INotifyPropertyChanged
+    [TypeConverter(typeof(SvgOptionsConverter))]
+    public class SvgImageSelector : INotifyPropertyChanged
     {
-        public SVGImage() { }
+        public SvgImageSelector() { }
 
-        public SVGImage(Size outer, Padding margin, AutoSize autoSize)
+        public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize)
         {
             _outer = outer;
             Margin = margin;
@@ -45,11 +46,30 @@ namespace SVGControl
         private Size _original { get; set; }
         private Padding _margin;
 
+        internal String AboluteImagePath
+        {
+            get { return _imagePath; }
+        }
+
         [NotifyParentProperty(true)]
         [Editor(typeof(SVGFileNameEditor), typeof(UITypeEditor))]
         public String ImagePath 
         {
-            get { return _imagePath; }
+            get 
+            {
+                if (_imagePath == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    string workingDirectory = Environment.CurrentDirectory;
+                    //string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
+                    string relativePath = _imagePath.MakeRelativePath(workingDirectory);
+                    return relativePath;
+                }
+                
+            }
             set 
             {
                 if (_imagePath != value)
@@ -98,28 +118,7 @@ namespace SVGControl
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        //public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        //{
-        //    if (destinationType == typeof(string))
-        //    {
-        //        return true;
-        //    }
-
-        //    return base.CanConvertTo(context, destinationType);
-        //}
-
-        //public override object ConvertTo(ITypeDescriptorContext context,
-        //                                 System.Globalization.CultureInfo culture,
-        //                                 object value,
-        //                                 Type destinationType)
-        //{
-        //    if (destinationType == typeof(string))
-        //    {
-        //        return "";
-        //    }
-        //    return base.ConvertTo(context, culture, value, destinationType); 
-        //}
-
+        
         private Size CalcInnerSize(Size outer, Padding margin) 
         {
             var innerWidth = outer.Width - margin.Left - margin.Right;
@@ -174,7 +173,7 @@ namespace SVGControl
         }
     }
 
-    public class SVGOptionsConverter : ExpandableObjectConverter
+    public class SvgOptionsConverter : ExpandableObjectConverter
     {
         public override object ConvertTo(
             ITypeDescriptorContext context,
@@ -184,6 +183,26 @@ namespace SVGControl
         {
             if (destinationType == typeof(string))
             {
+                SvgImageSelector image = value as SvgImageSelector;
+                if (image != null) 
+                { 
+                    if (image.AboluteImagePath != null) 
+                    { 
+                        string filename = Path.GetFileName(image.AboluteImagePath);
+                        string autoSizeCode;
+                        switch (image.AutoSize) 
+                        {
+                            case AutoSize.Disabled: autoSizeCode = "[Static]"; break;
+                            case AutoSize.MaintainAspectRatio: autoSizeCode = "[Proportional]"; break;
+                            case AutoSize.AllowStretching: autoSizeCode = "[Stretchable]"; break;
+                            default: autoSizeCode = "[]"; break;
+                        }
+
+                        return $"{filename} {autoSizeCode}";
+                    }
+                    else { return "(none)"; }
+                
+                }
                 return "";
             }
 

@@ -19,13 +19,13 @@ namespace SVGControl
         
         private SVGParser _parser;
         private String _imagePath = "";
-        private SVGImage _imageSVG;
+        private SvgImageSelector _imageSVG;
 
         public ButtonSVG()
         {
             InitializeComponent();
             
-            _imageSVG = new SVGImage(base.Size,
+            _imageSVG = new SvgImageSelector(base.Size,
                                     new Padding(3),
                                     SVGControl.AutoSize.MaintainAspectRatio);
             //ImageSVG.ImagePath = @"C:\Users\03311352\source\repos\drmoisan\TaskMaster\UtilitiesCS.Test\Resources\AbstractCube.svg";
@@ -36,7 +36,7 @@ namespace SVGControl
         //[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         //[Browsable(true)]
         //[EditorBrowsable(EditorBrowsableState.Always)]
-        public SVGImage ImageSVG 
+        public SvgImageSelector ImageSVG 
         {
             get { return this._imageSVG; }
             set { this._imageSVG = value; }

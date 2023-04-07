@@ -73,7 +73,8 @@
     <Compile Include="ButtonSVG.Designer.cs">
       <DependentUpon>ButtonSVG.cs</DependentUpon>
     </Compile>
-    <Compile Include="SVGImage.cs" />
+    <Compile Include="GetRelativePath.cs" />
+    <Compile Include="SvgImageSelector.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

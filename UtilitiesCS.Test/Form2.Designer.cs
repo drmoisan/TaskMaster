@@ -28,19 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SVGControl.SVGImage svgImage1 = new SVGControl.SVGImage();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
+            SVGControl.SvgImageSelector svgImageSelector1 = new SVGControl.SvgImageSelector();
             this.buttonSVG1 = new SVGControl.ButtonSVG();
             this.SuspendLayout();
             // 
             // buttonSVG1
             // 
-            svgImage1.ImagePath = null;
-            svgImage1.Margin = new System.Windows.Forms.Padding(3);
-            svgImage1.Size = new System.Drawing.Size(144, 63);
-            this.buttonSVG1.ImageSVG = svgImage1;
-            this.buttonSVG1.Location = new System.Drawing.Point(198, 145);
+            this.buttonSVG1.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG1.Image")));
+            svgImageSelector1.ImagePath = "TaskMaster\\UtilitiesCS.Test\\Resources\\AbstractCube.svg";
+            svgImageSelector1.Margin = new System.Windows.Forms.Padding(3);
+            svgImageSelector1.Size = new System.Drawing.Size(250, 123);
+            this.buttonSVG1.ImageSVG = svgImageSelector1;
+            this.buttonSVG1.Location = new System.Drawing.Point(222, 166);
             this.buttonSVG1.Name = "buttonSVG1";
-            this.buttonSVG1.Size = new System.Drawing.Size(150, 69);
+            this.buttonSVG1.Size = new System.Drawing.Size(256, 129);
             this.buttonSVG1.TabIndex = 0;
             this.buttonSVG1.Text = "buttonSVG1";
             this.buttonSVG1.UseVisualStyleBackColor = true;
@@ -51,12 +53,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(904, 558);
             this.Controls.Add(this.buttonSVG1);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "Form2";
             this.Text = "Form2";
             this.ResumeLayout(false);
 
         }
+
+
+
 
 
         #endregion
