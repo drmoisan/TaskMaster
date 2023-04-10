@@ -65,39 +65,36 @@ Public Module SaveAttachmentsModule
         End If
 
 
-        ' Get the handle of Outlook window.
-        lhWnd = FindWindow(olAppCLSN, vbNullString)
 
-        If lhWnd <> 0 Then
-            strFolderPath = SavePath & "\" ''New ADDED BY DAN TO BYPASS FOLDER SELECTION
+        strFolderPath = SavePath & "\" ''New ADDED BY DAN TO BYPASS FOLDER SELECTION
 
-            'Check to see if destination directory exists on the file system
-            'If it doesn't, ask the user what to do with it
-            If Not Directory.Exists(strFolderPath) Then
-                If strFolderNotToCreate = strFolderPath Then
-                    blnFolderExists = False
-                Else
-                    Load(FolderNotFoundAction)
-                    FolderNotFoundAction.FolderName.Caption = strFolderPath
-                    FolderNotFoundAction.Show
-                    Select Case FolderNotFoundAction.FolderAction
-                        Case "Create"
-                            objNewFolder = Email_SortToNewFolder.MakePath(strFolderPath)
-                        Case "Find"
-                        Case "NoToAll"
-                            strFolderNotToCreate = strFolderPath
-                            blnFolderExists = False
-                        Case Else
-                            blnFolderExists = False
+        'Check to see if destination directory exists on the file system
+        'If it doesn't, ask the user what to do with it
+        If Not Directory.Exists(strFolderPath) Then
+            If strFolderNotToCreate = strFolderPath Then
+                blnFolderExists = False
+            Else
+                Load(FolderNotFoundAction)
+                FolderNotFoundAction.FolderName.Caption = strFolderPath
+                FolderNotFoundAction.Show
+                Select Case FolderNotFoundAction.FolderAction
+                    Case "Create"
+                        objNewFolder = Email_SortToNewFolder.MakePath(strFolderPath)
+                    Case "Find"
+                    Case "NoToAll"
+                        strFolderNotToCreate = strFolderPath
+                        blnFolderExists = False
+                    Case Else
+                        blnFolderExists = False
 
-                    End Select
-                    Unload(FolderNotFoundAction)
-                End If
+                End Select
+                Unload(FolderNotFoundAction)
             End If
+        End If
 
-            ' /* Go through each item in the selection. */
+        ' /* Go through each item in the selection. */
 
-            If blnFolderExists Then
+        If blnFolderExists Then
                 For Each objItem In selItems
                     If TypeOf objItem Is Outlook.MailItem Then
                         MSG = objItem
@@ -264,10 +261,6 @@ Public Module SaveAttachmentsModule
         ' /* For run-time error:
         '    The Explorer has been closed and cannot be used for further operations.
         '    Review your code and restart Outlook. */
-        Else
-        MsgBox("Please select an Outlook item at least.", vbExclamation, "Message from Attachment Saver")
-        blnIsEnd = True
-        End If
 
     End Function
 
