@@ -29,36 +29,40 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
-            SVGControl.SvgImageSelector svgImageSelector1 = new SVGControl.SvgImageSelector();
             this.buttonSVG1 = new SVGControl.ButtonSVG();
             this.SuspendLayout();
             // 
             // buttonSVG1
             // 
             this.buttonSVG1.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG1.Image")));
-            svgImageSelector1.ImagePath = "TaskMaster\\UtilitiesCS.Test\\Resources\\AbstractCube.svg";
-            svgImageSelector1.Margin = new System.Windows.Forms.Padding(3);
-            svgImageSelector1.Size = new System.Drawing.Size(250, 123);
-            this.buttonSVG1.ImageSVG = svgImageSelector1;
-            this.buttonSVG1.Location = new System.Drawing.Point(222, 166);
+            this.buttonSVG1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buttonSVG1.ImageSVG.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\OpenFold" +
+    "er.svg";
+            this.buttonSVG1.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 3, 20, 3);
+            this.buttonSVG1.ImageSVG.Size = new System.Drawing.Size(126, 59);
+            this.buttonSVG1.Location = new System.Drawing.Point(79, 130);
             this.buttonSVG1.Name = "buttonSVG1";
-            this.buttonSVG1.Size = new System.Drawing.Size(256, 129);
+            this.buttonSVG1.Size = new System.Drawing.Size(149, 65);
             this.buttonSVG1.TabIndex = 0;
             this.buttonSVG1.Text = "buttonSVG1";
+            this.buttonSVG1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.buttonSVG1.UseVisualStyleBackColor = true;
             // 
             // Form2
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(904, 558);
+            this.ClientSize = new System.Drawing.Size(452, 290);
             this.Controls.Add(this.buttonSVG1);
-            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "Form2";
             this.Text = "Form2";
             this.ResumeLayout(false);
 
         }
+
+
+
+
 
 
 

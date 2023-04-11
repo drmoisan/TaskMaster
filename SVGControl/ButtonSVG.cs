@@ -28,37 +28,44 @@ namespace SVGControl
             _imageSVG = new SvgImageSelector(base.Size,
                                     new Padding(3),
                                     SVGControl.AutoSize.MaintainAspectRatio);
-            //ImageSVG.ImagePath = @"C:\Users\03311352\source\repos\drmoisan\TaskMaster\UtilitiesCS.Test\Resources\AbstractCube.svg";
-            //base.Image = ImageSVG.Render();
             _imageSVG.PropertyChanged += ImageSVG_PropertyChanged;
+            this.Resize += ButtonSVG_Resize;
         }
 
-        //[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        //[Browsable(true)]
-        //[EditorBrowsable(EditorBrowsableState.Always)]
+        private void ButtonSVG_Resize(object sender, EventArgs e)
+        {
+            _imageSVG.Outer = this.Size;
+        }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        [Browsable(true)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
         public SvgImageSelector ImageSVG 
         {
             get { return this._imageSVG; }
             set { this._imageSVG = value; }
         }
 
-        
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            if (ImageSVG.ImagePath != null) 
-            {
-                ImageSVG.Outer = e.ClipRectangle.Size;
-                
-                base.Image = ImageSVG.Render();
-                base.Invalidate();
-            }
-            base.OnPaint(e);
-        }
+
+        //protected override void OnPaint(PaintEventArgs e)
+        //{
+        //    if (ImageSVG.ImagePath != null)
+        //    {
+        //        ImageSVG.Outer = e.ClipRectangle.Size;
+
+        //        base.Image = ImageSVG.Render();
+        //        //base.Invalidate();
+        //    }
+        //    base.OnPaint(e);
+        //}
+
+
 
         private void ImageSVG_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.Image = ImageSVG.Render();
-            
+            //this.Refresh();
+            this.InvokePaint(this, new PaintEventArgs(this.CreateGraphics(), this.DisplayRectangle));
             //this.Image = ImageSVG.Render();
         }
 

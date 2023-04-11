@@ -16,6 +16,7 @@ using Svg;
 using Fizzler;
 using System.Globalization;
 using System.Diagnostics.Eventing.Reader;
+using System.Runtime.CompilerServices;
 
 namespace SVGControl
 {
@@ -25,7 +26,7 @@ namespace SVGControl
         MaintainAspectRatio = 1,
         AllowStretching = 2
     }
-        
+
     [TypeConverter(typeof(SvgOptionsConverter))]
     public class SvgImageSelector : INotifyPropertyChanged
     {
@@ -45,32 +46,38 @@ namespace SVGControl
         private Size _outer;
         private Size _original { get; set; }
         private Padding _margin;
+        private bool _saveRendering = false;
 
         internal String AboluteImagePath
         {
             get { return _imagePath; }
         }
 
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         [NotifyParentProperty(true)]
         [Editor(typeof(SVGFileNameEditor), typeof(UITypeEditor))]
-        public String ImagePath 
+        public String ImagePath
         {
-            get 
+            get
             {
                 if (_imagePath == null)
                 {
-                    return null;
+                    return "(none)";
                 }
                 else
                 {
-                    string workingDirectory = Environment.CurrentDirectory;
-                    //string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-                    string relativePath = _imagePath.MakeRelativePath(workingDirectory);
-                    return relativePath;
+                    return _imagePath;
+                    //string workingDirectory = Environment.CurrentDirectory;
+                    //string relativePath = _imagePath.MakeRelativePath(workingDirectory);
+                    //return relativePath;
                 }
-                
+
             }
-            set 
+            set
             {
                 if (_imagePath != value)
                 {
@@ -84,17 +91,20 @@ namespace SVGControl
                         _doc = SvgDocument.Open(_imagePath);
                         _original = _doc.Draw().Size;
                     }
+                    NotifyPropertyChanged("ImagePath");
                 }
-            } 
+            }
         }
 
-        internal Size Outer 
+        [NotifyParentProperty(true)]
+        internal Size Outer
         {
             get { return _outer; }
-            set 
-            { 
+            set
+            {
                 _outer = value;
                 Size = CalcInnerSize(Outer, _margin);
+                NotifyPropertyChanged("Outer");
             }
         }
 
@@ -102,14 +112,15 @@ namespace SVGControl
         public Size Size { get; set; }
 
         [NotifyParentProperty(true)]
-        public Padding Margin 
+        public Padding Margin
         {
-            get {return _margin; }
-            set 
+            get { return _margin; }
+            set
             {
                 _margin = value;
                 Size = CalcInnerSize(Outer, _margin);
-            } 
+                NotifyPropertyChanged("Margin");
+            }
         }
 
         [NotifyParentProperty(true)]
@@ -118,14 +129,13 @@ namespace SVGControl
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        
-        private Size CalcInnerSize(Size outer, Padding margin) 
+        private Size CalcInnerSize(Size outer, Padding margin)
         {
             var innerWidth = outer.Width - margin.Left - margin.Right;
-            var innerHeight = outer.Height - margin.Top - margin.Bottom;             
+            var innerHeight = outer.Height - margin.Top - margin.Bottom;
             return new Size(innerWidth, innerHeight);
         }
-                        
+
         public Bitmap Render()
         {
             if (_doc == null)
@@ -133,10 +143,10 @@ namespace SVGControl
                 return null;
             }
             else if ((AutoSize == AutoSize.Disabled) || (Size == null) || (Size.Height == 0) || (Size.Width == 0))
-            { 
-                return _doc.Draw(); 
+            {
+                return _doc.Draw();
             }
-            else if (AutoSize == AutoSize.AllowStretching) 
+            else if (AutoSize == AutoSize.AllowStretching)
             {
                 _doc.Width = Size.Width;
                 _doc.Height = Size.Height;
@@ -147,12 +157,91 @@ namespace SVGControl
                 var targetAdjusted = AdjustSizeProportionately(_original, Size);
                 _doc.Width = targetAdjusted.Width;
                 _doc.Height = targetAdjusted.Height;
+                //AddMargins(targetAdjusted.Width, targetAdjusted.Height);
                 return _doc.Draw();
             }
             else
             { return null; }
         }
-        
+
+        public bool SaveRendering
+        {
+            get
+            {
+                return _saveRendering;
+            }
+            set
+            {
+                if ((value == true) && (_imagePath != "") && (_doc != null))
+                {
+                    // Launch file save dialog with appropriate filters
+                    SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+                    saveFileDialog1.Filter = "Png Image|*.png|JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+                    saveFileDialog1.Title = "Save rendered Image File";
+                    saveFileDialog1.InitialDirectory = Path.GetFullPath(_imagePath);
+                    saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(_imagePath);
+
+                    saveFileDialog1.ShowDialog();
+
+                    // If the file name is not an empty string open it for saving.
+                    if (saveFileDialog1.FileName != "")
+                    {
+                        // Saves the Image via a FileStream created by the OpenFile method.
+                        using FileStream fs = (System.IO.FileStream)saveFileDialog1.OpenFile();
+                        {
+                            Image image = Render();
+                            // Saves the Image in the appropriate ImageFormat based upon the
+                            // File type selected in the dialog box.
+                            // NOTE that the FilterIndex property is one-based.
+                            switch (saveFileDialog1.FilterIndex)
+                            {
+                                case 1:
+                                    image.Save(fs, System.Drawing.Imaging.ImageFormat.Png); 
+                                    break;
+                                case 2:
+                                    image.Save(fs, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                    break;
+                                case 3:
+                                    image.Save(fs, System.Drawing.Imaging.ImageFormat.Bmp);
+                                    break;
+                                case 4:
+                                    image.Save(fs, System.Drawing.Imaging.ImageFormat.Gif);
+                                    break;
+                            }
+                        } // end using FileStream fs
+                    }
+                    
+                }
+                else if (_imagePath == "") 
+                {
+                    MessageBox.Show("Image path must have a value to save the rendering");
+                    
+                }
+                else if(_doc == null)
+                {
+                    MessageBox.Show("Image path does not refer to a valid SVG document");
+                    
+                }
+                _saveRendering = false; 
+                
+            }
+        }
+
+        private void AddMargins(int widthCurrent, int heightCurrent)
+        {
+            var group = new SvgGroup();
+            _doc.Children.Add(group);
+            group.Children.Add(new SvgRectangle
+            {
+                X = - _margin.Left,
+                Y = - _margin.Top,
+                Width = widthCurrent + Margin.Left + Margin.Right,
+                Height = heightCurrent + Margin.Top + Margin.Bottom,
+                Stroke = new SvgColourServer(Color.Transparent),
+                Fill = new SvgColourServer(Color.Transparent)
+            });
+        }
+
         private Size AdjustSizeProportionately(Size proportions, Size targetSize)
         {
             if ((targetSize.Height > 0) && (targetSize.Width > 0) && ((proportions.Height != targetSize.Height) || (proportions.Width != targetSize.Width)))
@@ -171,6 +260,7 @@ namespace SVGControl
             }
             return proportions;
         }
+        
     }
 
     public class SvgOptionsConverter : ExpandableObjectConverter

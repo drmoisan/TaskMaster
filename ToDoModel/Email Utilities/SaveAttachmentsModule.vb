@@ -4,9 +4,19 @@ Imports Microsoft.Office.Interop.Outlook
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip
 Imports UtilitiesVB
 Imports System.IO
+Imports UtilitiesCS
+Imports System.Windows.Forms
 
 Public Module SaveAttachmentsModule
     Public strFolderNotToCreate As String
+
+    Public Enum YesNoToAll
+        vbNull = 0
+        vbYes1 = 1
+        vbNo1 = 2
+        vbYesToAll = 4
+        vbNoToAll = 8
+    End Enum
 
     Public Function SaveAttachmentsFromSelection(AppGlobals As IApplicationGlobals,
                                                  SavePath As String,
@@ -47,6 +57,10 @@ Public Module SaveAttachmentsModule
         Dim FileExtExists As Boolean      ' Boolean value to check if file extension exists
         Dim MSG As Outlook.MailItem
         Dim blnFolderExists As Boolean
+        Const MAX_PATH = 260
+        Dim response As YesNoToAll
+        Static ResponseSaveFile As YesNoToAll
+        Static ResponseOverwriteFile As YesNoToAll
 
         'Dim Response            As Variant      ' Response to user input
 
@@ -74,188 +88,187 @@ Public Module SaveAttachmentsModule
             If strFolderNotToCreate = strFolderPath Then
                 blnFolderExists = False
             Else
-                Load(FolderNotFoundAction)
-                FolderNotFoundAction.FolderName.Caption = strFolderPath
-                FolderNotFoundAction.Show
-                Select Case FolderNotFoundAction.FolderAction
-                    Case "Create"
-                        objNewFolder = Email_SortToNewFolder.MakePath(strFolderPath)
-                    Case "Find"
-                    Case "NoToAll"
-                        strFolderNotToCreate = strFolderPath
-                        blnFolderExists = False
-                    Case Else
-                        blnFolderExists = False
-
-                End Select
-                Unload(FolderNotFoundAction)
+                Using fnfViewer As New FolderNotFoundViewer
+                    fnfViewer.FolderName = strFolderPath
+                    fnfViewer.ShowDialog()
+                    Select Case fnfViewer.FolderAction
+                        Case "Create"
+                            objNewFolder = Directory.CreateDirectory(strFolderPath)
+                        Case "Find"
+                        Case "NoToAll"
+                            strFolderNotToCreate = strFolderPath
+                            blnFolderExists = False
+                        Case Else
+                            blnFolderExists = False
+                    End Select
+                End Using
             End If
         End If
 
         ' /* Go through each item in the selection. */
 
         If blnFolderExists Then
-                For Each objItem In selItems
-                    If TypeOf objItem Is Outlook.MailItem Then
-                        MSG = objItem
-                        lCountEachItem = objItem.Attachments.Count
-                        emailDate = objItem.SentOn
-                        emailDate2 = DateAdd("d", 1, emailDate) 'Add a day to catch error from flow
-                        DteString = Format(emailDate, "yymmdd")
-                        DteString2 = Format(emailDate2, "yymmdd") 'Add a day to catch error from flow
+            For Each objItem In selItems
+                If TypeOf objItem Is Outlook.MailItem Then
+                    MSG = objItem
+                    lCountEachItem = objItem.Attachments.Count
+                    emailDate = objItem.SentOn
+                    'Add a day to catch error from flow
+                    emailDate2 = DateAdd("d", 1, emailDate)
+                    DteString = Format(emailDate, "yyMMdd")
+                    DteString2 = Format(emailDate2, "yyMMdd") 'Add a day to catch error from flow
 
-                        If SaveMSG = True Then
-                            If MSG.Subject <> "" Then
-                                strAtmtFullName = MSG.Subject
-                                ReplaceCharsForFileName(strAtmtFullName, "-")
-                                strAtmtPath = strFolderPath & DteString & " " & strAtmtFullName
-                                MSG.SaveAs(strAtmtPath, 3)
-                            End If
-                            '
-                            'If objFSO.FileExists(strAtmtPath) = True Then
+                    If SaveMSG = True Then
+                        If MSG.Subject <> "" Then
+                            strAtmtFullName = MSG.Subject
+                            ReplaceCharsForFileName(strAtmtFullName, "-")
+                            strAtmtPath = strFolderPath & DteString & " " & strAtmtFullName
+                            MSG.SaveAs(strAtmtPath, 3)
                         End If
+                        '
+                        'If objFSO.FileExists(strAtmtPath) = True Then
+                    End If
 
-                        ' /* If the current item contains attachments. */
-                        If lCountEachItem > 0 Then
-                            Atmts = objItem.Attachments
-                            For Each Atmt In Atmts
-                                atmtct = atmtct + 1
+                    ' /* If the current item contains attachments. */
+                    If lCountEachItem > 0 Then
+                        Atmts = objItem.Attachments
+                        For Each Atmt In Atmts
+                            atmtct = atmtct + 1
 
-                                AlreadyExists = False
-                                ' Get the full name of the current attachment.
-                                If Atmt.Type <> olOLE Then
-                                    strAtmtFullName = Atmt.FileName
-                                Else
-                                    strAtmtFullName = "NOTHING"
-                                End If
+                            AlreadyExists = False
+                            ' Get the full name of the current attachment.
+                            If Atmt.Type <> OlAttachmentType.olOLE Then
+                                strAtmtFullName = Atmt.FileName
+                            Else
+                                strAtmtFullName = "NOTHING"
+                            End If
 
-                                ' Is there a dot in the file extension?
-                                If InStrRev(strAtmtFullName, ".") <> 0 Then
-                                    FileExtExists = True
+                            ' Is there a dot in the file extension?
+                            If InStrRev(strAtmtFullName, ".") <> 0 Then
+                                FileExtExists = True
 
-                                    ' Find the dot postion in atmtFullName.
-                                    intDotPosition = InStrRev(strAtmtFullName, ".")
+                                ' Find the dot postion in atmtFullName.
+                                intDotPosition = InStrRev(strAtmtFullName, ".")
 
-                                    ' Get the name.
-                                    strAtmtName(0) = Left$(strAtmtFullName, intDotPosition - 1)
+                                ' Get the name.
+                                strAtmtName(0) = Left$(strAtmtFullName, intDotPosition - 1)
 
-                                    ' Get the file extension.
-                                    strAtmtName(1) = Right$(strAtmtFullName, Len(strAtmtFullName) - intDotPosition)
+                                ' Get the file extension.
+                                strAtmtName(1) = Right$(strAtmtFullName, Len(strAtmtFullName) - intDotPosition)
 
-                                Else
-                                    FileExtExists = False
-                                    strAtmtName(0) = strAtmtFullName
-                                    strAtmtName(1) = "NONE"
-                                End If
+                            Else
+                                FileExtExists = False
+                                strAtmtName(0) = strAtmtFullName
+                                strAtmtName(1) = "NONE"
+                            End If
 
 
-                                ' Get the full saving path of the current attachment.
-                                strAtmtPath = strFolderPath & DteString & " " & strAtmtFullName
-                                strAtmtPath2 = strFolderPath & DteString2 & " " & strAtmtFullName
+                            ' Get the full saving path of the current attachment.
+                            strAtmtPath = strFolderPath & DteString & " " & strAtmtFullName
+                            strAtmtPath2 = strFolderPath & DteString2 & " " & strAtmtFullName
 
-                                ' /* If the length of the saving path is not larger than 260 characters.*/
-                                If Len(strAtmtPath) <= MAX_PATH Then
-                                    ' True: This attachment can be saved.
-                                    If (save_images = True Or (UCase(strAtmtName(1)) <> "PNG" And UCase(strAtmtName(1)) <> "JPG" And UCase(strAtmtName(1)) <> "GIF")) Then
-                                        'True: Not a picture
-                                        If DELFILE = True Then
-                                            If objFSO.FileExists(strAtmtPath) = True Then
-                                                objFSO.DeleteFile(strAtmtPath)
-                                            ElseIf objFSO.FileExists(strAtmtPath2) = True Then
+                            ' /* If the length of the saving path is not larger than 260 characters.*/
+                            If Len(strAtmtPath) <= MAX_PATH Then
+                                ' True: This attachment can be saved.
+                                If (save_images = True Or (UCase(strAtmtName(1)) <> "PNG" And UCase(strAtmtName(1)) <> "JPG" And UCase(strAtmtName(1)) <> "GIF")) Then
+                                    'True: Not a picture
+                                    If DELFILE = True Then
+                                        If File.Exists(strAtmtPath) = True Then
+                                            File.Delete(strAtmtPath)
+                                        ElseIf File.Exists(strAtmtPath2) = True Then
+                                            File.Delete(strAtmtPath2)
+                                        End If
+                                        blnIsSave = False
 
-                                                objFSO.DeleteFile(strAtmtPath2)
-                                            End If
-                                            blnIsSave = False
+                                    Else
+                                        blnIsSave = True
 
-                                        Else
-                                            blnIsSave = True
+                                        ' /* Loop until getting the file name which does not exist in the folder. */
+                                        Do While File.Exists(strAtmtPath)
+                                            AlreadyExists = True
 
-                                            ' /* Loop until getting the file name which does not exist in the folder. */
-                                            Do While objFSO.FileExists(strAtmtPath)
-                                                AlreadyExists = True
-
-                                                strAtmtNameTemp = strAtmtName(0) &
+                                            strAtmtNameTemp = strAtmtName(0) &
                                                                   Format(Now, "_mmddhhmmss") &
                                                                   Format(Timer * 1000 Mod 1000, "000")
-                                                strAtmtPath = strFolderPath & DteString & strAtmtNameTemp
-                                                If FileExtExists Then strAtmtPath = strAtmtPath & "." & strAtmtName(1)
+                                            strAtmtPath = strFolderPath & DteString & strAtmtNameTemp
+                                            If FileExtExists Then strAtmtPath = strAtmtPath & "." & strAtmtName(1)
 
-                                                ' /* If the length of the saving path is over 260 characters.*/
-                                                If Len(strAtmtPath) > MAX_PATH Then
-                                                    lCountEachItem = lCountEachItem - 1
-                                                    ' False: This attachment cannot be saved.
-                                                    blnIsSave = False
-                                                    Exit Do
-                                                End If
-                                            Loop
-                                        End If
-
-                                        ' /* Save the current attachment if it is a valid file name. */
-                                        If blnIsSave Then
-                                            If Verify_Action = True Then
-
-                                                objMailItem = objItem
-
-                                                If ResponseOverwriteFile + ResponseSaveFile = 0 Then
-                                                    objMailItem.Display()
-                                                End If
-
-
-                                                If AlreadyExists = True Then
-                                                    'Response = MsgBox("File Already Exists. Save file: " & strAtmtPath, vbCritical + vbYesNo)
-                                                    If ResponseOverwriteFile = vbNull Then
-                                                        response = MsgBox_YesNoToAll("File Already Exists. Save file: " & strAtmtPath)
-                                                        If response = vbNoToAll Or response = vbYesToAll Then ResponseOverwriteFile = response
-                                                    Else
-                                                        response = ResponseOverwriteFile
-                                                    End If
-                                                Else
-                                                    'Response = MsgBox("Save file: " & strAtmtPath, vbYesNo + vbExclamation)
-                                                    If ResponseSaveFile = vbNull Then
-                                                        response = MsgBox_YesNoToAll("Save file: " & strAtmtPath)
-                                                        If response = vbNoToAll Or response = vbYesToAll Then ResponseSaveFile = response
-                                                    Else
-                                                        response = ResponseSaveFile
-
-                                                    End If
-                                                End If
-
-                                                If response = vbYes1 Or response = vbYesToAll Then
-                                                    strAtmtName(0) = InputBox("Email Subject: " & MSG.Subject & vbCrLf & "Rename file: " & strAtmtPath, , strAtmtName(0))
-                                                    If strAtmtName(0) = "" Then
-                                                        If MsgBox("Revert to file name: " & strAtmtPath, vbOKCancel) = vbCancel Then response = vbNo1
-                                                    Else
-                                                        strAtmtPath = strFolderPath & DteString & " " & strAtmtName(0)
-                                                        If FileExtExists Then strAtmtPath = strAtmtPath & "." & strAtmtName(1)
-                                                    End If
-                                                End If
-
-                                                objMailItem.Close(olDiscard)
-                                            Else
-                                                response = vbYes1
+                                            ' /* If the length of the saving path is over 260 characters.*/
+                                            If Len(strAtmtPath) > MAX_PATH Then
+                                                lCountEachItem = lCountEachItem - 1
+                                                ' False: This attachment cannot be saved.
+                                                blnIsSave = False
+                                                Exit Do
                                             End If
-                                            If (response = vbYes1 Or response = vbYesToAll) Then Atmt.SaveAsFile(strAtmtPath)
-                                        End If
+                                        Loop
                                     End If
-                                Else
-                                    lCountEachItem = lCountEachItem - 1
-                                End If
-                            Next
-                        End If
 
-                        ' Count the number of attachments in all Outlook items.
-                        lCountAllItems = lCountAllItems + lCountEachItem
-                    Else
+                                    ' /* Save the current attachment if it is a valid file name. */
+                                    If blnIsSave Then
+                                        If Verify_Action = True Then
+
+                                            objMailItem = objItem
+
+                                            If ResponseOverwriteFile + ResponseSaveFile = 0 Then
+                                                objMailItem.Display()
+                                            End If
+
+
+                                            If AlreadyExists = True Then
+                                                'Response = MsgBox("File Already Exists. Save file: " & strAtmtPath, vbCritical + vbYesNo)
+                                                If ResponseOverwriteFile = vbNull Then
+                                                    response = MsgBox_YesNoToAll("File Already Exists. Save file: " & strAtmtPath)
+                                                    If response = vbNoToAll Or response = vbYesToAll Then ResponseOverwriteFile = response
+                                                Else
+                                                    response = ResponseOverwriteFile
+                                                End If
+                                            Else
+                                                'Response = MsgBox("Save file: " & strAtmtPath, vbYesNo + vbExclamation)
+                                                If ResponseSaveFile = vbNull Then
+                                                    response = MsgBox_YesNoToAll("Save file: " & strAtmtPath)
+                                                    If response = vbNoToAll Or response = vbYesToAll Then ResponseSaveFile = response
+                                                Else
+                                                    response = ResponseSaveFile
+
+                                                End If
+                                            End If
+
+                                            If response = vbYes1 Or response = vbYesToAll Then
+                                                strAtmtName(0) = InputBox("Email Subject: " & MSG.Subject & vbCrLf & "Rename file: " & strAtmtPath, , strAtmtName(0))
+                                                If strAtmtName(0) = "" Then
+                                                    If MsgBox("Revert to file name: " & strAtmtPath, vbOKCancel) = vbCancel Then response = vbNo1
+                                                Else
+                                                    strAtmtPath = strFolderPath & DteString & " " & strAtmtName(0)
+                                                    If FileExtExists Then strAtmtPath = strAtmtPath & "." & strAtmtName(1)
+                                                End If
+                                            End If
+
+                                            objMailItem.Close(olDiscard)
+                                        Else
+                                            response = vbYes1
+                                        End If
+                                        If (response = vbYes1 Or response = vbYesToAll) Then Atmt.SaveAsFile(strAtmtPath)
+                                    End If
+                                End If
+                            Else
+                                lCountEachItem = lCountEachItem - 1
+                            End If
+                        Next
                     End If
-                Next
-            ElseIf (strFolderNotToCreate = strFolderPath) Then
-            Else
-                MsgBox("Canceled save due to non-existant folder")
-            End If
-            ''End If
+
+                    ' Count the number of attachments in all Outlook items.
+                    lCountAllItems = lCountAllItems + lCountEachItem
+                Else
+                End If
+            Next
+        ElseIf (strFolderNotToCreate = strFolderPath) Then
         Else
-            MsgBox("Failed to get the handle of Outlook window!", vbCritical, "Error from Attachment Saver")
-            blnIsEnd = True
+            MsgBox("Canceled save due to non-existant folder")
+        End If
+        ''End If
+        Else
+        MsgBox("Failed to get the handle of Outlook window!", vbCritical, "Error from Attachment Saver")
+        blnIsEnd = True
         End If
 
         ' /* For run-time error:
@@ -286,6 +299,27 @@ Public Module SaveAttachmentsModule
             MsgBox("No attachment(s) in the selected Outlook items.", vbInformation, "Message from Attachment Saver")
         End If
     End Sub
+
+    Public Sub ReplaceCharsForFileName(sName As String, sChr As String)
+        sName = Replace(sName, "/", sChr)
+        sName = Replace(sName, "\", sChr)
+        sName = Replace(sName, ":", sChr)
+        sName = Replace(sName, "?", sChr)
+        sName = Replace(sName, Chr(34), sChr)
+        sName = Replace(sName, "<", sChr)
+        sName = Replace(sName, ">", sChr)
+        sName = Replace(sName, "|", sChr)
+        sName = Replace(sName, "&", sChr)
+        sName = Replace(sName, "%", sChr)
+        sName = Replace(sName, "*", sChr)
+        sName = Replace(sName, " ", sChr)
+        sName = Replace(sName, "{", sChr)
+        sName = Replace(sName, "[", sChr)
+        sName = Replace(sName, "]", sChr)
+        sName = Replace(sName, "}", sChr)
+        sName = Replace(sName, "!", sChr)
+    End Sub
+
 
 
 

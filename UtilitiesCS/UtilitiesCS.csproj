@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="SerializableList.cs" />
     <Compile Include="MyBoxController.cs" />
+    <Compile Include="TableLayoutHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -140,6 +141,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NativeMethods.txt" />
+    <None Include="Resources\wb.svg" />
+    <None Include="Resources\CalculationWarning.svg" />
+    <None Include="Resources\NewFolder.png" />
+    <None Include="Resources\NewFolder.jpg" />
+    <None Include="Resources\RepeatUntilFailure.svg" />
+    <None Include="Resources\Cancel.svg" />
+    <None Include="Resources\NewFolder.svg" />
     <None Include="Resources\SearchFolderClosed.svg" />
     <None Include="Resources\ExclamationPoint.svg" />
     <None Include="Resources\OpenFolder.svg" />

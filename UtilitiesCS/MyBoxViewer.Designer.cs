@@ -10,7 +10,7 @@
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// <param _name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -32,13 +32,12 @@
             this.L2Bottom = new System.Windows.Forms.TableLayoutPanel();
             this.Button2 = new System.Windows.Forms.Button();
             this.Button1 = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.L1v1L2h = new System.Windows.Forms.TableLayoutPanel();
+            this.svg1 = new SVGControl.SVG();
             this.TextMessage = new System.Windows.Forms.TextBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.L1Vertical.SuspendLayout();
             this.L2Bottom.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.L1v1L2h.SuspendLayout();
             this.SuspendLayout();
             // 
             // L1Vertical
@@ -46,38 +45,41 @@
             this.L1Vertical.ColumnCount = 1;
             this.L1Vertical.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1Vertical.Controls.Add(this.L2Bottom, 0, 1);
-            this.L1Vertical.Controls.Add(this.panel1, 0, 0);
+            this.L1Vertical.Controls.Add(this.L1v1L2h, 0, 0);
             this.L1Vertical.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1Vertical.Location = new System.Drawing.Point(0, 0);
             this.L1Vertical.Name = "L1Vertical";
             this.L1Vertical.RowCount = 2;
             this.L1Vertical.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1Vertical.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-            this.L1Vertical.Size = new System.Drawing.Size(241, 143);
+            this.L1Vertical.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.L1Vertical.Size = new System.Drawing.Size(245, 143);
             this.L1Vertical.TabIndex = 0;
             // 
             // L2Bottom
             // 
-            this.L2Bottom.ColumnCount = 2;
+            this.L2Bottom.ColumnCount = 4;
+            this.L2Bottom.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.L2Bottom.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 115F));
-            this.L2Bottom.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
-            this.L2Bottom.Controls.Add(this.Button2, 1, 0);
-            this.L2Bottom.Controls.Add(this.Button1, 0, 0);
+            this.L2Bottom.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 115F));
+            this.L2Bottom.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.L2Bottom.Controls.Add(this.Button2, 2, 0);
+            this.L2Bottom.Controls.Add(this.Button1, 1, 0);
             this.L2Bottom.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L2Bottom.Location = new System.Drawing.Point(3, 86);
             this.L2Bottom.Name = "L2Bottom";
             this.L2Bottom.RowCount = 1;
             this.L2Bottom.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L2Bottom.Size = new System.Drawing.Size(235, 54);
+            this.L2Bottom.Size = new System.Drawing.Size(239, 54);
             this.L2Bottom.TabIndex = 0;
             // 
             // Button2
             // 
             this.Button2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Button2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.Button2.Location = new System.Drawing.Point(118, 3);
+            this.Button2.Location = new System.Drawing.Point(122, 3);
             this.Button2.Name = "Button2";
-            this.Button2.Size = new System.Drawing.Size(114, 48);
+            this.Button2.Size = new System.Drawing.Size(109, 48);
             this.Button2.TabIndex = 1;
             this.Button2.Text = "button2";
             this.Button2.UseVisualStyleBackColor = true;
@@ -87,7 +89,7 @@
             // 
             this.Button1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Button1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.Button1.Location = new System.Drawing.Point(3, 3);
+            this.Button1.Location = new System.Drawing.Point(7, 3);
             this.Button1.Name = "Button1";
             this.Button1.Size = new System.Drawing.Size(109, 48);
             this.Button1.TabIndex = 0;
@@ -95,54 +97,55 @@
             this.Button1.UseVisualStyleBackColor = true;
             this.Button1.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // panel1
+            // L1v1L2h
             // 
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Controls.Add(this.TextMessage);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(235, 77);
-            this.panel1.TabIndex = 1;
+            this.L1v1L2h.ColumnCount = 2;
+            this.L1v1L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.L1v1L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L1v1L2h.Controls.Add(this.svg1, 0, 0);
+            this.L1v1L2h.Controls.Add(this.TextMessage, 1, 0);
+            this.L1v1L2h.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L1v1L2h.Location = new System.Drawing.Point(3, 3);
+            this.L1v1L2h.Name = "L1v1L2h";
+            this.L1v1L2h.RowCount = 1;
+            this.L1v1L2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L1v1L2h.Size = new System.Drawing.Size(239, 77);
+            this.L1v1L2h.TabIndex = 1;
+            // 
+            // svg1
+            // 
+            this.svg1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.svg1.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\wb.svg";
+            this.svg1.Location = new System.Drawing.Point(3, 3);
+            this.svg1.Name = "svg1";
+            this.svg1.Size = new System.Drawing.Size(34, 71);
+            this.svg1.TabIndex = 0;
             // 
             // TextMessage
             // 
-            this.TextMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.TextMessage.BackColor = System.Drawing.SystemColors.Menu;
+            this.TextMessage.BackColor = System.Drawing.SystemColors.Control;
             this.TextMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TextMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextMessage.Location = new System.Drawing.Point(35, 7);
-            this.TextMessage.Margin = new System.Windows.Forms.Padding(10);
+            this.TextMessage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TextMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TextMessage.Location = new System.Drawing.Point(43, 3);
             this.TextMessage.Multiline = true;
             this.TextMessage.Name = "TextMessage";
-            this.TextMessage.Size = new System.Drawing.Size(190, 63);
-            this.TextMessage.TabIndex = 2;
+            this.TextMessage.Size = new System.Drawing.Size(193, 71);
+            this.TextMessage.TabIndex = 1;
+            this.TextMessage.Text = "Message Contents";
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.Control;
-            this.pictureBox1.Image = global::UtilitiesCS.Properties.Resources.ExceptionPublic;
-            this.pictureBox1.Location = new System.Drawing.Point(6, 7);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(16, 16);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox1.TabIndex = 3;
-            this.pictureBox1.TabStop = false;
-            // 
-            // MyBoxTemplate
+            // MyBoxViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(241, 143);
+            this.ClientSize = new System.Drawing.Size(245, 143);
             this.Controls.Add(this.L1Vertical);
-            this.Name = "MyBoxTemplate";
+            this.Name = "MyBoxViewer";
             this.Text = "FormName";
             this.L1Vertical.ResumeLayout(false);
             this.L2Bottom.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.L1v1L2h.ResumeLayout(false);
+            this.L1v1L2h.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -150,11 +153,11 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel L1Vertical;
-        private System.Windows.Forms.TableLayoutPanel L2Bottom;
         private System.Windows.Forms.Button Button2;
         private System.Windows.Forms.Button Button1;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.TableLayoutPanel L1v1L2h;
+        private SVGControl.SVG svg1;
         private System.Windows.Forms.TextBox TextMessage;
+        internal System.Windows.Forms.TableLayoutPanel L2Bottom;
     }
 }

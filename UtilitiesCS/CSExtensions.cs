@@ -17,7 +17,7 @@ namespace UtilitiesCS
     /// https://stackoverflow.com/questions/53636974/c-sharp-method-to-combine-a-generic-list-of-enum-values-to-a-single-value
     /// by @madreflection and doctor-jones
     /// </summary>
-    /// <typeparam name="TFlagEnum"></typeparam>
+    /// <typeparam _name="TFlagEnum"></typeparam>
     public static class GenericBitwise<TFlagEnum> where TFlagEnum : Enum
     {
         private static readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _and = And().Compile();
