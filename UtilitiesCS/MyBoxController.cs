@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace UtilitiesCS
 {
@@ -28,12 +29,35 @@ namespace UtilitiesCS
             get => _button;
             set 
             {
-                _button.Click -= (object sender, EventArgs e)=>_delegate;
+                _button.Click -= new System.EventHandler((object sender, EventArgs e)=>_delegate.DynamicInvoke());
                 _button = value;
-               
+                _button.Click += new System.EventHandler((object sender, EventArgs e) => _delegate.DynamicInvoke());
+
             }
         }
         public Delegate Delegate { get => _delegate; set => _delegate = value; }
+        
+        public Button MakeButton(string Text, Image Image) 
+        {
+            Button button = new Button();
+            button.Text = Text;
+            if (button.Image != null)
+                button.Image.Dispose();
+            button.Image = Image;
+            button.TextImageRelation = TextImageRelation.ImageBeforeText;
+            button.TextAlign = ContentAlignment.MiddleCenter;
+            button.Size = new Size(252, 108);
+            return button;
+        }
+
+        public Button MakeButton(string Text)
+        {
+            Button button = new Button();
+            button.Text = Text;
+            button.TextAlign = ContentAlignment.MiddleCenter;
+            button.Size = new Size(252, 108);
+            return button;
+        }
     }
 
     public class MyBoxController
@@ -47,7 +71,7 @@ namespace UtilitiesCS
 
             foreach (var delegateButton in delegateButtons)
             {
-
+                AppendButton(_viewer.L2Bottom, delegateButton);
             }
         }
 
