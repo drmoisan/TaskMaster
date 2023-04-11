@@ -27,9 +27,10 @@ namespace UtilitiesCS
         { 
             get => _button;
             set 
-            { 
-                
-                _button = value; 
+            {
+                _button.Click -= (object sender, EventArgs e)=>_delegate;
+                _button = value;
+               
             }
         }
         public Delegate Delegate { get => _delegate; set => _delegate = value; }
