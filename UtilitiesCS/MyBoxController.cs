@@ -12,77 +12,60 @@ namespace UtilitiesCS
     public enum BoxIcon
     {
         None = 0,
-        Critical = 1, 
+        Critical = 1,
         Warning = 2,
         Question = 4
     }
 
-    public class DelegateButton
+    public static class MyBoxController
     {
-        private string _name;
-        private Button _button;
-        private Delegate _delegate;
-
-        public string Name { get => _name; set => _name = value; }
-        public Button Button 
-        { 
-            get => _button;
-            set 
+        public static DialogResult CustomDialog(string Message, string Title, BoxIcon icon, IList<DelegateButton> delegateButtons)
+        {
+            using (MyBoxViewer _viewer = new MyBoxViewer())
             {
-                _button.Click -= new System.EventHandler((object sender, EventArgs e)=>_delegate.DynamicInvoke());
-                _button = value;
-                _button.Click += new System.EventHandler((object sender, EventArgs e) => _delegate.DynamicInvoke());
+                _viewer.Show();
+                _viewer.RemoveStandardButtons();
+                _viewer.Text = Title;
+                _viewer.TextMessage.Text = Message;
+                int columnWidth = 115;
 
-            }
-        }
-        public Delegate Delegate { get => _delegate; set => _delegate = value; }
-        
-        public Button MakeButton(string Text, Image Image) 
-        {
-            Button button = new Button();
-            button.Text = Text;
-            if (button.Image != null)
-                button.Image.Dispose();
-            button.Image = Image;
-            button.TextImageRelation = TextImageRelation.ImageBeforeText;
-            button.TextAlign = ContentAlignment.MiddleCenter;
-            button.Size = new Size(252, 108);
-            return button;
-        }
+                Size tmp = _viewer.MinimumSize;
 
-        public Button MakeButton(string Text)
-        {
-            Button button = new Button();
-            button.Text = Text;
-            button.TextAlign = ContentAlignment.MiddleCenter;
-            button.Size = new Size(252, 108);
-            return button;
-        }
-    }
+                foreach (var delegateButton in delegateButtons)
+                {
+                    AppendButtonInColumn(_viewer.L2Bottom, delegateButton, columnWidth);
+                    tmp.Width += columnWidth;
+                }
 
-    public class MyBoxController
-    {
-        private delegate DialogResult ResponseDelegate();
-
-        public void CustomDialog(string Message, string Title, BoxIcon icon, IList<DelegateButton> delegateButtons) 
-        {
-            MyBoxViewer _viewer = new MyBoxViewer();
-            _viewer.RemoveStandardButtons();
-
-            foreach (var delegateButton in delegateButtons)
-            {
-                AppendButton(_viewer.L2Bottom, delegateButton);
+                _viewer.MinimumSize = tmp;
+                _viewer.Hide();
+                DialogResult result = _viewer.ShowDialog();
+                return result;
             }
         }
 
-        private void AppendButton(TableLayoutPanel tlp, DelegateButton dlb)
+        private static void AppendButtonInColumn(TableLayoutPanel tlp, DelegateButton dlb, Single width)
         {
             tlp.ColumnCount++;
-            tlp.ColumnStyles.Insert(tlp.ColumnCount-2, new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 115F));
+            tlp.ColumnStyles.Insert(tlp.ColumnCount-2, 
+                                    new System.Windows.Forms.ColumnStyle(
+                                        System.Windows.Forms.SizeType.Absolute,
+                                        width));
             tlp.Controls.Add(dlb.Button, tlp.ColumnCount -2,0);
         }
 
-        
+        private static void SetDialogIcon(BoxIcon icon)
+        {
+            switch (icon)
+            {
+                case BoxIcon.None:
+                    break;
+                case BoxIcon.Critical: break;
+                case BoxIcon.Warning: break;
+                case BoxIcon.Question: break;
+                default: break;
+            }
+        }
 
     }
 }

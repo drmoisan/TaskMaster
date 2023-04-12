@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSExtensions.cs" />
+    <Compile Include="DelegateButton.cs" />
     <Compile Include="ExtraDeclarations.cs" />
     <Compile Include="FolderNotFoundViewer.cs">
       <SubType>Form</SubType>
@@ -112,6 +113,7 @@
     <Compile Include="SerializableList.cs" />
     <Compile Include="MyBoxController.cs" />
     <Compile Include="TableLayoutHelper.cs" />
+    <Compile Include="YesNoToAll.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -141,6 +143,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NativeMethods.txt" />
+    <None Include="Resources\Run.png" />
+    <None Include="Resources\RepeatLastRun.png" />
+    <None Include="Resources\Run.svg" />
+    <None Include="Resources\RepeatLastRun.svg" />
+    <None Include="Resources\Cancel.png" />
+    <None Include="Resources\OpenFolder.png" />
+    <None Include="Resources\RepeatUntilFailure.png" />
     <None Include="Resources\wb.svg" />
     <None Include="Resources\CalculationWarning.svg" />
     <None Include="Resources\NewFolder.png" />

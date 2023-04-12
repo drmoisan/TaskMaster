@@ -43,6 +43,7 @@
             this.CreateFolder.ImageSVG.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\NewFolde" +
     "r.svg";
             this.CreateFolder.ImageSVG.Margin = new System.Windows.Forms.Padding(7, 0, 7, 15);
+            this.CreateFolder.ImageSVG.SaveRendering = false;
             this.CreateFolder.ImageSVG.Size = new System.Drawing.Size(112, 41);
             this.CreateFolder.Location = new System.Drawing.Point(14, 94);
             this.CreateFolder.Name = "CreateFolder";
@@ -59,6 +60,7 @@
             this.OpenFolder.ImageSVG.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\OpenFold" +
     "er.svg";
             this.OpenFolder.ImageSVG.Margin = new System.Windows.Forms.Padding(7, 0, 7, 15);
+            this.OpenFolder.ImageSVG.SaveRendering = false;
             this.OpenFolder.ImageSVG.Size = new System.Drawing.Size(112, 41);
             this.OpenFolder.Location = new System.Drawing.Point(146, 94);
             this.OpenFolder.Name = "OpenFolder";

@@ -10,13 +10,13 @@ Imports System.Windows.Forms
 Public Module SaveAttachmentsModule
     Public strFolderNotToCreate As String
 
-    Public Enum YesNoToAll
-        vbNull = 0
-        vbYes1 = 1
-        vbNo1 = 2
-        vbYesToAll = 4
-        vbNoToAll = 8
-    End Enum
+    'Public Enum YesNoToAllResponse
+    '    Empty = 0
+    '    Yes = 1
+    '    No = 2
+    '    YesToAll = 4
+    '    NoToAll = 8
+    'End Enum
 
     Public Function SaveAttachmentsFromSelection(AppGlobals As IApplicationGlobals,
                                                  SavePath As String,
@@ -58,9 +58,9 @@ Public Module SaveAttachmentsModule
         Dim MSG As Outlook.MailItem
         Dim blnFolderExists As Boolean
         Const MAX_PATH = 260
-        Dim response As YesNoToAll
-        Static ResponseSaveFile As YesNoToAll
-        Static ResponseOverwriteFile As YesNoToAll
+        Dim response As YesNoToAllResponse
+        Static ResponseSaveFile As YesNoToAllResponse
+        Static ResponseOverwriteFile As YesNoToAllResponse
 
         'Dim Response            As Variant      ' Response to user input
 
@@ -188,8 +188,7 @@ Public Module SaveAttachmentsModule
                                             AlreadyExists = True
 
                                             strAtmtNameTemp = strAtmtName(0) &
-                                                                  Format(Now, "_mmddhhmmss") &
-                                                                  Format(Timer * 1000 Mod 1000, "000")
+                                                                  Format(Now, "_MMddhhmmss")
                                             strAtmtPath = strFolderPath & DteString & strAtmtNameTemp
                                             If FileExtExists Then strAtmtPath = strAtmtPath & "." & strAtmtName(1)
 
@@ -217,37 +216,37 @@ Public Module SaveAttachmentsModule
                                             If AlreadyExists = True Then
                                                 'Response = MsgBox("File Already Exists. Save file: " & strAtmtPath, vbCritical + vbYesNo)
                                                 If ResponseOverwriteFile = vbNull Then
-                                                    response = MsgBox_YesNoToAll("File Already Exists. Save file: " & strAtmtPath)
-                                                    If response = vbNoToAll Or response = vbYesToAll Then ResponseOverwriteFile = response
+                                                    response = YesNoToAll.ShowDialog("File Already Exists. Save file: " & strAtmtPath)
+                                                    If response = YesNoToAllResponse.NoToAll Or response = YesNoToAllResponse.YesToAll Then ResponseOverwriteFile = response
                                                 Else
                                                     response = ResponseOverwriteFile
                                                 End If
                                             Else
                                                 'Response = MsgBox("Save file: " & strAtmtPath, vbYesNo + vbExclamation)
                                                 If ResponseSaveFile = vbNull Then
-                                                    response = MsgBox_YesNoToAll("Save file: " & strAtmtPath)
-                                                    If response = vbNoToAll Or response = vbYesToAll Then ResponseSaveFile = response
+                                                    response = YesNoToAll.ShowDialog("Save file: " & strAtmtPath)
+                                                    If response = YesNoToAllResponse.NoToAll Or response = YesNoToAllResponse.YesToAll Then ResponseSaveFile = response
                                                 Else
                                                     response = ResponseSaveFile
 
                                                 End If
                                             End If
 
-                                            If response = vbYes1 Or response = vbYesToAll Then
+                                            If response = YesNoToAllResponse.Yes Or response = YesNoToAllResponse.YesToAll Then
                                                 strAtmtName(0) = InputBox("Email Subject: " & MSG.Subject & vbCrLf & "Rename file: " & strAtmtPath, , strAtmtName(0))
                                                 If strAtmtName(0) = "" Then
-                                                    If MsgBox("Revert to file name: " & strAtmtPath, vbOKCancel) = vbCancel Then response = vbNo1
+                                                    If MsgBox("Revert to file name: " & strAtmtPath, vbOKCancel) = vbCancel Then response = YesNoToAllResponse.No
                                                 Else
                                                     strAtmtPath = strFolderPath & DteString & " " & strAtmtName(0)
                                                     If FileExtExists Then strAtmtPath = strAtmtPath & "." & strAtmtName(1)
                                                 End If
                                             End If
 
-                                            objMailItem.Close(olDiscard)
+                                            objMailItem.Close(OlInspectorClose.olDiscard)
                                         Else
-                                            response = vbYes1
+                                            response = YesNoToAllResponse.Yes
                                         End If
-                                        If (response = vbYes1 Or response = vbYesToAll) Then Atmt.SaveAsFile(strAtmtPath)
+                                        If (response = YesNoToAllResponse.Yes Or response = YesNoToAllResponse.YesToAll) Then Atmt.SaveAsFile(strAtmtPath)
                                     End If
                                 End If
                             Else
@@ -266,10 +265,7 @@ Public Module SaveAttachmentsModule
             MsgBox("Canceled save due to non-existant folder")
         End If
         ''End If
-        Else
-        MsgBox("Failed to get the handle of Outlook window!", vbCritical, "Error from Attachment Saver")
-        blnIsEnd = True
-        End If
+
 
         ' /* For run-time error:
         '    The Explorer has been closed and cannot be used for further operations.
@@ -288,17 +284,17 @@ Public Module SaveAttachmentsModule
     ' ######################################
     ' Run this macro for saving attachments.
     ' ######################################
-    Private Sub ExecuteSavingDirect(SavePath As String)
-        Dim lNum As Long
+    'Private Sub ExecuteSavingDirect(SavePath As String)
+    '    Dim lNum As Long
 
-        lNum = SaveAttachmentsFromSelection(SavePath)
+    '    lNum = SaveAttachmentsFromSelection(SavePath)
 
-        If lNum > 0 Then
-            MsgBox(CStr(lNum) & " attachment(s) was(were) saved successfully.", vbInformation, "Message from Attachment Saver")
-        Else
-            MsgBox("No attachment(s) in the selected Outlook items.", vbInformation, "Message from Attachment Saver")
-        End If
-    End Sub
+    '    If lNum > 0 Then
+    '        MsgBox(CStr(lNum) & " attachment(s) was(were) saved successfully.", vbInformation, "Message from Attachment Saver")
+    '    Else
+    '        MsgBox("No attachment(s) in the selected Outlook items.", vbInformation, "Message from Attachment Saver")
+    '    End If
+    'End Sub
 
     Public Sub ReplaceCharsForFileName(sName As String, sChr As String)
         sName = Replace(sName, "/", sChr)

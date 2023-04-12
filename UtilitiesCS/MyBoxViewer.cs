@@ -71,9 +71,25 @@ namespace UtilitiesCS
                 this.L2Bottom.Controls.Remove(this.Button2);
                 this.Button1.Dispose();
                 this.Button2.Dispose();
+                
+                Size tmp = this.MinimumSize;
+                float width = this.L2Bottom.ColumnStyles[2].Width;
+                width += this.L2Bottom.ColumnStyles[1].Width;
+                int width2 = (int)Math.Round(width, 0);
+                if (tmp.Width > width2)
+                {
+                    tmp.Width -= width2;
+                }
+                else
+                {
+                    tmp.Width = 0;
+                }
+                
                 this.L2Bottom.ColumnStyles.RemoveAt(2);
                 this.L2Bottom.ColumnStyles.RemoveAt(1);
                 this.L2Bottom.ColumnCount -= 2;
+                
+                this.MinimumSize = tmp;
                 ableToRemoveStandard = false;
             }
         }

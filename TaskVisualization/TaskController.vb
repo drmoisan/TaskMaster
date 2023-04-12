@@ -808,7 +808,7 @@ Public Class TaskController
                 Throw New ArgumentNullException(NameOf(dictSeed))
 
             ElseIf selectedChar = vbNullChar Then
-                'Null character is only passed if Alt key is pressed again.
+                'Empty character is only passed if Alt key is pressed again.
                 'In this case, we should deactivate the accelerator dialogue
 
                 ToggleXl(dictSeed, ForceState.force_off)
