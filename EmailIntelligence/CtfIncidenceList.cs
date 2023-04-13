@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualBasic;
@@ -158,11 +159,11 @@ namespace EmailIntelligence
 
         }
 
-        public static List<CTF_Incidence> ReadTextFile(string filepath)
+        public static IList<CTF_Incidence> ReadTextFile(string filepath)
         {
             string[] fileContents = ReadFileToArray(filepath);
             Queue<string> lines = ArrayToQueue(fileContents);
-            List<CTF_Incidence> listCTF = ProcessQueue(lines);
+            IList<CTF_Incidence> listCTF = ProcessQueue(lines);
 
             return listCTF;
         }
@@ -175,7 +176,7 @@ namespace EmailIntelligence
             {
                 string[] fileContents = ReadFileToArray(filepath);
                 Queue<string> lines = ArrayToQueue(fileContents);
-                List<CTF_Incidence> listCTF = ProcessQueue(lines);
+                IList<CTF_Incidence> listCTF = ProcessQueue(lines);
                 CTF_Inc = listCTF.ToArray(Base1Simulation: true);
                 CTF_Inc_Ct = listCTF.Count - 1;
             }
@@ -192,9 +193,9 @@ namespace EmailIntelligence
             CTF_Inc = new CTF_Incidence[1];
         }
 
-        private static List<CTF_Incidence> ProcessQueue(Queue<string> lines)
+        private static IList<CTF_Incidence> ProcessQueue(Queue<string> lines)
         {
-            List<CTF_Incidence> listCTF = new List<CTF_Incidence>();
+            IList<CTF_Incidence> listCTF = new List<CTF_Incidence>();
 
             int i;
             while (lines.Count > 0)

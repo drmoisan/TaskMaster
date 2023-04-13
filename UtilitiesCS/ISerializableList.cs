@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using System;
 
 namespace UtilitiesCS
 {
-    public delegate List<T> CSVLoader<T>(string filepath);
+    public delegate IList<T> CSVLoader<T>(string filepath);
 
     public interface ISerializableList<T>
     {
+        
         T this[int index] { get; set; }
 
         int Count { get; }

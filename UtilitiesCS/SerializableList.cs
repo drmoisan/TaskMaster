@@ -17,7 +17,7 @@ namespace UtilitiesCS
     public class SerializableList<T> : IList<T>, ISerializableList<T>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private List<T> _innerList;
+        private IList<T> _innerList;
         private IEnumerable<T> _lazyLoader;
         private string _backupFilepath = "";
         
@@ -349,7 +349,7 @@ namespace UtilitiesCS
             }
         }
 
-        public List<T> ToList() { return _innerList; }
+        public List<T> ToList() { return new List<T>(_innerList); }
         #endregion
     }
 }

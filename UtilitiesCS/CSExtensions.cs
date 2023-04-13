@@ -145,7 +145,7 @@ namespace UtilitiesCS
             return list.Aggregate(aggregator);
         }
 
-        public static T[] ToArray<T>(this List<T> listT, bool Base1Simulation) where T : new()
+        public static T[] ToArray<T>(this IList<T> listT, bool Base1Simulation) where T : new()
         {
             if (Base1Simulation)
             {
