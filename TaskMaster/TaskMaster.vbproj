@@ -283,6 +283,10 @@
     <EmbeddedResource Include="Ribbon\RibbonViewer.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">
+      <Project>{6b8006b4-9eb2-466e-a178-3e69ff42e16e}</Project>
+      <Name>EmailIntelligence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QuickFiler\QuickFiler.csproj">
       <Project>{71735d4f-611a-4470-9170-4d9437534377}</Project>
       <Name>QuickFiler</Name>

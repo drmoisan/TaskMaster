@@ -8,6 +8,7 @@ using System.IO;
 using System.Windows.Forms;
 using Newtonsoft;
 using Newtonsoft.Json;
+using Microsoft.Office.Interop.Outlook;
 
 
 namespace UtilitiesCS
@@ -18,6 +19,7 @@ namespace UtilitiesCS
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private List<T> _innerList;
         private IEnumerable<T> _lazyLoader;
+        private string _backupFilepath = "";
         
 
         public SerializableList()
@@ -35,7 +37,22 @@ namespace UtilitiesCS
             _lazyLoader = IEnumerableOfT;
         }
 
-        private void ensureList()
+        public SerializableList(string filename, string folderpath)
+        {
+            Filename = filename;
+            Folderpath = folderpath;
+            Deserialize();
+        }
+
+        public SerializableList(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        {
+            Filename = filename;
+            Folderpath = folderpath;
+            _backupFilepath = backupFilepath;
+            Deserialize(_filepath, backupLoader, askUserOnError);
+        }
+        
+        internal void ensureList()
         {
             if (_innerList == null)
                 _innerList = new List<T>(_lazyLoader);
@@ -44,7 +61,6 @@ namespace UtilitiesCS
         #region IList<T> Members
         public int IndexOf(T item)
         {
-            ensureList();
             ensureList();
             return _innerList.IndexOf(item);
         }
@@ -229,7 +245,7 @@ namespace UtilitiesCS
                     response = DialogResult.Yes;
                 }
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 log.Error(e.Message);
                 if (askUserOnError)
@@ -249,12 +265,19 @@ namespace UtilitiesCS
             {
                 if (response == DialogResult.Yes)
                 {
-                    //BUGFIX: Add CSV_Read function
-                    log.Debug($"Attempting to load {Path.GetFileName(filepath)} from CSV");
-                    
-                    var folder = Path.GetDirectoryName(filepath);
-                    var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";
-                    _innerList = backupLoader(Path.Combine(folder, filename));
+                    if (_backupFilepath != "")
+                    {
+                        _innerList = backupLoader(_backupFilepath);
+                    }
+                    else
+                    {
+                        log.Debug($"Attempting to load {Path.GetFileName(filepath)} from CSV");
+
+                        var folder = Path.GetDirectoryName(filepath);
+                        var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";
+                        _innerList = backupLoader(Path.Combine(folder, filename));
+                    }
+                    Serialize();
                 }
                 else if (response == DialogResult.No)
                 {
@@ -300,7 +323,7 @@ namespace UtilitiesCS
                 }
                 else { response = DialogResult.Yes; }
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 log.Error($"Error! {e.Message}");
                 if (askUserOnError)
@@ -319,7 +342,10 @@ namespace UtilitiesCS
                 {
                     _innerList = new List<T> { };
                 }
-                else throw new ArgumentNullException("Must have a list or create one to continue executing");                
+                else if (_innerList == null)
+                {
+                    throw new ArgumentNullException("Must have a list or create one to continue executing");
+                }
             }
         }
 

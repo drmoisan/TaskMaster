@@ -8,9 +8,8 @@ Public Class AppAutoFileObjects
     Private _smithWatterman_MatchScore As Integer
     Private _smithWatterman_MismatchScore As Integer
     Private _smithWatterman_GapPenalty As Integer
-    Private _recentsList As SerializableList(Of String)
-    Private _parent As ApplicationGlobals
-
+    Private _recentsList As IRecentsList(Of String)
+    Private _parent As IApplicationGlobals
 
     Public Sub New(ParentInstance As ApplicationGlobals)
         _parent = ParentInstance
@@ -85,19 +84,14 @@ Public Class AppAutoFileObjects
         End Set
     End Property
 
-    Public Property RecentsList As ISerializableList(Of String) Implements IAppAutoFileObjects.RecentsList
+    Public Property RecentsList As IRecentsList(Of String) Implements IAppAutoFileObjects.RecentsList
         Get
             If _recentsList Is Nothing Then
-                _recentsList = New SerializableList(Of String)
-                With _recentsList
-                    .Folderpath = _parent.FS.FldrFlow
-                    .Filename = My.Settings.FileName_Recents
-                    .Deserialize(askUserOnError:=False)
-                End With
+                _recentsList = New RecentsList(Of String)(My.Settings.FileName_Recents, _parent.FS.FldrFlow, max:=MaxRecents)
             End If
             Return _recentsList
         End Get
-        Set(value As ISerializableList(Of String))
+        Set(value As IRecentsList(Of String))
             _recentsList = value
             With _recentsList
                 If .Folderpath = "" Then

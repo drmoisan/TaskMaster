@@ -145,5 +145,15 @@ namespace UtilitiesCS
             return list.Aggregate(aggregator);
         }
 
+        public static T[] ToArray<T>(this List<T> listT, bool Base1Simulation) where T : new()
+        {
+            if (Base1Simulation)
+            {
+                //Insert blank CTF_Incidence to simulate an array base 1
+                listT.Insert(0, new T());
+            }
+            return listT.ToArray();
+        }
     }
+    
 }

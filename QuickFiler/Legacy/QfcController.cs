@@ -837,12 +837,12 @@ namespace QuickFiler
                     //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
                     SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
                                                                                 Pictures_Checkbox: false,
-                                                                                SortFolder: FolderCbo.SelectedItem as string,
+                                                                                SortFolderpath: FolderCbo.SelectedItem as string,
                                                                                 Save_MSG: _chbxSaveMail.Checked,
                                                                                 Attchments: Attchments,
                                                                                 Remove_Flow_File: _chbxDelFlow.Checked,
-                                                                                OlArchiveRootPath: _globals.Ol.ArchiveRootPath,
-                                                                                AppGlobals: _globals);
+                                                                                AppGlobals: _globals, 
+                                                                                StrRoot: _globals.Ol.ArchiveRootPath);
                     SortItemsToExistingFolder.Cleanup_Files();
                 } // blDoMove
 

@@ -3,6 +3,7 @@ Imports System.IO
 Imports Microsoft.Office.Interop
 Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB
+Imports UtilitiesCS
 
 Public Module SortItemsToExistingFolder
     Public Sub InitializeSortToExisting(Optional InitType As String = "Sort",
@@ -15,12 +16,12 @@ Public Module SortItemsToExistingFolder
 
     Public Sub MASTER_SortEmailsToExistingFolder(selItems As IList,
                                                  Pictures_Checkbox As Boolean,
-                                                 SortFolder As String,
+                                                 SortFolderpath As String,
                                                  Save_MSG As Boolean,
                                                  Attchments As Boolean,
                                                  Remove_Flow_File As Boolean,
-                                                 OlArchiveRootPath As String,
-                                                 AppGlobals As IApplicationGlobals)
+                                                 AppGlobals As IApplicationGlobals,
+                                                 Optional StrRoot As String = "")
         Dim loc As String
         Dim FileSystem_LOC As String
         Dim FileSystem_LOC2 As String
@@ -34,9 +35,9 @@ Public Module SortItemsToExistingFolder
         Dim objFolder As Object       ' The selected folder object from Browse for Folder dialog box.
         Dim objSubFolders As Object
         Dim objNewFolder As Object
-        Dim myFolder As Outlook.Folder
+        Dim sortFolder As Outlook.Folder
         Dim folderCurrent As Outlook.Folder
-        Dim strFolderPath As String
+        Dim strFolderPath As String = ""
         Dim i As Integer
         Dim oMailTmp As MailItem
         Dim strTemp As String
@@ -47,7 +48,12 @@ Public Module SortItemsToExistingFolder
         '***INITIALIZE*****
         '******************
         Dim _globals As IApplicationGlobals = AppGlobals
-        loc = OlArchiveRootPath & "\"
+        If (StrRoot = "") Then
+            StrRoot = _globals.Ol.ArchiveRootPath
+        End If
+        'TODO: Eliminate following line once Path.Combine used below
+        loc = StrRoot & "\"
+
         Dim _olApp As Outlook.Application = _globals.Ol.App
         Dim OlNS As Outlook.NameSpace = _globals.Ol.NamespaceMAPI
 
@@ -59,8 +65,9 @@ Public Module SortItemsToExistingFolder
         End If
         If InStr(folderCurrent.FolderPath, _globals.Ol.Inbox.FolderPath) Then
             strFolderPath = _globals.FS.FldrFlow
-        ElseIf InStr(folderCurrent.FolderPath, _globals.Ol.ArchiveRootPath) And folderCurrent.FolderPath <> _globals.Ol.ArchiveRootPath Then
-            strFolderPath = _globals.FS.FldrRoot & Right(folderCurrent.FolderPath, Len(folderCurrent.FolderPath) - Len(_globals.Ol.ArchiveRootPath) - 1)
+        ElseIf InStr(folderCurrent.FolderPath, StrRoot) And folderCurrent.FolderPath <> StrRoot Then
+            strFolderPath = folderCurrent.ToFsFolder(OlFolderRoot:=_globals.Ol.ArchiveRootPath, FsFolderRoot:=_globals.FS.FldrRoot)
+            'strFolderPath = _globals.FS.FldrRoot & Right(folderCurrent.FolderPath, Len(folderCurrent.FolderPath) - Len(_globals.Ol.ArchiveRootPath) - 1)
         Else
 
         End If
@@ -70,13 +77,13 @@ Public Module SortItemsToExistingFolder
         '*************************************************************************
         '************** SAVE ATTACHMENTS IF ENABLED*******************************
         '*************************************************************************
-        Dim strTemp2 As String
+        Dim strTemp2 As String = ""
         'QUESTION: Original code allowed path to be an optional variable and then did something if a value was supplied that didn't match the archive root. Need to determine why and if new treatment loses functionality
-        If _globals.Ol.ArchiveRootPath <> _globals.Ol.ArchiveRootPath Then
+        If StrRoot <> _globals.Ol.ArchiveRootPath Then
             strTemp2 = Right(_globals.Ol.ArchiveRootPath, Len(_globals.Ol.ArchiveRootPath) - Len(_globals.Ol.EmailRootPath) - 1)
-            FileSystem_LOC = _globals.FS.FldrRoot & strTemp2 & "\" & SortFolder  'Parent Directory
+            FileSystem_LOC = _globals.FS.FldrRoot & strTemp2 & "\" & SortFolderpath  'Parent Directory
         Else
-            FileSystem_LOC = _globals.FS.FldrRoot & SortFolder  'Parent Directory
+            FileSystem_LOC = Path.Combine(_globals.FS.FldrRoot, SortFolderpath)
         End If
 
         FileSystem_DelLOC = _globals.FS.FldrRoot
@@ -96,13 +103,18 @@ Public Module SortItemsToExistingFolder
 
         If Attchments = True Then
             'Email_SortSaveAttachment.SaveAttachmentsFromSelection(SavePath:=FileSystem_LOC, Verify_Action:=Pictures_Checkbox, selItems:=selItems, save_images:=Pictures_Checkbox, SaveMSG:=Save_MSG)
-            SaveAttachmentsFromSelection(SavePath:=FileSystem_LOC, Verify_Action:=Pictures_Checkbox, selItems:=selItems, save_images:=Pictures_Checkbox, SaveMSG:=Save_MSG)
+            SaveAttachmentsFromSelection(AppGlobals:=AppGlobals,
+                                         SavePath:=FileSystem_LOC,
+                                         Verify_Action:=Pictures_Checkbox,
+                                         selItems:=selItems,
+                                         save_images:=Pictures_Checkbox,
+                                         SaveMSG:=Save_MSG)
         End If
 
 
 
         If Remove_Flow_File = True Then
-            Call SaveAttachmentsFromSelection(strFolderPath, True, , selItems)
+            Call SaveAttachmentsFromSelection(AppGlobals:=AppGlobals, SavePath:=strFolderPath, DELFILE:=True, selItems:=selItems)
         End If
 
 
@@ -111,30 +123,31 @@ Public Module SortItemsToExistingFolder
         '*********** LABEL EMAIL AS AUTOSORTED AND MOVE TO EMAIL FOLDER***********
         '*************************************************************************
 
-        If strTemp2 = "" Then Add_Recent(SortFolder)
-        loc = loc & SortFolder
-        myFolder = New FolderHandler(_globals).GetFolder(loc) 'Call Function to turn text to Folder
+        'If strTemp2 = "" Then Add_Recent(SortFolderpath)
+        If strTemp2 = "" Then _globals.AF.RecentsList.AddRecent(SortFolderpath)
+        loc = Path.Combine(StrRoot, SortFolderpath)
+        sortFolder = New FolderHandler(_globals).GetFolder(loc) 'Call Function to turn text to Folder
 
         'Call Flag_Fields_Categories.SetCategory("Autosort")
         'Call Flag_Fields_Categories.CustomFieldID_Set("Autosort", "True")
-        If myFolder Is Nothing Then
+        If sortFolder Is Nothing Then
             MsgBox(loc & " does not exist, skipping email move.")
         Else
 
-            For i = selItems.Count To 1 Step -1
+            For i = selItems.Count - 1 To 0 Step -1
                 If TypeOf selItems(i) Is Outlook.MailItem Then
                     If Not TypeOf selItems(i) Is Outlook.MeetingItem Then
                         MSG = selItems(i)
                         If strTemp2 = "" Then
-                            'Email_AutoCategorize.UpdateForMove(MSG, SortFolder)
-                            UpdateForMove(MSG, SortFolder)
+                            'Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
+                            UpdateForMove(MSG, SortFolderpath)
                         End If
                         On Error Resume Next
                         CustomFieldID_Set("Autosort", "True", SpecificItem:=MSG)
                         MSG.UnRead = False
                         MSG.Save()
 
-                        oMailTmp = MSG.Move(myFolder)
+                        oMailTmp = MSG.Move(sortFolder)
 
                         If Err.Number <> 0 Then
                             'TODO: ERROR LOGGING
@@ -307,17 +320,17 @@ Public Module SortItemsToExistingFolder
         Call Subject_Map_Add(MSG.Subject, fldr)
     End Sub
 
-    Private Sub Add_Recent(sortFolder As String)
-        Throw New NotImplementedException()
-    End Sub
+    'Private Sub Add_Recent(sortFolder As String)
+    '    Throw New NotImplementedException()
+    'End Sub
 
-    Private Sub SaveAttachmentsFromSelection(strFolderPath As String, v As Boolean, Optional value As Object = Nothing, Optional selItems As IList = Nothing)
-        Throw New NotImplementedException()
-    End Sub
+    'Private Sub SaveAttachmentsFromSelection(strFolderPath As String, v As Boolean, Optional value As Object = Nothing, Optional selItems As IList = Nothing)
+    '    Throw New NotImplementedException()
+    'End Sub
 
-    Private Sub SaveAttachmentsFromSelection(SavePath As String, Verify_Action As Boolean, selItems As IList, save_images As Boolean, SaveMSG As Boolean)
-        Throw New NotImplementedException()
-    End Sub
+    'Private Sub SaveAttachmentsFromSelection(SavePath As String, Verify_Action As Boolean, selItems As IList, save_images As Boolean, SaveMSG As Boolean)
+    '    Throw New NotImplementedException()
+    'End Sub
 
     Private Sub SaveMessageAsMSG(fileSystem_LOC As String, selItems As IList)
         Throw New NotImplementedException()
@@ -354,8 +367,8 @@ Public Module SortItemsToExistingFolder
         Throw New NotImplementedException
     End Sub
 
-    Public Function DialogueThrowNotImplemented() As Boolean
-        Return MsgBox("")
-    End Function
+    'Public Function DialogueThrowNotImplemented() As Boolean
+    '    Return MsgBox("")
+    'End Function
 
 End Module

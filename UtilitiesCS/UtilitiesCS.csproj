@@ -90,12 +90,14 @@
     <Compile Include="CSExtensions.cs" />
     <Compile Include="DelegateButton.cs" />
     <Compile Include="ExtraDeclarations.cs" />
+    <Compile Include="FolderConverter.cs" />
     <Compile Include="FolderNotFoundViewer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FolderNotFoundViewer.Designer.cs">
       <DependentUpon>FolderNotFoundViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="IRecentsList.cs" />
     <Compile Include="MyBoxViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -110,6 +112,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RecentsList.cs" />
     <Compile Include="SerializableList.cs" />
     <Compile Include="MyBoxController.cs" />
     <Compile Include="TableLayoutHelper.cs" />
