@@ -148,6 +148,7 @@ namespace QuickFiler
 
             // Calculate the emails per page based on screen settings
             var multiplier = PInvoke.GetDialogBaseUnits();
+            //System.Drawing.SizeF scalingFactor = 
             _intEmailsPerIteration = (int)Math.Round(Math.Round(_heightPanelMainMax / (double)(QuickFileControllerConstants.frmHt + QuickFileControllerConstants.frmSp), 0));
             _viewer.L1v2L2h5_SpnEmailPerLoad.Value = _intEmailsPerIteration;
 
