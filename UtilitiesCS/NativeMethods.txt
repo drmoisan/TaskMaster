@@ -8,6 +8,7 @@ DrawMenuBar
 EnableWindow
 GetAncestor
 GetSystemMetrics
+GetDialogBaseUnits
 SystemParametersInfoA
 SetWindowPos
 EnableWindow

@@ -485,6 +485,7 @@ namespace QuickFiler
             _colCtrls = controlList;
             foreach (Control ctlTmp in controlList)
             {
+                
                 Debug.WriteLine(ctlTmp.GetType().Name);
                 switch (ctlTmp.GetType().Name ?? "")
                 {
