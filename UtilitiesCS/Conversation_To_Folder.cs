@@ -1,5 +1,5 @@
 ﻿
-namespace EmailIntelligence
+namespace UtilitiesCS
 {
     public class Conversation_To_Folder 
     {

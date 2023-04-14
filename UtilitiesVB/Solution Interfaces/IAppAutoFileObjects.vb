@@ -5,6 +5,7 @@ Public Interface IAppAutoFileObjects
     Property LngConvCtPwr As Long
     Property MaxRecents As Long
     Property RecentsList As IRecentsList(Of String)
+    Property CTFList As CtfIncidenceList
     Property SuggestionFilesLoaded As Boolean
     Property SmithWatterman_MatchScore As Integer
     Property SmithWatterman_MismatchScore As Integer

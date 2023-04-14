@@ -140,7 +140,7 @@ Public Module SortItemsToExistingFolder
                         MSG = selItems(i)
                         If strTemp2 = "" Then
                             'Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
-                            UpdateForMove(MSG, SortFolderpath)
+                            UpdateForMove(MSG, SortFolderpath, AppGlobals.AF.CTFList)
                         End If
                         On Error Resume Next
                         CustomFieldID_Set("Autosort", "True", SpecificItem:=MSG)
@@ -253,7 +253,7 @@ Public Module SortItemsToExistingFolder
         End If
     End Sub
 
-    Private Sub UpdateForMove(MSG As MailItem, fldr As String)
+    Private Sub UpdateForMove(MSG As MailItem, fldr As String, CTFList As CtfIncidenceList)
         Dim Inc_Num As Integer
         Dim i, j As Integer
         Dim tmp_CTF_Map As Conversation_To_Folder
@@ -262,22 +262,22 @@ Public Module SortItemsToExistingFolder
 
 
         updated = False
-        Inc_Num = CTF_Incidence_FIND(MSG.ConversationID)                        'Check to see if the conversation id is already in the incidence matrix
+        Inc_Num = CTFList.CTF_Incidence_FIND(MSG.ConversationID)                        'Check to see if the conversation id is already in the incidence matrix
 
         If Inc_Num = 0 Then                                                     'If it is not in the matrix,
-            CTF_Inc_Ct = CTF_Inc_Ct + 1                                         'increase matrix record count
-            ReDim Preserve CTF_Inc(CTF_Inc_Ct)                                  'and expand the matrix
+            CTFList.CTF_Inc_Ct += 1                                         'increase matrix record count
+            ReDim Preserve CTFList.CTF_Inc(CTFList.CTF_Inc_Ct)                                  'and expand the matrix
 
             tmp_CTF_Map.Email_Conversation_Count = 1
             tmp_CTF_Map.Email_Conversation_ID = MSG.ConversationID
             tmp_CTF_Map.Email_Folder = fldr
 
-            Call CTF_Incidence_INIT(CTF_Inc_Ct)                                 'Initialize Variable
-            Call CTF_Incidence_SET(CTF_Inc_Ct, 1, 1, tmp_CTF_Map)                'Map Variable in top position
+            Call CTFList.CTF_Incidence_INIT(CTFList.CTF_Inc_Ct)                                 'Initialize Variable
+            Call CTFList.CTF_Incidence_SET(CTFList.CTF_Inc_Ct, 1, 1, tmp_CTF_Map)                'Map Variable in top position
 
         Else
 
-            With CTF_Inc(Inc_Num)
+            With CTFList.CTF_Inc(Inc_Num)
 
                 For i = 1 To .Folder_Count
                     If .Email_Folder(i) = fldr Then
@@ -311,7 +311,7 @@ Public Module SortItemsToExistingFolder
                     .Email_Folder = fldr
                 End With
 
-                Call CTF_Inc_Position_ADD(Inc_Num, tmp_CTF_Map)                     'If it is in the matrix, add it in the right slot
+                Call CTFList.CTF_Inc_Position_ADD(Inc_Num, tmp_CTF_Map)                     'If it is in the matrix, add it in the right slot
 
             End If
 

@@ -10,6 +10,7 @@ Public Class AppAutoFileObjects
     Private _smithWatterman_GapPenalty As Integer
     Private _recentsList As IRecentsList(Of String)
     Private _parent As IApplicationGlobals
+    Private _ctfList As CtfIncidenceList
 
     Public Sub New(ParentInstance As ApplicationGlobals)
         _parent = ParentInstance
@@ -103,5 +104,18 @@ Public Class AppAutoFileObjects
         End Set
     End Property
 
+    Public Property CTFList As CtfIncidenceList Implements IAppAutoFileObjects.CTFList
+        Get
+            If _ctfList Is Nothing Then
+                _ctfList = New CtfIncidenceList(filename:=My.Settings.File_CTF_Inc,
+                                                folderpath:=_parent.FS.FldrPythonStaging,
+                                                backupFilepath:=My.Settings.BackupFile_CTF_Inc)
+            End If
+            Return _ctfList
+        End Get
+        Set(value As CtfIncidenceList)
+
+        End Set
+    End Property
 
 End Class

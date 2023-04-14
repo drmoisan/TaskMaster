@@ -1,5 +1,5 @@
 ﻿
-namespace EmailIntelligence
+namespace UtilitiesCS
 {
     public class CTF_Incidence 
     {
@@ -11,7 +11,7 @@ namespace EmailIntelligence
 
         public CTF_Incidence()
         {
-            _maxFoldersPerConv = Properties.Settings.Default.MaxFoldersTrackedPerConversation;
+            _maxFoldersPerConv = 3;
             _emailFolder = new string[_maxFoldersPerConv + 1];
             _emailConversationCount = new int[_maxFoldersPerConv + 1];
         }

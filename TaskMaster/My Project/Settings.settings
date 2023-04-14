@@ -92,5 +92,8 @@
     <Setting Name="View_Compact" Type="System.String" Scope="User">
       <Value Profile="(Default)">Compact</Value>
     </Setting>
+    <Setting Name="BackupFile_CTF_Inc" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Inc.txt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

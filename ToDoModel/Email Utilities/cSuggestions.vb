@@ -215,9 +215,9 @@ Public Class cSuggestions
 
     Private Sub AddConversationBasedSuggestions(OlMail As MailItem, _globals As IApplicationGlobals)
         'Is the conversationID already mapped to an email Folder. If so, grab the index of it
-        Dim Inc_Num As Integer = CTF_Incidence_FIND(OlMail.ConversationID)
+        Dim Inc_Num As Integer = _globals.AF.CTFList.CTF_Incidence_FIND(OlMail.ConversationID)
         If Inc_Num > 0 Then
-            With CTF_Inc(Inc_Num)
+            With _globals.AF.CTFList.CTF_Inc(Inc_Num)
                 'For each Folder that already contains at least one email with the conversationID ...
                 For i = 1 To .Folder_Count
                     'Calculate the weight of the suggestion based on how much of the conversation is already in the folder
@@ -230,9 +230,9 @@ Public Class cSuggestions
     End Sub
 
     Private Shared Sub ReloadStagingFiles(_globals As IApplicationGlobals)
-        Throw New NotImplementedException("CTF_Incidence_Text_File_READ, Subject_MAP_Text_File_READ, " _
-                                                      & "and Common_Words_Text_File_READ are not implemented. Cannot reload")
-        CTF_Incidence_Text_File_READ(_globals.FS)
+        'Throw New NotImplementedException("CTF_Incidence_Text_File_READ, Subject_MAP_Text_File_READ, " _
+        '                                              & "and Common_Words_Text_File_READ are not implemented. Cannot reload")
+        'CTF_Incidence_Text_File_READ(_globals.FS)
         Subject_MAP_Text_File_READ(_globals.FS)
         Common_Words_Text_File_READ(_globals.FS)
 

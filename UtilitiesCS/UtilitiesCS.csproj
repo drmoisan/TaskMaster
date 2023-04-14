@@ -87,7 +87,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conversation_To_Folder.cs" />
     <Compile Include="CSExtensions.cs" />
+    <Compile Include="CtfIncidenceList.cs" />
+    <Compile Include="CTF_Incidence.cs" />
     <Compile Include="DelegateButton.cs" />
     <Compile Include="ExtraDeclarations.cs" />
     <Compile Include="FolderConverter.cs" />

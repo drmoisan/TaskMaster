@@ -3,17 +3,16 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualBasic;
-using UtilitiesVB;
 using UtilitiesCS;
 using System.Windows.Forms;
 
-namespace EmailIntelligence
+namespace UtilitiesCS
 {
 
     public class CtfIncidenceList : SerializableList<CTF_Incidence>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private int _maxFoldersPerConv = Properties.Settings.Default.MaxFoldersTrackedPerConversation;
+        private int _maxFoldersPerConv = 3;
 
         public CtfIncidenceList() : base() { }
         public CtfIncidenceList(string filename, string folderpath, string backupFilepath) : base(
