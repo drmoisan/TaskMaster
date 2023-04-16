@@ -89,7 +89,7 @@
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Legacy\QuickFileController.cs" />
-    <Compile Include="Legacy\QuickFileControllerConstants.cs" />
+    <Compile Include="Legacy\QfcConstants.cs" />
     <Compile Include="QfcKeyboardHandler.cs" />
     <Compile Include="QfcLauncher.cs" />
     <Compile Include="QfcFormViewer.cs">

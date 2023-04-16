@@ -83,7 +83,7 @@ namespace QuickFiler
 
                 LblPos.Visible = false;
 
-                // Make tips columns 0 pixels in width
+                // Make tips columns 0 pixels in _width
                 foreach (ColumnStyle col in _tipsColumns.Keys)
                     col.Width = 0f;
                 _tipsActive = false;
@@ -95,7 +95,7 @@ namespace QuickFiler
                     tip.Visible = true;
                 LblPos.Visible = true;
 
-                // Make tips columns 20 pixels in width
+                // Make tips columns 20 pixels in _width
                 foreach (ColumnStyle col in _tipsColumns.Keys)
                     col.Width = _tipsColumns[col];
                 _tipsActive = true;

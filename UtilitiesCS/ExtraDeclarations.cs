@@ -60,5 +60,8 @@ namespace Windows.Win32
             /// <remarks>Only applies to dialog boxes.</remarks>
             DWLP_DLGPROC = 4
         }
+    
+        public static int ScreenHeight = GetSystemMetrics(winmdroot.UI.WindowsAndMessaging.SYSTEM_METRICS_INDEX.SM_CYSCREEN);
+        
     }
 }

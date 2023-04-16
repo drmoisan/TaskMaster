@@ -191,7 +191,7 @@ namespace QuickFiler
             this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "QfcFormViewer";
             this.Text = "Quick File";
-            this.Activated += new System.EventHandler(this.QuickFileViewer_Activated);
+            //this.Activated += new System.EventHandler(this.QuickFileViewer_Activated);
             this.Closing += new System.ComponentModel.CancelEventHandler(this.QuickFileViewer_Closing);
             this.Resize += new System.EventHandler(this.QuickFileViewer_Resize);
             this.L1v.ResumeLayout(false);

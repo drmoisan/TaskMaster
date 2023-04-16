@@ -54,6 +54,11 @@ namespace QuickFiler
         private long _lngTopButtonUndoMin;
         private long _lngTopAcceleratorDialogueMin;
         private long _lngTopSpnMin;
+
+        /* Old design used absolute pixels for a particular resolution (1920 x 1080). 
+         * This variable uses PInvoke to grab the current resolution and adjust. Autoscaling
+         * is handled by forms class. This will be deprecated eventually. */
+        private double _multiplier;  
         #endregion
         #region Global Variables, Window Handles and Collections
         // Globals
@@ -121,6 +126,7 @@ namespace QuickFiler
             _stopWatch = new cStopWatch();
             _stopWatch.Start();
             var colEmails = DequeueNextEmailGroup(ref _queueEmailsInFolder, _intEmailsPerIteration);
+            _legacy.Multiplier = _multiplier;
             _legacy.LoadControlsAndHandlers(colEmails);
         }
 
@@ -145,11 +151,8 @@ namespace QuickFiler
             RemoveControlsTabstops();
             InitializeToleranceMinimums();
             _heightPanelMainMax = ResizeForToleranceMax();
-
-            // Calculate the emails per page based on screen settings
-            var multiplier = PInvoke.GetDialogBaseUnits();
-            //System.Drawing.SizeF scalingFactor = 
-            _intEmailsPerIteration = (int)Math.Round(Math.Round(_heightPanelMainMax / (double)(QuickFileControllerConstants.frmHt + QuickFileControllerConstants.frmSp), 0));
+             
+            _intEmailsPerIteration = (int)Math.Round(_heightPanelMainMax / ((double)(QfcConstants.FrmHt + QfcConstants.FrmSp)), 0);
             _viewer.L1v2L2h5_SpnEmailPerLoad.Value = _intEmailsPerIteration;
 
             _blSuppressEvents = false;
@@ -190,8 +193,8 @@ namespace QuickFiler
         private void InitializeToleranceMinimums()
         {
             _lngPanelMainSCTop = 0L;
-            _heightFormMin = _viewer.Height + QuickFileControllerConstants.frmHt + QuickFileControllerConstants.frmSp;
-            _heightPanelMainMin = QuickFileControllerConstants.frmHt + QuickFileControllerConstants.frmSp;
+            _heightFormMin = _viewer.Height + QfcConstants.FrmHt + QfcConstants.FrmSp;
+            _heightPanelMainMin = QfcConstants.FrmHt + QfcConstants.FrmSp;
             _lngTopButtonOkMin = _viewer.L1v2L2h3_ButtonOK.Top;
             _lngTopButtonCancelMin = _viewer.L1v2L2h4_ButtonCancel.Top;
             _lngTopButtonUndoMin = _viewer.L1v2L2h4_ButtonUndo.Top;
@@ -242,23 +245,23 @@ namespace QuickFiler
             if (!_blSuppressEvents | Force)
             {
 
-                intDiffx = (int)(_viewer.Width >= QuickFileControllerConstants.Width_UserForm - 100L ? _viewer.Width - QuickFileControllerConstants.Width_UserForm : 0L);
+                intDiffx = (int)(_viewer.Width >= QfcConstants.Width_UserForm - 100L ? _viewer.Width - QfcConstants.Width_UserForm : 0L);
 
                 intDiffy = (int)(_viewer.Height >= _heightFormMin ? _viewer.Height - _heightFormMin : 0L);
 
-                _viewer.L1v1L2_PanelMain.Width = (int)(QuickFileControllerConstants.Width_PanelMain + intDiffx);
+                _viewer.L1v1L2_PanelMain.Width = (int)(QfcConstants.Width_PanelMain + intDiffx);
                 _viewer.L1v1L2_PanelMain.Height = (int)(_heightPanelMainMin + intDiffy);
 
                 _viewer.L1v2L2h3_ButtonOK.Top = (int)(_lngTopButtonOkMin + intDiffy);
-                _viewer.L1v2L2h3_ButtonOK.Left = (int)Math.Round(QuickFileControllerConstants.OK_left + intDiffx / 2d);
+                _viewer.L1v2L2h3_ButtonOK.Left = (int)Math.Round(QfcConstants.OK_left + intDiffx / 2d);
                 _viewer.L1v2L2h4_ButtonCancel.Top = (int)(_lngTopButtonCancelMin + intDiffy);
-                _viewer.L1v2L2h4_ButtonCancel.Left = (int)(_viewer.L1v2L2h3_ButtonOK.Left + QuickFileControllerConstants.CANCEL_left - QuickFileControllerConstants.OK_left);
+                _viewer.L1v2L2h4_ButtonCancel.Left = (int)(_viewer.L1v2L2h3_ButtonOK.Left + QfcConstants.CANCEL_left - QfcConstants.OK_left);
                 _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_lngTopButtonUndoMin + intDiffy);
-                _viewer.L1v2L2h4_ButtonUndo.Left = (int)(_viewer.L1v2L2h3_ButtonOK.Left + QuickFileControllerConstants.UNDO_left - QuickFileControllerConstants.OK_left);
-                // Button1.top = lngTop_Button1_Min + intDiffy
+                _viewer.L1v2L2h4_ButtonUndo.Left = (int)(_viewer.L1v2L2h3_ButtonOK.Left + QfcConstants.UNDO_left - QfcConstants.OK_left);
+                // Button1._top = lngTop_Button1_Min + intDiffy
                 _viewer.KeyboardDialog.Top = (int)(_lngTopAcceleratorDialogueMin + intDiffy);
                 _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_lngTopSpnMin + intDiffy);
-                _viewer.L1v2L2h5_SpnEmailPerLoad.Left = (int)(QuickFileControllerConstants.spn_left + intDiffx);
+                _viewer.L1v2L2h5_SpnEmailPerLoad.Left = (int)(QfcConstants.Spn_left + intDiffx);
 
                 _legacy.ResizeChildren(intDiffx);
 

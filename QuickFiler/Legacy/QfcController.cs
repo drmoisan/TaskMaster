@@ -393,13 +393,13 @@ namespace QuickFiler
 
         private int lblSubject_Width;
         private int lblBody_Width;               // Body Width
-        private int cbFlag_Left;                 // Task button X% left position
-        private int lblAcT_Left;                 // Task accelerator X% left position
-        private int lbl5_Left;                   // Folder label X% left position
-        private int txt_Left;                    // Folder search box X% left position Y% Width
-        private int txt_Width;                   // Folder search box X% left position Y% Width
-        private int lblAcF_Left;                 // F Accelerator X% left position
-        private int lblAcD_Left;                 // D Accelerator X% left position
+        private int cbFlag_Left;                 // Task button X% _left position
+        private int lblAcT_Left;                 // Task accelerator X% _left position
+        private int lbl5_Left;                   // Folder label X% _left position
+        private int txt_Left;                    // Folder search box X% _left position Y% Width
+        private int txt_Width;                   // Folder search box X% _left position Y% Width
+        private int lblAcF_Left;                 // F Accelerator X% _left position
+        private int lblAcD_Left;                 // D Accelerator X% _left position
         private int cbo_Left;                    // Dropdown box X% Left position Y% Width
         private int cbo_Width;                   // Dropdown box X% Left position Y% Width
         private int cbDel_Left;                  // Delete button X+Y% Left position
@@ -1145,23 +1145,23 @@ namespace QuickFiler
             X3px = (int)Math.Round(Math.Round(X3pct, 0));
 
             LblSubject.Width = (int)(lblSubject_Width + X1px);                      // Subject Width X%
-            FlagTaskCb.Left = (int)(cbFlag_Left + X1px + X2px);                         // Task button X% + Y% left position
-            lblAcT.Left = (int)(lblAcT_Left + X1px + X2px);                         // Task accelerator X% + Y% left position
+            FlagTaskCb.Left = (int)(cbFlag_Left + X1px + X2px);                         // Task button X% + Y% _left position
+            lblAcT.Left = (int)(lblAcT_Left + X1px + X2px);                         // Task accelerator X% + Y% _left position
             CbDel.Left = (int)(cbDel_Left + X1px + X2px);                           // Delete button X+Y% Left position
             CbKll.Left = (int)(cbKll_Left + X1px + X2px);                           // Kill button X+Y% Left position
             lblAcX.Left = (int)(lblAcX_Left + X1px + X2px);
             lblAcR.Left = (int)(lblAcR_Left + X1px + X2px);
             lblSentOn.Left = (int)(lblSentOn_Left + X1px);                          // SentOn X% Left Position
-            lblActionable.Left = (int)(lblActionable_Left + X3px);                  // <ACTIONABL> left position + X3px
-            lblTriage.Left = (int)(lblTriage_Left + X3px);                          // Triage left position + X3px
+            lblActionable.Left = (int)(lblActionable_Left + X3px);                  // <ACTIONABL> _left position + X3px
+            lblTriage.Left = (int)(lblTriage_Left + X3px);                          // Triage _left position + X3px
 
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
-                SearchTxt.Left = (int)(txt_Left + X1px);                                  // Folder search box X% left position Y% Width
-                SearchTxt.Width = (int)(txt_Width + X2px);                                // Folder search box X% left position Y% Width
-                _lbl5.Left = (int)(lbl5_Left + X1px);                                // Folder label X% left position
-                lblAcF.Left = (int)(lblAcF_Left + X1px);                            // F Accelerator X% left position
+                SearchTxt.Left = (int)(txt_Left + X1px);                                  // Folder search box X% _left position Y% Width
+                SearchTxt.Width = (int)(txt_Width + X2px);                                // Folder search box X% _left position Y% Width
+                _lbl5.Left = (int)(lbl5_Left + X1px);                                // Folder label X% _left position
+                lblAcF.Left = (int)(lblAcF_Left + X1px);                            // F Accelerator X% _left position
                 lblConvCt.Left = (int)(lblConvCt_Left + X1px);                      // Conversation Count X% Left Position
                 _chbxSaveAttach.Left = (int)(chbxSaveAttach_Left + X1px + X2px);     // Checkbox Save Attachment X% Left Position
                 _chbxSaveMail.Left = (int)(chbxSaveMail_Left + X1px + X2px);         // Checkbox Save Mail X% Left Position
@@ -1176,7 +1176,7 @@ namespace QuickFiler
                     FolderCbo.Width = (int)(ItemPanel.Width - FolderCbo.Left - lngBlock_Width - 5L);
                     pos_cbo.leftOriginal = cbo_Left + X1px;                   // Dropdown box X% Left position Y% Width
                     pos_cbo.widthOriginal = cbo_Width + X2px;                 // Dropdown box X% Left position Y% Width
-                    pos_lblAcD.leftOriginal = lblAcD_Left + X1px;             // D Accelerator X% left position
+                    pos_lblAcD.leftOriginal = lblAcD_Left + X1px;             // D Accelerator X% _left position
                     pos_lblAcC.leftOriginal = lblAcC_Left + X1px;             // Conversation accelerator X% Left position
                     pos_chk.leftOriginal = chk_Left + X1px;                   // Conversation checkbox X% Left Position
                     lngTmp = ConversationCb.Left;
@@ -1191,7 +1191,7 @@ namespace QuickFiler
 
                     FolderCbo.Left = (int)(cbo_Left + X1px);                               // Dropdown box X% Left position Y% Width
                     FolderCbo.Width = (int)(cbo_Width + X2px);                             // Dropdown box X% Left position Y% Width
-                    lblAcD.Left = (int)(lblAcD_Left + X1px);                         // D Accelerator X% left position
+                    lblAcD.Left = (int)(lblAcD_Left + X1px);                         // D Accelerator X% _left position
                     lblAcC.Left = (int)(lblAcC_Left + X1px + X2px);                  // Conversation accelerator X% Left position
                     ConversationCb.Left = (int)(chk_Left + X1px + X2px);                        // Conversation checkbox X% Left Position
                     TxtBoxBody.Width = (int)(lblBody_Width + X1px);
