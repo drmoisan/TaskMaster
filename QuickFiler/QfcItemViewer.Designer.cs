@@ -160,7 +160,7 @@
             this.LblSentOn.Location = new System.Drawing.Point(375, 0);
             this.LblSentOn.Margin = new System.Windows.Forms.Padding(0);
             this.LblSentOn.Name = "LblSentOn";
-            this.LblSentOn.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.LblSentOn.Padding = new System.Windows.Forms.Padding(3);
             this.LblSentOn.Size = new System.Drawing.Size(70, 19);
             this.LblSentOn.TabIndex = 6;
             this.LblSentOn.Text = "<SENTON>";
@@ -171,7 +171,7 @@
             this.LblSender.Location = new System.Drawing.Point(3, 0);
             this.LblSender.Margin = new System.Windows.Forms.Padding(0);
             this.LblSender.Name = "LblSender";
-            this.LblSender.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.LblSender.Padding = new System.Windows.Forms.Padding(3);
             this.LblSender.Size = new System.Drawing.Size(70, 19);
             this.LblSender.TabIndex = 1;
             this.LblSender.Text = "<SENDER>";
@@ -183,7 +183,7 @@
             this.lblCaptionTriage.Location = new System.Drawing.Point(89, 0);
             this.lblCaptionTriage.Margin = new System.Windows.Forms.Padding(0);
             this.lblCaptionTriage.Name = "lblCaptionTriage";
-            this.lblCaptionTriage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.lblCaptionTriage.Padding = new System.Windows.Forms.Padding(3);
             this.lblCaptionTriage.Size = new System.Drawing.Size(75, 19);
             this.lblCaptionTriage.TabIndex = 0;
             this.lblCaptionTriage.Text = "Triage Group";
@@ -206,7 +206,7 @@
             this.LblCaptionPredicted.Location = new System.Drawing.Point(211, 0);
             this.LblCaptionPredicted.Margin = new System.Windows.Forms.Padding(0);
             this.LblCaptionPredicted.Name = "LblCaptionPredicted";
-            this.LblCaptionPredicted.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.LblCaptionPredicted.Padding = new System.Windows.Forms.Padding(3);
             this.LblCaptionPredicted.Size = new System.Drawing.Size(61, 19);
             this.LblCaptionPredicted.TabIndex = 3;
             this.LblCaptionPredicted.Text = "Predicted:";
@@ -216,7 +216,7 @@
             this.LblActionable.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.LblActionable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LblActionable.Location = new System.Drawing.Point(275, 3);
-            this.LblActionable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.LblActionable.Margin = new System.Windows.Forms.Padding(3);
             this.LblActionable.Name = "LblActionable";
             this.LblActionable.Size = new System.Drawing.Size(87, 14);
             this.LblActionable.TabIndex = 4;
@@ -248,7 +248,7 @@
             this.LblConvCt.Location = new System.Drawing.Point(391, 0);
             this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
             this.LblConvCt.Name = "LblConvCt";
-            this.LblConvCt.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.LblConvCt.Padding = new System.Windows.Forms.Padding(3);
             this.LblConvCt.Size = new System.Drawing.Size(54, 30);
             this.LblConvCt.TabIndex = 3;
             this.LblConvCt.Text = "<#>";
@@ -260,7 +260,7 @@
             this.lblSubject.Location = new System.Drawing.Point(3, 0);
             this.lblSubject.Margin = new System.Windows.Forms.Padding(0);
             this.lblSubject.Name = "lblSubject";
-            this.lblSubject.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.lblSubject.Padding = new System.Windows.Forms.Padding(3);
             this.lblSubject.Size = new System.Drawing.Size(138, 30);
             this.lblSubject.TabIndex = 2;
             this.lblSubject.Text = "<SUBJECT>";
@@ -286,7 +286,7 @@
             this.LblPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblPos.ForeColor = System.Drawing.SystemColors.HighlightText;
             this.LblPos.Location = new System.Drawing.Point(2, 22);
-            this.LblPos.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.LblPos.Margin = new System.Windows.Forms.Padding(2);
             this.LblPos.Name = "LblPos";
             this.LblPos.Size = new System.Drawing.Size(46, 26);
             this.LblPos.TabIndex = 5;
@@ -302,9 +302,9 @@
             this.LblAcOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcOpen.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.LblAcOpen.Location = new System.Drawing.Point(23, 53);
-            this.LblAcOpen.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.LblAcOpen.Margin = new System.Windows.Forms.Padding(3);
             this.LblAcOpen.Name = "LblAcOpen";
-            this.LblAcOpen.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.LblAcOpen.Padding = new System.Windows.Forms.Padding(2);
             this.LblAcOpen.Size = new System.Drawing.Size(24, 22);
             this.LblAcOpen.TabIndex = 6;
             this.LblAcOpen.Text = "O";
