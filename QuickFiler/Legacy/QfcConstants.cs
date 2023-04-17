@@ -87,7 +87,7 @@ namespace QuickFiler
         //private static int frmWd = 655;
         //private static int frmLt = 12;
 
-        internal static ConstantGroup Panel { get => new ConstantGroup(width: 655, height: 96, left: 12); }
+        internal static ConstantGroup Panel { get => new ConstantGroup(width: 655, height: 112, left: 12); }
         internal static ConstantGroup Lbl1 { get => new ConstantGroup(width: 54, height: 16, left: 6, top: _topOffsetC); }
         internal static ConstantGroup Lbl2
         {
@@ -116,7 +116,7 @@ namespace QuickFiler
             get
             {
                 var cg = new ConstantGroup();
-                cg.Height = ScaledInt(16);
+                cg.Height = ScaledInt(32);
                 cg.Left = ScaledInt(6);
                 cg.Top = TopOffset + ScaledInt(16);
                 cg.Width = ScaledInt(354);
@@ -130,7 +130,7 @@ namespace QuickFiler
                 var cg = new ConstantGroup();
                 cg.Height = ScaledInt(56) - TopOffset;
                 cg.Left = ScaledInt(6);
-                cg.Top = TopOffset + ScaledInt(40);
+                cg.Top = TopOffset + ScaledInt(50);
                 cg.Width = ScaledInt(354);
                 return cg;
             }
