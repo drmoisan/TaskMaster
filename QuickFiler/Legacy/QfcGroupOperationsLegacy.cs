@@ -95,56 +95,46 @@ namespace QuickFiler
             if (intPosition == 0)
                 intPosition = intItemNumber;
 
-            if (intItemNumber * (QfcConstants.FrmHt + QfcConstants.FrmSp) + QfcConstants.FrmSp > _viewer.L1v1L2_PanelMain.Height)      // Was _heightPanelMainMax but I replaced with Me.Height
+            if (intItemNumber * (QfcConstants.Panel.Height + QfcConstants.FrmSp) + QfcConstants.FrmSp > _viewer.L1v1L2_PanelMain.Height)      // Was _heightPanelMainMax but I replaced with Me.Height
             {
                 _viewer.L1v1L2_PanelMain.AutoScroll = true;
             }
             // Min Me Size is frmSp * 2 + frmHt
-            var Frm = new Panel();
-            _viewer.L1v1L2_PanelMain.Controls.Add(Frm);
-            Frm.Height = QfcConstants.FrmHt;
-            Frm.Top = (QfcConstants.FrmSp + QfcConstants.FrmHt) * (intPosition - 1) + QfcConstants.FrmSp + QfcConstants.ScaledInt(16);
-            Frm.Left = QfcConstants.FrmLt;
-            Frm.Width = QfcConstants.FrmWd;
-            Frm.TabStop = false;
+            var Pnl = new Panel();
+            _viewer.L1v1L2_PanelMain.Controls.Add(Pnl);
+            Pnl.Height = QfcConstants.Panel.Height;
+            Pnl.Left = QfcConstants.Panel.Left;
+            Pnl.Width = QfcConstants.Panel.Width;
+            Pnl.Top = (QfcConstants.FrmSp + QfcConstants.Panel.Height) * (intPosition - 1) + QfcConstants.FrmSp + QfcConstants.ScaledInt(16);
 
-            Frm.BorderStyle = BorderStyle.FixedSingle;
-            colCtrls.Add(Frm);
+            Pnl.TabStop = false;
+
+            Pnl.BorderStyle = BorderStyle.FixedSingle;
+            colCtrls.Add(Pnl);
 
             if (blWideView)
             {
                 var lbl1 = new Label();
-                Frm.Controls.Add(lbl1);
-                lbl1.Height = QfcConstants.Lbl1.Height;
-                lbl1.Top = QfcConstants.Lbl1.Top;
-                lbl1.Left = QfcConstants.Lbl1.Left;
-                lbl1.Width = QfcConstants.Lbl1.Width;
+                Pnl.Controls.Add(lbl1);
+                AssignDimensions(ref lbl1, QfcConstants.Lbl1);
                 lbl1.Text = "From:";
                 lbl1.Font = new Font(lbl1.Font.FontFamily, 10f, FontStyle.Bold);
                 colCtrls.Add(lbl1);
             }  // blWideView
-
             if (blWideView)
             {
                 var lbl2 = new Label();
-                Frm.Controls.Add(lbl2);
-                lbl2.Height = QfcConstants.Lbl2.Height;
-                lbl2.Top = QfcConstants.Lbl2.Top;
-                lbl2.Left = QfcConstants.Lbl2.Left;
-                lbl2.Width = QfcConstants.Lbl2.Width;
+                Pnl.Controls.Add(lbl2);
+                AssignDimensions(ref lbl2, QfcConstants.Lbl2);
                 lbl2.Text = "Subject:";
                 lbl2.Font = new Font(lbl2.Font.FontFamily, 10f, FontStyle.Bold);
                 colCtrls.Add(lbl2);
             }  // blWideView
-
             if (blWideView)
             {
                 var lbl3 = new Label();
-                Frm.Controls.Add(lbl3);
-                lbl3.Height = QfcConstants.Lbl3.Height;
-                lbl3.Top = QfcConstants.Lbl3.Top;
-                lbl3.Left = QfcConstants.Lbl3.Left;
-                lbl3.Width = QfcConstants.Lbl3.Width;
+                Pnl.Controls.Add(lbl3);
+                AssignDimensions(ref lbl3, QfcConstants.Lbl3);
                 lbl3.Text = "Body:";
                 lbl3.Font = new Font(lbl3.Font.FontFamily, 10f, FontStyle.Bold);
                 colCtrls.Add(lbl3);
@@ -154,105 +144,51 @@ namespace QuickFiler
             {
                 // TURN OFF IF CONDITIONAL REMINDER
                 var lbl5 = new Label();
-                Frm.Controls.Add(lbl5);
-
-                lbl5.Height = QfcConstants.Lbl5.Height;
-                lbl5.Top = QfcConstants.Lbl5.Top;
-                lbl5.Left = QfcConstants.Lbl5.Left;
-                lbl5.Width = QfcConstants.Lbl5.Width;
+                Pnl.Controls.Add(lbl5);
+                AssignDimensions(ref lbl5, QfcConstants.Lbl5);
                 lbl5.Text = "Folder:";
                 lbl5.Font = new Font(lbl5.Font.FontFamily, 10f, FontStyle.Bold);
                 colCtrls.Add(lbl5);
             }
 
             var lblSender = new Label();
-            Frm.Controls.Add(lblSender);
+            Pnl.Controls.Add(lblSender);
+            AssignDimensions(ref lblSender, QfcConstants.LblSender);
 
-            lblSender.Height = QfcConstants.LblSender.Height;
-            lblSender.Top = QfcConstants.LblSender.Top;
-            lblSender.Left = QfcConstants.LblSender.Left;
-            lblSender.Width = QfcConstants.LblSender.Width;
             lblSender.Text = "<SENDER>";
             lblSender.Font = new Font(lblSender.Font.FontFamily, 10f);
             colCtrls.Add(lblSender);
 
             var lblTriage = new Label();
-            Frm.Controls.Add(lblTriage);
-            lblTriage.Height = QfcConstants.LblTriage.Height;
-            lblTriage.Top = QfcConstants.LblTriage.Top;
-            lblTriage.Left = QfcConstants.LblTriage.Left;
-            lblTriage.Width = QfcConstants.LblTriage.Width;
+            Pnl.Controls.Add(lblTriage);
+            AssignDimensions(ref lblTriage, QfcConstants.LblTriage);
+
             lblTriage.Text = "ABC";
             lblTriage.Font = new Font(lblTriage.Font.FontFamily, 10f);
             colCtrls.Add(lblTriage);
 
             var lblActionable = new Label();
-            Frm.Controls.Add(lblActionable);
-            lblActionable.Height = QfcConstants.LblActionable.Height;
-            lblActionable.Top = QfcConstants.LblActionable.Top;
-            lblActionable.Left = QfcConstants.LblActionable.Left;
-            lblActionable.Width = QfcConstants.LblActionable.Width;
+            Pnl.Controls.Add(lblActionable);
+            AssignDimensions(ref lblActionable, QfcConstants.LblActionable);
 
             lblActionable.Text = "<ACTIONABL>";
             lblActionable.Font = new Font(lblActionable.Font.FontFamily, 10f);
             colCtrls.Add(lblActionable);
             var lblSubject = new Label();
-            Frm.Controls.Add(lblSubject);
+            Pnl.Controls.Add(lblSubject);
+            AssignDimensions(ref lblSubject, QfcConstants.LblSubject);
 
-            if (blWideView)
-            {
-                lblSubject.Height = QfcConstants.Lbl_height16;
-                lblSubject.Top = (int)(lngTopOff) + QfcConstants.Space32;
-                lblSubject.Left = (int)QfcConstants.Left_lblSubject;
-                lblSubject.Width = (int)QfcConstants.Width_lblSubject;
-                lblSubject.Font = new Font(lblSubject.Font.FontFamily, 10f);
-            }
-            else if (_initType.HasFlag(Enums.InitTypeEnum.InitConditionalReminder))
-            {
-                lblSubject.Height = QfcConstants.Lbl_height24;
-                lblSubject.Top = (int)(lngTopOff)+QfcConstants.Space16;
-                lblSubject.Left = (int)QfcConstants.Left_lblSubject_C;
-                lblSubject.Width = QfcConstants.FrmWd - lblSubject.Left - lblSubject.Left;
-                lblSubject.Font = new Font(lblSubject.Font.FontFamily, 16f);
-            }
-            else
-            {
-                lblSubject.Height = QfcConstants.Lbl_height24;
-                lblSubject.Top = (int)(lngTopOff) + QfcConstants.Space16;
-                lblSubject.Left = (int)QfcConstants.Left_lblSubject_C;
-                lblSubject.Width = (int)QfcConstants.Width_lblSubject_C;
-                lblSubject.Font = new Font(lblSubject.Font.FontFamily, 16f);
-            }
-
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitConditionalReminder))
+                lblSubject.Width -= (2 * lblSubject.Left);
+            lblSubject.Font = new Font(lblSubject.Font.FontFamily, 16f);
             lblSubject.Text = "<SUBJECT>";
             colCtrls.Add(lblSubject);
 
             var txtboxBody = new TextBox();
-            Frm.Controls.Add(txtboxBody);
-
-            if (blWideView)
-            {
-                txtboxBody.Top = (int)(lngTopOff + 36L);
-                txtboxBody.Left = (int)QfcConstants.Left_lblBody;
-                txtboxBody.Width = (int)QfcConstants.Width_lblBody;
-                txtboxBody.Height = QfcConstants.Space48-(int)(lngTopOff);
-            }
-            else if (_initType.HasFlag(Enums.InitTypeEnum.InitConditionalReminder))
-            {
-                txtboxBody.Top = (int)(lngTopOff)+ QfcConstants.Space40;
-                txtboxBody.Left = (int)QfcConstants.Left_lblBody_C;
-                txtboxBody.Width = QfcConstants.FrmWd - txtboxBody.Left - txtboxBody.Left;
-                txtboxBody.Height = QfcConstants.Space56-(int)(lngTopOff);
-            }
-            else
-            {
-                txtboxBody.Top = (int)(lngTopOff)+QfcConstants.Space40;
-                txtboxBody.Left = (int)QfcConstants.Left_lblBody_C;
-                txtboxBody.Width = (int)QfcConstants.Width_lblBody_C;
-                txtboxBody.Height = QfcConstants.Space56-(int)(lngTopOff);
-
-            }
-
+            Pnl.Controls.Add(txtboxBody);
+            AssignDimensions(ref txtboxBody, QfcConstants.TxtBody);
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitConditionalReminder))
+                txtboxBody.Width = QfcConstants.Panel.Width - txtboxBody.Left - txtboxBody.Left;
             txtboxBody.Text = "<BODY>";
             txtboxBody.Font = new Font(txtboxBody.Font.FontFamily, 10f);
             txtboxBody.WordWrap = true;
@@ -262,38 +198,28 @@ namespace QuickFiler
             colCtrls.Add(txtboxBody);
 
             var lblSentOn = new Label();
-            Frm.Controls.Add(lblSentOn);
-            lblSentOn.Height = QfcConstants.Lbl_height16;
-            if (blWideView)
-            {
-                lblSentOn.Top = (int)(lngTopOff)+QfcConstants.Space16;
-                lblSentOn.Left = (int)QfcConstants.Left_lblSentOn;
-                lblSentOn.TextAlign = ContentAlignment.TopLeft; // fmTextAlignLeft
-            }
-            else
-            {
-                lblSentOn.Top = (int)lngTopOff;
-                lblSentOn.Left = (int)QfcConstants.Left_lblSentOn_C;
-                lblSentOn.TextAlign = ContentAlignment.TopRight;
-            } // fmTextAlignRight
+            Pnl.Controls.Add(lblSentOn);
+            AssignDimensions(ref lblSentOn, QfcConstants.LblSentOn);
 
-            lblSentOn.Width = QfcConstants.Width_lblSentOn;
+            lblSentOn.TextAlign = ContentAlignment.TopRight;            
             lblSentOn.Text = "<SENTON>";
             lblSentOn.Font = new Font(lblSentOn.Font.FontFamily, 10f);
             colCtrls.Add(lblSentOn);
 
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
-                var cbxFolder = new ComboBox();
-                Frm.Controls.Add(cbxFolder);
-                cbxFolder.Height = QfcConstants.Lbl_height24;
-                cbxFolder.Top = (int)(27L + lngTopOff);
-                cbxFolder.Left = (int)QfcConstants.Left_cbxFolder;
-                cbxFolder.Width = (int)QfcConstants.Width_cbxFolder;
-                cbxFolder.Font = new Font(cbxFolder.Font.FontFamily, 8f);
-                cbxFolder.TabStop = false;
-                cbxFolder.DropDownStyle = ComboBoxStyle.DropDownList;
-                colCtrls.Add(cbxFolder);
+                var comboFolder = new ComboBox();
+                Pnl.Controls.Add(comboFolder);
+                
+                
+                comboFolder.Height = QfcConstants.ComboFolder.Height;
+                comboFolder.Top = QfcConstants.ComboFolder.Top;
+                comboFolder.Left = QfcConstants.ComboFolder.Left;
+                comboFolder.Width = QfcConstants.ComboFolder.Width;
+                comboFolder.Font = new Font(comboFolder.Font.FontFamily, 8f);
+                comboFolder.TabStop = false;
+                comboFolder.DropDownStyle = ComboBoxStyle.DropDownList;
+                colCtrls.Add(comboFolder);
             }
 
             var chbxGPConv = new CheckBox();
@@ -303,100 +229,62 @@ namespace QuickFiler
             var inpt = new TextBox();
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
-                Frm.Controls.Add(inpt);
-                inpt.Height = QfcConstants.Lbl_height24;
-                inpt.Top = (int)lngTopOff;
-                inpt.Left = (int)QfcConstants.Left_inpt;
-                inpt.Width = (int)QfcConstants.Width_inpt;
+                Pnl.Controls.Add(inpt);
+                inpt.Height = QfcConstants.Inpt.Height;
+                inpt.Top = QfcConstants.Inpt.Top;
+                inpt.Left = QfcConstants.Inpt.Left;
+                inpt.Width = QfcConstants.Inpt.Width;                
                 inpt.Font = new Font(inpt.Font.FontFamily, 10f);
                 inpt.TabStop = false;
-
                 inpt.BackColor = SystemColors.Control;
                 colCtrls.Add(inpt);
 
-                Frm.Controls.Add(chbxSaveMail);
-
-                chbxSaveMail.Height = QfcConstants.Lbl_height16;
-                chbxSaveMail.Width = QfcConstants.Width_chbxSaveMail; 
+                Pnl.Controls.Add(chbxSaveMail);
+                AssignDimensions(ref chbxSaveMail, QfcConstants.CheckboxSaveMail);                
                 chbxSaveMail.Font = new Font(chbxSaveMail.Font.FontFamily, 10f);
                 chbxSaveMail.Text = " Mail";
                 chbxSaveMail.Checked = false;
-                chbxSaveMail.TabStop = false;
-                if (blWideView)
-                {
-                }
-
-                else
-                {
-                    chbxSaveMail.Top = (int)(lngTopOff) + QfcConstants.Space48;
-                    chbxSaveMail.Left = (int)(QfcConstants.Right_Aligned - chbxSaveMail.Width);
-                }
+                chbxSaveMail.TabStop = false;                
                 colCtrls.Add(chbxSaveMail);
 
-                Frm.Controls.Add(chbxDelFlow);
+                Pnl.Controls.Add(chbxDelFlow);
+                
 
-                chbxDelFlow.Height = QfcConstants.Lbl_height16;
-                chbxDelFlow.Width = 45;
+                chbxDelFlow.Height = QfcConstants.CheckboxDelFlow.Height;
+                chbxDelFlow.Width = QfcConstants.CheckboxDelFlow.Width;
+                chbxDelFlow.Top = QfcConstants.CheckboxDelFlow.Top;
+                chbxDelFlow.Left = chbxSaveMail.Left - chbxDelFlow.Width - QfcConstants.ScaledInt(1);
                 chbxDelFlow.Font = new Font(chbxDelFlow.Font.FontFamily, 10f);
                 chbxDelFlow.Text = " Flow";
                 chbxDelFlow.Checked = false;
                 chbxDelFlow.TabStop = false;
-
-                if (blWideView)
-                {
-                }
-
-                else
-                {
-                    chbxDelFlow.Top = (int)(47L + lngTopOff);
-                    chbxDelFlow.Left = chbxSaveMail.Left - chbxDelFlow.Width - 1;
-
-                }
                 colCtrls.Add(chbxDelFlow);
 
-                Frm.Controls.Add(chbxSaveAttach);
-
-                chbxSaveAttach.Height = 16;
-                chbxSaveAttach.Width = 50;
+                Pnl.Controls.Add(chbxSaveAttach);
+                chbxSaveAttach.Height = QfcConstants.CheckboxSaveAttachment.Height;
+                chbxSaveAttach.Width = QfcConstants.CheckboxSaveAttachment.Width;
+                chbxSaveAttach.Top = QfcConstants.CheckboxSaveAttachment.Top;
+                chbxSaveAttach.Left = chbxDelFlow.Left - chbxSaveAttach.Width - QfcConstants.ScaledInt(1);
                 chbxSaveAttach.Font = new Font(chbxSaveAttach.Font.FontFamily, 10f);
                 chbxSaveAttach.Text = " Attach";
                 chbxSaveAttach.Checked = true;
                 chbxSaveAttach.TabStop = false;
-
-                if (blWideView)
-                {
-                }
-
-                else
-                {
-                    chbxSaveAttach.Top = (int)(47L + lngTopOff);
-                    chbxSaveAttach.Left = chbxDelFlow.Left - chbxSaveAttach.Width - 1;
-
-                }
                 colCtrls.Add(chbxSaveAttach);
 
-                Frm.Controls.Add(chbxGPConv);
-                chbxGPConv.Height = 16;
-                chbxGPConv.Width = 81;
+                Pnl.Controls.Add(chbxGPConv);
+                chbxGPConv.Height = QfcConstants.CheckboxGroupConversations.Height;
+                chbxGPConv.Width = QfcConstants.CheckboxGroupConversations.Width;
+                chbxGPConv.Top = QfcConstants.CheckboxGroupConversations.Top;
+                chbxGPConv.Left = chbxSaveAttach.Left - chbxGPConv.Width - QfcConstants.ScaledInt(1);
                 chbxGPConv.Font = new Font(chbxGPConv.Font.FontFamily, 10f);
                 chbxGPConv.Text = "  Conversation";
                 chbxGPConv.Checked = blGroupConversation;
-                chbxGPConv.TabStop = false;
-                if (blWideView)
-                {
-                    chbxGPConv.Top = (int)lngTopOff;
-                    chbxGPConv.Left = (int)QfcConstants.Left_chbxGPConv;
-                }
-                else
-                {
-                    chbxGPConv.Top = (int)(47L + lngTopOff);
-                    chbxGPConv.Left = chbxSaveAttach.Left - chbxGPConv.Width - 1;
-                }
+                chbxGPConv.TabStop = false;                
                 colCtrls.Add(chbxGPConv);
             }
 
             var cbFlagItem = new Button();
-            Frm.Controls.Add(cbFlagItem);
+            Pnl.Controls.Add(cbFlagItem);
             cbFlagItem.Height = 24;
             cbFlagItem.Top = (int)lngTopOff;
             cbFlagItem.Left = (int)QfcConstants.Left_cbFlagItem;
@@ -409,7 +297,7 @@ namespace QuickFiler
             colCtrls.Add(cbFlagItem);
 
             var cbKllItem = new Button();
-            Frm.Controls.Add(cbKllItem);
+            Pnl.Controls.Add(cbKllItem);
             cbKllItem.Height = 24;
             cbKllItem.Top = (int)lngTopOff;
             cbKllItem.Left = (int)(cbFlagItem.Left + QfcConstants.Width_cb + 2L);
@@ -422,7 +310,7 @@ namespace QuickFiler
             colCtrls.Add(cbKllItem);
 
             var cbDelItem = new Button();
-            Frm.Controls.Add(cbDelItem);
+            Pnl.Controls.Add(cbDelItem);
             cbDelItem.Height = 24;
             cbDelItem.Top = (int)lngTopOff;
             cbDelItem.Left = (int)(cbKllItem.Left + QfcConstants.Width_cb + 2L);
@@ -437,44 +325,20 @@ namespace QuickFiler
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
                 var lblConvCt = new Label();
-                Frm.Controls.Add(lblConvCt);
-                lblConvCt.Height = 24;
+                Pnl.Controls.Add(lblConvCt);
+                AssignDimensions(ref lblConvCt, QfcConstants.LblConversationCt);                
+                lblConvCt.Font = new Font(lblConvCt.Font.FontFamily, 16f);
                 lblConvCt.TextAlign = ContentAlignment.TopRight; // fmTextAlignRight
-
-                if (blWideView)
-                {
-                    lblConvCt.Left = (int)QfcConstants.Left_lblConvCt;
-                    lblConvCt.Top = (int)lngTopOff;
-                }
-                else
-                {
-                    lblConvCt.Left = (int)QfcConstants.Left_lblConvCt_C;
-                    lblConvCt.Top = (int)(lngTopOff + 16L);
-                }
-                lblConvCt.Width = 36;
                 lblConvCt.Text = "<#>";
-                if (blWideView)
-                {
-                    lblConvCt.Font = new Font(lblConvCt.Font.FontFamily, 12f);
-                }
-                else
-                {
-                    lblConvCt.Font = new Font(lblConvCt.Font.FontFamily, 16f);
-                }
-
-
+            
                 lblConvCt.Enabled = blGroupConversation;
                 colCtrls.Add(lblConvCt);
             }
 
             var lblPos = new Label();
-            Frm.Controls.Add(lblPos);
+            Pnl.Controls.Add(lblPos);
             lblPos.Height = 20;
-            lblPos.Top = (int)lngTopOff;
-
-            lblPos.Left = blWideView ? 6 : 0;
-
-            lblPos.Width = 20;
+            AssignDimensions(ref lblPos, QfcConstants.LblPos);
             lblPos.Text = "<Pos#>";
             lblPos.Font = new Font(lblPos.Font.FontFamily, 10f, FontStyle.Bold);
             lblPos.BackColor = SystemColors.ControlText;
@@ -486,28 +350,20 @@ namespace QuickFiler
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
                 var lblAcF = new Label();
-                Frm.Controls.Add(lblAcF);
-                lblAcF.Height = 14;
-                lblAcF.Top = (int)Math.Max(lngTopOff - 2L, 0L);
-                lblAcF.Left = 363;
-                lblAcF.Width = 14;
+                Pnl.Controls.Add(lblAcF);
+                AssignDimensions(ref lblAcF, QfcConstants.LblAcF);
                 lblAcF.Text = "F";
                 lblAcF.Font = new Font(lblAcF.Font.FontFamily, 10f, FontStyle.Bold);
                 lblAcF.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
                 lblAcF.TextAlign = ContentAlignment.TopCenter;  // fmTextAlignCenter
-                // .SpecialEffect = fmSpecialEffectBump
                 lblAcF.BackColor = SystemColors.ControlText;
                 lblAcF.ForeColor = SystemColors.Control;
-
                 lblAcF.Visible = blDebug;
                 colCtrls.Add(lblAcF);
 
                 var lblAcD = new Label();
-                Frm.Controls.Add(lblAcD);
-                lblAcD.Height = 14;
-                lblAcD.Top = (int)(20L + lngTopOff);
-                lblAcD.Left = 363;
-                lblAcD.Width = 14;
+                Pnl.Controls.Add(lblAcD);
+                AssignDimensions(ref lblAcD, QfcConstants.LblAcD);
                 lblAcD.Text = "D";
                 lblAcD.Font = new Font(lblAcD.Font.FontFamily, 10f, FontStyle.Bold);
                 lblAcD.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
@@ -519,16 +375,16 @@ namespace QuickFiler
                 colCtrls.Add(lblAcD);
 
                 var lblAcC = new Label();
-                Frm.Controls.Add(lblAcC);
-                lblAcC.Height = 14;
-                lblAcC.Top = (int)(lngTopOff + 47L);
-                lblAcC.Left = chbxGPConv.Left + 12;
-                lblAcC.Width = 14;
+                Pnl.Controls.Add(lblAcC);
+                
+                lblAcC.Height = QfcConstants.LblAcC.Height;
+                lblAcC.Top = QfcConstants.LblAcC.Top;
+                lblAcC.Width = QfcConstants.LblAcC.Width;
+                lblAcC.Left = chbxGPConv.Left + QfcConstants.ScaledInt(12);
                 lblAcC.Text = "C";
                 lblAcC.Font = new Font(lblAcC.Font.FontFamily, 10f, FontStyle.Bold);
                 lblAcC.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
                 lblAcC.TextAlign = ContentAlignment.TopCenter;  // fmTextAlignCenter
-                // .SpecialEffect = fmSpecialEffectBump
                 lblAcC.BackColor = SystemColors.ControlText;
                 lblAcC.ForeColor = SystemColors.Control;
                 lblAcC.Visible = blDebug;
@@ -536,39 +392,39 @@ namespace QuickFiler
             }
 
             var lblAcR = new Label();
-            Frm.Controls.Add(lblAcR);
-            lblAcR.Height = 14;
-            lblAcR.Top = (int)(2L + lngTopOff);
-            lblAcR.Left = cbKllItem.Left + 6;
-            lblAcR.Width = 14;
+            Pnl.Controls.Add(lblAcR);
+
+            lblAcR.Height = QfcConstants.LblAcR.Height;
+            lblAcR.Top = QfcConstants.LblAcR.Top;
+            lblAcR.Width = QfcConstants.LblAcR.Width;
+            lblAcR.Left = cbKllItem.Left + QfcConstants.ScaledInt(6);
             lblAcR.Text = "R";
             lblAcR.Font = new Font(lblAcR.Font.FontFamily, 10f, FontStyle.Bold);
             lblAcR.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
             lblAcR.TextAlign = ContentAlignment.TopCenter;  // fmTextAlignCenter
-            // .SpecialEffect = fmSpecialEffectBump
             lblAcR.BackColor = SystemColors.ControlText;
             lblAcR.ForeColor = SystemColors.Control;
             lblAcR.Visible = blDebug;
             colCtrls.Add(lblAcR);
 
             var lblAcX = new Label();
-            Frm.Controls.Add(lblAcX);
-            lblAcX.Height = 14;
-            lblAcX.Top = (int)(2L + lngTopOff);
-            lblAcX.Left = cbDelItem.Left + 6;
-            lblAcX.Width = 14;
+            Pnl.Controls.Add(lblAcX);
+            
+            lblAcX.Height = QfcConstants.LblAcX.Height;
+            lblAcX.Top = QfcConstants.LblAcX.Top;
+            lblAcX.Left = cbDelItem.Left + QfcConstants.ScaledInt(6);
+            lblAcX.Width = QfcConstants.LblAcX.Width;
             lblAcX.Text = "X";
             lblAcX.Font = new Font(lblAcX.Font.FontFamily, 10f, FontStyle.Bold);
             lblAcX.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
             lblAcX.TextAlign = ContentAlignment.TopCenter;  // fmTextAlignCenter
-            // .SpecialEffect = fmSpecialEffectBump
             lblAcX.BackColor = SystemColors.ControlText;
             lblAcX.ForeColor = SystemColors.Control;
             lblAcX.Visible = blDebug;
             colCtrls.Add(lblAcX);
 
             var lblAcT = new Label();
-            Frm.Controls.Add(lblAcT);
+            Pnl.Controls.Add(lblAcT);
             lblAcT.Height = 14;
             lblAcT.Top = (int)(2L + lngTopOff);
             lblAcT.Left = cbFlagItem.Left + 6;
@@ -577,32 +433,18 @@ namespace QuickFiler
             lblAcT.Font = new Font(lblAcT.Font.FontFamily, 10f, FontStyle.Bold);
             lblAcT.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
             lblAcT.TextAlign = ContentAlignment.TopCenter;  // fmTextAlignCenter
-            // .SpecialEffect = fmSpecialEffectBump
             lblAcT.BackColor = SystemColors.ControlText;
             lblAcT.ForeColor = SystemColors.Control;
             lblAcT.Visible = blDebug;
             colCtrls.Add(lblAcT);
 
             var lblAcO = new Label();
-            Frm.Controls.Add(lblAcO);
-            lblAcO.Height = 14;
-
-            if (blWideView)
-            {
-                lblAcO.Top = (int)(36L + lngTopOff);
-                lblAcO.Left = (int)QfcConstants.Left_lblAcO_C;
-            }
-            else
-            {
-                lblAcO.Top = txtboxBody.Top;
-                lblAcO.Left = (int)QfcConstants.Left_lblAcO_C;
-            }
-            lblAcO.Width = 14;
+            Pnl.Controls.Add(lblAcO);
+            AssignDimensions(ref lblAcO, QfcConstants.LblAcO);            
             lblAcO.Text = "O";
             lblAcO.Font = new Font(lblAcO.Font.FontFamily, 10f, FontStyle.Bold);
             lblAcO.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
             lblAcO.TextAlign = ContentAlignment.TopCenter;  // fmTextAlignCenter
-            // .SpecialEffect = fmSpecialEffectBump
             lblAcO.BackColor = SystemColors.ControlText;
             lblAcO.ForeColor = SystemColors.Control;
             lblAcO.Visible = blDebug;
@@ -611,45 +453,20 @@ namespace QuickFiler
             if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
             {
                 var lblAcA = new Label();
-                Frm.Controls.Add(lblAcA);
-                lblAcA.Height = 14;
-
-                if (blWideView)
-                {
-                    lblAcA.Top = (int)(36L + lngTopOff);
-                    lblAcA.Left = chbxSaveAttach.Left + 10;
-                }
-                else
-                {
-                    lblAcA.Top = chbxSaveAttach.Top;
-                    lblAcA.Left = chbxSaveAttach.Left + 10;
-                }
-                lblAcA.Width = 14;
+                Pnl.Controls.Add(lblAcA);
+                AssignDimensions(ref lblAcA, QfcConstants.LblAcA);
                 lblAcA.Text = "A";
                 lblAcA.Font = new Font(lblAcA.Font.FontFamily, 10f, FontStyle.Bold);
                 lblAcA.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
                 lblAcA.TextAlign = ContentAlignment.TopCenter;  // fmTextAlignCenter
-                // .SpecialEffect = fmSpecialEffectBump
                 lblAcA.BackColor = SystemColors.ControlText;
                 lblAcA.ForeColor = SystemColors.Control;
                 lblAcA.Visible = blDebug;
                 colCtrls.Add(lblAcA);
 
                 var lblAcW = new Label();
-                Frm.Controls.Add(lblAcW);
-                lblAcW.Height = 14;
-
-                if (blWideView)
-                {
-                    lblAcW.Top = (int)(36L + lngTopOff);
-                    lblAcW.Left = chbxDelFlow.Left + 29;
-                }
-                else
-                {
-                    lblAcW.Top = chbxDelFlow.Top;
-                    lblAcW.Left = chbxDelFlow.Left + 29;
-                }
-                lblAcW.Width = 14;
+                Pnl.Controls.Add(lblAcW);
+                AssignDimensions(ref lblAcW, QfcConstants.LblAcW);                                
                 lblAcW.Text = "W";
                 lblAcW.Font = new Font(lblAcW.Font.FontFamily, 10f, FontStyle.Bold);
                 lblAcW.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
@@ -660,20 +477,8 @@ namespace QuickFiler
                 colCtrls.Add(lblAcW);
 
                 var lblAcM = new Label();
-                Frm.Controls.Add(lblAcM);
-                lblAcM.Height = 14;
-
-                if (blWideView)
-                {
-                    lblAcM.Top = (int)(36L + lngTopOff);
-                    lblAcM.Left = chbxSaveMail.Left + 10;
-                }
-                else
-                {
-                    lblAcM.Top = chbxSaveMail.Top;
-                    lblAcM.Left = chbxSaveMail.Left + 10;
-                }
-                lblAcM.Width = 14;
+                Pnl.Controls.Add(lblAcM);
+                AssignDimensions(ref lblAcM, QfcConstants.LblAcM);                
                 lblAcM.Text = "M";
                 lblAcM.Font = new Font(lblAcM.Font.FontFamily, 10f, FontStyle.Bold);
                 lblAcM.BorderStyle = BorderStyle.Fixed3D; // fmBorderStyleSingle
@@ -686,6 +491,28 @@ namespace QuickFiler
 
 
 
+        }
+
+        private void AssignDimensions(ref Label lbl, QfcConstants.ConstantGroup constantGroup) 
+        {
+            lbl.Height = constantGroup.Height;
+            lbl.Width = constantGroup.Width;
+            lbl.Left = constantGroup.Left;
+            lbl.Top = constantGroup.Top;
+        }
+        private void AssignDimensions(ref CheckBox checkBox, QfcConstants.ConstantGroup constantGroup)
+        {
+            checkBox.Height = constantGroup.Height;
+            checkBox.Width = constantGroup.Width;
+            checkBox.Left = constantGroup.Left;
+            checkBox.Top = constantGroup.Top;
+        }
+        private void AssignDimensions(ref TextBox textBox, QfcConstants.ConstantGroup constantGroup)
+        {
+            textBox.Height = constantGroup.Height;
+            textBox.Width = constantGroup.Width;
+            textBox.Left = constantGroup.Left;
+            textBox.Top = constantGroup.Top;
         }
 
         internal void RemoveControls()
@@ -726,7 +553,7 @@ namespace QuickFiler
                 QF = (QfcController)_listQFClass[i];
                 QF.Position += intMoves;
                 ctlFrame = QF.ItemPanel;
-                ctlFrame.Top = ctlFrame.Top + intMoves * (QfcConstants.FrmHt + QfcConstants.FrmSp);
+                ctlFrame.Top = ctlFrame.Top + intMoves * (QfcConstants.Panel.Height + QfcConstants.FrmSp);
             }
             // PanelMain.ScrollHeight = max((intMoves + _listQFClass.Count) * (frmHt + frmSp), _heightPanelMainMax)
         }
@@ -866,7 +693,7 @@ namespace QuickFiler
                     QF = (QfcController)_listQFClass[i];
                     QF.Position -= 1;
                     ctlFrame = QF.ItemPanel;
-                    ctlFrame.Top = ctlFrame.Top - QfcConstants.FrmHt - QfcConstants.FrmSp;
+                    ctlFrame.Top = ctlFrame.Top - QfcConstants.Panel.Height - QfcConstants.FrmSp;
                 }
                 // _viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
             }
@@ -969,9 +796,9 @@ namespace QuickFiler
                 {
                     if (QF.BlHasChild)
                     {
-                        QF.ItemPanel.Left = QfcConstants.FrmLt * 2;
-                        QF.ItemPanel.Width = (int)(QfcConstants.Width_frm + intDiffx - QfcConstants.FrmLt);
-                        QF.ResizeCtrls(intDiffx - QfcConstants.FrmLt);
+                        QF.ItemPanel.Left = QfcConstants.Panel.Height * 2;
+                        QF.ItemPanel.Width = (int)(QfcConstants.Width_frm + intDiffx - QfcConstants.Panel.Height);
+                        QF.ResizeCtrls(intDiffx - QfcConstants.Panel.Height);
                     }
                     else
                     {

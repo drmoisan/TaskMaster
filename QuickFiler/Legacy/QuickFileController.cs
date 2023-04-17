@@ -152,7 +152,7 @@ namespace QuickFiler
             InitializeToleranceMinimums();
             _heightPanelMainMax = ResizeForToleranceMax();
              
-            _intEmailsPerIteration = (int)Math.Round(_heightPanelMainMax / ((double)(QfcConstants.FrmHt + QfcConstants.FrmSp)), 0);
+            _intEmailsPerIteration = (int)Math.Round(_heightPanelMainMax / ((double)(QfcConstants.Panel.Height + QfcConstants.FrmSp)), 0);
             _viewer.L1v2L2h5_SpnEmailPerLoad.Value = _intEmailsPerIteration;
 
             _blSuppressEvents = false;
@@ -193,8 +193,8 @@ namespace QuickFiler
         private void InitializeToleranceMinimums()
         {
             _lngPanelMainSCTop = 0L;
-            _heightFormMin = _viewer.Height + QfcConstants.FrmHt + QfcConstants.FrmSp;
-            _heightPanelMainMin = QfcConstants.FrmHt + QfcConstants.FrmSp;
+            _heightFormMin = _viewer.Height + QfcConstants.Panel.Height + QfcConstants.FrmSp;
+            _heightPanelMainMin = QfcConstants.Panel.Height + QfcConstants.FrmSp;
             _lngTopButtonOkMin = _viewer.L1v2L2h3_ButtonOK.Top;
             _lngTopButtonCancelMin = _viewer.L1v2L2h4_ButtonCancel.Top;
             _lngTopButtonUndoMin = _viewer.L1v2L2h4_ButtonUndo.Top;
