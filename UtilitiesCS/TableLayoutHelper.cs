@@ -9,7 +9,30 @@ namespace UtilitiesCS
 {
     public static class TableLayoutHelper
     {
-        public static void RemoveArbitraryRow(TableLayoutPanel panel, int rowIndex)
+        public static void InsertSpecificRow(TableLayoutPanel panel, int rowIndex, RowStyle newStyle) 
+        {
+            if ((rowIndex < 0)||(rowIndex>panel.RowCount))
+            {
+                throw new ArgumentOutOfRangeException(nameof(rowIndex));
+            }
+            panel.RowCount++;
+            panel.RowStyles.Insert(rowIndex, newStyle);
+
+            for (int i = panel.RowCount - 1; i >= rowIndex; i--)
+            {
+                for (int j = 0; j < panel.ColumnCount; j++)
+                {
+                    var control = panel.GetControlFromPosition(j, i);
+                    if (control != null)
+                    {
+                        panel.SetRow(control, i + 1);
+                    }
+                }
+            }
+
+        }
+
+        public static void RemoveSpecificRow(TableLayoutPanel panel, int rowIndex)
         {
             if (rowIndex >= panel.RowCount)
             {
@@ -44,7 +67,7 @@ namespace UtilitiesCS
             panel.RowCount--;
         }
 
-        public static void RemoveArbitraryColumn(TableLayoutPanel panel, int colIndex)
+        public static void RemoveSpecificColumn(TableLayoutPanel panel, int colIndex)
         {
             if (colIndex >= panel.ColumnCount)
             {

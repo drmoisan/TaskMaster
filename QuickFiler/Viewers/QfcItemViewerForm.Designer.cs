@@ -1,6 +1,6 @@
 ﻿namespace QuickFiler
 {
-	partial class QfcViewer
+	partial class QfcItemViewerForm
     {
 		/// <summary>
 		/// Required designer variable.
@@ -697,7 +697,7 @@
             this.LblAcEmail.TabIndex = 16;
             this.LblAcEmail.Text = "E";
             // 
-            // QfcViewer
+            // QfcItemViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -705,7 +705,7 @@
             this.ClientSize = new System.Drawing.Size(1078, 112);
             this.Controls.Add(this.L1h);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "QfcViewer";
+            this.Name = "QfcItemViewerForm";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.QfcViewer_Paint);
             this.L1h.Panel1.ResumeLayout(false);
             this.L1h.Panel2.ResumeLayout(false);

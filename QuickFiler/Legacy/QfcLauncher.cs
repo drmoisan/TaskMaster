@@ -7,9 +7,9 @@ using UtilitiesCS;
 namespace QuickFiler
 {
 
-    public class QfcLauncher
+    public class QfcLauncher 
     {
-        private QfcFormViewer _viewer;
+        private QfcFormLegacyViewer _viewer;
         private QuickFileController _controller;
         private IApplicationGlobals _globals;
         public delegate void ParentCleanupFunction();
@@ -19,7 +19,7 @@ namespace QuickFiler
         {
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
-            _viewer = new QfcFormViewer();
+            _viewer = new QfcFormLegacyViewer();
             
             var listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()); //as List<MailItem>;
             Queue<MailItem> MasterQueue = new Queue<MailItem>();
@@ -32,7 +32,7 @@ namespace QuickFiler
 
         public void Run()
         {
-            // _viewer.Show()
+            // _formViewer.Show()
         }
 
         public bool Loaded
@@ -41,7 +41,7 @@ namespace QuickFiler
             {
                 if (_viewer is not null)
                 {
-                    // If _viewer.IsDisposed = False Then
+                    // If _formViewer.IsDisposed = False Then
                     return true;
                 }
                 // Else

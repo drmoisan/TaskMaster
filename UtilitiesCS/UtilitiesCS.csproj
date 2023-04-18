@@ -118,6 +118,9 @@
     <Compile Include="RecentsList.cs" />
     <Compile Include="SerializableList.cs" />
     <Compile Include="MyBoxController.cs" />
+    <Compile Include="StackGeek.cs" />
+    <Compile Include="StackObjectCS.cs" />
+    <Compile Include="StackObjectCSconv.cs" />
     <Compile Include="TableLayoutHelper.cs" />
     <Compile Include="YesNoToAll.cs" />
   </ItemGroup>

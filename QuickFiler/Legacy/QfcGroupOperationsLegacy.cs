@@ -17,7 +17,7 @@ namespace QuickFiler
     /// </summary>
     internal class QfcGroupOperationsLegacy : IAcceleratorCallbacks, IQfcControllerCallbacks
     {
-        private readonly QfcFormViewer _viewer;
+        private readonly QfcFormLegacyViewer _viewer;
         private readonly Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private List<QfcController> _listQFClass;
@@ -29,7 +29,7 @@ namespace QuickFiler
         private QuickFileController _parent;
         private double _multiplier = 1;
 
-        public QfcGroupOperationsLegacy(QfcFormViewer viewerInstance, Enums.InitTypeEnum InitType, IApplicationGlobals AppGlobals, QuickFileController ParentObject)
+        public QfcGroupOperationsLegacy(QfcFormLegacyViewer viewerInstance, Enums.InitTypeEnum InitType, IApplicationGlobals AppGlobals, QuickFileController ParentObject)
         {
 
             _viewer = viewerInstance;
@@ -537,7 +537,7 @@ namespace QuickFiler
                     _listQFClass.RemoveAt(i);
                 }
             }
-            // _viewer.L1v1L2_PanelMain.ScrollHeight = _heightPanelMainMax
+            // _formViewer.L1v1L2_PanelMain.ScrollHeight = _heightPanelMainMax
         }
 
         internal void MoveDownControlGroups(int intPosition, int intMoves)
@@ -695,7 +695,7 @@ namespace QuickFiler
                     ctlFrame = QF.ItemPanel;
                     ctlFrame.Top = ctlFrame.Top - QfcConstants.Panel.Height - QfcConstants.FrmSp;
                 }
-                // _viewer.L1v1L2_PanelMain.ScrollHeight = max(_viewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
+                // _formViewer.L1v1L2_PanelMain.ScrollHeight = max(_formViewer.L1v1L2_PanelMain.ScrollHeight - frmHt - frmSp, _heightPanelMainMax)
             }
 
             _listQFClass.RemoveAt(index);

@@ -116,7 +116,7 @@ namespace QuickFiler
             get
             {
                 var cg = new ConstantGroup();
-                cg.Height = ScaledInt(32);
+                cg.Height = ScaledInt(16);
                 cg.Left = ScaledInt(6);
                 cg.Top = TopOffset + ScaledInt(16);
                 cg.Width = ScaledInt(354);
@@ -130,7 +130,7 @@ namespace QuickFiler
                 var cg = new ConstantGroup();
                 cg.Height = ScaledInt(56) - TopOffset;
                 cg.Left = ScaledInt(6);
-                cg.Top = TopOffset + ScaledInt(50);
+                cg.Top = TopOffset + ScaledInt(40);
                 cg.Width = ScaledInt(354);
                 return cg;
             }
@@ -203,7 +203,6 @@ namespace QuickFiler
             }
         }
         internal static ConstantGroup LblPos { get => new ConstantGroup(width: 20, height: 20, left: 0, top: _topOffsetC); }
-        //internal static ConstantGroup LblAcF { get => new ConstantGroup(width: , height: , left: , top: _topOffsetC); }
         internal static ConstantGroup LblAcF { get => new ConstantGroup(width: 14, height: 14, left: 363, top: (int)Math.Max(_topOffsetC - 2,0)); }
         internal static ConstantGroup LblAcD { get => new ConstantGroup(width: 14, height: 14, left: 363, top: _topOffsetC + 20); }
         internal static ConstantGroup LblAcC
@@ -293,7 +292,7 @@ namespace QuickFiler
         private static int width_chbxGPConv = 96;            // Checkbox to Group Conversations
         private static int width_cb = 25;            // Command buttons for: Delete email, Remove _mail from Processing, and Flag as Task
         private static int width_UserForm = 700;        // Minimum _width of Userform
-        private static int width_PanelMain = 683;           // Minimum _width of _viewer.L1v1L2_PanelMain
+        private static int width_PanelMain = 683;           // Minimum _width of _formViewer.L1v1L2_PanelMain
 
         #endregion
         #region height

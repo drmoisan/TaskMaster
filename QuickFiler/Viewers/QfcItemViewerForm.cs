@@ -10,13 +10,13 @@ using System.Windows.Forms;
 
 namespace QuickFiler
 {
-    public partial class QfcViewer : Form
+    public partial class QfcItemViewerForm : Form
     {
         private bool _tipsActive = true;
         private List<Label> _tipsLabels = new List<Label>();
         private Dictionary<ColumnStyle, float> _tipsColumns = new Dictionary<ColumnStyle, float>();
 
-        public QfcViewer()
+        public QfcItemViewerForm()
         {
 
             // This call is required by the designer.

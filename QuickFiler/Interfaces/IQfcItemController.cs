@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuickFiler
 {
-    internal interface IQfcItemController
+    public interface IQfcItemController
     {
         /// <summary>
         /// Toggles special formatting for one group to highlight the group of controls that is active

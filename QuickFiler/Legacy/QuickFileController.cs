@@ -5,13 +5,11 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Microsoft.Office.Interop.Outlook;
-//using Microsoft.VisualBasic;
-//using Microsoft.VisualBasic.CompilerServices;
 using ToDoModel;
 using UtilitiesVB;
 using Windows.Win32;
 
-//[assembly: log4net.Config.XmlConfigurator(Watch = true)]
+[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
 namespace QuickFiler
 {
@@ -66,7 +64,7 @@ namespace QuickFiler
         private readonly Explorer _activeExplorer;
         private readonly IOlObjects _olObjects;
         private readonly Microsoft.Office.Interop.Outlook.Application _olApp;
-        private readonly QfcFormViewer _viewer;
+        private readonly QfcFormLegacyViewer _viewer;
         private StackObjectVB _movedMails;
         private Enums.InitTypeEnum _initType;
 
@@ -86,7 +84,7 @@ namespace QuickFiler
 
         public QuickFileController(
             IApplicationGlobals AppGlobals,
-            QfcFormViewer Viewer,
+            QfcFormLegacyViewer Viewer,
             Queue<MailItem> ListEmailsInFolder,
             ParentCleanupMethod ParentCleanup)
         {

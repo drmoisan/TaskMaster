@@ -39,6 +39,15 @@ Public Class RibbonController
         taskTreeViewer.Show()
     End Sub
 
+    Friend Sub LoadQuickFilerOld()
+        Dim loaded As Boolean = False
+        If _quickfile IsNot Nothing Then loaded = _quickfile.Loaded
+        If loaded = False Then
+            _quickfile = New QfcLauncher(_globals, AddressOf ReleaseQuickFiler)
+            _quickfile.Run()
+        End If
+    End Sub
+
     Friend Sub LoadQuickFiler()
         Dim loaded As Boolean = False
         If _quickfile IsNot Nothing Then loaded = _quickfile.Loaded

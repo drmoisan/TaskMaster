@@ -41,9 +41,9 @@ namespace QuickFiler.Test
             MainPanel = new System.Windows.Forms.Panel();
             MainLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            ControlGroup3 = new QfcViewer();
-            ControlGroup1 = new QfcViewer();
-            ControlGroup2 = new QfcViewer();
+            ControlGroup3 = new QfcItemViewerForm();
+            ControlGroup1 = new QfcItemViewerForm();
+            ControlGroup2 = new QfcItemViewerForm();
             ButtonAdd = new System.Windows.Forms.Button();
             ButtonAdd.Click += new EventHandler(ButtonAdd_Click);
             TableLayoutPanel1.SuspendLayout();
@@ -202,11 +202,11 @@ namespace QuickFiler.Test
         }
 
         internal System.Windows.Forms.TableLayoutPanel TableLayoutPanel1;
-        internal QfcViewer ControlGroup1;
+        internal QfcItemViewerForm ControlGroup1;
         internal System.Windows.Forms.Button Button2;
         internal System.Windows.Forms.Button Button1;
-        internal QfcViewer ControlGroup3;
-        internal QfcViewer ControlGroup2;
+        internal QfcItemViewerForm ControlGroup3;
+        internal QfcItemViewerForm ControlGroup2;
         internal System.Windows.Forms.Panel MainPanel;
         internal System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
         internal System.Windows.Forms.TableLayoutPanel TableLayoutPanel2;

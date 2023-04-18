@@ -10,7 +10,6 @@ namespace QuickFiler.Notes
 		void Iterate();
 	}
 	
-	
 	public interface IQfcFormController
 	{
 		
