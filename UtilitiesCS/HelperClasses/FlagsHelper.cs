@@ -120,7 +120,7 @@ namespace UtilitiesCS
             );
         }
     }
-    public static class CSExtensions
+    public static class FlagsHelper
     {
         public static T ToCombined<T>(this IEnumerable<T> list)
             where T : Enum

@@ -87,42 +87,44 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Conversation_To_Folder.cs" />
-    <Compile Include="CSExtensions.cs" />
-    <Compile Include="CtfIncidenceList.cs" />
-    <Compile Include="CTF_Incidence.cs" />
-    <Compile Include="DelegateButton.cs" />
-    <Compile Include="ExtraDeclarations.cs" />
-    <Compile Include="FolderConverter.cs" />
-    <Compile Include="FolderNotFoundViewer.cs">
+    <Compile Include="EmailIntelligence\Conversation_To_Folder.cs" />
+    <Compile Include="HelperClasses\DictionaryExtensions.cs" />
+    <Compile Include="HelperClasses\FlagsHelper.cs" />
+    <Compile Include="EmailIntelligence\CtfIncidenceList.cs" />
+    <Compile Include="EmailIntelligence\CTF_Incidence.cs" />
+    <Compile Include="Dialogs\DelegateButton.cs" />
+    <Compile Include="HelperClasses\MailResolution.cs" />
+    <Compile Include="HelperClasses\OlItemSummary.cs" />
+    <Compile Include="WindowsAPI\ExtraDeclarations.cs" />
+    <Compile Include="EmailIntelligence\FolderConverter.cs" />
+    <Compile Include="Dialogs\FolderNotFoundViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FolderNotFoundViewer.Designer.cs">
+    <Compile Include="Dialogs\FolderNotFoundViewer.Designer.cs">
       <DependentUpon>FolderNotFoundViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="IRecentsList.cs" />
-    <Compile Include="MyBoxViewer.cs">
+    <Compile Include="Interfaces\IRecentsList.cs" />
+    <Compile Include="Dialogs\MyBoxViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MyBoxViewer.Designer.cs">
+    <Compile Include="Dialogs\MyBoxViewer.Designer.cs">
       <DependentUpon>MyBoxViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="ISerializableList.cs" />
-    <Compile Include="NotImplementedDialog.cs" />
+    <Compile Include="Interfaces\ISerializableList.cs" />
+    <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RecentsList.cs" />
-    <Compile Include="SerializableList.cs" />
-    <Compile Include="MyBoxController.cs" />
-    <Compile Include="StackGeek.cs" />
-    <Compile Include="StackObjectCS.cs" />
-    <Compile Include="StackObjectCSconv.cs" />
-    <Compile Include="TableLayoutHelper.cs" />
-    <Compile Include="YesNoToAll.cs" />
+    <Compile Include="EmailIntelligence\RecentsList.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableList.cs" />
+    <Compile Include="Dialogs\MyBoxController.cs" />
+    <Compile Include="ReusableTypeClasses\StackGeek.cs" />
+    <Compile Include="ReusableTypeClasses\StackObjectCS.cs" />
+    <Compile Include="HelperClasses\TableLayoutHelper.cs" />
+    <Compile Include="Dialogs\YesNoToAll.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -130,10 +132,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FolderNotFoundViewer.resx">
+    <EmbeddedResource Include="Dialogs\FolderNotFoundViewer.resx">
       <DependentUpon>FolderNotFoundViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MyBoxViewer.resx">
+    <EmbeddedResource Include="Dialogs\MyBoxViewer.resx">
       <DependentUpon>MyBoxViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -177,6 +179,7 @@
       <Name>SVGControl</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

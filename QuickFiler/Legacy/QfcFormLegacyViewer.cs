@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
 
     public partial class QfcFormLegacyViewer

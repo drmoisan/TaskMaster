@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using Moq;
-using QuickFiler;
+using QuickFiler.Legacy;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
 using System.Windows.Forms;

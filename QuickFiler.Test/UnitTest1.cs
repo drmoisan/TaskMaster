@@ -3,18 +3,33 @@ using System;
 using System.Windows.Forms;
 using UtilitiesCS;
 using Moq;
+using System.Collections;
+using System.Collections.Generic;
+using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Test
 {
     [TestClass]
     public class UnitTest1
     {
+        private QfcFormViewer qf;
+        private QfcItemViewer iv;
+        private Mock<IQfcFormController> formController;
+
+        [TestInitialize] public void Init() 
+        {
+            qf = new QfcFormViewer();
+            iv = new QfcItemViewer();
+            formController = new Mock<IQfcFormController>();
+        }
+        
         [TestMethod]
         public void TestMethod1()
         {
-            QfcFormViewer qf = new QfcFormViewer();
-            QfcItemViewer iv = new QfcItemViewer();
-            Mock<IQfcFormController> formController = new Mock<IQfcFormController>();
+            //QfcFormViewer qf = new QfcFormViewer();
+            //QfcItemViewer iv = new QfcItemViewer();
+            //Mock<IQfcFormController> formController = new Mock<IQfcFormController>();
             int itemHeight = iv.Height;
             formController.Setup(x => x.ButtonCancel_Click()).Callback(qf.Hide);
             formController.Setup(x => x.ButtonOK_Click()).Callback(qf.Hide);
@@ -39,6 +54,36 @@ namespace QuickFiler.Test
             //qf.Refresh();
             qf.Hide();
             qf.ShowDialog();
+        }
+
+        [TestMethod]
+        public void TestMethod2() 
+        {
+            qf.Show();
+            qf.Refresh();
+
+            IList<Label> tipsLabels = qf.QfcItemViewerTemplate.TipsLabels;
+            IList<QfcTipsDetails> listTipsDetails = new List<QfcTipsDetails>();
+            foreach (Label tipsLabel in tipsLabels) 
+            {
+                listTipsDetails.Add(new QfcTipsDetails(tipsLabel));
+            }
+            qf.Refresh();
+            qf.Refresh();
+
+            foreach (QfcTipsDetails tipsDetails in listTipsDetails)
+            {
+                tipsDetails.Toggle(QfcTipsDetails.ToggleState.Off);
+            }
+            qf.Refresh();
+            qf.Refresh();
+
+            foreach (QfcTipsDetails tipsDetails in listTipsDetails)
+            {
+                tipsDetails.Toggle();
+            }
+            qf.Refresh();
+            //qf.qfcItemViewer1
         }
     }
 }

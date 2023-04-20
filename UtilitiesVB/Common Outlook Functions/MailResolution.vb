@@ -5,7 +5,7 @@ Public Module MailResolution
         Return (item.MessageClass = "IPM.Note.SMIME") Or (item.MessageClass = "IPM.Note.Secure") Or (item.MessageClass = "IPM.Note.Secure.Sign") Or (item.MessageClass = "IPM.Outlook.Recall")
     End Function
 
-    Public Function TryResolveMailItem(objItem As Object) As MailItem
+    Public Function TryResolveMailItemDep(objItem As Object) As MailItem
         Dim OlMail As MailItem = Nothing
         If TypeOf objItem Is MailItem Then
             OlMail = objItem

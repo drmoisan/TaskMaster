@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,14 @@ using System.Web.UI.WebControls;
 using System.Windows.Forms;
 using UtilitiesCS;
 using UtilitiesVB;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 
-namespace QuickFiler
+namespace QuickFiler.Controllers
 {
     internal class QfcCollectionController : IQfcCollectionController
     {
-
         public QfcCollectionController(IApplicationGlobals AppGlobals,
-                                       QfcFormLegacyViewer viewerInstance,
+                                       QfcFormViewer viewerInstance,
                                        Enums.InitTypeEnum InitType,
                                        IQfcFormController ParentObject)
         {
@@ -24,81 +25,57 @@ namespace QuickFiler
             _initType = InitType;
             _globals = AppGlobals;
             _parent = ParentObject;
-            _rowHeight = new QfcItemViewerForm().Height;
+            _itemHeight = new QfcItemViewerForm().Height;
         }
 
-        
-        private QfcFormLegacyViewer _viewer;
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private QfcFormViewer _viewer;
         private Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IQfcFormController _parent;
-        private int _rowHeight;
-
+        private int _itemHeight;
 
         public int EmailsLoaded => throw new NotImplementedException();
 
         public bool ReadyForMove => throw new NotImplementedException();
 
-        public int ActivateByIndex(int intNewSelection, bool blExpanded)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddEmailControlGroup(object objItem,
-                                         int posInsert = 0,
-                                         bool blGroupConversation = true,
-                                         int ConvCt = 0,
-                                         object varList = null,
-                                         bool blChild = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ConvToggle_Group(IList<MailItem> selItems, int intOrigPosition)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ConvToggle_UnGroup(IList<MailItem> selItems, int intPosition, int ConvCt, object varList)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsSelectionBelowMax(int intNewSelection)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void LoadControlsAndHandlers(IList<MailItem> colEmails)
+        public void LoadControlsAndHandlers(IList<object> listObjects)
         {
             int i = 0;
-            foreach (MailItem mailItem in colEmails)
+            foreach (object objItem in listObjects)
             {
-                QfcItemViewerForm itemViewer = LoadItemViewer(++i, true);
+                if (objItem is MailItem)
+                {
+                    QfcItemViewer itemViewer = LoadItemViewer(++i, true);
+                }
+                else
+                {
+                    log.Debug($"Skipping Item {OlItemSummary.Extract(objItem,OlItemSummary.Details.All)}");
+                }
+                
             }
             
             _viewer.WindowState = FormWindowState.Maximized;
         }
 
-        public QfcItemViewerForm LoadItemViewer(int itemNumber,
+        
+
+        public QfcItemViewer LoadItemViewer(int itemNumber,
                                             bool blGroupConversation)
         {
-            QfcItemViewerForm itemViewer = new();
+            QfcItemViewer itemViewer = new();
+            RowStyle rowStyle = new RowStyle(SizeType.Absolute, _itemHeight+6);
             //_viewer.L1v1L2L3v
             return itemViewer;
         }
 
-        public void MakeSpaceToEnumerateConversation()
+        QfcItemViewerForm IQfcCollectionController.LoadItemViewer(int intItemNumber, bool blGroupConversation)
         {
             throw new NotImplementedException();
         }
 
-        public void MoveDownControlGroups(int intPosition, int intMoves)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void MoveDownPix(int intPosition, int intPix)
+        public void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false)
         {
             throw new NotImplementedException();
         }
@@ -118,7 +95,7 @@ namespace QuickFiler
             throw new NotImplementedException();
         }
 
-        public void ResizeChildren(int intDiffx)
+        public int ActivateByIndex(int intNewSelection, bool blExpanded)
         {
             throw new NotImplementedException();
         }
@@ -129,6 +106,41 @@ namespace QuickFiler
         }
 
         public void SelectPreviousItem()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void MoveDownControlGroups(int intPosition, int intMoves)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void MoveDownPix(int intPosition, int intPix)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ResizeChildren(int intDiffx)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ConvToggle_Group(IList<object> selItems, int intOrigPosition)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ConvToggle_UnGroup(IList<object> selItems, int intPosition, int ConvCt, object varList)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void MakeSpaceToEnumerateConversation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsSelectionBelowMax(int intNewSelection)
         {
             throw new NotImplementedException();
         }

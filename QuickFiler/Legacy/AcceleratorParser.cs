@@ -4,7 +4,7 @@ using System.Diagnostics.Eventing.Reader;
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
     
     internal class AcceleratorParser

@@ -11,7 +11,7 @@ using Windows.Win32;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
     public class QuickFileController 
     {
@@ -228,7 +228,7 @@ namespace QuickFiler
             _lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
             _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference);
 
-            // Set Max Size of the main panel based on resizing
+            // Set Max Size of the main _tlp based on resizing
             _viewer.L1v1L2_PanelMain.Height = (int)(_viewer.L1v1L2_PanelMain.Height + lngHeightDifference);
 
             return _viewer.L1v1L2_PanelMain.Height;
@@ -690,15 +690,15 @@ namespace QuickFiler
             while (i > 0 & repeatResponse == DialogResult.Yes)
             {
                 objTemp = listItems[i];
-                // objTemp = _movedMails.Pop
+                // objTemp = _movedObjects.Pop
                 if (objTemp is MailItem)
                     oMail_Current = (MailItem)objTemp;
-                // objTemp = _movedMails.Pop
+                // objTemp = _movedObjects.Pop
                 objTemp = listItems[i - 1];
                 if (objTemp is MailItem)
                     oMail_Old = (MailItem)objTemp;
 
-                // oMail_Old = _movedMails.Pop
+                // oMail_Old = _movedObjects.Pop
                 if (MailResolution.IsMailUnReadable(oMail_Current) == false & MailResolution.IsMailUnReadable(oMail_Old) == false)
                 {
                     oFolder_Current = (Folder)oMail_Current.Parent;

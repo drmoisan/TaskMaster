@@ -2,7 +2,7 @@
 using UtilitiesCS;
 using Windows.Win32;
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
     internal static class QfcConstants
     {

@@ -1,6 +1,6 @@
 using System.Windows.Forms;
 
-namespace QuickFiler
+namespace QuickFiler.Interfaces
 {
     public interface IQfcKeyboardHandler
     {

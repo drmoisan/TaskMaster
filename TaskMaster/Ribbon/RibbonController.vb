@@ -1,14 +1,14 @@
 ﻿Imports Microsoft.Office.Tools.Ribbon
 Imports ToDoModel
 Imports UtilitiesVB
-Imports QuickFiler
 Imports TaskVisualization
 
 Public Class RibbonController
     Private _viewer As RibbonViewer
     Private _globals As IApplicationGlobals
     Private blHook As Boolean = True
-    Private _quickfile As QfcLauncher
+    Private _quickfileLegacy As QuickFiler.Legacy.QfcLauncher
+    Private _quickFiler As QuickFiler.Interfaces.IQfcHomeController
 
     Public Sub New()
     End Sub
@@ -41,24 +41,28 @@ Public Class RibbonController
 
     Friend Sub LoadQuickFilerOld()
         Dim loaded As Boolean = False
-        If _quickfile IsNot Nothing Then loaded = _quickfile.Loaded
+        If _quickfileLegacy IsNot Nothing Then loaded = _quickfileLegacy.Loaded
         If loaded = False Then
-            _quickfile = New QfcLauncher(_globals, AddressOf ReleaseQuickFiler)
-            _quickfile.Run()
+            _quickfileLegacy = New QuickFiler.Legacy.QfcLauncher(_globals, AddressOf ReleaseQuickFilerLegacy)
+            _quickfileLegacy.Run()
         End If
     End Sub
 
     Friend Sub LoadQuickFiler()
         Dim loaded As Boolean = False
-        If _quickfile IsNot Nothing Then loaded = _quickfile.Loaded
+        If _quickFiler IsNot Nothing Then loaded = _quickFiler.Loaded
         If loaded = False Then
-            _quickfile = New QfcLauncher(_globals, AddressOf ReleaseQuickFiler)
-            _quickfile.Run()
+            _quickFiler = New QuickFiler.Controllers.QfcHomeController(_globals, AddressOf ReleaseQuickFiler)
+            _quickFiler.Run()
         End If
     End Sub
 
+    Private Sub ReleaseQuickFilerLegacy()
+        _quickfileLegacy = Nothing
+    End Sub
+
     Private Sub ReleaseQuickFiler()
-        _quickfile = Nothing
+        _quickFiler = Nothing
     End Sub
 
     Friend Sub ReviseProjectInfo()

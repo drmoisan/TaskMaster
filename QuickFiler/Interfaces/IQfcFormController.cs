@@ -1,4 +1,6 @@
-namespace QuickFiler
+using System.Collections.Generic;
+
+namespace QuickFiler.Interfaces
 {
     public interface IQfcFormController
     {
@@ -12,6 +14,8 @@ namespace QuickFiler
         void QFD_Minimize();
         void SpnEmailPerLoad_Change();
         void Viewer_Activate();
-        int MaxPixelsForEmail { get; }
+        int SpaceForEmail { get; }
+        int ItemsPerIteration { get; }
+        void LoadItems(IList<object> listObjects);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuickFiler.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +17,8 @@ namespace QuickFiler
         {
             InitializeComponent();
         }
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private IQfcFormController _formController;
         private IQfcKeyboardHandler _keyboardHandler;

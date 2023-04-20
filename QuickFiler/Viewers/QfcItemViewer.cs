@@ -15,6 +15,27 @@ namespace QuickFiler
         public QfcItemViewer()
         {
             InitializeComponent();
+            InitTipsLabelsList();
         }
+
+        private IList<Label> _tipsLabels;
+        public IList<Label> TipsLabels { get => _tipsLabels; }
+        private void InitTipsLabelsList()
+        {
+            _tipsLabels = new List<Label>
+            {
+                LblAcOpen,
+                LblAcPopOut,
+                LblAcTask,
+                LblAcDelete,
+                LblAcAttachments,
+                LblAcConversation,
+                LblAcEmail,
+                LblAcFolder,
+                LblAcSearch
+            };
+
+        }
+                
     }
 }

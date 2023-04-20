@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
     public partial class QfcFormLegacyViewer : System.Windows.Forms.Form
     {

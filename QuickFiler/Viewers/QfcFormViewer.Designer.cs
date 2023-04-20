@@ -37,8 +37,7 @@
             this.L1v1L2h5_SpnEmailPerLoad = new System.Windows.Forms.NumericUpDown();
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.qfcItemViewer1 = new QuickFiler.QfcItemViewer();
-            this.qfcItemViewer2 = new QuickFiler.QfcItemViewer();
+            this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();
@@ -164,39 +163,28 @@
             this.L1v0L2L3v_TableLayout.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.L1v0L2L3v_TableLayout.ColumnCount = 1;
             this.L1v0L2L3v_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v0L2L3v_TableLayout.Controls.Add(this.qfcItemViewer1, 0, 0);
-            this.L1v0L2L3v_TableLayout.Controls.Add(this.qfcItemViewer2, 0, 1);
+            this.L1v0L2L3v_TableLayout.Controls.Add(this.QfcItemViewerTemplate, 0, 0);
             this.L1v0L2L3v_TableLayout.Dock = System.Windows.Forms.DockStyle.Top;
             this.L1v0L2L3v_TableLayout.Location = new System.Drawing.Point(0, 0);
             this.L1v0L2L3v_TableLayout.Name = "L1v0L2L3v_TableLayout";
-            this.L1v0L2L3v_TableLayout.RowCount = 4;
-            this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 115F));
-            this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 115F));
+            this.L1v0L2L3v_TableLayout.RowCount = 2;
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 115F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(1063, 295);
+            this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(1080, 168);
             this.L1v0L2L3v_TableLayout.TabIndex = 0;
             // 
-            // qfcItemViewer1
+            // QfcItemViewerTemplate
             // 
-            this.qfcItemViewer1.AutoSize = true;
-            this.qfcItemViewer1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.qfcItemViewer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.qfcItemViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.qfcItemViewer1.Location = new System.Drawing.Point(3, 3);
-            this.qfcItemViewer1.Name = "qfcItemViewer1";
-            this.qfcItemViewer1.Size = new System.Drawing.Size(1057, 109);
-            this.qfcItemViewer1.TabIndex = 0;
-            // 
-            // qfcItemViewer2
-            // 
-            this.qfcItemViewer2.AutoSize = true;
-            this.qfcItemViewer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.qfcItemViewer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.qfcItemViewer2.Location = new System.Drawing.Point(3, 118);
-            this.qfcItemViewer2.Name = "qfcItemViewer2";
-            this.qfcItemViewer2.Size = new System.Drawing.Size(1057, 109);
-            this.qfcItemViewer2.TabIndex = 1;
+            this.QfcItemViewerTemplate.AutoSize = true;
+            this.QfcItemViewerTemplate.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.QfcItemViewerTemplate.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.QfcItemViewerTemplate.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.QfcItemViewerTemplate.Location = new System.Drawing.Point(3, 3);
+            this.QfcItemViewerTemplate.MinimumSize = new System.Drawing.Size(815, 110);
+            this.QfcItemViewerTemplate.Name = "QfcItemViewerTemplate";
+            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(1074, 110);
+            this.QfcItemViewerTemplate.TabIndex = 0;
             // 
             // QfcFormViewer
             // 
@@ -231,8 +219,7 @@
         internal System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad;
         internal System.Windows.Forms.TextBox L1v1L2h0_KeyboardDialog;
         private System.Windows.Forms.Panel L1v0L2_PanelMain;
-        private QfcItemViewer qfcItemViewer1;
-        private QfcItemViewer qfcItemViewer2;
         internal System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
+        internal QfcItemViewer QfcItemViewerTemplate;
     }
 }

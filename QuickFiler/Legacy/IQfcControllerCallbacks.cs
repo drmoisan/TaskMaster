@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
     internal interface IQfcControllerCallbacks
     {

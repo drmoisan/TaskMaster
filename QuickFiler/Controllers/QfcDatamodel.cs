@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using ToDoModel;
 using UtilitiesVB;
 using UtilitiesCS;
 
-namespace QuickFiler
+namespace QuickFiler.Controllers
 {
     internal class QfcDatamodel : IQfcDatamodel
     {
@@ -16,40 +17,42 @@ namespace QuickFiler
         { 
             _activeExplorer = ActiveExplorer;
             var listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_activeExplorer);
-            _masterQueue = new Queue<MailItem>();
+            _masterQueue = new Queue<object>();
             foreach (MailItem email in listEmailsInFolder)
             {
                 _masterQueue.Enqueue(email);
             }
         }
 
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private Explorer _activeExplorer;
-        private Queue<MailItem> _masterQueue;
-        private StackObjectCS<MailItem> _movedMails;
+        private Queue<object> _masterQueue;
+        private StackObjectCS<object> _movedObjects;
 
-        public StackObjectCS<MailItem> MovedMails { get => _movedMails; set => _movedMails = value; }
+        public StackObjectCS<object> StackMovedItems { get => _movedObjects; set => _movedObjects = value; }
 
-        public void CountMailsInConv(int ct = 0)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<MailItem> DequeueNextEmailGroup(int quantity)
+        public IList<object> DequeueNextItemGroup(int quantity)
         {
             int i;
-            IList<MailItem> listEmails = new List<MailItem>();
+            IList<object> listObjects = new List<object>();
             int adjustedQuantity = quantity < _masterQueue.Count ? quantity : _masterQueue.Count;
             for (i = 1; i <= adjustedQuantity; i++)
-                listEmails.Add(_masterQueue.Dequeue());
-            return listEmails;
-        }
-        
-        public bool MoveEmails(ref StackObjectCS<MailItem> MovedMails)
-        {
-            throw new NotImplementedException();
+                listObjects.Add(_masterQueue.Dequeue());
+            return listObjects;
         }
 
         public void UndoMove()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MoveItems(ref StackObjectCS<object> StackMovedItems)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CountMailsInConv(int ct = 0)
         {
             throw new NotImplementedException();
         }

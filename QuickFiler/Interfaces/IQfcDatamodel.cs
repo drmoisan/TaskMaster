@@ -3,14 +3,14 @@ using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 
 
-namespace QuickFiler
+namespace QuickFiler.Interfaces
 {
     public interface IQfcDatamodel
     {
-        IList<MailItem> DequeueNextEmailGroup(int quantity);
+        IList<object> DequeueNextItemGroup(int quantity);
         void UndoMove();
-        StackObjectCS<MailItem> MovedMails { get; set; }
-        bool MoveEmails(ref StackObjectCS<MailItem> MovedMails);
-        void CountMailsInConv(int ct = 0); //From item controller
+        StackObjectCS<object> StackMovedItems { get; set; }
+        bool MoveItems(ref StackObjectCS<object> StackMovedItems);
+        void CountMailsInConv(int ct = 0); 
     }
 }

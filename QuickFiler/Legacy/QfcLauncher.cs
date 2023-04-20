@@ -4,7 +4,7 @@ using Microsoft.Office.Interop.Outlook;
 using System.Collections.Generic;
 using UtilitiesCS;
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
 
     public class QfcLauncher 

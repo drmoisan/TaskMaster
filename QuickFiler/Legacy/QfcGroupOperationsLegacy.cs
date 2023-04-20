@@ -10,7 +10,7 @@ using UtilitiesVB;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QuickFiler
+namespace QuickFiler.Legacy
 {
     /// <summary>
     /// Class manages UI interactions with the collection of Qfc controllers and viewers
@@ -242,7 +242,7 @@ namespace QuickFiler
                 Pnl.Controls.Add(chbxSaveMail);
                 AssignDimensions(ref chbxSaveMail, QfcConstants.CheckboxSaveMail);                
                 chbxSaveMail.Font = new Font(chbxSaveMail.Font.FontFamily, 10f);
-                chbxSaveMail.Text = " Mail";
+                chbxSaveMail.Text = " ObjItem";
                 chbxSaveMail.Checked = false;
                 chbxSaveMail.TabStop = false;                
                 colCtrls.Add(chbxSaveMail);
@@ -624,13 +624,13 @@ namespace QuickFiler
                 }
                 else
                 {
-                    // _listQFClass.Add(qf, qf.Mail.Subject & qf.Mail.SentOn & qf.Mail.Sender, insertAtIndex)
+                    // _listQFClass.Add(qf, qf.ObjItem.Subject & qf.ObjItem.SentOn & qf.ObjItem.Sender, insertAtIndex)
                     _listQFClass.Insert(insertAtIndex, QF);
                 }
 
                 // For i = 1 To _listQFClass.Count
                 // qf = _listQFClass(i)
-                // Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & qf.intMyPosition & "   " & qf.Mail.Subject)
+                // Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & qf.intMyPosition & "   " & qf.ObjItem.Subject)
                 // Next i
 
             }

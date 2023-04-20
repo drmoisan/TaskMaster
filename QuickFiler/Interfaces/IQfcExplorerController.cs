@@ -1,11 +1,11 @@
 using Microsoft.Office.Interop.Outlook;
 
-namespace QuickFiler
+namespace QuickFiler.Interfaces
 {
     public interface IQfcExplorerController
     {
         bool BlShowInConversations { get; set; }
-        void OpenQFMail(MailItem OlMail);
+        void OpenQFItem(object ObjItem);
         void ExplConvView_ToggleOff();
         void ExplConvView_ToggleOn();
         void ExplConvView_Cleanup();

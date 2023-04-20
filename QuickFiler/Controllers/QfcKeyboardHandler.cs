@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuickFiler.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
 
-namespace QuickFiler
+namespace QuickFiler.Controllers
 {
     internal class QfcKeyboardHandler : IQfcKeyboardHandler
     {

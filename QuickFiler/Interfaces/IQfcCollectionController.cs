@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Windows.Forms;
 
-namespace QuickFiler
+namespace QuickFiler.Interfaces
 {
     public interface IQfcCollectionController
     {
         // UI Add and Remove QfcItems
-        void LoadControlsAndHandlers(IList<MailItem> colEmails);
+        void LoadControlsAndHandlers(IList<object> colEmails);
         QfcItemViewerForm LoadItemViewer(int intItemNumber, bool blGroupConversation = true); 
         void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false);
         void RemoveControls();
@@ -26,8 +26,8 @@ namespace QuickFiler
         void ResizeChildren(int intDiffx);                              //possibly unneccessary with new control group
 
         // UI Converations Expansion
-        void ConvToggle_Group(IList<MailItem> selItems, int intOrigPosition);
-        void ConvToggle_UnGroup(IList<MailItem> selItems, int intPosition, int ConvCt, object varList);
+        void ConvToggle_Group(IList<object> selItems, int intOrigPosition);
+        void ConvToggle_UnGroup(IList<object> selItems, int intPosition, int ConvCt, object varList);
         void MakeSpaceToEnumerateConversation();                        //Rewrite
 
         // Helper Functions
