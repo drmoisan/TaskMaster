@@ -94,9 +94,6 @@
             this.L1v1L2h0_KeyboardDialog.Size = new System.Drawing.Size(226, 40);
             this.L1v1L2h0_KeyboardDialog.TabIndex = 5;
             this.L1v1L2h0_KeyboardDialog.Visible = false;
-            this.L1v1L2h0_KeyboardDialog.TextChanged += new System.EventHandler(this.AcceleratorDialogue_TextChanged);
-            this.L1v1L2h0_KeyboardDialog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AcceleratorDialogue_KeyDown);
-            this.L1v1L2h0_KeyboardDialog.KeyUp += new System.Windows.Forms.KeyEventHandler(this.AcceleratorDialogue_KeyUp);
             // 
             // L1v1L2h2_ButtonOK
             // 
@@ -108,9 +105,6 @@
             this.L1v1L2h2_ButtonOK.TabIndex = 0;
             this.L1v1L2h2_ButtonOK.Text = "OK";
             this.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = true;
-            this.L1v1L2h2_ButtonOK.Click += new System.EventHandler(this.Button_OK_Click);
-            this.L1v1L2h2_ButtonOK.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Button_OK_KeyDown);
-            this.L1v1L2h2_ButtonOK.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Button_OK_KeyUp);
             // 
             // L1v1L2h3_ButtonCancel
             // 
@@ -122,7 +116,6 @@
             this.L1v1L2h3_ButtonCancel.TabIndex = 1;
             this.L1v1L2h3_ButtonCancel.Text = "CANCEL";
             this.L1v1L2h3_ButtonCancel.UseVisualStyleBackColor = true;
-            this.L1v1L2h3_ButtonCancel.Click += new System.EventHandler(this.L1v2L2h4_ButtonCancel_Click);
             // 
             // L1v1L2h4_ButtonUndo
             // 
@@ -133,7 +126,6 @@
             this.L1v1L2h4_ButtonUndo.TabIndex = 2;
             this.L1v1L2h4_ButtonUndo.Text = "Undo";
             this.L1v1L2h4_ButtonUndo.UseVisualStyleBackColor = true;
-            this.L1v1L2h4_ButtonUndo.Click += new System.EventHandler(this.Button_Undo_Click);
             // 
             // L1v1L2h5_SpnEmailPerLoad
             // 
@@ -144,7 +136,6 @@
             this.L1v1L2h5_SpnEmailPerLoad.Name = "L1v1L2h5_SpnEmailPerLoad";
             this.L1v1L2h5_SpnEmailPerLoad.Size = new System.Drawing.Size(66, 41);
             this.L1v1L2h5_SpnEmailPerLoad.TabIndex = 3;
-            this.L1v1L2h5_SpnEmailPerLoad.ValueChanged += new System.EventHandler(this.spn_EmailPerLoad_ValueChanged);
             // 
             // L1v0L2_PanelMain
             // 
@@ -195,8 +186,6 @@
             this.Controls.Add(this.L1v_TableLayout);
             this.Name = "QfcFormViewer";
             this.Text = "Quick File";
-            this.Closing += new System.ComponentModel.CancelEventHandler(this.QuickFileViewer_Closing);
-            this.Resize += new System.EventHandler(this.QuickFileViewer_Resize);
             this.L1v_TableLayout.ResumeLayout(false);
             this.L1v_TableLayout.PerformLayout();
             this.L1v1L2h_TableLayout.ResumeLayout(false);
@@ -211,15 +200,15 @@
 
         #endregion
 
-        internal System.Windows.Forms.TableLayoutPanel L1v_TableLayout;
-        internal System.Windows.Forms.TableLayoutPanel L1v1L2h_TableLayout;
-        internal System.Windows.Forms.Button L1v1L2h2_ButtonOK;
-        internal System.Windows.Forms.Button L1v1L2h3_ButtonCancel;
-        internal System.Windows.Forms.Button L1v1L2h4_ButtonUndo;
-        internal System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad;
-        internal System.Windows.Forms.TextBox L1v1L2h0_KeyboardDialog;
-        private System.Windows.Forms.Panel L1v0L2_PanelMain;
-        internal System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
-        internal QfcItemViewer QfcItemViewerTemplate;
+        public System.Windows.Forms.TableLayoutPanel L1v_TableLayout;
+        public System.Windows.Forms.TableLayoutPanel L1v1L2h_TableLayout;
+        public System.Windows.Forms.Button L1v1L2h2_ButtonOK;
+        public System.Windows.Forms.Button L1v1L2h3_ButtonCancel;
+        public System.Windows.Forms.Button L1v1L2h4_ButtonUndo;
+        public System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad;
+        public System.Windows.Forms.TextBox L1v1L2h0_KeyboardDialog;
+        public System.Windows.Forms.Panel L1v0L2_PanelMain;
+        public System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
+        public QfcItemViewer QfcItemViewerTemplate;
     }
 }

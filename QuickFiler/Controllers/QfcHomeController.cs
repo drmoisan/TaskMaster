@@ -33,10 +33,16 @@ namespace QuickFiler.Controllers
             _explorerController = new QfcExplorerController();
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler();
-            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup);
+            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup);           
         }
 
-        public void Run() { _formViewer.Show(); }
+        public void Run() 
+        { 
+            _formViewer.Show();
+            _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            _formViewer.Refresh();
+            Iterate();
+        }
 
         public bool Loaded { get => _formViewer is not null; }
         

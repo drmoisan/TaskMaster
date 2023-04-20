@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesVB;
+using UtilitiesCS;
 using Windows.Win32;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
@@ -88,17 +89,17 @@ namespace QuickFiler.Legacy
             Queue<MailItem> ListEmailsInFolder,
             ParentCleanupMethod ParentCleanup)
         {
-            // Link viewer to controller
+            // Link _itemViewer to _itemController
             _viewer = Viewer;
             _viewer.SetController(this);
 
-            // Link model to controller
+            // Link model to _itemController
             _queueEmailsInFolder = ListEmailsInFolder;
             InitializeModelProcessingMetrics();
 
             _parentCleanup = ParentCleanup;
 
-            // Link controller to global variables 
+            // Link _itemController to global variables 
             _globals = AppGlobals;
             _olObjects = AppGlobals.Ol;
             _olApp = AppGlobals.Ol.App;
@@ -143,7 +144,7 @@ namespace QuickFiler.Legacy
             // Suppress events while initializing form
             _blSuppressEvents = true;
 
-            // Configure viewer for SORTING rather than FINDING items
+            // Configure _itemViewer for SORTING rather than FINDING items
             _initType = Enums.InitTypeEnum.InitSort;
 
             RemoveControlsTabstops();

@@ -3,13 +3,14 @@ using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 using System.Windows.Forms;
 using UtilitiesCS;
 using UtilitiesVB;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+
 
 namespace QuickFiler.Controllers
 {
@@ -22,10 +23,10 @@ namespace QuickFiler.Controllers
         {
 
             _viewer = viewerInstance;
+            _itemTLP = _viewer.L1v0L2L3v_TableLayout;
             _initType = InitType;
             _globals = AppGlobals;
             _parent = ParentObject;
-            _itemHeight = new QfcItemViewerForm().Height;
         }
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -35,19 +36,24 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private IQfcFormController _parent;
         private int _itemHeight;
+        private TableLayoutPanel _itemTLP;
+        private List<ItemGroup> itemGroups = new List<ItemGroup>();
 
         public int EmailsLoaded => throw new NotImplementedException();
 
         public bool ReadyForMove => throw new NotImplementedException();
 
-        public void LoadControlsAndHandlers(IList<object> listObjects)
+        public void LoadControlsAndHandlers(IList<object> listObjects, RowStyle template)
         {
             int i = 0;
             foreach (object objItem in listObjects)
             {
                 if (objItem is MailItem)
                 {
-                    QfcItemViewer itemViewer = LoadItemViewer(++i, true);
+                    ItemGroup grp = new();
+                    grp.ItemViewer = LoadItemViewer(++i, template, true);
+                    grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, (MailItem)objItem, this);
+                    itemGroups.Add(grp);
                 }
                 else
                 {
@@ -62,17 +68,24 @@ namespace QuickFiler.Controllers
         
 
         public QfcItemViewer LoadItemViewer(int itemNumber,
+                                            RowStyle template,
                                             bool blGroupConversation)
         {
+            _viewer.Refresh();
             QfcItemViewer itemViewer = new();
-            RowStyle rowStyle = new RowStyle(SizeType.Absolute, _itemHeight+6);
-            //_viewer.L1v1L2L3v
+            _itemTLP.MinimumSize = new System.Drawing.Size(
+                _itemTLP.MinimumSize.Width, 
+                _itemTLP.MinimumSize.Height + 
+                (int)Math.Round(template.Height, 0));
+            TableLayoutHelper.InsertSpecificRow(_itemTLP, itemNumber - 1, template.Clone());
+            itemViewer.Parent = _itemTLP;
+            _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(0, itemNumber - 1));
+            itemViewer.AutoSize = true;
+            itemViewer.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            itemViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            itemViewer.Dock = DockStyle.Fill;
+            _viewer.Refresh();
             return itemViewer;
-        }
-
-        QfcItemViewerForm IQfcCollectionController.LoadItemViewer(int intItemNumber, bool blGroupConversation)
-        {
-            throw new NotImplementedException();
         }
 
         public void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false)
@@ -144,5 +157,19 @@ namespace QuickFiler.Controllers
         {
             throw new NotImplementedException();
         }
+
+        public class ItemGroup
+        {
+            public ItemGroup() { }
+
+            private QfcItemViewer _itemViewer;
+            private IQfcItemController _itemController;
+
+            internal QfcItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
+            internal IQfcItemController ItemController { get => _itemController; set => _itemController = value; }
+
+        }
+
+        
     }
 }

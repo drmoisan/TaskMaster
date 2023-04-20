@@ -6,30 +6,64 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ToDoModel;
 using UtilitiesCS;
-
+using UtilitiesVB;
 
 namespace QuickFiler.Controllers
 {
     internal class QfcItemController : IQfcItemController
     {
-        public QfcItemController(QfcItemViewer itemViewer, 
-                                 QfcTipsDetails tipsDetails, 
+        public QfcItemController(IApplicationGlobals AppGlobals, 
+                                 QfcItemViewer itemViewer,
+                                 MailItem mailItem,
                                  IQfcCollectionController parent) 
-        { 
+        {
+            _globals = AppGlobals;
             _itemViewer = itemViewer;
-            _tipsDetails = tipsDetails;
+            _mailItem = mailItem;
             _parent = parent;
+            _listTipsDetails = _itemViewer.TipsLabels.Select(x => (IQfcTipsDetails)new QfcTipsDetails(x)).ToList();
+            PopulateControls();
+            ToggleTips(IQfcTipsDetails.ToggleState.Off);
         }
-        
+
+        private IApplicationGlobals _globals;
         private QfcItemViewer _itemViewer;
         private IQfcCollectionController _parent;
-        private QfcTipsDetails _tipsDetails;
+        private IList<IQfcTipsDetails> _listTipsDetails;
+        private MailItem _mailItem;
 
-
-        internal void ResolveControlAssignments()
+        internal void PopulateControls()
         {
+            string[] emailDetails = CaptureEmailDetailsModule.CaptureEmailDetails(_mailItem, _globals.Ol.EmailRootPath);
+            _itemViewer.LblSender.Text = emailDetails[4];
+            _itemViewer.lblSubject.Text = emailDetails[7];
+            _itemViewer.TxtboxBody.Text = emailDetails[8];
+            _itemViewer.LblTriage.Text = emailDetails[1];
+            _itemViewer.LblSentOn.Text = emailDetails[3];
+            _itemViewer.LblActionable.Text = emailDetails[13];
 
+            //strAry(2) = GetEmailFolderPath(OlMail, emailRootFolder)
+            //strAry(5) = recipients.recipientsTo
+            //strAry(6) = recipients.recipientsCC
+            //strAry(9) = Right(strAry(4), Len(strAry(4)) - InStr(strAry(4), "@"))
+            //strAry(10) = OlMail.ConversationID
+            //strAry(11) = OlMail.EntryID
+            //strAry(12) = GetAttachmentNames(OlMail)
+            
+            
+            //_itemViewer.LblConvCt
+            //_itemViewer.LblPos
+            //_itemViewer.LblSearch
+            //_itemViewer.BtnDelItem
+            //_itemViewer.BtnPopOut
+            //_itemViewer.BtnFlagTask
+            //_itemViewer.LblFolder
+            //_itemViewer.CboFolders
+            //_itemViewer.CbxConversation
+            //_itemViewer.CbxEmailCopy
+            //_itemViewer.CbxAttachments
         }
         
         public bool BlExpanded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -38,6 +72,21 @@ namespace QuickFiler.Controllers
 
         public bool BlHasChild { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public object ObjItem { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public void ToggleTips()
+        {
+            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
+            {
+                tipsDetails.Toggle();
+            }
+        }
+        public void ToggleTips(IQfcTipsDetails.ToggleState desiredState)
+        {
+            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
+            {
+                tipsDetails.Toggle(desiredState);
+            }
+        }
 
         public void Accel_FocusToggle()
         {

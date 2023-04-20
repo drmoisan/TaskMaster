@@ -1,6 +1,6 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using UtilitiesCS.HelperClasses;
+using UtilitiesCS;
 using System;
 using System.Collections.Generic;
 

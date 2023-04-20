@@ -1,6 +1,7 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
 Imports Microsoft.Office.Interop
 Imports UtilitiesVB
+Imports UtilitiesCS
 Imports Newtonsoft.Json.Linq
 Imports System.Reflection
 
@@ -60,7 +61,7 @@ Public Class FolderHandler
     End Sub
 
     Private Sub InitializeFromEmail(ObjItem As Object)
-        Dim OlMail = TryResolveMailItem(ObjItem)
+        Dim OlMail = MailResolution.TryResolveMailItem(ObjItem)
         If OlMail Is Nothing Then
             Throw New ArgumentException("Constructor Requires the Email Object to be passed as MailItem to use this flag")
         Else
@@ -161,7 +162,7 @@ Public Class FolderHandler
     End Sub
 
     Private Sub RecalculateSuggestions(ObjItem As Object, ByRef ReloadCTFStagingFiles As Boolean)
-        Dim OlMail As MailItem = TryResolveMailItem(ObjItem)
+        Dim OlMail As MailItem = MailResolution.TryResolveMailItem(ObjItem)
         If OlMail IsNot Nothing Then
             If _globals.AF.SuggestionFilesLoaded = False Then ReloadCTFStagingFiles = True
             Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles)

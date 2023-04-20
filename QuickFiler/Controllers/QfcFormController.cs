@@ -64,7 +64,7 @@ namespace QuickFiler.Controllers
                                                   viewerInstance: _formViewer,
                                                   InitType: Enums.InitTypeEnum.InitSort,
                                                   ParentObject: this);
-            _groups.LoadControlsAndHandlers(listObjects);
+            _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate);
         }
 
         public void FormResize(bool Force = false)

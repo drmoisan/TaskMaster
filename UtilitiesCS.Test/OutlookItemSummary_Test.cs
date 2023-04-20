@@ -4,7 +4,6 @@ using Moq;
 using UtilitiesCS;
 using System;
 using System.Collections.Generic;
-using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Test
 {

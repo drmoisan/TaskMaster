@@ -1,6 +1,6 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
 
-Public Module MailResolution
+Public Module MailResolution_ToRemove
     Public Function IsMailUnReadable(item As MailItem) As Boolean
         Return (item.MessageClass = "IPM.Note.SMIME") Or (item.MessageClass = "IPM.Note.Secure") Or (item.MessageClass = "IPM.Note.Secure.Sign") Or (item.MessageClass = "IPM.Outlook.Recall")
     End Function

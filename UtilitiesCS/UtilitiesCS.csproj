@@ -95,6 +95,7 @@
     <Compile Include="Dialogs\DelegateButton.cs" />
     <Compile Include="HelperClasses\MailResolution.cs" />
     <Compile Include="HelperClasses\OlItemSummary.cs" />
+    <Compile Include="HelperClasses\WinFormsExtensions.cs" />
     <Compile Include="WindowsAPI\ExtraDeclarations.cs" />
     <Compile Include="EmailIntelligence\FolderConverter.cs" />
     <Compile Include="Dialogs\FolderNotFoundViewer.cs">

@@ -1,19 +1,18 @@
-﻿using System;
-using System.CodeDom;
+﻿using QuickFiler.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 using System.Windows.Forms;
 
 namespace QuickFiler.Controllers
 {
-    internal class QfcTipsDetails
+    internal class QfcTipsDetails : IQfcTipsDetails
     {
-        public QfcTipsDetails(System.Windows.Forms.Label LabelControl) 
-        { 
+        public QfcTipsDetails(System.Windows.Forms.Label LabelControl)
+        {
             _labelControl = LabelControl;
             _parentType = ResolveParentType();
             if (_parentType == typeof(TableLayoutPanel))
@@ -26,17 +25,17 @@ namespace QuickFiler.Controllers
             {
                 _panel = (System.Windows.Forms.Panel)_labelControl.Parent;
             }
-            _state = ToggleState.On;
+            _state = IQfcTipsDetails.ToggleState.On;
         }
 
-        private Type ResolveParentType()
+        public Type ResolveParentType()
         {
             if (_labelControl.Parent == null)
             {
                 throw new ArgumentException($"The parent of {nameof(LabelControl)} is null. " +
                 $"Must be of type {typeof(TableLayoutPanel)}");
             }
-            else if (!new List<Type>{typeof(TableLayoutPanel), 
+            else if (!new List<Type>{typeof(TableLayoutPanel),
                                     typeof(System.Windows.Forms.Panel)}
                                     .Contains(
                                     _labelControl.Parent.GetType()))
@@ -53,31 +52,30 @@ namespace QuickFiler.Controllers
         private System.Windows.Forms.Panel _panel;
         private int _columnNumber;
         private System.Single _columnWidth;
-        private ToggleState _state;
+        private IQfcTipsDetails.ToggleState _state;
         private Type _parentType;
-
 
         public System.Windows.Forms.Label LabelControl { get => _labelControl; }
         public TableLayoutPanel TLP { get => _tlp; }
         public int ColumnNumber { get => _columnNumber; }
         public float ColumnWidth { get => _columnWidth; }
-        public enum ToggleState { Off = 0, On = 1 }
         
-        public void Toggle() 
+
+        public void Toggle()
         {
-            if (_state == ToggleState.Off)
+            if (_state == IQfcTipsDetails.ToggleState.Off)
             {
-                Toggle(ToggleState.On);
+                Toggle(IQfcTipsDetails.ToggleState.On);
             }
             else
             {
-                Toggle(ToggleState.Off);
+                Toggle(IQfcTipsDetails.ToggleState.Off);
             }
         }
 
-        public void Toggle(ToggleState desiredState) 
+        public void Toggle(IQfcTipsDetails.ToggleState desiredState)
         {
-            if (desiredState == ToggleState.Off)
+            if (desiredState == IQfcTipsDetails.ToggleState.Off)
             {
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;

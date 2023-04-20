@@ -13,8 +13,6 @@ namespace QuickFiler.Interfaces
         /// Toggles special formatting for one group to highlight the group of controls that is active
         /// </summary>
         void Accel_FocusToggle(); // Turn on or off the formatting to highlight this QfcItem
-        
-        
         void Accel_Toggle();
         void ctrlsRemove(); // May not be necessary
         bool BlExpanded {  get; }
