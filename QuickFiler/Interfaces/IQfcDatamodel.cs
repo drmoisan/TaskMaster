@@ -11,6 +11,5 @@ namespace QuickFiler.Interfaces
         void UndoMove();
         StackObjectCS<object> StackMovedItems { get; set; }
         bool MoveItems(ref StackObjectCS<object> StackMovedItems);
-        void CountMailsInConv(int ct = 0); 
     }
 }

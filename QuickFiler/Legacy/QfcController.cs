@@ -490,7 +490,7 @@ namespace QuickFiler.Legacy
                 Debug.WriteLine(ctlTmp.GetType().Name);
                 switch (ctlTmp.GetType().Name ?? "")
                 {
-                    case "TLP":
+                    case "Panel":
                         {
                             ItemPanel = (Panel)ctlTmp;
                             break;

@@ -89,6 +89,10 @@ Public Class RibbonViewer
         _controller.LoadQuickFiler()
     End Sub
 
+    Public Sub Runtest(ByVal control As Office.IRibbonControl)
+        _controller.Runtest()
+    End Sub
+
 #End Region
 
 #Region "Helpers"

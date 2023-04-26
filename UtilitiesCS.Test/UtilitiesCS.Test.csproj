@@ -49,6 +49,7 @@
     <Reference Include="Fizzler, Version=1.2.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
       <HintPath>..\packages\Fizzler.1.2.1\lib\netstandard2.0\Fizzler.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -121,6 +122,7 @@
     <Compile Include="UnitTest3.cs" />
     <Compile Include="OutlookItemSummary_Test.cs" />
     <Compile Include="DictionaryExtensions_Test.cs" />
+    <Compile Include="RunMSDemo.cs" />
     <Compile Include="YesNoToAll_Test.cs" />
   </ItemGroup>
   <ItemGroup>

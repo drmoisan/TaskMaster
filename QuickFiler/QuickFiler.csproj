@@ -100,12 +100,6 @@
     <Compile Include="Viewers\QfcFormViewer.Designer.cs">
       <DependentUpon>QfcFormViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Viewers\QfcItemViewerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Viewers\QfcItemViewerForm.Designer.cs">
-      <DependentUpon>QfcItemViewerForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Legacy\QuickFileController.cs" />
     <Compile Include="Legacy\QfcConstants.cs" />
     <Compile Include="Controllers\QfcKeyboardHandler.cs" />
@@ -134,9 +128,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QfcItemViewerForm.resx">
-      <DependentUpon>QfcItemViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Legacy\QfcFormLegacyViewer.resx">
       <DependentUpon>QfcFormLegacyViewer.cs</DependentUpon>

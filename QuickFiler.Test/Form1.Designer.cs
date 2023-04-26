@@ -36,9 +36,9 @@
             MainPanel = new System.Windows.Forms.Panel();
             MainLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            ControlGroup3 = new QfcItemViewerForm();
-            ControlGroup1 = new QfcItemViewerForm();
-            ControlGroup2 = new QfcItemViewerForm();
+            ControlGroup3 = new QfcItemViewer();
+            ControlGroup1 = new QfcItemViewer();
+            ControlGroup2 = new QfcItemViewer();
             ButtonAdd = new System.Windows.Forms.Button();
             ButtonAdd.Click += new System.EventHandler(ButtonAdd_Click);
             TableLayoutPanel1.SuspendLayout();
@@ -199,11 +199,11 @@
         #endregion
 
         internal System.Windows.Forms.TableLayoutPanel TableLayoutPanel1;
-        internal QfcItemViewerForm ControlGroup1;
+        internal QfcItemViewer ControlGroup1;
         internal System.Windows.Forms.Button Button2;
         internal System.Windows.Forms.Button Button1;
-        internal QfcItemViewerForm ControlGroup3;
-        internal QfcItemViewerForm ControlGroup2;
+        internal QfcItemViewer ControlGroup3;
+        internal QfcItemViewer ControlGroup2;
         internal System.Windows.Forms.Panel MainPanel;
         internal System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
         internal System.Windows.Forms.TableLayoutPanel TableLayoutPanel2;

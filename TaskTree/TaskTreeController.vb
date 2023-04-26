@@ -1,4 +1,5 @@
 ﻿Imports BrightIdeasSoftware
+Imports Outlook = Microsoft.Office.Interop.Outlook
 Imports System.Collections
 Imports System.Drawing
 Imports System.Diagnostics
@@ -14,9 +15,10 @@ Public Class TaskTreeController
     Private expanded As Boolean = False
     Private filtercompleted As Boolean = True
     Private _viewer As TaskTreeForm
+    Private _globals As IApplicationGlobals
     Public _dataModel As New TreeOfToDoItems(New List(Of TreeNode(Of ToDoItem)))
 
-    Public Sub New(Viewer As TaskTreeForm, DataModel As TreeOfToDoItems)
+    Public Sub New(AppGlobals As IApplicationGlobals, Viewer As TaskTreeForm, DataModel As TreeOfToDoItems)
         _viewer = Viewer
         _dataModel = DataModel
         _viewer.SetController(Me)
@@ -203,7 +205,7 @@ Public Class TaskTreeController
             Dim strSeed = If(_dataModel.ListOfToDoTree.Count > toMove.Count, _dataModel.ListOfToDoTree(_dataModel.ListOfToDoTree.Count - toMove.Count - 2).Value.ToDoID, "00")
 
             For i = _dataModel.ListOfToDoTree.Count - toMove.Count - 1 To _dataModel.ListOfToDoTree.Count - 1
-                strSeed = Globals.ThisAddIn.IDList.GetNextAvailableToDoID(strSeed)
+                strSeed = _globals.TD.IDList.GetNextAvailableToDoID(strSeed)
                 _dataModel.ListOfToDoTree(i).Value.ToDoID = strSeed
             Next
         Else
@@ -211,7 +213,7 @@ Public Class TaskTreeController
             Dim idx As Integer = target.Parent.Children.IndexOf(target) + siblingOffset
             'Inconsistent with case of Parent is nothing
             target.Parent.Children.InsertRange(idx, toMove.Cast(Of TreeNode(Of ToDoItem))()) 'DataModel: Inserted into new data model tree. 
-            _dataModel.ReNumberChildrenIDs(target.Parent.Children, Globals.ThisAddIn.IDList)         'DataModel: Renumber IDs of new branch order
+            _dataModel.ReNumberChildrenIDs(target.Parent.Children, _globals.TD.IDList)         'DataModel: Renumber IDs of new branch order
 
         End If
 
@@ -243,7 +245,7 @@ Public Class TaskTreeController
             End If
 
             x.Parent = target                                   'Data Model: Add pointer to new Parent in data model
-            _dataModel.AddChild(x, target, Globals.ThisAddIn.IDList)    'Data Model: Add child to parent and renumber all affected
+            _dataModel.AddChild(x, target, _globals.TD.IDList)    'Data Model: Add child to parent and renumber all affected
 
             '***OLD Code to add child to target parent and renumber
             'target.AddChild(x)                      'Data Model: Add child to target parent and renumber grandchildren
@@ -313,7 +315,7 @@ Public Class TaskTreeController
             If TypeOf objItem Is Outlook.MailItem Then
                 Dim OlMail As Outlook.MailItem = TryCast(objItem, Outlook.MailItem)
                 If OlMail IsNot Nothing Then
-                    Dim OlExplorer As Outlook.Explorer = Globals.ThisAddIn.Application.ActiveExplorer
+                    Dim OlExplorer As Outlook.Explorer = _globals.Ol.App.ActiveExplorer()
                     If OlExplorer.IsItemSelectableInView(OlMail) Then
                         OlExplorer.ClearSelection()
                         OlExplorer.AddToSelection(OlMail)
@@ -325,7 +327,7 @@ Public Class TaskTreeController
             ElseIf TypeOf objItem Is Outlook.TaskItem Then
                 Dim OlTask As Outlook.TaskItem = TryCast(objItem, Outlook.TaskItem)
                 If OlTask IsNot Nothing Then
-                    Dim OlExplorer As Outlook.Explorer = Globals.ThisAddIn.Application.ActiveExplorer
+                    Dim OlExplorer As Outlook.Explorer = _globals.Ol.App.ActiveExplorer()
                     If OlExplorer.IsItemSelectableInView(OlTask) Then
                         OlExplorer.ClearSelection()
                         OlExplorer.AddToSelection(OlTask)

@@ -31,8 +31,8 @@ Public Class cConversation
         Do Until pTable.EndOfTable
             oRow = pTable.GetNextRow
             ' Use EntryID and StoreID to open the item.
-            Debug.Print(oRow("Subject"))
-            Debug.Print(oRow("http://schemas.microsoft.com/mapi/proptag/0x0e05001f"))
+            Debug.WriteLine(oRow("Subject"))
+            Debug.WriteLine(oRow("http://schemas.microsoft.com/mapi/proptag/0x0e05001f"))
         Loop
     End Sub
 

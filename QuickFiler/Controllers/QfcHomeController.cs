@@ -29,7 +29,7 @@ namespace QuickFiler.Controllers
         {
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
-            _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer());
+            _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
             _explorerController = new QfcExplorerController();
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler();

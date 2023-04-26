@@ -52,7 +52,7 @@ namespace QuickFiler.Controllers
                 {
                     ItemGroup grp = new();
                     grp.ItemViewer = LoadItemViewer(++i, template, true);
-                    grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, (MailItem)objItem, this);
+                    grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, (MailItem)objItem, this);
                     itemGroups.Add(grp);
                 }
                 else
@@ -71,7 +71,7 @@ namespace QuickFiler.Controllers
                                             RowStyle template,
                                             bool blGroupConversation)
         {
-            _viewer.Refresh();
+            //_viewer.Refresh();
             QfcItemViewer itemViewer = new();
             _itemTLP.MinimumSize = new System.Drawing.Size(
                 _itemTLP.MinimumSize.Width, 
@@ -84,7 +84,7 @@ namespace QuickFiler.Controllers
             itemViewer.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             itemViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             itemViewer.Dock = DockStyle.Fill;
-            _viewer.Refresh();
+            //_viewer.Refresh();
             return itemViewer;
         }
 

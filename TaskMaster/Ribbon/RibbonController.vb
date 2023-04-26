@@ -1,7 +1,11 @@
 ﻿Imports Microsoft.Office.Tools.Ribbon
 Imports ToDoModel
 Imports UtilitiesVB
+Imports UtilitiesCS
+Imports System.Diagnostics
 Imports TaskVisualization
+Imports Outlook = Microsoft.Office.Interop.Outlook
+Imports TaskTree
 
 Public Class RibbonController
     Private _viewer As RibbonViewer
@@ -35,7 +39,7 @@ Public Class RibbonController
         Dim taskTreeViewer As TaskTreeForm = New TaskTreeForm
         Dim dataModel As TreeOfToDoItems = New TreeOfToDoItems(New List(Of TreeNode(Of ToDoItem)))
         dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals.Ol.App)
-        Dim taskTreeController As TaskTreeController = New TaskTreeController(taskTreeViewer, dataModel)
+        Dim taskTreeController As TaskTreeController = New TaskTreeController(_globals, taskTreeViewer, dataModel)
         taskTreeViewer.Show()
     End Sub
 
@@ -110,6 +114,17 @@ Public Class RibbonController
     Friend Sub FlagAsTask()
         Dim taskFlagger As New FlagTasks(_globals)
         taskFlagger.Run()
+    End Sub
+
+    Friend Sub Runtest()
+        'UtilitiesCS.Examples.MSDemoConv.DemoConversation(_globals.Ol.App.ActiveExplorer.Selection.Item(1))
+        Dim ObjItem As Object = _globals.Ol.App.ActiveExplorer.Selection.Item(1)
+        Dim conv As Outlook.Conversation = ObjItem.GetConversation()
+        Dim df As Microsoft.Data.Analysis.DataFrame = conv.GetDataFrame()
+        Debug.WriteLine(df.PrettyText())
+        df.Display()
+        'Dim table As Outlook.Table = conv.GetTable(WithFolder:=True, WithStore:=True)
+        'table.EnumerateTable()
     End Sub
 
 End Class

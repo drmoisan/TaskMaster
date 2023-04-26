@@ -23,12 +23,12 @@ namespace QuickFiler.Test
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            ControlGroup1.ToggleAccelerator();
+            //ControlGroup1.ToggleAccelerator();
         }
 
         private void LoadControlGroup()
         {
-            var _controlGroup = new QfcItemViewerForm();
+            var _controlGroup = new QfcItemViewer();
             TableLayoutPanel1.SuspendLayout();
             TableLayoutPanel1.RowCount += 1;
             TableLayoutPanel1.RowStyles.Insert(TableLayoutPanel1.RowCount - 2, new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0f));
@@ -38,7 +38,7 @@ namespace QuickFiler.Test
 
         }
 
-        private void SetControlGroupOptions(QfcItemViewerForm group)
+        private void SetControlGroupOptions(QfcItemViewer group)
         {
             group.AutoSize = true;
             group.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;

@@ -18,11 +18,9 @@ Public Module CaptureEmailDetailsModule
         'Const PR_SMTP_ADDRESS As String =
         '"http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
-        Const PR_LAST_VERB_EXECUTED As String = "http://schemas.microsoft.com/mapi/proptag/0x10810003"
-
         strAry(1) = GetTriage(OlMail)
         strAry(2) = GetEmailFolderPath(OlMail, emailRootFolder)
-        strAry(3) = Format(OlMail.SentOn, "YYYY-MM-DD\Th:mm:ss\+\0\0\:\0\0")
+        strAry(3) = Format(OlMail.SentOn, "yyyy-MM-dd\Th:mm:ss\+\0\0\:\0\0")
 
         Dim recipients = GetRecipients(OlMail)
         strAry(5) = recipients.recipientsTo
@@ -34,17 +32,18 @@ Public Module CaptureEmailDetailsModule
         strAry(10) = OlMail.ConversationID
         strAry(11) = OlMail.EntryID
         strAry(12) = GetAttachmentNames(OlMail)
-        strAry(13) = GetActionTaken(OlMail, PR_LAST_VERB_EXECUTED)
+        strAry(13) = GetActionTaken(OlMail)
 
         Return strAry
 
     End Function
 
-    Private Function GetActionTaken(OlMail As MailItem, PR_LAST_VERB_EXECUTED As String) As String
+    Public Function GetActionTaken(OlMail As MailItem) As String
         Dim lngLastVerbExec As Integer
         Const Last_Verb_Reply_All = 103
         Const Last_Verb_Reply_Sender = 102
         Const Last_Verb_Reply_Forward = 104
+        Const PR_LAST_VERB_EXECUTED As String = "http://schemas.microsoft.com/mapi/proptag/0x10810003"
         Dim action As String
 
         If OlMail.IsMarkedAsTask = True Then
@@ -146,7 +145,7 @@ Public Module CaptureEmailDetailsModule
         Return folderPath
     End Function
 
-    Private Function GetTriage(OlMail As MailItem) As String
+    Public Function GetTriage(OlMail As MailItem) As String
         Dim OlProperty As UserProperty = OlMail.UserProperties.Find("Triage")
         Return If(OlProperty Is Nothing, "", DirectCast(OlProperty.Value, String))
     End Function

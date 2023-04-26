@@ -18,7 +18,8 @@ namespace UtilitiesCS
             Type = 1,
             Subject = 2,
             Date = 4,
-            All = 7
+            All = 7,
+            Folderpath = 8
         }
         public static string Extract(object Item, Details Flags) 
         {
@@ -30,12 +31,12 @@ namespace UtilitiesCS
             else { return $"Details.Type: {Item.GetType().ToString()}"; }
         }
 
-        internal static string ToString(this Dictionary<Details, string> Dict, Details Flags)
+        public static string ToString(this Dictionary<Details, string> Dict, Details Flags)
         {
             return String.Join(", ",Dict.Where(x => Flags.HasFlag(x.Key)).Select(x => $"{x.Key}: {x.Value}"));
         }
 
-        internal static Dictionary<Details, string> ExtractSummary(MailItem item)
+        public static Dictionary<Details, string> ExtractSummary(MailItem item)
         {
             MailItem OlMail = MailResolution.TryResolveMailItem(item);
             if (OlMail == null)
@@ -50,52 +51,68 @@ namespace UtilitiesCS
             {
                 { Details.Type, typeof(MailItem).ToString() },
                 { Details.Subject, OlMail.Subject },
-                { Details.Date, OlMail.SentOn.ToString("MM-dd-yyyy h:mm tt")}
+                { Details.Date, OlMail.SentOn.ToString("MM-dd-yyyy h:mm tt") },
+                { Details.Folderpath, OlMail.Parent.Folderpath}
             };
             //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
         }
-        
-        internal static Dictionary<Details, string> ExtractSummary(AppointmentItem item)
+
+        public static Dictionary<Details, string> ExtractSummary(object Item)
+        {
+            if (Item is AppointmentItem) { return ExtractSummary((AppointmentItem)Item); }
+            else if (Item is MailItem) { return ExtractSummary((MailItem)Item); }
+            else if (Item is MeetingItem) { return ExtractSummary((MeetingItem)Item); }
+            else if (Item is TaskRequestItem) { return ExtractSummary((TaskRequestItem)Item); }
+            else if (Item is TaskRequestUpdateItem) { return ExtractSummary((TaskRequestUpdateItem)Item); }
+            else { throw new ArgumentException($"{Item.GetType().ToString()} is an unsupported type"); }
+            //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
+        }
+
+        public static Dictionary<Details, string> ExtractSummary(AppointmentItem item)
         {
             return new Dictionary<Details, string>()
             {
                 { Details.Type, typeof(AppointmentItem).ToString() },
                 { Details.Subject, item.Subject },
-                { Details.Date, item.Start.ToString("MM-dd-yyyy h:mm tt") }
+                { Details.Date, item.Start.ToString("MM-dd-yyyy h:mm tt") },
+                { Details.Folderpath, item.Parent.Folderpath}
             };
             //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
         }
-        
-        internal static Dictionary<Details, string> ExtractSummary(MeetingItem item)
+
+        public static Dictionary<Details, string> ExtractSummary(MeetingItem item)
         {
             return new Dictionary<Details, string>()
             {
                 { Details.Type, typeof(MeetingItem).ToString() },
                 { Details.Subject, item.Subject },
-                { Details.Date, item.SentOn.ToString("MM-dd-yyyy h:mm tt") }
+                { Details.Date, item.SentOn.ToString("MM-dd-yyyy h:mm tt") },
+                { Details.Folderpath, item.Parent.Folderpath}
             };
             //return $"Type: {item.GetType()} Subject: {item.Subject} SentOn: {item.SentOn.ToString("MM-dd-yyyy h:mm t")}";
         }
-        
-        internal static Dictionary<Details, string> ExtractSummary(TaskRequestItem item)
+
+        public static Dictionary<Details, string> ExtractSummary(TaskRequestItem item)
         {
             
             return new Dictionary<Details, string>()
             {
                 { Details.Type, typeof(TaskRequestItem).ToString() },
                 { Details.Subject, item.Subject },
-                { Details.Date, item.CreationTime.ToString("MM-dd-yyyy h:mm tt") }
+                { Details.Date, item.CreationTime.ToString("MM-dd-yyyy h:mm tt") },
+                { Details.Folderpath, item.Parent.Folderpath}
             };
             //AppointmentItem, MeetingItem, TaskRequestItem, TaskRequestUpdateItem
         }
-        
-        internal static Dictionary<Details, string> ExtractSummary(TaskRequestUpdateItem item)
+
+        public static Dictionary<Details, string> ExtractSummary(TaskRequestUpdateItem item)
         {
             return new Dictionary<Details, string>()
             {
                 { Details.Type, typeof(TaskRequestUpdateItem).ToString() },
                 { Details.Subject, item.Subject },
-                { Details.Date, item.LastModificationTime.ToString("MM-dd-yyyy h:mm tt") }
+                { Details.Date, item.LastModificationTime.ToString("MM-dd-yyyy h:mm tt") },
+                { Details.Folderpath, item.Parent.Folderpath}
             };
             //AppointmentItem, MeetingItem, TaskRequestItem, TaskRequestUpdateItem
         }

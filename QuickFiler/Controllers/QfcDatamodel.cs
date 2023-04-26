@@ -8,14 +8,17 @@ using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesVB;
 using UtilitiesCS;
+using static UtilitiesCS.OlItemSummary;
+
 
 namespace QuickFiler.Controllers
 {
     internal class QfcDatamodel : IQfcDatamodel
     {
-        public QfcDatamodel(Explorer ActiveExplorer) 
+        public QfcDatamodel(Explorer ActiveExplorer, Application OlApp) 
         { 
             _activeExplorer = ActiveExplorer;
+            _olApp = OlApp;
             var listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_activeExplorer);
             _masterQueue = new Queue<object>();
             foreach (MailItem email in listEmailsInFolder)
@@ -29,6 +32,7 @@ namespace QuickFiler.Controllers
         private Explorer _activeExplorer;
         private Queue<object> _masterQueue;
         private StackObjectCS<object> _movedObjects;
+        private Application _olApp;
 
         public StackObjectCS<object> StackMovedItems { get => _movedObjects; set => _movedObjects = value; }
 
@@ -48,11 +52,6 @@ namespace QuickFiler.Controllers
         }
 
         public bool MoveItems(ref StackObjectCS<object> StackMovedItems)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CountMailsInConv(int ct = 0)
         {
             throw new NotImplementedException();
         }
