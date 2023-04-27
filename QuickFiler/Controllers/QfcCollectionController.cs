@@ -45,6 +45,7 @@ namespace QuickFiler.Controllers
 
         public void LoadControlsAndHandlers(IList<object> listObjects, RowStyle template)
         {
+            _itemTLP.SuspendLayout();
             int i = 0;
             foreach (object objItem in listObjects)
             {
@@ -53,6 +54,8 @@ namespace QuickFiler.Controllers
                     ItemGroup grp = new();
                     grp.ItemViewer = LoadItemViewer(++i, template, true);
                     grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, (MailItem)objItem, this);
+                    grp.ItemController.PopulateConversation();
+                    grp.ItemController.PopulateFolderCombobox();
                     itemGroups.Add(grp);
                 }
                 else
@@ -61,8 +64,9 @@ namespace QuickFiler.Controllers
                 }
                 
             }
-            
             _viewer.WindowState = FormWindowState.Maximized;
+            
+            _itemTLP.ResumeLayout();
         }
 
         
@@ -71,7 +75,6 @@ namespace QuickFiler.Controllers
                                             RowStyle template,
                                             bool blGroupConversation)
         {
-            //_viewer.Refresh();
             QfcItemViewer itemViewer = new();
             _itemTLP.MinimumSize = new System.Drawing.Size(
                 _itemTLP.MinimumSize.Width, 
@@ -84,7 +87,6 @@ namespace QuickFiler.Controllers
             itemViewer.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             itemViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             itemViewer.Dock = DockStyle.Fill;
-            //_viewer.Refresh();
             return itemViewer;
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Data.Analysis;
+using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,5 +31,9 @@ namespace QuickFiler.Interfaces
         void ToggleSaveCopyOfMail();
         void ToggleSaveAttachments();
         void ToggleConversationCheckbox();
+        void PopulateConversation();
+        void PopulateConversation(DataFrame df);
+        void PopulateConversation(int countOnly);
+        DataFrame DfConversation { get; }
     }
 }

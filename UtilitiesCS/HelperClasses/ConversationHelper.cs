@@ -25,14 +25,10 @@ namespace UtilitiesCS
         }
         
         const string PROPTAG_SPECIFIER = "http://schemas.microsoft.com/mapi/proptag/";
-        
-        //Message store
-        const string PR_STORE_ENTRYID = "0x0FFB";
-        const string PT_BINARY = "0102";
 
-        //Message parent folder
-        const string PR_PARENT_DISPLAY = "0x0e05";
-        
+        // PropTag Types
+        const string PT_BINARY = "0102";
+        const string PT_LONG = "0003";
         const string PT_TSTRING = "001f"; /* Null-terminated 16-bit (2-byte) character string. 
                                            * Properties with this type have the property type 
                                            * reset to PT_UNICODE when compiling with the UNICODE 
@@ -41,17 +37,36 @@ namespace UtilitiesCS
                                            * OLE type VT_LPSTR for resulting PT_STRING8 properties 
                                            * and VT_LPWSTR for PT_UNICODE properties */
 
+        const string PR_STORE_ENTRYID = "0x0FFB"; //Message store PID + PT_BINARY
+        const string PR_PARENT_DISPLAY = "0x0e05"; //Message parent folder
+        const string PR_DEPTH = "0x3005"; /* Represents the relative level of indentation, 
+                                           * or depth, of an object in a hierarchical table
+                                           * Data type is PT_LONG */
+        const string PR_CONVERSATION_INDEX = "0x0071"; /* PT_BINARY ScCreateConversationIndex 
+                                                        * implements the index as a header block 
+                                                        * that is 22 bytes in length, followed 
+                                                        * by zero or more child blocks each 
+                                                        * 5 bytes in length */
+
+
         public static string SchemaFolderName = PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
         public static string SchemaMessageStore = PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
-        public static Dictionary<string, string> SchemaFieldName = new()
+        public static string SchemaConversationDepth = PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
+        public static string SchemaConversationIndex = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
+
+        public static Dictionary<string, string> SchemaToField = new()
         {
             {SchemaFolderName, "Folder Name" },
-            {SchemaMessageStore, "Store"}
+            {SchemaMessageStore, "Store"},
+            {SchemaConversationDepth, "ConvDepth" },
+            {SchemaConversationIndex, "ConversationIndex" }
         };
-        public static Dictionary<string, string> FieldNameSchema = new()
+        public static Dictionary<string, string> FieldToSchema = new()
         {
             {"Folder Name", SchemaFolderName },
-            {"Store", SchemaMessageStore}
+            {"Store", SchemaMessageStore},
+            {"ConvDepth", SchemaConversationDepth },
+            {"ConversationIndex", SchemaConversationIndex }
         };
 
         public static int ConversationCt(this object ObjItem, bool SameFolder, bool MailOnly)
@@ -69,31 +84,55 @@ namespace UtilitiesCS
             Outlook.Conversation conv = ObjItem.GetConversation();
             if (conv != null)
             {
-                Outlook.Table table = ObjItem
-                                      .GetConversation()
-                                      .GetTable(true, false);
-                string FolderName = ObjItem.PropertyAccessor.GetProperty(SchemaFolderName) as string;
-                table = table.FilterTable(FolderName, true);
-                
-                
+                //Outlook.Table table = ObjItem
+                //                      .GetConversation()
+                //                      .GetTable(true, false);
+                DataFrame df = conv.GetDataFrame();
+                Debug.WriteLine(df.PrettyText());
+                if (SameFolder)
+                {
+                    string FolderName = ObjItem.PropertyAccessor.GetProperty(SchemaFolderName) as string;
+                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
+                }
+                if (MailOnly)
+                {
+                    df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                }
 
-                return table.GetRowCount();
+                return (int)df.Rows.Count;
             }
             return 0;
         }
 
-        public static Outlook.Table FilterTable(this Outlook.Table table, string InFolder, bool MailOnly)
+        public static DataFrame GetConversationDf(this object ObjItem, bool SameFolder, bool MailOnly)
         {
-            
-            string filter = "@SQL=" + "\"" + SchemaFolderName + "\" = '" + InFolder + "'";
-            table = table.Restrict(filter);
-            
-            if (MailOnly)
+            if (ObjItem is MailItem)
             {
-                filter = $"[MessageClass] = 'IPM.NOTE'";
-                table = table.Restrict(filter);
+                MailItem mailItem = (MailItem)ObjItem;
+                return mailItem.GetConversationDf(SameFolder, MailOnly);
             }
-            return table;
+            return null;
+        }
+
+        public static DataFrame GetConversationDf(this MailItem ObjItem, bool SameFolder, bool MailOnly)
+        {
+            Outlook.Conversation conv = ObjItem.GetConversation();
+            if (conv != null)
+            {
+                DataFrame df = conv.GetDataFrame();
+                Debug.WriteLine(df.PrettyText());
+                if (SameFolder)
+                {
+                    string FolderName = ObjItem.PropertyAccessor.GetProperty(SchemaFolderName) as string;
+                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
+                }
+                if (MailOnly)
+                {
+                    df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                }
+                return df;
+            }
+            return null;
         }
 
         public static DataFrame GetDataFrame(this Outlook.Conversation conversation)
@@ -101,7 +140,8 @@ namespace UtilitiesCS
             Outlook.Table table = conversation.GetTable();
             if (table != null)
             {
-                string[] columnsToAdd = new string[3] { "SentOn", SchemaFolderName, SchemaMessageStore };
+                // add From
+                string[] columnsToAdd = new string[5] { "SentOn", SchemaFolderName, SchemaMessageStore, SchemaConversationDepth, SchemaConversationIndex };
                 foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
             }
             string[] columnHeaders = table.GetColumnHeaders();
@@ -183,8 +223,8 @@ namespace UtilitiesCS
             foreach (Column column in table.Columns)
             {
                 string name = column.Name;
-                if (SchemaFieldName.ContainsKey(name))
-                    name = SchemaFieldName[name];
+                if (SchemaToField.ContainsKey(name))
+                    name = SchemaToField[name];
                 headers[++i] = name;
             }
             return headers;
