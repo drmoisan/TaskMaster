@@ -61,6 +61,10 @@
     <Reference Include="Office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Svg.3.4.4\lib\net462\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.AppContext.4.3.0\lib\net463\System.AppContext.dll</HintPath>
@@ -81,6 +85,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.3.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
@@ -217,6 +222,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Interfaces\IQfcFormViewer.cs" />
     <Compile Include="Interfaces\IQfcTipsDetails.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
@@ -272,6 +283,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -317,6 +331,10 @@
       <Project>{6b8006b4-9eb2-466e-a178-3e69ff42e16e}</Project>
       <Name>EmailIntelligence</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SVGControl\SVGControl.csproj">
+      <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
+      <Name>SVGControl</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TaskVisualization\TaskVisualization.vbproj">
       <Project>{cd11d1cb-dd70-4413-b278-263f5474c4b5}</Project>
       <Name>TaskVisualization</Name>
@@ -334,7 +352,30 @@
       <Name>UtilitiesVB</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\ApplicationFlyout.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Close.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Delete.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FlagDarkRed.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\QuickFind.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\QuickRefresh.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TextBlock.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Web.svg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
