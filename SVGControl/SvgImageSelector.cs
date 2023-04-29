@@ -42,7 +42,8 @@ namespace SVGControl
         }
 
         private SvgDocument _doc;
-        private String _imagePath;
+        private string _relativeImagePath;
+        private string _absoluteImagePath;
         private Size _outer;
         private Size _original { get; set; }
         private Padding _margin;
@@ -50,7 +51,7 @@ namespace SVGControl
 
         internal String AboluteImagePath
         {
-            get { return _imagePath; }
+            get { return _absoluteImagePath; }
         }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -64,36 +65,53 @@ namespace SVGControl
         {
             get
             {
-                if (_imagePath == null)
+                if (_absoluteImagePath == null)
                 {
                     return "(none)";
                 }
                 else
                 {
-                    return _imagePath;
+                    return _relativeImagePath;
                     //string workingDirectory = Environment.CurrentDirectory;
-                    //string relativePath = _imagePath.MakeRelativePath(workingDirectory);
+                    //string relativePath = _relativeImagePath.MakeRelativePath(workingDirectory);
                     //return relativePath;
                 }
 
             }
             set
             {
-                if (_imagePath != value)
+                //string valueAbs = value.AbsoluteFromURI(anchorPath:);
+                if (_relativeImagePath != value)
                 {
-                    _imagePath = value;
-                    if (_imagePath == "")
+                    
+                    if ((value == "")|(value == "(none)"))
                     {
+                        _relativeImagePath = value;
                         _doc = null;
                     }
                     else
                     {
-                        _doc = SvgDocument.Open(_imagePath);
+                        string valueAbs = value.AbsoluteFromURI(GetAnchorPath());
+                        _doc = SvgDocument.Open(valueAbs);
                         _original = _doc.Draw().Size;
+                        _absoluteImagePath = valueAbs;
+                        _relativeImagePath = valueAbs.GetRelativeURI(GetAnchorPath());
                     }
                     NotifyPropertyChanged("ImagePath");
                 }
             }
+        }
+
+        private string GetAnchorPath()
+        {
+            string workingDirectory = Environment.CurrentDirectory;
+            List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
+            if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))
+            {
+                // Backwards traverse 2 levels
+                return Directory.GetParent(workingDirectory).Parent.FullName;
+            }
+            else { return workingDirectory; }
         }
 
         [NotifyParentProperty(true)]
@@ -172,14 +190,14 @@ namespace SVGControl
             }
             set
             {
-                if ((value == true) && (_imagePath != "") && (_doc != null))
+                if ((value == true) && (_relativeImagePath != "") && (_doc != null))
                 {
                     // Launch file save dialog with appropriate filters
                     SaveFileDialog saveFileDialog1 = new SaveFileDialog();
                     saveFileDialog1.Filter = "Png Image|*.png|JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
                     saveFileDialog1.Title = "Save rendered Image File";
-                    saveFileDialog1.InitialDirectory = Path.GetFullPath(_imagePath);
-                    saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(_imagePath);
+                    saveFileDialog1.InitialDirectory = Path.GetFullPath(_relativeImagePath);
+                    saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(_relativeImagePath);
 
                     saveFileDialog1.ShowDialog();
 
@@ -212,7 +230,7 @@ namespace SVGControl
                     }
                     
                 }
-                else if (_imagePath == "") 
+                else if (_relativeImagePath == "") 
                 {
                     MessageBox.Show("Image path must have a value to save the rendering");
                     

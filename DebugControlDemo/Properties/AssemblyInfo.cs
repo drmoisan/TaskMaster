@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DebugControl")]
+[assembly: AssemblyTitle("DebugControlDemo")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PepsiCo Inc")]
-[assembly: AssemblyProduct("DebugControl")]
+[assembly: AssemblyProduct("DebugControlDemo")]
 [assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b8ed5f97-b5a6-4015-9e4e-5e9b0dbded6a")]
+[assembly: Guid("4a25c13c-1421-47eb-99a3-400501523642")]
 
 // Version information for an assembly consists of the following four values:
 //

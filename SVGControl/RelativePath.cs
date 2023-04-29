@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -74,12 +75,46 @@ namespace SVGControl
         public static string AbsoluteFromURI(this string uriToMakeAbsolute, string anchorPath)
         {
             if (uriToMakeAbsolute.StartsWith("./"))
+            {
                 uriToMakeAbsolute = uriToMakeAbsolute.Substring(2);
-            anchorPath = NormalizeFolderpath(anchorPath);
+                anchorPath = NormalizeFolderpath(anchorPath);
 
-            string relativePath = uriToMakeAbsolute.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            string absolutePath = Path.GetFullPath(anchorPath + relativePath);
-            return absolutePath;
+                string relativePath = uriToMakeAbsolute.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                string absolutePath = Path.GetAbsPath(relativePath, anchorPath);
+                return absolutePath;
+            }
+            return uriToMakeAbsolute;
+        }
+
+        static public string GetAbsPath(string relativePath, string anchorPath)
+        {
+            if (Path.IsFullyQualified(path))
+            {
+                // basePath is meaningless, call normal Path.GetFullPath()
+                return Path.GetFullPath(path);
+            }
+
+            // Windows ONLY:
+
+            // Look for C:, etc. with no slash
+            if (path.Length > 1 && path[1] == ':' && PathInternalExposed.IsValidDriveChar(path[0]))
+            {
+                // Shouldn't have a slash after the colon- would have been fully qualified
+                Debug.Assert(path.Length == 2 || !PathInternal.IsDirectorySeparator(path[3]));
+
+                // Return as described in https://github.com/dotnet/corefx/issues/25535#issuecomment-348363953
+            }
+
+            if (PathInternal.IsDevice(basePath))
+            {
+                // Combine as described in https://github.com/dotnet/corefx/issues/25535#issuecomment-348363953
+                // https://github.com/dotnet/coreclr/blob/688b75c143aa0e080f386a04c74b13b3fc9877bf/src/mscorlib/shared/System/IO/Path.Unix.cs#L51
+                // Don't want to eat segments above the root, make sure you have tests! ("C:\.." should come out to "C:\", or "\\?\C:\.." should result in "\\?\C:\", etc.)
+                return Path.RemoveRelativeSegments(PathHelpers.CombineNoChecks(basePath, path), PathInternal.GetRootLength(basePath));
+            }
+
+            // "Normal" path. Combine and resolve (same for Windows/Unix)
+            return (Path.GetFullPath(PathHelpers.CombineNoChecks(basePath, path)));
         }
 
         static public string NormalizeFolderpath(string filepath)
