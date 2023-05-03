@@ -37,7 +37,7 @@
             this.buttonSVG1.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
             this.buttonSVG1.ImageSVG.SaveRendering = false;
             this.buttonSVG1.ImageSVG.Size = new System.Drawing.Size(144, 63);
-            this.buttonSVG1.Location = new System.Drawing.Point(170, 149);
+            this.buttonSVG1.Location = new System.Drawing.Point(326, 155);
             this.buttonSVG1.Name = "buttonSVG1";
             this.buttonSVG1.Size = new System.Drawing.Size(150, 69);
             this.buttonSVG1.TabIndex = 0;
@@ -56,8 +56,9 @@
 
         }
 
+
         #endregion
 
-        private ButtonSVG buttonSVG1;
+        private SVGControl.ButtonSVG buttonSVG1;
     }
 }

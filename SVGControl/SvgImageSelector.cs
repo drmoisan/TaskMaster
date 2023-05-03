@@ -83,7 +83,6 @@ namespace SVGControl
                 //string valueAbs = value.AbsoluteFromURI(anchorPath:);
                 if (_relativeImagePath != value)
                 {
-                    
                     if ((value == "")|(value == "(none)"))
                     {
                         _relativeImagePath = value;
@@ -109,9 +108,13 @@ namespace SVGControl
             if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))
             {
                 // Backwards traverse 2 levels
-                return Directory.GetParent(workingDirectory).Parent.FullName;
+                workingDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
             }
-            else { return workingDirectory; }
+            if (workingDirectory[workingDirectory.Length - 1] != Path.DirectorySeparatorChar)
+            {
+                workingDirectory += Path.DirectorySeparatorChar;
+            }
+            return workingDirectory; 
         }
 
         [NotifyParentProperty(true)]
@@ -237,7 +240,7 @@ namespace SVGControl
                 }
                 else if(_doc == null)
                 {
-                    MessageBox.Show("Image path does not refer to a valid SVG document");
+                    // MessageBox.Show("Image path does not refer to a valid SVG document");
                     
                 }
                 _saveRendering = false; 

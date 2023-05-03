@@ -27,6 +27,7 @@ namespace QuickFiler.Controllers
 
         public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
         {
+            QfcFormViewer.Main();
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
             _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);

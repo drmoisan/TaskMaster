@@ -34,6 +34,17 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AltCover.Monitor, Version=8.6.0.0, Culture=neutral, PublicKeyToken=c02b1a9f5b7cade8, processorArchitecture=MSIL">
       <HintPath>..\packages\altcover.8.6.45\lib\net20\AltCover.Monitor.dll</HintPath>
@@ -222,12 +233,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Interfaces\IQfcFormViewer.cs" />
     <Compile Include="Interfaces\IQfcTipsDetails.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
@@ -258,6 +263,18 @@
     <Compile Include="Controllers\QfcFormController.cs" />
     <Compile Include="Legacy\QfcGroupOperationsLegacy.cs" />
     <Compile Include="Controllers\QfcItemController.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="ThemeHelper.cs" />
+    <Compile Include="Viewers\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewers\Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcFormViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -275,6 +292,36 @@
       <DependentUpon>QfcFormLegacyViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Controllers\QfcDatamodel.cs" />
+    <Compile Include="Viewers\QfcFormViewerExpanded.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewers\QfcFormViewerExpanded.Designer.cs">
+      <DependentUpon>QfcFormViewerExpanded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\QfcFormViewerDark.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewers\QfcFormViewerDark.Designer.cs">
+      <DependentUpon>QfcFormViewerDark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\QfcItemViewerV1.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\QfcItemViewerV1.Designer.cs">
+      <DependentUpon>QfcItemViewerV1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\QFCItemViewerLightNew.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\QFCItemViewerLightNew.Designer.cs">
+      <DependentUpon>QFCItemViewerLightNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\QFCItemViewerDarkNew.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\QFCItemViewerDarkNew.Designer.cs">
+      <DependentUpon>QFCItemViewerDarkNew.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcItemViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -283,26 +330,46 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcFormViewer.resx">
       <DependentUpon>QfcFormViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
-      <DependentUpon>QfcItemViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Viewers\QfcFormViewerExpanded.resx">
+      <DependentUpon>QfcFormViewerExpanded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcFormViewerDark.resx">
+      <DependentUpon>QfcFormViewerDark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcItemViewerV1.resx">
+      <DependentUpon>QfcItemViewerV1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Legacy\QfcFormLegacyViewer.resx">
       <DependentUpon>QfcFormLegacyViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QFCItemViewerLightNew.resx">
+      <DependentUpon>QFCItemViewerLightNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QFCItemViewerDarkNew.resx">
+      <DependentUpon>QFCItemViewerDarkNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
+      <DependentUpon>QfcItemViewer.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="app.manifest" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Resources\ApplicationFlyout.png" />
   </ItemGroup>
   <ItemGroup>

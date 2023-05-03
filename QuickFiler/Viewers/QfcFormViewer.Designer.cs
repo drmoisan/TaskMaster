@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.L1v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.L1v1L2h_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.L1v1L2h0_KeyboardDialog = new System.Windows.Forms.TextBox();
@@ -35,6 +36,7 @@
             this.L1v1L2h3_ButtonCancel = new System.Windows.Forms.Button();
             this.L1v1L2h4_ButtonUndo = new System.Windows.Forms.Button();
             this.L1v1L2h5_SpnEmailPerLoad = new System.Windows.Forms.NumericUpDown();
+            this.DarkMode = new SVGControl.ToggleSwitch(this.components);
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
@@ -53,7 +55,7 @@
             this.L1v_TableLayout.Controls.Add(this.L1v0L2_PanelMain, 0, 0);
             this.L1v_TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v_TableLayout.Location = new System.Drawing.Point(0, 0);
-            this.L1v_TableLayout.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v_TableLayout.Margin = new System.Windows.Forms.Padding(6);
             this.L1v_TableLayout.Name = "L1v_TableLayout";
             this.L1v_TableLayout.RowCount = 2;
             this.L1v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -76,9 +78,10 @@
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h3_ButtonCancel, 3, 0);
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h4_ButtonUndo, 4, 0);
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h5_SpnEmailPerLoad, 5, 0);
+            this.L1v1L2h_TableLayout.Controls.Add(this.DarkMode, 6, 0);
             this.L1v1L2h_TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v1L2h_TableLayout.Location = new System.Drawing.Point(6, 340);
-            this.L1v1L2h_TableLayout.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v1L2h_TableLayout.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h_TableLayout.Name = "L1v1L2h_TableLayout";
             this.L1v1L2h_TableLayout.RowCount = 1;
             this.L1v1L2h_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -123,7 +126,7 @@
             // 
             this.L1v1L2h4_ButtonUndo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v1L2h4_ButtonUndo.Location = new System.Drawing.Point(1406, 6);
-            this.L1v1L2h4_ButtonUndo.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v1L2h4_ButtonUndo.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h4_ButtonUndo.Name = "L1v1L2h4_ButtonUndo";
             this.L1v1L2h4_ButtonUndo.Size = new System.Drawing.Size(108, 84);
             this.L1v1L2h4_ButtonUndo.TabIndex = 2;
@@ -140,6 +143,18 @@
             this.L1v1L2h5_SpnEmailPerLoad.Size = new System.Drawing.Size(132, 74);
             this.L1v1L2h5_SpnEmailPerLoad.TabIndex = 3;
             // 
+            // DarkMode
+            // 
+            this.DarkMode.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.DarkMode.AutoSize = true;
+            this.DarkMode.Location = new System.Drawing.Point(2002, 27);
+            this.DarkMode.Name = "DarkMode";
+            this.DarkMode.Padding = new System.Windows.Forms.Padding(6);
+            this.DarkMode.Size = new System.Drawing.Size(155, 41);
+            this.DarkMode.TabIndex = 6;
+            this.DarkMode.Text = "DarkMode";
+            this.DarkMode.UseVisualStyleBackColor = true;
+            // 
             // L1v0L2_PanelMain
             // 
             this.L1v0L2_PanelMain.AutoScroll = true;
@@ -148,7 +163,7 @@
             this.L1v0L2_PanelMain.Controls.Add(this.L1v0L2L3v_TableLayout);
             this.L1v0L2_PanelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v0L2_PanelMain.Location = new System.Drawing.Point(6, 6);
-            this.L1v0L2_PanelMain.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v0L2_PanelMain.Margin = new System.Windows.Forms.Padding(6);
             this.L1v0L2_PanelMain.Name = "L1v0L2_PanelMain";
             this.L1v0L2_PanelMain.Size = new System.Drawing.Size(2160, 322);
             this.L1v0L2_PanelMain.TabIndex = 1;
@@ -161,7 +176,7 @@
             this.L1v0L2L3v_TableLayout.Controls.Add(this.QfcItemViewerTemplate, 0, 0);
             this.L1v0L2L3v_TableLayout.Dock = System.Windows.Forms.DockStyle.Top;
             this.L1v0L2L3v_TableLayout.Location = new System.Drawing.Point(0, 0);
-            this.L1v0L2L3v_TableLayout.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v0L2L3v_TableLayout.Margin = new System.Windows.Forms.Padding(6);
             this.L1v0L2L3v_TableLayout.Name = "L1v0L2L3v_TableLayout";
             this.L1v0L2L3v_TableLayout.RowCount = 2;
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 221F));
@@ -173,14 +188,13 @@
             // QfcItemViewerTemplate
             // 
             this.QfcItemViewerTemplate.AutoSize = true;
-            this.QfcItemViewerTemplate.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.QfcItemViewerTemplate.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.QfcItemViewerTemplate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.QfcItemViewerTemplate.Location = new System.Drawing.Point(12, 12);
-            this.QfcItemViewerTemplate.Margin = new System.Windows.Forms.Padding(12);
-            this.QfcItemViewerTemplate.MinimumSize = new System.Drawing.Size(1628, 210);
+            this.QfcItemViewerTemplate.Location = new System.Drawing.Point(6, 6);
+            this.QfcItemViewerTemplate.Margin = new System.Windows.Forms.Padding(6);
+            this.QfcItemViewerTemplate.MinimumSize = new System.Drawing.Size(1862, 183);
             this.QfcItemViewerTemplate.Name = "QfcItemViewerTemplate";
-            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(2102, 210);
+            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(2114, 209);
             this.QfcItemViewerTemplate.TabIndex = 0;
             // 
             // QfcFormViewer
@@ -190,7 +204,7 @@
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(2172, 442);
             this.Controls.Add(this.L1v_TableLayout);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "QfcFormViewer";
             this.Text = "Quick File";
             this.L1v_TableLayout.ResumeLayout(false);
@@ -216,6 +230,7 @@
         public System.Windows.Forms.TextBox L1v1L2h0_KeyboardDialog;
         public System.Windows.Forms.Panel L1v0L2_PanelMain;
         public System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
+        public SVGControl.ToggleSwitch DarkMode;
         public QfcItemViewer QfcItemViewerTemplate;
     }
 }

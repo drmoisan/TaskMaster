@@ -1149,7 +1149,7 @@ namespace QuickFiler.Legacy
             FlagTaskCb.Left = (int)(cbFlag_Left + X1px + X2px);                         // Task button X% + Y% _left position
             lblAcT.Left = (int)(lblAcT_Left + X1px + X2px);                         // Task accelerator X% + Y% _left position
             CbDel.Left = (int)(cbDel_Left + X1px + X2px);                           // Delete button X+Y% Left position
-            CbKll.Left = (int)(cbKll_Left + X1px + X2px);                           // Kill button X+Y% Left position
+            CbKll.Left = (int)(cbKll_Left + X1px + X2px);                           // Cleanup button X+Y% Left position
             lblAcX.Left = (int)(lblAcX_Left + X1px + X2px);
             lblAcR.Left = (int)(lblAcR_Left + X1px + X2px);
             lblSentOn.Left = (int)(lblSentOn_Left + X1px);                          // SentOn X% Left Position

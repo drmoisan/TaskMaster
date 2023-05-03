@@ -18,26 +18,29 @@ namespace QuickFiler.Controllers
     {
         public QfcCollectionController(IApplicationGlobals AppGlobals,
                                        QfcFormViewer viewerInstance,
+                                       bool darkMode,
                                        Enums.InitTypeEnum InitType,
                                        IQfcFormController ParentObject)
         {
 
-            _viewer = viewerInstance;
-            _itemTLP = _viewer.L1v0L2L3v_TableLayout;
+            _formViewer = viewerInstance;
+            _itemTLP = _formViewer.L1v0L2L3v_TableLayout;
             _initType = InitType;
             _globals = AppGlobals;
             _parent = ParentObject;
+            SetupLightDark(darkMode);
         }
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private QfcFormViewer _viewer;
+        private QfcFormViewer _formViewer;
         private Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IQfcFormController _parent;
         private int _itemHeight;
         private TableLayoutPanel _itemTLP;
-        private List<ItemGroup> itemGroups = new List<ItemGroup>();
+        private List<ItemGroup> _itemGroups = new List<ItemGroup>();
+        private bool _darkMode;
 
         public int EmailsLoaded => throw new NotImplementedException();
 
@@ -56,7 +59,9 @@ namespace QuickFiler.Controllers
                     grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, (MailItem)objItem, this);
                     grp.ItemController.PopulateConversation();
                     grp.ItemController.PopulateFolderCombobox();
-                    itemGroups.Add(grp);
+                    if (_darkMode) { grp.ItemController.SetThemeDark(); }
+                    else { grp.ItemController.SetThemeLight(); }
+                    _itemGroups.Add(grp);
                 }
                 else
                 {
@@ -64,7 +69,7 @@ namespace QuickFiler.Controllers
                 }
                 
             }
-            _viewer.WindowState = FormWindowState.Maximized;
+            _formViewer.WindowState = FormWindowState.Maximized;
             
             _itemTLP.ResumeLayout();
         }
@@ -97,7 +102,24 @@ namespace QuickFiler.Controllers
 
         public void RemoveControls()
         {
-            throw new NotImplementedException();
+            if (_itemGroups is not null)
+            {
+                _itemTLP.SuspendLayout();
+                while (_itemGroups.Count > 0)
+                {
+                    int i = _itemGroups.Count - 1;
+
+                    // Remove event managers and dispose unmanaged
+                    _itemGroups[i].ItemController.Cleanup();
+
+                    // Remove Item Viewer and Row from the form
+                    TableLayoutHelper.RemoveSpecificRow(_itemTLP, i);
+
+                    // Remove Handle on item viewer and controller
+                    _itemGroups.RemoveAt(i);  
+                }
+                _itemTLP.ResumeLayout();
+            }
         }
 
         public void RemoveSpaceToCollapseConversation()
@@ -158,6 +180,51 @@ namespace QuickFiler.Controllers
         public bool IsSelectionBelowMax(int intNewSelection)
         {
             throw new NotImplementedException();
+        }
+
+        private void SetupLightDark(bool initDarkMode)
+        {
+            _darkMode = initDarkMode;
+            _formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            
+        }
+
+        private void DarkMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_formViewer.DarkMode.Checked==true)
+            {
+                SetDarkMode();
+            }
+            else
+            {
+                SetLightMode();
+            }
+        }
+
+        public void SetDarkMode()
+        {
+            foreach (ItemGroup itemGroup in _itemGroups)
+            {
+                itemGroup.ItemController.SetThemeDark();
+            }
+        }
+
+        public void SetLightMode()
+        {
+            foreach (ItemGroup itemGroup in _itemGroups)
+            {
+                itemGroup.ItemController.SetThemeLight();
+            }
+        }
+
+        public void Cleanup()
+        {
+            RemoveControls();
+            _formViewer = null;
+            _globals = null;
+            _parent = null;
+            _itemTLP = null;
+            _itemGroups = null;
         }
 
         public class ItemGroup

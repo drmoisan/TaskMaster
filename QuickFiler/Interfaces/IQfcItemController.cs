@@ -34,6 +34,9 @@ namespace QuickFiler.Interfaces
         void PopulateConversation();
         void PopulateConversation(DataFrame df);
         void PopulateConversation(int countOnly);
+        void SetThemeDark();
+        void SetThemeLight();
+        void Cleanup();
         DataFrame DfConversation { get; }
     }
 }

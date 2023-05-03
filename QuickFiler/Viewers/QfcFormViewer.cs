@@ -13,6 +13,13 @@ namespace QuickFiler
 {
     internal partial class QfcFormViewer : Form
     {
+        [STAThread]
+        public static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+        }
+
         public QfcFormViewer()
         {
             InitializeComponent();

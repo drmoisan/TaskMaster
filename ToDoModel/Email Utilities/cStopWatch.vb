@@ -1,4 +1,4 @@
-﻿Imports Windows.Win32
+﻿Imports PInvoke = Windows.Win32.PInvoke
 
 Public Class cStopWatch
 

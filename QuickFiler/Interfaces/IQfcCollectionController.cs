@@ -30,11 +30,16 @@ namespace QuickFiler.Interfaces
         void ConvToggle_UnGroup(IList<object> selItems, int intPosition, int ConvCt, object varList);
         void MakeSpaceToEnumerateConversation();                        //Rewrite
 
+        // UI Light Dark
+        void SetDarkMode();
+        void SetLightMode();
+
         // Helper Functions
         bool IsSelectionBelowMax(int intNewSelection);
         int EmailsLoaded { get; }
         bool ReadyForMove { get; }
-        
+
+        void Cleanup();
 
     }
 }

@@ -35,6 +35,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Apache.Arrow, Version=2.0.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
       <HintPath>..\packages\Apache.Arrow.2.0.0\lib\netstandard1.3\Apache.Arrow.dll</HintPath>

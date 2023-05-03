@@ -36,3 +36,4 @@ GetDeviceCaps
 ReleaseDC
 SetTimer
 KillTimer
+GetFullPathNameW
