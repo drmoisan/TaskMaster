@@ -131,6 +131,7 @@
     <Compile Include="OutlookItemSummary_Test.cs" />
     <Compile Include="DictionaryExtensions_Test.cs" />
     <Compile Include="RunMSDemo.cs" />
+    <Compile Include="CommonWords_Test.cs" />
     <Compile Include="YesNoToAll_Test.cs" />
   </ItemGroup>
   <ItemGroup>

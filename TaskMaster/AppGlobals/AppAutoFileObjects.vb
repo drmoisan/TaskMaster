@@ -1,5 +1,6 @@
 ﻿Imports UtilitiesVB
 Imports UtilitiesCS
+Imports System.IO
 
 Public Class AppAutoFileObjects
     Implements IAppAutoFileObjects
@@ -11,6 +12,7 @@ Public Class AppAutoFileObjects
     Private _recentsList As IRecentsList(Of String)
     Private _parent As IApplicationGlobals
     Private _ctfList As CtfIncidenceList
+    Private _commonWords As ISerializableList(Of String)
 
     Public Sub New(ParentInstance As ApplicationGlobals)
         _parent = ParentInstance
@@ -114,8 +116,32 @@ Public Class AppAutoFileObjects
             Return _ctfList
         End Get
         Set(value As CtfIncidenceList)
-
+            _ctfList = value
         End Set
     End Property
+
+    Public Property CommonWords As ISerializableList(Of String) Implements IAppAutoFileObjects.CommonWords
+        Get
+            If _commonWords Is Nothing Then
+                _commonWords = New SerializableList(Of String)(filename:=My.Settings.File_Common_Words,
+                                                               folderpath:=_parent.FS.FldrPythonStaging,
+                                                               backupLoader:=AddressOf CommonWordsBackupLoader,
+                                                               backupFilepath:=Path.Combine(_parent.FS.FldrPythonStaging,
+                                                                                            My.Settings.BackupFile_CommonWords),
+                                                               askUserOnError:=False)
+            End If
+            Return _commonWords
+        End Get
+        Set(value As ISerializableList(Of String))
+            _commonWords = value
+        End Set
+    End Property
+
+    Private Function CommonWordsBackupLoader(filepath As String) As IList(Of String)
+        Dim cw As String() = FileIO2.CSV_Read(filename:=Path.GetFileName(filepath),
+                                              fileaddress:=Path.GetDirectoryName(filepath),
+                                              SkipHeaders:=False)
+        Return cw.ToList()
+    End Function
 
 End Class

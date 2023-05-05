@@ -16,7 +16,7 @@ Friend Module SubjectMapModule
     Public Subject_Inc() As Subject_Incidence
     Public Subject_Inc_Ct As Integer
 
-    Sub Subject_MAP_Text_File_READ(fs As IFileSystemFolderPaths)
+    Sub Subject_MAP_Text_File_READ(fs As IFileSystemFolderPaths, commonWords As IList(Of String))
 
         SubjectMapCt = 0
         ReDim SubjectMap(0)
@@ -30,7 +30,7 @@ Friend Module SubjectMapModule
             SubjectMapCt += 1
             ReDim Preserve SubjectMap(SubjectMapCt)
             SubjectMap(SubjectMapCt).Email_Folder = rowQueue.Dequeue()
-            SubjectMap(SubjectMapCt).Email_Subject = StripCommonWords(rowQueue.Dequeue())
+            SubjectMap(SubjectMapCt).Email_Subject = StripCommonWords(rowQueue.Dequeue(), commonWords)
             SubjectMap(SubjectMapCt).Email_Subject_Count = CInt(rowQueue.Dequeue())
         End While
 

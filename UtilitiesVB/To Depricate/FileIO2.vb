@@ -80,11 +80,11 @@ Public Module FileIO2
         Dim filepath As String = Path.Combine(fileaddress, filename)
 
         If File.Exists(filepath) Then
+            Dim lines = File.ReadAllLines(filepath, System.Text.Encoding.UTF8)
             If SkipHeaders Then
-                Dim lines = File.ReadAllLines(filepath, System.Text.Encoding.UTF8)
                 Return lines.Skip(1).ToArray()
             Else
-                Return File.ReadAllLines(filepath)
+                Return lines
             End If
 
         Else

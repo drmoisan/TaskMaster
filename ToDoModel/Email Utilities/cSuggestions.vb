@@ -1,5 +1,6 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB
+Imports UtilitiesCS.EmailIntelligence
 
 Public Class cSuggestions
 
@@ -42,7 +43,6 @@ Public Class cSuggestions
         End Get
 
     End Property
-
 
     Private Function find(strFolderName As String) As Integer
 
@@ -169,7 +169,9 @@ Public Class cSuggestions
     End Sub
 
     Private Sub ClearSuggestions()
-        Array.Clear(_strFolderArray, 0, _strFolderArray.Length)
+        If (_strFolderArray IsNot Nothing) Then
+            Array.Clear(_strFolderArray, 0, _strFolderArray.Length)
+        End If
     End Sub
 
     Private Sub AddWordSequenceSuggestions(OlMail As MailItem, AppGlobals As IApplicationGlobals)
@@ -180,7 +182,7 @@ Public Class cSuggestions
         Dim strTmpFldr As String
         Dim varFldrSubs As Object
 
-        SubjectStripped = StripCommonWords(OlMail.Subject) 'Eliminate common words from the subject
+        SubjectStripped = OlMail.Subject.StripCommonWords(AppGlobals.AF.CommonWords) 'Eliminate common words from the subject
         For i = 1 To SubjectMapCt   'Loop through every subject of every email ever received
             With SubjectMap(i)
                 SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .Email_Subject, Matrix, AppGlobals.AF, SW_Options.ByWords)
@@ -233,7 +235,7 @@ Public Class cSuggestions
         'Throw New NotImplementedException("CTF_Incidence_Text_File_READ, Subject_MAP_Text_File_READ, " _
         '                                              & "and Common_Words_Text_File_READ are not implemented. Cannot reload")
         'CTF_Incidence_Text_File_READ(_globals.FS)
-        Subject_MAP_Text_File_READ(_globals.FS)
+        Subject_MAP_Text_File_READ(_globals.FS, CType(_globals.AF.CommonWords, IList(Of String)))
         Common_Words_Text_File_READ(_globals.FS)
 
         Dim strFList() As String = OlFolderlist_GetAll(_globals.Ol)

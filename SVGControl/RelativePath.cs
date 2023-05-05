@@ -425,7 +425,6 @@ namespace SVGControl
             return $"Unknown error (0x{errorCode:x})";
         }
 
-
         /// <summary>
         /// Converts the specified Win32 error into a corresponding <see cref="Exception"/> object, optionally
         /// including the specified path in the error message.

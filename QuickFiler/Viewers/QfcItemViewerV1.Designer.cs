@@ -678,7 +678,7 @@
             this.LblAcConversation.TabIndex = 15;
             this.LblAcConversation.Text = "C";
             // 
-            // QfcItemViewer
+            // QfcItemViewerV1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -687,7 +687,7 @@
             this.Controls.Add(this.L1h);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.MinimumSize = new System.Drawing.Size(1862, 183);
-            this.Name = "QfcItemViewer";
+            this.Name = "QfcItemViewerV1";
             this.Size = new System.Drawing.Size(1862, 183);
             this.L1h.Panel1.ResumeLayout(false);
             this.L1h.Panel2.ResumeLayout(false);

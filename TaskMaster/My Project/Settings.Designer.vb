@@ -413,6 +413,18 @@ Namespace My
                 Me("BackupFile_CTF_Inc") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("9999999CommonWords.txt")>  _
+        Public Property BackupFile_CommonWords() As String
+            Get
+                Return CType(Me("BackupFile_CommonWords"),String)
+            End Get
+            Set
+                Me("BackupFile_CommonWords") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
