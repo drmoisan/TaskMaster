@@ -88,8 +88,7 @@ namespace ToDoModel
             }
 
         }
-
-
+        
         /// <summary>
         /// Extension function to set a user defined property on an Outlook item of unknown type. 
         /// Returns true if successful and false if unsuccessful but does not stop execution.
@@ -250,14 +249,16 @@ namespace ToDoModel
             }
         }
 
-        public static List<object> GetListOfItemsInView_ToDo(Application OlApp)
+        
+
+        public static List<object> GetListOfToDoItemsInView(Application OlApp)
         {
             Items OlItems;
             View objView;
             Folder OlFolder;
             string strFilter;
-            // QUESTION: ThisAddin.GetListOfItemsInView_ToDo When is this called? Is it needed?
-            // CLEANUP: ThisAddin.GetListOfItemsInView_ToDo Move to a Class, Module or a Library depending on how it is used. 
+            // QUESTION: ThisAddin.GetListOfToDoItemsInView When is this called? Is it needed?
+            // CLEANUP: ThisAddin.GetListOfToDoItemsInView Move to a Class, Module or a Library depending on how it is used. 
 
             objView = (View)OlApp.ActiveExplorer().CurrentView;
             strFilter = "@SQL=" + objView.Filter;
@@ -271,11 +272,11 @@ namespace ToDoModel
             var ListObjects = new List<object>();
             foreach (var objItem in OlItems)
                 ListObjects.Add(objItem);
-            // GetItemsInView_ToDo = OlItems
+            // GetToDoItemsInView = OlItems
             return ListObjects;
         }
 
-        public static Items GetItemsInView_ToDo(Application OlApp)
+        public static Items GetToDoItemsInView(Application OlApp)
         {
             Items GetItemsInView_ToDoRet = default;
             Items OlItems;
@@ -346,7 +347,7 @@ namespace ToDoModel
         public static void Refresh_ToDoID_Splits(Application OlApp)
         {
             ToDoItem todo;
-            var OlItems = GetItemsInView_ToDo(OlApp);
+            var OlItems = GetToDoItemsInView(OlApp);
             // QUESTION: Duplicate? If not, move to a class, module or library.
             foreach (var objItem in OlItems)
             {

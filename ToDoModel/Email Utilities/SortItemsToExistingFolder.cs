@@ -137,7 +137,7 @@ namespace ToDoModel
             sortFolder = new FolderHandler(_globals).GetFolder(loc); // Call Function to turn text to Folder
 
             // Call Flag_Fields_Categories.SetCategory("Autosort")
-            // Call Flag_Fields_Categories.SetUserDefinedField("Autosort", "True")
+            // Call Flag_Fields_Categories.SetUdf("Autosort", "True")
             if (sortFolder is null)
             {
                 Interaction.MsgBox(loc + " does not exist, skipping email move.");
@@ -166,8 +166,7 @@ namespace ToDoModel
 
                                                          */
                             object argSpecificItem = MSG;
-                            ToDoEvents.SetCustomField("Autosort", "True", SpecificItem: ref argSpecificItem);
-                            MSG = (MailItem)argSpecificItem;
+                            MSG.SetCustomField("Autosort", "True");
                             MSG.UnRead = false;
                             MSG.Save();
 
