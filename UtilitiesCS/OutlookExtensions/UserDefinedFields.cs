@@ -1,6 +1,8 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -10,9 +12,98 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public static class UserDefinedFields
     {
+
+        /// <summary>
+        /// Extension function to determine if a user defined property exists 
+        /// on an Outlook item of unknown type.
+        /// </summary>
+        /// <param name="item">Outlook item</param>
+        /// <param name="fieldName">Name of field to check</param>
+        /// <returns>true if exists. false if it does not exist</returns>
+        public static bool UdfExists(this object item, string fieldName)
+        {
+            try // Resolve type if supported and call overload. Else throw exception.
+            {
+                if (item is MailItem) { return ((MailItem)item).UdfExists(fieldName); }
+                else if (item is TaskItem) { return ((TaskItem)item).UdfExists(fieldName); }
+                else if (item is AppointmentItem) { return ((AppointmentItem)item).UdfExists(fieldName); }
+                else if (item is MeetingItem) { return ((MeetingItem)item).UdfExists(fieldName); }
+                else
+                {
+                    throw new ArgumentException("Unsupported type. Extension defined for MailItem, " +
+                                                   "TaskItem, AppointmentItem, and MeetingItem. " +
+                                                   $"{nameof(item)} is of type {item.GetType().ToString()}",
+                                                   nameof(item));
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                Debug.WriteLine(ex.Message);
+                Debug.WriteLine(ex.StackTrace);
+                return false;
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine($"Exception caught:");
+                Debug.WriteLine(ex.ToString());
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Extension function to determine if a user defined property exists in the Outlook 
+        /// MailItem
+        /// </summary>
+        /// <param name="item">Outlook.MailItem</param>
+        /// <param name="fieldName">Name of field to check</param>
+        /// <returns>true if exists. false if it does not exist</returns>
+        public static bool UdfExists(this MailItem item, string fieldName) 
+        {
+            UserProperty objProperty = item.UserProperties.Find(fieldName);
+            return objProperty is not null;
+        }
+
+        /// <summary>
+        /// Extension function to determine if a user defined property exists in the Outlook 
+        /// AppointmentItem
+        /// </summary>
+        /// <param name="item">Outlook.AppointmentItem</param>
+        /// <param name="fieldName">Name of field to check</param>
+        /// <returns>true if exists. false if it does not exist</returns>
+        public static bool UdfExists(this AppointmentItem item, string fieldName) 
+        {
+            UserProperty objProperty = item.UserProperties.Find(fieldName);
+            return objProperty is not null;
+        }
+
+        /// <summary>
+        /// Extension function to determine if a user defined property exists in the Outlook 
+        /// MeetingItem
+        /// </summary>
+        /// <param name="item">Outlook.MeetingItem</param>
+        /// <param name="fieldName">Name of field to check</param>
+        /// <returns>true if exists. false if it does not exist</returns>
+        public static bool UdfExists(this MeetingItem item, string fieldName)
+        {
+            UserProperty objProperty = item.UserProperties.Find(fieldName);
+            return objProperty is not null;
+        }
+
+        /// <summary>
+        /// Extension function to determine if a user defined property exists in the Outlook 
+        /// TaskItem
+        /// </summary>
+        /// <param name="item">Outlook.TaskItem</param>
+        /// <param name="fieldName">Name of field to check</param>
+        /// <returns>true if exists. false if it does not exist</returns>
+        public static bool UdfExists(this TaskItem item, string fieldName)
+        {
+            UserProperty objProperty = item.UserProperties.Find(fieldName);
+            return objProperty is not null;
+        }
+
         /// <summary>
         /// Extension function to set a user defined property on an Outlook item of unknown type. 
-        /// Returns true if successful and false if unsuccessful but does not stop execution.
         /// </summary>
         /// <param name="item">Outlook item. Supported types include MailItem, TaskItem, 
         /// AppointmentItem, and MeetingItem.</param>
@@ -155,9 +246,9 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
         /// <returns>true if successful. false if unsuccessful</returns>
         public static bool SetUdf(this TaskItem item,
-                                          string udfName,
-                                          object value,
-                                          OlUserPropertyType olUdfType = OlUserPropertyType.olText)
+                                  string udfName,
+                                  object value,
+                                  OlUserPropertyType olUdfType = OlUserPropertyType.olText)
         {
             try
             {
