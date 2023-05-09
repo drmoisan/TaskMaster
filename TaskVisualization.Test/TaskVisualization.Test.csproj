@@ -90,8 +90,8 @@
       <Project>{cd11d1cb-dd70-4413-b278-263f5474c4b5}</Project>
       <Name>TaskVisualization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
-      <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+      <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
       <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">

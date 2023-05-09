@@ -103,8 +103,8 @@
       <Project>{71735d4f-611a-4470-9170-4d9437534377}</Project>
       <Name>QuickFiler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
-      <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+      <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
       <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">

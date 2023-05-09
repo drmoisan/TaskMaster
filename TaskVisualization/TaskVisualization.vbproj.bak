@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3D5BD88D-D4FF-4302-8C45-8E06F7DC558A}</ProjectGuid>
+    <ProjectGuid>{CD11D1CB-DD70-4413-B278-263F5474C4B5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>TaskTree</RootNamespace>
-    <AssemblyName>TaskTree</AssemblyName>
+    <RootNamespace>TaskVisualization</RootNamespace>
+    <AssemblyName>TaskVisualization</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -19,7 +19,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>TaskTree.xml</DocumentationFile>
+    <DocumentationFile>TaskVisualization.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -28,7 +28,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>TaskTree.xml</DocumentationFile>
+    <DocumentationFile>TaskVisualization.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -55,13 +55,15 @@
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
       <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -81,6 +83,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FlagTasks.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -96,11 +99,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="TaskTreeController.vb" />
-    <Compile Include="TaskTreeForm.Designer.vb">
-      <DependentUpon>TaskTreeForm.vb</DependentUpon>
+    <Compile Include="TaskController.vb" />
+    <Compile Include="TaskViewer.Designer.vb">
+      <DependentUpon>TaskViewer.vb</DependentUpon>
     </Compile>
-    <Compile Include="TaskTreeForm.vb">
+    <Compile Include="TaskViewer.vb">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
@@ -111,8 +114,8 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="TaskTreeForm.resx">
-      <DependentUpon>TaskTreeForm.vb</DependentUpon>
+    <EmbeddedResource Include="TaskViewer.resx">
+      <DependentUpon>TaskViewer.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -133,12 +136,12 @@
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
-      <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
+      <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
       <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
-      <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
+      <Project>{46628EC9-8A89-491E-84A2-6CF3069BA011}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
