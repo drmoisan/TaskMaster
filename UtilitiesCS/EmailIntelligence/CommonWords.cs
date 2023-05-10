@@ -17,14 +17,7 @@ namespace UtilitiesCS.EmailIntelligence
                                     where !commonWords.Contains(word) 
                                     select word.StripAccents());
         }
-
-        public static string[] Tokenize(this string doc)
-        {
-            var _regex = new Regex(@"\b\w\w+\b");
-                        
-            return _regex.Matches(doc).Cast<Match>().Select(x => x.Value.ToLower()).ToArray();
-        }
-
+                
         public static string StripAccents(this string s)
         {
             StringBuilder sb = new StringBuilder(s.Normalize(NormalizationForm.FormKD));

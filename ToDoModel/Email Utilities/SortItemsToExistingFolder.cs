@@ -2,8 +2,6 @@
 using System.Collections;
 using System.IO;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using UtilitiesCS;
 using UtilitiesVB;
 
@@ -64,11 +62,11 @@ namespace ToDoModel
             {
                 folderCurrent = GetCurrentExplorerFolder(_globals.Ol.App.ActiveExplorer());
             }
-            if (Conversions.ToBoolean(Strings.InStr(folderCurrent.FolderPath, _globals.Ol.Inbox.FolderPath)))
+            if (folderCurrent.FolderPath.Contains(_globals.Ol.Inbox.FolderPath))
             {
                 strFolderPath = _globals.FS.FldrFlow;
             }
-            else if (Conversions.ToBoolean(Strings.InStr(folderCurrent.FolderPath, StrRoot) & Conversions.ToInteger((folderCurrent.FolderPath ?? "") != (StrRoot ?? ""))))
+            else if (folderCurrent.FolderPath.Contains(StrRoot) & Conversions.ToInteger((folderCurrent.FolderPath ?? "") != (StrRoot ?? ""))))
             {
                 strFolderPath = folderCurrent.ToFsFolder(OlFolderRoot: _globals.Ol.ArchiveRootPath, FsFolderRoot: _globals.FS.FldrRoot);
             }

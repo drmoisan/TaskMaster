@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
+using UtilitiesCS;
 
 namespace ToDoModel
 {
@@ -24,7 +24,7 @@ namespace ToDoModel
                 {
                     if (!string.IsNullOrEmpty(strEmail[i]))
                     {
-                        strAddresses = Strings.Split(strEmail[i], "; ");
+                        strAddresses = strEmail[i].Split(';', trim: true);
                         var loopTo = Information.UBound(strAddresses);
                         for (j = 0; j <= loopTo; j++)
                         {
