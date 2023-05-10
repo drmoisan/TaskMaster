@@ -5,14 +5,54 @@ using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace UtilitiesCS.OutlookExtensions
 {
     public static class UserDefinedFields
     {
+        public static object GetUdf(this object item, 
+                                    string fieldName, 
+                                    OlUserPropertyType olFieldType = OlUserPropertyType.olText,
+                                    bool flatten = true) 
+        { 
+            item.EnsureSupported();
+            Type objectType = item.GetType();
+            PropertyInfo p = objectType.GetProperty("UserProperties");
+            MethodInfo m = p.PropertyType.GetMethod("Find");
+            var result = m.Invoke(p.GetValue(item), new object[] { fieldName });
+            if (result!=null) { return result; }
+            else
+            {
+                TypeGroup group = udfGroupLookup[olFieldType];
+                switch (group)
+                {
+                    case TypeGroup.@string:
+                        return (object)"";
+                    case TypeGroup.numeric:
+                        return (object)0;
+                    case TypeGroup.@bool:
+                        return (object)false;
+                    default:
+                        return null;
+                }
+            }
+        }
 
+        //public static object GetUdf(this object item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
+        //public static object GetUdf(this MailItem item, string fieldName) { return new object(); }
+        //public static object GetUdf(this MailItem item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
+        //public static object GetUdf(this AppointmentItem item, string fieldName) { return new object(); }
+        //public static object GetUdf(this AppointmentItem item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
+        //public static object GetUdf(this MeetingItem item, string fieldName) { return new object(); }
+        //public static object GetUdf(this MeetingItem item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
+        //public static object GetUdf(this TaskItem item, string fieldName) { return new object(); }
+        //public static object GetUdf(this TaskItem item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
+           
+        
         /// <summary>
         /// Extension function to determine if a user defined property exists 
         /// on an Outlook item of unknown type.
@@ -284,6 +324,30 @@ namespace UtilitiesCS.OutlookExtensions
             {OlUserPropertyType.olEnumeration, typeof(Enum) }
         };
 
+        private enum TypeGroup
+        {
+            @numeric = 1,
+            @string = 2,
+            @bool = 4,
+            other = 8
+        }
+
+        private static Dictionary<OlUserPropertyType, TypeGroup> udfGroupLookup = new Dictionary<OlUserPropertyType, TypeGroup>
+        {
+            {OlUserPropertyType.olText, TypeGroup.@string},
+            {OlUserPropertyType.olNumber, TypeGroup.numeric },
+            {OlUserPropertyType.olDateTime, TypeGroup.other },
+            {OlUserPropertyType.olYesNo, TypeGroup.@bool },
+            {OlUserPropertyType.olDuration, TypeGroup.numeric },
+            {OlUserPropertyType.olKeywords, TypeGroup.@string },
+            {OlUserPropertyType.olPercent, TypeGroup.numeric  },
+            {OlUserPropertyType.olCurrency, TypeGroup.numeric  },
+            {OlUserPropertyType.olFormula, TypeGroup.@string },
+            {OlUserPropertyType.olCombination, TypeGroup.@string},
+            {OlUserPropertyType.olInteger, TypeGroup.numeric  },
+            {OlUserPropertyType.olEnumeration, TypeGroup.other }
+        };
+
         internal static bool ValidPropertyArgs(object value, OlUserPropertyType olUdfType)
         {
             Type destinationType = udfTypeLookup[olUdfType];
@@ -296,6 +360,38 @@ namespace UtilitiesCS.OutlookExtensions
                 Debug.WriteLine(msg);
                 return false;
             }
+        }
+
+        private static void EnsureSupported(this object item)
+        {
+            if (!((item is MailItem) || (item is MeetingItem) || (item is AppointmentItem) || (item is TaskItem)))
+            {
+                throw new ArgumentException(NotSupportedMessage(item), nameof(item));
+            }
+        }
+
+        private static string NotSupportedMessage(object item)
+        {
+            return "Unsupported type. Extension defined for MailItem, " +
+                   "TaskItem, AppointmentItem, and MeetingItem. " +
+                   $"{nameof(item)} is of type {item.GetType().ToString()}";
+        }
+
+        private static string FlattenStringTree(object[] branches)
+        {
+            if (!Array.TrueForAll(branches, branch => branch is string))
+            {
+                for (int i = 0; i < branches.Length; i++)
+                {
+                    if (branches[i] is Array) { branches[i] = FlattenStringTree((object[])branches[i]); }
+                    else if (!(branches[i] is string)) 
+                    {
+                        throw new ArgumentException($"branches[{i}] is of type {branches[i].GetType().ToString()}"
+                            + $". Array elements in FlattenStringTree must be arrays or strings.");
+                    }
+                }
+            }
+            return string.Join(", ", branches);
         }
     }
 }

@@ -182,48 +182,5 @@ namespace ToDoModel
             }
         }
 
-
-
-        private void DemoConversationTable()
-        {
-            Conversation oConv;
-            Table oTable;
-            Row oRow;
-            MailItem oMail;
-            MailItem oItem;
-            const string PR_STORE_ENTRYID = "https://schemas.microsoft.com/mapi/proptag/0x0FFB0102";
-            ;
-            // Obtain the current item for the active inspector.
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-            /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 6141
-
-
-                        Input:
-
-                                On Error Resume Next
-
-                         */
-            oMail = (MailItem)_olApp.ActiveInspector().CurrentItem;
-
-            if (oMail is not null)
-            {
-                // Obtain the Conversation object.
-                oConv = oMail.GetConversation();
-                if (oConv is not null)
-                {
-                    oTable = oConv.GetTable();
-                    var unused = oTable.Columns.Add(PR_STORE_ENTRYID);
-                    while (!oTable.EndOfTable)
-                    {
-                        oRow = oTable.GetNextRow();
-                        // Use EntryID and StoreID to open the item.
-                        oItem = (MailItem)_olApp.Session.GetItemFromID(Conversions.ToString(oRow["EntryID"]), oRow.BinaryToString(PR_STORE_ENTRYID));
-                        Debug.Print(oItem.Subject, "Attachments.Count=" + oItem.Attachments.Count);
-                    }
-                }
-            }
-        }
-
-
     }
 }

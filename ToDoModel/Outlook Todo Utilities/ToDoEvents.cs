@@ -9,6 +9,7 @@ using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using Newtonsoft.Json.Linq;
+using UtilitiesCS.OutlookExtensions;
 using UtilitiesVB;
 
 namespace ToDoModel
@@ -44,8 +45,6 @@ namespace ToDoModel
             Debug.WriteLine(storeList);
 
         }
-
-
 
         public static void WriteToCSV(string filename, string[] strOutput, bool overwrite = false)
         {
@@ -89,168 +88,6 @@ namespace ToDoModel
 
         }
         
-        /// <summary>
-        /// Extension function to set a user defined property on an Outlook item of unknown type. 
-        /// Returns true if successful and false if unsuccessful but does not stop execution.
-        /// </summary>
-        /// <param name="item">Outlook item. Supported types include MailItem, TaskItem, 
-        /// AppointmentItem, and MeetingItem.</param>
-        /// <param name="udfName">Name of the user defined field</param>
-        /// <param name="value">Value to assign to the user defined field</param>
-        /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
-        /// <returns>true if successful. false if unsuccessful</returns>
-        public static bool SetUserDefinedField(this object item, 
-                                          string udfName, 
-                                          object value, 
-                                          OlUserPropertyType olUdfType = OlUserPropertyType.olText)
-        {
-            try // Resolve type if supported and call overload. Else throw exception.
-            {  
-                if (item is MailItem) { return ((MailItem)item).SetUserDefinedField(udfName, value, olUdfType); }
-                else if (item is TaskItem) { return ((TaskItem)item).SetUserDefinedField(udfName, value, olUdfType); }
-                else if (item is AppointmentItem) { return ((AppointmentItem)item).SetUserDefinedField(udfName, value, olUdfType); }
-                else if (item is MeetingItem) { return ((MeetingItem)item).SetUserDefinedField(udfName, value, olUdfType); }
-                else { throw new ArgumentException("Unsupported type. Extension defined for MailItem, " +
-                                                   "TaskItem, AppointmentItem, and MeetingItem. " + 
-                                                   $"{nameof(item)} is of type {item.GetType().ToString()}", 
-                                                   nameof(item)); }
-            }
-            catch (ArgumentException ex)
-            {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.StackTrace);
-                return false;
-            }
-            catch (System.Exception ex)
-            {
-                Debug.WriteLine($"Exception caught:");
-                Debug.WriteLine(ex.ToString());
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Extension function to set a user defined property on an object of type Outlook.MailItem. 
-        /// </summary>
-        /// <param name="item">Outlook MailItem which will hold the UDF</param>
-        /// <param name="udfName">Name of the user defined field</param>
-        /// <param name="value">Value to assign to the user defined field</param>
-        /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
-        /// <returns>true if successful. false if unsuccessful</returns>
-        public static bool SetCustomField(this MailItem item,
-                                          string udfName,
-                                          object value,
-                                          OlUserPropertyType olUdfType = OlUserPropertyType.olText)
-        {
-            try
-            {
-                UserProperty property = item.UserProperties.Find(udfName);
-                if (property is null)
-                    property = item.UserProperties.Add(udfName, olUdfType);
-                property.Value = value;
-                item.Save();
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                Debug.WriteLine($"Error in set user property: {ex.Message}");
-                Debug.WriteLine($"Call Stack: {ex.StackTrace}");
-                return false;
-            } 
-        }
-
-        /// <summary>
-        /// Extension function to set a user defined property on an object of type Outlook.AppointmentItem. 
-        /// </summary>
-        /// <param name="item">Outlook AppointmentItem which will hold the UDF</param>
-        /// <param name="udfName">Name of the user defined field</param>
-        /// <param name="value">Value to assign to the user defined field</param>
-        /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
-        /// <returns>true if successful. false if unsuccessful</returns>
-        public static bool SetCustomField(this AppointmentItem item,
-                                          string udfName,
-                                          object value,
-                                          OlUserPropertyType olUdfType = OlUserPropertyType.olText)
-        {
-            try
-            {
-                UserProperty property = item.UserProperties.Find(udfName);
-                if (property is null)
-                    property = item.UserProperties.Add(udfName, olUdfType);
-                property.Value = value;
-                item.Save();
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                Debug.WriteLine($"Error in set user property: {ex.Message}");
-                Debug.WriteLine($"Call Stack: {ex.StackTrace}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Extension function to set a user defined property on an object of type Outlook.MeetingItem. 
-        /// </summary>
-        /// <param name="item">Outlook MeetingItem which will hold the UDF</param>
-        /// <param name="udfName">Name of the user defined field</param>
-        /// <param name="value">Value to assign to the user defined field</param>
-        /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
-        /// <returns>true if successful. false if unsuccessful</returns>
-        public static bool SetCustomField(this MeetingItem item,
-                                          string udfName,
-                                          object value,
-                                          OlUserPropertyType olUdfType = OlUserPropertyType.olText)
-        {
-            try
-            {
-                UserProperty property = item.UserProperties.Find(udfName);
-                if (property is null)
-                    property = item.UserProperties.Add(udfName, olUdfType);
-                property.Value = value;
-                item.Save();
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                Debug.WriteLine($"Error in set user property: {ex.Message}");
-                Debug.WriteLine($"Call Stack: {ex.StackTrace}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Extension function to set a user defined property on an object of type Outlook.TaskItem. 
-        /// </summary>
-        /// <param name="item">Outlook TaskItem which will hold the UDF</param>
-        /// <param name="udfName">Name of the user defined field</param>
-        /// <param name="value">Value to assign to the user defined field</param>
-        /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
-        /// <returns>true if successful. false if unsuccessful</returns>
-        public static bool SetCustomField(this TaskItem item,
-                                          string udfName,
-                                          object value,
-                                          OlUserPropertyType olUdfType = OlUserPropertyType.olText)
-        {
-            try
-            {
-                UserProperty property = item.UserProperties.Find(udfName);
-                if (property is null)
-                    property = item.UserProperties.Add(udfName, olUdfType);
-                property.Value = value;
-                item.Save();
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                Debug.WriteLine($"Error in set user property: {ex.Message}");
-                Debug.WriteLine($"Call Stack: {ex.StackTrace}");
-                return false;
-            }
-        }
-
-        
-
         public static List<object> GetListOfToDoItemsInView(Application OlApp)
         {
             Items OlItems;
@@ -656,14 +493,14 @@ namespace ToDoModel
             {
                 var Item = new ToDoItem(ToDoItems[i], true);
                 j += 1L;
-                if (Conversions.ToBoolean(Operators.ConditionalCompareObjectNotEqual(Item.get_CustomField("NewID"), "Done", false)))
+                if ((string)Item.olItem.GetUdf("NewID") != "Done")
                 {
                     string strToDoID = Item.ToDoID;
                     if (strToDoID.Length > 0)
                     {
                         string strToDoIDnew = SubstituteCharsInID(strToDoID);
                         Item.ToDoID = strToDoIDnew;
-                        Item.set_CustomField("NewID", value: "Done");
+                        Item.olItem.SetUdf("NewID", value: "Done");
                     }
                 }
                 if (j == 40L)
