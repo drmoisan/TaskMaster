@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 using UtilitiesVB;
 
 namespace ToDoModel
@@ -66,7 +71,7 @@ namespace ToDoModel
             {
                 strFolderPath = _globals.FS.FldrFlow;
             }
-            else if (folderCurrent.FolderPath.Contains(StrRoot) & Conversions.ToInteger((folderCurrent.FolderPath ?? "") != (StrRoot ?? ""))))
+            else if (folderCurrent.FolderPath.Contains(StrRoot) & (folderCurrent.FolderPath != StrRoot ))
             {
                 strFolderPath = folderCurrent.ToFsFolder(OlFolderRoot: _globals.Ol.ArchiveRootPath, FsFolderRoot: _globals.FS.FldrRoot);
             }
@@ -85,7 +90,7 @@ namespace ToDoModel
             // QUESTION: Original code allowed path to be an optional variable and then did something if a value was supplied that didn't match the archive root. Need to determine why and if new treatment loses functionality
             if ((StrRoot ?? "") != (_globals.Ol.ArchiveRootPath ?? ""))
             {
-                strTemp2 = Strings.Right(_globals.Ol.ArchiveRootPath, Strings.Len(_globals.Ol.ArchiveRootPath) - Strings.Len(_globals.Ol.EmailRootPath) - 1);
+                strTemp2 = _globals.Ol.ArchiveRootPath.Substring(_globals.Ol.EmailRootPath.Length);
                 FileSystem_LOC = _globals.FS.FldrRoot + strTemp2 + @"\" + SortFolderpath;  // Parent Directory
             }
             else
@@ -138,7 +143,7 @@ namespace ToDoModel
             // Call Flag_Fields_Categories.SetUdf("Autosort", "True")
             if (sortFolder is null)
             {
-                Interaction.MsgBox(loc + " does not exist, skipping email move.");
+                MessageBox.Show(loc + " does not exist, skipping email move.");
             }
             else
             {
@@ -155,81 +160,90 @@ namespace ToDoModel
                                 // Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
                                 UpdateForMove(MSG, SortFolderpath, AppGlobals.AF.CTFList);
                             };
-#error Cannot convert OnErrorResumeNextStatementSyntax - see comment for details
-                            /* Cannot convert OnErrorResumeNextStatementSyntax, CONVERSION ERROR: Conversion for OnErrorResumeNextStatement not implemented, please report this issue in 'On Error Resume Next' at character 7741
-
-
-                                                        Input:
-                                                                                On Error Resume Next
-
-                                                         */
-                            object argSpecificItem = MSG;
-                            MSG.SetCustomField("Autosort", "True");
-                            MSG.UnRead = false;
-                            MSG.Save();
-
-                            oMailTmp = (MailItem)MSG.Move(sortFolder);
-
-                            if (Information.Err().Number != 0)
+                            try
                             {
-                                // TODO: ERROR LOGGING
-                                // MsgBox("Error in " & SubNm & "-> MailItem.Move: " & Err.Number & " -> " & Err.Description & " ->" & Err.Source)
-                                Information.Err().Clear();
+                                MSG.SetUdf("Autosort", "True");
+                                MSG.UnRead = false;
+                                MSG.Save();
+
+                                oMailTmp = (MailItem)MSG.Move(sortFolder);
+                                CaptureMoveDetails(MSG, oMailTmp, strOutput, _globals);
                             }
-                            else
+                            catch (System.Exception e)
                             {
-                                if (_globals.Ol.MovedMails_Stack is null)
-                                    _globals.Ol.MovedMails_Stack = new StackObjectVB();
-                                _globals.Ol.MovedMails_Stack.Push(MSG);
-                                _globals.Ol.MovedMails_Stack.Push(oMailTmp);
-
-                                // TODO: Change this into a JSON file
-                                WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);
-                                strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
-                                strOutput[1] = SanitizeArrayLineTSV(ref strAry);
-                                FileIO2.Write_TextFile(_globals.FS.Filenames.EmailMoves, strOutput, _globals.FS.FldrMyD);
+                                Debug.WriteLine(e.Message);
+                                Debug.WriteLine(e.StackTrace);
                             }
-
                         }
                     }
-
-                    // FireTimerReset
                 }
             }
         }
 
+        private static void CaptureMoveDetails(MailItem MSG, MailItem oMailTmp, string[] strOutput, IApplicationGlobals _globals)
+        {
+            if (_globals.Ol.MovedMails_Stack is null)
+                _globals.Ol.MovedMails_Stack = new StackObjectVB();
+            _globals.Ol.MovedMails_Stack.Push(MSG);
+            _globals.Ol.MovedMails_Stack.Push(oMailTmp);
+
+            // TODO: Change this into a JSON file
+            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);
+            string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
+            strOutput[1] = SanitizeArrayLineTSV(ref strAry);
+            FileIO2.Write_TextFile(_globals.FS.Filenames.EmailMoves, strOutput, _globals.FS.FldrMyD);
+        }
+
+        //private static string SanitizeArrayLineTSV(ref string[] strOutput)
+        //{
+        //    string strBuild = "";
+        //    if (strOutput.IsInitialized())
+        //    {
+        //        int max = strOutput.Length;
+        //        for (int i = 1, loopTo = max; i <= loopTo; i++)
+        //        {
+        //            string strTemp = StripTabsCrLf(strOutput[i]);
+        //            strBuild = strBuild + "\t" + strTemp;
+
+        //        }
+        //        if (strBuild.Length > 0)
+        //            strBuild = strBuild.Substring(1);
+        //        return strBuild;
+        //    }
+        //    else
+        //    {
+        //        return "";
+        //    }
+        //}
+
         private static string SanitizeArrayLineTSV(ref string[] strOutput)
         {
-            string strBuild = "";
-            if (ArrayIsAllocated.IsAllocated(ref strOutput))
+            if (strOutput.IsInitialized())
             {
-                int max = Information.UBound(strOutput);
-                for (int i = 1, loopTo = max; i <= loopTo; i++)
-                {
-                    string strTemp = strOutput[i];
-                    strTemp = Strings.Replace(Strings.Trim(strTemp), Constants.vbTab, "");
-                    strTemp = Strings.Replace(strTemp, Constants.vbCrLf, " ");
-                    strTemp = Strings.Replace(strTemp, Constants.vbLf, " ");
-
-                    strBuild = strBuild + Constants.vbTab + strTemp;
-
-                }
-                if (Strings.Len(strBuild) > 0)
-                    strBuild = Strings.Right(strBuild, Strings.Len(strBuild) - 1);
-                return strBuild;
+                return string.Join("\t",strOutput
+                             .Where(s => !string.IsNullOrEmpty(s))
+                             .Select(s => StripTabsCrLf(s))
+                             .ToArray());
             }
-            else
-            {
-                return "";
-            }
+            else { return ""; }
+        }
+
+        internal static string StripTabsCrLf(string str)
+        {
+            var _regex = new Regex(@"[\t\n\r]*");
+            string result = _regex.Replace(str, " ");
+
+            // ensure max of one space per word
+            _regex = new Regex(@"  +");
+            result = _regex.Replace(result, " ");
+            result = result.Trim();
+            return result;
         }
 
         private static void WriteCSV_StartNewFileIfDoesNotExist(string strFileName, string strFileLocation)
         {
-            string[] strOutput;
+            string[] strOutput = null;
             string[,] strAryOutput;
-            object objFSO;
-            strOutput = null;
             if (File.Exists(Path.Combine(strFileName, strFileLocation)))
             {
                 strAryOutput = new string[14, 2];
@@ -248,49 +262,30 @@ namespace ToDoModel
                 strAryOutput[12, 1] = "Attachments";
                 strAryOutput[13, 1] = "FlaggedAsTask";
 
-                Sanitize_Array(strAryOutput, strOutput);
+                SanitizeArray(strAryOutput, ref strOutput);
                 FileIO2.Write_TextFile(strFileName, strOutput, strFileLocation: strFileLocation);
 
             }
             strOutput = null;
             strAryOutput = null;
-            objFSO = null;
-
         }
 
-        private static void Sanitize_Array(string[,] strAryOutput, string[] strOutput)
+        private static void SanitizeArray(string[,] strAryOutput, ref string[] strOutput)
         {
-            int i;
-            int j;
-            int maxi;
-            int maxj;
-            string strTemp;
-
-            if (ArrayIsAllocated.IsAllocated(ref strAryOutput))
+            if (strAryOutput == null) 
             {
-                maxi = Information.UBound(strAryOutput, 1);
-                maxj = Information.UBound(strAryOutput, 2);
-                strOutput = new string[maxj + 1];
-
-                var loopTo = maxj;
-                for (j = 1; j <= loopTo; j++)
-                {
-                    var loopTo1 = maxi;
-                    for (i = 1; i <= loopTo1; i++)
-                    {
-                        strTemp = strAryOutput[i, j];
-                        strTemp = Strings.Replace(Strings.Trim(strTemp), Constants.vbTab, "");
-                        strTemp = Strings.Replace(strTemp, Constants.vbCrLf, " ");
-                        strTemp = Strings.Replace(strTemp, Constants.vbLf, " ");
-                        strAryOutput[i, j] = strTemp;
-                        strOutput[j] = strOutput[j] + Constants.vbTab + strTemp;
-                    }
-                    strOutput[j] = Strings.Right(strOutput[j], Strings.Len(strOutput[j]) - 1);
-                }
+                Debug.WriteLine($"The array {nameof(strAryOutput)} is empty.");
             }
             else
             {
-                Interaction.MsgBox("Empty Array in Sub Sanitize_Array");
+                for (int j = 0; j < strAryOutput.GetLength(0); j++)
+                {
+                    strOutput[j] = string.Join("\t", strAryOutput
+                                         .SliceRow(j)
+                                         .Where(s => !string.IsNullOrEmpty(s))
+                                         .Select(s => StripTabsCrLf(s))
+                                         .ToArray());
+                }
             }
         }
 
@@ -328,22 +323,22 @@ namespace ToDoModel
                     var loopTo = withBlock.Folder_Count;
                     for (i = 1; i <= loopTo; i++)
                     {
-                        if ((withBlock.Email_Folder[i] ?? "") == (fldr ?? ""))
+                        if ((CTFList.CTF_Inc[Inc_Num].Email_Folder[i] ?? "") == (fldr ?? ""))
                         {
-                            withBlock.Email_Conversation_Count[i] = 1 + withBlock.Email_Conversation_Count[i];
+                            CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[i] = 1 + CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[i];
                             updated = true;
                             if (i > 1)
                             {
                                 for (j = i; j >= 2; j -= 1)
                                 {
-                                    if (withBlock.Email_Conversation_Count[j] > withBlock.Email_Conversation_Count[j - 1])
+                                    if (CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j] > CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j - 1])
                                     {
-                                        tmpCCT = withBlock.Email_Conversation_Count[j].ToString();
-                                        tmpFDR = withBlock.Email_Folder[j];
-                                        withBlock.Email_Conversation_Count[j] = withBlock.Email_Conversation_Count[j - 1];
-                                        withBlock.Email_Folder[j] = withBlock.Email_Folder[j - 1];
-                                        withBlock.Email_Conversation_Count[j - 1] = Conversions.ToInteger(tmpCCT);
-                                        withBlock.Email_Folder[j - 1] = tmpFDR;
+                                        tmpCCT = CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j].ToString();
+                                        tmpFDR = CTFList.CTF_Inc[Inc_Num].Email_Folder[j];
+                                        CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j] = withBlock.Email_Conversation_Count[j - 1];
+                                        CTFList.CTF_Inc[Inc_Num].Email_Folder[j] = withBlock.Email_Folder[j - 1];
+                                        CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j - 1] = int.Parse(tmpCCT);
+                                        CTFList.CTF_Inc[Inc_Num].Email_Folder[j - 1] = tmpFDR;
                                     }
                                     else
                                     {

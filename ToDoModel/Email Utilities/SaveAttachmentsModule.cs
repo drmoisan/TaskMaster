@@ -131,8 +131,8 @@ namespace ToDoModel
                     if (objItem is MailItem)
                     {
                         MSG = (MailItem)objItem;
-                        lCountEachItem = Conversions.ToLong(objItem.Attachments.Count);
-                        emailDate = Conversions.ToDate(objItem.SentOn);
+                        lCountEachItem = MSG.Attachments.Count;
+                        emailDate = MSG.SentOn;
                         // Add a day to catch error from flow
                         emailDate2 = DateAndTime.DateAdd("d", 1d, emailDate);
                         DteString = Strings.Format(emailDate, "yyMMdd");
@@ -154,7 +154,7 @@ namespace ToDoModel
                         // /* If the current item contains attachments. */
                         if (lCountEachItem > 0L)
                         {
-                            Atmts = (Attachments)objItem.Attachments;
+                            Atmts = (Attachments)MSG.Attachments;
                             foreach (Attachment Atmt in Atmts)
                             {
                                 atmtct = atmtct + 1;

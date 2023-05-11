@@ -22,7 +22,7 @@ namespace UtilitiesCS
             }
             return stringArray;
         }
-
+                
         public static string[] ToStringArray<T>(this T[] array)
         {
             int rowCount = array.Length;
@@ -48,6 +48,54 @@ namespace UtilitiesCS
             {
                 yield return array[i, column];
             }
+        }
+
+        public static bool IsInitialized<T>(this T[,] array)
+        {
+            if (array == null) { return false; }
+            for (int i = 0; i < array.GetLength(0); i++)
+            {
+                for (int j = 0; j < array.GetLength(1); j++)
+                {
+                    if (array[i, j] == null) { return false; }
+                }
+            }
+
+            return true;
+        }
+
+        public static bool IsInitialized<T>(this T[,] array, bool partially)
+        {
+            if (array == null) { return false; }
+            for (int i = 0; i < array.GetLength(0); i++)
+            {
+                for (int j = 0; j < array.GetLength(1); j++)
+                {
+                    if (array[i, j] != null) { return true; }
+                }
+            }
+            return false;
+        }
+
+        public static bool IsInitialized<T>(this T[] array)
+        {
+            if (array == null) { return false; }
+            for (int i = 0; i < array.GetLength(0); i++)
+            {
+                if (array[i] == null) { return false; }
+            }
+
+            return true;
+        }
+
+        public static bool IsInitialized<T>(this T[] array, bool partially)
+        {
+            if (array == null) { return false; }
+            for (int i = 0; i < array.GetLength(0); i++)
+            {
+                if (array[i] != null) { return true; }
+            }
+            return false;
         }
     }
 }

@@ -47,20 +47,22 @@ namespace UtilitiesCS.Test
         {
             return DialogResult.Cancel;
         }
-        
 
+        
     }
+
+    
     //public static class MyDelegates
     //{
     //    public static DialogResult buttonOK()
     //    {
     //        return DialogResult.OK;
     //    }
-        
+
     //    public static DialogResult buttonCancel() 
     //    { 
     //        return DialogResult.Cancel;
     //    }
     //}
-    
+
 }
