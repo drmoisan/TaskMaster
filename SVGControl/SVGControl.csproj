@@ -105,7 +105,7 @@
     </Compile>
     <Compile Include="OlvExtension.cs" />
     <Compile Include="PictureBoxSVG.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="PictureBoxSVG.Designer.cs">
       <DependentUpon>PictureBoxSVG.cs</DependentUpon>

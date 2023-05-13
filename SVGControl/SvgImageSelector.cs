@@ -233,7 +233,7 @@ namespace SVGControl
                     }
                     
                 }
-                else if (_relativeImagePath == "") 
+                else if ((value == true) && (_relativeImagePath == ""))
                 {
                     MessageBox.Show("Image path must have a value to save the rendering");
                     
