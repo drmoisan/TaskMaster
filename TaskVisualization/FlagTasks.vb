@@ -137,7 +137,7 @@ Public Class FlagTasks
             End Get
         End Property
 
-        Public Function AutoFind(objItem As Object) As Collection Implements IAutoAssign.AutoFind
+        Public Function AutoFind(objItem As Object) As IList(Of String) Implements IAutoAssign.AutoFind
             Return AutoFile.AutoFindPeople(objItem:=objItem,
                                            ppl_dict:=_globals.TD.DictPPL,
                                            emailRootFolder:=_globals.Ol.EmailRootPath,
@@ -148,17 +148,17 @@ Public Class FlagTasks
 
         Public Function AddChoicesToDict(olMail As MailItem,
                                          prefixes As List(Of IPrefix),
-                                         prefixKey As String) As Collection Implements IAutoAssign.AddChoicesToDict
+                                         prefixKey As String) As IList(Of String) Implements IAutoAssign.AddChoicesToDict
 
             Return AutoFile.dictPPL_AddMissingEntries(OlMail:=olMail,
-                                ppl_dict:=_globals.TD.DictPPL,
-                                dictRemap:=_globals.TD.DictRemap,
-                                prefixes:=prefixes,
-                                prefixKey:=prefixKey,
-                                emailRootFolder:=_globals.Ol.EmailRootPath,
-                                stagingPath:=_globals.FS.FldrStaging,
-                                filename_dictppl:=_globals.TD.DictPPL_Filename,
-                                dictPPLSave:=AddressOf _globals.TD.DictPPL_Save)
+                                                      ppl_dict:=_globals.TD.DictPPL,
+                                                      dictRemap:=_globals.TD.DictRemap,
+                                                      prefixes:=prefixes,
+                                                      prefixKey:=prefixKey,
+                                                      emailRootFolder:=_globals.Ol.EmailRootPath,
+                                                      stagingPath:=_globals.FS.FldrStaging,
+                                                      filename_dictppl:=_globals.TD.DictPPL_Filename,
+                                                      dictPPLSave:=AddressOf _globals.TD.DictPPL_Save)
 
         End Function
 

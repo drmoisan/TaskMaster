@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+
+
 
 namespace ToDoModel
 {
@@ -11,9 +11,9 @@ namespace ToDoModel
     public class cConversation
     {
         private object _item;
-        private Conversation pConversation;
-        private Table pTable;
-        private Collection pCollection;
+        private Conversation _conversation;
+        private Table _table;
+        private IList _pList;
         private Application _olApp;
         // Private Const PR_STORE_ENTRYID As String = "https://schemas.microsoft.com/mapi/proptag/0x0FFB0102"
         // Private Const FOLDERNAME As String = "http://schemas.microsoft.com/mapi/proptag/0x0e05001f"
@@ -28,11 +28,12 @@ namespace ToDoModel
             set
             {
                 _item = value;
-                pConversation = (Conversation)value.GetConversation;
-                if (pConversation is not null)
+                dynamic temp = _item;
+                _conversation = (Conversation)temp.GetConversation();
+                if (_conversation is not null)
                 {
-                    pTable = pConversation.GetTable();
-                    pTable.Columns.Add("http://schemas.microsoft.com/mapi/proptag/0x0e05001f");
+                    _table = _conversation.GetTable();
+                    _table.Columns.Add("http://schemas.microsoft.com/mapi/proptag/0x0e05001f");
                     _item = value;
                 }
             }
@@ -41,9 +42,9 @@ namespace ToDoModel
         public void Enumerate()
         {
             Row oRow;
-            while (!pTable.EndOfTable)
+            while (!_table.EndOfTable)
             {
-                oRow = pTable.GetNextRow();
+                oRow = _table.GetNextRow();
                 // Use EntryID and StoreID to open the item.
                 Debug.WriteLine(oRow["Subject"]);
                 Debug.WriteLine(oRow["http://schemas.microsoft.com/mapi/proptag/0x0e05001f"]);
@@ -57,12 +58,12 @@ namespace ToDoModel
             {
                 if (OnlySameFolder)
                 {
-                    pCollection = get_ToCollection(OnlySameFolder);
-                    CountRet = pCollection.Count;
+                    _pList = get_ToCollection(OnlySameFolder);
+                    CountRet = _pList.Count;
                 }
                 else
                 {
-                    CountRet = pTable.GetRowCount();
+                    CountRet = _table.GetRowCount();
                 }
             }
             else
@@ -81,13 +82,13 @@ namespace ToDoModel
                 object objItem;
                 var listObjects = new List<object>();
                 var listEmail = new List<MailItem>();
-                pTable.Sort("[ReceivedTime]", true);
+                _table.Sort("[ReceivedTime]", true);
 
-                while (!pTable.EndOfTable)
+                while (!_table.EndOfTable)
                 {
-                    oRow = pTable.GetNextRow();
+                    oRow = _table.GetNextRow();
                     // Use EntryID and StoreID to open the item.
-                    objItem = _olApp.Session.GetItemFromID(Conversions.ToString(oRow["EntryID"]));
+                    objItem = _olApp.Session.GetItemFromID(oRow["EntryID"]);
                     if (MailOnly)
                     {
                         AddEmailToList(OnlySameFolder, objItem, ref listEmail);
@@ -119,7 +120,7 @@ namespace ToDoModel
         {
             if (OnlySameFolder)
             {
-                if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(objItem.Parent.Name, _item.Parent.Name, false)))
+                if (((dynamic)objItem).Parent.Name == ((dynamic)_item).Parent.Name)
                 {
                     listObjects.Add(objItem);
                 }
@@ -134,47 +135,48 @@ namespace ToDoModel
         {
             if (objItem is MailItem)
             {
+                MailItem mailItem = (MailItem)objItem;
                 if (OnlySameFolder)
                 {
-                    if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(objItem.Parent.Name, _item.Parent.Name, false)))
+                    if (mailItem.Parent.Name == ((MailItem)_item).Parent.Name)
                     {
-                        listEmails.Add((MailItem)objItem);
+                        listEmails.Add(mailItem);
                     }
                 }
                 else
                 {
-                    listEmails.Add((MailItem)objItem);
+                    listEmails.Add(mailItem);
                 }
             }
         }
 
-        public Collection get_ToCollection(bool OnlySameFolder = false)
+        public IList get_ToCollection(bool OnlySameFolder = false)
         {
             if (_item is not null)
             {
                 Row oRow;
                 object objItem;
-                pCollection = new Collection();
-                pTable.Sort("[ReceivedTime]", true);
+                _pList = new List<object>();
+                _table.Sort("[ReceivedTime]", true);
 
-                while (!pTable.EndOfTable)
+                while (!_table.EndOfTable)
                 {
-                    oRow = pTable.GetNextRow();
+                    oRow = _table.GetNextRow();
                     // Use EntryID and StoreID to open the item.
-                    objItem = _olApp.Session.GetItemFromID(Conversions.ToString(oRow["EntryID"]));
+                    objItem = _olApp.Session.GetItemFromID(oRow["EntryID"]);
                     if (OnlySameFolder)
                     {
-                        if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(objItem.Parent.Name, _item.Parent.Name, false)))
+                        if (((dynamic)objItem).Parent.Name == ((dynamic)_item).Parent.Name)
                         {
-                            pCollection.Add(objItem);
+                            _pList.Add(objItem);
                         }
                     }
                     else
                     {
-                        pCollection.Add(objItem);
+                        _pList.Add(objItem);
                     }
                 }
-                return pCollection;
+                return _pList;
             }
             else
             {

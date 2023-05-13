@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+
+
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesVB;
 

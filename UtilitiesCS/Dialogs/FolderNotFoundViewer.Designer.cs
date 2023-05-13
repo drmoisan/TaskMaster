@@ -40,14 +40,14 @@
             // 
             this.CreateFolder.Image = ((System.Drawing.Image)(resources.GetObject("CreateFolder.Image")));
             this.CreateFolder.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.CreateFolder.ImageSVG.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\NewFolde" +
-    "r.svg";
+            this.CreateFolder.ImageSVG.ImagePath = "./UtilitiesCS/Resources/NewFolder.svg";
             this.CreateFolder.ImageSVG.Margin = new System.Windows.Forms.Padding(7, 0, 7, 15);
             this.CreateFolder.ImageSVG.SaveRendering = false;
-            this.CreateFolder.ImageSVG.Size = new System.Drawing.Size(112, 41);
-            this.CreateFolder.Location = new System.Drawing.Point(14, 94);
+            this.CreateFolder.ImageSVG.Size = new System.Drawing.Size(238, 93);
+            this.CreateFolder.Location = new System.Drawing.Point(28, 181);
+            this.CreateFolder.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.CreateFolder.Name = "CreateFolder";
-            this.CreateFolder.Size = new System.Drawing.Size(126, 56);
+            this.CreateFolder.Size = new System.Drawing.Size(252, 108);
             this.CreateFolder.TabIndex = 4;
             this.CreateFolder.Text = "    Create     Folder";
             this.CreateFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -57,14 +57,14 @@
             // OpenFolder
             // 
             this.OpenFolder.Image = ((System.Drawing.Image)(resources.GetObject("OpenFolder.Image")));
-            this.OpenFolder.ImageSVG.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\OpenFold" +
-    "er.svg";
+            this.OpenFolder.ImageSVG.ImagePath = "./UtilitiesCS/Resources/OpenFolder.svg";
             this.OpenFolder.ImageSVG.Margin = new System.Windows.Forms.Padding(7, 0, 7, 15);
             this.OpenFolder.ImageSVG.SaveRendering = false;
-            this.OpenFolder.ImageSVG.Size = new System.Drawing.Size(112, 41);
-            this.OpenFolder.Location = new System.Drawing.Point(146, 94);
+            this.OpenFolder.ImageSVG.Size = new System.Drawing.Size(238, 93);
+            this.OpenFolder.Location = new System.Drawing.Point(292, 181);
+            this.OpenFolder.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.OpenFolder.Name = "OpenFolder";
-            this.OpenFolder.Size = new System.Drawing.Size(126, 56);
+            this.OpenFolder.Size = new System.Drawing.Size(252, 108);
             this.OpenFolder.TabIndex = 4;
             this.OpenFolder.Text = "   Open     Folder";
             this.OpenFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -74,14 +74,14 @@
             // Cancel
             // 
             this.Cancel.Image = ((System.Drawing.Image)(resources.GetObject("Cancel.Image")));
-            this.Cancel.ImageSVG.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\Cancel.s" +
-    "vg";
+            this.Cancel.ImageSVG.ImagePath = "./UtilitiesCS/Resources/Cancel.svg";
             this.Cancel.ImageSVG.Margin = new System.Windows.Forms.Padding(7, 0, 7, 15);
             this.Cancel.ImageSVG.SaveRendering = false;
-            this.Cancel.ImageSVG.Size = new System.Drawing.Size(112, 41);
-            this.Cancel.Location = new System.Drawing.Point(278, 94);
+            this.Cancel.ImageSVG.Size = new System.Drawing.Size(238, 93);
+            this.Cancel.Location = new System.Drawing.Point(556, 181);
+            this.Cancel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(126, 56);
+            this.Cancel.Size = new System.Drawing.Size(252, 108);
             this.Cancel.TabIndex = 4;
             this.Cancel.Text = "Cancel";
             this.Cancel.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -91,14 +91,14 @@
             // NoToAll
             // 
             this.NoToAll.Image = ((System.Drawing.Image)(resources.GetObject("NoToAll.Image")));
-            this.NoToAll.ImageSVG.ImagePath = "C:\\Users\\03311352\\source\\repos\\drmoisan\\TaskMaster\\UtilitiesCS\\Resources\\RepeatUn" +
-    "tilFailure.svg";
+            this.NoToAll.ImageSVG.ImagePath = "./UtilitiesCS/Resources/RepeatUntilFailure.svg";
             this.NoToAll.ImageSVG.Margin = new System.Windows.Forms.Padding(7, 0, 7, 15);
             this.NoToAll.ImageSVG.SaveRendering = false;
-            this.NoToAll.ImageSVG.Size = new System.Drawing.Size(112, 41);
-            this.NoToAll.Location = new System.Drawing.Point(410, 94);
+            this.NoToAll.ImageSVG.Size = new System.Drawing.Size(238, 93);
+            this.NoToAll.Location = new System.Drawing.Point(820, 181);
+            this.NoToAll.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.NoToAll.Name = "NoToAll";
-            this.NoToAll.Size = new System.Drawing.Size(126, 56);
+            this.NoToAll.Size = new System.Drawing.Size(252, 108);
             this.NoToAll.TabIndex = 5;
             this.NoToAll.Text = "No To All";
             this.NoToAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -109,23 +109,25 @@
             // 
             this.FolderNameTxtBox.BackColor = System.Drawing.SystemColors.Control;
             this.FolderNameTxtBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FolderNameTxtBox.Location = new System.Drawing.Point(16, 23);
+            this.FolderNameTxtBox.Location = new System.Drawing.Point(32, 44);
+            this.FolderNameTxtBox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.FolderNameTxtBox.Multiline = true;
             this.FolderNameTxtBox.Name = "FolderNameTxtBox";
-            this.FolderNameTxtBox.Size = new System.Drawing.Size(519, 59);
+            this.FolderNameTxtBox.Size = new System.Drawing.Size(1034, 110);
             this.FolderNameTxtBox.TabIndex = 6;
             this.FolderNameTxtBox.Text = "<FOLDER NAME>";
             // 
             // FolderNotFoundViewer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(548, 161);
+            this.ClientSize = new System.Drawing.Size(1096, 310);
             this.Controls.Add(this.FolderNameTxtBox);
             this.Controls.Add(this.NoToAll);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.OpenFolder);
             this.Controls.Add(this.CreateFolder);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "FolderNotFoundViewer";
             this.Text = "Folder Not Found";
             this.ResumeLayout(false);

@@ -5,9 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesVB;
@@ -17,7 +17,7 @@ namespace ToDoModel
 
     public static class ToDoEvents
     {
-        private static void Debug_OutputNsStores(Application OlApp)
+        private static void Debug_OutputNsStores(Outlook.Application OlApp)
         {
             string storeList = string.Empty;
 
@@ -27,7 +27,7 @@ namespace ToDoModel
             for (int i = 1, loopTo = stores.Count; i <= loopTo; i++)
             {
                 var store = stores[i];
-                if (Strings.Right(store.FilePath, 3) == "pst")
+                if (Path.GetExtension(store.FilePath) == "pst")
                 {
                     Folder fldrtmp = (Folder)store.GetRootFolder();
 
@@ -53,16 +53,16 @@ namespace ToDoModel
             {
                 using (var sw = new StreamWriter(filename))
                 {
-                    for (long i = Information.LBound(strOutput), loopTo = Information.UBound(strOutput); i <= loopTo; i++)
-                        sw.WriteLine(strOutput[(int)i]);
+                    for (int i = 0; i < strOutput.Length; i++)
+                        sw.WriteLine(strOutput[i]);
                 }
             }
             else
             {
                 using (var sw = new StreamWriter(filename, append: true))
                 {
-                    for (long i = Information.LBound(strOutput), loopTo1 = Information.UBound(strOutput); i <= loopTo1; i++)
-                        sw.WriteLine(strOutput[(int)i]);
+                    for (int i = 0; i < strOutput.Length; i++)
+                        sw.WriteLine(strOutput[i]);
                 }
             }
 
@@ -88,16 +88,16 @@ namespace ToDoModel
 
         }
         
-        public static List<object> GetListOfToDoItemsInView(Application OlApp)
+        public static List<object> GetListOfToDoItemsInView(Outlook.Application OlApp)
         {
             Items OlItems;
-            View objView;
+            Outlook.View objView;
             Folder OlFolder;
             string strFilter;
             // QUESTION: ThisAddin.GetListOfToDoItemsInView When is this called? Is it needed?
             // CLEANUP: ThisAddin.GetListOfToDoItemsInView Move to a Class, Module or a Library depending on how it is used. 
 
-            objView = (View)OlApp.ActiveExplorer().CurrentView;
+            objView = (Outlook.View)OlApp.ActiveExplorer().CurrentView;
             strFilter = "@SQL=" + objView.Filter;
 
             OlItems = null;
@@ -113,16 +113,16 @@ namespace ToDoModel
             return ListObjects;
         }
 
-        public static Items GetToDoItemsInView(Application OlApp)
+        public static Items GetToDoItemsInView(Outlook.Application OlApp)
         {
             Items GetItemsInView_ToDoRet = default;
             Items OlItems;
-            View objView;
+            Outlook.View objView;
             Folder OlFolder;
             string strFilter;
 
             // QUESTION: Depricated? Previous function was GetList. Do we need both?
-            objView = (View)OlApp.ActiveExplorer().CurrentView;
+            objView = (Outlook.View)OlApp.ActiveExplorer().CurrentView;
             strFilter = "@SQL=" + objView.Filter;
 
             OlItems = null;
@@ -147,7 +147,7 @@ namespace ToDoModel
             {
                 if (unbroken)
                 {
-                    if ((Strings.Mid(strParent, i * 2 - 1, 2) ?? "") == (Strings.Mid(strChild, i * 2 - 1, 2) ?? ""))
+                    if ((strParent.Substring(i * 2 - 1, 2) ?? "") == (strChild.Substring(i * 2 - 1, 2) ?? ""))
                     {
                         count = i;
                     }
@@ -161,27 +161,22 @@ namespace ToDoModel
             return IsChildRet;
         }
 
-        public static object FindParent(Collection itms, string strChild)
-        {
-            object FindParentRet = default;
-            string strParent;
-            // QUESTION: Duplicate? If not, move to a class, module or library.
-            try
-            {
-                strParent = Strings.Left(strChild, strChild.Length - 2);
-                FindParentRet = itms[strParent];
-            }
-            catch
-            {
-                FindParentRet = null;
-                Information.Err().Clear();
-            }
+        //public static object FindParent(Collection itms, string strChild)
+        //{
+        //    string strParent;
+        //    // QUESTION: Duplicate? If not, move to a class, module or library.
+        //    try
+        //    {
+        //        strParent = strChild.Substring(2);
+        //        return itms[strParent];
+        //    }
+        //    catch (System.Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
 
-            return FindParentRet;
-
-        }
-
-        public static void Refresh_ToDoID_Splits(Application OlApp)
+        public static void Refresh_ToDoID_Splits(Outlook.Application OlApp)
         {
             ToDoItem todo;
             var OlItems = GetToDoItemsInView(OlApp);
@@ -209,9 +204,8 @@ namespace ToDoModel
                 var IDList = AppGlobals.TD.IDList;
 
                 var todo = new ToDoItem(Item, OnDemand: true);
-                UserProperty objProperty_ToDoID = (UserProperty)Item.UserProperties.Find("ToDoID");
-                UserProperty objProperty_Project = (UserProperty)Item.UserProperties.Find("TagProject");
-
+                UserProperty objProperty_ToDoID = ((dynamic)Item).UserProperties.Find("ToDoID");
+                UserProperty objProperty_Project = ((dynamic)Item).UserProperties.Find("TagProject");
 
                 bool blTmp = todo.EC2; // This reads the button and keeps the other field in sync if there is a change
                                        // Check to see if change was in the EC
@@ -234,7 +228,7 @@ namespace ToDoModel
                             if ((todoTmp.ToDoID ?? "") != (todo.ToDoID ?? ""))
                             {
                                 // Added if statement to correct for the fact that Restrict is not case sensitive
-                                if ((Strings.Left(todoTmp.ToDoID, todo.ToDoID.Length) ?? "") == (todo.ToDoID ?? ""))
+                                if ((todoTmp.ToDoID.Substring(0,todo.ToDoID.Length) ?? "") == (todo.ToDoID ?? ""))
                                 {
                                     if (strEC == "-")
                                     {
@@ -281,7 +275,7 @@ namespace ToDoModel
                     // Check to see whether there is an existing ID
                     if (objProperty_ToDoID is not null)
                     {
-                        string strToDoID = Conversions.ToString(objProperty_ToDoID);
+                        string strToDoID = objProperty_ToDoID.Value;
 
                         // Don't autocode branches that existed in another project previously
                         if (strToDoID.Length != 0 & strToDoID.Length <= 4)
@@ -310,8 +304,8 @@ namespace ToDoModel
 
                                 else if (strToDoID.Length == 4) // If it is not in the dictionary, see if this is a project we should add
                                 {
-                                    var response = Interaction.MsgBox("Add Project " + strProject + " to the Master List?", Constants.vbYesNo);
-                                    if (response == Constants.vbYes)
+                                    var response = MessageBox.Show("Add Project " + strProject + " to the Master List?", "Dialog", MessageBoxButtons.YesNo);
+                                    if (response == DialogResult.Yes)
                                     {
                                         string strProgram = Interaction.InputBox("What is the program name for " + strProject + "?", DefaultResponse: "");
                                         ProjInfo.Add(new ToDoProjectInfoEntry(strProject, strToDoID, strProgram));

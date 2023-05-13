@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+
+
 
 namespace ToDoModel
 {

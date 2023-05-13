@@ -3,8 +3,8 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+
+
 using UtilitiesCS;
 using UtilitiesVB;
 

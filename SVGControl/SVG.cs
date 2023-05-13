@@ -12,6 +12,7 @@ using System.Windows.Forms.Design;
 using System.Numerics;
 using System.Drawing.Design;
 using SVGControl.Properties;
+using Svg;
 
 namespace SVGControl
 {
@@ -24,25 +25,24 @@ namespace SVGControl
         {
             InitializeComponent();
             _parser = new SVGParser();
-            pictureBox1.Image = _parser.GetBitmapFromSVG(Properties.Resources.Image, pictureBox1.Size);
+            pictureBox1.Image = _parser.GetBitmapFromSVG(Defaults.GetDefault.SvgImage, pictureBox1.Size);
         }
 
-
         [Editor(typeof(SpecializedFileNameEditor), typeof(UITypeEditor))]
-        public string ImagePath 
-        { 
-            get 
-            { 
-                return _imagePath; 
-            } 
-            set 
-            { 
-                _imagePath = value; 
+        public string ImagePath
+        {
+            get
+            {
+                return _imagePath;
+            }
+            set
+            {
+                _imagePath = value;
                 if ((value != null) && (value != string.Empty))
                 {
                     this.pictureBox1.Image = _parser.GetBitmapFromSVG(value, pictureBox1.Size);
                 }
-            } 
+            }
         }
 
         public class SpecializedFileNameEditor : FileNameEditor
@@ -67,19 +67,18 @@ namespace SVGControl
 
         private void pictureBox1_SizeChanged(object sender, EventArgs e)
         {
-            
-            if (_imagePath != string.Empty) 
+            if (_parser != null)
             {
-                this.pictureBox1.Image = _parser.GetBitmapFromSVG(_imagePath, pictureBox1.Size);
-                
+                if (_imagePath != string.Empty)
+                { 
+                    this.pictureBox1.Image = _parser.GetBitmapFromSVG(_imagePath, this.Size);
+                }
+                else 
+                { 
+                    this.pictureBox1.Image = _parser.GetBitmapFromSVG(
+                        Defaults.GetDefault.SvgImage, this.Size);
+                }
             }
-            else 
-            {
-                this.pictureBox1.Image = _parser.GetBitmapFromSVG(Properties.Resources.Image, pictureBox1.Size);
-            }
-            
         }
-
-        
     }
 }

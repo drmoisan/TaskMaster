@@ -5,8 +5,8 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+
+
 using UtilitiesVB;
 
 namespace ToDoModel

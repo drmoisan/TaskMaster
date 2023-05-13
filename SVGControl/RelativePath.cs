@@ -540,8 +540,8 @@ namespace SVGControl
         //    uint u = GetFullPathNameZ(path, (uint)bufsz, out sbFull, out sbFile);  // 1st call: Get necessary bufsz
         //    if (u > bufsz)                            // 'u' should be >1
         //    {
-        //        bufsz = (int)u + 10;                       // Required size plus a few
-        //        sbFull = new StringBuilder(bufsz);                 // Re-create objects w/ proper size
+        //        bufsz = (int)u + 10;                       // Required _size plus a few
+        //        sbFull = new StringBuilder(bufsz);                 // Re-create objects w/ proper _size
         //        sbFile = new StringBuilder(bufsz);                 // "
         //        u = GetFullPathNameZ(path, (uint)bufsz, out sbFull, out sbFile);    // Try again, this should succeed
         //                                                                       // 'sbFull' should now contain "c:\windows\system32\desktop.ini"
@@ -582,7 +582,7 @@ namespace SVGControl
 
         //    while ((result = GetFullPathNameW(ref MemoryMarshal.GetReference(path), (uint)builder.Capacity, ref builder.GetPinnableReference(), IntPtr.Zero)) > builder.Capacity)
         //    {
-        //        // Reported size is greater than the buffer size. Increase the capacity.
+        //        // Reported _size is greater than the buffer _size. Increase the capacity.
         //        builder.EnsureCapacity(checked((int)result));
         //    }
 

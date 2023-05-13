@@ -1,6 +1,7 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
 Imports UtilitiesVB
 Imports System.IO
+Imports System.Net.Mail
 
 Public Class AppOlObjects
     Implements IOlObjects
@@ -8,6 +9,7 @@ Public Class AppOlObjects
     Private _olEmailRootPath As String
     Private _olArchiveRootPath As String
     Private _movedMails_Stack As StackObjectVB
+    Private _userEmailAddress As String
 
     Public Sub New(OlApp As Application)
         App = OlApp
@@ -105,5 +107,14 @@ Public Class AppOlObjects
                 objView.Save()
             End If
         End Set
+    End Property
+
+    Public ReadOnly Property UserEmailAddress As String Implements IOlObjects.UserEmailAddress
+        Get
+            If _userEmailAddress Is Nothing Then
+                _userEmailAddress = App.ActiveExplorer().Session.CurrentUser.AddressEntry.GetExchangeUser().PrimarySmtpAddress
+            End If
+            Return _userEmailAddress
+        End Get
     End Property
 End Class

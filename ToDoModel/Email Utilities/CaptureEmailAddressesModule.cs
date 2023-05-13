@@ -8,7 +8,7 @@ namespace ToDoModel
 
     public static class CaptureEmailAddressesModule
     {
-        public static List<string> CaptureEmailAddresses(MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap)
+        public static List<string> CaptureEmailAddresses(MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap, string currentUserEmail)
         {
             int i;
             int j;
@@ -25,15 +25,15 @@ namespace ToDoModel
                     if (!string.IsNullOrEmpty(strEmail[i]))
                     {
                         strAddresses = strEmail[i].Split(';', trim: true);
-                        var loopTo = Information.UBound(strAddresses);
-                        for (j = 0; j <= loopTo; j++)
+                        var loopTo = strAddresses.Length;
+                        for (j = 0; j < loopTo; j++)
                         {
                             blContains = false;
 
                             foreach (var strTmp in emailAddressList)
                             {
 
-                                if ((Strings.LCase(Strings.Trim(strTmp)) ?? "") == (Strings.LCase(Strings.Trim(strAddresses[j])) ?? ""))
+                                if ((strTmp.Trim().ToLower() ?? "") == (strAddresses[j].Trim().ToLower() ?? ""))
                                 {
                                     blContains = true;
                                 }
@@ -41,12 +41,11 @@ namespace ToDoModel
 
                             if (blContains == false)
                             {
-                                if (Strings.StrComp(strAddresses[j], "dan.moisan@planetpartnership.com", Constants.vbTextCompare) != 0)
+                                if (strAddresses[j].ToLower() != currentUserEmail.ToLower())
                                 {
-                                    emailAddressList.Add(Strings.LCase(Strings.Trim(strAddresses[j])));
+                                    emailAddressList.Add(strAddresses[j].Trim().ToLower());
                                 }
                             }
-
                         }
                     }
                 }

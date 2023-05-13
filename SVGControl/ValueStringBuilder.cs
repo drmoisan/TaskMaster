@@ -285,7 +285,7 @@ namespace SVGControl
         }
 
         /// <summary>
-        /// Resize the internal buffer either by doubling current buffer size or
+        /// Resize the internal buffer either by doubling current buffer _size or
         /// by adding <paramref name="additionalCapacityBeyondPos"/> to
         /// <see cref="_pos"/> whichever is greater.
         /// </summary>
@@ -300,8 +300,8 @@ namespace SVGControl
 
             const uint ArrayMaxLength = 0x7FFFFFC7; // same as Array.MaxLength
 
-            // Increase to at least the required size (_pos + additionalCapacityBeyondPos), but try
-            // to double the size if possible, bounding the doubling to not go beyond the max array length.
+            // Increase to at least the required _size (_pos + additionalCapacityBeyondPos), but try
+            // to double the _size if possible, bounding the doubling to not go beyond the max array length.
             int newCapacity = (int)Math.Max(
                 (uint)(_pos + additionalCapacityBeyondPos),
                 Math.Min((uint)_chars.Length * 2, ArrayMaxLength));

@@ -13,7 +13,7 @@ namespace SVGControl
     internal class SVGParser
     {
         /// <summary>
-        /// The maximum image size supported.
+        /// The maximum image _size supported.
         /// </summary>
         public Size TargetSize { get; set; }
 
@@ -77,7 +77,7 @@ namespace SVGControl
         }
 
         /// <summary>
-        /// Makes sure that the image does not exceed the maximum size, while preserving aspect ratio.
+        /// Makes sure that the image does not exceed the maximum _size, while preserving aspect ratio.
         /// </summary>
         /// <param name="document">The SVG document to resize.</param>
         /// <returns>Returns a resized or the original document depending on the document.</returns>

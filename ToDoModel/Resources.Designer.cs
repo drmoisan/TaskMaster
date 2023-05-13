@@ -9,7 +9,7 @@
 // ------------------------------------------------------------------------------
 
 using System.Diagnostics;
-using Microsoft.VisualBasic;
+
 
 
 namespace ToDoModel.My.Resources

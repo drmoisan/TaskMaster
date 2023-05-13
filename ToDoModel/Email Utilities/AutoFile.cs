@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using Tags;
 using UtilitiesVB;
+using UtilitiesCS;
+using System.Windows.Forms;
 
 namespace ToDoModel
 {
@@ -46,7 +48,7 @@ namespace ToDoModel
 
                 try
                 {
-                    StrSMTPAddress = Conversions.ToString(OlPA.GetProperty(PR_SMTP_ADDRESS));
+                    StrSMTPAddress = (string)(OlPA.GetProperty(PR_SMTP_ADDRESS));
                 }
                 catch
                 {
@@ -72,13 +74,13 @@ namespace ToDoModel
                     strAry[3] = strAry[3] + "; " + StrRecipientName;
                     strAry[4] = strAry[4] + "; " + StrSMTPAddress;
                 }
-                Information.Err().Clear();
+                
             }
 
             for (i = 1; i <= 4; i++)
             {
-                if (Strings.Len(strAry[i]) > 2)
-                    strAry[i] = Strings.Right(strAry[i], Strings.Len(strAry[i]) - 2);
+                if (strAry[i].Length > 2)
+                    strAry[i] = strAry[i].Substring(2);
             }
 
             if (OlMail.Sender.Type == "EX")
@@ -98,7 +100,7 @@ namespace ToDoModel
 
                 try
                 {
-                    strAry[6] = Conversions.ToString(OlPA.GetProperty(PR_SMTP_ADDRESS));
+                    strAry[6] = (string)(OlPA.GetProperty(PR_SMTP_ADDRESS));
                 }
                 catch
                 {
@@ -134,11 +136,16 @@ namespace ToDoModel
         }
 
 
-        public static Collection AutoFindPeople(object objItem, Dictionary<string, string> ppl_dict, string emailRootFolder, Dictionary<string, string> dictRemap, bool blNotifyMissing = true, bool blExcludeFlagged = true)
+        public static IList<string> AutoFindPeople(object objItem,
+                                                   Dictionary<string, string> ppl_dict,
+                                                   string emailRootFolder,
+                                                   Dictionary<string, string> dictRemap,
+                                                   bool blNotifyMissing = true,
+                                                   bool blExcludeFlagged = true)
         {
             MailItem OlMail;
             List<string> emailAddressList;
-            var colPPL = new Collection();
+            IList<string> peopleList = new List<string>();
             string strMissing = "";
             string strTmp;
 
@@ -158,12 +165,12 @@ namespace ToDoModel
                             {
                                 if (!Category_IsAlreadySelected(objItem, ppl_dict[strTmp]))
                                 {
-                                    colPPL.Add(ppl_dict[strTmp]);
+                                    peopleList.Add(ppl_dict[strTmp]);
                                 }
                             }
                             else
                             {
-                                colPPL.Add(ppl_dict[strTmp]);
+                                peopleList.Add(ppl_dict[strTmp]);
                             }
                         }
                         else
@@ -171,27 +178,27 @@ namespace ToDoModel
                             strMissing = strMissing + "; " + strTmp;
                         }
                     }
-                    if (Strings.Len(strMissing) > 0 & blNotifyMissing)
+                    if (strMissing.Length > 0 & blNotifyMissing)
                     {
-                        strMissing = Strings.Right(strMissing, Strings.Len(strMissing) - 2);
-                        var unused = Interaction.MsgBox("Recipients not in list of people: " + strMissing);
+                        strMissing = strMissing.Substring(2);
+                        MessageBox.Show("Recipients not in list of people: " + strMissing);
                     }
                 }
             }
 
-            return colPPL;
+            return peopleList;
         }
 
-        private static bool Category_IsAlreadySelected(object objItem, string strCat)
+        private static bool Category_IsAlreadySelected(dynamic objItem, string strCat)
         {
-            string[] varCats;
+            
             int i;
             bool blSelected;
 
             blSelected = false;
-            varCats = Strings.Split(Conversions.ToString(objItem.Categories), ", ");
-            var loopTo = Information.UBound(varCats);
-            for (i = 0; i <= loopTo; i++)
+            string[] varCats = (objItem.Categories as string).Split(',',trim: true);
+            var loopTo = varCats.Length;
+            for (i = 0; i < loopTo; i++)
             {
                 if ((strCat ?? "") == (varCats[i] ?? ""))
                 {
@@ -203,14 +210,14 @@ namespace ToDoModel
 
         public delegate void DictPPL_Save();
 
-        public static Collection dictPPL_AddMissingEntries(MailItem OlMail, Dictionary<string, string> ppl_dict, List<IPrefix> prefixes, string prefixKey, string emailRootFolder, string stagingPath, Dictionary<string, string> dictRemap, string filename_dictppl, DictPPL_Save dictPPLSave)
+        public static IList<string> dictPPL_AddMissingEntries(MailItem OlMail, Dictionary<string, string> ppl_dict, List<IPrefix> prefixes, string prefixKey, string emailRootFolder, string stagingPath, Dictionary<string, string> dictRemap, string filename_dictppl, DictPPL_Save dictPPLSave)
         {
 
             var addressList = new List<string>();
             string strTmp3;
             bool blNew = false;
             // Dim catTmp As Outlook.Category
-            var colReturnCatNames = new Collection();
+            var colReturnCatNames = new List<string>();
             Regex objRegex;
             TagViewer _viewer;
             SortedDictionary<string, bool> dictNAMES;
@@ -231,12 +238,12 @@ namespace ToDoModel
             foreach (string address in addressList)
             {
 
-                var vbR = Interaction.MsgBox("Add entry for " + address, Constants.vbYesNo);
-                if (vbR == Constants.vbYes)
+                var vbR = MessageBox.Show("Add entry for " + address, "Dialog",MessageBoxButtons.YesNo);
+                if (vbR == DialogResult.Yes)
                 {
                     objRegex = new Regex(@"([a-zA-z\d]+)\.([a-zA-z\d]+)@([a-zA-z\d]+)\.com", RegexOptions.Multiline);
 
-                    string newPplTag = Strings.StrConv(objRegex.Replace(address, Strings.UCase("$1 $2")), Constants.vbProperCase);
+                    string newPplTag = objRegex.Replace(address, ("$1 $2")); //Proper case
                     var selections = new List<string>() { newPplTag };
 
                     // Check if it is a new address for existing contact

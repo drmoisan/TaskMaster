@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
+
+
 
 namespace ToDoModel
 {
@@ -24,7 +24,7 @@ namespace ToDoModel
 
             strAry[1] = GetTriage(OlMail);
             strAry[2] = GetEmailFolderPath(OlMail, emailRootFolder);
-            strAry[3] = Strings.Format(OlMail.SentOn, @"yyyy-MM-dd\Th:mm:ss\+\0\0\:\0\0");
+            strAry[3] = OlMail.SentOn.ToString(@"yyyy-MM-dd\Th:mm:ss\+\0\0\:\0\0");
 
             var recipients = GetRecipients(OlMail);
             strAry[5] = recipients.recipientsTo;
@@ -32,7 +32,9 @@ namespace ToDoModel
             strAry[4] = GetSenderAddress(OlMail);
             strAry[7] = OlMail.Subject;
             strAry[8] = OlMail.Body;
-            strAry[9] = Strings.Right(strAry[4], Strings.Len(strAry[4]) - Strings.InStr(strAry[4], "@"));
+            int idx = strAry[4].LastIndexOf("@");
+            if (idx > -1) { strAry[9] = strAry[4].Substring(idx); }
+            else { strAry[9] = strAry[4]; }
             strAry[10] = OlMail.ConversationID;
             strAry[11] = OlMail.EntryID;
             strAry[12] = GetAttachmentNames(OlMail);
@@ -61,7 +63,7 @@ namespace ToDoModel
 
                 try
                 {
-                    int prop_tmp_int = Conversions.ToInteger(OlPA.GetProperty(PR_LAST_VERB_EXECUTED));
+                    int prop_tmp_int = OlPA.GetProperty(PR_LAST_VERB_EXECUTED);
                     lngLastVerbExec = prop_tmp_int != 0 ? prop_tmp_int : 0;
                 }
                 catch
@@ -106,9 +108,9 @@ namespace ToDoModel
                         attachmentNames = attachmentNames + "; " + OlAtmt.FileName;
                     }
                 }
-                if (Strings.Len(attachmentNames) > 2)
+                if (attachmentNames.Length > 2)
                 {
-                    attachmentNames = Strings.Right(attachmentNames, Strings.Len(attachmentNames) - 2);
+                    attachmentNames = attachmentNames.Substring(2);
                 }
             }
             return attachmentNames;
@@ -126,7 +128,7 @@ namespace ToDoModel
                 try
                 {
                     var OlPA = OlMail.Sender.PropertyAccessor;
-                    string senderAddress = Conversions.ToString(OlPA.GetProperty(PR_SMTP_ADDRESS));
+                    string senderAddress = OlPA.GetProperty(PR_SMTP_ADDRESS);
                     return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(senderAddress.Split('@')[0].Replace(".", " "));
                 }
                 catch
@@ -150,7 +152,7 @@ namespace ToDoModel
                 var OlPA = OlMail.Sender.PropertyAccessor;
                 try
                 {
-                    senderAddress = Conversions.ToString(OlPA.GetProperty(PR_SMTP_ADDRESS));
+                    senderAddress =OlPA.GetProperty(PR_SMTP_ADDRESS);
                 }
                 catch
                 {
@@ -175,10 +177,10 @@ namespace ToDoModel
         {
             Folder OlParent = (Folder)OlMail.Parent;
             string folderPath = OlParent.FolderPath;
-            int root_length = Strings.Len(emailRootFolder);
-            if (Strings.Len(folderPath) > root_length)
+            int root_length = emailRootFolder.Length;
+            if (folderPath.Length > root_length)
             {
-                folderPath = Strings.Right(folderPath, Strings.Len(folderPath) - root_length - 1);
+                folderPath = folderPath.Substring(root_length);
 
                 // If folder has been remapped, put the target folder
                 if (dict_remap is not null)
@@ -195,7 +197,7 @@ namespace ToDoModel
         public static string GetTriage(MailItem OlMail)
         {
             var OlProperty = OlMail.UserProperties.Find("Triage");
-            return OlProperty is null ? "" : (string)OlProperty;
+            return OlProperty is null ? "" : OlProperty.Value;
         }
 
         public static (string recipientsTo, string recipientsCC) GetRecipients(MailItem OlMail)
@@ -223,10 +225,10 @@ namespace ToDoModel
             }
 
             // Trim off extra semicolon if any values were set
-            if (Strings.Len(recipientsCC) > 2)
-                recipientsCC = Strings.Right(recipientsCC, Strings.Len(recipientsCC) - 2);
-            if (Strings.Len(recipientsTo) > 2)
-                recipientsTo = Strings.Right(recipientsTo, Strings.Len(recipientsTo) - 2);
+            if (recipientsCC.Length > 2)
+                recipientsCC = recipientsCC.Substring(2);
+            if (recipientsTo.Length > 2)
+                recipientsTo = recipientsTo.Substring(2);
 
             return (recipientsTo, recipientsCC);
         }
@@ -237,7 +239,7 @@ namespace ToDoModel
             string StrSMTPAddress;
             try
             {
-                StrSMTPAddress = Conversions.ToString(OlPA.GetProperty(PR_SMTP_ADDRESS));
+                StrSMTPAddress = OlPA.GetProperty(PR_SMTP_ADDRESS);
             }
             catch
             {

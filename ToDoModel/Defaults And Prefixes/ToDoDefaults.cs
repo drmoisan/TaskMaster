@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic.CompilerServices;
+
 using UtilitiesVB;
 
 namespace ToDoModel

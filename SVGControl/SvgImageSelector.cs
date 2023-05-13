@@ -27,7 +27,7 @@ namespace SVGControl
         AllowStretching = 2
     }
 
-    [TypeConverter(typeof(SvgOptionsConverter))]
+    [TypeConverter(typeof(SvgOptionsConverterFilepath))]
     public class SvgImageSelector : INotifyPropertyChanged
     {
         public SvgImageSelector() { }
@@ -284,44 +284,36 @@ namespace SVGControl
         
     }
 
-    public class SvgOptionsConverter : ExpandableObjectConverter
+    
+}
+
+namespace SVGControl.Defaults
+{
+    public static class GetDefault
     {
-        public override object ConvertTo(
-            ITypeDescriptorContext context,
-            CultureInfo culture,
-            object value,
-            Type destinationType)
-        {
-            if (destinationType == typeof(string))
+        public static byte[] SvgImage 
+        { 
+            get 
             {
-                SvgImageSelector image = value as SvgImageSelector;
-                if (image != null) 
-                { 
-                    if (image.AboluteImagePath != null) 
-                    { 
-                        string filename = Path.GetFileName(image.AboluteImagePath);
-                        string autoSizeCode;
-                        switch (image.AutoSize) 
-                        {
-                            case AutoSize.Disabled: autoSizeCode = "[Static]"; break;
-                            case AutoSize.MaintainAspectRatio: autoSizeCode = "[Proportional]"; break;
-                            case AutoSize.AllowStretching: autoSizeCode = "[Stretchable]"; break;
-                            default: autoSizeCode = "[]"; break;
-                        }
-
-                        return $"{filename} {autoSizeCode}";
-                    }
-                    else { return "(none)"; }
-                
-                }
-                return "";
-            }
-
-            return base.ConvertTo(
-                context,
-                culture,
-                value,
-                destinationType);
+                string svgXML = 
+@"<svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 16 16"">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.light-defaultgrey{fill: #212121; opacity: 1;}.light-yellow{fill: #996f00; opacity: 1;}.light-blue{fill: #005dba; opacity: 1;}</style>
+  </defs>
+  <title>IconLightImage</title>
+  <g id=""canvas"" class=""canvas"">
+    <path class=""canvas"" d=""M16,16H0V0H16Z"" />
+  </g>
+  <g id=""level-1"">
+    <path class=""light-defaultgrey-10"" d=""M14.5,2.5v12H1.5V2.5Z"" />
+    <path class=""light-defaultgrey"" d=""M14.5,2H1.5L1,2.5v12l.5.5h13l.5-.5V2.5ZM14,14H2V3H14Z"" />
+    <path class=""light-yellow"" d=""M12,5.5A1.5,1.5,0,1,1,10.5,4,1.5,1.5,0,0,1,12,5.5Z"" />
+    <path class=""light-blue"" d=""M14,11.09V12.5l-2.819-2.82L8.988,11.877H8.281L4.814,8.41,2,11.225V9.811L4.461,7.35h.707l3.466,3.466,2.193-2.193h.707Z"" />
+  </g>
+</svg>";
+                return Encoding.ASCII.GetBytes(svgXML);
+            } 
         }
+        
     }
 }

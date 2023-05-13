@@ -183,7 +183,7 @@ Public Class TagController
     End Sub
 
     Friend Sub AutoAssign()
-        Dim col_choices As Collection = _autoAssigner.AutoFind(_obj_item)
+        Dim col_choices As IList(Of String) = _autoAssigner.AutoFind(_obj_item)
         For Each str_choice As String In col_choices
             If _dict_options.ContainsKey(str_choice) Then
                 ToggleOn(str_choice)
@@ -221,7 +221,7 @@ Public Class TagController
 
     Friend Sub AddColorCategory(Optional categoryName As String = "")
         Dim autoAdded As Boolean = False
-        Dim colCatName As New Collection()
+        Dim colCatName As IList(Of String) = New List(Of String)()
 
         'Check to see if can be automatically created
         If (_autoAssigner IsNot Nothing) And _isMail Then
