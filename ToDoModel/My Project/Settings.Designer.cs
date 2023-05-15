@@ -74,7 +74,7 @@ namespace ToDoModel.My
         {
             get
             {
-                return Conversions.ToString(this["Prefix_People"]);
+                return (string)(this["Prefix_People"]);
             }
             set
             {
@@ -89,7 +89,7 @@ namespace ToDoModel.My
         {
             get
             {
-                return Conversions.ToString(this["Prefix_Context"]);
+                return (string)(this["Prefix_Context"]);
             }
             set
             {
@@ -104,7 +104,7 @@ namespace ToDoModel.My
         {
             get
             {
-                return Conversions.ToString(this["Prefix_Topic"]);
+                return (string)(this["Prefix_Topic"]);
             }
             set
             {
@@ -342,7 +342,6 @@ namespace ToDoModel.My
 namespace ToDoModel.My
 {
 
-    [HideModuleName()]
     [DebuggerNonUserCode()]
     [CompilerGenerated()]
     internal static class MySettingsProperty

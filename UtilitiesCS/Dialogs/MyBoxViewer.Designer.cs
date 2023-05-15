@@ -28,16 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MyBoxViewer));
             this.L1Vertical = new System.Windows.Forms.TableLayoutPanel();
             this.L2Bottom = new System.Windows.Forms.TableLayoutPanel();
             this.Button2 = new System.Windows.Forms.Button();
             this.Button1 = new System.Windows.Forms.Button();
             this.L1v1L2h = new System.Windows.Forms.TableLayoutPanel();
             this.TextMessage = new System.Windows.Forms.TextBox();
-            this.SvgIcon = new SVGControl.SVG();
+            this.SvgIcon = new SVGControl.PictureBoxSVG();
             this.L1Vertical.SuspendLayout();
             this.L2Bottom.SuspendLayout();
             this.L1v1L2h.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SvgIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // L1Vertical
@@ -48,7 +50,7 @@
             this.L1Vertical.Controls.Add(this.L1v1L2h, 0, 0);
             this.L1Vertical.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1Vertical.Location = new System.Drawing.Point(0, 0);
-            this.L1Vertical.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1Vertical.Margin = new System.Windows.Forms.Padding(6);
             this.L1Vertical.Name = "L1Vertical";
             this.L1Vertical.RowCount = 2;
             this.L1Vertical.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -68,7 +70,7 @@
             this.L2Bottom.Controls.Add(this.Button1, 1, 0);
             this.L2Bottom.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L2Bottom.Location = new System.Drawing.Point(6, 166);
-            this.L2Bottom.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L2Bottom.Margin = new System.Windows.Forms.Padding(6);
             this.L2Bottom.Name = "L2Bottom";
             this.L2Bottom.RowCount = 1;
             this.L2Bottom.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -80,7 +82,7 @@
             this.Button2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Button2.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.Button2.Location = new System.Drawing.Point(245, 6);
-            this.Button2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Button2.Margin = new System.Windows.Forms.Padding(6);
             this.Button2.Name = "Button2";
             this.Button2.Size = new System.Drawing.Size(218, 91);
             this.Button2.TabIndex = 1;
@@ -93,7 +95,7 @@
             this.Button1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Button1.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.Button1.Location = new System.Drawing.Point(15, 6);
-            this.Button1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Button1.Margin = new System.Windows.Forms.Padding(6);
             this.Button1.Name = "Button1";
             this.Button1.Size = new System.Drawing.Size(218, 91);
             this.Button1.TabIndex = 0;
@@ -110,7 +112,7 @@
             this.L1v1L2h.Controls.Add(this.SvgIcon, 0, 0);
             this.L1v1L2h.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v1L2h.Location = new System.Drawing.Point(6, 6);
-            this.L1v1L2h.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v1L2h.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h.Name = "L1v1L2h";
             this.L1v1L2h.RowCount = 1;
             this.L1v1L2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -124,7 +126,7 @@
             this.TextMessage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TextMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TextMessage.Location = new System.Drawing.Point(86, 6);
-            this.TextMessage.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.TextMessage.Margin = new System.Windows.Forms.Padding(6);
             this.TextMessage.Multiline = true;
             this.TextMessage.Name = "TextMessage";
             this.TextMessage.Size = new System.Drawing.Size(386, 136);
@@ -133,13 +135,13 @@
             // 
             // SvgIcon
             // 
-            this.SvgIcon.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.SvgIcon.ImagePath = "";
+            this.SvgIcon.Image = ((System.Drawing.Image)(resources.GetObject("SvgIcon.Image")));
             this.SvgIcon.Location = new System.Drawing.Point(6, 6);
-            this.SvgIcon.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.SvgIcon.Margin = new System.Windows.Forms.Padding(6);
             this.SvgIcon.Name = "SvgIcon";
             this.SvgIcon.Size = new System.Drawing.Size(68, 136);
             this.SvgIcon.TabIndex = 2;
+            this.SvgIcon.TabStop = false;
             // 
             // MyBoxViewer
             // 
@@ -147,7 +149,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(490, 275);
             this.Controls.Add(this.L1Vertical);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.MinimumSize = new System.Drawing.Size(496, 284);
             this.Name = "MyBoxViewer";
             this.Text = "FormName";
@@ -155,6 +157,7 @@
             this.L2Bottom.ResumeLayout(false);
             this.L1v1L2h.ResumeLayout(false);
             this.L1v1L2h.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SvgIcon)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -167,6 +170,6 @@
         private System.Windows.Forms.TableLayoutPanel L1v1L2h;
         internal System.Windows.Forms.TableLayoutPanel L2Bottom;
         internal System.Windows.Forms.TextBox TextMessage;
-        private SVGControl.SVG SvgIcon;
+        private SVGControl.PictureBoxSVG SvgIcon;
     }
 }

@@ -156,7 +156,6 @@ namespace ToDoModel.My
     /* TODO ERROR: Skipped EndIfDirectiveTrivia
     #End If
     */
-    [HideModuleName()]
     [System.CodeDom.Compiler.GeneratedCode("MyTemplate", "11.0.0.0")]
     internal static class MyProject
     {
@@ -310,7 +309,6 @@ namespace ToDoModel.My
         }
 
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [MyGroupCollection("System.Web.Services.Protocols.SoapHttpClientProtocol", "Create__Instance__", "Dispose__Instance__", "")]
         internal sealed class MyWebServices
         {
 

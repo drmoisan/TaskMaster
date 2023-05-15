@@ -72,9 +72,9 @@
       <Project>{752a10ed-36f8-4af1-a528-6240aa89f041}</Project>
       <Name>TaskMaster</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+    <ProjectReference Include="..\ToDoModel\ToDoModel.Ported.csproj">
       <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
-      <Name>ToDoModel</Name>
+      <Name>ToDoModel.Ported</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
       <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>

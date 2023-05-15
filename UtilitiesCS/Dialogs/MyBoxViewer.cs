@@ -12,26 +12,10 @@ namespace UtilitiesCS
 {
     public partial class MyBoxViewer : Form
     {
-        //public MyBoxTemplate()
-        //{
-        //    InitializeComponent();
-        //    string message = "This is a test to see if this is working properly";
-        //    this.TextMessage.Text = message;
-
-        //}
+        
         private bool ableToRemoveStandard = true;
         private readonly Dictionary<string, Delegate> _map;
-
-        //public MyBoxTemplate(string title, string message, Dictionary<string, Delegate> map)
-        //{
-        //    InitializeComponent();
-        //    this.Text = title;
-        //    this.TextMessage.Text = message;
-        //    List<string> keys = map.Keys.ToList();
-        //    Button1.Text = keys[0];
-        //    Button2.Text = keys[1];
-        //    this._map = map;
-        //}
+                
         public MyBoxViewer()
         {
             InitializeComponent();

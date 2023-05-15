@@ -28,13 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.svg1 = new SVGControl.SVG();
+            this.svg1 = new SVGControl.PictureBoxSVG();
             this.SuspendLayout();
             // 
             // svg1
             // 
-            this.svg1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.svg1.ImagePath = "";
             this.svg1.Location = new System.Drawing.Point(176, 108);
             this.svg1.Name = "svg1";
             this.svg1.Size = new System.Drawing.Size(100, 100);
@@ -54,6 +52,6 @@
 
         #endregion
 
-        private SVGControl.SVG svg1;
+        private SVGControl.PictureBoxSVG svg1;
     }
 }

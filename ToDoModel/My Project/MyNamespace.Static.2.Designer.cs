@@ -12,7 +12,6 @@ using System.Xml.Linq;
 // See Compiler::LoadXmlSolutionExtension
 namespace ToDoModel.My
 {
-    [Embedded()]
     [DebuggerNonUserCode()]
     [System.Runtime.CompilerServices.CompilerGenerated()]
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

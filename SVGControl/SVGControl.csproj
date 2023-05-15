@@ -103,25 +103,14 @@
     <Compile Include="ButtonSVG.Designer.cs">
       <DependentUpon>ButtonSVG.cs</DependentUpon>
     </Compile>
-    <Compile Include="OlvExtension.cs" />
     <Compile Include="PictureBoxSVG.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="PictureBoxSVG.Designer.cs">
       <DependentUpon>PictureBoxSVG.cs</DependentUpon>
     </Compile>
-    <Compile Include="SvgDialogEditor.cs" />
     <Compile Include="SvgOptionsConverter.cs" />
     <Compile Include="SvgRenderer.cs" />
-    <Compile Include="SvgResource.cs" />
-    <Compile Include="SvgResourceController.cs" />
-    <Compile Include="SvgResourceSelector.cs" />
-    <Compile Include="SvgResourceViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SvgResourceViewer.Designer.cs">
-      <DependentUpon>SvgResourceViewer.cs</DependentUpon>
-    </Compile>
     <Compile Include="ToggleSwitch.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -136,15 +125,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SVG.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="SVG.Designer.cs">
-      <DependentUpon>SVG.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ToDelete\SVGControlDesigner.cs" />
-    <Compile Include="SVGFileNameEditor.cs" />
+    <Compile Include="SvgFileNameEditor.cs" />
     <Compile Include="SVGParser.cs" />
     <Compile Include="ValueStringBuilder.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
@@ -159,12 +141,6 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SVG.resx">
-      <DependentUpon>SVG.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SvgResourceViewer.resx">
-      <DependentUpon>SvgResourceViewer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

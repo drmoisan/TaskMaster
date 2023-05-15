@@ -11,6 +11,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesVB;
+//using Microsoft.VisualBasic;
 
 namespace ToDoModel
 {
@@ -382,7 +383,7 @@ namespace ToDoModel
                 }
                 else if (todo.get_KB() == "Completed")
                 {
-                    string strCats = Conversions.ToString(Item.Categories);
+                    string strCats = (string)(Item.Categories);
 
                     // Strip Completed from categories
                     if (Strings.InStr(strCats, "Tag KB Completed") == Conversions.ToInteger(true))

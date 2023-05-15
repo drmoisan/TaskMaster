@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SVGControl
 {
-    public class SvgOptionsConverterFilepath : ExpandableObjectConverter
+    public class SvgOptionsConverter : ExpandableObjectConverter
     {
         public override object ConvertTo(
             ITypeDescriptorContext context,
@@ -35,47 +35,6 @@ namespace SVGControl
                         }
 
                         return $"{filename} {autoSizeCode}";
-                    }
-                    else { return "(none)"; }
-
-                }
-                return "";
-            }
-
-            return base.ConvertTo(
-                context,
-                culture,
-                value,
-                destinationType);
-        }
-    }
-
-    public class SvgOptionsConverterChooser : ExpandableObjectConverter
-    {
-        public override object ConvertTo(
-            ITypeDescriptorContext context,
-            CultureInfo culture,
-            object value,
-            Type destinationType)
-        {
-            if (destinationType == typeof(string))
-            {
-                SvgResourceSelector selector = value as SvgResourceSelector;
-                if (selector != null)
-                {
-                    if (selector.SvgImage != null)
-                    {
-                        string imageName = selector.SvgImage.Name;
-                        string autoSizeCode;
-                        switch (selector.AutoSize)
-                        {
-                            case AutoSize.Disabled: autoSizeCode = "[Static]"; break;
-                            case AutoSize.MaintainAspectRatio: autoSizeCode = "[Proportional]"; break;
-                            case AutoSize.AllowStretching: autoSizeCode = "[Stretchable]"; break;
-                            default: autoSizeCode = "[]"; break;
-                        }
-
-                        return $"{imageName} {autoSizeCode}";
                     }
                     else { return "(none)"; }
 

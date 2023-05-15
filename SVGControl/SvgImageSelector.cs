@@ -17,6 +17,7 @@ using Fizzler;
 using System.Globalization;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.CompilerServices;
+using BrightIdeasSoftware;
 
 namespace SVGControl
 {
@@ -27,41 +28,47 @@ namespace SVGControl
         AllowStretching = 2
     }
 
-    [TypeConverter(typeof(SvgOptionsConverterFilepath))]
+    [TypeConverter(typeof(SvgOptionsConverter))]
     public class SvgImageSelector : INotifyPropertyChanged
     {
-        public SvgImageSelector() { }
-
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize)
         {
-            _outer = outer;
-            Margin = margin;
-            AutoSize = autoSize;
-            Size = CalcInnerSize(outer, margin);
-            Debug.WriteLine("SVGImage Initialized");
+            _renderer = new SvgRenderer(outer, margin, autoSize);
+            _renderer.PropertyChanged += Renderer_PropertyChanged;
+            Debug.WriteLine("SvgImageSelector Initialized");
+        }
+
+        public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize, bool useDefaultImage)
+        {
+            _useDefaultImage = useDefaultImage;
+            if (useDefaultImage)
+            {
+                _renderer = new SvgRenderer(Defaults.GetDefault.SvgImage,
+                                            outer,
+                                            margin,
+                                            autoSize);
+            }
+            else { _renderer = new SvgRenderer(outer, margin, autoSize); }
+            _renderer.PropertyChanged += Renderer_PropertyChanged;
+            Debug.WriteLine("SvgImageSelector Initialized");
         }
 
         private SvgDocument _doc;
         private string _relativeImagePath;
         private string _absoluteImagePath;
-        private Size _outer;
-        private Size _original { get; set; }
-        private Padding _margin;
         private bool _saveRendering = false;
-
+        private bool _useDefaultImage = false;
+        private SvgRenderer _renderer;
         internal String AboluteImagePath
         {
             get { return _absoluteImagePath; }
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #region Public Properties
 
         [NotifyParentProperty(true)]
-        [Editor(typeof(SVGFileNameEditor), typeof(UITypeEditor))]
-        public String ImagePath
+        [Editor(typeof(SvgFileNameEditor), typeof(UITypeEditor))]
+        public string ImagePath
         {
             get
             {
@@ -72,27 +79,23 @@ namespace SVGControl
                 else
                 {
                     return _relativeImagePath;
-                    //string workingDirectory = Environment.CurrentDirectory;
-                    //string relativePath = _relativeImagePath.MakeRelativePath(workingDirectory);
-                    //return relativePath;
                 }
 
             }
             set
             {
-                //string valueAbs = value.AbsoluteFromURI(anchorPath:);
                 if (_relativeImagePath != value)
                 {
                     if ((value == "")|(value == "(none)"))
                     {
                         _relativeImagePath = value;
-                        _doc = null;
+                        if (_useDefaultImage) { SetDefaultImage(); }
+                        else { _renderer.Document = null; }
                     }
                     else
                     {
                         string valueAbs = value.AbsoluteFromURI(GetAnchorPath());
-                        _doc = SvgDocument.Open(valueAbs);
-                        _original = _doc.Draw().Size;
+                        _renderer.Document = SvgDocument.Open(valueAbs);
                         _absoluteImagePath = valueAbs;
                         _relativeImagePath = valueAbs.GetRelativeURI(GetAnchorPath());
                     }
@@ -100,91 +103,27 @@ namespace SVGControl
                 }
             }
         }
-
-        private string GetAnchorPath()
-        {
-            string workingDirectory = Environment.CurrentDirectory;
-            List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
-            if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))
-            {
-                // Backwards traverse 2 levels
-                workingDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
-            }
-            if (workingDirectory[workingDirectory.Length - 1] != Path.DirectorySeparatorChar)
-            {
-                workingDirectory += Path.DirectorySeparatorChar;
-            }
-            return workingDirectory; 
-        }
-
-        [NotifyParentProperty(true)]
-        internal Size Outer
-        {
-            get { return _outer; }
-            set
-            {
-                _outer = value;
-                Size = CalcInnerSize(Outer, _margin);
-                NotifyPropertyChanged("Outer");
-            }
-        }
-
-        [NotifyParentProperty(true)]
-        public Size Size { get; set; }
-
-        [NotifyParentProperty(true)]
-        public Padding Margin
-        {
-            get { return _margin; }
-            set
-            {
-                _margin = value;
-                Size = CalcInnerSize(Outer, _margin);
-                NotifyPropertyChanged("Margin");
-            }
-        }
-
-        [NotifyParentProperty(true)]
+        
         [DefaultValue(AutoSize.MaintainAspectRatio)]
-        public AutoSize AutoSize { get; set; }
+        public AutoSize AutoSize { get => _renderer.AutoSize; set => _renderer.AutoSize = value; }
+        
+        public Size Size { get => _renderer.Size; set => _renderer.Size = value; }
+        
+        public Padding Margin { get => _renderer.Margin; set => _renderer.Margin = value; }
+        
+        public Bitmap Render() => _renderer.Render();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private Size CalcInnerSize(Size outer, Padding margin)
+        public bool UseDefaultImage
         {
-            var innerWidth = outer.Width - margin.Left - margin.Right;
-            var innerHeight = outer.Height - margin.Top - margin.Bottom;
-            return new Size(innerWidth, innerHeight);
+            get => _useDefaultImage;
+            set
+            {
+                _useDefaultImage = value;
+                if (_useDefaultImage) { SetDefaultImage(); }
+                else { _renderer.Document = null; }
+            }
         }
-
-        public Bitmap Render()
-        {
-            if (_doc == null)
-            {
-                return null;
-            }
-            else if ((AutoSize == AutoSize.Disabled) || (Size == null) || (Size.Height == 0) || (Size.Width == 0))
-            {
-                return _doc.Draw();
-            }
-            else if (AutoSize == AutoSize.AllowStretching)
-            {
-                _doc.Width = Size.Width;
-                _doc.Height = Size.Height;
-                return _doc.Draw();
-            }
-            else if (AutoSize == AutoSize.MaintainAspectRatio)
-            {
-                var targetAdjusted = AdjustSizeProportionately(_original, Size);
-                _doc.Width = targetAdjusted.Width;
-                _doc.Height = targetAdjusted.Height;
-                //AddMargins(targetAdjusted.Width, targetAdjusted.Height);
-                return _doc.Draw();
-            }
-            else
-            { return null; }
-        }
-
+        
         public bool SaveRendering
         {
             get
@@ -217,7 +156,7 @@ namespace SVGControl
                             switch (saveFileDialog1.FilterIndex)
                             {
                                 case 1:
-                                    image.Save(fs, System.Drawing.Imaging.ImageFormat.Png); 
+                                    image.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
                                     break;
                                 case 2:
                                     image.Save(fs, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -231,60 +170,72 @@ namespace SVGControl
                             }
                         } // end using FileStream fs
                     }
-                    
+
                 }
                 else if ((value == true) && (_relativeImagePath == ""))
                 {
                     MessageBox.Show("Image path must have a value to save the rendering");
-                    
+
                 }
-                else if(_doc == null)
+                else if (_doc == null)
                 {
                     // MessageBox.Show("Image path does not refer to a valid SVG document");
-                    
+
                 }
-                _saveRendering = false; 
+                _saveRendering = false;
+
+            }
+        }
+
+        #endregion
+
+        #region Internal and Private Functions
+
+        internal Size Outer { get => _renderer.Outer; set => _renderer.Outer = value; }
+
+        private string GetAnchorPath()
+        {
+            string workingDirectory = Environment.CurrentDirectory;
+            List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
+            if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))
+            {
+                // Backwards traverse 2 levels
+                workingDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
+            }
+            if (workingDirectory[workingDirectory.Length - 1] != Path.DirectorySeparatorChar)
+            {
+                workingDirectory += Path.DirectorySeparatorChar;
+            }
+            return workingDirectory;
+        }
                 
-            }
+        internal void SetDefaultImage()
+        {
+            _renderer.Document = SvgRenderer.GetSvgDocument(Defaults.GetDefault.SvgImage);
         }
 
-        private void AddMargins(int widthCurrent, int heightCurrent)
+        #endregion
+
+        #region EventHandlers
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void Renderer_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var group = new SvgGroup();
-            _doc.Children.Add(group);
-            group.Children.Add(new SvgRectangle
-            {
-                X = - _margin.Left,
-                Y = - _margin.Top,
-                Width = widthCurrent + Margin.Left + Margin.Right,
-                Height = heightCurrent + Margin.Top + Margin.Bottom,
-                Stroke = new SvgColourServer(Color.Transparent),
-                Fill = new SvgColourServer(Color.Transparent)
-            });
+            PropertyChanged?.Invoke(this, e);
         }
 
-        private Size AdjustSizeProportionately(Size proportions, Size targetSize)
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-            if ((targetSize.Height > 0) && (targetSize.Width > 0) && ((proportions.Height != targetSize.Height) || (proportions.Width != targetSize.Width)))
-            {
-                int widthAspect = (int)(targetSize.Height * proportions.Width / (double)proportions.Height);
-                if (widthAspect < targetSize.Width)
-                {
-                    return new Size(widthAspect, targetSize.Height);
-                    
-                }
-                else
-                {
-                    int heightAspect = (int)(targetSize.Width * proportions.Height / (double)proportions.Width);
-                    return new Size(targetSize.Width, heightAspect);
-                }
-            }
-            return proportions;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        
+
+        #endregion
+
+
     }
 
-    
+
 }
 
 namespace SVGControl.Defaults

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using System.Windows.Forms;
 
 namespace ToDoModel
 {
@@ -24,12 +24,12 @@ namespace ToDoModel
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    var unused1 = Interaction.MsgBox("Unexpected Access Error. Duplicate Instance Running?");
+                    MessageBox.Show("Unexpected Access Error. Duplicate Instance Running?");
                     throw ex;
                 }
                 catch (IOException ex)
                 {
-                    var unused = Interaction.MsgBox("Unexpected IO Error. Is Project Info File Corrupt?");
+                    MessageBox.Show("Unexpected IO Error. Is Project Info File Corrupt?");
                     throw ex;
                 }
 

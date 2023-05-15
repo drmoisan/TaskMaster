@@ -103,9 +103,9 @@
       <Project>{71735d4f-611a-4470-9170-4d9437534377}</Project>
       <Name>QuickFiler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+    <ProjectReference Include="..\ToDoModel\ToDoModel.Ported.csproj">
       <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
-      <Name>ToDoModel</Name>
+      <Name>ToDoModel.Ported</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>

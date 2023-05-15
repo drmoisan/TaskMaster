@@ -7,7 +7,7 @@ using System.Windows.Forms.Design;
 
 namespace SVGControl
 {
-    internal class SVGFileNameEditor : FileNameEditor
+    internal class SvgFileNameEditor : FileNameEditor
     {
         private string _currentValue = string.Empty;
         private string _absoluteFilepath = string.Empty;
@@ -15,7 +15,7 @@ namespace SVGControl
         private string _appPath;
         private OpenFileDialog _ofd;
 
-        public SVGFileNameEditor()
+        public SvgFileNameEditor()
         {
             SetDevLevelPath();
         }

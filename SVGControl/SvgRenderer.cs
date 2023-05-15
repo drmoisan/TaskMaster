@@ -106,6 +106,7 @@ namespace SVGControl
             set 
             { 
                 _doc = value;
+                if (value != null) { _original = _doc.Draw().Size; }
                 NotifyPropertyChanged("Document");
             }
         }

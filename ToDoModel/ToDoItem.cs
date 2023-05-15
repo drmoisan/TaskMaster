@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 
 
@@ -94,7 +95,7 @@ namespace ToDoModel
             StartDate = _StartDate;
             Complete = _Complete;
             TotalWork = _TotalWork;
-            ActiveBranch = _ActiveBranch;
+            ActiveBranch = _ActiveBranch ?? false;
             ExpandChildren = _ExpandChildren;
             ExpandChildrenState = _ExpandChildrenState;
             EC2 = _EC2;
@@ -174,12 +175,13 @@ namespace ToDoModel
         {
 
             _olObject = Item;
-            string argstrCats_All = Conversions.ToString(Item.Categories);
+            dynamic olItem = Item;
+            string argstrCats_All = olItem.Categories;
             _flags = new FlagParser(ref argstrCats_All);
-            Item.Categories = argstrCats_All;
+            olItem.Categories = argstrCats_All;
             if (OnDemand == false)
             {
-                var unused = Interaction.MsgBox("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand");
+                MessageBox.Show("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand");
             }
         }
 
@@ -194,7 +196,7 @@ namespace ToDoModel
             _Priority = OlMail.Importance;
             _TaskCreateDate = OlMail.CreationTime;
             _StartDate = OlMail.TaskStartDate;
-            _Complete = Conversions.ToBoolean(OlMail.FlagStatus);
+            _Complete = (OlMail.FlagStatus == OlFlagStatus.olFlagComplete);
             _TotalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
         }
 
@@ -302,8 +304,9 @@ namespace ToDoModel
                 {
                     if (_olObject is not null)
                     {
-                        _olObject.Categories = _flags.Combine();
-                        var unused = _olObject.Save;
+                        dynamic olItem = _olObject;
+                        olItem.Categories = _flags.Combine();
+                        olItem.Save();
                     }
                 }
             }
@@ -322,8 +325,9 @@ namespace ToDoModel
                 {
                     if (_olObject is not null)
                     {
-                        _olObject.Categories = _flags.Combine();
-                        var unused = _olObject.Save;
+                        dynamic olItem = _olObject;
+                        olItem.Categories = _flags.Combine();
+                        olItem.Save();
                     }
                 }
             }
@@ -333,14 +337,16 @@ namespace ToDoModel
         {
             get
             {
-                return Conversions.ToDate(_olObject.ReminderTime);
+                dynamic olItem = _olObject;
+                return olItem.ReminderTime;
             }
             set
             {
                 if (!_readonly)
                 {
-                    _olObject.ReminderTime = (object)value;
-                    var unused = _olObject.Save();
+                    dynamic olItem = _olObject;
+                    olItem.ReminderTime = (object)value;
+                    var unused = olItem.Save();
                 }
             }
         }
@@ -361,7 +367,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    return DateAndTime.DateValue("1/1/4501");
+                    return DateTime.Parse("1/1/4501");
                 }
             }
             set
@@ -659,9 +665,10 @@ namespace ToDoModel
             {
                 if (_olObject is null)
                     throw new ArgumentNullException("Cannot get property " + CallerName + " if both _flags AND olObject are Null");
-                string argstrCats_All = Conversions.ToString(_olObject.Categories);
+                dynamic olItem = _olObject;
+                string argstrCats_All = olItem.Categories;
                 _flags = new FlagParser(ref argstrCats_All);
-                _olObject.Categories = argstrCats_All;
+                olItem.Categories = argstrCats_All;
             }
         }
 
@@ -754,7 +761,7 @@ namespace ToDoModel
         // _VisibleTreeState
         public bool get_VisibleTreeStateLVL(int Lvl)
         {
-            return Conversions.ToDouble(Math.Pow(2d, Lvl - 1).ToString() + VisibleTreeState) > 0d;
+            return ((int)Math.Pow(2d, Lvl - 1) & VisibleTreeState) > 0;
         }
 
         public void set_VisibleTreeStateLVL(int Lvl, bool value)

@@ -142,6 +142,11 @@
     <Compile Include="Email Utilities\SubjectMapModule.cs" />
     <Compile Include="Email Utilities\Subject_Mapping.cs" />
     <Compile Include="Outlook Todo Utilities\ToDoEvents.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="TreeOfToDoItems.cs" />
     <Compile Include="FlagParser.cs" />
     <Compile Include="My Project\AssemblyInfo.cs" />
@@ -196,6 +201,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">

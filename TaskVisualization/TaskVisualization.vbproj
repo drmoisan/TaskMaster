@@ -136,9 +136,9 @@
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+    <ProjectReference Include="..\ToDoModel\ToDoModel.Ported.csproj">
       <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
-      <Name>ToDoModel</Name>
+      <Name>ToDoModel.Ported</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628EC9-8A89-491E-84A2-6CF3069BA011}</Project>

@@ -7,7 +7,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "UtilitiesVB", "UtilitiesVB\
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Tags", "Tags\Tags.vbproj", "{4DD3C93F-61C5-4DCF-9832-2403D9439BD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoModel", "ToDoModel\ToDoModel.csproj", "{238EFD29-3CF3-07F3-28D3-C60D88F99769}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoModel.Ported", "ToDoModel\ToDoModel.Ported.csproj", "{238EFD29-3CF3-07F3-28D3-C60D88F99769}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoModel.Test", "ToDoModel.Test\ToDoModel.Test.csproj", "{6EE2B4F0-28FA-47AE-8E0C-8B71376E798D}"
 EndProject

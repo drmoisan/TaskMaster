@@ -5,9 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-
-
+using System.Windows.Forms;
 using UtilitiesVB;
+using UtilitiesCS;
 
 namespace ToDoModel
 {
@@ -41,38 +41,25 @@ namespace ToDoModel
             }
             else
             {
-                var unused = Interaction.MsgBox("Can't save. IDList FileName not set yet");
+                MessageBox.Show("Can't save. IDList FileName not set yet");
             }
         }
 
-        public bool Contains_ProjectName(string StrProjectName)
+        public bool Contains_ProjectName(string projectName)
         {
-            var common = StrProjectName.Split(Conversions.ToChar(", ")).ToList().Intersect(Enumerable.Select(b => b.ProjectName));
-            return StrProjectName.Split(Conversions.ToChar(", ")).ToList().Intersect(Enumerable.Select(b => b.ProjectName)).ToList().Count > 0;
-            // Return Me.Any(Function(p) String.Equals(p.ProjectName, StrProjectName, StringComparison.CurrentCulture))
+            return base.FindIndex(x => x.ProjectName.ToLower() == projectName.ToLower()) !=-1;
         }
 
-        public string Programs_ByProjectNames(string StrProjectNames)
+        public string Programs_ByProjectNames(string projectNames)
         {
             try
             {
-                //var names = this.Select(x => x.ProjectName);
-                //string strTemp = string.Join(", ",
-                //                 StrProjectNames.Split(',')
-                //                 .Where(x =>names.Contains(x.Trim())));
-                //var projects = StrProjectNames.Split(',').Select(x => x.Trim());
-                var query = from project in StrProjectNames.Split(',').Select(x => x.Trim())
+                var query = from project in projectNames.Split(',').Select(x => x.Trim())
                             join projectInfo in this on project equals projectInfo.ProjectName
                             select projectInfo.ProgramName;
 
                 string strTemp = query.First().ToString();
-                //string strTemp = string.Join(", ", 
-                //                             Enumerable
-                //                             .Where(p => StrProjectNames.Split(", " , StringSplitOptions.None)
-                //                             .ToList()
-                //                             .Contains(p.ProjectName))
-                //                             .Select(q => q.ProgramName)
-                //                             .Distinct());
+                
                 return strTemp;
             }
             catch (Exception ex)
@@ -84,31 +71,29 @@ namespace ToDoModel
 
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProjectName(string StrProjectName)
+        public List<IToDoProjectInfoEntry> Find_ByProjectName(string projectName)
         {
-            return Enumerable.Where(p => string.Equals(p.ProjectName, StrProjectName, StringComparison.CurrentCulture)).ToList();
+            return this.Where(x => x.ProjectName.ToLower() == projectName.ToLower()).ToList();
         }
 
-        public bool Contains_ProjectID(string StrProjectID)
+        public bool Contains_ProjectID(string projectID)
         {
-            // Dim common = StrProjectID.Split(", ").ToList().Intersect([Select](Function(b) b.ProjectID))
-            // Return Me.Any(StrProjectID.Split(", ").ToList().Intersect([Select](Function(b) b.ProjectID)))
-            return Enumerable.Any(p => string.Equals(p.ProjectID, StrProjectID, StringComparison.Ordinal));
+            return base.FindIndex(x => x.ProjectID == projectID) != -1;
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProjectID(string StrProjectID)
+        public List<IToDoProjectInfoEntry> Find_ByProjectID(string projectID)
         {
-            return Enumerable.Where(p => string.Equals(p.ProjectID, StrProjectID, StringComparison.CurrentCulture)).ToList();
+            return this.Where(x => x.ProjectID == projectID).ToList();
         }
 
-        public bool Contains_ProgramName(string StrProgramName)
+        public bool Contains_ProgramName(string programName)
         {
-            return Enumerable.Any(p => string.Equals(p.ProgramName, StrProgramName, StringComparison.CurrentCulture));
+            return base.FindIndex(x => x.ProgramName.ToLower() == programName.ToLower()) != -1;
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProgramName(string StrProgramName)
+        public List<IToDoProjectInfoEntry> Find_ByProgramName(string programName)
         {
-            return Enumerable.Where(p => string.Equals(p.ProgramName, StrProgramName, StringComparison.CurrentCulture)).ToList();
+            return this.Where(x => x.ProgramName.ToLower() == programName.ToLower()).ToList();
         }
     }
 }

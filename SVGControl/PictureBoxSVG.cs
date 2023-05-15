@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using System.Reflection;
+using System.Resources;
 
 namespace SVGControl
 {
@@ -19,34 +21,36 @@ namespace SVGControl
         public PictureBoxSVG()
         {
             InitializeComponent();
-            _imageSvg = new SvgResourceSelector(base.Size, 
-                                                new Padding(0), 
-                                                SVGControl.AutoSize.MaintainAspectRatio, 
-                                                useDefaultImage: true);
+            _imageSvg = new SvgImageSelector(base.Size, 
+                                             new Padding(0), 
+                                             SVGControl.AutoSize.MaintainAspectRatio, 
+                                             useDefaultImage: true);
             this.Image = _imageSvg.Render();
             _imageSvg.PropertyChanged += ImageSVG_PropertyChanged;
-            this.Resize += Control_Resize;
+            this.SizeChanged += Control_SizeChanged;
         }
 
-        private SvgResourceSelector _imageSvg;
+        private SvgImageSelector _imageSvg;
+        private ResourceManager _resMgr;
+        private Assembly _parentCaller;
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         [Browsable(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public SvgResourceSelector ImageSvg 
+        public SvgImageSelector ImageSvg 
         { 
             get => _imageSvg; 
             set => _imageSvg = value; 
         }
 
-        private void Control_Resize(object sender, EventArgs e)
+        private void Control_SizeChanged(object sender, EventArgs e)
         {
             _imageSvg.Outer = this.Size;
         }
 
         private void ImageSVG_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            this.Image = ImageSvg.Render();
+            base.Image = ImageSvg.Render();
             this.InvokePaint(this, new PaintEventArgs(this.CreateGraphics(), this.DisplayRectangle));
         }
     }
