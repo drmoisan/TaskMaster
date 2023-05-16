@@ -34,258 +34,207 @@ namespace ToDoModel.Properties {
                 this["Prefix_People"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("_@")]
-        public string Prefix_Context
-        {
-            get
-            {
-                return (string)(this["Prefix_Context"]);
+        public string Prefix_Context {
+            get {
+                return ((string)(this["Prefix_Context"]));
             }
-            set
-            {
+            set {
                 this["Prefix_Context"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Tag TOPIC ")]
-        public string Prefix_Topic
-        {
-            get
-            {
-                return (string)(this["Prefix_Topic"]);
+        public string Prefix_Topic {
+            get {
+                return ((string)(this["Prefix_Topic"]));
             }
-            set
-            {
+            set {
                 this["Prefix_Topic"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Tag PROJECT ")]
-        public string Prefix_Project
-        {
-            get
-            {
-                return (string)(this["Prefix_Project"]);
+        public string Prefix_Project {
+            get {
+                return ((string)(this["Prefix_Project"]));
             }
-            set
-            {
+            set {
                 this["Prefix_Project"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Tag A Top Priority Today")]
-        public string Prefix_Today
-        {
-            get
-            {
-                return (string)(this["Prefix_Today"]);
+        public string Prefix_Today {
+            get {
+                return ((string)(this["Prefix_Today"]));
             }
-            set
-            {
+            set {
                 this["Prefix_Today"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Tag Bullpin Priorities")]
-        public string Prefix_Bullpin
-        {
-            get
-            {
-                return (string)(this["Prefix_Bullpin"]);
+        public string Prefix_Bullpin {
+            get {
+                return ((string)(this["Prefix_Bullpin"]));
             }
-            set
-            {
+            set {
                 this["Prefix_Bullpin"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Tag KB ")]
-        public string Prefix_KB
-        {
-            get
-            {
-                return (string)(this["Prefix_KB"]);
+        public string Prefix_KB {
+            get {
+                return ((string)(this["Prefix_KB"]));
             }
-            set
-            {
+            set {
                 this["Prefix_KB"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("15")]
-        public string Default_Task_Length
-        {
-            get
-            {
-                return (string)(this["Default_Task_Length"]);
+        public int Default_Task_Length {
+            get {
+                return ((int)(this["Default_Task_Length"]));
             }
-            set
-            {
+            set {
                 this["Default_Task_Length"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int MaxToDo
-        {
-            get
-            {
-                return (int)(this["MaxToDo"]);
+        public int MaxToDo {
+            get {
+                return ((int)(this["MaxToDo"]));
             }
-            set
-            {
+            set {
                 this["MaxToDo"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public int MaxIDLength
-        {
-            get
-            {
-                return (int)(this["MaxIDLength"]);
+        public int MaxIDLength {
+            get {
+                return ((int)(this["MaxIDLength"]));
             }
-            set
-            {
+            set {
                 this["MaxIDLength"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("3")]
-        public int MaxFolders_ConvID
-        {
-            get
-            {
-                return (int)(this["MaxFolders_ConvID"]);
+        public int MaxFolders_ConvID {
+            get {
+                return ((int)(this["MaxFolders_ConvID"]));
             }
-            set
-            {
+            set {
                 this["MaxFolders_ConvID"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("9999999CTF_Inc.txt")]
-        public string File_CTF_Inc
-        {
-            get
-            {
-                return (string)(this["File_CTF_Inc"]);
+        public string File_CTF_Inc {
+            get {
+                return ((string)(this["File_CTF_Inc"]));
             }
-            set
-            {
+            set {
                 this["File_CTF_Inc"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("9999999CTF_Map.txt")]
-        public string File_CTF_Map
-        {
-            get
-            {
-                return (string)(this["File_CTF_Map"]);
+        public string File_CTF_Map {
+            get {
+                return ((string)(this["File_CTF_Map"]));
             }
-            set
-            {
+            set {
                 this["File_CTF_Map"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("9999999Subject_Map.txt")]
-        public string File_Subject_Map
-        {
-            get
-            {
-                return (string)(this["File_Subject_Map"]);
+        public string File_Subject_Map {
+            get {
+                return ((string)(this["File_Subject_Map"]));
             }
-            set
-            {
+            set {
                 this["File_Subject_Map"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("9999999CommonWords.txt")]
-        public string File_Common_Words
-        {
-            get
-            {
-                return (string)(this["File_Common_Words"]);
+        public string File_Common_Words {
+            get {
+                return ((string)(this["File_Common_Words"]));
             }
-            set
-            {
+            set {
                 this["File_Common_Words"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("999999ConditionalReminders.txt")]
-        public string File_ConditionalReminders
-        {
-            get
-            {
-                return (string)(this["File_ConditionalReminders"]);
+        public string File_ConditionalReminders {
+            get {
+                return ((string)(this["File_ConditionalReminders"]));
             }
-            set
-            {
+            set {
                 this["File_ConditionalReminders"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("3")]
-        public int MaxFolders_Subject
-        {
-            get
-            {
-                return (int)(this["MaxFolders_Subject"]);
+        public int MaxFolders_Subject {
+            get {
+                return ((int)(this["MaxFolders_Subject"]));
             }
-            set
-            {
+            set {
                 this["MaxFolders_Subject"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int MaxSuggestions
-        {
-            get
-            {
-                return (int)(this["MaxSuggestions"]);
+        public int MaxSuggestions {
+            get {
+                return ((int)(this["MaxSuggestions"]));
             }
-            set
-            {
+            set {
                 this["MaxSuggestions"] = value;
             }
         }

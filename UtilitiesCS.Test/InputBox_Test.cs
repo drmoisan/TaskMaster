@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using UtilitiesCS.Dialogs;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test
 {

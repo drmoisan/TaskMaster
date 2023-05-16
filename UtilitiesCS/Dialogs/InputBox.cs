@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace UtilitiesCS.Dialogs
+namespace UtilitiesCS
 {
     public static class InputBox
     {

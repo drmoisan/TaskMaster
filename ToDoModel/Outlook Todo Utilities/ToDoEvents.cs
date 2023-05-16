@@ -11,6 +11,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesVB;
+using UtilitiesCS;
 //using Microsoft.VisualBasic;
 
 namespace ToDoModel
@@ -308,7 +309,7 @@ namespace ToDoModel
                                     var response = MessageBox.Show("Add Project " + strProject + " to the Master List?", "Dialog", MessageBoxButtons.YesNo);
                                     if (response == DialogResult.Yes)
                                     {
-                                        string strProgram = Interaction.InputBox("What is the program name for " + strProject + "?", DefaultResponse: "");
+                                        string strProgram = InputBox.ShowDialog("What is the program name for " + strProject + "?", DefaultResponse: "");
                                         ProjInfo.Add(new ToDoProjectInfoEntry(strProject, strToDoID, strProgram));
                                         ProjInfo.Save();
                                     }
@@ -333,7 +334,7 @@ namespace ToDoModel
                     else // In this case, the project name exists but the todo id does not
                     {
                         // Get Project Name
-                        strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project) : (string)objProperty_Project;
+                        strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project.Value) : (string)objProperty_Project.Value;
 
                         // If the project name is in our dictionary, autoadd the ToDoID to this item
                         if (strProject.Length != 0)
@@ -360,14 +361,15 @@ namespace ToDoModel
                 // If So, adjust Kan Ban fields and categories
                 if (todo.Complete)
                 {
-                    if (Strings.InStr(Conversions.ToString(Item.Categories), "Tag KB Completed") == Conversions.ToInteger(false))
+                    dynamic olItem = Item;
+                    if (((string)olItem.Categories).Contains("Tag KB Completed"))
                     {
-                        string strCats = Conversions.ToString(Item.Categories);
+                        string strCats = olItem.Categories;
                         strCats = strCats.Replace("Tag KB Backlog", "").Replace(",,", ",");
                         strCats = strCats.Replace("Tag KB InProgress", "").Replace(",,", ",");
                         strCats = strCats.Replace("Tag KB Planned", "").Replace(",,", ",");
-                        while (Strings.Left(strCats, 1) == ",")
-                            strCats = Strings.Right(strCats, strCats.Length - 1);
+                        while (strCats.Substring(0,1) == ",")
+                            strCats = strCats.Substring(1);
                         if (strCats.Length > 0)
                         {
                             strCats += ", Tag KB Completed";
@@ -376,29 +378,30 @@ namespace ToDoModel
                         {
                             strCats += "Tag KB Completed";
                         }
-                        Item.Categories = strCats;
-                        var unused1 = Item.Save;
+                        olItem.Categories = strCats;
+                        olItem.Save();
                         todo.set_KB(value: "Completed");
                     }
                 }
                 else if (todo.get_KB() == "Completed")
                 {
-                    string strCats = (string)(Item.Categories);
+                    dynamic olItem = Item;
+                    string strCats = (string)(olItem.Categories);
 
                     // Strip Completed from categories
-                    if (Strings.InStr(strCats, "Tag KB Completed") == Conversions.ToInteger(true))
+                    if (((string)strCats).Contains("Tag KB Completed"))
                     {
-                        strCats = Strings.Replace(Strings.Replace(strCats, "Tag KB Completed", ""), ",,", ",");
+                        strCats = strCats.Replace("Tag KB Completed", "").Replace(",,", ",");
                     }
 
                     string strReplace;
                     string strKB;
-                    if (Strings.InStr(strCats, "Tag A Top Priority Today") == Conversions.ToInteger(true))
+                    if (strCats.Contains("Tag A Top Priority Today"))
                     {
                         strReplace = "Tag KB InProgress";
                         strKB = "InProgress";
                     }
-                    else if (Strings.InStr(strCats, "Tag Bullpin Priorities") == Conversions.ToInteger(true))
+                    else if (strCats.Contains("Tag Bullpin Priorities"))
                     {
                         strReplace = "Tag KB Planned";
                         strKB = "Planned";
@@ -416,8 +419,8 @@ namespace ToDoModel
                     {
                         strCats = strReplace;
                     }
-                    Item.Categories = strCats;
-                    var unused = Item.Save;
+                    olItem.Categories = strCats;
+                    olItem.Save();
                     todo.set_KB(value: strKB);
 
                 }
@@ -431,13 +434,13 @@ namespace ToDoModel
             // QUESTION: Duplicate Function??? I beleive this is already in the ToDoItem class
             if (Item is MailItem)
             {
-                var OlMail = Item;
-                return Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(OlMail.FlagStatus, OlFlagStatus.olFlagComplete, false));
+                MailItem OlMail = (MailItem)Item;
+                return (OlMail.FlagStatus == OlFlagStatus.olFlagComplete);
             }
             else if (Item is TaskItem)
             {
-                var OlTask = Item;
-                return Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(OlTask.Complete, true, false));
+                TaskItem OlTask = (TaskItem)Item;
+                return OlTask.Complete;
             }
             else
             {
@@ -478,7 +481,7 @@ namespace ToDoModel
         /// <summary>
     /// This is a helper procedure to migrate ToDoIDs from one framework to another
     /// </summary>
-        public static void MigrateToDoIDs(Application OlApp)
+        public static void MigrateToDoIDs(Outlook.Application OlApp)
         {
             // TODO: Move MigrateToDoIDs to a class, module, or library
             var ToDoItems = OlApp.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items;
@@ -521,8 +524,8 @@ namespace ToDoModel
             string strBuild = "";
             foreach (var c in strToDoID)
             {
-                int intLoc = Strings.InStr(charsorig, Conversions.ToString(c));
-                strBuild += Strings.Mid(charsnew, intLoc, 1);
+                int intLoc = charsorig.IndexOf(c);
+                strBuild += charsnew.Substring(intLoc, 1);
             }
 
             return strBuild;

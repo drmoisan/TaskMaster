@@ -5,7 +5,7 @@
     <Setting Name="Prefix_People" Type="System.String" Scope="User">
       <Value Profile="(Default)">Tag PPL </Value>
     </Setting>
-	<Setting Name="Prefix_Context" Type="System.String" Scope="User">
+    <Setting Name="Prefix_Context" Type="System.String" Scope="User">
       <Value Profile="(Default)">_@</Value>
     </Setting>
     <Setting Name="Prefix_Topic" Type="System.String" Scope="User">
@@ -23,7 +23,7 @@
     <Setting Name="Prefix_KB" Type="System.String" Scope="User">
       <Value Profile="(Default)">Tag KB </Value>
     </Setting>
-    <Setting Name="Default_Task_Length" Type="System.String" Scope="User">
+    <Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="MaxToDo" Type="System.Int32" Scope="User">

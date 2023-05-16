@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Windows.Forms;
 using UtilitiesVB;
 
 namespace ToDoModel
@@ -35,10 +35,10 @@ namespace ToDoModel
             else
             {
                 objProperty = null;
-                var unused = Interaction.MsgBox("Unsupported object type");
+                var unused = MessageBox.Show("Unsupported object type");
             }
 
-            CustomFieldID_GetValueRet = objProperty is null ? "" : objProperty is Array ? FlattenArray.FlattenArry((object[])objProperty) : (string)objProperty;
+            CustomFieldID_GetValueRet = objProperty is null ? "" : objProperty.Value is Array ? FlattenArray.FlattenArry((object[])objProperty.Value) : (string)objProperty.Value;
             return CustomFieldID_GetValueRet;
         }
     }

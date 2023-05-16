@@ -13,11 +13,11 @@ namespace ToDoModel
     public class FlagParser
     {
 
-        private readonly FlagDetails _people = new FlagDetails(My.MySettingsProperty.Settings.Prefix_People);
-        private readonly FlagDetails _projects = new FlagDetails(My.MySettingsProperty.Settings.Prefix_Project);
-        private readonly FlagDetails _topics = new FlagDetails(My.MySettingsProperty.Settings.Prefix_Topic);
-        private readonly FlagDetails _context = new FlagDetails(My.MySettingsProperty.Settings.Prefix_Context);
-        private readonly FlagDetails _kb = new FlagDetails(My.MySettingsProperty.Settings.Prefix_KB);
+        private readonly FlagDetails _people = new FlagDetails(Properties.Settings.Default.Prefix_People);
+        private readonly FlagDetails _projects = new FlagDetails(Properties.Settings.Default.Prefix_Project);
+        private readonly FlagDetails _topics = new FlagDetails(Properties.Settings.Default.Prefix_Topic);
+        private readonly FlagDetails _context = new FlagDetails(Properties.Settings.Default.Prefix_Context);
+        private readonly FlagDetails _kb = new FlagDetails(Properties.Settings.Default.Prefix_KB);
         public string other = "";
         public bool today = false;
         public bool bullpin = false;
@@ -44,7 +44,7 @@ namespace ToDoModel
     /// <returns>True if present. False if not present.</returns>
         private bool PrefixPresent(string test_string, string prefix)
         {
-            return (Strings.Left(test_string, prefix.Length) ?? "") == (prefix ?? "");
+            return (test_string.Substring(0, prefix.Length) ?? "") == (prefix ?? "");
         }
 
         private void InitFromString(ref string strCats_All)
@@ -62,20 +62,20 @@ namespace ToDoModel
 
 
 
-            if (list_categories.Contains(My.MySettingsProperty.Settings.Prefix_Today))
+            if (list_categories.Contains(Properties.Settings.Default.Prefix_Today))
             {
                 today = true;
-                bool unused1 = list_categories.Remove(My.MySettingsProperty.Settings.Prefix_Today);
+                bool unused1 = list_categories.Remove(Properties.Settings.Default.Prefix_Today);
             }
             else
             {
                 today = false;
             }
 
-            if (list_categories.Contains(My.MySettingsProperty.Settings.Prefix_Bullpin))
+            if (list_categories.Contains(Properties.Settings.Default.Prefix_Bullpin))
             {
                 bullpin = true;
-                bool unused = list_categories.Remove(My.MySettingsProperty.Settings.Prefix_Bullpin);
+                bool unused = list_categories.Remove(Properties.Settings.Default.Prefix_Bullpin);
             }
             else
             {
@@ -222,7 +222,7 @@ namespace ToDoModel
 
             if (string_return.Length > 2)
             {
-                string_return = Strings.Right(string_return, string_return.Length - 2);
+                string_return = string_return.Substring(2);
             }
 
             return string_return;
@@ -296,9 +296,7 @@ namespace ToDoModel
             }
             else
             {
-                list_return = MainString.Split(Conversions.ToChar(Delimiter)).Select(x => x.Replace(ReplaceString, "").Trim()).ToList();
-
-
+                list_return = MainString.Split(Delimiter[0]).Select(x => x.Replace(ReplaceString, "").Trim()).ToList();
             }
             return list_return;
         }
@@ -314,7 +312,7 @@ namespace ToDoModel
         public List<string> SubStr_MatchList_w_Delimiter(string MainString, string SubString, string Delimiter, bool bNotSearchStr = false, bool DeleteSearchSubString = true)
         {
 
-            string[] str_array = MainString.Split(Conversions.ToChar(Delimiter));
+            string[] str_array = MainString.Split(Delimiter[0]);
             object argvarStrArry = str_array;
             var filtered_array = SearchArry4Str(ref argvarStrArry, SubString, bNotSearchStr, DeleteSearchSubString: DeleteSearchSubString);
             str_array = (string[])argvarStrArry;
@@ -342,7 +340,7 @@ namespace ToDoModel
             object varFiltStrAry;
             string strTempStr;
 
-            varTempStrAry = strMainString.Split(Conversions.ToChar(strDelimiter));
+            varTempStrAry = strMainString.Split(strDelimiter[0]);
             varFiltStrAry = SearchArry4Str(ref varTempStrAry, strSubString, bNotSearchStr, DeleteSearchSubString: DeleteSearchSubString);
             strTempStr = Condense_Variant_To_Str(varFiltStrAry);
 
@@ -374,29 +372,29 @@ namespace ToDoModel
             string strTemp;
             string strSearchNoWC;
 
-            if (Strings.Len(Strings.Trim(SearchStr)) != 0)
+            if (SearchStr.Trim().Length !=0)
             {
 
                 strCats = new string[1];
                 m_Find = SearchStr;
 
                 // Make lower case
-                m_Find = Strings.LCase(m_Find);
+                m_Find = m_Find.ToLower();
 
                 // Standardize characters used as wildcards
-                m_Find = Strings.Replace(m_Find, "%", "*");
+                m_Find = m_Find.Replace("%", "*");
 
                 // Determine if wildcards are present in search string
-                m_Wildcard = Conversions.ToBoolean(Strings.InStr(m_Find, "*"));
+                m_Wildcard = m_Find.Contains("*");
 
                 intFoundCt = 0;
 
                 // Remove wildcards from the string
-                strSearchNoWC = Strings.Replace(SearchStr, "*", "");
+                strSearchNoWC = SearchStr.Replace("*", "");
 
                 // Loop through the array to find substring
-                var loopTo = Information.UBound((Array)varStrArry);
-                for (i = Information.LBound((Array)varStrArry); i <= loopTo; i++)
+                var loopTo = ((Array)varStrArry).Length;
+                for (i = 0; i < loopTo; i++)
                 {
                     boolFound = false;
 

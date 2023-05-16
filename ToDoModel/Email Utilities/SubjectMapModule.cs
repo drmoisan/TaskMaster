@@ -36,7 +36,7 @@ namespace ToDoModel
                 Array.Resize(ref SubjectMap, (int)(SubjectMapCt + 1));
                 SubjectMap[(int)SubjectMapCt].Email_Folder = rowQueue.Dequeue();
                 SubjectMap[(int)SubjectMapCt].Email_Subject = CommonWordsModule.StripCommonWords(rowQueue.Dequeue(), commonWords);
-                SubjectMap[(int)SubjectMapCt].Email_Subject_Count = Conversions.ToInteger(rowQueue.Dequeue());
+                SubjectMap[(int)SubjectMapCt].Email_Subject_Count = int.Parse(rowQueue.Dequeue());
             }
 
         }

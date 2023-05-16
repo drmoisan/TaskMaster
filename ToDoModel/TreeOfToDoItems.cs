@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
+using System.Collections;
 
 
 
@@ -32,7 +33,7 @@ namespace ToDoModel
 
             string strTemp;
             string strPrev;
-            Collection colItems;
+            IList colItems;
             strPrev = "";
             strTemp = "";
 
@@ -40,10 +41,10 @@ namespace ToDoModel
             {
                 // ***STEP 1: LOAD RAW [ITEMS] TO A LIST AND SORT THEM***
                 var TreeItems = GetToDoList(LoadType, Application);
-                TreeItems = (List<object>)this.MergeSort<object>(TreeItems, (_, __) => this.CompareItemsByToDoID());
+                TreeItems = (List<object>)this.MergeSort<object>(TreeItems, this.CompareItemsByToDoID);
 
-                colItems = new Collection();
-                var colNoID = new Collection();
+                colItems = new List<object>();
+                var colNoID = new List<object>();
                 ToDoItem tmpToDo = null;
                 TreeNode<ToDoItem> ToDoNode;
                 TreeNode<ToDoItem> NodeParent;
@@ -92,7 +93,7 @@ namespace ToDoModel
                     if (ToDoNode.Value.ToDoID.Length > 2)
                     {
                         string strID = ToDoNode.Value.ToDoID;
-                        string strParentID = Strings.Mid(strID, 1, strID.Length - 2);
+                        string strParentID = strID.Substring(1, strID.Length - 2);
                         bool blContinue = true;
 
                         while (blContinue)
@@ -107,7 +108,7 @@ namespace ToDoModel
                             }
                             if (strParentID.Length > 2)
                             {
-                                strParentID = Strings.Mid(strParentID, 1, strParentID.Length - 2);
+                                strParentID = strParentID.Substring(1, strParentID.Length - 2);
                             }
                             else
                             {
@@ -117,10 +118,9 @@ namespace ToDoModel
                     }
                 }
             }
-            catch
+            catch (System.Exception ex) 
             {
-                Debug.WriteLine(Information.Err().Description);
-                var unused = Interaction.MsgBox(Information.Err().Description);
+                Debug.WriteLine(ex.Message);
             }
         }
         public List<TreeNode<ToDoItem>> ListOfToDoTree { get; private set; } = new List<TreeNode<ToDoItem>>();
@@ -176,7 +176,7 @@ namespace ToDoModel
                 for (i = 0; i <= loopTo; i++)
                 {
                     if (IDList.UsedIDList.Contains(Children[i].Value.ToDoID))
-                        bool unused = IDList.UsedIDList.Remove(Children[i].Value.ToDoID);
+                        IDList.UsedIDList.Remove(Children[i].Value.ToDoID);
                 }
                 var loopTo1 = max;
                 for (i = 0; i <= loopTo1; i++)
@@ -242,39 +242,24 @@ namespace ToDoModel
             return ListObjects;
         }
 
-        private string IsHeader(string TagContext)
+        private bool IsHeader(string TagContext)
         {
-            if (Conversions.ToBoolean(Strings.InStr(TagContext, "@PROJECTS", CompareMethod.Text)))
+            if (TagContext.Contains("@PROJECTS") || TagContext.Contains("HEADER") || TagContext.Contains("DELIVERABLE") || TagContext.Contains("@PROGRAMS"))
             {
-                return Conversions.ToString(true);
+                return true;
             }
-            else if (Conversions.ToBoolean(Strings.InStr(TagContext, "HEADER", CompareMethod.Text)))
-            {
-                return Conversions.ToString(true);
-            }
-            else if (Conversions.ToBoolean(Strings.InStr(TagContext, "DELIVERABLE", CompareMethod.Text)))
-            {
-                return Conversions.ToString(true);
-            }
-            else if (Conversions.ToBoolean(Strings.InStr(TagContext, "@PROGRAMS", CompareMethod.Text)))
-            {
-                return Conversions.ToString(true);
-            }
-            else
-            {
-                return Conversions.ToString(false);
-            }
+            return false;
         }
 
         public void HideEmptyHeadersInView()
         {
-            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (Conversions.ToBoolean(IsHeader(node.Value.get_Context()))) { node.Value.ActiveBranch = false; } } };
+            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.get_Context())) { node.Value.ActiveBranch = false; } } };
 
             foreach (TreeNode<ToDoItem> node in ListOfToDoTree)
                 node.Traverse(action);
         }
 
-        private object CompareItemsByToDoID(object objItemLeft, object objItemRight)
+        private int CompareItemsByToDoID(object objItemLeft, object objItemRight)
         {
             string ToDoIDLeft = GetFields.CustomFieldID_GetValue(objItemLeft, "ToDoID");
             string ToDoIDRight = GetFields.CustomFieldID_GetValue(objItemRight, "ToDoID");

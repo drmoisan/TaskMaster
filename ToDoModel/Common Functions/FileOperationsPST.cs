@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Office.Interop.Outlook;
-
-
+using Outlook = Microsoft.Office.Interop.Outlook;
+using System.IO;
+using UtilitiesCS;
 using UtilitiesVB;
+using System.Windows.Forms;
 
 namespace ToDoModel
 {
@@ -24,11 +26,11 @@ namespace ToDoModel
             _handlerList = InstantiateHandlers();
         }
 
-        private Folder GetOutlookPSTFolderByPath(string FolderPath, Application Application)
+        private Folder GetOutlookPSTFolderByPath(string FolderPath, Outlook.Application Application)
         {
-            if (Strings.Left(FolderPath, 2) == @"\\")
+            if (FolderPath.Substring(0, 2) == @"\\")
             {
-                FolderPath = Strings.Right(FolderPath, Strings.Len(FolderPath) - 2);
+                FolderPath = FolderPath.Substring(2);
             }
             string[] FoldersArray = FolderPath.Split('\\');
 
@@ -43,13 +45,13 @@ namespace ToDoModel
                     Debug.WriteLine(OlFolder.FolderPath);
                 }
 
-                for (int i = 1, loopTo = Information.UBound(FoldersArray); i <= loopTo; i++)
+                for (int i = 0; i < FoldersArray.Length; i++)
                     OlFolder = (Folder)OlFolder.Folders[FoldersArray[i]];
                 return OlFolder;
             }
-            catch
+            catch (System.Exception ex) 
             {
-                Debug.WriteLine(Information.Err().Description);
+                Debug.WriteLine(ex.Message);
                 Debug.WriteLine("Folder Does Not Exist");
                 return null;
             }
@@ -76,7 +78,7 @@ namespace ToDoModel
 
             foreach (Store store in stores)
             {
-                if (Strings.Right(store.FilePath, 3) == "pst")
+                if (Path.GetExtension(store.FilePath) == "pst")
                 {
                     var OlFolder = GetSearchFolder(store, "FLAGGED");
                     var items = OlFolder.Items;
@@ -88,7 +90,7 @@ namespace ToDoModel
             return handlerList;
         }
 
-        private bool __itemsPST_ItemChange_blIsRunning = default;
+        private static bool __itemsPST_ItemChange_blIsRunning = default;
 
         private class PSTEvents
         {
@@ -139,8 +141,9 @@ namespace ToDoModel
 
                     __itemsPST_ItemChange_blIsRunning = true;
                     var todo = new ToDoItem(Item, OnDemand: true);
-                    UserProperty objProperty_ToDoID = (UserProperty)Item.UserProperties.Find("ToDoID");
-                    UserProperty objProperty_Project = (UserProperty)Item.UserProperties.Find("TagProject");
+                    dynamic olItem = Item;
+                    UserProperty objProperty_ToDoID = (UserProperty)olItem.UserProperties.Find("ToDoID");
+                    UserProperty objProperty_Project = (UserProperty)olItem.UserProperties.Find("TagProject");
 
 
                     // AUTOCODE ToDoID based on Project
@@ -153,7 +156,7 @@ namespace ToDoModel
                         // Check to see whether there is an existing ID
                         if (objProperty_ToDoID is not null)
                         {
-                            string strToDoID = Conversions.ToString(objProperty_ToDoID);
+                            string strToDoID = objProperty_ToDoID.Value;
 
                             // Don't autocode branches that existed to another project previously
                             if (strToDoID.Length != 0 & strToDoID.Length <= 4)
@@ -198,13 +201,13 @@ namespace ToDoModel
 
                                     else if (strToDoID.Length == 4) // If it is not in the dictionary, see if this is a project we should add
                                     {
-                                        var response = Interaction.MsgBox("Add Project " + strProject + " to the Master List?", Constants.vbYesNo);
-                                        if (response == Constants.vbYes)
+                                        var response = MessageBox.Show($"Add Project {strProject} to the Master List?", "", MessageBoxButtons.YesNo);
+                                        if (response == DialogResult.Yes)
                                         {
                                             // ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                             // SaveDict()
-                                            string strProgram = Interaction.InputBox("What is the program name for " + strProject + "?", DefaultResponse: "");
-                                            int unused2 = _globals.TD.ProjInfo.Add(new ToDoProjectInfoEntry(strProject, strToDoID, strProgram));
+                                            string strProgram = InputBox.ShowDialog($"What is the program name for {strProject}?", DefaultResponse: "");
+                                            _globals.TD.ProjInfo.Add(new ToDoProjectInfoEntry(strProject, strToDoID, strProgram));
                                             _globals.TD.ProjInfo.Save();
                                         }
                                     }
@@ -238,7 +241,7 @@ namespace ToDoModel
                         else // In this case, the project name exists but the todo id does not
                         {
                             // Get Project Name
-                            strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project) : (string)objProperty_Project;
+                            strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project.Value) : (string)objProperty_Project.Value;
 
                             // If the project name is in our dictionary, autoadd the ToDoID to this item
                             if (strProject.Length != 0)
@@ -271,13 +274,14 @@ namespace ToDoModel
                     // If So, adjust Kan Ban fields and categories
                     if (todo.Complete)
                     {
-                        if (Strings.InStr(Conversions.ToString(Item.Categories), "Tag KB Completed") == Conversions.ToInteger(false))
+                        if (((string)olItem.Categories).Contains("Tag KB Completed"))
                         {
-                            string strCats = Strings.Replace(Strings.Replace(Conversions.ToString(Item.Categories), "Tag KB Backlog", ""), ",,", ",");
-                            strCats = Strings.Replace(Strings.Replace(strCats, "Tag KB InProgress", ""), ",,", ",");
-                            strCats = Strings.Replace(Strings.Replace(strCats, "Tag KB Planned", ""), ",,", ",");
-                            while (Strings.Left(strCats, 1) == ",")
-                                strCats = Strings.Right(strCats, strCats.Length - 1);
+                            string strCats = ((string)olItem.Categories).Replace("Tag KB Backlog", "").Replace(",,", ",");
+                            strCats = strCats.Replace("Tag KB InProgress", "").Replace(",,", ",");
+                            strCats = strCats.Replace("Tag KB Planned", "").Replace(",,", ",");
+                            
+                            while (strCats.Substring(0, 1) == ",")
+                                strCats = strCats.Substring(1);
                             if (strCats.Length > 0)
                             {
                                 strCats += ", Tag KB Completed";
@@ -286,29 +290,29 @@ namespace ToDoModel
                             {
                                 strCats += "Tag KB Completed";
                             }
-                            Item.Categories = strCats;
-                            var unused1 = Item.Save;
+                            olItem.Categories = strCats;
+                            olItem.Save();
                             todo.set_KB(value: "Completed");
                         }
                     }
                     else if (todo.get_KB() == "Completed")
                     {
-                        string strCats = Conversions.ToString(Item.Categories);
+                        string strCats = olItem.Categories;
 
                         // Strip Completed from categories
-                        if (Strings.InStr(strCats, "Tag KB Completed") == Conversions.ToInteger(true))
+                        if (strCats.Contains("Tag KB Completed"))
                         {
-                            strCats = Strings.Replace(Strings.Replace(strCats, "Tag KB Completed", ""), ",,", ",");
+                            strCats = strCats.Replace("Tag KB Completed", "").Replace(",,", ",");
                         }
 
                         string strReplace;
                         string strKB;
-                        if (Strings.InStr(strCats, "Tag A Top Priority Today") == Conversions.ToInteger(true))
+                        if (strCats.Contains("Tag A Top Priority Today"))
                         {
                             strReplace = "Tag KB InProgress";
                             strKB = "InProgress";
                         }
-                        else if (Strings.InStr(strCats, "Tag Bullpin Priorities") == Conversions.ToInteger(true))
+                        else if (strCats.Contains("Tag Bullpin Priorities"))
                         {
                             strReplace = "Tag KB Planned";
                             strKB = "Planned";
@@ -326,8 +330,8 @@ namespace ToDoModel
                         {
                             strCats = strReplace;
                         }
-                        Item.Categories = strCats;
-                        var unused = Item.Save;
+                        olItem.Categories = strCats;
+                        olItem.Save();
                         todo.set_KB(value: strKB);
 
                     }
@@ -353,9 +357,9 @@ namespace ToDoModel
                 }
                 return null;
             }
-            catch
+            catch (System.Exception ex) 
             {
-                Debug.WriteLine(Information.Err().Description);
+                Debug.WriteLine(ex.Message);
                 return null;
             }
         }

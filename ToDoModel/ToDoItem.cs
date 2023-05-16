@@ -967,30 +967,31 @@ namespace ToDoModel
             try
             {
                 string strToDoID = ToDoID;
-                long strToDoID_Len = strToDoID.Length;
+                int strToDoID_Len = strToDoID.Length;
                 if (strToDoID_Len > 0L)
                 {
-                    long maxlen = My.MySettingsProperty.Settings.MaxIDLength;
+                    int maxlen = Properties.Settings.Default.MaxIDLength;
 
-                    for (long i = 2L, loopTo = maxlen; i <= loopTo; i += 2L)
+                    for (int i = 2, loopTo = maxlen; i <= loopTo; i += 2)
                     {
                         strField = "ToDoIdLvl" + i / 2d;
                         strFieldValue = "00";
                         if (i <= strToDoID_Len)
                         {
-                            strFieldValue = Strings.Mid(strToDoID, (int)(i - 1L), 2);
+                            strFieldValue = strToDoID.Substring(i - 1, 2);
                         }
                         if (!_readonly)
                             _olObject.SetUdf(strField, strFieldValue);
                     }
                 }
             }
-            catch
+            catch (System.Exception e) 
             {
                 Debug.WriteLine("Error in Split_ToDoID");
-                Debug.WriteLine(Information.Err().Description);
+                Debug.WriteLine(e.Message);
                 Debug.WriteLine("Field Name is " + strField);
                 Debug.WriteLine("Field Value is " + strFieldValue);
+                Debug.WriteLine(e.StackTrace);
                 Debugger.Break();
             }
         }
@@ -1073,8 +1074,9 @@ namespace ToDoModel
             {
                 // Dim prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
                 // Return Replace(_olObject.Parent.FolderPath, prefix, "")
-                string[] ary = _olObject.Parent.FolderPath.ToString().Split('\\');
-                return ary[Information.UBound(ary)];
+                dynamic olItem = _olObject;
+                string[] ary = olItem.Parent.FolderPath.ToString().Split('\\');
+                return ary[ary.Length -1];
             }
         }
 
@@ -1082,7 +1084,8 @@ namespace ToDoModel
         {
             try
             {
-                PropertyAccessor OlPA = (PropertyAccessor)_olObject.PropertyAccessor;
+                dynamic olItem = _olObject;
+                PropertyAccessor OlPA = (PropertyAccessor)olItem.PropertyAccessor;
                 var OlProperty = OlPA.GetProperty(PA_Schema);
                 return true;
             }
@@ -1116,11 +1119,11 @@ namespace ToDoModel
 
             strTemp = "";
 
-            var loopTo = Information.UBound(varBranch);
+            var loopTo = varBranch.Length-1;
             for (i = 0; i <= loopTo; i++)
-                strTemp = varBranch[i] is Array ? strTemp + ", " + FlattenArry((object[])varBranch[i]) : (string)Operators.ConcatenateObject(strTemp + ", ", varBranch[i]);
+                strTemp = varBranch[i] is Array ? strTemp + ", " + FlattenArry((object[])varBranch[i]) : string.Concat(strTemp + ", ", varBranch[i]);
             if (strTemp.Length != 0)
-                strTemp = Strings.Right(strTemp, Strings.Len(strTemp) - 2);
+                strTemp = strTemp.Substring(2);
             FlattenArryRet = strTemp;
             return FlattenArryRet;
         }

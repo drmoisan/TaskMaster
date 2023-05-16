@@ -12,13 +12,13 @@ namespace ToDoModel
         {
             string ConvertToBaseRet = default;
             string chars;
-            long r;
+            int r;
             string newNumber;
             int maxBase;
             int i;
 
             chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
-            maxBase = Strings.Len(chars);
+            maxBase = chars.Length;
 
             // check if we can convert to this base
             if (nbase > maxBase)
@@ -32,14 +32,14 @@ namespace ToDoModel
                 newNumber = "";
                 while (num >= nbase)
                 {
-                    r = (long)(num % nbase);
-                    newNumber = Strings.Mid(chars, (int)(r + 1L), 1) + newNumber;
+                    r = (int)(num % nbase);
+                    newNumber = chars.Substring((r + 1), 1) + newNumber;
                     num /= nbase;
                 }
 
-                newNumber = Strings.Mid(chars, (int)(num + 1), 1) + newNumber;
+                newNumber = chars.Substring((int)(num + 1), 1) + newNumber;
 
-                var loopTo = Strings.Len(newNumber) % intMinDigits;
+                var loopTo = newNumber.Length % intMinDigits;
                 for (i = 1; i <= loopTo; i++)
                     newNumber = 0 + newNumber;
 
@@ -53,22 +53,22 @@ namespace ToDoModel
         {
             BigInteger ConvertToDecimalRet = default;
             string chars;
-            long i;
+            int i;
             long lngLoc;
             var lngTmp = default(long);
             var bigint = new BigInteger();
 
             chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
-            bool unused = bigint.Equals(0L);
+            bigint.Equals(0L);
 
             try
             {
-                var loopTo = (long)Strings.Len(strBase);
-                for (i = 1L; i <= loopTo; i++)
+                var loopTo = strBase.Length;
+                for (i = 1; i <= loopTo; i++)
                 {
                     bigint *= nbase;
-                    lngLoc = Strings.InStr(chars, Strings.Mid(strBase, (int)i, 1));
-                    bigint += lngLoc - 1L;
+                    lngLoc = chars.IndexOf(strBase.Substring(i,1));
+                    bigint += lngLoc - 1;
                 }
             }
             catch (Exception ex)

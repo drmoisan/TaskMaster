@@ -188,8 +188,8 @@ namespace ToDoModel
             if (strMaxID.Length > _maxIDLength)
             {
                 _maxIDLength = strMaxID.Length;
-                My.MySettingsProperty.Settings.MaxIDLength = (int)_maxIDLength;
-                My.MySettingsProperty.Settings.Save();
+                Properties.Settings.Default.MaxIDLength = (int)_maxIDLength;
+                Properties.Settings.Default.Save();
             }
             return strMaxID;
         }
@@ -204,8 +204,8 @@ namespace ToDoModel
             if (strMaxID.Length > _maxIDLength)
             {
                 _maxIDLength = strMaxID.Length;
-                My.MySettingsProperty.Settings.MaxIDLength = (int)_maxIDLength;
-                My.MySettingsProperty.Settings.Save();
+                Properties.Settings.Default.MaxIDLength = (int)_maxIDLength;
+                Properties.Settings.Default.Save();
             }
 
             return strMaxID;
