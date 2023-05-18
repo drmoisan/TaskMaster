@@ -443,16 +443,16 @@
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TaskTree\TaskTree.vbproj">
-      <Project>{3d5bd88d-d4ff-4302-8c45-8e06f7dc558a}</Project>
+    <ProjectReference Include="..\TaskTree\TaskTree.csproj">
+      <Project>{8F7F59E6-18A7-0CF3-0E1D-4478954B612A}</Project>
       <Name>TaskTree</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TaskVisualization\TaskVisualization.vbproj">
-      <Project>{cd11d1cb-dd70-4413-b278-263f5474c4b5}</Project>
+    <ProjectReference Include="..\TaskVisualization\TaskVisualization.csproj">
+      <Project>{7F3550A0-1128-0BE2-3020-EC4136E3F015}</Project>
       <Name>TaskVisualization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
-      <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+      <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
       <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">

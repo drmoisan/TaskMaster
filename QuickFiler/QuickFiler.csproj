@@ -402,20 +402,20 @@
       <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
       <Name>SVGControl</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TaskVisualization\TaskVisualization.vbproj">
-      <Project>{cd11d1cb-dd70-4413-b278-263f5474c4b5}</Project>
+    <ProjectReference Include="..\TaskVisualization\TaskVisualization.csproj">
+      <Project>{7F3550A0-1128-0BE2-3020-EC4136E3F015}</Project>
       <Name>TaskVisualization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.Ported.csproj">
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
       <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
-      <Name>ToDoModel.Ported</Name>
+      <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
-      <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>
+    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.csproj">
+      <Project>{92B43F51-DD5D-06F1-26D9-2669F7341F60}</Project>
       <Name>UtilitiesVB</Name>
     </ProjectReference>
   </ItemGroup>

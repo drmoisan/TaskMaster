@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 
 using UtilitiesVB;
@@ -25,7 +27,7 @@ namespace ToDoModel
             UsedIDList = listUsedID;
         }
 
-        public ListOfIDs(string FilePath, Application OlApp)
+        public ListOfIDs(string FilePath, Outlook.Application OlApp)
         {
             LoadFromFile(FilePath: FilePath, OlApp: OlApp);
         }
@@ -35,7 +37,7 @@ namespace ToDoModel
             _usedIDList = new List<string>();
         }
 
-        public static ListOfIDs LoadFromFile(string FilePath, Application OlApp)
+        public static ListOfIDs LoadFromFile(string FilePath, Outlook.Application OlApp)
         {
             var tmpIDList = new ListOfIDs();
 
@@ -75,22 +77,22 @@ namespace ToDoModel
             return tmpIDList;
         }
 
-        private static ListOfIDs ProcessFileError(Application OlApp, string msg)
+        private static ListOfIDs ProcessFileError(Outlook.Application OlApp, string msg)
         {
             var tmpIDList = new ListOfIDs();
-            var result = Interaction.MsgBox(msg, Constants.vbYesNo);
-            if (result == MsgBoxResult.Yes)
+            var result = MessageBox.Show(msg, "Error",MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
             {
                 tmpIDList.RefreshIDList(OlApp);
             }
             else
             {
-                Interaction.MsgBox("Returning an empty list of ToDoIDs");
+                MessageBox.Show("Returning an empty list of ToDoIDs");
             }
             return tmpIDList;
         }
 
-        public void RefreshIDList(Application Application)
+        public void RefreshIDList(Outlook.Application Application)
         {
             var unused = new object();
             var _dataModel = new TreeOfToDoItems();
@@ -117,7 +119,7 @@ namespace ToDoModel
     /// ListOfIDs.Save() Method
     /// </summary>
     /// <param name="OlApp">Pointer to Outlook Application</param>
-        public void CompressToDoIDs(Application OlApp)
+        public void CompressToDoIDs(Outlook.Application OlApp)
         {
             var _dataModel = new TreeOfToDoItems();
             _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, OlApp);
@@ -239,7 +241,7 @@ namespace ToDoModel
             }
             else
             {
-                var unused = Interaction.MsgBox("Can't save. IDList FileName not set yet");
+                MessageBox.Show("Can't save. IDList FileName not set yet");
             }
         }
 
@@ -254,7 +256,7 @@ namespace ToDoModel
 
             // chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
             chars = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
-            maxBase = Strings.Len(chars);
+            maxBase = (chars.Length);
 
             // check if we can convert to this base
             if (nbase > maxBase)
@@ -269,13 +271,13 @@ namespace ToDoModel
                 while (num >= nbase)
                 {
                     r = num % nbase;
-                    newNumber = Strings.Mid(chars, (int)(r + 1), 1) + newNumber;
+                    newNumber = chars.Substring((int)(r + 1), 1) + newNumber;
                     num /= nbase;
                 }
 
-                newNumber = Strings.Mid(chars, (int)(num + 1), 1) + newNumber;
+                newNumber = chars.Substring((int)(num + 1), 1) + newNumber;
 
-                var loopTo = Strings.Len(newNumber) % intMinDigits;
+                var loopTo = (newNumber.Length) % intMinDigits;
                 for (i = 1; i <= loopTo; i++)
                     newNumber = 0 + newNumber;
 
@@ -297,11 +299,11 @@ namespace ToDoModel
             chars = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
             lngTmp = 0;
 
-            var loopTo = Strings.Len(strBase);
+            var loopTo = (strBase.Length -1);
             for (i = 1; i <= loopTo; i++)
             {
                 lngTmp *= nbase;
-                intLoc = Strings.InStr(chars, Strings.Mid(strBase, i, 1));
+                intLoc = chars.IndexOf(strBase.Substring(i, 1));
                 lngTmp += intLoc - 1;
             }
 
@@ -340,10 +342,10 @@ namespace ToDoModel
             else
             {
                 objProperty = null;
-                var unused = Interaction.MsgBox("Unsupported object type");
+                MessageBox.Show("Unsupported object type");
             }
 
-            return objProperty is null ? "" : objProperty is Array ? FlattenArry((object[])objProperty) : (string)objProperty;
+            return objProperty is null ? "" : objProperty is Array ? FlattenArry((object[])objProperty.Value) : (string)objProperty.Value;
 
             OlMail = null;
             OlTask = null;
@@ -360,11 +362,11 @@ namespace ToDoModel
 
             strTemp = "";
 
-            var loopTo = Information.UBound(varBranch);
+            var loopTo = (varBranch.Length - 1);
             for (i = 0; i <= loopTo; i++)
-                strTemp = varBranch[i] is Array ? strTemp + ", " + FlattenArry((object[])varBranch[i]) : (string)Operators.ConcatenateObject(strTemp + ", ", varBranch[i]);
+                strTemp = varBranch[i] is Array ? strTemp + ", " + FlattenArry((object[])varBranch[i]) : strTemp + ", " + varBranch[i];
             if (strTemp.Length != 0)
-                strTemp = Strings.Right(strTemp, Strings.Len(strTemp) - 2);
+                strTemp = strTemp.Substring(2);
             FlattenArryRet = strTemp;
             return FlattenArryRet;
         }

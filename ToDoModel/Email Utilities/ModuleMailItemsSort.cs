@@ -55,25 +55,25 @@ namespace ToDoModel
             // OlItems = OlFolder.Items
             // End If
 
-            if (Conversions.ToBoolean(options & SortOptionsEnum.DateRecentFirst))
+            if (options.HasFlag(SortOptionsEnum.DateRecentFirst))
             {
                 OlItems.Sort("Received", true);
             }
-            else if (Conversions.ToBoolean(options & SortOptionsEnum.DateOldestFirst))
+            else if (options.HasFlag(SortOptionsEnum.DateOldestFirst))
             {
                 OlItems.Sort("Received", false);
             }
 
             // Output_Items OlItems
 
-            if (Conversions.ToBoolean(options & SortOptionsEnum.TriageImportantFirst))
+            if (options.HasFlag(SortOptionsEnum.TriageImportantFirst))
             {
                 blTriage = true;
                 intFrom = 1;
                 intTo = 3;
                 intStep = 1;
             }
-            else if (Conversions.ToBoolean(options & SortOptionsEnum.TriageImportantLast))
+            else if (options.HasFlag(SortOptionsEnum.TriageImportantLast))
             {
                 blTriage = true;
                 intFrom = 3;
@@ -102,7 +102,7 @@ namespace ToDoModel
                             OlMailTmp = (MailItem)objItem;
                             if (!MailResolution_ToRemove.IsMailUnReadable(OlMailTmp))
                             {
-                                if (Conversions.ToBoolean(options & SortOptionsEnum.ConversationUniqueOnly))
+                                if (options.HasFlag(SortOptionsEnum.ConversationUniqueOnly))
                                 {
                                     var loopTo1 = listEmails.Count - 1;
                                     for (j = 0; j <= loopTo1; j++)
@@ -132,7 +132,7 @@ namespace ToDoModel
                         OlMailTmp = (MailItem)objItem;
                         if (!MailResolution_ToRemove.IsMailUnReadable(OlMailTmp))
                         {
-                            if (Conversions.ToBoolean(options & SortOptionsEnum.ConversationUniqueOnly))
+                            if (options.HasFlag(SortOptionsEnum.ConversationUniqueOnly))
                             {
                                 var loopTo2 = listEmails.Count - 1;
                                 for (j = 0; j <= loopTo2; j++)
@@ -164,7 +164,7 @@ namespace ToDoModel
                         OlMailTmp = (MailItem)objItem;
                         if (!MailResolution_ToRemove.IsMailUnReadable(OlMailTmp))
                         {
-                            if (Conversions.ToBoolean(options & SortOptionsEnum.ConversationUniqueOnly))
+                            if (options.HasFlag(SortOptionsEnum.ConversationUniqueOnly))
                             {
                                 var loopTo3 = listEmails.Count;
                                 for (j = 1; j <= loopTo3; j++)

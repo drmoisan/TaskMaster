@@ -55,7 +55,7 @@ namespace ToDoModel
                     }
                 }
                 return x;
-                // Return Me.ProjectID.CompareTo(other.ProjectID)
+                // Return Me.ProjectID.CompareTo(Other.ProjectID)
             }
         }
 

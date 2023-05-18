@@ -26,9 +26,9 @@ namespace TaskMaster.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public long MaxToDo {
+        public int MaxToDo {
             get {
-                return ((long)(this["MaxToDo"]));
+                return ((int)(this["MaxToDo"]));
             }
         }
         
@@ -182,9 +182,9 @@ namespace TaskMaster.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("3")]
-        public long ConversationExponent {
+        public int ConversationExponent {
             get {
-                return ((long)(this["ConversationExponent"]));
+                return ((int)(this["ConversationExponent"]));
             }
             set {
                 this["ConversationExponent"] = value;
@@ -194,9 +194,9 @@ namespace TaskMaster.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10000")]
-        public long ConversationWeight {
+        public int ConversationWeight {
             get {
-                return ((long)(this["ConversationWeight"]));
+                return ((int)(this["ConversationWeight"]));
             }
             set {
                 this["ConversationWeight"] = value;
@@ -254,9 +254,9 @@ namespace TaskMaster.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public long MaxRecents {
+        public int MaxRecents {
             get {
-                return ((long)(this["MaxRecents"]));
+                return ((int)(this["MaxRecents"]));
             }
             set {
                 this["MaxRecents"] = value;
@@ -380,6 +380,18 @@ namespace TaskMaster.Properties {
             }
             set {
                 this["BackupFile_CTF_Inc"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9999999CommonWords.txt")]
+        public string BackupFile_CommonWords {
+            get {
+                return ((string)(this["BackupFile_CommonWords"]));
+            }
+            set {
+                this["BackupFile_CommonWords"] = value;
             }
         }
     }

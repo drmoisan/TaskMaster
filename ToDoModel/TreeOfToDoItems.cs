@@ -85,11 +85,11 @@ namespace ToDoModel
                     ToDoNode = ListOfToDoTree[i];
 
                     // If the ID is bigger than 2 digits, it is a child of someone. 
-                    // So in that case link it to the proper parent
+                    // So in that case link it to the proper _parent
                     // First try cutting off the last two digits, but in the case of
-                    // Filtered Items, it is possible that the parent is not visible.
-                    // If the parent is not visible, work recursively to find the next 
-                    // closest visible parent until you get to the root
+                    // Filtered Items, it is possible that the _parent is not visible.
+                    // If the _parent is not visible, work recursively to find the next 
+                    // closest visible _parent until you get to the root
                     if (ToDoNode.Value.ToDoID.Length > 2)
                     {
                         string strID = ToDoNode.Value.ToDoID;

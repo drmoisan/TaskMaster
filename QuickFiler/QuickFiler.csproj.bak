@@ -402,12 +402,12 @@
       <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
       <Name>SVGControl</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TaskVisualization\TaskVisualization.vbproj">
-      <Project>{cd11d1cb-dd70-4413-b278-263f5474c4b5}</Project>
+    <ProjectReference Include="..\TaskVisualization\TaskVisualization.csproj">
+      <Project>{7F3550A0-1128-0BE2-3020-EC4136E3F015}</Project>
       <Name>TaskVisualization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
-      <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+      <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
       <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">

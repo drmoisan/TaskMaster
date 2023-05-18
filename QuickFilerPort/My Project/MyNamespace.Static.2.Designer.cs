@@ -179,11 +179,11 @@ namespace QuickFiler.My
                                     {
                                         if (ns == currentInScopeNs)
                                         {
-                                            // prefix and namespace match.  Remove the unneeded ns attribute 
+                                            // Prefix and namespace match.  Remove the unneeded ns attribute 
                                             a.Remove();
                                         }
 
-                                        // prefix is in scope but refers to something else.  Leave the ns attribute. 
+                                        // Prefix is in scope but refers to something else.  Leave the ns attribute. 
                                         a = null;
                                         break;
                                     }
@@ -209,11 +209,11 @@ namespace QuickFiler.My
                                             {
                                                 if (ns == currentInScopeNs)
                                                 {
-                                                    // prefix and namespace match.  Remove the unneeded ns attribute 
+                                                    // Prefix and namespace match.  Remove the unneeded ns attribute 
                                                     a.Remove();
                                                 }
 
-                                                // prefix is in scope but refers to something else.  Leave the ns attribute. 
+                                                // Prefix is in scope but refers to something else.  Leave the ns attribute. 
                                                 a = null;
                                                 break;
                                             }

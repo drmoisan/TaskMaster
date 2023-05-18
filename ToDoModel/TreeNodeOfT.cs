@@ -7,12 +7,11 @@ namespace ToDoModel
 {
     public class TreeNode<T>
     {
-        // Public ID As String
+        public TreeNode(T value) => Value = value;
 
-        public TreeNode(T value)
-        {
-            Value = value;
-        }
+        private TreeNode<T> _parent;
+        private T _tValue;
+        private List<TreeNode<T>> _children = new List<TreeNode<T>>();
 
         public TreeNode<T> this[int i]
         {
@@ -22,10 +21,9 @@ namespace ToDoModel
             }
         }
 
+        public TreeNode<T> Parent { get => _parent; set => _parent = value; }
 
-        public TreeNode<T> Parent { get; set; }
-
-        public T Value { get; private set; }
+        public T Value { get => _tValue; private set => value = _tValue; }
 
         public bool IsAncestor(TreeNode<T> model)
         {
@@ -36,25 +34,25 @@ namespace ToDoModel
             return Parent.IsAncestor(model);
         }
 
-        public int ChildCount
-        {
-            get
-            {
-                return Children.Count;
-            }
-        }
+        public int ChildCount { get => Children.Count; }
 
-
-        public List<TreeNode<T>> Children { get; set; } = new List<TreeNode<T>>();
-
-
+        public List<TreeNode<T>> Children { get => _children; set => _children = value; }
+        
         public TreeNode<T> AddChild(T value)
         {
             var node = new TreeNode<T>(value) { Parent = this };
-            // node.ID = NextChildID()
             Children.Add(node);
             return node;
         }
+        
+        public TreeNode<T> AddChild(T value, string strID)
+        {
+            var node = new TreeNode<T>(value) { Parent = this };
+            // node.ID = strID
+            Children.Add(node);
+            return node;
+        }
+
         public TreeNode<T> AddChild(TreeNode<T> node)
         {
             // node.Parent = Me
@@ -70,13 +68,7 @@ namespace ToDoModel
             Children.Insert(0, node);
             return node;
         }
-        public TreeNode<T> AddChild(T value, string strID)
-        {
-            var node = new TreeNode<T>(value) { Parent = this };
-            // node.ID = strID
-            Children.Add(node);
-            return node;
-        }
+        
         public TreeNode<T>[] AddChildren(params T[] values)
         {
             return values.Select(new Func<T, TreeNode<T>>(AddChild)).ToArray();

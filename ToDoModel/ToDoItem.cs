@@ -2,8 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-
-
+using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 
 namespace ToDoModel
@@ -12,122 +11,14 @@ namespace ToDoModel
     [Serializable()]
     public class ToDoItem : ICloneable
     {
-
-        private const string PA_TOTAL_WORK = "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
-
-        private readonly object _olObject;
-        private string _ToDoID = "";
-        public string _TaskSubject = "";
-        public string _MetaTaskSubject = "";
-        public string _MetaTaskLvl = "";
-        private string _TagProgram = "";
-        private OlImportance _Priority;
-        private DateTime _TaskCreateDate;
-        private DateTime _StartDate;
-        private bool _Complete;
-        private int _TotalWork = 0;
-        private bool? _ActiveBranch = null;
-        private string _ExpandChildren = "";
-        private string _ExpandChildrenState = "";
-        private bool _EC2;
-        private int _VisibleTreeState;
-        private bool _readonly = false;
-        private FlagParser _flags;
-        private bool _flagAsTask = true;
-
-
-        public object Clone()
-        {
-            var cloned_todo = new ToDoItem(_olObject, true);
-            cloned_todo._ToDoID = _ToDoID;
-            cloned_todo._TaskSubject = _TaskSubject;
-            cloned_todo._MetaTaskSubject = _MetaTaskSubject;
-            cloned_todo._MetaTaskLvl = _MetaTaskLvl;
-            cloned_todo._TagProgram = _TagProgram;
-            cloned_todo._Priority = _Priority;
-            cloned_todo._StartDate = _StartDate;
-            cloned_todo._Complete = _Complete;
-            cloned_todo._TotalWork = _TotalWork;
-            cloned_todo._ActiveBranch = _ActiveBranch;
-            cloned_todo._ExpandChildren = _ExpandChildren;
-            cloned_todo._ExpandChildrenState = _ExpandChildrenState;
-            cloned_todo._EC2 = _EC2;
-            cloned_todo._VisibleTreeState = _VisibleTreeState;
-            cloned_todo._readonly = _readonly;
-            return cloned_todo;
-        }
-
-        /// <summary>
-    /// Gets and Sets a flag that when true, prevents saving changes to the underlying [object]
-    /// </summary>
-    /// <returns>Boolean</returns>
-        public bool IsReadOnly
-        {
-            get
-            {
-                return _readonly;
-            }
-            set
-            {
-                _readonly = value;
-            }
-        }
-
-        /// <summary>
-    /// Saves all internal variables to the [Object]
-    /// </summary>
-        public void ForceSave()
-        {
-            // Save the current state of the read only flag
-            bool tmp_readonly_state = _readonly;
-
-            // Activate saving
-            _readonly = false;
-
-            WriteFlagsBatch();
-
-            ToDoID = _ToDoID;
-            TaskSubject = _TaskSubject;
-            MetaTaskSubject = _MetaTaskSubject;
-            MetaTaskLvl = _MetaTaskLvl;
-            TagProgram = _TagProgram;
-            Priority = _Priority;
-            StartDate = _StartDate;
-            Complete = _Complete;
-            TotalWork = _TotalWork;
-            ActiveBranch = _ActiveBranch ?? false;
-            ExpandChildren = _ExpandChildren;
-            ExpandChildrenState = _ExpandChildrenState;
-            EC2 = _EC2;
-            VisibleTreeState = _VisibleTreeState;
-
-            if (_olObject is MailItem)
-            {
-                MailItem OlMail = (MailItem)_olObject;
-                if (OlMail.FlagStatus == OlFlagStatus.olNoFlag & _flagAsTask)
-                {
-                    OlMail.MarkAsTask(OlMarkInterval.olMarkNoDate);
-                }
-                else if (OlMail.FlagStatus == OlFlagStatus.olFlagMarked & !_flagAsTask)
-                {
-                    OlMail.ClearTaskFlag();
-                }
-                OlMail.Save();
-            }
-
-            // Return read only variable to its original state
-            _readonly = tmp_readonly_state;
-        }
-
         public ToDoItem(MailItem OlMail)
         {
-            _olObject = OlMail;
-
-            InitializeMail(OlMail);
-            string argstrCats_All = OlMail.Categories;
-            _flags = new FlagParser(ref argstrCats_All);
-            OlMail.Categories = argstrCats_All;
-            InitializeCustomFields(_olObject);
+            this._olObject = OlMail;
+            this.InitializeMail(OlMail);
+            string strCategories = OlMail.Categories;
+            this._flags = new FlagParser(ref strCategories);
+            OlMail.Categories = strCategories;
+            this.InitializeCustomFields(_olObject);
 
         }
 
@@ -187,53 +78,145 @@ namespace ToDoModel
 
         public ToDoItem(string strID)
         {
-            _ToDoID = strID;
+            _toDoID = strID;
         }
+
+        
+        private const string PA_TOTAL_WORK = "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
+        private readonly object _olObject;
+        private string _toDoID = "";
+        private string _taskSubject = "";
+        private string _metaTaskSubject = "";
+        private string _metaTaskLvl = "";
+        private string _tagProgram = "";
+        private OlImportance _Priority;
+        private DateTime _taskCreateDate;
+        private DateTime _startDate;
+        private bool _complete;
+        private int _totalWork = 0;
+        private bool? _activeBranch = null;
+        private string _expandChildren = "";
+        private string _expandChildrenState = "";
+        private bool _EC2;
+        private int _VisibleTreeState;
+        private bool _readonly = false;
+        private FlagParser _flags;
+        private bool _flagAsTask = true;
 
         private void InitializeMail(MailItem OlMail)
         {
-            _TaskSubject = OlMail.TaskSubject.Length != 0 ? OlMail.TaskSubject : OlMail.Subject;
+            _taskSubject = OlMail.TaskSubject.Length != 0 ? OlMail.TaskSubject : OlMail.Subject;
             _Priority = OlMail.Importance;
-            _TaskCreateDate = OlMail.CreationTime;
-            _StartDate = OlMail.TaskStartDate;
-            _Complete = (OlMail.FlagStatus == OlFlagStatus.olFlagComplete);
-            _TotalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
+            _taskCreateDate = OlMail.CreationTime;
+            _startDate = OlMail.TaskStartDate;
+            _complete = (OlMail.FlagStatus == OlFlagStatus.olFlagComplete);
+            _totalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
         }
 
         private void InitializeTask(TaskItem OlTask)
         {
-            _TaskSubject = OlTask.Subject;
+            _taskSubject = OlTask.Subject;
             _Priority = OlTask.Importance;
-            _TaskCreateDate = OlTask.CreationTime;
-            _StartDate = OlTask.StartDate;
-            _Complete = OlTask.Complete;
-            _TotalWork = OlTask.TotalWork;
+            _taskCreateDate = OlTask.CreationTime;
+            _startDate = OlTask.StartDate;
+            _complete = OlTask.Complete;
+            _totalWork = OlTask.TotalWork;
         }
 
         private void InitializeCustomFields(object Item)
         {
-            _TagProgram = (string)(_olObject.GetUdf("TagProgram"));
-            _ActiveBranch = (bool)(_olObject.GetUdf("AB", OlUserPropertyType.olYesNo));
+            _tagProgram = (string)(_olObject.GetUdf("TagProgram"));
+            _activeBranch = (bool)(_olObject.GetUdf("AB", OlUserPropertyType.olYesNo));
             _EC2 = (bool)(_olObject.GetUdf("EC2", OlUserPropertyType.olYesNo));
-            _ExpandChildren = (string)(_olObject.GetUdf("EC"));
-            _ExpandChildrenState = (string)(_olObject.GetUdf("EcState"));
+            _expandChildren = (string)(_olObject.GetUdf("EC"));
+            _expandChildrenState = (string)(_olObject.GetUdf("EcState"));
         }
 
+        public object Clone()
+        {
+            var cloned_todo = new ToDoItem(_olObject, true);
+            cloned_todo._toDoID = _toDoID;
+            cloned_todo._taskSubject = _taskSubject;
+            cloned_todo._metaTaskSubject = _metaTaskSubject;
+            cloned_todo._metaTaskLvl = _metaTaskLvl;
+            cloned_todo._tagProgram = _tagProgram;
+            cloned_todo._Priority = _Priority;
+            cloned_todo._startDate = _startDate;
+            cloned_todo._complete = _complete;
+            cloned_todo._totalWork = _totalWork;
+            cloned_todo._activeBranch = _activeBranch;
+            cloned_todo._expandChildren = _expandChildren;
+            cloned_todo._expandChildrenState = _expandChildrenState;
+            cloned_todo._EC2 = _EC2;
+            cloned_todo._VisibleTreeState = _VisibleTreeState;
+            cloned_todo._readonly = _readonly;
+            return cloned_todo;
+        }
+
+        /// <summary>
+    /// Gets and Sets a flag that when true, prevents saving changes to the underlying [object]
+    /// </summary>
+    /// <returns>Boolean</returns>
+        public bool IsReadOnly {get => _readonly; set => _readonly = value; }
+
+        /// <summary>
+    /// Saves all internal variables to the [Object]
+    /// </summary>
+        public void ForceSave()
+        {
+            // Save the current state of the read only flag
+            bool tmp_readonly_state = _readonly;
+
+            // Activate saving
+            _readonly = false;
+
+            WriteFlagsBatch();
+            ToDoID = _toDoID;
+            TaskSubject = _taskSubject;
+            MetaTaskSubject = _metaTaskSubject;
+            MetaTaskLvl = _metaTaskLvl;
+            TagProgram = _tagProgram;
+            Priority = _Priority;
+            StartDate = _startDate;
+            Complete = _complete;
+            TotalWork = _totalWork;
+            ActiveBranch = _activeBranch ?? false;
+            ExpandChildren = _expandChildren;
+            ExpandChildrenState = _expandChildrenState;
+            EC2 = _EC2;
+            VisibleTreeState = _VisibleTreeState;
+
+            if (_olObject is MailItem)
+            {
+                MailItem OlMail = (MailItem)_olObject;
+                if (OlMail.FlagStatus == OlFlagStatus.olNoFlag & _flagAsTask)
+                {
+                    OlMail.MarkAsTask(OlMarkInterval.olMarkNoDate);
+                }
+                else if (OlMail.FlagStatus == OlFlagStatus.olFlagMarked & !_flagAsTask)
+                {
+                    OlMail.ClearTaskFlag();
+                }
+                OlMail.Save();
+            }
+
+            // Return read only variable to its original state
+            _readonly = tmp_readonly_state;
+        }
+                
         public void WriteFlagsBatch()
         {
-            dynamic olTemp = _olObject;
-            olTemp.Categories = _flags.Combine();
-            olTemp.Save();
+            _olObject.SetCategories(_flags.Combine());
             _olObject.SetUdf("TagContext", _flags.get_Context(false), OlUserPropertyType.olKeywords);
             _olObject.SetUdf("TagPeople", _flags.get_People(false),OlUserPropertyType.olKeywords);
             // TODO: Assign ToDoID if project assignment changes
-            // TODO: If ID exists and project reassigned, move any children
+            // TODO: If ID exists and project reassigned, move any _children
             _olObject.SetUdf("TagProject", _flags.get_Projects(false), OlUserPropertyType.olKeywords);
             _olObject.SetUdf("TagTopic", _flags.get_Topics(false), OlUserPropertyType.olKeywords);
             _olObject.SetUdf("KB", _flags.get_KB(false));
         }
 
-        public object olItem
+        public object OlItem
         {
             get
             {
@@ -286,7 +269,7 @@ namespace ToDoModel
             get
             {
                 DateTime TaskCreateDateRet = default;
-                TaskCreateDateRet = _TaskCreateDate;
+                TaskCreateDateRet = _taskCreateDate;
                 return TaskCreateDateRet;
             }
         }
@@ -295,11 +278,11 @@ namespace ToDoModel
         {
             get
             {
-                return _flags.bullpin;
+                return _flags.Bullpin;
             }
             set
             {
-                _flags.bullpin = value;
+                _flags.Bullpin = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -316,11 +299,11 @@ namespace ToDoModel
         {
             get
             {
-                return _flags.today;
+                return _flags.Today;
             }
             set
             {
-                _flags.today = value;
+                _flags.Today = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -394,11 +377,11 @@ namespace ToDoModel
         {
             get
             {
-                return _TaskCreateDate;
+                return _taskCreateDate;
             }
             set
             {
-                _TaskCreateDate = value;
+                _taskCreateDate = value;
             }
         }
 
@@ -453,23 +436,23 @@ namespace ToDoModel
             {
                 if (_olObject is null)
                 {
-                    _Complete = false;
+                    _complete = false;
                 }
                 else if (_olObject is MailItem)
                 {
                     MailItem OlMail = (MailItem)_olObject;
-                    _Complete = OlMail.FlagStatus == OlFlagStatus.olFlagComplete;
+                    _complete = OlMail.FlagStatus == OlFlagStatus.olFlagComplete;
                 }
                 else if (_olObject is TaskItem)
                 {
                     TaskItem OlTask = (TaskItem)_olObject;
-                    _Complete = OlTask.Complete;
+                    _complete = OlTask.Complete;
                 }
-                return _Complete;
+                return _complete;
             }
             set
             {
-                _Complete = value;
+                _complete = value;
                 if (!_readonly)
                 {
                     if (_olObject is null)
@@ -495,32 +478,32 @@ namespace ToDoModel
         {
             get
             {
-                if (_TaskSubject.Length == 0)
+                if (_taskSubject.Length == 0)
                 {
                     if (_olObject is null)
                     {
-                        _TaskSubject = "";
+                        _taskSubject = "";
                     }
                     else if (_olObject is MailItem)
                     {
                         MailItem OlMail = (MailItem)_olObject;
-                        _TaskSubject = OlMail.TaskSubject;
+                        _taskSubject = OlMail.TaskSubject;
                     }
                     else if (_olObject is TaskItem)
                     {
                         TaskItem OlTask = (TaskItem)_olObject;
-                        _TaskSubject = OlTask.Subject;
+                        _taskSubject = OlTask.Subject;
                     }
                     else
                     {
-                        _TaskSubject = "";
+                        _taskSubject = "";
                     }
                 }
-                return _TaskSubject;
+                return _taskSubject;
             }
             set
             {
-                _TaskSubject = value;
+                _taskSubject = value;
                 if (!_readonly)
                 {
                     if (_olObject is null)
@@ -529,13 +512,13 @@ namespace ToDoModel
                     else if (_olObject is MailItem)
                     {
                         MailItem OlMail = (MailItem)_olObject;
-                        OlMail.TaskSubject = _TaskSubject;
+                        OlMail.TaskSubject = _taskSubject;
                         OlMail.Save();
                     }
                     else if (_olObject is TaskItem)
                     {
                         TaskItem OlTask = (TaskItem)_olObject;
-                        OlTask.Subject = _TaskSubject;
+                        OlTask.Subject = _taskSubject;
                         OlTask.Save();
                     }
                 }
@@ -549,6 +532,21 @@ namespace ToDoModel
             // Set People and sanitize value
         }
 
+        public string People 
+        {
+            get 
+            {
+                EnsureInitialized(CallerName: "People");
+                return _flags.get_People(false);
+            }
+            set 
+            {
+                _flags.set_People(value: value);
+                if (!_readonly)
+                    SaveCatsToObj("TagPeople", _flags.get_People(false));
+            } 
+        }
+
         public void set_People(bool IncludePrefix = false, string value = default)
         {
             _flags.set_People(value: value);
@@ -556,7 +554,15 @@ namespace ToDoModel
                 SaveCatsToObj("TagPeople", _flags.get_People(false));
         }
 
-
+        internal string Categories 
+        {
+            get 
+            {
+                ThrowIfNull(_olObject, nameof(Categories));
+                return _olObject.GetCategories();
+            }
+            set => _olObject.SetCategories(value);
+        }
 
         public string get_Project(bool IncludePrefix = false)
         {
@@ -564,7 +570,22 @@ namespace ToDoModel
             return _flags.get_Projects(IncludePrefix);
             // Set Projects and sanitize value
             // TODO: Assign ToDoID if project assignment changes
-            // TODO: If ID exists and project reassigned, move any children 
+            // TODO: If ID exists and project reassigned, move any _children 
+        }
+
+        public string Project 
+        {
+            get 
+            {
+                EnsureInitialized(CallerName: "Project");
+                return _flags.get_Projects(false);
+            }
+            set 
+            {
+                _flags.set_Projects(value: value);
+                if (!_readonly)
+                    SaveCatsToObj("TagProject", _flags.get_Projects(false));
+            } 
         }
 
         public void set_Project(bool IncludePrefix = false, string value = default)
@@ -578,9 +599,9 @@ namespace ToDoModel
         {
             get
             {
-                if (_TagProgram.Length != 0)
+                if (_tagProgram.Length != 0)
                 {
-                    return _TagProgram;
+                    return _tagProgram;
                 }
                 else if (_olObject is null)
                 {
@@ -588,14 +609,14 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _TagProgram = (string)(_olObject.GetUdf("TagProgram", OlUserPropertyType.olKeywords));
-                    return _TagProgram;
+                    _tagProgram = (string)(_olObject.GetUdf("TagProgram", OlUserPropertyType.olKeywords));
+                    return _tagProgram;
                 }
 
             }
             set
             {
-                _TagProgram = value;
+                _tagProgram = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -605,12 +626,23 @@ namespace ToDoModel
                 }
             }
         }
-
+        
         public string get_Context(bool IncludePrefix = false)
         {
             EnsureInitialized(CallerName: "Context");
             return _flags.get_Context(IncludePrefix);
             // Set Context and sanitize value
+        }
+
+        public string Context
+        {
+            get => _flags.get_Context(false);
+            set
+            {
+                _flags.set_Context(value: value);
+                if (!_readonly)
+                    SaveCatsToObj("TagContext", _flags.get_Context(false));
+            }
         }
 
         public void set_Context(bool IncludePrefix = false, string value = default)
@@ -627,6 +659,21 @@ namespace ToDoModel
             // Set Context and sanitize value
         }
 
+        public string Topic 
+        { 
+            get
+            {
+                EnsureInitialized(CallerName: "Topic");
+                return _flags.get_Topics(false);
+            } 
+            set
+            {
+                _flags.set_Topics(value: value);
+                if (!_readonly)
+                    SaveCatsToObj("TagTopic", _flags.get_Topics(false));
+            } 
+        }
+        
         public void set_Topic(bool IncludePrefix = false, string value = default)
         {
             _flags.set_Topics(value: value);
@@ -639,6 +686,21 @@ namespace ToDoModel
             EnsureInitialized(CallerName: "KB");
             return _flags.get_KB(IncludePrefix);
             // Set Context and sanitize value
+        }
+
+        public string KB
+        {
+            get
+            {
+                EnsureInitialized(CallerName: "KB");
+                return _flags.get_KB(false);
+            }
+            set
+            {
+                _flags.set_KB(value: value);
+                if (!_readonly)
+                    SaveCatsToObj("KB", _flags.get_KB(false));
+            }
         }
 
         public void set_KB(bool IncludePrefix = false, string value = default)
@@ -672,40 +734,46 @@ namespace ToDoModel
             }
         }
 
+        private void ThrowIfNull(object obj, string property)
+        {
+            if (obj == null)
+                throw new ArgumentNullException($"Cannot get {property}. Item is null.");
+        }
+
         public int TotalWork
         {
             get
             {
-                if (_TotalWork == 0)
+                if (_totalWork == 0)
                 {
                     if (_olObject is null)
                     {
-                        _TotalWork = 0;
+                        _totalWork = 0;
                     }
                     else if (_olObject is MailItem)
                     {
                         MailItem OlMail = (MailItem)_olObject;
-                        _TotalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
+                        _totalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
                     }
 
                     else if (_olObject is TaskItem)
                     {
                         TaskItem OlTask = (TaskItem)_olObject;
-                        _TotalWork = OlTask.TotalWork;
+                        _totalWork = OlTask.TotalWork;
                     }
 
                     else
                     {
-                        _TotalWork = 0;
+                        _totalWork = 0;
                     }
                 }
-                return _TotalWork;
+                return _totalWork;
 
             }
 
             set
             {
-                _TotalWork = value;
+                _totalWork = value;
                 if (!_readonly)
                 {
                     if (_olObject is null)
@@ -731,9 +799,9 @@ namespace ToDoModel
         {
             get
             {
-                if (_ToDoID.Length != 0)
+                if (_toDoID.Length != 0)
                 {
-                    return _ToDoID;
+                    return _toDoID;
                 }
                 else if (_olObject is null)
                 {
@@ -741,13 +809,13 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _ToDoID = (string)(_olObject.GetUdf("ToDoID"));
-                    return _ToDoID;
+                    _toDoID = (string)(_olObject.GetUdf("ToDoID"));
+                    return _toDoID;
                 }
             }
             set
             {
-                _ToDoID = value;
+                _toDoID = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -817,26 +885,26 @@ namespace ToDoModel
         {
             get
             {
-                if (_ActiveBranch != null) { return (bool)_ActiveBranch; }
+                if (_activeBranch != null) { return (bool)_activeBranch; }
                 else if (_olObject is null) { return false; }
                 else
                 {
                     if (_olObject.UdfExists("AB"))
                     {
-                        _ActiveBranch = (bool)_olObject.GetUdf("AB", OlUserPropertyType.olYesNo);
+                        _activeBranch = (bool)_olObject.GetUdf("AB", OlUserPropertyType.olYesNo);
                     }
                     else
                     {
                         _olObject.SetUdf("AB", true, OlUserPropertyType.olYesNo);
-                        _ActiveBranch = true;
+                        _activeBranch = true;
                     }
 
-                    return (bool)_ActiveBranch;
+                    return (bool)_activeBranch;
                 }
             }
             set
             {
-                _ActiveBranch = value;
+                _activeBranch = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -874,8 +942,8 @@ namespace ToDoModel
                 _EC2 = value;
                 if (!_readonly)
                     _olObject.SetUdf("EC2", value, OlUserPropertyType.olYesNo);
-                _ExpandChildren = "";
-                _ExpandChildrenState = "";
+                _expandChildren = "";
+                _expandChildrenState = "";
             }
         }
 
@@ -902,9 +970,9 @@ namespace ToDoModel
         {
             get
             {
-                if (_ExpandChildren.Length != 0)
+                if (_expandChildren.Length != 0)
                 {
-                    return _ExpandChildren;
+                    return _expandChildren;
                 }
                 else if (_olObject is null)
                 {
@@ -912,13 +980,13 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _ExpandChildren = (string)(_olObject.GetUdf("EC"));
-                    return _ExpandChildren;
+                    _expandChildren = (string)(_olObject.GetUdf("EC"));
+                    return _expandChildren;
                 }
             }
             set
             {
-                _ExpandChildren = value;
+                _expandChildren = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -933,9 +1001,9 @@ namespace ToDoModel
         {
             get
             {
-                if (_ExpandChildrenState.Length != 0)
+                if (_expandChildrenState.Length != 0)
                 {
-                    return _ExpandChildrenState;
+                    return _expandChildrenState;
                 }
                 else if (_olObject is null)
                 {
@@ -943,13 +1011,13 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _ExpandChildrenState = (string)(_olObject.GetUdf("EcState"));
-                    return _ExpandChildrenState;
+                    _expandChildrenState = (string)(_olObject.GetUdf("EcState"));
+                    return _expandChildrenState;
                 }
             }
             set
             {
-                _ExpandChildrenState = value;
+                _expandChildrenState = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -1000,9 +1068,9 @@ namespace ToDoModel
         {
             get
             {
-                if (_MetaTaskLvl.Length != 0)
+                if (_metaTaskLvl.Length != 0)
                 {
-                    return _MetaTaskLvl;
+                    return _metaTaskLvl;
                 }
                 else if (_olObject is null)
                 {
@@ -1010,13 +1078,13 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _MetaTaskLvl = (string)(_olObject.GetUdf("Meta Task Level"));
-                    return _MetaTaskLvl;
+                    _metaTaskLvl = (string)(_olObject.GetUdf("Meta Task Level"));
+                    return _metaTaskLvl;
                 }
             }
             set
             {
-                _MetaTaskLvl = value;
+                _metaTaskLvl = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -1031,9 +1099,9 @@ namespace ToDoModel
         {
             get
             {
-                if (_MetaTaskSubject.Length != 0)
+                if (_metaTaskSubject.Length != 0)
                 {
-                    return _MetaTaskSubject;
+                    return _metaTaskSubject;
                 }
                 else if (_olObject is null)
                 {
@@ -1041,13 +1109,13 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _MetaTaskSubject = (string)(_olObject.GetUdf("Meta Task Subject"));
-                    return _MetaTaskSubject;
+                    _metaTaskSubject = (string)(_olObject.GetUdf("Meta Task Subject"));
+                    return _metaTaskSubject;
                 }
             }
             set
             {
-                _MetaTaskSubject = value;
+                _metaTaskSubject = value;
                 if (!_readonly)
                 {
                     if (_olObject is not null)
@@ -1072,8 +1140,8 @@ namespace ToDoModel
         {
             get
             {
-                // Dim prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
-                // Return Replace(_olObject.Parent.FolderPath, prefix, "")
+                // Dim Prefix As String = Globals.ThisAddIn._OlNS.DefaultStore.GetRootFolder.FolderPath & "\"
+                // Return Replace(_olObject.Parent.FolderPath, Prefix, "")
                 dynamic olItem = _olObject;
                 string[] ary = olItem.Parent.FolderPath.ToString().Split('\\');
                 return ary[ary.Length -1];

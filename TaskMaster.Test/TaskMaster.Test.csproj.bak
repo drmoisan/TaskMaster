@@ -68,12 +68,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TaskMaster\TaskMaster.vbproj">
-      <Project>{752a10ed-36f8-4af1-a528-6240aa89f041}</Project>
+    <ProjectReference Include="..\TaskMaster\TaskMaster.csproj">
+      <Project>{C70E9186-FAA0-0500-2770-A83EC81EC4E1}</Project>
       <Name>TaskMaster</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToDoModel\ToDoModel.vbproj">
-      <Project>{91aa7c42-f0ab-4802-aa8b-0c73ea6ea3c9}</Project>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+      <Project>{238EFD29-3CF3-07F3-28D3-C60D88F99769}</Project>
       <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">

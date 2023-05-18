@@ -629,7 +629,7 @@ Public Class TaskController
     ''' Sets value based on the flag type and value
     ''' </summary>
     ''' <param name="value">Comma separated list of tags</param>
-    ''' <param name="flagType">Used to identify field names and tag prefix</param>
+    ''' <param name="flagType">Used to identify field names and tag Prefix</param>
     Private Sub SetFlag(value As String, flagType As FlagsToSet)
         Select Case flagType
             Case FlagsToSet.context

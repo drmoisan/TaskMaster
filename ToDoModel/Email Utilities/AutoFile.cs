@@ -140,6 +140,7 @@ namespace ToDoModel
                                                    Dictionary<string, string> ppl_dict,
                                                    string emailRootFolder,
                                                    Dictionary<string, string> dictRemap,
+                                                   string userAddress,
                                                    bool blNotifyMissing = true,
                                                    bool blExcludeFlagged = true)
         {
@@ -154,7 +155,7 @@ namespace ToDoModel
                 OlMail = (MailItem)objItem;
                 if (MailResolution_ToRemove.IsMailUnReadable(OlMail) == false)
                 {
-                    emailAddressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap);
+                    emailAddressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap, userAddress);
                     for (int i = emailAddressList.Count - 1; i >= 0; i -= 1)
                     {
                         strTmp = emailAddressList[i];
@@ -210,7 +211,7 @@ namespace ToDoModel
 
         public delegate void DictPPL_Save();
 
-        public static IList<string> dictPPL_AddMissingEntries(MailItem OlMail, Dictionary<string, string> ppl_dict, List<IPrefix> prefixes, string prefixKey, string emailRootFolder, string stagingPath, Dictionary<string, string> dictRemap, string filename_dictppl, DictPPL_Save dictPPLSave)
+        public static IList<string> dictPPL_AddMissingEntries(MailItem OlMail, Dictionary<string, string> ppl_dict, List<IPrefix> prefixes, string prefixKey, string emailRootFolder, string stagingPath, Dictionary<string, string> dictRemap, string filename_dictppl, DictPPL_Save dictPPLSave, string currentUserEmail)
         {
 
             var addressList = new List<string>();
@@ -227,7 +228,7 @@ namespace ToDoModel
 
             if (MailResolution_ToRemove.IsMailUnReadable(OlMail) == false)
             {
-                addressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap);
+                addressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap, currentUserEmail);
             }
 
             // Discard any email addresses from the email that
@@ -249,7 +250,14 @@ namespace ToDoModel
                     // Check if it is a new address for existing contact
                     _viewer = new TagViewer();
 
-                    var _controller = new TagController(viewer_instance: _viewer, dictOptions: dictNAMES, autoAssigner: null, prefixes: prefixes, selections: selections, prefix_key: prefixKey, objItemObject: OlMail)
+                    var _controller = new TagController(viewer_instance: _viewer,
+                                                        dictOptions: dictNAMES,
+                                                        autoAssigner: null,
+                                                        prefixes: prefixes,
+                                                        selections: selections,
+                                                        prefix_key: prefixKey,
+                                                        objItemObject: OlMail,
+                                                        userEmailAddress: currentUserEmail)
                     {
                         ButtonNewActive = false,
                         ButtonAutoAssignActive = false

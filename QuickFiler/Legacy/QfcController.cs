@@ -426,7 +426,7 @@ namespace QuickFiler.Legacy
 
         #region Notes
         // The following functions are needed that reside at a higher level in the process
-        // due to the fact that they require interaction with other instances of this class
+        // due to the fact that they require interaction with Other instances of this class
         // as well as the parent form and object data model
         // 
         // QFD_Minimize

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace UtilitiesCS
@@ -96,6 +97,87 @@ namespace UtilitiesCS
                 if (array[i] != null) { return true; }
             }
             return false;
+        }
+                
+        /// <summary>
+        /// Function searches a string array and returns matching elements in a new string array.
+        /// How matches are performed is defined by the search options. See 
+        /// <see cref="StringSearchOptions"/>.
+        /// </summary>
+        /// <param name="sourceArray">String array to search</param>
+        /// <param name="searchString">Target substring to search</param>
+        /// <param name="options">Defines how matches are performed. 
+        /// See also <see cref="StringSearchOptions"/>.</param>
+        /// <returns>String array with elements that match the criteria. Null if no matches</returns>
+        public static string[] SearchArry4Str(this string[] sourceArray, 
+                                              string searchString = "", 
+                                              SearchOptions options = SearchOptions.Standard)
+        {
+            if (searchString.Trim().Length != 0)
+            {
+                switch (options)
+                {
+                    case SearchOptions.Standard:
+                        (Regex rg, string searchPattern) = SimpleRegex.MakeRegex(searchString);
+                        return sourceArray.Where(x => rg.IsMatch(x)).ToArray();
+
+                    case SearchOptions.Complement:
+                        (rg, searchPattern) = SimpleRegex.MakeRegex(searchString);
+                        return sourceArray.Where(x => !rg.IsMatch(x)).ToArray();
+
+                    case SearchOptions.DeleteFromMatches:
+                        (rg, searchPattern) = SimpleRegex.MakeRegex(searchString);
+                        string replacePattern = SimpleRegex.MakeReplacePattern(searchPattern);
+                        return sourceArray.Where(x => rg.IsMatch(x))
+                                          .Select(x => rg.Replace(x, replacePattern))
+                                          .ToArray();
+
+                    case SearchOptions.ExactMatch:
+                        return sourceArray.Where(x => x == searchString).ToArray();
+
+                    case SearchOptions.ExactComplement:
+                        return sourceArray.Where(x => x != searchString).ToArray();
+
+                    default:
+                        return sourceArray;
+                }
+            }
+            return sourceArray;
+        }
+
+        /// <summary>
+        /// Enumeration with search options.
+        /// <list type="number">
+        /// <listheader>
+        ///     <term>Standard</term>
+        ///     <description>Performs a simple regex search using a * or % as a wildcard</description>
+        /// </listheader>
+        /// <item>
+        /// <term>Complement</term>
+        /// <description>Elements that do NOT match the regex pattern will be returned</description>
+        /// </item>
+        /// <item>
+        /// <term>DeleteFromMatches</term>
+        /// <description>Similar to Standard except that the matching substring is removed from each 
+        /// matching element</description>
+        /// </item>
+        /// <item>
+        /// <term>ExactMatch</term>
+        /// <description>Return elements that match the literal search string (case sensitive)</description>
+        /// </item>
+        /// <item>
+        /// <term>ExactComplement</term>
+        /// <description>Return elements that do Not match the literal search string (case sensitive)</description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        public enum SearchOptions
+        {
+            Standard = 0,
+            Complement = 1,
+            DeleteFromMatches = 2,
+            ExactMatch = 3,
+            ExactComplement = 4
         }
     }
 }

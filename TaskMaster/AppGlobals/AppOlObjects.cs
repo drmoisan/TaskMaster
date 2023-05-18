@@ -12,6 +12,7 @@ namespace TaskMaster
         private string _olEmailRootPath;
         private string _olArchiveRootPath;
         private StackObjectVB _movedMails_Stack;
+        private string _userEmailAddress;
 
         public AppOlObjects(Application OlApp)
         {
@@ -24,7 +25,7 @@ namespace TaskMaster
         {
             get
             {
-                return Properties.Settings.Default.View_Wide;
+                return My.MySettingsProperty.Settings.View_Wide;
             }
         }
 
@@ -32,7 +33,7 @@ namespace TaskMaster
         {
             get
             {
-                return Properties.Settings.Default.View_Wide;
+                return My.MySettingsProperty.Settings.View_Wide;
             }
         }
 
@@ -131,16 +132,28 @@ namespace TaskMaster
                 if (value == false & App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations") == true)
                 {
                     // Turn Off Conversation View
-                    objView.XML = objView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
+                    objView.XML = Strings.Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, Compare: Constants.vbTextCompare);
                     objView.Save();
                 }
                 else if (value == true & App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations") == false)
                 {
                     // Turn On Conversation View
-                    string strReplace = "<arrangement>\r\n        <upgradetoconv>1</upgradetoconv>";
-                    objView.XML = objView.XML.Replace("<arrangement>", strReplace);
+                    string strReplace = "<arrangement>" + Constants.vbCrLf + "        <upgradetoconv>1</upgradetoconv>";
+                    objView.XML = Strings.Replace(objView.XML, "<arrangement>", strReplace, 1, Compare: Constants.vbTextCompare);
                     objView.Save();
                 }
+            }
+        }
+
+        public string UserEmailAddress
+        {
+            get
+            {
+                if (_userEmailAddress is null)
+                {
+                    _userEmailAddress = App.ActiveExplorer().Session.CurrentUser.AddressEntry.GetExchangeUser().PrimarySmtpAddress;
+                }
+                return _userEmailAddress;
             }
         }
     }

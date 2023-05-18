@@ -2,6 +2,8 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 
 
@@ -14,8 +16,8 @@ namespace ToDoModel
     public static class SaveAttachmentsModule
     {
         public static string strFolderNotToCreate;
-        private static YesNoToAllResponse _SaveAttachmentsFromSelection_ResponseSaveFile = default;
-        private static YesNoToAllResponse _SaveAttachmentsFromSelection_ResponseOverwriteFile = default;
+        private static YesNoToAllResponse ResponseSaveFile = default;
+        private static YesNoToAllResponse ResponseOverwriteFile = default;
 
         // Public Enum YesNoToAllResponse
         // Empty = 0
@@ -134,21 +136,20 @@ namespace ToDoModel
                         lCountEachItem = MSG.Attachments.Count;
                         emailDate = MSG.SentOn;
                         // Add a day to catch error from flow
-                        emailDate2 = DateAndTime.DateAdd("d", 1d, emailDate);
-                        DteString = Strings.Format(emailDate, "yyMMdd");
-                        DteString2 = Strings.Format(emailDate2, "yyMMdd"); // Add a day to catch error from flow
+                        emailDate2 = emailDate.AddDays(1);
+                        DteString = emailDate.ToString("yyMMdd");
+                        DteString2 = emailDate2.ToString("yyMMdd"); // Add a day to catch error from flow
 
                         if (SaveMSG == true)
                         {
                             if (!string.IsNullOrEmpty(MSG.Subject))
                             {
                                 strAtmtFullName = MSG.Subject;
-                                ReplaceCharsForFileName(strAtmtFullName, "-");
+                                ReplaceCharsForFileName(ref strAtmtFullName, "-");
                                 strAtmtPath = strFolderPath + DteString + " " + strAtmtFullName;
                                 MSG.SaveAs(strAtmtPath, 3);
                             }
-                            // 
-                            // If objFSO.FileExists(strAtmtPath) = True Then
+                           
                         }
 
                         // /* If the current item contains attachments. */
@@ -171,18 +172,18 @@ namespace ToDoModel
                                 }
 
                                 // Is there a dot in the file extension?
-                                if (Strings.InStrRev(strAtmtFullName, ".") != 0)
+                                if (strAtmtFullName.Contains("."))
                                 {
                                     FileExtExists = true;
 
                                     // Find the dot postion in atmtFullName.
-                                    intDotPosition = Strings.InStrRev(strAtmtFullName, ".");
+                                    intDotPosition = strAtmtFullName.IndexOf(".");
 
                                     // Get the name.
-                                    strAtmtName[0] = Strings.Left(strAtmtFullName, intDotPosition - 1);
+                                    strAtmtName[0] = strAtmtFullName.Substring(0, intDotPosition - 1);
 
                                     // Get the file extension.
-                                    strAtmtName[1] = Strings.Right(strAtmtFullName, Strings.Len(strAtmtFullName) - intDotPosition);
+                                    strAtmtName[1] = strAtmtFullName.Substring(strAtmtFullName.Length - intDotPosition);
                                 }
 
                                 else
@@ -198,10 +199,10 @@ namespace ToDoModel
                                 strAtmtPath2 = strFolderPath + DteString2 + " " + strAtmtFullName;
 
                                 // /* If the length of the saving path is not larger than 260 characters.*/
-                                if (Strings.Len(strAtmtPath) <= MAX_PATH)
+                                if (strAtmtPath.Length <= MAX_PATH)
                                 {
                                     // True: This attachment can be saved.
-                                    if (save_images == true | Strings.UCase(strAtmtName[1]) != "PNG" & Strings.UCase(strAtmtName[1]) != "JPG" & Strings.UCase(strAtmtName[1]) != "GIF")
+                                    if (save_images == true | strAtmtName[1].ToUpper() != "PNG" & strAtmtName[1].ToUpper() != "JPG" & strAtmtName[1].ToUpper() != "GIF")
                                     {
                                         // True: Not a picture
                                         if (DELFILE == true)
@@ -226,13 +227,13 @@ namespace ToDoModel
                                             {
                                                 AlreadyExists = true;
 
-                                                strAtmtNameTemp = strAtmtName[0] + Strings.Format(DateTime.Now, "_MMddhhmmss");
+                                                strAtmtNameTemp = strAtmtName[0] + DateTime.Now.ToString("_MMddhhmmss");
                                                 strAtmtPath = strFolderPath + DteString + strAtmtNameTemp;
                                                 if (FileExtExists)
                                                     strAtmtPath = strAtmtPath + "." + strAtmtName[1];
 
                                                 // /* If the length of the saving path is over 260 characters.*/
-                                                if (Strings.Len(strAtmtPath) > MAX_PATH)
+                                                if (strAtmtPath.Length > MAX_PATH)
                                                 {
                                                     lCountEachItem = lCountEachItem - 1L;
                                                     // False: This attachment cannot be saved.
@@ -250,7 +251,7 @@ namespace ToDoModel
 
                                                 objMailItem = (MailItem)objItem;
 
-                                                if ((int)_SaveAttachmentsFromSelection_ResponseOverwriteFile + (int)_SaveAttachmentsFromSelection_ResponseSaveFile == 0)
+                                                if ((int)ResponseOverwriteFile + (int)ResponseSaveFile == 0)
                                                 {
                                                     objMailItem.Display();
                                                 }
@@ -259,36 +260,37 @@ namespace ToDoModel
                                                 if (AlreadyExists == true)
                                                 {
                                                     // Response = MsgBox("File Already Exists. Save file: " & strAtmtPath, vbCritical + vbYesNo)
-                                                    if ((int)_SaveAttachmentsFromSelection_ResponseOverwriteFile == (int)Constants.vbNull)
+                                                    if (ResponseOverwriteFile == YesNoToAllResponse.Empty)
                                                     {
                                                         response = YesNoToAll.ShowDialog("File Already Exists. Save file: " + strAtmtPath);
                                                         if (response == YesNoToAllResponse.NoToAll | response == YesNoToAllResponse.YesToAll)
-                                                            _SaveAttachmentsFromSelection_ResponseOverwriteFile = response;
+                                                            ResponseOverwriteFile = response;
                                                     }
                                                     else
                                                     {
-                                                        response = _SaveAttachmentsFromSelection_ResponseOverwriteFile;
+                                                        response = ResponseOverwriteFile;
                                                     }
                                                 }
                                                 // Response = MsgBox("Save file: " & strAtmtPath, vbYesNo + vbExclamation)
-                                                else if ((int)_SaveAttachmentsFromSelection_ResponseSaveFile == (int)Constants.vbNull)
+                                                else if (ResponseSaveFile == YesNoToAllResponse.Empty)
                                                 {
                                                     response = YesNoToAll.ShowDialog("Save file: " + strAtmtPath);
                                                     if (response == YesNoToAllResponse.NoToAll | response == YesNoToAllResponse.YesToAll)
-                                                        _SaveAttachmentsFromSelection_ResponseSaveFile = response;
+                                                        ResponseSaveFile = response;
                                                 }
                                                 else
                                                 {
-                                                    response = _SaveAttachmentsFromSelection_ResponseSaveFile;
+                                                    response = ResponseSaveFile;
 
                                                 }
 
                                                 if (response == YesNoToAllResponse.Yes | response == YesNoToAllResponse.YesToAll)
                                                 {
-                                                    strAtmtName[0] = Interaction.InputBox("Email Subject: " + MSG.Subject + Constants.vbCrLf + "Rename file: " + strAtmtPath, DefaultResponse: strAtmtName[0]);
+                                                    strAtmtName[0] = InputBox.ShowDialog($"Email Subject: {MSG.Subject} \n Rename file: {strAtmtPath}",
+                                                                                        "Input Dialog", DefaultResponse: strAtmtName[0]);
                                                     if (string.IsNullOrEmpty(strAtmtName[0]))
                                                     {
-                                                        if (Interaction.MsgBox("Revert to file name: " + strAtmtPath, Constants.vbOKCancel) == Constants.vbCancel)
+                                                        if (MessageBox.Show($"Revert to file name: {strAtmtPath}", "", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
                                                             response = YesNoToAllResponse.No;
                                                     }
                                                     else
@@ -330,7 +332,7 @@ namespace ToDoModel
             }
             else
             {
-                Interaction.MsgBox("Canceled save due to non-existant folder");
+                MessageBox.Show("Canceled save due to non-existant folder");
             }
 
             return default;
@@ -349,7 +351,7 @@ namespace ToDoModel
         public static string CGPath(string path)
         {
             string CGPathRet = default;
-            if (Strings.Right(path, 1) != @"\")
+            if (path[path.Length-1] != @"\"[0])
                 path = path + @"\";
             CGPathRet = path;
             return CGPathRet;
@@ -370,29 +372,29 @@ namespace ToDoModel
         // End If
         // End Sub
 
-        public static void ReplaceCharsForFileName(string sName, string sChr)
+        public static void ReplaceCharsForFileName(ref string sName, string sChr)
         {
-            sName = Strings.Replace(sName, "/", sChr);
-            sName = Strings.Replace(sName, @"\", sChr);
-            sName = Strings.Replace(sName, ":", sChr);
-            sName = Strings.Replace(sName, "?", sChr);
-            sName = Strings.Replace(sName, Conversions.ToString('"'), sChr);
-            sName = Strings.Replace(sName, "<", sChr);
-            sName = Strings.Replace(sName, ">", sChr);
-            sName = Strings.Replace(sName, "|", sChr);
-            sName = Strings.Replace(sName, "&", sChr);
-            sName = Strings.Replace(sName, "%", sChr);
-            sName = Strings.Replace(sName, "*", sChr);
-            sName = Strings.Replace(sName, " ", sChr);
-            sName = Strings.Replace(sName, "{", sChr);
-            sName = Strings.Replace(sName, "[", sChr);
-            sName = Strings.Replace(sName, "]", sChr);
-            sName = Strings.Replace(sName, "}", sChr);
-            sName = Strings.Replace(sName, "!", sChr);
+            string patternMatch = "[/\\\\:\\?<>|&%* {}\\[\\]!]*";
+            var rg = new Regex(patternMatch);
+            rg.Replace(sName, sChr);
+            //sName = sName.Replace("/", sChr);
+            //sName = sName.Replace(  @"\", sChr);
+            //sName = sName.Replace(":", sChr);
+            //sName = sName.Replace("?", sChr);
+            //sName = sName.Replace('"'.ToString(), sChr);
+            //sName = sName.Replace("<", sChr);
+            //sName = sName.Replace(">", sChr);
+            //sName = sName.Replace("|", sChr);
+            //sName = sName.Replace("&", sChr);
+            //sName = sName.Replace("%", sChr);
+            //sName = sName.Replace("*", sChr);
+            //sName = sName.Replace(" ", sChr);
+            //sName = sName.Replace("{", sChr);
+            //sName = sName.Replace("[", sChr);
+            //sName = sName.Replace("]", sChr);
+            //sName = sName.Replace("}", sChr);
+            //sName = sName.Replace("!", sChr);
         }
-
-
-
 
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 using UtilitiesVB;
 
 namespace TaskMaster
@@ -13,19 +13,19 @@ namespace TaskMaster
 
     public class AppToDoObjects : IToDoObjects
     {
+        public AppToDoObjects(ApplicationGlobals ParentInstance)
+        {
+            _parent = ParentInstance;
+        }
 
         private ProjectInfo _projInfo;
         private Dictionary<string, string> _dictPPL;
         private ListOfIDs _IDList;
         private readonly ApplicationGlobals _parent;
         private Dictionary<string, string> _dictRemap;
-        private SerializableList<string> _catFilters;
-
-        public AppToDoObjects(ApplicationGlobals ParentInstance)
-        {
-            _parent = ParentInstance;
-        }
-
+        private ISerializableList<string> _catFilters;
+        private Properties.Settings _defaults = Properties.Settings.Default;
+                        
         public IApplicationGlobals Parent
         {
             get
@@ -38,7 +38,7 @@ namespace TaskMaster
         {
             get
             {
-                return Properties.Settings.Default.FileName_ProjInfo;
+                return _defaults.FileName_ProjInfo;
             }
         }
 
@@ -48,18 +48,18 @@ namespace TaskMaster
             {
                 if (_projInfo is null)
                 {
-                    _projInfo = ToDoProjectInfoUtilities.LoadToDoProjectInfo(Path.Combine(Parent.FS.FldrAppData, Properties.Settings.Default.FileName_ProjInfo));
+                    _projInfo = ToDoProjectInfoUtilities.LoadToDoProjectInfo(
+                        Path.Combine(Parent.FS.FldrAppData, _defaults.FileName_ProjInfo));
                 }
                 return _projInfo;
             }
         }
 
-
         public string DictPPL_Filename
         {
             get
             {
-                return Properties.Settings.Default.FilenameDictPpl;
+                return _defaults.FilenameDictPpl;
             }
         }
 
@@ -68,23 +68,22 @@ namespace TaskMaster
             get
             {
                 if (_dictPPL is null)
-                {
                     _dictPPL = LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename);
-                }
                 return _dictPPL;
             }
         }
 
         public void DictPPL_Save()
         {
-            File.WriteAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename), JsonConvert.SerializeObject(_dictPPL, Formatting.Indented));
+            File.WriteAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename), 
+                              JsonConvert.SerializeObject(_dictPPL, Formatting.Indented));
         }
 
         public string FnameIDList
         {
             get
             {
-                return Properties.Settings.Default.FileName_IDList;
+                return _defaults.FileName_IDList;
             }
         }
 
@@ -94,7 +93,7 @@ namespace TaskMaster
             {
                 if (_IDList is null)
                 {
-                    _IDList = new ListOfIDs(Path.Combine(Parent.FS.FldrAppData, Properties.Settings.Default.FileName_IDList), _parent.Ol.App);
+                    _IDList = new ListOfIDs(Path.Combine(Parent.FS.FldrAppData, _defaults.FileName_IDList), _parent.Ol.App);
                 }
                 return _IDList;
             }
@@ -104,7 +103,7 @@ namespace TaskMaster
         {
             get
             {
-                return Properties.Settings.Default.FileName_DictRemap;
+                return _defaults.FileName_DictRemap;
             }
         }
 
@@ -114,7 +113,7 @@ namespace TaskMaster
             {
                 if (_dictRemap is null)
                 {
-                    _dictRemap = LoadDictCSV(Parent.FS.FldrStaging, Properties.Settings.Default.FileName_DictRemap);
+                    _dictRemap = LoadDictCSV(Parent.FS.FldrStaging, _defaults.FileName_DictRemap);
                 }
                 return _dictRemap;
             }
@@ -125,33 +124,26 @@ namespace TaskMaster
             get
             {
                 if (_catFilters is null)
-                {
-                    var _catFilters = new SerializableList<string>();
-                    {
-                        ref var withBlock = ref _catFilters;
-                        withBlock.Filename = Properties.Settings.Default.FileName_CategoryFilters;
-                        withBlock.Folderpath = Parent.FS.FldrAppData;
-                        if (File.Exists(withBlock.Folderpath))
-                        {
-                            withBlock.Deserialize();
-                        }
-                        else
-                        {
-                            var tempList = new SerializableList<string>(Load_CCO_Categories.CCOCatList_Load());
-                            tempList.Folderpath = withBlock.Folderpath;
-                            _catFilters = tempList;
-                            withBlock.Serialize();
-                        }
-                    }
-                }
+                    _catFilters = new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
+                                                                folderpath: _parent.FS.FldrPythonStaging);
                 return _catFilters;
+            }
+            set
+            {
+                _catFilters = value;
+                if (_catFilters.Folderpath == "")
+                {
+                    _catFilters.Folderpath = _parent.FS.FldrFlow;
+                    _catFilters.Filename = _defaults.FileName_Recents;
+                }
+                _catFilters.Serialize();
             }
         }
 
         private Dictionary<string, string> LoadDictCSV(string fpath, string filename)
         {
             var dict = CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv");
-            if (dict != null)
+            if (dict is not null)
                 WriteDictJSON(dict, Path.Combine(fpath, filename));
             return dict;
         }
@@ -161,7 +153,7 @@ namespace TaskMaster
 
             string filepath = Path.Combine(fpath, filename);
             Dictionary<string, string> dict = null;
-            var response = DialogResult.Ignore;
+            var response = MsgBoxResult.Ignore;
 
             try
             {
@@ -169,22 +161,22 @@ namespace TaskMaster
             }
             catch (FileNotFoundException ex)
             {
-                response = MessageBox.Show($"{filepath} not found. Load from CSV?", "Error", MessageBoxButtons.YesNo);
+                response = Interaction.MsgBox(filepath + "not found. Load from CSV?", Constants.vbYesNo);
             }
             catch (Exception ex)
             {
-                response = MessageBox.Show($"{filepath} encountered a problem. {ex.Message} Load from CSV?", "Error", MessageBoxButtons.YesNo);
+                response = Interaction.MsgBox(filepath + "encountered a problem. " + ex.Message + "Load from CSV?", Constants.vbYesNo);
             }
             finally
             {
-                if (response == DialogResult.Yes)
+                if (response == Constants.vbYes)
                 {
                     dict = LoadDictCSV(fpath, filename);
                 }
-                else if (response == DialogResult.No)
+                else if (response == Constants.vbNo)
                 {
-                    response = MessageBox.Show("Start a new blank dictionary?", "Error",MessageBoxButtons.YesNo);
-                    if (response == DialogResult.Yes)
+                    response = Interaction.MsgBox("Start a new blank dictionary?", Constants.vbYesNo);
+                    if (response == Constants.vbYes)
                     {
                         dict = new Dictionary<string, string>();
                     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Outlook;
 
 
@@ -25,6 +26,8 @@ namespace ToDoModel
         public bool WhConv;
         private IApplicationGlobals _globals;
         private Options _options;
+        private Regex _regex;
+        private string _searchPattern;
 
         public enum Options
         {
@@ -69,7 +72,7 @@ namespace ToDoModel
             }
             else
             {
-                throw new ArgumentException((Conversions.ToDouble("Unknown option value ") + (double)Options).ToString());
+                throw new ArgumentException($"Unknown option value {Options}");
             }
 
             _folderList = new string[1];
@@ -90,24 +93,24 @@ namespace ToDoModel
             }
         }
 
-        private void InitializeFromArrayOrString(object ObjItem)
+        private void InitializeFromArrayOrString(object Obj)
         {
-            if (ObjItem is null)
+            if (Obj is null)
             {
                 throw new ArgumentException("Cannot initialize suggestions from array or string because reference is null");
             }
-            else if (ObjItem.GetType().IsArray && "".GetType().IsAssignableFrom((Type)ObjItem.GetElementType()))
+            else if (Obj.GetType().IsArray && typeof(string).IsAssignableFrom(Obj.GetType().GetElementType()))
             {
-                Suggestions.FolderSuggestionsArray = (string[])ObjItem;
+                Suggestions.FolderSuggestionsArray = (string[])Obj;
             }
-            else if (ObjItem is string)
+            else if (Obj is string)
             {
-                string tmpString = (string)ObjItem;
+                string tmpString = (string)Obj;
                 Suggestions.ADD_END(tmpString);
             }
             else
             {
-                throw new ArgumentException("ObjItem is of type " + Information.TypeName(ObjItem) + ", but selected option requires a string or string array");
+                throw new ArgumentException($"Obj is of type {Obj.GetType().Name}, but selected option requires a string or string array");
             }
         }
 
@@ -213,7 +216,7 @@ namespace ToDoModel
             }
             else
             {
-                throw new ArgumentException("ObjItem passed as " + Information.TypeName(ObjItem) + ", but should have been MailItem");
+                throw new ArgumentException($"Obj passed as {ObjItem.GetType().Name} but should have been MailItem");
             }
         }
 
@@ -231,32 +234,32 @@ namespace ToDoModel
             }
             else
             {
-                var varFldrs = objProperty;
+                var varFldrs = objProperty.Value;
 
-                if (varFldrs is Array == false)
+                if (varFldrs is not Array)
                 {
-                    if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(varFldrs, "Error", false)))
+                    if ((varFldrs as string) == "Error")
                     {
                         Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
                     }
                     else
                     {
-                        strTmp = Conversions.ToString(varFldrs);
+                        strTmp = (string)varFldrs;
                         Suggestions.Add(strTmp, 1L);
                     }
                 }
                 else
                 {
-                    intVarCt = Information.UBound((Array)varFldrs);
+                    intVarCt = varFldrs.Length -1;
                     if (intVarCt == 0)
                     {
-                        if (Conversions.ToBoolean(Operators.ConditionalCompareObjectEqual(varFldrs((object)0), "Error", false)))
+                        if (varFldrs[0] = "Error")
                         {
                             Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
                         }
                         else
                         {
-                            strTmp = Conversions.ToString(varFldrs((object)0));
+                            strTmp = varFldrs[0];
                             Suggestions.ADD_END(strTmp);
                         }
                     }
@@ -265,7 +268,7 @@ namespace ToDoModel
                         var loopTo = intVarCt;
                         for (i = 0; i <= loopTo; i++)
                         {
-                            strTmp = Conversions.ToString(varFldrs((object)i));
+                            strTmp = varFldrs[i];
                             Suggestions.ADD_END(strTmp);
                         }
                     }
@@ -294,14 +297,11 @@ namespace ToDoModel
             _wildcardFlag = false;
 
 
-            if (Strings.Len(Strings.Trim(Name)) != 0)
+            if (Name.Trim().Length != 0)
             {
                 _searchString = Name;
-
-                _searchString = Strings.LCase(_searchString);
-                _searchString = Strings.Replace(_searchString, "%", "*");
-                _wildcardFlag = Conversions.ToBoolean(Strings.InStr(_searchString, "*"));
-
+                (_regex, _searchPattern) = SimpleRegex.MakeRegex(_searchString);
+                
                 var folders = GetFolder(strEmailFolderPath).Folders;
                 LoopFolders(folders, strEmailFolderPath);
 
@@ -318,24 +318,24 @@ namespace ToDoModel
         public Folder GetFolder(string FolderPath)
         {
             Folder TestFolder;
-            object FoldersArray;
+            string[] FoldersArray;
             int i;
 
-            if (Strings.Left(FolderPath, 2) == @"\\")
+            if (FolderPath.Substring(0,2) == @"\\")
             {
-                FolderPath = Strings.Right(FolderPath, Strings.Len(FolderPath) - 2);
+                FolderPath = FolderPath.Substring(2);
             }
             // Convert folderpath to array
-            FoldersArray = Strings.Split(FolderPath, @"\");
-            TestFolder = (Folder)_olApp.Session.Folders[FoldersArray((object)0)];
+            FoldersArray = FolderPath.Split(@"\");
+            TestFolder = (Folder)_olApp.Session.Folders[FoldersArray[0]];
             if (TestFolder is not null)
             {
-                var loopTo = Information.UBound((Array)FoldersArray, 1);
+                var loopTo = FoldersArray.Length - 1;
                 for (i = 1; i <= loopTo; i++)
                 {
                     Folders SubFolders;
                     SubFolders = TestFolder.Folders;
-                    TestFolder = (Folder)SubFolders[FoldersArray((object)i)];
+                    TestFolder = (Folder)SubFolders[FoldersArray[i]];
                     if (TestFolder is null)
                     {
                         return null;
@@ -357,20 +357,11 @@ namespace ToDoModel
                 strEmailFolderPath = _globals.Ol.ArchiveRootPath;
             }
 
-            if (SpeedUp == false)
-                _olApp.DoEvents();
-
-            intRootLen = Strings.Len(strEmailFolderPath);
+            intRootLen = strEmailFolderPath.Length;
             foreach (Folder f in folders)
             {
-                if (_wildcardFlag)
-                {
-                    found = LikeOperator.LikeString(Strings.LCase(f.FolderPath), _searchString, CompareMethod.Binary);
-                }
-                else
-                {
-                    found = (Strings.LCase(f.FolderPath) ?? "") == (_searchString ?? "");
-                }
+                found = _regex.IsMatch(f.FolderPath);
+                
 
                 if (found)
                 {
@@ -380,7 +371,7 @@ namespace ToDoModel
                         _upBound = _upBound + 1;
                         Array.Resize(ref _folderList, _upBound + 1);
                         // _folderList(_upBound - 1) = Right(f.FolderPath, Len(f.FolderPath) - 36) 'If starting at 0 in folder list
-                        _folderList[_upBound] = Strings.Right(f.FolderPath, Strings.Len(f.FolderPath) - intRootLen - 1); // If starting at 1 in folder list
+                        _folderList[_upBound] = f.FolderPath.Substring(intRootLen); // If starting at 1 in folder list
                     }
                 }
                 if (found)

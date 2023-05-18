@@ -209,7 +209,7 @@ namespace ToDoModel
                 UserProperty objProperty_ToDoID = ((dynamic)Item).UserProperties.Find("ToDoID");
                 UserProperty objProperty_Project = ((dynamic)Item).UserProperties.Find("TagProject");
 
-                bool blTmp = todo.EC2; // This reads the button and keeps the other field in sync if there is a change
+                bool blTmp = todo.EC2; // This reads the button and keeps the Other field in sync if there is a change
                                        // Check to see if change was in the EC
                 if (todo.EC_Change)
                 {
@@ -491,14 +491,14 @@ namespace ToDoModel
             {
                 var Item = new ToDoItem(ToDoItems[i], true);
                 j += 1L;
-                if ((string)Item.olItem.GetUdf("NewID") != "Done")
+                if ((string)Item.OlItem.GetUdf("NewID") != "Done")
                 {
                     string strToDoID = Item.ToDoID;
                     if (strToDoID.Length > 0)
                     {
                         string strToDoIDnew = SubstituteCharsInID(strToDoID);
                         Item.ToDoID = strToDoIDnew;
-                        Item.olItem.SetUdf("NewID", value: "Done");
+                        Item.OlItem.SetUdf("NewID", value: "Done");
                     }
                 }
                 if (j == 40L)

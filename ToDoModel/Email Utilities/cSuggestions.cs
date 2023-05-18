@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using Microsoft.Office.Interop.Outlook;
 
-
+using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesVB;
 
@@ -71,7 +72,7 @@ namespace ToDoModel
 
             int i;
             findRet = 0;
-            var loopTo = Information.UBound(_strFolderArray);
+            var loopTo = _strFolderArray.Length -1;
             for (i = 1; i <= loopTo; i++)
             {
                 if ((_strFolderArray[i] ?? "") == (strFolderName ?? ""))
@@ -232,7 +233,7 @@ namespace ToDoModel
             string SubjectStripped;
             long SWVal, Val, Val1;
             string strTmpFldr;
-            object varFldrSubs;
+            string[] varFldrSubs;
 
             SubjectStripped = OlMail.Subject.StripCommonWords((IList<string>)AppGlobals.AF.CommonWords); // Eliminate common words from the subject
             var loopTo = (int)SubjectMapModule.SubjectMapCt;
@@ -240,20 +241,12 @@ namespace ToDoModel
             {
                 {
                     ref var withBlock = ref SubjectMapModule.SubjectMap[i];
-                    SWVal = Smith_Watterman.SW_Calc(SubjectStripped, withBlock.Email_Subject, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
-                    Val = (long)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * withBlock.Email_Subject_Count);
-                    if ((withBlock.Email_Folder ?? "") != (SubjectMapModule.SubjectMap[i - 1].Email_Folder ?? ""))
+                    SWVal = Smith_Watterman.SW_Calc(SubjectStripped, SubjectMapModule.SubjectMap[i].Email_Subject, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
+                    Val = (long)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * SubjectMapModule.SubjectMap[i].Email_Subject_Count);
+                    if ((SubjectMapModule.SubjectMap[i].Email_Folder ?? "") != (SubjectMapModule.SubjectMap[i - 1].Email_Folder ?? ""))
                     {
-                        varFldrSubs = Strings.Split(withBlock.Email_Folder, @"\");
-                        if (varFldrSubs is Array)
-                        {
-                            strTmpFldr = Conversions.ToString(varFldrSubs((object)Information.UBound((Array)varFldrSubs)));
-                        }
-                        else
-                        {
-                            strTmpFldr = Conversions.ToString(varFldrSubs);
-                        }
-
+                        varFldrSubs = SubjectMapModule.SubjectMap[i].Email_Folder.Split("\\");
+                        strTmpFldr = varFldrSubs[varFldrSubs.Length-1];
                         Val1 = Smith_Watterman.SW_Calc(SubjectStripped, strTmpFldr, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
                         Val = Val1 * Val1 + Val;
                     }
@@ -272,7 +265,7 @@ namespace ToDoModel
             var objProperty = OlMail.UserProperties.Find("AutoFile");
             if (objProperty is not null)
             {
-                Add(Conversions.ToString(objProperty), (long)Math.Round(Math.Pow(4d, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight));
+                Add(objProperty.Value, (long)Math.Round(Math.Pow(4d, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight));
                 throw new NotImplementedException("Please investigate what this is and why it fired");
             }
         }

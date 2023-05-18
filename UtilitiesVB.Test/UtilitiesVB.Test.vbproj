@@ -128,8 +128,8 @@
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
-      <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>
+    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.csproj">
+      <Project>{92B43F51-DD5D-06F1-26D9-2669F7341F60}</Project>
       <Name>UtilitiesVB</Name>
     </ProjectReference>
   </ItemGroup>

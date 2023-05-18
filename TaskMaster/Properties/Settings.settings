@@ -1,8 +1,8 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AddinStartup.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TaskMaster.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="MaxToDo" Type="System.Int64" Scope="Application">
+    <Setting Name="MaxToDo" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
@@ -44,10 +44,10 @@
     <Setting Name="FileName_DictRemap" Type="System.String" Scope="User">
       <Value Profile="(Default)">dictRemap.csv</Value>
     </Setting>
-    <Setting Name="ConversationExponent" Type="System.Int64" Scope="User">
+    <Setting Name="ConversationExponent" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="ConversationWeight" Type="System.Int64" Scope="User">
+    <Setting Name="ConversationWeight" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10000</Value>
     </Setting>
     <Setting Name="SubjectExponent" Type="System.Int32" Scope="User">
@@ -62,7 +62,7 @@
     <Setting Name="SmithWatterman_MismatchScore" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="MaxRecents" Type="System.Int64" Scope="User">
+    <Setting Name="MaxRecents" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="FileName_Recents" Type="System.String" Scope="User">
@@ -94,6 +94,9 @@
     </Setting>
     <Setting Name="BackupFile_CTF_Inc" Type="System.String" Scope="User">
       <Value Profile="(Default)">9999999CTF_Inc.txt</Value>
+    </Setting>
+    <Setting Name="BackupFile_CommonWords" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CommonWords.txt</Value>
     </Setting>
   </Settings>
 </SettingsFile>
