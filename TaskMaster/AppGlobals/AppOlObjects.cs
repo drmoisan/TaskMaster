@@ -21,22 +21,10 @@ namespace TaskMaster
 
         public Application App { get; private set; }
 
-        public string View_Wide
-        {
-            get
-            {
-                return My.MySettingsProperty.Settings.View_Wide;
-            }
-        }
-
-        public object View_Compact
-        {
-            get
-            {
-                return My.MySettingsProperty.Settings.View_Wide;
-            }
-        }
-
+        public string View_Wide { get => Properties.Settings.Default.View_Wide; }
+        
+        public object View_Compact { get => Properties.Settings.Default.View_Wide; }
+        
         public NameSpace NamespaceMAPI
         {
             get

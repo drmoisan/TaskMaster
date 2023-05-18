@@ -6,11 +6,11 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TaskMaster")]
+[assembly: AssemblyTitle("AddinStartup")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PepsiCo Inc")]
-[assembly: AssemblyProduct("TaskMaster")]
+[assembly: AssemblyProduct("AddinStartup")]
 [assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -21,7 +21,7 @@ using System.Security;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f56c479e-1679-47c9-865e-962ff49acbe4")]
+[assembly: Guid("3d9b0ac7-e4ea-43d8-b24f-65c2fe92952a")]
 
 // Version information for an assembly consists of the following four values:
 //

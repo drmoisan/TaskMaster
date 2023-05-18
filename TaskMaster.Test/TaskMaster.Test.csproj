@@ -69,7 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TaskMaster\TaskMaster.csproj">
-      <Project>{C70E9186-FAA0-0500-2770-A83EC81EC4E1}</Project>
+      <Project>{68924fdf-614d-447c-a175-450860ddb597}</Project>
       <Name>TaskMaster</Name>
     </ProjectReference>
     <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">

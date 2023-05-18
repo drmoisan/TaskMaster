@@ -5,7 +5,7 @@
     <Setting Name="MaxToDo" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
+	<Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="Prefix_People" Type="System.String" Scope="User">

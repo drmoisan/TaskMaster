@@ -1,36 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using Office = Microsoft.Office.Core;
-using Microsoft.Office.Interop.Outlook;
 using System.Runtime.CompilerServices;
-using ToDoModel;
 using Microsoft.Office.Core;
+using Microsoft.Office.Interop.Outlook;
+using ToDoModel;
 
 namespace TaskMaster
 {
+
     public partial class ThisAddIn
     {
-        private void ThisAddIn_Startup(object sender, System.EventArgs e)
-        {
-            _globals = new ApplicationGlobals(Application);
-
-            {
-                OlNS = _globals.Ol.NamespaceMAPI;
-                OlToDoItems = _globals.Ol.ToDoFolder.Items;
-                OlInboxItems = _globals.Ol.Inbox.Items;
-                OlReminders = _globals.Ol.OlReminders;
-                ProjInfo = (ProjectInfo)_globals.TD.ProjInfo;
-                DictPPL = _globals.TD.DictPPL;
-                IDList = (ListOfIDs)_globals.TD.IDList;
-                EmailRoot = _globals.Ol.EmailRootPath;
-            }
-
-            _ribbonController.SetGlobals(_globals);
-        }
 
         private ApplicationGlobals _globals;
 
@@ -129,6 +108,26 @@ namespace TaskMaster
         public TreeOfToDoItems DM_CurView;
         public FlagParser Cats;
 
+        private void ThisAddIn_Startup()
+        {
+            _globals = new ApplicationGlobals(Application);
+
+            {
+                ref var withBlock = ref _globals;
+                OlNS = withBlock.Ol.NamespaceMAPI;
+                OlToDoItems = withBlock.Ol.ToDoFolder.Items;
+                OlInboxItems = withBlock.Ol.Inbox.Items;
+                OlReminders = withBlock.Ol.OlReminders;
+                ProjInfo = (ProjectInfo)withBlock.TD.ProjInfo;
+                DictPPL = withBlock.TD.DictPPL;
+                IDList = (ListOfIDs)withBlock.TD.IDList;
+                EmailRoot = withBlock.Ol.EmailRootPath;
+            }
+
+            _ribbonController.SetGlobals(_globals);
+
+        }
+
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
             _ribbonController = new RibbonController();
@@ -164,25 +163,5 @@ namespace TaskMaster
         }
         #endregion
 
-
-        private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
-        {
-            // Note: Outlook no longer raises this event. If you have code that 
-            //    must run when Outlook shuts down, see https://go.microsoft.com/fwlink/?LinkId=506785
-        }
-
-        #region VSTO generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InternalStartup()
-        {
-            this.Startup += new System.EventHandler(ThisAddIn_Startup);
-            this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
-        }
-        
-        #endregion
     }
 }
