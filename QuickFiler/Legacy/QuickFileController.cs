@@ -9,6 +9,7 @@ using ToDoModel;
 using UtilitiesVB;
 using UtilitiesCS;
 using Windows.Win32;
+using UtilitiesCS.OutlookExtensions;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
@@ -330,12 +331,12 @@ namespace QuickFiler.Legacy
                 if (objItem is MailItem)
                 {
                     OlMail = (MailItem)objItem;
-                    strLine = i + " " + GetFields.CustomFieldID_GetValue(objItem, "Triage") + " " + OlMail.SentOn.ToString("General Date") + " " + OlMail.Subject;
+                    strLine = i + " " + objItem.GetUdfString("Triage") + " " + OlMail.SentOn.ToString("General Date") + " " + OlMail.Subject;
                 }
                 else if (objItem is AppointmentItem)
                 {
                     OlAppt = (MeetingItem)objItem;
-                    strLine = i + " " + GetFields.CustomFieldID_GetValue(objItem, "Triage") + " " + OlAppt.SentOn.ToString("General Date") + " " + OlAppt.Subject;
+                    strLine = i + " " + objItem.GetUdfString("Triage") + " " + OlAppt.SentOn.ToString("General Date") + " " + OlAppt.Subject;
                 }
                 Debug.WriteLine(strLine);
             }

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 
 namespace QuickFiler.Legacy
 {
@@ -591,13 +592,13 @@ namespace QuickFiler.Legacy
                                     }
                                 case "ABC":
                                     {
-                                        _lblTmp.Text = GetFields.CustomFieldID_GetValue(Mail, "Triage");
+                                        _lblTmp.Text = Mail.GetUdfString("Triage");
                                         lblTriage = _lblTmp;
                                         break;
                                     }
                                 case "<ACTIONABL>":
                                     {
-                                        _lblTmp.Text = GetFields.CustomFieldID_GetValue(Mail, "Actionable");
+                                        _lblTmp.Text = Mail.GetUdfString("Actionable");
                                         lblActionable = _lblTmp;
                                         break;
                                     }

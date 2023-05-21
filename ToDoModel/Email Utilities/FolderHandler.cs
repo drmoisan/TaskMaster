@@ -155,15 +155,15 @@ namespace ToDoModel
 
 
         /// <summary>
-    /// Function returns a list of Outlook folders that meet search criteria and appends a list of suggested folders 
-    /// as well as appending a list of recently used folders
-    /// </summary>
-    /// <param name="SearchString"></param>
-    /// <param name="ReloadCTFStagingFiles"></param>
-    /// <param name="EmailSearchRoot"></param>
-    /// <param name="ReCalcSuggestions"></param>
-    /// <param name="objItem"></param>
-    /// <returns></returns>
+        /// Function returns a list of Outlook folders that meet search criteria and appends a list of suggested folders 
+        /// as well as appending a list of recently used folders
+        /// </summary>
+        /// <param name="SearchString"></param>
+        /// <param name="ReloadCTFStagingFiles"></param>
+        /// <param name="EmailSearchRoot"></param>
+        /// <param name="ReCalcSuggestions"></param>
+        /// <param name="objItem"></param>
+        /// <returns></returns>
         public string[] FindFolder(string SearchString, object objItem, bool ReloadCTFStagingFiles = true, string EmailSearchRoot = "ARCHIVEROOT", bool ReCalcSuggestions = false)
         {
 
@@ -278,16 +278,16 @@ namespace ToDoModel
 
         private void AddSuggestions()
         {
-            if (Suggestions.Count > 0)
-            {
-                if (_upBound > 0)
-                    _upBound = _upBound + 1;
+            //if (Suggestions.Count > 0)
+            //{
+            //    if (_upBound > 0)
+            //        _upBound = _upBound + 1;
                 _upBound = _upBound + Suggestions.Count;
                 Array.Resize(ref _folderList, _upBound + 1);
                 _folderList[_upBound - Suggestions.Count] = "========= SUGGESTIONS =========";
                 for (int i = 1, loopTo = Suggestions.Count; i <= loopTo; i++)
                     _folderList[_upBound - Suggestions.Count + i] = Suggestions.get_FolderList_ItemByIndex(i);
-            }
+            //}
         }
 
         private Folders GetMatchingFolders(string Name, string strEmailFolderPath)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,25 @@ namespace UtilitiesCS
             else if (item is AppointmentItem) { return ((AppointmentItem)item).Categories; }
             else if (item is MeetingItem) { return ((MeetingItem)item).Categories; }
             else { throw new System.ArgumentException(NotSupportedMessage(item)); }
+        }
+
+        private static int counter = 0;
+
+        public static bool NoConflicts(this object obj)
+        {
+            try
+            {
+                if (obj is MailItem) { return ((MailItem)obj).Conflicts.Count == 0; }
+                else if (obj is TaskItem) { return ((TaskItem)obj).Conflicts.Count == 0; }
+                else if (obj is MeetingItem) { return ((MeetingItem)obj).Conflicts.Count == 0; }
+                else if (obj is AppointmentItem) { return ((AppointmentItem)obj).Conflicts.Count == 0; }
+                else { throw new ArgumentException($"Unsupported type {obj.GetType().Name}"); }
+            }
+            catch 
+            {
+                Debug.WriteLine(++counter);
+                return false; 
+            }
         }
 
         private static void EnsureSupported(this object item)

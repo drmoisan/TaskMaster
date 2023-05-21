@@ -14,17 +14,56 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public static class UserDefinedFields
     {
-        public static object GetUdf(this object item, 
-                                    string fieldName, 
-                                    OlUserPropertyType olFieldType = OlUserPropertyType.olText,
-                                    bool flatten = true) 
-        { 
-            item.EnsureSupported();
-            Type objectType = item.GetType();
-            PropertyInfo p = objectType.GetProperty("UserProperties");
-            MethodInfo m = p.PropertyType.GetMethod("Find");
-            var result = m.Invoke(p.GetValue(item), new object[] { fieldName });
-            if (result!=null) { return result; }
+        //public static UserProperty GetUdf(this object item, 
+        //                                  string fieldName) 
+        //{ 
+        //    item.EnsureSupported();
+        //    Type objectType = item.GetType();
+        //    PropertyInfo p = objectType.GetProperty("UserProperties");
+        //    MethodInfo m = p.PropertyType.GetMethod("Find");
+        //    var result = m.Invoke(p.GetValue(item), new object[] { fieldName });
+        //    if (result is null) { return null; }
+        //    if (result is UserProperty) { return (UserProperty)result; }
+        //    else { throw new System.Exception($"{nameof(GetUdf)} returned a result of type {result.GetType().Name} instead of {typeof(UserProperty).Name}"); }
+        //}
+
+        public static UserProperty GetUdf(this object item,
+                                          string fieldName)
+        {
+            if (item is MailItem) { return ((MailItem)item).UserProperties.Find(fieldName); }
+            else if (item is TaskItem) { return ((TaskItem)item).UserProperties.Find(fieldName); }
+            else if (item is AppointmentItem) { return ((AppointmentItem)item).UserProperties.Find(fieldName); }
+            else if (item is MeetingItem) { return ((MeetingItem)item).UserProperties.Find(fieldName); }
+            else
+            {
+                throw new ArgumentException("Unsupported type. Extension defined for MailItem, " +
+                                               "TaskItem, AppointmentItem, and MeetingItem. " +
+                                               $"{nameof(item)} is of type {item.GetType().Name}",
+                                               nameof(item));
+            }
+        }
+
+        public static string GetUdfString(this object item, string fieldName)
+        {
+            UserProperty property = item.GetUdf(fieldName);
+            return property.GetUdfString();
+        }
+        
+        public static string GetUdfString(this UserProperty property)
+        {
+            return (string)property.GetUdfValue(OlUserPropertyType.olText, true);
+        }
+
+        public static object GetUdfValue(this UserProperty property,
+                                         OlUserPropertyType olFieldType = OlUserPropertyType.olText,
+                                         bool flatten = true)
+        {
+            if ((property != null) && (property.Value != null))
+            {
+                var result = property.Value;
+                if (result is Array) { result = ((object[])result).FlattenStringTree(); }
+                return (object)result;
+            }
             else
             {
                 TypeGroup group = udfGroupLookup[olFieldType];
@@ -42,6 +81,15 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
+        public static object GetUdfValue(this object item,
+                                         string fieldName,
+                                         OlUserPropertyType olFieldType = OlUserPropertyType.olText,
+                                         bool flatten = true)
+        {
+            UserProperty property = item.GetUdf(fieldName);
+            return property.GetUdfValue(olFieldType, flatten);
+        }
+
         //public static object GetUdf(this object item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
         //public static object GetUdf(this MailItem item, string fieldName) { return new object(); }
         //public static object GetUdf(this MailItem item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
@@ -51,8 +99,8 @@ namespace UtilitiesCS.OutlookExtensions
         //public static object GetUdf(this MeetingItem item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
         //public static object GetUdf(this TaskItem item, string fieldName) { return new object(); }
         //public static object GetUdf(this TaskItem item, string fieldName, OlUserPropertyType olFieldType) { return new object(); }
-           
-        
+
+
         /// <summary>
         /// Extension function to determine if a user defined property exists 
         /// on an Outlook item of unknown type.
@@ -377,21 +425,6 @@ namespace UtilitiesCS.OutlookExtensions
                    $"{nameof(item)} is of type {item.GetType().ToString()}";
         }
 
-        private static string FlattenStringTree(object[] branches)
-        {
-            if (!Array.TrueForAll(branches, branch => branch is string))
-            {
-                for (int i = 0; i < branches.Length; i++)
-                {
-                    if (branches[i] is Array) { branches[i] = FlattenStringTree((object[])branches[i]); }
-                    else if (!(branches[i] is string)) 
-                    {
-                        throw new ArgumentException($"branches[{i}] is of type {branches[i].GetType().ToString()}"
-                            + $". Array elements in FlattenStringTree must be arrays or strings.");
-                    }
-                }
-            }
-            return string.Join(", ", branches);
-        }
+        
     }
 }

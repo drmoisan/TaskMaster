@@ -5,8 +5,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
 using System.Collections;
-
-
+using UtilitiesCS.OutlookExtensions;
 
 namespace ToDoModel
 {
@@ -261,8 +260,8 @@ namespace ToDoModel
 
         private int CompareItemsByToDoID(object objItemLeft, object objItemRight)
         {
-            string ToDoIDLeft = GetFields.CustomFieldID_GetValue(objItemLeft, "ToDoID");
-            string ToDoIDRight = GetFields.CustomFieldID_GetValue(objItemRight, "ToDoID");
+            string ToDoIDLeft = objItemLeft.GetUdfString("ToDoID");
+            string ToDoIDRight = objItemRight.GetUdfString("ToDoID");
             long LngLeft = (long)BaseChanger.ConvertToDecimal(125, ToDoIDLeft);
             long LngRight = (long)BaseChanger.ConvertToDecimal(125, ToDoIDRight);
 

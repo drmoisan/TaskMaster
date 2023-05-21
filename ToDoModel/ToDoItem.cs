@@ -125,11 +125,11 @@ namespace ToDoModel
 
         private void InitializeCustomFields(object Item)
         {
-            _tagProgram = (string)(_olObject.GetUdf("TagProgram"));
-            _activeBranch = (bool)(_olObject.GetUdf("AB", OlUserPropertyType.olYesNo));
-            _EC2 = (bool)(_olObject.GetUdf("EC2", OlUserPropertyType.olYesNo));
-            _expandChildren = (string)(_olObject.GetUdf("EC"));
-            _expandChildrenState = (string)(_olObject.GetUdf("EcState"));
+            _tagProgram = _olObject.GetUdfString("TagProgram");
+            _activeBranch = (bool)(_olObject.GetUdfValue("AB", OlUserPropertyType.olYesNo));
+            _EC2 = (bool)(_olObject.GetUdfValue("EC2", OlUserPropertyType.olYesNo));
+            _expandChildren = _olObject.GetUdfString("EC");
+            _expandChildrenState = _olObject.GetUdfString("EcState");
         }
 
         public object Clone()
@@ -609,7 +609,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _tagProgram = (string)(_olObject.GetUdf("TagProgram", OlUserPropertyType.olKeywords));
+                    _tagProgram = _olObject.GetUdfString("TagProgram");
                     return _tagProgram;
                 }
 
@@ -809,7 +809,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _toDoID = (string)(_olObject.GetUdf("ToDoID"));
+                    _toDoID = _olObject.GetUdfString("ToDoID");
                     return _toDoID;
                 }
             }
@@ -864,7 +864,7 @@ namespace ToDoModel
                     }
                     else
                     {
-                        _VisibleTreeState = (int)(_olObject.GetUdf("VTS", OlUserPropertyType.olInteger));
+                        _VisibleTreeState = (int)(_olObject.GetUdfValue("VTS", OlUserPropertyType.olInteger));
                     }
                     return _VisibleTreeState;
 
@@ -891,7 +891,7 @@ namespace ToDoModel
                 {
                     if (_olObject.UdfExists("AB"))
                     {
-                        _activeBranch = (bool)_olObject.GetUdf("AB", OlUserPropertyType.olYesNo);
+                        _activeBranch = (bool)_olObject.GetUdfValue("AB", OlUserPropertyType.olYesNo);
                     }
                     else
                     {
@@ -921,7 +921,7 @@ namespace ToDoModel
             {
                 if (_olObject.UdfExists("EC2"))
                 {
-                    _EC2 = (bool)_olObject.GetUdf("EC2");
+                    _EC2 = (bool)_olObject.GetUdfValue("EC2");
 
                     if (_EC2 == true)
                     {
@@ -980,7 +980,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _expandChildren = (string)(_olObject.GetUdf("EC"));
+                    _expandChildren = _olObject.GetUdfString("EC");
                     return _expandChildren;
                 }
             }
@@ -1011,7 +1011,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _expandChildrenState = (string)(_olObject.GetUdf("EcState"));
+                    _expandChildrenState = _olObject.GetUdfString("EcState");
                     return _expandChildrenState;
                 }
             }
@@ -1078,7 +1078,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _metaTaskLvl = (string)(_olObject.GetUdf("Meta Task Level"));
+                    _metaTaskLvl = _olObject.GetUdfString("Meta Task Level");
                     return _metaTaskLvl;
                 }
             }
@@ -1109,7 +1109,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _metaTaskSubject = (string)(_olObject.GetUdf("Meta Task Subject"));
+                    _metaTaskSubject = _olObject.GetUdfString("Meta Task Subject");
                     return _metaTaskSubject;
                 }
             }
@@ -1165,36 +1165,10 @@ namespace ToDoModel
                 
         public object GetCustomField(string fieldName, OlUserPropertyType olFieldType = OlUserPropertyType.olText)
         {
-            var value = _olObject.GetUdf(fieldName, olFieldType);
-            if (value is Array) { value = FlattenArry((object[])value); }
-            
-            switch (olFieldType)
-            {
-                case OlUserPropertyType.olInteger:
-                    return (object)0;
-                case OlUserPropertyType.olYesNo:
-                    return (object)false;
-                default:
-                    return (object)"";
-            }
+            return _olObject.GetUdfValue(fieldName, olFieldType);
         }
                 
-        private string FlattenArry(object[] varBranch)
-        {
-            string FlattenArryRet = default;
-            int i;
-            string strTemp;
-
-            strTemp = "";
-
-            var loopTo = varBranch.Length-1;
-            for (i = 0; i <= loopTo; i++)
-                strTemp = varBranch[i] is Array ? strTemp + ", " + FlattenArry((object[])varBranch[i]) : string.Concat(strTemp + ", ", varBranch[i]);
-            if (strTemp.Length != 0)
-                strTemp = strTemp.Substring(2);
-            FlattenArryRet = strTemp;
-            return FlattenArryRet;
-        }
+        
 
     }
 }

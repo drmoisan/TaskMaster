@@ -80,8 +80,8 @@ namespace TaskMaster
                 _OlInboxItems = value;
             }
         }
+        
         private Reminders _OlReminders;
-
         private Reminders OlReminders
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
@@ -139,10 +139,9 @@ namespace TaskMaster
         internal void Events_Hook()
         {
             {
-                ref var withBlock = ref _globals;
-                OlToDoItems = withBlock.Ol.ToDoFolder.Items;
-                OlInboxItems = withBlock.Ol.Inbox.Items;
-                OlReminders = withBlock.Ol.OlReminders;
+                OlToDoItems = _globals.Ol.ToDoFolder.Items;
+                OlInboxItems = _globals.Ol.Inbox.Items;
+                OlReminders = _globals.Ol.OlReminders;
             }
         }
 

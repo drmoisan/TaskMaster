@@ -91,7 +91,7 @@ namespace UtilitiesCS
             CTF_Incidence_FINDRet = 0;
 
             var loopTo = CTF_Inc_Ct;
-            for (i = 1; i <= loopTo; i++)
+            for (i = 0; i <= loopTo; i++)
             {
                 if ((CTF_Inc[i].Email_Conversation_ID ?? "") == (ConvID ?? ""))
                 {

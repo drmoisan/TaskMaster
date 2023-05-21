@@ -179,5 +179,35 @@ namespace UtilitiesCS
             ExactMatch = 3,
             ExactComplement = 4
         }
+
+        public static string FlattenStringTree(this object[] branches, bool strictValidation = true)
+        {
+            if (!Array.TrueForAll(branches, branch => branch is string))
+            {
+                for (int i = 0; i < branches.Length; i++)
+                {
+                    if (branches[i] is Array) { branches[i] = FlattenStringTree((object[])branches[i]); }
+                    else if (!(branches[i] is string))
+                    {
+                        if (strictValidation)
+                        { throw new ArgumentException($"branches[{i}] is of type {branches[i].GetType().Name}"
+                                + $". Array elements in FlattenStringTree must be arrays or strings."); }
+                        branches[i] = "Error";
+                    }
+                }
+            }
+            string result = string.Join(", ", branches);
+            if (result.Contains("Error")) { result = "Error"; }
+            
+            return result;
+        }
+
+        internal static bool IsStringArrayTree(this object[] branches, bool strictValidation)
+        {
+            return false;
+        }
+
     }
+
+    
 }

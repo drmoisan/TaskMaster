@@ -334,7 +334,7 @@ namespace ToDoModel
                     else // In this case, the project name exists but the todo id does not
                     {
                         // Get Project Name
-                        strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project.Value) : (string)objProperty_Project.Value;
+                        strProject = objProperty_Project.GetUdfString();
 
                         // If the project name is in our dictionary, autoadd the ToDoID to this item
                         if (strProject.Length != 0)
@@ -484,14 +484,14 @@ namespace ToDoModel
         public static void MigrateToDoIDs(Outlook.Application OlApp)
         {
             // TODO: Move MigrateToDoIDs to a class, module, or library
-            var ToDoItems = OlApp.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items;
-            long max = ToDoItems.Count;
-            long j = 0L;
-            for (long i = 1L, loopTo = max; i <= loopTo; i++)
+            var olItems = OlApp.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items;
+            int max = olItems.Count -1;
+            int j = 0;
+            for (int i = 0, loopTo = max; i <= loopTo; i++)
             {
-                var Item = new ToDoItem(ToDoItems[i], true);
-                j += 1L;
-                if ((string)Item.OlItem.GetUdf("NewID") != "Done")
+                var Item = new ToDoItem(olItems[i], true);
+                j += 1;
+                if (olItems[i].GetUdfString("NewID") != "Done")
                 {
                     string strToDoID = Item.ToDoID;
                     if (strToDoID.Length > 0)
@@ -501,9 +501,9 @@ namespace ToDoModel
                         Item.OlItem.SetUdf("NewID", value: "Done");
                     }
                 }
-                if (j == 40L)
+                if (j == 40)
                 {
-                    j = 0L;
+                    j = 0;
                     System.Windows.Forms.Application.DoEvents();
                 }
             }

@@ -40,7 +40,7 @@ namespace TaskMaster
 
         public string GetCustomUI(string ribbonID)
         {
-            return GetResourceText("TaskMaster.RibbonViewer.xml");
+            return GetResourceText("TaskMaster.Ribbon.RibbonViewer.xml");
         }
 
         #region Ribbon Callbacks

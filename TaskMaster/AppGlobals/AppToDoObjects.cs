@@ -93,7 +93,8 @@ namespace TaskMaster
             {
                 if (_IDList is null)
                 {
-                    _IDList = new ListOfIDs(Path.Combine(Parent.FS.FldrAppData, _defaults.FileName_IDList), _parent.Ol.App);
+                    _IDList = new ListOfIDs(Path.Combine(Parent.FS.FldrAppData,
+                                                         _defaults.FileName_IDList), _parent.Ol.App);
                 }
                 return _IDList;
             }

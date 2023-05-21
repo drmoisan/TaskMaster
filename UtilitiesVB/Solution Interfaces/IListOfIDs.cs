@@ -16,7 +16,6 @@ namespace UtilitiesVB
         void Save(string Filepath);
         string ConvertToBase(int nbase, BigInteger num, int intMinDigits = 2);
         BigInteger ConvertToDecimal(int nbase, string strBase);
-        string FlattenArry(object[] varBranch);
         string GetMaxToDoID();
         string GetNextAvailableToDoID(string strSeed);
     }

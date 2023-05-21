@@ -9,6 +9,7 @@ using System.IO;
 using UtilitiesCS;
 using UtilitiesVB;
 using System.Windows.Forms;
+using UtilitiesCS.OutlookExtensions;
 
 namespace ToDoModel
 {
@@ -141,9 +142,8 @@ namespace ToDoModel
 
                     __itemsPST_ItemChange_blIsRunning = true;
                     var todo = new ToDoItem(Item, OnDemand: true);
-                    dynamic olItem = Item;
-                    UserProperty objProperty_ToDoID = (UserProperty)olItem.UserProperties.Find("ToDoID");
-                    UserProperty objProperty_Project = (UserProperty)olItem.UserProperties.Find("TagProject");
+                    UserProperty objProperty_ToDoID = Item.GetUdf("ToDoID");
+                    UserProperty objProperty_Project = Item.GetUdf("TagProject");
 
 
                     // AUTOCODE ToDoID based on Project
@@ -166,7 +166,7 @@ namespace ToDoModel
                                 strProject = todo.get_Project();
 
                                 // If IsArray(objProperty_Project.Value) Then
-                                // strProject = FlattenArry(objProperty_Project.Value)
+                                // strProject = FlattenStringTree(objProperty_Project.Value)
                                 // Else
                                 // strProject = objProperty_Project.Value
                                 // End If
@@ -218,7 +218,7 @@ namespace ToDoModel
                             {
                                 strProject = todo.get_Project();
                                 // If IsArray(objProperty_Project.Value) Then
-                                // strProject = FlattenArry(objProperty_Project.Value)
+                                // strProject = FlattenStringTree(objProperty_Project.Value)
                                 // Else
                                 // strProject = objProperty_Project.Value
                                 // End If
@@ -241,7 +241,8 @@ namespace ToDoModel
                         else // In this case, the project name exists but the todo id does not
                         {
                             // Get Project Name
-                            strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project.Value) : (string)objProperty_Project.Value;
+                            strProject = objProperty_Project.GetUdfString();
+                            //strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project.Value) : (string)objProperty_Project.Value;
 
                             // If the project name is in our dictionary, autoadd the ToDoID to this item
                             if (strProject.Length != 0)
@@ -274,9 +275,9 @@ namespace ToDoModel
                     // If So, adjust Kan Ban fields and categories
                     if (todo.Complete)
                     {
-                        if (((string)olItem.Categories).Contains("Tag KB Completed"))
+                        if (Item.GetCategories().Contains("Tag KB Completed"))
                         {
-                            string strCats = ((string)olItem.Categories).Replace("Tag KB Backlog", "").Replace(",,", ",");
+                            string strCats = Item.GetCategories().Replace("Tag KB Backlog", "").Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB InProgress", "").Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB Planned", "").Replace(",,", ",");
                             
@@ -290,14 +291,13 @@ namespace ToDoModel
                             {
                                 strCats += "Tag KB Completed";
                             }
-                            olItem.Categories = strCats;
-                            olItem.Save();
-                            todo.set_KB(value: "Completed");
+                            Item.SetCategories(strCats);
+                            todo.KB = "Completed";
                         }
                     }
-                    else if (todo.get_KB() == "Completed")
+                    else if (todo.KB == "Completed")
                     {
-                        string strCats = olItem.Categories;
+                        string strCats = Item.GetCategories();
 
                         // Strip Completed from categories
                         if (strCats.Contains("Tag KB Completed"))
@@ -330,9 +330,8 @@ namespace ToDoModel
                         {
                             strCats = strReplace;
                         }
-                        olItem.Categories = strCats;
-                        olItem.Save();
-                        todo.set_KB(value: strKB);
+                        Item.SetCategories(strCats);
+                        todo.KB = strKB;
 
                     }
                     __itemsPST_ItemChange_blIsRunning = false;

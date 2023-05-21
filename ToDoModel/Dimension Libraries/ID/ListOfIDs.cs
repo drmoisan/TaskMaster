@@ -7,9 +7,12 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
+using UtilitiesCS;
 
 
 using UtilitiesVB;
+using UtilitiesCS.OutlookExtensions;
+using System.Runtime.CompilerServices;
 
 namespace ToDoModel
 {
@@ -74,6 +77,7 @@ namespace ToDoModel
             }
 
             tmpIDList.Filepath = FilePath;
+            tmpIDList.Save();
             return tmpIDList;
         }
 
@@ -92,18 +96,22 @@ namespace ToDoModel
             return tmpIDList;
         }
 
+        
+        
         public void RefreshIDList(Outlook.Application Application)
         {
-            var unused = new object();
             var _dataModel = new TreeOfToDoItems();
             List<object> _toDoList;
             UsedIDList = new List<string>();
 
             _toDoList = _dataModel.GetToDoList(TreeOfToDoItems.LoadOptions.vbLoadAll, Application);
+            _toDoList = _toDoList.Where(x => x.NoConflicts()).ToList();
 
             foreach (object _objItem in _toDoList)
             {
-                string strID = CustomFieldID_GetValue(_objItem, "ToDoID");
+                
+                string strID = _objItem.GetUdfString("ToDoID");
+        
                 if (UsedIDList.Contains(strID) == false & strID.Length != 0)
                 {
                     UsedIDList.Add(strID);
@@ -311,64 +319,6 @@ namespace ToDoModel
             return ConvertToDecimalRet;
         }
 
-        private string CustomFieldID_GetValue(object objItem, string UserDefinedFieldName)
-        {
-            MailItem OlMail;
-            TaskItem OlTask;
-            AppointmentItem OlAppt;
-            UserProperty objProperty;
-
-
-            if (objItem is null)
-            {
-                return "";
-            }
-            else if (objItem is MailItem)
-            {
-                OlMail = (MailItem)objItem;
-                objProperty = OlMail.UserProperties.Find(UserDefinedFieldName);
-            }
-
-            else if (objItem is TaskItem)
-            {
-                OlTask = (TaskItem)objItem;
-                objProperty = OlTask.UserProperties.Find(UserDefinedFieldName);
-            }
-            else if (objItem is AppointmentItem)
-            {
-                OlAppt = (AppointmentItem)objItem;
-                objProperty = OlAppt.UserProperties.Find(UserDefinedFieldName);
-            }
-            else
-            {
-                objProperty = null;
-                MessageBox.Show("Unsupported object type");
-            }
-
-            return objProperty is null ? "" : objProperty is Array ? FlattenArry((object[])objProperty.Value) : (string)objProperty.Value;
-
-            OlMail = null;
-            OlTask = null;
-            OlAppt = null;
-            objProperty = null;
-
-        }
-
-        public string FlattenArry(object[] varBranch)
-        {
-            string FlattenArryRet = default;
-            int i;
-            string strTemp;
-
-            strTemp = "";
-
-            var loopTo = (varBranch.Length - 1);
-            for (i = 0; i <= loopTo; i++)
-                strTemp = varBranch[i] is Array ? strTemp + ", " + FlattenArry((object[])varBranch[i]) : strTemp + ", " + varBranch[i];
-            if (strTemp.Length != 0)
-                strTemp = strTemp.Substring(2);
-            FlattenArryRet = strTemp;
-            return FlattenArryRet;
-        }
+        
     }
 }

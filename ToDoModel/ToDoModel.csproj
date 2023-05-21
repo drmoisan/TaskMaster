@@ -118,7 +118,6 @@
     <Compile Include="Common Functions\FileOperationsPST.cs" />
     <Compile Include="Dimension Libraries\ID\IDListUtilities.cs" />
     <Compile Include="Email Utilities\AutoFile.cs" />
-    <Compile Include="Common Functions\GetFields.cs" />
     <Compile Include="Dimension Libraries\ID\BaseChanger.cs" />
     <Compile Include="Dimension Libraries\ID\ListOfIDs.cs" />
     <Compile Include="Email Utilities\cConversation.cs" />
