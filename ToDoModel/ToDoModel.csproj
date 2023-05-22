@@ -135,7 +135,7 @@
     <Compile Include="Email Utilities\Smith_Watterman.cs" />
     <Compile Include="Email Utilities\SortItemsToExistingFolder.cs" />
     <Compile Include="Email Utilities\SubjectMapModule.cs" />
-    <Compile Include="Email Utilities\Subject_Mapping.cs" />
+    <Compile Include="Email Utilities\SubjectMapEntry.cs" />
     <Compile Include="FlagDetails.cs" />
     <Compile Include="Outlook Todo Utilities\ToDoEvents.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

@@ -38,7 +38,7 @@ namespace ToDoModel
                     foreach (Folder fldr in fldrs)
                         // \\03 LATAM CCO\search folders\FLAGGED
                         Debug.WriteLine(fldr.FolderPath);
-                    // Dim fldr As Outlook.Folder = store.GetSearchFolders.
+                    // Dim FolderName As Outlook.Folder = store.GetSearchFolders.
                     // Dim items As Outlook.Items
                     // storeList += String.Format("{0} - {1}{2}", store.DisplayName, (If(store.IsDataFileStore, ".pst", ".ost")), Environment.NewLine)
                 }

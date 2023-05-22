@@ -4,7 +4,7 @@
 // Private _email_Conversation_ID As String
 // Private _email_Conversation_Count As Integer
 
-// Public Property Email_Folder As String
+// Public Property EmailFolder As String
 // Get
 // Return _email_Folder
 // End Get

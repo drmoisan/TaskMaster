@@ -1,42 +1,144 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 using UtilitiesVB;
 
 namespace ToDoModel
 {
 
-    internal static class SubjectMapModule
+    public class SubjectIncidence
     {
-        public static long SubjectMapCt = 0L;
-        public static Subject_Mapping[] SubjectMap;
-        public static string[] WordList;
-        public static int WordCount;
-        public struct Subject_Incidence
+        public SubjectIncidence() { }
+        public SubjectIncidence(int score, string folderName)
         {
-            public int Val;
-            public string fldr;
+            Score = score;
+            FolderName = folderName;
         }
 
-        public static Subject_Incidence[] Subject_Inc;
+        private int _score;
+        private string _folderName;
+
+        public int Score { get => _score; set => _score = value; }
+        public string FolderName { get => _folderName; set => _folderName = value; }
+    }
+
+    public class SubjectMapClass 
+    {
+        public SubjectMapClass() { }        
+        public List<SubjectMapEntry> SubjectMapEntries;
+        public static string[] WordList;
+        public static int WordCount;
+
+        public List<SubjectIncidence> SubjectIncidences;
         public static int Subject_Inc_Ct;
 
-        public static void Subject_MAP_Text_File_READ(IFileSystemFolderPaths fs, IList<string> commonWords)
+        public static List<SubjectMapEntry> SubjectMapReadTextFile(IFileSystemFolderPaths fs, IList<string> commonWords)
         {
-
-            SubjectMapCt = 0L;
-            SubjectMap = new Subject_Mapping[1];
+            var subjectMapEntries = new List<SubjectMapEntry>();
 
             string[] fileContents = FileIO2.CSV_Read(filename: fs.Filenames.SubjectMap, fileaddress: fs.FldrPythonStaging, SkipHeaders: true);
             var rowQueue = new Queue<string>(fileContents);
 
             while (rowQueue.Count > 0)
             {
-                SubjectMapCt += 1L;
+                subjectMapEntries.Add(
+                    new SubjectMapEntry(emailFolder: rowQueue.Dequeue(),
+                                        emailSubject: rowQueue.Dequeue().StripCommonWords(commonWords),
+                                        emailSubjectCount: int.Parse(rowQueue.Dequeue())));
+            }
+            return subjectMapEntries;
+        }
+
+        public void SubjectMapAdd(string subject, string folderName)
+        {
+            int idx;
+
+
+            // Check to see if any mapping exists. If not, add the first entry
+            if (SubjectMapEntries.Count == 0)
+            {
+                SubjectMapEntries.Add(
+                    new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
+            }
+
+            // Else, try to find the item 
+            else
+            {
+                idx = SubjectMapEntries.FindIndex(entry => ((entry.EmailSubject == subject) && (entry.EmailFolder == folderName)));
+
+                // If it doesn't exist, add an entry. If it does exist, increase the count
+                if (idx == -1)
+                {
+                    SubjectMapEntries.Add(
+                        new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
+                }
+                else
+                {
+                    SubjectMapEntries[idx].EmailSubjectCount +=  1;
+                }
+
+            }
+        }
+
+        public void SubjectIncAdd(string folderName, int score)
+        {
+            int idx;
+
+            // Check to see if any mapping exists. If not, add the first entry
+            if (SubjectIncidences.Count == 0)
+            {
+                SubjectIncidences.Add(new SubjectIncidence(score: score, folderName: folderName));
+            }
+
+            // Else, find the item and insert it
+            else
+            {
+                idx = SubjectIncidences.FindIndex(incidence => incidence.FolderName == folderName);                            // Find a matching pair
+
+                // If it doesn't exist, add an entry. If it does exist, increase the count
+                if (idx == -1)
+                {
+                    SubjectIncidences.Add(new SubjectIncidence(score: score, folderName: folderName));
+                }
+
+                else
+                {
+                    SubjectIncidences[idx].Score += score;
+                }
+
+            }
+        }
+        
+    }
+
+
+    public static class SubjectMapModule
+    {
+        public static int SubjectMapCt = 0;
+        public static SubjectMapEntry[] SubjectMap;
+        public static string[] WordList;
+        public static int WordCount;
+        
+        public static SubjectIncidence[] Subject_Inc;
+        public static int Subject_Inc_Ct;
+
+        public static void Subject_MAP_Text_File_READ(IFileSystemFolderPaths fs, IList<string> commonWords)
+        {
+
+            SubjectMapCt = 0;
+            SubjectMap = new SubjectMapEntry[1];
+
+            string[] fileContents = FileIO2.CSV_Read(filename: fs.Filenames.SubjectMap, fileaddress: fs.FldrPythonStaging, SkipHeaders: true);
+            var rowQueue = new Queue<string>(fileContents);
+
+            while (rowQueue.Count > 0)
+            {
+                SubjectMapCt += 1;
                 Array.Resize(ref SubjectMap, (int)(SubjectMapCt + 1));
-                SubjectMap[(int)SubjectMapCt].Email_Folder = rowQueue.Dequeue();
-                SubjectMap[(int)SubjectMapCt].Email_Subject = CommonWordsModule.StripCommonWords(rowQueue.Dequeue(), commonWords);
-                SubjectMap[(int)SubjectMapCt].Email_Subject_Count = int.Parse(rowQueue.Dequeue());
+                SubjectMap[(int)SubjectMapCt].EmailFolder = rowQueue.Dequeue();
+                SubjectMap[(int)SubjectMapCt].EmailSubject = CommonWordsModule.StripCommonWords(rowQueue.Dequeue(), commonWords);
+                SubjectMap[(int)SubjectMapCt].EmailSubjectCount = int.Parse(rowQueue.Dequeue());
             }
 
         }
@@ -63,7 +165,7 @@ namespace ToDoModel
             // Check to see if any mapping exists. If not, add the first entry
             if (SubjectMapCt == 0L)
             {
-                SubjectMapCt = 1L;
+                SubjectMapCt = 1;
                 Array.Resize(ref SubjectMap, 2);
                 Subject_Map_Set(Subj, 1, FolderName, 1);
             }
@@ -76,24 +178,23 @@ namespace ToDoModel
                 // If it doesn't exist, add an entry. If it does exist, increase the count
                 if (Subject_Map_Idx == 0)
                 {
-                    SubjectMapCt = SubjectMapCt + 1L;                             // Increase the max count
+                    SubjectMapCt = SubjectMapCt + 1;                             // Increase the max count
                     Array.Resize(ref SubjectMap, (int)(SubjectMapCt + 1));                               // Add another slot to the array
                     Subject_Map_Set(Subj, 1, FolderName, (int)SubjectMapCt);     // Set the value to the last spot in the array
                 }
                 else
                 {
-                    SubjectMap[Subject_Map_Idx].Email_Subject_Count = SubjectMap[Subject_Map_Idx].Email_Subject_Count + 1;
+                    SubjectMap[Subject_Map_Idx].EmailSubjectCount = SubjectMap[Subject_Map_Idx].EmailSubjectCount + 1;
                 }
 
             }
         }
 
-
         public static void Subject_Map_Set(string Subj, int SubjCt, string FolderName, int Subject_Map_Idx)
         {
-            SubjectMap[Subject_Map_Idx].Email_Folder = FolderName;
-            SubjectMap[Subject_Map_Idx].Email_Subject = Subj;
-            SubjectMap[Subject_Map_Idx].Email_Subject_Count = SubjCt;
+            SubjectMap[Subject_Map_Idx].EmailFolder = FolderName;
+            SubjectMap[Subject_Map_Idx].EmailSubject = Subj;
+            SubjectMap[Subject_Map_Idx].EmailSubjectCount = SubjCt;
         }
 
         public static int Subject_Map_Find(string Subj, string FolderName)
@@ -108,7 +209,7 @@ namespace ToDoModel
             var loopTo = (int)SubjectMapCt;
             for (i = 1; i <= loopTo; i++)
             {
-                if ((SubjectMap[i].Email_Subject ?? "") == (Subj ?? "") & (SubjectMap[i].Email_Folder ?? "") == (FolderName ?? ""))
+                if ((SubjectMap[i].EmailSubject ?? "") == (Subj ?? "") & (SubjectMap[i].EmailFolder ?? "") == (FolderName ?? ""))
                 {
                     Subject_Map_Idx = i;
                     break;
@@ -130,8 +231,8 @@ namespace ToDoModel
             {
                 Subject_Inc_Ct = 1;
                 Array.Resize(ref Subject_Inc, 2);
-                Subject_Inc[Subject_Inc_Ct].fldr = FolderName;
-                Subject_Inc[Subject_Inc_Ct].Val = Val;
+                Subject_Inc[Subject_Inc_Ct].FolderName = FolderName;
+                Subject_Inc[Subject_Inc_Ct].Score = Val;
             }
 
             // Else, find the item and insert it
@@ -144,19 +245,17 @@ namespace ToDoModel
                 {
                     Subject_Inc_Ct = Subject_Inc_Ct + 1;                                         // Increase the max count
                     Array.Resize(ref Subject_Inc, Subject_Inc_Ct + 1);                                  // Add another slot to the array
-                    Subject_Inc[Subject_Inc_Ct].fldr = FolderName;
-                    Subject_Inc[Subject_Inc_Ct].Val = Val;
+                    Subject_Inc[Subject_Inc_Ct].FolderName = FolderName;
+                    Subject_Inc[Subject_Inc_Ct].Score = Val;
                 }
 
                 else
                 {
-                    Subject_Inc[Subject_Inc_Idx].Val = Subject_Inc[Subject_Inc_Idx].Val + Val;
+                    Subject_Inc[Subject_Inc_Idx].Score = Subject_Inc[Subject_Inc_Idx].Score + Val;
                 }
 
             }
         }
-
-
 
         public static int Subject_Inc_Find(string FolderName)
         {
@@ -170,7 +269,7 @@ namespace ToDoModel
             var loopTo = Subject_Inc_Ct;
             for (i = 1; i <= loopTo; i++)
             {
-                if ((Subject_Inc[i].fldr ?? "") == (FolderName ?? ""))
+                if ((Subject_Inc[i].FolderName ?? "") == (FolderName ?? ""))
                 {
                     Subject_Inc_Idx = i;
                     break;

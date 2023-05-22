@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 using UtilitiesVB;
 
 namespace TaskMaster
@@ -19,6 +21,7 @@ namespace TaskMaster
         private CtfIncidenceList _ctfList;
         private ISerializableList<string> _commonWords;
         private Properties.Settings _defaults = Properties.Settings.Default;
+        private ISerializableList<ISubjectMapEntry> _subjectMap;
 
         public AppAutoFileObjects(ApplicationGlobals ParentInstance)
         {
@@ -38,8 +41,7 @@ namespace TaskMaster
         }
 
         public bool SuggestionFilesLoaded { get => _sugFilesLoaded; set => _sugFilesLoaded = value; }
-            
-
+        
         public int SmithWatterman_MatchScore
         {
             get => _defaults.SmithWatterman_MatchScore;
@@ -131,6 +133,41 @@ namespace TaskMaster
         {
             string[] cw = FileIO2.CSV_Read(filename: Path.GetFileName(filepath), fileaddress: Path.GetDirectoryName(filepath), SkipHeaders: false);
             return cw.ToList();
+        }
+
+        
+
+        public ISerializableList<ISubjectMapEntry> SubjectMap
+        {
+            get
+            {
+                if (_subjectMap is null)
+                    _subjectMap = new SerializableList<ISubjectMapEntry>(filename: _defaults.File_Subject_Map,
+                                                                         folderpath: _parent.FS.FldrPythonStaging,
+                                                                         backupLoader: SubjectMapReadTextFile,
+                                                                         backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
+                                                                                             _defaults.BackupFile_CommonWords),
+                                                                         askUserOnError: false); 
+                return _subjectMap;
+            }
+
+        }
+
+        private IList<ISubjectMapEntry> SubjectMapReadTextFile(string filepath)
+        {
+            var subjectMapEntries = new List<ISubjectMapEntry>();
+
+            string[] fileContents = FileIO2.CSV_Read(filename: Path.GetFileName(filepath), fileaddress: Path.GetDirectoryName(filepath), SkipHeaders: true);
+            var rowQueue = new Queue<string>(fileContents);
+
+            while (rowQueue.Count > 0)
+            {
+                subjectMapEntries.Add(
+                    new SubjectMapEntry(emailFolder: rowQueue.Dequeue(),
+                                        emailSubject: rowQueue.Dequeue().StripCommonWords(this.CommonWords.ToList()),
+                                        emailSubjectCount: int.Parse(rowQueue.Dequeue())));
+            }
+            return subjectMapEntries;
         }
 
     }

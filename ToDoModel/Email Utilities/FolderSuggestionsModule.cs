@@ -24,7 +24,7 @@ namespace ToDoModel
         // Dim Result As cSuggestions
         // Result = New cSuggestions
         // Dim i As Integer
-        // Dim SWVal, Val, Val1 As Long
+        // Dim SWVal, Score, Val1 As Long
         // Dim ConvID As String
 
         // Dim strTmpFldr As String
@@ -34,10 +34,10 @@ namespace ToDoModel
         // ConvID = MSG.ConversationID
 
         // If Reload Then
-        // 'Throw New NotImplementedException("CTF_Incidence_Text_File_READ, Subject_MAP_Text_File_READ, " _
+        // 'Throw New NotImplementedException("CTF_Incidence_Text_File_READ, SubjectMapReadTextFile, " _
         // '                                  & "and Common_Words_Text_File_READ are not implemented. Cannot reload")
         // 'CTF_Incidence_Text_File_READ(_globals.FS)
-        // Subject_MAP_Text_File_READ(_globals.FS)
+        // SubjectMapReadTextFile(_globals.FS)
         // Common_Words_Text_File_READ(_globals.FS)
 
         // Dim strFList() As String = OlFolderlist_GetAll(_globals.Ol)
@@ -51,11 +51,11 @@ namespace ToDoModel
         // For i = 1 To .Folder_Count
 
         // 'Calculate the weight of the suggestion based on how much of the conversation is already in the folder
-        // Val = CLng(.Email_Conversation_Count(i))
-        // Val = (Val ^ _globals.AF.LngConvCtPwr) * CLng(_globals.AF.Conversation_Weight)
+        // Score = CLng(.Email_Conversation_Count(i))
+        // Score = (Score ^ _globals.AF.LngConvCtPwr) * CLng(_globals.AF.Conversation_Weight)
 
 
-        // Result.Add(.Email_Folder(i), Val)
+        // Result.Add(.EmailFolder(i), Score)
         // Next i
         // End With
 
@@ -67,20 +67,20 @@ namespace ToDoModel
 
         // For i = 1 To SubjectMapCt   'Loop through every subject of every email ever received
         // 'If InBackground Then DoEvents
-        // With SubjectMap(i)
+        // With SubjectMapClass(i)
 
 
-        // SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .Email_Subject, Matrix, AppGlobals.AF, SW_Options.ByWords)
+        // SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .EmailSubject, Matrix, AppGlobals.AF, SW_Options.ByWords)
 
         // '            StopWatch_Main.reStart
         // 'If SWVal > 1 Then Debug.Print "SWVal " & SWVal & "   SubjectStripped: " & SubjectStripped & _
-        // '    "   .Email_Subject: " & .Email_Subject & "  .EmailFolder " & .Email_Folder
+        // '    "   .EmailSubject: " & .EmailSubject & "  .EmailFolder " & .EmailFolder
 
-        // Val = (SWVal ^ AppGlobals.AF.LngConvCtPwr) * .Email_Subject_Count
-        // If .Email_Folder <> SubjectMap(i - 1).Email_Folder Then
+        // Score = (SWVal ^ AppGlobals.AF.LngConvCtPwr) * .EmailSubjectCount
+        // If .EmailFolder <> SubjectMapClass(i - 1).EmailFolder Then
         // '                StopWatch_Main.Pause
 
-        // varFldrSubs = Split(.Email_Folder, "\")
+        // varFldrSubs = Split(.EmailFolder, "\")
         // If IsArray(varFldrSubs) Then
         // strTmpFldr = varFldrSubs(UBound(varFldrSubs))
         // Else
@@ -88,16 +88,16 @@ namespace ToDoModel
         // End If
 
         // Val1 = Smith_Watterman.SW_Calc(SubjectStripped, strTmpFldr, Matrix, AppGlobals.AF, SW_Options.ByWords)
-        // Val = Val1 * Val1 + Val
+        // Score = Val1 * Val1 + Score
         // End If
-        // 'SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .Email_Subject, Matrix)
-        // 'SWVal = SWVal * .Email_Subject_Count
-        // 'If Val > 0 Then Debug.Print (Val & ", Message Subject: " & msg.Subject & ", Subject2: " & SubjectMap(i).Email_Subject & " Folder: " & SubjectMap(i).Email_Folder)
+        // 'SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .EmailSubject, Matrix)
+        // 'SWVal = SWVal * .EmailSubjectCount
+        // 'If Score > 0 Then Debug.Print (Score & ", Message Subject: " & msg.Subject & ", Subject2: " & SubjectMapClass(i).EmailSubject & " Folder: " & SubjectMapClass(i).EmailFolder)
 
 
 
-        // If Val > 5 Then
-        // Result.Add(.Email_Folder, Val)
+        // If Score > 5 Then
+        // Result.Add(.EmailFolder, Score)
         // End If
         // End With
         // Next i
@@ -107,8 +107,8 @@ namespace ToDoModel
         // '    strTmp = Replace(strTmp, "\", " ")
         // '    strTmp = Replace(strTmp, ".", " ")
         // '    strTmp = Replace(strTmp, "_", " ")
-        // '    Val = Smith_Watterman.SW_Calc(SubjectStripped, strTmp, Matrix)
-        // '    If Val > 10 Then Call Suggestions_ADD(Suggestions, strFlist(i), Val)
+        // '    Score = Smith_Watterman.SW_Calc(SubjectStripped, strTmp, Matrix)
+        // '    If Score > 10 Then Call Suggestions_ADD(Suggestions, strFlist(i), Score)
         // 'Next i
 
 
@@ -169,7 +169,7 @@ namespace ToDoModel
             // blOld = False
             // CTF_Incidence_Text_File_READ(_globals.FS)
             // Common_Words_Text_File_READ(_globals.FS)
-            // Subject_MAP_Text_File_READ(_globals.FS)
+            // SubjectMapReadTextFile(_globals.FS)
             // strFList = Folderlist_GetAll
             // bl_SuggestionFiles_IsLoaded = True
             // Conversation_Weight = 10000

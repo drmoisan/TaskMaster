@@ -27,10 +27,10 @@
 // If CTF_Map.Email_Conversation_Count > CTF_Inc(Inc_Num).Email_Conversation_Count(i) Then                         'from largest folder count to least folder count. Items that
 // For j = My.Settings.MaxFolders_ConvID - 1 To i Step -1                                                                  'have a lower count than all items up to the max will not be added
 // CTF_Inc(Inc_Num).Email_Conversation_Count(j + 1) = CTF_Inc(Inc_Num).Email_Conversation_Count(j)
-// CTF_Inc(Inc_Num).Email_Folder(j + 1) = CTF_Inc(Inc_Num).Email_Folder(j)
+// CTF_Inc(Inc_Num).EmailFolder(j + 1) = CTF_Inc(Inc_Num).EmailFolder(j)
 // Next j
 // CTF_Inc(Inc_Num).Email_Conversation_Count(i) = CTF_Map.Email_Conversation_Count
-// CTF_Inc(Inc_Num).Email_Folder(i) = CTF_Map.Email_Folder
+// CTF_Inc(Inc_Num).EmailFolder(i) = CTF_Map.EmailFolder
 // added = True
 // Exit For
 // End If
@@ -40,7 +40,7 @@
 
 // If CTF_Map.Email_Conversation_Count > CTF_Inc(Inc_Num).Email_Conversation_Count(My.Settings.MaxFolders_ConvID) Then
 // CTF_Inc(Inc_Num).Email_Conversation_Count(My.Settings.MaxFolders_ConvID) = CTF_Map.Email_Conversation_Count
-// CTF_Inc(Inc_Num).Email_Folder(My.Settings.MaxFolders_ConvID) = CTF_Map.Email_Folder
+// CTF_Inc(Inc_Num).EmailFolder(My.Settings.MaxFolders_ConvID) = CTF_Map.EmailFolder
 // End If
 
 // End If
@@ -70,7 +70,7 @@
 // For i = 1 To My.Settings.MaxFolders_ConvID                                                      'Loop through the number of Folders we are saving
 // CTF_Inc(Inc_Num).Folder_Count = 0
 // CTF_Inc(Inc_Num).Email_Conversation_Count(i) = 0                                'Set count to 0 so any value wins
-// CTF_Inc(Inc_Num).Email_Folder(i) = "==============================="            'Set Folder name to lines so that they will not be accepted if they show up in selection list
+// CTF_Inc(Inc_Num).EmailFolder(i) = "==============================="            'Set Folder name to lines so that they will not be accepted if they show up in selection list
 // Next i
 // End Sub
 
@@ -78,7 +78,7 @@
 // CTF_Inc(Inc_Num).Folder_Count = Folder_Count
 // CTF_Inc(Inc_Num).Email_Conversation_ID = Map.Email_Conversation_ID
 // CTF_Inc(Inc_Num).Email_Conversation_Count(Inc_Position) = Map.Email_Conversation_Count
-// CTF_Inc(Inc_Num).Email_Folder(Inc_Position) = Map.Email_Folder
+// CTF_Inc(Inc_Num).EmailFolder(Inc_Position) = Map.EmailFolder
 // End Sub
 
 
@@ -97,7 +97,7 @@
 // listOutput.Add(CTF_Inc(i).Email_Conversation_ID)
 // listOutput.Add(CTF_Inc(i).Folder_Count)
 // For j = 1 To CTF_Inc(i).Folder_Count
-// listOutput.Add(CTF_Inc(i).Email_Folder(j))
+// listOutput.Add(CTF_Inc(i).EmailFolder(j))
 // listOutput.Add(CTF_Inc(i).Email_Conversation_Count(j))
 // Next j
 // Next i
@@ -132,7 +132,7 @@
 // .Email_Conversation_ID = lines.Dequeue()
 // .Folder_Count = lines.Dequeue()
 // For i = 1 To .Folder_Count
-// .Email_Folder(i) = lines.Dequeue()
+// .EmailFolder(i) = lines.Dequeue()
 // .Email_Conversation_Count(i) = lines.Dequeue()
 // Next
 // End With

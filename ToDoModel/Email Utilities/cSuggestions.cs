@@ -134,7 +134,7 @@ namespace ToDoModel
                     var loopTo = _count - 1;
                     for (i = 1; i <= loopTo; i++)                                          // Put the result into the right sequence based on
                     {
-                        if (Val > lngValor[i])                                       // highest score to lowest score
+                        if (Val > lngValor[i])                                       // highest _score to lowest _score
                         {
                             added = true;
                             var loopTo1 = i;
@@ -241,11 +241,11 @@ namespace ToDoModel
             {
                 {
                     ref var withBlock = ref SubjectMapModule.SubjectMap[i];
-                    SWVal = Smith_Watterman.SW_Calc(SubjectStripped, SubjectMapModule.SubjectMap[i].Email_Subject, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
-                    Val = (long)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * SubjectMapModule.SubjectMap[i].Email_Subject_Count);
-                    if ((SubjectMapModule.SubjectMap[i].Email_Folder ?? "") != (SubjectMapModule.SubjectMap[i - 1].Email_Folder ?? ""))
+                    SWVal = Smith_Watterman.SW_Calc(SubjectStripped, SubjectMapModule.SubjectMap[i].EmailSubject, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
+                    Val = (long)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * SubjectMapModule.SubjectMap[i].EmailSubjectCount);
+                    if ((SubjectMapModule.SubjectMap[i].EmailFolder ?? "") != (SubjectMapModule.SubjectMap[i - 1].EmailFolder ?? ""))
                     {
-                        varFldrSubs = SubjectMapModule.SubjectMap[i].Email_Folder.Split("\\");
+                        varFldrSubs = SubjectMapModule.SubjectMap[i].EmailFolder.Split("\\");
                         strTmpFldr = varFldrSubs[varFldrSubs.Length-1];
                         Val1 = Smith_Watterman.SW_Calc(SubjectStripped, strTmpFldr, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
                         Val = Val1 * Val1 + Val;
@@ -253,7 +253,7 @@ namespace ToDoModel
 
                     if (Val > 5L)
                     {
-                        Add(withBlock.Email_Folder, Val);
+                        Add(withBlock.EmailFolder, Val);
                     }
                 }
             }
@@ -292,7 +292,7 @@ namespace ToDoModel
 
         private static void ReloadStagingFiles(IApplicationGlobals _globals)
         {
-            // Throw New NotImplementedException("CTF_Incidence_Text_File_READ, Subject_MAP_Text_File_READ, " _
+            // Throw New NotImplementedException("CTF_Incidence_Text_File_READ, SubjectMapReadTextFile, " _
             // & "and Common_Words_Text_File_READ are not implemented. Cannot reload")
             // CTF_Incidence_Text_File_READ(_globals.FS)
             SubjectMapModule.Subject_MAP_Text_File_READ(_globals.FS, (IList<string>)_globals.AF.CommonWords);

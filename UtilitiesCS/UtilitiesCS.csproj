@@ -245,6 +245,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HelperClasses\SimpleRegex.cs" />
+    <Compile Include="Interfaces\ISubjectMapEntry.cs" />
     <Compile Include="OutlookExtensions\OlItemPseudoInterface.cs" />
     <Compile Include="Dialogs\InputBox.cs" />
     <Compile Include="EmailIntelligence\CommonWords.cs" />
