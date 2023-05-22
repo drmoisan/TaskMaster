@@ -11,7 +11,7 @@ using UtilitiesVB;
 namespace ToDoModel
 {
 
-    public class cSuggestions
+    public class Suggestions
     {
 
         private int _count;
@@ -19,7 +19,7 @@ namespace ToDoModel
         private long[] lngValor;
         private const int MaxSuggestions = 5;
 
-        public cSuggestions()
+        public Suggestions()
         {
 
         }
@@ -231,7 +231,7 @@ namespace ToDoModel
             int i;
             object[,] Matrix = null;
             string SubjectStripped;
-            long SWVal, Val, Val1;
+            int SWVal, Val, Val1;
             string strTmpFldr;
             string[] varFldrSubs;
 
@@ -240,9 +240,8 @@ namespace ToDoModel
             for (i = 1; i <= loopTo; i++)   // Loop through every subject of every email ever received
             {
                 {
-                    ref var withBlock = ref SubjectMapModule.SubjectMap[i];
                     SWVal = Smith_Watterman.SW_Calc(SubjectStripped, SubjectMapModule.SubjectMap[i].EmailSubject, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
-                    Val = (long)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * SubjectMapModule.SubjectMap[i].EmailSubjectCount);
+                    Val = (int)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * SubjectMapModule.SubjectMap[i].EmailSubjectCount);
                     if ((SubjectMapModule.SubjectMap[i].EmailFolder ?? "") != (SubjectMapModule.SubjectMap[i - 1].EmailFolder ?? ""))
                     {
                         varFldrSubs = SubjectMapModule.SubjectMap[i].EmailFolder.Split("\\");
@@ -251,9 +250,9 @@ namespace ToDoModel
                         Val = Val1 * Val1 + Val;
                     }
 
-                    if (Val > 5L)
+                    if (Val > 5)
                     {
-                        Add(withBlock.EmailFolder, Val);
+                        Add(SubjectMapModule.SubjectMap[i].EmailFolder, Val);
                     }
                 }
             }

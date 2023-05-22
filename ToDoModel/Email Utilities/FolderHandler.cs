@@ -15,7 +15,7 @@ namespace ToDoModel
         private string _searchString;
         private bool _wildcardFlag;
         private string[] _folderList;
-        private cSuggestions _suggestions;
+        private Suggestions _suggestions;
         public int SaveCounter;
         private int _upBound;
         private Application _olApp;
@@ -42,7 +42,7 @@ namespace ToDoModel
             _globals = AppGlobals;
             _olApp = AppGlobals.Ol.App;
             _options = Options.NoSuggestions;
-            Suggestions = new cSuggestions();
+            Suggestions = new Suggestions();
             _folderList = new string[0];
         }
 
@@ -52,7 +52,7 @@ namespace ToDoModel
             _olApp = AppGlobals.Ol.App;
             _options = Options;
 
-            Suggestions = new cSuggestions();
+            Suggestions = new Suggestions();
 
             if (Options == Options.FromArrayOrString)
             {
@@ -129,7 +129,7 @@ namespace ToDoModel
             }
         }
 
-        public cSuggestions Suggestions
+        public Suggestions Suggestions
         {
             get
             {

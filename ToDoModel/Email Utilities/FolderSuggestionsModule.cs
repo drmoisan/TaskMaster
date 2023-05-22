@@ -13,7 +13,7 @@ namespace ToDoModel
         // Public Function Folder_Suggestions(MSG As MailItem,
         // AppGlobals As IApplicationGlobals,
         // Optional Reload As Boolean = True,
-        // Optional ByVal InBackground As Boolean = False) As cSuggestions
+        // Optional ByVal InBackground As Boolean = False) As Suggestions
 
 
         // Dim Inc_Num As Integer
@@ -21,8 +21,8 @@ namespace ToDoModel
         // Dim SubjectStripped As String
 
 
-        // Dim Result As cSuggestions
-        // Result = New cSuggestions
+        // Dim Result As Suggestions
+        // Result = New Suggestions
         // Dim i As Integer
         // Dim SWVal, Score, Val1 As Long
         // Dim ConvID As String

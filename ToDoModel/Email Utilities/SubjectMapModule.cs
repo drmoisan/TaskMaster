@@ -31,54 +31,34 @@ namespace ToDoModel
         public static int WordCount;
 
         public List<SubjectIncidence> SubjectIncidences;
-        public static int Subject_Inc_Ct;
 
-        public static List<SubjectMapEntry> SubjectMapReadTextFile(IFileSystemFolderPaths fs, IList<string> commonWords)
-        {
-            var subjectMapEntries = new List<SubjectMapEntry>();
-
-            string[] fileContents = FileIO2.CSV_Read(filename: fs.Filenames.SubjectMap, fileaddress: fs.FldrPythonStaging, SkipHeaders: true);
-            var rowQueue = new Queue<string>(fileContents);
-
-            while (rowQueue.Count > 0)
-            {
-                subjectMapEntries.Add(
-                    new SubjectMapEntry(emailFolder: rowQueue.Dequeue(),
-                                        emailSubject: rowQueue.Dequeue().StripCommonWords(commonWords),
-                                        emailSubjectCount: int.Parse(rowQueue.Dequeue())));
-            }
-            return subjectMapEntries;
-        }
 
         public void SubjectMapAdd(string subject, string folderName)
         {
-            int idx;
+            int idx = SubjectMapEntries.FindIndex(entry => ((entry.EmailSubject == subject) && (entry.EmailFolder == folderName)));
 
-
-            // Check to see if any mapping exists. If not, add the first entry
-            if (SubjectMapEntries.Count == 0)
+            // If it doesn't exist, add an entry. If it does exist, increase the count
+            if (idx == -1)
             {
                 SubjectMapEntries.Add(
                     new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
             }
-
-            // Else, try to find the item 
             else
             {
-                idx = SubjectMapEntries.FindIndex(entry => ((entry.EmailSubject == subject) && (entry.EmailFolder == folderName)));
-
-                // If it doesn't exist, add an entry. If it does exist, increase the count
-                if (idx == -1)
-                {
-                    SubjectMapEntries.Add(
-                        new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
-                }
-                else
-                {
-                    SubjectMapEntries[idx].EmailSubjectCount +=  1;
-                }
-
+                SubjectMapEntries[idx].EmailSubjectCount +=  1;
             }
+
+            // Check to see if any mapping exists. If not, add the first entry
+            //if (SubjectMapEntries.Count == 0)
+            //{
+            //    SubjectMapEntries.Add(
+            //        new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
+            //}
+
+            //// Else, try to find the item 
+            //else
+            //{
+            //}
         }
 
         public void SubjectIncAdd(string folderName, int score)

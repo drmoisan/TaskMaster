@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Newtonsoft;
 using Newtonsoft.Json;
 using Microsoft.Office.Interop.Outlook;
-
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
@@ -87,6 +87,12 @@ namespace UtilitiesCS
                 _innerList[index] = value;
             }
         }
+        #endregion
+
+        #region IList<T> Extensions
+        public int FindIndex(Predicate<T> match) => _innerList.FindIndex(match);
+        public int FindIndex(int startIndex, Predicate<T> match) => _innerList.FindIndex(startIndex, match);
+        public int FindIndex(int startIndex, int count, Predicate<T> match) => _innerList.FindIndex(startIndex, count, match);
         #endregion
 
         #region ICollection<T> Members
