@@ -394,5 +394,29 @@ namespace TaskMaster.Properties {
                 this["BackupFile_CommonWords"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9999999SubjectEncoding.json")]
+        public string FileName_SubjectEncoding {
+            get {
+                return ((string)(this["FileName_SubjectEncoding"]));
+            }
+            set {
+                this["FileName_SubjectEncoding"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9999999Subject_Map.txt")]
+        public string BackupFile_SubjectMap {
+            get {
+                return ((string)(this["BackupFile_SubjectMap"]));
+            }
+            set {
+                this["BackupFile_SubjectMap"] = value;
+            }
+        }
     }
 }

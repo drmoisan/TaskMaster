@@ -5,7 +5,7 @@
     <Setting Name="MaxToDo" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">0</Value>
     </Setting>
-	<Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
+    <Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="Prefix_People" Type="System.String" Scope="User">
@@ -97,6 +97,12 @@
     </Setting>
     <Setting Name="BackupFile_CommonWords" Type="System.String" Scope="User">
       <Value Profile="(Default)">9999999CommonWords.txt</Value>
+    </Setting>
+    <Setting Name="FileName_SubjectEncoding" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999SubjectEncoding.json</Value>
+    </Setting>
+    <Setting Name="BackupFile_SubjectMap" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999Subject_Map.txt</Value>
     </Setting>
   </Settings>
 </SettingsFile>

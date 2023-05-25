@@ -1,46 +1,44 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Serialization;
-using System.IO;
 using System.Windows.Forms;
-using Newtonsoft;
-using Newtonsoft.Json;
-using Microsoft.Office.Interop.Outlook;
-using UtilitiesCS.ReusableTypeClasses;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
-namespace UtilitiesCS
+namespace UtilitiesCS.ReusableTypeClasses
 {
     [Serializable()]
-    public class SerializableList<T> : IList<T>, ISerializableList<T>
+    public class SerializableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>, ISerializableDictionary<TKey, TValue>
     {
-        public SerializableList()
-        {
-            _innerList = new List<T>();
-        }
+        public SerializableDictionary() : base() { }
+        public SerializableDictionary(IEqualityComparer<TKey> comparer) : base(comparer) { }
+        public SerializableDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary) { }
+        public SerializableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer) : base(dictionary, comparer) { }
+        protected SerializableDictionary(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public SerializableList(List<T> listOfT)
-        {
-            _innerList = listOfT;
-        }
-
-        public SerializableList(IEnumerable<T> IEnumerableOfT)
-        {
-            _lazyLoader = IEnumerableOfT;
-        }
-
-        public SerializableList(string filename, string folderpath)
-        {
-            Filename = filename;
+        public SerializableDictionary(string filename, string folderpath) : base() 
+        { 
+            Filename = filename; 
             Folderpath = folderpath;
-            Deserialize();
         }
 
-        public SerializableList(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        public SerializableDictionary(IDictionary<TKey, TValue> dictionary,
+                                      string filename,
+                                      string folderpath) : base(dictionary) 
+        { 
+            Filename = filename; 
+            Folderpath = folderpath; 
+        }
+
+        public SerializableDictionary(string filename,
+                                      string folderpath,
+                                      AltLoader<TKey, TValue> backupLoader,
+                                      string backupFilepath,
+                                      bool askUserOnError) : base()
         {
             Filename = filename;
             Folderpath = folderpath;
@@ -48,118 +46,14 @@ namespace UtilitiesCS
             Deserialize(_filepath, backupLoader, askUserOnError);
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private IList<T> _innerList;
-        private IEnumerable<T> _lazyLoader;
-        private string _backupFilepath = "";
-
-        internal void ensureList()
-        {
-            if (_innerList == null)
-                _innerList = new List<T>(_lazyLoader);
-        }
-
-        #region IList<T> Members
-        public int IndexOf(T item)
-        {
-            ensureList();
-            return _innerList.IndexOf(item);
-        }
-        public void Insert(int index, T item)
-        {
-            ensureList();
-            _innerList.Insert(index, item);
-        }
-        public void RemoveAt(int index)
-        {
-            ensureList();
-            _innerList.RemoveAt(index);
-        }
-        public T this[int index]
-        {
-            get
-            {
-                ensureList();
-                return _innerList[index];
-            }
-            set
-            {
-                ensureList();
-                _innerList[index] = value;
-            }
-        }
-        #endregion
-
-        #region IList<T> Extensions
-        public int FindIndex(Predicate<T> match) => _innerList.FindIndex(match);
-        public int FindIndex(int startIndex, Predicate<T> match) => _innerList.FindIndex(startIndex, match);
-        public int FindIndex(int startIndex, int count, Predicate<T> match) => _innerList.FindIndex(startIndex, count, match);
-        #endregion
-
-        #region ICollection<T> Members
-        public void Add(T item)
-        {
-            ensureList();
-            _innerList.Add(item);
-            NotifyPropertyChanged(nameof(Add));
-        }
-        public void Clear()
-        {
-            ensureList();
-            _innerList.Clear();
-        }
-        public bool Contains(T item)
-        {
-            ensureList();
-            return _innerList.Contains(item);
-        }
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            ensureList();
-            _innerList.CopyTo(array, arrayIndex);
-        }
-        public int Count
-        {
-            get { ensureList(); return _innerList.Count; }
-        }
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-        public bool Remove(T item)
-        {
-            ensureList();
-            return _innerList.Remove(item);
-        }
-        #endregion
-
-        #region IEnumerable<T> Members
-        public IEnumerator<T> GetEnumerator()
-        {
-            ensureList();
-            return _innerList.GetEnumerator();
-        }
-        #endregion
-
-        #region IEnumerable Members
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            ensureList();
-            return _innerList.GetEnumerator();
-        }
-        #endregion
-
         #region Serialization
+        public delegate Dictionary<TKey, TValue> AltLoader<TKey, TValue>(string filepath);
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private string _filepath = "";
         private string _filename = "";
         private string _folderpath = "";
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        private string _backupFilepath = "";
 
         public string Filepath
         {
@@ -235,7 +129,7 @@ namespace UtilitiesCS
             if (Filepath != "") Deserialize(Filepath, askUserOnError);
         }
 
-        public void Deserialize(string filepath, CSVLoader<T> backupLoader, bool askUserOnError)
+        public void Deserialize(string filepath, AltLoader<TKey, TValue> backupLoader, bool askUserOnError)
         {
             if (_filepath != filepath) this.Filepath = filepath;
 
@@ -243,7 +137,8 @@ namespace UtilitiesCS
 
             try
             {
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
+                foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
             }
             catch (FileNotFoundException e)
             {
@@ -282,7 +177,8 @@ namespace UtilitiesCS
                 {
                     if (_backupFilepath != "")
                     {
-                        _innerList = backupLoader(_backupFilepath);
+                        var innerDictionary = backupLoader(_backupFilepath);
+                        foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
                     }
                     else
                     {
@@ -290,9 +186,9 @@ namespace UtilitiesCS
 
                         var folder = Path.GetDirectoryName(filepath);
                         var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";
-                        _innerList = backupLoader(Path.Combine(folder, filename));
+                        var innerDictionary = backupLoader(Path.Combine(folder, filename));
+                        foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
                     }
-                    NotifyPropertyChanged("BackupLoader");
                     Serialize();
                 }
                 else if (response == DialogResult.No)
@@ -309,7 +205,7 @@ namespace UtilitiesCS
 
                     if (response == DialogResult.Yes)
                     {
-                        _innerList = new List<T> { };
+
                     }
                     else { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
                 }
@@ -325,7 +221,8 @@ namespace UtilitiesCS
 
             try
             {
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
+                foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
             }
             catch (FileNotFoundException)
             {
@@ -352,20 +249,8 @@ namespace UtilitiesCS
                 }
                 else { response = DialogResult.Yes; }
             }
-            finally
-            {
-                if (response == DialogResult.Yes)
-                {
-                    _innerList = new List<T> { };
-                }
-                else if (_innerList == null)
-                {
-                    throw new ArgumentNullException("Must have a list or create one to continue executing");
-                }
-            }
         }
 
-        public List<T> ToList() { return new List<T>(_innerList); }
         #endregion
 
     }

@@ -36,10 +36,8 @@ namespace ToDoModel
 
         public int CompareTo(IToDoProjectInfoEntry other)
         {
-            if (other is null)
-            {
-                return 1;
-            }
+            if (other is null) { return 1; }
+            else if (ProjectID is null) { return -1; }
             else
             {
                 int x = string.CompareOrdinal(ProjectID, other.ProjectID);

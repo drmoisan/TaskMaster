@@ -133,6 +133,8 @@
     <Compile Include="RunMSDemo.cs" />
     <Compile Include="CommonWords_Test.cs" />
     <Compile Include="InputBox_Test.cs" />
+    <Compile Include="UnitTest4.cs" />
+    <Compile Include="Tokenizer_Test.cs" />
     <Compile Include="YesNoToAll_Test.cs" />
   </ItemGroup>
   <ItemGroup>

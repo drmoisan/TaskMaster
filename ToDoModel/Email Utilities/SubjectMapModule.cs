@@ -23,74 +23,74 @@ namespace ToDoModel
         public string FolderName { get => _folderName; set => _folderName = value; }
     }
 
-    public class SubjectMapClass 
-    {
-        public SubjectMapClass() { }        
-        public List<SubjectMapEntry> SubjectMapEntries;
-        public static string[] WordList;
-        public static int WordCount;
+    //public class SubjectMapClass 
+    //{
+    //    public SubjectMapClass() { }        
+    //    public List<SubjectMapEntry> SubjectMapEntries;
+    //    public static string[] WordList;
+    //    public static int WordCount;
 
-        public List<SubjectIncidence> SubjectIncidences;
+    //    public List<SubjectIncidence> SubjectIncidences;
 
 
-        public void SubjectMapAdd(string subject, string folderName)
-        {
-            int idx = SubjectMapEntries.FindIndex(entry => ((entry.EmailSubject == subject) && (entry.EmailFolder == folderName)));
+    //    public void SubjectMapAdd(string subject, string folderName)
+    //    {
+    //        int idx = SubjectMapEntries.FindIndex(entry => ((entry.EmailSubject == subject) && (entry.Folderpath == folderName)));
 
-            // If it doesn't exist, add an entry. If it does exist, increase the count
-            if (idx == -1)
-            {
-                SubjectMapEntries.Add(
-                    new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
-            }
-            else
-            {
-                SubjectMapEntries[idx].EmailSubjectCount +=  1;
-            }
+    //        // If it doesn't exist, add an entry. If it does exist, increase the count
+    //        if (idx == -1)
+    //        {
+    //            SubjectMapEntries.Add(
+    //                new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
+    //        }
+    //        else
+    //        {
+    //            SubjectMapEntries[idx].EmailSubjectCount +=  1;
+    //        }
 
-            // Check to see if any mapping exists. If not, add the first entry
-            //if (SubjectMapEntries.Count == 0)
-            //{
-            //    SubjectMapEntries.Add(
-            //        new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
-            //}
+    //        // Check to see if any mapping exists. If not, add the first entry
+    //        //if (SubjectMapEntries.Count == 0)
+    //        //{
+    //        //    SubjectMapEntries.Add(
+    //        //        new SubjectMapEntry(emailFolder: folderName, emailSubject: subject, emailSubjectCount: 1));
+    //        //}
 
-            //// Else, try to find the item 
-            //else
-            //{
-            //}
-        }
+    //        //// Else, try to find the item 
+    //        //else
+    //        //{
+    //        //}
+    //    }
 
-        public void SubjectIncAdd(string folderName, int score)
-        {
-            int idx;
+    //    public void SubjectIncAdd(string folderName, int score)
+    //    {
+    //        int idx;
 
-            // Check to see if any mapping exists. If not, add the first entry
-            if (SubjectIncidences.Count == 0)
-            {
-                SubjectIncidences.Add(new SubjectIncidence(score: score, folderName: folderName));
-            }
+    //        // Check to see if any mapping exists. If not, add the first entry
+    //        if (SubjectIncidences.Count == 0)
+    //        {
+    //            SubjectIncidences.Add(new SubjectIncidence(score: score, folderName: folderName));
+    //        }
 
-            // Else, find the item and insert it
-            else
-            {
-                idx = SubjectIncidences.FindIndex(incidence => incidence.FolderName == folderName);                            // Find a matching pair
+    //        // Else, find the item and insert it
+    //        else
+    //        {
+    //            idx = SubjectIncidences.FindIndex(incidence => incidence.FolderName == folderName);                            // Find a matching pair
 
-                // If it doesn't exist, add an entry. If it does exist, increase the count
-                if (idx == -1)
-                {
-                    SubjectIncidences.Add(new SubjectIncidence(score: score, folderName: folderName));
-                }
+    //            // If it doesn't exist, add an entry. If it does exist, increase the count
+    //            if (idx == -1)
+    //            {
+    //                SubjectIncidences.Add(new SubjectIncidence(score: score, folderName: folderName));
+    //            }
 
-                else
-                {
-                    SubjectIncidences[idx].Score += score;
-                }
+    //            else
+    //            {
+    //                SubjectIncidences[idx].Score += score;
+    //            }
 
-            }
-        }
+    //        }
+    //    }
         
-    }
+    //}
 
 
     public static class SubjectMapModule
@@ -116,7 +116,7 @@ namespace ToDoModel
             {
                 SubjectMapCt += 1;
                 Array.Resize(ref SubjectMap, (int)(SubjectMapCt + 1));
-                SubjectMap[(int)SubjectMapCt].EmailFolder = rowQueue.Dequeue();
+                SubjectMap[(int)SubjectMapCt].Folderpath = rowQueue.Dequeue();
                 SubjectMap[(int)SubjectMapCt].EmailSubject = CommonWordsModule.StripCommonWords(rowQueue.Dequeue(), commonWords);
                 SubjectMap[(int)SubjectMapCt].EmailSubjectCount = int.Parse(rowQueue.Dequeue());
             }
@@ -172,7 +172,7 @@ namespace ToDoModel
 
         public static void Subject_Map_Set(string Subj, int SubjCt, string FolderName, int Subject_Map_Idx)
         {
-            SubjectMap[Subject_Map_Idx].EmailFolder = FolderName;
+            SubjectMap[Subject_Map_Idx].Folderpath = FolderName;
             SubjectMap[Subject_Map_Idx].EmailSubject = Subj;
             SubjectMap[Subject_Map_Idx].EmailSubjectCount = SubjCt;
         }
@@ -189,7 +189,7 @@ namespace ToDoModel
             var loopTo = (int)SubjectMapCt;
             for (i = 1; i <= loopTo; i++)
             {
-                if ((SubjectMap[i].EmailSubject ?? "") == (Subj ?? "") & (SubjectMap[i].EmailFolder ?? "") == (FolderName ?? ""))
+                if ((SubjectMap[i].EmailSubject ?? "") == (Subj ?? "") & (SubjectMap[i].Folderpath ?? "") == (FolderName ?? ""))
                 {
                     Subject_Map_Idx = i;
                     break;

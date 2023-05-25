@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public static class FindIndexIList
+    public static class IListExtensions
     {
         public static int FindIndex<T>(this IList<T> list, Predicate<T> match)
         {

@@ -125,6 +125,7 @@
     <Compile Include="Email Utilities\CommonWordsModule.cs" />
     <Compile Include="Email Utilities\Conversation_To_Folder.cs" />
     <Compile Include="Email Utilities\cStopWatch.cs" />
+    <Compile Include="Email Utilities\SmithWaterman.cs" />
     <Compile Include="Email Utilities\Suggestions.cs" />
     <Compile Include="Email Utilities\CTFIncidenceModule.cs" />
     <Compile Include="Email Utilities\CTF_Incidence.cs" />
@@ -132,10 +133,8 @@
     <Compile Include="Email Utilities\Load_CTF_AND_Subjects_AND_Recents.cs" />
     <Compile Include="Email Utilities\ModuleMailItemsSort.cs" />
     <Compile Include="Email Utilities\SaveAttachmentsModule.cs" />
-    <Compile Include="Email Utilities\Smith_Watterman.cs" />
     <Compile Include="Email Utilities\SortItemsToExistingFolder.cs" />
     <Compile Include="Email Utilities\SubjectMapModule.cs" />
-    <Compile Include="Email Utilities\SubjectMapEntry.cs" />
     <Compile Include="FlagDetails.cs" />
     <Compile Include="Outlook Todo Utilities\ToDoEvents.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,46 @@ namespace UtilitiesCS
             for (int i = 0; i < rowCount; i++)
             {
                 stringArray[i] = array[i].ToString();
+            }
+            return stringArray;
+        }
+
+        public static string[,] ToStringArray<T>(this T[,] array, string nullReplacement)
+        {
+            int rowCount = array.GetLength(0);
+            int columnCount = array.GetLength(1);
+            string[,] stringArray = new string[rowCount, columnCount];
+            for (int i = 0; i < rowCount; i++)
+            {
+                for (int j = 0; j < columnCount; j++)
+                {
+                    if (array[i, j] is null) 
+                    {
+                        stringArray[i, j] = nullReplacement;
+                    }
+                    else
+                    {
+                        stringArray[i, j] = array[i, j].ToString();
+                    }
+                }
+            }
+            return stringArray;
+        }
+
+        public static string[] ToStringArray<T>(this T[] array, string nullReplacement)
+        {
+            int rowCount = array.Length;
+            string[] stringArray = new string[rowCount];
+            for (int i = 0; i < rowCount; i++)
+            {
+                if(array[i] is null)
+                {
+                    stringArray[i] = nullReplacement;
+                }
+                else
+                {
+                    stringArray[i] = array[i].ToString();
+                }
             }
             return stringArray;
         }
@@ -207,7 +248,59 @@ namespace UtilitiesCS
             return false;
         }
 
+        //
+        // Summary:
+        //     Casts the elements of an System.Collections.IEnumerable to the specified type.
+        //
+        // Parameters:
+        //   source:
+        //     The System.Collections.IEnumerable that contains the elements to be cast to type
+        //     TResult.
+        //
+        // Type parameters:
+        //   TResult:
+        //     The type to cast the elements of source to.
+        //
+        // Returns:
+        //     An System.Collections.Generic.IEnumerable`1 that contains each element of the
+        //     source sequence cast to the specified type.
+        //
+        // Exceptions:
+        //   T:System.ArgumentNullException:
+        //     source is null.
+        //
+        //   T:System.InvalidCastException:
+        //     An element in the sequence cannot be cast to type TResult.
+        public static IEnumerable<TResult> CastNullSafe<TResult>(this IEnumerable source)
+        {
+            IEnumerable<TResult> enumerable = source as IEnumerable<TResult>;
+            if (enumerable != null)
+            {
+                return enumerable;
+            }
+
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            return CastIteratorNullSafe<TResult>(source);
+        }
+
+        private static IEnumerable<TResult> CastIteratorNullSafe<TResult>(IEnumerable source)
+        {
+            foreach (object item in source)
+            {
+                if (item is null)
+                {
+                    yield return default(TResult);
+                }
+                else { yield return (TResult)item; }
+            }
+        }
+
+
     }
 
-    
+
 }

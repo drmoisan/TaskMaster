@@ -8,7 +8,7 @@ using UtilitiesCS;
 namespace ToDoModel
 {
 
-    public static class Smith_Watterman
+    public static class SmithWaterman
     {
         // Global Const Match_Score = 1
         // Global Const Mismatch_Score = 0
@@ -120,6 +120,84 @@ namespace ToDoModel
             
         }
 
+        public static int SW_CalcInt(int[] words_X, int[] wordLength_X, int[] words_Y, int[] wordLength_Y, IAppAutoFileObjects AFSettings)
+        {
+            int SW_CalcRet = default;
+            int LenX, LenY, x, y, calcA, calcB, calcC, tempa;
+            var maxSmith_Watterman = default(int);
+
+            // StopWatch_SW.reStart
+            //string[] flatcsv;
+            
+            LenX = words_X.Length;
+            LenY = words_Y.Length;
+            int[,] Matrix = new int[LenX + 3 + 1, LenY + 3 + 1];
+            //flatcsv = new string[LenY + 3 + 1];
+
+            // *********************************
+            // **********Initialize*************
+            var loopTo = LenX + 3;
+            for (x = 3; x < loopTo; x++)
+                Matrix[x, 1] = words_X[x - 3];
+
+            var loopTo1 = LenY + 3;
+            for (y = 3; y < loopTo1; y++)
+                Matrix[1, y] = words_Y[y - 3];
+
+            var loopTo2 = LenX + 3;
+            for (x = 2; x < loopTo2; x++)
+                Matrix[x, 2] = 0;
+
+            var loopTo3 = LenY + 3;
+            for (y = 2; y < loopTo3; y++)
+                Matrix[2, y] = 0;
+            // *********************************
+
+            // *********************************
+
+            var loopTo4 = LenX + 3;
+            for (x = 3; x < loopTo4; x++)
+            {
+                var loopTo5 = LenY + 3;
+                for (y = 3; y < loopTo5; y++)
+                {
+                    calcA = (int)Matrix[x - 1, y - 1];
+                    if (Matrix[x, 1] == Matrix[1, y])
+                    {
+                        calcA = calcA + AFSettings.SmithWatterman_MatchScore * wordLength_X[x-3];
+                    }
+                    else
+                    {
+                        calcA = calcA + AFSettings.SmithWatterman_MismatchScore;
+                    }
+
+                    calcB = (int)((int)Matrix[x, y - 1] + AFSettings.SmithWatterman_GapPenalty * wordLength_Y[y-3]);
+                    calcC = (int)((int)Matrix[x - 1, y] + AFSettings.SmithWatterman_GapPenalty * wordLength_X[x-3]);
+                    tempa = max(0, calcA, calcB, calcC);
+                    Matrix[x, y] = tempa;
+                    if (tempa > maxSmith_Watterman)
+                        maxSmith_Watterman = tempa;
+                }
+            }
+
+            //var loopTo6 = LenY + 3;
+            //for (y = 1; y <= loopTo6; y++)
+            //{
+            //    flatcsv[y] = "";
+            //    var loopTo7 = LenX + 2;
+            //    for (x = 1; x <= loopTo7; x++)
+            //        flatcsv[y] = string.Concat(flatcsv[y], Matrix[x, y].ToString(), ", ");
+            //    flatcsv[y] = string.Concat(flatcsv[y], Matrix[LenX + 3, y].ToString());
+            //}
+
+            // Call Printout(flatcsv)
+            // MsgBox (maxSmith_Watterman & " of " & Max(LenX + 1, LenY + 1))
+            SW_CalcRet = maxSmith_Watterman;
+
+            // StopWatch_SW.Pause
+            return SW_CalcRet;
+
+        }
 
 
         public static int max(params int[] values)

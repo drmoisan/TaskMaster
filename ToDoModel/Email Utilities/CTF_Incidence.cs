@@ -28,7 +28,7 @@
 // End Set
 // End Property
 
-// Public Property EmailFolder As String()
+// Public Property Folderpath As String()
 // Get
 // Return _emailFolder
 // End Get

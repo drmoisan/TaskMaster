@@ -19,12 +19,6 @@ namespace UtilitiesCS
         public static string[] Split(this string str,  string delimiter) 
         { return str.Split(new string[] { delimiter }, StringSplitOptions.None); }
 
-        public static string[] Tokenize(this string doc)
-        {
-            var _regex = new Regex(@"\b\w\w+\b");
-
-            return _regex.Matches(doc).Cast<Match>().Select(x => x.Value.ToLower()).ToArray();
-        }
 
         /// <summary>
         /// Function finds all matching substrings within a delimited string and returns 

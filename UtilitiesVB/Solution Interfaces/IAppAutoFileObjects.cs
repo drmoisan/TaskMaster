@@ -1,4 +1,5 @@
 ﻿using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesVB
 {
@@ -15,5 +16,7 @@ namespace UtilitiesVB
         int SmithWatterman_MatchScore { get; set; }
         int SmithWatterman_MismatchScore { get; set; }
         int SmithWatterman_GapPenalty { get; set; }
+        public ISubjectMapSL SubjectMap { get;  }
+        ISubjectMapEncoder Encoder { get; }
     }
 }

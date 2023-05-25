@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Office.Interop.Outlook;
-
+using System.Linq;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesVB;
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace ToDoModel
 {
@@ -18,6 +21,8 @@ namespace ToDoModel
         private string[] _strFolderArray;
         private long[] lngValor;
         private const int MaxSuggestions = 5;
+        private static char[] _wordChars = { '&' };
+        private Regex _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
 
         public Suggestions()
         {
@@ -215,7 +220,19 @@ namespace ToDoModel
             ClearSuggestions();
             AddConversationBasedSuggestions(OlMail, _globals);
             AddAnythingInAutoFileField(OlMail, _globals);
-            AddWordSequenceSuggestions(OlMail, AppGlobals);
+            if ((OlMail.Subject is not null)&&(OlMail.Subject.Length > 0))
+            {
+                var target = new SubjectMapEntry(emailSubject: OlMail.Subject,
+                                                 emailSubjectCount: 1,
+                                                 commonWords: AppGlobals.AF.CommonWords,
+                                                 tokenizerRegex: _tokenizerRegex,
+                                                 encoder: AppGlobals.AF.Encoder);
+                if (!target.SubjectEncoded.SequenceEqual(new int[] { }))
+                {
+                    AddWordSequenceSuggestionsP(target, AppGlobals);
+                }
+            }
+            
         }
 
         private void ClearSuggestions()
@@ -235,27 +252,124 @@ namespace ToDoModel
             string strTmpFldr;
             string[] varFldrSubs;
 
-            SubjectStripped = OlMail.Subject.StripCommonWords((IList<string>)AppGlobals.AF.CommonWords); // Eliminate common words from the subject
+            SubjectStripped = OlMail.Subject.StripCommonWords(AppGlobals.AF.CommonWords); // Eliminate common words from the subject
             var loopTo = (int)SubjectMapModule.SubjectMapCt;
-            for (i = 1; i <= loopTo; i++)   // Loop through every subject of every email ever received
+            for (i = 1; i <= loopTo; i++)   // Loop through every subject / folder combination
             {
                 {
-                    SWVal = Smith_Watterman.SW_Calc(SubjectStripped, SubjectMapModule.SubjectMap[i].EmailSubject, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
+                    // Run Smith Waterman on Email Subject and the SubjectMap
+                    SWVal = SmithWaterman.SW_Calc(SubjectStripped, SubjectMapModule.SubjectMap[i].EmailSubject, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
+
+                    // Calculate a weighted score
                     Val = (int)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * SubjectMapModule.SubjectMap[i].EmailSubjectCount);
-                    if ((SubjectMapModule.SubjectMap[i].EmailFolder ?? "") != (SubjectMapModule.SubjectMap[i - 1].EmailFolder ?? ""))
+
+                    // Execute on only distinct Email Folder Names 
+                    if ((SubjectMapModule.SubjectMap[i].Folderpath ?? "") != (SubjectMapModule.SubjectMap[i - 1].Folderpath ?? ""))
                     {
-                        varFldrSubs = SubjectMapModule.SubjectMap[i].EmailFolder.Split("\\");
+                        // Get the top level folder name in the folder tree
+                        varFldrSubs = SubjectMapModule.SubjectMap[i].Folderpath.Split("\\");
+
+                        // Run Smith Waterman on Email Subject and the distinct Email Folder Names
                         strTmpFldr = varFldrSubs[varFldrSubs.Length-1];
-                        Val1 = Smith_Watterman.SW_Calc(SubjectStripped, strTmpFldr, ref Matrix, AppGlobals.AF, Smith_Watterman.SW_Options.ByWords);
+
+                        // Run Smith Waterman on Email Subject and the distinct Email Folder Names
+                        Val1 = SmithWaterman.SW_Calc(SubjectStripped, strTmpFldr, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
+                        
+                        // Combine the two scores using relative weights
                         Val = Val1 * Val1 + Val;
                     }
 
                     if (Val > 5)
                     {
-                        Add(SubjectMapModule.SubjectMap[i].EmailFolder, Val);
+                        Add(SubjectMapModule.SubjectMap[i].Folderpath, Val);
                     }
                 }
             }
+        }
+
+        internal struct FolderScoring
+        {
+            public string FolderPath;
+            public string FolderName;
+            public int[] FolderEncoding;
+            public int[] FolderWordLengths;
+            public int Score;
+        }
+
+        internal void AddWordSequenceSuggestionsP(SubjectMapEntry target, IApplicationGlobals appGlobals)
+        {
+            var map = appGlobals.AF.SubjectMap.ToList();
+            
+            var querySubject = map //.AsParallel()
+                               .Where(entry => entry.SubjectEncoded is not null)
+                               .Select(entry =>
+                               {
+                                   int subjScore = SmithWaterman.SW_CalcInt(entry.SubjectEncoded,
+                                                                            entry.SubjectWordLengths,
+                                                                            target.SubjectEncoded,
+                                                                            target.SubjectWordLengths,
+                                                                            appGlobals.AF);
+                                   int subjScoreWt = (int)Math.Round(
+                                       Math.Pow(subjScore, appGlobals.AF.LngConvCtPwr) * entry.EmailSubjectCount);
+
+                                   entry.Score = subjScoreWt;
+                                   return entry;
+                               })
+                               .GroupBy(entry => entry.Folderpath,
+                                        entry => entry,
+                                        (folderpath, grouping) => new FolderScoring
+                                        {
+                                            FolderPath = folderpath,
+                                            FolderName = grouping.Select(x => x.Foldername).First(),
+                                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
+                                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                                            Score = grouping.Select(x => x.Score).Sum()
+                                        });
+
+            var queryFolder = map //.AsParallel()
+                              .GroupBy(entry => entry.Folderpath,
+                                       entry => entry,
+                                       (folderpath, grouping) => new FolderScoring
+                                       {
+                                           FolderPath = folderpath,
+                                           FolderName = grouping.Select(x => x.Foldername).First(),
+                                           FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
+                                           FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                                           Score = 0
+                                       })
+                              .Select(entry =>
+                              {
+                                  int fldrScore = SmithWaterman.SW_CalcInt(entry.FolderEncoding,
+                                                                           entry.FolderWordLengths,
+                                                                           target.SubjectEncoded,
+                                                                           target.SubjectWordLengths,
+                                                                           appGlobals.AF);
+                                  entry.Score = (int)(fldrScore * fldrScore);
+                                  return entry;
+                              });
+            
+            var queryCombined = querySubject
+                                .Concat(queryFolder) //.AsParallel()
+                                .GroupBy(entry => entry.FolderPath,
+                                         entry => entry,
+                                         (folderpath, grouping) => new FolderScoring
+                                         {
+                                             FolderPath = folderpath,
+                                             FolderName = grouping.Select(x => x.FolderName).First(),
+                                             FolderEncoding = grouping.Select(x => x.FolderEncoding).First(),
+                                             FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                                             Score = grouping.Select(x => x.Score).Sum()
+                                         })
+                                .OrderByDescending(entry => entry.Score)
+                                .Take(5);
+
+            foreach(var entry in queryCombined)
+            {
+                if (entry.Score > 5)
+                {
+                    Add(entry.FolderPath, entry.Score);
+                }
+            }                     
         }
 
         private void AddAnythingInAutoFileField(MailItem OlMail, IApplicationGlobals _globals)

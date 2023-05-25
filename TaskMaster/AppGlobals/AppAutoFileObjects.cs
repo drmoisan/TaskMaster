@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesVB;
 
 namespace TaskMaster
@@ -21,8 +23,7 @@ namespace TaskMaster
         private CtfIncidenceList _ctfList;
         private ISerializableList<string> _commonWords;
         private Properties.Settings _defaults = Properties.Settings.Default;
-        private ISerializableList<ISubjectMapEntry> _subjectMap;
-
+        
         public AppAutoFileObjects(ApplicationGlobals ParentInstance)
         {
             _parent = ParentInstance;
@@ -34,18 +35,18 @@ namespace TaskMaster
             set { _defaults.ConversationExponent = value; _defaults.Save(); }
         }
 
-        public int Conversation_Weight 
+        public int Conversation_Weight
         {
             get => _defaults.ConversationWeight;
-            set { _defaults.ConversationWeight = value; _defaults.Save();}
+            set { _defaults.ConversationWeight = value; _defaults.Save(); }
         }
 
         public bool SuggestionFilesLoaded { get => _sugFilesLoaded; set => _sugFilesLoaded = value; }
-        
+
         public int SmithWatterman_MatchScore
         {
             get => _defaults.SmithWatterman_MatchScore;
-            set {_defaults.SmithWatterman_MatchScore = value; _defaults.Save(); }
+            set { _defaults.SmithWatterman_MatchScore = value; _defaults.Save(); }
         }
 
         public int SmithWatterman_MismatchScore
@@ -60,7 +61,7 @@ namespace TaskMaster
             set { _defaults.SmithWatterman_GapPenalty = value; _defaults.Save(); }
         }
 
-        public int MaxRecents {get => _defaults.MaxRecents; set {_defaults.MaxRecents = value; _defaults.Save(); }}
+        public int MaxRecents { get => _defaults.MaxRecents; set { _defaults.MaxRecents = value; _defaults.Save(); } }
 
         public IRecentsList<string> RecentsList
         {
@@ -77,7 +78,7 @@ namespace TaskMaster
                 {
                     _recentsList.Folderpath = _parent.FS.FldrFlow;
                     _recentsList.Filename = Properties.Settings.Default.FileName_Recents;
-                } 
+                }
                 _recentsList.Serialize();
             }
         }
@@ -87,8 +88,8 @@ namespace TaskMaster
             get
             {
                 if (_ctfList is null)
-                    _ctfList = new CtfIncidenceList(filename: _defaults.File_CTF_Inc, 
-                                                    folderpath: _parent.FS.FldrPythonStaging, 
+                    _ctfList = new CtfIncidenceList(filename: _defaults.File_CTF_Inc,
+                                                    folderpath: _parent.FS.FldrPythonStaging,
                                                     backupFilepath: _defaults.BackupFile_CTF_Inc);
                 return _ctfList;
             }
@@ -109,11 +110,11 @@ namespace TaskMaster
             get
             {
                 if (_commonWords is null)
-                    _commonWords = new SerializableList<string>(filename: _defaults.File_Common_Words, 
-                                                                folderpath: _parent.FS.FldrPythonStaging, 
-                                                                backupLoader: CommonWordsBackupLoader, 
-                                                                backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging, 
-                                                                                             _defaults.BackupFile_CommonWords), 
+                    _commonWords = new SerializableList<string>(filename: _defaults.File_Common_Words,
+                                                                folderpath: _parent.FS.FldrPythonStaging,
+                                                                backupLoader: CommonWordsBackupLoader,
+                                                                backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
+                                                                                             _defaults.BackupFile_CommonWords),
                                                                 askUserOnError: false);
                 return _commonWords;
             }
@@ -135,25 +136,45 @@ namespace TaskMaster
             return cw.ToList();
         }
 
-        
+        private ISubjectMapEncoder _encoder;
+        public ISubjectMapEncoder Encoder 
+        { 
+            get 
+            {
+                if (_encoder is null) 
+                {
+                    _encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
+                                                     folderpath: _parent.FS.FldrPythonStaging);
+                    _encoder.Encoder.Deserialize();
+                    if (_encoder.Encoder.Count == 0) { _encoder.RebuildEncoding(SubjectMap); }
+                }
+                
+                return _encoder; 
+            }
+        }
 
-        public ISerializableList<ISubjectMapEntry> SubjectMap
+        private ISubjectMapSL _subjectMap;
+        public ISubjectMapSL SubjectMap
         {
             get
             {
                 if (_subjectMap is null)
-                    _subjectMap = new SerializableList<ISubjectMapEntry>(filename: _defaults.File_Subject_Map,
-                                                                         folderpath: _parent.FS.FldrPythonStaging,
-                                                                         backupLoader: SubjectMapReadTextFile,
-                                                                         backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
-                                                                                             _defaults.BackupFile_CommonWords),
-                                                                         askUserOnError: false); 
+                    _subjectMap = new SubjectMapSL(filename: _defaults.File_Subject_Map,
+                                                   folderpath: _parent.FS.FldrPythonStaging,
+                                                   backupLoader: SubjectMapBackupLoader,
+                                                   backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
+                                                                                _defaults.BackupFile_SubjectMap),
+                                                   askUserOnError: false,
+                                                   commonWords: CommonWords);
+
+                _subjectMap.PropertyChanged += SubjectMap_PropertyChanged;
+
                 return _subjectMap;
             }
 
         }
 
-        private IList<ISubjectMapEntry> SubjectMapReadTextFile(string filepath)
+        private IList<ISubjectMapEntry> SubjectMapBackupLoader(string filepath)
         {
             var subjectMapEntries = new List<ISubjectMapEntry>();
 
@@ -164,10 +185,25 @@ namespace TaskMaster
             {
                 subjectMapEntries.Add(
                     new SubjectMapEntry(emailFolder: rowQueue.Dequeue(),
-                                        emailSubject: rowQueue.Dequeue().StripCommonWords(this.CommonWords.ToList()),
-                                        emailSubjectCount: int.Parse(rowQueue.Dequeue())));
+                                        emailSubject: rowQueue.Dequeue(),
+                                        emailSubjectCount: int.Parse(rowQueue.Dequeue()),
+                                        commonWords: CommonWords));
             }
             return subjectMapEntries;
+        }
+        
+        internal void SubjectMap_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ISubjectMapSL map = (ISubjectMapSL)sender;
+            if (e.PropertyName == "Add")
+            {
+                var entry = map[map.Count - 1];
+                entry.Encode(Encoder);
+            }
+            else if (e.PropertyName == "BackupLoader") 
+            {
+                Encoder.RebuildEncoding(map);
+            }
         }
 
     }

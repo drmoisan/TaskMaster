@@ -145,6 +145,7 @@ namespace UtilitiesCS
                 foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
             }
             string[] columnHeaders = table.GetColumnHeaders();
+            
             object[,] data = table.GetArray(table.GetRowCount());
 
             //DataFrame df = DataFrame.FromColumns()

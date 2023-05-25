@@ -244,6 +244,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\KeyValuePairEnumerableExtensions.cs" />
+    <Compile Include="ReusableTypeClasses\IObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
+    <Compile Include="HelperClasses\Tokenizer.cs" />
+    <Compile Include="Interfaces\EnumFindBy.cs" />
+    <Compile Include="Interfaces\ISubjectMapSL.cs" />
+    <Compile Include="Interfaces\ISubjectMapEncoder.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapEncoder.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMapSL.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
     <Compile Include="Interfaces\ISubjectMapEntry.cs" />
@@ -252,10 +261,10 @@
     <Compile Include="EmailIntelligence\CommonWords.cs" />
     <Compile Include="EmailIntelligence\Conversation_To_Folder.cs" />
     <Compile Include="Examples\MSDemoConv.cs" />
-    <Compile Include="HelperClasses\ArrayExtensions.cs" />
+    <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="HelperClasses\ConversationHelper.cs" />
-    <Compile Include="HelperClasses\DataFrameExtensions.cs" />
-    <Compile Include="HelperClasses\DictionaryExtensions.cs" />
+    <Compile Include="Extensions\DataFrameExtensions.cs" />
+    <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="HelperClasses\FlagsHelper.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceList.cs" />
     <Compile Include="EmailIntelligence\CTF_Incidence.cs" />
@@ -269,8 +278,8 @@
     </Compile>
     <Compile Include="HelperClasses\OlItemSummary.cs" />
     <Compile Include="HelperClasses\PrettyPrint.cs" />
-    <Compile Include="HelperClasses\StringExtensions.cs" />
-    <Compile Include="HelperClasses\WinFormsExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\WinFormsExtensions.cs" />
     <Compile Include="Dialogs\InputBoxViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -278,7 +287,9 @@
       <DependentUpon>InputBoxViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="OutlookExtensions\UserDefinedFields.cs" />
-    <Compile Include="ReusableTypeClasses\FindIndexIList.cs" />
+    <Compile Include="Extensions\IListExtensions.cs" />
+    <Compile Include="Interfaces\ISerializableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
     <Compile Include="WindowsAPI\ExtraDeclarations.cs" />
     <Compile Include="EmailIntelligence\FolderConverter.cs" />
     <Compile Include="Dialogs\FolderNotFoundViewer.cs">

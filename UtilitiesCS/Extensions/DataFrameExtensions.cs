@@ -12,62 +12,52 @@ namespace UtilitiesCS
 {
     public static class DataFrameExtensions
     {
-        public static DataFrame ToDataFrame(this object[,] Data, string[] ColumnNames)
+        public static DataFrame ToDataFrame(this object[,] data, string[] columnNames)
         {
-            if (Data.GetLength(1) != ColumnNames.Length)
+            if (data.GetLength(1) != columnNames.Length)
             {
-                throw new ArgumentException($"Data is {Data.GetLength(1)} columns and column names is {ColumnNames.Length} columns. They must be of the same size");
+                throw new ArgumentException($"data is {data.GetLength(1)} columns and column names is {columnNames.Length} columns. They must be of the same size");
             }
 
             List<DataFrameColumn> dfCols = new List<DataFrameColumn>();
-            for (int j = 0; j < ColumnNames.Length; j++)
+            for (int j = 0; j < columnNames.Length; j++)
             {
-                dfCols.Add(GetDfColumn(ColumnNames[j], Data.SliceColumn<object>(j).ToArray()));
+                dfCols.Add(GetDfColumn(columnNames[j], data.SliceColumn<object>(j).ToArray()));
             }
 
             return new DataFrame(dfCols.ToArray());
         }
 
-        public static DataFrameColumn GetDfColumn(string ColumnName, object[] ColumnData)
+        public static DataFrameColumn GetDfColumn(string columnName, object[] columnData)
         {
-            object T = ColumnData[0];
-            if (T is string) { return new StringDataFrameColumn(ColumnName, ColumnData.Cast<string>().ToArray()); }
-            else if (T is bool) { return new PrimitiveDataFrameColumn<bool>(ColumnName, ColumnData.Cast<bool>().ToArray()); }
-            else if (T is byte) { return new PrimitiveDataFrameColumn<byte>(ColumnName, ColumnData.Cast<byte>().ToArray()); }
-            else if (T is sbyte) { return new PrimitiveDataFrameColumn<sbyte>(ColumnName, ColumnData.Cast<sbyte>().ToArray()); }
-            else if (T is char) { return new PrimitiveDataFrameColumn<char>(ColumnName, ColumnData.Cast<char>().ToArray()); }
-            else if (T is decimal) { return new PrimitiveDataFrameColumn<decimal>(ColumnName, ColumnData.Cast<decimal>().ToArray()); }
-            else if (T is double) { return new PrimitiveDataFrameColumn<double>(ColumnName, ColumnData.Cast<double>().ToArray()); }
-            else if (T is float) { return new PrimitiveDataFrameColumn<float>(ColumnName, ColumnData.Cast<float>().ToArray()); }
-            else if (T is int) { return new PrimitiveDataFrameColumn<int>(ColumnName, ColumnData.Cast<int>().ToArray()); }
-            else if (T is uint) { return new PrimitiveDataFrameColumn<uint>(ColumnName, ColumnData.Cast<uint>().ToArray()); }
-            else if (T is nint) { return new PrimitiveDataFrameColumn<nint>(ColumnName, ColumnData.Cast<nint>().ToArray()); }
-            else if (T is nuint) { return new PrimitiveDataFrameColumn<nuint>(ColumnName, ColumnData.Cast<nuint>().ToArray()); }
-            else if (T is long) { return new PrimitiveDataFrameColumn<long>(ColumnName, ColumnData.Cast<long>().ToArray()); }
-            else if (T is ulong) { return new PrimitiveDataFrameColumn<ulong>(ColumnName, ColumnData.Cast<ulong>().ToArray()); }
-            else if (T is short) { return new PrimitiveDataFrameColumn<short>(ColumnName, ColumnData.Cast<short>().ToArray()); }
-            else if (T is ushort) { return new PrimitiveDataFrameColumn<ushort>(ColumnName, ColumnData.Cast<ushort>().ToArray()); }
-            else { return new StringDataFrameColumn(ColumnName, ColumnData.ToStringArray()); }
+            object T = GetFirstNonNull(columnData);
+            if (T is string) { return new StringDataFrameColumn(columnName, columnData.CastNullSafe<string>().ToArray()); }
+            else if (T is bool) { return new PrimitiveDataFrameColumn<bool>(columnName, columnData.CastNullSafe<bool>().ToArray()); }
+            else if (T is byte) { return new PrimitiveDataFrameColumn<byte>(columnName, columnData.CastNullSafe<byte>().ToArray()); }
+            else if (T is sbyte) { return new PrimitiveDataFrameColumn<sbyte>(columnName, columnData.CastNullSafe<sbyte>().ToArray()); }
+            else if (T is char) { return new PrimitiveDataFrameColumn<char>(columnName, columnData.CastNullSafe<char>().ToArray()); }
+            else if (T is decimal) { return new PrimitiveDataFrameColumn<decimal>(columnName, columnData.CastNullSafe<decimal>().ToArray()); }
+            else if (T is double) { return new PrimitiveDataFrameColumn<double>(columnName, columnData.CastNullSafe<double>().ToArray()); }
+            else if (T is float) { return new PrimitiveDataFrameColumn<float>(columnName, columnData.CastNullSafe<float>().ToArray()); }
+            else if (T is int) { return new PrimitiveDataFrameColumn<int>(columnName, columnData.CastNullSafe<int>().ToArray()); }
+            else if (T is uint) { return new PrimitiveDataFrameColumn<uint>(columnName, columnData.CastNullSafe<uint>().ToArray()); }
+            else if (T is nint) { return new PrimitiveDataFrameColumn<nint>(columnName, columnData.CastNullSafe<nint>().ToArray()); }
+            else if (T is nuint) { return new PrimitiveDataFrameColumn<nuint>(columnName, columnData.CastNullSafe<nuint>().ToArray()); }
+            else if (T is long) { return new PrimitiveDataFrameColumn<long>(columnName, columnData.CastNullSafe<long>().ToArray()); }
+            else if (T is ulong) { return new PrimitiveDataFrameColumn<ulong>(columnName, columnData.CastNullSafe<ulong>().ToArray()); }
+            else if (T is short) { return new PrimitiveDataFrameColumn<short>(columnName, columnData.CastNullSafe<short>().ToArray()); }
+            else if (T is ushort) { return new PrimitiveDataFrameColumn<ushort>(columnName, columnData.CastNullSafe<ushort>().ToArray()); }
+            else { return new StringDataFrameColumn(columnName, columnData.ToStringArray(nullReplacement: "")); }
+        }
 
-            //else { return new ObjectDataFrameColumn(columnName, new object[rowCount]); }
-            //DataFrameColumn column = null;
-            //if (ColumnData[0] is string)
-            //{
-            //    return new StringDataFrameColumn(ColumnName, ColumnData.Cast<string>().ToArray());
-            //}
-            //else
-            //{
-            //    Type columnDataType = ColumnData[0].GetType();
-            //    // Use reflection to create an instance of the PrimitiveDataFrameColumn<T> class with the correct type parameter
-            //    Type columnType = typeof(PrimitiveDataFrameColumn<>).MakeGenericType(columnDataType);
-            //    column = (DataFrameColumn)Activator.CreateInstance(columnType, ColumnName);
-            //    for (int i = 0; i < ColumnData.Length; i++)
-            //    {
-            //        column[i] = Convert.ChangeType(ColumnData[i], columnDataType);
-            //    }
-            //}
-            //return column;
+        internal static object GetFirstNonNull(object[] columnData)
+        {
+            if ((columnData is null)||(columnData.Length == 0)) { return null; }
 
+            var filteredData = columnData.Where(x => x is not null).ToArray();
+            if ((filteredData is null) || (filteredData.Length == 0)) { return null; }
+
+            return filteredData.First();
         }
     
         public static string[] GetNames(this DataFrameColumnCollection columns) => columns.Select(x => x.Name).ToArray();
@@ -156,7 +146,7 @@ namespace UtilitiesCS
             DataColumn column;
             DataRow row;
 
-            // Create new DataColumn, set DataType, ColumnName
+            // Create new DataColumn, set DataType, columnName
             // and add to DataTable.
             column = new DataColumn();
             column.DataType = System.Type.GetType("System.Int32");
@@ -180,6 +170,25 @@ namespace UtilitiesCS
             // Set to DataGrid.DataSource property to the table.
             //dataGrid1.DataSource = table;
         }
+
+        //else { return new ObjectDataFrameColumn(columnName, new object[rowCount]); }
+        //DataFrameColumn column = null;
+        //if (columnData[0] is string)
+        //{
+        //    return new StringDataFrameColumn(columnName, columnData.Cast<string>().ToArray());
+        //}
+        //else
+        //{
+        //    Type columnDataType = columnData[0].GetType();
+        //    // Use reflection to create an instance of the PrimitiveDataFrameColumn<T> class with the correct type parameter
+        //    Type columnType = typeof(PrimitiveDataFrameColumn<>).MakeGenericType(columnDataType);
+        //    column = (DataFrameColumn)Activator.CreateInstance(columnType, columnName);
+        //    for (int i = 0; i < columnData.Length; i++)
+        //    {
+        //        column[i] = Convert.ChangeType(columnData[i], columnDataType);
+        //    }
+        //}
+        //return column;
     }
 }
 

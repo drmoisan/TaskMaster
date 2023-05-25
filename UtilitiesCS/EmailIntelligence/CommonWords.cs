@@ -10,14 +10,32 @@ namespace UtilitiesCS.EmailIntelligence
 {
     public static class CommonWords
     {
+        public static string StripCommonWords(this string sentence, ISerializableList<string> commonWords)
+        {
+            return sentence.StripCommonWords((IList<string>)commonWords);
+        }
+        public static string[] StripCommonWords(this string[] tokens, IList<string> commonWords)
+        {
+            if (tokens.Length == 0)
+            {
+                return tokens;
+            }
+            else
+            {
+                return (from word in tokens where !commonWords.Contains(word) select word.StripAccents()).ToArray();
+            }
+        }       
         public static string StripCommonWords(this string sentence, IList<string> commonWords)
         {
-            var sentenceWords = sentence.Tokenize();
-            return string.Join(" ", from word in sentenceWords 
-                                    where !commonWords.Contains(word) 
-                                    select word.StripAccents());
+            Regex tokenizer = Tokenizer.GetRegex();
+            return sentence.StripCommonWords(commonWords, tokenizer);
         }
-                
+        public static string StripCommonWords(this string sentence, IList<string> commonWords, Regex tokenizer)
+        {
+            var tokens = sentence.Tokenize(tokenizer);
+            return string.Join(" ", tokens.StripCommonWords(commonWords));
+        }
+
         public static string StripAccents(this string s)
         {
             StringBuilder sb = new StringBuilder(s.Normalize(NormalizationForm.FormKD));

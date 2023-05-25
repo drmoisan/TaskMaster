@@ -55,7 +55,7 @@ namespace ToDoModel
         // Score = (Score ^ _globals.AF.LngConvCtPwr) * CLng(_globals.AF.Conversation_Weight)
 
 
-        // Result.Add(.EmailFolder(i), Score)
+        // Result.Add(.Folderpath(i), Score)
         // Next i
         // End With
 
@@ -70,34 +70,34 @@ namespace ToDoModel
         // With SubjectMapClass(i)
 
 
-        // SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .EmailSubject, Matrix, AppGlobals.AF, SW_Options.ByWords)
+        // SWVal = SmithWaterman.SW_Calc(SubjectStripped, .EmailSubject, Matrix, AppGlobals.AF, SW_Options.ByWords)
 
         // '            StopWatch_Main.reStart
         // 'If SWVal > 1 Then Debug.Print "SWVal " & SWVal & "   SubjectStripped: " & SubjectStripped & _
-        // '    "   .EmailSubject: " & .EmailSubject & "  .EmailFolder " & .EmailFolder
+        // '    "   .EmailSubject: " & .EmailSubject & "  .Folderpath " & .Folderpath
 
         // Score = (SWVal ^ AppGlobals.AF.LngConvCtPwr) * .EmailSubjectCount
-        // If .EmailFolder <> SubjectMapClass(i - 1).EmailFolder Then
+        // If .Folderpath <> SubjectMapClass(i - 1).Folderpath Then
         // '                StopWatch_Main.Pause
 
-        // varFldrSubs = Split(.EmailFolder, "\")
+        // varFldrSubs = Split(.Folderpath, "\")
         // If IsArray(varFldrSubs) Then
         // strTmpFldr = varFldrSubs(UBound(varFldrSubs))
         // Else
         // strTmpFldr = varFldrSubs
         // End If
 
-        // Val1 = Smith_Watterman.SW_Calc(SubjectStripped, strTmpFldr, Matrix, AppGlobals.AF, SW_Options.ByWords)
+        // Val1 = SmithWaterman.SW_Calc(SubjectStripped, strTmpFldr, Matrix, AppGlobals.AF, SW_Options.ByWords)
         // Score = Val1 * Val1 + Score
         // End If
-        // 'SWVal = Smith_Watterman.SW_Calc(SubjectStripped, .EmailSubject, Matrix)
+        // 'SWVal = SmithWaterman.SW_Calc(SubjectStripped, .EmailSubject, Matrix)
         // 'SWVal = SWVal * .EmailSubjectCount
-        // 'If Score > 0 Then Debug.Print (Score & ", Message Subject: " & msg.Subject & ", Subject2: " & SubjectMapClass(i).EmailSubject & " Folder: " & SubjectMapClass(i).EmailFolder)
+        // 'If Score > 0 Then Debug.Print (Score & ", Message Subject: " & msg.Subject & ", Subject2: " & SubjectMapClass(i).EmailSubject & " Folder: " & SubjectMapClass(i).Folderpath)
 
 
 
         // If Score > 5 Then
-        // Result.Add(.EmailFolder, Score)
+        // Result.Add(.Folderpath, Score)
         // End If
         // End With
         // Next i
@@ -107,7 +107,7 @@ namespace ToDoModel
         // '    strTmp = Replace(strTmp, "\", " ")
         // '    strTmp = Replace(strTmp, ".", " ")
         // '    strTmp = Replace(strTmp, "_", " ")
-        // '    Score = Smith_Watterman.SW_Calc(SubjectStripped, strTmp, Matrix)
+        // '    Score = SmithWaterman.SW_Calc(SubjectStripped, strTmp, Matrix)
         // '    If Score > 10 Then Call Suggestions_ADD(Suggestions, strFlist(i), Score)
         // 'Next i
 
