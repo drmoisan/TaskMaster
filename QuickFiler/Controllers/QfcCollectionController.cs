@@ -46,30 +46,33 @@ namespace QuickFiler.Controllers
 
         public bool ReadyForMove => throw new NotImplementedException();
 
-        public void LoadControlsAndHandlers(IList<object> listObjects, RowStyle template)
+        public void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template)
         {
             _itemTLP.SuspendLayout();
             int i = 0;
-            foreach (object objItem in listObjects)
+            foreach (MailItem objItem in listObjects)
             {
-                if (objItem is MailItem)
-                {
-                    ItemGroup grp = new();
-                    grp.ItemViewer = LoadItemViewer(++i, template, true);
-                    grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, (MailItem)objItem, this);
-                    grp.ItemController.PopulateConversation();
-                    grp.ItemController.PopulateFolderCombobox();
-                    if (_darkMode) { grp.ItemController.SetThemeDark(); }
-                    else { grp.ItemController.SetThemeLight(); }
-                    _itemGroups.Add(grp);
-                }
-                else
-                {
-                    log.Debug($"Skipping Item {OlItemSummary.Extract(objItem,OlItemSummary.Details.All)}");
-                }
-                
+                ItemGroup grp = new(objItem);
+                grp.ItemViewer = LoadItemViewer(++i, template, true);
+                _itemGroups.Add(grp);
             }
+
             _formViewer.WindowState = FormWindowState.Maximized;
+
+            //foreach (var grp in _itemGroups)
+            Parallel.ForEach(_itemGroups, grp =>
+            {
+            grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, grp.MailItem, this);
+            Parallel.Invoke(
+                () => grp.ItemController.PopulateConversation(),
+                () => grp.ItemController.PopulateFolderCombobox(),
+                () => 
+                {
+                    if (_darkMode) { grp.ItemController.SetThemeDark(); }
+                    else { grp.ItemController.SetThemeLight(); } 
+                });
+            });
+
             
             _itemTLP.ResumeLayout();
         }
@@ -230,12 +233,15 @@ namespace QuickFiler.Controllers
         public class ItemGroup
         {
             public ItemGroup() { }
+            public ItemGroup(MailItem mailItem) { _mailItem = mailItem; }
 
             private QfcItemViewer _itemViewer;
             private IQfcItemController _itemController;
+            private MailItem _mailItem;
 
             internal QfcItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
             internal IQfcItemController ItemController { get => _itemController; set => _itemController = value; }
+            internal MailItem MailItem { get => _mailItem; set => _mailItem = value; }
 
         }
 

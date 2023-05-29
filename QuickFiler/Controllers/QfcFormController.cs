@@ -115,7 +115,7 @@ namespace QuickFiler.Controllers
 
         public int ItemsPerIteration { get => (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0); }
         
-        public void LoadItems(IList<object> listObjects) 
+        public void LoadItems(IList<MailItem> listObjects) 
         {
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,

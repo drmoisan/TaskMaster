@@ -61,6 +61,14 @@ namespace UtilitiesCS.Test
                 Maximum age: 1.5
             */
         }
+        
+        [TestMethod]
+        public void queueinit()
+        {
+            var a = new int[]{ 1, 2, 3, 4, 5, 6, 7 };
+            var q = new Queue<int>(a);
+        }
+    
     }
 
     class Pet

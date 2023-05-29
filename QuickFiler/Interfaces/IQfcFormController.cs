@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Interfaces
 {
@@ -16,6 +17,6 @@ namespace QuickFiler.Interfaces
         void Viewer_Activate();
         int SpaceForEmail { get; }
         int ItemsPerIteration { get; }
-        void LoadItems(IList<object> listObjects);
+        void LoadItems(IList<MailItem> listObjects);
     }
 }

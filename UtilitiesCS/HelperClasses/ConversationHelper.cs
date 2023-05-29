@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing.Imaging;
 using System.Xml.Linq;
+using static System.Net.WebRequestMethods;
 
 namespace UtilitiesCS
 {
@@ -38,6 +39,7 @@ namespace UtilitiesCS
                                            * and VT_LPWSTR for PT_UNICODE properties */
 
         const string PR_STORE_ENTRYID = "0x0FFB"; //Message store PID + PT_BINARY
+        const string PR_CONVERSATION_TOPIC = "0x0070"; // Normalized Conversation Subject for message group
         const string PR_PARENT_DISPLAY = "0x0e05"; //Message parent folder
         const string PR_DEPTH = "0x3005"; /* Represents the relative level of indentation, 
                                            * or depth, of an object in a hierarchical table
@@ -48,11 +50,12 @@ namespace UtilitiesCS
                                                         * by zero or more child blocks each 
                                                         * 5 bytes in length */
 
-
+        public static string SchemaConversationTopic = PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
         public static string SchemaFolderName = PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
         public static string SchemaMessageStore = PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
         public static string SchemaConversationDepth = PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
         public static string SchemaConversationIndex = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
+        public static string SchemaTriage = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
 
         public static Dictionary<string, string> SchemaToField = new()
         {
@@ -152,7 +155,15 @@ namespace UtilitiesCS
             //return new DataFrame();
             return data.ToDataFrame(columnHeaders);
         }
-       
+
+        public static Outlook.Table GetTableInView(this Explorer activeExplorer)
+        {
+            Outlook.TableView view = activeExplorer.CurrentView as Outlook.TableView;
+            //Outlook.View view2 = activeExplorer.CurrentView;
+            //Debug.WriteLine(view2.XML);
+            return view.GetTable();
+        }
+
         public static Outlook.Table GetTable(this Outlook.Conversation conversation, bool WithFolder, bool WithStore) 
         { 
             if (conversation != null)

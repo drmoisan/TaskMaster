@@ -50,11 +50,17 @@
     <Reference Include="Apache.Arrow, Version=2.0.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
       <HintPath>..\packages\Apache.Arrow.2.0.0\lib\netstandard1.3\Apache.Arrow.dll</HintPath>
     </Reference>
+    <Reference Include="Deedle, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
+    </Reference>
     <Reference Include="ExCSS, Version=4.1.4.0, Culture=neutral, PublicKeyToken=bdbe16be9b936b9a, processorArchitecture=MSIL">
       <HintPath>..\packages\ExCSS.4.1.4\lib\net452\ExCSS.dll</HintPath>
     </Reference>
     <Reference Include="Fizzler, Version=1.2.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
       <HintPath>..\packages\Fizzler.1.2.1\lib\netstandard2.0\Fizzler.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
@@ -244,8 +250,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DataFrameExtensionsDeedle.cs" />
     <Compile Include="Extensions\KeyValuePairEnumerableExtensions.cs" />
-    <Compile Include="ReusableTypeClasses\IObservableDictionary.cs" />
+    <Compile Include="Interfaces\IObservableDictionary.cs" />
+    <Compile Include="OutlookExtensions\OlTableFunctions.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
     <Compile Include="Interfaces\EnumFindBy.cs" />
@@ -263,7 +271,7 @@
     <Compile Include="Examples\MSDemoConv.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="HelperClasses\ConversationHelper.cs" />
-    <Compile Include="Extensions\DataFrameExtensions.cs" />
+    <Compile Include="Extensions\DataFrameExtensionsMLNet.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="HelperClasses\FlagsHelper.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceList.cs" />
@@ -356,6 +364,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NativeMethods.txt" />
+    <Content Include="Resources\ActivateWorkflow.svg" />
     <None Include="Resources\Run.png" />
     <None Include="Resources\RepeatLastRun.png" />
     <None Include="Resources\Run.svg" />

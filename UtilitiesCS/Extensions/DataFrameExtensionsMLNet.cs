@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS
 {
-    public static class DataFrameExtensions
+    public static class DataFrameExtensionsMLNet
     {
         public static DataFrame ToDataFrame(this object[,] data, string[] columnNames)
         {

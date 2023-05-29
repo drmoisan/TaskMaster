@@ -8,7 +8,7 @@ namespace QuickFiler.Interfaces
     public interface IQfcCollectionController
     {
         // UI Add and Remove QfcItems
-        void LoadControlsAndHandlers(IList<object> listObjects, RowStyle template);
+        void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template);
         QfcItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true); 
         void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false);
         void RemoveControls();

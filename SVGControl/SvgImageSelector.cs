@@ -53,7 +53,7 @@ namespace SVGControl
             Debug.WriteLine("SvgImageSelector Initialized");
         }
 
-        private SvgDocument _doc;
+        //private SvgDocument _doc;
         private string _relativeImagePath;
         private string _absoluteImagePath;
         private bool _saveRendering = false;
@@ -132,7 +132,7 @@ namespace SVGControl
             }
             set
             {
-                if ((value == true) && (_relativeImagePath != "") && (_doc != null))
+                if ((value == true) && (_relativeImagePath != "") && (_renderer.Document != null))
                 {
                     // Launch file save dialog with appropriate filters
                     SaveFileDialog saveFileDialog1 = new SaveFileDialog();
@@ -177,7 +177,7 @@ namespace SVGControl
                     MessageBox.Show("Image path must have a value to save the rendering");
 
                 }
-                else if (_doc == null)
+                else if (_renderer.Document == null)
                 {
                     // MessageBox.Show("Image path does not refer to a valid SVG document");
 

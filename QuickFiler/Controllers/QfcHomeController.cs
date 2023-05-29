@@ -38,11 +38,11 @@ namespace QuickFiler.Controllers
         }
 
         public void Run() 
-        { 
+        {
+            Iterate();
             _formViewer.Show();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Refresh();
-            Iterate();
         }
 
         public bool Loaded { get => _formViewer is not null; }
@@ -63,10 +63,10 @@ namespace QuickFiler.Controllers
 
         public void Iterate()
         {
-            _stopWatch = new cStopWatch();
-            _stopWatch.Start();
+            //_stopWatch = new cStopWatch();
+            //_stopWatch.Start();
             
-            IList<object> listObjects = _datamodel.DequeueNextItemGroup(_formController.ItemsPerIteration);
+            IList<MailItem> listObjects = _datamodel.DequeueNextItemGroup(_formController.ItemsPerIteration);
             _formController.LoadItems(listObjects);
         }
     }

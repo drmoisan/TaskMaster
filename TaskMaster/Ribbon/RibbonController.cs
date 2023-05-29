@@ -9,6 +9,7 @@ using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesVB;
+using QuickFiler.Interfaces;
 
 namespace TaskMaster
 {
@@ -152,12 +153,16 @@ namespace TaskMaster
 
         internal void Runtest()
         {
-            // UtilitiesCS.Examples.MSDemoConv.DemoConversation(_globals.Ol.App.ActiveExplorer.Selection.Item(1))
-            var ObjItem = _globals.Ol.App.ActiveExplorer().Selection[1];
-            Outlook.Conversation conv = (Outlook.Conversation)ObjItem.GetConversation();
-            Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
-            Debug.WriteLine(df.PrettyText());
-            df.Display();
+            //Outlook.Table table = _globals.Ol.App.ActiveExplorer().GetTableInView();
+
+            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
+
+            //var ObjItem = _globals.Ol.App.ActiveExplorer().Selection[1];
+            //Outlook.Conversation conv = (Outlook.Conversation)ObjItem.GetConversation();
+            //Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
+            //Debug.WriteLine(df.PrettyText());
+            //df.Display();
+
             // Dim table As Outlook.Table = conv.GetTable(WithFolder:=True, WithStore:=True)
             // table.EnumerateTable()
         }

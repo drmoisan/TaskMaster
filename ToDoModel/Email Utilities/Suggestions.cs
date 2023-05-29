@@ -300,7 +300,7 @@ namespace ToDoModel
         {
             var map = appGlobals.AF.SubjectMap.ToList();
             
-            var querySubject = map //.AsParallel()
+            var querySubject = map.AsParallel()
                                .Where(entry => entry.SubjectEncoded is not null)
                                .Select(entry =>
                                {
@@ -326,7 +326,7 @@ namespace ToDoModel
                                             Score = grouping.Select(x => x.Score).Sum()
                                         });
 
-            var queryFolder = map //.AsParallel()
+            var queryFolder = map.AsParallel()
                               .GroupBy(entry => entry.Folderpath,
                                        entry => entry,
                                        (folderpath, grouping) => new FolderScoring

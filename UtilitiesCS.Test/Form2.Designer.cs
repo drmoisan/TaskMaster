@@ -36,14 +36,15 @@
             // 
             this.buttonSVG1.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG1.Image")));
             this.buttonSVG1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonSVG1.ImageSVG.ImagePath = "C:\\Program Files\\Microsoft Visual Studio\\2022\\images\\ActivateWorkflow.svg";
+            this.buttonSVG1.ImageSVG.ImagePath = "./UtilitiesCS/Resources/ActivateWorkflow.svg";
             this.buttonSVG1.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 3, 20, 3);
             this.buttonSVG1.ImageSVG.SaveRendering = false;
-            this.buttonSVG1.ImageSVG.Size = new System.Drawing.Size(275, 119);
-            this.buttonSVG1.Location = new System.Drawing.Point(158, 250);
-            this.buttonSVG1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.buttonSVG1.ImageSVG.Size = new System.Drawing.Size(292, 134);
+            this.buttonSVG1.ImageSVG.UseDefaultImage = false;
+            this.buttonSVG1.Location = new System.Drawing.Point(202, 188);
+            this.buttonSVG1.Margin = new System.Windows.Forms.Padding(6);
             this.buttonSVG1.Name = "buttonSVG1";
-            this.buttonSVG1.Size = new System.Drawing.Size(298, 125);
+            this.buttonSVG1.Size = new System.Drawing.Size(315, 140);
             this.buttonSVG1.TabIndex = 0;
             this.buttonSVG1.Text = "buttonSVG1";
             this.buttonSVG1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -55,7 +56,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(904, 558);
             this.Controls.Add(this.buttonSVG1);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "Form2";
             this.Text = "Form2";
             this.ResumeLayout(false);

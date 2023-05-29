@@ -66,6 +66,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+      <Project>{238efd29-3cf3-07f3-28d3-c60d88f99769}</Project>
+      <Name>ToDoModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
