@@ -39,6 +39,7 @@ namespace UtilitiesCS
                                            * and VT_LPWSTR for PT_UNICODE properties */
 
         const string PR_STORE_ENTRYID = "0x0FFB"; //Message store PID + PT_BINARY
+        const string PR_STORE_RECORD_KEY = "0x0FFA"; //
         const string PR_CONVERSATION_TOPIC = "0x0070"; // Normalized Conversation Subject for message group
         const string PR_PARENT_DISPLAY = "0x0e05"; //Message parent folder
         const string PR_DEPTH = "0x3005"; /* Represents the relative level of indentation, 

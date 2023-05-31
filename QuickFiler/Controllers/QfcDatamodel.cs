@@ -12,6 +12,11 @@ using UtilitiesVB;
 using UtilitiesCS;
 using Deedle;
 using UtilitiesCS.ReusableTypeClasses;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Threading;
+using static Deedle.FrameBuilder;
 //using static UtilitiesCS.OlItemSummary;
 
 
@@ -20,23 +25,125 @@ namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
     {
-        public QfcDatamodel(Explorer ActiveExplorer, Application OlApp) 
+        public QfcDatamodel(Explorer ActiveExplorer, Outlook.Application OlApp) 
         { 
             _activeExplorer = ActiveExplorer;
             _olApp = OlApp;
-            var listEmailsInFolder = LoadEmailDataBase(_activeExplorer);
-            _masterQueue = new Queue<MailItem>(listEmailsInFolder);            
+            _frame = InitDf(_activeExplorer);
+            //_masterQueue = new Queue<MailItem>(listEmailsInFolder);            
         }
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private Explorer _activeExplorer;
         private Queue<MailItem> _masterQueue;
         private StackObjectCS<MailItem> _movedObjects;
-        private Application _olApp;
+        private Outlook.Application _olApp;
+        private Frame<int, string> _frame;
 
         public StackObjectCS<MailItem> StackMovedItems { get => _movedObjects; set => _movedObjects = value; }
 
+        public IList<MailItem> InitEmailQueueAsync(int batchSize, BackgroundWorker worker)
+        {
+            // Extract first batch
+            var firstIteration = _frame.GetRowsAt(Enumerable.Range(0, batchSize).ToArray());
+
+            // Drop extracted range from source table
+            _frame = _frame.GetRowsAt(Enumerable.Range(batchSize,_frame.RowCount-batchSize).ToArray());
+            
+            // Cast Frame to array of IEmailInfo
+            var rows = firstIteration.GetRowsAs<IEmailInfo>().Values.ToArray();
+
+            //BUGFIX: StoreId ID is being converted to the litteral string "byte[]" instead of the string equivalent of the byte array
+            // Convert array of IEmailInfo to List<MailItem>
+            var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
+
+            SetupWorker(worker);
+
+            worker.RunWorkerAsync();
+
+            return emailList;
+        }
+
+        public void SetupWorker(System.ComponentModel.BackgroundWorker worker) 
+        {
+            worker.WorkerSupportsCancellation = true;
+            worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
+            worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
+        }
+
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // Do not access the form's BackgroundWorker reference directly.
+            // Instead, use the reference provided by the sender parameter.
+            BackgroundWorker bw = sender as BackgroundWorker;
+
+            // Extract the argument.
+            //zxxint arg = (int)e.Argument;
+
+            // Start the time-consuming operation.
+            e.Result = TimeConsumingOperation(bw);
+
+            // If the operation was canceled by the user,
+            // set the DoWorkEventArgs.Cancel property to true.
+            if (bw.CancellationPending)
+            {
+                e.Cancel = true;
+            }
+        }
+
+        // This event handler demonstrates how to interpret
+        // the outcome of the asynchronous operation implemented
+        // in the DoWork event handler.
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                // The user canceled the operation.
+                MessageBox.Show("Operation was canceled");
+            }
+            else if (e.Error != null)
+            {
+                // There was an error during the operation.
+                string msg = String.Format("An error occurred: {0}", e.Error.Message);
+                MessageBox.Show(msg);
+            }
+            else
+            {
+                // The operation completed normally.
+                //string msg = String.Format("Result = {0}", e.Result);
+                //MessageBox.Show(msg);
+            }
+        }
+
+        private bool TimeConsumingOperation(BackgroundWorker bw)
+        {
+            if((_frame is null) || (_frame.RowCount == 0))
+            {
+                MessageBox.Show("Email Frame is empty");
+                _masterQueue = new Queue<MailItem>();
+                return false;
+            }
+            //try 
+            //{
+            // Cast Frame to array of IEmailInfo
+            var rows = _frame.GetRowsAs<IEmailInfo>().Values.ToArray();
+
+            // Convert array of IEmailInfo to List<MailItem>
+            var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
+
+            // Cast list to queue
+            _masterQueue = new Queue<MailItem>(emailList);
+
+            return true;
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //    _masterQueue = new Queue<MailItem>();
+            //    return false;
+            //}
+        }
+                                
         public IList<MailItem> DequeueNextItemGroup(int quantity)
         {
             int i;
@@ -56,9 +163,8 @@ namespace QuickFiler.Controllers
         {
             throw new NotImplementedException();
         }
-
-                
-        public IList<MailItem> LoadEmailDataBase(Explorer activeExplorer) 
+                        
+        public Frame<int, string> InitDf(Explorer activeExplorer) 
         {
             DebugTextWriter tw = new DebugTextWriter();
             Console.SetOut(tw);
@@ -78,9 +184,27 @@ namespace QuickFiler.Controllers
             });
 
             var dfFiltered = Frame.FromRows(rows);
+            var sorter = new EmailSorter(SortOptionsEnum.Default);
 
-            var df2 = dfFiltered.IndexRows<DateTime>("SentOn", false);
-            var df3 = df2.GroupRowsBy<string>("Triage");
+            var s1 = dfFiltered.GetColumn<DateTime>("SentOn");
+            var s2 = dfFiltered.GetColumn<string>("Triage");
+            var added = s1.ZipInner(s2).Select(t => sorter.GetSortKey(triage: t.Value.Item2, dateTime: t.Value.Item1));
+            dfFiltered.AddColumn("NewKey", added);
+
+            dfFiltered = dfFiltered.SortRows("NewKey");
+            
+            var df2 = dfFiltered;
+            df2 = df2.IndexRowsWith(Enumerable.Range(0, dfFiltered.RowCount).Reverse());
+            //dfFiltered.Print();
+            //df2.Print();
+
+            df2 = df2.SortRowsByKey();
+            //dfFiltered.IndexRowsOrdinally();
+            //var df2 = dfFiltered.RealignRows(dfFiltered.RowKeys.Reverse());
+            df2.DropColumn("NewKey");
+            //df2.Print();
+            //var df2 = dfFiltered.IndexRows<DateTime>("SentOn", false);
+            //var df3 = df2.GroupRowsBy<string>("Triage");
             //var s1 = dfConversation.GetColumn<DateTime>("SentOn");
             //var s2 = dfConversation.GetColumn<string>("Triage");
             //var added = s1.ZipInner(s2).Select(t => t.Value.Item1.ToString("yyyyMMddhhmmss") + t.Value.Item2);
@@ -103,24 +227,9 @@ namespace QuickFiler.Controllers
             //MultiKeyExtensions.Lookup1Of2<string, int>(keys)
             //dfgroup.Print();
 
-            return new List<MailItem>();
+            return df2;
         }
-        public void DeedleDoodles()
-        {
-
-            DebugTextWriter tw = new DebugTextWriter();
-            Console.SetOut(tw);
-            // Create a collection of anonymous types
-            var rnd = new Random();
-            var objects = Enumerable.Range(0, 10).Select(i =>
-              new { Key = "ID_" + i.ToString(), Number = rnd.Next() });
-
-            // Create data frame with properties as column names
-            var dfObjects = Frame.FromRecords(objects);
-            dfObjects.Print();
-
-        }
-
+        
         internal (string[], object[,]) GetEmailDataInView(Explorer activeExplorer)
         {
             Outlook.Table table = activeExplorer.GetTableInView();
@@ -154,7 +263,7 @@ namespace QuickFiler.Controllers
         public IList<MailItem> LoadEmailDataBase(Explorer activeExplorer, IList<MailItem> listEmailsToLoad)
         {
             Folder OlFolder;
-            View objCurView;
+            Outlook.View objCurView;
             string strFilter;
             Items OlItems;
             // TODO: Move this to Model Component of the MVC
@@ -162,7 +271,7 @@ namespace QuickFiler.Controllers
             if (listEmailsToLoad is null)
             {
                 OlFolder = (Folder)activeExplorer.CurrentFolder;
-                objCurView = (View)activeExplorer.CurrentView;
+                objCurView = (Outlook.View)activeExplorer.CurrentView;
                 strFilter = objCurView.Filter;
                 if (!string.IsNullOrEmpty(strFilter))
                 {
@@ -362,4 +471,55 @@ namespace QuickFiler.Controllers
 
         
     }
+
+    internal class EmailSorter
+    {
+        public EmailSorter() { }
+        public EmailSorter(SortOptionsEnum options) { _options = options; }
+
+        private SortOptionsEnum _options = SortOptionsEnum.Default;
+        private int _sortCode = -1;
+        private Dictionary<string, int> _triageImportantFirst = new Dictionary<string, int>
+        {
+            { "A", 1 },
+            { "B", 2 },
+            { "C", 3 },
+            { "Z", 4 }
+        };
+
+        private Dictionary<string, int> _triageImportantLast = new Dictionary<string, int>
+        {
+            { "A", 4 },
+            { "B", 3 },
+            { "C", 2 },
+            { "Z", 1 }
+        };
+
+        public SortOptionsEnum Options { get => _options; set => _options = value; }
+
+        public long GetSortKey(string triage, DateTime dateTime)
+        {
+            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) && _options.HasFlag(SortOptionsEnum.DateRecentFirst))
+            {
+                return (long)(100000000000000 * _triageImportantLast[triage]) + GetDateKey(dateTime); 
+            }
+            return -1;
+        }
+
+        public long GetDateKey(DateTime dateTime) 
+        { 
+            return long.Parse(dateTime.ToString("yyyyMMddhhmmss")); 
+        }
+    }
+
+    public interface IEmailInfo
+    {
+        string EntryId { get; }
+        string MessageClass { get; }
+        DateTime SentOn { get; }
+        string Conversation { get; }
+        string Triage { get; }
+        string StoreId { get; }
+    }
+
 }

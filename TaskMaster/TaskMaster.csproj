@@ -359,6 +359,8 @@
     </Compile>
     <None Include="TaskMaster_1_TemporaryKey.pfx" />
     <None Include="TaskMaster_2_TemporaryKey.pfx" />
+    <None Include="TaskMaster_3_TemporaryKey.pfx" />
+    <None Include="TaskMaster_4_TemporaryKey.pfx" />
     <None Include="TaskMaster_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
@@ -373,6 +375,10 @@
     <EmbeddedResource Include="Ribbon\RibbonViewer.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">
+      <Project>{6b8006b4-9eb2-466e-a178-3e69ff42e16e}</Project>
+      <Name>EmailIntelligence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QuickFiler\QuickFiler.csproj">
       <Project>{71735d4f-611a-4470-9170-4d9437534377}</Project>
       <Name>QuickFiler</Name>
@@ -410,10 +416,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_4_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>EF9A722B3E34421489E09F18F68BF8974F0488F9</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>9DC034A03478FF46BC28086BE01BD75250BED1D1</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

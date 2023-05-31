@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
 
@@ -197,6 +198,7 @@ namespace ToDoModel
 
         }
 
+        [Flags]
         public enum SortOptionsEnum
         {
             TriageIgnore = 1,

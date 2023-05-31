@@ -16,9 +16,11 @@ namespace UtilitiesCS
         public static Frame<int, string> GetEmailDataInView(Explorer activeExplorer)
         {
             Outlook.Table table = activeExplorer.GetTableInView();
+            var storeID = activeExplorer.CurrentFolder.StoreID;
             table.Columns.Add("SentOn");
             table.Columns.Add(ConvHelper.SchemaConversationTopic);
             table.Columns.Add(ConvHelper.SchemaTriage);
+            //table.Columns.Add(ConvHelper.SchemaMessageStore);
             table.Columns.Remove("Subject");
             table.Columns.Remove("CreationTime");
             table.Columns.Remove("LastModificationTime");
@@ -30,6 +32,7 @@ namespace UtilitiesCS
             var idxSentOn = columnHeaders.FindIndex(x => x == "SentOn");
             var idxConv = columnHeaders.FindIndex(x => x == ConvHelper.SchemaConversationTopic);
             var idxTriage = columnHeaders.FindIndex(x => x == ConvHelper.SchemaTriage);
+            //var idxStore = columnHeaders.FindIndex(x => x == "Store");
 
             object[,] data = table.GetArray(table.GetRowCount());
             //var df = Frame.FromArray2D(data);
@@ -45,12 +48,13 @@ namespace UtilitiesCS
                     MessageClass = data[i, idxMessageClass].ToString(),
                     SentOn = sentOn,
                     Conversation = data[i, idxConv].ToString(),
-                    Triage = (string)data[i, idxTriage] ?? "Z"
+                    Triage = (string)data[i, idxTriage] ?? "Z",
+                    StoreId = storeID
                 };
             });
 
             var df = Frame.FromRecords(records);
-            //df.Print();
+            df.Print();
             return df;
         }
 

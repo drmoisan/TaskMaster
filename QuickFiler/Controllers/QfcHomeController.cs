@@ -39,9 +39,9 @@ namespace QuickFiler.Controllers
 
         public void Run() 
         {
-            Iterate();
-            _formViewer.Show();
+            Initialize();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            _formViewer.Show();
             _formViewer.Refresh();
         }
 
@@ -61,6 +61,12 @@ namespace QuickFiler.Controllers
         public IQfcFormController FrmCtrlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public IQfcKeyboardHandler KbdHndlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public void Initialize()
+        {
+            IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
+            _formController.LoadItems(listEmail);
+        }
+        
         public void Iterate()
         {
             //_stopWatch = new cStopWatch();

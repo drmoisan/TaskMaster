@@ -36,10 +36,11 @@
             this.L1v1L2h3_ButtonCancel = new System.Windows.Forms.Button();
             this.L1v1L2h4_ButtonUndo = new System.Windows.Forms.Button();
             this.L1v1L2h5_SpnEmailPerLoad = new System.Windows.Forms.NumericUpDown();
+            this.DarkMode = new SVGControl.ToggleSwitch(this.components);
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
-            this.DarkMode = new SVGControl.ToggleSwitch(this.components);
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();
@@ -143,6 +144,18 @@
             this.L1v1L2h5_SpnEmailPerLoad.Size = new System.Drawing.Size(132, 74);
             this.L1v1L2h5_SpnEmailPerLoad.TabIndex = 3;
             // 
+            // DarkMode
+            // 
+            this.DarkMode.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.DarkMode.AutoSize = true;
+            this.DarkMode.Location = new System.Drawing.Point(2002, 27);
+            this.DarkMode.Name = "DarkMode";
+            this.DarkMode.Padding = new System.Windows.Forms.Padding(6);
+            this.DarkMode.Size = new System.Drawing.Size(155, 41);
+            this.DarkMode.TabIndex = 6;
+            this.DarkMode.Text = "DarkMode";
+            this.DarkMode.UseVisualStyleBackColor = true;
+            // 
             // L1v0L2_PanelMain
             // 
             this.L1v0L2_PanelMain.AutoScroll = true;
@@ -185,18 +198,6 @@
             this.QfcItemViewerTemplate.Size = new System.Drawing.Size(2114, 209);
             this.QfcItemViewerTemplate.TabIndex = 0;
             // 
-            // DarkMode
-            // 
-            this.DarkMode.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.DarkMode.AutoSize = true;
-            this.DarkMode.Location = new System.Drawing.Point(2002, 27);
-            this.DarkMode.Name = "DarkMode";
-            this.DarkMode.Padding = new System.Windows.Forms.Padding(6);
-            this.DarkMode.Size = new System.Drawing.Size(155, 41);
-            this.DarkMode.TabIndex = 6;
-            this.DarkMode.Text = "DarkMode";
-            this.DarkMode.UseVisualStyleBackColor = true;
-            // 
             // QfcFormViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -232,5 +233,6 @@
         public System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
         public SVGControl.ToggleSwitch DarkMode;
         public QfcItemViewer QfcItemViewerTemplate;
+        internal System.ComponentModel.BackgroundWorker Worker;
     }
 }
