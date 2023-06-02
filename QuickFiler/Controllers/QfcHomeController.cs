@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesVB;
 using UtilitiesCS;
-
+using System.IO;
 
 namespace QuickFiler.Controllers
 {
@@ -34,10 +34,10 @@ namespace QuickFiler.Controllers
             _explorerController = new QfcExplorerController();
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler();
-            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup);           
+            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
         }
 
-        public void Run() 
+        public void Run()
         {
             Initialize();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -46,7 +46,7 @@ namespace QuickFiler.Controllers
         }
 
         public bool Loaded { get => _formViewer is not null; }
-        
+
         internal void Cleanup()
         {
             _globals = null;
@@ -58,22 +58,94 @@ namespace QuickFiler.Controllers
         }
 
         public IQfcExplorerController ExplCtrlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IQfcFormController FrmCtrlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IQfcFormController FrmCtrlr { get => _formController; }
         public IQfcKeyboardHandler KbdHndlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IQfcDatamodel DataModel { get => _datamodel; }
+        public cStopWatch StopWatch { get => _stopWatch; }
 
         public void Initialize()
         {
             IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
             _formController.LoadItems(listEmail);
         }
-        
+
         public void Iterate()
         {
-            //_stopWatch = new cStopWatch();
-            //_stopWatch.Start();
-            
+            _stopWatch = new cStopWatch();
+            _stopWatch.Start();
+
             IList<MailItem> listObjects = _datamodel.DequeueNextItemGroup(_formController.ItemsPerIteration);
             _formController.LoadItems(listObjects);
         }
+
+        public void ExecuteMoves()
+        {
+            _formController.Groups.MoveEmails(DataModel.MovedItems);
+            QuickFileMetrics_WRITE("9999TimeWritingEmail.csv");
+            _formController.Groups.RemoveControls();
+            Iterate();
+        }
+
+        internal void QuickFileMetrics_WRITE(string filename)
+        {
+
+            string LOC_TXT_FILE;
+            string curDateText, curTimeText, durationText, durationMinutesText;
+            double Duration;
+            string dataLineBeg;
+            DateTime OlEndTime;
+            DateTime OlStartTime;
+            AppointmentItem OlAppointment;
+            Folder OlEmailCalendar;
+
+
+            // Create a line of comma seperated valued to store data
+            curDateText = DateTime.Now.ToString("mm/dd/yyyy");
+            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curDateText = " & curDateText
+
+            curTimeText = DateTime.Now.ToString("hh:mm");
+            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curTimeText = " & curTimeText
+
+            dataLineBeg = curDateText + "," + curTimeText + ",";
+
+            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
+
+            Duration = _stopWatch.timeElapsed;
+            OlEndTime = DateTime.Now;
+            OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
+
+            var emailsLoaded = _formController.Groups.EmailsLoaded;
+
+            if (emailsLoaded > 0)
+            {
+                Duration /= emailsLoaded;
+            }
+
+            durationText = Duration.ToString("##0");
+            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
+
+            durationMinutesText = (Duration / 60d).ToString("##0.00");
+
+            OlEmailCalendar = Calendar.GetCalendar("Email Time", _globals.Ol.App.Session);
+            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add(new AppointmentItem());
+            {
+                OlAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
+                OlAppointment.Start = OlStartTime;
+                OlAppointment.End = OlEndTime;
+                OlAppointment.Categories = "@ Email";
+                OlAppointment.ReminderSet = false;
+                OlAppointment.Sensitivity = OlSensitivity.olPrivate;
+                OlAppointment.Save();
+            }
+
+            string[] strOutput = _formController.Groups
+                .GetMoveDiagnostics(durationText, durationMinutesText, Duration, 
+                dataLineBeg, OlEndTime, ref OlAppointment);
+
+            FileIO2.Write_TextFile(filename, strOutput, _globals.FS.FldrMyD);
+
+        }
+
+
     }
 }

@@ -41,19 +41,57 @@ namespace QuickFiler.Controllers
         private TableLayoutPanel _itemTLP;
         private List<ItemGroup> _itemGroups = new List<ItemGroup>();
         private bool _darkMode;
+        private RowStyle _template;
 
-        public int EmailsLoaded => throw new NotImplementedException();
+        public int EmailsLoaded
+        {
+            get 
+            {
+                return _itemGroups.Count;
+            } 
+        }
 
-        public bool ReadyForMove => throw new NotImplementedException();
+        public bool ReadyForMove
+        {
+            get
+            {
+                bool blReadyForMove = true;
+                string strNotifications = "Can't complete actions! Not all emails assigned to folder" + System.Environment.NewLine;
 
-        public void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template)
+                foreach (var grp in _itemGroups)
+                {
+                    string[] headers = {"======= SEARCH RESULTS =======",
+                                        "======= RECENT SELECTIONS ========",
+                                        "========= SUGGESTIONS =========" };
+                    if ((grp.ItemController.SelectedFolder is null) || 
+                        headers.Contains(grp.ItemController.SelectedFolder))
+                    {
+                        blReadyForMove = false;
+                        strNotifications = strNotifications + 
+                                           grp.ItemController.Position + 
+                                           "  " + 
+                                           grp.ItemController.Mail.SentOn.ToString("MM/dd/yyyy") +
+                                           "  " + 
+                                           grp.ItemController.Mail.Subject + 
+                                           Environment.NewLine;
+                    }
+                }
+                if (!blReadyForMove)
+                    MessageBox.Show("Error Notification", strNotifications, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return blReadyForMove;
+            }
+        }
+
+        public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template)
         {
             _itemTLP.SuspendLayout();
+            _template = template;
+            TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
             int i = 0;
-            foreach (MailItem objItem in listObjects)
+            foreach (MailItem mailItem in listMailItems)
             {
-                ItemGroup grp = new(objItem);
-                grp.ItemViewer = LoadItemViewer(++i, template, true);
+                ItemGroup grp = new(mailItem);
+                grp.ItemViewer = LoadItemViewer(i++, template, true);
                 _itemGroups.Add(grp);
             }
 
@@ -77,20 +115,30 @@ namespace QuickFiler.Controllers
             _itemTLP.ResumeLayout();
         }
 
-        
-
         public QfcItemViewer LoadItemViewer(int itemNumber,
                                             RowStyle template,
-                                            bool blGroupConversation)
+                                            bool blGroupConversation = true, 
+                                            int columnNumber = 0)
         {
             QfcItemViewer itemViewer = new();
             _itemTLP.MinimumSize = new System.Drawing.Size(
                 _itemTLP.MinimumSize.Width, 
                 _itemTLP.MinimumSize.Height + 
                 (int)Math.Round(template.Height, 0));
-            TableLayoutHelper.InsertSpecificRow(_itemTLP, itemNumber - 1, template.Clone());
+            // moved to caller for efficencies of multiple insertions
+            //TableLayoutHelper.InsertSpecificRow(_itemTLP, itemNumber - 1, template.Clone());
             itemViewer.Parent = _itemTLP;
-            _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(0, itemNumber - 1));
+            if (columnNumber == 0)
+            {
+                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(columnNumber, itemNumber - 1));
+                _itemTLP.SetColumnSpan(itemViewer, 2);
+            }
+            else
+            {
+                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(1, itemNumber - 1));
+                _itemTLP.SetColumnSpan(itemViewer, 1);
+            }
+            
             itemViewer.AutoSize = true;
             itemViewer.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             itemViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -98,9 +146,54 @@ namespace QuickFiler.Controllers
             return itemViewer;
         }
 
-        public void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false)
+        public void AddEmailControlGroup(MailItem mailItem,
+                                         int posInsert = 0,
+                                         bool blGroupConversation = true,
+                                         int ConvCt = 0,
+                                         object varList = null,
+                                         bool blChild = false)
         {
-            throw new NotImplementedException();
+            
+            if (posInsert == 0)
+                posInsert = _itemGroups.Count + 1;
+                
+            //LoadGroupOfCtrls(ref listCtrls, _intUniqueItemCounter, posInsert, blGroupConversation);
+            //QF = new QfcController(mailItem, listCtrls, posInsert, _boolRemoteMouseApp, this, _globals);
+            //if (blChild)
+            //    QF.BlHasChild = true;
+            //if (folderList is Array == true)
+            //{
+            //    if (((Array)folderList).GetUpperBound(0) == 0)
+            //    {
+            //        QF.PopulateFolderCombobox();
+            //    }
+            //    else
+            //    {
+            //        QF.PopulateFolderCombobox(folderList);
+            //    }
+            //}
+            //else
+            //{
+            //    QF.PopulateFolderCombobox(folderList);
+            //}
+            //QF.CountMailsInConv(insertionCount);
+
+            //if (posInsert > _listQFClass.Count)
+            //{
+            //    _listQFClass.Add(QF);
+            //}
+            //else
+            //{
+            //    // _listQFClass.Add(qf, qf.mailItem.Subject & qf.mailItem.SentOn & qf.mailItem.Sender, posInsert)
+            //    _listQFClass.Insert(posInsert, QF);
+            //}
+
+            //// For i = 1 To _listQFClass.Count
+            //// qf = _listQFClass(i)
+            //// Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & qf.intMyPosition & "   " & qf.mailItem.Subject)
+            //// Next i
+
+            
         }
 
         public void RemoveControls()
@@ -165,14 +258,95 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        public void ConvToggle_Group(IList<object> selItems, int intOrigPosition)
+        public void ConvToggle_Group(IList<MailItem> selItems, int indexOriginal)
         {
-            throw new NotImplementedException();
+            _itemTLP.SuspendLayout();
+
+            int removalIndex = indexOriginal + 1;
+            int membersToRemove = selItems.Count - 1;
+
+            var qfOriginal = _itemGroups[indexOriginal].ItemController;
+            TableLayoutHelper.RemoveSpecificRow(_itemTLP, removalIndex, membersToRemove);
+            
+            for (int i = 0; i < membersToRemove; i++)
+            {
+                _itemGroups[removalIndex].ItemController.Cleanup();
+                _itemGroups.RemoveAt(removalIndex);
+            }
+            
         }
 
-        public void ConvToggle_UnGroup(IList<object> selItems, int intPosition, int ConvCt, object varList)
+        /// <summary>
+        /// Expands each member of a conversation into its own ItemViewer/ItemController while replicating
+        /// the sorting suggestions of the base member
+        /// </summary>
+        /// <param name="mailItems">Qualifying Conversation Members</param>
+        /// <param name="baseEmailIndex">Index of base member in collection</param>
+        /// <param name="conversationCount">Number of qualifying conversation members</param>
+        /// <param name="folderList">Sorting suggestions from base member</param>
+        public void ConvToggle_UnGroup(IList<MailItem> mailItems,
+                                       int baseEmailIndex,
+                                       int conversationCount,
+                                       object folderList)
         {
-            throw new NotImplementedException();
+            _itemTLP.SuspendLayout();
+            int insertionIndex = baseEmailIndex + 1;
+            int membersToInsert = conversationCount - 1;
+            
+            TableLayoutHelper.InsertSpecificRow(panel: _itemTLP, 
+                                                rowIndex: insertionIndex, 
+                                                templateStyle: _template, 
+                                                insertCount: membersToInsert);
+
+            // Insert the datamodel placeholders
+            InsertItemGroups(baseEmailIndex, conversationCount);
+            EnumerateConversationMembers(mailItems, baseEmailIndex, conversationCount, folderList);
+
+            _itemTLP.ResumeLayout();
+        }
+
+        /// <summary>
+        /// Parallel function to expand each member of a conversation into individual ItemViewers/Controllers.
+        /// Expanded members are inserted into the base collection and conversation count and folder suggestions
+        /// are replicated from the base member. This enables distinct actions to be taken with each member
+        /// </summary>
+        /// <param name="mailItems">List of MailItems in a conversation</param>
+        /// <param name="insertionIndex">Location of the Item Group collection where the base member is stored</param>
+        /// <param name="conversationCount">Number of qualifying conversation members</param>
+        /// <param name="folderList">Folder suggestions for the first email</param>
+        internal void EnumerateConversationMembers(IList<MailItem> mailItems, int insertionIndex, int conversationCount, object folderList)
+        {
+            Enumerable.Range(0, conversationCount - 1).AsParallel().Select(i =>
+            {
+                var grp = _itemGroups[i + insertionIndex];
+                grp.ItemViewer = LoadItemViewer(i + insertionIndex, _template, false, 1);
+                grp.MailItem = mailItems[i];
+                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i + insertionIndex, grp.MailItem, this);
+                Parallel.Invoke(
+                    () => grp.ItemController.PopulateConversation(conversationCount),
+                    () => grp.ItemController.PopulateFolderCombobox(folderList),
+                    () =>
+                    {
+                        if (_darkMode) { grp.ItemController.SetThemeDark(); }
+                        else { grp.ItemController.SetThemeLight(); }
+                    });
+                return i;
+            });
+        }
+
+        /// <summary>
+        /// Creates empty item groups and inserts them into the 
+        /// collection at the targeted location
+        /// </summary>
+        /// <param name="insertionIndex">Targeted location for the insertion</param>
+        /// <param name="insertionCount">Number of elements to insert</param>
+        internal void InsertItemGroups(int insertionIndex, int insertionCount)
+        {
+            for (int i = 0; i < insertionCount - 1; i++)
+            {
+                var grp = new ItemGroup();
+                _itemGroups.Insert(insertionIndex, grp);
+            }
         }
 
         public void MakeSpaceToEnumerateConversation()
@@ -229,6 +403,67 @@ namespace QuickFiler.Controllers
             _itemTLP = null;
             _itemGroups = null;
         }
+
+        public void MoveEmails(StackObjectCS<MailItem> stackMovedItems)
+        {
+            foreach (var grp in _itemGroups)
+            {
+                //TODO: function needed to shut off KeyboardDialog at this step if active
+                grp.ItemController.MoveMail();
+                stackMovedItems.Push(grp.MailItem);
+            }
+        }
+
+        public string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment)
+        {
+            int k;
+            string[] strOutput = new string[EmailsLoaded + 1];
+            var loopTo = EmailsLoaded;
+            for (k = 1; k <= loopTo; k++)
+            {
+                var QF = _itemGroups[k].ItemController;
+                var infoMail = new cInfoMail();
+                if (infoMail.Init_wMail(QF.Mail, OlEndTime: OlEndTime, lngDurationSec: (int)Math.Round(Duration)))
+                {
+                    if (string.IsNullOrEmpty(OlAppointment.Body))
+                    {
+                        OlAppointment.Body = infoMail.ToString;
+                        OlAppointment.Save();
+                    }
+                    else
+                    {
+                        OlAppointment.Body = OlAppointment.Body + System.Environment.NewLine + infoMail.ToString;
+                        OlAppointment.Save();
+                    }
+                }
+                string dataLine = dataLineBeg + xComma(QF.Subject);
+                dataLine = dataLine + "," + "QuickFiled";
+                dataLine = dataLine + "," + durationText;
+                dataLine = dataLine + "," + durationMinutesText;
+                dataLine = dataLine + "," + xComma(QF.To);
+                dataLine = dataLine + "," + xComma(QF.Sender);
+                dataLine = dataLine + "," + "Email";
+                dataLine = dataLine + "," + xComma(QF.SelectedFolder);           // Target Folder
+                dataLine = dataLine + "," + QF.SentDate;
+                dataLine = dataLine + "," + QF.SentTime;
+                strOutput[k] = dataLine;
+            }
+
+            return default;
+        }
+
+        private string xComma(string str)
+        {
+            string xCommaRet = default;
+            string strTmp;
+
+            strTmp = str.Replace(", ", "_");
+            strTmp = strTmp.Replace(",", "_");
+            xCommaRet = StringManipulation.GetStrippedText(strTmp);
+            return xCommaRet;
+            // xComma = StripAccents(strTmp)
+        }
+
 
         public class ItemGroup
         {

@@ -172,23 +172,23 @@
             // 
             this.LblSentOn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.LblSentOn.AutoSize = true;
-            this.LblSentOn.Font = new System.Drawing.Font("SF Pro Rounded", 9F, System.Drawing.FontStyle.Bold);
-            this.LblSentOn.Location = new System.Drawing.Point(807, 0);
+            this.LblSentOn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.LblSentOn.Location = new System.Drawing.Point(794, 0);
             this.LblSentOn.Margin = new System.Windows.Forms.Padding(0);
             this.LblSentOn.Name = "LblSentOn";
-            this.LblSentOn.Size = new System.Drawing.Size(139, 29);
+            this.LblSentOn.Size = new System.Drawing.Size(152, 29);
             this.LblSentOn.TabIndex = 6;
             this.LblSentOn.Text = "<SENTON>";
             // 
             // LblSender
             // 
             this.LblSender.AutoSize = true;
-            this.LblSender.Font = new System.Drawing.Font("SF Pro Rounded", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblSender.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblSender.ForeColor = System.Drawing.SystemColors.ControlText;
             this.LblSender.Location = new System.Drawing.Point(6, 0);
             this.LblSender.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
             this.LblSender.Name = "LblSender";
-            this.LblSender.Size = new System.Drawing.Size(139, 33);
+            this.LblSender.Size = new System.Drawing.Size(151, 33);
             this.LblSender.TabIndex = 1;
             this.LblSender.Text = "[SENDER]";
             // 
@@ -196,11 +196,11 @@
             // 
             this.lblCaptionTriage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblCaptionTriage.AutoSize = true;
-            this.lblCaptionTriage.Font = new System.Drawing.Font("SF Pro Rounded", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCaptionTriage.Location = new System.Drawing.Point(213, 0);
+            this.lblCaptionTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCaptionTriage.Location = new System.Drawing.Point(196, 0);
             this.lblCaptionTriage.Margin = new System.Windows.Forms.Padding(0);
             this.lblCaptionTriage.Name = "lblCaptionTriage";
-            this.lblCaptionTriage.Size = new System.Drawing.Size(140, 29);
+            this.lblCaptionTriage.Size = new System.Drawing.Size(157, 29);
             this.lblCaptionTriage.TabIndex = 0;
             this.lblCaptionTriage.Text = "Triage Group";
             // 
@@ -208,22 +208,22 @@
             // 
             this.LblTriage.AutoSize = true;
             this.LblTriage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.LblTriage.Font = new System.Drawing.Font("SF Pro Rounded", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblTriage.Location = new System.Drawing.Point(353, 0);
             this.LblTriage.Margin = new System.Windows.Forms.Padding(0);
             this.LblTriage.Name = "LblTriage";
-            this.LblTriage.Size = new System.Drawing.Size(32, 31);
+            this.LblTriage.Size = new System.Drawing.Size(31, 31);
             this.LblTriage.TabIndex = 2;
             this.LblTriage.Text = "A";
             // 
             // LblCaptionPredicted
             // 
             this.LblCaptionPredicted.AutoSize = true;
-            this.LblCaptionPredicted.Font = new System.Drawing.Font("SF Pro Rounded", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblCaptionPredicted.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblCaptionPredicted.Location = new System.Drawing.Point(447, 0);
             this.LblCaptionPredicted.Margin = new System.Windows.Forms.Padding(0);
             this.LblCaptionPredicted.Name = "LblCaptionPredicted";
-            this.LblCaptionPredicted.Size = new System.Drawing.Size(113, 29);
+            this.LblCaptionPredicted.Size = new System.Drawing.Size(117, 33);
             this.LblCaptionPredicted.TabIndex = 3;
             this.LblCaptionPredicted.Text = "Predicted:";
             // 
@@ -231,7 +231,7 @@
             // 
             this.LblActionable.AutoSize = true;
             this.LblActionable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblActionable.Font = new System.Drawing.Font("SF Pro Rounded", 9F, System.Drawing.FontStyle.Bold);
+            this.LblActionable.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
             this.LblActionable.Location = new System.Drawing.Point(569, 0);
             this.LblActionable.Margin = new System.Windows.Forms.Padding(0);
             this.LblActionable.Name = "LblActionable";
@@ -260,24 +260,24 @@
             // 
             this.LblConvCt.AutoSize = true;
             this.LblConvCt.Dock = System.Windows.Forms.DockStyle.Right;
-            this.LblConvCt.Font = new System.Drawing.Font("SF Pro Rounded", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblConvCt.Location = new System.Drawing.Point(829, 0);
+            this.LblConvCt.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblConvCt.Location = new System.Drawing.Point(835, 0);
             this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
             this.LblConvCt.Name = "LblConvCt";
             this.LblConvCt.Padding = new System.Windows.Forms.Padding(6);
-            this.LblConvCt.Size = new System.Drawing.Size(117, 55);
+            this.LblConvCt.Size = new System.Drawing.Size(111, 55);
             this.LblConvCt.TabIndex = 3;
             this.LblConvCt.Text = "<#>";
             // 
             // lblSubject
             // 
             this.lblSubject.AutoSize = true;
-            this.lblSubject.Font = new System.Drawing.Font("SF Pro Rounded", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSubject.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSubject.ForeColor = System.Drawing.SystemColors.ControlText;
             this.lblSubject.Location = new System.Drawing.Point(0, 0);
             this.lblSubject.Margin = new System.Windows.Forms.Padding(0);
             this.lblSubject.Name = "lblSubject";
-            this.lblSubject.Size = new System.Drawing.Size(256, 55);
+            this.lblSubject.Size = new System.Drawing.Size(269, 55);
             this.lblSubject.TabIndex = 2;
             this.lblSubject.Text = "[SUBJECT]";
             // 
@@ -286,7 +286,7 @@
             this.TxtboxBody.BackColor = System.Drawing.SystemColors.Control;
             this.TxtboxBody.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TxtboxBody.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtboxBody.Font = new System.Drawing.Font("SF Pro Text", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtboxBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtboxBody.Location = new System.Drawing.Point(112, 88);
             this.TxtboxBody.Margin = new System.Windows.Forms.Padding(12, 0, 0, 0);
             this.TxtboxBody.Multiline = true;
@@ -300,7 +300,7 @@
             // 
             this.LblPos.BackColor = System.Drawing.SystemColors.HotTrack;
             this.LblPos.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblPos.Font = new System.Drawing.Font("SF Compact Black", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblPos.ForeColor = System.Drawing.SystemColors.HighlightText;
             this.LblPos.Location = new System.Drawing.Point(4, 4);
             this.LblPos.Margin = new System.Windows.Forms.Padding(4, 4, 4, 19);
@@ -318,13 +318,13 @@
             this.LblAcOpen.AutoSize = true;
             this.LblAcOpen.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcOpen.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcOpen.Font = new System.Drawing.Font("SF Compact Black", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblAcOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcOpen.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcOpen.Location = new System.Drawing.Point(50, 88);
+            this.LblAcOpen.Location = new System.Drawing.Point(48, 88);
             this.LblAcOpen.Margin = new System.Windows.Forms.Padding(6, 0, 6, 6);
             this.LblAcOpen.Name = "LblAcOpen";
             this.LblAcOpen.Padding = new System.Windows.Forms.Padding(4);
-            this.LblAcOpen.Size = new System.Drawing.Size(44, 43);
+            this.LblAcOpen.Size = new System.Drawing.Size(46, 41);
             this.LblAcOpen.TabIndex = 6;
             this.LblAcOpen.Text = "O";
             // 
@@ -380,12 +380,12 @@
             this.LblAcSearch.AutoSize = true;
             this.LblAcSearch.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcSearch.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcSearch.Font = new System.Drawing.Font("SF Compact Black", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcSearch.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcSearch.Location = new System.Drawing.Point(118, 7);
+            this.LblAcSearch.Location = new System.Drawing.Point(118, 8);
             this.LblAcSearch.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcSearch.Name = "LblAcSearch";
-            this.LblAcSearch.Size = new System.Drawing.Size(35, 35);
+            this.LblAcSearch.Size = new System.Drawing.Size(35, 33);
             this.LblAcSearch.TabIndex = 10;
             this.LblAcSearch.Text = "S";
             // 
@@ -393,11 +393,11 @@
             // 
             this.LblSearch.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblSearch.AutoSize = true;
-            this.LblSearch.Font = new System.Drawing.Font("SF Pro Rounded", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblSearch.Location = new System.Drawing.Point(6, 12);
             this.LblSearch.Margin = new System.Windows.Forms.Padding(0);
             this.LblSearch.Name = "LblSearch";
-            this.LblSearch.Size = new System.Drawing.Size(85, 25);
+            this.LblSearch.Size = new System.Drawing.Size(93, 25);
             this.LblSearch.TabIndex = 6;
             this.LblSearch.Text = "Search:";
             // 
@@ -429,12 +429,12 @@
             this.LblAcDelete.AutoSize = true;
             this.LblAcDelete.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcDelete.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcDelete.Font = new System.Drawing.Font("SF Compact Black", 7.875F, System.Drawing.FontStyle.Bold);
+            this.LblAcDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
             this.LblAcDelete.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.LblAcDelete.Location = new System.Drawing.Point(0, 0);
             this.LblAcDelete.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcDelete.Name = "LblAcDelete";
-            this.LblAcDelete.Size = new System.Drawing.Size(28, 27);
+            this.LblAcDelete.Size = new System.Drawing.Size(29, 27);
             this.LblAcDelete.TabIndex = 2;
             this.LblAcDelete.Text = "X";
             // 
@@ -470,12 +470,12 @@
             this.LblAcPopOut.AutoSize = true;
             this.LblAcPopOut.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcPopOut.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcPopOut.Font = new System.Drawing.Font("SF Compact Black", 7.875F, System.Drawing.FontStyle.Bold);
+            this.LblAcPopOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
             this.LblAcPopOut.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.LblAcPopOut.Location = new System.Drawing.Point(0, 0);
             this.LblAcPopOut.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcPopOut.Name = "LblAcPopOut";
-            this.LblAcPopOut.Size = new System.Drawing.Size(28, 27);
+            this.LblAcPopOut.Size = new System.Drawing.Size(29, 27);
             this.LblAcPopOut.TabIndex = 3;
             this.LblAcPopOut.Text = "P";
             // 
@@ -506,12 +506,12 @@
             this.LblAcTask.AutoSize = true;
             this.LblAcTask.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcTask.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcTask.Font = new System.Drawing.Font("SF Compact Black", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblAcTask.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcTask.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.LblAcTask.Location = new System.Drawing.Point(0, 0);
             this.LblAcTask.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcTask.Name = "LblAcTask";
-            this.LblAcTask.Size = new System.Drawing.Size(26, 27);
+            this.LblAcTask.Size = new System.Drawing.Size(28, 27);
             this.LblAcTask.TabIndex = 4;
             this.LblAcTask.Text = "T";
             // 
@@ -552,12 +552,12 @@
             this.LblAcFolder.AutoSize = true;
             this.LblAcFolder.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcFolder.Font = new System.Drawing.Font("SF Compact Black", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcFolder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcFolder.Location = new System.Drawing.Point(119, 12);
+            this.LblAcFolder.Location = new System.Drawing.Point(119, 13);
             this.LblAcFolder.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcFolder.Name = "LblAcFolder";
-            this.LblAcFolder.Size = new System.Drawing.Size(33, 35);
+            this.LblAcFolder.Size = new System.Drawing.Size(34, 33);
             this.LblAcFolder.TabIndex = 11;
             this.LblAcFolder.Text = "F";
             // 
@@ -565,11 +565,11 @@
             // 
             this.LblFolder.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblFolder.AutoSize = true;
-            this.LblFolder.Font = new System.Drawing.Font("SF Pro Rounded", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblFolder.Location = new System.Drawing.Point(6, 17);
             this.LblFolder.Margin = new System.Windows.Forms.Padding(0);
             this.LblFolder.Name = "LblFolder";
-            this.LblFolder.Size = new System.Drawing.Size(80, 25);
+            this.LblFolder.Size = new System.Drawing.Size(86, 25);
             this.LblFolder.TabIndex = 5;
             this.LblFolder.Text = "Folder:";
             // 
@@ -615,11 +615,11 @@
             // 
             this.CbxEmailCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.CbxEmailCopy.AutoSize = true;
-            this.CbxEmailCopy.Font = new System.Drawing.Font("SF Pro Rounded", 10.125F);
-            this.CbxEmailCopy.Location = new System.Drawing.Point(624, 6);
+            this.CbxEmailCopy.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F);
+            this.CbxEmailCopy.Location = new System.Drawing.Point(616, 6);
             this.CbxEmailCopy.Margin = new System.Windows.Forms.Padding(6);
             this.CbxEmailCopy.Name = "CbxEmailCopy";
-            this.CbxEmailCopy.Size = new System.Drawing.Size(176, 34);
+            this.CbxEmailCopy.Size = new System.Drawing.Size(184, 34);
             this.CbxEmailCopy.TabIndex = 6;
             this.CbxEmailCopy.Text = "Copy Email";
             this.CbxEmailCopy.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -628,11 +628,11 @@
             // CbxAttachments
             // 
             this.CbxAttachments.AutoSize = true;
-            this.CbxAttachments.Font = new System.Drawing.Font("SF Pro Rounded", 10.125F);
+            this.CbxAttachments.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F);
             this.CbxAttachments.Location = new System.Drawing.Point(342, 6);
             this.CbxAttachments.Margin = new System.Windows.Forms.Padding(6);
             this.CbxAttachments.Name = "CbxAttachments";
-            this.CbxAttachments.Size = new System.Drawing.Size(192, 34);
+            this.CbxAttachments.Size = new System.Drawing.Size(198, 34);
             this.CbxAttachments.TabIndex = 12;
             this.CbxAttachments.Text = "Attachments";
             this.CbxAttachments.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -644,12 +644,12 @@
             this.LblAcAttachments.AutoSize = true;
             this.LblAcAttachments.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcAttachments.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcAttachments.Font = new System.Drawing.Font("SF Compact Black", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcAttachments.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcAttachments.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.LblAcAttachments.Location = new System.Drawing.Point(298, 4);
             this.LblAcAttachments.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.LblAcAttachments.Name = "LblAcAttachments";
-            this.LblAcAttachments.Size = new System.Drawing.Size(36, 35);
+            this.LblAcAttachments.Size = new System.Drawing.Size(35, 33);
             this.LblAcAttachments.TabIndex = 14;
             this.LblAcAttachments.Text = "A";
             // 
@@ -659,23 +659,23 @@
             this.LblAcEmail.AutoSize = true;
             this.LblAcEmail.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcEmail.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcEmail.Font = new System.Drawing.Font("SF Compact Black", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcEmail.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcEmail.Location = new System.Drawing.Point(559, 4);
+            this.LblAcEmail.Location = new System.Drawing.Point(558, 4);
             this.LblAcEmail.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.LblAcEmail.Name = "LblAcEmail";
-            this.LblAcEmail.Size = new System.Drawing.Size(33, 35);
+            this.LblAcEmail.Size = new System.Drawing.Size(35, 33);
             this.LblAcEmail.TabIndex = 16;
             this.LblAcEmail.Text = "E";
             // 
             // CbxConversation
             // 
             this.CbxConversation.AutoSize = true;
-            this.CbxConversation.Font = new System.Drawing.Font("SF Pro Rounded", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CbxConversation.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CbxConversation.Location = new System.Drawing.Point(66, 6);
             this.CbxConversation.Margin = new System.Windows.Forms.Padding(0, 6, 6, 6);
             this.CbxConversation.Name = "CbxConversation";
-            this.CbxConversation.Size = new System.Drawing.Size(197, 34);
+            this.CbxConversation.Size = new System.Drawing.Size(207, 34);
             this.CbxConversation.TabIndex = 13;
             this.CbxConversation.Text = "Conversation";
             this.CbxConversation.UseVisualStyleBackColor = true;
@@ -686,12 +686,12 @@
             this.LblAcConversation.AutoSize = true;
             this.LblAcConversation.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcConversation.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcConversation.Font = new System.Drawing.Font("SF Compact Black", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblAcConversation.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcConversation.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcConversation.Location = new System.Drawing.Point(28, 4);
+            this.LblAcConversation.Location = new System.Drawing.Point(27, 4);
             this.LblAcConversation.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.LblAcConversation.Name = "LblAcConversation";
-            this.LblAcConversation.Size = new System.Drawing.Size(35, 35);
+            this.LblAcConversation.Size = new System.Drawing.Size(37, 33);
             this.LblAcConversation.TabIndex = 15;
             this.LblAcConversation.Text = "C";
             // 

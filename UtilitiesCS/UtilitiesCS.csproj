@@ -66,10 +66,10 @@
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Data.Analysis.0.21.0-preview.22621.2\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Data.Analysis.0.20.1\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.DataView.3.0.0-preview.22621.2\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.DataView.3.0.0-preview.23266.6\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>

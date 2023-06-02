@@ -105,7 +105,7 @@
       <HintPath>..\packages\Apache.Arrow.2.0.0\lib\netstandard1.3\Apache.Arrow.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Data.Analysis.0.21.0-preview.23266.6\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Data.Analysis.0.20.1\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ML.DataView.3.0.0-preview.23266.6\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>

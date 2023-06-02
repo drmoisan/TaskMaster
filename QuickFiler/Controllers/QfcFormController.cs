@@ -8,34 +8,43 @@ using System.Threading.Tasks;
 using UtilitiesVB;
 using UtilitiesCS;
 using System.Windows.Forms;
-using static QuickFiler.Controllers.QfcCollectionController;
 using System.Drawing;
+using System.IO;
+using ToDoModel;
 
 namespace QuickFiler.Controllers
 {    
     internal class QfcFormController : IQfcFormController
     {
-        public QfcFormController(IApplicationGlobals AppGlobals,
-                                 QfcFormViewer FormViewer,
-                                 Enums.InitTypeEnum InitType,
-                                 System.Action ParentCleanup)
+        public QfcFormController(IApplicationGlobals appGlobals,
+                                 QfcFormViewer formViewer,
+                                 Enums.InitTypeEnum initType,
+                                 System.Action parentCleanup,
+                                 IQfcHomeController parent)
         { 
-            _globals = AppGlobals;
-            _formViewer = FormViewer;
-            _parentCleanup = ParentCleanup;
+            _globals = appGlobals;
+            _initType = initType;
+            _formViewer = formViewer;
+            _formViewer.SetController(this);
+            _parentCleanup = parentCleanup;
+            _parent = parent;
             CaptureItemSettings();
             RemoveItemTemplate();
             SetupLightDark();
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
         private QfcFormViewer _formViewer;
         private IQfcCollectionController _groups;
         private RowStyle _rowStyleTemplate;
         private Padding _itemMarginTemplate;
+        private Enums.InitTypeEnum _initType;
+        private bool _blRunningModalCode = false;
+        private bool _blSuppressEvents = false;
+        private IQfcHomeController _parent;
 
         public void CaptureItemSettings()
         {
@@ -125,10 +134,10 @@ namespace QuickFiler.Controllers
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate);
         }
 
-        public void FormResize(bool Force = false)
-        {
-            throw new NotImplementedException();
-        }
+        //public void FormResize(bool Force = false)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public void ButtonCancel_Click()
         {
@@ -142,7 +151,29 @@ namespace QuickFiler.Controllers
 
         public void ButtonOK_Click()
         {
-            throw new NotImplementedException();
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            {
+                if (_blRunningModalCode == false)
+                {
+                    _blRunningModalCode = true;
+
+                    if (_groups.ReadyForMove)
+                    {
+                        _blSuppressEvents = true;
+                        _parent.ExecuteMoves();
+                        _blSuppressEvents = false;
+                    }
+                    _blRunningModalCode = false;
+                }
+                else
+                {
+                    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                _formViewer.Close();
+            }
         }
 
         public void ButtonUndo_Click()
@@ -174,5 +205,8 @@ namespace QuickFiler.Controllers
         {
             throw new NotImplementedException();
         }
+
+        public IQfcCollectionController Groups { get => _groups; }
+
     }
 }

@@ -42,7 +42,7 @@ namespace QuickFiler.Legacy
         //TODO: Need to ensure references to _colCtrls are zero based
         private List<Control> _colCtrls;
         internal int ControlCount { get { return _colCtrls.Count; } }
-        //TODO: Need to ensure references to _selItemsInClass are zero based
+        //TODO: Need to ensure references to _conversationItems are zero based
         private IList _selItemsInClass;
         private bool _blAccelFocusToggle;
         private int _intEnterCounter;
@@ -348,7 +348,7 @@ namespace QuickFiler.Legacy
         private Label lblAcO;                     // ACCELERATOR O for Open Email
         private Label lblAcA;                     // ACCELERATOR A for Save Attachments
         private Label lblAcW;                     // ACCELERATOR W for Delete Flow
-        private Label lblAcM;                     // ACCELERATOR M for Save ObjItem
+        private Label lblAcM;                     // ACCELERATOR M for Save Mail
         private Label _lblTmp;
 
         // QUESTION: Shouldn't these have events???
@@ -379,7 +379,7 @@ namespace QuickFiler.Legacy
         }
 
         private ctrlPosition pos_chbxSaveAttach;  // Checkbox Save Attachment X% Left Position
-        private ctrlPosition pos_chbxSaveMail;    // Checkbox Save ObjItem X% Left Position
+        private ctrlPosition pos_chbxSaveMail;    // Checkbox Save Mail X% Left Position
         private ctrlPosition pos_chbxDelFlow;     // Checkbox Delete Flow X% Left Position
         private ctrlPosition pos_lblAcA;          // A Accelerator X% Left Position
         private ctrlPosition pos_lblAcW;          // W Accelerator X% Left Position
@@ -412,7 +412,7 @@ namespace QuickFiler.Legacy
         private int chk_Left;                    // Conversation checkbox X% Left Position
         private int lblConvCt_Left;              // Conversation Count X% Left Position
         private int chbxSaveAttach_Left;         // Checkbox Save Attachment X% Left Position
-        private int chbxSaveMail_Left;           // Checkbox Save ObjItem X% Left Position
+        private int chbxSaveMail_Left;           // Checkbox Save Mail X% Left Position
         private int chbxDelFlow_Left;            // Checkbox Delete Flow X% Left Position
         private int lblAcA_Left;                 // A Accelerator X% Left Position
         private int lblAcW_Left;                 // W Accelerator X% Left Position
@@ -515,7 +515,7 @@ namespace QuickFiler.Legacy
                                         _chbxDelFlow = (CheckBox)ctlTmp;
                                         break;
                                     }
-                                case " ObjItem":
+                                case " Mail":
                                     {
                                         _chbxSaveMail = (CheckBox)ctlTmp;
                                         break;
@@ -726,7 +726,7 @@ namespace QuickFiler.Legacy
             //else
             //{
             //    // TODO: Move this module to cFolderSuggestions and load a _folderHandler instead
-            //    _suggestions = FolderSuggestionsModule.Folder_Suggestions(ObjItem, _globals, false);
+            //    _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
 
             //    if (_suggestions.Count > 0)
             //    {
@@ -743,7 +743,7 @@ namespace QuickFiler.Legacy
             //        FolderCbo.Items.AddRange(_fldrHandler.FindFolder(SearchString: "", 
             //                                                         ReloadCTFStagingFiles: false, 
             //                                                         ReCalcSuggestions: true, 
-            //                                                         objItem: ObjItem));
+            //                                                         objItem: Mail));
 
             //        if (FolderCbo.Items.Count >= 2)
             //            FolderCbo.SelectedIndex = 2;
@@ -818,7 +818,7 @@ namespace QuickFiler.Legacy
                     {
                         // Set selItems = New Collection
                         // Set Sel = New Collection
-                        // Sel.Add ObjItem
+                        // Sel.Add Mail
                         // Set selItems = Email_SortToExistingFolder.DemoConversation(selItems, Sel)
 
                         conv = new cConversation(_globals.Ol.App) { item = Mail };
@@ -954,7 +954,7 @@ namespace QuickFiler.Legacy
                 lblAcC_Left = lblAcC.Left;                       // Conversation accelerator X% Left position
                 chk_Left = ConversationCb.Left;                             // Conversation checkbox X% Left Position
                 chbxSaveAttach_Left = _chbxSaveAttach.Left;       // Checkbox Save Attachment X% Left Position
-                chbxSaveMail_Left = _chbxSaveMail.Left;           // Checkbox Save ObjItem X% Left Position
+                chbxSaveMail_Left = _chbxSaveMail.Left;           // Checkbox Save Mail X% Left Position
                 chbxDelFlow_Left = _chbxDelFlow.Left;             // Checkbox Delete Flow X% Left Position
                 lblAcA_Left = lblAcA.Left;                       // A Accelerator X% Left Position
                 lblAcW_Left = lblAcW.Left;                       // W Accelerator X% Left Position
@@ -1166,7 +1166,7 @@ namespace QuickFiler.Legacy
                 lblAcF.Left = (int)(lblAcF_Left + X1px);                            // F Accelerator X% _left position
                 lblConvCt.Left = (int)(lblConvCt_Left + X1px);                      // Conversation Count X% Left Position
                 _chbxSaveAttach.Left = (int)(chbxSaveAttach_Left + X1px + X2px);     // Checkbox Save Attachment X% Left Position
-                _chbxSaveMail.Left = (int)(chbxSaveMail_Left + X1px + X2px);         // Checkbox Save ObjItem X% Left Position
+                _chbxSaveMail.Left = (int)(chbxSaveMail_Left + X1px + X2px);         // Checkbox Save Mail X% Left Position
                 _chbxDelFlow.Left = (int)(chbxDelFlow_Left + X1px + X2px);           // Checkbox Delete Flow X% Left Position
                 lblAcA.Left = (int)(lblAcA_Left + X1px + X2px);                     // A Accelerator X% Left Position
                 lblAcW.Left = (int)(lblAcW_Left + X1px + X2px);                     // W Accelerator X% Left Position
@@ -1381,7 +1381,7 @@ namespace QuickFiler.Legacy
                     lblAcC.Text = "F7";   // ACCELERATOR C for Grouping Conversations
                     lblAcA.Text = "F8";   // ACCELERATOR A for Save Attachments
                     lblAcW.Text = "F9";   // ACCELERATOR W for Delete Flow
-                    lblAcM.Text = "^=";   // ACCELERATOR M for Save ObjItem
+                    lblAcM.Text = "^=";   // ACCELERATOR M for Save Mail
                 }
             }
             else
@@ -1400,7 +1400,7 @@ namespace QuickFiler.Legacy
                     lblAcC.Text = "C";   // ACCELERATOR C for Grouping Conversations
                     lblAcA.Text = "A";   // ACCELERATOR A for Save Attachments
                     lblAcW.Text = "W";   // ACCELERATOR W for Delete Flow
-                    lblAcM.Text = "M";   // ACCELERATOR M for Save ObjItem
+                    lblAcM.Text = "M";   // ACCELERATOR M for Save Mail
                 }
             }
         }

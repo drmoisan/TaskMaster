@@ -39,8 +39,8 @@
             this.DarkMode = new SVGControl.ToggleSwitch(this.components);
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
+            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();
@@ -111,6 +111,7 @@
             this.L1v1L2h2_ButtonOK.TabIndex = 0;
             this.L1v1L2h2_ButtonOK.Text = "OK";
             this.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = true;
+            this.L1v1L2h2_ButtonOK.Click += new System.EventHandler(this.L1v1L2h2_ButtonOK_Click);
             // 
             // L1v1L2h3_ButtonCancel
             // 
@@ -122,6 +123,7 @@
             this.L1v1L2h3_ButtonCancel.TabIndex = 1;
             this.L1v1L2h3_ButtonCancel.Text = "CANCEL";
             this.L1v1L2h3_ButtonCancel.UseVisualStyleBackColor = true;
+            this.L1v1L2h3_ButtonCancel.Click += new System.EventHandler(this.L1v1L2h3_ButtonCancel_Click);
             // 
             // L1v1L2h4_ButtonUndo
             // 
@@ -133,6 +135,7 @@
             this.L1v1L2h4_ButtonUndo.TabIndex = 2;
             this.L1v1L2h4_ButtonUndo.Text = "Undo";
             this.L1v1L2h4_ButtonUndo.UseVisualStyleBackColor = true;
+            this.L1v1L2h4_ButtonUndo.Click += new System.EventHandler(this.L1v1L2h4_ButtonUndo_Click);
             // 
             // L1v1L2h5_SpnEmailPerLoad
             // 
@@ -172,7 +175,8 @@
             // L1v0L2L3v_TableLayout
             // 
             this.L1v0L2L3v_TableLayout.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.L1v0L2L3v_TableLayout.ColumnCount = 1;
+            this.L1v0L2L3v_TableLayout.ColumnCount = 2;
+            this.L1v0L2L3v_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.L1v0L2L3v_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v0L2L3v_TableLayout.Controls.Add(this.QfcItemViewerTemplate, 0, 0);
             this.L1v0L2L3v_TableLayout.Dock = System.Windows.Forms.DockStyle.Top;
@@ -182,7 +186,6 @@
             this.L1v0L2L3v_TableLayout.RowCount = 2;
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 221F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
             this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(2126, 323);
             this.L1v0L2L3v_TableLayout.TabIndex = 0;
             // 
@@ -190,6 +193,7 @@
             // 
             this.QfcItemViewerTemplate.AutoSize = true;
             this.QfcItemViewerTemplate.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.L1v0L2L3v_TableLayout.SetColumnSpan(this.QfcItemViewerTemplate, 2);
             this.QfcItemViewerTemplate.Dock = System.Windows.Forms.DockStyle.Fill;
             this.QfcItemViewerTemplate.Location = new System.Drawing.Point(6, 6);
             this.QfcItemViewerTemplate.Margin = new System.Windows.Forms.Padding(6);

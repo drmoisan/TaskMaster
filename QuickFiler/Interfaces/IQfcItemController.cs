@@ -19,8 +19,10 @@ namespace QuickFiler.Interfaces
         bool BlExpanded {  get; }
         bool BlHasChild { get; set; }
         int Height { get; }
-        object ObjItem { get; set; }
+        MailItem Mail { get; set; }
         void ExpandCtrls1(); // Rewrite
+        string SelectedFolder { get; }
+        int Position { get; set; }
         void PopulateFolderCombobox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
         void ApplyReadEmailFormat();
         void FlagAsTask();
@@ -37,6 +39,12 @@ namespace QuickFiler.Interfaces
         void SetThemeDark();
         void SetThemeLight();
         void Cleanup();
+        void MoveMail();
         DataFrame DfConversation { get; }
+        string Subject { get; }
+        string To { get; }
+        string Sender { get; }
+        string SentDate { get; }
+        string SentTime { get; }
     }
 }

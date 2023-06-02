@@ -2,6 +2,8 @@ using Microsoft.Office.Interop.Outlook;
 using System.Collections.Generic;
 using System.Collections;
 using System.Windows.Forms;
+using UtilitiesCS;
+using System;
 
 namespace QuickFiler.Interfaces
 {
@@ -9,11 +11,12 @@ namespace QuickFiler.Interfaces
     {
         // UI Add and Remove QfcItems
         void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template);
-        QfcItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true); 
-        void AddEmailControlGroup(object objItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false);
+        QfcItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
+        void AddEmailControlGroup(MailItem mailItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false);
         void RemoveControls();
         void RemoveSpaceToCollapseConversation();
         void RemoveSpecificControlGroup(int intPosition);
+        void MoveEmails(StackObjectCS<MailItem> StackMovedItems);
 
         // UI Select QfcItems
         int ActivateByIndex(int intNewSelection, bool blExpanded);
@@ -26,8 +29,8 @@ namespace QuickFiler.Interfaces
         void ResizeChildren(int intDiffx);                              //possibly unneccessary with new control group
 
         // UI Converations Expansion
-        void ConvToggle_Group(IList<object> selItems, int intOrigPosition);
-        void ConvToggle_UnGroup(IList<object> selItems, int intPosition, int ConvCt, object varList);
+        void ConvToggle_Group(IList<MailItem> selItems, int intOrigPosition);
+        void ConvToggle_UnGroup(IList<MailItem> mailItems, int baseEmailIndex, int conversationCount, object folderList);
         void MakeSpaceToEnumerateConversation();                        //Rewrite
 
         // UI Light Dark
@@ -40,6 +43,8 @@ namespace QuickFiler.Interfaces
         bool ReadyForMove { get; }
 
         void Cleanup();
+
+        string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment);
 
     }
 }

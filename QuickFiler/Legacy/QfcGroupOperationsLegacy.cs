@@ -31,7 +31,6 @@ namespace QuickFiler.Legacy
 
         public QfcGroupOperationsLegacy(QfcFormLegacyViewer viewerInstance, Enums.InitTypeEnum InitType, IApplicationGlobals AppGlobals, QuickFileController ParentObject)
         {
-
             _viewer = viewerInstance;
             _initType = InitType;
             _globals = AppGlobals;
@@ -242,7 +241,7 @@ namespace QuickFiler.Legacy
                 Pnl.Controls.Add(chbxSaveMail);
                 AssignDimensions(ref chbxSaveMail, QfcConstants.CheckboxSaveMail);                
                 chbxSaveMail.Font = new Font(chbxSaveMail.Font.FontFamily, 10f);
-                chbxSaveMail.Text = " ObjItem";
+                chbxSaveMail.Text = " Mail";
                 chbxSaveMail.Checked = false;
                 chbxSaveMail.TabStop = false;                
                 colCtrls.Add(chbxSaveMail);
@@ -624,13 +623,13 @@ namespace QuickFiler.Legacy
                 }
                 else
                 {
-                    // _listQFClass.Add(qf, qf.ObjItem.Subject & qf.ObjItem.SentOn & qf.ObjItem.Sender, insertAtIndex)
+                    // _listQFClass.Add(qf, qf.Mail.Subject & qf.Mail.SentOn & qf.Mail.Sender, insertAtIndex)
                     _listQFClass.Insert(insertAtIndex, QF);
                 }
 
                 // For i = 1 To _listQFClass.Count
                 // qf = _listQFClass(i)
-                // Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & qf.intMyPosition & "   " & qf.ObjItem.Subject)
+                // Debug.WriteLine("_listQFClass(" & i & ")   MyPosition " & qf.intMyPosition & "   " & qf.Mail.Subject)
                 // Next i
 
             }

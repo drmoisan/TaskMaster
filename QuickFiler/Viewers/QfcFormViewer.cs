@@ -13,20 +13,25 @@ namespace QuickFiler
 {
     internal partial class QfcFormViewer : Form
     {
-        [STAThread]
-        public static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-        }
-
         public QfcFormViewer()
         {
             InitializeComponent();
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        [STAThread]
+        public static void Main()
+        {
+            if(!DpiInitialized)
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                DpiInitialized = true;
+            }
+        }
 
+        public static bool DpiInitialized { get; set; } = false;
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IQfcFormController _formController;
         private IQfcKeyboardHandler _keyboardHandler;
 
@@ -54,5 +59,19 @@ namespace QuickFiler
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        private void L1v1L2h2_ButtonOK_Click(object sender, EventArgs e)
+        {
+            _formController.ButtonOK_Click();
+        }
+
+        private void L1v1L2h3_ButtonCancel_Click(object sender, EventArgs e)
+        {
+            _formController.ButtonCancel_Click();
+        }
+
+        private void L1v1L2h4_ButtonUndo_Click(object sender, EventArgs e)
+        {
+            _formController.ButtonUndo_Click();
+        }
     }
 }

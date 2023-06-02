@@ -14,6 +14,8 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesVB;
 using System.Windows.Forms;
+using System.Net.Mail;
+using System.Collections;
 
 namespace QuickFiler.Controllers
 {
@@ -47,6 +49,7 @@ namespace QuickFiler.Controllers
         private IList<IQfcTipsDetails> _listTipsDetails;
         private MailItem _mailItem;
         private DataFrame _dfConversation;
+        private IList _conversationItems;
         public DataFrame DfConversation { get { return _dfConversation; } }
         private int _viewerPosition;
         private FolderHandler _fldrHandler;
@@ -185,12 +188,65 @@ namespace QuickFiler.Controllers
             _itemViewer.CboFolders.SelectedIndex = 1;
         }
 
+        public void MoveMail()
+        {
+            if (Mail is not null)
+            {
+                IList selItems = PackageItems();
+                bool Attchments = (SelectedFolder != "Trash to Delete") ? false : _itemViewer.CbxAttachments.Checked;
+
+                //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
+                SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
+                                                                            Pictures_Checkbox: false,
+                                                                            SortFolderpath: _itemViewer.CboFolders.SelectedItem as string,
+                                                                            Save_MSG: _itemViewer.CbxEmailCopy.Checked,
+                                                                            Attchments: Attchments,
+                                                                            Remove_Flow_File: false,
+                                                                            AppGlobals: _globals,
+                                                                            StrRoot: _globals.Ol.ArchiveRootPath);
+                SortItemsToExistingFolder.Cleanup_Files();
+                // blDoMove
+            }
+        }
+
+        internal IList PackageItems()
+        {
+            if (_itemViewer.CbxConversation.Checked == true)
+            {
+                var conversationCount = int.Parse(_itemViewer.LblConvCt.Text);
+                if ((_conversationItems is not null) && 
+                    (_conversationItems.Count == conversationCount) && 
+                    (_conversationItems.Count != 0))
+                {
+                    return _conversationItems;
+                }
+                else
+                {
+                    if ((_dfConversation is null) || (_dfConversation.Rows.Count != conversationCount))
+                    {
+                        _dfConversation = Mail.GetConversationDf(true, true);
+                    }
+                    _conversationItems = ConvHelper.GetMailItemList(_dfConversation,
+                                                                   ((Folder)Mail.Parent).StoreID,
+                                                                   _globals.Ol.App,
+                                                                   true);
+
+                    return _conversationItems;
+                }
+            }
+            else
+            {
+                return new List<MailItem> { Mail };
+            }
+        }
+
         public bool BlExpanded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public int Height => throw new NotImplementedException();
 
         public bool BlHasChild { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public object ObjItem { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        
+        public MailItem Mail { get => _mailItem; set => _mailItem = value; }
 
         public void ToggleTips()
         {
@@ -342,7 +398,6 @@ namespace QuickFiler.Controllers
             _itemViewer.BackColor = System.Drawing.Color.Black;
             _itemViewer.ForeColor = System.Drawing.Color.WhiteSmoke;
         }
-
         
         public void SetThemeLight()
         {
@@ -429,5 +484,23 @@ namespace QuickFiler.Controllers
             _dfConversation = null;
             _fldrHandler = null;
         }
+
+        #region Exposed Properties
+
+        public string SelectedFolder { get => _itemViewer.CboFolders.SelectedItem.ToString(); }
+
+        public int Position { get => _viewerPosition; set => _viewerPosition = value; }
+
+        public string Subject { get => _itemViewer.lblSubject.Text; }
+
+        public string To { get => _mailItem.To; }
+
+        public string Sender { get => _itemViewer.LblSender.Text; }
+
+        public string SentDate { get => _mailItem.SentOn.ToString("MM/dd/yyyy"); }
+
+        public string SentTime { get => _mailItem.SentOn.ToString("HH:mm"); }
+
+        #endregion
     }
 }

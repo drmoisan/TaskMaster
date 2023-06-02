@@ -157,8 +157,8 @@ namespace TaskMaster
 
             var dc = new QuickFiler.Controllers.QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
 
-            //var ObjItem = _globals.Ol.App.ActiveExplorer().Selection[1];
-            //Outlook.Conversation conv = (Outlook.Conversation)ObjItem.GetConversation();
+            //var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            //Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
             //Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
             //Debug.WriteLine(df.PrettyText());
             //df.Display();

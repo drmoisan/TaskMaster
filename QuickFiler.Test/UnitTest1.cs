@@ -38,7 +38,7 @@ namespace QuickFiler.Test
             qf.Refresh();
             
             RowStyle rowStyle = new RowStyle(SizeType.Absolute, itemHeight);
-            TableLayoutHelper.InsertSpecificRow(panel: qf.L1v0L2L3v_TableLayout, rowIndex: 0, newStyle: rowStyle);
+            TableLayoutHelper.InsertSpecificRow(panel: qf.L1v0L2L3v_TableLayout, rowIndex: 0, templateStyle: rowStyle);
             qf.L1v0L2L3v_TableLayout.Height += itemHeight;
 
             qf.Refresh();

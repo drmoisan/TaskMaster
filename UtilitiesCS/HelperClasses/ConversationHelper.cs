@@ -73,6 +73,67 @@ namespace UtilitiesCS
             {"ConversationIndex", SchemaConversationIndex }
         };
 
+        public static IList GetMailItemList(DataFrame df,
+                                            string storeID,
+                                            Outlook.Application olApp,
+                                            bool strict)
+        {
+            IList emails = new List<MailItem>();
+            string EntryID = "EntryID";
+            
+            if (df == null) 
+            { 
+                if (strict) { throw new ArgumentNullException(nameof(df)); } 
+                else { return emails; }
+            }
+            
+            else if (df.Columns.GetNames().Contains(EntryID)) 
+            {
+                if (strict) 
+                { 
+                    throw new ArgumentOutOfRangeException(
+                        $"{nameof(df)} is missing {EntryID} columns: {df.Columns.GetNames()}"); 
+                }
+                else { return emails; }
+            }
+
+            else if (df.Rows.Count == 0) 
+            { 
+                if (strict) { throw new ArgumentOutOfRangeException("df is empty"); } 
+                else { return emails; } 
+            }
+
+            else
+            {
+                emails = df["EntryID"][0, (int)df.Rows.Count]
+                    .Select(x => olApp.GetNamespace("MAPI")
+                    .GetItemFromID((string)x, storeID))
+                    .ToList();
+                return emails;
+            }
+        }
+
+        public static IList GetMailItemList(DataFrame df,
+                                            string storeID,
+                                            Outlook.Application olApp)
+        {
+            IList emails = new List<MailItem>();
+            string EntryID = "EntryID";
+
+            if ((df == null) || (df.Columns.GetNames().Contains(EntryID)) || (df.Rows.Count == 0))
+            {
+                return emails; 
+            }
+            else
+            {
+                emails = df["EntryID"][0, (int)df.Rows.Count]
+                    .Select(x => olApp.GetNamespace("MAPI")
+                    .GetItemFromID((string)x, storeID))
+                    .ToList();
+                return emails;
+            }
+        }
+
         public static int ConversationCt(this object ObjItem, bool SameFolder, bool MailOnly)
         {
             if (ObjItem is MailItem)

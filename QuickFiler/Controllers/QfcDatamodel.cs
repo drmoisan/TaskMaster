@@ -40,7 +40,7 @@ namespace QuickFiler.Controllers
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
 
-        public StackObjectCS<MailItem> StackMovedItems { get => _movedObjects; set => _movedObjects = value; }
+        public StackObjectCS<MailItem> MovedItems { get => _movedObjects; }
 
         public IList<MailItem> InitEmailQueueAsync(int batchSize, BackgroundWorker worker)
         {
@@ -81,7 +81,7 @@ namespace QuickFiler.Controllers
             //zxxint arg = (int)e.Argument;
 
             // Start the time-consuming operation.
-            e.Result = TimeConsumingOperation(bw);
+            e.Result = LoadRemainingEmailsToQueue(bw);
 
             // If the operation was canceled by the user,
             // set the DoWorkEventArgs.Cancel property to true.
@@ -115,7 +115,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private bool TimeConsumingOperation(BackgroundWorker bw)
+        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw)
         {
             if((_frame is null) || (_frame.RowCount == 0))
             {
@@ -155,11 +155,6 @@ namespace QuickFiler.Controllers
         }
 
         public void UndoMove()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MoveItems(ref StackObjectCS<MailItem> StackMovedItems)
         {
             throw new NotImplementedException();
         }
@@ -391,8 +386,8 @@ namespace QuickFiler.Controllers
                                     listEmails.Add(OlMailTmp);
 
                             } // If IsMailUnReadable
-                        } // If TypeOf ObjItem Is mailItem Then
-                    } // For Each ObjItem In OlItemsTmp
+                        } // If TypeOf Mail Is mailItem Then
+                    } // For Each Mail In OlItemsTmp
                 } // For i = 1 To 4
 
                 foreach (var currentObjItem1 in OlItemsRemainder)
@@ -421,8 +416,8 @@ namespace QuickFiler.Controllers
                                 listEmails.Add(OlMailTmp);
 
                         } // If IsMailUnReadable
-                    } // If TypeOf ObjItem Is mailItem Then
-                } // For Each ObjItem In OlItemsRemainder
+                    } // If TypeOf Mail Is mailItem Then
+                } // For Each Mail In OlItemsRemainder
             }
 
             else
@@ -452,7 +447,7 @@ namespace QuickFiler.Controllers
                             if (BlUniqueConv)
                                 listEmails.Add(OlMailTmp);
                         } // Not IsMailUnReadable(OlMailTmp) Then
-                    } // If TypeOf ObjItem Is mailItem Then
+                    } // If TypeOf Mail Is mailItem Then
                 }
             }
 
