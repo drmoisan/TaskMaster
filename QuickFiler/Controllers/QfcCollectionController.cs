@@ -42,6 +42,7 @@ namespace QuickFiler.Controllers
         private List<ItemGroup> _itemGroups = new List<ItemGroup>();
         private bool _darkMode;
         private RowStyle _template;
+        private int _intActiveSelection;
 
         public int EmailsLoaded
         {
@@ -158,34 +159,34 @@ namespace QuickFiler.Controllers
                 posInsert = _itemGroups.Count + 1;
                 
             //LoadGroupOfCtrls(ref listCtrls, _intUniqueItemCounter, posInsert, blGroupConversation);
-            //QF = new QfcController(mailItem, listCtrls, posInsert, _boolRemoteMouseApp, this, _globals);
+            //itemController = new QfcController(mailItem, listCtrls, posInsert, _boolRemoteMouseApp, this, _globals);
             //if (blChild)
-            //    QF.BlHasChild = true;
+            //    itemController.BlHasChild = true;
             //if (folderList is Array == true)
             //{
             //    if (((Array)folderList).GetUpperBound(0) == 0)
             //    {
-            //        QF.PopulateFolderCombobox();
+            //        itemController.PopulateFolderCombobox();
             //    }
             //    else
             //    {
-            //        QF.PopulateFolderCombobox(folderList);
+            //        itemController.PopulateFolderCombobox(folderList);
             //    }
             //}
             //else
             //{
-            //    QF.PopulateFolderCombobox(folderList);
+            //    itemController.PopulateFolderCombobox(folderList);
             //}
-            //QF.CountMailsInConv(insertionCount);
+            //itemController.CountMailsInConv(insertionCount);
 
             //if (posInsert > _listQFClass.Count)
             //{
-            //    _listQFClass.Add(QF);
+            //    _listQFClass.Add(itemController);
             //}
             //else
             //{
             //    // _listQFClass.Add(qf, qf.mailItem.Subject & qf.mailItem.SentOn & qf.mailItem.Sender, posInsert)
-            //    _listQFClass.Insert(posInsert, QF);
+            //    _listQFClass.Insert(posInsert, itemController);
             //}
 
             //// For i = 1 To _listQFClass.Count
@@ -198,6 +199,7 @@ namespace QuickFiler.Controllers
 
         public void RemoveControls()
         {
+            //TODO: Optimize removal so all are removed at once using new helper
             if (_itemGroups is not null)
             {
                 _itemTLP.SuspendLayout();
@@ -220,6 +222,7 @@ namespace QuickFiler.Controllers
 
         public void RemoveSpaceToCollapseConversation()
         {
+            // Perhaps can eliminate
             throw new NotImplementedException();
         }
 
@@ -230,32 +233,84 @@ namespace QuickFiler.Controllers
 
         public int ActivateByIndex(int intNewSelection, bool blExpanded)
         {
-            throw new NotImplementedException();
+            if (intNewSelection > 0 & intNewSelection <= _itemGroups.Count)
+            {
+                IQfcItemController itemController = _itemGroups[intNewSelection - 1].ItemController;
+                QfcItemViewer itemViewer = _itemGroups[intNewSelection - 1].ItemViewer;
+                
+                itemController.Accel_FocusToggle();
+                if (blExpanded)
+                {
+                    // BUGFIX: Replace Function MoveDownPix
+                    //MoveDownPix(intNewSelection + 1, itemController.ItemPanel.Height);
+                    itemController.ExpandCtrls1();
+                }
+                _intActiveSelection = intNewSelection;
+                _formViewer.L1v0L2L3v_TableLayout.ScrollControlIntoView(itemViewer);
+            }
+            return _intActiveSelection;
+        }
+
+        public bool ToggleOffActiveItem(bool parentBlExpanded)
+        {
+            bool blExpanded = parentBlExpanded;
+            if (_intActiveSelection != 0)
+            {
+                //adjusted to _intActiveSelection -1 to accommodate zero based
+                IQfcItemController itemController = _itemGroups[_intActiveSelection - 1].ItemController;
+                if (itemController.BlExpanded)
+                {
+                    //TODO: Replace MoveDownPix Function
+                    //MoveDownPix(_intActiveSelection + 1, (int)Math.Round(itemController.ItemPanel.Height * -0.5d));
+                    itemController.ExpandCtrls1();
+                    blExpanded = true;
+                }
+                itemController.Accel_FocusToggle();
+
+                //QUESTION: This assignment worries me and will be out of sync 
+                _intActiveSelection = 0;
+            }
+            return blExpanded;
         }
 
         public void SelectNextItem()
         {
-            throw new NotImplementedException();
+            if (_intActiveSelection < _itemGroups.Count)
+            {
+                //BUGFIX: Write logic to select the next item
+                //_viewer.KeyboardDialog.Text = (_intActiveSelection + 1).ToString();
+            }
+            // Deactivated code to reset dialog accelerator since not using
+            //_viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
         }
 
         public void SelectPreviousItem()
         {
-            throw new NotImplementedException();
+            if (_intActiveSelection > 0)
+            {
+                //BUGFIX: Write logic to select the next item
+                // _viewer.KeyboardDialog.Text = (_intActiveSelection - 1).ToString();
+            }
+            // Deactivated code to reset dialog accelerator since not using
+            // _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
         }
 
         public void MoveDownControlGroups(int intPosition, int intMoves)
         {
-            throw new NotImplementedException();
+            // Perhaps this can be eliminated
+            // throw new NotImplementedException();
         }
 
         public void MoveDownPix(int intPosition, int intPix)
         {
-            throw new NotImplementedException();
+            // Perhaps this can be eliminated
+            // throw new NotImplementedException();
         }
 
         public void ResizeChildren(int intDiffx)
         {
-            throw new NotImplementedException();
+            // Perhaps this can be eliminated
+            // throw new NotImplementedException();
         }
 
         public void ConvToggle_Group(IList<MailItem> selItems, int indexOriginal)
@@ -463,7 +518,6 @@ namespace QuickFiler.Controllers
             return xCommaRet;
             // xComma = StripAccents(strTmp)
         }
-
 
         public class ItemGroup
         {

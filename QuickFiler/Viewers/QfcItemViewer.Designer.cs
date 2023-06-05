@@ -334,8 +334,8 @@
             this.L1h1L2v.ColumnCount = 1;
             this.L1h1L2v.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1h1L2v.Controls.Add(this.L1h1L2v1h, 0, 0);
-            this.L1h1L2v.Controls.Add(this.L1h1L2v2h, 0, 1);
-            this.L1h1L2v.Controls.Add(this.L1h1L2v3h, 0, 2);
+            this.L1h1L2v.Controls.Add(this.L1h1L2v2h, 0, 2);
+            this.L1h1L2v.Controls.Add(this.L1h1L2v3h, 0, 1);
             this.L1h1L2v.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1h1L2v.Location = new System.Drawing.Point(0, 0);
             this.L1h1L2v.Margin = new System.Windows.Forms.Padding(0, 0, 6, 0);
@@ -537,13 +537,13 @@
             this.L1h1L2v2h.Controls.Add(this.LblFolder, 0, 0);
             this.L1h1L2v2h.Controls.Add(this.CboFolders, 2, 0);
             this.L1h1L2v2h.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h1L2v2h.Location = new System.Drawing.Point(0, 62);
+            this.L1h1L2v2h.Location = new System.Drawing.Point(0, 129);
             this.L1h1L2v2h.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.L1h1L2v2h.Name = "L1h1L2v2h";
             this.L1h1L2v2h.Padding = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.L1h1L2v2h.RowCount = 1;
             this.L1h1L2v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v2h.Size = new System.Drawing.Size(818, 59);
+            this.L1h1L2v2h.Size = new System.Drawing.Size(818, 50);
             this.L1h1L2v2h.TabIndex = 1;
             // 
             // LblAcFolder
@@ -554,7 +554,7 @@
             this.LblAcFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcFolder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcFolder.Location = new System.Drawing.Point(119, 13);
+            this.LblAcFolder.Location = new System.Drawing.Point(119, 8);
             this.LblAcFolder.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcFolder.Name = "LblAcFolder";
             this.LblAcFolder.Size = new System.Drawing.Size(34, 33);
@@ -566,7 +566,7 @@
             this.LblFolder.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblFolder.AutoSize = true;
             this.LblFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblFolder.Location = new System.Drawing.Point(6, 17);
+            this.LblFolder.Location = new System.Drawing.Point(6, 12);
             this.LblFolder.Margin = new System.Windows.Forms.Padding(0);
             this.LblFolder.Name = "LblFolder";
             this.LblFolder.Size = new System.Drawing.Size(86, 25);
@@ -603,12 +603,12 @@
             this.L1h1L2v3h.Controls.Add(this.CbxConversation, 2, 0);
             this.L1h1L2v3h.Controls.Add(this.LblAcConversation, 1, 0);
             this.L1h1L2v3h.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h1L2v3h.Location = new System.Drawing.Point(6, 131);
+            this.L1h1L2v3h.Location = new System.Drawing.Point(6, 64);
             this.L1h1L2v3h.Margin = new System.Windows.Forms.Padding(6);
             this.L1h1L2v3h.Name = "L1h1L2v3h";
             this.L1h1L2v3h.RowCount = 1;
             this.L1h1L2v3h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v3h.Size = new System.Drawing.Size(806, 46);
+            this.L1h1L2v3h.Size = new System.Drawing.Size(806, 55);
             this.L1h1L2v3h.TabIndex = 2;
             // 
             // CbxEmailCopy
@@ -619,7 +619,7 @@
             this.CbxEmailCopy.Location = new System.Drawing.Point(616, 6);
             this.CbxEmailCopy.Margin = new System.Windows.Forms.Padding(6);
             this.CbxEmailCopy.Name = "CbxEmailCopy";
-            this.CbxEmailCopy.Size = new System.Drawing.Size(184, 34);
+            this.CbxEmailCopy.Size = new System.Drawing.Size(184, 35);
             this.CbxEmailCopy.TabIndex = 6;
             this.CbxEmailCopy.Text = "Copy Email";
             this.CbxEmailCopy.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -632,7 +632,7 @@
             this.CbxAttachments.Location = new System.Drawing.Point(342, 6);
             this.CbxAttachments.Margin = new System.Windows.Forms.Padding(6);
             this.CbxAttachments.Name = "CbxAttachments";
-            this.CbxAttachments.Size = new System.Drawing.Size(198, 34);
+            this.CbxAttachments.Size = new System.Drawing.Size(198, 35);
             this.CbxAttachments.TabIndex = 12;
             this.CbxAttachments.Text = "Attachments";
             this.CbxAttachments.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -675,7 +675,7 @@
             this.CbxConversation.Location = new System.Drawing.Point(66, 6);
             this.CbxConversation.Margin = new System.Windows.Forms.Padding(0, 6, 6, 6);
             this.CbxConversation.Name = "CbxConversation";
-            this.CbxConversation.Size = new System.Drawing.Size(207, 34);
+            this.CbxConversation.Size = new System.Drawing.Size(207, 35);
             this.CbxConversation.TabIndex = 13;
             this.CbxConversation.Text = "Conversation";
             this.CbxConversation.UseVisualStyleBackColor = true;

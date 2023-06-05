@@ -333,6 +333,12 @@
     <Compile Include="Viewers\QfcFormViewerDark.Designer.cs">
       <DependentUpon>QfcFormViewerDark.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewers\QfcItemViewerExpandedLight.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\QfcItemViewerExpandedLight.Designer.cs">
+      <DependentUpon>QfcItemViewerExpandedLight.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcItemViewerV1.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -357,6 +363,12 @@
     <Compile Include="Viewers\QfcItemViewer.Designer.cs">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewers\QfcItemViewerLightSelected.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\QfcItemViewerLightSelected.Designer.cs">
+      <DependentUpon>QfcItemViewerLightSelected.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -375,6 +387,9 @@
     <EmbeddedResource Include="Viewers\QfcFormViewerDark.resx">
       <DependentUpon>QfcFormViewerDark.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcItemViewerExpandedLight.resx">
+      <DependentUpon>QfcItemViewerExpandedLight.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewerV1.resx">
       <DependentUpon>QfcItemViewerV1.cs</DependentUpon>
     </EmbeddedResource>
@@ -389,6 +404,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcItemViewerLightSelected.resx">
+      <DependentUpon>QfcItemViewerLightSelected.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
