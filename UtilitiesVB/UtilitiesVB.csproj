@@ -241,9 +241,8 @@
     <Compile Include="Solution Interfaces\IFileSystemFolderPaths.cs" />
     <Compile Include="Solution Interfaces\IListOfIDs.cs" />
     <Compile Include="Solution Interfaces\IOlObjects.cs" />
-    <Compile Include="Solution Interfaces\IProjectInfo.cs" />
+    <Compile Include="Solution Interfaces\IProjectInfoLegacy.cs" />
     <Compile Include="Solution Interfaces\IToDoObjects.cs" />
-    <Compile Include="Solution Interfaces\IToDoProjectInfoEntry.cs" />
     <Compile Include="Common Outlook Functions\MailResolution.cs" />
     <Compile Include="Windows Forms\MouseDownFilter.cs" />
     <Compile Include="My Project\AssemblyInfo.cs" />

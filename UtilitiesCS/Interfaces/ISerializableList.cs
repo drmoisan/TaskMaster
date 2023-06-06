@@ -22,5 +22,6 @@ namespace UtilitiesCS
         void Serialize();
         void Serialize(string filepath);
         List<T> ToList();
+        void FromList(IList<T> value);
     }
 }

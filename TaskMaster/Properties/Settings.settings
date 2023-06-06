@@ -33,7 +33,7 @@
       <Value Profile="(Default)">Archive</Value>
     </Setting>
     <Setting Name="FileName_ProjInfo" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ProjInfo.bin</Value>
+      <Value Profile="(Default)">ProjInfo.json</Value>
     </Setting>
     <Setting Name="FilenameDictPpl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">pplkey.json</Value>

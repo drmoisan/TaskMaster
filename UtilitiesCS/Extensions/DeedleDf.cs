@@ -11,7 +11,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-    public static class DataFrameExtensionsDeedle
+    public static class DeedleDf
     {
         public static Frame<int, string> GetEmailDataInView(Explorer activeExplorer)
         {
@@ -71,6 +71,22 @@ namespace UtilitiesCS
             if ((filteredData is null) || (filteredData.Count() == 0)) { return null; }
 
             return filteredData.First();
+        }
+
+        public static Frame<int, string> FromArray2D(object[,] data, Dictionary<string, int> columnDictionary)
+        {
+            var rows = Enumerable.Range(0, data.GetLength(0)).Select(i =>
+            {
+                var sb = new SeriesBuilder<string>();
+                foreach (var key in columnDictionary.Keys)
+                {
+                    var value = data[i, columnDictionary[key]];
+                    sb.Add(key, value);
+                }
+                return KeyValue.Create(i, sb.Series);
+            });
+            var dfTemp = Frame.FromRows(rows);
+            return dfTemp;
         }
 
         //public static  GetDfColumn(string columnName, object[] columnData)

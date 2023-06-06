@@ -142,7 +142,7 @@ namespace TaskMaster.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ProjInfo.bin")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ProjInfo.json")]
         public string FileName_ProjInfo {
             get {
                 return ((string)(this["FileName_ProjInfo"]));

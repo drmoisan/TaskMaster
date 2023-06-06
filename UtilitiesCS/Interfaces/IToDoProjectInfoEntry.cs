@@ -1,5 +1,5 @@
 ﻿
-namespace UtilitiesVB
+namespace UtilitiesCS
 {
     public interface IToDoProjectInfoEntry
     {
@@ -10,5 +10,6 @@ namespace UtilitiesVB
         bool Equals(object obj);
         bool Equals(IToDoProjectInfoEntry other);
         string ToCSV();
+        bool IsAnyNull();
     }
 }

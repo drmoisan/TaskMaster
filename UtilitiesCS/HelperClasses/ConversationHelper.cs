@@ -57,20 +57,23 @@ namespace UtilitiesCS
         public static string SchemaConversationDepth = PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
         public static string SchemaConversationIndex = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
         public static string SchemaTriage = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
+        public static string SchemaToDoID = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
 
         public static Dictionary<string, string> SchemaToField = new()
         {
             {SchemaFolderName, "Folder Name" },
             {SchemaMessageStore, "Store"},
             {SchemaConversationDepth, "ConvDepth" },
-            {SchemaConversationIndex, "ConversationIndex" }
+            {SchemaConversationIndex, "ConversationIndex" },
+            {SchemaToDoID, "ToDoID" }
         };
         public static Dictionary<string, string> FieldToSchema = new()
         {
             {"Folder Name", SchemaFolderName },
             {"Store", SchemaMessageStore},
             {"ConvDepth", SchemaConversationDepth },
-            {"ConversationIndex", SchemaConversationIndex }
+            {"ConversationIndex", SchemaConversationIndex },
+            {"ToDoID", SchemaToDoID }
         };
 
         public static IList GetMailItemList(DataFrame df,
@@ -243,9 +246,9 @@ namespace UtilitiesCS
         {
             int columnCount = table.Columns.Count;
             int[] charSpacing = Enumerable.Repeat(15, columnCount).ToArray();
-            charSpacing[1] = 30;
-            charSpacing[2] = 22;
-            charSpacing[3] = 22;
+            //charSpacing[1] = 30;
+            //charSpacing[2] = 22;
+            //charSpacing[3] = 22;
             Justify[] justification = Enumerable.Repeat(Justify.Left, columnCount).ToArray();
             Justify[] headerCenter = Enumerable.Repeat(Justify.Center, columnCount).ToArray();
             var styleParams = charSpacing.Zip(justification, (space, align) => (Spacing: space, Justification: align)).ToArray();
@@ -284,10 +287,13 @@ namespace UtilitiesCS
             
             rows.Add(lineDivider);
             string output = string.Join("\n", rows.ToArray());
-            Debug.WriteLine("");
-            Debug.WriteLine("");
-            Debug.WriteLine("");
-            Debug.WriteLine(output);
+            
+            
+            Console.WriteLine("");
+            Console.WriteLine("");
+            Console.WriteLine(output);
+
+            table.MoveToStart();
         }
         
         public static string[] GetColumnHeaders(this Outlook.Table table)

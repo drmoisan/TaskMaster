@@ -19,7 +19,8 @@ namespace UtilitiesCS
             {
                 for (int j = 0; j < columnCount; j++)
                 {
-                    stringArray[i, j] = array[i, j].ToString();
+                    if (array[i, j] is null) { stringArray[i, j] = ""; }
+                    else { stringArray[i, j] = array[i, j].ToString(); }
                 }
             }
             return stringArray;

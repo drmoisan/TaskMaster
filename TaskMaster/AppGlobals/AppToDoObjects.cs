@@ -48,8 +48,8 @@ namespace TaskMaster
             {
                 if (_projInfo is null)
                 {
-                    _projInfo = ToDoProjectInfoUtilities.LoadToDoProjectInfo(
-                        Path.Combine(Parent.FS.FldrAppData, _defaults.FileName_ProjInfo));
+                    _projInfo = new ProjectInfo(filename: _defaults.FileName_ProjInfo, 
+                                                folderpath: Parent.FS.FldrAppData);
                 }
                 return _projInfo;
             }

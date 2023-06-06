@@ -9,6 +9,7 @@ using Microsoft.Office.Interop.Outlook;
 using System.Runtime.CompilerServices;
 using ToDoModel;
 using Microsoft.Office.Core;
+using QuickFiler;
 
 namespace TaskMaster
 {
@@ -19,6 +20,8 @@ namespace TaskMaster
             _globals = new ApplicationGlobals(Application);
 
             {
+                DebugTextWriter tw = new DebugTextWriter();
+                Console.SetOut(tw);
                 OlNS = _globals.Ol.NamespaceMAPI;
                 OlToDoItems = _globals.Ol.ToDoFolder.Items;
                 OlInboxItems = _globals.Ol.Inbox.Items;

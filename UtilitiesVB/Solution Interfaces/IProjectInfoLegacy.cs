@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UtilitiesCS;
 
 namespace UtilitiesVB
 {
-    public interface IProjectInfo : IList
+    public interface IProjectInfoLegacy : IList
     {
         void Save();
         void Save(string FileName_IDList);

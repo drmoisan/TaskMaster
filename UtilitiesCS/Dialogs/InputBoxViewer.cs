@@ -22,7 +22,10 @@ namespace UtilitiesCS
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            DpiCalled = true;
         }
+
+        public static bool DpiCalled { get; set; } = false;
 
         private void Ok_Click(object sender, EventArgs e)
         {

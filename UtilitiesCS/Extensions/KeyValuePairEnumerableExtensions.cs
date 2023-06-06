@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Deedle.Internal;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace UtilitiesCS
 {
@@ -34,8 +37,11 @@ namespace UtilitiesCS
     /// <returns>A Sorted Dictionary</returns>
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> l)
         {
+            IEnumerable<IGrouping<TKey, KeyValuePair<TKey, TValue>>> duplicateKVPsByKey = l.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1);
+            if (duplicateKVPsByKey.Any())
+                throw new InvalidOperationException($"Cannot convert to dictionary with duplicate keys: {string.Join(",", duplicateKVPsByKey)}");
+            
             var result = new Dictionary<TKey, TValue>();
-
             foreach (var e in l)
                 result[e.Key] = e.Value;
 

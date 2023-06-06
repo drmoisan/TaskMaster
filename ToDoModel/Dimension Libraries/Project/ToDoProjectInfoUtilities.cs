@@ -2,15 +2,16 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
+using ToDoModel.Legacy;
 
 namespace ToDoModel
 {
 
     public static class ToDoProjectInfoUtilities
     {
-        public static ProjectInfo LoadToDoProjectInfo(string filePath)
+        public static ProjectInfoLegacy LoadToDoProjectInfo(string filePath)
         {
-            ProjectInfo ProjInfo;
+            ProjectInfoLegacy ProjInfo;
             if (File.Exists(filePath))
             {
                 // Dim TestFileStream As Stream = File.OpenRead(filePath)
@@ -19,7 +20,7 @@ namespace ToDoModel
                 {
                     using (Stream TestFileStream = File.OpenRead(filePath))
                     {
-                        ProjInfo = (ProjectInfo)deserializer.Deserialize(TestFileStream);
+                        ProjInfo = (ProjectInfoLegacy)deserializer.Deserialize(TestFileStream);
                     }
                 }
                 catch (UnauthorizedAccessException ex)
@@ -39,7 +40,7 @@ namespace ToDoModel
             }
             else
             {
-                ProjInfo = new ProjectInfo();
+                ProjInfo = new ProjectInfoLegacy();
                 ProjInfo.Save(filePath);
                 return ProjInfo;
             }

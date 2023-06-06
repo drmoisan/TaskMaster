@@ -1,37 +1,28 @@
 ﻿using System;
 using UtilitiesVB;
+using UtilitiesCS;
+using System.Collections.Generic;
 
 namespace ToDoModel
 {
 
     [Serializable()]
-    public class ToDoProjectInfoEntry : IEquatable<IToDoProjectInfoEntry>, IComparable, IComparable<IToDoProjectInfoEntry>, IToDoProjectInfoEntry
+    public class ToDoProjectInfoEntry : IEquatable<IToDoProjectInfoEntry>, IComparable, IComparable<IToDoProjectInfoEntry>, IToDoProjectInfoEntry, IEquatable<ToDoProjectInfoEntry>
     {
 
-        public string ProjectName { get; set; }
-        public string ProjectID { get; set; }
-        public string ProgramName { get; set; }
+        private string _projectName;
+        private string _projectID;
+        private string _programName;
+
+        public string ProjectName { get => _projectName; set => _projectName = value; }
+        public string ProjectID { get => _projectID; set => _projectID = value; }
+        public string ProgramName { get => _programName; set => _programName = value; }
 
         public ToDoProjectInfoEntry(string ProjName, string ProjID, string ProgName)
         {
             ProjectName = ProjName;
             ProjectID = ProjID;
             ProgramName = ProgName;
-        }
-
-        public bool Equals(IToDoProjectInfoEntry other)
-        {
-
-            return other is not null && ProjectName.Equals(other.ProjectName);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is null)
-                return false;
-
-            ToDoProjectInfoEntry other = obj as ToDoProjectInfoEntry;
-            return other is not null && Equals(other);
         }
 
         public int CompareTo(IToDoProjectInfoEntry other)
@@ -78,5 +69,37 @@ namespace ToDoModel
             return ProjectID + "," + ProjectName + "," + ProgramName;
         }
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as IToDoProjectInfoEntry);
+        }
+
+        public bool Equals(ToDoProjectInfoEntry other)
+        {
+            return other is not null &&
+                   ProjectName == other.ProjectName &&
+                   ProjectID == other.ProjectID &&
+                   ProgramName == other.ProgramName;
+        }
+
+        public bool Equals(IToDoProjectInfoEntry other)
+        {
+            return other is not null &&
+                   ProjectName == other.ProjectName &&
+                   ProjectID == other.ProjectID &&
+                   ProgramName == other.ProgramName;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 682028280;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProjectName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProjectID);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProgramName);
+            return hashCode;
+        }
+    
+        public bool IsAnyNull() 
+        { return (_projectName is null)||(_projectID is null)||(_programName is null); }
     }
 }

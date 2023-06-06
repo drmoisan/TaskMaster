@@ -23,7 +23,7 @@ namespace UtilitiesCS
             _innerList = new List<T>();
         }
 
-        public SerializableList(List<T> listOfT)
+        public SerializableList(IList<T> listOfT)
         {
             _innerList = listOfT;
         }
@@ -357,6 +357,7 @@ namespace UtilitiesCS
                 if (response == DialogResult.Yes)
                 {
                     _innerList = new List<T> { };
+                    this.Serialize();
                 }
                 else if (_innerList == null)
                 {
@@ -366,6 +367,9 @@ namespace UtilitiesCS
         }
 
         public List<T> ToList() { return new List<T>(_innerList); }
+
+        public void FromList(IList<T> value) { _innerList = value; }
+
         #endregion
 
     }

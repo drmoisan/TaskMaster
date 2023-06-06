@@ -53,7 +53,7 @@ namespace QuickFiler.Controllers
             // Cast Frame to array of IEmailInfo
             var rows = firstIteration.GetRowsAs<IEmailInfo>().Values.ToArray();
 
-            //BUGFIX: StoreId ID is being converted to the litteral string "byte[]" instead of the string equivalent of the byte array
+            //BUGFIX: StoreId ID is being converted to the literal string "byte[]" instead of the string equivalent of the byte array
             // Convert array of IEmailInfo to List<MailItem>
             var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
 
@@ -161,9 +161,7 @@ namespace QuickFiler.Controllers
                         
         public Frame<int, string> InitDf(Explorer activeExplorer) 
         {
-            DebugTextWriter tw = new DebugTextWriter();
-            Console.SetOut(tw);
-            Frame<int, string> df = DataFrameExtensionsDeedle.GetEmailDataInView(activeExplorer);
+            Frame<int, string> df = DeedleDf.GetEmailDataInView(activeExplorer);
             df = df.FilterRowsBy("MessageClass", "IPM.Note");
             
             var topics = df.GetColumn<string>("Conversation").Values.Distinct().ToArray();

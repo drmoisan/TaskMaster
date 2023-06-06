@@ -7,13 +7,14 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using UtilitiesVB;
+using ToDoModel.Legacy;
 using UtilitiesCS;
 
-namespace ToDoModel
+namespace ToDoModel.Legacy
 {
 
     [Serializable()]
-    public class ProjectInfo : List<IToDoProjectInfoEntry>, IProjectInfo
+    public class ProjectInfoLegacy : List<IToDoProjectInfoEntry>, IProjectInfoLegacy
     {
         public string FileName = "";
 

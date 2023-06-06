@@ -34,6 +34,10 @@ namespace ToDoModel
                 {
                     TmpList = value;
                 }
+                else if (value[0].Length < Prefix.Length)
+                {
+                    TmpList = value;
+                }
                 else if ((value[0].Substring(0, Prefix.Length) ?? "") == (Prefix ?? ""))
                 {
                     TmpList = value.Select(x => x.Replace(Prefix, "")).ToList();

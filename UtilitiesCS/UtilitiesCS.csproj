@@ -250,10 +250,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\DataFrameExtensionsDeedle.cs" />
+    <Compile Include="Extensions\DeedleDf.cs" />
     <Compile Include="Extensions\KeyValuePairEnumerableExtensions.cs" />
     <Compile Include="Interfaces\IObservableDictionary.cs" />
+    <Compile Include="Interfaces\IProjectInfo.cs" />
+    <Compile Include="Interfaces\IToDoProjectInfoEntry.cs" />
     <Compile Include="OutlookExtensions\OlTableFunctions.cs" />
+    <Compile Include="OutlookExtensions\OlToDoTable.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
     <Compile Include="Interfaces\EnumFindBy.cs" />
