@@ -13,6 +13,7 @@ using UtilitiesCS;
 using UtilitiesVB;
 using UtilitiesCS.OutlookExtensions;
 using System.Runtime.CompilerServices;
+using Deedle;
 
 namespace ToDoModel
 {
@@ -20,10 +21,10 @@ namespace ToDoModel
     [Serializable()]
     public class ListOfIDs : IListOfIDs
     {
-
-        private List<string> _usedIDList;
-        private long _maxIDLength;
-        private string _filepath = "";
+        public ListOfIDs()
+        {
+            _usedIDList = new List<string>();
+        }
 
         public ListOfIDs(List<string> listUsedID)
         {
@@ -33,11 +34,6 @@ namespace ToDoModel
         public ListOfIDs(string FilePath, Outlook.Application OlApp)
         {
             LoadFromFile(FilePath: FilePath, OlApp: OlApp);
-        }
-
-        public ListOfIDs()
-        {
-            _usedIDList = new List<string>();
         }
 
         public static ListOfIDs LoadFromFile(string FilePath, Outlook.Application OlApp)
@@ -81,6 +77,10 @@ namespace ToDoModel
             return tmpIDList;
         }
 
+        private List<string> _usedIDList;
+        private long _maxIDLength;
+        private string _filepath = "";
+
         private static ListOfIDs ProcessFileError(Outlook.Application OlApp, string msg)
         {
             var tmpIDList = new ListOfIDs();
@@ -95,8 +95,6 @@ namespace ToDoModel
             }
             return tmpIDList;
         }
-
-        
         
         public void RefreshIDList(Outlook.Application Application)
         {
@@ -121,12 +119,39 @@ namespace ToDoModel
             }
         }
 
+        internal Frame<int, string> GetDfToDo(Microsoft.Office.Interop.Outlook.Store store)
+        {
+            var table = store.GetToDoTable();
+
+            (var data, var columnInfo) = table.ExtractData();
+
+            Frame<int, string> df = DeedleDf.FromArray2D(data: data, columnInfo);
+
+            df = df.FillMissing("");
+
+            return df;
+        }
+
+        //public void SubstituteIdRoot(string oldPrefix, string newPrefix)
+        //{
+        //    Frame<int, string> df = null;
+        //    foreach (Outlook.Store store in olApp.Session.Stores)
+        //    {
+        //        var dfTemp = GetDfToDo(store);
+        //        if (df is null) { df = dfTemp; }
+        //        else if (dfTemp is not null) { df.Merge(dfTemp); }
+        //    }
+
+            
+
+        //}
+
         /// <summary>
-    /// Function Invokes the DataModel_ToDoTree.ReNumberIDs() method at the root level which 
-    /// recursively calls DataModel_ToDoTree.ReNumberChildrenIDs() and then invokes the
-    /// ListOfIDs.Save() Method
-    /// </summary>
-    /// <param name="OlApp">Pointer to Outlook Application</param>
+        /// Function Invokes the DataModel_ToDoTree.ReNumberIDs() method at the root level which 
+        /// recursively calls DataModel_ToDoTree.ReNumberChildrenIDs() and then invokes the
+        /// ListOfIDs.Save() Method
+        /// </summary>
+        /// <param name="OlApp">Pointer to Outlook Application</param>
         public void CompressToDoIDs(Outlook.Application OlApp)
         {
             var _dataModel = new TreeOfToDoItems();
@@ -181,14 +206,16 @@ namespace ToDoModel
 
         public string GetNextAvailableToDoID(string strSeed)
         {
+            int encoderBase = 36; // 125;
+
             bool blContinue = true;
-            var lngMaxID = ConvertToDecimal(125, strSeed);
+            var lngMaxID = ConvertToDecimal(encoderBase, strSeed);
             string strMaxID = "";
 
             while (blContinue)
             {
                 lngMaxID += 1;
-                strMaxID = ConvertToBase(125, lngMaxID);
+                strMaxID = ConvertToBase(encoderBase, lngMaxID);
                 if (UsedIDList.Contains(strMaxID) == false)
                 {
                     blContinue = false;
@@ -206,10 +233,12 @@ namespace ToDoModel
 
         public string GetMaxToDoID()
         {
+            int encoderBase = 36; // 125;
+
             string strMaxID = UsedIDList.Max();
-            var lngMaxID = ConvertToDecimal(125, strMaxID);
+            var lngMaxID = ConvertToDecimal(encoderBase, strMaxID);
             lngMaxID += 1;
-            strMaxID = ConvertToBase(125, lngMaxID);
+            strMaxID = ConvertToBase(encoderBase, lngMaxID);
             UsedIDList.Add(strMaxID);
             if (strMaxID.Length > _maxIDLength)
             {
@@ -263,7 +292,8 @@ namespace ToDoModel
             int i;
 
             // chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
-            chars = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
+            // chars = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
+            chars = "0123456789abcdefghijklmnopqrstuvwxyz";
             maxBase = (chars.Length);
 
             // check if we can convert to this base
@@ -304,7 +334,8 @@ namespace ToDoModel
             BigInteger lngTmp;
 
             // chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
-            chars = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
+            // chars = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
+            chars = "0123456789abcdefghijklmnopqrstuvwxyz";
             lngTmp = 0;
 
             var loopTo = (strBase.Length -1);
@@ -318,7 +349,6 @@ namespace ToDoModel
             ConvertToDecimalRet = lngTmp;
             return ConvertToDecimalRet;
         }
-
         
     }
 }

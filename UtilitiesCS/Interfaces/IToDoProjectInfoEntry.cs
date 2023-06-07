@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace UtilitiesCS
 {
     public interface IToDoProjectInfoEntry
@@ -11,5 +13,6 @@ namespace UtilitiesCS
         bool Equals(IToDoProjectInfoEntry other);
         string ToCSV();
         bool IsAnyNull();
+        void SetIdUpdateAction(Action<string, string> action);
     }
 }

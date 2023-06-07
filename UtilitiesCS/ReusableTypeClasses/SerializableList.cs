@@ -220,7 +220,12 @@ namespace UtilitiesCS
         {
             this.Filepath = filepath;
 
-            string output = JsonConvert.SerializeObject(this, Formatting.Indented);
+            var settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.Auto;
+            settings.Formatting = Formatting.Indented;
+            string output = JsonConvert.SerializeObject(this, settings);
+
+            //string output = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(filepath, output);
 
         }
@@ -325,7 +330,12 @@ namespace UtilitiesCS
 
             try
             {
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                var settings = new JsonSerializerSettings();
+                settings.TypeNameHandling = TypeNameHandling.Auto;
+                settings.Formatting = Formatting.Indented;
+                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath),settings);
+
+                //_innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
             }
             catch (FileNotFoundException)
             {

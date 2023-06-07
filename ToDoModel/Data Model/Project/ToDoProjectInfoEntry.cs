@@ -2,27 +2,66 @@
 using UtilitiesVB;
 using UtilitiesCS;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace ToDoModel
 {
-
     [Serializable()]
     public class ToDoProjectInfoEntry : IEquatable<IToDoProjectInfoEntry>, IComparable, IComparable<IToDoProjectInfoEntry>, IToDoProjectInfoEntry, IEquatable<ToDoProjectInfoEntry>
     {
-
         private string _projectName;
         private string _projectID;
         private string _programName;
+        private Action<string, string> _idUpdate;
 
         public string ProjectName { get => _projectName; set => _projectName = value; }
-        public string ProjectID { get => _projectID; set => _projectID = value; }
         public string ProgramName { get => _programName; set => _programName = value; }
+        public string ProjectID 
+        { 
+            get => _projectID;
+            set 
+            { 
+                if ((value is not null)&&(value.Length != 4))
+                {
+                    MessageBox.Show($"{nameof(ProjectID)} cannot be set with malformed value {value}." +
+                        "Value should be 4 digits or characters");
+                }
+                else if (_projectID is null)
+                {
+                    _projectID = value;
+                }
+                else if (_projectID != value)
+                {
+                    var response = MessageBox.Show($"Are you sure you want to change {nameof(ProjectID)} from" +
+                        $"{_projectID} to {value}", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (response == DialogResult.Yes) 
+                    { 
+                        if (_idUpdate is not null)
+                        {
+                            var response2 = MessageBox.Show("Would you like to change underlying outlook objects, " +
+                            "child objects, and update ID List?", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                            if (response2 == DialogResult.Yes) 
+                            {
+                                _idUpdate.Invoke(_projectID,value);
+                            }
+                        }
+                        _projectID = value;
+                    }
+                }
+                
+            }
+        }
 
         public ToDoProjectInfoEntry(string ProjName, string ProjID, string ProgName)
         {
             ProjectName = ProjName;
             ProjectID = ProjID;
             ProgramName = ProgName;
+        }
+
+        public void SetIdUpdateAction(Action<string, string> action) 
+        { 
+            _idUpdate = action;
         }
 
         public int CompareTo(IToDoProjectInfoEntry other)

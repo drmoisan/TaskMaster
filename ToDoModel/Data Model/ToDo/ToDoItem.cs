@@ -1046,7 +1046,7 @@ namespace ToDoModel
                         strFieldValue = "00";
                         if (i <= strToDoID_Len)
                         {
-                            strFieldValue = strToDoID.Substring(i - 1, 2);
+                            strFieldValue = strToDoID.Substring(i - 2, 2);
                         }
                         if (!_readonly)
                             _olObject.SetUdf(strField, strFieldValue);

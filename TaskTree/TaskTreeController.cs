@@ -19,6 +19,14 @@ namespace TaskTree
 
     public class TaskTreeController
     {
+        public TaskTreeController(IApplicationGlobals AppGlobals, TaskTreeForm Viewer, TreeOfToDoItems DataModel)
+        {
+            _viewer = Viewer;
+            _dataModel = DataModel;
+            _viewer.SetController(this);
+        }
+
+        
         public List<TreeNode<ToDoItem>> ToDoTree = new List<TreeNode<ToDoItem>>();
         private readonly Resizer rs = new Resizer();
         private readonly Resizer rscol = new Resizer();
@@ -27,13 +35,6 @@ namespace TaskTree
         private TaskTreeForm _viewer;
         private IApplicationGlobals _globals;
         public TreeOfToDoItems _dataModel = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
-
-        public TaskTreeController(IApplicationGlobals AppGlobals, TaskTreeForm Viewer, TreeOfToDoItems DataModel)
-        {
-            _viewer = Viewer;
-            _dataModel = DataModel;
-            _viewer.SetController(this);
-        }
 
         public void InitializeTreeListView()
         {
@@ -56,16 +57,6 @@ namespace TaskTree
             rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position | Resizer.ResizeDimensions.Size, true);
             rs.PrintDict();
         }
-
-        // Friend Function Init_DataModel()
-        // _dataModel = New TreeOfToDoItems(New List(Of TreeNode(Of ToDoItem))) 'Added for the second use of function which was appending
-        // _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, Globals.ThisAddIn.Application)
-        // ToDoTree = _dataModel.ListOfToDoTree
-        // Return True
-        // End Function
-
-
-        
 
         internal void HandleModelCanDrop(object sender, ModelDropEventArgs e)
         {
@@ -113,7 +104,6 @@ namespace TaskTree
             }
         }
 
-
         internal void HandleModelDropped(object sender, ModelDropEventArgs e)
         {
             e.Handled = true;
@@ -155,7 +145,6 @@ namespace TaskTree
             // this.lastSortOrder = order;
         }
 
-
         internal void MoveObjectsToRoots(TreeListView targetTree, TreeListView sourceTree, IList toMove)
         {
             if (ReferenceEquals(sourceTree, targetTree))                // Data Model: Check to see if the desination tree roots are in the same tree
@@ -195,46 +184,24 @@ namespace TaskTree
 
         internal void MoveObjectsToSibling(TreeListView targetTree, TreeListView sourceTree, TreeNode<ToDoItem> target, IList toMove, int siblingOffset)
         {
-
-            // There are lots of things to get right here:
-            // - sourceTree and targetTree may be the same
-            // - target may be a root (which means that all moved objects will also become roots)
-            // - one or more moved objects may be roots (which means the roots of the sourceTree will change)
-            // ***Why does this sub adjust sourceRoots and targetRoots Directly? I would think the underlying datamodel
-            // ***change would flow through the rest of the TreeListView
-
-            // Dim sourceRoots As ArrayList = TryCast(sourceTree.Roots, ArrayList)
-            // Dim targetRoots As ArrayList = If(targetTree Is sourceTree, sourceRoots, TryCast(targetTree.Roots, ArrayList))
-            // Dim sourceRootsChanged = False
-            // Dim targetRootsChanged = False
-
-            // We want to make the moved objects to be siblings of the target. So, we have to 
-            // remove the moved objects from their old parent and give them the same parent as the target.
-            // If the target is a root, then the moved objects have to become roots too.
             foreach (TreeNode<ToDoItem> x in toMove)
             {
-
                 if (x.Parent is null)
                 {
-                    // sourceRootsChanged = True               'TreeListView: 
-                    // sourceRoots.Remove(x)                   'TreeListView: Remove node from roots
                     if (_dataModel.ListOfToDoTree.Contains(x))
                     {
-                        bool unused2 = _dataModel.ListOfToDoTree.Remove(x);         // Data Model: Remove node from roots
+                        _dataModel.ListOfToDoTree.Remove(x);         // Data Model: Remove node from roots
                     }
                     else
                     {
-                        var unused1 = Interaction.MsgBox("Error in MoveObjectsToSibling: TreeListView and DataModel out of sync at roots");
+                        MessageBox.Show("Error in MoveObjectsToSibling: TreeListView and DataModel out of sync at roots");
                     }
                 }
                 else
                 {
-                    bool unused = x.Parent.RemoveChild(x);
-                    // TreeListView: Where is the action here? Is this automatic?
-                    // TreeListView: If it is automatic, why did I have to change for the roots?
-                }                 // Data Model: Remove Child from old Parent
-
-                x.Parent = target.Parent;                    // Data Model: give the Child a new Parent. Parent doesn't yet recognize child
+                    x.Parent.RemoveChild(x);
+                }                 
+                x.Parent = target.Parent;                    
             }
 
             // Now add to the moved objects to children of their parent (or to the roots collection

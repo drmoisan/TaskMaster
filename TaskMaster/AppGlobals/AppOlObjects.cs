@@ -5,7 +5,6 @@ using UtilitiesVB;
 
 namespace TaskMaster
 {
-
     public class AppOlObjects : IOlObjects
     {
 

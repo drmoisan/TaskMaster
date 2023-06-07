@@ -9,25 +9,33 @@ namespace ToDoModel
 
     public partial class ProjectInfoWindow
     {
-        public ProjectInfo pi;
+        public ProjectInfo _projectInfo;
         private readonly Resizer rs = new Resizer();
         private bool blEditingCell = false;
 
         public ProjectInfoWindow(ProjectInfo ProjInfo)
         {
-
-
             // This call is required by the designer.
             InitializeComponent();
 
             // Add any initialization after the InitializeComponent() call.
-            pi = ProjInfo;
+            _projectInfo = ProjInfo;
+
+        }
+
+        public ProjectInfoWindow(ProjectInfo ProjInfo, Action<string, string> action)
+        {
+            // This call is required by the designer.
+            InitializeComponent();
+
+            // Add any initialization after the InitializeComponent() call.
+            _projectInfo = ProjInfo;
 
         }
 
         private void ProjectInfoWindow_Load(object sender, EventArgs e)
         {
-            olvProjInfo.SetObjects(pi);
+            olvProjInfo.SetObjects(_projectInfo);
 
             rs.FindAllControls(this);
             rs.SetResizeDimensions(SplitContainer1.Panel2, Resizer.ResizeDimensions.Position, true);
@@ -38,7 +46,7 @@ namespace ToDoModel
 
         private void BTN_OK_Click(object sender, EventArgs e)
         {
-            pi.Save();
+            _projectInfo.Save();
             Close();
         }
 
@@ -65,8 +73,8 @@ namespace ToDoModel
                     if (selection is not null)
                     {
                         foreach (ToDoProjectInfoEntry entry in selection)
-                            pi.Remove(entry);
-                        pi.Save();
+                            _projectInfo.Remove(entry);
+                        _projectInfo.Save();
                         olvProjInfo.RemoveObjects(olvProjInfo.SelectedObjects);
                     }
                 }

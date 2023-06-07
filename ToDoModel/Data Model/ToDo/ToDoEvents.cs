@@ -474,42 +474,39 @@ namespace ToDoModel
                 }
             }
             todo.VisibleTreeState = 63;
-
-
         }
 
         /// <summary>
-    /// This is a helper procedure to migrate ToDoIDs from one framework to another
-    /// </summary>
+        /// This is a helper procedure to migrate ToDoIDs from one framework to another
+        /// </summary>
         public static void MigrateToDoIDs(Outlook.Application OlApp)
         {
             // TODO: Move MigrateToDoIDs to a class, module, or library
             var olItems = OlApp.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items;
-            int max = olItems.Count -1;
             int j = 0;
-            for (int i = 0, loopTo = max; i <= loopTo; i++)
+            int i = 0;
+            foreach (var olItem in olItems)
             {
-                var Item = new ToDoItem(olItems[i], true);
-                j += 1;
-                if (olItems[i].GetUdfString("NewID") != "Done")
+                var item = new ToDoItem(olItem, true);
+                if (item.OlItem.GetUdfString("NewID") != "20230606")
                 {
-                    string strToDoID = Item.ToDoID;
+                    string strToDoID = item.ToDoID;
                     if (strToDoID.Length > 0)
                     {
                         string strToDoIDnew = SubstituteCharsInID(strToDoID);
-                        Item.ToDoID = strToDoIDnew;
-                        Item.OlItem.SetUdf("NewID", value: "Done");
+                        item.ToDoID = strToDoIDnew;
+                        item.OlItem.SetUdf("NewID", value: "20230606");
                     }
                 }
-                if (j == 40)
+                i++;
+                if (++j == 40)
                 {
                     j = 0;
                     System.Windows.Forms.Application.DoEvents();
+                    Debug.WriteLine($"Converted {i} items");
                 }
             }
-
-
-
+            MessageBox.Show("ToDoID Conversion Complete!");
         }
 
         private static string SubstituteCharsInID(string strToDoID)
@@ -518,8 +515,11 @@ namespace ToDoModel
             // Dim charsnew As String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
             // "0123456789AaÁáÀàÂâÄäÃãÅåÆæBbCcÇçDdÐðEeÉéÈèÊêËëFfƒGgHhIiÍíÌìÎîÏïJjKkLlMmNnÑñOoÓóÒòÔôÖöÕõØøŒœPpQqRrSsŠšßTtÞþUuÚúÙùÛûÜüVvWwXxYyÝýÿŸZzŽž"
             // "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ"
-            string charsorig = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
-            string charsnew = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
+            // string charsorig = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
+            // string charsnew = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
+            // 20230606
+            string charsorig = "0123456789aAáÁàÀâÂäÄãÃåÅæÆbBcCçÇdDðÐeEéÉèÈêÊëËfFƒgGhHIIíÍìÌîÎïÏjJkKlLmMnNñÑoOóÓòÒôÔöÖõÕøØœŒpPqQrRsSšŠßtTþÞuUúÚùÙûÛüÜvVwWxXyYýÝÿŸzZžŽ";
+            string charsnew = "0123456789abcdefghijklmnopqrstuvwxyzZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 
             string strBuild = "";
             foreach (var c in strToDoID)

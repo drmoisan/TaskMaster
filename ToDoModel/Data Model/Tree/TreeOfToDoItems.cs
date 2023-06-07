@@ -9,27 +9,36 @@ using UtilitiesCS.OutlookExtensions;
 
 namespace ToDoModel
 {
-
-
     public class TreeOfToDoItems
     {
+        #region constructors 
+
+        public TreeOfToDoItems()
+        {
+            ListOfToDoTree = new List<TreeNode<ToDoItem>>();
+        }
+
+        public TreeOfToDoItems(List<TreeNode<ToDoItem>> todoTree)
+        {
+            _todoTree = todoTree;
+        }
+
+        #endregion
+
+        #region Initialize and Access Encapsulated Tree
+
+        private List<TreeNode<ToDoItem>> _todoTree = new List<TreeNode<ToDoItem>>();
+        
+        public List<TreeNode<ToDoItem>> ListOfToDoTree { get => _todoTree; private set => _todoTree = value; }
+        
         public enum LoadOptions
         {
             vbLoadAll = 0,
             vbLoadInView = 1
         }
 
-        public TreeOfToDoItems()
-        {
-            ListOfToDoTree = new List<TreeNode<ToDoItem>>();
-        }
-        public TreeOfToDoItems(List<TreeNode<ToDoItem>> DM_ToDoTree)
-        {
-            ListOfToDoTree = DM_ToDoTree;
-        }
         public void LoadTree(LoadOptions LoadType, Application Application)
         {
-
             string strTemp;
             string strPrev;
             IList colItems;
@@ -53,7 +62,6 @@ namespace ToDoModel
                 // Iterate through ToDo items in List
                 foreach (var objItem in TreeItems)
                 {
-
                     // Cast objItem to temporary ToDoItem
                     if (objItem is MailItem)
                     {
@@ -117,42 +125,72 @@ namespace ToDoModel
                     }
                 }
             }
-            catch (System.Exception ex) 
+            catch (System.Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
         }
-        public List<TreeNode<ToDoItem>> ListOfToDoTree { get; private set; } = new List<TreeNode<ToDoItem>>();
 
+        public List<object> GetToDoList(LoadOptions LoadType, Application Application)
+        {
+            Items OlItems;
+            View objView;
+            Folder OlFolder;
+            string strFilter;
+            var ListObjects = new List<object>();
 
+            objView = (View)Application.ActiveExplorer().CurrentView;
+            strFilter = "@SQL=" + objView.Filter;
+
+            foreach (Store oStore in Application.Session.Stores)
+            {
+                OlItems = null;
+                OlFolder = (Folder)oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+                OlItems = strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll ? OlFolder.Items : OlFolder.Items.Restrict(strFilter);
+
+                foreach (var objItem in OlItems)
+                    ListObjects.Add(objItem);
+            }
+
+            return ListObjects;
+        }
+
+        #endregion
+
+        #region ToDoId
 
         public bool CompareToDoID(ToDoItem item, string strToDoID)
         {
             return (item.ToDoID ?? "") == (strToDoID ?? "");
         }
 
-        public void AddChild(TreeNode<ToDoItem> Child, TreeNode<ToDoItem> Parent, ListOfIDs IDList)
+        internal int CompareItemsByToDoID(object objItemLeft, object objItemRight)
         {
-            Parent.Children.Add(Child);
-            string strSeed = Parent.Children.Count > 1 ? Parent.Children[Parent.Children.Count - 2].Value.ToDoID : Parent.Value.ToDoID + "00";
+            string ToDoIDLeft = objItemLeft.GetUdfString("ToDoID");
+            string ToDoIDRight = objItemRight.GetUdfString("ToDoID");
+            long LngLeft = (long)BaseChanger.ConvertToDecimal(125, ToDoIDLeft);
+            long LngRight = (long)BaseChanger.ConvertToDecimal(125, ToDoIDRight);
 
-            if (IDList.UsedIDList.Contains(Child.Value.ToDoID))
+            if (ToDoIDRight.Length == 0)
             {
-                bool unused = IDList.UsedIDList.Remove(Child.Value.ToDoID);
+                return -1;
             }
-            Child.Value.ToDoID = IDList.GetNextAvailableToDoID(strSeed);
-            if (Child.Children.Count > 0)
+            else if (ToDoIDLeft.Length == 0)
             {
-                ReNumberChildrenIDs(Child.Children, IDList);
+                return 1;
             }
-            IDList.Save();
+            else if (LngLeft < LngRight)
+            {
+                return -1;
+            }
+            else
+            {
+                return 1;
+            }
         }
-
+        
         public void ReNumberIDs(ListOfIDs IDList)
         {
-            // WriteTreeToCSVDebug()
-
-
             foreach (var RootNode in ListOfToDoTree)
             {
                 foreach (var Child in RootNode.Children)
@@ -161,11 +199,10 @@ namespace ToDoModel
                         ReNumberChildrenIDs(Child.Children, IDList);
                 }
             }
-            // WriteTreeToCSVDebug()
         }
+        
         public void ReNumberChildrenIDs(List<TreeNode<ToDoItem>> Children, ListOfIDs IDList)
         {
-
             var i = default(int);
             int max = Children.Count - 1;
             if (max >= 0)
@@ -192,7 +229,6 @@ namespace ToDoModel
             }
         }
 
-
         public TreeNode<ToDoItem> FindChildByID(string ID, List<TreeNode<ToDoItem>> nodes)
         {
             TreeNode<ToDoItem> rnode;
@@ -216,32 +252,27 @@ namespace ToDoModel
             return null;
 
         }
-        public List<object> GetToDoList(LoadOptions LoadType, Application Application)
+
+        #endregion region
+
+        public void AddChild(TreeNode<ToDoItem> Child, TreeNode<ToDoItem> Parent, ListOfIDs IDList)
         {
+            Parent.Children.Add(Child);
+            string strSeed = Parent.Children.Count > 1 ? Parent.Children[Parent.Children.Count - 2].Value.ToDoID : Parent.Value.ToDoID + "00";
 
-            Items OlItems;
-            View objView;
-            Folder OlFolder;
-            string strFilter;
-            var ListObjects = new List<object>();
-
-            objView = (View)Application.ActiveExplorer().CurrentView;
-            strFilter = "@SQL=" + objView.Filter;
-
-            foreach (Store oStore in Application.Session.Stores)
+            if (IDList.UsedIDList.Contains(Child.Value.ToDoID))
             {
-                OlItems = null;
-                OlFolder = (Folder)oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
-                OlItems = strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll ? OlFolder.Items : OlFolder.Items.Restrict(strFilter);
-
-                foreach (var objItem in OlItems)
-                    ListObjects.Add(objItem);
+                bool unused = IDList.UsedIDList.Remove(Child.Value.ToDoID);
             }
-
-            return ListObjects;
+            Child.Value.ToDoID = IDList.GetNextAvailableToDoID(strSeed);
+            if (Child.Children.Count > 0)
+            {
+                ReNumberChildrenIDs(Child.Children, IDList);
+            }
+            IDList.Save();
         }
 
-        private bool IsHeader(string TagContext)
+        internal bool IsHeader(string TagContext)
         {
             if (TagContext.Contains("@PROJECTS") || TagContext.Contains("HEADER") || TagContext.Contains("DELIVERABLE") || TagContext.Contains("@PROGRAMS"))
             {
@@ -258,31 +289,8 @@ namespace ToDoModel
                 node.Traverse(action);
         }
 
-        private int CompareItemsByToDoID(object objItemLeft, object objItemRight)
-        {
-            string ToDoIDLeft = objItemLeft.GetUdfString("ToDoID");
-            string ToDoIDRight = objItemRight.GetUdfString("ToDoID");
-            long LngLeft = (long)BaseChanger.ConvertToDecimal(125, ToDoIDLeft);
-            long LngRight = (long)BaseChanger.ConvertToDecimal(125, ToDoIDRight);
-
-            if (ToDoIDRight.Length == 0)
-            {
-                return -1;
-            }
-            else if (ToDoIDLeft.Length == 0)
-            {
-                return 1;
-            }
-            else if (LngLeft < LngRight)
-            {
-                return -1;
-            }
-            else
-            {
-                return 1;
-            }
-        }
-        private IList<T> MergeSort<T>(IList<T> coll, Comparison<T> comparison)
+        
+        internal IList<T> MergeSort<T>(IList<T> coll, Comparison<T> comparison)
         {
             var Result = new List<T>();
             var Left = new Queue<T>();
@@ -303,10 +311,9 @@ namespace ToDoModel
             Result = Merge(Left, Right, comparison);
             return Result;
         }
-        private List<T> Merge<T>(Queue<T> Left, Queue<T> Right, Comparison<T> comparison)
+        
+        internal List<T> Merge<T>(Queue<T> Left, Queue<T> Right, Comparison<T> comparison)
         {
-            // Dim cmp As Integer = comparison(coll(i), coll(j))
-
             var Result = new List<T>();
 
             while (Left.Count > 0 && Right.Count > 0)
@@ -330,6 +337,9 @@ namespace ToDoModel
 
             return Result;
         }
+
+        #region Debugging Helper Functions
+
         public void WriteTreeToCSVDebug(string FilePath)
         {
 
@@ -340,7 +350,8 @@ namespace ToDoModel
 
             LoopTreeToWrite(ListOfToDoTree, FilePath, "");
         }
-        private void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)
+        
+        internal void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)
         {
             if (nodes is not null)
             {
@@ -351,7 +362,8 @@ namespace ToDoModel
                 }
             }
         }
-        private void AppendLineToCSV(string filename, string line)
+        
+        internal void AppendLineToCSV(string filename, string line)
         {
             using (var sw = File.AppendText(filename))
             {
@@ -359,6 +371,7 @@ namespace ToDoModel
             }
         }
 
+        #endregion
 
     }
 }

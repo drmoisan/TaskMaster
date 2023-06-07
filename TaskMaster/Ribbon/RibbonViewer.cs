@@ -1,6 +1,7 @@
 ﻿using System;
 using Office = Microsoft.Office.Core;
 using Microsoft.VisualBasic;
+using System.Windows.Forms;
 
 namespace TaskMaster
 {
@@ -98,7 +99,8 @@ namespace TaskMaster
 
         public void BtnMigrateIDs_Click(Office.IRibbonControl control)
         {
-            Interaction.MsgBox("Not Implemented");
+            _controller.BtnMigrateIDs_Click();
+            // MessageBox.Show("Not Implemented");
         }
 
         public void QuickFilerOld_Click(Office.IRibbonControl control)

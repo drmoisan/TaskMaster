@@ -119,14 +119,14 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dimension Libraries\Project\ProjectInfo.cs" />
+    <Compile Include="Data Model\Project\ProjectInfo.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
     <Compile Include="Email Utilities\CaptureEmailDetailsModule.cs" />
     <Compile Include="Common Functions\FileOperationsPST.cs" />
-    <Compile Include="Dimension Libraries\ID\IDListUtilities.cs" />
+    <Compile Include="Data Model\ID\IDListUtilities.cs" />
     <Compile Include="Email Utilities\AutoFile.cs" />
-    <Compile Include="Dimension Libraries\ID\BaseChanger.cs" />
-    <Compile Include="Dimension Libraries\ID\ListOfIDs.cs" />
+    <Compile Include="Data Model\ID\BaseChanger.cs" />
+    <Compile Include="Data Model\ID\ListOfIDs.cs" />
     <Compile Include="Email Utilities\cConversation.cs" />
     <Compile Include="Email Utilities\FolderHandler.cs" />
     <Compile Include="Email Utilities\CommonWordsModule.cs" />
@@ -142,33 +142,33 @@
     <Compile Include="Email Utilities\SaveAttachmentsModule.cs" />
     <Compile Include="Email Utilities\SortItemsToExistingFolder.cs" />
     <Compile Include="Email Utilities\SubjectMapModule.cs" />
-    <Compile Include="FlagDetails.cs" />
-    <Compile Include="Outlook Todo Utilities\ToDoEvents.cs" />
+    <Compile Include="Data Model\Flags\FlagDetails.cs" />
+    <Compile Include="Data Model\ToDo\ToDoEvents.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="TreeOfToDoItems.cs" />
-    <Compile Include="FlagParser.cs" />
+    <Compile Include="Data Model\Tree\TreeOfToDoItems.cs" />
+    <Compile Include="Data Model\Flags\FlagParser.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Dimension Libraries\Project\ToDoProjectInfoEntry.cs" />
-    <Compile Include="Dimension Libraries\Project\ProjectList.cs" />
-    <Compile Include="Dimension Libraries\Project\ProjectInfoWindow.Designer.cs">
+    <Compile Include="Data Model\Project\ToDoProjectInfoEntry.cs" />
+    <Compile Include="Data Model\Project\ProjectList.cs" />
+    <Compile Include="Data Model\Project\ProjectInfoWindow.Designer.cs">
       <DependentUpon>ProjectInfoWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dimension Libraries\Project\ProjectInfoWindow.cs">
+    <Compile Include="Data Model\Project\ProjectInfoWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Defaults And Prefixes\ToDoDefaults.cs" />
-    <Compile Include="ToDoItem.cs" />
-    <Compile Include="Dimension Libraries\Project\ToDoProjectInfoLegacy.cs" />
-    <Compile Include="Dimension Libraries\Project\ToDoProjectInfoUtilities.cs" />
-    <Compile Include="TreeNodeOfT.cs" />
+    <Compile Include="Data Model\ToDo\ToDoDefaults.cs" />
+    <Compile Include="Data Model\ToDo\ToDoItem.cs" />
+    <Compile Include="Data Model\Project\ToDoProjectInfoLegacy.cs" />
+    <Compile Include="Data Model\Project\ToDoProjectInfoUtilities.cs" />
+    <Compile Include="Data Model\Tree\TreeNodeOfT.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -177,7 +177,7 @@
       <CustomToolNamespace>ToDoModel.My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dimension Libraries\Project\ProjectInfoWindow.resx">
+    <EmbeddedResource Include="Data Model\Project\ProjectInfoWindow.resx">
       <DependentUpon>ProjectInfoWindow.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>

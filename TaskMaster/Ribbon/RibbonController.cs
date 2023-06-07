@@ -10,6 +10,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesVB;
 using QuickFiler.Interfaces;
+using System.Windows.Forms;
 
 namespace TaskMaster
 {
@@ -100,12 +101,13 @@ namespace TaskMaster
         internal void CompressIDs()
         {
             _globals.TD.IDList.CompressToDoIDs(_globals.Ol.App);
-            Interaction.MsgBox("ID Compression Complete");
+            MessageBox.Show("ID Compression Complete");
         }
 
-        private void BtnMigrateIDs_Click(object sender, RibbonControlEventArgs e)
+        internal void BtnMigrateIDs_Click()
         {
             // Globals.ThisAddIn.MigrateToDoIDs()
+            ToDoEvents.MigrateToDoIDs(_globals.Ol.App);
         }
 
         internal string GetHookButtonText(Office.IRibbonControl control)

@@ -35,6 +35,16 @@ namespace ToDoModel
         public void Save(string filepath) => base.Serialize(filepath);
         public void Save() => base.Serialize();
 
+        private Action<string, string> _idUpdateAction;
+        public void SetIdUpdateAction(Action<string, string> action)
+        {
+            _idUpdateAction = action;
+            foreach(var entry in this)
+            {
+                entry.SetIdUpdateAction(action);
+            }
+        }
+
         public (bool Any, int[] Indices) IsCorrupt()
         {
             if (this.Any()) 
