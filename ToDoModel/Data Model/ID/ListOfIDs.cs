@@ -33,19 +33,22 @@ namespace ToDoModel
 
         public ListOfIDs(string FilePath, Outlook.Application OlApp)
         {
-            LoadFromFile(FilePath: FilePath, OlApp: OlApp);
+            _olApp = OlApp;
+            var tmpIDList = LoadFromFile(filepath: FilePath, olApp: OlApp);
+            _usedIDList = tmpIDList.UsedIDList;
+            Filepath = tmpIDList.Filepath;
         }
 
-        public static ListOfIDs LoadFromFile(string FilePath, Outlook.Application OlApp)
+        public static ListOfIDs LoadFromFile(string filepath, Outlook.Application olApp)
         {
             var tmpIDList = new ListOfIDs();
 
-            if (File.Exists(FilePath))
+            if (File.Exists(filepath))
             {
                 var deserializer = new BinaryFormatter();
                 try
                 {
-                    using (Stream TestFileStream = File.OpenRead(FilePath))
+                    using (Stream TestFileStream = File.OpenRead(filepath))
                     {
                         tmpIDList = (ListOfIDs)deserializer.Deserialize(TestFileStream);
                     }
@@ -53,41 +56,41 @@ namespace ToDoModel
 
                 catch (UnauthorizedAccessException ex)
                 {
-                    tmpIDList = ProcessFileError(OlApp, "Unexpected File Access Error. Recreate the list?");
+                    tmpIDList = ProcessFileError(olApp, "Unexpected File Access Error. Recreate the list?");
                 }
 
                 catch (IOException ex)
                 {
-                    tmpIDList = ProcessFileError(OlApp, "Unexpected IO Error. Is IDList File Corrupt?");
+                    tmpIDList = ProcessFileError(olApp, "Unexpected IO Error. Is IDList File Corrupt?");
                 }
 
                 catch (InvalidCastException ex)
                 {
-                    tmpIDList = ProcessFileError(OlApp, "File exists but cannot cast to ListOfIDs. Recreate the list?");
+                    tmpIDList = ProcessFileError(olApp, "File exists but cannot cast to ListOfIDs. Recreate the list?");
                 }
             }
 
             else
             {
-                tmpIDList = ProcessFileError(OlApp, "File " + FilePath + " does not exist. Recreate the List?");
+                tmpIDList = ProcessFileError(olApp, "File " + filepath + " does not exist. Recreate the List?");
             }
 
-            tmpIDList.Filepath = FilePath;
-            tmpIDList.Save();
+            tmpIDList.Filepath = filepath;
             return tmpIDList;
         }
 
         private List<string> _usedIDList;
         private long _maxIDLength;
         private string _filepath = "";
+        private Outlook.Application _olApp;
 
-        private static ListOfIDs ProcessFileError(Outlook.Application OlApp, string msg)
+        private static ListOfIDs ProcessFileError(Outlook.Application olApp, string msg)
         {
             var tmpIDList = new ListOfIDs();
             var result = MessageBox.Show(msg, "Error",MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
             {
-                tmpIDList.RefreshIDList(OlApp);
+                tmpIDList.RefreshIDList(olApp);
             }
             else
             {
@@ -96,30 +99,49 @@ namespace ToDoModel
             return tmpIDList;
         }
         
+        public void SetOlApp(Outlook.Application olApp) { _olApp = olApp; }
+        
         public void RefreshIDList(Outlook.Application Application)
         {
-            var _dataModel = new TreeOfToDoItems();
-            List<object> _toDoList;
-            UsedIDList = new List<string>();
+            var df = DeedleDf.FromDefaultFolder(stores: _olApp.Session.Stores,
+                                                    folderEnum: OlDefaultFolders.olFolderToDo,
+                                                    removeColumns: null, //new string[] {"RemoveAll"},
+                                                    addColumns: new string[]
+                                                    {
+                                                        OlTableExtensions.SchemaToDoID,
+                                                        "Categories",
+                                                        OlTableExtensions.SchemaMessageStore
+                                                    });
 
-            _toDoList = _dataModel.GetToDoList(TreeOfToDoItems.LoadOptions.vbLoadAll, Application);
-            _toDoList = _toDoList.Where(x => x.NoConflicts()).ToList();
+            df = df.FillMissing("ERROR");
+            var df2 = df.Where(x => ((string)x.Value["ToDoID"]) != "ERROR");
+            var idList = df.GetColumn<string>("ToDoID").Values.ToList();
+            _usedIDList = idList;
+            _maxIDLength = _usedIDList.Select(x => x.Length).Max();
+            //var _dataModel = new TreeOfToDoItems();
+            //List<object> _toDoList;
+            //UsedIDList = new List<string>();
 
-            foreach (object _objItem in _toDoList)
-            {
-                
-                string strID = _objItem.GetUdfString("ToDoID");
-        
-                if (UsedIDList.Contains(strID) == false & strID.Length != 0)
-                {
-                    UsedIDList.Add(strID);
-                    if (strID.Length > _maxIDLength)
-                        _maxIDLength = strID.Length;
-                }
-            }
+            //_toDoList = _dataModel.GetToDoList(TreeOfToDoItems.LoadOptions.vbLoadAll, Application);
+            //_toDoList = _toDoList.Where(x => x.NoConflicts()).ToList();
+
+            //foreach (object _objItem in _toDoList)
+            //{
+
+            //    string strID = _objItem.GetUdfString("ToDoID");
+
+            //    if (UsedIDList.Contains(strID) == false & strID.Length != 0)
+            //    {
+            //        UsedIDList.Add(strID);
+            //        if (strID.Length > _maxIDLength)
+            //            _maxIDLength = strID.Length;
+            //    }
+            //}
+            Save();
+
         }
 
-        internal Frame<int, string> GetDfToDo(Microsoft.Office.Interop.Outlook.Store store)
+        internal Frame<int, string> GetDfToDo(Store store)
         {
             var table = store.GetToDoTable();
 
@@ -132,19 +154,52 @@ namespace ToDoModel
             return df;
         }
 
-        //public void SubstituteIdRoot(string oldPrefix, string newPrefix)
-        //{
-        //    Frame<int, string> df = null;
-        //    foreach (Outlook.Store store in olApp.Session.Stores)
-        //    {
-        //        var dfTemp = GetDfToDo(store);
-        //        if (df is null) { df = dfTemp; }
-        //        else if (dfTemp is not null) { df.Merge(dfTemp); }
-        //    }
+        public void SubstituteIdRoot(string oldPrefix, string newPrefix)
+        {
+            if (_olApp is null)
+            {
+                MessageBox.Show($"Coding Error. Cannot substitute id root without a handle to "+
+                    $"the Outlook Application. Please use the {nameof(SetOlApp)} method.");
+            }
+            else
+            {
+                var df = DeedleDf.FromDefaultFolder(stores: _olApp.Session.Stores,
+                                                    folderEnum: OlDefaultFolders.olFolderToDo,
+                                                    removeColumns: null, //new string[] {"RemoveAll"},
+                                                    addColumns: new string[]
+                                                    {
+                                                        OlTableExtensions.SchemaToDoID,
+                                                        "Categories",
+                                                        OlTableExtensions.SchemaMessageStore
+                                                    });
 
-            
+                df = df.FillMissing("");
+                var df2 = df.Where(x => ((string)x.Value["ToDoID"]).Contains(oldPrefix));
+                
+                //df2.Print();
+                //var firstRow = df2.GetRowAt<ObjectSeries<string>>(0);
+                //var storeByte = firstRow["Store"];
+                foreach (var row in df2.Rows.Values) 
+                {
+                    string entryID = row["EntryID"].ToString();
+                    string storeID = row["Store"].ToString();
+                    string todoOld = row["ToDoID"].ToString();
+                    string todoNew = todoOld.Replace(oldPrefix, newPrefix);
+                    object item = _olApp.Session.GetItemFromID(entryID, storeID);
+                    item.SetUdf("ToDoID", todoNew);
+                    _usedIDList.Remove(todoOld);
+                    _usedIDList.Add(todoNew);
+                }
 
-        //}
+                Save();
+
+                //var mystore = (Store)storeByte;
+                //var mystoreID = mystore.StoreID;
+                //var addr = df.RowIndex.Locate(maxSentOn);
+                //var idx = (int)dfDateIdx.RowIndex.AddressOperations.OffsetOf(addr);
+                //var row = dfConversation.Rows.GetAt(idx);
+            }
+        }
 
         /// <summary>
         /// Function Invokes the DataModel_ToDoTree.ReNumberIDs() method at the root level which 

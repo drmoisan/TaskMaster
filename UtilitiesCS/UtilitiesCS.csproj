@@ -255,7 +255,7 @@
     <Compile Include="Interfaces\IObservableDictionary.cs" />
     <Compile Include="Interfaces\IProjectInfo.cs" />
     <Compile Include="Interfaces\IToDoProjectInfoEntry.cs" />
-    <Compile Include="OutlookExtensions\OlTableFunctions.cs" />
+    <Compile Include="OutlookExtensions\OlTableExtensions.cs" />
     <Compile Include="OutlookExtensions\OlToDoTable.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />

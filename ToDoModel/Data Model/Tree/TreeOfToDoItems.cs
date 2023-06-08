@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Office.Interop.Outlook;
 using System.Collections;
 using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS;
 
 namespace ToDoModel
 {
@@ -164,31 +165,43 @@ namespace ToDoModel
             return (item.ToDoID ?? "") == (strToDoID ?? "");
         }
 
+        internal int CompareItemsByToDoID(ToDoItem left, ToDoItem right)
+        {
+            string todoIDLeft = left.ToDoID;
+            string todoIDRight = right.ToDoID;
+
+            return CompareItemsByToDoID(todoIDLeft, todoIDRight);
+        }
+
         internal int CompareItemsByToDoID(object objItemLeft, object objItemRight)
         {
-            string ToDoIDLeft = objItemLeft.GetUdfString("ToDoID");
-            string ToDoIDRight = objItemRight.GetUdfString("ToDoID");
-            long LngLeft = (long)BaseChanger.ConvertToDecimal(125, ToDoIDLeft);
-            long LngRight = (long)BaseChanger.ConvertToDecimal(125, ToDoIDRight);
+            string todoIDLeft = objItemLeft.GetUdfString("ToDoID");
+            string todoIDRight = objItemRight.GetUdfString("ToDoID");
 
-            if (ToDoIDRight.Length == 0)
+            return CompareItemsByToDoID(todoIDLeft, todoIDRight);
+        }
+
+        internal int CompareItemsByToDoID(string todoIDLeft, string todoIDRight)
+        {
+            if (todoIDRight.Length == 0)
             {
                 return -1;
             }
-            else if (ToDoIDLeft.Length == 0)
+            else if (todoIDLeft.Length == 0)
             {
                 return 1;
-            }
-            else if (LngLeft < LngRight)
-            {
-                return -1;
             }
             else
             {
-                return 1;
+                var idx = todoIDLeft.FirstDiffIndex(todoIDRight);
+                if (idx == -1) { return 0; }
+                var left = BaseChanger.ConvertToDecimal(36, todoIDLeft[idx]);
+                var right = BaseChanger.ConvertToDecimal(36, todoIDRight[idx]);
+                if (left < right) { return -1; }
+                else { return 1; }
             }
         }
-        
+
         public void ReNumberIDs(ListOfIDs IDList)
         {
             foreach (var RootNode in ListOfToDoTree)

@@ -15,7 +15,7 @@ namespace UtilitiesCS.OutlookExtensions
             var folder = store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
             Outlook.Table table = folder.GetTable();
             table.Columns.RemoveAll();
-            table.Columns.Add(ConvHelper.SchemaToDoID);
+            table.Columns.Add(OlTableExtensions.SchemaToDoID);
             table.Columns.Add("Categories");
             // table.EnumerateTable();
             return table;

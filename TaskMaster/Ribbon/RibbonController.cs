@@ -159,7 +159,9 @@ namespace TaskMaster
 
             //var dc = new QuickFiler.Controllers.QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
 
-            _globals.TD.ProjInfo.Rebuild(_globals.Ol.App);
+            //_globals.TD.ProjInfo.Rebuild(_globals.Ol.App);
+
+            _globals.TD.IDList.SubstituteIdRoot("9710", "2501");
 
             //var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
             //Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();

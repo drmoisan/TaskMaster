@@ -25,56 +25,7 @@ namespace UtilitiesCS
             Right = 1, Left = 2, Center = 4
         }
         
-        const string PROPTAG_SPECIFIER = "http://schemas.microsoft.com/mapi/proptag/";
-
-        // PropTag Types
-        const string PT_BINARY = "0102";
-        const string PT_LONG = "0003";
-        const string PT_TSTRING = "001f"; /* Null-terminated 16-bit (2-byte) character string. 
-                                           * Properties with this type have the property type 
-                                           * reset to PT_UNICODE when compiling with the UNICODE 
-                                           * symbol and to PT_STRING8 when not compiling with the 
-                                           * UNICODE symbol. This property type is the same as the 
-                                           * OLE type VT_LPSTR for resulting PT_STRING8 properties 
-                                           * and VT_LPWSTR for PT_UNICODE properties */
-
-        const string PR_STORE_ENTRYID = "0x0FFB"; //Message store PID + PT_BINARY
-        const string PR_STORE_RECORD_KEY = "0x0FFA"; //
-        const string PR_CONVERSATION_TOPIC = "0x0070"; // Normalized Conversation Subject for message group
-        const string PR_PARENT_DISPLAY = "0x0e05"; //Message parent folder
-        const string PR_DEPTH = "0x3005"; /* Represents the relative level of indentation, 
-                                           * or depth, of an object in a hierarchical table
-                                           * Data type is PT_LONG */
-        const string PR_CONVERSATION_INDEX = "0x0071"; /* PT_BINARY ScCreateConversationIndex 
-                                                        * implements the index as a header block 
-                                                        * that is 22 bytes in length, followed 
-                                                        * by zero or more child blocks each 
-                                                        * 5 bytes in length */
-
-        public static string SchemaConversationTopic = PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
-        public static string SchemaFolderName = PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
-        public static string SchemaMessageStore = PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
-        public static string SchemaConversationDepth = PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
-        public static string SchemaConversationIndex = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
-        public static string SchemaTriage = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
-        public static string SchemaToDoID = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
-
-        public static Dictionary<string, string> SchemaToField = new()
-        {
-            {SchemaFolderName, "Folder Name" },
-            {SchemaMessageStore, "Store"},
-            {SchemaConversationDepth, "ConvDepth" },
-            {SchemaConversationIndex, "ConversationIndex" },
-            {SchemaToDoID, "ToDoID" }
-        };
-        public static Dictionary<string, string> FieldToSchema = new()
-        {
-            {"Folder Name", SchemaFolderName },
-            {"Store", SchemaMessageStore},
-            {"ConvDepth", SchemaConversationDepth },
-            {"ConversationIndex", SchemaConversationIndex },
-            {"ToDoID", SchemaToDoID }
-        };
+        
 
         public static IList GetMailItemList(DataFrame df,
                                             string storeID,
@@ -159,7 +110,7 @@ namespace UtilitiesCS
                 Debug.WriteLine(df.PrettyText());
                 if (SameFolder)
                 {
-                    string FolderName = ObjItem.PropertyAccessor.GetProperty(SchemaFolderName) as string;
+                    string FolderName = ObjItem.PropertyAccessor.GetProperty(OlTableExtensions.SchemaFolderName) as string;
                     df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
                 }
                 if (MailOnly)
@@ -191,7 +142,7 @@ namespace UtilitiesCS
                 Debug.WriteLine(df.PrettyText());
                 if (SameFolder)
                 {
-                    string FolderName = ObjItem.PropertyAccessor.GetProperty(SchemaFolderName) as string;
+                    string FolderName = ObjItem.PropertyAccessor.GetProperty(OlTableExtensions.SchemaFolderName) as string;
                     df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
                 }
                 if (MailOnly)
@@ -209,7 +160,14 @@ namespace UtilitiesCS
             if (table != null)
             {
                 // add From
-                string[] columnsToAdd = new string[5] { "SentOn", SchemaFolderName, SchemaMessageStore, SchemaConversationDepth, SchemaConversationIndex };
+                string[] columnsToAdd = new string[5] 
+                { 
+                    "SentOn", 
+                    OlTableExtensions.SchemaFolderName, 
+                    OlTableExtensions.SchemaMessageStore, 
+                    OlTableExtensions.SchemaConversationDepth, 
+                    OlTableExtensions.SchemaConversationIndex 
+                };
                 foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
             }
             string[] columnHeaders = table.GetColumnHeaders();
@@ -220,96 +178,20 @@ namespace UtilitiesCS
             //return new DataFrame();
             return data.ToDataFrame(columnHeaders);
         }
-
-        public static Outlook.Table GetTableInView(this Explorer activeExplorer)
-        {
-            Outlook.TableView view = activeExplorer.CurrentView as Outlook.TableView;
-            //Outlook.View view2 = activeExplorer.CurrentView;
-            //Debug.WriteLine(view2.XML);
-            return view.GetTable();
-        }
-
+                
         public static Outlook.Table GetTable(this Outlook.Conversation conversation, bool WithFolder, bool WithStore) 
         { 
             if (conversation != null)
             {
                 Outlook.Table table = conversation.GetTable();
                 table.Columns.Add("SentOn");
-                if (WithFolder) { table.Columns.Add(SchemaFolderName); }
-                if (WithStore) { table.Columns.Add(SchemaMessageStore); }
+                if (WithFolder) { table.Columns.Add(OlTableExtensions.SchemaFolderName); }
+                if (WithStore) { table.Columns.Add(OlTableExtensions.SchemaMessageStore); }
                 return table;
             }
             else { return null; }
         }
-
-        public static void EnumerateTable(this Outlook.Table table)
-        {
-            int columnCount = table.Columns.Count;
-            int[] charSpacing = Enumerable.Repeat(15, columnCount).ToArray();
-            //charSpacing[1] = 30;
-            //charSpacing[2] = 22;
-            //charSpacing[3] = 22;
-            Justify[] justification = Enumerable.Repeat(Justify.Left, columnCount).ToArray();
-            Justify[] headerCenter = Enumerable.Repeat(Justify.Center, columnCount).ToArray();
-            var styleParams = charSpacing.Zip(justification, (space, align) => (Spacing: space, Justification: align)).ToArray();
-            var headerStyles = charSpacing.Zip(headerCenter, (space, align) => (Spacing: space, Justification: align)).ToArray();
-
-            string columnDivider = "   ";
-            string rowBookends = " ";
-            int lineLength = charSpacing.Sum() + columnDivider.Length * (columnCount -1) + rowBookends.Length * 2;
-            //string lineDivider = string.Join("",Enumerable.Repeat("*", lineLength));
-            
-            string[] dividerParts = new string[columnCount];
-            for (int i = 0; i < columnCount; i++)
-            {
-                dividerParts[i] = string.Join("", Enumerable.Repeat("=", charSpacing[i]));
-            }
-            string lineDivider = rowBookends + string.Join(columnDivider, dividerParts) + rowBookends;
-            
-            //+ string.Join(columnDivider, Enumerable.Repeat("_"))
-
-            
-            string[] headers = table.GetColumnHeaders();
-            List<string> rows = new List<string>
-            {
-                lineDivider,
-                table.EnumerateColumnHeaders(headerStyles, columnDivider, rowBookends),
-                lineDivider
-            };
-            object[,] array = table.GetArray(table.GetRowCount());
-            string[,] stringArray = array.ToStringArray();
-            
-            for (int i = 0; i < stringArray.GetLength(0); i++)
-            {
-                string[] row = stringArray.SliceRow(i).ToArray();
-                rows.Add(row.JoinFixedWidth(styleParams, columnDivider, rowBookends));
-            }
-            
-            rows.Add(lineDivider);
-            string output = string.Join("\n", rows.ToArray());
-            
-            
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine(output);
-
-            table.MoveToStart();
-        }
         
-        public static string[] GetColumnHeaders(this Outlook.Table table)
-        {
-            string[] headers = new string[table.Columns.Count];
-            int i = -1;
-            foreach (Column column in table.Columns)
-            {
-                string name = column.Name;
-                if (SchemaToField.ContainsKey(name))
-                    name = SchemaToField[name];
-                headers[++i] = name;
-            }
-            return headers;
-        }
-
         public static string EnumerateColumnHeaders(this Outlook.Table table, (int FieldWidth, Justify Justification)[] styleParams, string columnDivider, string rowBookends)
         {
             string[] headers = table.GetColumnHeaders();

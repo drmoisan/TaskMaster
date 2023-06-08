@@ -18,5 +18,6 @@ namespace UtilitiesVB
         BigInteger ConvertToDecimal(int nbase, string strBase);
         string GetMaxToDoID();
         string GetNextAvailableToDoID(string strSeed);
+        void SubstituteIdRoot(string oldPrefix, string newPrefix);
     }
 }

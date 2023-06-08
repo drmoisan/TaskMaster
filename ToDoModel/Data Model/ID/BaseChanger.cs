@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 
 namespace ToDoModel
@@ -17,7 +18,8 @@ namespace ToDoModel
             int maxBase;
             int i;
 
-            chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
+            //chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
+            chars = "0123456789abcdefghijklmnopqrstuvwxyz";
             maxBase = chars.Length;
 
             // check if we can convert to this base
@@ -49,6 +51,24 @@ namespace ToDoModel
             return ConvertToBaseRet;
         }
 
+        public static int ConvertToDecimal(int nbase, char c)
+        {
+            string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+            if (nbase > chars.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(nbase), $"Cannot convert from base {nbase}. " +
+                $"Extension method {nameof(ConvertToDecimal)} supports a max of base {chars.Length}");
+            }
+
+            int idx = chars.IndexOf(c);
+            if (idx == -1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(c), $"Character {c} is not part of this " +
+                $"implementation of base {nbase}");
+            }
+            return idx;
+        }
+                
         public static BigInteger ConvertToDecimal(int nbase, string strBase)
         {
             BigInteger ConvertToDecimalRet = default;
@@ -58,7 +78,8 @@ namespace ToDoModel
             var lngTmp = default(long);
             var bigint = new BigInteger();
 
-            chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
+            //chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
+            chars = "0123456789abcdefghijklmnopqrstuvwxyz";
             bigint.Equals(0L);
 
             try

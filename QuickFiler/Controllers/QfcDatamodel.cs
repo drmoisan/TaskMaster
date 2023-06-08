@@ -227,8 +227,8 @@ namespace QuickFiler.Controllers
         {
             Outlook.Table table = activeExplorer.GetTableInView();
             table.Columns.Add("SentOn");
-            table.Columns.Add(ConvHelper.SchemaFolderName);
-            table.Columns.Add(ConvHelper.SchemaTriage);
+            table.Columns.Add(OlTableExtensions.SchemaFolderName);
+            table.Columns.Add(OlTableExtensions.SchemaTriage);
 
             string[] columnHeaders = table.GetColumnHeaders();
             object[,] data = table.GetArray(table.GetRowCount());
@@ -239,8 +239,8 @@ namespace QuickFiler.Controllers
         {
             Outlook.Table table = activeExplorer.GetTableInView();
             table.Columns.Add("SentOn");
-            table.Columns.Add(ConvHelper.SchemaFolderName);
-            table.Columns.Add(ConvHelper.SchemaTriage);
+            table.Columns.Add(OlTableExtensions.SchemaFolderName);
+            table.Columns.Add(OlTableExtensions.SchemaTriage);
 
             string[] columnHeaders = table.GetColumnHeaders();
             object[,] data = table.GetArray(table.GetRowCount());

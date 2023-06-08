@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.OutlookExtensions;
 
 namespace UtilitiesCS
 {
@@ -18,8 +19,8 @@ namespace UtilitiesCS
             Outlook.Table table = activeExplorer.GetTableInView();
             var storeID = activeExplorer.CurrentFolder.StoreID;
             table.Columns.Add("SentOn");
-            table.Columns.Add(ConvHelper.SchemaConversationTopic);
-            table.Columns.Add(ConvHelper.SchemaTriage);
+            table.Columns.Add(OlTableExtensions.SchemaConversationTopic);
+            table.Columns.Add(OlTableExtensions .SchemaTriage);
             //table.Columns.Add(ConvHelper.SchemaMessageStore);
             table.Columns.Remove("Subject");
             table.Columns.Remove("CreationTime");
@@ -30,8 +31,8 @@ namespace UtilitiesCS
             var idxEntryID = columnHeaders.FindIndex(x => x == "EntryID");
             var idxMessageClass = columnHeaders.FindIndex(x => x == "MessageClass");
             var idxSentOn = columnHeaders.FindIndex(x => x == "SentOn");
-            var idxConv = columnHeaders.FindIndex(x => x == ConvHelper.SchemaConversationTopic);
-            var idxTriage = columnHeaders.FindIndex(x => x == ConvHelper.SchemaTriage);
+            var idxConv = columnHeaders.FindIndex(x => x == OlTableExtensions.SchemaConversationTopic);
+            var idxTriage = columnHeaders.FindIndex(x => x == OlTableExtensions.SchemaTriage);
             //var idxStore = columnHeaders.FindIndex(x => x == "Store");
 
             object[,] data = table.GetArray(table.GetRowCount());
@@ -87,6 +88,40 @@ namespace UtilitiesCS
             });
             var dfTemp = Frame.FromRows(rows);
             return dfTemp;
+        }
+
+        public static Frame<int, string> FromDefaultFolder(Store store,
+                                                           OlDefaultFolders folderEnum,
+                                                           string[] removeColumns,
+                                                           string[] addColumns)
+        {
+            var table = store.GetTable(folderEnum: folderEnum,
+                                       removeColumns: removeColumns,
+                                       addColumns: addColumns);
+
+            (var data, var columnInfo) = table.ExtractData();
+
+            Frame<int, string> df = FromArray2D(data: data, columnInfo);
+
+            return df;   
+        }
+
+        public static Frame<int, string> FromDefaultFolder(Stores stores,
+                                                           OlDefaultFolders folderEnum,
+                                                           string[] removeColumns,
+                                                           string[] addColumns)
+        {
+            Frame<int, string> df = null;
+            foreach (Outlook.Store store in stores)
+            {
+                var dfTemp = DeedleDf.FromDefaultFolder(store: store,
+                                                        folderEnum: folderEnum,
+                                                        removeColumns: removeColumns,
+                                                        addColumns: addColumns);
+                if (df is null) { df = dfTemp; }
+                else if (dfTemp is not null) { df.Merge(dfTemp); }
+            }
+            return df;
         }
 
         //public static  GetDfColumn(string columnName, object[] columnData)
