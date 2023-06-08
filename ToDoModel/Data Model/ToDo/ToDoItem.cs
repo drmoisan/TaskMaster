@@ -1038,7 +1038,7 @@ namespace ToDoModel
                 int strToDoID_Len = strToDoID.Length;
                 if (strToDoID_Len > 0L)
                 {
-                    int maxlen = Properties.Settings.Default.MaxIDLength;
+                    int maxlen = Properties.Settings.Default.MaxLengthOfID;
 
                     for (int i = 2, loopTo = maxlen; i <= loopTo; i += 2)
                     {

@@ -134,12 +134,12 @@ namespace ToDoModel.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public int MaxIDLength {
+        public int MaxLengthOfID {
             get {
-                return ((int)(this["MaxIDLength"]));
+                return ((int)(this["MaxLengthOfID"]));
             }
             set {
-                this["MaxIDLength"] = value;
+                this["MaxLengthOfID"] = value;
             }
         }
         

@@ -214,7 +214,7 @@ namespace ToDoModel
             _dataModel.ReNumberIDs(this);
         }
 
-        public long MaxIDLength
+        public long MaxLengthOfID
         {
             get
             {
@@ -280,7 +280,7 @@ namespace ToDoModel
             if (strMaxID.Length > _maxIDLength)
             {
                 _maxIDLength = strMaxID.Length;
-                Properties.Settings.Default.MaxIDLength = (int)_maxIDLength;
+                Properties.Settings.Default.MaxLengthOfID = (int)_maxIDLength;
                 Properties.Settings.Default.Save();
             }
             return strMaxID;
@@ -298,7 +298,7 @@ namespace ToDoModel
             if (strMaxID.Length > _maxIDLength)
             {
                 _maxIDLength = strMaxID.Length;
-                Properties.Settings.Default.MaxIDLength = (int)_maxIDLength;
+                Properties.Settings.Default.MaxLengthOfID = (int)_maxIDLength;
                 Properties.Settings.Default.Save();
             }
 

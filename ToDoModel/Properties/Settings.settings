@@ -29,7 +29,7 @@
     <Setting Name="MaxToDo" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="MaxIDLength" Type="System.Int32" Scope="User">
+    <Setting Name="MaxLengthOfID" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="MaxFolders_ConvID" Type="System.Int32" Scope="User">

@@ -8,7 +8,7 @@ namespace UtilitiesCS
     public interface IListOfIDsLegacy
     {
         string Filepath { get; set; }
-        long MaxIDLength { get; }
+        long MaxLengthOfID { get; }
         List<string> UsedIDList { get; set; }
         void CompressToDoIDs(Application OlApp);
         void RefreshIDList(Application Application);
