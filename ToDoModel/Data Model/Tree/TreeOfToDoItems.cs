@@ -202,7 +202,7 @@ namespace ToDoModel
             }
         }
 
-        public void ReNumberIDs(ListOfIDs IDList)
+        public void ReNumberIDs(ListOfIDsLegacy IDList)
         {
             foreach (var RootNode in ListOfToDoTree)
             {
@@ -214,7 +214,7 @@ namespace ToDoModel
             }
         }
         
-        public void ReNumberChildrenIDs(List<TreeNode<ToDoItem>> Children, ListOfIDs IDList)
+        public void ReNumberChildrenIDs(List<TreeNode<ToDoItem>> Children, ListOfIDsLegacy IDList)
         {
             var i = default(int);
             int max = Children.Count - 1;
@@ -268,7 +268,7 @@ namespace ToDoModel
 
         #endregion region
 
-        public void AddChild(TreeNode<ToDoItem> Child, TreeNode<ToDoItem> Parent, ListOfIDs IDList)
+        public void AddChild(TreeNode<ToDoItem> Child, TreeNode<ToDoItem> Parent, ListOfIDsLegacy IDList)
         {
             Parent.Children.Add(Child);
             string strSeed = Parent.Children.Count > 1 ? Parent.Children[Parent.Children.Count - 2].Value.ToDoID : Parent.Value.ToDoID + "00";

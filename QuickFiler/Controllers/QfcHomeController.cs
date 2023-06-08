@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoModel;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 using System.IO;
 
@@ -142,7 +142,7 @@ namespace QuickFiler.Controllers
                 .GetMoveDiagnostics(durationText, durationMinutesText, Duration, 
                 dataLineBeg, OlEndTime, ref OlAppointment);
 
-            FileIO2.Write_TextFile(filename, strOutput, _globals.FS.FldrMyD);
+            FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
 
         }
 

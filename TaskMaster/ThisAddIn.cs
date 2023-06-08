@@ -28,7 +28,7 @@ namespace TaskMaster
                 OlReminders = _globals.Ol.OlReminders;
                 ProjInfo = (ProjectInfo)_globals.TD.ProjInfo;
                 DictPPL = _globals.TD.DictPPL;
-                IDList = (ListOfIDs)_globals.TD.IDList;
+                IDList = (ListOfIDsLegacy)_globals.TD.IDList;
                 EmailRoot = _globals.Ol.EmailRootPath;
             }
 
@@ -113,9 +113,9 @@ namespace TaskMaster
 
         public ProjectInfo ProjInfo;
         public Dictionary<string, string> DictPPL;
-        private ListOfIDs _IDList;
+        private ListOfIDsLegacy _IDList;
 
-        public ListOfIDs IDList
+        public ListOfIDsLegacy IDList
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get

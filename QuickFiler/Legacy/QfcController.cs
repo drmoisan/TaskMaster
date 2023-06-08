@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using TaskVisualization;
 using ToDoModel;
-using UtilitiesVB;
+using UtilitiesCS;
 using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;

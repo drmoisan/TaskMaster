@@ -6,7 +6,7 @@ using Microsoft.Office.Interop.Outlook;
 using System.Linq;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
-using UtilitiesVB;
+using UtilitiesCS;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;

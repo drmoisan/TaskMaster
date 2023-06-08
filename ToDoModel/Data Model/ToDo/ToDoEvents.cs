@@ -10,7 +10,7 @@ using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 //using Microsoft.VisualBasic;
 

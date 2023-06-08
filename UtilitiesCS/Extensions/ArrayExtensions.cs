@@ -10,6 +10,8 @@ namespace UtilitiesCS
 {
     public static class ArrayExtensions
     {
+        #region conversion and slicing extensions
+
         public static string[,] ToStringArray<T>(this T[,] array)
         {
             int rowCount = array.GetLength(0);
@@ -93,6 +95,30 @@ namespace UtilitiesCS
             }
         }
 
+        public static T[,] To2D<T>(this T[][] source)
+        {
+            try
+            {
+                int FirstDim = source.Length;
+                int SecondDim = source.GroupBy(row => row.Length).Single().Key; // throws InvalidOperationException if source is not rectangular
+
+                var result = new T[FirstDim, SecondDim];
+                for (int i = 0; i < FirstDim; ++i)
+                    for (int j = 0; j < SecondDim; ++j)
+                        result[i, j] = source[i][j];
+
+                return result;
+            }
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException("The given jagged array is not rectangular.");
+            }
+        }
+
+        #endregion
+
+        #region Allocation and Initialization
+
         public static bool IsInitialized<T>(this T[,] array)
         {
             if (array == null) { return false; }
@@ -140,7 +166,12 @@ namespace UtilitiesCS
             }
             return false;
         }
-                
+
+
+        #endregion
+
+        #region Array indexing, lookup and search
+
         /// <summary>
         /// Function searches a string array and returns matching elements in a new string array.
         /// How matches are performed is defined by the search options. See 
@@ -222,6 +253,8 @@ namespace UtilitiesCS
             ExactComplement = 4
         }
 
+        #endregion 
+
         public static string FlattenStringTree(this object[] branches, bool strictValidation = true)
         {
             if (!Array.TrueForAll(branches, branch => branch is string))
@@ -249,59 +282,61 @@ namespace UtilitiesCS
             return false;
         }
 
-        //
-        // Summary:
-        //     Casts the elements of an System.Collections.IEnumerable to the specified type.
-        //
-        // Parameters:
-        //   source:
-        //     The System.Collections.IEnumerable that contains the elements to be cast to type
-        //     TResult.
-        //
-        // Type parameters:
-        //   TResult:
-        //     The type to cast the elements of source to.
-        //
-        // Returns:
-        //     An System.Collections.Generic.IEnumerable`1 that contains each element of the
-        //     source sequence cast to the specified type.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     source is null.
-        //
-        //   T:System.InvalidCastException:
-        //     An element in the sequence cannot be cast to type TResult.
-        public static IEnumerable<TResult> CastNullSafe<TResult>(this IEnumerable source)
-        {
-            IEnumerable<TResult> enumerable = source as IEnumerable<TResult>;
-            if (enumerable != null)
-            {
-                return enumerable;
-            }
-
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            return CastIteratorNullSafe<TResult>(source);
-        }
-
-        private static IEnumerable<TResult> CastIteratorNullSafe<TResult>(IEnumerable source)
-        {
-            foreach (object item in source)
-            {
-                if (item is null)
-                {
-                    yield return default(TResult);
-                }
-                else { yield return (TResult)item; }
-            }
-        }
-
-
+        
+        
     }
 
+    public static class ArrayIsAllocated
+    {
+        public static bool IsAllocated(ref Array inArray)
+        {
+            bool FlagEx = true;
+            try
+            {
+                if (inArray is null)
+                {
+                    FlagEx = false;
+                }
+                else if (inArray.Length <= 0)
+                {
+                    FlagEx = false;
+                }
+                else if (inArray.GetValue(0) == null)
+                {
+                    FlagEx = false;
+                }
+            }
+            catch
+            {
+                FlagEx = false;
+            }
+            return FlagEx;
+        }
+
+        public static bool IsAllocated(ref string[] inArray)
+        {
+            bool FlagEx = true;
+            try
+            {
+                if (inArray is null)
+                {
+                    FlagEx = false;
+                }
+                else if (inArray.Length <= 0)
+                {
+                    FlagEx = false;
+                }
+                else if (inArray[0] is null)
+                {
+                    FlagEx = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                FlagEx = false;
+            }
+            return FlagEx;
+        }
+    }
 
 }

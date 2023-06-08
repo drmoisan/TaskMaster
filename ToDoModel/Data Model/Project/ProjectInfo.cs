@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 using Deedle;
@@ -62,7 +62,7 @@ namespace ToDoModel
             
             (var data, var columnInfo) = table.ExtractData();
             
-            Frame<int, string> df = DeedleDf.FromArray2D(data: data, columnInfo);
+            Frame<int, string> df = DfDeedle.FromArray2D(data: data, columnInfo);
                         
             df = df.FillMissing("");
             

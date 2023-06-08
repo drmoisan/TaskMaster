@@ -221,30 +221,7 @@
     <Compile Include="My Project\MyNamespace.Static.1.Designer.cs" />
     <Compile Include="My Project\MyNamespace.Static.2.Designer.cs" />
     <Compile Include="My Project\MyNamespace.Static.3.Designer.cs" />
-    <Compile Include="Base Functionality Extensions\ArrayIsAllocated.cs" />
-    <Compile Include="Base Functionality Extensions\MergeSortImplementations.cs" />
-    <Compile Include="Base Functionality Extensions\SerializableList.cs" />
-    <Compile Include="Common Outlook Functions\Calendar.cs" />
-    <Compile Include="Common Outlook Functions\CreateCategory.cs" />
-    <Compile Include="Common Outlook Functions\NavigateOlFolders.cs" />
-    <Compile Include="Solution Interfaces\IAppStagingFilenames.cs" />
-    <Compile Include="Solution Interfaces\IAppAutoFileObjects.cs" />
-    <Compile Include="To Depricate\StackObjectVB.cs" />
-    <Compile Include="Solution Interfaces\IToDoObj.cs" />
-    <Compile Include="To Depricate\CSVDictUtilities.cs" />
-    <Compile Include="To Depricate\FileIO2.cs" />
-    <Compile Include="To Depricate\StringManipulation.cs" />
-    <Compile Include="Common Outlook Functions\ExplorerActions.cs" />
-    <Compile Include="Base Functionality Extensions\ExtToChar.cs" />
-    <Compile Include="To Depricate\FlattenArray.cs" />
-    <Compile Include="Solution Interfaces\IApplicationGlobals.cs" />
-    <Compile Include="Solution Interfaces\IFileSystemFolderPaths.cs" />
-    <Compile Include="Solution Interfaces\IListOfIDs.cs" />
-    <Compile Include="Solution Interfaces\IOlObjects.cs" />
-    <Compile Include="Solution Interfaces\IProjectInfoLegacy.cs" />
-    <Compile Include="Solution Interfaces\IToDoObjects.cs" />
-    <Compile Include="Common Outlook Functions\MailResolution.cs" />
-    <Compile Include="Windows Forms\MouseDownFilter.cs" />
+    <Compile Include="Base Functionality Extensions\SerializableList2.cs" />
     <Compile Include="My Project\AssemblyInfo.cs" />
     <Compile Include="My Project\Application.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -260,10 +237,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Solution Interfaces\PrefixInterface.cs" />
-    <Compile Include="Windows Forms\OlvExtension.cs" />
-    <Compile Include="Windows Forms\Resizer.cs" />
-    <Compile Include="Base Functionality Extensions\ToSortedDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -294,6 +267,10 @@
       <Project>{e95fc36a-dce3-4c1f-b445-262d7dc4aa0a}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common Outlook Functions\" />
+    <Folder Include="Solution Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

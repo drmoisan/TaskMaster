@@ -4,14 +4,14 @@ namespace ToDoModel
 
     public static class IDListUtilities
     {
-        // Public Function LoadIDList(FilePath As String, Application As Application) As ListOfIDs
-        // Dim IDList As ListOfIDs
+        // Public Function LoadIDList(FilePath As String, Application As Application) As ListOfIDsLegacy
+        // Dim IDList As ListOfIDsLegacy
         // If File.Exists(FilePath) Then
 
         // Dim deserializer As New BinaryFormatter
         // Try
         // Using TestFileStream As Stream = File.OpenRead(FilePath)
-        // IDList = CType(deserializer.Deserialize(TestFileStream), ListOfIDs)
+        // IDList = CType(deserializer.Deserialize(TestFileStream), ListOfIDsLegacy)
         // End Using
         // Catch ex As UnauthorizedAccessException
         // Dim unused1 = MsgBox("Unexpected Access Error. Duplicate Instance Running?")
@@ -25,15 +25,15 @@ namespace ToDoModel
 
         // Return IDList
         // Else
-        // IDList = New ListOfIDs(New List(Of String))
+        // IDList = New ListOfIDsLegacy(New List(Of String))
         // IDList.RefreshIDList(Application)
         // IDList.Save(FilePath)
         // Return IDList
         // End If
         // End Function
 
-        // Public Function RefreshIDList(FilePath As String, Application As Application) As ListOfIDs
-        // Dim _idList As ListOfIDs = New ListOfIDs(New List(Of String))
+        // Public Function RefreshIDList(FilePath As String, Application As Application) As ListOfIDsLegacy
+        // Dim _idList As ListOfIDsLegacy = New ListOfIDsLegacy(New List(Of String))
         // _idList.RefreshIDList(Application)
         // _idList.Save(FilePath)
         // Return _idList
@@ -42,12 +42,12 @@ namespace ToDoModel
         // ''' <summary>
         // ''' Function Invokes the DataModel_ToDoTree.ReNumberIDs() method at the root level which 
         // ''' recursively calls DataModel_ToDoTree.ReNumberChildrenIDs() and then invokes the
-        // ''' ListOfIDs.Save() Method
+        // ''' ListOfIDsLegacy.Save() Method
         // ''' </summary>
-        // ''' <param name="IDList">Pointer to active instance of ListOfIDs Class</param>
+        // ''' <param name="IDList">Pointer to active instance of ListOfIDsLegacy Class</param>
         // ''' <param name="Application">Pointer to Outlook Application</param>
         // ''' <param name="DebugFolderPath">Optional path to output csv for debugging if supplied</param>
-        // Public Sub CompressToDoIDs(ByRef IDList As ListOfIDs,
+        // Public Sub CompressToDoIDs(ByRef IDList As ListOfIDsLegacy,
         // ByRef Application As Application,
         // Optional DebugFolderPath As String = "")
         // 'DOC: Add documentation to CompressToDoIDs

@@ -9,7 +9,6 @@ using Microsoft.VisualBasic.CompilerServices;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
-using UtilitiesVB;
 
 [assembly: InternalsVisibleTo("TaskVisualization.Test")]
 

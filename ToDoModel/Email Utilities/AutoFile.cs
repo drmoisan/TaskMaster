@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Outlook;
 using Tags;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 using System.Windows.Forms;
 

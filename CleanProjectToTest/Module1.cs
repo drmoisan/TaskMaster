@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace CleanProjectToTest
 {

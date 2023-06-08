@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.CompilerServices;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace TaskVisualization
 {
@@ -183,7 +183,7 @@ namespace TaskVisualization
         {
             if (_controller is not null)
             {
-                Debug.WriteLine(Conversions.ToString(e.KeyCode.ToChar()));
+                Debug.WriteLine(e.KeyCode.ToString());
                 bool consumed = _controller.KeyboardHandler_KeyDown(sender, e);
                 if (consumed)
                 {

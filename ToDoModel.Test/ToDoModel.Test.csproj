@@ -111,9 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FolderPathsTest.cs" />
-    <Compile Include="PeopleDictTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CTFIncidence_Test.cs" />
     <Compile Include="FlagParser_Test.cs" />
     <Compile Include="TempClass.cs" />
   </ItemGroup>
@@ -122,13 +120,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CleanProjectToTest\CleanProjectToTest.csproj">
-      <Project>{6404299D-63F6-08A2-0115-8A4BBDAE587B}</Project>
-      <Name>CleanProjectToTest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.csproj">
-      <Project>{92B43F51-DD5D-06F1-26D9-2669F7341F60}</Project>
-      <Name>UtilitiesVB</Name>
+    <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
+      <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
+      <Name>UtilitiesCS</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

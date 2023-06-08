@@ -2,7 +2,7 @@
 using Microsoft.Office.Interop.Outlook;
 using System;
 using TaskVisualization;
-using UtilitiesVB;
+using UtilitiesCS;
 using Moq;
 using System.Collections.Generic;
 using System.Collections;

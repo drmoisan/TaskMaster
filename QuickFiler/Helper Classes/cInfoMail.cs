@@ -7,7 +7,7 @@ using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 
 namespace QuickFiler

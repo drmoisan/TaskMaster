@@ -12,7 +12,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using ToDoModel;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace TaskTree
 {
@@ -227,7 +227,7 @@ namespace TaskTree
                 int idx = target.Parent.Children.IndexOf(target) + siblingOffset;
                 // Inconsistent with case of Parent is nothing
                 target.Parent.Children.InsertRange(idx, toMove.Cast<TreeNode<ToDoItem>>()); // DataModel: Inserted into new data model tree. 
-                _dataModel.ReNumberChildrenIDs(target.Parent.Children, (ListOfIDs)_globals.TD.IDList);
+                _dataModel.ReNumberChildrenIDs(target.Parent.Children, (ListOfIDsLegacy)_globals.TD.IDList);
 
             }         // DataModel: Renumber IDs of new branch order
 
@@ -264,7 +264,7 @@ namespace TaskTree
                 }             // Data Model: Remove pointer to child from parent
 
                 x.Parent = target;                                   // Data Model: Add pointer to new Parent in data model
-                _dataModel.AddChild(x, target, (ListOfIDs)_globals.TD.IDList);    // Data Model: Add child to parent and renumber all affected
+                _dataModel.AddChild(x, target, (ListOfIDsLegacy)_globals.TD.IDList);    // Data Model: Add child to parent and renumber all affected
 
                 // ***OLD Code to add child to target parent and renumber
                 // target.AddChild(x)                      'Data Model: Add child to target parent and renumber grandchildren

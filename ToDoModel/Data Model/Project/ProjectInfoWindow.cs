@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace ToDoModel
 {

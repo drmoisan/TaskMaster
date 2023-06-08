@@ -119,6 +119,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data Model\ID\IDList.cs" />
     <Compile Include="Data Model\Project\ProjectInfo.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
     <Compile Include="Email Utilities\CaptureEmailDetailsModule.cs" />
@@ -126,7 +127,7 @@
     <Compile Include="Data Model\ID\IDListUtilities.cs" />
     <Compile Include="Email Utilities\AutoFile.cs" />
     <Compile Include="Data Model\ID\BaseChanger.cs" />
-    <Compile Include="Data Model\ID\ListOfIDs.cs" />
+    <Compile Include="Data Model\ID\ListOfIDsLegacy.cs" />
     <Compile Include="Email Utilities\cConversation.cs" />
     <Compile Include="Email Utilities\FolderHandler.cs" />
     <Compile Include="Email Utilities\CommonWordsModule.cs" />
@@ -197,10 +198,6 @@
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.csproj">
-      <Project>{92B43F51-DD5D-06F1-26D9-2669F7341F60}</Project>
-      <Name>UtilitiesVB</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

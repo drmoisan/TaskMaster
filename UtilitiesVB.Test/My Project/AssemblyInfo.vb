@@ -2,10 +2,10 @@
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
-<Assembly: AssemblyTitle("UtilitiesVB.Test")>
+<Assembly: AssemblyTitle("UtilitiesCS.Test")>
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("UtilitiesVB.Test")>
+<Assembly: AssemblyProduct("UtilitiesCS.Test")>
 <Assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")>
 <Assembly: AssemblyTrademark("")>
 

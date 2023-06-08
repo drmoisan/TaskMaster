@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
-using UtilitiesVB;
+using UtilitiesCS;
 using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using System.Security.Policy;
@@ -28,7 +28,7 @@ namespace TaskMaster.Test
                                        Environment.SpecialFolder.LocalApplicationData),
                                        "TaskMaster", 
                                        "UsedIDList.bin");
-            ToDoObj<IListOfIDs> Obj = new ToDoObj<IListOfIDs>(Filepath, ListOfIDs.LoadFromFile);
+            ToDoObj<IListOfIDsLegacy> Obj = new ToDoObj<IListOfIDsLegacy>(Filepath, ListOfIDsLegacy.LoadFromFile);
             Assert.IsNotNull(Obj);
         }
         
@@ -39,7 +39,7 @@ namespace TaskMaster.Test
                                        Environment.SpecialFolder.LocalApplicationData),
                                        "TaskMaster",
                                        "UsedIDList.bin");
-            ToDoObj<IListOfIDs> Obj = new ToDoObj<IListOfIDs>(Filepath, ListOfIDs.LoadFromFile);
+            ToDoObj<IListOfIDsLegacy> Obj = new ToDoObj<IListOfIDsLegacy>(Filepath, ListOfIDsLegacy.LoadFromFile);
             Obj.LoadFromFile(Filepath, _olApp);
             Assert.IsNotNull(Obj.Item);
         }
@@ -51,10 +51,10 @@ namespace TaskMaster.Test
                                        Environment.SpecialFolder.LocalApplicationData),
                                        "TaskMaster",
                                        "UsedIDList.bin");
-            ToDoObj<IListOfIDs> Obj = new ToDoObj<IListOfIDs>(Filepath, ListOfIDs.LoadFromFile);
+            ToDoObj<IListOfIDsLegacy> Obj = new ToDoObj<IListOfIDsLegacy>(Filepath, ListOfIDsLegacy.LoadFromFile);
             Obj.LoadFromFile(Filepath, _olApp);
             Type mytype = Obj.Item.GetType();
-            Assert.IsInstanceOfType(Obj.Item, typeof(ListOfIDs));
+            Assert.IsInstanceOfType(Obj.Item, typeof(ListOfIDsLegacy));
         }
 
     }

@@ -148,10 +148,6 @@
       <Project>{46628EC9-8A89-491E-84A2-6CF3069BA011}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.csproj">
-      <Project>{92B43F51-DD5D-06F1-26D9-2669F7341F60}</Project>
-      <Name>UtilitiesVB</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

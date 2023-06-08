@@ -6,7 +6,7 @@ using Microsoft.Office.Interop.Outlook;
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
 using ToDoModel;
-using UtilitiesVB;
+using UtilitiesCS;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -1129,7 +1129,7 @@ namespace QuickFiler.Legacy
 
         public double Multiplier { get => _multiplier; set => _multiplier = value; }
 
-        internal void MoveEmails(ref StackObjectVB MovedMails)
+        internal void MoveEmails(ref StackObjectCS<object> MovedMails)
         {
             if (_viewer.KeyboardDialog.Visible == true)
             {

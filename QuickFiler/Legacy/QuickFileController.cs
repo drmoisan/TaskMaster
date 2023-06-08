@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 using Windows.Win32;
 using UtilitiesCS.OutlookExtensions;
@@ -67,7 +67,7 @@ namespace QuickFiler.Legacy
         private readonly IOlObjects _olObjects;
         private readonly Microsoft.Office.Interop.Outlook.Application _olApp;
         private readonly QfcFormLegacyViewer _viewer;
-        private StackObjectVB _movedMails;
+        private StackObjectCS<object> _movedMails;
         private Enums.InitTypeEnum _initType;
 
         // Collections
@@ -684,9 +684,9 @@ namespace QuickFiler.Legacy
             DialogResult repeatResponse = DialogResult.Yes;
 
             if (_movedMails is null)
-                _movedMails = new StackObjectVB();
+                _movedMails = new StackObjectCS<object>();
 
-            i = _movedMails.Count() - 1;
+            i = _movedMails.Count - 1;
             listItems = _movedMails.ToList();
 
             while (i > 0 & repeatResponse == DialogResult.Yes)
@@ -956,7 +956,7 @@ namespace QuickFiler.Legacy
 
             string[] strOutput = _legacy.GetMoveDiagnostics(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, ref OlAppointment);
 
-            FileIO2.Write_TextFile(filename, strOutput, _globals.FS.FldrMyD);
+            FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
 
         }
 

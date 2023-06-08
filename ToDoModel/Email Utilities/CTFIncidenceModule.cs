@@ -1,6 +1,6 @@
 ﻿
 // Imports System.IO
-// Imports UtilitiesVB
+// Imports UtilitiesCS
 
 // Public Module CTFIncidenceModule
 // Public CTF_Inc() As CTF_Incidence

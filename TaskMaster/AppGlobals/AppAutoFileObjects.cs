@@ -6,7 +6,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace TaskMaster
 {
@@ -132,7 +132,7 @@ namespace TaskMaster
 
         private IList<string> CommonWordsBackupLoader(string filepath)
         {
-            string[] cw = FileIO2.CSV_Read(filename: Path.GetFileName(filepath), fileaddress: Path.GetDirectoryName(filepath), SkipHeaders: false);
+            string[] cw = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: false);
             return cw.ToList();
         }
 
@@ -178,7 +178,7 @@ namespace TaskMaster
         {
             var subjectMapEntries = new List<ISubjectMapEntry>();
 
-            string[] fileContents = FileIO2.CSV_Read(filename: Path.GetFileName(filepath), fileaddress: Path.GetDirectoryName(filepath), SkipHeaders: true);
+            string[] fileContents = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: true);
             var rowQueue = new Queue<string>(fileContents);
 
             while (rowQueue.Count > 0)

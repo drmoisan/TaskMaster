@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace ToDoModel
 {
@@ -109,7 +109,7 @@ namespace ToDoModel
             SubjectMapCt = 0;
             SubjectMap = new SubjectMapEntry[1];
 
-            string[] fileContents = FileIO2.CSV_Read(filename: fs.Filenames.SubjectMap, fileaddress: fs.FldrPythonStaging, SkipHeaders: true);
+            string[] fileContents = FileIO2.CsvRead(filename: fs.Filenames.SubjectMap, folderpath: fs.FldrPythonStaging, skipHeaders: true);
             var rowQueue = new Queue<string>(fileContents);
 
             while (rowQueue.Count > 0)
@@ -125,7 +125,7 @@ namespace ToDoModel
 
         public static void Common_Words_Text_File_READ(IFileSystemFolderPaths fs)
         {
-            string[] fileContents = FileIO2.CSV_Read(filename: fs.Filenames.CommonWords, fileaddress: fs.FldrPythonStaging, SkipHeaders: false);
+            string[] fileContents = FileIO2.CsvRead(filename: fs.Filenames.CommonWords, folderpath: fs.FldrPythonStaging, skipHeaders: false);
             int i = 0;
             WordList = new string[fileContents.Length + 1];
             WordList[0] = "";

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace ToDoModel
 {
@@ -183,7 +183,7 @@ namespace ToDoModel
         private static void CaptureMoveDetails(MailItem MSG, MailItem oMailTmp, string[] strOutput, IApplicationGlobals _globals)
         {
             if (_globals.Ol.MovedMails_Stack is null)
-                _globals.Ol.MovedMails_Stack = new StackObjectVB();
+                _globals.Ol.MovedMails_Stack = new StackObjectCS<object>();
             _globals.Ol.MovedMails_Stack.Push(MSG);
             _globals.Ol.MovedMails_Stack.Push(oMailTmp);
 
@@ -191,7 +191,7 @@ namespace ToDoModel
             WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);
             string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
-            FileIO2.Write_TextFile(_globals.FS.Filenames.EmailMoves, strOutput, _globals.FS.FldrMyD);
+            FileIO2.WriteTextFile(_globals.FS.Filenames.EmailMoves, strOutput, _globals.FS.FldrMyD);
         }
 
         //private static string SanitizeArrayLineTSV(ref string[] strOutput)
@@ -263,7 +263,7 @@ namespace ToDoModel
                 strAryOutput[13, 1] = "FlaggedAsTask";
 
                 SanitizeArray(strAryOutput, ref strOutput);
-                FileIO2.Write_TextFile(strFileName, strOutput, strFileLocation: strFileLocation);
+                FileIO2.WriteTextFile(strFileName, strOutput, folderpath: strFileLocation);
 
             }
             strOutput = null;

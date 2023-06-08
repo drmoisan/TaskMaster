@@ -10,8 +10,8 @@ using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 using Tags;
 using ToDoModel;
-using UtilitiesVB;
 using UtilitiesCS;
+
 
 namespace TaskVisualization
 {
@@ -512,7 +512,7 @@ namespace TaskVisualization
             {
                 if (e.KeyCode >= Keys.A & e.KeyCode <= Keys.Z)
                 {
-                    var tup = RecurseXl(_xlCtrlsActive, _altActive, char.ToUpper(e.KeyCode.ToChar()), _altLevel);
+                    var tup = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
                     _xlCtrlsActive = tup.dictActive;
                     _altActive = tup.altActive;
                     _altLevel = tup.level;

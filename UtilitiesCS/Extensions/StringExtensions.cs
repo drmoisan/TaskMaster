@@ -19,6 +19,16 @@ namespace UtilitiesCS
         public static string[] Split(this string str,  string delimiter) 
         { return str.Split(new string[] { delimiter }, StringSplitOptions.None); }
 
+        public static string[] Split(this string str, string delimiter, bool trim)
+        {
+            if (trim)
+            {
+                return str.Split(new string[] { delimiter }, StringSplitOptions.None)
+                                  .Select(s => s.Trim())
+                                  .ToArray();
+            }
+            else { return str.Split(new string[] { delimiter }, StringSplitOptions.None); }
+        }
 
         /// <summary>
         /// Function finds all matching substrings within a delimited string and returns 

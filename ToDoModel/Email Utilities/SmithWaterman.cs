@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.Services.Common;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 
 namespace ToDoModel

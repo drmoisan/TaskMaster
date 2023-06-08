@@ -4,7 +4,7 @@ using Microsoft.Office.Interop.Outlook;
 
 
 using UtilitiesCS;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace ToDoModel
 {

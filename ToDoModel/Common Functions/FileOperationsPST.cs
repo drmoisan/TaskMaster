@@ -7,7 +7,7 @@ using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using System.IO;
 using UtilitiesCS;
-using UtilitiesVB;
+using UtilitiesCS;
 using System.Windows.Forms;
 using UtilitiesCS.OutlookExtensions;
 

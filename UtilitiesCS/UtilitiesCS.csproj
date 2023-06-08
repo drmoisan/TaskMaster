@@ -88,6 +88,9 @@
     <Reference Include="NumSharp, Version=0.30.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\NumSharp.0.30.0\lib\netstandard2.0\NumSharp.dll</HintPath>
     </Reference>
+    <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
+      <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
+    </Reference>
     <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
       <HintPath>..\packages\Svg.3.4.4\lib\net462\Svg.dll</HintPath>
     </Reference>
@@ -250,11 +253,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\DeedleDf.cs" />
-    <Compile Include="Extensions\KeyValuePairEnumerableExtensions.cs" />
+    <Compile Include="Extensions\DfDeedle.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\ExtToChar.cs" />
+    <Compile Include="HelperClasses\MergeSortImplementations.cs" />
+    <Compile Include="Interfaces\IAppAutoFileObjects.cs" />
+    <Compile Include="Interfaces\IApplicationGlobals.cs" />
+    <Compile Include="Interfaces\IAppStagingFilenames.cs" />
+    <Compile Include="Interfaces\IFileSystemFolderPaths.cs" />
+    <Compile Include="Interfaces\IListOfIDsLegacy.cs" />
     <Compile Include="Interfaces\IObservableDictionary.cs" />
+    <Compile Include="Interfaces\IOlObjects.cs" />
     <Compile Include="Interfaces\IProjectInfo.cs" />
+    <Compile Include="Interfaces\IProjectInfoLegacy.cs" />
+    <Compile Include="Interfaces\IToDoObj.cs" />
+    <Compile Include="Interfaces\IToDoObjects.cs" />
     <Compile Include="Interfaces\IToDoProjectInfoEntry.cs" />
+    <Compile Include="Interfaces\PrefixInterface.cs" />
+    <Compile Include="OutlookExtensions\Calendar.cs" />
+    <Compile Include="OutlookExtensions\CreateCategory.cs" />
+    <Compile Include="OutlookExtensions\ExplorerActions.cs" />
+    <Compile Include="OutlookExtensions\MailResolution.cs" />
+    <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
     <Compile Include="OutlookExtensions\OlTableExtensions.cs" />
     <Compile Include="OutlookExtensions\OlToDoTable.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
@@ -274,7 +294,7 @@
     <Compile Include="Examples\MSDemoConv.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="HelperClasses\ConversationHelper.cs" />
-    <Compile Include="Extensions\DataFrameExtensionsMLNet.cs" />
+    <Compile Include="Extensions\DfMLNet.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="HelperClasses\FlagsHelper.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceList.cs" />
@@ -301,6 +321,14 @@
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Interfaces\ISerializableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
+    <Compile Include="To Depricate\CSVDictUtilities.cs" />
+    <Compile Include="To Depricate\FileIO2.cs" />
+    <Compile Include="To Depricate\FlattenArray.cs" />
+    <Compile Include="To Depricate\StackObjectVB.cs" />
+    <Compile Include="To Depricate\StringManipulation.cs" />
+    <Compile Include="Windows Forms\MouseDownFilter.cs" />
+    <Compile Include="Windows Forms\OlvExtension.cs" />
+    <Compile Include="Windows Forms\Resizer.cs" />
     <Compile Include="WindowsAPI\ExtraDeclarations.cs" />
     <Compile Include="EmailIntelligence\FolderConverter.cs" />
     <Compile Include="Dialogs\FolderNotFoundViewer.cs">

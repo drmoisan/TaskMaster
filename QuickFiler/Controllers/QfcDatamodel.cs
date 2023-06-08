@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoModel;
-using UtilitiesVB;
+using UtilitiesCS;
 using UtilitiesCS;
 using Deedle;
 using UtilitiesCS.ReusableTypeClasses;
@@ -161,7 +161,7 @@ namespace QuickFiler.Controllers
                         
         public Frame<int, string> InitDf(Explorer activeExplorer) 
         {
-            Frame<int, string> df = DeedleDf.GetEmailDataInView(activeExplorer);
+            Frame<int, string> df = DfDeedle.GetEmailDataInView(activeExplorer);
             df = df.FilterRowsBy("MessageClass", "IPM.Note");
             
             var topics = df.GetColumn<string>("Conversation").Values.Distinct().ToArray();

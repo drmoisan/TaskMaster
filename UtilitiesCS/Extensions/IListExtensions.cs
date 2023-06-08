@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UtilitiesCS.ReusableTypeClasses
+namespace UtilitiesCS
 {
     public static class IListExtensions
     {

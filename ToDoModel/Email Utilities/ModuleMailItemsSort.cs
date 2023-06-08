@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
 
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace ToDoModel
 {

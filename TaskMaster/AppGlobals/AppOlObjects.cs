@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
-using UtilitiesVB;
+using UtilitiesCS;
 
 namespace TaskMaster
 {
@@ -10,7 +10,7 @@ namespace TaskMaster
 
         private string _olEmailRootPath;
         private string _olArchiveRootPath;
-        private StackObjectVB _movedMails_Stack;
+        private StackObjectCS<object> _movedMails_Stack;
         private string _userEmailAddress;
 
         public AppOlObjects(Application OlApp)
@@ -88,7 +88,7 @@ namespace TaskMaster
             }
         }
 
-        public StackObjectVB MovedMails_Stack
+        public StackObjectCS<object> MovedMails_Stack
         {
             get
             {
