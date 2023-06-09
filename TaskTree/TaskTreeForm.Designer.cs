@@ -3,37 +3,34 @@ using System.Diagnostics;
 
 namespace TaskTree
 {
-    [Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
-    public partial class TaskTreeForm : System.Windows.Forms.Form
+    public partial class TaskTreeForm 
     {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-        // Form overrides dispose to clean up the component list.
-        [DebuggerNonUserCode()]
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            try
+            if (disposing && (components != null))
             {
-                if (disposing && components is not null)
-                {
-                    components.Dispose();
-                }
+                components.Dispose();
             }
-            finally
-            {
-                base.Dispose(disposing);
-            }
+            base.Dispose(disposing);
         }
 
-        // Required by the Windows Form Designer
-        private System.ComponentModel.IContainer components;
+        #region Windows Form Designer generated code
 
-        // NOTE: The following procedure is required by the Windows Form Designer
-        // It can be modified using the Windows Form Designer.  
-        // Do not modify it using the code editor.
-        [DebuggerStepThrough()]
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             ImageList1 = new System.Windows.Forms.ImageList(components);
             ContextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(components);
             ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -275,8 +272,10 @@ namespace TaskTree
             Load += new EventHandler(TaskTreeForm_Load);
             Resize += new EventHandler(TaskTreeForm_Resize);
             ResumeLayout(false);
-
         }
+
+        #endregion
+
         internal BrightIdeasSoftware.OLVColumn OlvToDoID;
         internal BrightIdeasSoftware.OLVColumn OlvTaskSubject;
         internal System.Windows.Forms.ImageList ImageList1;

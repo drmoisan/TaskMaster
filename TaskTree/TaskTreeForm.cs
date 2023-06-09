@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ToDoModel;
 
 namespace TaskTree
 {
-    public partial class TaskTreeForm
+    public partial class TaskTreeForm: Form
     {
         private TaskTreeController _controller;
 
