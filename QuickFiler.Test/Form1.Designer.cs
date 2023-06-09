@@ -28,170 +28,185 @@
         /// </summary>
         private void InitializeComponent()
         {
-            TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            Button2 = new System.Windows.Forms.Button();
-            Button2.Click += new System.EventHandler(Button2_Click);
-            Button1 = new System.Windows.Forms.Button();
-            Button1.Click += new System.EventHandler(Button1_Click);
-            MainPanel = new System.Windows.Forms.Panel();
-            MainLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            ControlGroup3 = new QfcItemViewer();
-            ControlGroup1 = new QfcItemViewer();
-            ControlGroup2 = new QfcItemViewer();
-            ButtonAdd = new System.Windows.Forms.Button();
-            ButtonAdd.Click += new System.EventHandler(ButtonAdd_Click);
-            TableLayoutPanel1.SuspendLayout();
-            MainPanel.SuspendLayout();
-            MainLayoutPanel.SuspendLayout();
-            TableLayoutPanel2.SuspendLayout();
+            this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.ControlGroup3 = new QuickFiler.QfcItemViewer();
+            this.ControlGroup1 = new QuickFiler.QfcItemViewer();
+            this.ControlGroup2 = new QuickFiler.QfcItemViewer();
+            this.Button2 = new System.Windows.Forms.Button();
+            this.Button1 = new System.Windows.Forms.Button();
+            this.MainPanel = new System.Windows.Forms.Panel();
+            this.MainLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.TableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.ButtonAdd = new System.Windows.Forms.Button();
+            this.TableLayoutPanel1.SuspendLayout();
+            this.MainPanel.SuspendLayout();
+            this.MainLayoutPanel.SuspendLayout();
+            this.TableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // TableLayoutPanel1
             // 
-            TableLayoutPanel1.AutoSize = true;
-            TableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            TableLayoutPanel1.ColumnCount = 1;
-            TableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0f));
-            TableLayoutPanel1.Controls.Add(ControlGroup3, 0, 1);
-            TableLayoutPanel1.Controls.Add(ControlGroup1, 0, 0);
-            TableLayoutPanel1.Controls.Add(ControlGroup2, 0, 2);
-            TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
-            TableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            TableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
-            TableLayoutPanel1.Name = "TableLayoutPanel1";
-            TableLayoutPanel1.Padding = new System.Windows.Forms.Padding(10);
-            TableLayoutPanel1.RowCount = 4;
-            TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0f));
-            TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0f));
-            TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0f));
-            TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0f));
-            TableLayoutPanel1.Size = new System.Drawing.Size(1163, 350);
-            TableLayoutPanel1.TabIndex = 0;
-            // 
-            // Button2
-            // 
-            Button2.Location = new System.Drawing.Point(597, 3);
-            Button2.Name = "Button2";
-            Button2.Padding = new System.Windows.Forms.Padding(6);
-            Button2.Size = new System.Drawing.Size(91, 35);
-            Button2.TabIndex = 3;
-            Button2.Text = "Toggle";
-            Button2.UseVisualStyleBackColor = true;
-            // 
-            // Button1
-            // 
-            Button1.Location = new System.Drawing.Point(497, 3);
-            Button1.Name = "Button1";
-            Button1.Size = new System.Drawing.Size(91, 35);
-            Button1.TabIndex = 2;
-            Button1.Text = "OK";
-            Button1.UseVisualStyleBackColor = true;
-            // 
-            // MainPanel
-            // 
-            MainPanel.AutoScroll = true;
-            MainPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            MainPanel.Controls.Add(TableLayoutPanel1);
-            MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            MainPanel.Location = new System.Drawing.Point(3, 3);
-            MainPanel.Name = "MainPanel";
-            MainPanel.Size = new System.Drawing.Size(1182, 304);
-            MainPanel.TabIndex = 1;
-            // 
-            // MainLayoutPanel
-            // 
-            MainLayoutPanel.ColumnCount = 1;
-            MainLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0f));
-            MainLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0f));
-            MainLayoutPanel.Controls.Add(MainPanel, 0, 0);
-            MainLayoutPanel.Controls.Add(TableLayoutPanel2, 0, 1);
-            MainLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            MainLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            MainLayoutPanel.Name = "MainLayoutPanel";
-            MainLayoutPanel.RowCount = 2;
-            MainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0f));
-            MainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64.0f));
-            MainLayoutPanel.Size = new System.Drawing.Size(1188, 374);
-            MainLayoutPanel.TabIndex = 2;
-            // 
-            // TableLayoutPanel2
-            // 
-            TableLayoutPanel2.ColumnCount = 4;
-            TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0f));
-            TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100.0f));
-            TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100.0f));
-            TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0f));
-            TableLayoutPanel2.Controls.Add(ButtonAdd, 0, 0);
-            TableLayoutPanel2.Controls.Add(Button2, 2, 0);
-            TableLayoutPanel2.Controls.Add(Button1, 1, 0);
-            TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            TableLayoutPanel2.Location = new System.Drawing.Point(0, 310);
-            TableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            TableLayoutPanel2.Name = "TableLayoutPanel2";
-            TableLayoutPanel2.RowCount = 1;
-            TableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0f));
-            TableLayoutPanel2.Size = new System.Drawing.Size(1188, 64);
-            TableLayoutPanel2.TabIndex = 2;
+            this.TableLayoutPanel1.AutoSize = true;
+            this.TableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.TableLayoutPanel1.ColumnCount = 1;
+            this.TableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayoutPanel1.Controls.Add(this.ControlGroup3, 0, 1);
+            this.TableLayoutPanel1.Controls.Add(this.ControlGroup1, 0, 0);
+            this.TableLayoutPanel1.Controls.Add(this.ControlGroup2, 0, 2);
+            this.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.TableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.TableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.TableLayoutPanel1.Name = "TableLayoutPanel1";
+            this.TableLayoutPanel1.Padding = new System.Windows.Forms.Padding(20, 19, 20, 19);
+            this.TableLayoutPanel1.RowCount = 4;
+            this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 212F));
+            this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 212F));
+            this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 212F));
+            this.TableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayoutPanel1.Size = new System.Drawing.Size(2328, 674);
+            this.TableLayoutPanel1.TabIndex = 0;
             // 
             // ControlGroup3
             // 
-            ControlGroup3.AutoSize = true;
-            ControlGroup3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            ControlGroup3.Dock = System.Windows.Forms.DockStyle.Fill;
-            ControlGroup3.Location = new System.Drawing.Point(13, 123);
-            ControlGroup3.Name = "ControlGroup3";
-            ControlGroup3.Padding = new System.Windows.Forms.Padding(3);
-            ControlGroup3.Size = new System.Drawing.Size(1137, 104);
-            ControlGroup3.TabIndex = 2;
+            this.ControlGroup3.AutoSize = true;
+            this.ControlGroup3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ControlGroup3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ControlGroup3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ControlGroup3.Location = new System.Drawing.Point(32, 243);
+            this.ControlGroup3.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ControlGroup3.MinimumSize = new System.Drawing.Size(3722, 350);
+            this.ControlGroup3.Name = "ControlGroup3";
+            this.ControlGroup3.Padding = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ControlGroup3.Size = new System.Drawing.Size(3722, 350);
+            this.ControlGroup3.TabIndex = 2;
             // 
             // ControlGroup1
             // 
-            ControlGroup1.AutoSize = true;
-            ControlGroup1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            ControlGroup1.Dock = System.Windows.Forms.DockStyle.Fill;
-            ControlGroup1.Location = new System.Drawing.Point(13, 13);
-            ControlGroup1.Name = "ControlGroup1";
-            ControlGroup1.Padding = new System.Windows.Forms.Padding(3);
-            ControlGroup1.Size = new System.Drawing.Size(1137, 104);
-            ControlGroup1.TabIndex = 0;
+            this.ControlGroup1.AutoSize = true;
+            this.ControlGroup1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ControlGroup1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ControlGroup1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ControlGroup1.Location = new System.Drawing.Point(32, 31);
+            this.ControlGroup1.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ControlGroup1.MinimumSize = new System.Drawing.Size(3722, 350);
+            this.ControlGroup1.Name = "ControlGroup1";
+            this.ControlGroup1.Padding = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ControlGroup1.Size = new System.Drawing.Size(3722, 350);
+            this.ControlGroup1.TabIndex = 0;
             // 
             // ControlGroup2
             // 
-            ControlGroup2.AutoSize = true;
-            ControlGroup2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            ControlGroup2.Dock = System.Windows.Forms.DockStyle.Fill;
-            ControlGroup2.Location = new System.Drawing.Point(13, 233);
-            ControlGroup2.Name = "ControlGroup2";
-            ControlGroup2.Padding = new System.Windows.Forms.Padding(3);
-            ControlGroup2.Size = new System.Drawing.Size(1137, 104);
-            ControlGroup2.TabIndex = 1;
+            this.ControlGroup2.AutoSize = true;
+            this.ControlGroup2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ControlGroup2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ControlGroup2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ControlGroup2.Location = new System.Drawing.Point(32, 455);
+            this.ControlGroup2.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ControlGroup2.MinimumSize = new System.Drawing.Size(3722, 350);
+            this.ControlGroup2.Name = "ControlGroup2";
+            this.ControlGroup2.Padding = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ControlGroup2.Size = new System.Drawing.Size(3722, 350);
+            this.ControlGroup2.TabIndex = 1;
+            // 
+            // Button2
+            // 
+            this.Button2.Location = new System.Drawing.Point(1194, 6);
+            this.Button2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Button2.Name = "Button2";
+            this.Button2.Padding = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.Button2.Size = new System.Drawing.Size(182, 67);
+            this.Button2.TabIndex = 3;
+            this.Button2.Text = "Toggle";
+            this.Button2.UseVisualStyleBackColor = true;
+            this.Button2.Click += new System.EventHandler(this.Button2_Click);
+            // 
+            // Button1
+            // 
+            this.Button1.Location = new System.Drawing.Point(994, 6);
+            this.Button1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Button1.Name = "Button1";
+            this.Button1.Size = new System.Drawing.Size(182, 67);
+            this.Button1.TabIndex = 2;
+            this.Button1.Text = "OK";
+            this.Button1.UseVisualStyleBackColor = true;
+            this.Button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // MainPanel
+            // 
+            this.MainPanel.AutoScroll = true;
+            this.MainPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.MainPanel.Controls.Add(this.TableLayoutPanel1);
+            this.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MainPanel.Location = new System.Drawing.Point(6, 6);
+            this.MainPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.MainPanel.Name = "MainPanel";
+            this.MainPanel.Size = new System.Drawing.Size(2364, 584);
+            this.MainPanel.TabIndex = 1;
+            // 
+            // MainLayoutPanel
+            // 
+            this.MainLayoutPanel.ColumnCount = 1;
+            this.MainLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.MainLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.MainLayoutPanel.Controls.Add(this.MainPanel, 0, 0);
+            this.MainLayoutPanel.Controls.Add(this.TableLayoutPanel2, 0, 1);
+            this.MainLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MainLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.MainLayoutPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.MainLayoutPanel.Name = "MainLayoutPanel";
+            this.MainLayoutPanel.RowCount = 2;
+            this.MainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.MainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 123F));
+            this.MainLayoutPanel.Size = new System.Drawing.Size(2376, 719);
+            this.MainLayoutPanel.TabIndex = 2;
+            // 
+            // TableLayoutPanel2
+            // 
+            this.TableLayoutPanel2.ColumnCount = 4;
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.TableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TableLayoutPanel2.Controls.Add(this.ButtonAdd, 0, 0);
+            this.TableLayoutPanel2.Controls.Add(this.Button2, 2, 0);
+            this.TableLayoutPanel2.Controls.Add(this.Button1, 1, 0);
+            this.TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TableLayoutPanel2.Location = new System.Drawing.Point(0, 596);
+            this.TableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
+            this.TableLayoutPanel2.Name = "TableLayoutPanel2";
+            this.TableLayoutPanel2.RowCount = 1;
+            this.TableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayoutPanel2.Size = new System.Drawing.Size(2376, 123);
+            this.TableLayoutPanel2.TabIndex = 2;
             // 
             // ButtonAdd
             // 
-            ButtonAdd.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            ButtonAdd.Location = new System.Drawing.Point(380, 3);
-            ButtonAdd.Name = "ButtonAdd";
-            ButtonAdd.Padding = new System.Windows.Forms.Padding(6);
-            ButtonAdd.Size = new System.Drawing.Size(111, 49);
-            ButtonAdd.TabIndex = 4;
-            ButtonAdd.Text = "Add Control Group";
-            ButtonAdd.UseVisualStyleBackColor = true;
+            this.ButtonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonAdd.Location = new System.Drawing.Point(760, 6);
+            this.ButtonAdd.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ButtonAdd.Name = "ButtonAdd";
+            this.ButtonAdd.Padding = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ButtonAdd.Size = new System.Drawing.Size(222, 94);
+            this.ButtonAdd.TabIndex = 4;
+            this.ButtonAdd.Text = "Add Control Group";
+            this.ButtonAdd.UseVisualStyleBackColor = true;
+            this.ButtonAdd.Click += new System.EventHandler(this.ButtonAdd_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6.0f, 13.0f);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1188, 374);
-            this.Controls.Add(MainLayoutPanel);
+            this.ClientSize = new System.Drawing.Size(2376, 719);
+            this.Controls.Add(this.MainLayoutPanel);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "Form1";
             this.Text = "Form1";
-            TableLayoutPanel1.ResumeLayout(false);
-            TableLayoutPanel1.PerformLayout();
-            MainPanel.ResumeLayout(false);
-            MainPanel.PerformLayout();
-            MainLayoutPanel.ResumeLayout(false);
-            TableLayoutPanel2.ResumeLayout(false);
+            this.TableLayoutPanel1.ResumeLayout(false);
+            this.TableLayoutPanel1.PerformLayout();
+            this.MainPanel.ResumeLayout(false);
+            this.MainPanel.PerformLayout();
+            this.MainLayoutPanel.ResumeLayout(false);
+            this.TableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

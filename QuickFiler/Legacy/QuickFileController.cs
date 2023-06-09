@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
-using UtilitiesCS;
 using Windows.Win32;
 using UtilitiesCS.OutlookExtensions;
 

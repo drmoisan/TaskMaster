@@ -11,7 +11,7 @@ using QuickFiler.Interfaces;
 namespace QuickFiler.Test
 {
     [TestClass]
-    public class UnitTest1
+    public class QfcViewer_Test
     {
         private QfcFormViewer qf;
         private QfcItemViewer iv;
@@ -57,7 +57,7 @@ namespace QuickFiler.Test
         }
 
         [TestMethod]
-        public void TestMethod2() 
+        public void TestToggleTips() 
         {
             qf.Show();
             qf.Refresh();
@@ -82,6 +82,7 @@ namespace QuickFiler.Test
             {
                 tipsDetails.Toggle();
             }
+            qf.Refresh();
             qf.Refresh();
             //qf.qfcItemViewer1
         }

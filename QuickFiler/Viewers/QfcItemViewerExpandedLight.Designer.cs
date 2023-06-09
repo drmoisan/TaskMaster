@@ -31,7 +31,6 @@
             this.L0v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h = new System.Windows.Forms.SplitContainer();
             this.L1h0L2hv = new System.Windows.Forms.TableLayoutPanel();
-            this.LblPos = new System.Windows.Forms.Label();
             this.L1h0L2hv1L3h = new System.Windows.Forms.TableLayoutPanel();
             this.LblSentOn = new System.Windows.Forms.Label();
             this.LblSender = new System.Windows.Forms.Label();
@@ -42,8 +41,8 @@
             this.L1h0L2hv2L3h = new System.Windows.Forms.TableLayoutPanel();
             this.LblConvCt = new System.Windows.Forms.Label();
             this.lblSubject = new System.Windows.Forms.Label();
+            this.LblPos = new System.Windows.Forms.Label();
             this.LblAcOpen = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.L1h1L2v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h1L2v1h = new System.Windows.Forms.TableLayoutPanel();
             this.LblAcSearch = new System.Windows.Forms.Label();
@@ -70,6 +69,10 @@
             this.CbxConversation = new System.Windows.Forms.CheckBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
             this.web = new System.Windows.Forms.WebBrowser();
+            this.topicThread = new BrightIdeasSoftware.FastObjectListView();
+            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.time = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.L0v.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1h)).BeginInit();
             this.L1h.Panel1.SuspendLayout();
@@ -85,6 +88,7 @@
             this.L1h1L2v1h3Panel.SuspendLayout();
             this.L1h1L2v2h.SuspendLayout();
             this.L1h1L2v3h.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.topicThread)).BeginInit();
             this.SuspendLayout();
             // 
             // L0v
@@ -99,7 +103,7 @@
             this.L0v.Margin = new System.Windows.Forms.Padding(6);
             this.L0v.Name = "L0v";
             this.L0v.RowCount = 2;
-            this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 234F));
+            this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 250F));
             this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L0v.Size = new System.Drawing.Size(1868, 994);
             this.L0v.TabIndex = 0;
@@ -119,7 +123,7 @@
             // L1h.Panel2
             // 
             this.L1h.Panel2.Controls.Add(this.L1h1L2v);
-            this.L1h.Size = new System.Drawing.Size(1868, 234);
+            this.L1h.Size = new System.Drawing.Size(1868, 250);
             this.L1h.SplitterDistance = 1046;
             this.L1h.TabIndex = 2;
             // 
@@ -133,7 +137,7 @@
             this.L1h0L2hv.Controls.Add(this.L1h0L2hv2L3h, 1, 1);
             this.L1h0L2hv.Controls.Add(this.LblPos, 0, 0);
             this.L1h0L2hv.Controls.Add(this.LblAcOpen, 0, 2);
-            this.L1h0L2hv.Controls.Add(this.comboBox1, 1, 2);
+            this.L1h0L2hv.Controls.Add(this.topicThread, 1, 2);
             this.L1h0L2hv.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1h0L2hv.Location = new System.Drawing.Point(0, 0);
             this.L1h0L2hv.Margin = new System.Windows.Forms.Padding(6);
@@ -142,24 +146,8 @@
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 55F));
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv.Size = new System.Drawing.Size(1046, 234);
+            this.L1h0L2hv.Size = new System.Drawing.Size(1046, 250);
             this.L1h0L2hv.TabIndex = 0;
-            // 
-            // LblPos
-            // 
-            this.LblPos.BackColor = System.Drawing.SystemColors.HotTrack;
-            this.LblPos.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblPos.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.LblPos.Location = new System.Drawing.Point(4, 4);
-            this.LblPos.Margin = new System.Windows.Forms.Padding(4, 4, 4, 19);
-            this.LblPos.Name = "LblPos";
-            this.LblPos.Padding = new System.Windows.Forms.Padding(0, 0, 0, 8);
-            this.L1h0L2hv.SetRowSpan(this.LblPos, 2);
-            this.LblPos.Size = new System.Drawing.Size(92, 65);
-            this.LblPos.TabIndex = 5;
-            this.LblPos.Text = "[#]";
-            this.LblPos.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // L1h0L2hv1L3h
             // 
@@ -300,6 +288,22 @@
             this.lblSubject.TabIndex = 2;
             this.lblSubject.Text = "[SUBJECT]";
             // 
+            // LblPos
+            // 
+            this.LblPos.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.LblPos.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LblPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblPos.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.LblPos.Location = new System.Drawing.Point(4, 4);
+            this.LblPos.Margin = new System.Windows.Forms.Padding(4, 4, 4, 19);
+            this.LblPos.Name = "LblPos";
+            this.LblPos.Padding = new System.Windows.Forms.Padding(0, 0, 0, 8);
+            this.L1h0L2hv.SetRowSpan(this.LblPos, 2);
+            this.LblPos.Size = new System.Drawing.Size(92, 65);
+            this.LblPos.TabIndex = 5;
+            this.LblPos.Text = "[#]";
+            this.LblPos.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // LblAcOpen
             // 
             this.LblAcOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -315,23 +319,6 @@
             this.LblAcOpen.Size = new System.Drawing.Size(46, 41);
             this.LblAcOpen.TabIndex = 6;
             this.LblAcOpen.Text = "O";
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.AllowDrop = true;
-            this.comboBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.Simple;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4",
-            "Item 5"});
-            this.comboBox1.Location = new System.Drawing.Point(103, 91);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(940, 140);
-            this.comboBox1.TabIndex = 7;
             // 
             // L1h1L2v
             // 
@@ -349,7 +336,7 @@
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 58F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v.Size = new System.Drawing.Size(818, 234);
+            this.L1h1L2v.Size = new System.Drawing.Size(818, 250);
             this.L1h1L2v.TabIndex = 0;
             // 
             // L1h1L2v1h
@@ -547,7 +534,7 @@
             this.L1h1L2v2h.Padding = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.L1h1L2v2h.RowCount = 1;
             this.L1h1L2v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v2h.Size = new System.Drawing.Size(818, 108);
+            this.L1h1L2v2h.Size = new System.Drawing.Size(818, 124);
             this.L1h1L2v2h.TabIndex = 1;
             // 
             // LblAcFolder
@@ -702,11 +689,45 @@
             // web
             // 
             this.web.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.web.Location = new System.Drawing.Point(3, 237);
+            this.web.Location = new System.Drawing.Point(3, 253);
             this.web.MinimumSize = new System.Drawing.Size(20, 20);
             this.web.Name = "web";
-            this.web.Size = new System.Drawing.Size(1862, 754);
+            this.web.Size = new System.Drawing.Size(1862, 738);
             this.web.TabIndex = 3;
+            // 
+            // topicThread
+            // 
+            this.topicThread.AllColumns.Add(this.sender);
+            this.topicThread.AllColumns.Add(this.time);
+            this.topicThread.AllColumns.Add(this.infolder);
+            this.topicThread.CellEditUseWholeCell = false;
+            this.topicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.sender,
+            this.time,
+            this.infolder});
+            this.topicThread.Cursor = System.Windows.Forms.Cursors.Default;
+            this.topicThread.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.topicThread.HideSelection = false;
+            this.topicThread.Location = new System.Drawing.Point(103, 91);
+            this.topicThread.Name = "topicThread";
+            this.topicThread.ShowGroups = false;
+            this.topicThread.Size = new System.Drawing.Size(940, 156);
+            this.topicThread.TabIndex = 7;
+            this.topicThread.UseCompatibleStateImageBehavior = false;
+            this.topicThread.View = System.Windows.Forms.View.Details;
+            this.topicThread.VirtualMode = true;
+            // 
+            // sender
+            // 
+            this.sender.Text = "From";
+            // 
+            // time
+            // 
+            this.time.Text = "Received";
+            // 
+            // infolder
+            // 
+            this.infolder.Text = "In Folder";
             // 
             // QfcItemViewerExpandedLight
             // 
@@ -743,6 +764,7 @@
             this.L1h1L2v2h.PerformLayout();
             this.L1h1L2v3h.ResumeLayout(false);
             this.L1h1L2v3h.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.topicThread)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -789,7 +811,10 @@
         internal System.Windows.Forms.Label lblSubject;
         internal System.Windows.Forms.Label LblPos;
         internal System.Windows.Forms.Label LblAcOpen;
-        private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.WebBrowser web;
+        private BrightIdeasSoftware.FastObjectListView topicThread;
+        private BrightIdeasSoftware.OLVColumn sender;
+        private BrightIdeasSoftware.OLVColumn time;
+        private BrightIdeasSoftware.OLVColumn infolder;
     }
 }

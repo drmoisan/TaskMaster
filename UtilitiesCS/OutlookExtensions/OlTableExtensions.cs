@@ -55,7 +55,8 @@ namespace UtilitiesCS
             {SchemaConversationDepth, "ConvDepth" },
             {SchemaConversationIndex, "ConversationIndex" },
             {SchemaConversationTopic, "ConversationTopic" },
-            {SchemaToDoID, "ToDoID" }
+            {SchemaToDoID, "ToDoID" },
+            {SchemaTriage, "Triage" }
         };
         public static Dictionary<string, string> FieldToSchema = new()
         {
@@ -64,7 +65,8 @@ namespace UtilitiesCS
             {"ConvDepth", SchemaConversationDepth },
             {"ConversationIndex", SchemaConversationIndex },
             {"ConversationTopic", SchemaConversationTopic },
-            {"ToDoID", SchemaToDoID }
+            {"ToDoID", SchemaToDoID },
+            {"Triage", SchemaTriage }
         };
 
         #endregion
@@ -146,7 +148,7 @@ namespace UtilitiesCS
             var columnDictionary = table.GetColumnDictionary();
             var rowCount = table.GetRowCount();
             var columnCount = columnDictionary.Count;
-            EnumerateTable(table);
+            //EnumerateTable(table);
             table.MoveToStart();
             object[,] data = null;
 

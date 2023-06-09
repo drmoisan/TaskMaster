@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
-using UtilitiesCS;
 using System.Windows.Forms;
 using System.Net.Mail;
 using System.Collections;
@@ -21,6 +20,8 @@ namespace QuickFiler.Controllers
 {
     internal class QfcItemController : IQfcItemController
     {
+        #region constructors
+
         public QfcItemController(IApplicationGlobals AppGlobals, 
                                  QfcItemViewer itemViewer,
                                  int viewerPosition,
@@ -43,6 +44,10 @@ namespace QuickFiler.Controllers
 
         }
 
+        #endregion
+
+        #region private fields and variables
+
         private IApplicationGlobals _globals;
         private QfcItemViewer _itemViewer;
         private IQfcCollectionController _parent;
@@ -54,11 +59,42 @@ namespace QuickFiler.Controllers
         private int _viewerPosition;
         private FolderHandler _fldrHandler;
         private IList<Control> _controls;
-        private Dictionary<Type, Control> _ctrlDict;
         private IList<TableLayoutPanel> _tlps;
         private IList<Button> _buttons;
         private IList<CheckBox> _checkBoxes;
         private IList<Label> _labels;
+        private bool _expanded = false;
+        private bool _blHasChild;
+
+        #endregion
+
+        #region Exposed properties
+
+        public string SelectedFolder { get => _itemViewer.CboFolders.SelectedItem.ToString(); }
+
+        public int Position { get => _viewerPosition; set => _viewerPosition = value; }
+
+        public string Subject { get => _itemViewer.lblSubject.Text; }
+
+        public string To { get => _mailItem.To; }
+
+        public string Sender { get => _itemViewer.LblSender.Text; }
+
+        public string SentDate { get => _mailItem.SentOn.ToString("MM/dd/yyyy"); }
+
+        public string SentTime { get => _mailItem.SentOn.ToString("HH:mm"); }
+
+        public bool BlExpanded { get => _expanded; }
+
+        public bool BlHasChild { get => _blHasChild; set => _blHasChild = value; }
+
+        public int Height { get => _itemViewer.Height; }
+
+        public MailItem Mail { get => _mailItem; set => _mailItem = value; }
+
+        #endregion
+
+        #region completed functions
 
         internal string CompressPlainText(string text)
         {
@@ -76,14 +112,10 @@ namespace QuickFiler.Controllers
         {
             var ctrls = itemViewer.GetAllChildren();
             _controls = ctrls.ToList();
-            
-            _ctrlDict = ctrls.Select(x => new KeyValuePair<Type, Control>(x.GetType(), x))
-                             .ToDictionary();
-            
+                        
             _listTipsDetails = _itemViewer.TipsLabels
                                .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
                                .ToList();
-
 
             _tlps = ctrls.Where(x => x is TableLayoutPanel)
                          .Select(x => (TableLayoutPanel)x)
@@ -240,104 +272,16 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public bool BlExpanded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public int Height => throw new NotImplementedException();
-
-        public bool BlHasChild { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        
-        public MailItem Mail { get => _mailItem; set => _mailItem = value; }
-
-        public void ToggleTips()
-        {
-            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
-            {
-                tipsDetails.Toggle();
-            }
-        }
-        public void ToggleTips(IQfcTipsDetails.ToggleState desiredState)
-        {
-            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
-            {
-                tipsDetails.Toggle(desiredState);
-            }
-        }
-
-        public void Accel_FocusToggle()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Accel_Toggle()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ApplyReadEmailFormat()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ctrlsRemove()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExpandCtrls1()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void FlagAsTask()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void JumpToFolderDropDown()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void JumpToSearchTextbox()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void MarkItemForDeletion()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ToggleConversationCheckbox()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ToggleDeleteFlow()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ToggleSaveAttachments()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ToggleSaveCopyOfMail()
-        {
-            throw new NotImplementedException();
-        }
-
         public void SetThemeDark()
         {
             foreach (TableLayoutPanel tlp in _tlps)
             {
                 tlp.SetTheme(backColor: System.Drawing.Color.Black);
             }
-            
+
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
             {
-                tipsDetails.LabelControl.SetTheme(backColor: Color.LightSkyBlue, 
+                tipsDetails.LabelControl.SetTheme(backColor: Color.LightSkyBlue,
                                                   forecolor: SystemColors.ActiveCaptionText);
             }
 
@@ -398,7 +342,7 @@ namespace QuickFiler.Controllers
             _itemViewer.BackColor = System.Drawing.Color.Black;
             _itemViewer.ForeColor = System.Drawing.Color.WhiteSmoke;
         }
-        
+
         public void SetThemeLight()
         {
             foreach (TableLayoutPanel tlp in _tlps)
@@ -474,6 +418,22 @@ namespace QuickFiler.Controllers
             _itemViewer.ForeColor = System.Drawing.SystemColors.ControlText;
         }
 
+        public void ToggleTips()
+        {
+            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
+            {
+                tipsDetails.Toggle();
+            }
+        }
+        
+        public void ToggleTips(IQfcTipsDetails.ToggleState desiredState)
+        {
+            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
+            {
+                tipsDetails.Toggle(desiredState);
+            }
+        }
+
         public void Cleanup()
         {
             _globals = null;
@@ -485,22 +445,77 @@ namespace QuickFiler.Controllers
             _fldrHandler = null;
         }
 
+        #endregion
+       
+        public void Accel_FocusToggle()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Accel_Toggle()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ApplyReadEmailFormat()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ctrlsRemove()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ExpandCtrls1()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FlagAsTask()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void JumpToFolderDropDown()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void JumpToSearchTextbox()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void MarkItemForDeletion()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ToggleConversationCheckbox()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ToggleDeleteFlow()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ToggleSaveAttachments()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ToggleSaveCopyOfMail()
+        {
+            throw new NotImplementedException();
+        }
+
+        
         #region Exposed Properties
 
-        public string SelectedFolder { get => _itemViewer.CboFolders.SelectedItem.ToString(); }
-
-        public int Position { get => _viewerPosition; set => _viewerPosition = value; }
-
-        public string Subject { get => _itemViewer.lblSubject.Text; }
-
-        public string To { get => _mailItem.To; }
-
-        public string Sender { get => _itemViewer.LblSender.Text; }
-
-        public string SentDate { get => _mailItem.SentOn.ToString("MM/dd/yyyy"); }
-
-        public string SentTime { get => _mailItem.SentOn.ToString("HH:mm"); }
-
+        
         #endregion
     }
 }

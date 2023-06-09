@@ -12,7 +12,6 @@ using UtilitiesCS;
 using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;
-using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 
 namespace QuickFiler.Legacy

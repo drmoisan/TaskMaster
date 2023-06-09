@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
-using UtilitiesCS;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 

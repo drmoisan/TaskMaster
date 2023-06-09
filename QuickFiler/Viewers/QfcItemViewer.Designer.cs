@@ -95,9 +95,9 @@
             this.L0v.Location = new System.Drawing.Point(0, 0);
             this.L0v.Margin = new System.Windows.Forms.Padding(6);
             this.L0v.Name = "L0v";
-            this.L0v.RowCount = 1;
+            this.L0v.RowCount = 2;
             this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 0F));
             this.L0v.Size = new System.Drawing.Size(1868, 183);
             this.L0v.TabIndex = 0;
             // 
