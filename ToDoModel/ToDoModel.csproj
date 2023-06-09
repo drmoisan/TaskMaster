@@ -127,7 +127,6 @@
     <Compile Include="Data Model\ID\IDListUtilities.cs" />
     <Compile Include="Email Utilities\AutoFile.cs" />
     <Compile Include="Data Model\ID\BaseChanger.cs" />
-    <Compile Include="Data Model\ID\ListOfIDsLegacy.cs" />
     <Compile Include="Email Utilities\cConversation.cs" />
     <Compile Include="Email Utilities\FolderHandler.cs" />
     <Compile Include="Email Utilities\CommonWordsModule.cs" />

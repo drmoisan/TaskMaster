@@ -9,14 +9,11 @@ using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using Outlook = Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using ToDoModel;
 using UtilitiesCS;
 
 namespace TaskTree
 {
-
     public class TaskTreeController
     {
         public TaskTreeController(IApplicationGlobals AppGlobals, TaskTreeForm Viewer, TreeOfToDoItems DataModel)
@@ -229,61 +226,40 @@ namespace TaskTree
                 target.Parent.Children.InsertRange(idx, toMove.Cast<TreeNode<ToDoItem>>()); // DataModel: Inserted into new data model tree. 
                 _dataModel.ReNumberChildrenIDs(target.Parent.Children, (IDList)_globals.TD.IDList);
 
-            }         // DataModel: Renumber IDs of new branch order
+            }         
 
 
         }
 
         internal void MoveObjectsToChildren(TreeListView targetTree, TreeListView sourceTree, TreeNode<ToDoItem> target, IList toMove)
         {
-
-            // Dim strID_PrefixOld As String
-            // Dim strID_PrefixNew As String
-
             foreach (TreeNode<ToDoItem> x in toMove)
             {
-
-                // strID_PrefixOld = x.ID 'Kill this line
-
                 if (x.Parent is null)
                 {
-                    sourceTree.RemoveObject(x);              // TreeListView: Remove from Visual Tree
+                    sourceTree.RemoveObject(x);              
                     if (_dataModel.ListOfToDoTree.Contains(x))
                     {
-                        bool unused2 = _dataModel.ListOfToDoTree.Remove(x);         // Data Model: Remove node from roots
+                        _dataModel.ListOfToDoTree.Remove(x);         
                     }
                     else
                     {
-                        var unused1 = Interaction.MsgBox("Error in MoveObjectsToChildren: TreeListView and DataModel out of sync at roots");
+                        MessageBox.Show("Error in MoveObjectsToChildren: TreeListView and DataModel out of sync at roots");
                     }
                 }
                 else
                 {
-                    bool unused = x.Parent.Children.Remove(x);
-                    // ***NO REFERENCE TO TREELISTVIEW. INCONSISTENT WITH TREATMENT OF ROOTS
-                }             // Data Model: Remove pointer to child from parent
+                    x.Parent.Children.Remove(x);
+                }             
 
-                x.Parent = target;                                   // Data Model: Add pointer to new Parent in data model
-                _dataModel.AddChild(x, target, _globals.TD.IDList);    // Data Model: Add child to parent and renumber all affected
-
-                // ***OLD Code to add child to target parent and renumber
-                // target.AddChild(x)                      'Data Model: Add child to target parent and renumber grandchildren
-                // target.Children.Add(x)
-                // x.Value.ToDoID = x.ID
-                // strID_PrefixNew = x.ID
-                // For Each y As TreeNode(Of ToDoItem) In x.Children
-                // SubstituteIDPrefix(y, strID_PrefixOld, strID_PrefixNew)
-                // Next
+                x.Parent = target;                                   
+                _dataModel.AddChild(x, target, _globals.TD.IDList);    
             }
-            // WriteTreeToCSVDebug()
-
-            // Curious ... this is inconsistent with MoveObjectsToSibling
         }
-
-
 
         private TreeNode<ToDoItem> FindChildByID(string ID, List<TreeNode<ToDoItem>> nodes)
         {
+            //QUESTION: Why is this method here? Shouldn't it be part of the class ToDoTree?
             TreeNode<ToDoItem> rnode;
 
             foreach (var node in nodes)
@@ -305,82 +281,40 @@ namespace TaskTree
             return null;
 
         }
-
-        public void WriteTreeToDisk(object filepath)
-        {
-            string filename = Path.Combine(Conversions.ToString(filepath), "DebugTreeDump.csv");
-
-            using (var sw = new StreamWriter(filename))
-            {
-                sw.WriteLine("File Dump");
-            }
-
-            // LoopTreeToWrite(ToDoTree.Children, filename, "")
-            LoopTreeToWrite(ToDoTree, filename, "");
-        }
-
-        public void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)
-        {
-            if (nodes is not null)
-            {
-                foreach (TreeNode<ToDoItem> node in nodes)
-                {
-                    AppendLineToCSV(filename, lineprefix + node.Value.ToDoID + " " + node.Value.TaskSubject);
-                    LoopTreeToWrite(node.Children, filename, lineprefix + node.Value.ToDoID + ",");
-                }
-            }
-        }
-        public void AppendLineToCSV(string filename, string line)
-        {
-            using (var sw = File.AppendText(filename))
-            {
-                sw.WriteLine(line);
-            }
-        }
-
-        internal void TLV_ItemActivate()
+        
+        internal TreeNode<ToDoItem> GetSelectedTreeNode()
         {
             var item = _viewer.TLV.GetItem(_viewer.TLV.SelectedIndex).RowObject;
-            TreeNode<ToDoItem> node = item as TreeNode<ToDoItem>;
-            if (node is not null)
+            return item as TreeNode<ToDoItem>;
+        }
+                
+        internal bool IsValidType(object item)
+        {
+            return ((item is Outlook.MailItem) || (item is Outlook.TaskItem));
+        }
+        
+        internal void ActivateOlItem(dynamic item)
+        {
+            if (item is not null)
+            {
+                var activeExplorer = _globals.Ol.App.ActiveExplorer();
+                if (activeExplorer.IsItemSelectableInView(item))
+                {
+                    activeExplorer.ClearSelection();
+                    activeExplorer.AddToSelection(item);
+                }
+                else { item.Display(); }
+            }
+        }
+
+        internal void TlvActivateItem()
+        {
+            var node = GetSelectedTreeNode();
+            if (node is not null) 
             {
                 var objItem = node.Value.GetItem();
-                if (objItem is Outlook.MailItem)
-                {
-                    Outlook.MailItem OlMail = objItem as Outlook.MailItem;
-                    if (OlMail is not null)
-                    {
-                        var OlExplorer = _globals.Ol.App.ActiveExplorer();
-                        if (OlExplorer.IsItemSelectableInView(OlMail))
-                        {
-                            OlExplorer.ClearSelection();
-                            OlExplorer.AddToSelection(OlMail);
-                            OlMail.Display();
-                        }
-                        else
-                        {
-                            OlMail.Display();
-                        }
-                    }
-                }
-                else if (objItem is Outlook.TaskItem)
-                {
-                    Outlook.TaskItem OlTask = objItem as Outlook.TaskItem;
-                    if (OlTask is not null)
-                    {
-                        var OlExplorer = _globals.Ol.App.ActiveExplorer();
-                        if (OlExplorer.IsItemSelectableInView(OlTask))
-                        {
-                            OlExplorer.ClearSelection();
-                            OlExplorer.AddToSelection(OlTask);
-                            OlTask.Display();
-                        }
-                        else
-                        {
-                            OlTask.Display();
-                        }
-                    }
-                }
+                if (IsValidType(objItem)) { ActivateOlItem(objItem); }
+                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
             }
         }
 
@@ -429,5 +363,41 @@ namespace TaskTree
             _viewer.TLV.Roots = _dataModel.ListOfToDoTree;
             _viewer.TLV.RebuildAll(preserveState: false);
         }
+
+        #region debugging helper functions
+
+        public void WriteTreeToDisk(string filepath)
+        {
+            string filename = Path.Combine(filepath, "DebugTreeDump.csv");
+
+            using (var sw = new StreamWriter(filename))
+            {
+                sw.WriteLine("File Dump");
+            }
+            LoopTreeToWrite(ToDoTree, filename, "");
+        }
+
+        public void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)
+        {
+            if (nodes is not null)
+            {
+                foreach (TreeNode<ToDoItem> node in nodes)
+                {
+                    AppendLineToCSV(filename, lineprefix + node.Value.ToDoID + " " + node.Value.TaskSubject);
+                    LoopTreeToWrite(node.Children, filename, lineprefix + node.Value.ToDoID + ",");
+                }
+            }
+        }
+
+        public void AppendLineToCSV(string filename, string line)
+        {
+            using (var sw = File.AppendText(filename))
+            {
+                sw.WriteLine(line);
+            }
+        }
+
+        #endregion
+
     }
 }

@@ -5,8 +5,6 @@ using ToDoModel;
 
 namespace TaskTree
 {
-
-
     public partial class TaskTreeForm
     {
         private TaskTreeController _controller;
@@ -69,7 +67,7 @@ namespace TaskTree
         private void TLV_ItemActivate(object sender, EventArgs e)
         {
             if (_controller is not null)
-                _controller.TLV_ItemActivate();
+                _controller.TlvActivateItem();
         }
 
 
