@@ -11,7 +11,7 @@ namespace UtilitiesCS
         void DictPPL_Save();
         Dictionary<string, string> DictRemap { get; }
         ISerializableList<string> CategoryFilters { get; }
-        IListOfIDsLegacy IDList { get; }
+        IIDList IDList { get; }
         IApplicationGlobals Parent { get; }
         IProjectInfo ProjInfo { get; }
         string ProjInfo_Filename { get; }

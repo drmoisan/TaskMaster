@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using ToDoModel;
 using Microsoft.Office.Core;
 using QuickFiler;
+using UtilitiesCS;
 
 namespace TaskMaster
 {
@@ -23,16 +24,17 @@ namespace TaskMaster
                 DebugTextWriter tw = new DebugTextWriter();
                 Console.SetOut(tw);
                 OlNS = _globals.Ol.NamespaceMAPI;
-                OlToDoItems = _globals.Ol.ToDoFolder.Items;
-                OlInboxItems = _globals.Ol.Inbox.Items;
-                OlReminders = _globals.Ol.OlReminders;
+                //OlToDoItems = _globals.Ol.ToDoFolder.Items;
+                //OlInboxItems = _globals.Ol.Inbox.Items;
+                //OlReminders = _globals.Ol.OlReminders;
                 ProjInfo = (ProjectInfo)_globals.TD.ProjInfo;
                 DictPPL = _globals.TD.DictPPL;
-                IDList = (ListOfIDsLegacy)_globals.TD.IDList;
+                IDList = _globals.TD.IDList;
                 EmailRoot = _globals.Ol.EmailRootPath;
             }
 
             _ribbonController.SetGlobals(_globals);
+            Events_Hook();
         }
 
         private ApplicationGlobals _globals;
@@ -113,9 +115,9 @@ namespace TaskMaster
 
         public ProjectInfo ProjInfo;
         public Dictionary<string, string> DictPPL;
-        private ListOfIDsLegacy _IDList;
+        private IIDList _IDList;
 
-        public ListOfIDsLegacy IDList
+        public IIDList IDList
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get

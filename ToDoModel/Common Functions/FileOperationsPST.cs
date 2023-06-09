@@ -188,10 +188,10 @@ namespace ToDoModel
                                             {
                                                 strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                                 todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                                                todo.ToDoID = _globals.TD.IDList.GetNextAvailableToDoID(strProjectToDo + "00");
-                                                // strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                                todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
+                                                // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
                                                 // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                                _globals.TD.IDList.Save(_globals.TD.FnameIDList);
+                                                _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
                                                 // Split_ToDoID(objItem:=Item)
                                                 todo.SplitID();
                                             }
@@ -228,10 +228,10 @@ namespace ToDoModel
                                     todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                     // If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                     // strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                                    todo.ToDoID = _globals.TD.IDList.GetNextAvailableToDoID(strProjectToDo + "00");
-                                    // strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
+                                    // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
                                     // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                    _globals.TD.IDList.Save(_globals.TD.FnameIDList);
+                                    _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
                                     // Split_ToDoID(objItem:=Item)
                                     todo.SplitID();
                                 }
@@ -253,11 +253,11 @@ namespace ToDoModel
                                     // strProjectToDo = ProjDict.ProjectDictionary(strProject)
                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                     // Add the next ToDoID available in that branch
-                                    todo.ToDoID = _globals.TD.IDList.GetNextAvailableToDoID(strProjectToDo + "00");
+                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
                                     todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                                    // strToDoID = IDList.GetNextAvailableToDoID(strProjectToDo & "00")
+                                    // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
                                     // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                    _globals.TD.IDList.Save(_globals.TD.FnameIDList);
+                                    _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
                                     // Split_ToDoID(objItem:=Item)
                                     todo.SplitID();
                                     // ***NEED CODE HERE***

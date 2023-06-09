@@ -261,6 +261,7 @@
     <Compile Include="Interfaces\IApplicationGlobals.cs" />
     <Compile Include="Interfaces\IAppStagingFilenames.cs" />
     <Compile Include="Interfaces\IFileSystemFolderPaths.cs" />
+    <Compile Include="Interfaces\IIDList.cs" />
     <Compile Include="Interfaces\IListOfIDsLegacy.cs" />
     <Compile Include="Interfaces\IObservableDictionary.cs" />
     <Compile Include="Interfaces\IOlObjects.cs" />

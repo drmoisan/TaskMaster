@@ -17,7 +17,6 @@ using Deedle;
 
 namespace ToDoModel
 {
-
     [Serializable()]
     public class ListOfIDsLegacy : IListOfIDsLegacy
     {
@@ -211,7 +210,7 @@ namespace ToDoModel
         {
             var _dataModel = new TreeOfToDoItems();
             _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, OlApp);
-            _dataModel.ReNumberIDs(this);
+            //_dataModel.ReNumberIDs(this);
         }
 
         public long MaxLengthOfID
@@ -259,7 +258,7 @@ namespace ToDoModel
             }
         }
 
-        public string GetNextAvailableToDoID(string strSeed)
+        public string GetNextToDoID(string strSeed)
         {
             int encoderBase = 36; // 125;
 
@@ -286,7 +285,7 @@ namespace ToDoModel
             return strMaxID;
         }
 
-        public string GetMaxToDoID()
+        public string GetNextToDoID()
         {
             int encoderBase = 36; // 125;
 

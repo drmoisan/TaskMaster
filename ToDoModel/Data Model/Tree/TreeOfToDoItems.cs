@@ -195,26 +195,26 @@ namespace ToDoModel
             {
                 var idx = todoIDLeft.FirstDiffIndex(todoIDRight);
                 if (idx == -1) { return 0; }
-                var left = BaseChanger.ConvertToDecimal(36, todoIDLeft[idx]);
-                var right = BaseChanger.ConvertToDecimal(36, todoIDRight[idx]);
+                var left = todoIDLeft[idx].ToBase10(36);
+                var right = todoIDRight[idx].ToBase10(36);
                 if (left < right) { return -1; }
                 else { return 1; }
             }
         }
 
-        public void ReNumberIDs(ListOfIDsLegacy IDList)
+        public void ReNumberIDs(IDList idList)
         {
             foreach (var RootNode in ListOfToDoTree)
             {
                 foreach (var Child in RootNode.Children)
                 {
                     if (Child.Children.Count > 0)
-                        ReNumberChildrenIDs(Child.Children, IDList);
+                        ReNumberChildrenIDs(Child.Children, idList);
                 }
             }
         }
         
-        public void ReNumberChildrenIDs(List<TreeNode<ToDoItem>> Children, ListOfIDsLegacy IDList)
+        public void ReNumberChildrenIDs(List<TreeNode<ToDoItem>> Children, IIDList idList)
         {
             var i = default(int);
             int max = Children.Count - 1;
@@ -224,21 +224,21 @@ namespace ToDoModel
                 var loopTo = max;
                 for (i = 0; i <= loopTo; i++)
                 {
-                    if (IDList.UsedIDList.Contains(Children[i].Value.ToDoID))
-                        IDList.UsedIDList.Remove(Children[i].Value.ToDoID);
+                    if (idList.Contains(Children[i].Value.ToDoID))
+                        idList.Remove(Children[i].Value.ToDoID);
                 }
                 var loopTo1 = max;
                 for (i = 0; i <= loopTo1; i++)
                 {
-                    string NextID = IDList.GetNextAvailableToDoID(strParentID + "00");
+                    string NextID = idList.GetNextToDoID(strParentID + "00");
                     // Dim LevelChange As Boolean = (Children(i).Value.ToDoID.Length = NextID.Length)
                     Children[i].Value.ToDoID = NextID;
                     // Children(i).Value.VisibleTreeState = 67
                     // Children(i).Value.ToDoID = Children(i).Value.ToDoID
                     if (Children[i].Children.Count > 0)
-                        ReNumberChildrenIDs(Children[i].Children, IDList);
+                        ReNumberChildrenIDs(Children[i].Children, idList);
                 }
-                IDList.Save();
+                idList.Serialize();
             }
         }
 
@@ -268,21 +268,21 @@ namespace ToDoModel
 
         #endregion region
 
-        public void AddChild(TreeNode<ToDoItem> Child, TreeNode<ToDoItem> Parent, ListOfIDsLegacy IDList)
+        public void AddChild(TreeNode<ToDoItem> Child, TreeNode<ToDoItem> Parent, IIDList idList)
         {
             Parent.Children.Add(Child);
             string strSeed = Parent.Children.Count > 1 ? Parent.Children[Parent.Children.Count - 2].Value.ToDoID : Parent.Value.ToDoID + "00";
 
-            if (IDList.UsedIDList.Contains(Child.Value.ToDoID))
+            if (idList.Contains(Child.Value.ToDoID))
             {
-                bool unused = IDList.UsedIDList.Remove(Child.Value.ToDoID);
+                bool unused = idList.Remove(Child.Value.ToDoID);
             }
-            Child.Value.ToDoID = IDList.GetNextAvailableToDoID(strSeed);
+            Child.Value.ToDoID = idList.GetNextToDoID(strSeed);
             if (Child.Children.Count > 0)
             {
-                ReNumberChildrenIDs(Child.Children, IDList);
+                ReNumberChildrenIDs(Child.Children, idList);
             }
-            IDList.Save();
+            idList.Serialize();
         }
 
         internal bool IsHeader(string TagContext)

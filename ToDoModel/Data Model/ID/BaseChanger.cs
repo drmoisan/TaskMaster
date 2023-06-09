@@ -1,66 +1,80 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 
 namespace ToDoModel
 {
-
     public static class BaseChanger
     {
-        public static string ConvertToBase(int nbase, BigInteger num, int intMinDigits = 2)
+        public const string ConverterString = "0123456789abcdefghijklmnopqrstuvwxyz";
+        private static int _maxBase = ConverterString.Length;
+        public static int MaxBase { get => _maxBase; }   
+
+        internal static void ValidateParams(int nbase)
         {
-            string ConvertToBaseRet = default;
-            string chars;
-            int r;
-            string newNumber;
-            int maxBase;
-            int i;
-
-            //chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
-            chars = "0123456789abcdefghijklmnopqrstuvwxyz";
-            maxBase = chars.Length;
-
-            // check if we can convert to this base
-            if (nbase > maxBase)
+            if (nbase < 1)
             {
-                ConvertToBaseRet = "";
+                throw new ArgumentOutOfRangeException(
+                    $"Cannot convert base {nbase} because it must be a positive number");
             }
-            else
+            if (nbase > MaxBase)
             {
-
-                // in r we have the offset of the char that was converted to the new base
-                newNumber = "";
-                while (num >= nbase)
-                {
-                    r = (int)(num % nbase);
-                    newNumber = chars.Substring((r + 1), 1) + newNumber;
-                    num /= nbase;
-                }
-
-                newNumber = chars.Substring((int)(num + 1), 1) + newNumber;
-
-                var loopTo = newNumber.Length % intMinDigits;
-                for (i = 1; i <= loopTo; i++)
-                    newNumber = 0 + newNumber;
-
-                ConvertToBaseRet = newNumber;
+                throw new ArgumentOutOfRangeException(
+                    $"Cannot convert base {nbase} because {nameof(ConverterString)} " +
+                    $"only supports conversions up to base {MaxBase}");
             }
-
-            return ConvertToBaseRet;
+        }
+        
+        internal static void ValidateParams(int nbase, BigInteger num)
+        {
+            if (num < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    $"Cannot convert number {num} because it must be 0 or greater");
+            }
+            ValidateParams(nbase);
         }
 
-        public static int ConvertToDecimal(int nbase, char c)
+        public static string ToBase(this BigInteger num, int nbase, int intMinDigits = 2)
         {
-            string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
-            if (nbase > chars.Length)
+            BigInteger r;
+            StringBuilder baseBuilder = new StringBuilder(10);
+            
+            ValidateParams(nbase, num);
+
+            // in r we have the offset of the char that was converted to the new base
+            while (num >= nbase)
             {
-                throw new ArgumentOutOfRangeException(nameof(nbase), $"Cannot convert from base {nbase}. " +
-                $"Extension method {nameof(ConvertToDecimal)} supports a max of base {chars.Length}");
+                r = num % nbase;
+                baseBuilder.Append(ConverterString[(int)r]);
+                num /= nbase;
             }
 
-            int idx = chars.IndexOf(c);
+            baseBuilder.Append(ConverterString[(int)num]);
+
+            var prependCount = baseBuilder.Length % intMinDigits;
+            switch (prependCount)
+            {
+                case 1:
+                    baseBuilder.Insert(0, "0");
+                    return baseBuilder.ToString();
+                case 2:
+                    baseBuilder.Insert(0, "00");
+                    return baseBuilder.ToString();
+                default: 
+                    return baseBuilder.ToString();
+            }
+        }
+                
+        public static int ToBase10(this char c, int nbase)
+        {
+            ValidateParams(nbase);
+
+            int idx = ConverterString.IndexOf(c);
             if (idx == -1)
             {
                 throw new ArgumentOutOfRangeException(nameof(c), $"Character {c} is not part of this " +
@@ -69,40 +83,23 @@ namespace ToDoModel
             return idx;
         }
                 
-        public static BigInteger ConvertToDecimal(int nbase, string strBase)
+        public static BigInteger ToBase10(this string strBase, int nbase)
         {
-            BigInteger ConvertToDecimalRet = default;
-            string chars;
-            int i;
-            long lngLoc;
-            var lngTmp = default(long);
+            string converter;
             var bigint = new BigInteger();
 
-            //chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŒœŠšŸŽžƒ";
-            chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+            converter = ConverterString;
             bigint.Equals(0L);
-
-            try
+                        
+            var loopTo = strBase.Length;
+            for (int i = 0; i < loopTo; i++)
             {
-                var loopTo = strBase.Length;
-                for (i = 1; i <= loopTo; i++)
-                {
-                    bigint *= nbase;
-                    lngLoc = chars.IndexOf(strBase.Substring(i,1));
-                    bigint += lngLoc - 1;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                Debug.WriteLine(ex.Source);
-                Debug.WriteLine(ex.StackTrace);
-                Debug.WriteLine("");
-
+                bigint *= nbase;
+                int idx = converter.IndexOf(strBase[i]);
+                bigint += idx;
             }
 
-            ConvertToDecimalRet = lngTmp;
-            return ConvertToDecimalRet;
+            return bigint;  
         }
 
     }

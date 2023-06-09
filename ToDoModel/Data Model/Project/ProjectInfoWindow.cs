@@ -9,11 +9,11 @@ namespace ToDoModel
 
     public partial class ProjectInfoWindow
     {
-        public ProjectInfo _projectInfo;
+        public IProjectInfo _projectInfo;
         private readonly Resizer rs = new Resizer();
         private bool blEditingCell = false;
 
-        public ProjectInfoWindow(ProjectInfo ProjInfo)
+        public ProjectInfoWindow(IProjectInfo ProjInfo)
         {
             // This call is required by the designer.
             InitializeComponent();
@@ -23,7 +23,7 @@ namespace ToDoModel
 
         }
 
-        public ProjectInfoWindow(ProjectInfo ProjInfo, Action<string, string> action)
+        public ProjectInfoWindow(IProjectInfo ProjInfo, Action<string, string> action)
         {
             // This call is required by the designer.
             InitializeComponent();

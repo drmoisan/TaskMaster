@@ -5,8 +5,6 @@ using System.Linq;
 
 namespace ToDoModel
 {
-
-
     [Serializable()]
     public class ProjectList
     {

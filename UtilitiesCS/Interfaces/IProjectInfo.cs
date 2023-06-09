@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace UtilitiesCS
@@ -16,5 +17,6 @@ namespace UtilitiesCS
         void Save(string filepath);
         (bool Any, int[] Indices) IsCorrupt();
         void Rebuild(Microsoft.Office.Interop.Outlook.Application olApp);
+        void SetIdUpdateAction(Action<string, string> action);
     }
 }

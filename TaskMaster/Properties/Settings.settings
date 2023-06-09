@@ -39,7 +39,7 @@
       <Value Profile="(Default)">pplkey.json</Value>
     </Setting>
     <Setting Name="FileName_IDList" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">UsedIDList.bin</Value>
+      <Value Profile="(Default)">UsedIDList.json</Value>
     </Setting>
     <Setting Name="FileName_DictRemap" Type="System.String" Scope="User">
       <Value Profile="(Default)">dictRemap.csv</Value>

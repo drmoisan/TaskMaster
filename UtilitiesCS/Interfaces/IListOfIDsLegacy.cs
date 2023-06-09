@@ -16,8 +16,8 @@ namespace UtilitiesCS
         void Save(string Filepath);
         string ConvertToBase(int nbase, BigInteger num, int intMinDigits = 2);
         BigInteger ConvertToDecimal(int nbase, string strBase);
-        string GetMaxToDoID();
-        string GetNextAvailableToDoID(string strSeed);
+        string GetNextToDoID();
+        string GetNextToDoID(string strSeed);
         void SubstituteIdRoot(string oldPrefix, string newPrefix);
     }
 }

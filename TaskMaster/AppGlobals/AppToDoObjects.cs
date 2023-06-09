@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
-using UtilitiesCS;
 
 namespace TaskMaster
 {
@@ -20,7 +19,7 @@ namespace TaskMaster
 
         private ProjectInfo _projInfo;
         private Dictionary<string, string> _dictPPL;
-        private ListOfIDsLegacy _IDList;
+        private IIDList _idList;
         private readonly ApplicationGlobals _parent;
         private Dictionary<string, string> _dictRemap;
         private ISerializableList<string> _catFilters;
@@ -50,6 +49,7 @@ namespace TaskMaster
                 {
                     _projInfo = new ProjectInfo(filename: _defaults.FileName_ProjInfo, 
                                                 folderpath: Parent.FS.FldrAppData);
+                    if (_projInfo.Count ==0) { _projInfo.Rebuild(Parent.Ol.App); }
                 }
                 return _projInfo;
             }
@@ -87,16 +87,18 @@ namespace TaskMaster
             }
         }
 
-        public IListOfIDsLegacy IDList
+        public IIDList IDList
         {
             get
             {
-                if (_IDList is null)
+                if (_idList is null)
                 {
-                    _IDList = new ListOfIDsLegacy(Path.Combine(Parent.FS.FldrAppData,
-                                                         _defaults.FileName_IDList), _parent.Ol.App);
+                    _idList = new IDList(_defaults.FileName_IDList,
+                                         Parent.FS.FldrAppData,
+                                         Parent.Ol.App);
+                    if (_idList.Count == 0) { _idList.RefreshIDList(); }
                 }
-                return _IDList;
+                return _idList;
             }
         }
 

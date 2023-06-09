@@ -203,7 +203,7 @@ namespace ToDoModel
                 _blItemChangeRunning = true;
 
                 var ProjInfo = AppGlobals.TD.ProjInfo;
-                var IDList = AppGlobals.TD.IDList;
+                var idList = AppGlobals.TD.IDList;
 
                 var todo = new ToDoItem(Item, OnDemand: true);
                 UserProperty objProperty_ToDoID = ((dynamic)Item).UserProperties.Find("ToDoID");
@@ -295,8 +295,8 @@ namespace ToDoModel
                                         if (todo.get_Context() != "@PROJECTS")
                                         {
                                             strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                            todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo + "00");
-                                            IDList.Save();
+                                            todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
+                                            idList.Serialize();
                                             todo.SplitID();
                                             todo.EC2 = true;
                                         }
@@ -324,8 +324,8 @@ namespace ToDoModel
                             {
                                 strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                 todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                                todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo + "00");
-                                IDList.Save();
+                                todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
+                                idList.Serialize();
                                 todo.SplitID();
                             }
 
@@ -344,9 +344,9 @@ namespace ToDoModel
                             {
                                 strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                 // Add the next ToDoID available in that branch
-                                todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo + "00");
+                                todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
                                 todo.TagProgram = ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                                IDList.Save();
+                                idList.Serialize();
                                 todo.SplitID();
                                 todo.EC2 = true;
                             }
@@ -462,15 +462,15 @@ namespace ToDoModel
                     {
                         string strProjectToDo = ProjInfo.Find_ByProjectName(todo.get_Project()).First().ProjectID;
                         // Add the next ToDoID available in that branch
-                        todo.ToDoID = IDList.GetNextAvailableToDoID(strProjectToDo + "00");
+                        todo.ToDoID = IDList.GetNextToDoID(strProjectToDo + "00");
                         todo.TagProgram = ProjInfo.Find_ByProjectName(todo.get_Project()).First().ProgramName;
-                        IDList.Save();
+                        IDList.Serialize();
                         todo.SplitID();
                     }
                 }
                 else
                 {
-                    todo.ToDoID = IDList.GetMaxToDoID();
+                    todo.ToDoID = IDList.GetNextToDoID();
                 }
             }
             todo.VisibleTreeState = 63;
