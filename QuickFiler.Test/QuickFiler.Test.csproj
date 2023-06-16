@@ -55,7 +55,7 @@
       <HintPath>..\packages\Castle.Core.5.1.1\lib\net462\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.2.2.10\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
@@ -79,6 +79,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,6 +89,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AcceleratorParser_Test.cs" />
     <Compile Include="QfcViewer_Test.cs" />
+    <Compile Include="SetupAssemblyInitializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -61,7 +61,7 @@
             this.L1v_TableLayout.RowCount = 2;
             this.L1v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 108F));
-            this.L1v_TableLayout.Size = new System.Drawing.Size(2172, 442);
+            this.L1v_TableLayout.Size = new System.Drawing.Size(2172, 874);
             this.L1v_TableLayout.TabIndex = 0;
             // 
             // L1v1L2h_TableLayout
@@ -81,7 +81,7 @@
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h5_SpnEmailPerLoad, 5, 0);
             this.L1v1L2h_TableLayout.Controls.Add(this.DarkMode, 6, 0);
             this.L1v1L2h_TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h_TableLayout.Location = new System.Drawing.Point(6, 340);
+            this.L1v1L2h_TableLayout.Location = new System.Drawing.Point(6, 772);
             this.L1v1L2h_TableLayout.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h_TableLayout.Name = "L1v1L2h_TableLayout";
             this.L1v1L2h_TableLayout.RowCount = 1;
@@ -169,7 +169,7 @@
             this.L1v0L2_PanelMain.Location = new System.Drawing.Point(6, 6);
             this.L1v0L2_PanelMain.Margin = new System.Windows.Forms.Padding(6);
             this.L1v0L2_PanelMain.Name = "L1v0L2_PanelMain";
-            this.L1v0L2_PanelMain.Size = new System.Drawing.Size(2160, 322);
+            this.L1v0L2_PanelMain.Size = new System.Drawing.Size(2160, 754);
             this.L1v0L2_PanelMain.TabIndex = 1;
             // 
             // L1v0L2L3v_TableLayout
@@ -186,7 +186,7 @@
             this.L1v0L2L3v_TableLayout.RowCount = 2;
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 221F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(2126, 323);
+            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(2160, 323);
             this.L1v0L2L3v_TableLayout.TabIndex = 0;
             // 
             // QfcItemViewerTemplate
@@ -199,15 +199,16 @@
             this.QfcItemViewerTemplate.Margin = new System.Windows.Forms.Padding(6);
             this.QfcItemViewerTemplate.MinimumSize = new System.Drawing.Size(1862, 183);
             this.QfcItemViewerTemplate.Name = "QfcItemViewerTemplate";
-            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(2114, 209);
+            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(2148, 209);
             this.QfcItemViewerTemplate.TabIndex = 0;
             // 
             // QfcFormViewer
             // 
+            var danSize = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(2172, 442);
+            this.ClientSize = new System.Drawing.Size(2172, 874);
             this.Controls.Add(this.L1v_TableLayout);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "QfcFormViewer";

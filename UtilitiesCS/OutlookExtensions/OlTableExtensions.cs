@@ -162,7 +162,7 @@ namespace UtilitiesCS
                     i++;
                     Outlook.Row row = table.GetNextRow();
                     var storeID = row.BinaryToString(storeIndex + 1);
-                    object[] values = row.GetValues();
+                    object[] values = (object[])row.GetValues();
                     //values[columnDictionary["Store"]] = storeID;
                     for (int j = 0; j < columnCount; j++)
                     {
@@ -171,7 +171,7 @@ namespace UtilitiesCS
                     }
                 }
             }
-            else { data = table.GetArray(rowCount); }
+            else { data = (object[,])table.GetArray(rowCount); }
             return (data, columnDictionary);
         }
 
@@ -256,7 +256,7 @@ namespace UtilitiesCS
                 table.EnumerateColumnHeaders(headerStyles, columnDivider, rowBookends),
                 lineDivider
             };
-            object[,] array = table.GetArray(table.GetRowCount());
+            object[,] array = (object[,])table.GetArray(table.GetRowCount());
             string[,] stringArray = array.ToStringArray();
 
             for (int i = 0; i < stringArray.GetLength(0); i++)

@@ -63,7 +63,7 @@ namespace ToDoModel
 
                 try
                 {
-                    int prop_tmp_int = OlPA.GetProperty(PR_LAST_VERB_EXECUTED);
+                    int prop_tmp_int = (int)OlPA.GetProperty(PR_LAST_VERB_EXECUTED);
                     lngLastVerbExec = prop_tmp_int != 0 ? prop_tmp_int : 0;
                 }
                 catch
@@ -128,7 +128,7 @@ namespace ToDoModel
                 try
                 {
                     var OlPA = OlMail.Sender.PropertyAccessor;
-                    string senderAddress = OlPA.GetProperty(PR_SMTP_ADDRESS);
+                    string senderAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
                     return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(senderAddress.Split('@')[0].Replace(".", " "));
                 }
                 catch
@@ -152,7 +152,7 @@ namespace ToDoModel
                 var OlPA = OlMail.Sender.PropertyAccessor;
                 try
                 {
-                    senderAddress =OlPA.GetProperty(PR_SMTP_ADDRESS);
+                    senderAddress =(string)OlPA.GetProperty(PR_SMTP_ADDRESS);
                 }
                 catch
                 {
@@ -197,7 +197,7 @@ namespace ToDoModel
         public static string GetTriage(MailItem OlMail)
         {
             var OlProperty = OlMail.UserProperties.Find("Triage");
-            return OlProperty is null ? "" : OlProperty.Value;
+            return OlProperty is null ? "" : (string)OlProperty.Value;
         }
 
         public static (string recipientsTo, string recipientsCC) GetRecipients(MailItem OlMail)
@@ -239,7 +239,7 @@ namespace ToDoModel
             string StrSMTPAddress;
             try
             {
-                StrSMTPAddress = OlPA.GetProperty(PR_SMTP_ADDRESS);
+                StrSMTPAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
             }
             catch
             {

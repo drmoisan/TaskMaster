@@ -17,9 +17,13 @@ namespace QuickFiler.Test
         private QfcItemViewer iv;
         private Mock<IQfcFormController> formController;
 
+        
+
         [TestInitialize] public void Init() 
         {
             qf = new QfcFormViewer();
+            qf.ShowDialog();
+            qf.Refresh();
             iv = new QfcItemViewer();
             formController = new Mock<IQfcFormController>();
         }
@@ -59,7 +63,7 @@ namespace QuickFiler.Test
         [TestMethod]
         public void TestToggleTips() 
         {
-            qf.Show();
+            //qf.Show();
             qf.Refresh();
 
             IList<Label> tipsLabels = qf.QfcItemViewerTemplate.TipsLabels;

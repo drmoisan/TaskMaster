@@ -52,7 +52,7 @@ namespace UtilitiesCS
                 { Details.Type, typeof(MailItem).ToString() },
                 { Details.Subject, OlMail.Subject },
                 { Details.Date, OlMail.SentOn.ToString("MM-dd-yyyy h:mm tt") },
-                { Details.Folderpath, OlMail.Parent.Folderpath}
+                { Details.Folderpath, ((MAPIFolder)OlMail.Parent).FolderPath}
             };
             //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
         }
@@ -75,7 +75,7 @@ namespace UtilitiesCS
                 { Details.Type, typeof(AppointmentItem).ToString() },
                 { Details.Subject, item.Subject },
                 { Details.Date, item.Start.ToString("MM-dd-yyyy h:mm tt") },
-                { Details.Folderpath, item.Parent.Folderpath}
+                { Details.Folderpath, ((MAPIFolder) item.Parent).FolderPath}
             };
             //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
         }
@@ -87,7 +87,7 @@ namespace UtilitiesCS
                 { Details.Type, typeof(MeetingItem).ToString() },
                 { Details.Subject, item.Subject },
                 { Details.Date, item.SentOn.ToString("MM-dd-yyyy h:mm tt") },
-                { Details.Folderpath, item.Parent.Folderpath}
+                { Details.Folderpath, ((MAPIFolder) item.Parent).FolderPath}
             };
             //return $"Type: {item.GetType()} Subject: {item.Subject} SentOn: {item.SentOn.ToString("MM-dd-yyyy h:mm t")}";
         }
@@ -100,7 +100,7 @@ namespace UtilitiesCS
                 { Details.Type, typeof(TaskRequestItem).ToString() },
                 { Details.Subject, item.Subject },
                 { Details.Date, item.CreationTime.ToString("MM-dd-yyyy h:mm tt") },
-                { Details.Folderpath, item.Parent.Folderpath}
+                { Details.Folderpath, ((MAPIFolder) item.Parent).FolderPath}
             };
             //AppointmentItem, MeetingItem, TaskRequestItem, TaskRequestUpdateItem
         }
@@ -112,7 +112,7 @@ namespace UtilitiesCS
                 { Details.Type, typeof(TaskRequestUpdateItem).ToString() },
                 { Details.Subject, item.Subject },
                 { Details.Date, item.LastModificationTime.ToString("MM-dd-yyyy h:mm tt") },
-                { Details.Folderpath, item.Parent.Folderpath}
+                { Details.Folderpath, ((MAPIFolder) item.Parent).FolderPath}
             };
             //AppointmentItem, MeetingItem, TaskRequestItem, TaskRequestUpdateItem
         }

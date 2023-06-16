@@ -23,18 +23,18 @@ namespace TaskMaster
             {
                 DebugTextWriter tw = new DebugTextWriter();
                 Console.SetOut(tw);
-                OlNS = _globals.Ol.NamespaceMAPI;
+                //OlNS = _globals.Ol.NamespaceMAPI;
                 //OlToDoItems = _globals.Ol.ToDoFolder.Items;
                 //OlInboxItems = _globals.Ol.Inbox.Items;
                 //OlReminders = _globals.Ol.OlReminders;
-                ProjInfo = (ProjectInfo)_globals.TD.ProjInfo;
-                DictPPL = _globals.TD.DictPPL;
-                IDList = _globals.TD.IDList;
-                EmailRoot = _globals.Ol.EmailRootPath;
+                //ProjInfo = (ProjectInfo)_globals.TD.ProjInfo;
+                //DictPPL = _globals.TD.DictPPL;
+                //IDList = _globals.TD.IDList;
+                //EmailRoot = _globals.Ol.EmailRootPath;
             }
 
             _ribbonController.SetGlobals(_globals);
-            Events_Hook();
+            //Events_Hook();
         }
 
         private ApplicationGlobals _globals;

@@ -231,7 +231,7 @@ namespace QuickFiler.Controllers
             table.Columns.Add(OlTableExtensions.SchemaTriage);
 
             string[] columnHeaders = table.GetColumnHeaders();
-            object[,] data = table.GetArray(table.GetRowCount());
+            object[,] data = (object[,])table.GetArray(table.GetRowCount());
             return (columnHeaders, data);
         }
 
@@ -243,7 +243,7 @@ namespace QuickFiler.Controllers
             table.Columns.Add(OlTableExtensions.SchemaTriage);
 
             string[] columnHeaders = table.GetColumnHeaders();
-            object[,] data = table.GetArray(table.GetRowCount());
+            object[,] data = (object[,])table.GetArray(table.GetRowCount());
             for (int i = 0; i < columnHeaders.Length; i++)
             {
                 var header = columnHeaders[i];

@@ -250,16 +250,17 @@ namespace ToDoModel
                 }
                 else
                 {
-                    intVarCt = varFldrs.Length -1;
+                    string[] strFolders = (string[])varFldrs;
+                    intVarCt = strFolders.Length -1;
                     if (intVarCt == 0)
                     {
-                        if (varFldrs[0] = "Error")
+                        if (strFolders[0] == "Error")
                         {
                             Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
                         }
                         else
                         {
-                            strTmp = varFldrs[0];
+                            strTmp = strFolders[0];
                             Suggestions.ADD_END(strTmp);
                         }
                     }
@@ -268,7 +269,7 @@ namespace ToDoModel
                         var loopTo = intVarCt;
                         for (i = 0; i <= loopTo; i++)
                         {
-                            strTmp = varFldrs[i];
+                            strTmp = strFolders[i];
                             Suggestions.ADD_END(strTmp);
                         }
                     }

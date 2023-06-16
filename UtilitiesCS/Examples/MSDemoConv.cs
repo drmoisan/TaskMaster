@@ -44,7 +44,7 @@ namespace UtilitiesCS.Examples
                         while (!table.EndOfTable)
                         {
                             Outlook.Row nextRow = table.GetNextRow();
-                            string subject = nextRow["Subject"];
+                            string subject = (string)nextRow["Subject"];
                             string modified = nextRow["LastModificationTime"].ToString();
                             Debug.WriteLine($"{subject} Modified: {modified}");
                         }

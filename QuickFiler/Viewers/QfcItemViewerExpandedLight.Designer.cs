@@ -43,6 +43,10 @@
             this.lblSubject = new System.Windows.Forms.Label();
             this.LblPos = new System.Windows.Forms.Label();
             this.LblAcOpen = new System.Windows.Forms.Label();
+            this.topicThread = new BrightIdeasSoftware.FastObjectListView();
+            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.time = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.L1h1L2v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h1L2v1h = new System.Windows.Forms.TableLayoutPanel();
             this.LblAcSearch = new System.Windows.Forms.Label();
@@ -69,10 +73,6 @@
             this.CbxConversation = new System.Windows.Forms.CheckBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
             this.web = new System.Windows.Forms.WebBrowser();
-            this.topicThread = new BrightIdeasSoftware.FastObjectListView();
-            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.time = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.L0v.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1h)).BeginInit();
             this.L1h.Panel1.SuspendLayout();
@@ -81,6 +81,7 @@
             this.L1h0L2hv.SuspendLayout();
             this.L1h0L2hv1L3h.SuspendLayout();
             this.L1h0L2hv2L3h.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.topicThread)).BeginInit();
             this.L1h1L2v.SuspendLayout();
             this.L1h1L2v1h.SuspendLayout();
             this.L1h1L2v1h5Panel.SuspendLayout();
@@ -88,7 +89,6 @@
             this.L1h1L2v1h3Panel.SuspendLayout();
             this.L1h1L2v2h.SuspendLayout();
             this.L1h1L2v3h.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.topicThread)).BeginInit();
             this.SuspendLayout();
             // 
             // L0v
@@ -319,6 +319,40 @@
             this.LblAcOpen.Size = new System.Drawing.Size(46, 41);
             this.LblAcOpen.TabIndex = 6;
             this.LblAcOpen.Text = "O";
+            // 
+            // topicThread
+            // 
+            this.topicThread.AllColumns.Add(this.sender);
+            this.topicThread.AllColumns.Add(this.time);
+            this.topicThread.AllColumns.Add(this.infolder);
+            this.topicThread.CellEditUseWholeCell = false;
+            this.topicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.sender,
+            this.time,
+            this.infolder});
+            this.topicThread.Cursor = System.Windows.Forms.Cursors.Default;
+            this.topicThread.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.topicThread.HideSelection = false;
+            this.topicThread.Location = new System.Drawing.Point(103, 91);
+            this.topicThread.Name = "topicThread";
+            this.topicThread.ShowGroups = false;
+            this.topicThread.Size = new System.Drawing.Size(940, 156);
+            this.topicThread.TabIndex = 7;
+            this.topicThread.UseCompatibleStateImageBehavior = false;
+            this.topicThread.View = System.Windows.Forms.View.Details;
+            this.topicThread.VirtualMode = true;
+            // 
+            // sender
+            // 
+            this.sender.Text = "From";
+            // 
+            // time
+            // 
+            this.time.Text = "Received";
+            // 
+            // infolder
+            // 
+            this.infolder.Text = "In Folder";
             // 
             // L1h1L2v
             // 
@@ -695,40 +729,6 @@
             this.web.Size = new System.Drawing.Size(1862, 738);
             this.web.TabIndex = 3;
             // 
-            // topicThread
-            // 
-            this.topicThread.AllColumns.Add(this.sender);
-            this.topicThread.AllColumns.Add(this.time);
-            this.topicThread.AllColumns.Add(this.infolder);
-            this.topicThread.CellEditUseWholeCell = false;
-            this.topicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.sender,
-            this.time,
-            this.infolder});
-            this.topicThread.Cursor = System.Windows.Forms.Cursors.Default;
-            this.topicThread.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.topicThread.HideSelection = false;
-            this.topicThread.Location = new System.Drawing.Point(103, 91);
-            this.topicThread.Name = "topicThread";
-            this.topicThread.ShowGroups = false;
-            this.topicThread.Size = new System.Drawing.Size(940, 156);
-            this.topicThread.TabIndex = 7;
-            this.topicThread.UseCompatibleStateImageBehavior = false;
-            this.topicThread.View = System.Windows.Forms.View.Details;
-            this.topicThread.VirtualMode = true;
-            // 
-            // sender
-            // 
-            this.sender.Text = "From";
-            // 
-            // time
-            // 
-            this.time.Text = "Received";
-            // 
-            // infolder
-            // 
-            this.infolder.Text = "In Folder";
-            // 
             // QfcItemViewerExpandedLight
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -737,7 +737,7 @@
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.L0v);
             this.Margin = new System.Windows.Forms.Padding(6);
-            this.MinimumSize = new System.Drawing.Size(1862, 549);
+            this.MinimumSize = new System.Drawing.Size(1868, 994);
             this.Name = "QfcItemViewerExpandedLight";
             this.Size = new System.Drawing.Size(1868, 994);
             this.L0v.ResumeLayout(false);
@@ -751,6 +751,7 @@
             this.L1h0L2hv1L3h.PerformLayout();
             this.L1h0L2hv2L3h.ResumeLayout(false);
             this.L1h0L2hv2L3h.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.topicThread)).EndInit();
             this.L1h1L2v.ResumeLayout(false);
             this.L1h1L2v1h.ResumeLayout(false);
             this.L1h1L2v1h.PerformLayout();
@@ -764,7 +765,6 @@
             this.L1h1L2v2h.PerformLayout();
             this.L1h1L2v3h.ResumeLayout(false);
             this.L1h1L2v3h.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.topicThread)).EndInit();
             this.ResumeLayout(false);
 
         }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
 using Windows.Win32;
@@ -37,9 +38,9 @@ namespace QuickFiler.Legacy
         private bool blShowInConversations;
         #endregion
         #region Outlook View Variables
-        public Microsoft.Office.Interop.Outlook.View ObjView;
+        public Outlook.View ObjView;
         private string _objViewMem;
-        public Microsoft.Office.Interop.Outlook.View ObjViewTemp;
+        public Outlook.View ObjViewTemp;
         #endregion
         #region Resizing Variables
         // Left and Width Constants
@@ -64,7 +65,7 @@ namespace QuickFiler.Legacy
         private IApplicationGlobals _globals;
         private readonly Explorer _activeExplorer;
         private readonly IOlObjects _olObjects;
-        private readonly Microsoft.Office.Interop.Outlook.Application _olApp;
+        private readonly Outlook.Application _olApp;
         private readonly QfcFormLegacyViewer _viewer;
         private StackObjectCS<object> _movedMails;
         private Enums.InitTypeEnum _initType;
@@ -139,7 +140,7 @@ namespace QuickFiler.Legacy
             // Set conversation state variable with initial state
             BlShowInConversations = CurrentConversationState;
             if (BlShowInConversations)
-                _objViewMem = _activeExplorer.CurrentView.Name;
+                _objViewMem = ((Outlook.View)_activeExplorer.CurrentView).Name;
 
             // Suppress events while initializing form
             _blSuppressEvents = true;
@@ -801,10 +802,27 @@ namespace QuickFiler.Legacy
             }
             catch (System.Exception)
             {
-                ObjViewTemp = (Microsoft.Office.Interop.Outlook.View)_activeExplorer.CurrentView.Parent("tmpNoConversation");
+                ObjViewTemp = GetSiblingView((Outlook.View)_activeExplorer.CurrentView, 
+                                             "tmpNoConversation");
+                
                 if (ObjViewTemp is not null)
                     ObjViewTemp.Delete();
             }
+        }
+
+        public Outlook.View GetSiblingView(Outlook.View currentView, string viewName)
+        {
+            Outlook.View view = null;
+            var views = (Views)currentView.Parent;
+            foreach (Outlook.View v in views)
+            {
+                if (v.Name == viewName)
+                {
+                    view = v;
+                    break;
+                }
+            }
+            return view;
         }
 
         public void ExplConvView_ToggleOff()
@@ -812,7 +830,7 @@ namespace QuickFiler.Legacy
             if (_olApp.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations"))
             {
                 BlShowInConversations = true;
-                ObjView = (Microsoft.Office.Interop.Outlook.View)_activeExplorer.CurrentView;
+                ObjView = (Outlook.View)_activeExplorer.CurrentView;
 
                 if (ObjView.Name == "tmpNoConversation")
                 {
@@ -828,7 +846,8 @@ namespace QuickFiler.Legacy
                 if (_objViewMem == "tmpNoConversation")
                     _objViewMem = _globals.Ol.View_Wide;
 
-                ObjViewTemp = (Microsoft.Office.Interop.Outlook.View)ObjView.Parent("tmpNoConversation");
+                //ObjViewTemp = ObjView.Parent("tmpNoConversation");
+                ObjViewTemp = GetSiblingView(ObjView,"tmpNoConversation");
 
                 if (ObjViewTemp is null)
                 {
@@ -891,7 +910,8 @@ namespace QuickFiler.Legacy
 
         private void NavigateToOutlookFolder(MailItem olMail)
         {
-            if (_globals.Ol.App.ActiveExplorer().CurrentFolder.FolderPath != olMail.Parent.FolderPath)
+            if (_globals.Ol.App.ActiveExplorer().CurrentFolder.FolderPath != 
+                ((MAPIFolder)olMail.Parent).FolderPath)
             {
                 ExplConvView_ReturnState();
                 _globals.Ol.App.ActiveExplorer().CurrentFolder = (MAPIFolder)olMail.Parent;
@@ -942,7 +962,7 @@ namespace QuickFiler.Legacy
             durationMinutesText = (Duration / 60d).ToString("##0.00");
 
             OlEmailCalendar = Calendar.GetCalendar("Email Time", _olApp.Session);
-            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add(new AppointmentItem());
+            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
             {
                 OlAppointment.Subject = "Quick Filed " + _legacy.EmailsLoaded as string + " emails";
                 OlAppointment.Start = OlStartTime;

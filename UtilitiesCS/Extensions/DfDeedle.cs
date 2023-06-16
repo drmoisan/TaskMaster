@@ -21,24 +21,12 @@ namespace UtilitiesCS
             table.Columns.Add("SentOn");
             table.Columns.Add(OlTableExtensions.SchemaConversationTopic);
             table.Columns.Add(OlTableExtensions .SchemaTriage);
-            //table.Columns.Add(ConvHelper.SchemaMessageStore);
             table.Columns.Remove("Subject");
             table.Columns.Remove("CreationTime");
             table.Columns.Remove("LastModificationTime");
 
             (object[,] data, Dictionary<string, int> columnInfo) = table.ExtractData();
-            //string[] columnHeaders = table.GetColumnHeaders();
-            //var idxEntryID = columnHeaders.FindIndex(x => x == "EntryID");
-            //var idxMessageClass = columnHeaders.FindIndex(x => x == "MessageClass");
-            //var idxSentOn = columnHeaders.FindIndex(x => x == "SentOn");
-            //var idxConv = columnHeaders.FindIndex(x => x == OlTableExtensions.SchemaConversationTopic);
-            //var idxTriage = columnHeaders.FindIndex(x => x == OlTableExtensions.SchemaTriage);
-            ////var idxStore = columnHeaders.FindIndex(x => x == "Store");
-
-            //object[,] data = table.GetArray(table.GetRowCount());
-            ////var df = Frame.FromArray2D(data);
-            ////df.Print();
-            ////var cols = Enumerable.Range(0, columnHeaders.Length).Select(i => data.SliceColumn(i).ToArray()).ToArray();
+            
             var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
             {
                 DateTime sentOn;
@@ -55,7 +43,6 @@ namespace UtilitiesCS
             });
 
             var df = Frame.FromRecords(records);
-            //df.Print();
             return df;
         }
 

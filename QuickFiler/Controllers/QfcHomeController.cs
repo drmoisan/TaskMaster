@@ -126,7 +126,7 @@ namespace QuickFiler.Controllers
             durationMinutesText = (Duration / 60d).ToString("##0.00");
 
             OlEmailCalendar = Calendar.GetCalendar("Email Time", _globals.Ol.App.Session);
-            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add(new AppointmentItem());
+            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
             {
                 OlAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
                 OlAppointment.Start = OlStartTime;

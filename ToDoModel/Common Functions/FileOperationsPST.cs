@@ -156,7 +156,7 @@ namespace ToDoModel
                         // Check to see whether there is an existing ID
                         if (objProperty_ToDoID is not null)
                         {
-                            string strToDoID = objProperty_ToDoID.Value;
+                            string strToDoID = (string)objProperty_ToDoID.Value;
 
                             // Don't autocode branches that existed to another project previously
                             if (strToDoID.Length != 0 & strToDoID.Length <= 4)

@@ -375,7 +375,7 @@ namespace ToDoModel
         private void AddAnythingInAutoFileField(MailItem OlMail, IApplicationGlobals _globals)
         {
             // TODO: Determine if this property still exists
-            var objProperty = OlMail.UserProperties.Find("AutoFile");
+            dynamic objProperty = OlMail.UserProperties.Find("AutoFile");
             if (objProperty is not null)
             {
                 Add(objProperty.Value, (long)Math.Round(Math.Pow(4d, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight));

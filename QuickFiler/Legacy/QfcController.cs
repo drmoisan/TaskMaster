@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
@@ -831,7 +832,7 @@ namespace QuickFiler.Legacy
                 Attchments = (FolderCbo.SelectedItem as string != "Trash to Delete") ? false : _chbxSaveAttach.Checked;
 
                 blDoMove = true;
-                if (_fldrOriginal.FolderPath != Mail.Parent.FolderPath)
+                if (_fldrOriginal.FolderPath != ((MAPIFolder)Mail.Parent).FolderPath)
                     blDoMove = false;
 
                 if (blDoMove)
@@ -1108,7 +1109,7 @@ namespace QuickFiler.Legacy
                 _activeExplorer.NavigationPane.CurrentModule = _activeExplorer
                     .NavigationPane.Modules.GetNavigationModule(OlNavigationModuleType.olModuleMail);
             }
-            if (_activeExplorer.CurrentView.Name != "tmpNoConversation")
+            if (((Outlook.View)_activeExplorer.CurrentView).Name != "tmpNoConversation")
             {
                 _activeExplorer.CurrentView = "tmpNoConversation";
             }

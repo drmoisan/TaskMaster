@@ -73,10 +73,10 @@
             this.ControlGroup3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ControlGroup3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ControlGroup3.Location = new System.Drawing.Point(32, 243);
-            this.ControlGroup3.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ControlGroup3.Margin = new System.Windows.Forms.Padding(12);
             this.ControlGroup3.MinimumSize = new System.Drawing.Size(3722, 350);
             this.ControlGroup3.Name = "ControlGroup3";
-            this.ControlGroup3.Padding = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ControlGroup3.Padding = new System.Windows.Forms.Padding(6);
             this.ControlGroup3.Size = new System.Drawing.Size(3722, 350);
             this.ControlGroup3.TabIndex = 2;
             // 
@@ -87,10 +87,10 @@
             this.ControlGroup1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ControlGroup1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ControlGroup1.Location = new System.Drawing.Point(32, 31);
-            this.ControlGroup1.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ControlGroup1.Margin = new System.Windows.Forms.Padding(12);
             this.ControlGroup1.MinimumSize = new System.Drawing.Size(3722, 350);
             this.ControlGroup1.Name = "ControlGroup1";
-            this.ControlGroup1.Padding = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ControlGroup1.Padding = new System.Windows.Forms.Padding(6);
             this.ControlGroup1.Size = new System.Drawing.Size(3722, 350);
             this.ControlGroup1.TabIndex = 0;
             // 
@@ -101,19 +101,19 @@
             this.ControlGroup2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ControlGroup2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ControlGroup2.Location = new System.Drawing.Point(32, 455);
-            this.ControlGroup2.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ControlGroup2.Margin = new System.Windows.Forms.Padding(12);
             this.ControlGroup2.MinimumSize = new System.Drawing.Size(3722, 350);
             this.ControlGroup2.Name = "ControlGroup2";
-            this.ControlGroup2.Padding = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ControlGroup2.Padding = new System.Windows.Forms.Padding(6);
             this.ControlGroup2.Size = new System.Drawing.Size(3722, 350);
             this.ControlGroup2.TabIndex = 1;
             // 
             // Button2
             // 
             this.Button2.Location = new System.Drawing.Point(1194, 6);
-            this.Button2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Button2.Margin = new System.Windows.Forms.Padding(6);
             this.Button2.Name = "Button2";
-            this.Button2.Padding = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.Button2.Padding = new System.Windows.Forms.Padding(12);
             this.Button2.Size = new System.Drawing.Size(182, 67);
             this.Button2.TabIndex = 3;
             this.Button2.Text = "Toggle";
@@ -123,7 +123,7 @@
             // Button1
             // 
             this.Button1.Location = new System.Drawing.Point(994, 6);
-            this.Button1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Button1.Margin = new System.Windows.Forms.Padding(6);
             this.Button1.Name = "Button1";
             this.Button1.Size = new System.Drawing.Size(182, 67);
             this.Button1.TabIndex = 2;
@@ -138,7 +138,7 @@
             this.MainPanel.Controls.Add(this.TableLayoutPanel1);
             this.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainPanel.Location = new System.Drawing.Point(6, 6);
-            this.MainPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.MainPanel.Margin = new System.Windows.Forms.Padding(6);
             this.MainPanel.Name = "MainPanel";
             this.MainPanel.Size = new System.Drawing.Size(2364, 584);
             this.MainPanel.TabIndex = 1;
@@ -152,7 +152,7 @@
             this.MainLayoutPanel.Controls.Add(this.TableLayoutPanel2, 0, 1);
             this.MainLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            this.MainLayoutPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.MainLayoutPanel.Margin = new System.Windows.Forms.Padding(6);
             this.MainLayoutPanel.Name = "MainLayoutPanel";
             this.MainLayoutPanel.RowCount = 2;
             this.MainLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -183,9 +183,9 @@
             // 
             this.ButtonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonAdd.Location = new System.Drawing.Point(760, 6);
-            this.ButtonAdd.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ButtonAdd.Margin = new System.Windows.Forms.Padding(6);
             this.ButtonAdd.Name = "ButtonAdd";
-            this.ButtonAdd.Padding = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ButtonAdd.Padding = new System.Windows.Forms.Padding(12);
             this.ButtonAdd.Size = new System.Drawing.Size(222, 94);
             this.ButtonAdd.TabIndex = 4;
             this.ButtonAdd.Text = "Add Control Group";
@@ -198,7 +198,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2376, 719);
             this.Controls.Add(this.MainLayoutPanel);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "Form1";
             this.Text = "Form1";
             this.TableLayoutPanel1.ResumeLayout(false);

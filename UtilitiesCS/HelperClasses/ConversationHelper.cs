@@ -172,7 +172,7 @@ namespace UtilitiesCS
             }
             string[] columnHeaders = table.GetColumnHeaders();
             
-            object[,] data = table.GetArray(table.GetRowCount());
+            object[,] data = (object[,])table.GetArray(table.GetRowCount());
 
             //DataFrame df = DataFrame.FromColumns()
             //return new DataFrame();

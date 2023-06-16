@@ -88,7 +88,7 @@ namespace ToDoModel
                 {
                     oRow = _table.GetNextRow();
                     // Use EntryID and StoreID to open the item.
-                    objItem = _olApp.Session.GetItemFromID(oRow["EntryID"]);
+                    objItem = _olApp.Session.GetItemFromID((string)oRow["EntryID"]);
                     if (MailOnly)
                     {
                         AddEmailToList(OnlySameFolder, objItem, ref listEmail);
@@ -138,7 +138,7 @@ namespace ToDoModel
                 MailItem mailItem = (MailItem)objItem;
                 if (OnlySameFolder)
                 {
-                    if (mailItem.Parent.Name == ((MailItem)_item).Parent.Name)
+                    if (((MAPIFolder)mailItem.Parent).Name == ((MAPIFolder)((MailItem)_item).Parent).Name)
                     {
                         listEmails.Add(mailItem);
                     }
@@ -163,7 +163,7 @@ namespace ToDoModel
                 {
                     oRow = _table.GetNextRow();
                     // Use EntryID and StoreID to open the item.
-                    objItem = _olApp.Session.GetItemFromID(oRow["EntryID"]);
+                    objItem = _olApp.Session.GetItemFromID((string)oRow["EntryID"]);
                     if (OnlySameFolder)
                     {
                         if (((dynamic)objItem).Parent.Name == ((dynamic)_item).Parent.Name)

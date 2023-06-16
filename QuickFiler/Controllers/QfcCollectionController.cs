@@ -82,36 +82,43 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template)
+        public void LoadItemGroupsAndViewers(IList<MailItem> items, RowStyle template)
         {
-            _itemTLP.SuspendLayout();
-            _template = template;
-            TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
             int i = 0;
-            foreach (MailItem mailItem in listMailItems)
+            foreach (MailItem mailItem in items)
             {
                 ItemGroup grp = new(mailItem);
                 grp.ItemViewer = LoadItemViewer(i++, template, true);
                 _itemGroups.Add(grp);
             }
+        }
 
-            _formViewer.WindowState = FormWindowState.Maximized;
-
+        public void LoadConversationsAndFolders()
+        {
+            int i = 0;
             //foreach (var grp in _itemGroups)
             Parallel.ForEach(_itemGroups, grp =>
             {
-            grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, grp.MailItem, this);
-            Parallel.Invoke(
-                () => grp.ItemController.PopulateConversation(),
-                () => grp.ItemController.PopulateFolderCombobox(),
-                () => 
-                {
-                    if (_darkMode) { grp.ItemController.SetThemeDark(); }
-                    else { grp.ItemController.SetThemeLight(); } 
-                });
+                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, grp.MailItem, this);
+                Parallel.Invoke(
+                    () => grp.ItemController.PopulateConversation(),
+                    () => grp.ItemController.PopulateFolderCombobox(),
+                    () =>
+                    {
+                        if (_darkMode) { grp.ItemController.SetThemeDark(); }
+                        else { grp.ItemController.SetThemeLight(); }
+                    });
             });
+        }
 
-            
+        public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template)
+        {
+            _itemTLP.SuspendLayout();
+            _template = template;
+            TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
+            LoadItemGroupsAndViewers(listMailItems, template);
+            _formViewer.WindowState = FormWindowState.Maximized;
+            LoadConversationsAndFolders();
             _itemTLP.ResumeLayout();
         }
 
