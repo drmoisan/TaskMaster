@@ -1,54 +1,71 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
+using System.Collections.Specialized;
+using System.Collections;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Swordfish.NET.Collections;
+using Newtonsoft.Json;
+using System.IO;
+using System.Windows.Forms;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
+    /// <summary>
+    /// Class that implements a serializable concurrent observable dictionary
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     [Serializable()]
-    public class SerializableDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>, ISerializableDictionary<TKey, TValue>
+    public class SCODictionary<TKey, TValue>: ConcurrentObservableDictionary<TKey, TValue>, ISCODictionary<TKey, TValue>
     {
-        public SerializableDictionary() : base() { }
-        public SerializableDictionary(IEqualityComparer<TKey> comparer) : base(comparer) { }
-        public SerializableDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary) { }
-        public SerializableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer) : base(dictionary, comparer) { }
-        protected SerializableDictionary(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        #region constructors
+        public SCODictionary() : base() { }
+        public SCODictionary(IDictionary<TKey, TValue> source) : base(source) { }
+        public SCODictionary(IEqualityComparer<TKey> equalityComparer) : base(equalityComparer) { }    
+        public SCODictionary(int capactity) : base(capactity) { }
+        public SCODictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer) : base(source, equalityComparer) { }
+        public SCODictionary(int capacity, IEqualityComparer<TKey> equalityComparer) : base(capacity, equalityComparer) { }
 
-        public SerializableDictionary(string filename, string folderpath) : base() 
-        { 
-            Filename = filename; 
+        public SCODictionary(string filename,
+                             string folderpath) : base()
+        {
+            Filename = filename;
             Folderpath = folderpath;
+            Deserialize();
         }
 
-        public SerializableDictionary(IDictionary<TKey, TValue> dictionary,
-                                      string filename,
-                                      string folderpath) : base(dictionary) 
-        { 
-            Filename = filename; 
-            Folderpath = folderpath; 
+        /// <summary>
+        /// Creates a new serializable concurrent observable dictionary from an existing dictionary and filepath
+        /// </summary>
+        /// <param name="dictionary">Existing dictionary</param>
+        /// <param name="filename">Name of json file to house the SCODictionary</param>
+        /// <param name="folderpath">Location of json file</param>
+        public SCODictionary(IDictionary<TKey, TValue> dictionary,
+                             string filename,
+                             string folderpath) : base(dictionary)
+        {
+            Filename = filename;
+            Folderpath = folderpath;
+            Serialize();
         }
 
-        public SerializableDictionary(string filename,
-                                      string folderpath,
-                                      AltLoader<TKey, TValue> backupLoader,
-                                      string backupFilepath,
-                                      bool askUserOnError) : base()
+        public SCODictionary(string filename,
+                             string folderpath,
+                             ISCODictionary<TKey, TValue>.AltLoader backupLoader,
+                             string backupFilepath,
+                             bool askUserOnError) : base()
         {
             Filename = filename;
             Folderpath = folderpath;
             _backupFilepath = backupFilepath;
             Deserialize(_filepath, backupLoader, askUserOnError);
         }
+        #endregion
 
         #region Serialization
-        public delegate Dictionary<TKey, TValue> AltLoader<TKey, TValue>(string filepath);
+        
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private string _filepath = "";
@@ -130,7 +147,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             if (Filepath != "") Deserialize(Filepath, askUserOnError);
         }
 
-        public void Deserialize(string filepath, AltLoader<TKey, TValue> backupLoader, bool askUserOnError)
+        public void Deserialize(string filepath, ISCODictionary<TKey, TValue>.AltLoader backupLoader, bool askUserOnError)
         {
             if (_filepath != filepath) this.Filepath = filepath;
 
@@ -139,7 +156,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             try
             {
                 var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
-                foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
+                foreach (var kvp in innerDictionary) { this.Add(kvp.Key, kvp.Value); }
             }
             catch (FileNotFoundException e)
             {
@@ -223,7 +240,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             try
             {
                 var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
-                foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
+                foreach (var kvp in innerDictionary) { this.Add(kvp.Key, kvp.Value); }
             }
             catch (FileNotFoundException)
             {
@@ -252,7 +269,13 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
+        Dictionary<TKey, TValue> ISCODictionary<TKey, TValue>.ToDictionary()
+        {
+            return new Dictionary<TKey, TValue>(this);
+        }
+
         #endregion
+
 
     }
 }

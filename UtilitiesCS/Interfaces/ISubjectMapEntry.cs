@@ -61,6 +61,11 @@ namespace UtilitiesCS
         void SetCommonWords(IList<string> commonWords);
 
         /// <summary>
+        /// Reference to encoder to be used to encode the folder name and subject
+        /// </summary>
+        public ISubjectMapEncoder Encoder { get;  set; }
+
+        /// <summary>
         /// Tokenize Foldername and Subject and Encode using the supplied 
         /// tokenizer regex pattern and encoder
         /// </summary>
@@ -87,7 +92,7 @@ namespace UtilitiesCS
         /// <summary>
         /// Encode Foldername and Subject. Encoder must have already been initialized
         /// </summary>
-        public void Encode();
+        //public void Encode();
 
         /// <summary>
         /// Determine if the class members are ready to be encoded. 

@@ -95,8 +95,14 @@ namespace QuickFiler.Controllers
 
         public void LoadConversationsAndFolders()
         {
+            bool parallel = true;
+            if (parallel) { LoadParallelCF(); }
+            else { LoadSequentialCF(); }
+        }
+
+        internal void LoadParallelCF()
+        {
             int i = 0;
-            //foreach (var grp in _itemGroups)
             Parallel.ForEach(_itemGroups, grp =>
             {
                 grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, grp.MailItem, this);
@@ -109,6 +115,20 @@ namespace QuickFiler.Controllers
                         else { grp.ItemController.SetThemeLight(); }
                     });
             });
+        }
+        
+        internal void LoadSequentialCF()
+        {
+            int i = 0;
+            foreach (var grp in _itemGroups)
+            {
+                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, grp.MailItem, this);
+                grp.ItemController.PopulateConversation();
+                grp.ItemController.PopulateFolderCombobox();
+                if (_darkMode) { grp.ItemController.SetThemeDark(); }
+                else { grp.ItemController.SetThemeLight(); }
+                i++;
+            }
         }
 
         public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template)

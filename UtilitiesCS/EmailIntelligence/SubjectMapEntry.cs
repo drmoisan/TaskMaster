@@ -2,6 +2,7 @@
 using UtilitiesCS.EmailIntelligence;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace UtilitiesCS
 {
@@ -167,12 +168,54 @@ namespace UtilitiesCS
         }
         
         public int EmailSubjectCount { get => _subjectEmailCount; set => _subjectEmailCount = value; }
-        public int[] FolderEncoded { get => _folderEncoded; set => _folderEncoded = value; }
+        
         public int[] FolderWordLengths { get => _folderWordLengths; set => _folderWordLengths = value; }
-        public int[] SubjectEncoded { get => _subjectEncoded; set => _subjectEncoded = value; }
+
+        public int[] FolderEncoded 
+        {
+            get
+            {
+                // Encode folder only if it is null, we have an active encoder, and we are ready to encode
+                if (_folderEncoded is null && _encoder is not null && ReadyToEncode(_folderTokens, false))
+                {
+                    _folderEncoded = _encoder.Encode(_folderTokens);
+                }
+                return _folderEncoded;
+            }
+            set
+            {
+                if (value is null)
+                {
+                    Debug.WriteLine("SubjectEncoded set to null");
+                }
+                _folderEncoded = value;
+            }
+        }
+
+        public int[] SubjectEncoded 
+        {
+            get 
+            { 
+                // Encode subject only if it is null, we have an active encoder, and we are ready to encode
+                if (_subjectEncoded is null && _encoder is not null && ReadyToEncode(_subjectTokens, false))
+                {
+                    _subjectEncoded = _encoder.Encode(_subjectTokens);
+                }
+                return _subjectEncoded; 
+            }
+            set 
+            { 
+                if (value is null) 
+                { 
+                    Debug.WriteLine("SubjectEncoded set to null");
+                }
+                _subjectEncoded = value; 
+            } 
+        }
+        
         public int[] SubjectWordLengths { get => _subjectWordLengths; set => _subjectWordLengths = value; }
         public int Score { get => _score; set => _score = value; }
-        public ISubjectMapEncoder Encoder { set => _encoder = value; }
+        public ISubjectMapEncoder Encoder { get => _encoder; set => _encoder = value; }
 
         public bool ReadyToEncode(ISubjectMapEncoder encoder)
         {
@@ -197,7 +240,8 @@ namespace UtilitiesCS
         {
             if (IsNull(_encoder, nameof(_encoder), throwEx)) { return false; }
 
-            if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0) { return false; }
+            //if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0) { return false; }
+            if (IsNull(tokens, nameof(tokens), throwEx)) { return false; }
 
             _encoder.AugmentTokenDict(tokens);
 
@@ -234,18 +278,26 @@ namespace UtilitiesCS
             else { return _folderTokens.Union(_subjectTokens).ToArray(); }
         }
 
-        public void Encode()
+        internal void Encode()
         {
             _folderEncoded = _encoder.Encode(_folderTokens);
-            if ((_subjectTokens is null) || (_subjectTokens.Length == 0)) 
-            {
-                _subjectEncoded = null;
-            }
-            else 
-            { 
-                _subjectEncoded = _encoder.Encode(_subjectTokens); 
-            }
-            
+            _subjectEncoded = _encoder.Encode(_subjectTokens);
+
+            //if (_folderTokens is null)
+            //{
+            //    if (_folderName is not null) { _folderTokens = _folderName.Tokenize(_tokenizerRegex); }
+            //    else { _folderEncoded = null; }
+            //}
+            //else if (_folderTokens.Length == 0) { _folderEncoded = new int[] { }; }
+            //else { _folderEncoded = _encoder.Encode(_folderTokens); }
+
+            //if (_subjectTokens is null)
+            //{
+            //    if (_subjectText is not null) { _subjectTokens = _subjectText.Tokenize(_tokenizerRegex); }
+            //    else { _subjectEncoded = null; }
+            //}
+            //else if (_subjectTokens.Length == 0) { _subjectEncoded = new int[] { }; }
+            //else { _subjectEncoded = _encoder.Encode(_subjectTokens); }
         }
 
         public void Encode(ISubjectMapEncoder encoder, Regex tokenizerRegex)
@@ -267,7 +319,28 @@ namespace UtilitiesCS
             {
                 return _encoder.Encode(tokens);
             }
-            else { return null; }
+            else 
+            { 
+                return null; 
+            }
+        }
+    
+        internal int[] Encode(ISubjectMapEncoder encoder, string text)
+        {
+            if (text is null) { return null; }
+            else if (_tokenizerRegex is null) { return null; }
+            else
+            {
+                string[] tokens = text.Tokenize(_tokenizerRegex);
+                if (ReadyToEncode(tokens, true))
+                {
+                    return _encoder.Encode(tokens);
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
     }
 }

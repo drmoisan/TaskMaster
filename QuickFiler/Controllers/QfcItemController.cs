@@ -446,76 +446,84 @@ namespace QuickFiler.Controllers
         }
 
         #endregion
-       
+
+        // TODO: Implement Accel_FocusToggle
         public void Accel_FocusToggle()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement Accel_Toggle
         public void Accel_Toggle()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement ApplyReadEmailFormat
         public void ApplyReadEmailFormat()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement ctrlsRemove
         public void ctrlsRemove()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement ExpandCtrls1
         public void ExpandCtrls1()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement FlagAsTask
         public void FlagAsTask()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement JumpToFolderDropDown
         public void JumpToFolderDropDown()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement JumpToSearchTextbox
         public void JumpToSearchTextbox()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement MarkItemForDeletion
         public void MarkItemForDeletion()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement ToggleConversationCheckbox
         public void ToggleConversationCheckbox()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement ToggleDeleteFlow
         public void ToggleDeleteFlow()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement ToggleSaveAttachments
         public void ToggleSaveAttachments()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Implement ToggleSaveCopyOfMail
         public void ToggleSaveCopyOfMail()
         {
             throw new NotImplementedException();
         }
 
-        
-        #region Exposed Properties
-
-        
-        #endregion
     }
 }

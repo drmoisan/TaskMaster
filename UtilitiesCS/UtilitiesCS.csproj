@@ -251,6 +251,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DfDeedle.cs" />
@@ -277,6 +278,7 @@
     <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
     <Compile Include="OutlookExtensions\OlTableExtensions.cs" />
     <Compile Include="OutlookExtensions\OlToDoTable.cs" />
+    <Compile Include="Interfaces\ISCODictionary.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
     <Compile Include="Interfaces\EnumFindBy.cs" />
@@ -320,6 +322,7 @@
     <Compile Include="OutlookExtensions\UserDefinedFields.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Interfaces\ISerializableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
     <Compile Include="To Depricate\CSVDictUtilities.cs" />
     <Compile Include="To Depricate\FileIO2.cs" />
@@ -419,6 +422,10 @@
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
       <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
       <Name>SVGControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
+      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
+      <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

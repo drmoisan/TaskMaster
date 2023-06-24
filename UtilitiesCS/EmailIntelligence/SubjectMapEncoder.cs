@@ -17,12 +17,12 @@ namespace UtilitiesCS
         {
             _filename = filename;
             _folderpath = folderpath;
-            _encoder = new SerializableDictionary<string, int>(filename, folderpath);
+            _encoder = new SCODictionary<string, int>(filename, folderpath);
         }
 
         private string _filename;
         private string _folderpath;
-        private ISerializableDictionary<string, int> _encoder;
+        private ISCODictionary<string, int> _encoder;
         private Dictionary<int, string> _decoder;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
@@ -41,13 +41,13 @@ namespace UtilitiesCS
                 return _decoder; 
             } 
         }
-        public ISerializableDictionary<string, int> Encoder
+        public ISCODictionary<string, int> Encoder
         {
             get
             {
                 if (_encoder is null)
-                    _encoder = new SerializableDictionary<string, int>(filename: _filename,
-                                                                               folderpath: _folderpath);
+                    _encoder = new SCODictionary<string, int>(filename: _filename,
+                                                              folderpath: _folderpath);
                 return _encoder;
             }
         }
@@ -64,9 +64,9 @@ namespace UtilitiesCS
                            .Select((input, index) => new { input, index })
                            .ToDictionary(x => x.input, x => x.index);
 
-            _encoder = new SerializableDictionary<string, int>(dictionary: words,
-                                                               filename: _filename,
-                                                               folderpath: _folderpath);
+            _encoder = new SCODictionary<string, int>(dictionary: words,
+                                                      filename: _filename,
+                                                      folderpath: _folderpath);
 
             _encoder.Serialize();
             _decoder = _encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary();
@@ -81,6 +81,7 @@ namespace UtilitiesCS
         public void AugmentTokenDict(string[] tokens)
         {
             bool changed = false;
+            if (tokens is null) { throw new ArgumentNullException(nameof(tokens));}
             foreach (var token in tokens)
             {
                 if (!Encoder.ContainsKey(token))

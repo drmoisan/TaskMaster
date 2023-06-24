@@ -19,7 +19,7 @@ namespace QuickFiler
         }
 
         [STAThread]
-        public static void Main()
+        public static void InitializeDPI()
         {
             if(!DpiInitialized)
             {

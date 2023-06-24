@@ -134,6 +134,8 @@
     <Compile Include="Email Utilities\cStopWatch.cs" />
     <Compile Include="Email Utilities\SmithWaterman.cs" />
     <Compile Include="Email Utilities\Suggestions.cs" />
+    <Compile Include="Email Utilities\SuggestionsLeg2.cs" />
+    <Compile Include="Email Utilities\SuggestionsLegacy.cs" />
     <Compile Include="Email Utilities\CTFIncidenceModule.cs" />
     <Compile Include="Email Utilities\CTF_Incidence.cs" />
     <Compile Include="Email Utilities\FolderSuggestionsModule.cs" />

@@ -9,9 +9,9 @@ namespace UtilitiesCS
     public interface ISubjectMapEncoder
     {
         /// <summary>
-        /// Serializable dictionary containing word tokens and integer values
+        /// Serializable concurrent observable dictionary containing word tokens and integer values
         /// </summary>
-        ISerializableDictionary<string, int> Encoder { get; }
+        ISCODictionary<string, int> Encoder { get; }
         
         /// <summary>
         /// Matches array of tokens against existing values. Integers are 

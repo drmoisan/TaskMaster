@@ -6,7 +6,6 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS;
 
 namespace TaskMaster
 {
@@ -145,7 +144,6 @@ namespace TaskMaster
                 {
                     _encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
                                                      folderpath: _parent.FS.FldrPythonStaging);
-                    _encoder.Encoder.Deserialize();
                     if (_encoder.Encoder.Count == 0) { _encoder.RebuildEncoding(SubjectMap); }
                 }
                 
@@ -159,6 +157,7 @@ namespace TaskMaster
             get
             {
                 if (_subjectMap is null)
+                {
                     _subjectMap = new SubjectMapSL(filename: _defaults.File_Subject_Map,
                                                    folderpath: _parent.FS.FldrPythonStaging,
                                                    backupLoader: SubjectMapBackupLoader,
@@ -167,8 +166,8 @@ namespace TaskMaster
                                                    askUserOnError: false,
                                                    commonWords: CommonWords);
 
-                _subjectMap.PropertyChanged += SubjectMap_PropertyChanged;
-
+                    _subjectMap.PropertyChanged += SubjectMap_PropertyChanged;
+                }
                 return _subjectMap;
             }
 

@@ -4,16 +4,57 @@ using Microsoft.Office.Interop.Outlook;
 
 
 using UtilitiesCS;
-using UtilitiesCS;
+
 
 namespace ToDoModel
 {
 
     public class FolderHandler
     {
+        public FolderHandler(IApplicationGlobals AppGlobals)
+        {
+            _globals = AppGlobals;
+            _olApp = AppGlobals.Ol.App;
+            _options = Options.NoSuggestions;
+            Suggestions = new Suggestions();
+            _folderList = new string[0];
+        }
+
+        public FolderHandler(IApplicationGlobals appGlobals, object objItem, Options options)
+        {
+            _globals = appGlobals;
+            _olApp = appGlobals.Ol.App;
+            _options = options;
+
+            Suggestions = new Suggestions();
+
+            switch(options)
+            {
+                case Options.NoSuggestions:
+                    break;
+                case Options.FromArrayOrString:
+                    InitializeFromArrayOrString(objItem);
+                    break;
+                case Options.FromField:
+                    InitializeFromEmail(objItem);
+                    break;
+                case Options.Recalculate:
+                    RecalculateSuggestions(objItem, false);
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown option value {options}");
+            }
+                        
+            _folderList = new string[1];
+            AddSuggestions();
+            AddRecents();
+        }
+
+
         private Folder _matchedFolder;
         private string _searchString;
         private bool _wildcardFlag;
+        //private string[] _folderList = new string[] { };
         private string[] _folderList;
         private Suggestions _suggestions;
         public int SaveCounter;
@@ -36,61 +77,13 @@ namespace ToDoModel
             FromField = 2,
             Recalculate = 4
         }
-
-        public FolderHandler(IApplicationGlobals AppGlobals)
-        {
-            _globals = AppGlobals;
-            _olApp = AppGlobals.Ol.App;
-            _options = Options.NoSuggestions;
-            Suggestions = new Suggestions();
-            _folderList = new string[0];
-        }
-
-        public FolderHandler(IApplicationGlobals AppGlobals, object ObjItem, Options Options)
-        {
-            _globals = AppGlobals;
-            _olApp = AppGlobals.Ol.App;
-            _options = Options;
-
-            Suggestions = new Suggestions();
-
-            if (Options == Options.FromArrayOrString)
-            {
-                InitializeFromArrayOrString(ObjItem);
-            }
-            else if (Options == Options.FromField)
-            {
-                InitializeFromEmail(ObjItem);
-            }
-            else if (Options == Options.Recalculate)
-            {
-                bool argReloadCTFStagingFiles = false;
-                RecalculateSuggestions(ObjItem, ref argReloadCTFStagingFiles);
-            }
-            else if (Options == Options.NoSuggestions)
-            {
-            }
-            else
-            {
-                throw new ArgumentException($"Unknown option value {Options}");
-            }
-
-            _folderList = new string[1];
-            AddSuggestions();
-            AddRecents();
-        }
-
+                
         private void InitializeFromEmail(object ObjItem)
         {
             var OlMail = MailResolution.TryResolveMailItem(ObjItem);
-            if (OlMail is null)
-            {
-                throw new ArgumentException("Constructor Requires the Email Object to be passed as MailItem to use this flag");
-            }
-            else
-            {
-                LoadFromFolderKeyField(false, OlMail);
-            }
+            if (OlMail is null) { throw new ArgumentException("Constructor Requires the Email Object to be passed as MailItem to use this flag"); }
+            
+            LoadFromFolderKeyField(false, OlMail);
         }
 
         private void InitializeFromArrayOrString(object Obj)
@@ -101,12 +94,12 @@ namespace ToDoModel
             }
             else if (Obj.GetType().IsArray && typeof(string).IsAssignableFrom(Obj.GetType().GetElementType()))
             {
-                Suggestions.FolderSuggestionsArray = (string[])Obj;
+                Suggestions.FromArray((string[])Obj);
             }
             else if (Obj is string)
             {
                 string tmpString = (string)Obj;
-                Suggestions.ADD_END(tmpString);
+                Suggestions.AddSuggestion(tmpString,0);
             }
             else
             {
@@ -129,31 +122,10 @@ namespace ToDoModel
             }
         }
 
-        public Suggestions Suggestions
-        {
-            get
-            {
-                return _suggestions;
-            }
-            set
-            {
-                _suggestions = value;
-            }
-        }
-
-        public bool BlUpdateSuggestions
-        {
-            get
-            {
-                return _blUpdateSuggestions;
-            }
-            set
-            {
-                _blUpdateSuggestions = value;
-            }
-        }
-
-
+        public Suggestions Suggestions { get => _suggestions; set => _suggestions = value; }
+        
+        public bool BlUpdateSuggestions { get => _blUpdateSuggestions; set => _blUpdateSuggestions = value; }
+        
         /// <summary>
         /// Function returns a list of Outlook folders that meet search criteria and appends a list of suggested folders 
         /// as well as appending a list of recently used folders
@@ -180,7 +152,7 @@ namespace ToDoModel
 
             if (ReCalcSuggestions)
             {
-                RecalculateSuggestions(objItem, ref ReloadCTFStagingFiles);
+                RecalculateSuggestions(objItem, ReloadCTFStagingFiles);
             }
             AddSuggestions();
             AddRecents();
@@ -204,7 +176,7 @@ namespace ToDoModel
             }
         }
 
-        private void RecalculateSuggestions(object ObjItem, ref bool ReloadCTFStagingFiles)
+        private void RecalculateSuggestions(object ObjItem, bool ReloadCTFStagingFiles)
         {
             var OlMail = MailResolution.TryResolveMailItem(ObjItem);
             if (OlMail is not null)
@@ -245,7 +217,7 @@ namespace ToDoModel
                     else
                     {
                         strTmp = (string)varFldrs;
-                        Suggestions.Add(strTmp, 1L);
+                        Suggestions.AddSuggestion(strTmp, 1L);
                     }
                 }
                 else
@@ -261,7 +233,7 @@ namespace ToDoModel
                         else
                         {
                             strTmp = strFolders[0];
-                            Suggestions.ADD_END(strTmp);
+                            Suggestions.AddSuggestion(strTmp, 0);
                         }
                     }
                     else
@@ -270,7 +242,7 @@ namespace ToDoModel
                         for (i = 0; i <= loopTo; i++)
                         {
                             strTmp = strFolders[i];
-                            Suggestions.ADD_END(strTmp);
+                            Suggestions.AddSuggestion(strTmp, 0);
                         }
                     }
                 }
@@ -279,16 +251,11 @@ namespace ToDoModel
 
         private void AddSuggestions()
         {
-            //if (Suggestions.Count > 0)
-            //{
-            //    if (_upBound > 0)
-            //        _upBound = _upBound + 1;
                 _upBound = _upBound + Suggestions.Count;
                 Array.Resize(ref _folderList, _upBound + 1);
                 _folderList[_upBound - Suggestions.Count] = "========= SUGGESTIONS =========";
-                for (int i = 1, loopTo = Suggestions.Count; i <= loopTo; i++)
-                    _folderList[_upBound - Suggestions.Count + i] = Suggestions.get_FolderList_ItemByIndex(i);
-            //}
+                for (int i = 0, loopTo = Suggestions.Count-1; i <= loopTo; i++)
+                    _folderList[_upBound - Suggestions.Count + i + 1] = Suggestions[i];
         }
 
         private Folders GetMatchingFolders(string Name, string strEmailFolderPath)
@@ -388,8 +355,6 @@ namespace ToDoModel
                 }
             }
         }
-
-
 
     }
 }

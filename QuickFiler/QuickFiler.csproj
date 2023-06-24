@@ -265,6 +265,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
+    <Compile Include="Helper Classes\Theme.cs" />
     <Compile Include="Interfaces\IQfcFormViewer.cs" />
     <Compile Include="Interfaces\IQfcTipsDetails.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
@@ -300,7 +301,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ThemeHelper.cs" />
+    <Compile Include="Helper Classes\ThemeHelper.cs" />
     <Compile Include="Viewers\Form1.cs">
       <SubType>Form</SubType>
     </Compile>

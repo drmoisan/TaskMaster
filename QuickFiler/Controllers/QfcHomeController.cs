@@ -14,6 +14,19 @@ namespace QuickFiler.Controllers
 {
     public class QfcHomeController : IQfcHomeController
     {
+        public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
+        {
+            QfcFormViewer.InitializeDPI();
+            _globals = AppGlobals;
+            InitAfObjects();
+            _parentCleanup = ParentCleanup;
+            _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
+            _explorerController = new QfcExplorerController();
+            _formViewer = new QfcFormViewer();
+            _keyboardHandler = new QfcKeyboardHandler();
+            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
+        }
+
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
         private QfcFormViewer _formViewer;
@@ -24,16 +37,14 @@ namespace QuickFiler.Controllers
         private IQfcKeyboardHandler _keyboardHandler;
         private cStopWatch _stopWatch;
 
-        public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
+        internal void InitAfObjects() 
         {
-            QfcFormViewer.Main();
-            _globals = AppGlobals;
-            _parentCleanup = ParentCleanup;
-            _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
-            _explorerController = new QfcExplorerController();
-            _formViewer = new QfcFormViewer();
-            _keyboardHandler = new QfcKeyboardHandler();
-            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
+            if (_globals.AF.CTFList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CTFList)}"); }
+            if (_globals.AF.RecentsList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.RecentsList)}"); }
+            if (_globals.AF.CommonWords is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CommonWords)}"); }
+            if (_globals.AF.SubjectMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.SubjectMap)}"); }
+            if (_globals.AF.Encoder is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.Encoder)}"); }
+            _globals.AF.SubjectMap.Where(x => x.Encoder is null).ForEach(x => x.Encoder = _globals.AF.Encoder);
         }
 
         public void Run()

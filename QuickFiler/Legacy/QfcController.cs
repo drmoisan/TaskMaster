@@ -37,7 +37,7 @@ namespace QuickFiler.Legacy
 
         #region QFC Specific Variables
         private int _intMyPosition;
-        private Suggestions _suggestions = new Suggestions();
+        private Suggestions _suggestions = new();
         //private string[] _strFolders;
         //TODO: Need to ensure references to _colCtrls are zero based
         private List<Control> _colCtrls;

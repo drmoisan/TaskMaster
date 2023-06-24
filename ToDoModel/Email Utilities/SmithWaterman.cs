@@ -45,6 +45,10 @@ namespace ToDoModel
             int LenX, LenY, x, y, calcA, calcB, calcC, tempa, tempB, tempC;
             var maxSmith_Watterman = default(int);
 
+            int matchScore = AFSettings.SmithWatterman_MatchScore;
+            int mismatchScore = AFSettings.SmithWatterman_MismatchScore;
+            int gapPenalty = AFSettings.SmithWatterman_GapPenalty;
+
             // StopWatch_SW.reStart
             string[] flatcsv;
             string[] words_X = Str_X.GetWords(SWOptions);
@@ -85,15 +89,15 @@ namespace ToDoModel
                     calcA = (int)Matrix[x - 1, y - 1];
                     if (Matrix[x, 1] == Matrix[1, y])
                     {
-                        calcA = calcA + AFSettings.SmithWatterman_MatchScore * ((string)Matrix[x, 1]).Length;
+                        calcA = calcA + matchScore * ((string)Matrix[x, 1]).Length;
                     }
                     else
                     {
-                        calcA = calcA + AFSettings.SmithWatterman_MismatchScore;
+                        calcA = calcA + mismatchScore;
                     }
 
-                    calcB = (int)((int)Matrix[x, y - 1] + AFSettings.SmithWatterman_GapPenalty * ((string)Matrix[1, y]).Length);
-                    calcC = (int)((int)Matrix[x - 1, y] + AFSettings.SmithWatterman_GapPenalty * ((string)Matrix[x, 1]).Length);
+                    calcB = (int)((int)Matrix[x, y - 1] + gapPenalty * ((string)Matrix[1, y]).Length);
+                    calcC = (int)((int)Matrix[x - 1, y] + gapPenalty * ((string)Matrix[x, 1]).Length);
                     tempa = max(0, calcA, calcB, calcC);
                     Matrix[x, y] = tempa;
                     if (tempa > maxSmith_Watterman)
@@ -120,15 +124,28 @@ namespace ToDoModel
             
         }
 
-        public static int SW_CalcInt(int[] words_X, int[] wordLength_X, int[] words_Y, int[] wordLength_Y, IAppAutoFileObjects AFSettings)
+        public static int SW_CalcInt(int[] words_X,
+                                     int[] wordLength_X,
+                                     int[] words_Y,
+                                     int[] wordLength_Y,
+                                     int matchScore,
+                                     int mismatchScore,
+                                     int gapPenalty)
         {
+            // Check if any of the parameters are null and throw an exception showing which one and the call stack            // Check if any of the parameters are null and throw an exception showing which one and the call stack
+            if (words_X == null || wordLength_X == null || words_Y == null || wordLength_Y == null)
+            {
+                var stackTrace = new StackTrace();
+                var callingMethod = stackTrace.GetFrame(1).GetMethod();
+                Debug.WriteLine(stackTrace.ToString());
+                throw new ArgumentNullException($"One of the parameters in {callingMethod} is null");
+            }
+            
             int SW_CalcRet = default;
             int LenX, LenY, x, y, calcA, calcB, calcC, tempa;
-            var maxSmith_Watterman = default(int);
-
-            // StopWatch_SW.reStart
-            //string[] flatcsv;
             
+            var maxSmith_Watterman = default(int);    
+                
             LenX = words_X.Length;
             LenY = words_Y.Length;
             int[,] Matrix = new int[LenX + 3 + 1, LenY + 3 + 1];
@@ -164,15 +181,15 @@ namespace ToDoModel
                     calcA = (int)Matrix[x - 1, y - 1];
                     if (Matrix[x, 1] == Matrix[1, y])
                     {
-                        calcA = calcA + AFSettings.SmithWatterman_MatchScore * wordLength_X[x-3];
+                        calcA = calcA + matchScore * wordLength_X[x-3];
                     }
                     else
                     {
-                        calcA = calcA + AFSettings.SmithWatterman_MismatchScore;
+                        calcA = calcA + mismatchScore;
                     }
 
-                    calcB = (int)((int)Matrix[x, y - 1] + AFSettings.SmithWatterman_GapPenalty * wordLength_Y[y-3]);
-                    calcC = (int)((int)Matrix[x - 1, y] + AFSettings.SmithWatterman_GapPenalty * wordLength_X[x-3]);
+                    calcB = (int)((int)Matrix[x, y - 1] + gapPenalty * wordLength_Y[y-3]);
+                    calcC = (int)((int)Matrix[x - 1, y] + gapPenalty * wordLength_X[x-3]);
                     tempa = max(0, calcA, calcB, calcC);
                     Matrix[x, y] = tempa;
                     if (tempa > maxSmith_Watterman)
