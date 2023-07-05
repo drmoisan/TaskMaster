@@ -41,7 +41,18 @@ namespace TaskMaster
 
         public string GetCustomUI(string ribbonID)
         {
-            return GetResourceText("TaskMaster.Ribbon.RibbonViewer.xml");
+            switch (ribbonID)
+            {
+                case "Microsoft.Outlook.Explorer":
+                    return GetResourceText("TaskMaster.Ribbon.RibbonExplorer.xml");
+                //case "Microsoft.Outlook.Mail.Compose":
+                //    return GetResourceText("TaskMaster.Ribbon.RibbonMailCompose.xml");
+                //case "Microsoft.Outlook.Appointment":
+                //    return GetResourceText("TaskMaster.Ribbon.RibbonAppointment.xml");
+                default:
+                    return null;
+            }
+            //return GetResourceText("TaskMaster.Ribbon.RibbonViewer.xml");
         }
 
         #region Ribbon Callbacks

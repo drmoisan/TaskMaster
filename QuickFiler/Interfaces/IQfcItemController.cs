@@ -3,8 +3,10 @@ using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace QuickFiler.Interfaces
 {
@@ -46,5 +48,8 @@ namespace QuickFiler.Interfaces
         string Sender { get; }
         string SentDate { get; }
         string SentTime { get; }
+        IList<TableLayoutPanel> Tlps { get; }
+        IList<Button> Buttons { get; }
+        IList<IQfcTipsDetails> ListTipsDetails { get; }
     }
 }

@@ -158,21 +158,27 @@ namespace QuickFiler.Controllers
         {
             throw new NotImplementedException();
         }
-                        
+
+        
+
+        
+
         public Frame<int, string> InitDf(Explorer activeExplorer) 
         {
             Frame<int, string> df = DfDeedle.GetEmailDataInView(activeExplorer);
-            df = df.FilterRowsBy("MessageClass", "IPM.Note");
-            
+            df = df.FilterRowsBy("MessageClass", "IPM.Note");            
             var topics = df.GetColumn<string>("Conversation").Values.Distinct().ToArray();
+
+            
             var rows = topics.Select(topic =>
             {
                 var dfConversation = df.FilterRowsBy("Conversation", topic);
                 var maxSentOn = dfConversation.GetColumn<DateTime>("SentOn").Values.Max();
-                var dfDateIdx = dfConversation.IndexRows<DateTime>("SentOn", keepColumn: true);
-                var addr = dfDateIdx.RowIndex.Locate(maxSentOn);
-                var idx = (int)dfDateIdx.RowIndex.AddressOperations.OffsetOf(addr);
-                var row = dfConversation.Rows.GetAt(idx);
+                var row = dfConversation.FilterRowsBy("SentOn", maxSentOn).Rows.FirstValue();
+                //var dfDateIdx = dfConversation.IndexRows<DateTime>("SentOn", keepColumn: true);
+                //var addr = dfDateIdx.RowIndex.Locate(maxSentOn);
+                //var idx = (int)dfDateIdx.RowIndex.AddressOperations.OffsetOf(addr);
+                //var row = dfConversation.Rows.GetAt(idx);
                 return row;
             });
 

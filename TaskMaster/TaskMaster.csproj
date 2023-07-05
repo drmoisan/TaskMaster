@@ -358,6 +358,7 @@
       <SubType>Code</SubType>
     </Compile>
     <None Include="TaskMaster_1_TemporaryKey.pfx" />
+    <None Include="TaskMaster_5_TemporaryKey.pfx" />
     <None Include="TaskMaster_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
@@ -369,7 +370,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Ribbon\RibbonViewer.xml" />
+    <EmbeddedResource Include="Ribbon\RibbonExplorer.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">
@@ -409,10 +410,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_5_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>98AC15CC11DDB0C189A8D3BA0E4D902AC324BD01</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>CD2F261C97CB5C97C0F1CFF5AACB73153996B221</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
