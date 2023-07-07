@@ -22,8 +22,8 @@ namespace QuickFiler.Interfaces
         int ActivateByIndex(int intNewSelection, bool blExpanded);
         void SelectNextItem();
         void SelectPreviousItem();
-        void ToggleOffTips();
-        void ToggleOnTips();
+        void ToggleOffNavigation();
+        void ToggleOnNavigation();
 
         // UI Move QfcItems
         void MoveDownControlGroups(int intPosition, int intMoves);		//Rewrite

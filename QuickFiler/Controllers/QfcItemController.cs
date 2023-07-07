@@ -45,8 +45,9 @@ namespace QuickFiler.Controllers
             PopulateControls(mailItem, viewerPosition);
             
             _themes = ThemeHelper.SetupThemes(this, _itemViewer);
-
+           
             ToggleTips(IQfcTipsDetails.ToggleState.Off);
+            ToggleNavigation(IQfcTipsDetails.ToggleState.Off);
 
         }
 
@@ -302,6 +303,16 @@ namespace QuickFiler.Controllers
             _activeTheme = "LightNormal";
         }
 
+        public void ToggleNavigation() 
+        {
+            _itemPositionTips.Toggle(true);
+        }
+
+        public void ToggleNavigation(IQfcTipsDetails.ToggleState desiredState)
+        {
+            _itemPositionTips.Toggle(desiredState, true);   
+        }
+
         public void ToggleTips()
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
@@ -357,13 +368,14 @@ namespace QuickFiler.Controllers
                     break;
             }
             _themes[_activeTheme].SetTheme();
+            ToggleTips();
         }
 
         // TODO: Implement Accel_Toggle
         public void Accel_Toggle()
         {
             if (_active) { Accel_FocusToggle(); }
-            ToggleTips();
+            ToggleNavigation();
         }
 
         // TODO: Implement ApplyReadEmailFormat

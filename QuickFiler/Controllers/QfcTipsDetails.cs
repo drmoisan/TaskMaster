@@ -73,6 +73,37 @@ namespace QuickFiler.Controllers
             }
         }
 
+        public void Toggle(bool sharedColumn)
+        {
+            if (_state == IQfcTipsDetails.ToggleState.Off)
+            {
+                Toggle(IQfcTipsDetails.ToggleState.On, sharedColumn);
+            }
+            else
+            {
+                Toggle(IQfcTipsDetails.ToggleState.Off, sharedColumn);
+            }
+        }
+
+        public void Toggle(IQfcTipsDetails.ToggleState desiredState, bool sharedColumn)
+        {
+            if (desiredState == IQfcTipsDetails.ToggleState.Off)
+            {
+                _labelControl.Visible = false;
+                _labelControl.Enabled = false;
+                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1)|(sharedColumn)))
+                    _tlp.ColumnStyles[_columnNumber].Width = 0;
+            }
+            else
+            {
+                _labelControl.Visible = true;
+                _labelControl.Enabled = true;
+                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                    _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
+            }
+            _state = desiredState;
+        }
+
         public void Toggle(IQfcTipsDetails.ToggleState desiredState)
         {
             if (desiredState == IQfcTipsDetails.ToggleState.Off)
@@ -86,7 +117,7 @@ namespace QuickFiler.Controllers
             {
                 _labelControl.Visible = true;
                 _labelControl.Enabled = true;
-                if (_parentType == typeof(TableLayoutPanel))
+                if (_parentType == typeof(TableLayoutPanel) && (_tlp.RowCount == 1))
                     _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
             }
             _state = desiredState;

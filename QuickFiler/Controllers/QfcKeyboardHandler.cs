@@ -76,8 +76,8 @@ namespace QuickFiler.Controllers
 
         public void ToggleKeyboardDialog()
         {
-            if (_kbdActive) { _parent.FrmCtrlr.Groups.ToggleOffTips(); }
-            else { _parent.FrmCtrlr.Groups.ToggleOnTips(); }
+            if (_kbdActive) { _parent.FrmCtrlr.Groups.ToggleOffNavigation(); }
+            else { _parent.FrmCtrlr.Groups.ToggleOnNavigation(); }
             _kbdActive = !_kbdActive;
         }
 

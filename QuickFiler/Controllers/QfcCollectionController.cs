@@ -19,6 +19,7 @@ namespace QuickFiler.Controllers
                                        QfcFormViewer viewerInstance,
                                        bool darkMode,
                                        Enums.InitTypeEnum InitType,
+                                       IQfcKeyboardHandler keyboardHandler,
                                        IQfcFormController ParentObject)
         {
 
@@ -26,6 +27,7 @@ namespace QuickFiler.Controllers
             _itemTLP = _formViewer.L1v0L2L3v_TableLayout;
             _initType = InitType;
             _globals = AppGlobals;
+            _keyboardHandler = keyboardHandler;
             _parent = ParentObject;
             SetupLightDark(darkMode);
         }
@@ -42,6 +44,7 @@ namespace QuickFiler.Controllers
         private bool _darkMode;
         private RowStyle _template;
         private int _intActiveSelection;
+        private IQfcKeyboardHandler _keyboardHandler;
 
         public int EmailsLoaded
         {
@@ -278,22 +281,22 @@ namespace QuickFiler.Controllers
             return _intActiveSelection;
         }
 
-        public void ToggleOffTips()
+        public void ToggleOffNavigation()
         {
             ToggleOffActiveItem(false);
             _itemGroups.ForEach(
                         itemGroup => itemGroup
                         .ItemController
-                        .ToggleTips(
+                        .ToggleNavigation(
                             IQfcTipsDetails.ToggleState.Off));
         }
 
-        public void ToggleOnTips()
+        public void ToggleOnNavigation()
         {
             _itemGroups.ForEach(
                         itemGroup => itemGroup
                         .ItemController
-                        .ToggleTips(
+                        .ToggleNavigation(
                             IQfcTipsDetails.ToggleState.On));
         }
 

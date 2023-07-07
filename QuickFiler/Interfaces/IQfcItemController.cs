@@ -51,6 +51,8 @@ namespace QuickFiler.Interfaces
         IList<TableLayoutPanel> Tlps { get; }
         IList<Button> Buttons { get; }
         IList<IQfcTipsDetails> ListTipsDetails { get; }
+        void ToggleNavigation();
+        void ToggleNavigation(IQfcTipsDetails.ToggleState desiredState);
         void ToggleTips();
         void ToggleTips(IQfcTipsDetails.ToggleState desiredState);
     }

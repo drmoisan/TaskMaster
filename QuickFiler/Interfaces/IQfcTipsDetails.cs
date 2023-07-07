@@ -14,5 +14,7 @@ namespace QuickFiler.Interfaces
         Type ResolveParentType();
         void Toggle();
         void Toggle(ToggleState desiredState);
+        void Toggle(bool shareColumn);
+        void Toggle(ToggleState desiredState, bool shareColumn);
     }
 }
