@@ -143,7 +143,8 @@ namespace TaskMaster
                 if (_encoder is null) 
                 {
                     _encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
-                                                     folderpath: _parent.FS.FldrPythonStaging);
+                                                     folderpath: _parent.FS.FldrPythonStaging,
+                                                     subjectMap: SubjectMap);
                     if (_encoder.Encoder.Count == 0) { _encoder.RebuildEncoding(SubjectMap); }
                 }
                 

@@ -11,6 +11,19 @@ namespace QuickFiler.Controllers
 {
     internal class QfcKeyboardHandler : IQfcKeyboardHandler
     {
+        public QfcKeyboardHandler(QfcFormViewer viewer, IQfcHomeController parent) 
+        { 
+            _viewer = viewer;
+            _viewer.SetKeyboardHandler(this);
+            _parent = parent;
+        }
+        
+        private QfcFormViewer _viewer;
+        private IQfcHomeController _parent;
+        private bool _kbdActive = false;
+
+        public bool KbdActive { get => _kbdActive; set => _kbdActive = value; }
+
         public void KeyboardDialog_Change()
         {
             throw new NotImplementedException();
@@ -63,7 +76,9 @@ namespace QuickFiler.Controllers
 
         public void ToggleKeyboardDialog()
         {
-            throw new NotImplementedException();
+            if (_kbdActive) { _parent.FrmCtrlr.Groups.ToggleOffTips(); }
+            else { _parent.FrmCtrlr.Groups.ToggleOnTips(); }
+            _kbdActive = !_kbdActive;
         }
 
         public bool ToggleOffActiveItem(bool parentBlExpanded)

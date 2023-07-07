@@ -200,6 +200,7 @@ namespace QuickFiler.Controllers
             df2 = df2.SortRowsByKey();
             //dfFiltered.IndexRowsOrdinally();
             //var df2 = dfFiltered.RealignRows(dfFiltered.RowKeys.Reverse());
+            //df2.Print();
             df2.DropColumn("NewKey");
             //df2.Print();
             //var df2 = dfFiltered.IndexRows<DateTime>("SentOn", false);
@@ -507,7 +508,7 @@ namespace QuickFiler.Controllers
 
         public long GetDateKey(DateTime dateTime) 
         { 
-            return long.Parse(dateTime.ToString("yyyyMMddhhmmss")); 
+            return long.Parse(dateTime.ToString("yyyyMMddHHmmss")); 
         }
     }
 

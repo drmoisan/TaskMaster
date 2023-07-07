@@ -79,7 +79,7 @@ namespace QuickFiler.Controllers
             {
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;
-                if (_parentType == typeof(TableLayoutPanel))
+                if (_parentType == typeof(TableLayoutPanel)&&(_tlp.RowCount==1))
                     _tlp.ColumnStyles[_columnNumber].Width = 0;
             }
             else

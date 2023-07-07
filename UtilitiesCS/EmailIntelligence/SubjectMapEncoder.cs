@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
@@ -13,20 +14,22 @@ namespace UtilitiesCS
         //TODO: Make this class inherit from Serializable Dictionary
         public SubjectMapEncoder() { }
 
-        public SubjectMapEncoder(string filename, string folderpath)
+        public SubjectMapEncoder(string filename, string folderpath, ISubjectMapSL subjectMap)
         {
             _filename = filename;
             _folderpath = folderpath;
+            _subjectMap = subjectMap;
             _encoder = new SCODictionary<string, int>(filename, folderpath);
         }
 
         private string _filename;
         private string _folderpath;
         private ISCODictionary<string, int> _encoder;
-        private Dictionary<int, string> _decoder;
+        private ISCODictionary<int, string> _decoder;
+        private ISubjectMapSL _subjectMap;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
-        public Dictionary<int, string> Decoder 
+        public ISCODictionary<int, string> Decoder 
         { 
             get 
             { 
@@ -36,7 +39,26 @@ namespace UtilitiesCS
                     {
                         _encoder.Deserialize();
                     }
-                    _decoder = _encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary();
+                    // _decoder = new SCODictionary<int, string>(_encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary());
+                    var iEnumerableOfKVPs = _encoder.Select(x => new KeyValuePair<int, string>(x.Value, x.Key));
+                    try
+                    {
+                        _decoder = new SCODictionary<int, string>(iEnumerableOfKVPs.ToDictionary());
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        if (iEnumerableOfKVPs.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1).Any())
+                        {
+                            var response = MessageBox.Show("Encoder is corrupt. "+
+                                "Duplicate keys found in decoder. "+
+                                "Would you like to rebuild the encoder / decoder?", 
+                                "Duplicate Keys", MessageBoxButtons.YesNo);
+                            
+                            if (response == DialogResult.Yes) { RebuildEncoding(); }
+                            else { throw; }
+                        }
+                        else { throw; }
+                    }
                 }
                 return _decoder; 
             } 
@@ -50,6 +72,13 @@ namespace UtilitiesCS
                                                               folderpath: _folderpath);
                 return _encoder;
             }
+        }
+
+        public void RebuildEncoding()
+        {
+            if(_subjectMap is null) { throw new NullReferenceException(
+                $"{nameof(_subjectMap)} is null within class {nameof(SubjectMapEncoder)}"); }
+            RebuildEncoding(_subjectMap);
         }
 
         public void RebuildEncoding(ISubjectMapSL map)
@@ -69,7 +98,10 @@ namespace UtilitiesCS
                                                       folderpath: _folderpath);
 
             _encoder.Serialize();
-            _decoder = _encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary();
+            _decoder = new SCODictionary<int, string>(
+                _encoder.ToDictionary()
+                .Select(x => new KeyValuePair<int, string>(x.Value, x.Key))
+                .ToDictionary());
 
             foreach (var entry in map)
             {
@@ -86,8 +118,13 @@ namespace UtilitiesCS
             {
                 if (!Encoder.ContainsKey(token))
                 {
-                    int code = Encoder.Values.Max() + 1;
-                    Decoder.Add(code, token);
+                    bool tryAgain = true;
+                    int code = -1;
+                    while (tryAgain)
+                    {
+                        code = Encoder.Values.Max() + 1;
+                        if (Decoder.TryAdd(code, token)) { tryAgain = false; }
+                    }
                     Encoder.Add(token, code);
                     changed = true;
                 }

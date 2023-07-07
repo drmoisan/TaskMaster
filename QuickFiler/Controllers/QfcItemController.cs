@@ -58,6 +58,7 @@ namespace QuickFiler.Controllers
         private QfcItemViewer _itemViewer;
         private IQfcCollectionController _parent;
         private IList<IQfcTipsDetails> _listTipsDetails;
+        private IQfcTipsDetails _itemPositionTips;
         private MailItem _mailItem;
         private DataFrame _dfConversation;
         private IList _conversationItems;
@@ -70,8 +71,10 @@ namespace QuickFiler.Controllers
         private IList<CheckBox> _checkBoxes;
         private IList<Label> _labels;
         private bool _expanded = false;
+        private bool _active = false;
         private bool _blHasChild;
         private Dictionary<string,Theme> _themes;
+        private string _activeTheme;
 
         #endregion
 
@@ -129,6 +132,8 @@ namespace QuickFiler.Controllers
             _listTipsDetails = _itemViewer.TipsLabels
                                .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
                                .ToList();
+
+            _itemPositionTips = new QfcTipsDetails(_itemViewer.LblPos);
 
             _tlps = ctrls.Where(x => x is TableLayoutPanel)
                          .Select(x => (TableLayoutPanel)x)
@@ -288,11 +293,13 @@ namespace QuickFiler.Controllers
         public void SetThemeDark()
         {
             _themes["DarkNormal"].SetTheme();
+            _activeTheme = "DarkNormal";
         }
 
         public void SetThemeLight()
         {
             _themes["LightNormal"].SetTheme();
+            _activeTheme = "LightNormal";
         }
 
         public void ToggleTips()
@@ -324,16 +331,39 @@ namespace QuickFiler.Controllers
 
         #endregion
 
-        // TODO: Implement Accel_FocusToggle
         public void Accel_FocusToggle()
         {
-            throw new NotImplementedException();
+            switch (_activeTheme)
+            {
+                case "DarkNormal":
+                    _activeTheme = "DarkActive";
+                    _active = true;
+                    break;
+                case "DarkActive":
+                    _activeTheme = "DarkNormal";
+                    _active = false;
+                    break;
+                case "LightNormal":
+                    _activeTheme = "LightActive";
+                    _active = true;
+                    break;
+                case "LightActive":
+                    _activeTheme = "LightNormal";
+                    _active = false;
+                    break;
+                default:
+                    _activeTheme = "LightNormal";
+                    _active = false;
+                    break;
+            }
+            _themes[_activeTheme].SetTheme();
         }
 
         // TODO: Implement Accel_Toggle
         public void Accel_Toggle()
         {
-            throw new NotImplementedException();
+            if (_active) { Accel_FocusToggle(); }
+            ToggleTips();
         }
 
         // TODO: Implement ApplyReadEmailFormat

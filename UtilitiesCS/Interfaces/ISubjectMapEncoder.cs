@@ -50,9 +50,16 @@ namespace UtilitiesCS
         int[] Encode(string[] words);
 
         /// <summary>
-        /// Rebuilds encoding dictionary based and re-encodes elements within the map
+        /// Rebuilds encoding dictionary based and re-encodes elements within 
+        /// the map passed as a variable
         /// </summary>
         /// <param name="map">Serializable list of <see cref="ISubjectMapEntry"/></param>
         void RebuildEncoding(ISubjectMapSL map);
+
+        /// <summary>
+        /// Rebuilds encoding dictionary based and re-encodes elements within 
+        /// the map stored in the class
+        /// </summary>
+        void RebuildEncoding();
     }
 }

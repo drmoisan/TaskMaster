@@ -23,7 +23,7 @@ namespace QuickFiler.Controllers
             _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
             _explorerController = new QfcExplorerController();
             _formViewer = new QfcFormViewer();
-            _keyboardHandler = new QfcKeyboardHandler();
+            _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
             _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
         }
 
@@ -49,6 +49,8 @@ namespace QuickFiler.Controllers
 
         public void Run()
         {
+            //_formViewer.Show();
+            //_formViewer.Refresh();
             Initialize();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();

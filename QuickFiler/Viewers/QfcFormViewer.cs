@@ -52,7 +52,8 @@ namespace QuickFiler
                 // If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
-                _keyboardHandler.KeyboardHandler_KeyDown(sender, e);
+                //_keyboardHandler.KeyboardHandler_KeyDown(sender, e);
+                _keyboardHandler.ToggleKeyboardDialog();
                 return true;
             }
 

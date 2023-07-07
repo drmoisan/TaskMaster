@@ -4,6 +4,7 @@ namespace QuickFiler.Interfaces
 {
     public interface IQfcKeyboardHandler
     {
+        bool KbdActive { get; set; }
         void ToggleKeyboardDialog(); // Need to rewrite
         void ToggleRemoteMouseLabels(); // Not supported yet
         bool ToggleOffActiveItem(bool parentBlExpanded);

@@ -84,12 +84,12 @@ namespace QuickFiler.Controllers
 
         public void LoadItemGroupsAndViewers(IList<MailItem> items, RowStyle template)
         {
-            int i = 0;
             foreach (MailItem mailItem in items)
             {
                 ItemGroup grp = new(mailItem);
-                grp.ItemViewer = LoadItemViewer(i++, template, true);
                 _itemGroups.Add(grp);
+                grp.ItemViewer = LoadItemViewer(_itemGroups.IndexOf(grp), template, true);
+                
             }
         }
 
@@ -105,6 +105,7 @@ namespace QuickFiler.Controllers
             int i = 0;
             Parallel.ForEach(_itemGroups, grp =>
             {
+                i = _itemGroups.IndexOf(grp) + 1;
                 grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, grp.MailItem, this);
                 Parallel.Invoke(
                     () => grp.ItemController.PopulateConversation(),
@@ -142,7 +143,7 @@ namespace QuickFiler.Controllers
             _itemTLP.ResumeLayout();
         }
 
-        public QfcItemViewer LoadItemViewer(int itemNumber,
+        public QfcItemViewer LoadItemViewer(int indexNumber,
                                             RowStyle template,
                                             bool blGroupConversation = true, 
                                             int columnNumber = 0)
@@ -157,12 +158,12 @@ namespace QuickFiler.Controllers
             itemViewer.Parent = _itemTLP;
             if (columnNumber == 0)
             {
-                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(columnNumber, itemNumber - 1));
+                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(columnNumber, indexNumber));
                 _itemTLP.SetColumnSpan(itemViewer, 2);
             }
             else
             {
-                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(1, itemNumber - 1));
+                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(1, indexNumber));
                 _itemTLP.SetColumnSpan(itemViewer, 1);
             }
             
@@ -275,6 +276,25 @@ namespace QuickFiler.Controllers
                 _formViewer.L1v0L2L3v_TableLayout.ScrollControlIntoView(itemViewer);
             }
             return _intActiveSelection;
+        }
+
+        public void ToggleOffTips()
+        {
+            ToggleOffActiveItem(false);
+            _itemGroups.ForEach(
+                        itemGroup => itemGroup
+                        .ItemController
+                        .ToggleTips(
+                            IQfcTipsDetails.ToggleState.Off));
+        }
+
+        public void ToggleOnTips()
+        {
+            _itemGroups.ForEach(
+                        itemGroup => itemGroup
+                        .ItemController
+                        .ToggleTips(
+                            IQfcTipsDetails.ToggleState.On));
         }
 
         public bool ToggleOffActiveItem(bool parentBlExpanded)
