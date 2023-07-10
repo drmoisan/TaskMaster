@@ -129,8 +129,11 @@ namespace QuickFiler.Controllers
                                                   viewerInstance: _formViewer,
                                                   darkMode: Properties.Settings.Default.DarkMode,
                                                   InitType: Enums.InitTypeEnum.InitSort,
+                                                  keyboardHandler: _parent.KbdHndlr,
                                                   ParentObject: this);
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate);
+            //this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.QfcFormViewer_KeyDown);
+            //ForAllControls(_formViewer,(x => ))
         }
 
         //public void FormResize(bool Force = false)
@@ -206,6 +209,18 @@ namespace QuickFiler.Controllers
         }
 
         public IQfcCollectionController Groups { get => _groups; }
+
+        public void ForAllControls(Control parent, Action<Control> action)
+        {
+            if (parent.HasChildren)
+            {
+                foreach(Control control in parent.Controls)
+                {
+                    ForAllControls(control, action);
+                }
+            }
+            action(parent);
+        }
 
     }
 }
