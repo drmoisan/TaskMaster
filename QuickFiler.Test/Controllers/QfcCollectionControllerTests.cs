@@ -166,7 +166,7 @@ namespace QuickFiler.Test.Controllers
             bool blExpanded = false;
 
             // Act
-            var result = qfcCollectionController.ActivateByIndex(
+            var result = qfcCollectionController.ActivateBySelection(
                 intNewSelection,
                 blExpanded);
 

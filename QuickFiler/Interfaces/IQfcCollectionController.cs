@@ -19,7 +19,7 @@ namespace QuickFiler.Interfaces
         void MoveEmails(StackObjectCS<MailItem> StackMovedItems);
 
         // UI Select QfcItems
-        int ActivateByIndex(int intNewSelection, bool blExpanded);
+        int ActivateBySelection(int intNewSelection, bool blExpanded);
         void ChangeByIndex(int idx);
         void SelectNextItem();
         void SelectPreviousItem();

@@ -263,7 +263,7 @@ namespace QuickFiler.Controllers
                     _globals, varList, FolderHandler.Options.FromArrayOrString);
             }
 
-            _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderList);
+            _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderArray);
             _itemViewer.CboFolders.SelectedIndex = 1;
         }
 

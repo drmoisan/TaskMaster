@@ -44,9 +44,12 @@ namespace QuickFiler.Controllers
         private List<ItemGroup> _itemGroups;
         private bool _darkMode;
         private RowStyle _template;
-        private int _intActiveSelection;
+        private int _activeIndex = -1;
         private IQfcKeyboardHandler _keyboardHandler;
         private delegate int ActionDelegate(int intNewSelection, bool blExpanded);
+
+        public int ActiveIndex { get => _activeIndex; set => _activeIndex = value; }
+        public int ActiveSelection { get => _activeIndex + 1; set => _activeIndex = value - 1; }
 
         public int EmailsLoaded
         {
@@ -295,15 +298,20 @@ namespace QuickFiler.Controllers
         public void ChangeByIndex(int idx)
         {
             bool expanded = false;
-            if ((_intActiveSelection != idx + 1)&&(idx < _itemGroups.Count))
+            if ((ActiveIndex != idx)&&(idx < _itemGroups.Count))
             { 
-                if (_intActiveSelection != 0)
+                if (ActiveIndex != -1)
                     expanded = ToggleOffActiveItem(false);
-                ActivateByIndex(idx + 1, expanded);
+                ActivateBySelection(idx + 1, expanded);
             }
         }
         
-        public int ActivateByIndex(int intNewSelection, bool blExpanded)
+        public int ActivateByIndex(int newIndex, bool blExpanded)
+        {
+            return ActivateBySelection(newIndex + 1, blExpanded);
+        }
+
+        public int ActivateBySelection(int intNewSelection, bool blExpanded)
         {
             if (intNewSelection > 0 & intNewSelection <= _itemGroups.Count)
             {
@@ -317,15 +325,15 @@ namespace QuickFiler.Controllers
                     //MoveDownPix(intNewSelection + 1, itemController.ItemPanel.Height);
                     itemController.ExpandCtrls1();
                 }
-                _intActiveSelection = intNewSelection;
+                ActiveSelection = intNewSelection;
                 _formViewer.L1v0L2L3v_TableLayout.ScrollControlIntoView(itemViewer);
             }
-            return _intActiveSelection;
+            return ActiveSelection;
         }
 
         public void ToggleOffNavigation()
         {
-            ToggleOffActiveItem(false);
+            if (ActiveIndex != -1) { ToggleOffActiveItem(false); }
             _itemGroups.ForEach(
                         itemGroup => itemGroup
                         .ItemController
@@ -340,15 +348,19 @@ namespace QuickFiler.Controllers
                         .ItemController
                         .ToggleNavigation(
                             Enums.ToggleState.On));
+            if (ActiveIndex != -1)
+            {
+                ActivateByIndex(ActiveIndex, false);
+            }
         }
 
         public bool ToggleOffActiveItem(bool parentBlExpanded)
         {
             bool blExpanded = parentBlExpanded;
-            if (_intActiveSelection != 0)
+            if (ActiveIndex != -1)
             {
                 //adjusted to _intActiveSelection -1 to accommodate zero based
-                IQfcItemController itemController = _itemGroups[_intActiveSelection - 1].ItemController;
+                IQfcItemController itemController = _itemGroups[ActiveIndex].ItemController;
                 if (itemController.BlExpanded)
                 {
                     //TODO: Replace MoveDownPix Function
@@ -359,17 +371,17 @@ namespace QuickFiler.Controllers
                 itemController.Accel_FocusToggle();
 
                 //QUESTION: This assignment worries me and will be out of sync 
-                _intActiveSelection = 0;
+                //ActiveIndex = -1;
             }
             return blExpanded;
         }
 
         public void SelectNextItem()
         {
-            if (_intActiveSelection < _itemGroups.Count)
+            if (ActiveSelection < _itemGroups.Count)
             {
                 // Index is zero based but active selection begins at 1
-                int nextIndex = _intActiveSelection;
+                int nextIndex = ActiveIndex + 1;
                 ChangeByIndex(nextIndex);
                 //BUGFIX: Write logic to select the next item
                 //_viewer.KeyboardDialog.Text = (_intActiveSelection + 1).ToString();
@@ -380,9 +392,9 @@ namespace QuickFiler.Controllers
 
         public void SelectPreviousItem()
         {
-            if (_intActiveSelection > 1)
+            if (ActiveIndex > 0)
             {
-                int prevIndex = _intActiveSelection - 2;
+                int prevIndex = ActiveIndex - 1;
                 ChangeByIndex(prevIndex);
                 //BUGFIX: Write logic to select the next item
                 // _viewer.KeyboardDialog.Text = (_intActiveSelection - 1).ToString();
@@ -409,27 +421,17 @@ namespace QuickFiler.Controllers
             // throw new NotImplementedException();
         }
 
-        public void ConvToggle_Group(string originalId)
+        internal void ChangeConversationSilently(int indexOriginal, bool desiredState) 
         {
-            int childCount = _itemGroups.Where(itemGroup => itemGroup.ItemController.ConvOriginID == originalId).Count();
-            int indexOriginal = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.Mail.EntryID == originalId);
-
-            // if original has been removed, find the first child and set it as the original
-            if (indexOriginal == -1) { indexOriginal = PromoteFirstChild(originalId, ref childCount); }
-            
-            // ensure the original is checked
-            EnsureChecked(indexOriginal);
-            
-            // if there are children, collapse them into the original
-            if (childCount > 0) { ConvToggle_Group(childCount, indexOriginal); }
+            ChangeConversationSilently(_itemGroups[indexOriginal], desiredState);
         }
 
-        internal void EnsureChecked(int indexOriginal)
+        internal void ChangeConversationSilently(ItemGroup grp, bool desiredState)
         {
-            var suppressionState = _itemGroups[indexOriginal].ItemController.SuppressEvents;
-            _itemGroups[indexOriginal].ItemController.SuppressEvents = true;
-            _itemGroups[indexOriginal].ItemViewer.CbxConversation.Checked = true;
-            _itemGroups[indexOriginal].ItemController.SuppressEvents = suppressionState;
+            var suppressionState = grp.ItemController.SuppressEvents;
+            grp.ItemController.SuppressEvents = true;
+            grp.ItemViewer.CbxConversation.Checked = desiredState;
+            grp.ItemController.SuppressEvents = suppressionState;
         }
 
         internal int PromoteFirstChild(string originalId, ref int childCount)
@@ -444,9 +446,34 @@ namespace QuickFiler.Controllers
             return indexOriginal;
         }
 
+        public void ConvToggle_Group(string originalId)
+        {
+            int childCount = _itemGroups.Where(itemGroup => itemGroup.ItemController.ConvOriginID == originalId).Count();
+            int indexOriginal = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.Mail.EntryID == originalId);
+
+            // if original has been removed, find the first child and set it as the original
+            if (indexOriginal == -1) { indexOriginal = PromoteFirstChild(originalId, ref childCount); }
+
+            // ensure the original is checked
+            ChangeConversationSilently(indexOriginal, true);
+
+            // if there are children, collapse them into the original
+            if (childCount > 0) 
+            {
+                bool reactivate = false;
+                if (ActiveIndex!=-1 && (ActiveIndex != indexOriginal))
+                {
+                    reactivate = true;
+                    ToggleOffActiveItem(false);
+                }
+                ConvToggle_Group(childCount, indexOriginal); 
+                if (reactivate) { ActivateByIndex(indexOriginal, false);}
+            }
+        }
+
         public void ConvToggle_Group(int childCount, int indexOriginal)
         {
-            //_itemTLP.SuspendLayout();
+            _itemTLP.SuspendLayout();
 
             int removalIndex = indexOriginal + 1;
 
@@ -459,7 +486,9 @@ namespace QuickFiler.Controllers
                 _itemGroups.RemoveAt(removalIndex);
             }
 
-            //_itemTLP.ResumeLayout();
+            RenumberGroups();
+
+            _itemTLP.ResumeLayout();
         }
 
         /// <summary>
@@ -503,7 +532,7 @@ namespace QuickFiler.Controllers
                                       .ToList();
 
             //Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
-            Enumerable.Range(0, insertions.Count).ForEach(i =>
+            Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
             {
                 var grp = _itemGroups[i + insertionIndex];
                 grp.ItemViewer = LoadItemViewer(i + insertionIndex, _template, false, 1);
@@ -518,7 +547,7 @@ namespace QuickFiler.Controllers
 
                 if (_darkMode) { grp.ItemController.SetThemeDark(); }
                 else { grp.ItemController.SetThemeLight(); }
-
+                ChangeConversationSilently(grp, false);
                 
             });
         }

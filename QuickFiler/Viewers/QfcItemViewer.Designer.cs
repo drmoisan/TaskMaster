@@ -550,13 +550,13 @@
             // 
             // LblAcFolder
             // 
-            this.LblAcFolder.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LblAcFolder.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.LblAcFolder.AutoSize = true;
             this.LblAcFolder.BackColor = System.Drawing.SystemColors.ControlText;
             this.LblAcFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcFolder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcFolder.Location = new System.Drawing.Point(119, 13);
+            this.LblAcFolder.Location = new System.Drawing.Point(119, 0);
             this.LblAcFolder.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcFolder.Name = "LblAcFolder";
             this.LblAcFolder.Size = new System.Drawing.Size(34, 33);
@@ -565,10 +565,9 @@
             // 
             // LblFolder
             // 
-            this.LblFolder.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblFolder.AutoSize = true;
             this.LblFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblFolder.Location = new System.Drawing.Point(6, 17);
+            this.LblFolder.Location = new System.Drawing.Point(6, 0);
             this.LblFolder.Margin = new System.Windows.Forms.Padding(0);
             this.LblFolder.Name = "LblFolder";
             this.LblFolder.Size = new System.Drawing.Size(86, 25);

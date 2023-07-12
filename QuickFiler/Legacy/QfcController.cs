@@ -706,60 +706,8 @@ namespace QuickFiler.Legacy
             if (varList is null) { _fldrHandler = new FolderHandler(_globals, _mail, FolderHandler.Options.FromField); }
             else { _fldrHandler = new FolderHandler(_globals, varList, FolderHandler.Options.FromArrayOrString); }
 
-            FolderCbo.Items.AddRange(_fldrHandler.FolderList);
+            FolderCbo.Items.AddRange(_fldrHandler.FolderArray);
             FolderCbo.SelectedIndex = 1;
-
-            //FolderCbo.Items.AddRange((object[])_fldrHandler.FolderList);
-
-
-            //if (varList is Array)
-            //{
-            //    Array varArray = varList as Array;
-            //    if (ArrayIsAllocated.IsAllocated(ref varArray))
-            //    {
-
-            //        //FolderCbo.Items.AddRange((object[])varList);
-            //        //FolderCbo.SelectedIndex = 0;
-
-            //    }
-            //}
-            //else
-            //{
-            //    // TODO: Move this module to cFolderSuggestions and load a _folderHandler instead
-            //    _suggestions = FolderSuggestionsModule.Folder_Suggestions(Mail, _globals, false);
-
-            //    if (_suggestions.Count > 0)
-            //    {
-            //        Array.Resize(ref _strFolders, _suggestions.Count + 1);
-            //        var loopTo = _suggestions.Count;
-            //        for (i = 1; i <= loopTo; i++)
-            //            _strFolders[i] = _suggestions.FolderSuggestionsArray[i];
-            //        FolderCbo.Items.AddRange(_strFolders);
-            //        FolderCbo.SelectedIndex = 1;
-            //    }
-            //    else
-            //    {
-            //        //_fldrHandler = new cFolderHandler(_globals);
-            //        FolderCbo.Items.AddRange(_fldrHandler.FindFolder(SearchString: "", 
-            //                                                         ReloadCTFStagingFiles: false, 
-            //                                                         ReCalcSuggestions: true, 
-            //                                                         objItem: Mail));
-
-            //        if (FolderCbo.Items.Count >= 2)
-            //            FolderCbo.SelectedIndex = 2;
-            //    }
-
-            //}
-
-            // Set _fldrHandler = New cFolderHandler
-            // cbo.List = _fldrHandler.FindFolder("", True, ReCalcSuggestions:=True, objItem:=_mail)
-            // If cbo.ListCount >= 2 Then cbo.Value = cbo.List(2)
-
-            // Set objProperty = _mail.UserProperties.FIND("AutoFile")
-            // If Not objProperty Is Nothing Then _searchTxt.Value = objProperty.Value
-
-
-            // Call Email_SortToExistingFolder.FindFolder("", True, objItem:=_mail)
         }
 
         internal void CountMailsInConv(int ct = 0)
