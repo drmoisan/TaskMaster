@@ -272,6 +272,7 @@
     <Compile Include="Interfaces\IToDoProjectInfoEntry.cs" />
     <Compile Include="Interfaces\PrefixInterface.cs" />
     <Compile Include="OutlookExtensions\Calendar.cs" />
+    <Compile Include="OutlookExtensions\ComType.cs" />
     <Compile Include="OutlookExtensions\CreateCategory.cs" />
     <Compile Include="OutlookExtensions\ExplorerActions.cs" />
     <Compile Include="OutlookExtensions\MailResolution.cs" />

@@ -13,9 +13,11 @@ namespace QuickFiler.Helper_Classes
     public class Theme
     {
         public Theme() { }
-        public Theme(string name, 
+        public Theme(string name,
                      QfcItemViewer itemViewer,
                      IQfcItemController parent,
+                     Color navBackgColor,
+                     Color navForeColor,
                      Color tlpBackColor,
                      Color tipsForeColor,
                      Color tipsBackColor,
@@ -38,6 +40,8 @@ namespace QuickFiler.Helper_Classes
             _name = name;
             _itemViewer = itemViewer;
             _parent = parent;
+            _navBackColor = navBackgColor;
+            _navForeColor = navForeColor;
             _tlpBackColor = tlpBackColor;
             _tipsForeColor = tipsForeColor;
             _tipsBackColor = tipsBackColor;
@@ -61,6 +65,8 @@ namespace QuickFiler.Helper_Classes
         }
 
         private string _name;
+        private Color _navBackColor;
+        private Color _navForeColor;
         private Color _tlpBackColor;
         private Color _tipsForeColor;
         private Color _tipsBackColor;
@@ -122,7 +128,10 @@ namespace QuickFiler.Helper_Classes
 
         public void SetTheme()
         {
-            foreach (TableLayoutPanel tlp in _parent.Tlps)
+            _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
+                                        forecolor: _navForeColor);
+
+            foreach (TableLayoutPanel tlp in _parent.TableLayoutPanels)
             {
                 tlp.SetTheme(backColor: TlpBackColor);
             }

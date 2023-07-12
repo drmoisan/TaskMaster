@@ -223,10 +223,14 @@ namespace UtilitiesCS
             var settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.Auto;
             settings.Formatting = Formatting.Indented;
-            string output = JsonConvert.SerializeObject(this, settings);
-
+            using (TextWriter writer = File.CreateText(filepath))
+            {
+                var serializer = JsonSerializer.Create(settings);
+                serializer.Serialize(writer, this);
+            }
+            //string output = JsonConvert.SerializeObject(this, settings);
             //string output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(filepath, output);
+            //File.WriteAllText(filepath, output);
 
         }
 

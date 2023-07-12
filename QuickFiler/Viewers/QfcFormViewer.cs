@@ -16,6 +16,7 @@ namespace QuickFiler
         public QfcFormViewer()
         {
             InitializeComponent();
+            //this.KeyPreview = true;
         }
 
         [STAThread]
@@ -43,6 +44,9 @@ namespace QuickFiler
         public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;
+            //this.KeyDown += _keyboardHandler.KeyboardHandler_KeyDown;
+            //this.KeyUp += _keyboardHandler.KeyboardHandler_KeyUp;
+            //this.KeyPress += _keyboardHandler.KeyboardHandler_KeyPress;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -53,7 +57,7 @@ namespace QuickFiler
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
                 //_keyboardHandler.KeyboardHandler_KeyDown(sender, e);
-                _keyboardHandler.ToggleKeyboardDialog();
+                _keyboardHandler.ToggleKeyboardDialog(sender, e);
                 return true;
             }
 
@@ -74,7 +78,6 @@ namespace QuickFiler
         {
             _formController.ButtonUndo_Click();
         }
-
-        
+                
     }
 }

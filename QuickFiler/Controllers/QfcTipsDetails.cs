@@ -25,7 +25,7 @@ namespace QuickFiler.Controllers
             {
                 _panel = (System.Windows.Forms.Panel)_labelControl.Parent;
             }
-            _state = IQfcTipsDetails.ToggleState.On;
+            _state = Enums.ToggleState.On;
         }
 
         public Type ResolveParentType()
@@ -52,7 +52,7 @@ namespace QuickFiler.Controllers
         private System.Windows.Forms.Panel _panel;
         private int _columnNumber;
         private System.Single _columnWidth;
-        private IQfcTipsDetails.ToggleState _state;
+        private Enums.ToggleState _state;
         private Type _parentType;
 
         public System.Windows.Forms.Label LabelControl { get => _labelControl; }
@@ -63,31 +63,31 @@ namespace QuickFiler.Controllers
 
         public void Toggle()
         {
-            if (_state == IQfcTipsDetails.ToggleState.Off)
+            if (_state == Enums.ToggleState.Off)
             {
-                Toggle(IQfcTipsDetails.ToggleState.On);
+                Toggle(Enums.ToggleState.On);
             }
             else
             {
-                Toggle(IQfcTipsDetails.ToggleState.Off);
+                Toggle(Enums.ToggleState.Off);
             }
         }
 
         public void Toggle(bool sharedColumn)
         {
-            if (_state == IQfcTipsDetails.ToggleState.Off)
+            if (_state == Enums.ToggleState.Off)
             {
-                Toggle(IQfcTipsDetails.ToggleState.On, sharedColumn);
+                Toggle(Enums.ToggleState.On, sharedColumn);
             }
             else
             {
-                Toggle(IQfcTipsDetails.ToggleState.Off, sharedColumn);
+                Toggle(Enums.ToggleState.Off, sharedColumn);
             }
         }
 
-        public void Toggle(IQfcTipsDetails.ToggleState desiredState, bool sharedColumn)
+        public void Toggle(Enums.ToggleState desiredState, bool sharedColumn)
         {
-            if (desiredState == IQfcTipsDetails.ToggleState.Off)
+            if (desiredState == Enums.ToggleState.Off)
             {
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;
@@ -104,9 +104,9 @@ namespace QuickFiler.Controllers
             _state = desiredState;
         }
 
-        public void Toggle(IQfcTipsDetails.ToggleState desiredState)
+        public void Toggle(Enums.ToggleState desiredState)
         {
-            if (desiredState == IQfcTipsDetails.ToggleState.Off)
+            if (desiredState == Enums.ToggleState.Off)
             {
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;

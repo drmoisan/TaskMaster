@@ -19,13 +19,15 @@ namespace QuickFiler.Interfaces
         void Accel_Toggle();
         void ctrlsRemove(); // May not be necessary
         bool BlExpanded {  get; }
-        bool BlHasChild { get; set; }
+        bool BlIsChild { get; set; }
+        string ConvOriginID { get; set; }
         int Height { get; }
         MailItem Mail { get; set; }
         void ExpandCtrls1(); // Rewrite
         string SelectedFolder { get; }
         int Position { get; set; }
         void PopulateFolderCombobox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
+        bool SuppressEvents { get; set; }
         void ApplyReadEmailFormat();
         void FlagAsTask();
         void MarkItemForDeletion();
@@ -35,6 +37,7 @@ namespace QuickFiler.Interfaces
         void ToggleSaveCopyOfMail();
         void ToggleSaveAttachments();
         void ToggleConversationCheckbox();
+        void ToggleConversationCheckbox(Enums.ToggleState desiredState);
         void PopulateConversation();
         void PopulateConversation(DataFrame df);
         void PopulateConversation(int countOnly);
@@ -48,12 +51,12 @@ namespace QuickFiler.Interfaces
         string Sender { get; }
         string SentDate { get; }
         string SentTime { get; }
-        IList<TableLayoutPanel> Tlps { get; }
+        IList<TableLayoutPanel> TableLayoutPanels { get; }
         IList<Button> Buttons { get; }
         IList<IQfcTipsDetails> ListTipsDetails { get; }
         void ToggleNavigation();
-        void ToggleNavigation(IQfcTipsDetails.ToggleState desiredState);
+        void ToggleNavigation(Enums.ToggleState desiredState);
         void ToggleTips();
-        void ToggleTips(IQfcTipsDetails.ToggleState desiredState);
+        void ToggleTips(Enums.ToggleState desiredState);
     }
 }

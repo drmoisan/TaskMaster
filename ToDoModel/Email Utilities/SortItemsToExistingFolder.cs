@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
-using UtilitiesCS;
+using System.Collections.Generic;
 
 namespace ToDoModel
 {
@@ -20,7 +20,7 @@ namespace ToDoModel
             throw new NotImplementedException();
         }
 
-        public static void MASTER_SortEmailsToExistingFolder(IList selItems, bool Pictures_Checkbox, string SortFolderpath, bool Save_MSG, bool Attchments, bool Remove_Flow_File, IApplicationGlobals AppGlobals, string StrRoot = "")
+        public static void MASTER_SortEmailsToExistingFolder(IList<MailItem> selItems, bool Pictures_Checkbox, string SortFolderpath, bool Save_MSG, bool Attchments, bool Remove_Flow_File, IApplicationGlobals AppGlobals, string StrRoot = "")
         {
             string loc;
             string FileSystem_LOC;
@@ -381,7 +381,7 @@ namespace ToDoModel
         // Throw New NotImplementedException()
         // End Sub
 
-        private static void SaveMessageAsMSG(string fileSystem_LOC, IList selItems)
+        private static void SaveMessageAsMSG(string fileSystem_LOC, IList<MailItem> selItems)
         {
             throw new NotImplementedException();
         }

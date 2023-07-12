@@ -20,6 +20,7 @@ namespace QuickFiler.Interfaces
 
         // UI Select QfcItems
         int ActivateByIndex(int intNewSelection, bool blExpanded);
+        void ChangeByIndex(int idx);
         void SelectNextItem();
         void SelectPreviousItem();
         void ToggleOffNavigation();
@@ -31,7 +32,8 @@ namespace QuickFiler.Interfaces
         void ResizeChildren(int intDiffx);                              //possibly unneccessary with new control group
 
         // UI Converations Expansion
-        void ConvToggle_Group(IList<MailItem> selItems, int intOrigPosition);
+        void ConvToggle_Group(int childCount, int indexOriginal);
+        void ConvToggle_Group(string originalId);
         void ConvToggle_UnGroup(IList<MailItem> mailItems, int baseEmailIndex, int conversationCount, object folderList);
         void MakeSpaceToEnumerateConversation();                        //Rewrite
 

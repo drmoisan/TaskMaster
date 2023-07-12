@@ -71,7 +71,7 @@ namespace QuickFiler.Controllers
 
         public IQfcExplorerController ExplCtrlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public IQfcFormController FrmCtrlr { get => _formController; }
-        public IQfcKeyboardHandler KbdHndlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IQfcKeyboardHandler KbdHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
         public IQfcDatamodel DataModel { get => _datamodel; }
         public cStopWatch StopWatch { get => _stopWatch; }
 

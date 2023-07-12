@@ -77,7 +77,7 @@ namespace QuickFiler.Test
 
             foreach (QfcTipsDetails tipsDetails in listTipsDetails)
             {
-                tipsDetails.Toggle(IQfcTipsDetails.ToggleState.Off);
+                tipsDetails.Toggle(Enums.ToggleState.Off);
             }
             qf.Refresh();
             qf.Refresh();

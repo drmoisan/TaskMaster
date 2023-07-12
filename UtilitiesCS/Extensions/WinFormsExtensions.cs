@@ -27,8 +27,20 @@ namespace UtilitiesCS
         {
             foreach (Control c in parent.Controls)
             {
-                action(c);
                 ForAllControls(c, action);
+            }
+            action(parent);
+        }
+
+        public static void ForAllControls(this Control parent, Action<Control> action, IList<Control> except)
+        {
+            if (!except.Contains(parent))
+            {
+                foreach (Control c in parent.Controls)
+                {
+                    ForAllControls(c, action);
+                }
+                action(parent);
             }
         }
 
@@ -45,5 +57,11 @@ namespace UtilitiesCS
                 yield return next;
             }
         }
+
+        public static bool IsRegistered(this EventHandler handler, 
+                                        Delegate prospectiveHandler) => 
+            handler != null && 
+            handler.GetInvocationList()
+                   .Any(existingHandler => existingHandler == prospectiveHandler);
     }
 }

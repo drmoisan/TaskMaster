@@ -630,6 +630,8 @@
             // CbxAttachments
             // 
             this.CbxAttachments.AutoSize = true;
+            this.CbxAttachments.Checked = true;
+            this.CbxAttachments.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CbxAttachments.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F);
             this.CbxAttachments.Location = new System.Drawing.Point(318, 6);
             this.CbxAttachments.Margin = new System.Windows.Forms.Padding(6);
@@ -673,6 +675,8 @@
             // CbxConversation
             // 
             this.CbxConversation.AutoSize = true;
+            this.CbxConversation.Checked = true;
+            this.CbxConversation.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CbxConversation.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CbxConversation.Location = new System.Drawing.Point(42, 6);
             this.CbxConversation.Margin = new System.Windows.Forms.Padding(0, 6, 6, 6);

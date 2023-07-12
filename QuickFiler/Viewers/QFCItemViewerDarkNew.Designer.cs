@@ -269,7 +269,7 @@
             // 
             // TxtboxBody
             // 
-            this.TxtboxBody.BackColor = System.Drawing.Color.Black;
+            this.TxtboxBody.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.TxtboxBody.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TxtboxBody.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TxtboxBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));

@@ -786,7 +786,7 @@ namespace QuickFiler.Legacy
 
         public void MoveMail()
         {
-            IList selItems = new List<MailItem>();
+            IList<MailItem> selItems = new List<MailItem>();
 
             bool Attchments;
             bool blRepullConv;
@@ -802,7 +802,7 @@ namespace QuickFiler.Legacy
                     {
                         if ((_selItemsInClass.Count == int.Parse(lblConvCt.Text)) & (_selItemsInClass.Count != 0))
                         {
-                            selItems = _selItemsInClass;
+                            selItems = _selItemsInClass.Cast<MailItem>().ToList();
                         }
                         else
                         {
@@ -822,7 +822,7 @@ namespace QuickFiler.Legacy
                         // Set selItems = Email_SortToExistingFolder.DemoConversation(selItems, Sel)
 
                         conv = new cConversation(_globals.Ol.App) { item = Mail };
-                        selItems = conv.get_ToList(true, true);
+                        selItems = conv.get_ToList(true, true).Cast<MailItem>().ToList();
                     }
                 }
                 else
@@ -1408,7 +1408,6 @@ namespace QuickFiler.Legacy
         #endregion
 
         #region Event Handlers
-        #endregion
 
         private void WireEventHandlers()
         {
@@ -1795,7 +1794,7 @@ namespace QuickFiler.Legacy
                 CountMailsInConv();
 
             var loopTo = _selItemsInClass.Count;
-            for (i = 1; i <= loopTo; i++)
+            for (i = 0; i < loopTo; i++)
             {
                 objItem = _selItemsInClass[i];
                 objMail = (MailItem)objItem;
@@ -1911,7 +1910,7 @@ namespace QuickFiler.Legacy
             // Case Else
             // End Select
         }
-               
-        
+
+        #endregion
     }
 }

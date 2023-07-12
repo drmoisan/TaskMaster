@@ -908,6 +908,13 @@ namespace TaskVisualization
                 Button btn = ctrl as Button;
                 btn.PerformClick();
             }
+            
+            else if (ctrl is CheckBox)
+            {
+                CheckBox checkBox = ctrl as CheckBox;
+                checkBox.Checked = !checkBox.Checked;
+            }
+
             else if (ctrl is TextBox)
             {
                 TextBox txt = ctrl as TextBox;
@@ -1054,31 +1061,30 @@ namespace TaskVisualization
         {
             var xlCtrlOptions = new Dictionary<Label, bool>();
             {
-                var withBlock = _viewer;
-                xlCtrlOptions.Add(withBlock.XlTopic, _options.HasFlag(FlagsToSet.topics));
-                xlCtrlOptions.Add(withBlock.XlProject, _options.HasFlag(FlagsToSet.projects));
-                xlCtrlOptions.Add(withBlock.XlPeople, _options.HasFlag(FlagsToSet.people));
-                xlCtrlOptions.Add(withBlock.XlContext, _options.HasFlag(FlagsToSet.context));
-                xlCtrlOptions.Add(withBlock.XlTaskname, _options.HasFlag(FlagsToSet.taskname));
-                xlCtrlOptions.Add(withBlock.XlImportance, _options.HasFlag(FlagsToSet.priority));
-                xlCtrlOptions.Add(withBlock.XlKanban, _options.HasFlag(FlagsToSet.kbf));
-                xlCtrlOptions.Add(withBlock.XlWorktime, _options.HasFlag(FlagsToSet.worktime));
-                xlCtrlOptions.Add(withBlock.XlOk, true);
-                xlCtrlOptions.Add(withBlock.XlCancel, true);
-                xlCtrlOptions.Add(withBlock.XlReminder, _options.HasFlag(FlagsToSet.reminder));
-                xlCtrlOptions.Add(withBlock.XlDuedate, _options.HasFlag(FlagsToSet.duedate));
-                xlCtrlOptions.Add(withBlock.XlScWaiting, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScUnprocessed, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScNews, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScEmail, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScReadingbusiness, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScCalls, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScInternet, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScPreread, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScMeeting, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScPersonal, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScBullpin, _options.HasFlag(FlagsToSet.all));
-                xlCtrlOptions.Add(withBlock.XlScToday, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlTopic, _options.HasFlag(FlagsToSet.topics));
+                xlCtrlOptions.Add(_viewer.XlProject, _options.HasFlag(FlagsToSet.projects));
+                xlCtrlOptions.Add(_viewer.XlPeople, _options.HasFlag(FlagsToSet.people));
+                xlCtrlOptions.Add(_viewer.XlContext, _options.HasFlag(FlagsToSet.context));
+                xlCtrlOptions.Add(_viewer.XlTaskname, _options.HasFlag(FlagsToSet.taskname));
+                xlCtrlOptions.Add(_viewer.XlImportance, _options.HasFlag(FlagsToSet.priority));
+                xlCtrlOptions.Add(_viewer.XlKanban, _options.HasFlag(FlagsToSet.kbf));
+                xlCtrlOptions.Add(_viewer.XlWorktime, _options.HasFlag(FlagsToSet.worktime));
+                xlCtrlOptions.Add(_viewer.XlOk, true);
+                xlCtrlOptions.Add(_viewer.XlCancel, true);
+                xlCtrlOptions.Add(_viewer.XlReminder, _options.HasFlag(FlagsToSet.reminder));
+                xlCtrlOptions.Add(_viewer.XlDuedate, _options.HasFlag(FlagsToSet.duedate));
+                xlCtrlOptions.Add(_viewer.XlScWaiting, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScUnprocessed, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScNews, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScEmail, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScReadingbusiness, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScCalls, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScInternet, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScPreread, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScMeeting, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScPersonal, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScBullpin, _options.HasFlag(FlagsToSet.all));
+                xlCtrlOptions.Add(_viewer.XlScToday, _options.HasFlag(FlagsToSet.all));
             }
             return xlCtrlOptions;
         }
@@ -1087,32 +1093,31 @@ namespace TaskVisualization
         {
             var xlCtrlCaptions = new Dictionary<Label, string>();
             {
-                var withBlock = _viewer;
-                xlCtrlCaptions.Add(withBlock.XlTopic, withBlock.LblTopic.Text);
-                xlCtrlCaptions.Add(withBlock.XlProject, withBlock.LblProject.Text);
-                xlCtrlCaptions.Add(withBlock.XlPeople, withBlock.LblPeople.Text);
-                xlCtrlCaptions.Add(withBlock.XlContext, withBlock.LblContext.Text);
-                xlCtrlCaptions.Add(withBlock.XlTaskname, withBlock.LblTaskname.Text);
-                xlCtrlCaptions.Add(withBlock.XlImportance, withBlock.LblPriority.Text);
-                xlCtrlCaptions.Add(withBlock.XlKanban, withBlock.LblKbf.Text);
-                xlCtrlCaptions.Add(withBlock.XlWorktime, withBlock.LblDuration.Text);
-                xlCtrlCaptions.Add(withBlock.XlOk, withBlock.OKButton.Text);
-                xlCtrlCaptions.Add(withBlock.XlCancel, withBlock.Cancel_Button.Text);
-                xlCtrlCaptions.Add(withBlock.XlReminder, withBlock.LblReminder.Text);
-                xlCtrlCaptions.Add(withBlock.XlDuedate, withBlock.LblDuedate.Text);
+                xlCtrlCaptions.Add(_viewer.XlTopic, _viewer.LblTopic.Text);
+                xlCtrlCaptions.Add(_viewer.XlProject, _viewer.LblProject.Text);
+                xlCtrlCaptions.Add(_viewer.XlPeople, _viewer.LblPeople.Text);
+                xlCtrlCaptions.Add(_viewer.XlContext, _viewer.LblContext.Text);
+                xlCtrlCaptions.Add(_viewer.XlTaskname, _viewer.LblTaskname.Text);
+                xlCtrlCaptions.Add(_viewer.XlImportance, _viewer.LblPriority.Text);
+                xlCtrlCaptions.Add(_viewer.XlKanban, _viewer.LblKbf.Text);
+                xlCtrlCaptions.Add(_viewer.XlWorktime, _viewer.LblDuration.Text);
+                xlCtrlCaptions.Add(_viewer.XlOk, _viewer.OKButton.Text);
+                xlCtrlCaptions.Add(_viewer.XlCancel, _viewer.Cancel_Button.Text);
+                xlCtrlCaptions.Add(_viewer.XlReminder, _viewer.LblReminder.Text);
+                xlCtrlCaptions.Add(_viewer.XlDuedate, _viewer.LblDuedate.Text);
 
-                xlCtrlCaptions.Add(withBlock.XlScWaiting, withBlock.ShortcutWaitingFor.Text);
-                xlCtrlCaptions.Add(withBlock.XlScUnprocessed, withBlock.ShortcutUnprocessed.Text);
-                xlCtrlCaptions.Add(withBlock.XlScNews, withBlock.ShortcutNews.Text);
-                xlCtrlCaptions.Add(withBlock.XlScEmail, withBlock.ShortcutEmail.Text);
-                xlCtrlCaptions.Add(withBlock.XlScReadingbusiness, withBlock.ShortcutReadingBusiness.Text);
-                xlCtrlCaptions.Add(withBlock.XlScCalls, withBlock.ShortcutCalls.Text);
-                xlCtrlCaptions.Add(withBlock.XlScInternet, withBlock.ShortcutInternet.Text);
-                xlCtrlCaptions.Add(withBlock.XlScPreread, withBlock.ShortcutPreRead.Text);
-                xlCtrlCaptions.Add(withBlock.XlScMeeting, withBlock.ShortcutMeeting.Text);
-                xlCtrlCaptions.Add(withBlock.XlScPersonal, withBlock.ShortcutPersonal.Text);
-                xlCtrlCaptions.Add(withBlock.XlScBullpin, withBlock.CbxBullpin.Text);
-                xlCtrlCaptions.Add(withBlock.XlScToday, withBlock.CbxToday.Text);
+                xlCtrlCaptions.Add(_viewer.XlScWaiting, _viewer.ShortcutWaitingFor.Text);
+                xlCtrlCaptions.Add(_viewer.XlScUnprocessed, _viewer.ShortcutUnprocessed.Text);
+                xlCtrlCaptions.Add(_viewer.XlScNews, _viewer.ShortcutNews.Text);
+                xlCtrlCaptions.Add(_viewer.XlScEmail, _viewer.ShortcutEmail.Text);
+                xlCtrlCaptions.Add(_viewer.XlScReadingbusiness, _viewer.ShortcutReadingBusiness.Text);
+                xlCtrlCaptions.Add(_viewer.XlScCalls, _viewer.ShortcutCalls.Text);
+                xlCtrlCaptions.Add(_viewer.XlScInternet, _viewer.ShortcutInternet.Text);
+                xlCtrlCaptions.Add(_viewer.XlScPreread, _viewer.ShortcutPreRead.Text);
+                xlCtrlCaptions.Add(_viewer.XlScMeeting, _viewer.ShortcutMeeting.Text);
+                xlCtrlCaptions.Add(_viewer.XlScPersonal, _viewer.ShortcutPersonal.Text);
+                xlCtrlCaptions.Add(_viewer.XlScBullpin, _viewer.CbxBullpin.Text);
+                xlCtrlCaptions.Add(_viewer.XlScToday, _viewer.CbxToday.Text);
             }
             return xlCtrlCaptions;
         }
@@ -1121,32 +1126,31 @@ namespace TaskVisualization
         {
             var xlCtrlLookup = new Dictionary<Label, Control>();
             {
-                var withBlock = _viewer;
-                xlCtrlLookup.Add(withBlock.XlTopic, withBlock.LblTopic);
-                xlCtrlLookup.Add(withBlock.XlProject, withBlock.LblProject);
-                xlCtrlLookup.Add(withBlock.XlPeople, withBlock.LblPeople);
-                xlCtrlLookup.Add(withBlock.XlContext, withBlock.LblContext);
-                xlCtrlLookup.Add(withBlock.XlTaskname, withBlock.TaskName);
-                xlCtrlLookup.Add(withBlock.XlImportance, withBlock.PriorityBox);
-                xlCtrlLookup.Add(withBlock.XlKanban, withBlock.KbSelector);
-                xlCtrlLookup.Add(withBlock.XlWorktime, withBlock.Duration);
-                xlCtrlLookup.Add(withBlock.XlOk, withBlock.OKButton);
-                xlCtrlLookup.Add(withBlock.XlCancel, withBlock.Cancel_Button);
-                xlCtrlLookup.Add(withBlock.XlReminder, withBlock.DtReminder);
-                xlCtrlLookup.Add(withBlock.XlDuedate, withBlock.DtDuedate);
+                xlCtrlLookup.Add(_viewer.XlTopic, _viewer.LblTopic);
+                xlCtrlLookup.Add(_viewer.XlProject, _viewer.LblProject);
+                xlCtrlLookup.Add(_viewer.XlPeople, _viewer.LblPeople);
+                xlCtrlLookup.Add(_viewer.XlContext, _viewer.LblContext);
+                xlCtrlLookup.Add(_viewer.XlTaskname, _viewer.TaskName);
+                xlCtrlLookup.Add(_viewer.XlImportance, _viewer.PriorityBox);
+                xlCtrlLookup.Add(_viewer.XlKanban, _viewer.KbSelector);
+                xlCtrlLookup.Add(_viewer.XlWorktime, _viewer.Duration);
+                xlCtrlLookup.Add(_viewer.XlOk, _viewer.OKButton);
+                xlCtrlLookup.Add(_viewer.XlCancel, _viewer.Cancel_Button);
+                xlCtrlLookup.Add(_viewer.XlReminder, _viewer.DtReminder);
+                xlCtrlLookup.Add(_viewer.XlDuedate, _viewer.DtDuedate);
 
-                xlCtrlLookup.Add(withBlock.XlScWaiting, withBlock.ShortcutWaitingFor);
-                xlCtrlLookup.Add(withBlock.XlScUnprocessed, withBlock.ShortcutUnprocessed);
-                xlCtrlLookup.Add(withBlock.XlScNews, withBlock.ShortcutNews);
-                xlCtrlLookup.Add(withBlock.XlScEmail, withBlock.ShortcutEmail);
-                xlCtrlLookup.Add(withBlock.XlScReadingbusiness, withBlock.ShortcutReadingBusiness);
-                xlCtrlLookup.Add(withBlock.XlScCalls, withBlock.ShortcutCalls);
-                xlCtrlLookup.Add(withBlock.XlScInternet, withBlock.ShortcutInternet);
-                xlCtrlLookup.Add(withBlock.XlScPreread, withBlock.ShortcutPreRead);
-                xlCtrlLookup.Add(withBlock.XlScMeeting, withBlock.ShortcutMeeting);
-                xlCtrlLookup.Add(withBlock.XlScPersonal, withBlock.ShortcutPersonal);
-                xlCtrlLookup.Add(withBlock.XlScBullpin, withBlock.CbxBullpin);
-                xlCtrlLookup.Add(withBlock.XlScToday, withBlock.CbxToday);
+                xlCtrlLookup.Add(_viewer.XlScWaiting, _viewer.ShortcutWaitingFor);
+                xlCtrlLookup.Add(_viewer.XlScUnprocessed, _viewer.ShortcutUnprocessed);
+                xlCtrlLookup.Add(_viewer.XlScNews, _viewer.ShortcutNews);
+                xlCtrlLookup.Add(_viewer.XlScEmail, _viewer.ShortcutEmail);
+                xlCtrlLookup.Add(_viewer.XlScReadingbusiness, _viewer.ShortcutReadingBusiness);
+                xlCtrlLookup.Add(_viewer.XlScCalls, _viewer.ShortcutCalls);
+                xlCtrlLookup.Add(_viewer.XlScInternet, _viewer.ShortcutInternet);
+                xlCtrlLookup.Add(_viewer.XlScPreread, _viewer.ShortcutPreRead);
+                xlCtrlLookup.Add(_viewer.XlScMeeting, _viewer.ShortcutMeeting);
+                xlCtrlLookup.Add(_viewer.XlScPersonal, _viewer.ShortcutPersonal);
+                xlCtrlLookup.Add(_viewer.XlScBullpin, _viewer.CbxBullpin);
+                xlCtrlLookup.Add(_viewer.XlScToday, _viewer.CbxToday);
             }
             return xlCtrlLookup;
         }

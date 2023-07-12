@@ -11,5 +11,7 @@ namespace QuickFiler
             InitConditionalReminder = 8     // 00000000 00001000   2^3
         }
 
+        public enum ToggleState { Off = 0, On = 1 }
+
     }
 }

@@ -21,6 +21,7 @@ namespace QuickFiler.Test.Controllers
         //private Mock<QfcFormViewer> mockQfcFormViewer;
         private QfcFormViewer mockQfcFormViewer;
         private Mock<IQfcFormController> mockQfcFormController;
+        private Mock<IQfcKeyboardHandler> mockKeyboardHandler;
 
         [TestInitialize]
         public void TestInitialize()
@@ -32,6 +33,7 @@ namespace QuickFiler.Test.Controllers
             //this.mockQfcFormViewer.SetupAllProperties();
             this.mockQfcFormViewer = new QfcFormViewer();
             this.mockQfcFormController = this.mockRepository.Create<IQfcFormController>();
+            this.mockKeyboardHandler = this.mockRepository.Create<IQfcKeyboardHandler>();
         }
 
         private QfcCollectionController CreateQfcCollectionController()
@@ -41,6 +43,7 @@ namespace QuickFiler.Test.Controllers
                 this.mockQfcFormViewer, //.Object,
                 false,
                 Enums.InitTypeEnum.InitSort,
+                this.mockKeyboardHandler.Object,
                 this.mockQfcFormController.Object);
         }
 

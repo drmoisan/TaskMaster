@@ -546,7 +546,7 @@ namespace QuickFiler.Legacy
             Panel ctlFrame;
 
             var loopTo = intPosition;
-            for (i = _listQFClass.Count; i >= loopTo; i -= 1)
+            for (i = _listQFClass.Count - 1; i >= loopTo; i -= 1)
             {
                 // Shift items downward if there are any
                 QF = (QfcController)_listQFClass[i];
@@ -764,7 +764,7 @@ namespace QuickFiler.Legacy
             MoveDownControlGroups(qfIndex + 1, selItems.Count);
 
             var loopTo1 = selItems.Count;
-            for (i = 1; i <= loopTo1; i++)
+            for (i = 0; i < loopTo1; i++)
                 AddEmailControlGroup(selItems[i], qfIndex + i, false, convCt, varList, true);
 
             if (blDebug)

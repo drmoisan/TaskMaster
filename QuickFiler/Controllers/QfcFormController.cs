@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using UtilitiesCS;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Diagnostics;
 using System.IO;
 using ToDoModel;
+using System.Reflection;
 
 namespace QuickFiler.Controllers
 {    
@@ -122,9 +124,19 @@ namespace QuickFiler.Controllers
         }
 
         public int ItemsPerIteration { get => (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0); }
-        
-        public void LoadItems(IList<MailItem> listObjects) 
+
+        public void LoadItems(IList<MailItem> listObjects)
         {
+            _formViewer.ForAllControls(x =>
+            {
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KbdHndlr.KeyboardHandler_PreviewKeyDown);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyDown);
+                x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyUp);
+                x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyPress);
+                Debug.WriteLine($"Registered handler for {x.Name}");
+            },
+            new List<Control> { _formViewer.QfcItemViewerTemplate });
+
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
                                                   darkMode: Properties.Settings.Default.DarkMode,
@@ -132,9 +144,9 @@ namespace QuickFiler.Controllers
                                                   keyboardHandler: _parent.KbdHndlr,
                                                   ParentObject: this);
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate);
-            //this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.QfcFormViewer_KeyDown);
-            //ForAllControls(_formViewer,(x => ))
         }
+
+        
 
         //public void FormResize(bool Force = false)
         //{
@@ -210,17 +222,7 @@ namespace QuickFiler.Controllers
 
         public IQfcCollectionController Groups { get => _groups; }
 
-        public void ForAllControls(Control parent, Action<Control> action)
-        {
-            if (parent.HasChildren)
-            {
-                foreach(Control control in parent.Controls)
-                {
-                    ForAllControls(control, action);
-                }
-            }
-            action(parent);
-        }
+        
 
     }
 }

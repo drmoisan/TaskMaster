@@ -41,12 +41,12 @@ namespace UtilitiesCS
                 else { return emails; }
             }
             
-            else if (df.Columns.GetNames().Contains(EntryID)) 
+            else if (!df.Columns.GetNames().Contains(EntryID)) 
             {
                 if (strict) 
                 { 
                     throw new ArgumentOutOfRangeException(
-                        $"{nameof(df)} is missing {EntryID} columns: {df.Columns.GetNames()}"); 
+                        $"{nameof(df)} is missing {EntryID} columns: {string.Join(",",df.Columns.GetNames())}"); 
                 }
                 else { return emails; }
             }
@@ -139,10 +139,13 @@ namespace UtilitiesCS
             if (conv != null)
             {
                 DataFrame df = conv.GetDataFrame();
-                Debug.WriteLine(df.PrettyText());
+                
+                //Console.WriteLine(df.PrettyText());
                 if (SameFolder)
                 {
-                    string FolderName = ObjItem.PropertyAccessor.GetProperty(OlTableExtensions.SchemaFolderName) as string;
+                    //string FolderName = ObjItem.PropertyAccessor.GetProperty(OlTableExtensions.SchemaFolderName) as string;
+                    //Console.WriteLine($"Parent is of com type {ComType.TypeInformation.GetTypeName(ObjItem.Parent)}");
+                    string FolderName = ((MAPIFolder)ObjItem.Parent).Name;
                     df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
                 }
                 if (MailOnly)

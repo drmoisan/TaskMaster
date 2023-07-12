@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -27,7 +28,7 @@ namespace ToDoModel
         // NoToAll = 8
         // End Enum
 
-        public static long SaveAttachmentsFromSelection(IApplicationGlobals AppGlobals, string SavePath, bool DELFILE = false, bool Verify_Action = false, IList selItems = null, bool save_images = false, bool SaveACopy = false, bool SaveMSG = false, bool blVerifySaveDuplicate = true)
+        public static long SaveAttachmentsFromSelection(IApplicationGlobals AppGlobals, string SavePath, bool DELFILE = false, bool Verify_Action = false, IList<MailItem> selItems = null, bool save_images = false, bool SaveACopy = false, bool SaveMSG = false, bool blVerifySaveDuplicate = true)
         {
 
             var _globals = AppGlobals;
@@ -75,7 +76,7 @@ namespace ToDoModel
 
             if (selItems is null)
             {
-                selItems = (IList)_globals.Ol.App.ActiveExplorer().Selection;
+                selItems = (IList<MailItem>)_globals.Ol.App.ActiveExplorer().Selection;
             }
 
 
