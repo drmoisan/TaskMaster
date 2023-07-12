@@ -34,8 +34,8 @@ namespace QuickFiler.Interfaces
         // UI Converations Expansion
         void ConvToggle_Group(int childCount, int indexOriginal);
         void ConvToggle_Group(string originalId);
-        void ConvToggle_UnGroup(IList<MailItem> mailItems, int baseEmailIndex, int conversationCount, object folderList);
-        void MakeSpaceToEnumerateConversation();                        //Rewrite
+        void ConvToggle_UnGroup(IList<MailItem> mailItems, string entryID, int conversationCount, object folderList);
+        void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount);                        
 
         // UI Light Dark
         void SetDarkMode();

@@ -19,20 +19,21 @@ namespace UtilitiesCS
             {
                 throw new ArgumentOutOfRangeException(nameof(insertCount));
             }
+            int lastRowIdx = panel.RowCount - 1;
             panel.RowCount += insertCount;
             for (int i = 1; i <= insertCount; i++)
             {
                 panel.RowStyles.Insert(rowIndex, templateStyle.Clone());
             }
 
-            for (int i = panel.RowCount - 1; i >= rowIndex; i--)
+            for (int i = lastRowIdx; i >= rowIndex; i--)
             {
                 for (int j = 0; j < panel.ColumnCount; j++)
                 {
                     var control = panel.GetControlFromPosition(j, i);
                     if (control != null)
                     {
-                        panel.SetRow(control, i + 1);
+                        panel.SetRow(control, i + insertCount);
                     }
                 }
             }
@@ -58,14 +59,14 @@ namespace UtilitiesCS
             
 
             // move up row controls that comes after row we want to remove
-            for (int i = rowIndex + 1; i < panel.RowCount; i++)
+            for (int i = rowIndex + removeCount; i < panel.RowCount; i++)
             {
                 for (int j = 0; j < panel.ColumnCount; j++)
                 {
                     var control = panel.GetControlFromPosition(j, i);
                     if (control != null)
                     {
-                        panel.SetRow(control, i - 1);
+                        panel.SetRow(control, i - removeCount);
                     }
                 }
             }

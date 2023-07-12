@@ -446,7 +446,7 @@ namespace QuickFiler.Controllers
 
         public void ConvToggle_Group(int childCount, int indexOriginal)
         {
-            _itemTLP.SuspendLayout();
+            //_itemTLP.SuspendLayout();
 
             int removalIndex = indexOriginal + 1;
 
@@ -458,7 +458,8 @@ namespace QuickFiler.Controllers
                 _itemGroups[removalIndex].ItemController.Cleanup();
                 _itemGroups.RemoveAt(removalIndex);
             }
-            
+
+            //_itemTLP.ResumeLayout();
         }
 
         /// <summary>
@@ -470,22 +471,18 @@ namespace QuickFiler.Controllers
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Sorting suggestions from base member</param>
         public void ConvToggle_UnGroup(IList<MailItem> mailItems,
-                                       int baseEmailIndex,
+                                       string entryID,
                                        int conversationCount,
                                        object folderList)
         {
             _itemTLP.SuspendLayout();
+            int baseEmailIndex = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.Mail.EntryID == entryID);
             int insertionIndex = baseEmailIndex + 1;
-            int membersToInsert = conversationCount - 1;
-            
-            TableLayoutHelper.InsertSpecificRow(panel: _itemTLP, 
-                                                rowIndex: insertionIndex, 
-                                                templateStyle: _template, 
-                                                insertCount: membersToInsert);
+            int insertCount = conversationCount - 1;
 
-            // Insert the datamodel placeholders
-            InsertItemGroups(baseEmailIndex, conversationCount);
-            EnumerateConversationMembers(mailItems, baseEmailIndex, conversationCount, folderList);
+            MakeSpaceToEnumerateConversation(insertionIndex, insertCount);
+                        
+            EnumerateConversationMembers(entryID, mailItems, insertionIndex, conversationCount, folderList);
 
             _itemTLP.ResumeLayout();
         }
@@ -499,33 +496,30 @@ namespace QuickFiler.Controllers
         /// <param name="insertionIndex">Location of the Item Group collection where the base member is stored</param>
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Folder suggestions for the first email</param>
-        internal void EnumerateConversationMembers(IList<MailItem> mailItems, int insertionIndex, int conversationCount, object folderList)
+        internal void EnumerateConversationMembers(string entryID, IList<MailItem> mailItems, int insertionIndex, int conversationCount, object folderList)
         {
-            Enumerable.Range(0, conversationCount - 1).AsParallel().Select(i =>
+            var insertions = mailItems.Where(mailItem => mailItem.EntryID != entryID)
+                                      .OrderByDescending(mailItem => mailItem.SentOn)
+                                      .ToList();
+
+            //Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
+            Enumerable.Range(0, insertions.Count).ForEach(i =>
             {
                 var grp = _itemGroups[i + insertionIndex];
                 grp.ItemViewer = LoadItemViewer(i + insertionIndex, _template, false, 1);
-                grp.MailItem = mailItems[i];
-                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i + insertionIndex, grp.MailItem, _keyboardHandler, this);
+                grp.MailItem = insertions[i];
                 
-                //Parallel.Invoke(
-                //    () => grp.ItemController.PopulateConversation(conversationCount),
-                //    () => grp.ItemController.PopulateFolderCombobox(folderList),
-                //    () =>
-                //    {
-                //        if (_darkMode) { grp.ItemController.SetThemeDark(); }
-                //        else { grp.ItemController.SetThemeLight(); }
-                //    });
-                
+                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i + insertionIndex + 1, grp.MailItem, _keyboardHandler, this);                
                 grp.ItemController.PopulateConversation(conversationCount);
                 grp.ItemController.PopulateFolderCombobox(folderList);
                 grp.ItemController.BlIsChild = true;
                 grp.ItemController.ConvOriginID = _itemGroups[insertionIndex-1].MailItem.EntryID;
+                if (_keyboardHandler.KbdActive) { grp.ItemController.ToggleNavigation(Enums.ToggleState.On); }
 
                 if (_darkMode) { grp.ItemController.SetThemeDark(); }
                 else { grp.ItemController.SetThemeLight(); }
 
-                return i;
+                
             });
         }
 
@@ -534,19 +528,40 @@ namespace QuickFiler.Controllers
         /// collection at the targeted location
         /// </summary>
         /// <param name="insertionIndex">Targeted location for the insertion</param>
-        /// <param name="insertionCount">Number of elements to insert</param>
-        internal void InsertItemGroups(int insertionIndex, int insertionCount)
+        /// <param name="insertCount">Number of elements to insert</param>
+        internal void InsertItemGroups(int insertionIndex, int insertCount)
         {
-            for (int i = 0; i < insertionCount - 1; i++)
+            for (int i = 0; i < insertCount; i++)
             {
                 var grp = new ItemGroup();
                 _itemGroups.Insert(insertionIndex, grp);
             }
         }
 
-        public void MakeSpaceToEnumerateConversation()
+        internal void RenumberGroups()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < _itemGroups.Count; i++)
+            {
+                _itemGroups[i].ItemController.Position = i + 1;
+            }
+        }
+
+        internal void RenumberGroups(int beginningIndex)
+        {
+            for (int i = beginningIndex; i < _itemGroups.Count; i++)
+            {
+                _itemGroups[i].ItemController.Position = i + 1;
+            }
+        }
+
+        public void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount)
+        {
+            TableLayoutHelper.InsertSpecificRow(panel: _itemTLP,
+                                                rowIndex: insertionIndex,
+                                                templateStyle: _template,
+                                                insertCount: insertCount);
+            InsertItemGroups(insertionIndex, insertCount);
+            RenumberGroups(insertionIndex+insertCount);
         }
 
         public bool IsSelectionBelowMax(int intNewSelection)

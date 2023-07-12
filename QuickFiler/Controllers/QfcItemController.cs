@@ -131,7 +131,15 @@ namespace QuickFiler.Controllers
 
         public MailItem Mail { get => _mailItem; set => _mailItem = value; }
 
-        public int Position { get => _viewerPosition; set => _viewerPosition = value; }
+        public int Position 
+        { 
+            get => _viewerPosition;
+            set 
+            { 
+                _viewerPosition = value;
+                _itemViewer.LblPos.Text = _viewerPosition.ToString();
+            }
+        }
 
         public string SelectedFolder { get => _itemViewer.CboFolders.SelectedItem.ToString(); }
 
@@ -282,14 +290,14 @@ namespace QuickFiler.Controllers
 
         internal void WireEvents()
         {
-            Debug.WriteLine($"Wiring keyboard for item {this.Position}, {this.Subject}");
+            //Debug.WriteLine($"Wiring keyboard for item {this.Position}, {this.Subject}");
             _itemViewer.ForAllControls(x =>
             {
                 x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_keyboardHandler.KeyboardHandler_PreviewKeyDown);
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDown);
                 x.KeyUp += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyUp);
                 x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_keyboardHandler.KeyboardHandler_KeyPress);
-                Debug.WriteLine($"Registered handler for {x.Name}");
+                //Debug.WriteLine($"Registered handler for {x.Name}");
             },
             new List<Control> { _itemViewer.CboFolders });
 
@@ -520,14 +528,15 @@ namespace QuickFiler.Controllers
         internal void CollapseConversation()
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
-            _parent.ConvToggle_Group(_convOriginID);
+            var entryID = _convOriginID != "" ? _convOriginID :  Mail.EntryID;
+            _parent.ConvToggle_Group(entryID);
         }
 
         internal void EnumerateConversation() 
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             _parent.ConvToggle_UnGroup(ConversationItems,
-                                       ConversationItems.FindIndex(x=>x.EntryID == Mail.EntryID),
+                                       Mail.EntryID,
                                        ConversationItems.Count,
                                        folderList);
         }
