@@ -7,7 +7,7 @@ using System.Linq;
 namespace UtilitiesCS.Test
 {
     [TestClass]
-    public class UnitTest4
+    public class zExampleGroupBy
     {
         [TestMethod]
         public void GroupByEx4()

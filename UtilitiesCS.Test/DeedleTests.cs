@@ -9,7 +9,7 @@ using System.Text;
 namespace UtilitiesCS.Test
 {
     [TestClass]
-    public class UnitTest5
+    public class DeedleTests
     {
         [TestMethod]
         public void DeedleDoodles()

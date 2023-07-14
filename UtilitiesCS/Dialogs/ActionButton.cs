@@ -10,103 +10,103 @@ using UtilitiesCS.Dialogs;
 
 namespace UtilitiesCS
 {
-    public class DelegateButton
+    public class ActionButton
     {
-        public DelegateButton() { }
-        
-        public DelegateButton(Button button,
-                              DialogResult dialogResult,
-                              Delegate @delegate)
+        public ActionButton() { }
+
+        public ActionButton(Button button,
+                            DialogResult dialogResult,
+                            Action action)
         {
             _button = button;
             _button.DialogResult = dialogResult;
-            _delegate = @delegate;
+            _action = action;
         }
 
-        public DelegateButton(string name,
-                              string buttonText,
-                              Delegate @delegate)
+        public ActionButton(string name,
+                            string buttonText,
+                            Action action)
         {
             _name = name;
-            _delegate = @delegate;
+            _action = action;
             Button = MakeButton(buttonText);
         }
 
-        public DelegateButton(string name,
-                              string buttonText,
-                              Delegate @delegate,
-                              Button template)
+        public ActionButton(string name,
+                            string buttonText,
+                            Action action,
+                            Button template)
         {
             _template = template.Clone();
             _name = name;
-            _delegate = @delegate;
+            _action = action;
             Button = MakeButton(buttonText);
         }
 
-        public DelegateButton(string name,
-                              string buttonText,
-                              DialogResult dialogResult,
-                              Delegate @delegate)
+        public ActionButton(string name,
+                            string buttonText,
+                            DialogResult dialogResult,
+                            Action action)
         {
             _name = name;
-            _delegate = @delegate;
+            _action = action;
             Button = MakeButton(buttonText, dialogResult);
         }
 
-        public DelegateButton(string name,
-                              string buttonText,
-                              DialogResult dialogResult,
-                              Delegate @delegate,
-                              Button template)
-        { 
+        public ActionButton(string name,
+                            string buttonText,
+                            DialogResult dialogResult,
+                            Action action,
+                            Button template)
+        {
             _template = template.Clone();
             _name = name;
-            _delegate = @delegate;
+            _action = action;
             Button = MakeButton(buttonText, dialogResult);
         }
 
-        public DelegateButton(string name, 
-                              Image buttonImage, 
-                              string buttonText, 
-                              DialogResult dialogResult, 
-                              Delegate @delegate)
+        public ActionButton(string name,
+                            Image buttonImage,
+                            string buttonText,
+                            DialogResult dialogResult,
+                            Action action)
         {
             _name = name;
-            _delegate = @delegate;
+            _action = action;
             Button = MakeButton(buttonText, buttonImage, dialogResult);
         }
 
-        public DelegateButton(string name,
-                              Image buttonImage,
-                              string buttonText,
-                              DialogResult dialogResult,
-                              Delegate @delegate,
-                              Button template)
+        public ActionButton(string name,
+                            Image buttonImage,
+                            string buttonText,
+                            DialogResult dialogResult,
+                            Action action,
+                            Button template)
         {
             _template = template.Clone();
             _name = name;
-            _delegate = @delegate;
+            _action = action;
             Button = MakeButton(buttonText, buttonImage, dialogResult);
         }
 
         private string _name;
         private Button _button;
-        private Button _template = new DelegateButtonTemplate().Button1.Clone();
-        private Delegate _delegate;
+        private Button _template = new DelegateButtonTemplate().Button1; //.Clone();
+        private Action _action;
 
-        
-        public static DelegateButton FromButton(Button button,
-                                                DialogResult dialogResult,
-                                                Delegate @delegate) 
-        { 
-            var db = new DelegateButton();
+
+        public static ActionButton FromButton(Button button,
+                                              DialogResult dialogResult,
+                                              Action action)
+        {
+            var db = new ActionButton();
             db.Button = button;
             db.Button.DialogResult = dialogResult;
-            db.Delegate = @delegate;
+            db.Delegate = action;
 
-            return db; 
+            return db;
         }
-        
+
         public string Name { get => _name; set => _name = value; }
 
         public Button Button
@@ -120,15 +120,17 @@ namespace UtilitiesCS
                 _button.Click += new System.EventHandler(Button_Click);
             }
         }
-        
-        public Delegate Delegate { get => _delegate; set => _delegate = value; }
+
+        public Action Delegate { get => _action; set => _action = value; }
 
         public Button ButtonTemplate { get => _template; set => _template = value.Clone(); }
 
         public Button MakeButton(string text)
         {
             Button b = _template.Clone();
+            b.Name = _name;
             b.Text = text;
+            b.Visible = true;
             return b;
         }
 
@@ -163,8 +165,8 @@ namespace UtilitiesCS
 
         internal void Button_Click(object sender, EventArgs e)
         {
-            _delegate.DynamicInvoke();
+            _action.DynamicInvoke();
         }
-        
+
     }
 }

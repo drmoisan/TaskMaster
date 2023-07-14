@@ -293,7 +293,8 @@ namespace ToDoModel
         {
             int Inc_Num;
             int i, j;
-            var tmp_CTF_Map = default(Conversation_To_Folder);
+            //var tmp_CTF_Map = default(Conversation_To_Folder);
+            var tmp_CTF_Map = new Conversation_To_Folder();
             string tmpCCT, tmpFDR;
             bool updated;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -63,5 +64,29 @@ namespace UtilitiesCS
             handler != null && 
             handler.GetInvocationList()
                    .Any(existingHandler => existingHandler == prospectiveHandler);
+
+        
+        public static T Clone<T>(this T controlToClone)
+            where T : Control
+        {
+            PropertyInfo[] controlProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            T instance = Activator.CreateInstance<T>();
+
+            var excluded = new List<string>() { "WindowTarget", "Name", "Parent" };
+            
+            foreach (PropertyInfo propInfo in controlProperties)
+            {
+                if (propInfo.CanWrite)
+                {
+                    //if (propInfo.Name != "WindowTarget")
+                    if (!excluded.Contains(propInfo.Name))
+                        propInfo.SetValue(instance, propInfo.GetValue(controlToClone, null), null);
+                }
+            }
+
+            return instance;
+        }
+        
     }
 }

@@ -81,6 +81,8 @@ namespace QuickFiler.Controllers
         private IQfcKeyboardHandler _keyboardHandler;
         private string _convOriginID = "";
         private bool _suppressEvents = false;
+        private int _intEnterCounter = 0;
+        private int _intComboRightCtr = 0;
 
         #endregion
 
@@ -299,9 +301,16 @@ namespace QuickFiler.Controllers
                 x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_keyboardHandler.KeyboardHandler_KeyPress);
                 //Debug.WriteLine($"Registered handler for {x.Name}");
             },
-            new List<Control> { _itemViewer.CboFolders });
+            new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch });
 
             _itemViewer.CbxConversation.CheckedChanged += new System.EventHandler(this.CbxConversation_CheckedChanged);
+
+            _itemViewer.BtnFlagTask.Click += new System.EventHandler(this.BtnFlagTask_Click);
+            _itemViewer.BtnPopOut.Click += new System.EventHandler(this.BtnPopOut_Click);
+            _itemViewer.BtnDelItem.Click += new System.EventHandler(this.BtnDelItem_Click);
+            _itemViewer.TxtboxSearch.TextChanged += new System.EventHandler(this.TxtboxSearch_TextChanged);
+            _itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtboxSearch_KeyDown);
+            _itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CboFolders_KeyDown);
         }
 
         internal void RegisterFocusActions()
@@ -311,14 +320,15 @@ namespace QuickFiler.Controllers
             _keyboardHandler.KdKeyActions.Add(
                 Keys.Left, (x) => this.ToggleConversationCheckbox(Enums.ToggleState.On));
             _keyboardHandler.KdCharActions.Add('O', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('C', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('A', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('E', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('S', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('T', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('P', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('X', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
-            _keyboardHandler.KdCharActions.Add('F', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
+            _keyboardHandler.KdCharActions.Add('C', (x) => this.ToggleConversationCheckbox());
+            _keyboardHandler.KdCharActions.Add('A', (x) => this.ToggleSaveAttachments());
+            _keyboardHandler.KdCharActions.Add('M', (x) => this.ToggleSaveCopyOfMail());
+            _keyboardHandler.KdCharActions.Add('E', (x) => this.ExpandCtrls1());
+            _keyboardHandler.KdCharActions.Add('S', (x) => this.JumpToSearchTextbox());
+            _keyboardHandler.KdCharActions.Add('T', (x) => this.FlagAsTask());
+            _keyboardHandler.KdCharActions.Add('P', (x) => this.PopOutItem());
+            _keyboardHandler.KdCharActions.Add('X', (x) => this.MarkItemForDeletion());
+            _keyboardHandler.KdCharActions.Add('F', (x) => this.JumpToFolderDropDown());
         }
 
         internal void UnregisterFocusActions()
@@ -328,6 +338,7 @@ namespace QuickFiler.Controllers
             _keyboardHandler.KdCharActions.Remove('O');
             _keyboardHandler.KdCharActions.Remove('C');
             _keyboardHandler.KdCharActions.Remove('A');
+            _keyboardHandler.KdCharActions.Remove('M');
             _keyboardHandler.KdCharActions.Remove('E');
             _keyboardHandler.KdCharActions.Remove('S');
             _keyboardHandler.KdCharActions.Remove('T');
@@ -345,8 +356,127 @@ namespace QuickFiler.Controllers
             }
         }
 
+        internal void BtnFlagTask_Click(object sender, EventArgs e) => FlagAsTask();
+        
+        internal void BtnPopOut_Click(object sender, EventArgs e) => PopOutItem();
+
+        internal void BtnDelItem_Click(object sender, EventArgs e) => MarkItemForDeletion();
+
+        internal void TxtboxSearch_TextChanged(object sender, EventArgs e)
+        {
+            _itemViewer.CboFolders.Items.Clear();
+            _itemViewer.CboFolders.Items.AddRange(
+                _fldrHandler.FindFolder(SearchString: "*" + 
+                _itemViewer.TxtboxSearch.Text + "*",
+                ReloadCTFStagingFiles: false,
+                ReCalcSuggestions: false,
+                objItem: Mail));
+
+            if (_itemViewer.CboFolders.Items.Count >= 2)
+                _itemViewer.CboFolders.SelectedIndex = 1;
+            _itemViewer.CboFolders.DroppedDown = true;
+        }
+
+        internal void TxtboxSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down)
+            {
+                _itemViewer.CboFolders.DroppedDown = true;
+                _itemViewer.CboFolders.Focus();
+            }
+        }
+
+        internal void CboFolders_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Escape:
+                    {
+                        _intEnterCounter = 1;
+                        _intComboRightCtr = 0;
+                        break;
+                    }
+                case Keys.Up:
+                    {
+                        _intEnterCounter = 0;
+                        break;
+                    }
+                case Keys.Down:
+                    {
+                        _intEnterCounter = 0;
+                        break;
+                    }
+                case Keys.Right:
+                    {
+                        _intEnterCounter = 0;
+                        switch (_intComboRightCtr)
+                        {
+                            case 0:
+                                {
+                                    _itemViewer.CboFolders.DroppedDown = true;
+                                    _intComboRightCtr++;
+                                    break;
+                                }
+                            case 1:
+                                {
+                                    _itemViewer.CboFolders.DroppedDown = false;
+                                    _intComboRightCtr = 0;
+                                    MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?", 
+                                        "Dialog", BoxIcon.Question, rightKeyActions);
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageBox.Show(
+                                        "Error in intComboRightCtr ... setting to 0 and continuing",
+                                        "Error",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                                    _intComboRightCtr = 0;
+                                    break;
+                                }
+                        }
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+                        break;
+                    }
+                case Keys.Left:
+                    {
+                        _intEnterCounter = 0;
+                        _intComboRightCtr = 0;
+                        if (_itemViewer.CboFolders.DroppedDown)
+                        {
+                            _itemViewer.CboFolders.DroppedDown = false;
+                            e.SuppressKeyPress = true;
+                            e.Handled = true;
+                        }
+                        else { _keyboardHandler.KeyboardHandler_KeyDown(sender, e); }
+                        
+                        break;
+                    }
+                case Keys.Return:
+                    {
+                        _intEnterCounter++;
+                        if (_intEnterCounter == 1)
+                        {
+                            _intEnterCounter = 0;
+                            _intComboRightCtr = 0;
+                            _keyboardHandler.KeyboardHandler_KeyDown(sender, e);
+                        }
+                        else
+                        {
+                            _intEnterCounter = 1;
+                            _intComboRightCtr = 0;
+                            e.Handled = true;
+                        }
+                        
+                        break;
+                    }
+            }            
+        }
+
         #endregion
-                
+
         #region UI Navigation Methods
 
         public void ToggleNavigation()
@@ -410,16 +540,19 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        // TODO: Implement JumpToFolderDropDown
         public void JumpToFolderDropDown()
         {
-            throw new NotImplementedException();
+            _keyboardHandler.ToggleKeyboardDialog();
+            _parent.ToggleOffNavigation();
+            _itemViewer.CboFolders.Focus();
+            _itemViewer.CboFolders.DroppedDown = true;
+            _intEnterCounter = 0;
         }
 
-        // TODO: Implement JumpToSearchTextbox
         public void JumpToSearchTextbox()
         {
-            throw new NotImplementedException();
+            _keyboardHandler.ToggleKeyboardDialog();
+            _itemViewer.TxtboxSearch.Focus();
         }
 
         /// <summary>
@@ -459,16 +592,14 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        // TODO: Implement ToggleSaveAttachments
         public void ToggleSaveAttachments()
         {
-            throw new NotImplementedException();
+            _itemViewer.CbxAttachments.Checked = !_itemViewer.CbxAttachments.Checked;
         }
 
-        // TODO: Implement ToggleSaveCopyOfMail
         public void ToggleSaveCopyOfMail()
         {
-            throw new NotImplementedException();
+            _itemViewer.CbxEmailCopy.Checked = !_itemViewer.CbxEmailCopy.Checked;
         }
 
         #endregion
@@ -540,7 +671,14 @@ namespace QuickFiler.Controllers
                                        ConversationItems.Count,
                                        folderList);
         }
-        
+
+        internal Dictionary<string, System.Action> rightKeyActions { get => new() 
+        {
+            { "&Pop Out", ()=>this.PopOutItem()},
+            { "&Expand", ()=>{_itemViewer.lblSubject.Focus(); this.EnumerateConversation(); } },
+            { "&Cancel", ()=>{ } }
+        }; }
+
         public void MoveMail()
         {
             if (Mail is not null)
@@ -593,17 +731,22 @@ namespace QuickFiler.Controllers
                 return new List<MailItem> { Mail };
             }
         }
-                
+        
+        public void PopOutItem() => _parent.PopOutControlGroup(Position);
+        
         // TODO: Implement FlagAsTask
         public void FlagAsTask()
         {
             throw new NotImplementedException();
         }
         
-        // TODO: Implement MarkItemForDeletion
         public void MarkItemForDeletion()
         {
-            throw new NotImplementedException();
+            if (!_itemViewer.CboFolders.Items.Contains("Trash to Delete"))
+            {
+                _itemViewer.CboFolders.Items.Add("Trash to Delete");
+            }
+            _itemViewer.CboFolders.SelectedItem = "Trash to Delete";
         }
 
         #endregion

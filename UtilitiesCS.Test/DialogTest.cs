@@ -7,7 +7,7 @@ using UtilitiesCS;
 namespace UtilitiesCS.Test
 {
     [TestClass]
-    public class UnitTest1
+    public class DialogTest
     {
         private delegate DialogResult TestDelegate();
         //private TestDelegate testDelegate1 = buttonOK;

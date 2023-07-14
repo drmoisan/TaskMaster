@@ -72,7 +72,8 @@ namespace UtilitiesCS
             }
 
             // remove specific styles
-            for (int i = rowIndex; i < rowIndex + removeCount; i++)
+            //for (int i = rowIndex; i < rowIndex + removeCount; i++)
+            for (int i = rowIndex + removeCount -1; i >= rowIndex; i--)
             {
                 panel.RowStyles.RemoveAt(i);
             }

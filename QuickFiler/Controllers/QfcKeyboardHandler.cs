@@ -93,28 +93,17 @@ namespace QuickFiler.Controllers
             {
                 if ((KdKeyActions != null) && KdKeyActions.ContainsKey(e.KeyCode))
                 {
+                    e.SuppressKeyPress = true;
                     KdKeyActions[e.KeyCode].DynamicInvoke(e.KeyCode);
+                    e.Handled = true;
                 }
                 else if ((KdCharActions != null) && KdCharActions.ContainsKey((char)e.KeyValue))
                 {
+                    e.SuppressKeyPress = true;
                     KdCharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
+                    e.Handled = true;
                 }   
             }
-            
-
-            //switch (e.KeyCode)
-            //{
-            //    case Keys.Down:
-            //        {
-            //            _parent.FrmCtrlr.Groups.SelectNextItem();
-            //            break;
-            //        }
-            //    case Keys.Up:
-            //        {
-            //            _parent.FrmCtrlr.Groups.SelectPreviousItem();
-            //            break;
-            //        }
-            //}
         }
 
         public void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e)
@@ -147,11 +136,16 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        public void ToggleKeyboardDialog(object sender, KeyEventArgs e)
+        public void ToggleKeyboardDialog()
         {
             if (_kbdActive) { _parent.FrmCtrlr.Groups.ToggleOffNavigation(); }
             else { _parent.FrmCtrlr.Groups.ToggleOnNavigation(); }
             _kbdActive = !_kbdActive;
+        }
+        
+        public void ToggleKeyboardDialog(object sender, KeyEventArgs e)
+        {
+            ToggleKeyboardDialog();
             e.Handled = true;
         }
 

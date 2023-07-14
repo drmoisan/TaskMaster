@@ -81,6 +81,7 @@
             // 
             this.Button2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Button2.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.Button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Button2.Location = new System.Drawing.Point(245, 6);
             this.Button2.Margin = new System.Windows.Forms.Padding(6);
             this.Button2.Name = "Button2";
@@ -94,6 +95,7 @@
             // 
             this.Button1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Button1.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.Button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Button1.Location = new System.Drawing.Point(15, 6);
             this.Button1.Margin = new System.Windows.Forms.Padding(6);
             this.Button1.Name = "Button1";
@@ -124,7 +126,7 @@
             this.TextMessage.BackColor = System.Drawing.SystemColors.Control;
             this.TextMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TextMessage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TextMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TextMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TextMessage.Location = new System.Drawing.Point(86, 6);
             this.TextMessage.Margin = new System.Windows.Forms.Padding(6);
             this.TextMessage.Multiline = true;
@@ -170,6 +172,6 @@
         private System.Windows.Forms.TableLayoutPanel L1v1L2h;
         internal System.Windows.Forms.TableLayoutPanel L2Bottom;
         internal System.Windows.Forms.TextBox TextMessage;
-        private SVGControl.PictureBoxSVG SvgIcon;
+        internal SVGControl.PictureBoxSVG SvgIcon;
     }
 }

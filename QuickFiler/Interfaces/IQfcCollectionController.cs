@@ -13,6 +13,7 @@ namespace QuickFiler.Interfaces
         void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template);
         QfcItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
         void AddEmailControlGroup(MailItem mailItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false);
+        void PopOutControlGroup(int intPosition);
         void RemoveControls();
         void RemoveSpaceToCollapseConversation();
         void RemoveSpecificControlGroup(int intPosition);

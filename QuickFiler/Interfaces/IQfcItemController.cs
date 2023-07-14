@@ -45,6 +45,7 @@ namespace QuickFiler.Interfaces
         void SetThemeLight();
         void Cleanup();
         void MoveMail();
+        void PopOutItem();
         DataFrame DfConversation { get; }
         string Subject { get; }
         string To { get; }

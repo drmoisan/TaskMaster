@@ -11,7 +11,7 @@ using System.Xml;
 namespace UtilitiesCS.Test
 {
     [TestClass]
-    public class UnitTest2
+    public class ResourceTests
     {
         [TestMethod]
         public void TestMethod1()

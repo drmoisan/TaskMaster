@@ -133,7 +133,7 @@ namespace QuickFiler.Controllers
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyDown);
                 x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyUp);
                 x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyPress);
-                Debug.WriteLine($"Registered handler for {x.Name}");
+                // Debug.WriteLine($"Registered handler for {x.Name}");
             },
             new List<Control> { _formViewer.QfcItemViewerTemplate });
 

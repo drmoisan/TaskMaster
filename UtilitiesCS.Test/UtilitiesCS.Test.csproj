@@ -131,17 +131,17 @@
     </Compile>
     <Compile Include="SerializableListTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnitTest1.cs" />
-    <Compile Include="UnitTest2.cs" />
-    <Compile Include="UnitTest3.cs" />
+    <Compile Include="DialogTest.cs" />
+    <Compile Include="ResourceTests.cs" />
+    <Compile Include="StackTest.cs" />
     <Compile Include="OutlookItemSummary_Test.cs" />
     <Compile Include="DictionaryExtensions_Test.cs" />
-    <Compile Include="RunMSDemo.cs" />
+    <Compile Include="zExampleRunMSDemo.cs" />
     <Compile Include="CommonWords_Test.cs" />
     <Compile Include="InputBox_Test.cs" />
-    <Compile Include="UnitTest4.cs" />
+    <Compile Include="zExampleGroupBy.cs" />
     <Compile Include="Tokenizer_Test.cs" />
-    <Compile Include="UnitTest5.cs" />
+    <Compile Include="DeedleTests.cs" />
     <Compile Include="SimpleRegex_Test.cs" />
     <Compile Include="YesNoToAll_Test.cs" />
   </ItemGroup>

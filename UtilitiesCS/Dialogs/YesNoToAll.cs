@@ -45,7 +45,7 @@ namespace UtilitiesCS
                 new DelegateButton("NoToAll",Properties.Resources.RepeatUntilFailure1,"NoToAll",
                     DialogResult.OK, new YesNoToAllDelegate(YesNoToAll.RespondNoToAll))
             };
-            MyBoxController.CustomDialog(message, "Dialog",BoxIcon.Question, delegateButtons);
+            MyBox.ShowDialog(message, "Dialog",BoxIcon.Question, delegateButtons);
 
             return Response;
         }

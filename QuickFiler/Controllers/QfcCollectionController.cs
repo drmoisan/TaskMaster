@@ -261,25 +261,48 @@ namespace QuickFiler.Controllers
             
         }
 
+        public void PopOutControlGroup(int selection)
+        {
+            // Get mail item from the group            
+            MailItem mailItem = _itemGroups[selection - 1].MailItem;
+            
+            // If the group is active, set the active index to -1
+            if(ActiveSelection == selection)
+            {
+                ToggleOffActiveItem(false);
+                ActiveIndex = -1; 
+            }
+            // Else if the active selection is greater than the selection,
+            // decrement the active index
+            else if (ActiveSelection > selection) { ActiveIndex--; }
+
+            // Remove the group from the form
+            RemoveSpecificControlGroup(selection);
+            
+            // TODO: Add the group to the pop out form 
+            
+        }
+
         public void RemoveControls()
         {
             //TODO: Optimize removal so all are removed at once using new helper
             if (_itemGroups is not null)
             {
                 _itemTLP.SuspendLayout();
-                while (_itemGroups.Count > 0)
-                {
-                    int i = _itemGroups.Count - 1;
+                
+                // Remove Item Viewers and Rows from the form
+                TableLayoutHelper.RemoveSpecificRow(_itemTLP, 0, _itemGroups.Count);
 
+                int max = _itemGroups.Count -1;
+                for (int i = max; i >= 0; i--)
+                {
                     // Remove event managers and dispose unmanaged
                     _itemGroups[i].ItemController.Cleanup();
 
-                    // Remove Item Viewer and Row from the form
-                    TableLayoutHelper.RemoveSpecificRow(_itemTLP, i);
-
                     // Remove Handle on item viewer and controller
-                    _itemGroups.RemoveAt(i);  
+                    _itemGroups.RemoveAt(i);
                 }
+                                
                 _itemTLP.ResumeLayout();
             }
         }
@@ -290,9 +313,29 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        public void RemoveSpecificControlGroup(int intPosition)
+        /// <summary>
+        /// Remove a specific control group from the form, 
+        /// remove the group from the list of groups,
+        /// and renumber the remaining groups
+        /// </summary>
+        /// <param name="selection">Number representing the item to remove</param>
+        public void RemoveSpecificControlGroup(int selection)
         {
-            throw new NotImplementedException();
+            _itemTLP.SuspendLayout();
+
+            // Remove the controls from the form
+            TableLayoutHelper.RemoveSpecificRow(_itemTLP, selection - 1);
+
+            // Renumber the remaining groups
+            RenumberGroups();
+
+            // Remove the group from the list of groups
+            _itemGroups.RemoveAt(selection - 1);
+
+            // Renumber the remaining groups
+            RenumberGroups();
+
+            _itemTLP.ResumeLayout();
         }
 
         public void ChangeByIndex(int idx)
@@ -339,6 +382,7 @@ namespace QuickFiler.Controllers
                         .ItemController
                         .ToggleNavigation(
                         Enums.ToggleState.Off));
+            //_keyboardHandler.KbdActive = false;
         }
 
         public void ToggleOnNavigation()
@@ -357,7 +401,7 @@ namespace QuickFiler.Controllers
         public bool ToggleOffActiveItem(bool parentBlExpanded)
         {
             bool blExpanded = parentBlExpanded;
-            if (ActiveIndex != -1)
+            if ((ActiveIndex != -1)&&_keyboardHandler.KbdActive)
             {
                 //adjusted to _intActiveSelection -1 to accommodate zero based
                 IQfcItemController itemController = _itemGroups[ActiveIndex].ItemController;
@@ -403,29 +447,44 @@ namespace QuickFiler.Controllers
             // _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
         }
 
+        // QUESTION: Is this method needed?
         public void MoveDownControlGroups(int intPosition, int intMoves)
         {
             // Perhaps this can be eliminated
             // throw new NotImplementedException();
         }
 
+        // QUESTION: Is this method needed?
         public void MoveDownPix(int intPosition, int intPix)
         {
             // Perhaps this can be eliminated
             // throw new NotImplementedException();
         }
 
+        // QUESTION: Is this method needed?
         public void ResizeChildren(int intDiffx)
         {
             // Perhaps this can be eliminated
             // throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Changes the conversation checkbox state of the item viewer at the 
+        /// specified index without raising events
+        /// </summary>
+        /// <param name="indexOriginal">Index of the group to change</param>
+        /// <param name="desiredState">Checked is true or false</param>
         internal void ChangeConversationSilently(int indexOriginal, bool desiredState) 
         {
             ChangeConversationSilently(_itemGroups[indexOriginal], desiredState);
         }
 
+        /// <summary>
+        /// Changes the conversation checkbox state of the item viewer within 
+        /// the group without raising events
+        /// </summary>
+        /// <param name="grp">Item group containing the item viewer</param>
+        /// <param name="desiredState">Checked is true or false</param>
         internal void ChangeConversationSilently(ItemGroup grp, bool desiredState)
         {
             var suppressionState = grp.ItemController.SuppressEvents;
@@ -509,10 +568,17 @@ namespace QuickFiler.Controllers
             int insertionIndex = baseEmailIndex + 1;
             int insertCount = conversationCount - 1;
 
-            MakeSpaceToEnumerateConversation(insertionIndex, insertCount);
-                        
-            EnumerateConversationMembers(entryID, mailItems, insertionIndex, conversationCount, folderList);
-
+            if (insertCount > 0)
+            {
+                MakeSpaceToEnumerateConversation(insertionIndex,
+                                                 insertCount);
+                
+                EnumerateConversationMembers(entryID,
+                                             mailItems,
+                                             insertionIndex,
+                                             conversationCount,
+                                             folderList);
+            }
             _itemTLP.ResumeLayout();
         }
 

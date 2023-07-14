@@ -254,6 +254,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\ActionButton.cs" />
+    <Compile Include="Dialogs\DelegateButtonTemplate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DelegateButtonTemplate.Designer.cs">
+      <DependentUpon>DelegateButtonTemplate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />
@@ -358,7 +365,7 @@
     </Compile>
     <Compile Include="EmailIntelligence\RecentsList.cs" />
     <Compile Include="ReusableTypeClasses\SerializableList.cs" />
-    <Compile Include="Dialogs\MyBoxController.cs" />
+    <Compile Include="Dialogs\MyBox.cs" />
     <Compile Include="ReusableTypeClasses\StackGeek.cs" />
     <Compile Include="ReusableTypeClasses\StackObjectCS.cs" />
     <Compile Include="HelperClasses\TableLayoutHelper.cs" />
@@ -371,6 +378,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Dialogs\DelegateButtonTemplate.resx">
+      <DependentUpon>DelegateButtonTemplate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\FolderNotFoundViewer.resx">
       <DependentUpon>FolderNotFoundViewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -400,6 +410,7 @@
   <ItemGroup>
     <Content Include="NativeMethods.txt" />
     <Content Include="Resources\ActivateWorkflow.svg" />
+    <None Include="Resources\QuestionMark.svg" />
     <None Include="Resources\Run.png" />
     <None Include="Resources\RepeatLastRun.png" />
     <None Include="Resources\Run.svg" />

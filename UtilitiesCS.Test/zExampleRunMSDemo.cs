@@ -6,7 +6,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace UtilitiesCS.Test
 {
     [TestClass]
-    public class RunMSDemo
+    public class zExampleRunMSDemo
     {
         [TestMethod]
         public void TestMethod1()
