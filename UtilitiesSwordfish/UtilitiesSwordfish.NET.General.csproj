@@ -65,6 +65,7 @@
     <Compile Include="Collections\DoubleLinkListDictionaryNode.cs" />
     <Compile Include="Collections\DoubleLinkListIndexNode.cs" />
     <Compile Include="Collections\IConcurrentObservableBase.cs" />
+    <Compile Include="Collections\IConcurrentObservableCollection.cs" />
     <Compile Include="Collections\IConcurrentObservableDictionary.cs" />
     <Compile Include="Collections\IImmutableCollectionBase.cs" />
     <Compile Include="Collections\ImmutableCollection.cs" />

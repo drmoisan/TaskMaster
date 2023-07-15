@@ -88,7 +88,7 @@ namespace ToDoModel
         internal void AddConversationBasedSuggestions(MailItem OlMail, IApplicationGlobals _globals)
         {
             // Is the conversationID already mapped to an email Folder. If so, grab the index of it
-            int Inc_Num = _globals.AF.CTFList.CTF_Incidence_FIND(OlMail.ConversationID);
+            int Inc_Num = _globals.AF.CTFList.FindID(OlMail.ConversationID);
             
             // If an incidence is found score it and add it to the list of suggestions
             if (Inc_Num > 0) { ScoreAndAddConv(_globals.AF.CTFList.CTF_Inc[Inc_Num], 
@@ -96,17 +96,17 @@ namespace ToDoModel
                                                _globals.AF.Conversation_Weight); }
         }
 
-        internal void ScoreAndAddConv(CTF_Incidence ctfIncidence, int convCtPwr, int convWeight)
+        internal void ScoreAndAddConv(CtfIncidence ctfIncidence, int convCtPwr, int convWeight)
         {
             // For each Folder that already contains at least one email with the conversationID ...
-            for (int i = 1; i <= ctfIncidence.Folder_Count; i++)
+            for (int i = 1; i <= ctfIncidence.FolderCount; i++)
             {
                 // Calculate the weight of the suggestion based on how much of the conversation is already in the folder
-                long score = ctfIncidence.Email_Conversation_Count[i];
+                long score = ctfIncidence.EmailCounts[i];
                 score = (long)Math.Round(Math.Pow(score, convCtPwr) * convWeight);
 
                 // Add or increment the score for the folder
-                AddSuggestion(ctfIncidence.Email_Folder[i], score);
+                AddSuggestion(ctfIncidence.EmailFolders[i], score);
             }
         }
 

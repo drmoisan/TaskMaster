@@ -10,16 +10,16 @@ namespace EmailIntelligence.Test
     [TestClass]
     public class CTFIncidences_Test
     {
-        [TestMethod]
-        public void CTF_Incidence_Text_File_READ_Test()
-        {
-            string oneDrive = Environment.GetEnvironmentVariable("OneDriveCommercial");
-            string folderpath = Path.Combine(oneDrive, "Email attachments from Flow", "Combined", "data");
-            string filename = "9999999CTF_Inc.txt";
+        //[TestMethod]
+        //public void CTF_Incidence_Text_File_READ_Test()
+        //{
+        //    string oneDrive = Environment.GetEnvironmentVariable("OneDriveCommercial");
+        //    string folderpath = Path.Combine(oneDrive, "Email attachments from Flow", "Combined", "data");
+        //    string filename = "9999999CTF_Inc.txt";
 
-            CtfIncidenceList ctfs = new CtfIncidenceList();
-            ctfs.CTF_Incidence_Text_File_READ(folderpath, filename);
-        }
+        //    CtfIncidenceList ctfs = new CtfIncidenceList();
+        //    ctfs.CTF_Incidence_Text_File_READ(folderpath, filename);
+        //}
 
         [TestMethod]
         public void Deserialize_JSONMissing_Test()

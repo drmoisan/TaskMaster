@@ -349,7 +349,7 @@ namespace ToDoModel
         private void AddConversationBasedSuggestions(MailItem OlMail, IApplicationGlobals _globals)
         {
             // Is the conversationID already mapped to an email Folder. If so, grab the index of it
-            int Inc_Num = _globals.AF.CTFList.CTF_Incidence_FIND(OlMail.ConversationID);
+            int Inc_Num = _globals.AF.CTFList.FindID(OlMail.ConversationID);
             if (Inc_Num > 0)
             {
                 {

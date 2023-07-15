@@ -261,8 +261,10 @@
     <Compile Include="Dialogs\DelegateButtonTemplate.Designer.cs">
       <DependentUpon>DelegateButtonTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="EmailIntelligence\CtfMap.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations.cs" />
     <Compile Include="Interfaces\IAppAutoFileObjects.cs" />
@@ -300,7 +302,7 @@
     <Compile Include="OutlookExtensions\OlItemPseudoInterface.cs" />
     <Compile Include="Dialogs\InputBox.cs" />
     <Compile Include="EmailIntelligence\CommonWords.cs" />
-    <Compile Include="EmailIntelligence\Conversation_To_Folder.cs" />
+    <Compile Include="EmailIntelligence\CtfMapEntry.cs" />
     <Compile Include="Examples\MSDemoConv.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="HelperClasses\ConversationHelper.cs" />
@@ -308,7 +310,7 @@
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="HelperClasses\FlagsHelper.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceList.cs" />
-    <Compile Include="EmailIntelligence\CTF_Incidence.cs" />
+    <Compile Include="EmailIntelligence\CtfIncidence.cs" />
     <Compile Include="Dialogs\DelegateButton.cs" />
     <Compile Include="HelperClasses\MailResolution.cs" />
     <Compile Include="HelperClasses\DgvForm.cs">
@@ -331,6 +333,7 @@
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Interfaces\ISerializableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
+    <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
     <Compile Include="To Depricate\CSVDictUtilities.cs" />
     <Compile Include="To Depricate\FileIO2.cs" />

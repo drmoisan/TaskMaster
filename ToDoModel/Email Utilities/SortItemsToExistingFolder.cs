@@ -294,22 +294,22 @@ namespace ToDoModel
             int Inc_Num;
             int i, j;
             //var tmp_CTF_Map = default(Conversation_To_Folder);
-            var tmp_CTF_Map = new Conversation_To_Folder();
+            var tmp_CTF_Map = new CtfMapEntry();
             string tmpCCT, tmpFDR;
             bool updated;
 
 
             updated = false;
-            Inc_Num = CTFList.CTF_Incidence_FIND(MSG.ConversationID);                        // Check to see if the conversation id is already in the incidence matrix
+            Inc_Num = CTFList.FindID(MSG.ConversationID);                        // Check to see if the conversation id is already in the incidence matrix
 
             if (Inc_Num == 0)                                                     // If it is not in the matrix,
             {
                 CTFList.CTF_Inc_Ct += 1;                                         // increase matrix record count
                 Array.Resize(ref CTFList.CTF_Inc, CTFList.CTF_Inc_Ct + 1);                                  // and expand the matrix
 
-                tmp_CTF_Map.Email_Conversation_Count = 1;
-                tmp_CTF_Map.Email_Conversation_ID = MSG.ConversationID;
-                tmp_CTF_Map.Email_Folder = fldr;
+                tmp_CTF_Map.EmailCount = 1;
+                tmp_CTF_Map.ConversationID = MSG.ConversationID;
+                tmp_CTF_Map.EmailFolder = fldr;
 
                 CTFList.CTF_Incidence_INIT(CTFList.CTF_Inc_Ct);                                 // Initialize Variable
                 CTFList.CTF_Incidence_SET(CTFList.CTF_Inc_Ct, 1, 1, tmp_CTF_Map);                // Map Variable in top position
@@ -357,11 +357,11 @@ namespace ToDoModel
                 if (updated == false)
                 {
 
-                    tmp_CTF_Map.Email_Conversation_Count = 1;
-                    tmp_CTF_Map.Email_Conversation_ID = MSG.ConversationID;
-                    tmp_CTF_Map.Email_Folder = fldr;
+                    tmp_CTF_Map.EmailCount = 1;
+                    tmp_CTF_Map.ConversationID = MSG.ConversationID;
+                    tmp_CTF_Map.EmailFolder = fldr;
 
-                    CTFList.CTF_Inc_Position_ADD(Inc_Num, tmp_CTF_Map);                     // If it is in the matrix, add it in the right slot
+                    CTFList.CtfIncidencePositionAdd(Inc_Num, tmp_CTF_Map);                     // If it is in the matrix, add it in the right slot
 
                 }
 

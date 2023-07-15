@@ -1,46 +1,44 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Serialization;
-using System.IO;
 using System.Windows.Forms;
-using Newtonsoft;
-using Newtonsoft.Json;
+using Deedle;
 using Microsoft.Office.Interop.Outlook;
-using UtilitiesCS.ReusableTypeClasses;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
+using Swordfish.NET.Collections;
+using Swordfish.NET.General.Collections;
 
 namespace UtilitiesCS
 {
-    [Serializable()]
-    public class SerializableList<T> : IList<T>, ISerializableList<T>
+    public class ScoCollection<T> : IConcurrentObservableBase<T>, IList<T>, ICollection<T>, IList, ICollection
     {
-        public SerializableList()
+        #region Constructors
+
+        public ScoCollection() 
         {
-            _innerList = new List<T>();
+            _collection = new();
+        }
+        
+        public ScoCollection(IEnumerable<T> enumerable) 
+        { 
+            _collection = new(enumerable);
         }
 
-        public SerializableList(IList<T> listOfT)
-        {
-            _innerList = listOfT;
-        }
-
-        public SerializableList(IEnumerable<T> IEnumerableOfT)
-        {
-            _lazyLoader = IEnumerableOfT;
-        }
-
-        public SerializableList(string filename, string folderpath)
+        public ScoCollection(string filename, string folderpath)
         {
             Filename = filename;
             Folderpath = folderpath;
             Deserialize();
         }
 
-        public SerializableList(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        public ScoCollection(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
         {
             Filename = filename;
             Folderpath = folderpath;
@@ -48,105 +46,88 @@ namespace UtilitiesCS
             Deserialize(_filepath, backupLoader, askUserOnError);
         }
 
+        #endregion
+
+        #region Private Variables
+
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private IList<T> _innerList;
-        private IEnumerable<T> _lazyLoader;
+        private ConcurrentObservableCollection<T> _collection;
         private string _backupFilepath = "";
 
-        internal void ensureList()
-        {
-            if (_innerList == null)
-                _innerList = new List<T>(_lazyLoader);
-        }
-
-        #region IList<T> Members
-        public int IndexOf(T item)
-        {
-            ensureList();
-            return _innerList.IndexOf(item);
-        }
-        public void Insert(int index, T item)
-        {
-            ensureList();
-            _innerList.Insert(index, item);
-        }
-        public void RemoveAt(int index)
-        {
-            ensureList();
-            _innerList.RemoveAt(index);
-        }
-        public T this[int index]
-        {
-            get
-            {
-                ensureList();
-                return _innerList[index];
-            }
-            set
-            {
-                ensureList();
-                _innerList[index] = value;
-            }
-        }
         #endregion
 
-        #region IList<T> Extensions
-        public int FindIndex(Predicate<T> match) => _innerList.FindIndex(match);
-        public int FindIndex(int startIndex, Predicate<T> match) => _innerList.FindIndex(startIndex, match);
-        public int FindIndex(int startIndex, int count, Predicate<T> match) => _innerList.FindIndex(startIndex, count, match);
+        #region IConcurrentObservableBase Implementation
+
+        public T this[int index] { get => _collection[index]; set => _collection[index] = value; }
+        
+        public ImmutableCollectionBase<T> Snapshot => _collection.Snapshot;
+
+        public int Count => _collection.Count;
+
+        public bool IsReadOnly => _collection.IsReadOnly;
+       
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public void Add(T item) => _collection.Add(item);
+        
+        public void Clear() => _collection.Clear();
+        
+        public bool Contains(T item) => _collection.Contains(item);
+        
+        public void CopyTo(T[] array, int arrayIndex) => _collection.CopyTo(array, arrayIndex);
+        
+        public void Dispose() => _collection.Dispose();
+        
+        public IEnumerator<T> GetEnumerator() => _collection.GetEnumerator();
+        
+        public int IndexOf(T item) => _collection.IndexOf(item);
+        
+        public void Insert(int index, T item) => _collection.Insert(index, item);
+        
+        public bool Remove(T item) => _collection.Remove(item);
+        
+        public void RemoveAt(int index) => _collection.RemoveAt(index);
+        
+        public IDisposable Subscribe(IObserver<NotifyCollectionChangedEventArgs> observer) => _collection.Subscribe(observer);
+                
+        IEnumerator IEnumerable.GetEnumerator() => (_collection as IEnumerable).GetEnumerator();
+
         #endregion
 
-        #region ICollection<T> Members
-        public void Add(T item)
-        {
-            ensureList();
-            _innerList.Add(item);
-            NotifyPropertyChanged(nameof(Add));
-        }
-        public void Clear()
-        {
-            ensureList();
-            _innerList.Clear();
-        }
-        public bool Contains(T item)
-        {
-            ensureList();
-            return _innerList.Contains(item);
-        }
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            ensureList();
-            _innerList.CopyTo(array, arrayIndex);
-        }
-        public int Count
-        {
-            get { ensureList(); return _innerList.Count; }
-        }
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-        public bool Remove(T item)
-        {
-            ensureList();
-            return _innerList.Remove(item);
-        }
+        #region IList Implementation
+
+        object IList.this[int index] { get => (_collection as IList)[index]; set => (_collection as IList)[index] = value; }
+
+        bool IList.IsReadOnly => (_collection as IList).IsReadOnly;
+
+        bool IList.IsFixedSize => (_collection as IList).IsFixedSize;
+
+        int IList.Add(object value) => (_collection as IList).Add(value);
+        
+        void IList.Clear() => (_collection as IList).Clear();
+        
+        bool IList.Contains(object value) => (_collection as IList).Contains(value);
+        
+        int IList.IndexOf(object value) => (_collection as IList).IndexOf(value);
+        
+        void IList.Insert(int index, object value) => (_collection as IList).Insert(index, value);
+        
+        void IList.Remove(object value) => (_collection as IList).Remove(value);
+        
+        void IList.RemoveAt(int index) => (_collection as IList).RemoveAt(index);
+        
         #endregion
 
-        #region IEnumerable<T> Members
-        public IEnumerator<T> GetEnumerator()
-        {
-            ensureList();
-            return _innerList.GetEnumerator();
-        }
-        #endregion
+        #region ICollection Implementation
 
-        #region IEnumerable Members
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            ensureList();
-            return _innerList.GetEnumerator();
-        }
+        int ICollection.Count => (_collection as ICollection).Count;
+
+        object ICollection.SyncRoot => (_collection as ICollection).SyncRoot;
+
+        bool ICollection.IsSynchronized => (_collection as ICollection).IsSynchronized;
+
+        void ICollection.CopyTo(Array array, int index) => (_collection as ICollection).CopyTo(array, index);
+
         #endregion
 
         #region Serialization
@@ -252,7 +233,7 @@ namespace UtilitiesCS
 
             try
             {
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                _collection = JsonConvert.DeserializeObject<ConcurrentObservableCollection<T>>(File.ReadAllText(filepath));
             }
             catch (FileNotFoundException e)
             {
@@ -291,7 +272,7 @@ namespace UtilitiesCS
                 {
                     if (_backupFilepath != "")
                     {
-                        _innerList = backupLoader(_backupFilepath);
+                        _collection = new ConcurrentObservableCollection<T>(backupLoader(_backupFilepath));
                     }
                     else
                     {
@@ -299,7 +280,7 @@ namespace UtilitiesCS
 
                         var folder = Path.GetDirectoryName(filepath);
                         var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";
-                        _innerList = backupLoader(Path.Combine(folder, filename));
+                        _collection = new ConcurrentObservableCollection<T>(backupLoader(Path.Combine(folder, filename)));
                     }
                     NotifyPropertyChanged("BackupLoader");
                     Serialize();
@@ -318,7 +299,7 @@ namespace UtilitiesCS
 
                     if (response == DialogResult.Yes)
                     {
-                        _innerList = new List<T> { };
+                        _collection = new ConcurrentObservableCollection<T> { };
                     }
                     else { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
                 }
@@ -337,9 +318,9 @@ namespace UtilitiesCS
                 var settings = new JsonSerializerSettings();
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath),settings);
+                _collection = JsonConvert.DeserializeObject<ConcurrentObservableCollection<T>>(File.ReadAllText(filepath), settings);
 
-                //_innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                //_collection = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
             }
             catch (FileNotFoundException)
             {
@@ -370,21 +351,23 @@ namespace UtilitiesCS
             {
                 if (response == DialogResult.Yes)
                 {
-                    _innerList = new List<T> { };
+                    _collection = new ConcurrentObservableCollection<T> { };
                     this.Serialize();
                 }
-                else if (_innerList == null)
+                else if (_collection == null)
                 {
                     throw new ArgumentNullException("Must have a list or create one to continue executing");
                 }
             }
         }
 
-        public List<T> ToList() { return new List<T>(_innerList); }
+        public List<T> ToList() { return new List<T>(_collection); }
 
-        public void FromList(IList<T> value) { _innerList = value; }
+        public void FromList(IList<T> value) { _collection = new ConcurrentObservableCollection<T>(value); }
 
         #endregion
 
     }
+
+
 }
