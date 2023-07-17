@@ -133,8 +133,20 @@ namespace UtilitiesCS.ReusableTypeClasses
             this.Filepath = filepath;
 
             string output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(filepath, output);
+            //File.WriteAllText(filepath, output);
+            WriteTextAsync(filepath, output).Wait();
+        }
 
+        private async Task WriteTextAsync(string filePath, string text)
+        {
+            byte[] encodedText = Encoding.Unicode.GetBytes(text);
+
+            using (FileStream sourceStream = new FileStream(filePath,
+                FileMode.Create, FileAccess.Write, FileShare.None,
+                bufferSize: 4096, useAsync: true))
+            {
+                await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
+            };
         }
 
         public void Deserialize()
@@ -239,7 +251,9 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             try
             {
-                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
+                string strObject = File.ReadAllText(filepath, Encoding.Unicode);
+                //var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
+                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(strObject);
                 foreach (var kvp in innerDictionary) { this.Add(kvp.Key, kvp.Value); }
             }
             catch (FileNotFoundException)

@@ -87,13 +87,26 @@ namespace ToDoModel
 
         internal void AddConversationBasedSuggestions(MailItem OlMail, IApplicationGlobals _globals)
         {
+            var map = _globals.AF.CtfMap;
             // Is the conversationID already mapped to an email Folder. If so, grab the index of it
-            int Inc_Num = _globals.AF.CTFList.FindID(OlMail.ConversationID);
-            
-            // If an incidence is found score it and add it to the list of suggestions
-            if (Inc_Num > 0) { ScoreAndAddConv(_globals.AF.CTFList.CTF_Inc[Inc_Num], 
-                                               _globals.AF.LngConvCtPwr, 
-                                               _globals.AF.Conversation_Weight); }
+            if (map.ContainsId(OlMail.ConversationID))
+            {
+                var matches = map.TopEntriesById(OlMail.ConversationID, 5);
+                foreach (var match in matches)
+                {
+                    long score = match.EmailCount;
+                    score = (long)Math.Round(Math.Pow(score, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight);
+                    AddSuggestion(match.EmailFolder, score);
+                }
+            }
+
+            //// Is the conversationID already mapped to an email Folder. If so, grab the index of it
+            //int Inc_Num = _globals.AF.CtfMap.FindId(OlMail.ConversationID);
+
+            //// If an incidence is found score it and add it to the list of suggestions
+            //if (Inc_Num > 0) { ScoreAndAddConv(_globals.AF.CtfMap.CTF_Inc[Inc_Num], 
+            //                                   _globals.AF.LngConvCtPwr, 
+            //                                   _globals.AF.Conversation_Weight); }
         }
 
         internal void ScoreAndAddConv(CtfIncidence ctfIncidence, int convCtPwr, int convWeight)

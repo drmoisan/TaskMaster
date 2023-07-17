@@ -724,7 +724,7 @@ namespace QuickFiler.Controllers
             int k;
             string[] strOutput = new string[EmailsLoaded + 1];
             var loopTo = EmailsLoaded;
-            for (k = 1; k <= loopTo; k++)
+            for (k = 0; k < loopTo; k++)
             {
                 var QF = _itemGroups[k].ItemController;
                 var infoMail = new cInfoMail();
@@ -754,7 +754,7 @@ namespace QuickFiler.Controllers
                 strOutput[k] = dataLine;
             }
 
-            return default;
+            return strOutput;
         }
 
         private string xComma(string str)

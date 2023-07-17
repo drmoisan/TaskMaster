@@ -219,27 +219,26 @@ namespace ToDoModel
             int SWVal, Val, Val1;
             string strTmpFldr;
             string[] varFldrSubs;
+            ISubjectMapSL subMap = AppGlobals.AF.SubjectMap;
 
             SubjectStripped = OlMail.Subject.StripCommonWords(AppGlobals.AF.CommonWords); // Eliminate common words from the subject
-            var loopTo = (int)SubjectMapModule.SubjectMapCt;
-            for (i = 1; i <= loopTo; i++)   // Loop through every subject / folder combination
+            string folderpath = "default";
+            var loopTo = subMap.Count;
+            for (i = 0; i < loopTo; i++)   // Loop through every subject / folder combination
             {
                 {
                     // Run Smith Waterman on Email Subject and the SubjectMap
-                    SWVal = SmithWaterman.SW_Calc(SubjectStripped, SubjectMapModule.SubjectMap[i].EmailSubject, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
+                    SWVal = SmithWaterman.SW_Calc(SubjectStripped, subMap[i].EmailSubject, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
 
                     // Calculate a weighted score
-                    Val = (int)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * SubjectMapModule.SubjectMap[i].EmailSubjectCount);
+                    Val = (int)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * subMap[i].EmailSubjectCount);
 
                     // Execute on only distinct Email Folder Names 
-                    if ((SubjectMapModule.SubjectMap[i].Folderpath ?? "") != (SubjectMapModule.SubjectMap[i - 1].Folderpath ?? ""))
+                    if (subMap[i].Folderpath != folderpath)
                     {
                         // Get the top level folder name in the folder tree
-                        varFldrSubs = SubjectMapModule.SubjectMap[i].Folderpath.Split("\\");
-
-                        // Run Smith Waterman on Email Subject and the distinct Email Folder Names
-                        strTmpFldr = varFldrSubs[varFldrSubs.Length-1];
-
+                        strTmpFldr = Path.GetDirectoryName(subMap[i].Folderpath);
+                        
                         // Run Smith Waterman on Email Subject and the distinct Email Folder Names
                         Val1 = SmithWaterman.SW_Calc(SubjectStripped, strTmpFldr, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
                         
@@ -249,7 +248,7 @@ namespace ToDoModel
 
                     if (Val > 5)
                     {
-                        Add(SubjectMapModule.SubjectMap[i].Folderpath, Val);
+                        Add(subMap[i].Folderpath, Val);
                     }
                 }
             }
@@ -348,33 +347,23 @@ namespace ToDoModel
 
         private void AddConversationBasedSuggestions(MailItem OlMail, IApplicationGlobals _globals)
         {
+            var map = _globals.AF.CtfMap;
             // Is the conversationID already mapped to an email Folder. If so, grab the index of it
-            int Inc_Num = _globals.AF.CTFList.FindID(OlMail.ConversationID);
-            if (Inc_Num > 0)
+            if (map.ContainsId(OlMail.ConversationID))
             {
+                var matches = map.TopEntriesById(OlMail.ConversationID, 5);
+                foreach (var match in matches)
                 {
-                    ref var withBlock = ref _globals.AF.CTFList.CTF_Inc[Inc_Num];
-                    // For each Folder that already contains at least one email with the conversationID ...
-                    for (int i = 1, loopTo = withBlock.Folder_Count; i <= loopTo; i++)
-                    {
-                        // Calculate the weight of the suggestion based on how much of the conversation is already in the folder
-                        long Val = withBlock.Email_Conversation_Count[i];
-                        Val = (long)Math.Round(Math.Pow(Val, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight);
-                        Add(withBlock.Email_Folder[i], Val);
-                    }
+                    long score = match.EmailCount;
+                    score = (long)Math.Round(Math.Pow(score, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight);
+                    this.Add(match.EmailFolder, score);
                 }
             }
         }
 
         private static void ReloadStagingFiles(IApplicationGlobals _globals)
         {
-            // Throw New NotImplementedException("CTF_Incidence_Text_File_READ, SubjectMapReadTextFile, " _
-            // & "and Common_Words_Text_File_READ are not implemented. Cannot reload")
-            // CTF_Incidence_Text_File_READ(_globals.FS)
-            SubjectMapModule.Subject_MAP_Text_File_READ(_globals.FS, (IList<string>)_globals.AF.CommonWords);
-            SubjectMapModule.Common_Words_Text_File_READ(_globals.FS);
-
-            string[] strFList = NavigateOlFolders.OlFolderlist_GetAll(_globals.Ol);
+            throw new NotImplementedException();
         }
 
         #endregion

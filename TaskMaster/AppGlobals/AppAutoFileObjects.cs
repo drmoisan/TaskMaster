@@ -19,7 +19,7 @@ namespace TaskMaster
         private int _smithWatterman_GapPenalty;
         private IRecentsList<string> _recentsList;
         private IApplicationGlobals _parent;
-        private CtfIncidenceList _ctfList;
+        private CtfMap _ctfMap;
         private ISerializableList<string> _commonWords;
         private Properties.Settings _defaults = Properties.Settings.Default;
         
@@ -82,25 +82,28 @@ namespace TaskMaster
             }
         }
 
-        public CtfIncidenceList CTFList
+        public CtfMap CtfMap
         {
             get
             {
-                if (_ctfList is null)
-                    _ctfList = new CtfIncidenceList(filename: _defaults.File_CTF_Inc,
-                                                    folderpath: _parent.FS.FldrPythonStaging,
-                                                    backupFilepath: _defaults.BackupFile_CTF_Inc);
-                return _ctfList;
+                if (_ctfMap is null)
+                    _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc,
+                                         folderpath: _parent.FS.FldrPythonStaging,
+                                         backupFilepath: Path.Combine(
+                                             _parent.FS.FldrPythonStaging, 
+                                             _defaults.BackupFile_CTF_Inc),
+                                         askUserOnError: true);
+                return _ctfMap;
             }
             set
             {
-                _ctfList = value;
-                if (_ctfList.Filepath == "")
+                _ctfMap = value;
+                if (_ctfMap.Filepath == "")
                 {
-                    _ctfList.Folderpath = _parent.FS.FldrPythonStaging;
-                    _ctfList.Filename = _defaults.File_CTF_Inc;
+                    _ctfMap.Folderpath = _parent.FS.FldrPythonStaging;
+                    _ctfMap.Filename = _defaults.File_CTF_Inc;
                 }
-                _ctfList.Serialize();
+                _ctfMap.Serialize();
             }
         }
 

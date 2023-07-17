@@ -271,59 +271,59 @@ namespace QuickFiler.Test.Controllers
             this.mockRepository.VerifyAll();
         }
 
-        [TestMethod]
-        public void ConvToggle_Group_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
-            IList<MailItem> selItems = null;
-            int indexOriginal = 0;
+        //[TestMethod]
+        //public void ConvToggle_Group_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var qfcCollectionController = this.CreateQfcCollectionController();
+        //    IList<MailItem> selItems = null;
+        //    int indexOriginal = 0;
 
-            // Act
-            qfcCollectionController.ConvToggle_Group(
-                selItems,
-                indexOriginal);
+        //    // Act
+        //    qfcCollectionController.ConvToggle_Group(
+        //        selItems,
+        //        indexOriginal);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    // Assert
+        //    Assert.Fail();
+        //    this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void ConvToggle_UnGroup_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
-            IList<MailItem> mailItems = null;
-            int baseEmailIndex = 0;
-            int conversationCount = 0;
-            object folderList = null;
+        //[TestMethod]
+        //public void ConvToggle_UnGroup_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var qfcCollectionController = this.CreateQfcCollectionController();
+        //    IList<MailItem> mailItems = null;
+        //    int baseEmailIndex = 0;
+        //    int conversationCount = 0;
+        //    object folderList = null;
 
-            // Act
-            qfcCollectionController.ConvToggle_UnGroup(
-                mailItems,
-                baseEmailIndex,
-                conversationCount,
-                folderList);
+        //    // Act
+        //    qfcCollectionController.ConvToggle_UnGroup(
+        //        mailItems,
+        //        baseEmailIndex,
+        //        conversationCount,
+        //        folderList);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    // Assert
+        //    Assert.Fail();
+        //    this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void MakeSpaceToEnumerateConversation_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
+        //[TestMethod]
+        //public void MakeSpaceToEnumerateConversation_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var qfcCollectionController = this.CreateQfcCollectionController();
 
-            // Act
-            qfcCollectionController.MakeSpaceToEnumerateConversation();
+        //    // Act
+        //    qfcCollectionController.MakeSpaceToEnumerateConversation();
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    // Assert
+        //    Assert.Fail();
+        //    this.mockRepository.VerifyAll();
+        //}
 
         [TestMethod]
         public void IsSelectionBelowMax_StateUnderTest_ExpectedBehavior()

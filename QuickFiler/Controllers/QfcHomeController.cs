@@ -39,7 +39,7 @@ namespace QuickFiler.Controllers
 
         internal void InitAfObjects() 
         {
-            if (_globals.AF.CTFList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CTFList)}"); }
+            if (_globals.AF.CtfMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CtfMap)}"); }
             if (_globals.AF.RecentsList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.RecentsList)}"); }
             if (_globals.AF.CommonWords is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CommonWords)}"); }
             if (_globals.AF.SubjectMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.SubjectMap)}"); }
@@ -79,6 +79,8 @@ namespace QuickFiler.Controllers
         {
             IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
             _formController.LoadItems(listEmail);
+            _stopWatch = new cStopWatch();
+            _stopWatch.Start();
         }
 
         public void Iterate()
@@ -112,7 +114,7 @@ namespace QuickFiler.Controllers
 
 
             // Create a line of comma seperated valued to store data
-            curDateText = DateTime.Now.ToString("mm/dd/yyyy");
+            curDateText = DateTime.Now.ToString("MM/dd/yyyy");
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curDateText = " & curDateText
 
             curTimeText = DateTime.Now.ToString("hh:mm");

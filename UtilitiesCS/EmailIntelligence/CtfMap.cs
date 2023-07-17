@@ -16,11 +16,10 @@ namespace UtilitiesCS
 
         public CtfMap(string filename,
                       string folderpath,
-                      CSVLoader<CtfMapEntry> backupLoader,
                       string backupFilepath,
                       bool askUserOnError) : base(filename: filename, 
                                                   folderpath: folderpath,
-                                                  backupLoader: backupLoader,
+                                                  backupLoader: ReadTextFile,
                                                   backupFilepath: backupFilepath,
                                                   askUserOnError: askUserOnError) { }
                 
@@ -49,6 +48,18 @@ namespace UtilitiesCS
                 this.Add(entry);
             }
             
+        }
+
+        public bool ContainsId(string id)
+        {
+            var idx = this.FindIndex(x => x.ConversationID == id);
+            return idx != -1;
+        }
+
+        public int FindId(string id)
+        {
+            int idx = this.FindIndex(x => x.ConversationID == id);
+            return idx;
         }
 
         #region Backup Loader
@@ -82,7 +93,8 @@ namespace UtilitiesCS
             {
                 entry.EmailFolder = lines.Dequeue();
                 entry.ConversationID = lines.Dequeue();
-                entry.EmailCount = int.Parse(lines.Dequeue());
+                var emailCount = lines.Dequeue();
+                entry.EmailCount = int.Parse(emailCount.Trim());
                 return entry;
             }
             catch (System.FormatException e)
