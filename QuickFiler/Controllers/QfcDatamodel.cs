@@ -39,7 +39,17 @@ namespace QuickFiler.Controllers
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
 
-        public StackObjectCS<MailItem> MovedItems { get => _movedObjects; }
+        public StackObjectCS<MailItem> MovedItems 
+        {
+            get 
+            {
+                if (_movedObjects is null)
+                {
+                    _movedObjects = new StackObjectCS<MailItem>();
+                }
+                return _movedObjects; 
+            }
+        }
 
         public IList<MailItem> InitEmailQueueAsync(int batchSize, BackgroundWorker worker)
         {

@@ -259,7 +259,7 @@ namespace UtilitiesCS
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show($"{filepath} not found. Load from CSV?",
+                    response = MessageBox.Show($"{filepath} not found. Load from backup?",
                                                "File Not Found",
                                                MessageBoxButtons.YesNo,
                                                MessageBoxIcon.Error);
@@ -275,7 +275,7 @@ namespace UtilitiesCS
                 if (askUserOnError)
                 {
                     response = MessageBox.Show($"{filepath} encountered a problem. {e.Message} " +
-                                               " Load from CSV?",
+                                               " Load from backup?",
                                                "Error!",
                                                MessageBoxButtons.YesNo,
                                                MessageBoxIcon.Error);
@@ -295,7 +295,7 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        log.Debug($"Attempting to load {Path.GetFileName(filepath)} from CSV");
+                        log.Debug($"Attempting to load {Path.GetFileName(filepath)} from backup");
 
                         var folder = Path.GetDirectoryName(filepath);
                         var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";

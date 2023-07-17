@@ -51,10 +51,13 @@
             this.TxtboxSearch = new System.Windows.Forms.TextBox();
             this.L1h1L2v1h5Panel = new System.Windows.Forms.Panel();
             this.LblAcDelete = new System.Windows.Forms.Label();
+            this.BtnDelItem = new System.Windows.Forms.Button();
             this.L1h1L2v1h4Panel = new System.Windows.Forms.Panel();
             this.LblAcPopOut = new System.Windows.Forms.Label();
+            this.BtnPopOut = new System.Windows.Forms.Button();
             this.L1h1L2v1h3Panel = new System.Windows.Forms.Panel();
             this.LblAcTask = new System.Windows.Forms.Label();
+            this.BtnFlagTask = new System.Windows.Forms.Button();
             this.L1h1L2v2h = new System.Windows.Forms.TableLayoutPanel();
             this.LblAcFolder = new System.Windows.Forms.Label();
             this.LblFolder = new System.Windows.Forms.Label();
@@ -66,9 +69,6 @@
             this.LblAcEmail = new System.Windows.Forms.Label();
             this.CbxConversation = new System.Windows.Forms.CheckBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
-            this.BtnDelItem = new System.Windows.Forms.Button();
-            this.BtnPopOut = new System.Windows.Forms.Button();
-            this.BtnFlagTask = new System.Windows.Forms.Button();
             this.L0v.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1h)).BeginInit();
             this.L1h.Panel1.SuspendLayout();
@@ -439,6 +439,24 @@
             this.LblAcDelete.TabIndex = 2;
             this.LblAcDelete.Text = "X";
             // 
+            // BtnDelItem
+            // 
+            this.BtnDelItem.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BtnDelItem.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnDelItem.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.BtnDelItem.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.BtnDelItem.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Red;
+            this.BtnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.BtnDelItem.Image = global::QuickFiler.Properties.Resources.Delete;
+            this.BtnDelItem.Location = new System.Drawing.Point(0, 0);
+            this.BtnDelItem.Margin = new System.Windows.Forms.Padding(0);
+            this.BtnDelItem.Name = "BtnDelItem";
+            this.BtnDelItem.Size = new System.Drawing.Size(100, 50);
+            this.BtnDelItem.TabIndex = 1;
+            this.BtnDelItem.TabStop = false;
+            this.BtnDelItem.UseVisualStyleBackColor = true;
+            // 
             // L1h1L2v1h4Panel
             // 
             this.L1h1L2v1h4Panel.Controls.Add(this.LblAcPopOut);
@@ -464,6 +482,19 @@
             this.LblAcPopOut.TabIndex = 3;
             this.LblAcPopOut.Text = "P";
             // 
+            // BtnPopOut
+            // 
+            this.BtnPopOut.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BtnPopOut.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.BtnPopOut.Image = global::QuickFiler.Properties.Resources.ApplicationFlyout;
+            this.BtnPopOut.Location = new System.Drawing.Point(0, 0);
+            this.BtnPopOut.Margin = new System.Windows.Forms.Padding(0);
+            this.BtnPopOut.Name = "BtnPopOut";
+            this.BtnPopOut.Size = new System.Drawing.Size(100, 50);
+            this.BtnPopOut.TabIndex = 2;
+            this.BtnPopOut.TabStop = false;
+            this.BtnPopOut.UseVisualStyleBackColor = true;
+            // 
             // L1h1L2v1h3Panel
             // 
             this.L1h1L2v1h3Panel.Controls.Add(this.LblAcTask);
@@ -488,6 +519,19 @@
             this.LblAcTask.Size = new System.Drawing.Size(28, 27);
             this.LblAcTask.TabIndex = 4;
             this.LblAcTask.Text = "T";
+            // 
+            // BtnFlagTask
+            // 
+            this.BtnFlagTask.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BtnFlagTask.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.BtnFlagTask.Image = global::QuickFiler.Properties.Resources.FlagDarkRed;
+            this.BtnFlagTask.Location = new System.Drawing.Point(0, 0);
+            this.BtnFlagTask.Margin = new System.Windows.Forms.Padding(0);
+            this.BtnFlagTask.Name = "BtnFlagTask";
+            this.BtnFlagTask.Size = new System.Drawing.Size(100, 50);
+            this.BtnFlagTask.TabIndex = 3;
+            this.BtnFlagTask.TabStop = false;
+            this.BtnFlagTask.UseVisualStyleBackColor = true;
             // 
             // L1h1L2v2h
             // 
@@ -660,50 +704,6 @@
             this.LblAcConversation.Size = new System.Drawing.Size(37, 33);
             this.LblAcConversation.TabIndex = 15;
             this.LblAcConversation.Text = "C";
-            // 
-            // BtnDelItem
-            // 
-            this.BtnDelItem.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnDelItem.BackColor = System.Drawing.SystemColors.Control;
-            this.BtnDelItem.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BtnDelItem.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.BtnDelItem.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Red;
-            this.BtnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.BtnDelItem.Image = global::QuickFiler.Properties.Resources.Delete;
-            this.BtnDelItem.Location = new System.Drawing.Point(0, 0);
-            this.BtnDelItem.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnDelItem.Name = "BtnDelItem";
-            this.BtnDelItem.Size = new System.Drawing.Size(100, 50);
-            this.BtnDelItem.TabIndex = 1;
-            this.BtnDelItem.TabStop = false;
-            this.BtnDelItem.UseVisualStyleBackColor = true;
-            // 
-            // BtnPopOut
-            // 
-            this.BtnPopOut.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnPopOut.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BtnPopOut.Image = global::QuickFiler.Properties.Resources.ApplicationFlyout;
-            this.BtnPopOut.Location = new System.Drawing.Point(0, 0);
-            this.BtnPopOut.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnPopOut.Name = "BtnPopOut";
-            this.BtnPopOut.Size = new System.Drawing.Size(100, 50);
-            this.BtnPopOut.TabIndex = 2;
-            this.BtnPopOut.TabStop = false;
-            this.BtnPopOut.UseVisualStyleBackColor = true;
-            // 
-            // BtnFlagTask
-            // 
-            this.BtnFlagTask.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnFlagTask.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BtnFlagTask.Image = global::QuickFiler.Properties.Resources.FlagDarkRed;
-            this.BtnFlagTask.Location = new System.Drawing.Point(0, 0);
-            this.BtnFlagTask.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnFlagTask.Name = "BtnFlagTask";
-            this.BtnFlagTask.Size = new System.Drawing.Size(100, 50);
-            this.BtnFlagTask.TabIndex = 3;
-            this.BtnFlagTask.TabStop = false;
-            this.BtnFlagTask.UseVisualStyleBackColor = true;
             // 
             // QfcItemViewer
             // 

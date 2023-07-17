@@ -101,7 +101,7 @@ namespace Swordfish.NET.Collections {
         WriteCollection.Add(item);
       });
     }
-
+        
     public void Clear(){
       DoBaseClear(() => { });
     }

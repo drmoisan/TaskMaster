@@ -1,77 +1,146 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Collections;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Swordfish.NET.Collections;
-using Newtonsoft.Json;
-using System.IO;
 using System.Windows.Forms;
+using Deedle;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
+using Swordfish.NET.Collections;
+using Swordfish.NET.General.Collections;
 
-namespace UtilitiesCS.ReusableTypeClasses
+namespace UtilitiesCS
 {
-    /// <summary>
-    /// Class that implements a serializable concurrent observable dictionary
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    [Serializable()]
-    public class SCODictionary<TKey, TValue>: ConcurrentObservableDictionary<TKey, TValue>, ISCODictionary<TKey, TValue>
+    public class ScoCollection<T> : IConcurrentObservableBase<T>, IList<T>, ICollection<T>, IList, ICollection
     {
-        #region constructors
-        public SCODictionary() : base() { }
-        public SCODictionary(IDictionary<TKey, TValue> source) : base(source) { }
-        public SCODictionary(IEqualityComparer<TKey> equalityComparer) : base(equalityComparer) { }    
-        public SCODictionary(int capactity) : base(capactity) { }
-        public SCODictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer) : base(source, equalityComparer) { }
-        public SCODictionary(int capacity, IEqualityComparer<TKey> equalityComparer) : base(capacity, equalityComparer) { }
+        #region Constructors
 
-        public SCODictionary(string filename,
-                             string folderpath) : base()
+        public ScoCollection() 
+        {
+            _collection = new();
+        }
+        
+        public ScoCollection(IEnumerable<T> enumerable) 
+        { 
+            _collection = new(enumerable);
+        }
+
+        public ScoCollection(string filename, string folderpath)
         {
             Filename = filename;
             Folderpath = folderpath;
             Deserialize();
         }
 
-        /// <summary>
-        /// Creates a new serializable concurrent observable dictionary from an existing dictionary and filepath
-        /// </summary>
-        /// <param name="dictionary">Existing dictionary</param>
-        /// <param name="filename">Name of json file to house the SCODictionary</param>
-        /// <param name="folderpath">Location of json file</param>
-        public SCODictionary(IDictionary<TKey, TValue> dictionary,
-                             string filename,
-                             string folderpath) : base(dictionary)
-        {
-            Filename = filename;
-            Folderpath = folderpath;
-            Serialize();
-        }
-
-        public SCODictionary(string filename,
-                             string folderpath,
-                             ISCODictionary<TKey, TValue>.AltLoader backupLoader,
-                             string backupFilepath,
-                             bool askUserOnError) : base()
+        public ScoCollection(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
         {
             Filename = filename;
             Folderpath = folderpath;
             _backupFilepath = backupFilepath;
             Deserialize(_filepath, backupLoader, askUserOnError);
         }
+
+        #endregion
+
+        #region Private Variables
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private ConcurrentObservableCollection<T> _collection;
+        private string _backupFilepath = "";
+
+        #endregion
+
+        #region IConcurrentObservableBase Implementation
+
+        public T this[int index] { get => _collection[index]; set => _collection[index] = value; }
+        
+        public ImmutableCollectionBase<T> Snapshot => _collection.Snapshot;
+
+        public int Count => _collection.Count;
+
+        public bool IsReadOnly => _collection.IsReadOnly;
+       
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public void Add(T item) => _collection.Add(item);
+        
+        public void Clear() => _collection.Clear();
+        
+        public bool Contains(T item) => _collection.Contains(item);
+        
+        public void CopyTo(T[] array, int arrayIndex) => _collection.CopyTo(array, arrayIndex);
+        
+        public void Dispose() => _collection.Dispose();
+        
+        public IEnumerator<T> GetEnumerator() => _collection.GetEnumerator();
+        
+        public int IndexOf(T item) => _collection.IndexOf(item);
+        
+        public void Insert(int index, T item) => _collection.Insert(index, item);
+        
+        public bool Remove(T item) => _collection.Remove(item);
+        
+        public void RemoveAt(int index) => _collection.RemoveAt(index);
+        
+        public IDisposable Subscribe(IObserver<NotifyCollectionChangedEventArgs> observer) => _collection.Subscribe(observer);
+                
+        IEnumerator IEnumerable.GetEnumerator() => (_collection as IEnumerable).GetEnumerator();
+
+        #endregion
+
+        #region IList Implementation
+
+        object IList.this[int index] { get => (_collection as IList)[index]; set => (_collection as IList)[index] = value; }
+
+        bool IList.IsReadOnly => (_collection as IList).IsReadOnly;
+
+        bool IList.IsFixedSize => (_collection as IList).IsFixedSize;
+
+        int IList.Add(object value) => (_collection as IList).Add(value);
+        
+        void IList.Clear() => (_collection as IList).Clear();
+        
+        bool IList.Contains(object value) => (_collection as IList).Contains(value);
+        
+        int IList.IndexOf(object value) => (_collection as IList).IndexOf(value);
+        
+        void IList.Insert(int index, object value) => (_collection as IList).Insert(index, value);
+        
+        void IList.Remove(object value) => (_collection as IList).Remove(value);
+        
+        void IList.RemoveAt(int index) => (_collection as IList).RemoveAt(index);
+        
+        #endregion
+
+        #region ICollection Implementation
+
+        int ICollection.Count => (_collection as ICollection).Count;
+
+        object ICollection.SyncRoot => (_collection as ICollection).SyncRoot;
+
+        bool ICollection.IsSynchronized => (_collection as ICollection).IsSynchronized;
+
+        void ICollection.CopyTo(Array array, int index) => (_collection as ICollection).CopyTo(array, index);
+
         #endregion
 
         #region Serialization
-        
-
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private string _filepath = "";
         private string _filename = "";
         private string _folderpath = "";
-        private string _backupFilepath = "";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public string Filepath
         {
@@ -132,21 +201,18 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             this.Filepath = filepath;
 
-            string output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            //File.WriteAllText(filepath, output);
-            WriteTextAsync(filepath, output).Wait();
-        }
-
-        private async Task WriteTextAsync(string filePath, string text)
-        {
-            byte[] encodedText = Encoding.Unicode.GetBytes(text);
-
-            using (FileStream sourceStream = new FileStream(filePath,
-                FileMode.Create, FileAccess.Write, FileShare.None,
-                bufferSize: 4096, useAsync: true))
+            var settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.Auto;
+            settings.Formatting = Formatting.Indented;
+            using (TextWriter writer = File.CreateText(filepath))
             {
-                await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
-            };
+                var serializer = JsonSerializer.Create(settings);
+                serializer.Serialize(writer, this);
+            }
+            //string output = JsonConvert.SerializeObject(this, settings);
+            //string output = JsonConvert.SerializeObject(this, Formatting.Indented);
+            //File.WriteAllText(filepath, output);
+
         }
 
         public void Deserialize()
@@ -159,7 +225,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             if (Filepath != "") Deserialize(Filepath, askUserOnError);
         }
 
-        public void Deserialize(string filepath, ISCODictionary<TKey, TValue>.AltLoader backupLoader, bool askUserOnError)
+        public void Deserialize(string filepath, CSVLoader<T> backupLoader, bool askUserOnError)
         {
             if (_filepath != filepath) this.Filepath = filepath;
 
@@ -167,15 +233,14 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             try
             {
-                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
-                foreach (var kvp in innerDictionary) { this.Add(kvp.Key, kvp.Value); }
+                _collection = JsonConvert.DeserializeObject<ConcurrentObservableCollection<T>>(File.ReadAllText(filepath));
             }
             catch (FileNotFoundException e)
             {
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show($"{filepath} not found. Load from CSV?",
+                    response = MessageBox.Show($"{filepath} not found. Load from backup?",
                                                "File Not Found",
                                                MessageBoxButtons.YesNo,
                                                MessageBoxIcon.Error);
@@ -191,7 +256,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 if (askUserOnError)
                 {
                     response = MessageBox.Show($"{filepath} encountered a problem. {e.Message} " +
-                                               " Load from CSV?",
+                                               " Load from backup?",
                                                "Error!",
                                                MessageBoxButtons.YesNo,
                                                MessageBoxIcon.Error);
@@ -207,18 +272,17 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     if (_backupFilepath != "")
                     {
-                        var innerDictionary = backupLoader(_backupFilepath);
-                        foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
+                        _collection = new ConcurrentObservableCollection<T>(backupLoader(_backupFilepath));
                     }
                     else
                     {
-                        log.Debug($"Attempting to load {Path.GetFileName(filepath)} from CSV");
+                        log.Debug($"Attempting to load {Path.GetFileName(filepath)} from backup");
 
                         var folder = Path.GetDirectoryName(filepath);
                         var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";
-                        var innerDictionary = backupLoader(Path.Combine(folder, filename));
-                        foreach (var kvp in innerDictionary) { base.Add(kvp.Key, kvp.Value); }
+                        _collection = new ConcurrentObservableCollection<T>(backupLoader(Path.Combine(folder, filename)));
                     }
+                    NotifyPropertyChanged("BackupLoader");
                     Serialize();
                 }
                 else if (response == DialogResult.No)
@@ -235,7 +299,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
                     if (response == DialogResult.Yes)
                     {
-
+                        _collection = new ConcurrentObservableCollection<T> { };
                     }
                     else { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
                 }
@@ -251,10 +315,12 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             try
             {
-                string strObject = File.ReadAllText(filepath, Encoding.Unicode);
-                //var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
-                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(strObject);
-                foreach (var kvp in innerDictionary) { this.Add(kvp.Key, kvp.Value); }
+                var settings = new JsonSerializerSettings();
+                settings.TypeNameHandling = TypeNameHandling.Auto;
+                settings.Formatting = Formatting.Indented;
+                _collection = JsonConvert.DeserializeObject<ConcurrentObservableCollection<T>>(File.ReadAllText(filepath), settings);
+
+                //_collection = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
             }
             catch (FileNotFoundException)
             {
@@ -281,15 +347,27 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
                 else { response = DialogResult.Yes; }
             }
+            finally
+            {
+                if (response == DialogResult.Yes)
+                {
+                    _collection = new ConcurrentObservableCollection<T> { };
+                    this.Serialize();
+                }
+                else if (_collection == null)
+                {
+                    throw new ArgumentNullException("Must have a list or create one to continue executing");
+                }
+            }
         }
 
-        Dictionary<TKey, TValue> ISCODictionary<TKey, TValue>.ToDictionary()
-        {
-            return new Dictionary<TKey, TValue>(this);
-        }
+        public List<T> ToList() { return new List<T>(_collection); }
+
+        public void FromList(IList<T> value) { _collection = new ConcurrentObservableCollection<T>(value); }
 
         #endregion
 
-
     }
+
+
 }

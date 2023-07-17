@@ -158,7 +158,7 @@ namespace ToDoModel
                             if (string.IsNullOrEmpty(strTemp2))
                             {
                                 // Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
-                                UpdateForMove(MSG, SortFolderpath, AppGlobals.AF.CTFList);
+                                UpdateForMove(MSG, SortFolderpath, AppGlobals.AF.CtfMap, AppGlobals.AF.SubjectMap);
                             };
                             try
                             {
@@ -289,99 +289,12 @@ namespace ToDoModel
             }
         }
 
-        private static void UpdateForMove(MailItem MSG, string fldr, CtfIncidenceList CTFList)
+        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSL subMap)
         {
-            int Inc_Num;
-            int i, j;
-            //var tmp_CTF_Map = default(Conversation_To_Folder);
-            var tmp_CTF_Map = new Conversation_To_Folder();
-            string tmpCCT, tmpFDR;
-            bool updated;
-
-
-            updated = false;
-            Inc_Num = CTFList.CTF_Incidence_FIND(MSG.ConversationID);                        // Check to see if the conversation id is already in the incidence matrix
-
-            if (Inc_Num == 0)                                                     // If it is not in the matrix,
-            {
-                CTFList.CTF_Inc_Ct += 1;                                         // increase matrix record count
-                Array.Resize(ref CTFList.CTF_Inc, CTFList.CTF_Inc_Ct + 1);                                  // and expand the matrix
-
-                tmp_CTF_Map.Email_Conversation_Count = 1;
-                tmp_CTF_Map.Email_Conversation_ID = MSG.ConversationID;
-                tmp_CTF_Map.Email_Folder = fldr;
-
-                CTFList.CTF_Incidence_INIT(CTFList.CTF_Inc_Ct);                                 // Initialize Variable
-                CTFList.CTF_Incidence_SET(CTFList.CTF_Inc_Ct, 1, 1, tmp_CTF_Map);                // Map Variable in top position
-            }
-
-            else
-            {
-
-                {
-                    ref var withBlock = ref CTFList.CTF_Inc[Inc_Num];
-
-                    var loopTo = withBlock.Folder_Count;
-                    for (i = 1; i <= loopTo; i++)
-                    {
-                        if ((CTFList.CTF_Inc[Inc_Num].Email_Folder[i] ?? "") == (fldr ?? ""))
-                        {
-                            CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[i] = 1 + CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[i];
-                            updated = true;
-                            if (i > 1)
-                            {
-                                for (j = i; j >= 2; j -= 1)
-                                {
-                                    if (CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j] > CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j - 1])
-                                    {
-                                        tmpCCT = CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j].ToString();
-                                        tmpFDR = CTFList.CTF_Inc[Inc_Num].Email_Folder[j];
-                                        CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j] = withBlock.Email_Conversation_Count[j - 1];
-                                        CTFList.CTF_Inc[Inc_Num].Email_Folder[j] = withBlock.Email_Folder[j - 1];
-                                        CTFList.CTF_Inc[Inc_Num].Email_Conversation_Count[j - 1] = int.Parse(tmpCCT);
-                                        CTFList.CTF_Inc[Inc_Num].Email_Folder[j - 1] = tmpFDR;
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            if (updated == true)
-                                break;
-                        }
-                    }
-
-                }
-
-                if (updated == false)
-                {
-
-                    tmp_CTF_Map.Email_Conversation_Count = 1;
-                    tmp_CTF_Map.Email_Conversation_ID = MSG.ConversationID;
-                    tmp_CTF_Map.Email_Folder = fldr;
-
-                    CTFList.CTF_Inc_Position_ADD(Inc_Num, tmp_CTF_Map);                     // If it is in the matrix, add it in the right slot
-
-                }
-
-            }
-
-            SubjectMapModule.Subject_Map_Add(MSG.Subject, fldr);
+            ctfMap.Add(mailItem.ConversationID, fldr, 1);
+            subMap.Add(mailItem.Subject, fldr);
         }
-
-        // Private Sub Add_Recent(sortFolder As String)
-        // Throw New NotImplementedException()
-        // End Sub
-
-        // Private Sub SaveAttachmentsFromSelection(strFolderPath As String, v As Boolean, Optional value As Object = Nothing, Optional selItems As IList = Nothing)
-        // Throw New NotImplementedException()
-        // End Sub
-
-        // Private Sub SaveAttachmentsFromSelection(SavePath As String, Verify_Action As Boolean, selItems As IList, save_images As Boolean, SaveMSG As Boolean)
-        // Throw New NotImplementedException()
-        // End Sub
-
+                
         private static void SaveMessageAsMSG(string fileSystem_LOC, IList<MailItem> selItems)
         {
             throw new NotImplementedException();
@@ -427,7 +340,9 @@ namespace ToDoModel
 
         public static void Cleanup_Files()
         {
-            throw new NotImplementedException();
+            // Call WRITE_Text_File     - Writes to the recents list
+            // Call Email_AutoCategorize.CTF_Incidence_Text_File_WRITE - Writes to the CTF_Incidence file   
+            // Call Email_AutoCategorize.Subject_MAP_Text_File_WRITE - Writes to the Subject_MAP file
         }
 
         // Public Function DialogueThrowNotImplemented() As Boolean

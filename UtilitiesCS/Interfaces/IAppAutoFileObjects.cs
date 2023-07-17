@@ -10,7 +10,7 @@ namespace UtilitiesCS
         int LngConvCtPwr { get; set; }
         int MaxRecents { get; set; }
         IRecentsList<string> RecentsList { get; set; }
-        CtfIncidenceList CTFList { get; set; }
+        CtfMap CtfMap { get; set; }
         ISerializableList<string> CommonWords { get; set; }
         bool SuggestionFilesLoaded { get; set; }
         int SmithWatterman_MatchScore { get; set; }

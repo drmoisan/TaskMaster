@@ -93,7 +93,7 @@
       <Value Profile="(Default)">Compact</Value>
     </Setting>
     <Setting Name="BackupFile_CTF_Inc" Type="System.String" Scope="User">
-      <Value Profile="(Default)">9999999CTF_Inc.txt</Value>
+      <Value Profile="(Default)">9999999CTF_Map.txt</Value>
     </Setting>
     <Setting Name="BackupFile_CommonWords" Type="System.String" Scope="User">
       <Value Profile="(Default)">9999999CommonWords.txt</Value>

@@ -3,6 +3,7 @@ using UtilitiesCS.EmailIntelligence;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace UtilitiesCS
 {
@@ -214,7 +215,11 @@ namespace UtilitiesCS
         }
         
         public int[] SubjectWordLengths { get => _subjectWordLengths; set => _subjectWordLengths = value; }
+
+        [JsonIgnore]
         public int Score { get => _score; set => _score = value; }
+
+        [JsonIgnore]
         public ISubjectMapEncoder Encoder { get => _encoder; set => _encoder = value; }
 
         public bool ReadyToEncode(ISubjectMapEncoder encoder)
