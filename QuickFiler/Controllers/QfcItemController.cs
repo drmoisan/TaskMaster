@@ -193,28 +193,47 @@ namespace QuickFiler.Controllers
 
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
-            _itemViewer.LblSender.Text = CaptureEmailDetailsModule.GetSenderName(mailItem);
-            _itemViewer.lblSubject.Text = mailItem.Subject;
-            if (_mailItem.UnRead == true)
-            {
-                _itemViewer.LblSender.Font = new Font(_itemViewer.LblSender.Font, FontStyle.Bold);
-                _itemViewer.lblSubject.Font = new Font(_itemViewer.lblSubject.Font, FontStyle.Bold);
-            }
-            _itemViewer.TxtboxBody.Text = CompressPlainText(mailItem.Body);
-            _itemViewer.LblTriage.Text = CaptureEmailDetailsModule.GetTriage(mailItem);
-            _itemViewer.LblSentOn.Text = mailItem.SentOn.ToString("g");
-            _itemViewer.LblActionable.Text = CaptureEmailDetailsModule.GetActionTaken(mailItem);
+            var itemInfo = new MailItemInfo(mailItem);
+            itemInfo.ExtractBasics();
+            
+            _itemViewer.Invoke(new System.Action(() => AssignControls(itemInfo, viewerPosition)));
+            
+            //_itemViewer.LblSender.Text = itemInfo.Sender;
+            //_itemViewer.lblSubject.Text = itemInfo.Subject;
+            //_itemViewer.TxtboxBody.Text = itemInfo.Body;
+
+            //_itemViewer.LblTriage.Text = itemInfo.Triage;
+            //_itemViewer.LblSentOn.Text = itemInfo.SentOn;
+            //_itemViewer.LblActionable.Text = itemInfo.Actionable;
+            //_itemViewer.LblPos.Text = viewerPosition.ToString();
+
+            //if (_mailItem.UnRead == true)
+            //{
+            //    _itemViewer.LblSender.Font = new Font(_itemViewer.LblSender.Font, FontStyle.Bold);
+            //    _itemViewer.lblSubject.Font = new Font(_itemViewer.lblSubject.Font, FontStyle.Bold);
+            //}
+        }
+
+        internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
+        {
+            _itemViewer.LblSender.Text = itemInfo.Sender;
+            _itemViewer.lblSubject.Text = itemInfo.Subject;
+            _itemViewer.TxtboxBody.Text = itemInfo.Body;
+
+            _itemViewer.LblTriage.Text = itemInfo.Triage;
+            _itemViewer.LblSentOn.Text = itemInfo.SentOn;
+            _itemViewer.LblActionable.Text = itemInfo.Actionable;
             _itemViewer.LblPos.Text = viewerPosition.ToString();
-            //_itemViewer.LblConvCt.Text 
-            //_itemViewer.LblSearch
-            //_itemViewer.BtnDelItem
-            //_itemViewer.BtnPopOut
-            //_itemViewer.BtnFlagTask
-            //_itemViewer.LblFolder
-            //_itemViewer.CboFolders
-            //_itemViewer.CbxConversation
-            //_itemViewer.CbxEmailCopy
-            //_itemViewer.CbxAttachments
+        }
+
+        /// <summary>
+        /// Gets the Outlook.Conversation from the underlying MailItem
+        /// embedded in the class. Conversation details are loaded to 
+        /// a Dataframe. Count is inferred from the df rowcount
+        /// </summary>
+        public void PopulateConversation()
+        {
+            PopulateConversation(_mailItem.GetConversationDf(true, true));
         }
 
         /// <summary>
@@ -225,7 +244,8 @@ namespace QuickFiler.Controllers
         public void PopulateConversation(DataFrame df)
         {
             _dfConversation = df;
-            _itemViewer.LblConvCt.Text = _dfConversation.Rows.Count.ToString();
+            int count = _dfConversation.Rows.Count();
+            PopulateConversation(count);
         }
 
         /// <summary>
@@ -233,25 +253,17 @@ namespace QuickFiler.Controllers
         /// _dfConversation. Usefull when expanding or collapsing the 
         /// conversation to show how many items will be moved
         /// </summary>
-        /// <param name="countOnly"></param>
-        public void PopulateConversation(int countOnly)
+        /// <param name="count"></param>
+        public void PopulateConversation(int count)
         {
-            _itemViewer.LblConvCt.Text = countOnly.ToString();
+            _itemViewer.LblConvCt.Invoke(new System.Action(() =>
+            {
+                _itemViewer.LblConvCt.Text = count.ToString();
+                if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
+            }));
         }
 
-        /// <summary>
-        /// Gets the Outlook.Conversation from the underlying MailItem
-        /// embedded in the class. Conversation details are loaded to 
-        /// a Dataframe. Count is inferred from the df rowcount
-        /// </summary>
-        public void PopulateConversation()
-        {
-            _dfConversation = _mailItem.GetConversationDf(true, true);
-            int count = _dfConversation.Rows.Count();
-            _itemViewer.LblConvCt.Text = count.ToString();
-            if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
-        }
-
+        
         public void PopulateFolderCombobox(object varList = null)
         {
             if (varList is null)
@@ -265,8 +277,12 @@ namespace QuickFiler.Controllers
                     _globals, varList, FolderHandler.Options.FromArrayOrString);
             }
 
-            _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderArray);
-            _itemViewer.CboFolders.SelectedIndex = 1;
+            _itemViewer.CboFolders.Invoke(new System.Action(() =>
+            {
+                _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderArray);
+                _itemViewer.CboFolders.SelectedIndex = 1;
+            }));
+            
         }
 
         // TODO: Implement ctrlsRemove
@@ -481,19 +497,19 @@ namespace QuickFiler.Controllers
 
         public void ToggleNavigation()
         {
-            _itemPositionTips.Toggle(true);
+            _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(true)));
         }
 
         public void ToggleNavigation(Enums.ToggleState desiredState)
         {
-            _itemPositionTips.Toggle(desiredState, true);
+            _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, true)));
         }
 
         public void ToggleTips()
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
             {
-                tipsDetails.Toggle();
+                _itemViewer.Invoke(new System.Action(() => tipsDetails.Toggle()));
             }
         }
 
@@ -501,31 +517,34 @@ namespace QuickFiler.Controllers
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
             {
-                tipsDetails.Toggle(desiredState);
+                _itemViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState)));
             }
         }
 
         public void Accel_FocusToggle()
         {
-            if (_active) 
-            {
-                // If active, then we are turning off
-                _active = false;
-                if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
-                else { _activeTheme = "LightNormal";}
-                ToggleTips(Enums.ToggleState.Off);
-                UnregisterFocusActions();
-            }
-            else 
+            _itemViewer.Invoke(new System.Action(() => 
             { 
-                // If not active, then we are turning on
-                _active = true;
-                if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
-                else { _activeTheme = "LightActive"; }
-                ToggleTips(Enums.ToggleState.On);
-                RegisterFocusActions();
-            }
-            _themes[_activeTheme].SetTheme();
+                if (_active) 
+                {
+                    // If active, then we are turning off
+                    _active = false;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
+                    else { _activeTheme = "LightNormal";}
+                    ToggleTips(Enums.ToggleState.Off);
+                    UnregisterFocusActions();
+                }
+                else 
+                { 
+                    // If not active, then we are turning on
+                    _active = true;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
+                    else { _activeTheme = "LightActive"; }
+                    ToggleTips(Enums.ToggleState.On);
+                    RegisterFocusActions();
+                }
+                _themes[_activeTheme].SetTheme();
+            }));
         }
 
         public void Accel_Toggle()
@@ -643,18 +662,6 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Major Action Methods
-
-        internal string CompressPlainText(string text)
-        {
-            //text = text.Replace(System.Environment.NewLine, " ");
-            text = text.Replace(Properties.Resources.Email_Prefix_To_Strip, "");
-            text = Regex.Replace(text, @"<https://[^>]+>", " <link> "); //Strip links
-            text = Regex.Replace(text, @"[\s]", " ");
-            text = Regex.Replace(text, @"[ ]{2,}", " ");
-            text = text.Trim();
-            text += " <EOM>";
-            return text;
-        }
 
         internal void CollapseConversation()
         {

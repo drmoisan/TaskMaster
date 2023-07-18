@@ -60,7 +60,7 @@ namespace QuickFiler.Controllers
             _frame = _frame.GetRowsAt(Enumerable.Range(batchSize,_frame.RowCount-batchSize).ToArray());
             
             // Cast Frame to array of IEmailInfo
-            var rows = firstIteration.GetRowsAs<IEmailInfo>().Values.ToArray();
+            var rows = firstIteration.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
             //BUGFIX: StoreId ID is being converted to the literal string "byte[]" instead of the string equivalent of the byte array
             // Convert array of IEmailInfo to List<MailItem>
@@ -135,7 +135,7 @@ namespace QuickFiler.Controllers
             //try 
             //{
             // Cast Frame to array of IEmailInfo
-            var rows = _frame.GetRowsAs<IEmailInfo>().Values.ToArray();
+            var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
             // Convert array of IEmailInfo to List<MailItem>
             var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
@@ -167,10 +167,6 @@ namespace QuickFiler.Controllers
         {
             throw new NotImplementedException();
         }
-
-        
-
-        
 
         public Frame<int, string> InitDf(Explorer activeExplorer) 
         {
@@ -478,7 +474,6 @@ namespace QuickFiler.Controllers
 
         }
 
-        
     }
 
     internal class EmailSorter
@@ -521,7 +516,7 @@ namespace QuickFiler.Controllers
         }
     }
 
-    public interface IEmailInfo
+    public interface IEmailSortInfo
     {
         string EntryId { get; }
         string MessageClass { get; }
