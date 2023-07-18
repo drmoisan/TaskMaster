@@ -16,10 +16,12 @@ namespace QuickFiler.Interfaces
         /// Toggles special formatting for one group to highlight the group of controls that is active
         /// </summary>
         void Accel_FocusToggle(); // Turn on or off the formatting to highlight this QfcItem
+        void Accel_FocusToggle(Enums.ToggleState desiredState);
         void Accel_Toggle();
         void ctrlsRemove(); // May not be necessary
-        bool BlExpanded {  get; }
-        bool BlIsChild { get; set; }
+        bool IsExpanded {  get; }
+        bool IsChild { get; set; }
+        bool IsActiveUI { get; set; }
         string ConvOriginID { get; set; }
         int Height { get; }
         MailItem Mail { get; set; }

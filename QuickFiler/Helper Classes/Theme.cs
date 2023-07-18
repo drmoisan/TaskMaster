@@ -111,54 +111,63 @@ namespace QuickFiler.Helper_Classes
 
         public void SetMailRead()
         {
-            _itemViewer.LblSender.SetTheme(backColor: _mailReadBackColor,
+            _itemViewer.BeginInvoke(new System.Action(() =>
+            {
+                _itemViewer.LblSender.SetTheme(backColor: _mailReadBackColor,
                                                forecolor: _mailReadForeColor);
             _itemViewer.lblSubject.SetTheme(backColor: _mailReadBackColor,
                                             forecolor: _mailReadForeColor);
+            }));
         }
 
         public void SetMailUnread()
         {
-            _itemViewer.LblSender.SetTheme(backColor: _mailUnreadBackColor,
+            _itemViewer.BeginInvoke(new System.Action(() =>
+            {
+                _itemViewer.LblSender.SetTheme(backColor: _mailUnreadBackColor,
                                                forecolor: _mailUnreadForeColor);
-            _itemViewer.lblSubject.SetTheme(backColor: _mailUnreadBackColor,
-                                            forecolor: _mailUnreadForeColor);
-
+                _itemViewer.lblSubject.SetTheme(backColor: _mailUnreadBackColor,
+                                                forecolor: _mailUnreadForeColor);
+            }));
         }
 
         public void SetTheme()
         {
-            _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
-                                        forecolor: _navForeColor);
-
-            foreach (TableLayoutPanel tlp in _parent.TableLayoutPanels)
+            _itemViewer.BeginInvoke(new System.Action(() =>
             {
-                tlp.SetTheme(backColor: TlpBackColor);
-            }
+                _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
+                                            forecolor: _navForeColor);
 
-            foreach (IQfcTipsDetails tipsDetails in _parent.ListTipsDetails)
-            {
-                tipsDetails.LabelControl.SetTheme(backColor: TipsDetailsBackColor,
-                                                  forecolor: TipsDetailsForeColor);
-            }
+                foreach (TableLayoutPanel tlp in _parent.TableLayoutPanels)
+                {
+                    tlp.SetTheme(backColor: TlpBackColor);
+                }
 
-            if (_parent.Mail.UnRead == true) { SetMailUnread(); }
-            else { SetMailRead(); }
+                foreach (IQfcTipsDetails tipsDetails in _parent.ListTipsDetails)
+                {
+                    tipsDetails.LabelControl.SetTheme(backColor: TipsDetailsBackColor,
+                                                      forecolor: TipsDetailsForeColor);
+                }
 
-            foreach (Button btn in _parent.Buttons)
-            {
-                btn.SetTheme(backColor: ButtonBackColor);
-            }
+                if (_parent.Mail.UnRead == true) { SetMailUnread(); }
+                else { SetMailRead(); }
 
-            _itemViewer.TxtboxSearch.BackColor = TxtboxSearchBackColor;
-            _itemViewer.TxtboxSearch.ForeColor = TxtboxSearchForeColor;
+                foreach (Button btn in _parent.Buttons)
+                {
+                    btn.SetTheme(backColor: ButtonBackColor);
+                }
 
-            _itemViewer.TxtboxBody.BackColor = TxtboxBodyBackColor;
-            _itemViewer.TxtboxBody.ForeColor = TxtboxBodyForeColor;
-            _itemViewer.CboFolders.BackColor = CboFoldersBackColor;
-            _itemViewer.CboFolders.ForeColor = CboFoldersForeColor;
-            _itemViewer.BackColor = DefaultBackColor;
-            _itemViewer.ForeColor = DefaultForeColor;
+                _itemViewer.TxtboxSearch.BackColor = TxtboxSearchBackColor;
+                _itemViewer.TxtboxSearch.ForeColor = TxtboxSearchForeColor;
+
+                _itemViewer.TxtboxBody.BackColor = TxtboxBodyBackColor;
+                _itemViewer.TxtboxBody.ForeColor = TxtboxBodyForeColor;
+                _itemViewer.CboFolders.BackColor = CboFoldersBackColor;
+                _itemViewer.CboFolders.ForeColor = CboFoldersForeColor;
+                _itemViewer.BackColor = DefaultBackColor;
+                _itemViewer.ForeColor = DefaultForeColor;
+
+            }));
         }
 
     }

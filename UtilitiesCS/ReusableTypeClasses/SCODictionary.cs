@@ -9,6 +9,7 @@ using Swordfish.NET.Collections;
 using Newtonsoft.Json;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
@@ -131,10 +132,37 @@ namespace UtilitiesCS.ReusableTypeClasses
         public void Serialize(string filepath)
         {
             this.Filepath = filepath;
+            SerializeThreadSafe(filepath);
+        }
 
-            string output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            //File.WriteAllText(filepath, output);
-            WriteTextAsync(filepath, output).Wait();
+        private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
+
+        public void SerializeThreadSafe(string filepath)
+        {
+            // Set Status to Locked
+            if (_readWriteLock.TryEnterWriteLock(-1))
+            {
+                try
+                {
+                    // Append text to the file
+                    using (StreamWriter sw = File.CreateText(filepath))
+                    {
+                        var settings = new JsonSerializerSettings();
+                        settings.TypeNameHandling = TypeNameHandling.Auto;
+                        settings.Formatting = Formatting.Indented;
+
+                        var serializer = JsonSerializer.Create(settings);
+                        serializer.Serialize(sw, this);                        
+                        sw.Close();
+                    }
+                }
+                finally
+                {
+                    // Release lock
+                    _readWriteLock.ExitWriteLock();
+                }
+            }
+            
         }
 
         private async Task WriteTextAsync(string filePath, string text)
@@ -251,7 +279,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             try
             {
-                string strObject = File.ReadAllText(filepath, Encoding.Unicode);
+                string strObject = File.ReadAllText(filepath, Encoding.UTF8);
                 //var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
                 var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(strObject);
                 foreach (var kvp in innerDictionary) { this.Add(kvp.Key, kvp.Value); }

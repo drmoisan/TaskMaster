@@ -13,7 +13,7 @@ namespace ToDoModel
         private readonly static Dictionary<string, string> dict_remap;
         private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
 
-        public static string[] CaptureEmailDetails(MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap = null)
+        public static string[] Details(this MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap = null)
         {
             string[] strAry;
 
@@ -22,8 +22,8 @@ namespace ToDoModel
             // Const PR_SMTP_ADDRESS As String =
             // "http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
-            strAry[1] = GetTriage(OlMail);
-            strAry[2] = GetEmailFolderPath(OlMail, emailRootFolder);
+            strAry[1] = OlMail.GetTriage();
+            strAry[2] = OlMail.GetEmailFolderPath(emailRootFolder);
             strAry[3] = OlMail.SentOn.ToString(@"yyyy-MM-dd\Th:mm:ss\+\0\0\:\0\0");
 
             var recipients = GetRecipients(OlMail);
@@ -44,7 +44,7 @@ namespace ToDoModel
 
         }
 
-        public static string GetActionTaken(MailItem OlMail)
+        public static string GetActionTaken(this MailItem OlMail)
         {
             int lngLastVerbExec;
             const int Last_Verb_Reply_All = 103;
@@ -92,7 +92,7 @@ namespace ToDoModel
             return action;
         }
 
-        private static string GetAttachmentNames(MailItem OlMail)
+        private static string GetAttachmentNames(this MailItem OlMail)
         {
             int IntAttachment_Ct;
             string attachmentNames = "";
@@ -117,7 +117,7 @@ namespace ToDoModel
         }
 
         // Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
-        public static string GetSenderName(MailItem OlMail)
+        public static string GetSenderName(this MailItem OlMail)
         {
             if (OlMail.Sent == false)
             {
@@ -143,7 +143,7 @@ namespace ToDoModel
 
         }
 
-        public static string GetSenderAddress(MailItem OlMail)
+        public static string GetSenderAddress(this MailItem OlMail)
         {
             string senderAddress;
 
@@ -173,7 +173,7 @@ namespace ToDoModel
             return senderAddress;
         }
 
-        private static string GetEmailFolderPath(MailItem OlMail, string emailRootFolder)
+        private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder)
         {
             Folder OlParent = (Folder)OlMail.Parent;
             string folderPath = OlParent.FolderPath;
@@ -194,13 +194,13 @@ namespace ToDoModel
             return folderPath;
         }
 
-        public static string GetTriage(MailItem OlMail)
+        public static string GetTriage(this MailItem OlMail)
         {
-            var OlProperty = OlMail.UserProperties.Find("Triage");
+            var OlProperty = OlMail.UserProperties.Find("Triage", true);
             return OlProperty is null ? "" : (string)OlProperty.Value;
         }
 
-        public static (string recipientsTo, string recipientsCC) GetRecipients(MailItem OlMail)
+        public static (string recipientsTo, string recipientsCC) GetRecipients(this MailItem OlMail)
         {
 
             string StrSMTPAddress;

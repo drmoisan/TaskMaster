@@ -16,7 +16,8 @@ namespace ToDoModel
             bool blContains;
             var emailAddressList = new List<string>();
 
-            string[] strEmail = CaptureEmailDetailsModule.CaptureEmailDetails(OlMail, emailRootFolder, dictRemap);
+            //string[] strEmail = CaptureEmailDetailsModule.CaptureEmailDetails(OlMail, emailRootFolder, dictRemap);
+            string[] strEmail = OlMail.Details(emailRootFolder, dictRemap);
 
             if (strEmail is Array == true)
             {
