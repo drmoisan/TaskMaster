@@ -74,7 +74,7 @@ namespace QuickFiler.Controllers
         private IList<CheckBox> _checkBoxes;
         private IList<Label> _labels;
         private bool _expanded = false;
-        private bool _active = false;
+        private bool _activeUI = false;
         private bool _blIsChild;
         private Dictionary<string,Theme> _themes;
         private string _activeTheme;
@@ -88,9 +88,11 @@ namespace QuickFiler.Controllers
 
         #region Exposed properties
 
-        public bool BlExpanded { get => _expanded; }
+        public bool IsExpanded { get => _expanded; }
 
-        public bool BlIsChild { get => _blIsChild; set => _blIsChild = value; }
+        public bool IsChild { get => _blIsChild; set => _blIsChild = value; }
+
+        public bool IsActiveUI { get => _activeUI; set => _activeUI = value; }
 
         public IList<Button> Buttons { get => _buttons; }
 
@@ -196,7 +198,7 @@ namespace QuickFiler.Controllers
             var itemInfo = new MailItemInfo(mailItem);
             itemInfo.ExtractBasics();
             
-            _itemViewer.Invoke(new System.Action(() => AssignControls(itemInfo, viewerPosition)));
+            _itemViewer.BeginInvoke(new System.Action(() => AssignControls(itemInfo, viewerPosition)));
             
             //_itemViewer.LblSender.Text = itemInfo.Sender;
             //_itemViewer.lblSubject.Text = itemInfo.Subject;
@@ -256,13 +258,12 @@ namespace QuickFiler.Controllers
         /// <param name="count"></param>
         public void PopulateConversation(int count)
         {
-            _itemViewer.LblConvCt.Invoke(new System.Action(() =>
+            _itemViewer.LblConvCt.BeginInvoke(new System.Action(() =>
             {
                 _itemViewer.LblConvCt.Text = count.ToString();
                 if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
             }));
         }
-
         
         public void PopulateFolderCombobox(object varList = null)
         {
@@ -277,7 +278,7 @@ namespace QuickFiler.Controllers
                     _globals, varList, FolderHandler.Options.FromArrayOrString);
             }
 
-            _itemViewer.CboFolders.Invoke(new System.Action(() =>
+            _itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
             {
                 _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderArray);
                 _itemViewer.CboFolders.SelectedIndex = 1;
@@ -342,7 +343,8 @@ namespace QuickFiler.Controllers
             _keyboardHandler.KdCharActions.Add('E', (x) => this.ExpandCtrls1());
             _keyboardHandler.KdCharActions.Add('S', (x) => this.JumpToSearchTextbox());
             _keyboardHandler.KdCharActions.Add('T', (x) => this.FlagAsTask());
-            _keyboardHandler.KdCharActions.Add('P', (x) => this.PopOutItem());
+            _keyboardHandler.KdCharActions.Add('P', (x) => this._parent.PopOutControlGroup(Position));
+            _keyboardHandler.KdCharActions.Add('R', (x) => this._parent.RemoveSpecificControlGroup(Position));
             _keyboardHandler.KdCharActions.Add('X', (x) => this.MarkItemForDeletion());
             _keyboardHandler.KdCharActions.Add('F', (x) => this.JumpToFolderDropDown());
         }
@@ -359,6 +361,7 @@ namespace QuickFiler.Controllers
             _keyboardHandler.KdCharActions.Remove('S');
             _keyboardHandler.KdCharActions.Remove('T');
             _keyboardHandler.KdCharActions.Remove('P');
+            _keyboardHandler.KdCharActions.Remove('R');
             _keyboardHandler.KdCharActions.Remove('X');
             _keyboardHandler.KdCharActions.Remove('F');
         }
@@ -497,19 +500,19 @@ namespace QuickFiler.Controllers
 
         public void ToggleNavigation()
         {
-            _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(true)));
+            _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(true)));
         }
 
         public void ToggleNavigation(Enums.ToggleState desiredState)
         {
-            _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, true)));
+            _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, true)));
         }
 
         public void ToggleTips()
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
             {
-                _itemViewer.Invoke(new System.Action(() => tipsDetails.Toggle()));
+                _itemViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle()));
             }
         }
 
@@ -517,18 +520,44 @@ namespace QuickFiler.Controllers
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
             {
-                _itemViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState)));
+                _itemViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(desiredState)));
             }
         }
 
+        public void Accel_FocusToggle(Enums.ToggleState desiredState)
+        {
+            _itemViewer.BeginInvoke(new System.Action(() =>
+            {
+                if ((desiredState == Enums.ToggleState.On)&&(!_activeUI))
+                {
+                    // If not active and we want to turn on, then we are turning on
+                    _activeUI = true;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
+                    else { _activeTheme = "LightActive"; }
+                    ToggleTips(Enums.ToggleState.On);
+                    RegisterFocusActions();
+                }
+                else if ((desiredState == Enums.ToggleState.Off) && (_activeUI))
+                {
+                    // If active and we want to turn off, then we are turning off
+                    _activeUI = false;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
+                    else { _activeTheme = "LightNormal"; }
+                    ToggleTips(Enums.ToggleState.Off);
+                    UnregisterFocusActions();
+                }
+                _themes[_activeTheme].SetTheme();
+            }));
+        }
+        
         public void Accel_FocusToggle()
         {
-            _itemViewer.Invoke(new System.Action(() => 
+            _itemViewer.BeginInvoke(new System.Action(() => 
             { 
-                if (_active) 
+                if (_activeUI) 
                 {
                     // If active, then we are turning off
-                    _active = false;
+                    _activeUI = false;
                     if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
                     else { _activeTheme = "LightNormal";}
                     ToggleTips(Enums.ToggleState.Off);
@@ -537,7 +566,7 @@ namespace QuickFiler.Controllers
                 else 
                 { 
                     // If not active, then we are turning on
-                    _active = true;
+                    _activeUI = true;
                     if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
                     else { _activeTheme = "LightActive"; }
                     ToggleTips(Enums.ToggleState.On);
@@ -549,7 +578,7 @@ namespace QuickFiler.Controllers
 
         public void Accel_Toggle()
         {
-            if (_active) { Accel_FocusToggle(); }
+            if (_activeUI) { Accel_FocusToggle(); }
             ToggleNavigation();
         }
 

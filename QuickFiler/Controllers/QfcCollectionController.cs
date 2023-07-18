@@ -128,7 +128,7 @@ namespace QuickFiler.Controllers
             else { LoadSequentialCF(); }
         }
 
-        internal void LoadParallelCF()
+        public void LoadParallelCF()
         {
             int i = 0;
             Parallel.ForEach(_itemGroups, grp =>
@@ -154,7 +154,7 @@ namespace QuickFiler.Controllers
             });
         }
         
-        internal void LoadSequentialCF()
+        public void LoadSequentialCF()
         {
             int i = 0;
             foreach (var grp in _itemGroups)
@@ -170,14 +170,17 @@ namespace QuickFiler.Controllers
 
         public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template)
         {
+            _formViewer.SuspendLayout();
             _itemTLP.SuspendLayout();
             _template = template;
             TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
             LoadItemGroupsAndViewers(listMailItems, template);
             _formViewer.WindowState = FormWindowState.Maximized;
+            _itemTLP.ResumeLayout();
+            _formViewer.ResumeLayout();
             WireUpKeyboardHandler();
             LoadConversationsAndFolders();
-            _itemTLP.ResumeLayout();
+            
         }
 
         public QfcItemViewer LoadItemViewer(int indexNumber,
@@ -265,22 +268,32 @@ namespace QuickFiler.Controllers
         {
             // Get mail item from the group            
             MailItem mailItem = _itemGroups[selection - 1].MailItem;
-            
-            // If the group is active, set the active index to -1
-            if(ActiveSelection == selection)
-            {
-                ToggleOffActiveItem(false);
-                ActiveIndex = -1; 
-            }
-            // Else if the active selection is greater than the selection,
-            // decrement the active index
-            else if (ActiveSelection > selection) { ActiveIndex--; }
 
             // Remove the group from the form
             RemoveSpecificControlGroup(selection);
-            
+
             // TODO: Add the group to the pop out form 
-            
+
+        }
+
+        public void UpdateSelectionForRemoval(int selection)
+        {
+            // Adjust the active selection if necessary
+            if (ActiveSelection == selection)
+            {
+                if (selection == _itemGroups.Count)
+                {
+                    // Removing the last item so select the previous item
+                    ActiveSelection--; 
+                }
+                // Else do nothing becauuse the next item will become the active selection when renumbered
+            }
+            else if (ActiveSelection > selection)
+            {
+                // Else if the active selection is greater than the selection,
+                // decrement the active index to keep it in sync
+                ActiveIndex--;
+            }
         }
 
         public void RemoveControls()
@@ -321,13 +334,17 @@ namespace QuickFiler.Controllers
         /// <param name="selection">Number representing the item to remove</param>
         public void RemoveSpecificControlGroup(int selection)
         {
+            // If the group is active, turn off the active item and select a new item
+            bool activeUI = _itemGroups[selection - 1].ItemController.IsActiveUI;
+            bool expanded = _itemGroups[selection - 1].ItemController.IsExpanded;
+            if (activeUI) { ToggleOffActiveItem(false); }
+
+            UpdateSelectionForRemoval(selection);
+
             _itemTLP.SuspendLayout();
 
             // Remove the controls from the form
             TableLayoutHelper.RemoveSpecificRow(_itemTLP, selection - 1);
-
-            // Renumber the remaining groups
-            RenumberGroups();
 
             // Remove the group from the list of groups
             _itemGroups.RemoveAt(selection - 1);
@@ -335,7 +352,16 @@ namespace QuickFiler.Controllers
             // Renumber the remaining groups
             RenumberGroups();
 
+            // Restore UI to previous state with newly selected item
+            if (activeUI) 
+            {
+                _itemGroups[ActiveIndex].ItemController.Accel_FocusToggle(Enums.ToggleState.On);
+                if (expanded) { _itemGroups[ActiveIndex].ItemController.ExpandCtrls1(); }
+            }
+
             _itemTLP.ResumeLayout();
+
+            
         }
 
         public void ChangeByIndex(int idx)
@@ -405,17 +431,15 @@ namespace QuickFiler.Controllers
             {
                 //adjusted to _intActiveSelection -1 to accommodate zero based
                 IQfcItemController itemController = _itemGroups[ActiveIndex].ItemController;
-                if (itemController.BlExpanded)
+                
+                if (itemController.IsExpanded)
                 {
                     //TODO: Replace MoveDownPix Function
                     //MoveDownPix(_intActiveSelection + 1, (int)Math.Round(itemController.ItemPanel.Height * -0.5d));
                     itemController.ExpandCtrls1();
                     blExpanded = true;
                 }
-                itemController.Accel_FocusToggle();
-
-                //QUESTION: This assignment worries me and will be out of sync 
-                //ActiveIndex = -1;
+                itemController.Accel_FocusToggle(Enums.ToggleState.Off);
             }
             return blExpanded;
         }
@@ -474,7 +498,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         /// <param name="indexOriginal">Index of the group to change</param>
         /// <param name="desiredState">Checked is true or false</param>
-        internal void ChangeConversationSilently(int indexOriginal, bool desiredState) 
+        public void ChangeConversationSilently(int indexOriginal, bool desiredState) 
         {
             ChangeConversationSilently(_itemGroups[indexOriginal], desiredState);
         }
@@ -485,7 +509,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         /// <param name="grp">Item group containing the item viewer</param>
         /// <param name="desiredState">Checked is true or false</param>
-        internal void ChangeConversationSilently(ItemGroup grp, bool desiredState)
+        public void ChangeConversationSilently(ItemGroup grp, bool desiredState)
         {
             var suppressionState = grp.ItemController.SuppressEvents;
             grp.ItemController.SuppressEvents = true;
@@ -493,14 +517,14 @@ namespace QuickFiler.Controllers
             grp.ItemController.SuppressEvents = suppressionState;
         }
 
-        internal int PromoteFirstChild(string originalId, ref int childCount)
+        public int PromoteFirstChild(string originalId, ref int childCount)
         {
             int indexOriginal = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.ConvOriginID == originalId);
             var itemViewer = _itemGroups[indexOriginal].ItemViewer;
             _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(0, indexOriginal));
             _itemTLP.SetColumnSpan(itemViewer, 2);
             _itemGroups[indexOriginal].ItemController.ConvOriginID = "";
-            _itemGroups[indexOriginal].ItemController.BlIsChild = false;
+            _itemGroups[indexOriginal].ItemController.IsChild = false;
             childCount--;
             return indexOriginal;
         }
@@ -591,7 +615,7 @@ namespace QuickFiler.Controllers
         /// <param name="insertionIndex">Location of the Item Group collection where the base member is stored</param>
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Folder suggestions for the first email</param>
-        internal void EnumerateConversationMembers(string entryID, IList<MailItem> mailItems, int insertionIndex, int conversationCount, object folderList)
+        public void EnumerateConversationMembers(string entryID, IList<MailItem> mailItems, int insertionIndex, int conversationCount, object folderList)
         {
             var insertions = mailItems.Where(mailItem => mailItem.EntryID != entryID)
                                       .OrderByDescending(mailItem => mailItem.SentOn)
@@ -607,7 +631,7 @@ namespace QuickFiler.Controllers
                 grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i + insertionIndex + 1, grp.MailItem, _keyboardHandler, this);                
                 grp.ItemController.PopulateConversation(conversationCount);
                 grp.ItemController.PopulateFolderCombobox(folderList);
-                grp.ItemController.BlIsChild = true;
+                grp.ItemController.IsChild = true;
                 grp.ItemController.ConvOriginID = _itemGroups[insertionIndex-1].MailItem.EntryID;
                 if (_keyboardHandler.KbdActive) { grp.ItemController.ToggleNavigation(Enums.ToggleState.On); }
 
@@ -624,7 +648,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         /// <param name="insertionIndex">Targeted location for the insertion</param>
         /// <param name="insertCount">Number of elements to insert</param>
-        internal void InsertItemGroups(int insertionIndex, int insertCount)
+        public void InsertItemGroups(int insertionIndex, int insertCount)
         {
             for (int i = 0; i < insertCount; i++)
             {
@@ -633,7 +657,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        internal void RenumberGroups()
+        public void RenumberGroups()
         {
             for (int i = 0; i < _itemGroups.Count; i++)
             {
@@ -641,7 +665,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        internal void RenumberGroups(int beginningIndex)
+        public void RenumberGroups(int beginningIndex)
         {
             for (int i = beginningIndex; i < _itemGroups.Count; i++)
             {
@@ -664,14 +688,14 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        private void SetupLightDark(bool initDarkMode)
+        public void SetupLightDark(bool initDarkMode)
         {
             _darkMode = initDarkMode;
             _formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
             
         }
 
-        private void DarkMode_CheckedChanged(object sender, EventArgs e)
+        public void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
             if (_formViewer.DarkMode.Checked==true)
             {
@@ -757,7 +781,7 @@ namespace QuickFiler.Controllers
             return strOutput;
         }
 
-        private string xComma(string str)
+        public string xComma(string str)
         {
             string xCommaRet = default;
             string strTmp;

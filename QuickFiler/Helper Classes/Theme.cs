@@ -111,7 +111,7 @@ namespace QuickFiler.Helper_Classes
 
         public void SetMailRead()
         {
-            _itemViewer.Invoke(new System.Action(() =>
+            _itemViewer.BeginInvoke(new System.Action(() =>
             {
                 _itemViewer.LblSender.SetTheme(backColor: _mailReadBackColor,
                                                forecolor: _mailReadForeColor);
@@ -122,7 +122,7 @@ namespace QuickFiler.Helper_Classes
 
         public void SetMailUnread()
         {
-            _itemViewer.Invoke(new System.Action(() =>
+            _itemViewer.BeginInvoke(new System.Action(() =>
             {
                 _itemViewer.LblSender.SetTheme(backColor: _mailUnreadBackColor,
                                                forecolor: _mailUnreadForeColor);
@@ -133,7 +133,7 @@ namespace QuickFiler.Helper_Classes
 
         public void SetTheme()
         {
-            _itemViewer.Invoke(new System.Action(() =>
+            _itemViewer.BeginInvoke(new System.Action(() =>
             {
                 _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
                                             forecolor: _navForeColor);
