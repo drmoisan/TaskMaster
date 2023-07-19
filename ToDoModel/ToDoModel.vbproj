@@ -43,6 +43,14 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -67,10 +75,13 @@
       <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.16.170.0\lib\net462\Microsoft.VisualStudio.Services.WebApi.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
       <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
+    </Reference>
+    <Reference Include="office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -110,6 +121,22 @@
     <Compile Include="Common Functions\GetFields.vb" />
     <Compile Include="Dimension Libraries\ID\BaseChanger.vb" />
     <Compile Include="Dimension Libraries\ID\ListOfIDs.vb" />
+    <Compile Include="Email Utilities\cConversation.vb" />
+    <Compile Include="Email Utilities\FolderHandler.vb" />
+    <Compile Include="Email Utilities\CommonWordsModule.vb" />
+    <Compile Include="Email Utilities\Conversation_To_Folder.vb" />
+    <Compile Include="Email Utilities\cStopWatch.vb" />
+    <Compile Include="Email Utilities\cSuggestions.vb" />
+    <Compile Include="Email Utilities\CTFIncidenceModule.vb" />
+    <Compile Include="Email Utilities\CTF_Incidence.vb" />
+    <Compile Include="Email Utilities\FolderSuggestionsModule.vb" />
+    <Compile Include="Email Utilities\Load_CTF_AND_Subjects_AND_Recents.vb" />
+    <Compile Include="Email Utilities\ModuleMailItemsSort.vb" />
+    <Compile Include="Email Utilities\SaveAttachmentsModule.vb" />
+    <Compile Include="Email Utilities\Smith_Watterman.vb" />
+    <Compile Include="Email Utilities\SortItemsToExistingFolder.vb" />
+    <Compile Include="Email Utilities\SubjectMapModule.vb" />
+    <Compile Include="Email Utilities\Subject_Mapping.vb" />
     <Compile Include="Outlook Todo Utilities\ToDoEvents.vb" />
     <Compile Include="TreeOfToDoItems.vb" />
     <Compile Include="FlagParser.vb" />
@@ -167,9 +194,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">
+      <Project>{6b8006b4-9eb2-466e-a178-3e69ff42e16e}</Project>
+      <Name>EmailIntelligence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tags\Tags.vbproj">
       <Project>{4dd3c93f-61c5-4dcf-9832-2403d9439bd2}</Project>
       <Name>Tags</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
+      <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
+      <Name>UtilitiesCS</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesVB\UtilitiesVB.vbproj">
       <Project>{2090be3a-1105-4900-a481-ec1795a32bc0}</Project>

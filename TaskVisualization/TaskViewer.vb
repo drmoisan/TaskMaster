@@ -1,6 +1,7 @@
 ﻿Imports System.Diagnostics
 Imports System.Windows.Forms
 Imports UtilitiesVB
+Imports System
 
 Public Class TaskViewer
 
@@ -31,7 +32,7 @@ Public Class TaskViewer
             'If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
             Dim sender As Object = Control.FromHandle(msg.HWnd)
             Dim e As New KeyEventArgs(keyData)
-            Dim unused = _controller.KeyboardHandler_KeyDown(sender, e)
+            _controller.KeyboardHandler_KeyDown(sender, e)
             Return True
         End If
 

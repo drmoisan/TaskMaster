@@ -20,7 +20,7 @@ Public Module ExplorerActions
 
         If TypeOf obj Is Outlook.MailItem Then
             oMail = obj
-            If Mail_IsItEncrypted(oMail) Then
+            If IsMailUnReadable(oMail) Then
                 obj = Nothing
             End If
         End If

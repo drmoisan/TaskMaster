@@ -1,0 +1,13 @@
+/* Hierarchy of controllers */
+
+QfcLauncher ->
+	IQfcDatamodel
+	QfcFormViewer
+	IQfcFormController ->
+		IKeyboardHandler
+		IQfcExplorerController
+		IQfcCollectionController ->
+			IQfcItemController
+			<-
+		<-
+<-

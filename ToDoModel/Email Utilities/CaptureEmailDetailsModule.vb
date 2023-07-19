@@ -1,8 +1,11 @@
 ﻿Imports Microsoft.Office.Interop.Outlook
+Imports System.Globalization
 
 Public Module CaptureEmailDetailsModule
     Private Const NumberOfFields = 13
     Private ReadOnly dict_remap As Dictionary(Of String, String)
+    Const PR_SMTP_ADDRESS As String =
+        "http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
     Public Function CaptureEmailDetails(OlMail As MailItem,
                                        emailRootFolder As String,
@@ -12,36 +15,35 @@ Public Module CaptureEmailDetailsModule
 
         ReDim strAry(NumberOfFields)
 
-        Const PR_SMTP_ADDRESS As String =
-        "http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
-
-        Const PR_LAST_VERB_EXECUTED As String = "http://schemas.microsoft.com/mapi/proptag/0x10810003"
+        'Const PR_SMTP_ADDRESS As String =
+        '"http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
         strAry(1) = GetTriage(OlMail)
         strAry(2) = GetEmailFolderPath(OlMail, emailRootFolder)
-        strAry(3) = Format(OlMail.SentOn, "YYYY-MM-DD\Th:mm:ss\+\0\0\:\0\0")
+        strAry(3) = Format(OlMail.SentOn, "yyyy-MM-dd\Th:mm:ss\+\0\0\:\0\0")
 
-        Dim recipients = GetRecipients(OlMail, PR_SMTP_ADDRESS)
+        Dim recipients = GetRecipients(OlMail)
         strAry(5) = recipients.recipientsTo
         strAry(6) = recipients.recipientsCC
-        strAry(4) = GetSenderAddress(OlMail, PR_SMTP_ADDRESS)
+        strAry(4) = GetSenderAddress(OlMail)
         strAry(7) = OlMail.Subject
         strAry(8) = OlMail.Body
         strAry(9) = Right(strAry(4), Len(strAry(4)) - InStr(strAry(4), "@"))
         strAry(10) = OlMail.ConversationID
         strAry(11) = OlMail.EntryID
         strAry(12) = GetAttachmentNames(OlMail)
-        strAry(13) = GetActionTaken(OlMail, PR_LAST_VERB_EXECUTED)
+        strAry(13) = GetActionTaken(OlMail)
 
         Return strAry
 
     End Function
 
-    Private Function GetActionTaken(OlMail As MailItem, PR_LAST_VERB_EXECUTED As String) As String
+    Public Function GetActionTaken(OlMail As MailItem) As String
         Dim lngLastVerbExec As Integer
         Const Last_Verb_Reply_All = 103
         Const Last_Verb_Reply_Sender = 102
         Const Last_Verb_Reply_Forward = 104
+        Const PR_LAST_VERB_EXECUTED As String = "http://schemas.microsoft.com/mapi/proptag/0x10810003"
         Dim action As String
 
         If OlMail.IsMarkedAsTask = True Then
@@ -86,7 +88,27 @@ Public Module CaptureEmailDetailsModule
         Return attachmentNames
     End Function
 
-    Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
+    'Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
+    Public Function GetSenderName(OlMail As MailItem) As String
+        If OlMail.Sent = False Then
+            Return ""
+        Else
+            If OlMail.Sender.Type = "EX" Then
+                Try
+                    Dim OlPA As PropertyAccessor = OlMail.Sender.PropertyAccessor
+                    Dim senderAddress As String = OlPA.GetProperty(PR_SMTP_ADDRESS)
+                    Return CultureInfo.CurrentCulture.TextInfo.ToTitleCase((senderAddress.Split("@")(0)).Replace(".", " "))
+                Catch
+                    Return ""
+                End Try
+            Else
+                Return OlMail.Sender.Name
+            End If
+        End If
+
+    End Function
+
+    Public Function GetSenderAddress(OlMail As MailItem) As String
         Dim senderAddress As String
 
         If OlMail.Sender.Type = "EX" Then
@@ -100,7 +122,6 @@ Public Module CaptureEmailDetailsModule
                     senderAddress = ""
                 End Try
             End Try
-
         Else
             senderAddress = OlMail.SenderEmailAddress
         End If
@@ -124,13 +145,12 @@ Public Module CaptureEmailDetailsModule
         Return folderPath
     End Function
 
-    Private Function GetTriage(OlMail As MailItem) As String
+    Public Function GetTriage(OlMail As MailItem) As String
         Dim OlProperty As UserProperty = OlMail.UserProperties.Find("Triage")
         Return If(OlProperty Is Nothing, "", DirectCast(OlProperty.Value, String))
     End Function
 
-    Private Function GetRecipients(OlMail As MailItem,
-                                   PR_SMTP_ADDRESS As String) As _
+    Public Function GetRecipients(OlMail As MailItem) As _
                                    (recipientsTo As String,
                                    recipientsCC As String)
 

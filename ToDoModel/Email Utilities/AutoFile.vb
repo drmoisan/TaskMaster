@@ -85,6 +85,17 @@ Public Module AutoFile
 
     End Function
 
+    Public Function AreConversationsGrouped(ActiveExplorer As Outlook.Explorer) As Boolean
+        Dim blTemp As Boolean
+        If ActiveExplorer.CommandBars.GetPressedMso("ShowInConversations") Then
+            blTemp = True
+        Else
+            blTemp = False
+        End If
+
+        AreConversationsGrouped = blTemp
+    End Function
+
 
     Public Function AutoFindPeople(objItem As Object,
                                    ppl_dict As Dictionary(Of String, String),
@@ -92,7 +103,7 @@ Public Module AutoFile
                                    dictRemap As Dictionary(Of String, String),
                                    Optional blNotifyMissing As Boolean = True,
                                    Optional blExcludeFlagged As Boolean = True) As Collection
-        Dim OlMail As [MailItem]
+        Dim OlMail As MailItem
         Dim emailAddressList As List(Of String)
         Dim colPPL As New Collection
         Dim strMissing As String = ""
@@ -100,7 +111,7 @@ Public Module AutoFile
 
         If TypeOf objItem Is MailItem Then
             OlMail = objItem
-            If Mail_IsItEncrypted(OlMail) = False Then
+            If IsMailUnReadable(OlMail) = False Then
                 emailAddressList = CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap)
                 For i = emailAddressList.Count - 1 To 0 Step -1
                     strTmp = emailAddressList(i)
@@ -167,7 +178,7 @@ Public Module AutoFile
             .ToDictionary(Function(y) y.Key, Function(z) False) _
             .ToSortedDictionary()
 
-        If Mail_IsItEncrypted(OlMail) = False Then
+        If IsMailUnReadable(OlMail) = False Then
             addressList = CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap)
         End If
 
@@ -199,9 +210,9 @@ Public Module AutoFile
                                                      selections:=selections,
                                                      prefix_key:=prefixKey,
                                                      objItemObject:=OlMail) With {
-                    .ButtonNewActive = False,
-                    .ButtonAutoAssignActive = False
-                                                     }
+                                                        .ButtonNewActive = False,
+                                                        .ButtonAutoAssignActive = False
+                                                        }
                 _controller.SetSearchText(newPplTag)
 
                 Dim unused = _viewer.ShowDialog()

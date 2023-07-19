@@ -12,13 +12,13 @@ Public Class CheckBoxController
     Public WithEvents ctrlCB As CheckBox
     Public TrigByKeyChg As Boolean
     Private TrigByValChg As Boolean
-    Private objUserForm As Object
+    Private _parent As TagController
     Private strTagPrefix As String
     Private strTemp As String
 
 
-    Friend Function Init(objUF As Object, strPrefix As String)
-        objUserForm = objUF
+    Friend Function Init(parent As TagController, strPrefix As String)
+        _parent = parent
         strTagPrefix = strPrefix
         Return True
     End Function
@@ -26,8 +26,8 @@ Public Class CheckBoxController
     Private Sub ctrlCB_Click() Handles ctrlCB.Click
         If Not TrigByKeyChg Then
             strTemp = strTagPrefix & ctrlCB.Text
-            Dim unused1 = objUserForm.ToggleChoice(strTemp)
-            Dim unused = objUserForm.FocusCheckbox(ctrlCB)
+            _parent.ToggleChoice(strTemp)
+            _parent.FocusCheckbox(ctrlCB)
         ElseIf TrigByValChg Then
             TrigByKeyChg = False
             TrigByValChg = False
@@ -41,25 +41,25 @@ Public Class CheckBoxController
     Private Sub ctrlCB_KeyDown(sender As Object, e As KeyEventArgs) Handles ctrlCB.KeyDown
         Select Case e.KeyCode
             Case Keys.Down
-                Dim unused6 = objUserForm.Select_Ctrl_By_Offset(1)
+                _parent.Select_Ctrl_By_Offset(1)
 
             Case Keys.Up
-                Dim unused5 = objUserForm.Select_Ctrl_By_Offset(-1)
+                _parent.Select_Ctrl_By_Offset(-1)
 
             Case Keys.End
-                Dim unused4 = objUserForm.Select_Last_Control()
+                _parent.Select_Last_Control()
 
             Case Keys.Home
-                Dim unused3 = objUserForm.Select_First_Control()
+                _parent.Select_First_Control()
 
             Case Keys.PageDown
-                Dim unused2 = objUserForm.Select_PageDown()
+                _parent.Select_PageDown()
 
             Case Keys.PageUp
-                Dim unused1 = objUserForm.Select_PageUp()
+                _parent.Select_PageUp()
 
             Case Keys.Enter
-                Dim unused = objUserForm.OK_Action()
+                _parent.OK_Action()
         End Select
     End Sub
 

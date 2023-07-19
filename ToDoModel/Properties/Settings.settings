@@ -1,0 +1,60 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ToDoModel.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Prefix_People" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag PPL </Value>
+    </Setting>
+    <Setting Name="Prefix_Context" Type="System.String" Scope="User">
+      <Value Profile="(Default)">_@</Value>
+    </Setting>
+    <Setting Name="Prefix_Topic" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag TOPIC </Value>
+    </Setting>
+    <Setting Name="Prefix_Project" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag PROJECT </Value>
+    </Setting>
+    <Setting Name="Prefix_Today" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag A Top Priority Today</Value>
+    </Setting>
+    <Setting Name="Prefix_Bullpin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag Bullpin Priorities</Value>
+    </Setting>
+    <Setting Name="Prefix_KB" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag KB </Value>
+    </Setting>
+    <Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+    <Setting Name="MaxToDo" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MaxLengthOfID" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="MaxFolders_ConvID" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="File_CTF_Inc" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Inc.txt</Value>
+    </Setting>
+    <Setting Name="File_CTF_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Map.txt</Value>
+    </Setting>
+    <Setting Name="File_Subject_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999Subject_Map.txt</Value>
+    </Setting>
+    <Setting Name="File_Common_Words" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CommonWords.txt</Value>
+    </Setting>
+    <Setting Name="File_ConditionalReminders" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999ConditionalReminders.txt</Value>
+    </Setting>
+    <Setting Name="MaxFolders_Subject" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="MaxSuggestions" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
