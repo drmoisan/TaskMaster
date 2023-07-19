@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuickFiler.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,7 +20,11 @@ namespace QuickFiler
         }
 
         private IList<Label> _tipsLabels;
+        private IQfcItemController _controller;
+
         public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IQfcItemController Controller { get => _controller; set => _controller = value; }
+
         private void InitTipsLabelsList()
         {
             _tipsLabels = new List<Label>

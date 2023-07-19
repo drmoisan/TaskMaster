@@ -44,40 +44,20 @@ namespace QuickFiler
         public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;
-            //this.KeyDown += _keyboardHandler.KeyboardHandler_KeyDown;
-            //this.KeyUp += _keyboardHandler.KeyboardHandler_KeyUp;
-            //this.KeyPress += _keyboardHandler.KeyboardHandler_KeyPress;
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData.HasFlag(Keys.Alt))
+            if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))
             {
-                // If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
-                //_keyboardHandler.KeyboardHandler_KeyDown(sender, e);
                 _keyboardHandler.ToggleKeyboardDialog(sender, e);
                 return true;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
-
-        private void L1v1L2h2_ButtonOK_Click(object sender, EventArgs e)
-        {
-            _formController.ButtonOK_Click();
-        }
-
-        private void L1v1L2h3_ButtonCancel_Click(object sender, EventArgs e)
-        {
-            _formController.ButtonCancel_Click();
-        }
-
-        private void L1v1L2h4_ButtonUndo_Click(object sender, EventArgs e)
-        {
-            _formController.ButtonUndo_Click();
-        }
-                
+                        
     }
 }

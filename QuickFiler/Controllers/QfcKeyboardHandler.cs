@@ -49,16 +49,19 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // TODO: Eliminate KeyboardDialog_Change
         public void KeyboardDialog_Change()
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Eliminate KeyboardDialog_KeyDown
         public void KeyboardDialog_KeyDown(object sender, KeyEventArgs e)
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Eliminate KeyboardDialog_KeyUp
         public void KeyboardDialog_KeyUp(object sender, KeyEventArgs e)
         {
             throw new NotImplementedException();
@@ -70,21 +73,6 @@ namespace QuickFiler.Controllers
             {
                 e.IsInputKey = true;
             }
-            //switch (e.KeyCode)
-            //{
-            //    case Keys.Down:
-            //        e.IsInputKey = true;
-            //        break;
-            //    case Keys.Up:
-            //        e.IsInputKey = true;
-            //        break;
-            //    case Keys.Left:
-            //        e.IsInputKey = true;
-            //        break;
-            //    case Keys.Right:
-            //        e.IsInputKey = true;
-            //        break;
-            //}
         }
 
         public void KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
@@ -94,43 +82,49 @@ namespace QuickFiler.Controllers
                 if ((KdKeyActions != null) && KdKeyActions.ContainsKey(e.KeyCode))
                 {
                     e.SuppressKeyPress = true;
-                    KdKeyActions[e.KeyCode].DynamicInvoke(e.KeyCode);
                     e.Handled = true;
+                    KdKeyActions[e.KeyCode].DynamicInvoke(e.KeyCode);
                 }
                 else if ((KdCharActions != null) && KdCharActions.ContainsKey((char)e.KeyValue))
                 {
                     e.SuppressKeyPress = true;
-                    KdCharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
                     e.Handled = true;
+                    KdCharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
                 }   
             }
         }
 
+        // TODO: Implement or eliminate KeyboardsHandler_KeyPress
         public void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e)
         {
             //throw new NotImplementedException();
         }
 
+        // TODO: Implement or eliminate KeyboardsHandler_KeyUp
         public void KeyboardHandler_KeyUp(object sender, KeyEventArgs e)
         {
             //throw new NotImplementedException();
         }
 
+        // TODO: Eliminate PanelMain_KeyDown
         public void PanelMain_KeyDown(object sender, KeyEventArgs e)
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Eliminate PanelMain_KeyPress
         public void PanelMain_KeyPress(object sender, KeyPressEventArgs e)
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Eliminate PanelMain_KeyUp
         public void PanelMain_KeyUp(object sender, KeyEventArgs e)
         {
             throw new NotImplementedException();
         }
 
+        // TODO: Eliminate ResetAcceleratorSilently
         public void ResetAcceleratorSilently()
         {
             throw new NotImplementedException();
@@ -138,8 +132,8 @@ namespace QuickFiler.Controllers
 
         public void ToggleKeyboardDialog()
         {
-            if (_kbdActive) { _parent.FrmCtrlr.Groups.ToggleOffNavigation(); }
-            else { _parent.FrmCtrlr.Groups.ToggleOnNavigation(); }
+            if (_kbdActive) { _parent.FrmCtrlr.Groups.ToggleOffNavigation(async: false); }
+            else { _parent.FrmCtrlr.Groups.ToggleOnNavigation(async: false); }
             _kbdActive = !_kbdActive;
         }
         
@@ -149,14 +143,120 @@ namespace QuickFiler.Controllers
             e.Handled = true;
         }
 
+        // Eliminate ToggleOffActiveItem
         public bool ToggleOffActiveItem(bool parentBlExpanded)
         {
             throw new NotImplementedException();
         }
 
+        // Eliminate ToggleRemoteMouseLabels
         public void ToggleRemoteMouseLabels()
         {
             throw new NotImplementedException();
+        }
+
+        internal QfcItemViewer GetItemViewer(Control control)
+        {
+            if (control as QfcItemViewer != null) { return (control as QfcItemViewer); }
+            else if (control.Parent != null) { return GetItemViewer(control.Parent); }
+            else { return null; }
+        }
+
+        private List<Keys> _cboKeys = new List<Keys> { Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.Escape, Keys.Return };
+        
+        public void CboFolders_KeyDown(object sender, KeyEventArgs e)
+        {
+            QfcItemViewer viewer = null;
+            if (_cboKeys.Contains(e.KeyCode)) { viewer = GetItemViewer(sender as Control); }
+
+            switch (e.KeyCode)
+            {
+                case Keys.Escape:
+                    {
+                        viewer.Controller.CounterEnter = 1;
+                        viewer.Controller.CounterComboRight = 0;
+                        viewer.CboFolders.DroppedDown = false;
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+                        break;
+                    }
+                case Keys.Up:
+                    {
+                        viewer.Controller.CounterEnter = 0;
+                        break;
+                    }
+                case Keys.Down:
+                    {
+                        viewer.Controller.CounterEnter = 0;
+                        break;
+                    }
+                case Keys.Right:
+                    {
+                        viewer.Controller.CounterEnter = 0;
+                        switch (viewer.Controller.CounterComboRight)
+                        {
+                            case 0:
+                                {
+                                    viewer.CboFolders.DroppedDown = true;
+                                    viewer.Controller.CounterComboRight++;
+                                    break;
+                                }
+                            case 1:
+                                {
+                                    viewer.CboFolders.DroppedDown = false;
+                                    viewer.Controller.CounterComboRight = 0;
+                                    MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?",
+                                        "Dialog", BoxIcon.Question, viewer.Controller.RightKeyActions);
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageBox.Show(
+                                        "Error in intComboRightCtr ... setting to 0 and continuing",
+                                        "Error",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                                    viewer.Controller.CounterComboRight = 0;
+                                    break;
+                                }
+                        }
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+                        break;
+                    }
+                case Keys.Left:
+                    {
+                        viewer.Controller.CounterEnter = 1;
+                        viewer.Controller.CounterComboRight = 0;
+                        if (viewer.CboFolders.DroppedDown)
+                        {
+                            viewer.CboFolders.DroppedDown = false;
+                            e.SuppressKeyPress = true;
+                            e.Handled = true;
+                        }
+                        else { this.KeyboardHandler_KeyDown(sender, e); }
+
+                        break;
+                    }
+                case Keys.Return:
+                    {
+                        if (viewer.Controller.CounterEnter == 1)
+                        {
+                            viewer.Controller.CounterEnter = 0;
+                            viewer.Controller.CounterComboRight = 0;
+                            KeyboardHandler_KeyDown(sender, e);
+                        }
+                        else
+                        {
+                            viewer.Controller.CounterEnter = 1;
+                            viewer.Controller.CounterComboRight = 0;
+                            viewer.CboFolders.DroppedDown = false;
+                            e.SuppressKeyPress = true;
+                            e.Handled = true;
+                        }
+                        break;
+                    }
+            }
         }
     }
 }

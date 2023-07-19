@@ -109,65 +109,73 @@ namespace QuickFiler.Helper_Classes
         public Color DefaultBackColor { get => _defaultBackColor; set => _defaultBackColor = value; }
         public Color DefaultForeColor { get => _defaultForeColor; set => _defaultForeColor = value; }
 
+        public void SetMailRead(bool async)
+        {
+            if (async) { _itemViewer.BeginInvoke(new System.Action(() => SetMailRead())); }
+            else { _itemViewer.Invoke(new System.Action(() => SetMailRead())); }
+        }
+
         public void SetMailRead()
         {
-            _itemViewer.BeginInvoke(new System.Action(() =>
-            {
-                _itemViewer.LblSender.SetTheme(backColor: _mailReadBackColor,
+            _itemViewer.LblSender.SetTheme(backColor: _mailReadBackColor,
                                                forecolor: _mailReadForeColor);
             _itemViewer.lblSubject.SetTheme(backColor: _mailReadBackColor,
                                             forecolor: _mailReadForeColor);
-            }));
         }
 
-        public void SetMailUnread()
+        public void SetMailUnread(bool async)
         {
-            _itemViewer.BeginInvoke(new System.Action(() =>
-            {
-                _itemViewer.LblSender.SetTheme(backColor: _mailUnreadBackColor,
-                                               forecolor: _mailUnreadForeColor);
-                _itemViewer.lblSubject.SetTheme(backColor: _mailUnreadBackColor,
-                                                forecolor: _mailUnreadForeColor);
-            }));
+            if (async) { _itemViewer.BeginInvoke(new System.Action(() => SetMailUnread())); }
+            else { _itemViewer.Invoke(new System.Action(() => SetMailUnread())); }
+        }
+        
+        private void SetMailUnread()
+        {
+            _itemViewer.LblSender.SetTheme(backColor: _mailUnreadBackColor,
+                                            forecolor: _mailUnreadForeColor);
+            _itemViewer.lblSubject.SetTheme(backColor: _mailUnreadBackColor,
+                                            forecolor: _mailUnreadForeColor);
         }
 
-        public void SetTheme()
+        public void SetTheme(bool async)
         {
-            _itemViewer.BeginInvoke(new System.Action(() =>
+            if (async) { _itemViewer.BeginInvoke(new System.Action(() => SetTheme())); }
+            else { _itemViewer.Invoke(new System.Action(() => SetTheme())); }
+        }
+        
+        private void SetTheme()
+        {
+            _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
+                                        forecolor: _navForeColor);
+
+            foreach (TableLayoutPanel tlp in _parent.TableLayoutPanels)
             {
-                _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
-                                            forecolor: _navForeColor);
+                tlp.SetTheme(backColor: TlpBackColor);
+            }
 
-                foreach (TableLayoutPanel tlp in _parent.TableLayoutPanels)
-                {
-                    tlp.SetTheme(backColor: TlpBackColor);
-                }
+            foreach (IQfcTipsDetails tipsDetails in _parent.ListTipsDetails)
+            {
+                tipsDetails.LabelControl.SetTheme(backColor: TipsDetailsBackColor,
+                                                    forecolor: TipsDetailsForeColor);
+            }
 
-                foreach (IQfcTipsDetails tipsDetails in _parent.ListTipsDetails)
-                {
-                    tipsDetails.LabelControl.SetTheme(backColor: TipsDetailsBackColor,
-                                                      forecolor: TipsDetailsForeColor);
-                }
+            if (_parent.Mail.UnRead == true) { SetMailUnread(); }
+            else { SetMailRead(); }
 
-                if (_parent.Mail.UnRead == true) { SetMailUnread(); }
-                else { SetMailRead(); }
+            foreach (Button btn in _parent.Buttons)
+            {
+                btn.SetTheme(backColor: ButtonBackColor);
+            }
 
-                foreach (Button btn in _parent.Buttons)
-                {
-                    btn.SetTheme(backColor: ButtonBackColor);
-                }
+            _itemViewer.TxtboxSearch.BackColor = TxtboxSearchBackColor;
+            _itemViewer.TxtboxSearch.ForeColor = TxtboxSearchForeColor;
 
-                _itemViewer.TxtboxSearch.BackColor = TxtboxSearchBackColor;
-                _itemViewer.TxtboxSearch.ForeColor = TxtboxSearchForeColor;
-
-                _itemViewer.TxtboxBody.BackColor = TxtboxBodyBackColor;
-                _itemViewer.TxtboxBody.ForeColor = TxtboxBodyForeColor;
-                _itemViewer.CboFolders.BackColor = CboFoldersBackColor;
-                _itemViewer.CboFolders.ForeColor = CboFoldersForeColor;
-                _itemViewer.BackColor = DefaultBackColor;
-                _itemViewer.ForeColor = DefaultForeColor;
-
-            }));
+            _itemViewer.TxtboxBody.BackColor = TxtboxBodyBackColor;
+            _itemViewer.TxtboxBody.ForeColor = TxtboxBodyForeColor;
+            _itemViewer.CboFolders.BackColor = CboFoldersBackColor;
+            _itemViewer.CboFolders.ForeColor = CboFoldersForeColor;
+            _itemViewer.BackColor = DefaultBackColor;
+            _itemViewer.ForeColor = DefaultForeColor;
         }
 
     }

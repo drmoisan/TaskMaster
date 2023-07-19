@@ -168,13 +168,48 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        public Frame<int, string> InitDf(Explorer activeExplorer) 
+        public Frame<int, string> InitDf(Explorer activeExplorer)
         {
-            Frame<int, string> df = DfDeedle.GetEmailDataInView(activeExplorer);
-            df = df.FilterRowsBy("MessageClass", "IPM.Note");            
+            var df = DfDeedle.GetEmailDataInView(activeExplorer);
+
+            // Filter out non-email items
+            df = df.FilterRowsBy("MessageClass", "IPM.Note");
+
+            // Filter to the latest email in each conversation
+            var dfFiltered = MostRecentByConversation(df);
+            
+            // Sort by triage classification and then date
+            var dfSorted = SortTriageDate(dfFiltered);
+
+            return dfSorted;
+            
+        }
+
+        public Frame<int, string> SortTriageDate(Frame<int, string> df)
+        {
+            var sorter = new EmailSorter(SortOptionsEnum.Default);
+
+            var dfClone = df.Clone();
+
+            var s1 = dfClone.GetColumn<DateTime>("SentOn");
+            var s2 = dfClone.GetColumn<string>("Triage");
+            var added = s1.ZipInner(s2).Select(t => sorter.GetSortKey(triage: t.Value.Item2, dateTime: t.Value.Item1));
+            dfClone.AddColumn("NewKey", added);
+
+            dfClone = dfClone.SortRows("NewKey");
+
+            var dfSorted = dfClone.IndexRowsWith(Enumerable.Range(0, dfClone.RowCount).Reverse());
+
+            dfSorted = dfSorted.SortRowsByKey();
+
+            dfSorted.DropColumn("NewKey");
+            return dfSorted;
+        }
+
+        public Frame<int, string> MostRecentByConversation(Frame<int, string> df)
+        {
             var topics = df.GetColumn<string>("Conversation").Values.Distinct().ToArray();
 
-            
             var rows = topics.Select(topic =>
             {
                 var dfConversation = df.FilterRowsBy("Conversation", topic);
@@ -188,53 +223,9 @@ namespace QuickFiler.Controllers
             });
 
             var dfFiltered = Frame.FromRows(rows);
-            var sorter = new EmailSorter(SortOptionsEnum.Default);
-
-            var s1 = dfFiltered.GetColumn<DateTime>("SentOn");
-            var s2 = dfFiltered.GetColumn<string>("Triage");
-            var added = s1.ZipInner(s2).Select(t => sorter.GetSortKey(triage: t.Value.Item2, dateTime: t.Value.Item1));
-            dfFiltered.AddColumn("NewKey", added);
-
-            dfFiltered = dfFiltered.SortRows("NewKey");
-            
-            var df2 = dfFiltered;
-            df2 = df2.IndexRowsWith(Enumerable.Range(0, dfFiltered.RowCount).Reverse());
-            //dfFiltered.Print();
-            //df2.Print();
-
-            df2 = df2.SortRowsByKey();
-            //dfFiltered.IndexRowsOrdinally();
-            //var df2 = dfFiltered.RealignRows(dfFiltered.RowKeys.Reverse());
-            //df2.Print();
-            df2.DropColumn("NewKey");
-            //df2.Print();
-            //var df2 = dfFiltered.IndexRows<DateTime>("SentOn", false);
-            //var df3 = df2.GroupRowsBy<string>("Triage");
-            //var s1 = dfConversation.GetColumn<DateTime>("SentOn");
-            //var s2 = dfConversation.GetColumn<string>("Triage");
-            //var added = s1.ZipInner(s2).Select(t => t.Value.Item1.ToString("yyyyMMddhhmmss") + t.Value.Item2);
-            //dfConversation.AddColumn("NewKey", added);
-
-            //dfFiltered.Print();
-
-            //var dfgroup = df.GroupRowsBy<string>("Conversation");
-
-            //var dfgroup2 = df.Rows.GroupBy<string>(row => MultiKeyExtensions.Lookup1of2<Tuple<string, int>,int>(row.Key))
-            //var keys = dfgroup.RowKeys;
-            //var keysDistinct = keys.Distinct();
-            //var convCol = dfgroup.GetColumn<string>("Conversation").Values.Distinct().ToArray();
-            //var rows = convCol.Select(key => dfgroup.GetRows)
-            //var rows = dfgroup.Rows[MultiKeyExtensions.Lookup1Of2<string, int>(convCol[0])];
-            //var rows = dfgroup.Rows.GetByLevel(MultiKeyExtensions.Lookup1Of2<string, int>(convCol[0]));
-            //var lookups = keysDistinct.Select(key => MultiKeyExtensions.Lookup1Of2<Tuple<string, int>, string>(key));
-            //var keysDistinct = keys.Select(x => MultiKeyExtensions.Lookup1Of2<Tuple<string, int>, string>(x));
-
-            //MultiKeyExtensions.Lookup1Of2<string, int>(keys)
-            //dfgroup.Print();
-
-            return df2;
+            return dfFiltered;
         }
-        
+
         internal (string[], object[,]) GetEmailDataInView(Explorer activeExplorer)
         {
             Outlook.Table table = activeExplorer.GetTableInView();

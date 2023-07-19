@@ -9,10 +9,12 @@ namespace QuickFiler.Interfaces
 {
     public interface IQfcCollectionController
     {
+        // Public Properties
+        
+
         // UI Add and Remove QfcItems
         void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template);
         QfcItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
-        void AddEmailControlGroup(MailItem mailItem, int posInsert = 0, bool blGroupConversation = true, int ConvCt = 0, object varList = null, bool blChild = false);
         void PopOutControlGroup(int intPosition);
         void RemoveControls();
         void RemoveSpaceToCollapseConversation();
@@ -24,13 +26,8 @@ namespace QuickFiler.Interfaces
         void ChangeByIndex(int idx);
         void SelectNextItem();
         void SelectPreviousItem();
-        void ToggleOffNavigation();
-        void ToggleOnNavigation();
-
-        // UI Move QfcItems
-        void MoveDownControlGroups(int intPosition, int intMoves);		//Rewrite
-        void MoveDownPix(int intPosition, int intPix);                  //Rewrite
-        void ResizeChildren(int intDiffx);                              //possibly unneccessary with new control group
+        void ToggleOffNavigation(bool async);
+        void ToggleOnNavigation(bool async);
 
         // UI Converations Expansion
         void ConvToggle_Group(int childCount, int indexOriginal);
@@ -39,13 +36,13 @@ namespace QuickFiler.Interfaces
         void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount);                        
 
         // UI Light Dark
-        void SetDarkMode();
-        void SetLightMode();
+        void SetDarkMode(bool async);
+        void SetLightMode(bool async);
 
         // Helper Functions
-        bool IsSelectionBelowMax(int intNewSelection);
         int EmailsLoaded { get; }
         bool ReadyForMove { get; }
+        void ResetPanelHeight();
 
         void Cleanup();
 

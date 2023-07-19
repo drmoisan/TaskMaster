@@ -111,7 +111,6 @@
             this.L1v1L2h2_ButtonOK.TabIndex = 0;
             this.L1v1L2h2_ButtonOK.Text = "OK";
             this.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = true;
-            this.L1v1L2h2_ButtonOK.Click += new System.EventHandler(this.L1v1L2h2_ButtonOK_Click);
             // 
             // L1v1L2h3_ButtonCancel
             // 
@@ -123,7 +122,6 @@
             this.L1v1L2h3_ButtonCancel.TabIndex = 1;
             this.L1v1L2h3_ButtonCancel.Text = "CANCEL";
             this.L1v1L2h3_ButtonCancel.UseVisualStyleBackColor = true;
-            this.L1v1L2h3_ButtonCancel.Click += new System.EventHandler(this.L1v1L2h3_ButtonCancel_Click);
             // 
             // L1v1L2h4_ButtonUndo
             // 
@@ -135,7 +133,6 @@
             this.L1v1L2h4_ButtonUndo.TabIndex = 2;
             this.L1v1L2h4_ButtonUndo.Text = "Undo";
             this.L1v1L2h4_ButtonUndo.UseVisualStyleBackColor = true;
-            this.L1v1L2h4_ButtonUndo.Click += new System.EventHandler(this.L1v1L2h4_ButtonUndo_Click);
             // 
             // L1v1L2h5_SpnEmailPerLoad
             // 
@@ -195,6 +192,7 @@
             this.QfcItemViewerTemplate.AutoSize = true;
             this.QfcItemViewerTemplate.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.L1v0L2L3v_TableLayout.SetColumnSpan(this.QfcItemViewerTemplate, 2);
+            this.QfcItemViewerTemplate.Controller = null;
             this.QfcItemViewerTemplate.Dock = System.Windows.Forms.DockStyle.Fill;
             this.QfcItemViewerTemplate.Location = new System.Drawing.Point(12, 12);
             this.QfcItemViewerTemplate.Margin = new System.Windows.Forms.Padding(12);

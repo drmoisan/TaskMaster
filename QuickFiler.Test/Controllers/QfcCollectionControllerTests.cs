@@ -348,7 +348,7 @@ namespace QuickFiler.Test.Controllers
             var qfcCollectionController = this.CreateQfcCollectionController();
 
             // Act
-            qfcCollectionController.SetDarkMode();
+            qfcCollectionController.SetDarkMode(async: false);
 
             // Assert
             Assert.Fail();
@@ -362,7 +362,7 @@ namespace QuickFiler.Test.Controllers
             var qfcCollectionController = this.CreateQfcCollectionController();
 
             // Act
-            qfcCollectionController.SetLightMode();
+            qfcCollectionController.SetLightMode(async: false);
 
             // Assert
             Assert.Fail();

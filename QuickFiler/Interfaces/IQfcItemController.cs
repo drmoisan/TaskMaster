@@ -17,15 +17,16 @@ namespace QuickFiler.Interfaces
         /// </summary>
         void Accel_FocusToggle(); // Turn on or off the formatting to highlight this QfcItem
         void Accel_FocusToggle(Enums.ToggleState desiredState);
-        void Accel_Toggle();
-        void ctrlsRemove(); // May not be necessary
+        void Accel_Toggle(bool async);
+        int CounterEnter { get; set; }
+        int CounterComboRight { get; set; }
         bool IsExpanded {  get; }
         bool IsChild { get; set; }
         bool IsActiveUI { get; set; }
         string ConvOriginID { get; set; }
         int Height { get; }
         MailItem Mail { get; set; }
-        void ExpandCtrls1(); // Rewrite
+        void ExpandCtrls1(); 
         string SelectedFolder { get; }
         int Position { get; set; }
         void PopulateFolderCombobox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
@@ -35,19 +36,18 @@ namespace QuickFiler.Interfaces
         void MarkItemForDeletion();
         void JumpToSearchTextbox();
         void JumpToFolderDropDown();
-        void ToggleDeleteFlow();
         void ToggleSaveCopyOfMail();
         void ToggleSaveAttachments();
         void ToggleConversationCheckbox();
         void ToggleConversationCheckbox(Enums.ToggleState desiredState);
+        IQfcCollectionController Parent { get; }
         void PopulateConversation();
         void PopulateConversation(DataFrame df);
         void PopulateConversation(int countOnly);
-        void SetThemeDark();
-        void SetThemeLight();
+        void SetThemeDark(bool async);
+        void SetThemeLight(bool async);
         void Cleanup();
         void MoveMail();
-        void PopOutItem();
         DataFrame DfConversation { get; }
         string Subject { get; }
         string To { get; }
@@ -57,9 +57,10 @@ namespace QuickFiler.Interfaces
         IList<TableLayoutPanel> TableLayoutPanels { get; }
         IList<Button> Buttons { get; }
         IList<IQfcTipsDetails> ListTipsDetails { get; }
-        void ToggleNavigation();
-        void ToggleNavigation(Enums.ToggleState desiredState);
-        void ToggleTips();
-        void ToggleTips(Enums.ToggleState desiredState);
+        void ToggleNavigation(bool async);
+        void ToggleNavigation(bool async, Enums.ToggleState desiredState);
+        void ToggleTips(bool async);
+        void ToggleTips(bool async, Enums.ToggleState desiredState);
+        public Dictionary<string, System.Action> RightKeyActions { get; }
     }
 }

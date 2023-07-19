@@ -28,5 +28,6 @@ namespace QuickFiler.Interfaces
         Dictionary<Keys, System.Action> KuKeyActions { get; set; }
         Dictionary<char, System.Action> KprsCharActions { get; set; }
         Dictionary<Keys, System.Action> KprsKeyActions { get; set; }
+        void CboFolders_KeyDown(object sender, KeyEventArgs e);
     }
 }

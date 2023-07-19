@@ -129,16 +129,18 @@ namespace UtilitiesCS.ReusableTypeClasses
                 Serialize(Filepath);
         }
 
-        public void Serialize(string filepath)
+        public async void Serialize(string filepath)
         {
             this.Filepath = filepath;
-            SerializeThreadSafe(filepath);
+            _ = Task.Run(() => SerializeThreadSafe(filepath));
+            await Task.Delay(1);
         }
 
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
         public void SerializeThreadSafe(string filepath)
         {
+            
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
@@ -148,13 +150,17 @@ namespace UtilitiesCS.ReusableTypeClasses
                     using (StreamWriter sw = File.CreateText(filepath))
                     {
                         var settings = new JsonSerializerSettings();
-                        settings.TypeNameHandling = TypeNameHandling.Auto;
+                        //settings.TypeNameHandling = TypeNameHandling.Auto;
                         settings.Formatting = Formatting.Indented;
 
                         var serializer = JsonSerializer.Create(settings);
-                        serializer.Serialize(sw, this);                        
+                        serializer.Serialize(sw, this);
                         sw.Close();
                     }
+                }
+                catch (Exception e)
+                {
+                    log.Error($"Error serializing to {filepath}", e);
                 }
                 finally
                 {
@@ -195,7 +201,9 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             try
             {
-                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
+                string strObject = File.ReadAllText(filepath, Encoding.UTF8);
+                //var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
+                var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(strObject);
                 foreach (var kvp in innerDictionary) { this.Add(kvp.Key, kvp.Value); }
             }
             catch (FileNotFoundException e)
