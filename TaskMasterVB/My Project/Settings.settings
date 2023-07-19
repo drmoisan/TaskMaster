@@ -1,0 +1,99 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="MaxToDo" Type="System.Int64" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="Default_Task_Length" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+    <Setting Name="Prefix_People" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag PPL </Value>
+    </Setting>
+    <Setting Name="Prefix_Context" Type="System.String" Scope="User">
+      <Value Profile="(Default)">_@</Value>
+    </Setting>
+    <Setting Name="Prefix_Topic" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag TOPIC </Value>
+    </Setting>
+    <Setting Name="Prefix_Project" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag PROJECT </Value>
+    </Setting>
+    <Setting Name="Prefix_Today" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag A Top Priority Today</Value>
+    </Setting>
+    <Setting Name="Prefix_Bullpin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag Bullpin Priorities</Value>
+    </Setting>
+    <Setting Name="Prefix_KB" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag KB </Value>
+    </Setting>
+    <Setting Name="Archive_Root" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Archive</Value>
+    </Setting>
+    <Setting Name="FileName_ProjInfo" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ProjInfo.bin</Value>
+    </Setting>
+    <Setting Name="FilenameDictPpl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">pplkey.json</Value>
+    </Setting>
+    <Setting Name="FileName_IDList" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">UsedIDList.bin</Value>
+    </Setting>
+    <Setting Name="FileName_DictRemap" Type="System.String" Scope="User">
+      <Value Profile="(Default)">dictRemap.csv</Value>
+    </Setting>
+    <Setting Name="ConversationExponent" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="ConversationWeight" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="SubjectExponent" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="SmithWatterman_GapPenalty" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="SmithWatterman_MatchScore" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="SmithWatterman_MismatchScore" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MaxRecents" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="FileName_Recents" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999RecentsFile.json</Value>
+    </Setting>
+    <Setting Name="File_CTF_Inc" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Inc.json</Value>
+    </Setting>
+    <Setting Name="File_CTF_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Map.json</Value>
+    </Setting>
+    <Setting Name="File_Subject_Map" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999Subject_Map.json</Value>
+    </Setting>
+    <Setting Name="File_Common_Words" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CommonWords.json</Value>
+    </Setting>
+    <Setting Name="File_ConditionalReminders" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999ConditionalReminders.json</Value>
+    </Setting>
+    <Setting Name="FileName_CategoryFilters" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999CategoryFilters.json</Value>
+    </Setting>
+    <Setting Name="View_Wide" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Main View</Value>
+    </Setting>
+    <Setting Name="View_Compact" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Compact</Value>
+    </Setting>
+    <Setting Name="BackupFile_CTF_Inc" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999CTF_Inc.txt</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

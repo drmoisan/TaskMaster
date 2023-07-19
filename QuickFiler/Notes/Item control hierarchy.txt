@@ -1,0 +1,108 @@
+L1h 	
+	Panel1
+		L1h0L2hv						Parent->L1h.Panel1    		Location:			this.L1h.Panel1.Controls.Add(this.L1h0L2hv);
+			L1h0L2hv1L3h				Parent->L1h0L2hv    		Location:1, 0		this.L1h0L2hv.Controls.Add(this.L1h0L2hv1L3h, 1, 0);
+				LblSentOn				Parent->L1h0L2hv1L3h    	Location:6, 0		this.L1h0L2hv1L3h.Controls.Add(this.LblSentOn, 6, 0);
+				LblSender				Parent->L1h0L2hv1L3h    	Location:0, 0		this.L1h0L2hv1L3h.Controls.Add(this.LblSender, 0, 0);
+				lblCaptionTriage		Parent->L1h0L2hv1L3h    	Location:1, 0		this.L1h0L2hv1L3h.Controls.Add(this.lblCaptionTriage, 1, 0);
+				LblTriage				Parent->L1h0L2hv1L3h    	Location:2, 0		this.L1h0L2hv1L3h.Controls.Add(this.LblTriage, 2, 0);
+				LblCaptionPredicted		Parent->L1h0L2hv1L3h    	Location:4, 0		this.L1h0L2hv1L3h.Controls.Add(this.LblCaptionPredicted, 4, 0);
+				LblActionable			Parent->L1h0L2hv1L3h    	Location:5, 0		this.L1h0L2hv1L3h.Controls.Add(this.LblActionable, 5, 0);
+				LblConvCt				Parent->L1h0L2hv2L3h    	Location:1, 0		this.L1h0L2hv2L3h.Controls.Add(this.LblConvCt, 1, 0);
+				lblSubject				Parent->L1h0L2hv2L3h    	Location:0, 0		this.L1h0L2hv2L3h.Controls.Add(this.lblSubject, 0, 0);
+			L1h0L2hv2L3h				Parent->L1h0L2hv    		Location:1, 1		this.L1h0L2hv.Controls.Add(this.L1h0L2hv2L3h, 1, 1);
+			TxtboxBody					Parent->L1h0L2hv    		Location:1, 2		this.L1h0L2hv.Controls.Add(this.TxtboxBody, 1, 2);
+			LblPos						Parent->L1h0L2hv    		Location:0, 1		this.L1h0L2hv.Controls.Add(this.LblPos, 0, 1);
+			LblAcOpen					Parent->L1h0L2hv    		Location:0, 2		this.L1h0L2hv.Controls.Add(this.LblAcOpen, 0, 2);
+	Panel2
+		L1h1L2v							Parent->L1h.Panel2    		Location:			this.L1h.Panel2.Controls.Add(this.L1h1L2v);
+			L1h1L2v1h					Parent->L1h1L2v    			Location:0, 0		this.L1h1L2v.Controls.Add(this.L1h1L2v1h, 0, 0);
+				LblAcSearch				Parent->L1h1L2v1h    		Location:0, 0		this.L1h1L2v1h.Controls.Add(this.LblAcSearch, 0, 0);
+				LblSearch				Parent->L1h1L2v1h    		Location:0, 0		this.L1h1L2v1h.Controls.Add(this.LblSearch, 0, 0);
+				TxtboxSearch			Parent->L1h1L2v1h    		Location:2, 0		this.L1h1L2v1h.Controls.Add(this.TxtboxSearch, 2, 0);
+
+				L1h1L2v1h5Panel			Parent->L1h1L2v1h    		Location:5, 0		this.L1h1L2v1h.Controls.Add(this.L1h1L2v1h5Panel, 5, 0);
+					LblAcDelete			Parent->L1h1L2v1h5Panel    	Location:			this.L1h1L2v1h5Panel.Controls.Add(this.LblAcDelete);
+					BtnDelItem			Parent->L1h1L2v1h5Panel    	Location:			this.L1h1L2v1h5Panel.Controls.Add(this.BtnDelItem);
+
+
+				L1h1L2v1h4Panel			Parent->L1h1L2v1h    		Location:4, 0		this.L1h1L2v1h.Controls.Add(this.L1h1L2v1h4Panel, 4, 0);
+					LblAcPopOut			Parent->L1h1L2v1h4Panel    	Location:			this.L1h1L2v1h4Panel.Controls.Add(this.LblAcPopOut);
+					BtnPopOut			Parent->L1h1L2v1h4Panel    	Location:			this.L1h1L2v1h4Panel.Controls.Add(this.BtnPopOut);
+
+				L1h1L2v1h3Panel			Parent->L1h1L2v1h    		Location:3, 0		this.L1h1L2v1h.Controls.Add(this.L1h1L2v1h3Panel, 3, 0);
+					LblAcTask			Parent->L1h1L2v1h3Panel    	Location:			this.L1h1L2v1h3Panel.Controls.Add(this.LblAcTask);
+					BtnFlagTask			Parent->L1h1L2v1h3Panel    	Location:			this.L1h1L2v1h3Panel.Controls.Add(this.BtnFlagTask);
+				
+			
+			L1h1L2v2h					Parent->L1h1L2v    			Location:0, 1		this.L1h1L2v.Controls.Add(this.L1h1L2v2h, 0, 1);
+				LblAcFolder				Parent->L1h1L2v2h    		Location:0, 0		this.L1h1L2v2h.Controls.Add(this.LblAcFolder, 0, 0);
+				LblFolder				Parent->L1h1L2v2h    		Location:0, 0		this.L1h1L2v2h.Controls.Add(this.LblFolder, 0, 0);
+				CboFolders				Parent->L1h1L2v2h    		Location:2, 0		this.L1h1L2v2h.Controls.Add(this.CboFolders, 2, 0);
+
+			L1h1L2v3h					Parent->L1h1L2v    			Location:0, 2		this.L1h1L2v.Controls.Add(this.L1h1L2v3h, 0, 2);
+				CbxEmailCopy			Parent->L1h1L2v3h    		Location:6, 0		this.L1h1L2v3h.Controls.Add(this.CbxEmailCopy, 6, 0);
+				CbxAttachments			Parent->L1h1L2v3h    		Location:4, 0		this.L1h1L2v3h.Controls.Add(this.CbxAttachments, 4, 0);
+				LblAcAttachments		Parent->L1h1L2v3h    		Location:3, 0		this.L1h1L2v3h.Controls.Add(this.LblAcAttachments, 3, 0);
+				LblAcEmail				Parent->L1h1L2v3h    		Location:5, 0		this.L1h1L2v3h.Controls.Add(this.LblAcEmail, 5, 0);
+				CbxConversation			Parent->L1h1L2v3h    		Location:2, 0		this.L1h1L2v3h.Controls.Add(this.CbxConversation, 2, 0);
+				LblAcConversation		Parent->L1h1L2v3h    		Location:1, 0		this.L1h1L2v3h.Controls.Add(this.LblAcConversation, 1, 0);
+
+
+
+
+            
+
+L1h 	
+	Panel1
+		this.L1h.Panel1.Controls.Add(this.L1h0L2hv);
+			this.L1h0L2hv.Controls.Add(this.L1h0L2hv1L3h, 1, 0);
+				this.L1h0L2hv1L3h.Controls.Add(this.LblSentOn, 6, 0);
+				this.L1h0L2hv1L3h.Controls.Add(this.LblSender, 0, 0);
+				this.L1h0L2hv1L3h.Controls.Add(this.lblCaptionTriage, 1, 0);
+				this.L1h0L2hv1L3h.Controls.Add(this.LblTriage, 2, 0);
+				this.L1h0L2hv1L3h.Controls.Add(this.LblCaptionPredicted, 4, 0);
+				this.L1h0L2hv1L3h.Controls.Add(this.LblActionable, 5, 0);
+				this.L1h0L2hv2L3h.Controls.Add(this.LblConvCt, 1, 0);
+				this.L1h0L2hv2L3h.Controls.Add(this.lblSubject, 0, 0);
+			this.L1h0L2hv.Controls.Add(this.L1h0L2hv2L3h, 1, 1);
+			this.L1h0L2hv.Controls.Add(this.TxtboxBody, 1, 2);
+			this.L1h0L2hv.Controls.Add(this.LblPos, 0, 1);
+			this.L1h0L2hv.Controls.Add(this.LblAcOpen, 0, 2);
+	Panel2
+		this.L1h.Panel2.Controls.Add(this.L1h1L2v);
+			this.L1h1L2v.Controls.Add(this.L1h1L2v1h, 0, 0);
+				this.L1h1L2v1h.Controls.Add(this.LblAcSearch, 0, 0);
+				this.L1h1L2v1h.Controls.Add(this.LblSearch, 0, 0);
+				this.L1h1L2v1h.Controls.Add(this.TxtboxSearch, 2, 0);
+
+				this.L1h1L2v1h.Controls.Add(this.L1h1L2v1h5Panel, 5, 0);
+					this.L1h1L2v1h5Panel.Controls.Add(this.LblAcDelete);
+					this.L1h1L2v1h5Panel.Controls.Add(this.BtnDelItem);
+
+
+				this.L1h1L2v1h.Controls.Add(this.L1h1L2v1h4Panel, 4, 0);
+					this.L1h1L2v1h4Panel.Controls.Add(this.LblAcPopOut);
+					this.L1h1L2v1h4Panel.Controls.Add(this.BtnPopOut);
+
+				this.L1h1L2v1h.Controls.Add(this.L1h1L2v1h3Panel, 3, 0);
+					this.L1h1L2v1h3Panel.Controls.Add(this.LblAcTask);
+					this.L1h1L2v1h3Panel.Controls.Add(this.BtnFlagTask);
+				
+			
+			this.L1h1L2v.Controls.Add(this.L1h1L2v2h, 0, 1);
+				this.L1h1L2v2h.Controls.Add(this.LblAcFolder, 0, 0);
+				this.L1h1L2v2h.Controls.Add(this.LblFolder, 0, 0);
+				this.L1h1L2v2h.Controls.Add(this.CboFolders, 2, 0);
+
+			this.L1h1L2v.Controls.Add(this.L1h1L2v3h, 0, 2);
+				this.L1h1L2v3h.Controls.Add(this.CbxEmailCopy, 6, 0);
+				this.L1h1L2v3h.Controls.Add(this.CbxAttachments, 4, 0);
+				this.L1h1L2v3h.Controls.Add(this.LblAcAttachments, 3, 0);
+				this.L1h1L2v3h.Controls.Add(this.LblAcEmail, 5, 0);
+				this.L1h1L2v3h.Controls.Add(this.CbxConversation, 2, 0);
+				this.L1h1L2v3h.Controls.Add(this.LblAcConversation, 1, 0);
+            
+			
+
+            
