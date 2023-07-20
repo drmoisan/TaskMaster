@@ -324,13 +324,15 @@ namespace QuickFiler.Controllers
                 QfcItemViewer itemViewer = _itemGroups[intNewSelection - 1].ItemViewer;
 
                 itemController.Accel_FocusToggle();
+                ActiveSelection = intNewSelection;
+
                 if (blExpanded)
                 {
                     // BUGFIX: Replace Function MoveDownPix
                     //MoveDownPix(intNewSelection + 1, itemController.ItemPanel.Height);
                     itemController.ToggleExpansion();
                 }
-                ActiveSelection = intNewSelection;
+                
                 _formViewer.L1v0L2L3v_TableLayout.ScrollControlIntoView(itemViewer);
             }
             return ActiveSelection;

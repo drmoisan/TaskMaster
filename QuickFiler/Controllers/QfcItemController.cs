@@ -658,8 +658,7 @@ style='color:black'>" + this.To + @"<o:p></o:p></span></p>
 style='color:black'>Subject:<span style='mso-tab-count:1'></span></span></b><span
 style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
 
-<p class=MsoNormal><o:p>&nbsp;</o:p></p>"; } 
-        
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>"; }         
         
         internal string MailToHTML()
         {
@@ -678,7 +677,7 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 _itemViewer.TxtboxBody.Visible = false;
                 _itemViewer.TopicThread.Visible = true;
                 _itemViewer.L0v2h2_Web.Visible = true;
-                //_itemViewer.L0v2h2_Web.DocumentText = Mail.HTMLBody;
+                // TODO: Switch to WebView2. Download examples from https://docs.microsoft.com/en-us/microsoft-edge/webview2/gettingstarted/winforms
                 _itemViewer.L0v2h2_Web.DocumentText = MailToHTML();
                 _expanded = true; 
             }
