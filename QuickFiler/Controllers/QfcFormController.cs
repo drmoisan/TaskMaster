@@ -50,6 +50,7 @@ namespace QuickFiler.Controllers
         private QfcFormViewer _formViewer;
         private IQfcCollectionController _groups;
         private RowStyle _rowStyleTemplate;
+        private RowStyle _rowStyleExpanded;
         private int itemPanelHeight;
         private Padding _itemMarginTemplate;
         private Enums.InitTypeEnum _initType;
@@ -65,6 +66,7 @@ namespace QuickFiler.Controllers
         public void CaptureItemSettings()
         {
             _rowStyleTemplate = _formViewer.L1v0L2L3v_TableLayout.RowStyles[0];
+            _rowStyleExpanded = _formViewer.L1v0L2L3v_TableLayout.RowStyles[1];
             _itemMarginTemplate = _formViewer.QfcItemViewerTemplate.Margin;
             //_formViewer.L1v0L2_PanelMain.Height
         }
@@ -263,7 +265,7 @@ namespace QuickFiler.Controllers
                                                   InitType: Enums.InitTypeEnum.InitSort,
                                                   keyboardHandler: _parent.KbdHndlr,
                                                   ParentObject: this);
-            _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate);
+            _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
         /// <summary>

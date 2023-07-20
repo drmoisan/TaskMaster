@@ -50,6 +50,7 @@ namespace QuickFiler.Controllers
         private List<ItemGroup> _itemGroups;
         private bool _darkMode;
         private RowStyle _template;
+        private RowStyle _templateExpanded;
         private int _activeIndex = -1;
         private IQfcKeyboardHandler _keyboardHandler;
         private delegate int ActionDelegate(int intNewSelection, bool blExpanded);
@@ -183,11 +184,12 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template)
+        public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
         {
             _formViewer.SuspendLayout();
             _itemTLP.SuspendLayout();
             _template = template;
+            _templateExpanded = templateExpanded;
             TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
             LoadItemGroupsAndViewers(listMailItems, template);
             _formViewer.WindowState = FormWindowState.Maximized;
@@ -297,7 +299,7 @@ namespace QuickFiler.Controllers
             if (activeUI)
             {
                 _itemGroups[ActiveIndex].ItemController.Accel_FocusToggle(Enums.ToggleState.On);
-                if (expanded) { _itemGroups[ActiveIndex].ItemController.ExpandCtrls1(); }
+                if (expanded) { _itemGroups[ActiveIndex].ItemController.ToggleExpansion(); }
             }
 
             _itemTLP.ResumeLayout();
@@ -322,13 +324,15 @@ namespace QuickFiler.Controllers
                 QfcItemViewer itemViewer = _itemGroups[intNewSelection - 1].ItemViewer;
 
                 itemController.Accel_FocusToggle();
+                ActiveSelection = intNewSelection;
+
                 if (blExpanded)
                 {
                     // BUGFIX: Replace Function MoveDownPix
                     //MoveDownPix(intNewSelection + 1, itemController.ItemPanel.Height);
-                    itemController.ExpandCtrls1();
+                    itemController.ToggleExpansion();
                 }
-                ActiveSelection = intNewSelection;
+                
                 _formViewer.L1v0L2L3v_TableLayout.ScrollControlIntoView(itemViewer);
             }
             return ActiveSelection;
@@ -372,6 +376,22 @@ namespace QuickFiler.Controllers
             // _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
         }
 
+        public void ToggleExpansionStyle(Enums.ToggleState desiredState)
+        {
+            if ((ActiveIndex == -1) || (!_itemGroups[ActiveIndex].ItemController.IsActiveUI))
+            {
+                throw new InvalidOperationException($"{nameof(ToggleExpansionStyle)} should" +
+                    "only be called from an active item");
+            }
+            {
+                if (desiredState == Enums.ToggleState.On)
+                {
+                    _itemTLP.RowStyles[ActiveIndex] = _templateExpanded.Clone();
+                }
+                else { _itemTLP.RowStyles[ActiveIndex] = _template.Clone(); }
+            }            
+        }
+
         public void ToggleOffNavigation(bool async)
         {
             if (ActiveIndex != -1) { ToggleOffActiveItem(false); }
@@ -410,7 +430,7 @@ namespace QuickFiler.Controllers
                 {
                     //TODO: Replace MoveDownPix Function
                     //MoveDownPix(_intActiveSelection + 1, (int)Math.Round(itemController.ItemPanel.Height * -0.5d));
-                    itemController.ExpandCtrls1();
+                    itemController.ToggleExpansion();
                     blExpanded = true;
                 }
                 itemController.Accel_FocusToggle(Enums.ToggleState.Off);

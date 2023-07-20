@@ -87,32 +87,7 @@ namespace QuickFiler.Test.Controllers
             this.mockRepository.VerifyAll();
         }
 
-        [TestMethod]
-        public void AddEmailControlGroup_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
-            MailItem mailItem = null;
-            int posInsert = 0;
-            bool blGroupConversation = false;
-            int ConvCt = 0;
-            object varList = null;
-            bool blChild = false;
-
-            // Act
-            qfcCollectionController.AddEmailControlGroup(
-                mailItem,
-                posInsert,
-                blGroupConversation,
-                ConvCt,
-                varList,
-                blChild);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
+        
         [TestMethod]
         public void RemoveControls_StateUnderTest_ExpectedBehavior()
         {
@@ -219,57 +194,11 @@ namespace QuickFiler.Test.Controllers
             this.mockRepository.VerifyAll();
         }
 
-        [TestMethod]
-        public void MoveDownControlGroups_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
-            int intPosition = 0;
-            int intMoves = 0;
+        
 
-            // Act
-            qfcCollectionController.MoveDownControlGroups(
-                intPosition,
-                intMoves);
+        
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void MoveDownPix_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
-            int intPosition = 0;
-            int intPix = 0;
-
-            // Act
-            qfcCollectionController.MoveDownPix(
-                intPosition,
-                intPix);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void ResizeChildren_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
-            int intDiffx = 0;
-
-            // Act
-            qfcCollectionController.ResizeChildren(
-                intDiffx);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        
 
         //[TestMethod]
         //public void ConvToggle_Group_StateUnderTest_ExpectedBehavior()
@@ -325,21 +254,7 @@ namespace QuickFiler.Test.Controllers
         //    this.mockRepository.VerifyAll();
         //}
 
-        [TestMethod]
-        public void IsSelectionBelowMax_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var qfcCollectionController = this.CreateQfcCollectionController();
-            int intNewSelection = 0;
-
-            // Act
-            var result = qfcCollectionController.IsSelectionBelowMax(
-                intNewSelection);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+       
 
         [TestMethod]
         public void SetDarkMode_StateUnderTest_ExpectedBehavior()

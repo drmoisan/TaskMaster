@@ -19,6 +19,7 @@ using QuickFiler.Helper_Classes;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using System.Xml.Linq;
 using System.Diagnostics;
+using System.IO;
 
 namespace QuickFiler.Controllers
 {
@@ -370,7 +371,7 @@ namespace QuickFiler.Controllers
             _keyboardHandler.KdCharActions.Add('C', (x) => this.ToggleConversationCheckbox());
             _keyboardHandler.KdCharActions.Add('A', (x) => this.ToggleSaveAttachments());
             _keyboardHandler.KdCharActions.Add('M', (x) => this.ToggleSaveCopyOfMail());
-            _keyboardHandler.KdCharActions.Add('E', (x) => this.ExpandCtrls1());
+            _keyboardHandler.KdCharActions.Add('E', (x) => this.ToggleExpansion());
             _keyboardHandler.KdCharActions.Add('S', (x) => this.JumpToSearchTextbox());
             _keyboardHandler.KdCharActions.Add('T', (x) => this.FlagAsTask());
             _keyboardHandler.KdCharActions.Add('P', (x) => this._parent.PopOutControlGroup(Position));
@@ -435,94 +436,94 @@ namespace QuickFiler.Controllers
             }
         }
 
-        internal void CboFolders_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Escape:
-                    {
-                        _intEnterCounter = 1;
-                        _intComboRightCtr = 0;
-                        break;
-                    }
-                case Keys.Up:
-                    {
-                        _intEnterCounter = 0;
-                        break;
-                    }
-                case Keys.Down:
-                    {
-                        _intEnterCounter = 0;
-                        break;
-                    }
-                case Keys.Right:
-                    {
-                        _intEnterCounter = 0;
-                        switch (_intComboRightCtr)
-                        {
-                            case 0:
-                                {
-                                    _itemViewer.CboFolders.DroppedDown = true;
-                                    _intComboRightCtr++;
-                                    break;
-                                }
-                            case 1:
-                                {
-                                    _itemViewer.CboFolders.DroppedDown = false;
-                                    _intComboRightCtr = 0;
-                                    MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?", 
-                                        "Dialog", BoxIcon.Question, RightKeyActions);
-                                    break;
-                                }
-                            default:
-                                {
-                                    MessageBox.Show(
-                                        "Error in intComboRightCtr ... setting to 0 and continuing",
-                                        "Error",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Error);
-                                    _intComboRightCtr = 0;
-                                    break;
-                                }
-                        }
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                        break;
-                    }
-                case Keys.Left:
-                    {
-                        _intEnterCounter = 0;
-                        _intComboRightCtr = 0;
-                        if (_itemViewer.CboFolders.DroppedDown)
-                        {
-                            _itemViewer.CboFolders.DroppedDown = false;
-                            e.SuppressKeyPress = true;
-                            e.Handled = true;
-                        }
-                        else { _keyboardHandler.KeyboardHandler_KeyDown(sender, e); }
+        //internal void CboFolders_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    switch (e.KeyCode)
+        //    {
+        //        case Keys.Escape:
+        //            {
+        //                _intEnterCounter = 1;
+        //                _intComboRightCtr = 0;
+        //                break;
+        //            }
+        //        case Keys.Up:
+        //            {
+        //                _intEnterCounter = 0;
+        //                break;
+        //            }
+        //        case Keys.Down:
+        //            {
+        //                _intEnterCounter = 0;
+        //                break;
+        //            }
+        //        case Keys.Right:
+        //            {
+        //                _intEnterCounter = 0;
+        //                switch (_intComboRightCtr)
+        //                {
+        //                    case 0:
+        //                        {
+        //                            _itemViewer.CboFolders.DroppedDown = true;
+        //                            _intComboRightCtr++;
+        //                            break;
+        //                        }
+        //                    case 1:
+        //                        {
+        //                            _itemViewer.CboFolders.DroppedDown = false;
+        //                            _intComboRightCtr = 0;
+        //                            MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?", 
+        //                                "Dialog", BoxIcon.Question, RightKeyActions);
+        //                            break;
+        //                        }
+        //                    default:
+        //                        {
+        //                            MessageBox.Show(
+        //                                "Error in intComboRightCtr ... setting to 0 and continuing",
+        //                                "Error",
+        //                                MessageBoxButtons.OK,
+        //                                MessageBoxIcon.Error);
+        //                            _intComboRightCtr = 0;
+        //                            break;
+        //                        }
+        //                }
+        //                e.SuppressKeyPress = true;
+        //                e.Handled = true;
+        //                break;
+        //            }
+        //        case Keys.Left:
+        //            {
+        //                _intEnterCounter = 0;
+        //                _intComboRightCtr = 0;
+        //                if (_itemViewer.CboFolders.DroppedDown)
+        //                {
+        //                    _itemViewer.CboFolders.DroppedDown = false;
+        //                    e.SuppressKeyPress = true;
+        //                    e.Handled = true;
+        //                }
+        //                else { _keyboardHandler.KeyboardHandler_KeyDown(sender, e); }
                         
-                        break;
-                    }
-                case Keys.Return:
-                    {
-                        _intEnterCounter++;
-                        if (_intEnterCounter == 1)
-                        {
-                            _intEnterCounter = 0;
-                            _intComboRightCtr = 0;
-                            _keyboardHandler.KeyboardHandler_KeyDown(sender, e);
-                        }
-                        else
-                        {
-                            _intEnterCounter = 1;
-                            _intComboRightCtr = 0;
-                            e.Handled = true;
-                        }
+        //                break;
+        //            }
+        //        case Keys.Return:
+        //            {
+        //                _intEnterCounter++;
+        //                if (_intEnterCounter == 1)
+        //                {
+        //                    _intEnterCounter = 0;
+        //                    _intComboRightCtr = 0;
+        //                    _keyboardHandler.KeyboardHandler_KeyDown(sender, e);
+        //                }
+        //                else
+        //                {
+        //                    _intEnterCounter = 1;
+        //                    _intComboRightCtr = 0;
+        //                    e.Handled = true;
+        //                }
                         
-                        break;
-                    }
-            }            
-        }
+        //                break;
+        //            }
+        //    }            
+        //}
 
         #endregion
 
@@ -630,10 +631,64 @@ namespace QuickFiler.Controllers
             ToggleNavigation(async);
         }
 
-        // TODO: Implement ExpandCtrls1
-        public void ExpandCtrls1()
+        public void ToggleExpansion()
         {
-            throw new NotImplementedException();
+            if (_expanded) { ToggleExpansion(Enums.ToggleState.Off); }
+            else { ToggleExpansion(Enums.ToggleState.On); }
+        }
+
+        internal string EmailHeader { get => @"<div class=""WordSection1"">
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>From:<span style='mso-tab-count:1'> </span></span></b><span
+style='color:black'>" + this.Sender + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>Sent:<span style='mso-tab-count:1'> </span></span></b><span
+style='color:black'>" + this.Mail.SentOn.ToString("f") + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>To:<span style='mso-tab-count:1'> </span></span></b><span
+style='color:black'>" + this.To + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>Subject:<span style='mso-tab-count:1'></span></span></b><span
+style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>"; }         
+        
+        internal string MailToHTML()
+        {
+            string body = Mail.HTMLBody;
+            string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
+            return revisedBody;
+        }
+        
+        public void ToggleExpansion(Enums.ToggleState desiredState)
+        {
+            _parent.ToggleExpansionStyle(desiredState);
+            if (desiredState == Enums.ToggleState.On) 
+            {
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
+                _itemViewer.TxtboxBody.Visible = false;
+                _itemViewer.TopicThread.Visible = true;
+                _itemViewer.L0v2h2_Web.Visible = true;
+                // TODO: Switch to WebView2. Download examples from https://docs.microsoft.com/en-us/microsoft-edge/webview2/gettingstarted/winforms
+                _itemViewer.L0v2h2_Web.DocumentText = MailToHTML();
+                _expanded = true; 
+            }
+            else 
+            {
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
+                _itemViewer.TxtboxBody.Visible = true;
+                _itemViewer.L0v2h2_Web.Visible = true;
+                _expanded = false; 
+            }
         }
 
         public void JumpToFolderDropDown()

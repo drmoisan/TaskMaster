@@ -26,7 +26,7 @@ namespace QuickFiler.Interfaces
         string ConvOriginID { get; set; }
         int Height { get; }
         MailItem Mail { get; set; }
-        void ExpandCtrls1(); 
+        void ToggleExpansion(); 
         string SelectedFolder { get; }
         int Position { get; set; }
         void PopulateFolderCombobox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
