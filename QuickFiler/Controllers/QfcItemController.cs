@@ -19,6 +19,7 @@ using QuickFiler.Helper_Classes;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using System.Xml.Linq;
 using System.Diagnostics;
+using System.IO;
 
 namespace QuickFiler.Controllers
 {
@@ -636,6 +637,37 @@ namespace QuickFiler.Controllers
             else { ToggleExpansion(Enums.ToggleState.On); }
         }
 
+        internal string EmailHeader { get => @"<div class=""WordSection1"">
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>From:<span style='mso-tab-count:1'> </span></span></b><span
+style='color:black'>" + this.Sender + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>Sent:<span style='mso-tab-count:1'> </span></span></b><span
+style='color:black'>" + this.Mail.SentOn.ToString("f") + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>To:<span style='mso-tab-count:1'> </span></span></b><span
+style='color:black'>" + this.To + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='color:black'>Subject:<span style='mso-tab-count:1'></span></span></b><span
+style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>"; } 
+        
+        
+        internal string MailToHTML()
+        {
+            string body = Mail.HTMLBody;
+            string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
+            return revisedBody;
+        }
+        
         public void ToggleExpansion(Enums.ToggleState desiredState)
         {
             _parent.ToggleExpansionStyle(desiredState);
@@ -645,8 +677,9 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
                 _itemViewer.TxtboxBody.Visible = false;
                 _itemViewer.TopicThread.Visible = true;
-                _itemViewer.L0v2_web.Visible = true;
-                _itemViewer.L0v2_web.DocumentText = Mail.HTMLBody;
+                _itemViewer.L0v2h2_Web.Visible = true;
+                //_itemViewer.L0v2h2_Web.DocumentText = Mail.HTMLBody;
+                _itemViewer.L0v2h2_Web.DocumentText = MailToHTML();
                 _expanded = true; 
             }
             else 
@@ -654,7 +687,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
                 _itemViewer.TxtboxBody.Visible = true;
-                _itemViewer.L0v2_web.Visible = true;
+                _itemViewer.L0v2h2_Web.Visible = true;
                 _expanded = false; 
             }
         }
