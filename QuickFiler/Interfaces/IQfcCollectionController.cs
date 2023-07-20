@@ -13,7 +13,7 @@ namespace QuickFiler.Interfaces
         
 
         // UI Add and Remove QfcItems
-        void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template);
+        void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
         QfcItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
         void PopOutControlGroup(int intPosition);
         void RemoveControls();
@@ -28,6 +28,7 @@ namespace QuickFiler.Interfaces
         void SelectPreviousItem();
         void ToggleOffNavigation(bool async);
         void ToggleOnNavigation(bool async);
+        void ToggleExpansionStyle(Enums.ToggleState desiredState);
 
         // UI Converations Expansion
         void ConvToggle_Group(int childCount, int indexOriginal);

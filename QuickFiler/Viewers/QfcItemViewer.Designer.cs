@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.L0v = new System.Windows.Forms.TableLayoutPanel();
+            this.L0v2_web = new System.Windows.Forms.WebBrowser();
             this.L1h = new System.Windows.Forms.SplitContainer();
             this.L1h0L2hv = new System.Windows.Forms.TableLayoutPanel();
             this.L1h0L2hv1L3h = new System.Windows.Forms.TableLayoutPanel();
@@ -41,9 +42,14 @@
             this.L1h0L2hv2L3h = new System.Windows.Forms.TableLayoutPanel();
             this.LblConvCt = new System.Windows.Forms.Label();
             this.lblSubject = new System.Windows.Forms.Label();
-            this.TxtboxBody = new System.Windows.Forms.TextBox();
             this.LblPos = new System.Windows.Forms.Label();
             this.LblAcOpen = new System.Windows.Forms.Label();
+            this.L1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
+            this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
+            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.time = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.TxtboxBody = new System.Windows.Forms.TextBox();
             this.L1h1L2v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h1L2v1h = new System.Windows.Forms.TableLayoutPanel();
             this.LblAcSearch = new System.Windows.Forms.Label();
@@ -63,10 +69,10 @@
             this.LblFolder = new System.Windows.Forms.Label();
             this.CboFolders = new System.Windows.Forms.ComboBox();
             this.L1h1L2v3h = new System.Windows.Forms.TableLayoutPanel();
+            this.LblAcEmail = new System.Windows.Forms.Label();
             this.CbxEmailCopy = new System.Windows.Forms.CheckBox();
             this.CbxAttachments = new System.Windows.Forms.CheckBox();
             this.LblAcAttachments = new System.Windows.Forms.Label();
-            this.LblAcEmail = new System.Windows.Forms.Label();
             this.CbxConversation = new System.Windows.Forms.CheckBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
             this.L0v.SuspendLayout();
@@ -77,6 +83,8 @@
             this.L1h0L2hv.SuspendLayout();
             this.L1h0L2hv1L3h.SuspendLayout();
             this.L1h0L2hv2L3h.SuspendLayout();
+            this.L1h0L2hv3h_TlpBodyToggle.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).BeginInit();
             this.L1h1L2v.SuspendLayout();
             this.L1h1L2v1h.SuspendLayout();
             this.L1h1L2v1h5Panel.SuspendLayout();
@@ -90,16 +98,28 @@
             // 
             this.L0v.ColumnCount = 1;
             this.L0v.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L0v.Controls.Add(this.L0v2_web, 0, 1);
             this.L0v.Controls.Add(this.L1h, 0, 0);
             this.L0v.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v.Location = new System.Drawing.Point(0, 0);
             this.L0v.Margin = new System.Windows.Forms.Padding(6);
             this.L0v.Name = "L0v";
             this.L0v.RowCount = 2;
-            this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 197F));
             this.L0v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 0F));
-            this.L0v.Size = new System.Drawing.Size(1840, 183);
+            this.L0v.Size = new System.Drawing.Size(1840, 197);
             this.L0v.TabIndex = 0;
+            // 
+            // L0v2_web
+            // 
+            this.L0v2_web.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L0v2_web.Location = new System.Drawing.Point(3, 200);
+            this.L0v2_web.MinimumSize = new System.Drawing.Size(20, 20);
+            this.L0v2_web.Name = "L0v2_web";
+            this.L0v2_web.Size = new System.Drawing.Size(1834, 738);
+            this.L0v2_web.TabIndex = 4;
+            this.L0v2_web.TabStop = false;
+            this.L0v2_web.Visible = false;
             // 
             // L1h
             // 
@@ -117,7 +137,7 @@
             // 
             this.L1h.Panel2.Controls.Add(this.L1h1L2v);
             this.L1h.Panel2MinSize = 603;
-            this.L1h.Size = new System.Drawing.Size(1840, 183);
+            this.L1h.Size = new System.Drawing.Size(1840, 197);
             this.L1h.SplitterDistance = 1098;
             this.L1h.SplitterWidth = 8;
             this.L1h.TabIndex = 2;
@@ -130,9 +150,9 @@
             this.L1h0L2hv.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1h0L2hv.Controls.Add(this.L1h0L2hv1L3h, 1, 0);
             this.L1h0L2hv.Controls.Add(this.L1h0L2hv2L3h, 1, 1);
-            this.L1h0L2hv.Controls.Add(this.TxtboxBody, 1, 2);
             this.L1h0L2hv.Controls.Add(this.LblPos, 0, 0);
             this.L1h0L2hv.Controls.Add(this.LblAcOpen, 0, 2);
+            this.L1h0L2hv.Controls.Add(this.L1h0L2hv3h_TlpBodyToggle, 1, 2);
             this.L1h0L2hv.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1h0L2hv.Location = new System.Drawing.Point(0, 0);
             this.L1h0L2hv.Margin = new System.Windows.Forms.Padding(6);
@@ -141,7 +161,7 @@
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv.Size = new System.Drawing.Size(1098, 183);
+            this.L1h0L2hv.Size = new System.Drawing.Size(1098, 197);
             this.L1h0L2hv.TabIndex = 0;
             // 
             // L1h0L2hv1L3h
@@ -286,22 +306,6 @@
             this.lblSubject.TabIndex = 2;
             this.lblSubject.Text = "[SUBJECT]";
             // 
-            // TxtboxBody
-            // 
-            this.TxtboxBody.BackColor = System.Drawing.SystemColors.Control;
-            this.TxtboxBody.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TxtboxBody.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtboxBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtboxBody.Location = new System.Drawing.Point(112, 89);
-            this.TxtboxBody.Margin = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.TxtboxBody.Multiline = true;
-            this.TxtboxBody.Name = "TxtboxBody";
-            this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(986, 94);
-            this.TxtboxBody.TabIndex = 4;
-            this.TxtboxBody.TabStop = false;
-            this.TxtboxBody.Text = "[BODY]";
-            // 
             // LblPos
             // 
             this.LblPos.BackColor = System.Drawing.SystemColors.HotTrack;
@@ -334,6 +338,76 @@
             this.LblAcOpen.TabIndex = 6;
             this.LblAcOpen.Text = "O";
             // 
+            // L1h0L2hv3h_TlpBodyToggle
+            // 
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnCount = 2;
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 0F));
+            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 0, 0);
+            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TxtboxBody, 0, 0);
+            this.L1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L1h0L2hv3h_TlpBodyToggle.Location = new System.Drawing.Point(100, 89);
+            this.L1h0L2hv3h_TlpBodyToggle.Margin = new System.Windows.Forms.Padding(0);
+            this.L1h0L2hv3h_TlpBodyToggle.Name = "L1h0L2hv3h_TlpBodyToggle";
+            this.L1h0L2hv3h_TlpBodyToggle.RowCount = 1;
+            this.L1h0L2hv3h_TlpBodyToggle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(998, 108);
+            this.L1h0L2hv3h_TlpBodyToggle.TabIndex = 7;
+            // 
+            // TopicThread
+            // 
+            this.TopicThread.AllColumns.Add(this.sender);
+            this.TopicThread.AllColumns.Add(this.time);
+            this.TopicThread.AllColumns.Add(this.infolder);
+            this.TopicThread.CellEditUseWholeCell = false;
+            this.TopicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.sender,
+            this.time,
+            this.infolder});
+            this.TopicThread.Cursor = System.Windows.Forms.Cursors.Default;
+            this.TopicThread.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TopicThread.HideSelection = false;
+            this.TopicThread.Location = new System.Drawing.Point(1001, 3);
+            this.TopicThread.Name = "TopicThread";
+            this.TopicThread.ShowGroups = false;
+            this.TopicThread.Size = new System.Drawing.Size(1, 102);
+            this.TopicThread.TabIndex = 8;
+            this.TopicThread.UseCompatibleStateImageBehavior = false;
+            this.TopicThread.View = System.Windows.Forms.View.Details;
+            this.TopicThread.VirtualMode = true;
+            this.TopicThread.Visible = false;
+            // 
+            // sender
+            // 
+            this.sender.Text = "From";
+            this.sender.Width = 121;
+            // 
+            // time
+            // 
+            this.time.Text = "Received";
+            this.time.Width = 131;
+            // 
+            // infolder
+            // 
+            this.infolder.Text = "In Folder";
+            this.infolder.Width = 149;
+            // 
+            // TxtboxBody
+            // 
+            this.TxtboxBody.BackColor = System.Drawing.SystemColors.Control;
+            this.TxtboxBody.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.TxtboxBody.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TxtboxBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtboxBody.Location = new System.Drawing.Point(12, 0);
+            this.TxtboxBody.Margin = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.TxtboxBody.Multiline = true;
+            this.TxtboxBody.Name = "TxtboxBody";
+            this.TxtboxBody.ReadOnly = true;
+            this.TxtboxBody.Size = new System.Drawing.Size(986, 108);
+            this.TxtboxBody.TabIndex = 5;
+            this.TxtboxBody.TabStop = false;
+            this.TxtboxBody.Text = "[BODY]";
+            // 
             // L1h1L2v
             // 
             this.L1h1L2v.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -350,7 +424,7 @@
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 58F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 58F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 48F));
-            this.L1h1L2v.Size = new System.Drawing.Size(734, 183);
+            this.L1h1L2v.Size = new System.Drawing.Size(734, 197);
             this.L1h1L2v.TabIndex = 0;
             // 
             // L1h1L2v1h
@@ -554,7 +628,7 @@
             this.L1h1L2v2h.Padding = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.L1h1L2v2h.RowCount = 1;
             this.L1h1L2v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v2h.Size = new System.Drawing.Size(734, 59);
+            this.L1h1L2v2h.Size = new System.Drawing.Size(734, 73);
             this.L1h1L2v2h.TabIndex = 1;
             // 
             // LblAcFolder
@@ -624,6 +698,21 @@
             this.L1h1L2v3h.Size = new System.Drawing.Size(722, 46);
             this.L1h1L2v3h.TabIndex = 2;
             // 
+            // LblAcEmail
+            // 
+            this.LblAcEmail.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.LblAcEmail.AutoSize = true;
+            this.LblAcEmail.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcEmail.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcEmail.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcEmail.Location = new System.Drawing.Point(521, 4);
+            this.LblAcEmail.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
+            this.LblAcEmail.Name = "LblAcEmail";
+            this.LblAcEmail.Size = new System.Drawing.Size(39, 33);
+            this.LblAcEmail.TabIndex = 16;
+            this.LblAcEmail.Text = "M";
+            // 
             // CbxEmailCopy
             // 
             this.CbxEmailCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -668,21 +757,6 @@
             this.LblAcAttachments.TabIndex = 14;
             this.LblAcAttachments.Text = "A";
             // 
-            // LblAcEmail
-            // 
-            this.LblAcEmail.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.LblAcEmail.AutoSize = true;
-            this.LblAcEmail.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcEmail.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcEmail.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcEmail.Location = new System.Drawing.Point(521, 4);
-            this.LblAcEmail.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
-            this.LblAcEmail.Name = "LblAcEmail";
-            this.LblAcEmail.Size = new System.Drawing.Size(39, 33);
-            this.LblAcEmail.TabIndex = 16;
-            this.LblAcEmail.Text = "M";
-            // 
             // CbxConversation
             // 
             this.CbxConversation.AutoSize = true;
@@ -722,7 +796,7 @@
             this.Margin = new System.Windows.Forms.Padding(6);
             this.MinimumSize = new System.Drawing.Size(1516, 183);
             this.Name = "QfcItemViewer";
-            this.Size = new System.Drawing.Size(1840, 183);
+            this.Size = new System.Drawing.Size(1840, 197);
             this.L0v.ResumeLayout(false);
             this.L1h.Panel1.ResumeLayout(false);
             this.L1h.Panel2.ResumeLayout(false);
@@ -734,6 +808,9 @@
             this.L1h0L2hv1L3h.PerformLayout();
             this.L1h0L2hv2L3h.ResumeLayout(false);
             this.L1h0L2hv2L3h.PerformLayout();
+            this.L1h0L2hv3h_TlpBodyToggle.ResumeLayout(false);
+            this.L1h0L2hv3h_TlpBodyToggle.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).EndInit();
             this.L1h1L2v.ResumeLayout(false);
             this.L1h1L2v1h.ResumeLayout(false);
             this.L1h1L2v1h.PerformLayout();
@@ -766,7 +843,6 @@
         internal System.Windows.Forms.TableLayoutPanel L1h0L2hv2L3h;
         internal System.Windows.Forms.Label LblConvCt;
         internal System.Windows.Forms.Label lblSubject;
-        internal System.Windows.Forms.TextBox TxtboxBody;
         internal System.Windows.Forms.Label LblPos;
         internal System.Windows.Forms.Label LblAcOpen;
         internal System.Windows.Forms.TableLayoutPanel L1h1L2v;
@@ -794,5 +870,12 @@
         internal System.Windows.Forms.Label LblAcEmail;
         internal System.Windows.Forms.CheckBox CbxConversation;
         internal System.Windows.Forms.Label LblAcConversation;
+        internal System.Windows.Forms.TextBox TxtboxBody;
+        private BrightIdeasSoftware.OLVColumn sender;
+        private BrightIdeasSoftware.OLVColumn time;
+        private BrightIdeasSoftware.OLVColumn infolder;
+        public BrightIdeasSoftware.FastObjectListView TopicThread;
+        internal System.Windows.Forms.TableLayoutPanel L1h0L2hv3h_TlpBodyToggle;
+        public System.Windows.Forms.WebBrowser L0v2_web;
     }
 }

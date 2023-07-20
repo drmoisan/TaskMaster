@@ -40,8 +40,8 @@
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
-            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.qfcItemViewerExpandedLight1 = new QuickFiler.QfcItemViewerExpandedLight();
+            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();
@@ -62,7 +62,7 @@
             this.L1v_TableLayout.RowCount = 2;
             this.L1v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 108F));
-            this.L1v_TableLayout.Size = new System.Drawing.Size(1433, 1515);
+            this.L1v_TableLayout.Size = new System.Drawing.Size(1557, 1515);
             this.L1v_TableLayout.TabIndex = 0;
             // 
             // L1v1L2h_TableLayout
@@ -88,7 +88,7 @@
             this.L1v1L2h_TableLayout.RowCount = 1;
             this.L1v1L2h_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v1L2h_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 96F));
-            this.L1v1L2h_TableLayout.Size = new System.Drawing.Size(1421, 96);
+            this.L1v1L2h_TableLayout.Size = new System.Drawing.Size(1545, 96);
             this.L1v1L2h_TableLayout.TabIndex = 0;
             // 
             // L1v1L2h0_KeyboardDialog
@@ -98,14 +98,14 @@
             this.L1v1L2h0_KeyboardDialog.Location = new System.Drawing.Point(14, 6);
             this.L1v1L2h0_KeyboardDialog.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v1L2h0_KeyboardDialog.Name = "L1v1L2h0_KeyboardDialog";
-            this.L1v1L2h0_KeyboardDialog.Size = new System.Drawing.Size(82, 73);
+            this.L1v1L2h0_KeyboardDialog.Size = new System.Drawing.Size(144, 73);
             this.L1v1L2h0_KeyboardDialog.TabIndex = 5;
             this.L1v1L2h0_KeyboardDialog.Visible = false;
             // 
             // L1v1L2h2_ButtonOK
             // 
             this.L1v1L2h2_ButtonOK.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h2_ButtonOK.Location = new System.Drawing.Point(404, 6);
+            this.L1v1L2h2_ButtonOK.Location = new System.Drawing.Point(466, 6);
             this.L1v1L2h2_ButtonOK.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v1L2h2_ButtonOK.Name = "L1v1L2h2_ButtonOK";
             this.L1v1L2h2_ButtonOK.Size = new System.Drawing.Size(292, 84);
@@ -116,7 +116,7 @@
             // L1v1L2h3_ButtonCancel
             // 
             this.L1v1L2h3_ButtonCancel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h3_ButtonCancel.Location = new System.Drawing.Point(724, 6);
+            this.L1v1L2h3_ButtonCancel.Location = new System.Drawing.Point(786, 6);
             this.L1v1L2h3_ButtonCancel.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v1L2h3_ButtonCancel.Name = "L1v1L2h3_ButtonCancel";
             this.L1v1L2h3_ButtonCancel.Size = new System.Drawing.Size(292, 84);
@@ -127,7 +127,7 @@
             // L1v1L2h4_ButtonUndo
             // 
             this.L1v1L2h4_ButtonUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h4_ButtonUndo.Location = new System.Drawing.Point(1036, 6);
+            this.L1v1L2h4_ButtonUndo.Location = new System.Drawing.Point(1098, 6);
             this.L1v1L2h4_ButtonUndo.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h4_ButtonUndo.Name = "L1v1L2h4_ButtonUndo";
             this.L1v1L2h4_ButtonUndo.Size = new System.Drawing.Size(108, 84);
@@ -139,7 +139,7 @@
             // 
             this.L1v1L2h5_SpnEmailPerLoad.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.L1v1L2h5_SpnEmailPerLoad.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.L1v1L2h5_SpnEmailPerLoad.Location = new System.Drawing.Point(1164, 11);
+            this.L1v1L2h5_SpnEmailPerLoad.Location = new System.Drawing.Point(1226, 11);
             this.L1v1L2h5_SpnEmailPerLoad.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v1L2h5_SpnEmailPerLoad.Name = "L1v1L2h5_SpnEmailPerLoad";
             this.L1v1L2h5_SpnEmailPerLoad.Size = new System.Drawing.Size(132, 74);
@@ -149,11 +149,11 @@
             // 
             this.DarkMode.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.DarkMode.AutoSize = true;
-            this.DarkMode.Location = new System.Drawing.Point(1314, 27);
+            this.DarkMode.Location = new System.Drawing.Point(1386, 27);
             this.DarkMode.Margin = new System.Windows.Forms.Padding(4);
             this.DarkMode.Name = "DarkMode";
             this.DarkMode.Padding = new System.Windows.Forms.Padding(6);
-            this.DarkMode.Size = new System.Drawing.Size(103, 41);
+            this.DarkMode.Size = new System.Drawing.Size(155, 41);
             this.DarkMode.TabIndex = 6;
             this.DarkMode.Text = "DarkMode";
             this.DarkMode.UseVisualStyleBackColor = true;
@@ -168,7 +168,7 @@
             this.L1v0L2_PanelMain.Location = new System.Drawing.Point(6, 6);
             this.L1v0L2_PanelMain.Margin = new System.Windows.Forms.Padding(6);
             this.L1v0L2_PanelMain.Name = "L1v0L2_PanelMain";
-            this.L1v0L2_PanelMain.Size = new System.Drawing.Size(1421, 1395);
+            this.L1v0L2_PanelMain.Size = new System.Drawing.Size(1545, 1395);
             this.L1v0L2_PanelMain.TabIndex = 1;
             // 
             // L1v0L2L3v_TableLayout
@@ -187,7 +187,7 @@
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 221F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1018F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(1421, 1337);
+            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(1545, 1337);
             this.L1v0L2L3v_TableLayout.TabIndex = 0;
             // 
             // QfcItemViewerTemplate
@@ -201,7 +201,7 @@
             this.QfcItemViewerTemplate.Margin = new System.Windows.Forms.Padding(12);
             this.QfcItemViewerTemplate.MinimumSize = new System.Drawing.Size(1370, 183);
             this.QfcItemViewerTemplate.Name = "QfcItemViewerTemplate";
-            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(1397, 197);
+            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(1521, 197);
             this.QfcItemViewerTemplate.TabIndex = 0;
             // 
             // qfcItemViewerExpandedLight1
@@ -214,7 +214,7 @@
             this.qfcItemViewerExpandedLight1.Margin = new System.Windows.Forms.Padding(12);
             this.qfcItemViewerExpandedLight1.MinimumSize = new System.Drawing.Size(1370, 994);
             this.qfcItemViewerExpandedLight1.Name = "qfcItemViewerExpandedLight1";
-            this.qfcItemViewerExpandedLight1.Size = new System.Drawing.Size(1397, 994);
+            this.qfcItemViewerExpandedLight1.Size = new System.Drawing.Size(1521, 994);
             this.qfcItemViewerExpandedLight1.TabIndex = 1;
             // 
             // QfcFormViewer
@@ -222,7 +222,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1433, 1515);
+            this.ClientSize = new System.Drawing.Size(1557, 1515);
             this.Controls.Add(this.L1v_TableLayout);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "QfcFormViewer";
