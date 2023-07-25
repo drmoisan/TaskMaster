@@ -384,11 +384,22 @@ namespace QuickFiler.Controllers
                     "only be called from an active item");
             }
             {
+                float heightChange = 0;
                 if (desiredState == Enums.ToggleState.On)
                 {
+                    heightChange = _templateExpanded.Height - _itemTLP.RowStyles[ActiveIndex].Height;
                     _itemTLP.RowStyles[ActiveIndex] = _templateExpanded.Clone();
                 }
-                else { _itemTLP.RowStyles[ActiveIndex] = _template.Clone(); }
+                else 
+                { 
+                    _itemTLP.RowStyles[ActiveIndex] = _template.Clone();
+                    heightChange = _itemTLP.RowStyles[ActiveIndex].Height - _template.Height;
+                }
+                
+                _itemTLP.MinimumSize = new System.Drawing.Size(
+                        _itemTLP.MinimumSize.Width,
+                        _itemTLP.MinimumSize.Height +
+                        (int)Math.Round(heightChange, 0));
             }            
         }
 

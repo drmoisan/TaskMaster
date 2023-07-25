@@ -472,95 +472,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        //internal void CboFolders_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    switch (e.KeyCode)
-        //    {
-        //        case Keys.Escape:
-        //            {
-        //                _intEnterCounter = 1;
-        //                _intComboRightCtr = 0;
-        //                break;
-        //            }
-        //        case Keys.Up:
-        //            {
-        //                _intEnterCounter = 0;
-        //                break;
-        //            }
-        //        case Keys.Down:
-        //            {
-        //                _intEnterCounter = 0;
-        //                break;
-        //            }
-        //        case Keys.Right:
-        //            {
-        //                _intEnterCounter = 0;
-        //                switch (_intComboRightCtr)
-        //                {
-        //                    case 0:
-        //                        {
-        //                            _itemViewer.CboFolders.DroppedDown = true;
-        //                            _intComboRightCtr++;
-        //                            break;
-        //                        }
-        //                    case 1:
-        //                        {
-        //                            _itemViewer.CboFolders.DroppedDown = false;
-        //                            _intComboRightCtr = 0;
-        //                            MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?", 
-        //                                "Dialog", BoxIcon.Question, RightKeyActions);
-        //                            break;
-        //                        }
-        //                    default:
-        //                        {
-        //                            MessageBox.Show(
-        //                                "Error in intComboRightCtr ... setting to 0 and continuing",
-        //                                "Error",
-        //                                MessageBoxButtons.OK,
-        //                                MessageBoxIcon.Error);
-        //                            _intComboRightCtr = 0;
-        //                            break;
-        //                        }
-        //                }
-        //                e.SuppressKeyPress = true;
-        //                e.Handled = true;
-        //                break;
-        //            }
-        //        case Keys.Left:
-        //            {
-        //                _intEnterCounter = 0;
-        //                _intComboRightCtr = 0;
-        //                if (_itemViewer.CboFolders.DroppedDown)
-        //                {
-        //                    _itemViewer.CboFolders.DroppedDown = false;
-        //                    e.SuppressKeyPress = true;
-        //                    e.Handled = true;
-        //                }
-        //                else { _keyboardHandler.KeyboardHandler_KeyDown(sender, e); }
-                        
-        //                break;
-        //            }
-        //        case Keys.Return:
-        //            {
-        //                _intEnterCounter++;
-        //                if (_intEnterCounter == 1)
-        //                {
-        //                    _intEnterCounter = 0;
-        //                    _intComboRightCtr = 0;
-        //                    _keyboardHandler.KeyboardHandler_KeyDown(sender, e);
-        //                }
-        //                else
-        //                {
-        //                    _intEnterCounter = 1;
-        //                    _intComboRightCtr = 0;
-        //                    e.Handled = true;
-        //                }
-                        
-        //                break;
-        //            }
-        //    }            
-        //}
-
         #endregion
 
         #region UI Navigation Methods
@@ -713,7 +624,6 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 _itemViewer.TxtboxBody.Visible = false;
                 _itemViewer.TopicThread.Visible = true;
                 _itemViewer.L0v2h2_Web.Visible = true;
-                //_itemViewer.L0v2h2_Web.NavigateToString(MailToHTML());
                 _expanded = true; 
             }
             else 
