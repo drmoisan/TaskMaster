@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h = new System.Windows.Forms.SplitContainer();
             this.L1h0L2hv = new System.Windows.Forms.TableLayoutPanel();
@@ -74,8 +75,7 @@
             this.LblAcAttachments = new System.Windows.Forms.Label();
             this.CbxConversation = new System.Windows.Forms.CheckBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
-            this.L0v2h = new System.Windows.Forms.TableLayoutPanel();
-            this.L0v2h2_Web = new System.Windows.Forms.WebBrowser();
+            this.L0v2h2_Web = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.L0v.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1h)).BeginInit();
             this.L1h.Panel1.SuspendLayout();
@@ -93,7 +93,7 @@
             this.L1h1L2v1h3Panel.SuspendLayout();
             this.L1h1L2v2h.SuspendLayout();
             this.L1h1L2v3h.SuspendLayout();
-            this.L0v2h.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_Web)).BeginInit();
             this.SuspendLayout();
             // 
             // L0v
@@ -101,7 +101,7 @@
             this.L0v.ColumnCount = 1;
             this.L0v.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L0v.Controls.Add(this.L1h, 0, 0);
-            this.L0v.Controls.Add(this.L0v2h, 0, 1);
+            this.L0v.Controls.Add(this.L0v2h2_Web, 0, 1);
             this.L0v.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v.Location = new System.Drawing.Point(0, 0);
             this.L0v.Margin = new System.Windows.Forms.Padding(6);
@@ -777,32 +777,25 @@
             this.LblAcConversation.TabIndex = 15;
             this.LblAcConversation.Text = "C";
             // 
-            // L0v2h
-            // 
-            this.L0v2h.ColumnCount = 2;
-            this.L0v2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.L0v2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L0v2h.Controls.Add(this.L0v2h2_Web, 1, 0);
-            this.L0v2h.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h.Location = new System.Drawing.Point(3, 200);
-            this.L0v2h.Name = "L0v2h";
-            this.L0v2h.RowCount = 1;
-            this.L0v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L0v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.L0v2h.Size = new System.Drawing.Size(1834, 704);
-            this.L0v2h.TabIndex = 3;
-            // 
             // L0v2h2_Web
             // 
+            this.L0v2h2_Web.AllowExternalDrop = true;
+            this.L0v2h2_Web.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_Web.CreationProperties = coreWebView2CreationProperties1;
+            this.L0v2h2_Web.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_Web.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_Web.Location = new System.Drawing.Point(110, 10);
-            this.L0v2h2_Web.Margin = new System.Windows.Forms.Padding(10);
-            this.L0v2h2_Web.MinimumSize = new System.Drawing.Size(20, 20);
+            this.L0v2h2_Web.Location = new System.Drawing.Point(100, 200);
+            this.L0v2h2_Web.Margin = new System.Windows.Forms.Padding(100, 3, 3, 3);
             this.L0v2h2_Web.Name = "L0v2h2_Web";
-            this.L0v2h2_Web.Size = new System.Drawing.Size(1714, 684);
-            this.L0v2h2_Web.TabIndex = 5;
-            this.L0v2h2_Web.TabStop = false;
-            this.L0v2h2_Web.Visible = false;
+            this.L0v2h2_Web.Size = new System.Drawing.Size(1737, 704);
+            this.L0v2h2_Web.TabIndex = 3;
+            this.L0v2h2_Web.ZoomFactor = 1D;
             // 
             // QfcItemViewer
             // 
@@ -842,7 +835,7 @@
             this.L1h1L2v2h.PerformLayout();
             this.L1h1L2v3h.ResumeLayout(false);
             this.L1h1L2v3h.PerformLayout();
-            this.L0v2h.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_Web)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -895,7 +888,6 @@
         private BrightIdeasSoftware.OLVColumn infolder;
         public BrightIdeasSoftware.FastObjectListView TopicThread;
         internal System.Windows.Forms.TableLayoutPanel L1h0L2hv3h_TlpBodyToggle;
-        private System.Windows.Forms.TableLayoutPanel L0v2h;
-        public System.Windows.Forms.WebBrowser L0v2h2_Web;
+        internal Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_Web;
     }
 }

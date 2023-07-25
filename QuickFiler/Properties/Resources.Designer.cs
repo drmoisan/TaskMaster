@@ -83,6 +83,16 @@ namespace QuickFiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AppStartPageBackground {
+            get {
+                object obj = ResourceManager.GetObject("AppStartPageBackground", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Close {
             get {
                 object obj = ResourceManager.GetObject("Close", resourceCulture);
@@ -126,6 +136,23 @@ namespace QuickFiler.Properties {
         internal static string Email_Prefix_To_Strip {
             get {
                 return ResourceManager.GetString("Email Prefix To Strip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;WordSection1&quot;&gt;
+        ///&lt;p class=MsoNormal style=&apos;margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+        ///225.0pt;mso-layout-grid-align:none;text-autospace:none&apos;&gt;&lt;b&gt;&lt;span
+        ///style=&apos;color:black&apos;&gt;From:&lt;span style=&apos;mso-tab-count:1&apos;&gt; &lt;/span&gt;&lt;/span&gt;&lt;/b&gt;&lt;span
+        ///style=&apos;color:black&apos;&gt;SenderField&lt;o:p&gt;&lt;/o:p&gt;&lt;/span&gt;&lt;/p&gt;
+        ///
+        ///&lt;p class=MsoNormal style=&apos;margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+        ///225.0pt;mso-layout-grid-align:none;text-autospace:none&apos;&gt;&lt;b&gt;&lt;span
+        ///style=&apos;color:black&apos;&gt;Sent:&lt;span style=&apos;mso-tab-count:1&apos;&gt;  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EmailHeader {
+            get {
+                return ResourceManager.GetString("EmailHeader", resourceCulture);
             }
         }
         

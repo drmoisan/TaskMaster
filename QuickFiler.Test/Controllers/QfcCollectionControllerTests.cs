@@ -54,11 +54,13 @@ namespace QuickFiler.Test.Controllers
             var qfcCollectionController = this.CreateQfcCollectionController();
             IList<MailItem> listMailItems = null;
             RowStyle template = null;
+            RowStyle templateExpanded = null;
 
             // Act
             qfcCollectionController.LoadControlsAndHandlers(
                 listMailItems,
-                template);
+                template,
+                templateExpanded);
 
             // Assert
             Assert.Fail();

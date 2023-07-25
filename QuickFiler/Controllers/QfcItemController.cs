@@ -20,6 +20,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using System.Xml.Linq;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Web.WebView2.Core;
 
 namespace QuickFiler.Controllers
 {
@@ -81,6 +82,7 @@ namespace QuickFiler.Controllers
         private bool _suppressEvents = false;
         private int _intEnterCounter = 0;
         private int _intComboRightCtr = 0;
+        private CoreWebView2Environment _webViewEnvironment;
 
         #endregion
 
@@ -193,11 +195,37 @@ namespace QuickFiler.Controllers
 
             // Populate placeholder controls with 
             PopulateControls(mailItem, viewerPosition);
-
+            
             ToggleTips(async: async, desiredState: Enums.ToggleState.Off);
             ToggleNavigation(async: async, desiredState: Enums.ToggleState.Off);
 
             WireEvents();
+            InitializeWebView();
+        }
+
+        internal void InitializeWebView()
+        {
+            // Create the cache directory 
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
+
+            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
+            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
+
+            _itemViewer.L0v2h2_Web.BeginInvoke(new System.Action(() =>
+            { 
+                // Create the environment manually
+                Task <CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
+
+                // Do this so the task is continued on the UI Thread
+                TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
+
+                task.ContinueWith(t =>
+                {
+                    _webViewEnvironment = task.Result;
+                    _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
+                }, ui);
+            }));
         }
 
         internal void ResolveControlGroups(QfcItemViewer itemViewer)
@@ -353,12 +381,20 @@ namespace QuickFiler.Controllers
 
             _itemViewer.BtnFlagTask.Click += new System.EventHandler(this.BtnFlagTask_Click);
             _itemViewer.BtnPopOut.Click += new System.EventHandler(this.BtnPopOut_Click);
-            //_itemViewer.BtnPopOut.Click += new System.EventHandler(_keyboardHandler.BtnPopOut_Click);
             _itemViewer.BtnDelItem.Click += new System.EventHandler(this.BtnDelItem_Click);
             _itemViewer.TxtboxSearch.TextChanged += new System.EventHandler(this.TxtboxSearch_TextChanged);
             _itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtboxSearch_KeyDown);
-            //_itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CboFolders_KeyDown);
             _itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.CboFolders_KeyDown);
+            _itemViewer.L0v2h2_Web.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
+        }
+
+        internal void WebView2Control_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
+        {
+            if (!e.IsSuccess)
+            {
+                throw (e.InitializationException);
+            }
+            _itemViewer.L0v2h2_Web.NavigateToString(MailToHTML());
         }
 
         internal void RegisterFocusActions()
@@ -677,8 +713,7 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 _itemViewer.TxtboxBody.Visible = false;
                 _itemViewer.TopicThread.Visible = true;
                 _itemViewer.L0v2h2_Web.Visible = true;
-                // TODO: Switch to WebView2. Download examples from https://docs.microsoft.com/en-us/microsoft-edge/webview2/gettingstarted/winforms
-                _itemViewer.L0v2h2_Web.DocumentText = MailToHTML();
+                //_itemViewer.L0v2h2_Web.NavigateToString(MailToHTML());
                 _expanded = true; 
             }
             else 

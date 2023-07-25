@@ -1,9 +1,11 @@
-﻿using QuickFiler.Interfaces;
+﻿using Microsoft.Web.WebView2.Core;
+using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ namespace QuickFiler
 
         private IList<Label> _tipsLabels;
         private IQfcItemController _controller;
+        private CoreWebView2Environment _webViewEnvironment;
 
         public IList<Label> TipsLabels { get => _tipsLabels; }
         public IQfcItemController Controller { get => _controller; set => _controller = value; }
@@ -41,6 +44,9 @@ namespace QuickFiler
             };
 
         }
+
+
+        
 
     }
 }
