@@ -139,19 +139,15 @@ namespace QuickFiler.Controllers
 
         public void LoadConversationsAndFolders()
         {
-            bool parallel = true;
+            bool parallel = Properties.Settings.Default.ParallelLoad;
             if (parallel) { LoadParallelCF(); }
             else { LoadSequentialCF(); }
         }
 
         public void LoadParallelCF()
         {
-            int i = 0;
             Parallel.ForEach(_itemGroups, grp =>
             {
-                //i = _itemGroups.IndexOf(grp) + 1;
-                //i = _itemGroups.FindIndex(x => x.MailItem == grp.MailItem) + 1;
-
                 grp.ItemController = new QfcItemController(_globals,
                                                            grp.ItemViewer,
                                                            _itemGroups.FindIndex(
@@ -175,7 +171,7 @@ namespace QuickFiler.Controllers
             int i = 0;
             foreach (var grp in _itemGroups)
             {
-                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i, grp.MailItem, _keyboardHandler, this);
+                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i+1, grp.MailItem, _keyboardHandler, this);
                 grp.ItemController.PopulateConversation();
                 grp.ItemController.PopulateFolderCombobox();
                 if (_darkMode) { grp.ItemController.SetThemeDark(async: false); }
@@ -292,15 +288,19 @@ namespace QuickFiler.Controllers
             // Remove the group from the list of groups
             _itemGroups.RemoveAt(selection - 1);
 
-            // Renumber the remaining groups
-            RenumberGroups();
-
-            // Restore UI to previous state with newly selected item
-            if (activeUI)
+            if (_itemGroups.Count > 0)
             {
-                _itemGroups[ActiveIndex].ItemController.Accel_FocusToggle(Enums.ToggleState.On);
-                if (expanded) { _itemGroups[ActiveIndex].ItemController.ToggleExpansion(); }
+                // Renumber the remaining groups
+                RenumberGroups();
+
+                // Restore UI to previous state with newly selected item
+                if (activeUI)
+                {
+                    _itemGroups[ActiveIndex].ItemController.Accel_FocusToggle(Enums.ToggleState.On);
+                    if (expanded) { _itemGroups[ActiveIndex].ItemController.ToggleExpansion(); }
+                }
             }
+            
 
             _itemTLP.ResumeLayout();
             ResetPanelHeight();
@@ -391,15 +391,19 @@ namespace QuickFiler.Controllers
                     _itemTLP.RowStyles[ActiveIndex] = _templateExpanded.Clone();
                 }
                 else 
-                { 
+                {
+                    heightChange = _template.Height - _itemTLP.RowStyles[ActiveIndex].Height;
                     _itemTLP.RowStyles[ActiveIndex] = _template.Clone();
-                    heightChange = _itemTLP.RowStyles[ActiveIndex].Height - _template.Height;
                 }
                 
                 _itemTLP.MinimumSize = new System.Drawing.Size(
                         _itemTLP.MinimumSize.Width,
                         _itemTLP.MinimumSize.Height +
                         (int)Math.Round(heightChange, 0));
+                if (heightChange < 0)
+                {
+                    _itemTLP.Invoke(new System.Action(() => _itemTLP.Height += (int)Math.Round(heightChange, 0)));
+                }
             }            
         }
 

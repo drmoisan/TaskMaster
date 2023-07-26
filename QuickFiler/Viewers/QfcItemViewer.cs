@@ -24,9 +24,11 @@ namespace QuickFiler
         private IList<Label> _tipsLabels;
         private IQfcItemController _controller;
         private CoreWebView2Environment _webViewEnvironment;
+        private TaskScheduler _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
         public IList<Label> TipsLabels { get => _tipsLabels; }
         public IQfcItemController Controller { get => _controller; set => _controller = value; }
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         private void InitTipsLabelsList()
         {
@@ -45,8 +47,6 @@ namespace QuickFiler
 
         }
 
-
         
-
     }
 }

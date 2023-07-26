@@ -73,7 +73,7 @@ namespace QuickFiler.Controllers
 
         public void RemoveItemTemplate()
         {
-            TableLayoutHelper.RemoveSpecificRow(_formViewer.L1v0L2L3v_TableLayout, 0);
+            TableLayoutHelper.RemoveSpecificRow(_formViewer.L1v0L2L3v_TableLayout, 0, 2);
         }
 
         public void SetupLightDark()
