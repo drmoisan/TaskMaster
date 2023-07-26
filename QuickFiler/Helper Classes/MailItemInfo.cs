@@ -43,6 +43,8 @@ namespace QuickFiler
         public string Folder { get => Initialized(ref _folder); set => _folder = value; }
         public bool UnRead { get => Initialized(ref _unread); set => _unread = value; }
         
+        public DateTime SentDate { get => _item.SentOn; }
+
         internal string Initialized(ref string variable)
         {
             if (variable is null) { ExtractBasics(); }

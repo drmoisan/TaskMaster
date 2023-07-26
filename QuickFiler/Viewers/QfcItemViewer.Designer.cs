@@ -45,9 +45,9 @@
             this.LblPos = new System.Windows.Forms.Label();
             this.LblAcOpen = new System.Windows.Forms.Label();
             this.L1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
-            this.TopicThread = new BrightIdeasSoftware.ObjectListView();
+            this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
             this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.time = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.SentDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.TxtboxBody = new System.Windows.Forms.TextBox();
             this.L1h1L2v = new System.Windows.Forms.TableLayoutPanel();
@@ -336,8 +336,8 @@
             // L1h0L2hv3h_TlpBodyToggle
             // 
             this.L1h0L2hv3h_TlpBodyToggle.ColumnCount = 2;
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 0F));
             this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 0, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TxtboxBody, 0, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -352,7 +352,7 @@
             // TopicThread
             // 
             this.TopicThread.AllColumns.Add(this.sender);
-            this.TopicThread.AllColumns.Add(this.time);
+            this.TopicThread.AllColumns.Add(this.SentDate);
             this.TopicThread.AllColumns.Add(this.infolder);
             this.TopicThread.AllowDrop = true;
             this.TopicThread.BackColor = System.Drawing.SystemColors.Control;
@@ -360,21 +360,23 @@
             this.TopicThread.CellEditUseWholeCell = false;
             this.TopicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.sender,
-            this.time,
+            this.SentDate,
             this.infolder});
             this.TopicThread.Cursor = System.Windows.Forms.Cursors.Default;
             this.TopicThread.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TopicThread.EmptyListMsg = "The fast list is empty";
             this.TopicThread.FullRowSelect = true;
             this.TopicThread.HideSelection = false;
-            this.TopicThread.Location = new System.Drawing.Point(501, 3);
+            this.TopicThread.Location = new System.Drawing.Point(1000, 3);
             this.TopicThread.MultiSelect = false;
             this.TopicThread.Name = "TopicThread";
             this.TopicThread.ShowGroups = false;
-            this.TopicThread.Size = new System.Drawing.Size(493, 102);
+            this.TopicThread.Size = new System.Drawing.Size(1, 102);
+            this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.TopicThread.TabIndex = 8;
             this.TopicThread.UseCompatibleStateImageBehavior = false;
             this.TopicThread.View = System.Windows.Forms.View.Details;
+            this.TopicThread.VirtualMode = true;
             // 
             // sender
             // 
@@ -385,13 +387,13 @@
             this.sender.Text = "From";
             this.sender.Width = 200;
             // 
-            // time
+            // SentDate
             // 
-            this.time.AspectName = "SentOn";
-            this.time.FillsFreeSpace = true;
-            this.time.MinimumWidth = 250;
-            this.time.Text = "Received";
-            this.time.Width = 250;
+            this.SentDate.AspectName = "SentDate";
+            this.SentDate.FillsFreeSpace = true;
+            this.SentDate.MinimumWidth = 250;
+            this.SentDate.Text = "Received";
+            this.SentDate.Width = 250;
             // 
             // infolder
             // 
@@ -412,7 +414,7 @@
             this.TxtboxBody.Multiline = true;
             this.TxtboxBody.Name = "TxtboxBody";
             this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(486, 108);
+            this.TxtboxBody.Size = new System.Drawing.Size(985, 108);
             this.TxtboxBody.TabIndex = 5;
             this.TxtboxBody.TabStop = false;
             this.TxtboxBody.Text = "[BODY]";
@@ -928,12 +930,12 @@
         internal System.Windows.Forms.Label LblAcConversation;
         internal System.Windows.Forms.TextBox TxtboxBody;
         private BrightIdeasSoftware.OLVColumn sender;
-        private BrightIdeasSoftware.OLVColumn time;
         private BrightIdeasSoftware.OLVColumn infolder;
-        public BrightIdeasSoftware.ObjectListView TopicThread;
+        public BrightIdeasSoftware.FastObjectListView TopicThread;
         internal System.Windows.Forms.TableLayoutPanel L1h0L2hv3h_TlpBodyToggle;
         private System.Windows.Forms.TableLayoutPanel L0v2h;
         internal Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_Web;
         internal System.Windows.Forms.Panel L0v2h2_Panel;
+        internal BrightIdeasSoftware.OLVColumn SentDate;
     }
 }

@@ -415,7 +415,11 @@ namespace QuickFiler.Controllers
 
             ConversationInfo = await Task.FromResult(mailItems.Select(x => new MailItemInfo(x)).ToList());
 
-            _itemViewer.TopicThread.BeginInvoke(new System.Action(() => _itemViewer.TopicThread.SetObjects(ConversationInfo)));
+            _itemViewer.TopicThread.BeginInvoke(new System.Action(() => 
+            { 
+                _itemViewer.TopicThread.SetObjects(ConversationInfo);
+                _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
+            }));
         }
 
         #endregion
