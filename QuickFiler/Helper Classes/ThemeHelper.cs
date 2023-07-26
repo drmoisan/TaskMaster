@@ -30,7 +30,9 @@ namespace QuickFiler
             //btn.ForeColor = forecolor;
         }
 
-        public static Dictionary<string,Theme> SetupThemes(IQfcItemController controller, QfcItemViewer viewer)
+        public static Dictionary<string,Theme> SetupThemes(IQfcItemController controller, 
+                                                           QfcItemViewer viewer,
+                                                           Action<Enums.ToggleState> htmlConverter)
         {
             var themes = new Dictionary<string, Theme>
             {
@@ -40,6 +42,8 @@ namespace QuickFiler
                           itemViewer: viewer,
                           parent: controller,
                           web2ViewScheme: Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Light,
+                          htmlConverter: htmlConverter,
+                          htmlDark: Enums.ToggleState.Off,
                           navBackgColor: SystemColors.HotTrack,
                           navForeColor: SystemColors.Control,
                           tlpBackColor: SystemColors.Control,
@@ -67,6 +71,8 @@ namespace QuickFiler
                           itemViewer: viewer,
                           parent: controller,
                           web2ViewScheme: Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Light,
+                          htmlConverter: htmlConverter,
+                          htmlDark: Enums.ToggleState.Off,
                           navBackgColor: Color.Green,
                           navForeColor: SystemColors.Control,
                           tlpBackColor: Color.LightCyan,
@@ -94,6 +100,8 @@ namespace QuickFiler
                           itemViewer: viewer,
                           parent: controller,
                           web2ViewScheme: Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Dark,
+                          htmlConverter: htmlConverter,
+                          htmlDark: Enums.ToggleState.On,
                           navBackgColor: Color.FromArgb(64,64,64),
                           navForeColor: SystemColors.Control,
                           tlpBackColor: Color.Black,
@@ -121,6 +129,8 @@ namespace QuickFiler
                           itemViewer: viewer,
                           parent: controller,
                           web2ViewScheme: Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Dark,
+                          htmlConverter: htmlConverter,
+                          htmlDark: Enums.ToggleState.On,
                           navBackgColor: SystemColors.HotTrack,
                           navForeColor: SystemColors.Control,
                           tlpBackColor: Color.FromArgb(64,64,64),

@@ -30,7 +30,9 @@ namespace QuickFiler
         private string _actionable;
         private string _sentOn;
         private string _folder;
+        private string _html;
         private bool _unread;
+        private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
         
         public MailItem Item { get => _item; set => _item = value; }
         public string Sender { get => Initialized(ref _sender); set => _sender = value; }
@@ -43,6 +45,8 @@ namespace QuickFiler
         public string Folder { get => Initialized(ref _folder); set => _folder = value; }
         public bool UnRead { get => Initialized(ref _unread); set => _unread = value; }
         
+        public string Html { get => _html ?? GetHTML(); private set => _html = value; }
+
         public DateTime SentDate { get => _item.SentOn; }
 
         internal string Initialized(ref string variable)
@@ -111,11 +115,51 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>";
         }
         
-        public string GetHTML()
+        internal string DarkModeHeader
+        {
+            get => @"
+<style>
+body { filter: invert(100%) }
+* { backdrop-filter: invert(20%) }
+img {
+    -webkit-filter: invert(100%) !important;
+    -moz-filter: invert(100%) !important;
+    -o-filter: invert(100%) !important;
+    -ms-filter: invert(100%) !important;
+}
+</style>
+";
+        }
+
+        public string ToggleDark()
+        {
+            if (_darkMode == Enums.ToggleState.On) 
+            { return ToggleDark(Enums.ToggleState.Off); }
+            else { return ToggleDark(Enums.ToggleState.On); }
+        }
+
+        public string ToggleDark(Enums.ToggleState desiredState) 
+        { 
+            if ((desiredState == Enums.ToggleState.On)&&_darkMode== Enums.ToggleState.Off) 
+            { 
+                _darkMode = Enums.ToggleState.On;
+                var regex = new Regex(@"(</head>)", RegexOptions.Multiline);
+                Html = regex.Replace(Html, DarkModeHeader + "$1");
+            }
+            else if ((desiredState == Enums.ToggleState.Off) && _darkMode == Enums.ToggleState.On)
+            {
+                _darkMode = Enums.ToggleState.Off;
+                var regex = new Regex(Regex.Escape(DarkModeHeader), RegexOptions.Multiline);
+                Html = regex.Replace(Html, "");
+            }
+            return Html;
+        }
+                
+        internal string GetHTML()
         {
             string body = _item.HTMLBody;
-            var rx = new Regex(@"(<body[\S\s]*?>)", RegexOptions.Multiline);
-            string revisedBody = rx.Replace(body, "$1" + EmailHeader);
+            var regex = new Regex(@"(<body[\S\s]*?>)", RegexOptions.Multiline);
+            string revisedBody = regex.Replace(body, "$1" + EmailHeader);
             //string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
             return revisedBody;
         }

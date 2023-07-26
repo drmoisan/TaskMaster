@@ -72,6 +72,7 @@ namespace QuickFiler.Controllers
         private bool _expanded = false;
         private bool _activeUI = false;
         private bool _isChild;
+        private bool _isDarkMode = false;
         private Dictionary<string,Theme> _themes;
         private string _activeTheme;
         private IQfcKeyboardHandler _keyboardHandler;
@@ -81,6 +82,8 @@ namespace QuickFiler.Controllers
         private int _intComboRightCtr = 0;
         private CoreWebView2Environment _webViewEnvironment;
         private List<MailItemInfo> _conversationInfo;
+        private MailItemInfo _itemInfo;
+        private bool _isWebViewerInitialized = false;
 
         #endregion
 
@@ -194,7 +197,7 @@ namespace QuickFiler.Controllers
             _mailItem = mailItem;               // handle on underlying Email
             _keyboardHandler = keyboardHandler; // handle keystrokes
             _parent = parent;                   // handle on collection controller
-            _themes = ThemeHelper.SetupThemes(this, _itemViewer);
+            _themes = ThemeHelper.SetupThemes(this, _itemViewer, this.HtmlDarkConverter);
 
             ResolveControlGroups(itemViewer);
 
@@ -217,21 +220,21 @@ namespace QuickFiler.Controllers
             // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
             CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
 
-            //_itemViewer.L0v2h2_Web.BeginInvoke(new System.Action(() =>
-            //{ 
+            _itemViewer.L0v2h2_Web.BeginInvoke(new System.Action(() =>
+            { 
                 // Create the environment manually
                 Task <CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
-            // Do this so the task is continued on the UI Thread
-            //TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
-            TaskScheduler ui = _itemViewer.UiScheduler;
+                // Do this so the task is continued on the UI Thread
+                TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
+                //TaskScheduler ui = _itemViewer.UiScheduler;
 
                 task.ContinueWith(t =>
                 {
                     _webViewEnvironment = task.Result;
                     _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
                 }, ui);
-            //}));
+            }));
         }
 
         internal void ResolveControlGroups(QfcItemViewer itemViewer)
@@ -264,25 +267,10 @@ namespace QuickFiler.Controllers
 
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
-            var itemInfo = new MailItemInfo(mailItem);
-            itemInfo.ExtractBasics();
-            
-            _itemViewer.BeginInvoke(new System.Action(() => AssignControls(itemInfo, viewerPosition)));
-            
-            //_itemViewer.LblSender.Text = itemInfo.Sender;
-            //_itemViewer.lblSubject.Text = itemInfo.Subject;
-            //_itemViewer.TxtboxBody.Text = itemInfo.Body;
-
-            //_itemViewer.LblTriage.Text = itemInfo.Triage;
-            //_itemViewer.LblSentOn.Text = itemInfo.SentOn;
-            //_itemViewer.LblActionable.Text = itemInfo.Actionable;
-            //_itemViewer.LblPos.Text = viewerPosition.ToString();
-
-            //if (_mailItem.UnRead == true)
-            //{
-            //    _itemViewer.LblSender.Font = new Font(_itemViewer.LblSender.Font, FontStyle.Bold);
-            //    _itemViewer.lblSubject.Font = new Font(_itemViewer.lblSubject.Font, FontStyle.Bold);
-            //}
+            _itemInfo = new MailItemInfo(mailItem);
+            _itemInfo.ExtractBasics();
+            _itemViewer.BeginInvoke(new System.Action(
+                () => AssignControls(_itemInfo, viewerPosition)));
         }
 
         internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
@@ -398,12 +386,12 @@ namespace QuickFiler.Controllers
         {
             if (e.PropertyName == nameof(DfConversation))
             {
-                _ = GetMailItemsAsync();
+                _ = GetConversationInfoAsync();
             }
 
         }
 
-        internal async Task GetMailItemsAsync()
+        internal async Task GetConversationInfoAsync()
         {
             var mailItems = await Task.FromResult(ConvHelper.GetMailItemList(DfConversation,
                                                                     ((Folder)Mail.Parent).StoreID,
@@ -458,7 +446,8 @@ namespace QuickFiler.Controllers
             {
                 throw (e.InitializationException);
             }
-            _itemViewer.L0v2h2_Web.NavigateToString(MailToHTML());
+            _isWebViewerInitialized = true;
+            _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.Html);
             _itemViewer.L0v2h2_Panel.Visible = false;
         }
 
@@ -660,39 +649,6 @@ namespace QuickFiler.Controllers
             else { ToggleExpansion(Enums.ToggleState.On); }
         }
 
-        internal string EmailHeader { get => //@"<div class=""WordSection1"">
-@"
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>From:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.Sender + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>Sent:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.Mail.SentOn.ToString("f") + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>To:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.To + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>Subject:<span style='mso-tab-count:1'></span></span></b><span
-style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal><o:p>&nbsp;</o:p></p>"; }         
-        
-        internal string MailToHTML()
-        {
-            string body = Mail.HTMLBody;
-            var rx = new Regex(@"(<body[\S\s]*?>)",RegexOptions.Multiline);
-            string revisedBody = rx.Replace(body, "$1" + EmailHeader);
-            //string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
-            return revisedBody;
-        }
-        
         public void ToggleExpansion(Enums.ToggleState desiredState)
         {
             _parent.ToggleExpansionStyle(desiredState);
@@ -799,6 +755,13 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 _themes["DarkActive"].SetTheme(async);
                 _activeTheme = "DarkActive";
             }
+            _isDarkMode = true;
+        }
+
+        public void HtmlDarkConverter(Enums.ToggleState desiredState)
+        {
+            if (_isWebViewerInitialized)
+                _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.ToggleDark(desiredState));
         }
 
         public void SetThemeLight(bool async)
@@ -813,6 +776,7 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 _themes["LightActive"].SetTheme(async);
                 _activeTheme = "LightActive";
             }
+            _isDarkMode = false;
         }
 
         // TODO: Implement ApplyReadEmailFormat
