@@ -275,7 +275,7 @@ namespace QuickFiler.Controllers
 
         internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
         {
-            _itemViewer.LblSender.Text = itemInfo.Sender;
+            _itemViewer.LblSender.Text = itemInfo.SenderName;
             _itemViewer.lblSubject.Text = itemInfo.Subject;
             _itemViewer.TxtboxBody.Text = itemInfo.Body;
 
@@ -403,11 +403,17 @@ namespace QuickFiler.Controllers
 
             ConversationInfo = await Task.FromResult(mailItems.Select(x => new MailItemInfo(x)).ToList());
 
-            _itemViewer.TopicThread.BeginInvoke(new System.Action(() => 
-            { 
-                _itemViewer.TopicThread.SetObjects(ConversationInfo);
-                _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
-            }));
+            //_itemViewer.TopicThread.BeginInvoke(new System.Action(() => 
+            //{ 
+            //    _itemViewer.TopicThread.SetObjects(ConversationInfo);
+            //    _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
+            //}));
+            
+            // Switch to UI Thread
+            await _itemViewer.UiSyncContext;
+
+            _itemViewer.TopicThread.SetObjects(ConversationInfo);
+            _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
         }
 
         #endregion
