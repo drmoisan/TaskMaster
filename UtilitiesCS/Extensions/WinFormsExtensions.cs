@@ -39,7 +39,7 @@ namespace UtilitiesCS
             {
                 foreach (Control c in parent.Controls)
                 {
-                    ForAllControls(c, action);
+                    ForAllControls(c, action, except);
                 }
                 action(parent);
             }

@@ -72,7 +72,7 @@ namespace QuickFiler.Test
             var expected = "SenderName";
 
             // Act
-            var actual = mailItemInfo.Sender;
+            var actual = mailItemInfo.SenderName;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -86,7 +86,7 @@ namespace QuickFiler.Test
             var expected = new MailItemInfo()
             {
                 Item = this.mockMailItem.Object,
-                Sender = "SenderName",
+                SenderName = "SenderName",
                 Subject = "Subject",
                 Body = "Body",
                 Triage = "Triage",

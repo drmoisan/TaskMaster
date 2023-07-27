@@ -1,11 +1,32 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using System.Globalization;
+using System.Linq;
 using Microsoft.Office.Interop.Outlook;
 
 
 
 namespace ToDoModel
 {
+    public class RecipientInfo
+    {
+        public RecipientInfo() { }
+        
+        public RecipientInfo(string name, string address, string html)
+        {
+            _name = name;
+            _address = address;
+            _html = html;
+        }
+
+        private string _name;
+        private string _address;
+        private string _html;
+
+        public string Name { get => _name; set => _name = value; }
+        public string Address { get => _address; set => _address = value; }
+        public string Html { get => _html; set => _html = value; }
+    }    
 
     public static class CaptureEmailDetailsModule
     {
@@ -117,17 +138,17 @@ namespace ToDoModel
         }
 
         // Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
-        public static string GetSenderName(this MailItem OlMail)
+        public static string GetSenderName(this MailItem olMail)
         {
-            if (OlMail.Sent == false)
+            if (olMail.Sent == false)
             {
                 return "";
             }
-            else if (OlMail.Sender.Type == "EX")
+            else if (olMail.Sender.Type == "EX")
             {
                 try
                 {
-                    var OlPA = OlMail.Sender.PropertyAccessor;
+                    var OlPA = olMail.Sender.PropertyAccessor;
                     string senderAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
                     return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(senderAddress.Split('@')[0].Replace(".", " "));
                 }
@@ -138,18 +159,18 @@ namespace ToDoModel
             }
             else
             {
-                return OlMail.Sender.Name;
+                return olMail.Sender.Name;
             }
 
         }
 
-        public static string GetSenderAddress(this MailItem OlMail)
+        public static string GetSenderAddress(this MailItem olMail)
         {
             string senderAddress;
 
-            if (OlMail.Sender.Type == "EX")
+            if (olMail.Sender.Type == "EX")
             {
-                var OlPA = OlMail.Sender.PropertyAccessor;
+                var OlPA = olMail.Sender.PropertyAccessor;
                 try
                 {
                     senderAddress =(string)OlPA.GetProperty(PR_SMTP_ADDRESS);
@@ -158,7 +179,7 @@ namespace ToDoModel
                 {
                     try
                     {
-                        senderAddress = OlMail.Sender.Name;
+                        senderAddress = olMail.Sender.Name;
                     }
                     catch
                     {
@@ -168,9 +189,17 @@ namespace ToDoModel
             }
             else
             {
-                senderAddress = OlMail.SenderEmailAddress;
+                senderAddress = olMail.SenderEmailAddress;
             }
             return senderAddress;
+        }
+
+        public static RecipientInfo GetSenderInfo(this MailItem olMail)
+        {
+            var name = olMail.GetSenderName();
+            var address = olMail.GetSenderAddress();
+            var html = ConvertRecipientToHtml(name, address);
+            return new RecipientInfo(name, address, html);
         }
 
         private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder)
@@ -212,7 +241,7 @@ namespace ToDoModel
 
             foreach (Recipient OlRecipient in OlRecipients)
             {
-                StrSMTPAddress = ExtractRecipient(PR_SMTP_ADDRESS, OlRecipient);
+                StrSMTPAddress = GetRecipientAddress(OlRecipient);
 
                 if (OlRecipient.Type == (int)OlMailRecipientType.olTo)
                 {
@@ -233,7 +262,58 @@ namespace ToDoModel
             return (recipientsTo, recipientsCC);
         }
 
-        private static string ExtractRecipient(string PR_SMTP_ADDRESS, Recipient OlRecipient)
+        public static RecipientInfo GetInfo(this IEnumerable<Recipient> recipients)
+        {
+            var recipientTuples = recipients.Select(GetRecipientInfo);
+            return new RecipientInfo(
+                string.Join("; ", recipientTuples.Select(t => t.Name)),
+                string.Join("; ", recipientTuples.Select(t => t.Address)),
+                string.Join("; ", recipientTuples.Select(t => t.Html)));
+        }
+
+        public static string GetToRecipientsInHtml(MailItem olMail)
+        {
+            return string.Join("; ", GetToRecipients(olMail).Select(GetRecipientHtml));
+        }
+        
+        public static IEnumerable<Recipient> GetToRecipients(this MailItem olMail)
+        {
+            return olMail.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olTo);
+        }
+        
+        public static IEnumerable<Recipient> GetCcRecipients(this MailItem olMail)
+        {
+            return olMail.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olCC);
+        }
+
+        private static string GetRecipientHtml(Recipient olRecipient)
+        {
+            return ConvertRecipientToHtml(
+                GetRecipientName(olRecipient), 
+                GetRecipientAddress(olRecipient));
+        }
+
+        private static RecipientInfo GetRecipientInfo(Recipient olRecipient)
+        {
+            string name = GetRecipientName(olRecipient);
+            string address = GetRecipientAddress(olRecipient);
+            string html = ConvertRecipientToHtml(name, address);
+            return new RecipientInfo(name, address, html);
+        }
+
+        private static string ConvertRecipientToHtml(string name, string address)
+        {
+              return $"{name} &lt;<a href=\"mailto:{address}\">{address}</a>&gt;";
+        }
+        
+        
+
+        private static string GetRecipientName(Recipient olRecipient)
+        {
+            return olRecipient.Name;
+        }
+        
+        private static string GetRecipientAddress(Recipient OlRecipient)
         {
             var OlPA = OlRecipient.PropertyAccessor;
             string StrSMTPAddress;

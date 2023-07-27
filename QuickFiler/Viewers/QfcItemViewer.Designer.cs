@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h = new System.Windows.Forms.SplitContainer();
             this.L1h0L2hv = new System.Windows.Forms.TableLayoutPanel();
@@ -46,7 +47,7 @@
             this.L1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
             this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
             this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.time = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.SentDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.TxtboxBody = new System.Windows.Forms.TextBox();
             this.L1h1L2v = new System.Windows.Forms.TableLayoutPanel();
@@ -75,7 +76,8 @@
             this.CbxConversation = new System.Windows.Forms.CheckBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
             this.L0v2h = new System.Windows.Forms.TableLayoutPanel();
-            this.L0v2h2_Web = new System.Windows.Forms.WebBrowser();
+            this.L0v2h2_Panel = new System.Windows.Forms.Panel();
+            this.L0v2h2_Web = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.L0v.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1h)).BeginInit();
             this.L1h.Panel1.SuspendLayout();
@@ -94,6 +96,8 @@
             this.L1h1L2v2h.SuspendLayout();
             this.L1h1L2v3h.SuspendLayout();
             this.L0v2h.SuspendLayout();
+            this.L0v2h2_Panel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_Web)).BeginInit();
             this.SuspendLayout();
             // 
             // L0v
@@ -129,7 +133,7 @@
             this.L1h.Panel2.Controls.Add(this.L1h1L2v);
             this.L1h.Panel2MinSize = 603;
             this.L1h.Size = new System.Drawing.Size(1840, 197);
-            this.L1h.SplitterDistance = 1098;
+            this.L1h.SplitterDistance = 1097;
             this.L1h.SplitterWidth = 8;
             this.L1h.TabIndex = 2;
             // 
@@ -152,7 +156,7 @@
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
             this.L1h0L2hv.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv.Size = new System.Drawing.Size(1098, 197);
+            this.L1h0L2hv.Size = new System.Drawing.Size(1097, 197);
             this.L1h0L2hv.TabIndex = 0;
             // 
             // L1h0L2hv1L3h
@@ -180,7 +184,7 @@
             this.L1h0L2hv1L3h.Name = "L1h0L2hv1L3h";
             this.L1h0L2hv1L3h.RowCount = 1;
             this.L1h0L2hv1L3h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv1L3h.Size = new System.Drawing.Size(998, 33);
+            this.L1h0L2hv1L3h.Size = new System.Drawing.Size(997, 33);
             this.L1h0L2hv1L3h.TabIndex = 0;
             // 
             // LblSentOn
@@ -268,7 +272,7 @@
             this.L1h0L2hv2L3h.Name = "L1h0L2hv2L3h";
             this.L1h0L2hv2L3h.RowCount = 1;
             this.L1h0L2hv2L3h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv2L3h.Size = new System.Drawing.Size(998, 56);
+            this.L1h0L2hv2L3h.Size = new System.Drawing.Size(997, 56);
             this.L1h0L2hv2L3h.TabIndex = 1;
             this.L1h0L2hv2L3h.TabStop = true;
             // 
@@ -277,7 +281,7 @@
             this.LblConvCt.AutoSize = true;
             this.LblConvCt.Dock = System.Windows.Forms.DockStyle.Right;
             this.LblConvCt.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblConvCt.Location = new System.Drawing.Point(914, 0);
+            this.LblConvCt.Location = new System.Drawing.Point(913, 0);
             this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
             this.LblConvCt.Name = "LblConvCt";
             this.LblConvCt.Padding = new System.Windows.Forms.Padding(6);
@@ -342,46 +346,62 @@
             this.L1h0L2hv3h_TlpBodyToggle.Name = "L1h0L2hv3h_TlpBodyToggle";
             this.L1h0L2hv3h_TlpBodyToggle.RowCount = 1;
             this.L1h0L2hv3h_TlpBodyToggle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(998, 108);
+            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(997, 108);
             this.L1h0L2hv3h_TlpBodyToggle.TabIndex = 7;
             // 
             // TopicThread
             // 
             this.TopicThread.AllColumns.Add(this.sender);
-            this.TopicThread.AllColumns.Add(this.time);
+            this.TopicThread.AllColumns.Add(this.SentDate);
             this.TopicThread.AllColumns.Add(this.infolder);
+            this.TopicThread.AllowDrop = true;
+            this.TopicThread.BackColor = System.Drawing.SystemColors.Control;
+            this.TopicThread.CellEditEnterChangesRows = true;
             this.TopicThread.CellEditUseWholeCell = false;
             this.TopicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.sender,
-            this.time,
+            this.SentDate,
             this.infolder});
             this.TopicThread.Cursor = System.Windows.Forms.Cursors.Default;
             this.TopicThread.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TopicThread.EmptyListMsg = "The fast list is empty";
+            this.TopicThread.FullRowSelect = true;
             this.TopicThread.HideSelection = false;
-            this.TopicThread.Location = new System.Drawing.Point(1001, 3);
+            this.TopicThread.Location = new System.Drawing.Point(1000, 3);
+            this.TopicThread.MultiSelect = false;
             this.TopicThread.Name = "TopicThread";
             this.TopicThread.ShowGroups = false;
             this.TopicThread.Size = new System.Drawing.Size(1, 102);
+            this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.TopicThread.TabIndex = 8;
             this.TopicThread.UseCompatibleStateImageBehavior = false;
             this.TopicThread.View = System.Windows.Forms.View.Details;
             this.TopicThread.VirtualMode = true;
-            this.TopicThread.Visible = false;
             // 
             // sender
             // 
+            this.sender.AspectName = "Sender";
+            this.sender.FillsFreeSpace = true;
+            this.sender.HeaderForeColor = System.Drawing.SystemColors.ControlText;
+            this.sender.MinimumWidth = 200;
             this.sender.Text = "From";
-            this.sender.Width = 121;
+            this.sender.Width = 200;
             // 
-            // time
+            // SentDate
             // 
-            this.time.Text = "Received";
-            this.time.Width = 131;
+            this.SentDate.AspectName = "SentDate";
+            this.SentDate.FillsFreeSpace = true;
+            this.SentDate.MinimumWidth = 250;
+            this.SentDate.Text = "Received";
+            this.SentDate.Width = 250;
             // 
             // infolder
             // 
+            this.infolder.AspectName = "Folder";
+            this.infolder.FillsFreeSpace = true;
+            this.infolder.MinimumWidth = 200;
             this.infolder.Text = "In Folder";
-            this.infolder.Width = 149;
+            this.infolder.Width = 200;
             // 
             // TxtboxBody
             // 
@@ -394,7 +414,7 @@
             this.TxtboxBody.Multiline = true;
             this.TxtboxBody.Name = "TxtboxBody";
             this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(986, 108);
+            this.TxtboxBody.Size = new System.Drawing.Size(985, 108);
             this.TxtboxBody.TabIndex = 5;
             this.TxtboxBody.TabStop = false;
             this.TxtboxBody.Text = "[BODY]";
@@ -415,7 +435,7 @@
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 58F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 58F));
             this.L1h1L2v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 48F));
-            this.L1h1L2v.Size = new System.Drawing.Size(734, 197);
+            this.L1h1L2v.Size = new System.Drawing.Size(735, 197);
             this.L1h1L2v.TabIndex = 0;
             // 
             // L1h1L2v1h
@@ -441,7 +461,7 @@
             this.L1h1L2v1h.Padding = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.L1h1L2v1h.RowCount = 1;
             this.L1h1L2v1h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v1h.Size = new System.Drawing.Size(734, 50);
+            this.L1h1L2v1h.Size = new System.Drawing.Size(735, 50);
             this.L1h1L2v1h.TabIndex = 0;
             // 
             // LblAcSearch
@@ -479,7 +499,7 @@
             this.TxtboxSearch.Location = new System.Drawing.Point(156, 2);
             this.TxtboxSearch.Margin = new System.Windows.Forms.Padding(0, 2, 0, 2);
             this.TxtboxSearch.Name = "TxtboxSearch";
-            this.TxtboxSearch.Size = new System.Drawing.Size(272, 41);
+            this.TxtboxSearch.Size = new System.Drawing.Size(273, 41);
             this.TxtboxSearch.TabIndex = 2;
             // 
             // L1h1L2v1h5Panel
@@ -488,7 +508,7 @@
             this.L1h1L2v1h5Panel.Controls.Add(this.LblAcDelete);
             this.L1h1L2v1h5Panel.Controls.Add(this.BtnDelItem);
             this.L1h1L2v1h5Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h1L2v1h5Panel.Location = new System.Drawing.Point(628, 0);
+            this.L1h1L2v1h5Panel.Location = new System.Drawing.Point(629, 0);
             this.L1h1L2v1h5Panel.Margin = new System.Windows.Forms.Padding(0);
             this.L1h1L2v1h5Panel.Name = "L1h1L2v1h5Panel";
             this.L1h1L2v1h5Panel.Size = new System.Drawing.Size(100, 50);
@@ -531,7 +551,7 @@
             this.L1h1L2v1h4Panel.Controls.Add(this.LblAcPopOut);
             this.L1h1L2v1h4Panel.Controls.Add(this.BtnPopOut);
             this.L1h1L2v1h4Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h1L2v1h4Panel.Location = new System.Drawing.Point(528, 0);
+            this.L1h1L2v1h4Panel.Location = new System.Drawing.Point(529, 0);
             this.L1h1L2v1h4Panel.Margin = new System.Windows.Forms.Padding(0);
             this.L1h1L2v1h4Panel.Name = "L1h1L2v1h4Panel";
             this.L1h1L2v1h4Panel.Size = new System.Drawing.Size(100, 50);
@@ -569,7 +589,7 @@
             this.L1h1L2v1h3Panel.Controls.Add(this.LblAcTask);
             this.L1h1L2v1h3Panel.Controls.Add(this.BtnFlagTask);
             this.L1h1L2v1h3Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h1L2v1h3Panel.Location = new System.Drawing.Point(428, 0);
+            this.L1h1L2v1h3Panel.Location = new System.Drawing.Point(429, 0);
             this.L1h1L2v1h3Panel.Margin = new System.Windows.Forms.Padding(0);
             this.L1h1L2v1h3Panel.Name = "L1h1L2v1h3Panel";
             this.L1h1L2v1h3Panel.Size = new System.Drawing.Size(100, 50);
@@ -619,7 +639,7 @@
             this.L1h1L2v2h.Padding = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.L1h1L2v2h.RowCount = 1;
             this.L1h1L2v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v2h.Size = new System.Drawing.Size(734, 73);
+            this.L1h1L2v2h.Size = new System.Drawing.Size(735, 73);
             this.L1h1L2v2h.TabIndex = 1;
             // 
             // LblAcFolder
@@ -657,7 +677,7 @@
             this.CboFolders.Location = new System.Drawing.Point(156, 4);
             this.CboFolders.Margin = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.CboFolders.Name = "CboFolders";
-            this.CboFolders.Size = new System.Drawing.Size(572, 41);
+            this.CboFolders.Size = new System.Drawing.Size(573, 41);
             this.CboFolders.TabIndex = 3;
             // 
             // L1h1L2v3h
@@ -686,7 +706,7 @@
             this.L1h1L2v3h.Name = "L1h1L2v3h";
             this.L1h1L2v3h.RowCount = 1;
             this.L1h1L2v3h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h1L2v3h.Size = new System.Drawing.Size(722, 46);
+            this.L1h1L2v3h.Size = new System.Drawing.Size(723, 46);
             this.L1h1L2v3h.TabIndex = 2;
             // 
             // LblAcEmail
@@ -782,7 +802,7 @@
             this.L0v2h.ColumnCount = 2;
             this.L0v2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.L0v2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L0v2h.Controls.Add(this.L0v2h2_Web, 1, 0);
+            this.L0v2h.Controls.Add(this.L0v2h2_Panel, 1, 0);
             this.L0v2h.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h.Location = new System.Drawing.Point(3, 200);
             this.L0v2h.Name = "L0v2h";
@@ -792,17 +812,34 @@
             this.L0v2h.Size = new System.Drawing.Size(1834, 704);
             this.L0v2h.TabIndex = 3;
             // 
+            // L0v2h2_Panel
+            // 
+            this.L0v2h2_Panel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.L0v2h2_Panel.Controls.Add(this.L0v2h2_Web);
+            this.L0v2h2_Panel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L0v2h2_Panel.Location = new System.Drawing.Point(103, 3);
+            this.L0v2h2_Panel.Name = "L0v2h2_Panel";
+            this.L0v2h2_Panel.Size = new System.Drawing.Size(1728, 698);
+            this.L0v2h2_Panel.TabIndex = 0;
+            // 
             // L0v2h2_Web
             // 
+            this.L0v2h2_Web.AllowExternalDrop = true;
+            this.L0v2h2_Web.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
+            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties2.Language = null;
+            coreWebView2CreationProperties2.ProfileName = null;
+            coreWebView2CreationProperties2.UserDataFolder = null;
+            this.L0v2h2_Web.CreationProperties = coreWebView2CreationProperties2;
+            this.L0v2h2_Web.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_Web.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_Web.Location = new System.Drawing.Point(110, 10);
-            this.L0v2h2_Web.Margin = new System.Windows.Forms.Padding(10);
-            this.L0v2h2_Web.MinimumSize = new System.Drawing.Size(20, 20);
+            this.L0v2h2_Web.Location = new System.Drawing.Point(0, 0);
             this.L0v2h2_Web.Name = "L0v2h2_Web";
-            this.L0v2h2_Web.Size = new System.Drawing.Size(1714, 684);
+            this.L0v2h2_Web.Size = new System.Drawing.Size(1724, 694);
             this.L0v2h2_Web.TabIndex = 5;
-            this.L0v2h2_Web.TabStop = false;
-            this.L0v2h2_Web.Visible = false;
+            this.L0v2h2_Web.ZoomFactor = 1D;
             // 
             // QfcItemViewer
             // 
@@ -843,6 +880,8 @@
             this.L1h1L2v3h.ResumeLayout(false);
             this.L1h1L2v3h.PerformLayout();
             this.L0v2h.ResumeLayout(false);
+            this.L0v2h2_Panel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_Web)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -891,11 +930,12 @@
         internal System.Windows.Forms.Label LblAcConversation;
         internal System.Windows.Forms.TextBox TxtboxBody;
         private BrightIdeasSoftware.OLVColumn sender;
-        private BrightIdeasSoftware.OLVColumn time;
         private BrightIdeasSoftware.OLVColumn infolder;
         public BrightIdeasSoftware.FastObjectListView TopicThread;
         internal System.Windows.Forms.TableLayoutPanel L1h0L2hv3h_TlpBodyToggle;
         private System.Windows.Forms.TableLayoutPanel L0v2h;
-        public System.Windows.Forms.WebBrowser L0v2h2_Web;
+        internal Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_Web;
+        internal System.Windows.Forms.Panel L0v2h2_Panel;
+        internal BrightIdeasSoftware.OLVColumn SentDate;
     }
 }

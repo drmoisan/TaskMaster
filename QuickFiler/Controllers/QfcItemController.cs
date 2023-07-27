@@ -20,10 +20,12 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using System.Xml.Linq;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Web.WebView2.Core;
+using System.ComponentModel;
 
 namespace QuickFiler.Controllers
 {
-    internal class QfcItemController : IQfcItemController
+    internal class QfcItemController : IQfcItemController, INotifyPropertyChanged
     {
         #region constructors
 
@@ -37,8 +39,6 @@ namespace QuickFiler.Controllers
             Initialize(AppGlobals, itemViewer, viewerPosition, mailItem, keyboardHandler, parent, async: true);
         }
 
-
-
         public QfcItemController(IApplicationGlobals AppGlobals,
                                  QfcItemViewer itemViewer,
                                  int viewerPosition,
@@ -49,8 +49,6 @@ namespace QuickFiler.Controllers
         {
             Initialize(AppGlobals, itemViewer, viewerPosition, mailItem, keyboardHandler, parent, async);
         }
-
-        
 
         #endregion
 
@@ -74,6 +72,7 @@ namespace QuickFiler.Controllers
         private bool _expanded = false;
         private bool _activeUI = false;
         private bool _isChild;
+        private bool _isDarkMode = false;
         private Dictionary<string,Theme> _themes;
         private string _activeTheme;
         private IQfcKeyboardHandler _keyboardHandler;
@@ -81,6 +80,10 @@ namespace QuickFiler.Controllers
         private bool _suppressEvents = false;
         private int _intEnterCounter = 0;
         private int _intComboRightCtr = 0;
+        private CoreWebView2Environment _webViewEnvironment;
+        private List<MailItemInfo> _conversationInfo;
+        private MailItemInfo _itemInfo;
+        private bool _isWebViewerInitialized = false;
 
         #endregion
 
@@ -89,6 +92,8 @@ namespace QuickFiler.Controllers
         public IList<Button> Buttons { get => _buttons; }
 
         public string ConvOriginID { get => _convOriginID; set => _convOriginID = value; }
+
+        public List<MailItemInfo> ConversationInfo { get => _conversationInfo; set => _conversationInfo = value; }
 
         public int CounterEnter { get => _intEnterCounter; set => _intEnterCounter = value; }
 
@@ -119,9 +124,14 @@ namespace QuickFiler.Controllers
             {
                 if ((_dfConversation is null)&&(_mailItem is not null))
                 {
-                    _dfConversation = Mail.GetConversationDf(true, true);
+                    DfConversation = Mail.GetConversationDf(true, true);
                 }
                 return _dfConversation; 
+            }
+            internal set 
+            { 
+                _dfConversation = value;
+                NotifyPropertyChanged();
             }
         } 
 
@@ -187,17 +197,44 @@ namespace QuickFiler.Controllers
             _mailItem = mailItem;               // handle on underlying Email
             _keyboardHandler = keyboardHandler; // handle keystrokes
             _parent = parent;                   // handle on collection controller
-            _themes = ThemeHelper.SetupThemes(this, _itemViewer);
+            _themes = ThemeHelper.SetupThemes(this, _itemViewer, this.HtmlDarkConverter);
 
             ResolveControlGroups(itemViewer);
 
             // Populate placeholder controls with 
             PopulateControls(mailItem, viewerPosition);
-
+            
             ToggleTips(async: async, desiredState: Enums.ToggleState.Off);
             ToggleNavigation(async: async, desiredState: Enums.ToggleState.Off);
 
             WireEvents();
+            InitializeWebView();
+        }
+
+        internal void InitializeWebView()
+        {
+            // Create the cache directory 
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
+
+            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
+            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
+
+            _itemViewer.L0v2h2_Web.BeginInvoke(new System.Action(() =>
+            { 
+                // Create the environment manually
+                Task <CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
+
+                // Do this so the task is continued on the UI Thread
+                TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
+                //TaskScheduler ui = _itemViewer.UiScheduler;
+
+                task.ContinueWith(t =>
+                {
+                    _webViewEnvironment = task.Result;
+                    _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
+                }, ui);
+            }));
         }
 
         internal void ResolveControlGroups(QfcItemViewer itemViewer)
@@ -230,30 +267,15 @@ namespace QuickFiler.Controllers
 
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
-            var itemInfo = new MailItemInfo(mailItem);
-            itemInfo.ExtractBasics();
-            
-            _itemViewer.BeginInvoke(new System.Action(() => AssignControls(itemInfo, viewerPosition)));
-            
-            //_itemViewer.LblSender.Text = itemInfo.Sender;
-            //_itemViewer.lblSubject.Text = itemInfo.Subject;
-            //_itemViewer.TxtboxBody.Text = itemInfo.Body;
-
-            //_itemViewer.LblTriage.Text = itemInfo.Triage;
-            //_itemViewer.LblSentOn.Text = itemInfo.SentOn;
-            //_itemViewer.LblActionable.Text = itemInfo.Actionable;
-            //_itemViewer.LblPos.Text = viewerPosition.ToString();
-
-            //if (_mailItem.UnRead == true)
-            //{
-            //    _itemViewer.LblSender.Font = new Font(_itemViewer.LblSender.Font, FontStyle.Bold);
-            //    _itemViewer.lblSubject.Font = new Font(_itemViewer.lblSubject.Font, FontStyle.Bold);
-            //}
+            _itemInfo = new MailItemInfo(mailItem);
+            _itemInfo.ExtractBasics();
+            _itemViewer.BeginInvoke(new System.Action(
+                () => AssignControls(_itemInfo, viewerPosition)));
         }
 
         internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
         {
-            _itemViewer.LblSender.Text = itemInfo.Sender;
+            _itemViewer.LblSender.Text = itemInfo.SenderName;
             _itemViewer.lblSubject.Text = itemInfo.Subject;
             _itemViewer.TxtboxBody.Text = itemInfo.Body;
 
@@ -280,8 +302,8 @@ namespace QuickFiler.Controllers
         /// <param name="df"></param>
         public void PopulateConversation(DataFrame df)
         {
-            _dfConversation = df;
-            int count = _dfConversation.Rows.Count();
+            DfConversation = df;
+            int count = DfConversation.Rows.Count();
             PopulateConversation(count);
         }
 
@@ -334,6 +356,68 @@ namespace QuickFiler.Controllers
 
         #endregion
 
+        #region INotifyPropertyChanged implementation
+
+        protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged is not null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public async Task Handler_PropertyChangedAsync(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DfConversation))
+            {
+                ConversationItems = await Task.FromResult(ConvHelper.GetMailItemList(DfConversation,
+                                                                   ((Folder)Mail.Parent).StoreID,
+                                                                   _globals.Ol.App,
+                                                                   true)
+                                              .Cast<MailItem>()
+                                              .ToList());
+            }
+
+        }
+
+        public void Handler_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DfConversation))
+            {
+                _ = GetConversationInfoAsync();
+            }
+
+        }
+
+        internal async Task GetConversationInfoAsync()
+        {
+            var mailItems = await Task.FromResult(ConvHelper.GetMailItemList(DfConversation,
+                                                                    ((Folder)Mail.Parent).StoreID,
+                                                                    _globals.Ol.App,
+                                                                    true)
+                                                         .Cast<MailItem>()
+                                                         .ToList());
+            ConversationItems = mailItems;
+
+            ConversationInfo = await Task.FromResult(mailItems.Select(x => new MailItemInfo(x)).ToList());
+
+            //_itemViewer.TopicThread.BeginInvoke(new System.Action(() => 
+            //{ 
+            //    _itemViewer.TopicThread.SetObjects(ConversationInfo);
+            //    _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
+            //}));
+            
+            // Switch to UI Thread
+            await _itemViewer.UiSyncContext;
+
+            _itemViewer.TopicThread.SetObjects(ConversationInfo);
+            _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
+        }
+
+        #endregion
+
         #region Event Handlers
 
         internal void WireEvents()
@@ -347,18 +431,30 @@ namespace QuickFiler.Controllers
                 x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_keyboardHandler.KeyboardHandler_KeyPress);
                 //Debug.WriteLine($"Registered handler for {x.Name}");
             },
-            new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch });
+            new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
 
             _itemViewer.CbxConversation.CheckedChanged += new System.EventHandler(this.CbxConversation_CheckedChanged);
 
             _itemViewer.BtnFlagTask.Click += new System.EventHandler(this.BtnFlagTask_Click);
             _itemViewer.BtnPopOut.Click += new System.EventHandler(this.BtnPopOut_Click);
-            //_itemViewer.BtnPopOut.Click += new System.EventHandler(_keyboardHandler.BtnPopOut_Click);
             _itemViewer.BtnDelItem.Click += new System.EventHandler(this.BtnDelItem_Click);
             _itemViewer.TxtboxSearch.TextChanged += new System.EventHandler(this.TxtboxSearch_TextChanged);
             _itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtboxSearch_KeyDown);
-            //_itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CboFolders_KeyDown);
             _itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.CboFolders_KeyDown);
+            _itemViewer.L0v2h2_Web.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
+            PropertyChanged += new PropertyChangedEventHandler(Handler_PropertyChanged);
+            _itemViewer.TopicThread.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
+        }
+
+        internal void WebView2Control_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
+        {
+            if (!e.IsSuccess)
+            {
+                throw (e.InitializationException);
+            }
+            _isWebViewerInitialized = true;
+            _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.Html);
+            _itemViewer.L0v2h2_Panel.Visible = false;
         }
 
         internal void RegisterFocusActions()
@@ -436,94 +532,16 @@ namespace QuickFiler.Controllers
             }
         }
 
-        //internal void CboFolders_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    switch (e.KeyCode)
-        //    {
-        //        case Keys.Escape:
-        //            {
-        //                _intEnterCounter = 1;
-        //                _intComboRightCtr = 0;
-        //                break;
-        //            }
-        //        case Keys.Up:
-        //            {
-        //                _intEnterCounter = 0;
-        //                break;
-        //            }
-        //        case Keys.Down:
-        //            {
-        //                _intEnterCounter = 0;
-        //                break;
-        //            }
-        //        case Keys.Right:
-        //            {
-        //                _intEnterCounter = 0;
-        //                switch (_intComboRightCtr)
-        //                {
-        //                    case 0:
-        //                        {
-        //                            _itemViewer.CboFolders.DroppedDown = true;
-        //                            _intComboRightCtr++;
-        //                            break;
-        //                        }
-        //                    case 1:
-        //                        {
-        //                            _itemViewer.CboFolders.DroppedDown = false;
-        //                            _intComboRightCtr = 0;
-        //                            MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?", 
-        //                                "Dialog", BoxIcon.Question, RightKeyActions);
-        //                            break;
-        //                        }
-        //                    default:
-        //                        {
-        //                            MessageBox.Show(
-        //                                "Error in intComboRightCtr ... setting to 0 and continuing",
-        //                                "Error",
-        //                                MessageBoxButtons.OK,
-        //                                MessageBoxIcon.Error);
-        //                            _intComboRightCtr = 0;
-        //                            break;
-        //                        }
-        //                }
-        //                e.SuppressKeyPress = true;
-        //                e.Handled = true;
-        //                break;
-        //            }
-        //        case Keys.Left:
-        //            {
-        //                _intEnterCounter = 0;
-        //                _intComboRightCtr = 0;
-        //                if (_itemViewer.CboFolders.DroppedDown)
-        //                {
-        //                    _itemViewer.CboFolders.DroppedDown = false;
-        //                    e.SuppressKeyPress = true;
-        //                    e.Handled = true;
-        //                }
-        //                else { _keyboardHandler.KeyboardHandler_KeyDown(sender, e); }
-                        
-        //                break;
-        //            }
-        //        case Keys.Return:
-        //            {
-        //                _intEnterCounter++;
-        //                if (_intEnterCounter == 1)
-        //                {
-        //                    _intEnterCounter = 0;
-        //                    _intComboRightCtr = 0;
-        //                    _keyboardHandler.KeyboardHandler_KeyDown(sender, e);
-        //                }
-        //                else
-        //                {
-        //                    _intEnterCounter = 1;
-        //                    _intComboRightCtr = 0;
-        //                    e.Handled = true;
-        //                }
-                        
-        //                break;
-        //            }
-        //    }            
-        //}
+        private void TopicThread_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            var objects = _itemViewer.TopicThread.SelectedObjects;
+            if ((objects is not null)&&(objects.Count !=0))
+            {
+                var info = objects[0] as MailItemInfo;
+                _itemViewer.L0v2h2_Web.NavigateToString(info.GetHTML());
+            }
+           
+        }
 
         #endregion
 
@@ -637,36 +655,6 @@ namespace QuickFiler.Controllers
             else { ToggleExpansion(Enums.ToggleState.On); }
         }
 
-        internal string EmailHeader { get => @"<div class=""WordSection1"">
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>From:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.Sender + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>Sent:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.Mail.SentOn.ToString("f") + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>To:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.To + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
-style='color:black'>Subject:<span style='mso-tab-count:1'></span></span></b><span
-style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
-
-<p class=MsoNormal><o:p>&nbsp;</o:p></p>"; }         
-        
-        internal string MailToHTML()
-        {
-            string body = Mail.HTMLBody;
-            string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
-            return revisedBody;
-        }
-        
         public void ToggleExpansion(Enums.ToggleState desiredState)
         {
             _parent.ToggleExpansionStyle(desiredState);
@@ -674,19 +662,18 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
             {
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
-                _itemViewer.TxtboxBody.Visible = false;
                 _itemViewer.TopicThread.Visible = true;
+                _itemViewer.L0v2h2_Panel.Visible = true;
                 _itemViewer.L0v2h2_Web.Visible = true;
-                // TODO: Switch to WebView2. Download examples from https://docs.microsoft.com/en-us/microsoft-edge/webview2/gettingstarted/winforms
-                _itemViewer.L0v2h2_Web.DocumentText = MailToHTML();
                 _expanded = true; 
             }
             else 
             {
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
-                _itemViewer.TxtboxBody.Visible = true;
-                _itemViewer.L0v2h2_Web.Visible = true;
+                _itemViewer.TopicThread.Visible = false;
+                _itemViewer.L0v2h2_Panel.Visible = false;
+                _itemViewer.L0v2h2_Web.Visible = false;
                 _expanded = false; 
             }
         }
@@ -774,6 +761,13 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 _themes["DarkActive"].SetTheme(async);
                 _activeTheme = "DarkActive";
             }
+            _isDarkMode = true;
+        }
+
+        public void HtmlDarkConverter(Enums.ToggleState desiredState)
+        {
+            if (_isWebViewerInitialized)
+                _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.ToggleDark(desiredState));
         }
 
         public void SetThemeLight(bool async)
@@ -788,6 +782,7 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 _themes["LightActive"].SetTheme(async);
                 _activeTheme = "LightActive";
             }
+            _isDarkMode = false;
         }
 
         // TODO: Implement ApplyReadEmailFormat

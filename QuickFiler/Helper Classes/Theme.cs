@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
+using BrightIdeasSoftware;
 
 namespace QuickFiler.Helper_Classes
 {
@@ -16,6 +17,9 @@ namespace QuickFiler.Helper_Classes
         public Theme(string name,
                      QfcItemViewer itemViewer,
                      IQfcItemController parent,
+                     Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme web2ViewScheme,
+                     Action<Enums.ToggleState> htmlConverter,
+                     Enums.ToggleState htmlDark,
                      Color navBackgColor,
                      Color navForeColor,
                      Color tlpBackColor,
@@ -40,6 +44,9 @@ namespace QuickFiler.Helper_Classes
             _name = name;
             _itemViewer = itemViewer;
             _parent = parent;
+            _web2ViewScheme = web2ViewScheme;
+            _htmlConverter = htmlConverter;
+            _htmlDark = htmlDark;
             _navBackColor = navBackgColor;
             _navForeColor = navForeColor;
             _tlpBackColor = tlpBackColor;
@@ -60,8 +67,6 @@ namespace QuickFiler.Helper_Classes
             _cboFoldersForeColor = cboFoldersForeColor;
             _defaultBackColor = defaultBackColor;
             _defaultForeColor = defaultForeColor;
-
-            
         }
 
         private string _name;
@@ -85,9 +90,11 @@ namespace QuickFiler.Helper_Classes
         private Color _cboFoldersForeColor;
         private Color _defaultBackColor;
         private Color _defaultForeColor;
-
+        private Action<Enums.ToggleState> _htmlConverter;
+        private Enums.ToggleState _htmlDark;
         private QfcItemViewer _itemViewer;
         private IQfcItemController _parent;
+        private Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme _web2ViewScheme;
 
         public string Name { get => _name; set => _name = value; }
         public Color TlpBackColor { get => _tlpBackColor; set => _tlpBackColor = value; }
@@ -108,6 +115,9 @@ namespace QuickFiler.Helper_Classes
         public Color CboFoldersForeColor { get => _cboFoldersForeColor; set => _cboFoldersForeColor = value; }
         public Color DefaultBackColor { get => _defaultBackColor; set => _defaultBackColor = value; }
         public Color DefaultForeColor { get => _defaultForeColor; set => _defaultForeColor = value; }
+        public Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme Web2ViewScheme { get => _web2ViewScheme; set => _web2ViewScheme = value; }
+        public Action<Enums.ToggleState> HtmlConverter { get => _htmlConverter; set => _htmlConverter = value; }
+        public Enums.ToggleState HtmlDark { get => _htmlDark; set => _htmlDark = value; }
 
         public void SetMailRead(bool async)
         {
@@ -145,35 +155,65 @@ namespace QuickFiler.Helper_Classes
         
         private void SetTheme()
         {
+            // Active item navigation colors
             _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
                                         forecolor: _navForeColor);
 
+            // General thematic colors
             foreach (TableLayoutPanel tlp in _parent.TableLayoutPanels)
             {
                 tlp.SetTheme(backColor: TlpBackColor);
             }
 
+            // Shortcut accelerator colors  
             foreach (IQfcTipsDetails tipsDetails in _parent.ListTipsDetails)
             {
                 tipsDetails.LabelControl.SetTheme(backColor: TipsDetailsBackColor,
                                                     forecolor: TipsDetailsForeColor);
             }
 
+            // Mail item colors
             if (_parent.Mail.UnRead == true) { SetMailUnread(); }
             else { SetMailRead(); }
 
+            // Button colors
             foreach (Button btn in _parent.Buttons)
             {
                 btn.SetTheme(backColor: ButtonBackColor);
             }
 
+            // Colors for the folder search
+            // TODO: Override the draw function because these colors do not work as expected
             _itemViewer.TxtboxSearch.BackColor = TxtboxSearchBackColor;
             _itemViewer.TxtboxSearch.ForeColor = TxtboxSearchForeColor;
 
+            // Colors for email body
             _itemViewer.TxtboxBody.BackColor = TxtboxBodyBackColor;
             _itemViewer.TxtboxBody.ForeColor = TxtboxBodyForeColor;
+
+            // TODO: Override the draw function because these colors do not work as expected
             _itemViewer.CboFolders.BackColor = CboFoldersBackColor;
             _itemViewer.CboFolders.ForeColor = CboFoldersForeColor;
+            
+            _itemViewer.TopicThread.BackColor = DefaultBackColor;
+            _itemViewer.TopicThread.ForeColor = DefaultForeColor;
+            
+            var headerstyle = new HeaderFormatStyle();
+            headerstyle.SetBackColor(DefaultBackColor);
+            headerstyle.SetForeColor(DefaultForeColor);
+
+            foreach (OLVColumn column in _itemViewer.TopicThread.Columns)
+            {
+                column.HeaderFormatStyle = headerstyle;    
+            }
+
+            if (_itemViewer.L0v2h2_Web.CoreWebView2 is not null)
+            {
+                _itemViewer.L0v2h2_Web.CoreWebView2.Profile.PreferredColorScheme = Web2ViewScheme;
+                HtmlConverter(HtmlDark);
+            }
+            
+            // Default colors   
             _itemViewer.BackColor = DefaultBackColor;
             _itemViewer.ForeColor = DefaultForeColor;
         }
