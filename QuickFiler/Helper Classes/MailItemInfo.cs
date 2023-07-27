@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using ToDoModel;
+using UtilitiesCS;
 
 namespace QuickFiler
 {
@@ -62,7 +64,7 @@ namespace QuickFiler
 
         internal string Initialized(ref string variable)
         {
-            if (variable is null) { ExtractBasics(); }
+            if (variable is null) { LoadPriority(); }
             return variable;
         }
 
@@ -70,29 +72,37 @@ namespace QuickFiler
         {
             // check if one of the nullable variables is null which would indicate
             // the need to initialize
-            if (_senderName is null) { ExtractBasics(); }
+            if (_senderName is null) { LoadPriority(); }
             return variable;
         }
 
-        public bool ExtractBasics()
+        public bool LoadPriority()
         {
             if (_item is null) { throw new ArgumentNullException(); }
             _sender = _item.GetSenderInfo();
             _senderName = _sender.Name;
             _senderHtml = _sender.Html;
-            _toRecipients = _item.GetToRecipients().GetInfo();
-            _toRecipientsName = _toRecipients.Name;
-            _toRecipientsHtml = _toRecipients.Html;
-            _ccRecipients = _item.GetCcRecipients().GetInfo();
-            _ccRecipientsName = _ccRecipients.Name;
-            _ccRecipientsHtml = _ccRecipients.Html;
             _subject = _item.Subject;
             _body = CompressPlainText(_item.Body);
             _triage = _item.GetTriage();
             _sentOn = _item.SentOn.ToString("g");
             _actionable = _item.GetActionTaken();
             _folder = ((Folder)_item.Parent).Name;
+            _ = Task.Factory.StartNew(() => LoadRecipients(), 
+                                      default, 
+                                      TaskCreationOptions.None, 
+                                      PriorityScheduler.BelowNormal);
             return true;            
+        }
+
+        public void LoadRecipients()
+        {
+            _toRecipients = _item.GetToRecipients().GetInfo();
+            _toRecipientsName = _toRecipients.Name;
+            _toRecipientsHtml = _toRecipients.Html;
+            _ccRecipients = _item.GetCcRecipients().GetInfo();
+            _ccRecipientsName = _ccRecipients.Name;
+            _ccRecipientsHtml = _ccRecipients.Html;
         }
 
         internal string CompressPlainText(string text)

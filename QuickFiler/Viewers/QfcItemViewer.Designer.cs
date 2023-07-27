@@ -42,7 +42,7 @@
             this.L1h0L2hv2L3h = new System.Windows.Forms.TableLayoutPanel();
             this.LblConvCt = new System.Windows.Forms.Label();
             this.lblSubject = new System.Windows.Forms.Label();
-            this.LblPos = new System.Windows.Forms.Label();
+            this.LblItemNumber = new System.Windows.Forms.Label();
             this.LblAcOpen = new System.Windows.Forms.Label();
             this.L1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
             this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
@@ -145,7 +145,7 @@
             this.L1h0L2hv.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1h0L2hv.Controls.Add(this.L1h0L2hv1L3h, 1, 0);
             this.L1h0L2hv.Controls.Add(this.L1h0L2hv2L3h, 1, 1);
-            this.L1h0L2hv.Controls.Add(this.LblPos, 0, 0);
+            this.L1h0L2hv.Controls.Add(this.LblItemNumber, 0, 0);
             this.L1h0L2hv.Controls.Add(this.LblAcOpen, 0, 2);
             this.L1h0L2hv.Controls.Add(this.L1h0L2hv3h_TlpBodyToggle, 1, 2);
             this.L1h0L2hv.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -301,21 +301,21 @@
             this.lblSubject.TabIndex = 2;
             this.lblSubject.Text = "[SUBJECT]";
             // 
-            // LblPos
+            // LblItemNumber
             // 
-            this.LblPos.BackColor = System.Drawing.SystemColors.HotTrack;
-            this.LblPos.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblPos.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.LblPos.Location = new System.Drawing.Point(4, 4);
-            this.LblPos.Margin = new System.Windows.Forms.Padding(4, 4, 4, 19);
-            this.LblPos.Name = "LblPos";
-            this.LblPos.Padding = new System.Windows.Forms.Padding(0, 0, 0, 8);
-            this.L1h0L2hv.SetRowSpan(this.LblPos, 2);
-            this.LblPos.Size = new System.Drawing.Size(92, 66);
-            this.LblPos.TabIndex = 5;
-            this.LblPos.Text = "[#]";
-            this.LblPos.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblItemNumber.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.LblItemNumber.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LblItemNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblItemNumber.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.LblItemNumber.Location = new System.Drawing.Point(4, 4);
+            this.LblItemNumber.Margin = new System.Windows.Forms.Padding(4, 4, 4, 19);
+            this.LblItemNumber.Name = "LblItemNumber";
+            this.LblItemNumber.Padding = new System.Windows.Forms.Padding(0, 0, 0, 8);
+            this.L1h0L2hv.SetRowSpan(this.LblItemNumber, 2);
+            this.LblItemNumber.Size = new System.Drawing.Size(92, 66);
+            this.LblItemNumber.TabIndex = 5;
+            this.LblItemNumber.Text = "[#]";
+            this.LblItemNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // LblAcOpen
             // 
@@ -380,7 +380,7 @@
             // 
             // sender
             // 
-            this.sender.AspectName = "Sender";
+            this.sender.AspectName = "SenderName";
             this.sender.FillsFreeSpace = true;
             this.sender.HeaderForeColor = System.Drawing.SystemColors.ControlText;
             this.sender.MinimumWidth = 200;
@@ -901,7 +901,7 @@
         internal System.Windows.Forms.TableLayoutPanel L1h0L2hv2L3h;
         internal System.Windows.Forms.Label LblConvCt;
         internal System.Windows.Forms.Label lblSubject;
-        internal System.Windows.Forms.Label LblPos;
+        internal System.Windows.Forms.Label LblItemNumber;
         internal System.Windows.Forms.Label LblAcOpen;
         internal System.Windows.Forms.TableLayoutPanel L1h1L2v;
         internal System.Windows.Forms.TableLayoutPanel L1h1L2v1h;

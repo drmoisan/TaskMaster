@@ -28,7 +28,7 @@ namespace QuickFiler.Interfaces
         void SelectPreviousItem();
         void ToggleOffNavigation(bool async);
         void ToggleOnNavigation(bool async);
-        void ToggleExpansionStyle(Enums.ToggleState desiredState);
+        void ToggleExpansionStyle(int itemIndex, Enums.ToggleState desiredState);
 
         // UI Converations Expansion
         void ConvToggle_Group(int childCount, int indexOriginal);
