@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace UtilitiesCS
 {
     using Microsoft.Data.Analysis;
+    using Microsoft.Office.Interop.Outlook;
     using System.Text;
 
     /// <summary>
@@ -15,12 +16,14 @@ namespace UtilitiesCS
     public static class PrettyPrinters
     {
         public static void PrettyPrint(this DataFrame df) => Console.WriteLine(PrettyText(df));
+        public static void PrettyPrint(this DataFrameRow row) => Console.WriteLine(Pretty(row));
+
         public static string PrettyText(this DataFrame df) => ToStringArray2D(df).ToFormattedText();
 
-        public static string ToMarkdown(this DataFrame df) => ToStringArray2D(df).ToMarkdown();
-
-        public static void PrettyPrint(this DataFrameRow row) => Console.WriteLine(Pretty(row));
         public static string Pretty(this DataFrameRow row) => row.Select(x => x?.ToString() ?? string.Empty).StringJoin();
+
+        public static string ToMarkdown(this DataFrame df) => ToStringArray2D(df).ToMarkdown();
+        
         private static string StringJoin(this IEnumerable<string> strings) => string.Join(" ", strings.Select(x => x.ToString()));
 
         private static string[,] ToStringArray2D(DataFrame df)
@@ -36,6 +39,8 @@ namespace UtilitiesCS
 
             return strings;
         }
+
+        
 
         private static int[] GetMaxLengthsByColumn(this string[,] strings)
         {

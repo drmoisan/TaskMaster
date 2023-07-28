@@ -7,9 +7,9 @@ namespace TaskMaster
     public class ApplicationGlobals : IApplicationGlobals
     {
 
-        private readonly AppFileSystemFolderPaths _fs;
-        private readonly AppOlObjects _olObjects;
-        private readonly AppToDoObjects _toDoObjects;
+        private AppFileSystemFolderPaths _fs;
+        private AppOlObjects _olObjects;
+        private AppToDoObjects _toDoObjects;
         private AppAutoFileObjects _autoFileObjects;
 
         public ApplicationGlobals(Application OlApp)

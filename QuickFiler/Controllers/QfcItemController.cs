@@ -59,28 +59,20 @@ namespace QuickFiler.Controllers
         private IQfcCollectionController _parent;
         private IList<IQfcTipsDetails> _listTipsDetails;
         private IQfcTipsDetails _itemPositionTips;
-        
-        
-        
-        
         private FolderHandler _fldrHandler;
         private IList<Control> _controls;
         private IList<TableLayoutPanel> _tableLayoutPanels;
-        
         private IList<CheckBox> _checkBoxes;
         private IList<Label> _labels;
-        
         private Dictionary<string,Theme> _themes;
         private string _activeTheme;
         private IQfcKeyboardHandler _keyboardHandler;
-        
         private bool _suppressEvents = false;
-        
         private CoreWebView2Environment _webViewEnvironment;
-        
         private MailItemInfo _itemInfo;
         private bool _isWebViewerInitialized = false;
         private bool _isDarkMode = false;
+        
         #endregion
 
         #region Exposed properties
@@ -120,6 +112,26 @@ namespace QuickFiler.Controllers
             set => _conversationItems = value; 
         }
 
+        private IList<MailItem> _conversationItemsExpanded;
+        public IList<MailItem> ConversationItemsExpanded
+        {
+            get
+            {
+                if (_conversationItemsExpanded is null)
+                {
+                    _conversationItemsExpanded = ConvHelper.GetMailItemList(DfConversation,
+                                                                           ((Folder)Mail.Parent).StoreID,
+                                                                           _globals.Ol.App,
+                                                                           true)
+                                                           .Cast<MailItem>()
+                                                           .ToList();
+                }
+                return _conversationItemsExpanded;
+            }
+
+            set => _conversationItemsExpanded = value;
+        }
+
         private DataFrame _dfConversation;
         public DataFrame DfConversation 
         {
@@ -127,7 +139,9 @@ namespace QuickFiler.Controllers
             {
                 if ((_dfConversation is null)&&(_mailItem is not null))
                 {
-                    DfConversation = Mail.GetConversationDf(true, true);
+                    var conversation = Mail.GetConversation();
+                    DfConversationExpanded = conversation.GetConversationDf();
+                    DfConversation = DfConversationExpanded.FilterConversation(false, true);
                 }
                 return _dfConversation; 
             }
@@ -136,7 +150,21 @@ namespace QuickFiler.Controllers
                 _dfConversation = value;
                 NotifyPropertyChanged();
             }
-        } 
+        }
+        
+        private DataFrame _dfConversationExpanded;
+        public DataFrame DfConversationExpanded 
+        { 
+            get
+            {
+                return _dfConversationExpanded;
+            } 
+            internal set
+            {
+                _dfConversationExpanded = value;
+                NotifyPropertyChanged();
+            } 
+        }
 
         public int Height { get => _itemViewer.Height; }
 
@@ -301,7 +329,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void PopulateConversation()
         {
-            PopulateConversation(_mailItem.GetConversationDf(true, true));
+            PopulateConversation(_mailItem.GetConversationDf());
         }
 
         /// <summary>
@@ -311,7 +339,8 @@ namespace QuickFiler.Controllers
         /// <param name="df"></param>
         public void PopulateConversation(DataFrame df)
         {
-            DfConversation = df;
+            DfConversationExpanded = df.FilterConversation(false, true);
+            DfConversation = DfConversationExpanded.FilterConversation(true, true);
             int count = DfConversation.Rows.Count();
             PopulateConversation(count);
         }
@@ -803,13 +832,13 @@ namespace QuickFiler.Controllers
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             var entryID = _convOriginID != "" ? _convOriginID :  Mail.EntryID;
-            _parent.ConvToggle_Group(entryID);
+            _parent.ToggleGroupConv(entryID);
         }
 
         internal void EnumerateConversation() 
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
-            _parent.ConvToggle_UnGroup(ConversationItems,
+            _parent.ToggleUnGroupConv(ConversationItems,
                                        Mail.EntryID,
                                        ConversationItems.Count,
                                        folderList);
@@ -848,26 +877,12 @@ namespace QuickFiler.Controllers
             if (_itemViewer.CbxConversation.Checked == true)
             {
                 var conversationCount = int.Parse(_itemViewer.LblConvCt.Text);
-                if ((_conversationItems is not null) && 
-                    (_conversationItems.Count == conversationCount) && 
-                    (_conversationItems.Count != 0))
+                if ((conversationCount == 0) || (ConversationItems.Count != conversationCount))
                 {
-                    return _conversationItems;
+                    _dfConversation = null;
+                    _conversationItems = null;
                 }
-                else
-                {
-                    if ((_dfConversation is null) || (_dfConversation.Rows.Count != conversationCount))
-                    {
-                        _dfConversation = Mail.GetConversationDf(true, true);
-                    }
-                    _conversationItems = ConvHelper.GetMailItemList(_dfConversation,
-                                                                   ((Folder)Mail.Parent).StoreID,
-                                                                   _globals.Ol.App,
-                                                                   true)
-                                                   .Cast<MailItem>().ToList();
-
-                    return _conversationItems;
-                }
+                return ConversationItems;
             }
             else
             {

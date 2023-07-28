@@ -25,7 +25,7 @@ namespace UtilitiesCS
             table.Columns.Remove("CreationTime");
             table.Columns.Remove("LastModificationTime");
 
-            (object[,] data, Dictionary<string, int> columnInfo) = table.ExtractData();
+            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
             
             var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
             {
@@ -86,7 +86,7 @@ namespace UtilitiesCS
                                        removeColumns: removeColumns,
                                        addColumns: addColumns);
 
-            (var data, var columnInfo) = table.ExtractData();
+            (var data, var columnInfo) = table.ETL();
 
             Frame<int, string> df = FromArray2D(data: data, columnInfo);
 

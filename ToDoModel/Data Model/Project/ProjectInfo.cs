@@ -60,7 +60,7 @@ namespace ToDoModel
         {
             var table = store.GetToDoTable();
             
-            (var data, var columnInfo) = table.ExtractData();
+            (var data, var columnInfo) = table.ETL();
             
             Frame<int, string> df = DfDeedle.FromArray2D(data: data, columnInfo);
                         

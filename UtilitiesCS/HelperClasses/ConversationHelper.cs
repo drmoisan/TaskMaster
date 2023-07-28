@@ -25,8 +25,6 @@ namespace UtilitiesCS
             Right = 1, Left = 2, Center = 4
         }
         
-        
-
         public static IList GetMailItemList(DataFrame df,
                                             string storeID,
                                             Outlook.Application olApp,
@@ -123,29 +121,43 @@ namespace UtilitiesCS
             return 0;
         }
 
-        public static DataFrame GetConversationDf(this object ObjItem, bool SameFolder, bool MailOnly)
+        public static DataFrame GetConversationDf(this object ObjItem)
         {
             if (ObjItem is MailItem)
             {
                 MailItem mailItem = (MailItem)ObjItem;
-                return mailItem.GetConversationDf(SameFolder, MailOnly);
+                return mailItem.GetConversationDf();
             }
             return null;
         }
 
-        public static DataFrame GetConversationDf(this MailItem ObjItem, bool SameFolder, bool MailOnly)
+        //PERFORMANCE: Add async version of GetConversationDf 
+        public static DataFrame GetConversationDf(this Conversation conversation)
         {
-            Outlook.Conversation conv = ObjItem.GetConversation();
-            if (conv != null)
+            if (conversation != null)
             {
-                DataFrame df = conv.GetDataFrame();
-                
+                DataFrame df = conversation.GetDataFrame();
+
                 //Console.WriteLine(df.PrettyText());
+                return df;
+            }
+            return null;
+        }
+
+        public static DataFrame GetConversationDf(this MailItem mailItem)
+        {
+            Outlook.Conversation conv = mailItem.GetConversation();
+            return conv.GetConversationDf();
+        }
+
+        //PERFORMANCE: Add async version of FilterConversation
+        public static DataFrame FilterConversation(this DataFrame df, bool SameFolder, bool MailOnly)
+        {
+            if (df != null)
+            {
                 if (SameFolder)
                 {
-                    //string FolderName = ObjItem.PropertyAccessor.GetProperty(OlTableExtensions.SchemaFolderName) as string;
-                    //Console.WriteLine($"Parent is of com type {ComType.TypeInformation.GetTypeName(ObjItem.Parent)}");
-                    string FolderName = ((MAPIFolder)ObjItem.Parent).Name;
+                    string FolderName = df["Folder Name"][0] as string;
                     df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
                 }
                 if (MailOnly)
@@ -155,6 +167,38 @@ namespace UtilitiesCS
                 return df;
             }
             return null;
+        }
+        
+        //WAITING: If GetInfoMethod can get all the data, map this method to MailItemInfo class
+        public static DataFrame GetInfoDf(this Conversation conversation)
+        {
+            Outlook.Table table = conversation.GetInfoTable();
+            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
+            var df = data.ToDataFrame(columnInfo.Keys.ToArray());
+            df.Display();
+            return df;
+        }
+        
+        //QUESTION: Can we get all the info we need from the GetInfoTable method?
+        public static Table GetInfoTable(this Conversation conversation)
+        {
+            Outlook.Table table = conversation.GetTable();
+            if (table != null)
+            {
+                // add From
+                string[] columnsToAdd = new string[]
+                {
+                    "SentOn",
+                    OlTableExtensions.SchemaFolderName,
+                    OlTableExtensions.SchemaMessageStore,
+                    OlTableExtensions.SchemaConversationDepth,
+                    OlTableExtensions.SchemaConversationIndex,
+                    OlTableExtensions.SchemaReceivedByName,
+                    OlTableExtensions.SchemaMessageRecipients
+                };
+                foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
+            }
+            return table;
         }
 
         public static DataFrame GetDataFrame(this Outlook.Conversation conversation)
