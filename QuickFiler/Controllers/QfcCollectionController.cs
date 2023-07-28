@@ -26,6 +26,7 @@ namespace QuickFiler.Controllers
 
             _formViewer = viewerInstance;
             _itemTLP = _formViewer.L1v0L2L3v_TableLayout;
+            _itemPanel = _formViewer.L1v0L2_PanelMain;
             _initType = InitType;
             _globals = AppGlobals;
             _keyboardHandler = keyboardHandler;
@@ -44,6 +45,7 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private IQfcFormController _parent;
         private int _itemHeight;
+        private Panel _itemPanel;
         private TableLayoutPanel _itemTLP;
         private List<ItemGroup> _itemGroups;
         private bool _darkMode;
@@ -346,15 +348,19 @@ namespace QuickFiler.Controllers
         {
             if (intNewSelection > 0 & intNewSelection <= _itemGroups.Count)
             {
-                //var tlpState = 
-                IQfcItemController itemController = _itemGroups[intNewSelection - 1].ItemController;
-                QfcItemViewer itemViewer = _itemGroups[intNewSelection - 1].ItemViewer;
+                var tlpState = TlpLayout;
+                TlpLayout = false;
+
+                var itemController = _itemGroups[intNewSelection - 1].ItemController;
+                var itemViewer = _itemGroups[intNewSelection - 1].ItemViewer;
 
                 itemController.ToggleFocus();
                 if (blExpanded) { itemController.ToggleExpansion(); }
-                
-                _formViewer.L1v0L2L3v_TableLayout.ScrollControlIntoView(itemViewer);
+                ScrollIntoView(itemViewer);
+
                 ActiveSelection = intNewSelection;
+
+                TlpLayout = tlpState;
             }
             return ActiveSelection;
         }
@@ -364,9 +370,14 @@ namespace QuickFiler.Controllers
             bool expanded = false;
             if ((ActiveIndex != idx) && (idx < _itemGroups.Count))
             {
+                var tlpState = TlpLayout;
+                TlpLayout = false;
+
                 if (ActiveIndex != -1)
                     expanded = ToggleOffActiveItem(false);
                 ActivateBySelection(idx + 1, expanded);
+
+                TlpLayout = tlpState;
             }
         }
 
@@ -396,30 +407,22 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public void ScrollBottomIntoView(int itemIndex)
+        internal void ScrollIntoView(QfcItemViewer item)
         {
-            if (_itemGroups[itemIndex].ItemViewer.Bottom > (_formViewer.L1v0L2_PanelMain.Bottom - _formViewer.L1v0L2_PanelMain.AutoScrollPosition.Y))
+            // If top is not visible, scroll top into view
+            if (_itemPanel.Top - _itemPanel.AutoScrollPosition.Y > item.Top)
             {
-                int y_scroll = Math.Max(0, _itemGroups[itemIndex].ItemViewer.Bottom -
-                                           _formViewer.L1v0L2_PanelMain.Height +
-                                           _formViewer.L1v0L2_PanelMain.Top);
-                _formViewer.L1v0L2_PanelMain.AutoScrollPosition = new System.Drawing.Point(
-                        _formViewer.L1v0L2_PanelMain.AutoScrollPosition.X, y_scroll);
+                _itemPanel.AutoScrollPosition = new System.Drawing.Point(_itemPanel.AutoScrollPosition.X, item.Top);
             }
+            // Else if bottom is not visible, scroll bottom into view
+            else if (item.Bottom > (_itemPanel.Bottom - _itemPanel.AutoScrollPosition.Y))
+            {
+                int yScroll = Math.Max(0, item.Bottom - _itemPanel.Height + _itemPanel.Top);
+                _itemPanel.AutoScrollPosition = new System.Drawing.Point(_itemPanel.AutoScrollPosition.X, yScroll);
+            }
+            // Else do nothing
         }
         
-        public void ScrollTopIntoView()
-        {
-            //if (_formViewer.L1v0L2_PanelMain.VerticalScroll.Maximum > _formViewer.L1v0L2_PanelMain.Height)
-            if (_formViewer.L1v0L2_PanelMain.VerticalScroll.Maximum > _formViewer.L1v0L2_PanelMain.Height)
-            {
-                //int y_scroll = _itemGroups[ActiveIndex].ItemViewer.Top - _formViewer.L1v0L2_PanelMain.AutoScrollPosition.Y;
-                _formViewer.L1v0L2_PanelMain.AutoScrollPosition = new System.Drawing.Point(
-                        _formViewer.L1v0L2_PanelMain.AutoScrollPosition.X,
-                        _itemGroups[ActiveIndex].ItemViewer.Top);
-            }
-        }
-
         public void ToggleExpansionStyle(int itemIndex, Enums.ToggleState desiredState)
         {
             if (itemIndex < 0 || itemIndex >= _itemGroups.Count)
@@ -458,9 +461,9 @@ namespace QuickFiler.Controllers
             {
                 _itemTLP.Invoke(new System.Action(() => _itemTLP.Height += (int)Math.Round(heightChange, 0)));
             }
-            
+
             if (desiredState == Enums.ToggleState.On)
-                ScrollBottomIntoView(itemIndex);
+                ScrollIntoView(_itemGroups[itemIndex].ItemViewer);
         }
 
         public void ToggleOffNavigation(bool async)
@@ -538,7 +541,7 @@ namespace QuickFiler.Controllers
             grp.ItemController.SuppressEvents = suppressionState;
         }
 
-        public void ConvToggle_Group(string originalId)
+        public void ToggleGroupConv(string originalId)
         {
             int childCount = _itemGroups.Where(itemGroup => itemGroup.ItemController.ConvOriginID == originalId).Count();
             int indexOriginal = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.Mail.EntryID == originalId);
@@ -558,12 +561,12 @@ namespace QuickFiler.Controllers
                     reactivate = true;
                     ToggleOffActiveItem(false);
                 }
-                ConvToggle_Group(childCount, indexOriginal); 
+                ToggleGroupConv(childCount, indexOriginal); 
                 if (reactivate) { ActivateByIndex(indexOriginal, false);}
             }
         }
 
-        public void ConvToggle_Group(int childCount, int indexOriginal)
+        public void ToggleGroupConv(int childCount, int indexOriginal)
         {
             var tlpState = TlpLayout;
             TlpLayout = false;
@@ -592,7 +595,7 @@ namespace QuickFiler.Controllers
         /// <param name="baseEmailIndex">Index of base member in collection</param>
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Sorting suggestions from base member</param>
-        public void ConvToggle_UnGroup(IList<MailItem> mailItems,
+        public void ToggleUnGroupConv(IList<MailItem> mailItems,
                                        string entryID,
                                        int conversationCount,
                                        object folderList)
