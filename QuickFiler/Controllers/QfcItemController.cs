@@ -803,16 +803,16 @@ namespace QuickFiler.Controllers
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             var entryID = _convOriginID != "" ? _convOriginID :  Mail.EntryID;
-            _parent.ConvToggle_Group(entryID);
+            _parent.ToggleGroupConv(entryID);
         }
 
         internal void EnumerateConversation() 
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
-            _parent.ConvToggle_UnGroup(ConversationItems,
-                                       Mail.EntryID,
-                                       ConversationItems.Count,
-                                       folderList);
+            _parent.ToggleUnGroupConv(ConversationItems,
+                                      Mail.EntryID,
+                                      ConversationItems.Count,
+                                      folderList);
         }
 
         public Dictionary<string, System.Action> RightKeyActions { get => new() 
