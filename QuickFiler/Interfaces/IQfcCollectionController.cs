@@ -28,12 +28,12 @@ namespace QuickFiler.Interfaces
         void SelectPreviousItem();
         void ToggleOffNavigation(bool async);
         void ToggleOnNavigation(bool async);
-        void ToggleExpansionStyle(Enums.ToggleState desiredState);
+        void ToggleExpansionStyle(int itemIndex, Enums.ToggleState desiredState);
 
         // UI Converations Expansion
-        void ConvToggle_Group(int childCount, int indexOriginal);
-        void ConvToggle_Group(string originalId);
-        void ConvToggle_UnGroup(IList<MailItem> mailItems, string entryID, int conversationCount, object folderList);
+        void ToggleGroupConv(int childCount, int indexOriginal);
+        void ToggleGroupConv(string originalId);
+        void ToggleUnGroupConv(IList<MailItem> mailItems, string entryID, int conversationCount, object folderList);
         void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount);                        
 
         // UI Light Dark

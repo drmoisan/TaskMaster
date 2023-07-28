@@ -59,46 +59,48 @@ namespace QuickFiler.Controllers
         private IQfcCollectionController _parent;
         private IList<IQfcTipsDetails> _listTipsDetails;
         private IQfcTipsDetails _itemPositionTips;
-        private MailItem _mailItem;
-        private DataFrame _dfConversation;
-        private IList<MailItem> _conversationItems;
-        private int _viewerPosition;
+        
+        
+        
+        
         private FolderHandler _fldrHandler;
         private IList<Control> _controls;
         private IList<TableLayoutPanel> _tableLayoutPanels;
-        private IList<Button> _buttons;
+        
         private IList<CheckBox> _checkBoxes;
         private IList<Label> _labels;
-        private bool _expanded = false;
-        private bool _activeUI = false;
-        private bool _isChild;
-        private bool _isDarkMode = false;
+        
         private Dictionary<string,Theme> _themes;
         private string _activeTheme;
         private IQfcKeyboardHandler _keyboardHandler;
-        private string _convOriginID = "";
+        
         private bool _suppressEvents = false;
-        private int _intEnterCounter = 0;
-        private int _intComboRightCtr = 0;
+        
         private CoreWebView2Environment _webViewEnvironment;
-        private List<MailItemInfo> _conversationInfo;
+        
         private MailItemInfo _itemInfo;
         private bool _isWebViewerInitialized = false;
-
+        private bool _isDarkMode = false;
         #endregion
 
         #region Exposed properties
 
+        private IList<Button> _buttons;
         public IList<Button> Buttons { get => _buttons; }
 
+        private string _convOriginID = "";
         public string ConvOriginID { get => _convOriginID; set => _convOriginID = value; }
-
-        public List<MailItemInfo> ConversationInfo { get => _conversationInfo; set => _conversationInfo = value; }
-
+        
+        private int _intEnterCounter = 0;
         public int CounterEnter { get => _intEnterCounter; set => _intEnterCounter = value; }
-
+        
+        private int _intComboRightCtr = 0;
         public int CounterComboRight { get => _intComboRightCtr; set => _intComboRightCtr = value; }
 
+        private List<MailItemInfo> _conversationInfo;
+        public List<MailItemInfo> ConversationInfo { get => _conversationInfo; set => _conversationInfo = value; }
+
+        private IList<MailItem> _conversationItems;
         public IList<MailItem> ConversationItems 
         {
             get 
@@ -117,7 +119,8 @@ namespace QuickFiler.Controllers
             
             set => _conversationItems = value; 
         }
-        
+
+        private DataFrame _dfConversation;
         public DataFrame DfConversation 
         {
             get 
@@ -138,30 +141,36 @@ namespace QuickFiler.Controllers
         public int Height { get => _itemViewer.Height; }
 
         public bool IsExpanded { get => _expanded; }
+        private bool _expanded = false;
 
         public bool IsChild { get => _isChild; set => _isChild = value; }
+        private bool _isChild;
 
         public bool IsActiveUI { get => _activeUI; set => _activeUI = value; }
-
+        private bool _activeUI = false;
+        
         public IList<IQfcTipsDetails> ListTipsDetails { get => _listTipsDetails; }
 
+        private MailItem _mailItem;
         public MailItem Mail { get => _mailItem; set => _mailItem = value; }
 
         public IQfcCollectionController Parent { get => _parent; }
 
-        public int Position 
+        private int _itemNumber;
+        public int ItemNumber 
         { 
-            get => _viewerPosition;
+            get => _itemNumber;
             set 
             { 
-                _viewerPosition = value;
-                _itemViewer.LblPos.Text = _viewerPosition.ToString();
+                _itemNumber = value;
+                _itemViewer.LblItemNumber.Text = _itemNumber.ToString();
             }
         }
+        public int ItemIndex { get => ItemNumber - 1; set => _itemNumber = value + 1; }
 
         public string SelectedFolder { get => _itemViewer.CboFolders.SelectedItem.ToString(); }
 
-        public string Sender { get => _itemViewer.LblSender.Text; }
+        public string Sender { get => _itemInfo.SenderName; }
 
         public string SentDate { get => _mailItem.SentOn.ToString("MM/dd/yyyy"); }
 
@@ -193,7 +202,7 @@ namespace QuickFiler.Controllers
             _itemViewer = itemViewer;
             _itemViewer.Controller = this;
 
-            _viewerPosition = viewerPosition;   // visible position in collection (index is 1 less)
+            _itemNumber = viewerPosition;   // visible position in collection (index is 1 less)
             _mailItem = mailItem;               // handle on underlying Email
             _keyboardHandler = keyboardHandler; // handle keystrokes
             _parent = parent;                   // handle on collection controller
@@ -246,7 +255,7 @@ namespace QuickFiler.Controllers
                                .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
                                .ToList();
 
-            _itemPositionTips = new QfcTipsDetails(_itemViewer.LblPos);
+            _itemPositionTips = new QfcTipsDetails(_itemViewer.LblItemNumber);
 
             _tableLayoutPanels = ctrls.Where(x => x is TableLayoutPanel)
                          .Select(x => (TableLayoutPanel)x)
@@ -268,7 +277,7 @@ namespace QuickFiler.Controllers
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
             _itemInfo = new MailItemInfo(mailItem);
-            _itemInfo.ExtractBasics();
+            _itemInfo.LoadPriority();
             _itemViewer.BeginInvoke(new System.Action(
                 () => AssignControls(_itemInfo, viewerPosition)));
         }
@@ -282,7 +291,7 @@ namespace QuickFiler.Controllers
             _itemViewer.LblTriage.Text = itemInfo.Triage;
             _itemViewer.LblSentOn.Text = itemInfo.SentOn;
             _itemViewer.LblActionable.Text = itemInfo.Actionable;
-            _itemViewer.LblPos.Text = viewerPosition.ToString();
+            _itemViewer.LblItemNumber.Text = viewerPosition.ToString();
         }
 
         /// <summary>
@@ -470,8 +479,8 @@ namespace QuickFiler.Controllers
             _keyboardHandler.KdCharActions.Add('E', (x) => this.ToggleExpansion());
             _keyboardHandler.KdCharActions.Add('S', (x) => this.JumpToSearchTextbox());
             _keyboardHandler.KdCharActions.Add('T', (x) => this.FlagAsTask());
-            _keyboardHandler.KdCharActions.Add('P', (x) => this._parent.PopOutControlGroup(Position));
-            _keyboardHandler.KdCharActions.Add('R', (x) => this._parent.RemoveSpecificControlGroup(Position));
+            _keyboardHandler.KdCharActions.Add('P', (x) => this._parent.PopOutControlGroup(ItemNumber));
+            _keyboardHandler.KdCharActions.Add('R', (x) => this._parent.RemoveSpecificControlGroup(ItemNumber));
             _keyboardHandler.KdCharActions.Add('X', (x) => this.MarkItemForDeletion());
             _keyboardHandler.KdCharActions.Add('F', (x) => this.JumpToFolderDropDown());
         }
@@ -504,7 +513,7 @@ namespace QuickFiler.Controllers
 
         internal void BtnFlagTask_Click(object sender, EventArgs e) => FlagAsTask();
         
-        internal void BtnPopOut_Click(object sender, EventArgs e) => _parent.PopOutControlGroup(Position);
+        internal void BtnPopOut_Click(object sender, EventArgs e) => _parent.PopOutControlGroup(ItemNumber);
 
         internal void BtnDelItem_Click(object sender, EventArgs e) => MarkItemForDeletion();
 
@@ -546,6 +555,140 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region UI Navigation Methods
+
+        public void JumpToFolderDropDown()
+        {
+            _keyboardHandler.ToggleKeyboardDialog();
+            _itemViewer.Invoke(new System.Action(() =>
+            {
+                _itemViewer.CboFolders.Focus();
+                _itemViewer.CboFolders.DroppedDown = true;
+                _intEnterCounter = 0;
+            }));
+        }
+
+        public void JumpToSearchTextbox()
+        {
+            _keyboardHandler.ToggleKeyboardDialog();
+            _itemViewer.TxtboxSearch.Invoke(new System.Action(() => _itemViewer.TxtboxSearch.Focus()));
+        }
+
+        /// <summary>
+        /// Function programatically clicks the "Conversation" checkbox
+        /// </summary>
+        public void ToggleConversationCheckbox()
+        {
+            _itemViewer.CbxConversation.Invoke(new System.Action(() =>
+                _itemViewer.CbxConversation.Checked =
+                !_itemViewer.CbxConversation.Checked));
+        }
+
+        /// <summary>
+        /// Function programatically sets the "Conversation" checkbox to the desired state 
+        /// if it is not already in that state
+        /// </summary>
+        /// <param name="desiredState">State of checkbox desired</param>
+        public void ToggleConversationCheckbox(Enums.ToggleState desiredState)
+        {
+            _itemViewer.CbxConversation.Invoke(new System.Action(() =>
+            {
+                switch (desiredState)
+                {
+                    case Enums.ToggleState.On:
+                        if (_itemViewer.CbxConversation.Checked == false)
+                            _itemViewer.CbxConversation.Checked = true;
+                        break;
+                    case Enums.ToggleState.Off:
+                        if (_itemViewer.CbxConversation.Checked == true)
+                            _itemViewer.CbxConversation.Checked = false;
+                        break;
+                    default:
+                        _itemViewer.CbxConversation.Checked = !_itemViewer.CbxConversation.Checked;
+                        break;
+                }
+            }));
+        }
+
+        public void ToggleExpansion()
+        {
+            if (_expanded) { ToggleExpansion(Enums.ToggleState.Off); }
+            else { ToggleExpansion(Enums.ToggleState.On); }
+        }
+
+        public void ToggleExpansion(Enums.ToggleState desiredState)
+        {
+            _parent.ToggleExpansionStyle(ItemIndex, desiredState);
+            if (desiredState == Enums.ToggleState.On)
+            {
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
+                _itemViewer.TopicThread.Visible = true;
+                _itemViewer.L0v2h2_Panel.Visible = true;
+                _itemViewer.L0v2h2_Web.Visible = true;
+                _expanded = true;
+            }
+            else
+            {
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
+                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
+                _itemViewer.TopicThread.Visible = false;
+                _itemViewer.L0v2h2_Panel.Visible = false;
+                _itemViewer.L0v2h2_Web.Visible = false;
+                _expanded = false;
+            }
+        }
+
+        public void ToggleFocus(Enums.ToggleState desiredState)
+        {
+            _itemViewer.Invoke(new System.Action(() =>
+            {
+                if ((desiredState == Enums.ToggleState.On) && (!_activeUI))
+                {
+                    // If not active and we want to turn on, then we are turning on
+                    _activeUI = true;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
+                    else { _activeTheme = "LightActive"; }
+                    ToggleTips(async: false, desiredState: Enums.ToggleState.On);
+                    RegisterFocusActions();
+                }
+                else if ((desiredState == Enums.ToggleState.Off) && (_activeUI))
+                {
+                    // If active and we want to turn off, then we are turning off
+                    _activeUI = false;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
+                    else { _activeTheme = "LightNormal"; }
+                    ToggleTips(async: false, desiredState: Enums.ToggleState.Off);
+                    UnregisterFocusActions();
+                }
+                _themes[_activeTheme].SetTheme(async: false);
+            }));
+        }
+
+        public void ToggleFocus()
+        {
+            _itemViewer.Invoke(new System.Action(() =>
+            {
+                if (_activeUI)
+                {
+                    // If active, then we are turning off
+                    _activeUI = false;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
+                    else { _activeTheme = "LightNormal"; }
+                    ToggleTips(async: false, desiredState: Enums.ToggleState.Off);
+                    UnregisterFocusActions();
+                }
+                else
+                {
+                    // If not active, then we are turning on
+                    _activeUI = true;
+                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
+                    else { _activeTheme = "LightActive"; }
+                    ToggleTips(async: false, desiredState: Enums.ToggleState.On);
+                    RegisterFocusActions();
+                }
+                _themes[_activeTheme].SetTheme(async: false);
+            }));
+        }
 
         public void ToggleNavigation(bool async)
         {
@@ -589,146 +732,6 @@ namespace QuickFiler.Controllers
                 if (async) { _itemViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(desiredState))); }
                 else { _itemViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState))); }
             }
-        }
-
-        public void Accel_FocusToggle(Enums.ToggleState desiredState)
-        {
-            _itemViewer.Invoke(new System.Action(() =>
-            {
-                if ((desiredState == Enums.ToggleState.On)&&(!_activeUI))
-                {
-                    // If not active and we want to turn on, then we are turning on
-                    _activeUI = true;
-                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
-                    else { _activeTheme = "LightActive"; }
-                    ToggleTips(async: false, desiredState: Enums.ToggleState.On);
-                    RegisterFocusActions();
-                }
-                else if ((desiredState == Enums.ToggleState.Off) && (_activeUI))
-                {
-                    // If active and we want to turn off, then we are turning off
-                    _activeUI = false;
-                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
-                    else { _activeTheme = "LightNormal"; }
-                    ToggleTips(async: false, desiredState: Enums.ToggleState.Off);
-                    UnregisterFocusActions();
-                }
-                _themes[_activeTheme].SetTheme(async: false);
-            }));
-        }
-        
-        public void Accel_FocusToggle()
-        {
-            _itemViewer.Invoke(new System.Action(() => 
-            { 
-                if (_activeUI) 
-                {
-                    // If active, then we are turning off
-                    _activeUI = false;
-                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkNormal"; }
-                    else { _activeTheme = "LightNormal";}
-                    ToggleTips(async: false, desiredState: Enums.ToggleState.Off);
-                    UnregisterFocusActions();
-                }
-                else 
-                { 
-                    // If not active, then we are turning on
-                    _activeUI = true;
-                    if (_activeTheme.Contains("Dark")) { _activeTheme = "DarkActive"; }
-                    else { _activeTheme = "LightActive"; }
-                    ToggleTips(async: false, desiredState: Enums.ToggleState.On);
-                    RegisterFocusActions();
-                }
-                _themes[_activeTheme].SetTheme(async: false);
-            }));
-        }
-
-        public void Accel_Toggle(bool async)
-        {
-            if (_activeUI) { Accel_FocusToggle(); }
-            ToggleNavigation(async);
-        }
-
-        public void ToggleExpansion()
-        {
-            if (_expanded) { ToggleExpansion(Enums.ToggleState.Off); }
-            else { ToggleExpansion(Enums.ToggleState.On); }
-        }
-
-        public void ToggleExpansion(Enums.ToggleState desiredState)
-        {
-            _parent.ToggleExpansionStyle(desiredState);
-            if (desiredState == Enums.ToggleState.On) 
-            {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
-                _itemViewer.TopicThread.Visible = true;
-                _itemViewer.L0v2h2_Panel.Visible = true;
-                _itemViewer.L0v2h2_Web.Visible = true;
-                _expanded = true; 
-            }
-            else 
-            {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
-                _itemViewer.TopicThread.Visible = false;
-                _itemViewer.L0v2h2_Panel.Visible = false;
-                _itemViewer.L0v2h2_Web.Visible = false;
-                _expanded = false; 
-            }
-        }
-
-        public void JumpToFolderDropDown()
-        {
-            _keyboardHandler.ToggleKeyboardDialog();
-            _itemViewer.Invoke(new System.Action(() => 
-            { 
-                _itemViewer.CboFolders.Focus();
-                _itemViewer.CboFolders.DroppedDown = true;
-                _intEnterCounter = 0;
-            }));
-        }
-
-        public void JumpToSearchTextbox()
-        {
-            _keyboardHandler.ToggleKeyboardDialog();
-            _itemViewer.TxtboxSearch.Invoke(new System.Action(() => _itemViewer.TxtboxSearch.Focus()));
-        }
-
-        /// <summary>
-        /// Function programatically clicks the "Conversation" checkbox
-        /// </summary>
-        public void ToggleConversationCheckbox()
-        {
-            _itemViewer.CbxConversation.Invoke(new System.Action(() => 
-                _itemViewer.CbxConversation.Checked = 
-                !_itemViewer.CbxConversation.Checked));
-        }
-
-        /// <summary>
-        /// Function programatically sets the "Conversation" checkbox to the desired state 
-        /// if it is not already in that state
-        /// </summary>
-        /// <param name="desiredState">State of checkbox desired</param>
-        public void ToggleConversationCheckbox(Enums.ToggleState desiredState)
-        {
-            _itemViewer.CbxConversation.Invoke(new System.Action(() =>
-            {
-                switch (desiredState)
-                {
-                    case Enums.ToggleState.On:
-                        if (_itemViewer.CbxConversation.Checked == false)
-                            _itemViewer.CbxConversation.Checked = true;
-                        break;
-                    case Enums.ToggleState.Off:
-                        if (_itemViewer.CbxConversation.Checked == true)
-                            _itemViewer.CbxConversation.Checked = false;
-                        break;
-                    default:
-                        _itemViewer.CbxConversation.Checked = !_itemViewer.CbxConversation.Checked;
-                        break;
-                }
-            }));
         }
 
         public void ToggleSaveAttachments()
@@ -791,6 +794,7 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
+
         #endregion
 
         #region Major Action Methods
@@ -799,21 +803,21 @@ namespace QuickFiler.Controllers
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             var entryID = _convOriginID != "" ? _convOriginID :  Mail.EntryID;
-            _parent.ConvToggle_Group(entryID);
+            _parent.ToggleGroupConv(entryID);
         }
 
         internal void EnumerateConversation() 
         {
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
-            _parent.ConvToggle_UnGroup(ConversationItems,
-                                       Mail.EntryID,
-                                       ConversationItems.Count,
-                                       folderList);
+            _parent.ToggleUnGroupConv(ConversationItems,
+                                      Mail.EntryID,
+                                      ConversationItems.Count,
+                                      folderList);
         }
 
         public Dictionary<string, System.Action> RightKeyActions { get => new() 
         {
-            { "&Pop Out", ()=>this._parent.PopOutControlGroup(Position)},
+            { "&Pop Out", ()=>this._parent.PopOutControlGroup(ItemNumber)},
             { "&Expand", ()=>{_itemViewer.lblSubject.Focus(); this.EnumerateConversation(); } },
             { "&Cancel", ()=>{ } }
         }; }

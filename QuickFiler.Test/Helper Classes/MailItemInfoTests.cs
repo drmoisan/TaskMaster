@@ -95,7 +95,7 @@ namespace QuickFiler.Test
             };
 
             // Act
-            var result = mailItemInfo.ExtractBasics();
+            var result = mailItemInfo.LoadPriority();
             var actual = mailItemInfo;
 
             // Assert

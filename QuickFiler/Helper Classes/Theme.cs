@@ -156,7 +156,7 @@ namespace QuickFiler.Helper_Classes
         private void SetTheme()
         {
             // Active item navigation colors
-            _itemViewer.LblPos.SetTheme(backColor: _navBackColor,
+            _itemViewer.LblItemNumber.SetTheme(backColor: _navBackColor,
                                         forecolor: _navForeColor);
 
             // General thematic colors
