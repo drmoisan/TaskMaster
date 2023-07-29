@@ -174,7 +174,7 @@ namespace QuickFiler.Controllers
 
             // Filter out non-email items
             df = df.FilterRowsBy("MessageClass", "IPM.Note");
-
+            //df.Display(new List<string> { "RowKey" });
             // Filter to the latest email in each conversation
             var dfFiltered = MostRecentByConversation(df);
             
@@ -208,11 +208,11 @@ namespace QuickFiler.Controllers
 
         public Frame<int, string> MostRecentByConversation(Frame<int, string> df)
         {
-            var topics = df.GetColumn<string>("Conversation").Values.Distinct().ToArray();
+            var topics = df.GetColumn<string>("ConversationId").Values.Distinct().ToArray();
 
             var rows = topics.Select(topic =>
             {
-                var dfConversation = df.FilterRowsBy("Conversation", topic);
+                var dfConversation = df.FilterRowsBy("ConversationId", topic);
                 var maxSentOn = dfConversation.GetColumn<DateTime>("SentOn").Values.Max();
                 var row = dfConversation.FilterRowsBy("SentOn", maxSentOn).Rows.FirstValue();
                 //var dfDateIdx = dfConversation.IndexRows<DateTime>("SentOn", keepColumn: true);
@@ -512,7 +512,7 @@ namespace QuickFiler.Controllers
         string EntryId { get; }
         string MessageClass { get; }
         DateTime SentOn { get; }
-        string Conversation { get; }
+        string ConversationId { get; }
         string Triage { get; }
         string StoreId { get; }
     }

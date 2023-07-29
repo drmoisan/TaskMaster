@@ -33,6 +33,7 @@ namespace UtilitiesCS
         const string PR_STORE_ENTRYID = "0x0FFB"; //Message store PID + PT_BINARY
         const string PR_STORE_RECORD_KEY = "0x0FFA"; //
         const string PR_CONVERSATION_TOPIC = "0x0070"; // Normalized Conversation Subject for message group
+        
         const string PR_PARENT_DISPLAY = "0x0e05"; //Message parent folder
         const string PR_DEPTH = "0x3005"; /* Represents the relative level of indentation, 
                                            * or depth, of an object in a hierarchical table
@@ -42,6 +43,10 @@ namespace UtilitiesCS
                                                         * that is 22 bytes in length, followed 
                                                         * by zero or more child blocks each 
                                                         * 5 bytes in length */
+
+        const string PR_CONVERSATION_KEY = "0x000B"; // PT_BINARY
+        const string PR_CONVERSATION_ID = "0x3013"; // PT_BINARY
+
         const string PR_MESSAGE_RECIPIENTS = "0x0e12"; 
 
         public static string SchemaConversationTopic = PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
@@ -52,9 +57,12 @@ namespace UtilitiesCS
         public static string SchemaTriage = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
         public static string SchemaToDoID = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
         //public static string SchemaReceivedByName = PROPTAG_SPECIFIER + PR_RECEIVED_BY_NAME + PT_TSTRING;
+        //public static string SchemaConversationId = "http://schemas.microsoft.com/mapi/proptag/0x30130102";
+        public static string SchemaConversationId = PROPTAG_SPECIFIER + PR_CONVERSATION_ID + PT_BINARY;
 
         public static string SchemaReceivedByName = "http://schemas.microsoft.com/mapi/proptag/0x0040001E";
         public static string SchemaMessageRecipients = "http://schemas.microsoft.com/mapi/proptag/0x0E12000D";
+        //public static string SchemaConversationKey = PROPTAG_SPECIFIER + PR_CONVERSATION_KEY + PT_BINARY; does not work
 
         public static Dictionary<string, string> SchemaToField = new()
         {
@@ -63,6 +71,7 @@ namespace UtilitiesCS
             {SchemaConversationDepth, "ConvDepth" },
             {SchemaConversationIndex, "ConversationIndex" },
             {SchemaConversationTopic, "ConversationTopic" },
+            {SchemaConversationId, "ConversationId" },
             {SchemaToDoID, "ToDoID" },
             {SchemaTriage, "Triage" },
             {SchemaReceivedByName, "ReceivedByName" },
@@ -75,6 +84,7 @@ namespace UtilitiesCS
             {"ConvDepth", SchemaConversationDepth },
             {"ConversationIndex", SchemaConversationIndex },
             {"ConversationTopic", SchemaConversationTopic },
+            {"ConversationId", SchemaConversationId },
             {"ToDoID", SchemaToDoID },
             {"Triage", SchemaTriage },
             {"ReceivedByName", SchemaReceivedByName },
@@ -84,6 +94,7 @@ namespace UtilitiesCS
         public static List<string> BinaryToStringFields = new()
         {
             "ConversationIndex",
+            "ConversationId",
             "Store"//,
             //"ReceivedByName"
         };
@@ -339,8 +350,8 @@ namespace UtilitiesCS
         {
             for (int j = 0; j < columnDictionary.Count; j++)
             {
-                if (binIndices.Contains(j)) { data[rowNumber, j] = binStrings[j]; }
-                else if (objIndices.Contains(j)) { data[rowNumber, j] = objStrings[j]; }
+                if ((binIndices is not null) && binIndices.Contains(j)) { data[rowNumber, j] = binStrings[j]; }
+                else if (objIndices is not null && objIndices.Contains(j)) { data[rowNumber, j] = objStrings[j]; }
                 else { data[rowNumber, j] = rawValues[j]; }
             }
         }

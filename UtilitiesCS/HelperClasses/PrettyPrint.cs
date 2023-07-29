@@ -8,7 +8,10 @@ namespace UtilitiesCS
 {
     using Microsoft.Data.Analysis;
     using Microsoft.Office.Interop.Outlook;
+    using System.Data;
+    using System.Diagnostics;
     using System.Text;
+    using System.Windows.Forms;
 
     /// <summary>
     /// Class written to transform Dataframe objects for printing
@@ -39,8 +42,6 @@ namespace UtilitiesCS
 
             return strings;
         }
-
-        
 
         private static int[] GetMaxLengthsByColumn(this string[,] strings)
         {
@@ -102,6 +103,48 @@ namespace UtilitiesCS
             }
 
             return sb.ToString();
+        }
+
+        public static void Display(this DataTable table)
+        {
+            DgvForm dfViewer = new DgvForm();
+
+            int diffHeight = dfViewer.Height - dfViewer.Dgv.Height;
+            int diffWidth = dfViewer.Width - dfViewer.Dgv.Width;
+            dfViewer.Dgv.Dock = DockStyle.None;
+
+            dfViewer.Dgv.DataSource = table;
+
+            foreach (DataGridViewColumn dgvColumn in dfViewer.Dgv.Columns)
+            {
+                dgvColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            }
+            dfViewer.Show();
+            int dgvWidth = 0;
+            for (int i = 0; i <= dfViewer.Dgv.Columns.Count - 1; i++)
+            {
+                // Store Auto Sized Widths:
+                int colw = dfViewer.Dgv.Columns[i].Width;
+
+                // Remove AutoSizing:
+                dfViewer.Dgv.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+
+                // Set Width to calculated AutoSize value:
+                dfViewer.Dgv.Columns[i].Width = colw;
+                dgvWidth += colw;
+            }
+            dfViewer.Dgv.Width = dgvWidth + dfViewer.Dgv.RowHeadersWidth;
+            int lastRowHeight = dfViewer.Dgv.Rows[dfViewer.Dgv.Rows.Count - 1].Height;
+            dfViewer.Dgv.Height = dfViewer.Dgv.Rows
+                                  .Cast<DataGridViewRow>()
+                                  .Select(row => row.Height)
+                                  .Sum() + dfViewer.Dgv.ColumnHeadersHeight;
+            //dfViewer.Width = dgvWidth + diffWidth + dfViewer.Dgv.RowHeadersWidth;
+            dfViewer.Width = dfViewer.Dgv.Width + diffWidth + 6;
+            dfViewer.Height = dfViewer.Dgv.Height + diffHeight + 6;
+            dfViewer.Refresh();
+            Debug.WriteLine($"Size is {dfViewer.Size.ToString()}");
+            dfViewer.Dgv.Dock = DockStyle.Fill;
         }
     }
 }

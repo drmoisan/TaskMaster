@@ -190,11 +190,13 @@ namespace UtilitiesCS
                 {
                     "SentOn",
                     OlTableExtensions.SchemaFolderName,
-                    OlTableExtensions.SchemaMessageStore,
+                    //OlTableExtensions.SchemaMessageStore,
                     OlTableExtensions.SchemaConversationDepth,
                     OlTableExtensions.SchemaConversationIndex,
-                    OlTableExtensions.SchemaReceivedByName,
-                    OlTableExtensions.SchemaMessageRecipients
+                    OlTableExtensions.SchemaConversationTopic,
+                    OlTableExtensions.SchemaConversationId,
+                    OlTableExtensions.SchemaReceivedByName
+                    
                 };
                 foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
             }
