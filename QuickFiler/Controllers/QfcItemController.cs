@@ -59,16 +59,25 @@ namespace QuickFiler.Controllers
         private IQfcCollectionController _parent;
         private IList<IQfcTipsDetails> _listTipsDetails;
         private IQfcTipsDetails _itemPositionTips;
+        
+        
+        
+        
         private FolderHandler _fldrHandler;
         private IList<Control> _controls;
         private IList<TableLayoutPanel> _tableLayoutPanels;
+        
         private IList<CheckBox> _checkBoxes;
         private IList<Label> _labels;
+        
         private Dictionary<string,Theme> _themes;
         private string _activeTheme;
         private IQfcKeyboardHandler _keyboardHandler;
+        
         private bool _suppressEvents = false;
+        
         private CoreWebView2Environment _webViewEnvironment;
+        
         private MailItemInfo _itemInfo;
         private bool _isWebViewerInitialized = false;
         private bool _isDarkMode = false;
