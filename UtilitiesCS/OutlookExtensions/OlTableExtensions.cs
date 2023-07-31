@@ -26,10 +26,14 @@ namespace UtilitiesCS
                                            * UNICODE symbol. This property type is the same as the 
                                            * OLE type VT_LPSTR for resulting PT_STRING8 properties 
                                            * and VT_LPWSTR for PT_UNICODE properties */
+        const string PT_STRING8 = "001e"; /* Null-terminated 8-bit (1-byte) character string. 
+                                           * This property type is the same as the OLE type VT_LPSTR */
 
+        const string PR_RECEIVED_BY_NAME = "0x0040"; //PidTagReceivedByName
         const string PR_STORE_ENTRYID = "0x0FFB"; //Message store PID + PT_BINARY
         const string PR_STORE_RECORD_KEY = "0x0FFA"; //
         const string PR_CONVERSATION_TOPIC = "0x0070"; // Normalized Conversation Subject for message group
+        
         const string PR_PARENT_DISPLAY = "0x0e05"; //Message parent folder
         const string PR_DEPTH = "0x3005"; /* Represents the relative level of indentation, 
                                            * or depth, of an object in a hierarchical table
@@ -40,6 +44,11 @@ namespace UtilitiesCS
                                                         * by zero or more child blocks each 
                                                         * 5 bytes in length */
 
+        const string PR_CONVERSATION_KEY = "0x000B"; // PT_BINARY
+        const string PR_CONVERSATION_ID = "0x3013"; // PT_BINARY
+
+        const string PR_MESSAGE_RECIPIENTS = "0x0e12"; 
+
         public static string SchemaConversationTopic = PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
         public static string SchemaFolderName = PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
         public static string SchemaMessageStore = PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
@@ -47,6 +56,13 @@ namespace UtilitiesCS
         public static string SchemaConversationIndex = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
         public static string SchemaTriage = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
         public static string SchemaToDoID = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
+        //public static string SchemaReceivedByName = PROPTAG_SPECIFIER + PR_RECEIVED_BY_NAME + PT_TSTRING;
+        //public static string SchemaConversationId = "http://schemas.microsoft.com/mapi/proptag/0x30130102";
+        public static string SchemaConversationId = PROPTAG_SPECIFIER + PR_CONVERSATION_ID + PT_BINARY;
+
+        public static string SchemaReceivedByName = "http://schemas.microsoft.com/mapi/proptag/0x0040001E";
+        public static string SchemaMessageRecipients = "http://schemas.microsoft.com/mapi/proptag/0x0E12000D";
+        //public static string SchemaConversationKey = PROPTAG_SPECIFIER + PR_CONVERSATION_KEY + PT_BINARY; does not work
 
         public static Dictionary<string, string> SchemaToField = new()
         {
@@ -55,8 +71,11 @@ namespace UtilitiesCS
             {SchemaConversationDepth, "ConvDepth" },
             {SchemaConversationIndex, "ConversationIndex" },
             {SchemaConversationTopic, "ConversationTopic" },
+            {SchemaConversationId, "ConversationId" },
             {SchemaToDoID, "ToDoID" },
-            {SchemaTriage, "Triage" }
+            {SchemaTriage, "Triage" },
+            {SchemaReceivedByName, "ReceivedByName" },
+            {SchemaMessageRecipients, "MessageRecipients" }
         };
         public static Dictionary<string, string> FieldToSchema = new()
         {
@@ -65,8 +84,24 @@ namespace UtilitiesCS
             {"ConvDepth", SchemaConversationDepth },
             {"ConversationIndex", SchemaConversationIndex },
             {"ConversationTopic", SchemaConversationTopic },
+            {"ConversationId", SchemaConversationId },
             {"ToDoID", SchemaToDoID },
-            {"Triage", SchemaTriage }
+            {"Triage", SchemaTriage },
+            {"ReceivedByName", SchemaReceivedByName },
+            {"MessageRecipients", SchemaMessageRecipients }
+        };
+
+        public static List<string> BinaryToStringFields = new()
+        {
+            "ConversationIndex",
+            "ConversationId",
+            "Store"//,
+            //"ReceivedByName"
+        };
+
+        public static List<string> ObjectFields = new()
+        {
+            "MessageRecipients"
         };
 
         #endregion
@@ -143,7 +178,7 @@ namespace UtilitiesCS
         /// </summary>
         /// <param name="table"></param>
         /// <returns>ValueTuple of a 2D object array and a column dictionary</returns>
-        public static (object[,] data, Dictionary<string, int> columnInfo) ExtractData(this Outlook.Table table)
+        public static (object[,] data, Dictionary<string, int> columnInfo) ExtractData2(this Outlook.Table table)
         {
             var columnDictionary = table.GetColumnDictionary();
             var rowCount = table.GetRowCount();
@@ -173,6 +208,197 @@ namespace UtilitiesCS
             }
             else { data = (object[,])table.GetArray(rowCount); }
             return (data, columnDictionary);
+        }
+
+        /// <summary>
+        /// Extract, transform, and load data from an Outlook Table object into a 2D object array
+        /// </summary>
+        /// <param name="table">Outlook.Table</param>
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// object in the column into string representation</param>
+        /// <returns>2D object array with string data</returns>
+        public static (object[,] data, Dictionary<string, int> columnInfo) ETL(
+            this Outlook.Table table, Dictionary<string, Func<object, string>> objectConverters = null)
+        {
+            var columnDictionary = table.GetColumnDictionary();
+            object[,] data = null;
+            
+            table.MoveToStart();
+
+            if (BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x))||
+               (objectConverters is not null && 
+               objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
+            {
+                data = EtlByRow(table, objectConverters, columnDictionary);
+            }
+            else { data = (object[,])table.GetArray(table.GetRowCount()); }
+            return (data, columnDictionary);
+        }
+
+        /// <summary>
+        /// Extract, transform, and load data from an Outlook Table object into a 2D object 
+        /// array by row to convert non-string data to string equivalents
+        /// </summary>
+        /// <param name="table">Outlook.Table</param>
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// object in the column into string representation</param>
+        /// <param name="columnDictionary">Dictionary with column indices and column names</param>
+        /// <returns>2D object array with string data</returns>
+        private static object[,] EtlByRow(Table table, Dictionary<string, Func<object, string>> objectConverters, Dictionary<string, int> columnDictionary)
+        {
+            // Get the column headers of the binary fields
+            var binFields = BinaryToStringFields.Where(x => columnDictionary.ContainsKey(x));
+            
+            // Get the indices of the binary fields
+            var binIndices = binFields.Select(x => columnDictionary[x]).OrderBy(x => x);
+
+            (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
+            
+            // Create the data array to hold the extracted data
+            var data = new object[table.GetRowCount(), columnDictionary.Count];
+            
+            // Iterate over each row in the Outlook.Table
+            int rowNumber = -1;
+            while (!table.EndOfTable)
+            {
+                Outlook.Row row = table.GetNextRow();
+                EtlRow(ref data,
+                                  row,
+                                  objectConverters,
+                                  columnDictionary,
+                                  binIndices,
+                                  objFields,
+                                  objIndices,
+                                  ++rowNumber);
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// Check if objectConverters is null and if not, get the object fields and indices
+        /// </summary>
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// object in the column into string representation</param>
+        /// <param name="columnDictionary">Dictionary with column indices and column names</param>
+        /// <returns>Tuple with IEnumerable of Field names with object data and 
+        /// IEnumerable of indices of columns with object data</returns>
+        private static (IEnumerable<string>, IEnumerable<int>) GetObjectFields(
+            Dictionary<string, Func<object, string>> objectConverters, 
+            Dictionary<string, int> columnDictionary)
+        {
+            if (objectConverters is null) { return (null, null); }
+            else
+            {
+                // Get the column headers of the object fields
+                var objFields = objectConverters.Keys.Where(x => columnDictionary.ContainsKey(x));
+
+                // Get the indices of the object fields
+                var objIndices = objFields.Select(x => columnDictionary[x]);
+                
+                return (objFields, objIndices);
+            }
+        }
+
+        /// <summary>
+        /// Extract, Transform, and Load a row of data from an Outlook.Table into a 
+        /// 2D object array containing the data from all rows
+        /// </summary>
+        /// <param name="data">Reference to 2D object array</param>
+        /// <param name="row">Outlook.Row</param>
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// object in the column into string representation</param>
+        /// <param name="columnDictionary">Dictionary with column indices and column names</param>
+        /// <param name="binIndices">Indices of columns with binary information</param>
+        /// <param name="objFields">Field names with object data</param>
+        /// <param name="objIndices">Indices of columns with object data</param>
+        /// <param name="rowNumber">Zero based counter to map row to </param>
+        private static void EtlRow(ref object[,] data, 
+                                   Outlook.Row row, 
+                                   Dictionary<string, Func<object, string>> objectConverters, 
+                                   Dictionary<string, int> columnDictionary, 
+                                   IOrderedEnumerable<int> binIndices, 
+                                   IEnumerable<string> objFields,
+                                   IEnumerable<int> objIndices, 
+                                   int rowNumber)
+        {
+            object[] rawValues = (object[])row.GetValues();
+            var binStrings = ConvertBinColumnsToString(row, binIndices);
+            var objStrings = ConvertObjectColumnsToString(row, objIndices, objFields, objectConverters);
+            WriteValuesToData(ref data, columnDictionary, binIndices, rowNumber, binStrings, objIndices, objStrings, rawValues);
+        }
+
+        /// <summary>
+        /// Load transformed values into the data array
+        /// </summary>
+        /// <param name="data">Reference to 2D object array</param>
+        /// <param name="columnDictionary">Dictionary with column indices and column names</param>
+        /// <param name="binIndices">Indices of columns with binary information</param>
+        /// <param name="rowNumber">Zero based counter to map row to </param>
+        /// <param name="binStrings">Dictionary of column indices and string representation of binary data</param>
+        /// <param name="objIndices">Indices of columns with object data</param>
+        /// <param name="objStrings">Dictionary of column indices and string representation of object data</param>
+        /// <param name="rawValues">Raw values obtained from table</param>
+        internal static void WriteValuesToData(ref object[,] data, 
+                                               Dictionary<string, int> columnDictionary, 
+                                               IOrderedEnumerable<int> binIndices, 
+                                               int rowNumber, 
+                                               Dictionary<int, string> binStrings,
+                                               IEnumerable<int> objIndices,
+                                               Dictionary<int, string> objStrings,
+                                               object[] rawValues)
+        {
+            for (int j = 0; j < columnDictionary.Count; j++)
+            {
+                if ((binIndices is not null) && binIndices.Contains(j)) { data[rowNumber, j] = binStrings[j]; }
+                else if (objIndices is not null && objIndices.Contains(j)) { data[rowNumber, j] = objStrings[j]; }
+                else { data[rowNumber, j] = rawValues[j]; }
+            }
+        }
+
+        /// <summary>
+        /// Transform binary columns into string representations
+        /// </summary>
+        /// <param name="row">Outlook.Row</param>
+        /// <param name="binIndices">Indices of columns with binary information</param>
+        /// <returns>Dictionary of column indices and string representation of binary data</returns>
+        internal static Dictionary<int,string> ConvertBinColumnsToString(
+            Outlook.Row row, 
+            IOrderedEnumerable<int> binIndices)
+        {
+            return binIndices.Select(binIndex =>
+                        new KeyValuePair<int, string>(
+                            binIndex,
+                            row.BinaryToString(binIndex + 1)))
+                        .ToDictionary();
+        }
+
+        /// <summary>
+        /// Transform object columns into string representations
+        /// </summary>
+        /// <param name="row">Outlook.Row</param>
+        /// <param name="objIndices">Indices of columns with object data</param>
+        /// <param name="objFields">Field names with object data</param>
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// object in the column into string representation</param>
+        /// <returns>Dictionary of column indices and string representation of object data</returns>
+        internal static Dictionary<int, string> ConvertObjectColumnsToString(
+            Outlook.Row row,
+            IEnumerable<int> objIndices,
+            IEnumerable<string> objFields,
+            Dictionary<string, Func<object, string>> objectConverters)
+        {
+            var objStrings = new Dictionary<int, string>();
+            if(objectConverters is not null && objIndices is not null && objFields is not null)
+            {
+                foreach (var objIndex in objIndices)
+                {
+                    var element = row[objIndex + 1];
+                    var objString = objectConverters[objFields.ElementAt(objIndex)](element);
+                    objStrings[objIndex] = objString;
+                }
+            }
+            return objStrings;
         }
 
         /// <summary>
@@ -206,6 +432,14 @@ namespace UtilitiesCS
         public static Outlook.Table GetTable(this MAPIFolder folder, string[] removeColumns, string[] addColumns)
         {
             var table = folder.GetTable();
+            table.RemoveColumns(removeColumns);
+            table.AddColumns(addColumns);
+            return table;
+        }
+
+        public static Outlook.Table GetTable(this Conversation conversation, string[] removeColumns, string[] addColumns)
+        {
+            var table = conversation.GetTable();
             table.RemoveColumns(removeColumns);
             table.AddColumns(addColumns);
             return table;

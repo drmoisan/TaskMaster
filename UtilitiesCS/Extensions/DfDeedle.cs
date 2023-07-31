@@ -1,5 +1,4 @@
 ﻿using Deedle;
-using Microsoft.Data.Analysis;
 using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using System;
@@ -9,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.OutlookExtensions;
+using System.Data;
 
 namespace UtilitiesCS
 {
@@ -19,13 +19,13 @@ namespace UtilitiesCS
             Outlook.Table table = activeExplorer.GetTableInView();
             var storeID = activeExplorer.CurrentFolder.StoreID;
             table.Columns.Add("SentOn");
-            table.Columns.Add(OlTableExtensions.SchemaConversationTopic);
-            table.Columns.Add(OlTableExtensions .SchemaTriage);
+            table.Columns.Add(OlTableExtensions.SchemaConversationId);
+            table.Columns.Add(OlTableExtensions.SchemaTriage);
             table.Columns.Remove("Subject");
             table.Columns.Remove("CreationTime");
             table.Columns.Remove("LastModificationTime");
 
-            (object[,] data, Dictionary<string, int> columnInfo) = table.ExtractData();
+            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
             
             var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
             {
@@ -33,16 +33,17 @@ namespace UtilitiesCS
                 DateTime.TryParse(data[i, columnInfo["SentOn"]].ToString(), out sentOn);
                 return new
                 {
-                    EntryId = data[i, columnInfo["EntryID"]].ToString(),
+                    EntryId = data[i, columnInfo["EntryID"]],
                     MessageClass = data[i, columnInfo["MessageClass"]].ToString(),
                     SentOn = sentOn,
-                    Conversation = data[i, columnInfo["ConversationTopic"]].ToString(),
+                    ConversationId = data[i, columnInfo["ConversationId"]],
                     Triage = (string)data[i, columnInfo["Triage"]] ?? "Z",
                     StoreId = storeID
                 };
             });
 
             var df = Frame.FromRecords(records);
+            
             return df;
         }
 
@@ -86,7 +87,7 @@ namespace UtilitiesCS
                                        removeColumns: removeColumns,
                                        addColumns: addColumns);
 
-            (var data, var columnInfo) = table.ExtractData();
+            (var data, var columnInfo) = table.ETL();
 
             Frame<int, string> df = FromArray2D(data: data, columnInfo);
 
@@ -109,6 +110,12 @@ namespace UtilitiesCS
                 else if (dfTemp is not null) { df.Merge(dfTemp); }
             }
             return df;
+        }
+
+        public static void Display(this Frame<int, string> df, IEnumerable<string> rowKeyNames)
+        {
+            DataTable table = df.ToDataTable(rowKeyNames);
+            table.Display();
         }
 
         //public static  GetDfColumn(string columnName, object[] columnData)

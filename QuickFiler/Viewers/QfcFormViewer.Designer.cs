@@ -39,9 +39,9 @@
             this.DarkMode = new SVGControl.ToggleSwitch(this.components);
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
             this.qfcItemViewerExpandedLight1 = new QuickFiler.QfcItemViewerExpandedLight();
-            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();

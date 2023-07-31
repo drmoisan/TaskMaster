@@ -162,7 +162,7 @@ namespace TaskMaster
 
             //_globals.TD.ProjInfo.Rebuild(_globals.Ol.App);
 
-            _globals.TD.IDList.SubstituteIdRoot("9710", "2501");
+            //_globals.TD.IDList.SubstituteIdRoot("9710", "2501");
 
             //var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
             //Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
@@ -172,6 +172,10 @@ namespace TaskMaster
 
             // Dim table As Outlook.Table = conv.GetTable(WithFolder:=True, WithStore:=True)
             // table.EnumerateTable()
+
+            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            var conv = (Outlook.Conversation)Mail.GetConversation();
+            var df = conv.GetInfoDf();
         }
 
     }
