@@ -1,4 +1,6 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Data.Analysis;
+using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,44 +25,91 @@ namespace QuickFiler
             _item = item;
         }        
 
-        private MailItem _item;
+        public MailItemInfo(DataFrame df, long indexRow)
+        {
+            _entryId = (string)df["EntryID"][indexRow];
+            _storeId = (string)df["Store"][indexRow];
+            _senderName = (string)df["SenderName"][indexRow];
+            _sender = new RecipientInfo() { Name = _senderName, Address = (string)df["SenderSmtpAddress"][indexRow] }; 
+            _folder = (string)df["Folder Name"][indexRow];
+            _sentDate = DateTime.Parse((string)df["SentOn"][indexRow]);
+            _conversationIndex = (string)df["ConversationIndex"][indexRow];
+        }
+
+        private string _entryId;
+        private string _storeId;
         private RecipientInfo _sender;
-        private string _senderName; 
-        private string _senderHtml;
         private RecipientInfo _toRecipients;
-        private string _toRecipientsName;
-        private string _toRecipientsHtml;
         private RecipientInfo _ccRecipients;
-        private string _ccRecipientsName;
-        private string _ccRecipientsHtml;
-        private string _subject;
-        private string _body;
-        private string _triage;
-        private string _actionable;
-        private string _sentOn;
-        private string _folder;
-        private string _html;
-        private bool _unread;
         private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
+
+        #region Public Properties
+
+        private string _actionable;
+        public string Actionable { get => Initialized(ref _actionable); set => _actionable = value; }        
         
-        public MailItem Item { get => _item; set => _item = value; }
-        public string SenderName { get => Initialized(ref _senderName); set => _senderName = value; }
-        public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
-        public string ToRecipientsName { get => Initialized(ref _toRecipientsName); set => _toRecipientsName = value; }
-        public string ToRecipientsHtml { get => Initialized(ref _toRecipientsHtml); set => _toRecipientsHtml = value; }
-        public string CcRecipientsName { get => Initialized(ref _ccRecipientsName); set => _ccRecipientsName = value;  }
-        public string CcRecipientsHtml { get => Initialized(ref _ccRecipientsHtml); set => _ccRecipientsHtml = value; }
-        public string Subject { get => Initialized(ref _subject); set => _subject = value; }
+        private string _body;
         public string Body { get => Initialized(ref _body); set => _body = value; }
-        public string Triage { get => Initialized(ref _triage); set => _triage = value; }
-        public string Actionable { get => Initialized(ref _actionable); set => _actionable = value; }
-        public string SentOn { get => Initialized(ref _sentOn); set => _sentOn = value; }
+        
+        private string _ccRecipientsHtml;
+        public string CcRecipientsHtml { get => Initialized(ref _ccRecipientsHtml); set => _ccRecipientsHtml = value; }
+        
+        private string _ccRecipientsName;
+        public string CcRecipientsName { get => Initialized(ref _ccRecipientsName); set => _ccRecipientsName = value;  }
+        
+        private string _conversationIndex;
+        public string ConversationIndex { get => Initialized(ref _conversationIndex); set => _conversationIndex = value; }
+        
+        private string _folder;
         public string Folder { get => Initialized(ref _folder); set => _folder = value; }
+        
+        private MailItem _item;
+        public MailItem Item { get => _item; set => _item = value; }
+        
+        private string _senderHtml;
+        public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
+        
+        private string _senderName; 
+        public string SenderName { get => Initialized(ref _senderName); set => _senderName = value; }
+        
+        private string _sentOn;
+        public string SentOn { get => Initialized(ref _sentOn); set => _sentOn = value; }
+        
+        private string _subject;
+        public string Subject { get => Initialized(ref _subject); set => _subject = value; }
+        
+        private string _toRecipientsHtml;
+        public string ToRecipientsHtml { get => Initialized(ref _toRecipientsHtml); set => _toRecipientsHtml = value; }
+        
+        private string _toRecipientsName;
+        public string ToRecipientsName { get => Initialized(ref _toRecipientsName); set => _toRecipientsName = value; }
+        
+        private string _triage;
+        public string Triage { get => Initialized(ref _triage); set => _triage = value; }
+        
+        private bool _unread;
         public bool UnRead { get => Initialized(ref _unread); set => _unread = value; }
-                
+
+        private string _html;
         public string Html { get => _html ?? GetHTML(); private set => _html = value; }
 
-        public DateTime SentDate { get => _item.SentOn; }
+        private DateTime _sentDate;
+        public DateTime SentDate 
+        { 
+            get
+            {
+                if (_sentDate == default) 
+                { 
+                    if (_item is not null) { _sentDate = _item.SentOn; } 
+                }
+                return _sentDate;
+            }
+            set => _sentDate = value;
+        }
+
+        #endregion
+
+        #region Initialization Methods
 
         internal string Initialized(ref string variable)
         {
@@ -88,6 +137,7 @@ namespace QuickFiler
             _sentOn = _item.SentOn.ToString("g");
             _actionable = _item.GetActionTaken();
             _folder = ((Folder)_item.Parent).Name;
+            _conversationIndex = _item.ConversationIndex;
             _ = Task.Factory.StartNew(() => LoadRecipients(), 
                                       default, 
                                       TaskCreationOptions.None, 
@@ -95,6 +145,21 @@ namespace QuickFiler
             return true;            
         }
 
+        async public Task<bool> LoadAsync(Outlook.NameSpace olNs, bool darkMode=false)
+        {
+            _item = await Task.FromResult((MailItem)olNs.GetItemFromID(_entryId, _storeId));
+            _sender.Html = CaptureEmailDetailsModule.ConvertRecipientToHtml(_sender.Address, _sender.Name);
+            _senderHtml = _sender.Html;
+            LoadRecipients();
+            _html = GetHTML();
+            if (darkMode) { _html = ToggleDark(Enums.ToggleState.On); }
+            _triage = _item.GetTriage();
+            _sentOn = _sentDate.ToString("g");
+            _actionable = _item.GetActionTaken();
+            
+            return true;
+        }
+        
         public void LoadRecipients()
         {
             _toRecipients = _item.GetToRecipients().GetInfo();
@@ -104,6 +169,10 @@ namespace QuickFiler
             _ccRecipientsName = _ccRecipients.Name;
             _ccRecipientsHtml = _ccRecipients.Html;
         }
+
+        #endregion
+
+        #region HTML and Plain Text Methods
 
         internal string CompressPlainText(string text)
         {
@@ -144,7 +213,7 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>";
         }
 
-#nullable enable
+        #nullable enable
         private string? _emailHeader = null;
         internal string EmailHeader
         {
@@ -218,5 +287,8 @@ img {
             //string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
             return revisedBody;
         }
+
+        #endregion
+
     }
 }

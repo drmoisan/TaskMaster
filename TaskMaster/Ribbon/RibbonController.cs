@@ -8,9 +8,11 @@ using TaskTree;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
-using UtilitiesCS;
 using QuickFiler.Interfaces;
 using System.Windows.Forms;
+using QuickFiler;
+using Microsoft.Office.Interop.Outlook;
+using System.Linq;
 
 namespace TaskMaster
 {
@@ -173,9 +175,15 @@ namespace TaskMaster
             // Dim table As Outlook.Table = conv.GetTable(WithFolder:=True, WithStore:=True)
             // table.EnumerateTable()
 
-            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
-            var conv = (Outlook.Conversation)Mail.GetConversation();
-            var df = conv.GetInfoDf();
+            //var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            //var conversation = (Outlook.Conversation)Mail.GetConversation();
+            //var df = conversation.GetDataFrame();
+            //df.PrettyPrint();
+            //var mInfo = new MailItemInfo(df, 0);
+
+            var Mail = (Outlook.MailItem)_globals.Ol.App.ActiveExplorer().Selection[1];
+            var recips = Mail.Recipients.Cast<Recipient>();
+            var info = recips.GetInfo();
         }
 
     }
