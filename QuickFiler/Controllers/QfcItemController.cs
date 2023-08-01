@@ -54,33 +54,24 @@ namespace QuickFiler.Controllers
 
         #region private fields and variables
 
-        private IApplicationGlobals _globals;
-        private QfcItemViewer _itemViewer;
-        private IQfcCollectionController _parent;
-        private IList<IQfcTipsDetails> _listTipsDetails;
-        private IQfcTipsDetails _itemPositionTips;
-        
-        
-        
-        
-        private FolderHandler _fldrHandler;
-        private IList<Control> _controls;
-        private IList<TableLayoutPanel> _tableLayoutPanels;
-        
-        private IList<CheckBox> _checkBoxes;
-        private IList<Label> _labels;
-        
-        private Dictionary<string,Theme> _themes;
         private string _activeTheme;
-        private IQfcKeyboardHandler _keyboardHandler;
-        
-        private bool _suppressEvents = false;
-        
-        private CoreWebView2Environment _webViewEnvironment;
-        
-        private MailItemInfo _itemInfo;
+        private IList<Control> _controls;
+        private IList<CheckBox> _checkBoxes;
+        private FolderHandler _fldrHandler;
+        private IApplicationGlobals _globals;
         private bool _isWebViewerInitialized = false;
         private bool _isDarkMode = false;
+        private MailItemInfo _itemInfo;
+        private IQfcTipsDetails _itemPositionTips;
+        private QfcItemViewer _itemViewer;
+        private IQfcKeyboardHandler _keyboardHandler;
+        private IList<Label> _labels;
+        private IList<IQfcTipsDetails> _listTipsDetails;
+        private IQfcCollectionController _parent;
+        private bool _suppressEvents = false;
+        private IList<TableLayoutPanel> _tableLayoutPanels;
+        private Dictionary<string,Theme> _themes;
+        private CoreWebView2Environment _webViewEnvironment;
         
         #endregion
 
@@ -166,6 +157,12 @@ namespace QuickFiler.Controllers
         { 
             get
             {
+                if ((_dfConversationExpanded is null) && (_mailItem is not null))
+                {
+                    var conversation = Mail.GetConversation();
+                    DfConversationExpanded = conversation.GetConversationDf();
+                    DfConversation = DfConversationExpanded.FilterConversation(false, true);
+                }
                 return _dfConversationExpanded;
             } 
             internal set
@@ -415,30 +412,43 @@ namespace QuickFiler.Controllers
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public async Task Handler_PropertyChangedAsync(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(DfConversation))
-            {
-                ConversationItems = await Task.FromResult(ConvHelper.GetMailItemList(DfConversation,
-                                                                   ((Folder)Mail.Parent).StoreID,
-                                                                   _globals.Ol.App,
-                                                                   true)
-                                              .Cast<MailItem>()
-                                              .ToList());
-            }
-
-        }
-
         public void Handler_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(DfConversation))
+            if (e.PropertyName == nameof(DfConversationExpanded))
             {
-                _ = GetConversationInfoAsync();
+                _ = GetConversationInfoAsync().ConfigureAwait(false);
             }
-
         }
 
         internal async Task GetConversationInfoAsync()
+        {
+            var olNs = _globals.Ol.App.GetNamespace("MAPI");
+            DataFrame df = DfConversationExpanded;
+            
+            // Initialize the ConversationInfo list from the Dataframe with Synchronous code
+            ConversationInfo = Enumerable.Range(0, df.Rows.Count())
+                                         .Select(indexRow => new MailItemInfo(df, indexRow))
+                                         .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
+                                         .ToList();
+
+            // Switch to UI Thread
+            await _itemViewer.UiSyncContext;
+
+            // Set the TopicThread to the ConversationInfo list
+            _itemViewer.TopicThread.SetObjects(ConversationInfo);
+            _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
+
+            // Run the async code in parallel to resolve the mailitem and load extended properties
+            ConversationItems = Task.WhenAll(ConversationInfo.Select(async itemInfo =>
+                                            {
+                                                await itemInfo.LoadAsync(olNs, _isDarkMode).ConfigureAwait(false);
+                                                return itemInfo.Item;
+                                            }))
+                                    .Result
+                                    .ToList();
+        }
+
+        internal async Task GetConversationInfoAsync3()
         {
             var mailItems = await Task.FromResult(ConvHelper.GetMailItemList(DfConversation,
                                                                     ((Folder)Mail.Parent).StoreID,
@@ -446,15 +456,12 @@ namespace QuickFiler.Controllers
                                                                     true)
                                                          .Cast<MailItem>()
                                                          .ToList());
+            
             ConversationItems = mailItems;
 
-            ConversationInfo = await Task.FromResult(mailItems.Select(x => new MailItemInfo(x)).ToList());
-
-            //_itemViewer.TopicThread.BeginInvoke(new System.Action(() => 
-            //{ 
-            //    _itemViewer.TopicThread.SetObjects(ConversationInfo);
-            //    _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
-            //}));
+            ConversationInfo = await Task.FromResult(mailItems.Select(mailItem => new MailItemInfo(mailItem))
+                                                              .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
+                                                              .ToList());
             
             // Switch to UI Thread
             await _itemViewer.UiSyncContext;
@@ -585,7 +592,7 @@ namespace QuickFiler.Controllers
             if ((objects is not null)&&(objects.Count !=0))
             {
                 var info = objects[0] as MailItemInfo;
-                _itemViewer.L0v2h2_Web.NavigateToString(info.GetHTML());
+                _itemViewer.L0v2h2_Web.NavigateToString(info.Html);
             }
            
         }
@@ -808,7 +815,10 @@ namespace QuickFiler.Controllers
         public void HtmlDarkConverter(Enums.ToggleState desiredState)
         {
             if (_isWebViewerInitialized)
+            {
                 _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.ToggleDark(desiredState));
+                ConversationInfo.ForEach(item => item.ToggleDark(desiredState));
+            }
         }
 
         public void SetThemeLight(bool async)

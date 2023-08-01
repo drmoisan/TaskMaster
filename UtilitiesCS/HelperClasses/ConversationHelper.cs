@@ -65,6 +65,14 @@ namespace UtilitiesCS
             }
         }
 
+        async public static Task<T> GetItemAsync<T>(this DataFrameRow row, Outlook.NameSpace olNs, int indexEntryId, int indexStoreId) where T: MailItem, TaskItem, AppointmentItem, MeetingItem
+        {
+            string entryId = (string)row[indexEntryId];
+            string storeId = (string)row[indexStoreId];
+            var item = await Task.FromResult((T)olNs.GetItemFromID(entryId, storeId));
+            return item;            
+        }
+
         public static IList GetMailItemList(DataFrame df,
                                             string storeID,
                                             Outlook.Application olApp)
@@ -208,24 +216,26 @@ namespace UtilitiesCS
             Outlook.Table table = conversation.GetTable();
             if (table != null)
             {
-                // add From
-                string[] columnsToAdd = new string[5] 
-                { 
-                    "SentOn", 
-                    OlTableExtensions.SchemaFolderName, 
+                table.RemoveColumns(new string[] { "EntryID"});
+                string[] columnsToAdd = new string[]
+                {
+                    "SentOn",
+                    OlTableExtensions.SchemaFolderName,
+                    OlTableExtensions.SchemaSenderName,
+                    OlTableExtensions.SchemaSenderSmtpAddress,
+                    OlTableExtensions.SchemaSenderAddrType,
+                    "EntryID",
                     OlTableExtensions.SchemaMessageStore, 
                     OlTableExtensions.SchemaConversationDepth, 
-                    OlTableExtensions.SchemaConversationIndex 
+                    OlTableExtensions.SchemaConversationIndex
+                    
                 };
                 foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
             }
-            string[] columnHeaders = table.GetColumnHeaders();
-            
-            object[,] data = (object[,])table.GetArray(table.GetRowCount());
 
-            //DataFrame df = DataFrame.FromColumns()
-            //return new DataFrame();
-            return data.ToDataFrame(columnHeaders);
+            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
+            
+            return data.ToDataFrame(columnInfo.Keys.ToArray());
         }
                 
         public static Outlook.Table GetTable(this Outlook.Conversation conversation, bool WithFolder, bool WithStore) 

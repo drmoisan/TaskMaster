@@ -301,7 +301,7 @@ namespace ToDoModel
             return new RecipientInfo(name, address, html);
         }
 
-        private static string ConvertRecipientToHtml(string name, string address)
+        public static string ConvertRecipientToHtml(string name, string address)
         {
               return $"{name} &lt;<a href=\"mailto:{address}\">{address}</a>&gt;";
         }

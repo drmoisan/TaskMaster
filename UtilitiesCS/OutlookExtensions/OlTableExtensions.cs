@@ -47,7 +47,10 @@ namespace UtilitiesCS
         const string PR_CONVERSATION_KEY = "0x000B"; // PT_BINARY
         const string PR_CONVERSATION_ID = "0x3013"; // PT_BINARY
 
-        const string PR_MESSAGE_RECIPIENTS = "0x0e12"; 
+        const string PR_MESSAGE_RECIPIENTS = "0x0e12";
+        const string PR_SENDER_NAME = "0x0C1A"; // PT_TSTRING
+        const string PR_SENDER_SMTP_ADDRESS = "0x5D01"; // PT_TSTRING
+        const string PR_SENDER_ADDRTYPE = "0x0C1E"; // PT_TSTRING
 
         public static string SchemaConversationTopic = PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
         public static string SchemaFolderName = PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
@@ -59,7 +62,9 @@ namespace UtilitiesCS
         //public static string SchemaReceivedByName = PROPTAG_SPECIFIER + PR_RECEIVED_BY_NAME + PT_TSTRING;
         //public static string SchemaConversationId = "http://schemas.microsoft.com/mapi/proptag/0x30130102";
         public static string SchemaConversationId = PROPTAG_SPECIFIER + PR_CONVERSATION_ID + PT_BINARY;
-
+        public static string SchemaSenderName = PROPTAG_SPECIFIER + PR_SENDER_NAME + PT_TSTRING;
+        public static string SchemaSenderSmtpAddress = PROPTAG_SPECIFIER + PR_SENDER_SMTP_ADDRESS + PT_TSTRING;
+        public static string SchemaSenderAddrType = PROPTAG_SPECIFIER + PR_SENDER_ADDRTYPE + PT_TSTRING;
         public static string SchemaReceivedByName = "http://schemas.microsoft.com/mapi/proptag/0x0040001E";
         public static string SchemaMessageRecipients = "http://schemas.microsoft.com/mapi/proptag/0x0E12000D";
         //public static string SchemaConversationKey = PROPTAG_SPECIFIER + PR_CONVERSATION_KEY + PT_BINARY; does not work
@@ -74,6 +79,9 @@ namespace UtilitiesCS
             {SchemaConversationId, "ConversationId" },
             {SchemaToDoID, "ToDoID" },
             {SchemaTriage, "Triage" },
+            {SchemaSenderName, "SenderName" },
+            {SchemaSenderSmtpAddress, "SenderSmtpAddress" },
+            {SchemaSenderAddrType, "SenderAddrType" },
             {SchemaReceivedByName, "ReceivedByName" },
             {SchemaMessageRecipients, "MessageRecipients" }
         };
@@ -87,6 +95,9 @@ namespace UtilitiesCS
             {"ConversationId", SchemaConversationId },
             {"ToDoID", SchemaToDoID },
             {"Triage", SchemaTriage },
+            {"SenderName", SchemaSenderName },
+            {"SenderSmtpAddress", SchemaSenderSmtpAddress },
+            {"SenderAddrType", SchemaSenderAddrType },
             {"ReceivedByName", SchemaReceivedByName },
             {"MessageRecipients", SchemaMessageRecipients }
         };
@@ -217,8 +228,8 @@ namespace UtilitiesCS
         /// <param name="objectConverters">Dictionary with column names and functions to convert the 
         /// object in the column into string representation</param>
         /// <returns>2D object array with string data</returns>
-        public static (object[,] data, Dictionary<string, int> columnInfo) ETL(
-            this Outlook.Table table, Dictionary<string, Func<object, string>> objectConverters = null)
+        public static (object[,] data, Dictionary<string, int> columnInfo) ETL(this Outlook.Table table,
+                                                                               Dictionary<string, Func<object, string>> objectConverters = null)
         {
             var columnDictionary = table.GetColumnDictionary();
             object[,] data = null;
