@@ -87,9 +87,6 @@ namespace QuickFiler
         private string _triage;
         public string Triage { get => Initialized(ref _triage); set => _triage = value; }
         
-        private bool _unread;
-        public bool UnRead { get => Initialized(ref _unread); set => _unread = value; }
-
         private string _html;
         public string Html { get => _html ?? GetHTML(); private set => _html = value; }
 
@@ -117,12 +114,12 @@ namespace QuickFiler
             return variable;
         }
 
-        internal bool Initialized(ref bool variable)
+        internal bool Initialized(ref bool? variable)
         {
             // check if one of the nullable variables is null which would indicate
             // the need to initialize
-            if (_senderName is null) { LoadPriority(); }
-            return variable;
+            if (variable is null) { LoadPriority(); }
+            return (bool)variable;
         }
 
         public bool LoadPriority()
@@ -138,6 +135,7 @@ namespace QuickFiler
             _actionable = _item.GetActionTaken();
             _folder = ((Folder)_item.Parent).Name;
             _conversationIndex = _item.ConversationIndex;
+            _unread = _item.UnRead;
             _ = Task.Factory.StartNew(() => LoadRecipients(), 
                                       default, 
                                       TaskCreationOptions.None, 
@@ -238,6 +236,10 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 return _emailHeader;
             }
         }
+
+        private bool? _unread;
+        public bool UnRead { get => Initialized(ref _unread); set => _unread = value; }
+
 
         internal string DarkModeHeader
         {

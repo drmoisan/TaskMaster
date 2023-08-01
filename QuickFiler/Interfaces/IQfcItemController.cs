@@ -31,7 +31,7 @@ namespace QuickFiler.Interfaces
         int ItemIndex { get; set; }
         void PopulateFolderCombobox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
         bool SuppressEvents { get; set; }
-        void ApplyReadEmailFormat();
+        void ApplyReadEmailFormat(object state);
         void FlagAsTask();
         void MarkItemForDeletion();
         void JumpToSearchTextbox();

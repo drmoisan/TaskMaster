@@ -107,6 +107,7 @@ namespace QuickFiler.Controllers
                 if (_itemsPerIteration == -1)
                 {
                     _itemsPerIteration = (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0);
+                    _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = _itemsPerIteration));
                 }
                 return _itemsPerIteration;
             }

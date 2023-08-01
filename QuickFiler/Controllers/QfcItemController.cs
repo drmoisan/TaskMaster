@@ -71,6 +71,7 @@ namespace QuickFiler.Controllers
         private bool _suppressEvents = false;
         private IList<TableLayoutPanel> _tableLayoutPanels;
         private Dictionary<string,Theme> _themes;
+        private System.Threading.Timer _timer;
         private CoreWebView2Environment _webViewEnvironment;
         
         #endregion
@@ -671,6 +672,11 @@ namespace QuickFiler.Controllers
                 _itemViewer.L0v2h2_Panel.Visible = true;
                 _itemViewer.L0v2h2_Web.Visible = true;
                 _expanded = true;
+                if ((_itemInfo is not null)&&_itemInfo.UnRead == true)
+                {
+                _timer = new System.Threading.Timer(ApplyReadEmailFormat);
+                _timer.Change(4000, System.Threading.Timeout.Infinite);
+                }
             }
             else
             {
@@ -680,6 +686,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L0v2h2_Panel.Visible = false;
                 _itemViewer.L0v2h2_Web.Visible = false;
                 _expanded = false;
+                if (_timer is not null) { _timer.Dispose(); }
             }
         }
 
@@ -836,10 +843,12 @@ namespace QuickFiler.Controllers
             _isDarkMode = false;
         }
 
-        // TODO: Implement ApplyReadEmailFormat
-        public void ApplyReadEmailFormat()
+        public void ApplyReadEmailFormat(object state)
         {
-            throw new NotImplementedException();
+            _itemInfo.UnRead = false;
+            _themes[_activeTheme].SetMailRead(async: true);
+            Mail.UnRead = false;
+            Mail.Save();
         }
 
 
