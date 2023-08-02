@@ -1,4 +1,6 @@
-﻿
+﻿using Outlook = Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
+
 namespace UtilitiesCS
 {
 
@@ -8,6 +10,6 @@ namespace UtilitiesCS
         string Filepath { get; set; }
         string Folderpath { get; set; }
         T Item { get; }
-        void LoadFromFile(string Folderpath, Microsoft.Office.Interop.Outlook.Application OlApp);
+        void LoadFromFile(string Folderpath, Outlook.Application OlApp);
     }
 }

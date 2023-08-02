@@ -23,5 +23,6 @@ namespace QuickFiler.Interfaces
         int ItemsPerIteration { get; }
         void LoadItems(IList<MailItem> listObjects);
         IQfcCollectionController Groups { get; }
+        IntPtr FormHandle { get; }
     }
 }

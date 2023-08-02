@@ -32,6 +32,8 @@ namespace QuickFiler.Helper_Classes
                      Color tipsDetailsBackColor,
                      Color tipsDetailsForeColor,
                      Color buttonBackColor,
+                     Color buttonMouseOverColor,
+                     Color buttonClickedColor,
                      Color txtboxSearchBackColor,
                      Color txtboxSearchForeColor,
                      Color txtboxBodyBackColor,
@@ -59,6 +61,8 @@ namespace QuickFiler.Helper_Classes
             _tipsDetailsBackColor = tipsDetailsBackColor;
             _tipsDetailsForeColor = tipsDetailsForeColor;
             _buttonBackColor = buttonBackColor;
+            _buttonMouseOverColor = buttonMouseOverColor;
+            _buttonClickedColor = buttonClickedColor;
             _txtboxSearchBackColor = txtboxSearchBackColor;
             _txtboxSearchForeColor = txtboxSearchForeColor;
             _txtboxBodyBackColor = txtboxBodyBackColor;
@@ -69,55 +73,83 @@ namespace QuickFiler.Helper_Classes
             _defaultForeColor = defaultForeColor;
         }
 
-        private string _name;
         private Color _navBackColor;
         private Color _navForeColor;
-        private Color _tlpBackColor;
-        private Color _tipsForeColor;
-        private Color _tipsBackColor;
-        private Color _mailReadForeColor;
-        private Color _mailReadBackColor;
-        private Color _mailUnreadForeColor;
-        private Color _mailUnreadBackColor;
-        private Color _tipsDetailsBackColor;
-        private Color _tipsDetailsForeColor;
-        private Color _buttonBackColor;
-        private Color _txtboxSearchBackColor;
-        private Color _txtboxSearchForeColor;
-        private Color _txtboxBodyBackColor;
-        private Color _txtboxBodyForeColor;
-        private Color _cboFoldersBackColor;
-        private Color _cboFoldersForeColor;
-        private Color _defaultBackColor;
-        private Color _defaultForeColor;
-        private Action<Enums.ToggleState> _htmlConverter;
-        private Enums.ToggleState _htmlDark;
-        private QfcItemViewer _itemViewer;
         private IQfcItemController _parent;
-        private Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme _web2ViewScheme;
-
-        public string Name { get => _name; set => _name = value; }
-        public Color TlpBackColor { get => _tlpBackColor; set => _tlpBackColor = value; }
-        public Color TipsForeColor { get => _tipsForeColor; set => _tipsForeColor = value; }
-        public Color TipsBackColor { get => _tipsBackColor; set => _tipsBackColor = value; }
-        public Color MailReadForeColor { get => _mailReadForeColor; set => _mailReadForeColor = value; }
-        public Color MailReadBackColor { get => _mailReadBackColor; set => _mailReadBackColor = value; }
-        public Color MailUnreadForeColor { get => _mailUnreadForeColor; set => _mailUnreadForeColor = value; }
-        public Color MailUnreadBackColor { get => _mailUnreadBackColor; set => _mailUnreadBackColor = value; }
-        public Color TipsDetailsForeColor { get => _tipsDetailsForeColor; set => _tipsDetailsForeColor = value; }
-        public Color TipsDetailsBackColor { get => _tipsDetailsBackColor; set => _tipsDetailsBackColor = value; }
-        public Color ButtonBackColor { get => _buttonBackColor; set => _buttonBackColor = value; }
-        public Color TxtboxSearchBackColor { get => _txtboxSearchBackColor; set => _txtboxSearchBackColor = value; }
-        public Color TxtboxSearchForeColor { get => _txtboxSearchForeColor; set => _txtboxSearchForeColor = value; }
-        public Color TxtboxBodyBackColor { get => _txtboxBodyBackColor; set => _txtboxBodyBackColor = value; }
-        public Color TxtboxBodyForeColor { get => _txtboxBodyForeColor; set => _txtboxBodyForeColor = value; }
-        public Color CboFoldersBackColor { get => _cboFoldersBackColor; set => _cboFoldersBackColor = value; }
-        public Color CboFoldersForeColor { get => _cboFoldersForeColor; set => _cboFoldersForeColor = value; }
-        public Color DefaultBackColor { get => _defaultBackColor; set => _defaultBackColor = value; }
-        public Color DefaultForeColor { get => _defaultForeColor; set => _defaultForeColor = value; }
-        public Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme Web2ViewScheme { get => _web2ViewScheme; set => _web2ViewScheme = value; }
+        private QfcItemViewer _itemViewer;
+        
+        
+        private Action<Enums.ToggleState> _htmlConverter;
         public Action<Enums.ToggleState> HtmlConverter { get => _htmlConverter; set => _htmlConverter = value; }
+        
+        private Color _buttonBackColor;
+        public Color ButtonBackColor { get => _buttonBackColor; set => _buttonBackColor = value; }
+
+        private Color _buttonMouseOverColor;
+        public Color ButtonMouseOverColor { get => _buttonMouseOverColor; set => _buttonMouseOverColor = value; }
+
+        private Color _buttonClickedColor;
+        public Color ButtonClickedColor { get => _buttonClickedColor; set => _buttonClickedColor = value; }
+
+        private Color _cboFoldersBackColor;
+        public Color CboFoldersBackColor { get => _cboFoldersBackColor; set => _cboFoldersBackColor = value; }
+        
+        private Color _cboFoldersForeColor;
+        public Color CboFoldersForeColor { get => _cboFoldersForeColor; set => _cboFoldersForeColor = value; }
+        
+        private Color _defaultBackColor;
+        public Color DefaultBackColor { get => _defaultBackColor; set => _defaultBackColor = value; }
+        
+        private Color _defaultForeColor;
+        public Color DefaultForeColor { get => _defaultForeColor; set => _defaultForeColor = value; }        
+        
+        private Color _mailReadBackColor;
+        public Color MailReadBackColor { get => _mailReadBackColor; set => _mailReadBackColor = value; }
+        
+        private Color _mailReadForeColor;
+        public Color MailReadForeColor { get => _mailReadForeColor; set => _mailReadForeColor = value; }
+        
+        private Color _mailUnreadBackColor;
+        public Color MailUnreadBackColor { get => _mailUnreadBackColor; set => _mailUnreadBackColor = value; }
+        
+        private Color _mailUnreadForeColor;
+        public Color MailUnreadForeColor { get => _mailUnreadForeColor; set => _mailUnreadForeColor = value; }
+        
+        private Color _tipsBackColor;
+        public Color TipsBackColor { get => _tipsBackColor; set => _tipsBackColor = value; }
+        
+        private Color _tipsDetailsBackColor;
+        public Color TipsDetailsBackColor { get => _tipsDetailsBackColor; set => _tipsDetailsBackColor = value; }
+        
+        private Color _tipsDetailsForeColor;
+        public Color TipsDetailsForeColor { get => _tipsDetailsForeColor; set => _tipsDetailsForeColor = value; }
+        
+        private Color _tipsForeColor;
+        public Color TipsForeColor { get => _tipsForeColor; set => _tipsForeColor = value; }
+        
+        private Color _tlpBackColor;
+        public Color TlpBackColor { get => _tlpBackColor; set => _tlpBackColor = value; }
+        
+        private Color _txtboxBodyBackColor;
+        public Color TxtboxBodyBackColor { get => _txtboxBodyBackColor; set => _txtboxBodyBackColor = value; }
+        
+        private Color _txtboxBodyForeColor;
+        public Color TxtboxBodyForeColor { get => _txtboxBodyForeColor; set => _txtboxBodyForeColor = value; }
+        
+        private Color _txtboxSearchBackColor;
+        public Color TxtboxSearchBackColor { get => _txtboxSearchBackColor; set => _txtboxSearchBackColor = value; }
+        
+        private Color _txtboxSearchForeColor;
+        public Color TxtboxSearchForeColor { get => _txtboxSearchForeColor; set => _txtboxSearchForeColor = value; }
+        
+        private Enums.ToggleState _htmlDark;
         public Enums.ToggleState HtmlDark { get => _htmlDark; set => _htmlDark = value; }
+        
+        private Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme _web2ViewScheme;
+        public Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme Web2ViewScheme { get => _web2ViewScheme; set => _web2ViewScheme = value; }
+       
+        private string _name;
+        public string Name { get => _name; set => _name = value; }
 
         public void SetMailRead(bool async)
         {
@@ -128,7 +160,7 @@ namespace QuickFiler.Helper_Classes
         public void SetMailRead()
         {
             _itemViewer.LblSender.SetTheme(backColor: _mailReadBackColor,
-                                               forecolor: _mailReadForeColor);
+                                           forecolor: _mailReadForeColor);
             _itemViewer.lblSubject.SetTheme(backColor: _mailReadBackColor,
                                             forecolor: _mailReadForeColor);
         }
@@ -179,7 +211,8 @@ namespace QuickFiler.Helper_Classes
             // Button colors
             foreach (Button btn in _parent.Buttons)
             {
-                btn.SetTheme(backColor: ButtonBackColor);
+                if (btn.DialogResult == DialogResult.OK) { btn.SetTheme(backColor: ButtonClickedColor); }
+                else { btn.SetTheme(backColor: ButtonBackColor); }
             }
 
             // Colors for the folder search

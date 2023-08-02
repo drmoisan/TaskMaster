@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,28 @@ namespace QuickFiler.Controllers
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public QfcExplorerController(Enums.InitTypeEnum initType, IApplicationGlobals appGlobals, IQfcHomeController parent)
+        {
+            _initType = initType;
+            _globals = appGlobals;
+            _activeExplorer = _globals.Ol.App.ActiveExplorer();
+            _parent = parent;
+        }
+        
+        private Enums.InitTypeEnum _initType;
+        private IApplicationGlobals _globals;
+        private IQfcHomeController _parent;
+        private Explorer _activeExplorer;
+        private Outlook.View _objView;
+        private string _objViewMem;
+        public Outlook.View ObjViewTemp;
+
+
         //PRIORITY: Implement BlShowInConversations
-        public bool BlShowInConversations { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private bool _blShowInConversations;
+        public bool BlShowInConversations { get => _blShowInConversations; set => _blShowInConversations = value; }
+
+        internal bool CurrentConversationState { get => _activeExplorer.CommandBars.GetPressedMso("ShowInConversations"); }
 
         //PRIORITY: Implement ExplConvView_Cleanup
         public void ExplConvView_Cleanup()
@@ -28,28 +49,110 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        //PRIORITY: Implement ExplConvView_ReturnState
+        
         public void ExplConvView_ReturnState()
         {
-            throw new NotImplementedException();
+            if (BlShowInConversations)
+                ExplConvView_ToggleOn();
         }
 
-        //PRIORITY: Implement ExplConvView_ToggleOff
         public void ExplConvView_ToggleOff()
         {
-            throw new NotImplementedException();
+            if (_activeExplorer.CommandBars.GetPressedMso("ShowInConversations"))
+            {
+                BlShowInConversations = true;
+                _objView = (Outlook.View)_activeExplorer.CurrentView;
+
+                if (_objView.Name == "tmpNoConversation")
+                {
+                    if (_activeExplorer.CommandBars.GetPressedMso("ShowInConversations"))
+                    {
+
+                        _objView.XML = _objView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
+                        _objView.Save();
+                        _objView.Apply();
+                    }
+                }
+                _objViewMem = _objView.Name;
+                if (_objViewMem == "tmpNoConversation")
+                    _objViewMem = _globals.Ol.ViewWide;
+
+                //ObjViewTemp = ObjView.Parent("tmpNoConversation");
+                ObjViewTemp = GetSiblingView(_objView, "tmpNoConversation");
+
+                if (ObjViewTemp is null)
+                {
+                    ObjViewTemp = _objView.Copy("tmpNoConversation", OlViewSaveOption.olViewSaveOptionThisFolderOnlyMe);
+                    ObjViewTemp.XML = _objView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
+                    ObjViewTemp.Save();
+
+                }
+                ObjViewTemp.Apply();
+            }
         }
 
-        //PRIORITY: Implement ExplConvView_ToggleOn
+        public Outlook.View GetSiblingView(Outlook.View currentView, string viewName)
+        {
+            Outlook.View view = null;
+            var views = (Views)currentView.Parent;
+            foreach (Outlook.View v in views)
+            {
+                if (v.Name == viewName)
+                {
+                    view = v;
+                    break;
+                }
+            }
+            return view;
+        }
+
         public void ExplConvView_ToggleOn()
         {
-            throw new NotImplementedException();
+            if (BlShowInConversations)
+            {
+                _objView = _activeExplorer.CurrentFolder.Views[_objViewMem];
+                _objView.Apply();
+                BlShowInConversations = false;
+            }
         }
-        
-        //PRIORITY: Implement OpenQFItem
-        public void OpenQFItem(object ObjItem)
+
+        private void NavigateToOutlookFolder(MailItem mailItem)
         {
-            throw new NotImplementedException();
+            if (_activeExplorer.CurrentFolder.FolderPath !=
+                ((MAPIFolder)mailItem.Parent).FolderPath)
+            {
+                ExplConvView_ReturnState();
+                _globals.Ol.App.ActiveExplorer().CurrentFolder = (MAPIFolder)mailItem.Parent;
+                BlShowInConversations = AutoFile.AreConversationsGrouped(_activeExplorer);
+            }
+        }
+
+        //PRIORITY: Implement OpenQFItem
+        async public Task OpenQFItem(MailItem mailItem)
+        {
+            _parent.FormCtrlr.MinimizeQfcFormViewer();
+            NavigateToOutlookFolder(mailItem);
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & AutoFile.AreConversationsGrouped(_activeExplorer))
+                await Task.Run(() => ExplConvView_ToggleOff());
+            
+            if (_activeExplorer.IsItemSelectableInView(mailItem))
+            {
+                await Task.Run(() => _activeExplorer.ClearSelection());
+                await Task.Run(() => _activeExplorer.AddToSelection(mailItem));
+
+                //MAPIFolder tmp = _activeExplorer.CurrentFolder;
+                //MAPIFolder drafts = _globals.Ol.NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderDrafts);
+                //_activeExplorer.CurrentFolder = drafts;
+                //_activeExplorer.CurrentFolder.Display();
+            }
+            else
+            {
+                DialogResult result = MessageBox.Show("Selected message is not in view. Would you like to open it?",
+                    "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                if (result == DialogResult.Yes) { mailItem.Display(); }
+            }
+            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & BlShowInConversations)
+                await Task.Run(() => ExplConvView_ToggleOn());
         }
 
         #region Email Sorting To Rewrite

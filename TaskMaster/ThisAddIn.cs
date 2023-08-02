@@ -7,6 +7,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Interop.Outlook;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 using ToDoModel;
 using Microsoft.Office.Core;
 using QuickFiler;
@@ -19,19 +20,11 @@ namespace TaskMaster
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
             _globals = new ApplicationGlobals(Application);
-
-            {
-                DebugTextWriter tw = new DebugTextWriter();
-                Console.SetOut(tw);
-                //OlNS = _globals.Ol.NamespaceMAPI;
-                //OlToDoItems = _globals.Ol.ToDoFolder.Items;
-                //OlInboxItems = _globals.Ol.Inbox.Items;
-                //OlReminders = _globals.Ol.OlReminders;
-                //ProjInfo = (ProjectInfo)_globals.TD.ProjInfo;
-                //DictPPL = _globals.TD.DictPPL;
-                //IDList = _globals.TD.IDList;
-                //EmailRoot = _globals.Ol.EmailRootPath;
-            }
+            _ = _globals.LoadAsync();
+            Debug.WriteLine("Fired and forgetting");
+            DebugTextWriter tw = new DebugTextWriter();
+            Console.SetOut(tw);
+            InitializeDPI();
 
             _ribbonController.SetGlobals(_globals);
             //Events_Hook();
@@ -139,6 +132,15 @@ namespace TaskMaster
             _ribbonController = new RibbonController();
             return new RibbonViewer(_ribbonController);
         }
+
+        [STAThread]
+        public static void InitializeDPI()
+        {
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+        }
+
+        
 
         #region Explorer Event Hooks
         internal void Events_Hook()

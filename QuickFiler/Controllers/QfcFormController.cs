@@ -118,10 +118,10 @@ namespace QuickFiler.Controllers
         {
             _formViewer.ForAllControls(x =>
             {
-                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KbdHndlr.KeyboardHandler_PreviewKeyDown);
-                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyDown);
-                x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyUp);
-                x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KbdHndlr.KeyboardHandler_KeyPress);
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHndlr.KeyboardHandler_PreviewKeyDown);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
+                x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyUp);
+                x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyPress);
                 // Debug.WriteLine($"Registered handler for {x.Name}");
             },
             new List<Control> { _formViewer.QfcItemViewerTemplate });
@@ -151,6 +151,7 @@ namespace QuickFiler.Controllers
         #region Public Properties
         
         public IQfcCollectionController Groups { get => _groups; }
+        public IntPtr FormHandle { get => _formViewer.Handle; }
         
         #endregion
 
@@ -264,8 +265,8 @@ namespace QuickFiler.Controllers
                                                   viewerInstance: _formViewer,
                                                   darkMode: Properties.Settings.Default.DarkMode,
                                                   InitType: Enums.InitTypeEnum.InitSort,
-                                                  keyboardHandler: _parent.KbdHndlr,
-                                                  ParentObject: this);
+                                                  homeController: _parent,
+                                                  parent: this);
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
