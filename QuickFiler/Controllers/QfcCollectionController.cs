@@ -20,8 +20,8 @@ namespace QuickFiler.Controllers
                                        QfcFormViewer viewerInstance,
                                        bool darkMode,
                                        Enums.InitTypeEnum InitType,
-                                       IQfcKeyboardHandler keyboardHandler,
-                                       IQfcFormController ParentObject)
+                                       IQfcHomeController homeController,
+                                       IQfcFormController parent)
         {
 
             _formViewer = viewerInstance;
@@ -29,8 +29,9 @@ namespace QuickFiler.Controllers
             _itemPanel = _formViewer.L1v0L2_PanelMain;
             _initType = InitType;
             _globals = AppGlobals;
-            _keyboardHandler = keyboardHandler;
-            _parent = ParentObject;
+            _homeController = homeController;
+            _keyboardHandler = _homeController.KeyboardHndlr;
+            _parent = parent;
             SetupLightDark(darkMode);
         }
 
@@ -43,6 +44,7 @@ namespace QuickFiler.Controllers
         private QfcFormViewer _formViewer;
         private Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
+        private IQfcHomeController _homeController;
         private IQfcFormController _parent;
         private int _itemHeight;
         private Panel _itemPanel;
@@ -171,13 +173,13 @@ namespace QuickFiler.Controllers
         {
             Parallel.ForEach(_itemGroups, grp =>
             {
-                grp.ItemController = new QfcItemController(_globals,
-                                                           grp.ItemViewer,
-                                                           _itemGroups.FindIndex(
-                                                           x => x.MailItem == grp.MailItem) + 1,
-                                                           grp.MailItem,
-                                                           _keyboardHandler,
-                                                           this);
+                grp.ItemController = new QfcItemController(AppGlobals: _globals,
+                                                           homeController: _homeController,
+                                                           parent: this,
+                                                           itemViewer: grp.ItemViewer,
+                                                           viewerPosition: _itemGroups.FindIndex(x => x.MailItem == grp.MailItem) + 1,
+                                                           grp.MailItem);
+                
                 Parallel.Invoke(
                     () => grp.ItemController.PopulateConversation(),
                     () => grp.ItemController.PopulateFolderCombobox(),
@@ -194,7 +196,12 @@ namespace QuickFiler.Controllers
             int i = 0;
             foreach (var grp in _itemGroups)
             {
-                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i+1, grp.MailItem, _keyboardHandler, this);
+                grp.ItemController = new QfcItemController(AppGlobals: _globals,
+                                                           homeController: _homeController,
+                                                           parent: this,
+                                                           itemViewer: grp.ItemViewer,
+                                                           viewerPosition: ++i,
+                                                           grp.MailItem);
                 grp.ItemController.PopulateConversation();
                 grp.ItemController.PopulateFolderCombobox();
                 if (_darkMode) { grp.ItemController.SetThemeDark(async: false); }
@@ -641,8 +648,13 @@ namespace QuickFiler.Controllers
                 var grp = _itemGroups[i + insertionIndex];
                 grp.ItemViewer = LoadItemViewer(i + insertionIndex, _template, false, 1);
                 grp.MailItem = insertions[i];
-                
-                grp.ItemController = new QfcItemController(_globals, grp.ItemViewer, i + insertionIndex + 1, grp.MailItem, _keyboardHandler, this);                
+                grp.ItemController = new QfcItemController(AppGlobals: _globals,
+                                                           homeController: _homeController,
+                                                           parent: this,
+                                                           itemViewer: grp.ItemViewer,
+                                                           viewerPosition: i + insertionIndex + 1,
+                                                           grp.MailItem);
+
                 grp.ItemController.PopulateConversation(conversationCount);
                 grp.ItemController.PopulateFolderCombobox(folderList);
                 grp.ItemController.IsChild = true;

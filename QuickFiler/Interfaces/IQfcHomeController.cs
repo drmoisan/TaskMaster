@@ -5,14 +5,31 @@ namespace QuickFiler.Interfaces
 {
 	public interface IQfcHomeController
 	{
-        IQfcExplorerController ExplCtrlr { get; set; }
-		IQfcFormController FrmCtrlr { get; }
-		IQfcKeyboardHandler KbdHndlr { get; set; }
-        IQfcDatamodel DataModel { get; }
+        #region Constructors, Initializers, and Destructors
+        
+        void Run();
+        void Cleanup();
+        
+        #endregion
+
+        #region Public Properties
+
         bool Loaded { get; }
-		void Run();
-		void Iterate();
-		void ExecuteMoves();
 		cStopWatch StopWatch { get; }
-	}
+        IQfcDatamodel DataModel { get; }
+        IQfcExplorerController ExplorerCtlr { get; set; }
+		IQfcFormController FormCtrlr { get; }
+		IQfcKeyboardHandler KeyboardHndlr { get; set; }
+        QfcFormViewer FormViewer { get; }
+
+        #endregion
+
+        #region Major Actions
+        
+        void ExecuteMoves();        
+		void Iterate();
+        void QuickFileMetrics_WRITE(string filename);
+
+        #endregion
+    }
 }

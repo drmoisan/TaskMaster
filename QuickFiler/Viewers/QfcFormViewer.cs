@@ -11,26 +11,13 @@ using System.Windows.Forms;
 
 namespace QuickFiler
 {
-    internal partial class QfcFormViewer : Form
+    public partial class QfcFormViewer : Form
     {
         public QfcFormViewer()
         {
             InitializeComponent();
             //this.KeyPreview = true;
         }
-
-        [STAThread]
-        public static void InitializeDPI()
-        {
-            if(!DpiInitialized)
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                DpiInitialized = true;
-            }
-        }
-
-        public static bool DpiInitialized { get; set; } = false;
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IQfcFormController _formController;

@@ -14,28 +14,26 @@ namespace QuickFiler.Controllers
 {
     public class QfcHomeController : IQfcHomeController
     {
+        #region Constructors, Initializers, and Destructors
+
         public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
         {
-            QfcFormViewer.InitializeDPI();
             _globals = AppGlobals;
             InitAfObjects();
             _parentCleanup = ParentCleanup;
             _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
-            _explorerController = new QfcExplorerController();
+            _explorerController = new QfcExplorerController(Enums.InitTypeEnum.InitSort, _globals, this);
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
             _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
         }
 
+        
+        
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
-        private QfcFormViewer _formViewer;
-        private IQfcDatamodel _datamodel;
-        private IQfcExplorerController _explorerController;
-        private IQfcFormController _formController;
-        private IQfcCollectionController _collectionController;
-        private IQfcKeyboardHandler _keyboardHandler;
-        private cStopWatch _stopWatch;
+
+        #endregion Constructors, Initializers, and Destructors
 
         internal void InitAfObjects() 
         {
@@ -49,38 +47,13 @@ namespace QuickFiler.Controllers
 
         public void Run()
         {
-            //_formViewer.Show();
-            //_formViewer.Refresh();
-            Initialize();
-            _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            _formViewer.Show();
-            _formViewer.Refresh();
-        }
-
-        public bool Loaded { get => _formViewer is not null; }
-
-        internal void Cleanup()
-        {
-            _globals = null;
-            _formViewer = null;
-            _explorerController = null;
-            _formController = null;
-            _keyboardHandler = null;
-            _parentCleanup.Invoke();
-        }
-
-        public IQfcExplorerController ExplCtrlr { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IQfcFormController FrmCtrlr { get => _formController; }
-        public IQfcKeyboardHandler KbdHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
-        public IQfcDatamodel DataModel { get => _datamodel; }
-        public cStopWatch StopWatch { get => _stopWatch; }
-
-        public void Initialize()
-        {
             IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
             _formController.LoadItems(listEmail);
             _stopWatch = new cStopWatch();
             _stopWatch.Start();
+            _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            _formViewer.Show();
+            _formViewer.Refresh();
         }
 
         public void Iterate()
@@ -100,7 +73,7 @@ namespace QuickFiler.Controllers
             Iterate();
         }
 
-        internal void QuickFileMetrics_WRITE(string filename)
+        public void QuickFileMetrics_WRITE(string filename)
         {
 
             string LOC_TXT_FILE;
@@ -159,6 +132,38 @@ namespace QuickFiler.Controllers
             FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
 
         }
+
+        public void Cleanup()
+        {
+            _globals = null;
+            _formViewer = null;
+            _explorerController = null;
+            _formController = null;
+            _keyboardHandler = null;
+            _parentCleanup.Invoke();
+        }
+
+        public bool Loaded { get => _formViewer is not null; }
+
+        private IQfcExplorerController _explorerController;
+        public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
+        
+        private IQfcFormController _formController;
+        public IQfcFormController FormCtrlr { get => _formController; }
+        
+        private IQfcKeyboardHandler _keyboardHandler;
+        public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
+        
+        private IQfcDatamodel _datamodel;
+        public IQfcDatamodel DataModel { get => _datamodel; }
+        
+        private cStopWatch _stopWatch;
+        public cStopWatch StopWatch { get => _stopWatch; }
+
+        private QfcFormViewer _formViewer;
+        public QfcFormViewer FormViewer { get => _formViewer; }
+
+        
 
 
     }

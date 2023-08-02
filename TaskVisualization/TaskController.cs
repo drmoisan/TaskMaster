@@ -227,6 +227,8 @@ namespace TaskVisualization
                 // Apply values captured in _active to each member of _todo_list for flags in _options
                 ApplyChanges();
 
+                _viewer.DialogResult = DialogResult.OK;
+
                 _viewer.Dispose();
             }
         }
@@ -239,6 +241,7 @@ namespace TaskVisualization
         {
             _viewer.Hide();
             _exit_type = "Cancel";
+            _viewer.DialogResult = DialogResult.Cancel;
             _viewer.Dispose();
         }
 

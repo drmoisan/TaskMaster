@@ -1,4 +1,5 @@
-﻿using UtilitiesCS;
+﻿using System.Threading.Tasks;
+using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
@@ -6,6 +7,7 @@ namespace UtilitiesCS
 
     public interface IAppAutoFileObjects
     {
+        Task LoadAsync();
         int Conversation_Weight { get; set; }
         int LngConvCtPwr { get; set; }
         int MaxRecents { get; set; }

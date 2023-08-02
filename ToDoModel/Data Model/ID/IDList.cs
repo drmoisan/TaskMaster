@@ -112,14 +112,14 @@ namespace ToDoModel
         public void RefreshIDList()
         {
             var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
-                                                    folderEnum: OlDefaultFolders.olFolderToDo,
-                                                    removeColumns: null, //new string[] {"RemoveAll"},
-                                                    addColumns: new string[]
-                                                    {
-                                                        OlTableExtensions.SchemaToDoID,
-                                                        "Categories",
-                                                        OlTableExtensions.SchemaMessageStore
-                                                    });
+                                                folderEnum: OlDefaultFolders.olFolderToDo,
+                                                removeColumns: null, //new string[] {"RemoveAll"},
+                                                addColumns: new string[]
+                                                {
+                                                    OlTableExtensions.SchemaToDoID,
+                                                    "Categories",
+                                                    OlTableExtensions.SchemaMessageStore
+                                                });
 
             df = df.FillMissing("ERROR");
             df = df.Where(x => ((string)x.Value["ToDoID"]) != "ERROR");

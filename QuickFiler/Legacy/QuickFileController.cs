@@ -844,7 +844,7 @@ namespace QuickFiler.Legacy
                 }
                 _objViewMem = ObjView.Name;
                 if (_objViewMem == "tmpNoConversation")
-                    _objViewMem = _globals.Ol.View_Wide;
+                    _objViewMem = _globals.Ol.ViewWide;
 
                 //ObjViewTemp = ObjView.Parent("tmpNoConversation");
                 ObjViewTemp = GetSiblingView(ObjView,"tmpNoConversation");

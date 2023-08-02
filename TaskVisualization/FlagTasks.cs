@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic.CompilerServices;
 using Tags;
@@ -63,10 +64,14 @@ namespace TaskVisualization
             _userEmailAddress = AppGlobals.Ol.UserEmailAddress;
         }
 
-        public void Run()
+        public DialogResult Run(bool modal = false)
         {
             _controller.LoadInitialValues();
-            _viewer.ShowDialog();
+            if (modal)
+                return _viewer.ShowDialog();
+            else
+                _viewer.Show();
+                return DialogResult.None;
         }
 
         private List<ToDoItem> InitializeToDoList(IList ItemList)

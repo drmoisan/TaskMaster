@@ -8,7 +8,6 @@ namespace TaskMaster
 
     public class AppFileSystemFolderPaths : IFileSystemFolderPaths
     {
-
         private string _appStaging;
         private string _stagingPath;
         private string _myD;
@@ -59,17 +58,18 @@ namespace TaskMaster
         private void LoadFolders()
         {
             _appStaging = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskMaster");
-            CreateMissingPaths(_appStaging);
+            _ = Task.Factory.StartNew(() => CreateMissingPaths(_appStaging),
+                                      default,
+                                      TaskCreationOptions.None,
+                                      PriorityScheduler.BelowNormal);
 
             _stagingPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             _myD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             _oneDrive = Environment.GetEnvironmentVariable("OneDriveCommercial");
             _flow = Path.Combine(_oneDrive, "Email attachments from Flow");
             CreateMissingPaths(_flow);
-
             _prereads = Path.Combine(_oneDrive, "_  Workflow", "_ Pre-Reads");
             CreateMissingPaths(_prereads);
-
             _remap = Path.Combine(_stagingPath, "dictRemap.csv");
             _fldrPythonStaging = Path.Combine(_flow, "Combined", "data");
         }

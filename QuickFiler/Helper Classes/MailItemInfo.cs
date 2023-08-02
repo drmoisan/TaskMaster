@@ -136,6 +136,7 @@ namespace QuickFiler
             _folder = ((Folder)_item.Parent).Name;
             _conversationIndex = _item.ConversationIndex;
             _unread = _item.UnRead;
+            _isTaskFlagSet = (_item.FlagStatus == OlFlagStatus.olFlagMarked);
             _ = Task.Factory.StartNew(() => LoadRecipients(), 
                                       default, 
                                       TaskCreationOptions.None, 
@@ -240,6 +241,8 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
         private bool? _unread;
         public bool UnRead { get => Initialized(ref _unread); set => _unread = value; }
 
+        private bool? _isTaskFlagSet;
+        public bool IsTaskFlagSet { get => Initialized(ref _isTaskFlagSet); set => _isTaskFlagSet = value; }
 
         internal string DarkModeHeader
         {

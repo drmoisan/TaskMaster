@@ -1,27 +1,20 @@
 ﻿using Microsoft.Data.Analysis;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
-using QuickFiler.Properties;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
 using System.Windows.Forms;
-using System.Net.Mail;
-using System.Collections;
 using QuickFiler.Helper_Classes;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-using System.Xml.Linq;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Web.WebView2.Core;
 using System.ComponentModel;
+using TaskVisualization;
 
 namespace QuickFiler.Controllers
 {
@@ -30,50 +23,228 @@ namespace QuickFiler.Controllers
         #region constructors
 
         public QfcItemController(IApplicationGlobals AppGlobals,
+                                 IQfcHomeController homeController,
+                                 IQfcCollectionController parent,
                                  QfcItemViewer itemViewer,
                                  int viewerPosition,
-                                 MailItem mailItem,
-                                 IQfcKeyboardHandler keyboardHandler,
-                                 IQfcCollectionController parent)
+                                 MailItem mailItem)
         {
-            Initialize(AppGlobals, itemViewer, viewerPosition, mailItem, keyboardHandler, parent, async: true);
+            Initialize(AppGlobals, homeController, parent, itemViewer,viewerPosition, mailItem, async: true);
+            
         }
 
         public QfcItemController(IApplicationGlobals AppGlobals,
+                                 IQfcHomeController homeController,
+                                 IQfcCollectionController parent,
                                  QfcItemViewer itemViewer,
                                  int viewerPosition,
                                  MailItem mailItem,
-                                 IQfcKeyboardHandler keyboardHandler,
-                                 IQfcCollectionController parent,
                                  bool async)
         {
-            Initialize(AppGlobals, itemViewer, viewerPosition, mailItem, keyboardHandler, parent, async);
+            Initialize(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem, async);
+        }
+
+        #endregion
+
+        #region ItemViewer Setup and Disposal
+
+        private void Initialize(IApplicationGlobals AppGlobals,
+                                IQfcHomeController homeController,
+                                IQfcCollectionController parent,
+                                QfcItemViewer itemViewer,
+                                int viewerPosition,
+                                MailItem mailItem,
+                                bool async)
+        {
+            _globals = AppGlobals;
+            _homeController = homeController;
+
+            // Grab handle on viewer and controllers
+            _itemViewer = itemViewer;
+            _itemViewer.Controller = this;
+            _itemNumber = viewerPosition;                           
+            _formController = _homeController.FormCtrlr;
+            _formHandle = _formController.FormHandle;               
+            _mailItem = mailItem;                                   
+            _keyboardHandler = _homeController.KeyboardHndlr;            
+            _parent = parent;                                       
+            _themes = ThemeHelper.SetupThemes(this, _itemViewer, this.HtmlDarkConverter);
+            _explorerController = _homeController.ExplorerCtlr;
+
+            ResolveControlGroups(itemViewer);
+
+            // Populate placeholder controls with 
+            PopulateControls(mailItem, viewerPosition);
+
+            ToggleTips(async: async, desiredState: Enums.ToggleState.Off);
+            ToggleNavigation(async: async, desiredState: Enums.ToggleState.Off);
+
+            WireEvents();
+            InitializeWebView();
+        }
+
+        internal void InitializeWebView()
+        {
+            // Create the cache directory 
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
+
+            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
+            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
+
+            _itemViewer.L0v2h2_Web.BeginInvoke(new System.Action(() =>
+            {
+                // Create the environment manually
+                Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
+
+                // Do this so the task is continued on the UI Thread
+                TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
+                //TaskScheduler ui = _itemViewer.UiScheduler;
+
+                task.ContinueWith(t =>
+                {
+                    _webViewEnvironment = task.Result;
+                    _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
+                }, ui);
+            }));
+        }
+
+        internal void ResolveControlGroups(QfcItemViewer itemViewer)
+        {
+            var ctrls = itemViewer.GetAllChildren();
+
+            _listTipsDetails = _itemViewer.TipsLabels
+                               .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
+                               .ToList();
+
+            _itemPositionTips = new QfcTipsDetails(_itemViewer.LblItemNumber);
+
+            _tableLayoutPanels = ctrls.Where(x => x is TableLayoutPanel)
+                         .Select(x => (TableLayoutPanel)x)
+                         .ToList();
+
+            _buttons = ctrls.Where(x => x is Button)
+                            .Select(x => (Button)x)
+                            .ToList();
+
+        }
+
+        public void PopulateControls(MailItem mailItem, int viewerPosition)
+        {
+            _itemInfo = new MailItemInfo(mailItem);
+            _itemInfo.LoadPriority();
+            _itemViewer.BeginInvoke(new System.Action(
+                () => AssignControls(_itemInfo, viewerPosition)));
+        }
+
+        internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
+        {
+            _itemViewer.LblSender.Text = itemInfo.SenderName;
+            _itemViewer.lblSubject.Text = itemInfo.Subject;
+            _itemViewer.TxtboxBody.Text = itemInfo.Body;
+            _itemViewer.LblTriage.Text = itemInfo.Triage;
+            _itemViewer.LblSentOn.Text = itemInfo.SentOn;
+            _itemViewer.LblActionable.Text = itemInfo.Actionable;
+            if(itemInfo.IsTaskFlagSet) { _itemViewer.BtnFlagTask.DialogResult = DialogResult.OK; }
+            else { _itemViewer.BtnFlagTask.DialogResult = DialogResult.Cancel;}
+            _itemViewer.LblItemNumber.Text = viewerPosition.ToString();
+        }
+
+        /// <summary>
+        /// Gets the Outlook.Conversation from the underlying MailItem
+        /// embedded in the class. Conversation details are loaded to 
+        /// a Dataframe. Count is inferred from the df rowcount
+        /// </summary>
+        public void PopulateConversation()
+        {
+            PopulateConversation(_mailItem.GetConversationDf());
+        }
+
+        /// <summary>
+        /// TBD if this overload will be of use. Depends on whether _dfConversation
+        /// is needed by any individual element when expanded
+        /// </summary>
+        /// <param name="df"></param>
+        public void PopulateConversation(DataFrame df)
+        {
+            DfConversationExpanded = df.FilterConversation(false, true);
+            DfConversation = DfConversationExpanded.FilterConversation(true, true);
+            int count = DfConversation.Rows.Count();
+            PopulateConversation(count);
+        }
+
+        /// <summary>
+        /// Sets the conversation count of the visual without altering the
+        /// _dfConversation. Usefull when expanding or collapsing the 
+        /// conversation to show how many items will be moved
+        /// </summary>
+        /// <param name="count"></param>
+        public void PopulateConversation(int count)
+        {
+            _itemViewer.LblConvCt.BeginInvoke(new System.Action(() =>
+            {
+                _itemViewer.LblConvCt.Text = count.ToString();
+                if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
+            }));
+        }
+
+        public void PopulateFolderCombobox(object varList = null)
+        {
+            if (varList is null)
+            {
+                _fldrHandler = new FolderHandler(
+                    _globals, _mailItem, FolderHandler.Options.FromField);
+            }
+            else
+            {
+                _fldrHandler = new FolderHandler(
+                    _globals, varList, FolderHandler.Options.FromArrayOrString);
+            }
+
+            _itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
+            {
+                _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderArray);
+                _itemViewer.CboFolders.SelectedIndex = 1;
+            }));
+
+        }
+
+        public void Cleanup()
+        {
+            _globals = null;
+            _itemViewer = null;
+            _parent = null;
+            _listTipsDetails = null;
+            _mailItem = null;
+            _dfConversation = null;
+            _fldrHandler = null;
         }
 
         #endregion
 
         #region private fields and variables
 
-        private string _activeTheme;
-        private IList<Control> _controls;
-        private IList<CheckBox> _checkBoxes;
+        private bool _isDarkMode = false;
+        private bool _isWebViewerInitialized = false;
+        private bool _suppressEvents = false;
+        private CoreWebView2Environment _webViewEnvironment;
+        private Dictionary<string,Theme> _themes;
         private FolderHandler _fldrHandler;
         private IApplicationGlobals _globals;
-        private bool _isWebViewerInitialized = false;
-        private bool _isDarkMode = false;
-        private MailItemInfo _itemInfo;
-        private IQfcTipsDetails _itemPositionTips;
-        private QfcItemViewer _itemViewer;
-        private IQfcKeyboardHandler _keyboardHandler;
-        private IList<Label> _labels;
         private IList<IQfcTipsDetails> _listTipsDetails;
-        private IQfcCollectionController _parent;
-        private bool _suppressEvents = false;
         private IList<TableLayoutPanel> _tableLayoutPanels;
-        private Dictionary<string,Theme> _themes;
+        private IntPtr _formHandle;
+        private IQfcCollectionController _parent;
+        private IQfcExplorerController _explorerController;
+        private IQfcFormController _formController;
+        private IQfcHomeController _homeController;
+        private IQfcKeyboardHandler _keyboardHandler;
+        private IQfcTipsDetails _itemPositionTips;
+        private MailItemInfo _itemInfo;
+        private QfcItemViewer _itemViewer;
+        private string _activeTheme;
         private System.Threading.Timer _timer;
-        private CoreWebView2Environment _webViewEnvironment;
-        
+
         #endregion
 
         #region Exposed properties
@@ -221,186 +392,6 @@ namespace QuickFiler.Controllers
 
         #endregion
 
-        #region ItemViewer Setup and Disposal
-
-        private void Initialize(IApplicationGlobals AppGlobals,
-                                QfcItemViewer itemViewer,
-                                int viewerPosition,
-                                MailItem mailItem,
-                                IQfcKeyboardHandler keyboardHandler,
-                                IQfcCollectionController parent,
-                                bool async)
-        {
-            _globals = AppGlobals;
-
-            // Grab handle on viewer and controls
-            _itemViewer = itemViewer;
-            _itemViewer.Controller = this;
-
-            _itemNumber = viewerPosition;   // visible position in collection (index is 1 less)
-            _mailItem = mailItem;               // handle on underlying Email
-            _keyboardHandler = keyboardHandler; // handle keystrokes
-            _parent = parent;                   // handle on collection controller
-            _themes = ThemeHelper.SetupThemes(this, _itemViewer, this.HtmlDarkConverter);
-
-            ResolveControlGroups(itemViewer);
-
-            // Populate placeholder controls with 
-            PopulateControls(mailItem, viewerPosition);
-            
-            ToggleTips(async: async, desiredState: Enums.ToggleState.Off);
-            ToggleNavigation(async: async, desiredState: Enums.ToggleState.Off);
-
-            WireEvents();
-            InitializeWebView();
-        }
-
-        internal void InitializeWebView()
-        {
-            // Create the cache directory 
-            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
-
-            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
-            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
-
-            _itemViewer.L0v2h2_Web.BeginInvoke(new System.Action(() =>
-            { 
-                // Create the environment manually
-                Task <CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
-
-                // Do this so the task is continued on the UI Thread
-                TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
-                //TaskScheduler ui = _itemViewer.UiScheduler;
-
-                task.ContinueWith(t =>
-                {
-                    _webViewEnvironment = task.Result;
-                    _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
-                }, ui);
-            }));
-        }
-
-        internal void ResolveControlGroups(QfcItemViewer itemViewer)
-        {
-            var ctrls = itemViewer.GetAllChildren();
-            _controls = ctrls.ToList();
-
-            _listTipsDetails = _itemViewer.TipsLabels
-                               .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
-                               .ToList();
-
-            _itemPositionTips = new QfcTipsDetails(_itemViewer.LblItemNumber);
-
-            _tableLayoutPanels = ctrls.Where(x => x is TableLayoutPanel)
-                         .Select(x => (TableLayoutPanel)x)
-                         .ToList();
-
-            _buttons = ctrls.Where(x => x is Button)
-                            .Select(x => (Button)x)
-                            .ToList();
-
-            _labels = ctrls.Where(x => (x is Label) &&
-                                       (!itemViewer.TipsLabels.Contains(x)) &&
-                                       (x != itemViewer.lblSubject) &&
-                                       (x != itemViewer.LblSender))
-                           .Select(x => (Label)x)
-                           .ToList();
-
-        }
-
-        public void PopulateControls(MailItem mailItem, int viewerPosition)
-        {
-            _itemInfo = new MailItemInfo(mailItem);
-            _itemInfo.LoadPriority();
-            _itemViewer.BeginInvoke(new System.Action(
-                () => AssignControls(_itemInfo, viewerPosition)));
-        }
-
-        internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
-        {
-            _itemViewer.LblSender.Text = itemInfo.SenderName;
-            _itemViewer.lblSubject.Text = itemInfo.Subject;
-            _itemViewer.TxtboxBody.Text = itemInfo.Body;
-
-            _itemViewer.LblTriage.Text = itemInfo.Triage;
-            _itemViewer.LblSentOn.Text = itemInfo.SentOn;
-            _itemViewer.LblActionable.Text = itemInfo.Actionable;
-            _itemViewer.LblItemNumber.Text = viewerPosition.ToString();
-        }
-
-        /// <summary>
-        /// Gets the Outlook.Conversation from the underlying MailItem
-        /// embedded in the class. Conversation details are loaded to 
-        /// a Dataframe. Count is inferred from the df rowcount
-        /// </summary>
-        public void PopulateConversation()
-        {
-            PopulateConversation(_mailItem.GetConversationDf());
-        }
-
-        /// <summary>
-        /// TBD if this overload will be of use. Depends on whether _dfConversation
-        /// is needed by any individual element when expanded
-        /// </summary>
-        /// <param name="df"></param>
-        public void PopulateConversation(DataFrame df)
-        {
-            DfConversationExpanded = df.FilterConversation(false, true);
-            DfConversation = DfConversationExpanded.FilterConversation(true, true);
-            int count = DfConversation.Rows.Count();
-            PopulateConversation(count);
-        }
-
-        /// <summary>
-        /// Sets the conversation count of the visual without altering the
-        /// _dfConversation. Usefull when expanding or collapsing the 
-        /// conversation to show how many items will be moved
-        /// </summary>
-        /// <param name="count"></param>
-        public void PopulateConversation(int count)
-        {
-            _itemViewer.LblConvCt.BeginInvoke(new System.Action(() =>
-            {
-                _itemViewer.LblConvCt.Text = count.ToString();
-                if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
-            }));
-        }
-        
-        public void PopulateFolderCombobox(object varList = null)
-        {
-            if (varList is null)
-            {
-                _fldrHandler = new FolderHandler(
-                    _globals, _mailItem, FolderHandler.Options.FromField);
-            }
-            else
-            {
-                _fldrHandler = new FolderHandler(
-                    _globals, varList, FolderHandler.Options.FromArrayOrString);
-            }
-
-            _itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
-            {
-                _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderArray);
-                _itemViewer.CboFolders.SelectedIndex = 1;
-            }));
-            
-        }
-
-        public void Cleanup()
-        {
-            _globals = null;
-            _itemViewer = null;
-            _parent = null;
-            _listTipsDetails = null;
-            _mailItem = null;
-            _dfConversation = null;
-            _fldrHandler = null;
-        }
-
-        #endregion
-
         #region INotifyPropertyChanged implementation
 
         protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
@@ -449,28 +440,6 @@ namespace QuickFiler.Controllers
                                     .ToList();
         }
 
-        internal async Task GetConversationInfoAsync3()
-        {
-            var mailItems = await Task.FromResult(ConvHelper.GetMailItemList(DfConversation,
-                                                                    ((Folder)Mail.Parent).StoreID,
-                                                                    _globals.Ol.App,
-                                                                    true)
-                                                         .Cast<MailItem>()
-                                                         .ToList());
-            
-            ConversationItems = mailItems;
-
-            ConversationInfo = await Task.FromResult(mailItems.Select(mailItem => new MailItemInfo(mailItem))
-                                                              .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
-                                                              .ToList());
-            
-            // Switch to UI Thread
-            await _itemViewer.UiSyncContext;
-
-            _itemViewer.TopicThread.SetObjects(ConversationInfo);
-            _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
-        }
-
         #endregion
 
         #region Event Handlers
@@ -489,10 +458,15 @@ namespace QuickFiler.Controllers
             new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
 
             _itemViewer.CbxConversation.CheckedChanged += new System.EventHandler(this.CbxConversation_CheckedChanged);
-
             _itemViewer.BtnFlagTask.Click += new System.EventHandler(this.BtnFlagTask_Click);
+            _itemViewer.BtnFlagTask.MouseEnter += new System.EventHandler(this.Button_MouseEnter);
+            _itemViewer.BtnFlagTask.MouseLeave += new System.EventHandler(this.Button_MouseLeave);
             _itemViewer.BtnPopOut.Click += new System.EventHandler(this.BtnPopOut_Click);
+            _itemViewer.BtnPopOut.MouseEnter += new System.EventHandler(this.Button_MouseEnter);
+            _itemViewer.BtnPopOut.MouseLeave += new System.EventHandler(this.Button_MouseLeave);
             _itemViewer.BtnDelItem.Click += new System.EventHandler(this.BtnDelItem_Click);
+            _itemViewer.BtnDelItem.MouseEnter += new System.EventHandler(this.Button_MouseEnter);
+            _itemViewer.BtnDelItem.MouseLeave += new System.EventHandler(this.Button_MouseLeave);
             _itemViewer.TxtboxSearch.TextChanged += new System.EventHandler(this.TxtboxSearch_TextChanged);
             _itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtboxSearch_KeyDown);
             _itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.CboFolders_KeyDown);
@@ -518,7 +492,7 @@ namespace QuickFiler.Controllers
                 Keys.Right, (x) => this.ToggleConversationCheckbox(Enums.ToggleState.Off));
             _keyboardHandler.KdKeyActions.Add(
                 Keys.Left, (x) => this.ToggleConversationCheckbox(Enums.ToggleState.On));
-            _keyboardHandler.KdCharActions.Add('O', (x) => Debug.WriteLine($"{x} keyboardhandler tbd"));
+            _keyboardHandler.KdCharActions.Add('O', (x) => _ = _explorerController.OpenQFItem(Mail));
             _keyboardHandler.KdCharActions.Add('C', (x) => this.ToggleConversationCheckbox());
             _keyboardHandler.KdCharActions.Add('A', (x) => this.ToggleSaveAttachments());
             _keyboardHandler.KdCharActions.Add('M', (x) => this.ToggleSaveCopyOfMail());
@@ -562,6 +536,23 @@ namespace QuickFiler.Controllers
         internal void BtnPopOut_Click(object sender, EventArgs e) => _parent.PopOutControlGroup(ItemNumber);
 
         internal void BtnDelItem_Click(object sender, EventArgs e) => MarkItemForDeletion();
+
+        private void Button_MouseEnter(object sender, EventArgs e)
+        {
+            ((Button)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor; 
+        }
+        
+        private void Button_MouseLeave(object sender, EventArgs e)
+        {
+            if (((Button)sender).DialogResult == DialogResult.OK)
+            {
+                ((Button)sender).BackColor = _themes[_activeTheme].ButtonClickedColor;
+            }
+            else
+            {
+                ((Button)sender).BackColor = _themes[_activeTheme].ButtonBackColor;
+            }
+        }
 
         internal void TxtboxSearch_TextChanged(object sender, EventArgs e)
         {
@@ -851,7 +842,6 @@ namespace QuickFiler.Controllers
             Mail.Save();
         }
 
-
         #endregion
 
         #region Major Action Methods
@@ -918,10 +908,15 @@ namespace QuickFiler.Controllers
             }
         }
                
-        // TODO: Implement FlagAsTask
         public void FlagAsTask()
         {
-            throw new NotImplementedException();
+            List<MailItem> itemList = new() { Mail };
+            var flagTask = new FlagTasks(AppGlobals: _globals, ItemList: itemList, blFile: false, hWndCaller: _formHandle);
+            _itemViewer.BtnFlagTask.DialogResult = flagTask.Run(modal: true);
+            if (_itemViewer.BtnFlagTask.DialogResult == DialogResult.OK)
+            {
+                _itemViewer.BtnFlagTask.BackColor = _themes[_activeTheme].ButtonClickedColor;
+            }
         }
         
         public void MarkItemForDeletion()
