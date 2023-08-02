@@ -206,7 +206,6 @@ namespace QuickFiler.Controllers
                 grp.ItemController.PopulateFolderCombobox();
                 if (_darkMode) { grp.ItemController.SetThemeDark(async: false); }
                 else { grp.ItemController.SetThemeLight(async: false); }
-                i++;
             }
         }
 
