@@ -18,8 +18,7 @@ namespace QuickFiler.Test.Controllers
         private MockRepository mockRepository;
 
         private Mock<IApplicationGlobals> mockApplicationGlobals;
-        //private Mock<QfcFormViewer> mockQfcFormViewer;
-        private QfcFormViewer mockQfcFormViewer;
+        private QfcFormViewer formViewer;
         private Mock<IQfcFormController> mockQfcFormController;
         private Mock<IQfcKeyboardHandler> mockKeyboardHandler;
         private Mock<IQfcHomeController> mockHomeController;
@@ -32,7 +31,7 @@ namespace QuickFiler.Test.Controllers
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
             //this.mockQfcFormViewer = this.mockRepository.Create<QfcFormViewer>();
             //this.mockQfcFormViewer.SetupAllProperties();
-            this.mockQfcFormViewer = new QfcFormViewer();
+            this.formViewer = new QfcFormViewer();
             this.mockQfcFormController = this.mockRepository.Create<IQfcFormController>();
             this.mockKeyboardHandler = this.mockRepository.Create<IQfcKeyboardHandler>();
             this.mockHomeController = this.mockRepository.Create<IQfcHomeController>();
@@ -42,7 +41,7 @@ namespace QuickFiler.Test.Controllers
         {
             return new QfcCollectionController(
                 this.mockApplicationGlobals.Object,
-                this.mockQfcFormViewer, //.Object,
+                this.formViewer, //.Object,
                 false,
                 Enums.InitTypeEnum.InitSort,
                 this.mockHomeController.Object,

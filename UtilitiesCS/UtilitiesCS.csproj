@@ -267,6 +267,7 @@
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />
     <Compile Include="Threading\PriorityScheduler.cs" />
+    <Compile Include="Threading\TaskPriority.cs" />
     <Compile Include="Threading\UIThreadExtensions.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations.cs" />
     <Compile Include="Interfaces\IAppAutoFileObjects.cs" />

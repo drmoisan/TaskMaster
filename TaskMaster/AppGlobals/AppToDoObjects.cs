@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
@@ -55,29 +56,10 @@ namespace TaskMaster
 
         private string _projInfo_Filename;
         public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _defaults.FileName_ProjInfo);
-        //{
-        //    get
-        //    {
-        //        if (_projInfo_Filename is null)
-        //            _projInfo_Filename = _defaults.FileName_ProjInfo;
-        //        return _projInfo_Filename;
-        //    }
-        //}
-
+        
         private ProjectInfo _projInfo;
         public IProjectInfo ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
-        //{
-        //    get
-        //    {
-        //        if (_projInfo is null)
-        //        {
-        //            _projInfo = new ProjectInfo(filename: _defaults.FileName_ProjInfo, 
-        //                                        folderpath: Parent.FS.FldrAppData);
-        //            if (_projInfo.Count ==0) { _projInfo.Rebuild(Parent.Ol.App); }
-        //        }
-        //        return _projInfo;
-        //    }
-        //}        
+         
         async private Task LoadProjInfoAsync()
         {
             _projInfo = await Task.Factory.StartNew(
@@ -140,28 +122,8 @@ namespace TaskMaster
         private IIDList _idList;
         //TODO: Convert IDList to ScoCollection
         public IIDList IDList => Initialized(_idList, () => LoadIDList());
-        //{
-        //    get
-        //    {
-        //        if (_idList is null)
-        //        {
-        //            _idList = new IDList(_defaults.FileName_IDList,
-        //                                 Parent.FS.FldrAppData,
-        //                                 Parent.Ol.App);
-        //            if (_idList.Count == 0) { _idList.RefreshIDList(); }
-        //        }
-        //        return _idList;
-        //    }
-        //}
-        async private Task LoadIdListAsync()
-        {
-            _idList = await Task<IDList>.Factory.StartNew(() => new IDList(_defaults.FileName_IDList,
-                                                                           Parent.FS.FldrAppData,
-                                                                           Parent.Ol.App),
-                                                          default,
-                                                          TaskCreationOptions.None,
-                                                          PriorityScheduler.BelowNormal);
-        }
+        async private Task LoadIdListAsync() => _idList = await TaskPriority<IIDList>.Run(() => LoadIDList(), PriorityScheduler.BelowNormal);
+        
         private IIDList LoadIDList()
         {
             var idList = new IDList(FnameIDList,
@@ -173,43 +135,18 @@ namespace TaskMaster
 
         private string _fnameDictRemap;
         public string FnameDictRemap => Initialized(_fnameDictRemap, () => _defaults.FileName_DictRemap);
-        //{
-        //    get
-        //    {
-        //        if (_fnameDictRemap is null)
-        //            _fnameDictRemap = _defaults.FileName_DictRemap;
-        //        return _fnameDictRemap;
-        //    }
-        //}
-
+        
         private Dictionary<string, string> _dictRemap;
         public Dictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictJSON(Parent.FS.FldrStaging, FnameDictRemap));
-        //{
-        //    get
-        //    {
-        //        if (_dictRemap is null)
-        //        {
-        //            _dictRemap = LoadDictCSV(Parent.FS.FldrStaging, _defaults.FileName_DictRemap);
-        //        }
-        //        return _dictRemap;
-        //    }
-        //}
+        
         async private Task LoadDictRemapAsync() => _dictRemap = await LoadDictJSONAsync(Parent.FS.FldrStaging, FnameDictRemap);
-        
 
-        
         //TODO: Convert CategoryFilters to ScoCollection
         private ISerializableList<string> _catFilters;
         public ISerializableList<string> CategoryFilters
         {
             get => Initialized(_catFilters, () => new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
                                                                                folderpath: _parent.FS.FldrPythonStaging));
-            //{
-            //    if (_catFilters is null)
-            //        _catFilters = new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
-            //                                                   folderpath: _parent.FS.FldrPythonStaging);
-            //    return _catFilters;
-            //}
             set
             {
                 _catFilters = value;
@@ -262,7 +199,7 @@ namespace TaskMaster
 
             string filepath = Path.Combine(fpath, filename);
             Dictionary<string, string> dict = null;
-            var response = MsgBoxResult.Ignore;
+            var response = DialogResult.Ignore;
 
             try
             {                
@@ -270,22 +207,22 @@ namespace TaskMaster
             }
             catch (FileNotFoundException ex)
             {
-                response = Interaction.MsgBox(filepath + "not found. Load from CSV?", Constants.vbYesNo);
+                response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo,MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                response = Interaction.MsgBox(filepath + "encountered a problem. " + ex.Message + "Load from CSV?", Constants.vbYesNo);
+                response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
             }
             finally
             {
-                if (response == Constants.vbYes)
+                if (response == DialogResult.Yes)
                 {
                     dict = LoadDictCSV(fpath, filename);
                 }
-                else if (response == Constants.vbNo)
+                else if (response == DialogResult.No)
                 {
-                    response = Interaction.MsgBox("Start a new blank dictionary?", Constants.vbYesNo);
-                    if (response == Constants.vbYes)
+                    response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    if (response == DialogResult.Yes)
                     {
                         dict = new Dictionary<string, string>();
                     }
@@ -303,7 +240,7 @@ namespace TaskMaster
 
             string filepath = Path.Combine(fpath, filename);
             Dictionary<string, string> dict = null;
-            var response = MsgBoxResult.Ignore;
+            var response = DialogResult.Ignore;
 
             try
             {
@@ -320,22 +257,22 @@ namespace TaskMaster
             catch (FileNotFoundException)
             {
                 
-                response = Interaction.MsgBox(filepath + "not found. Load from CSV?", Constants.vbYesNo);
+                response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                response = Interaction.MsgBox(filepath + "encountered a problem. " + ex.Message + "Load from CSV?", Constants.vbYesNo);
+                response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
             }
             finally
             {
-                if (response == Constants.vbYes)
+                if (response == DialogResult.Yes)
                 {
                     dict = await LoadDictCSVAsync(fpath, filename);
                 }
-                else if (response == Constants.vbNo)
+                else if (response == DialogResult.No)
                 {
-                    response = Interaction.MsgBox("Start a new blank dictionary?", Constants.vbYesNo);
-                    if (response == Constants.vbYes)
+                    response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    if (response == DialogResult.Yes)
                     {
                         dict = new Dictionary<string, string>();
                     }
