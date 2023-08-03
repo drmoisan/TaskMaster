@@ -1,5 +1,6 @@
 ﻿
 using System.Threading.Tasks;
+using TaskMaster;
 
 namespace UtilitiesCS
 {
@@ -10,5 +11,6 @@ namespace UtilitiesCS
         IOlObjects Ol { get; }
         IToDoObjects TD { get; }
         IAppAutoFileObjects AF { get; }
+        IAppEvents Events { get; }
     }
 }

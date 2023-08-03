@@ -14,6 +14,7 @@ namespace TaskMaster
         private AppOlObjects _olObjects;
         private AppToDoObjects _toDoObjects;
         private AppAutoFileObjects _autoFileObjects;
+        private AppEvents _events;
 
         public ApplicationGlobals(Application OlApp)
         {
@@ -21,6 +22,7 @@ namespace TaskMaster
             _olObjects = new AppOlObjects(OlApp);
             _toDoObjects = new AppToDoObjects(this);
             _autoFileObjects = new AppAutoFileObjects(this);
+            _events = new AppEvents(this);
         }
 
         async public Task LoadAsync()
@@ -62,6 +64,9 @@ namespace TaskMaster
             }
 
         }
+
+        public IAppEvents Events => _events;
+        
 
         #region Legacy Definitions and Constants
 

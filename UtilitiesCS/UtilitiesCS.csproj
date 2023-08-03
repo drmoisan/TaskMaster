@@ -266,6 +266,7 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />
+    <Compile Include="Interfaces\IAppEvents.cs" />
     <Compile Include="Threading\PriorityScheduler.cs" />
     <Compile Include="Threading\TaskPriority.cs" />
     <Compile Include="Threading\UIThreadExtensions.cs" />

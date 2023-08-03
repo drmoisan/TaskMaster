@@ -324,6 +324,7 @@
   <ItemGroup>
     <Compile Include="AddInUtilities.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjects.cs" />
+    <Compile Include="AppGlobals\AppEvents.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />

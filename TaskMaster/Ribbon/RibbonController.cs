@@ -127,17 +127,17 @@ namespace TaskMaster
         {
             if (blHook == true)
             {
-                Globals.ThisAddIn.Events_Unhook();
+                _globals.Events.Unhook();
                 blHook = false;
                 Ribbon.InvalidateControl("BtnHookToggle");
-                Interaction.MsgBox("Events Disconnected");
+                MessageBox.Show("Events Disconnected");
             }
             else
             {
-                Globals.ThisAddIn.Events_Hook();
+                _globals.Events.Hook();
                 blHook = true;
                 Ribbon.InvalidateControl("BtnHookToggle");
-                Interaction.MsgBox("Hooked Events");
+                MessageBox.Show("Hooked Events");
             }
         }
 
