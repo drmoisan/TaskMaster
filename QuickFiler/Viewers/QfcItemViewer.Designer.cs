@@ -198,7 +198,7 @@
             this.LblSentOn.Name = "LblSentOn";
             this.LblSentOn.Size = new System.Drawing.Size(256, 29);
             this.LblSentOn.TabIndex = 6;
-            this.LblSentOn.Text = "12/31/2023 12:59 PM";
+            this.LblSentOn.Text = "12/31/2999 12:59 PM";
             // 
             // LblSender
             // 
@@ -211,7 +211,7 @@
             this.LblSender.Name = "LblSender";
             this.LblSender.Size = new System.Drawing.Size(545, 33);
             this.LblSender.TabIndex = 1;
-            this.LblSender.Text = "SPA - Corporate Communications {PEP}";
+            this.LblSender.Text = "[SENDER NAME]";
             // 
             // lblCaptionTriage
             // 
@@ -287,7 +287,7 @@
             this.LblConvCt.Padding = new System.Windows.Forms.Padding(6);
             this.LblConvCt.Size = new System.Drawing.Size(84, 56);
             this.LblConvCt.TabIndex = 3;
-            this.LblConvCt.Text = "15";
+            this.LblConvCt.Text = "99";
             // 
             // lblSubject
             // 

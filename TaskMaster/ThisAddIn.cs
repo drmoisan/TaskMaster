@@ -27,106 +27,116 @@ namespace TaskMaster
             InitializeDPI();
 
             _ribbonController.SetGlobals(_globals);
+            _externalUtilities.SetGlobals(_globals, _ribbonController);
             //Events_Hook();
         }
 
         private ApplicationGlobals _globals;
+        private AddInUtilities _externalUtilities;
+
+        protected override object RequestComAddInAutomationService()
+        {
+            if (_externalUtilities is null)
+                _externalUtilities = new AddInUtilities();
+
+            return _externalUtilities;
+        }
 
         public List<string> CatFilterList;
-        private Items _OlToDoItems;
-
+        
+        private Items _olToDoItems;
         private Items OlToDoItems
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return _OlToDoItems;
+                return _olToDoItems;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (_OlToDoItems != null)
+                if (_olToDoItems != null)
                 {
-                    _OlToDoItems.ItemAdd -= OlToDoItems_ItemAdd;
-                    _OlToDoItems.ItemChange -= OlToDoItems_ItemChange;
+                    _olToDoItems.ItemAdd -= OlToDoItems_ItemAdd;
+                    _olToDoItems.ItemChange -= OlToDoItems_ItemChange;
                 }
 
-                _OlToDoItems = value;
-                if (_OlToDoItems != null)
+                _olToDoItems = value;
+                if (_olToDoItems != null)
                 {
-                    _OlToDoItems.ItemAdd += OlToDoItems_ItemAdd;
-                    _OlToDoItems.ItemChange += OlToDoItems_ItemChange;
+                    _olToDoItems.ItemAdd += OlToDoItems_ItemAdd;
+                    _olToDoItems.ItemChange += OlToDoItems_ItemChange;
                 }
             }
         }
+        
         private List<Items> ListOfPSTtodo;
         private List<Items> ListToDoItems;
-        private Items _OlInboxItems;
-
+        
+        private Items _olInboxItems;
         private Items OlInboxItems
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return _OlInboxItems;
+                return _olInboxItems;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                _OlInboxItems = value;
+                _olInboxItems = value;
             }
         }
         
-        private Reminders _OlReminders;
+        private Reminders _olReminders;
         private Reminders OlReminders
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return _OlReminders;
+                return _olReminders;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                _OlReminders = value;
+                _olReminders = value;
             }
         }
-        private NameSpace OlNS;
+        
+
+        //private readonly string _filenameProjectList;
+        //private readonly string _filenameProjInfo2;
+        //private readonly string _filenameProjInfo = "ProjInfo.bin";
+        //public readonly string FilenameDictPpl = "pplkey.xml";
+        //public readonly string StagingPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        //public string EmailRoot;
+        //private const string _appDataFolder = "TaskMaster";
+
+        //public ProjectInfo ProjInfo;
+        //public Dictionary<string, string> DictPPL;
+        //private IIDList _IDList;
+
+        //public IIDList IDList
+        //{
+        //    [MethodImpl(MethodImplOptions.Synchronized)]
+        //    get
+        //    {
+        //        return _IDList;
+        //    }
+
+        //    [MethodImpl(MethodImplOptions.Synchronized)]
+        //    set
+        //    {
+        //        _IDList = value;
+        //    }
+        //}
+        //public TreeOfToDoItems DM_CurView;
+        //public FlagParser Cats;
 
         private RibbonController _ribbonController;
-
-        private readonly string _filenameProjectList;
-        private readonly string _filenameProjInfo2;
-        private readonly string _filenameProjInfo = "ProjInfo.bin";
-        public readonly string FilenameDictPpl = "pplkey.xml";
-        public readonly string StagingPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        public string EmailRoot;
-        private const string _appDataFolder = "TaskMaster";
-
-        public ProjectInfo ProjInfo;
-        public Dictionary<string, string> DictPPL;
-        private IIDList _IDList;
-
-        public IIDList IDList
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _IDList;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                _IDList = value;
-            }
-        }
-        public TreeOfToDoItems DM_CurView;
-        public FlagParser Cats;
-
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
             _ribbonController = new RibbonController();

@@ -1,26 +1,37 @@
-﻿using System;
+﻿using Microsoft.Web.WebView2.Core;
+using QuickFiler.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace QuickFiler
 {
-    public partial class QfcItemViewerLightSelected : UserControl
+    public partial class QfcItemViewerExpanded : UserControl
     {
-        public QfcItemViewerLightSelected()
+        public QfcItemViewerExpanded()
         {
             InitializeComponent();
+            _context = SynchronizationContext.Current;
             InitTipsLabelsList();
         }
 
         private IList<Label> _tipsLabels;
+        private IQfcItemController _controller;
+        private CoreWebView2Environment _webViewEnvironment;
+        private SynchronizationContext _context;
+
         public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IQfcItemController Controller { get => _controller; set => _controller = value; }
+        public SynchronizationContext UiSyncContext { get => _context; }
+
         private void InitTipsLabelsList()
         {
             _tipsLabels = new List<Label>
@@ -38,16 +49,6 @@ namespace QuickFiler
 
         }
 
-        private void CboFolders_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            {
-                var Brush = Brushes.Black;
 
-                var Point = new Point(2, e.Index * e.Bounds.Height + 1);
-                int index = e.Index >= 0 ? e.Index : 0;
-                e.Graphics.FillRectangle(new SolidBrush(CboFolders.BackColor), new Rectangle(Point, e.Bounds.Size));
-                e.Graphics.DrawString(CboFolders.Items[index].ToString(), e.Font, Brush, e.Bounds, StringFormat.GenericDefault);
-            }
-        }
     }
 }

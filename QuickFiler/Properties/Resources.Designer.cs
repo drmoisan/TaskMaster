@@ -140,15 +140,18 @@ namespace QuickFiler.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;WordSection1&quot;&gt;
-        ///&lt;p class=MsoNormal style=&apos;margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-        ///225.0pt;mso-layout-grid-align:none;text-autospace:none&apos;&gt;&lt;b&gt;&lt;span
-        ///style=&apos;color:black&apos;&gt;From:&lt;span style=&apos;mso-tab-count:1&apos;&gt; &lt;/span&gt;&lt;/span&gt;&lt;/b&gt;&lt;span
-        ///style=&apos;color:black&apos;&gt;SenderField&lt;o:p&gt;&lt;/o:p&gt;&lt;/span&gt;&lt;/p&gt;
+        ///   Looks up a localized string similar to &lt;html&gt;
+        ///    &lt;head&gt;
+        ///    &lt;/head&gt;
+        ///    &lt;body&gt;
+        ///        &lt;div class=&quot;WordSection1&quot;&gt;
+        ///            &lt;p class=MsoNormal style=&apos;margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
+        ///            225.0pt;mso-layout-grid-align:none;text-autospace:none&apos;&gt;
+        ///                &lt;b&gt;&lt;span style=&apos;color:black&apos;&gt;From:&lt;span style=&apos;mso-tab-count:1&apos;&gt; &lt;/span&gt;&lt;/span&gt;&lt;/b&gt;
+        ///                &lt;span style=&apos;color:black&apos;&gt;SenderField&lt;o:p&gt;&lt;/o:p&gt;&lt;/span&gt;
+        ///            &lt;/p&gt;
         ///
-        ///&lt;p class=MsoNormal style=&apos;margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
-        ///225.0pt;mso-layout-grid-align:none;text-autospace:none&apos;&gt;&lt;b&gt;&lt;span
-        ///style=&apos;color:black&apos;&gt;Sent:&lt;span style=&apos;mso-tab-count:1&apos;&gt;  [rest of string was truncated]&quot;;.
+        ///            &lt;p class=MsoNormal style=&apos;margin-left:225.0pt;text-indent:-225.0 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EmailHeader {
             get {
@@ -172,6 +175,16 @@ namespace QuickFiler.Properties {
         internal static byte[] FlagDarkRed1 {
             get {
                 object obj = ResourceManager.GetObject("FlagDarkRed1", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] NewFolder {
+            get {
+                object obj = ResourceManager.GetObject("NewFolder", resourceCulture);
                 return ((byte[])(obj));
             }
         }

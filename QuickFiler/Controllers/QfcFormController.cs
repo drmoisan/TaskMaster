@@ -29,6 +29,7 @@ namespace QuickFiler.Controllers
             _globals = appGlobals;
             _initType = initType;
             _formViewer = formViewer;
+            _globals.AF.MaximizeQuickFileWindow = MaximizeQfcFormViewer;
             _formViewer.SetController(this);
             _parentCleanup = parentCleanup;
             _parent = parent;

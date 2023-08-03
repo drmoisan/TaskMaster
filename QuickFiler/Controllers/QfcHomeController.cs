@@ -19,7 +19,7 @@ namespace QuickFiler.Controllers
         public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
         {
             _globals = AppGlobals;
-            InitAfObjects();
+            //InitAfObjects();
             _parentCleanup = ParentCleanup;
             _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
             _explorerController = new QfcExplorerController(Enums.InitTypeEnum.InitSort, _globals, this);
@@ -28,22 +28,20 @@ namespace QuickFiler.Controllers
             _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
         }
 
-        
-        
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
 
         #endregion Constructors, Initializers, and Destructors
 
-        internal void InitAfObjects() 
-        {
-            if (_globals.AF.CtfMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CtfMap)}"); }
-            if (_globals.AF.RecentsList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.RecentsList)}"); }
-            if (_globals.AF.CommonWords is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CommonWords)}"); }
-            if (_globals.AF.SubjectMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.SubjectMap)}"); }
-            if (_globals.AF.Encoder is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.Encoder)}"); }
-            _globals.AF.SubjectMap.Where(x => x.Encoder is null).ForEach(x => x.Encoder = _globals.AF.Encoder);
-        }
+        //internal void InitAfObjects() 
+        //{
+        //    if (_globals.AF.CtfMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CtfMap)}"); }
+        //    if (_globals.AF.RecentsList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.RecentsList)}"); }
+        //    if (_globals.AF.CommonWords is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CommonWords)}"); }
+        //    if (_globals.AF.SubjectMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.SubjectMap)}"); }
+        //    if (_globals.AF.Encoder is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.Encoder)}"); }
+        //    _globals.AF.SubjectMap.Where(x => x.Encoder is null).ForEach(x => x.Encoder = _globals.AF.Encoder);
+        //}
 
         public void Run()
         {
@@ -162,9 +160,6 @@ namespace QuickFiler.Controllers
 
         private QfcFormViewer _formViewer;
         public QfcFormViewer FormViewer { get => _formViewer; }
-
-        
-
 
     }
 }

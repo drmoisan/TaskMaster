@@ -23,11 +23,9 @@ namespace TaskMaster
         private IApplicationGlobals _globals;
         private bool blHook = true;
         private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
-        private QuickFiler.Interfaces.IQfcHomeController _quickFiler;
+        private IQfcHomeController _quickFiler;
 
-        public RibbonController()
-        {
-        }
+        public RibbonController() { }
 
         internal void SetGlobals(IApplicationGlobals AppGlobals)
         {

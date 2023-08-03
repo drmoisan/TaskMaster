@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuickFiler;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -48,8 +49,10 @@ namespace TaskMaster
         private CtfMap _ctfMap;
         private ISerializableList<string> _commonWords;
         private Properties.Settings _defaults = Properties.Settings.Default;
-        
 
+        private System.Action _maximizeQuickFileWindow = null;
+        public System.Action MaximizeQuickFileWindow { get => _maximizeQuickFileWindow; set => _maximizeQuickFileWindow = value; }
+        
         public int LngConvCtPwr
         {
             get => _defaults.ConversationExponent;

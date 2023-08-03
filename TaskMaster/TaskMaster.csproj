@@ -322,6 +322,7 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="AddInUtilities.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjects.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />

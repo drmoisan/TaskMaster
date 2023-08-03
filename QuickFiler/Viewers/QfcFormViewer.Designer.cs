@@ -40,7 +40,7 @@
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
-            this.qfcItemViewerExpandedLight1 = new QuickFiler.QfcItemViewerExpandedLight();
+            this.qfcItemViewerExpanded1 = new QuickFiler.QfcItemViewerExpanded();
             this.Worker = new System.ComponentModel.BackgroundWorker();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
@@ -178,7 +178,7 @@
             this.L1v0L2L3v_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.L1v0L2L3v_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v0L2L3v_TableLayout.Controls.Add(this.QfcItemViewerTemplate, 0, 0);
-            this.L1v0L2L3v_TableLayout.Controls.Add(this.qfcItemViewerExpandedLight1, 0, 1);
+            this.L1v0L2L3v_TableLayout.Controls.Add(this.qfcItemViewerExpanded1, 0, 1);
             this.L1v0L2L3v_TableLayout.Dock = System.Windows.Forms.DockStyle.Top;
             this.L1v0L2L3v_TableLayout.Location = new System.Drawing.Point(0, 0);
             this.L1v0L2L3v_TableLayout.Margin = new System.Windows.Forms.Padding(6);
@@ -204,18 +204,19 @@
             this.QfcItemViewerTemplate.Size = new System.Drawing.Size(1521, 197);
             this.QfcItemViewerTemplate.TabIndex = 0;
             // 
-            // qfcItemViewerExpandedLight1
+            // qfcItemViewerExpanded1
             // 
-            this.qfcItemViewerExpandedLight1.AutoSize = true;
-            this.qfcItemViewerExpandedLight1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.L1v0L2L3v_TableLayout.SetColumnSpan(this.qfcItemViewerExpandedLight1, 2);
-            this.qfcItemViewerExpandedLight1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.qfcItemViewerExpandedLight1.Location = new System.Drawing.Point(12, 233);
-            this.qfcItemViewerExpandedLight1.Margin = new System.Windows.Forms.Padding(12);
-            this.qfcItemViewerExpandedLight1.MinimumSize = new System.Drawing.Size(1370, 994);
-            this.qfcItemViewerExpandedLight1.Name = "qfcItemViewerExpandedLight1";
-            this.qfcItemViewerExpandedLight1.Size = new System.Drawing.Size(1521, 994);
-            this.qfcItemViewerExpandedLight1.TabIndex = 1;
+            this.qfcItemViewerExpanded1.AutoSize = true;
+            this.qfcItemViewerExpanded1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.L1v0L2L3v_TableLayout.SetColumnSpan(this.qfcItemViewerExpanded1, 2);
+            this.qfcItemViewerExpanded1.Controller = null;
+            this.qfcItemViewerExpanded1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.qfcItemViewerExpanded1.Location = new System.Drawing.Point(6, 227);
+            this.qfcItemViewerExpanded1.Margin = new System.Windows.Forms.Padding(6);
+            this.qfcItemViewerExpanded1.MinimumSize = new System.Drawing.Size(1516, 197);
+            this.qfcItemViewerExpanded1.Name = "qfcItemViewerExpanded1";
+            this.qfcItemViewerExpanded1.Size = new System.Drawing.Size(1533, 1006);
+            this.qfcItemViewerExpanded1.TabIndex = 1;
             // 
             // QfcFormViewer
             // 
@@ -253,6 +254,6 @@
         public SVGControl.ToggleSwitch DarkMode;
         public QfcItemViewer QfcItemViewerTemplate;
         internal System.ComponentModel.BackgroundWorker Worker;
-        private QfcItemViewerExpandedLight qfcItemViewerExpandedLight1;
+        private QfcItemViewerExpanded qfcItemViewerExpanded1;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -20,5 +21,6 @@ namespace UtilitiesCS
         int SmithWatterman_GapPenalty { get; set; }
         public ISubjectMapSL SubjectMap { get;  }
         ISubjectMapEncoder Encoder { get; }
+        System.Action MaximizeQuickFileWindow { get; set; }
     }
 }
