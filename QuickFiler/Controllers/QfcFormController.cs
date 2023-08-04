@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 
 namespace QuickFiler.Controllers
 {    
-    internal class QfcFormController : IQfcFormController
+    internal class QfcFormController : IFilerFormController
     {
         #region Contructors
 
@@ -24,7 +24,7 @@ namespace QuickFiler.Controllers
                                  QfcFormViewer formViewer,
                                  Enums.InitTypeEnum initType,
                                  System.Action parentCleanup,
-                                 IQfcHomeController parent)
+                                 IFilerHomeController parent)
         { 
             _globals = appGlobals;
             _initType = initType;
@@ -57,7 +57,7 @@ namespace QuickFiler.Controllers
         private Enums.InitTypeEnum _initType;
         private bool _blRunningModalCode = false;
         private bool _blSuppressEvents = false;
-        private IQfcHomeController _parent;
+        private IFilerHomeController _parent;
         private int _itemsPerIteration = -1;
 
         #endregion
@@ -121,8 +121,8 @@ namespace QuickFiler.Controllers
             {
                 x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHndlr.KeyboardHandler_PreviewKeyDown);
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
-                x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyUp);
-                x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyPress);
+                //x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyUp);
+                //x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyPress);
                 // Debug.WriteLine($"Registered handler for {x.Name}");
             },
             new List<Control> { _formViewer.QfcItemViewerTemplate });
@@ -153,7 +153,10 @@ namespace QuickFiler.Controllers
         
         public IQfcCollectionController Groups { get => _groups; }
         public IntPtr FormHandle { get => _formViewer.Handle; }
-        
+        public QfcFormViewer FormViewer { get => _formViewer; }
+        public void ToggleOffNavigation(bool async) => _groups.ToggleOffNavigation(async);
+        public void ToggleOnNavigation(bool async) => _groups.ToggleOnNavigation(async);
+
         #endregion
 
         #region Event Handlers
@@ -218,7 +221,7 @@ namespace QuickFiler.Controllers
 
         public void ButtonOK_Click()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 if (_blRunningModalCode == false)
                 {
@@ -265,7 +268,7 @@ namespace QuickFiler.Controllers
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
                                                   darkMode: Properties.Settings.Default.DarkMode,
-                                                  InitType: Enums.InitTypeEnum.InitSort,
+                                                  InitType: Enums.InitTypeEnum.Sort,
                                                   homeController: _parent,
                                                   parent: this);
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);

@@ -273,6 +273,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\EfcFormController.cs" />
+    <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\Theme.cs" />
@@ -283,8 +285,8 @@
     <Compile Include="Interfaces\IQfcCollectionController.cs" />
     <Compile Include="Interfaces\IQfcDatamodel.cs" />
     <Compile Include="Interfaces\IQfcExplorerController.cs" />
-    <Compile Include="Interfaces\IQfcFormController.cs" />
-    <Compile Include="Interfaces\IQfcHomeController.cs" />
+    <Compile Include="Interfaces\IFilerFormController.cs" />
+    <Compile Include="Interfaces\IFilerHomeController.cs" />
     <Compile Include="Interfaces\IQfcItemController.cs" />
     <Compile Include="Interfaces\IQfcKeyboardHandler.cs" />
     <Compile Include="Legacy\AcceleratorParser.cs" />
@@ -341,11 +343,11 @@
     <Compile Include="Viewers\QfcItemViewer.Designer.cs">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Viewers\SingleSortViewer.cs">
+    <Compile Include="Viewers\EfcViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewers\SingleSortViewer.Designer.cs">
-      <DependentUpon>SingleSortViewer.cs</DependentUpon>
+    <Compile Include="Viewers\EfcViewer.Designer.cs">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -365,8 +367,8 @@
     <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\SingleSortViewer.resx">
-      <DependentUpon>SingleSortViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Viewers\EfcViewer.resx">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

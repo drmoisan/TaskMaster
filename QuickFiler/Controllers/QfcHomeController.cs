@@ -12,7 +12,7 @@ using System.IO;
 
 namespace QuickFiler.Controllers
 {
-    public class QfcHomeController : IQfcHomeController
+    public class QfcHomeController : IFilerHomeController
     {
         #region Constructors, Initializers, and Destructors
 
@@ -22,10 +22,10 @@ namespace QuickFiler.Controllers
             //InitAfObjects();
             _parentCleanup = ParentCleanup;
             _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
-            _explorerController = new QfcExplorerController(Enums.InitTypeEnum.InitSort, _globals, this);
+            _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, _globals, this);
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
-            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
+            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.Sort, Cleanup, this);
         }
 
         private IApplicationGlobals _globals;
@@ -141,13 +141,14 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
-        public bool Loaded { get => _formViewer is not null; }
+        private bool _loaded = false;
+        public bool Loaded { get => _loaded; }
 
         private IQfcExplorerController _explorerController;
         public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
         
-        private IQfcFormController _formController;
-        public IQfcFormController FormCtrlr { get => _formController; }
+        private QfcFormController _formController;
+        public IFilerFormController FormCtrlr { get => _formController; }
         
         private IQfcKeyboardHandler _keyboardHandler;
         public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
@@ -159,7 +160,8 @@ namespace QuickFiler.Controllers
         public cStopWatch StopWatch { get => _stopWatch; }
 
         private QfcFormViewer _formViewer;
-        public QfcFormViewer FormViewer { get => _formViewer; }
+        //public QfcFormViewer FormViewer { get => _formViewer; }
 
+        
     }
 }

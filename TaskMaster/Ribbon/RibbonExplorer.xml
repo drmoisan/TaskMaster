@@ -22,7 +22,7 @@
             <tab idMso="TabMail">
               <group id="Group2" label="Task Master">
                 <button id="FlagAsTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
-                <button id="QuickFilerOld" imageMso="UpdateFolder" onAction="QuickFilerOld_Click" label="Quick Filer" size="large" />
+                <button id="SortEmail" imageMso="MoveToFolder" onAction="SortEmail_Click" label="Sort Email" size="large"/>
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
                 <button id="Test" imageMso="TechnicalSupport" onAction="Runtest" label="Test" size="large"/>
               </group>

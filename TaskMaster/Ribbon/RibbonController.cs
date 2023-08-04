@@ -23,7 +23,7 @@ namespace TaskMaster
         private IApplicationGlobals _globals;
         private bool blHook = true;
         private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
-        private IQfcHomeController _quickFiler;
+        private IFilerHomeController _quickFiler;
 
         public RibbonController() { }
 
@@ -182,6 +182,12 @@ namespace TaskMaster
             var Mail = (Outlook.MailItem)_globals.Ol.App.ActiveExplorer().Selection[1];
             var recips = Mail.Recipients.Cast<Recipient>();
             var info = recips.GetInfo();
+        }
+
+        internal void SortEmail()
+        {
+            var sorter = new EfcHomeController(_globals, () => { });
+            sorter.Run();
         }
 
     }

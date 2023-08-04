@@ -20,8 +20,8 @@ namespace QuickFiler.Controllers
                                        QfcFormViewer viewerInstance,
                                        bool darkMode,
                                        Enums.InitTypeEnum InitType,
-                                       IQfcHomeController homeController,
-                                       IQfcFormController parent)
+                                       IFilerHomeController homeController,
+                                       IFilerFormController parent)
         {
 
             _formViewer = viewerInstance;
@@ -44,8 +44,8 @@ namespace QuickFiler.Controllers
         private QfcFormViewer _formViewer;
         private Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
-        private IQfcHomeController _homeController;
-        private IQfcFormController _parent;
+        private IFilerHomeController _homeController;
+        private IFilerFormController _parent;
         private int _itemHeight;
         private Panel _itemPanel;
         private TableLayoutPanel _itemTLP;

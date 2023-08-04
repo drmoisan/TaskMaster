@@ -20,7 +20,7 @@ namespace ToDoModel
             throw new NotImplementedException();
         }
 
-        public static void MASTER_SortEmailsToExistingFolder(IList<MailItem> selItems, bool Pictures_Checkbox, string SortFolderpath, bool Save_MSG, bool Attchments, bool Remove_Flow_File, IApplicationGlobals AppGlobals, string StrRoot = "")
+        public static void MASTER_SortEmailsToExistingFolder(IList<MailItem> selItems, bool picturesCheckbox, string sortFolderpath, bool saveMsg, bool attchments, bool removeFlowFile, IApplicationGlobals appGlobals, string strRoot = "")
         {
             string loc;
             string FileSystem_LOC;
@@ -47,13 +47,13 @@ namespace ToDoModel
             // ******************
             // ***INITIALIZE*****
             // ******************
-            var _globals = AppGlobals;
-            if (string.IsNullOrEmpty(StrRoot))
+            var _globals = appGlobals;
+            if (string.IsNullOrEmpty(strRoot))
             {
-                StrRoot = _globals.Ol.ArchiveRootPath;
+                strRoot = _globals.Ol.ArchiveRootPath;
             }
             // TODO: Eliminate following line once Path.Combine used below
-            loc = StrRoot + @"\";
+            loc = strRoot + @"\";
 
             var _olApp = _globals.Ol.App;
             var OlNS = _globals.Ol.NamespaceMAPI;
@@ -71,7 +71,7 @@ namespace ToDoModel
             {
                 strFolderPath = _globals.FS.FldrFlow;
             }
-            else if (folderCurrent.FolderPath.Contains(StrRoot) & (folderCurrent.FolderPath != StrRoot ))
+            else if (folderCurrent.FolderPath.Contains(strRoot) & (folderCurrent.FolderPath != strRoot ))
             {
                 strFolderPath = folderCurrent.ToFsFolder(OlFolderRoot: _globals.Ol.ArchiveRootPath, FsFolderRoot: _globals.FS.FldrRoot);
             }
@@ -88,14 +88,14 @@ namespace ToDoModel
             // *************************************************************************
             string strTemp2 = "";
             // QUESTION: Original code allowed path to be an optional variable and then did something if a value was supplied that didn't match the archive root. Need to determine why and if new treatment loses functionality
-            if ((StrRoot ?? "") != (_globals.Ol.ArchiveRootPath ?? ""))
+            if ((strRoot ?? "") != (_globals.Ol.ArchiveRootPath ?? ""))
             {
                 strTemp2 = _globals.Ol.ArchiveRootPath.Substring(_globals.Ol.EmailRootPath.Length);
-                FileSystem_LOC = _globals.FS.FldrRoot + strTemp2 + @"\" + SortFolderpath;  // Parent Directory
+                FileSystem_LOC = _globals.FS.FldrRoot + strTemp2 + @"\" + sortFolderpath;  // Parent Directory
             }
             else
             {
-                FileSystem_LOC = Path.Combine(_globals.FS.FldrRoot, SortFolderpath);
+                FileSystem_LOC = Path.Combine(_globals.FS.FldrRoot, sortFolderpath);
             }
 
             FileSystem_DelLOC = _globals.FS.FldrRoot;
@@ -104,7 +104,7 @@ namespace ToDoModel
             // Call SaveAsPDF.SaveMessageAsPDF(FileSystem_LOC, selItems)
             // End If
 
-            if (Save_MSG == true)
+            if (saveMsg == true)
             {
                 SaveMessageAsMSG(FileSystem_LOC, selItems);
             }
@@ -114,17 +114,17 @@ namespace ToDoModel
 
             // ****Save Attachment to OneDrive directory****
 
-            if (Attchments == true)
+            if (attchments == true)
             {
                 // Email_SortSaveAttachment.SaveAttachmentsFromSelection(SavePath:=FileSystem_LOC, Verify_Action:=Pictures_Checkbox, selItems:=selItems, save_images:=Pictures_Checkbox, SaveMSG:=Save_MSG)
-                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: AppGlobals, SavePath: FileSystem_LOC, Verify_Action: Pictures_Checkbox, selItems: selItems, save_images: Pictures_Checkbox, SaveMSG: Save_MSG);
+                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: appGlobals, SavePath: FileSystem_LOC, Verify_Action: picturesCheckbox, selItems: selItems, save_images: picturesCheckbox, SaveMSG: saveMsg);
             }
 
 
 
-            if (Remove_Flow_File == true)
+            if (removeFlowFile == true)
             {
-                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: AppGlobals, SavePath: strFolderPath, DELFILE: true, selItems: selItems);
+                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: appGlobals, SavePath: strFolderPath, DELFILE: true, selItems: selItems);
             }
 
 
@@ -135,8 +135,8 @@ namespace ToDoModel
 
             // If strTemp2 = "" Then Add_Recent(SortFolderpath)
             if (string.IsNullOrEmpty(strTemp2))
-                _globals.AF.RecentsList.AddRecent(SortFolderpath);
-            loc = Path.Combine(StrRoot, SortFolderpath);
+                _globals.AF.RecentsList.AddRecent(sortFolderpath);
+            loc = Path.Combine(strRoot, sortFolderpath);
             sortFolder = new FolderHandler(_globals).GetFolder(loc); // Call Function to turn text to Folder
 
             // Call Flag_Fields_Categories.SetCategory("Autosort")
@@ -158,7 +158,7 @@ namespace ToDoModel
                             if (string.IsNullOrEmpty(strTemp2))
                             {
                                 // Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
-                                UpdateForMove(MSG, SortFolderpath, AppGlobals.AF.CtfMap, AppGlobals.AF.SubjectMap);
+                                UpdateForMove(MSG, sortFolderpath, appGlobals.AF.CtfMap, appGlobals.AF.SubjectMap);
                             };
                             try
                             {

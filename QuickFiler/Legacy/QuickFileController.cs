@@ -146,7 +146,7 @@ namespace QuickFiler.Legacy
             _blSuppressEvents = true;
 
             // Configure _itemViewer for SORTING rather than FINDING items
-            _initType = Enums.InitTypeEnum.InitSort;
+            _initType = Enums.InitTypeEnum.Sort;
 
             RemoveControlsTabstops();
             InitializeToleranceMinimums();
@@ -643,7 +643,7 @@ namespace QuickFiler.Legacy
 
         internal void ButtonOK_Click()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 if (_blRunningModalCode == false)
                 {
@@ -881,7 +881,7 @@ namespace QuickFiler.Legacy
         internal void OpenQFMail(MailItem OlMail)
         {
             NavigateToOutlookFolder(OlMail);
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & AutoFile.AreConversationsGrouped(_activeExplorer))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
                 ExplConvView_ToggleOff();
             QFD_Minimize();
             if (_activeExplorer.IsItemSelectableInView(OlMail))
@@ -904,7 +904,7 @@ namespace QuickFiler.Legacy
                     "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                 if (result == DialogResult.Yes) { OlMail.Display(); }
             }
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & BlShowInConversations)
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort) & BlShowInConversations)
                 ExplConvView_ToggleOn();
         }
 

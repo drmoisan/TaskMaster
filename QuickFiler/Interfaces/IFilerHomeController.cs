@@ -3,7 +3,7 @@ using ToDoModel;
 
 namespace QuickFiler.Interfaces
 {
-	public interface IQfcHomeController
+	public interface IFilerHomeController
 	{
         #region Constructors, Initializers, and Destructors
         
@@ -16,18 +16,18 @@ namespace QuickFiler.Interfaces
 
         bool Loaded { get; }
 		cStopWatch StopWatch { get; }
-        IQfcDatamodel DataModel { get; }
+        //IQfcDatamodel DataModel { get; }
         IQfcExplorerController ExplorerCtlr { get; set; }
-		IQfcFormController FormCtrlr { get; }
+		IFilerFormController FormCtrlr { get; }
 		IQfcKeyboardHandler KeyboardHndlr { get; set; }
-        QfcFormViewer FormViewer { get; }
+        //QfcFormViewer FormViewer { get; }
 
         #endregion
 
         #region Major Actions
         
         void ExecuteMoves();        
-		void Iterate();
+		//void Iterate();
         void QuickFileMetrics_WRITE(string filename);
 
         #endregion

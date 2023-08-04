@@ -20,7 +20,7 @@ namespace QuickFiler.Controllers
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public QfcExplorerController(Enums.InitTypeEnum initType, IApplicationGlobals appGlobals, IQfcHomeController parent)
+        public QfcExplorerController(Enums.InitTypeEnum initType, IApplicationGlobals appGlobals, IFilerHomeController parent)
         {
             _initType = initType;
             _globals = appGlobals;
@@ -30,7 +30,7 @@ namespace QuickFiler.Controllers
         
         private Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
-        private IQfcHomeController _parent;
+        private IFilerHomeController _parent;
         private Explorer _activeExplorer;
         private Outlook.View _objView;
         private string _objViewMem;
@@ -132,7 +132,7 @@ namespace QuickFiler.Controllers
         {
             _parent.FormCtrlr.MinimizeQfcFormViewer();
             NavigateToOutlookFolder(mailItem);
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & AutoFile.AreConversationsGrouped(_activeExplorer))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
                 await Task.Run(() => ExplConvView_ToggleOff());
             
             if (_activeExplorer.IsItemSelectableInView(mailItem))
@@ -151,7 +151,7 @@ namespace QuickFiler.Controllers
                     "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                 if (result == DialogResult.Yes) { mailItem.Display(); }
             }
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & BlShowInConversations)
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort) & BlShowInConversations)
                 await Task.Run(() => ExplConvView_ToggleOn());
         }
 

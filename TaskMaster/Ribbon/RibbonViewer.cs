@@ -25,14 +25,13 @@ namespace TaskMaster
     [System.Runtime.InteropServices.ComVisible(true)]
     public class RibbonViewer : Office.IRibbonExtensibility
     {
-
-        private Office.IRibbonUI _ribbon;
-        private RibbonController _controller;
-
         public RibbonViewer(RibbonController Controller)
         {
             _controller = Controller;
         }
+        
+        private Office.IRibbonUI _ribbon;
+        private RibbonController _controller;
 
         public void SetController(RibbonController Controller)
         {
@@ -57,6 +56,7 @@ namespace TaskMaster
 
         #region Ribbon Callbacks
         // Create callback methods here. For more information about adding callback methods, visit https://go.microsoft.com/fwlink/?LinkID=271226
+        
         public void Ribbon_Load(Office.IRibbonUI ribbonUI)
         {
             _ribbon = ribbonUI;
@@ -127,6 +127,11 @@ namespace TaskMaster
         public void Runtest(Office.IRibbonControl control)
         {
             _controller.Runtest();
+        }
+
+        public void SortEmail_Click(Office.IRibbonControl control)
+        {
+            _controller.SortEmail();
         }
 
         #endregion
