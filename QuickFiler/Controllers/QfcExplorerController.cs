@@ -130,7 +130,7 @@ namespace QuickFiler.Controllers
         //PRIORITY: Implement OpenQFItem
         async public Task OpenQFItem(MailItem mailItem)
         {
-            _parent.FormCtrlr.MinimizeQfcFormViewer();
+            _parent.FormCtrlr.MinimizeFormViewer();
             NavigateToOutlookFolder(mailItem);
             if (_initType.HasFlag(Enums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
                 await Task.Run(() => ExplConvView_ToggleOff());

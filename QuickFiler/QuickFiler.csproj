@@ -273,8 +273,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\EfcDataModel.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
+    <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\Theme.cs" />
@@ -456,6 +458,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\NewFolder.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Run.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewFolder.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

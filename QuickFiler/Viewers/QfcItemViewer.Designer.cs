@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h = new System.Windows.Forms.SplitContainer();
             this.L1h0L2hv = new System.Windows.Forms.TableLayoutPanel();
@@ -827,13 +827,13 @@
             // 
             this.L0v2h2_Web.AllowExternalDrop = true;
             this.L0v2h2_Web.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
-            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties2.Language = null;
-            coreWebView2CreationProperties2.ProfileName = null;
-            coreWebView2CreationProperties2.UserDataFolder = null;
-            this.L0v2h2_Web.CreationProperties = coreWebView2CreationProperties2;
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_Web.CreationProperties = coreWebView2CreationProperties1;
             this.L0v2h2_Web.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_Web.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_Web.Location = new System.Drawing.Point(0, 0);

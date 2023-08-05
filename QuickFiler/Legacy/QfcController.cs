@@ -786,7 +786,7 @@ namespace QuickFiler.Legacy
                 if (blDoMove)
                 {
                     //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                    SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
+                    SortItemsToExistingFolder.Run(selItems: selItems,
                                                                                 picturesCheckbox: false,
                                                                                 sortFolderpath: FolderCbo.SelectedItem as string,
                                                                                 saveMsg: _chbxSaveMail.Checked,

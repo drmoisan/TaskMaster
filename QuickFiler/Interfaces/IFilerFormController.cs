@@ -12,8 +12,8 @@ namespace QuickFiler.Interfaces
         void ButtonCancel_Click(object sender, EventArgs e);
         void ButtonOK_Click(object sender, EventArgs e);
         void Cleanup();
-        void MaximizeQfcFormViewer();
-        void MinimizeQfcFormViewer();
+        void MaximizeFormViewer();
+        void MinimizeFormViewer();
         void ToggleOffNavigation(bool async);
         void ToggleOnNavigation(bool async);
         IntPtr FormHandle { get; }

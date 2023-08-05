@@ -20,7 +20,7 @@ namespace ToDoModel
             throw new NotImplementedException();
         }
 
-        public static void MASTER_SortEmailsToExistingFolder(IList<MailItem> selItems, bool picturesCheckbox, string sortFolderpath, bool saveMsg, bool attchments, bool removeFlowFile, IApplicationGlobals appGlobals, string strRoot = "")
+        public static void Run(IList<MailItem> selItems, bool picturesCheckbox, string sortFolderpath, bool saveMsg, bool attchments, bool removeFlowFile, IApplicationGlobals appGlobals, string strRoot = "")
         {
             string loc;
             string FileSystem_LOC;

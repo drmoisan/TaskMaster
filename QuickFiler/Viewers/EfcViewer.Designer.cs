@@ -28,18 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EfcViewer));
             this.Tlp = new System.Windows.Forms.TableLayoutPanel();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.SearchText = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.BtnDelItem = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.buttonSVG1 = new SVGControl.ButtonSVG();
-            this.buttonSVG2 = new SVGControl.ButtonSVG();
-            this.buttonSVG3 = new SVGControl.ButtonSVG();
-            this.buttonSVG4 = new SVGControl.ButtonSVG();
+            this.FolderListBox = new System.Windows.Forms.ListBox();
+            this.Ok = new System.Windows.Forms.Button();
+            this.Cancel = new System.Windows.Forms.Button();
+            this.Refresh = new System.Windows.Forms.Button();
+            this.Create = new System.Windows.Forms.Button();
+            this.SaveAttachments = new System.Windows.Forms.CheckBox();
+            this.SaveEmail = new System.Windows.Forms.CheckBox();
+            this.SavePictures = new System.Windows.Forms.CheckBox();
+            this.MoveConversation = new System.Windows.Forms.CheckBox();
             this.Tlp.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,22 +57,25 @@
             this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 329F));
             this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.99937F));
             this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 205F));
-            this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.Tlp.Controls.Add(this.textBox1, 1, 2);
+            this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 38F));
+            this.Tlp.Controls.Add(this.SearchText, 1, 2);
             this.Tlp.Controls.Add(this.label1, 1, 1);
             this.Tlp.Controls.Add(this.label2, 1, 4);
-            this.Tlp.Controls.Add(this.checkedListBox1, 1, 7);
             this.Tlp.Controls.Add(this.BtnDelItem, 8, 2);
-            this.Tlp.Controls.Add(this.listBox1, 1, 5);
-            this.Tlp.Controls.Add(this.buttonSVG2, 5, 7);
-            this.Tlp.Controls.Add(this.buttonSVG1, 6, 7);
-            this.Tlp.Controls.Add(this.buttonSVG3, 3, 7);
-            this.Tlp.Controls.Add(this.buttonSVG4, 4, 7);
+            this.Tlp.Controls.Add(this.FolderListBox, 1, 5);
+            this.Tlp.Controls.Add(this.Ok, 3, 7);
+            this.Tlp.Controls.Add(this.Cancel, 4, 7);
+            this.Tlp.Controls.Add(this.Refresh, 5, 7);
+            this.Tlp.Controls.Add(this.Create, 6, 7);
+            this.Tlp.Controls.Add(this.SaveAttachments, 1, 7);
+            this.Tlp.Controls.Add(this.SaveEmail, 1, 8);
+            this.Tlp.Controls.Add(this.SavePictures, 1, 9);
+            this.Tlp.Controls.Add(this.MoveConversation, 1, 10);
             this.Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Tlp.Location = new System.Drawing.Point(0, 0);
             this.Tlp.Margin = new System.Windows.Forms.Padding(5);
             this.Tlp.Name = "Tlp";
-            this.Tlp.RowCount = 9;
+            this.Tlp.RowCount = 12;
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 69F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 59F));
@@ -78,22 +83,24 @@
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 69F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 178F));
+            this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
+            this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
+            this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
+            this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.Tlp.Size = new System.Drawing.Size(1847, 1334);
             this.Tlp.TabIndex = 0;
             // 
-            // textBox1
+            // SearchText
             // 
-            this.Tlp.SetColumnSpan(this.textBox1, 7);
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(35, 104);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(5);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(1569, 49);
-            this.textBox1.TabIndex = 0;
+            this.Tlp.SetColumnSpan(this.SearchText, 7);
+            this.SearchText.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SearchText.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SearchText.Location = new System.Drawing.Point(35, 104);
+            this.SearchText.Margin = new System.Windows.Forms.Padding(5);
+            this.SearchText.Name = "SearchText";
+            this.SearchText.Size = new System.Drawing.Size(1563, 49);
+            this.SearchText.TabIndex = 0;
             // 
             // label1
             // 
@@ -121,22 +128,6 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Matched Folders:";
             // 
-            // checkedListBox1
-            // 
-            this.checkedListBox1.BackColor = System.Drawing.SystemColors.Control;
-            this.checkedListBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Items.AddRange(new object[] {
-            "Attachments",
-            "Email ",
-            "Pictures",
-            "Conversation"});
-            this.checkedListBox1.Location = new System.Drawing.Point(35, 1131);
-            this.checkedListBox1.Margin = new System.Windows.Forms.Padding(5);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(244, 168);
-            this.checkedListBox1.TabIndex = 5;
-            // 
             // BtnDelItem
             // 
             this.BtnDelItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -147,7 +138,7 @@
             this.BtnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
             this.BtnDelItem.Image = global::QuickFiler.Properties.Resources.Delete;
-            this.BtnDelItem.Location = new System.Drawing.Point(1651, 104);
+            this.BtnDelItem.Location = new System.Drawing.Point(1645, 104);
             this.BtnDelItem.Margin = new System.Windows.Forms.Padding(5);
             this.BtnDelItem.Name = "BtnDelItem";
             this.BtnDelItem.Size = new System.Drawing.Size(158, 49);
@@ -155,99 +146,123 @@
             this.BtnDelItem.TabStop = false;
             this.BtnDelItem.UseVisualStyleBackColor = true;
             // 
-            // listBox1
+            // FolderListBox
             // 
-            this.Tlp.SetColumnSpan(this.listBox1, 8);
-            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 37;
-            this.listBox1.Location = new System.Drawing.Point(35, 262);
-            this.listBox1.Margin = new System.Windows.Forms.Padding(5);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(1774, 829);
-            this.listBox1.TabIndex = 11;
+            this.Tlp.SetColumnSpan(this.FolderListBox, 8);
+            this.FolderListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FolderListBox.FormattingEnabled = true;
+            this.FolderListBox.ItemHeight = 37;
+            this.FolderListBox.Location = new System.Drawing.Point(35, 262);
+            this.FolderListBox.Margin = new System.Windows.Forms.Padding(5);
+            this.FolderListBox.Name = "FolderListBox";
+            this.FolderListBox.Size = new System.Drawing.Size(1768, 827);
+            this.FolderListBox.TabIndex = 11;
             // 
-            // buttonSVG1
+            // Ok
             // 
-            this.buttonSVG1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSVG1.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG1.Image")));
-            this.buttonSVG1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonSVG1.ImageSVG.ImagePath = "./QuickFiler/Resources/NewFolder.svg";
-            this.buttonSVG1.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 15, 3, 15);
-            this.buttonSVG1.ImageSVG.SaveRendering = false;
-            this.buttonSVG1.ImageSVG.Size = new System.Drawing.Size(293, 73);
-            this.buttonSVG1.ImageSVG.UseDefaultImage = false;
-            this.buttonSVG1.Location = new System.Drawing.Point(1291, 1163);
-            this.buttonSVG1.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
-            this.buttonSVG1.Name = "buttonSVG1";
-            this.buttonSVG1.Size = new System.Drawing.Size(299, 103);
-            this.buttonSVG1.TabIndex = 8;
-            this.buttonSVG1.Text = "Create\r\nFolder";
-            this.buttonSVG1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.buttonSVG1.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.buttonSVG1.UseVisualStyleBackColor = true;
+            this.Ok.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.Ok.Image = global::QuickFiler.Properties.Resources.Run;
+            this.Ok.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Ok.Location = new System.Drawing.Point(301, 1162);
+            this.Ok.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
+            this.Ok.Name = "Ok";
+            this.Tlp.SetRowSpan(this.Ok, 4);
+            this.Ok.Size = new System.Drawing.Size(299, 103);
+            this.Ok.TabIndex = 12;
+            this.Ok.Text = "OK";
+            this.Ok.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Ok.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.Ok.UseVisualStyleBackColor = true;
             // 
-            // buttonSVG2
+            // Cancel
             // 
-            this.buttonSVG2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSVG2.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG2.Image")));
-            this.buttonSVG2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonSVG2.ImageSVG.ImagePath = "./QuickFiler/Resources/QuickRefresh.svg";
-            this.buttonSVG2.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 15, 3, 15);
-            this.buttonSVG2.ImageSVG.SaveRendering = false;
-            this.buttonSVG2.ImageSVG.Size = new System.Drawing.Size(293, 73);
-            this.buttonSVG2.ImageSVG.UseDefaultImage = false;
-            this.buttonSVG2.Location = new System.Drawing.Point(962, 1163);
-            this.buttonSVG2.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
-            this.buttonSVG2.Name = "buttonSVG2";
-            this.buttonSVG2.Size = new System.Drawing.Size(299, 103);
-            this.buttonSVG2.TabIndex = 8;
-            this.buttonSVG2.Text = "Refresh\r\nPredicted";
-            this.buttonSVG2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.buttonSVG2.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.buttonSVG2.UseVisualStyleBackColor = true;
+            this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.Cancel.Image = global::QuickFiler.Properties.Resources.Cancel;
+            this.Cancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Cancel.Location = new System.Drawing.Point(630, 1162);
+            this.Cancel.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
+            this.Cancel.Name = "Cancel";
+            this.Tlp.SetRowSpan(this.Cancel, 4);
+            this.Cancel.Size = new System.Drawing.Size(299, 103);
+            this.Cancel.TabIndex = 12;
+            this.Cancel.Text = "Cancel";
+            this.Cancel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Cancel.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.Cancel.UseVisualStyleBackColor = true;
             // 
-            // buttonSVG3
+            // Refresh
             // 
-            this.buttonSVG3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSVG3.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG3.Image")));
-            this.buttonSVG3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonSVG3.ImageSVG.ImagePath = "./QuickFiler/Resources/Run.svg";
-            this.buttonSVG3.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 20, 3, 20);
-            this.buttonSVG3.ImageSVG.SaveRendering = false;
-            this.buttonSVG3.ImageSVG.Size = new System.Drawing.Size(293, 63);
-            this.buttonSVG3.ImageSVG.UseDefaultImage = false;
-            this.buttonSVG3.Location = new System.Drawing.Point(304, 1163);
-            this.buttonSVG3.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
-            this.buttonSVG3.Name = "buttonSVG3";
-            this.buttonSVG3.Size = new System.Drawing.Size(299, 103);
-            this.buttonSVG3.TabIndex = 8;
-            this.buttonSVG3.Text = "OK";
-            this.buttonSVG3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.buttonSVG3.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.buttonSVG3.UseVisualStyleBackColor = true;
+            this.Refresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.Refresh.Image = global::QuickFiler.Properties.Resources.QuickRefresh1;
+            this.Refresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Refresh.Location = new System.Drawing.Point(959, 1162);
+            this.Refresh.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
+            this.Refresh.Name = "Refresh";
+            this.Tlp.SetRowSpan(this.Refresh, 4);
+            this.Refresh.Size = new System.Drawing.Size(299, 103);
+            this.Refresh.TabIndex = 12;
+            this.Refresh.Text = "Refresh\r\nPredicted";
+            this.Refresh.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Refresh.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.Refresh.UseVisualStyleBackColor = true;
             // 
-            // buttonSVG4
+            // Create
             // 
-            this.buttonSVG4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSVG4.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG4.Image")));
-            this.buttonSVG4.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buttonSVG4.ImageSVG.ImagePath = "./QuickFiler/Resources/Cancel.svg";
-            this.buttonSVG4.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 15, 3, 15);
-            this.buttonSVG4.ImageSVG.SaveRendering = false;
-            this.buttonSVG4.ImageSVG.Size = new System.Drawing.Size(293, 73);
-            this.buttonSVG4.ImageSVG.UseDefaultImage = false;
-            this.buttonSVG4.Location = new System.Drawing.Point(633, 1163);
-            this.buttonSVG4.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
-            this.buttonSVG4.Name = "buttonSVG4";
-            this.buttonSVG4.Size = new System.Drawing.Size(299, 103);
-            this.buttonSVG4.TabIndex = 8;
-            this.buttonSVG4.Text = "Refresh\r\nPredicted";
-            this.buttonSVG4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.buttonSVG4.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.buttonSVG4.UseVisualStyleBackColor = true;
+            this.Create.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.Create.Image = global::QuickFiler.Properties.Resources.NewFolder1;
+            this.Create.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Create.Location = new System.Drawing.Point(1288, 1162);
+            this.Create.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
+            this.Create.Name = "Create";
+            this.Tlp.SetRowSpan(this.Create, 4);
+            this.Create.Size = new System.Drawing.Size(299, 103);
+            this.Create.TabIndex = 12;
+            this.Create.Text = "Create\r\nFolder";
+            this.Create.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Create.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.Create.UseVisualStyleBackColor = true;
             // 
-            // SingleSortViewer
+            // SaveAttachments
+            // 
+            this.SaveAttachments.AutoSize = true;
+            this.SaveAttachments.Location = new System.Drawing.Point(33, 1127);
+            this.SaveAttachments.Name = "SaveAttachments";
+            this.SaveAttachments.Size = new System.Drawing.Size(228, 39);
+            this.SaveAttachments.TabIndex = 13;
+            this.SaveAttachments.Text = "Attachments";
+            this.SaveAttachments.UseVisualStyleBackColor = true;
+            // 
+            // SaveEmail
+            // 
+            this.SaveEmail.AutoSize = true;
+            this.SaveEmail.Location = new System.Drawing.Point(33, 1172);
+            this.SaveEmail.Name = "SaveEmail";
+            this.SaveEmail.Size = new System.Drawing.Size(129, 39);
+            this.SaveEmail.TabIndex = 14;
+            this.SaveEmail.Text = "Email";
+            this.SaveEmail.UseVisualStyleBackColor = true;
+            // 
+            // SavePictures
+            // 
+            this.SavePictures.AutoSize = true;
+            this.SavePictures.Location = new System.Drawing.Point(33, 1217);
+            this.SavePictures.Name = "SavePictures";
+            this.SavePictures.Size = new System.Drawing.Size(164, 39);
+            this.SavePictures.TabIndex = 15;
+            this.SavePictures.Text = "Pictures";
+            this.SavePictures.UseVisualStyleBackColor = true;
+            // 
+            // MoveConversation
+            // 
+            this.MoveConversation.AutoSize = true;
+            this.MoveConversation.Location = new System.Drawing.Point(33, 1262);
+            this.MoveConversation.Name = "MoveConversation";
+            this.MoveConversation.Size = new System.Drawing.Size(237, 39);
+            this.MoveConversation.TabIndex = 16;
+            this.MoveConversation.Text = "Conversation";
+            this.MoveConversation.UseVisualStyleBackColor = true;
+            // 
+            // EfcViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(19F, 37F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -256,7 +271,7 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(5);
             this.MinimumSize = new System.Drawing.Size(1873, 635);
-            this.Name = "SingleSortViewer";
+            this.Name = "EfcViewer";
             this.Text = "Sort Email To Folder";
             this.Tlp.ResumeLayout(false);
             this.Tlp.PerformLayout();
@@ -267,15 +282,18 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel Tlp;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckedListBox checkedListBox1;
-        private SVGControl.ButtonSVG buttonSVG1;
         internal System.Windows.Forms.Button BtnDelItem;
-        private System.Windows.Forms.ListBox listBox1;
-        private SVGControl.ButtonSVG buttonSVG2;
-        private SVGControl.ButtonSVG buttonSVG3;
-        private SVGControl.ButtonSVG buttonSVG4;
+        internal System.Windows.Forms.CheckBox SaveAttachments;
+        internal System.Windows.Forms.CheckBox SaveEmail;
+        internal System.Windows.Forms.CheckBox SavePictures;
+        internal System.Windows.Forms.CheckBox MoveConversation;
+        internal System.Windows.Forms.Button Ok;
+        internal System.Windows.Forms.Button Cancel;
+        internal System.Windows.Forms.Button Refresh;
+        internal System.Windows.Forms.Button Create;
+        internal System.Windows.Forms.ListBox FolderListBox;
+        internal System.Windows.Forms.TextBox SearchText;
     }
 }

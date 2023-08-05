@@ -29,7 +29,7 @@ namespace QuickFiler.Controllers
             _globals = appGlobals;
             _initType = initType;
             _formViewer = formViewer;
-            _globals.AF.MaximizeQuickFileWindow = MaximizeQfcFormViewer;
+            _globals.AF.MaximizeQuickFileWindow = MaximizeFormViewer;
             _formViewer.SetController(this);
             _parentCleanup = parentCleanup;
             _parent = parent;
@@ -277,7 +277,7 @@ namespace QuickFiler.Controllers
         /// <summary>
         /// Maximizes the QfcFormViewer
         /// </summary>
-        public void MaximizeQfcFormViewer()
+        public void MaximizeFormViewer()
         {
             _formViewer.Invoke(new System.Action(() => _formViewer.WindowState = FormWindowState.Maximized));
         }
@@ -285,7 +285,7 @@ namespace QuickFiler.Controllers
         /// <summary>
         /// Minimizes the QfcFormViewer
         /// </summary>
-        public void MinimizeQfcFormViewer()
+        public void MinimizeFormViewer()
         {
             _formViewer.Invoke(new System.Action(() => _formViewer.WindowState = FormWindowState.Minimized));
         }

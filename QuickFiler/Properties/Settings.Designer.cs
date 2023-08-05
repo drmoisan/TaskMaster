@@ -43,5 +43,53 @@ namespace QuickFiler.Properties {
                 return ((bool)(this["ParallelLoad"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveAttachments {
+            get {
+                return ((bool)(this["SaveAttachments"]));
+            }
+            set {
+                this["SaveAttachments"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveEmail {
+            get {
+                return ((bool)(this["SaveEmail"]));
+            }
+            set {
+                this["SaveEmail"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SavePictures {
+            get {
+                return ((bool)(this["SavePictures"]));
+            }
+            set {
+                this["SavePictures"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MoveConversation {
+            get {
+                return ((bool)(this["MoveConversation"]));
+            }
+            set {
+                this["MoveConversation"] = value;
+            }
+        }
     }
 }

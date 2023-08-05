@@ -119,8 +119,12 @@ namespace SVGControl
             set
             {
                 _useDefaultImage = value;
-                if (_useDefaultImage) { SetDefaultImage(); }
-                else { _renderer.Document = null; }
+                if ((_relativeImagePath == "") | (_relativeImagePath == "(none)"))
+                {
+                    if (_useDefaultImage) { SetDefaultImage(); }
+                    else { _renderer.Document = null; }
+                }
+                    
             }
         }
         
@@ -195,6 +199,9 @@ namespace SVGControl
 
         private string GetAnchorPath()
         {
+            //string workingDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
+            //Debug.WriteLine("System.AppDomain.CurrentDomain.BaseDirectory is " + workingDirectory);
+            //var resrcs = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
             string workingDirectory = Environment.CurrentDirectory;
             List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
             if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))

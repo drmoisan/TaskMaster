@@ -877,7 +877,7 @@ namespace QuickFiler.Controllers
                 bool attchments = (SelectedFolder != "Trash to Delete") ? false : _itemViewer.CbxAttachments.Checked;
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
+                SortItemsToExistingFolder.Run(selItems: selItems,
                                                                             picturesCheckbox: false,
                                                                             sortFolderpath: _itemViewer.CboFolders.SelectedItem as string,
                                                                             saveMsg: _itemViewer.CbxEmailCopy.Checked,

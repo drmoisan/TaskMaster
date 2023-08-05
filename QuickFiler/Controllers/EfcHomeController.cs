@@ -1,5 +1,6 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Controllers;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,17 +17,19 @@ namespace QuickFiler
     {
         #region Constructors, Initializers, and Destructors
 
-        public EfcHomeController(IApplicationGlobals appGlobals, System.Action parentCleanup)
+        public EfcHomeController(IApplicationGlobals appGlobals, System.Action parentCleanup, MailItem mail = null)
         {
             _globals = appGlobals;
             _parentCleanup = parentCleanup;
-            if (Mail is not null)
+            _dataModel = new EfcDataModel(_globals, mail);
+
+            if (_dataModel.Mail is not null)
             {
                 _initType = Enums.InitTypeEnum.Sort | Enums.InitTypeEnum.SortConv;
                 _stopWatch = new cStopWatch();
                 _formViewer = new EfcViewer();
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
-                _formController = new EfcFormController(_globals, Mail, _formViewer, Cleanup, _initType);
+                _formController = new EfcFormController(_globals, _dataModel.Mail, _formViewer, this, Cleanup, _initType);
             }
         }
 
@@ -34,10 +37,11 @@ namespace QuickFiler
         private IApplicationGlobals _globals;
         private Enums.InitTypeEnum _initType;
         private System.Action _parentCleanup;
+        private ConversationResolver _conversationResolver;
 
         public void Run() 
         { 
-            if (Mail is not null)
+            if (_dataModel.Mail is not null)
             {
                 _formViewer.Show();
             }
@@ -53,7 +57,6 @@ namespace QuickFiler
             _keyboardHandler = null;
             _parentCleanup.Invoke();
         }
-              
 
         #endregion
 
@@ -68,18 +71,9 @@ namespace QuickFiler
         private IQfcKeyboardHandler _keyboardHandler;
         public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
 
-        private MailItem _mail;
-        public MailItem Mail 
-        {
-            get 
-            {
-                if (_mail is null)
-                    _mail = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
-                return _mail;
-            } 
-            set => _mail = value; 
-        }
-
+        private EfcDataModel _dataModel;
+        internal EfcDataModel DataModel { get => _dataModel; set => _dataModel = value; }
+                
         private cStopWatch _stopWatch;
         public cStopWatch StopWatch { get => _stopWatch; }
 
@@ -89,29 +83,13 @@ namespace QuickFiler
 
         #region Major Actions
 
-        public void ExecuteMoves()
-        {
-            //grp.ItemController.MoveMail();
-            if (Mail is not null)
-            {
-                IList<MailItem> selItems = PackageItems();
-                bool attchments = (SelectedFolder != "Trash to Delete") ? false : SaveAttachments;
+        public void ExecuteMoves() => _dataModel.MoveToFolder(_formController.SelectedFolder,
+                                                              _formController.SaveAttachments,
+                                                              _formController.SaveEmail,
+                                                              _formController.SavePictures,
+                                                              _formController.MoveConversation);
 
-                //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
-                                                                            picturesCheckbox: false,
-                                                                            sortFolderpath: SelectedFolder,
-                                                                            saveMsg: SaveMsg,
-                                                                            attchments: attchments,
-                                                                            removeFlowFile: false,
-                                                                            appGlobals: _globals,
-                                                                            strRoot: _globals.Ol.ArchiveRootPath);
-                SortItemsToExistingFolder.Cleanup_Files();
-                // blDoMove
-            }
-            //stackMovedItems.Push(grp.MailItem);
-        }
-
+        
         //TODO: Implement QuickFileMetrics_WRITE
         public void QuickFileMetrics_WRITE(string filename)
         {
@@ -122,39 +100,9 @@ namespace QuickFiler
 
         #region Helper Methods
                 
-        //TODO: Implement package items
-        public IList<MailItem> PackageItems()
-        {
-            throw new NotImplementedException();
-        }
+        //public IList<MailItem> PackageItems() => _conversationResolver.ConversationItems;
 
-        //TODO: Implement SelectedFolder
-        public string SelectedFolder
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        //TODO: Implement SaveAttachments
-        public bool SaveAttachments
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        //TODO: Implement SaveMsg
-        public bool SaveMsg
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
+        
         #endregion
     }
 }
