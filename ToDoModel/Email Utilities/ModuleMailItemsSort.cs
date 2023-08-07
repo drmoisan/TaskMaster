@@ -15,62 +15,62 @@ namespace ToDoModel
         {
             var query = QueryMailItems(olItems, options);
 
-            if (options.HasFlag(SortOptionsEnum.ConversationUniqueOnly))
-            {
-                query = QueryUniqueConversations(query, options);
-            }
+            if (options.HasFlag(SortOptionsEnum.ConversationUniqueOnly)) { query = QueryUniqueConversations(query, options); }
 
-            if (options.HasFlag(SortOptionsEnum.TriageIgnore))
+            if (options.HasFlag(SortOptionsEnum.TriageIgnore)) { query = QuerySortIgnoringTriage(query, options); }
+            else { query = QuerySortIncludingTriage(query, options); }
+
+            return query.ToList();
+        }
+
+        private static IEnumerable<MailItem> QuerySortIncludingTriage(IEnumerable<MailItem> query, SortOptionsEnum options)
+        {
+            if (options.HasFlag(SortOptionsEnum.TriageImportantFirst))
             {
                 if (options.HasFlag(SortOptionsEnum.DateRecentFirst))
                 {
-                    query = query.OrderByDescending(mail => mail.SentOn);
+                    return query.OrderBy(mail =>
+                    {
+                        var letter = mail.GetTriage();
+                        if (letter == "") { return "Z"; }
+                        else { return letter; }
+                    }).ThenByDescending(mail => mail.SentOn);
                 }
-                else { query = query.OrderBy(mail => mail.SentOn); }
+                else
+                {
+                    return query.OrderBy(mail =>
+                    {
+                        var letter = mail.GetTriage();
+                        if (letter == "") { return "Z"; }
+                        else { return letter; }
+                    }).ThenBy(mail => mail.SentOn);
+                }
+
             }
-            else 
+            else if (options.HasFlag(SortOptionsEnum.TriageImportantLast))
             {
-                if (options.HasFlag(SortOptionsEnum.TriageImportantFirst))
+                if (options.HasFlag(SortOptionsEnum.DateRecentFirst))
                 {
-                    if (options.HasFlag(SortOptionsEnum.DateRecentFirst))
-                    {
-                        query = query.OrderBy(mail =>
-                        {
-                            var letter = mail.GetTriage();
-                            if (letter == "") { return "Z"; }
-                            else { return letter; }
-                        }).ThenByDescending(mail => mail.SentOn);
-                    }
-                    else
-                    {
-                        query = query.OrderBy(mail =>
-                        {
-                            var letter = mail.GetTriage();
-                            if (letter == "") { return "Z"; }
-                            else { return letter; }
-                        }).ThenBy(mail => mail.SentOn);
-                    }
+                    return query.OrderByDescending(mail => mail.GetTriage())
+                                 .ThenByDescending(mail => mail.SentOn);
+                }
+                else
+                {
+                    return query.OrderByDescending(mail => mail.GetTriage())
+                                 .ThenBy(mail => mail.SentOn);
+                }
 
-                }
-                else if (options.HasFlag(SortOptionsEnum.TriageImportantLast))
-                {
-                    if (options.HasFlag(SortOptionsEnum.DateRecentFirst))
-                    {
-                        query = query.OrderByDescending(mail => mail.GetTriage())
-                                     .ThenByDescending(mail => mail.SentOn);
-                    }
-                    else
-                    {
-                        query = query.OrderByDescending(mail => mail.GetTriage())
-                                     .ThenBy(mail => mail.SentOn);
-                    }
-                        
-                }
-                else { throw new ArgumentException("No triage option is selected"); }
             }
+            else { throw new ArgumentException("No triage option is selected"); }
+        }
 
-            return query.ToList();
-
+        private static IEnumerable<MailItem> QuerySortIgnoringTriage(IEnumerable<MailItem> query, SortOptionsEnum options)
+        {
+            if (options.HasFlag(SortOptionsEnum.DateRecentFirst))
+            {
+                return query.OrderByDescending(mail => mail.SentOn);
+            }
+            else { return query.OrderBy(mail => mail.SentOn); }
         }
 
         private static IEnumerable<MailItem> QueryMailItems(Items olItems, SortOptionsEnum options)
