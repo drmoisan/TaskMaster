@@ -4,8 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
 
-
-
 namespace ToDoModel
 {
     public static class EmailDetails

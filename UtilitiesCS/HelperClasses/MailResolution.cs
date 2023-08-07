@@ -11,16 +11,16 @@ namespace UtilitiesCS
 
         public static MailItem TryResolveMailItem(object objItem)
         {
-            MailItem OlMail = null;
+            MailItem olMail = null;
             if (objItem is MailItem)
             {
-                OlMail = (MailItem)objItem;
-                if (IsMailUnReadable(OlMail) == true)
+                olMail = (MailItem)objItem;
+                if (IsMailUnReadable(olMail) == true)
                 {
-                    OlMail = null;
+                    olMail = null;
                 }
             }
-            return OlMail;
+            return olMail;
         }
 
     }

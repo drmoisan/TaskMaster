@@ -137,7 +137,7 @@
     <Compile Include="Email Utilities\Suggestions.cs" />
     <Compile Include="Email Utilities\SuggestionsLeg2.cs" />
     <Compile Include="Email Utilities\SuggestionsLegacy.cs" />
-    <Compile Include="Email Utilities\FolderSuggestionsModule.cs" />
+    <Compile Include="Email Utilities\FolderSuggestions.cs" />
     <Compile Include="Email Utilities\Load_CTF_AND_Subjects_AND_Recents.cs" />
     <Compile Include="Email Utilities\ModuleMailItemsSort.cs" />
     <Compile Include="Email Utilities\SaveAttachmentsModule.cs" />
