@@ -147,7 +147,7 @@ namespace QuickFiler
                     EndDate = OlEndTime;
                 if (lngDurationSec != 0)
                     DurationSec = lngDurationSec;
-                var recipients = CaptureEmailDetailsModule.GetRecipients(OlMail);
+                var recipients = EmailDetails.GetRecipients(OlMail);
                 SentTo = recipients.recipientsTo;
                 SentCC = recipients.recipientsCC;
                 SentFrom = OlMail.Sender.ToString();

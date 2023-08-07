@@ -12,21 +12,19 @@ namespace ToDoModel
 
     public class FolderHandler
     {
+        #region Constructors and Initialization
+
         public FolderHandler(IApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
             _olApp = AppGlobals.Ol.App;
-            _options = Options.NoSuggestions;
             Suggestions = new Suggestions();
-            //_folderArray = new string[0];
-
         }
 
         public FolderHandler(IApplicationGlobals appGlobals, object objItem, Options options)
         {
             _globals = appGlobals;
             _olApp = appGlobals.Ol.App;
-            _options = options;
 
             Suggestions = new Suggestions();
 
@@ -49,26 +47,6 @@ namespace ToDoModel
             
         }
 
-
-        private Folder _matchedFolder;
-        private string _searchString;
-        private bool _wildcardFlag;
-        //private string[] _folderArray;
-        private List<string> _folderList;
-        private Suggestions _suggestions;
-        public int SaveCounter;
-        private int _upBound;
-        private Application _olApp;
-
-        private const bool SpeedUp = true;
-        private const bool StopAtFirstMatch = false;
-        private bool _blUpdateSuggestions;
-        public bool WhConv;
-        private IApplicationGlobals _globals;
-        private Options _options;
-        private Regex _regex;
-        private string _searchPattern;
-
         public enum Options
         {
             NoSuggestions = 0,
@@ -82,7 +60,7 @@ namespace ToDoModel
             var OlMail = MailResolution.TryResolveMailItem(objItem);
             if (OlMail is null) { throw new ArgumentException("Constructor Requires the Email Object to be passed as MailItem to use this flag"); }
             
-            LoadFromFolderKeyField(false, OlMail);
+            InitializeFromFolderKeyField(false, OlMail);
         }
 
         private void InitializeFromArrayOrString(object obj)
@@ -107,168 +85,44 @@ namespace ToDoModel
                 throw new ArgumentException($"Obj is of type {obj.GetType().Name}, but selected option requires a string or string array");
             }
         }
-
-        public string[] FolderArray
-        {
-            get
-            {
-                if ((_folderList is null) || (_folderList.Count == 0))
-                {
-                    _folderList = new List<string>();
-                    if (Suggestions.Count > 0)
-                        AddSuggestions();
-                    if (_globals.AF.RecentsList.Count > 0) 
-                        AddRecents();
-                }
-                
-                return _folderList.ToArray();
-            }
-        }
-
-        public Suggestions Suggestions { get => _suggestions; set => _suggestions = value; }
         
-        public bool BlUpdateSuggestions { get => _blUpdateSuggestions; set => _blUpdateSuggestions = value; }
-        
-        /// <summary>
-        /// Function returns a list of Outlook folders that meet search criteria and appends a list of suggested folders 
-        /// as well as appending a list of recently used folders
-        /// </summary>
-        /// <param name="SearchString"></param>
-        /// <param name="ReloadCTFStagingFiles"></param>
-        /// <param name="EmailSearchRoot"></param>
-        /// <param name="ReCalcSuggestions"></param>
-        /// <param name="objItem"></param>
-        /// <returns></returns>
-        public string[] FindFolder(string SearchString, object objItem, bool ReloadCTFStagingFiles = true, string EmailSearchRoot = "ARCHIVEROOT", bool ReCalcSuggestions = false)
-        {
-
-            if (EmailSearchRoot == "ARCHIVEROOT")
-            {
-                EmailSearchRoot = _globals.Ol.ArchiveRootPath;
-            }
-            _folderList = new List<string>();
-            
-            var matchingFolders = GetMatchingFolders(SearchString, EmailSearchRoot);
-            if (matchingFolders is not null && matchingFolders.Count > 0)
-            {
-                _folderList.Add("======= SEARCH RESULTS =======");
-                _folderList.AddRange(matchingFolders);
-            }
-            
-            // TODO: Either use the embedded UBound or pass as reference. It is hard to know where it is changed
-            _upBound = 0;
-
-
-            if (ReCalcSuggestions)
-            {
-                RecalculateSuggestions(objItem, ReloadCTFStagingFiles);
-            }
-            AddSuggestions();
-            AddRecents();
-
-            return FolderArray;
-
-
-        }
-
-        /// <summary>
-        /// Function returns a list of Outlook folders that meet search criteria and appends a list of suggested folders 
-        /// as well as appending a list of recently used folders
-        /// </summary>
-        /// <param name="SearchString"></param>
-        /// <param name="ReloadCTFStagingFiles"></param>
-        /// <param name="EmailSearchRoot"></param>
-        /// <param name="ReCalcSuggestions"></param>
-        /// <param name="objItem"></param>
-        /// <returns></returns>
-        //public string[] FindFolderOld(string SearchString, object objItem, bool ReloadCTFStagingFiles = true, string EmailSearchRoot = "ARCHIVEROOT", bool ReCalcSuggestions = false)
-        //{
-
-        //    if (EmailSearchRoot == "ARCHIVEROOT")
-        //    {
-        //        EmailSearchRoot = _globals.Ol.ArchiveRootPath;
-        //    }
-        //    _folderArray = new string[1];
-        //    _folderArray[0] = "======= SEARCH RESULTS =======";
-        //    // TODO: Either use the embedded UBound or pass as reference. It is hard to know where it is changed
-        //    _upBound = 0;
-
-        //    GetMatchingFolders(SearchString, EmailSearchRoot);
-
-        //    if (ReCalcSuggestions)
-        //    {
-        //        RecalculateSuggestions(objItem, ReloadCTFStagingFiles);
-        //    }
-        //    AddSuggestions();
-        //    AddRecents();
-
-        //    return _folderArray;
-
-
-        //}
-
-        private void AddRecents()
-        {
-            if (_globals.AF.RecentsList.Count > 0)
-            {
-                _folderList.Add("======= RECENT SELECTIONS ========");
-                _folderList.AddRange(_globals.AF.RecentsList);
-            }
-        }
-                
-        private void RecalculateSuggestions(object ObjItem, bool ReloadCTFStagingFiles)
-        {
-            var OlMail = MailResolution.TryResolveMailItem(ObjItem);
-            if (OlMail is not null)
-            {
-                if (_globals.AF.SuggestionFilesLoaded == false)
-                    ReloadCTFStagingFiles = true;
-                Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
-                BlUpdateSuggestions = false;
-            }
-            else
-            {
-                throw new ArgumentException($"Obj passed as {ObjItem.GetType().Name} but should have been MailItem");
-            }
-        }
-
-        private void LoadFromFolderKeyField(bool ReloadCTFStagingFiles, MailItem OlMail)
+        private void InitializeFromFolderKeyField(bool reloadCTFStagingFiles, MailItem olMail)
         {
             int i;
             string strTmp;
 
             int intVarCt;
 
-            var objProperty = OlMail.UserProperties.Find("FolderKey");
+            var objProperty = olMail.UserProperties.Find("FolderKey");
             if (objProperty is null)
             {
-                Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
+                Suggestions.RefreshSuggestions(olMail, _globals, reloadCTFStagingFiles);
             }
             else
             {
-                var varFldrs = objProperty.Value;
+                var foldersObject = objProperty.Value;
 
-                if (varFldrs is not Array)
+                if (foldersObject is not Array)
                 {
-                    if ((varFldrs as string) == "Error")
+                    if ((foldersObject as string) == "Error")
                     {
-                        Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
+                        Suggestions.RefreshSuggestions(olMail, _globals, reloadCTFStagingFiles);
                     }
                     else
                     {
-                        strTmp = (string)varFldrs;
+                        strTmp = (string)foldersObject;
                         Suggestions.AddSuggestion(strTmp, 1L);
                     }
                 }
                 else
                 {
-                    string[] strFolders = (string[])varFldrs;
+                    string[] strFolders = (string[])foldersObject;
                     intVarCt = strFolders.Length -1;
                     if (intVarCt == 0)
                     {
                         if (strFolders[0] == "Error")
                         {
-                            Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
+                            Suggestions.RefreshSuggestions(olMail, _globals, reloadCTFStagingFiles);
                         }
                         else
                         {
@@ -288,23 +142,145 @@ namespace ToDoModel
                 }
             }
         }
+        
+        #endregion
 
+        #region Private Fields
+
+        private IApplicationGlobals _globals;
+        private Folder _matchedFolder;
+        private Application _olApp;
+        private Regex _regex;
+        private string _searchString;
+        private const bool _stopAtFirstMatch = false;
+
+        #endregion
+
+        #region Public Properties
+
+        private List<string> _folderList;
+        public string[] FolderArray
+        {
+            get
+            {
+                if ((_folderList is null) || (_folderList.Count == 0))
+                {
+                    _folderList = new List<string>();
+                    if (Suggestions.Count > 0)
+                        AddSuggestions();
+                    if (_globals.AF.RecentsList.Count > 0) 
+                        AddRecents();
+                }
+                
+                return _folderList.ToArray();
+            }
+        }
+
+        private Suggestions _suggestions;
+        public Suggestions Suggestions { get => _suggestions; set => _suggestions = value; }
+        
+        private bool _blUpdateSuggestions;
+        public bool BlUpdateSuggestions { get => _blUpdateSuggestions; set => _blUpdateSuggestions = value; }
+
+        #endregion
+
+        #region public Methods
+
+        /// <summary>
+        /// Function returns a list of Outlook folders that meet search criteria and appends a list of suggested folders 
+        /// as well as appending a list of recently used folders
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <param name="reloadCTFStagingFiles"></param>
+        /// <param name="emailSearchRoot"></param>
+        /// <param name="reCalcSuggestions"></param>
+        /// <param name="objItem"></param>
+        /// <returns></returns>
+        public string[] FindFolder(string searchString, object objItem, bool reloadCTFStagingFiles = true, string emailSearchRoot = "ARCHIVEROOT", bool reCalcSuggestions = false)
+        {
+            if (emailSearchRoot == "ARCHIVEROOT") { emailSearchRoot = _globals.Ol.ArchiveRootPath; }
+            
+            _folderList = new List<string>();
+            
+            // Add search results
+            var matchingFolders = GetMatchingFolders(searchString, emailSearchRoot);
+            if (matchingFolders is not null && matchingFolders.Count > 0)
+            {
+                _folderList.Add("======= SEARCH RESULTS =======");
+                _folderList.AddRange(matchingFolders);
+            }
+            
+            // Add suggestions
+            if (reCalcSuggestions)
+            {
+                RecalculateSuggestions(objItem, reloadCTFStagingFiles);
+            }
+            AddSuggestions();
+            
+            // Add recents
+            AddRecents();
+
+            return FolderArray;
+        }
+
+        public Folder GetFolder(string FolderPath)
+        {
+            Folder TestFolder;
+            string[] foldersArray;
+            int i;
+
+            if (FolderPath.Substring(0,2) == @"\\")
+            {
+                FolderPath = FolderPath.Substring(2);
+            }
+            // Convert folderpath to array
+            foldersArray = FolderPath.Split(@"\");
+            TestFolder = (Folder)_olApp.Session.Folders[foldersArray[0]];
+            if (TestFolder is not null)
+            {
+                var loopTo = foldersArray.Length - 1;
+                for (i = 1; i <= loopTo; i++)
+                {
+                    Folders SubFolders;
+                    SubFolders = TestFolder.Folders;
+                    TestFolder = (Folder)SubFolders[foldersArray[i]];
+                    if (TestFolder is null)
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return TestFolder;
+
+        }
+        
+        #endregion
+
+        #region Helper Functions
+
+        private void AddRecents()
+        {
+            if (_globals.AF.RecentsList.Count > 0)
+            {
+                _folderList.Add("======= RECENT SELECTIONS ========");
+                _folderList.AddRange(_globals.AF.RecentsList);
+            }
+        }
+                
         private void AddSuggestions()
         {
             _folderList.Add("========= SUGGESTIONS =========");
             _folderList.AddRange(Suggestions.ToArray());
         }
-                
-        private List<string> GetMatchingFolders(string Name, string strEmailFolderPath)
+        
+        private List<string> GetMatchingFolders(string searchString, string strEmailFolderPath)
         {
             _matchedFolder = null;
-            _searchString = "";
-            _wildcardFlag = false;
 
-            if (Name.Trim().Length != 0)
+            if (searchString.Trim().Length != 0)
             {
-                _searchString = Name;
-                (_regex, _searchPattern) = SimpleRegex.MakeRegex(_searchString);
+                (_regex, _) = SimpleRegex.MakeRegex(searchString);
                 
                 var matchingFolders = new List<string>();
                 var folders = GetFolder(strEmailFolderPath).Folders;
@@ -316,40 +292,6 @@ namespace ToDoModel
             {
                 return null;
             }
-
-
-        }
-
-        public Folder GetFolder(string FolderPath)
-        {
-            Folder TestFolder;
-            string[] FoldersArray;
-            int i;
-
-            if (FolderPath.Substring(0,2) == @"\\")
-            {
-                FolderPath = FolderPath.Substring(2);
-            }
-            // Convert folderpath to array
-            FoldersArray = FolderPath.Split(@"\");
-            TestFolder = (Folder)_olApp.Session.Folders[FoldersArray[0]];
-            if (TestFolder is not null)
-            {
-                var loopTo = FoldersArray.Length - 1;
-                for (i = 1; i <= loopTo; i++)
-                {
-                    Folders SubFolders;
-                    SubFolders = TestFolder.Folders;
-                    TestFolder = (Folder)SubFolders[FoldersArray[i]];
-                    if (TestFolder is null)
-                    {
-                        return null;
-                    }
-                }
-            }
-
-            return TestFolder;
-
         }
 
         private void LoopFolders(Folders folders, ref List<string> matchingFolders, string strEmailFolderPath = "")
@@ -370,10 +312,9 @@ namespace ToDoModel
 
                 if (found)
                 {
-                    if (StopAtFirstMatch == false)
+                    if (_stopAtFirstMatch == false)
                     {
                         found = false;
-                        _upBound = _upBound + 1;
                         matchingFolders.Add(f.FolderPath.Substring(intRootLen));
                         
                     }
@@ -391,6 +332,23 @@ namespace ToDoModel
                 }
             }
         }
+        
+        private void RecalculateSuggestions(object ObjItem, bool ReloadCTFStagingFiles)
+        {
+            var OlMail = MailResolution.TryResolveMailItem(ObjItem);
+            if (OlMail is not null)
+            {
+                if (_globals.AF.SuggestionFilesLoaded == false)
+                    ReloadCTFStagingFiles = true;
+                Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
+                BlUpdateSuggestions = false;
+            }
+            else
+            {
+                throw new ArgumentException($"Obj passed as {ObjItem.GetType().Name} but should have been MailItem");
+            }
+        }
 
+        #endregion
     }
 }

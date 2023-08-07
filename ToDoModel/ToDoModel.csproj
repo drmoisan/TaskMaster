@@ -122,7 +122,7 @@
     <Compile Include="Data Model\ID\IDList.cs" />
     <Compile Include="Data Model\Project\ProjectInfo.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
-    <Compile Include="Email Utilities\CaptureEmailDetailsModule.cs" />
+    <Compile Include="Email Utilities\EmailDetails.cs" />
     <Compile Include="Common Functions\FileOperationsPST.cs" />
     <Compile Include="Data Model\ID\IDListUtilities.cs" />
     <Compile Include="Email Utilities\AutoFile.cs" />
@@ -132,6 +132,7 @@
     <Compile Include="Email Utilities\CommonWordsModule.cs" />
     <Compile Include="Email Utilities\Conversation_To_Folder.cs" />
     <Compile Include="Email Utilities\cStopWatch.cs" />
+    <Compile Include="Email Utilities\RecipientInfo.cs" />
     <Compile Include="Email Utilities\SmithWaterman.cs" />
     <Compile Include="Email Utilities\Suggestions.cs" />
     <Compile Include="Email Utilities\SuggestionsLeg2.cs" />

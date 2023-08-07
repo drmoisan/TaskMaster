@@ -233,9 +233,9 @@ namespace QuickFiler.Controllers
             }
 
             _formViewer.FolderListBox.DataSource = _folderHandler.FindFolder(
-                SearchString: searchText,
-                ReloadCTFStagingFiles: false,
-                ReCalcSuggestions: false,
+                searchString: searchText,
+                reloadCTFStagingFiles: false,
+                reCalcSuggestions: false,
                 objItem: _mailItem);
 
             if (_formViewer.FolderListBox.Items.Count > 0)

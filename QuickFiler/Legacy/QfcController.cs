@@ -580,7 +580,7 @@ namespace QuickFiler.Legacy
                                     }
                                 case "<SENDER>":
                                     {
-                                        _lblTmp.Text = Mail.Sent == true ? CaptureEmailDetailsModule.GetSenderAddress(Mail) : "Draft Message";
+                                        _lblTmp.Text = Mail.Sent == true ? EmailDetails.GetSenderAddress(Mail) : "Draft Message";
                                         _lblSender = _lblTmp;
                                         break;
                                     }
@@ -1821,9 +1821,9 @@ namespace QuickFiler.Legacy
         {
 
             FolderCbo.Items.Clear();
-            FolderCbo.Items.AddRange(_fldrHandler.FindFolder(SearchString: "*" + SearchTxt.Text + "*", 
-                                                             ReloadCTFStagingFiles: false, 
-                                                             ReCalcSuggestions: false, 
+            FolderCbo.Items.AddRange(_fldrHandler.FindFolder(searchString: "*" + SearchTxt.Text + "*", 
+                                                             reloadCTFStagingFiles: false, 
+                                                             reCalcSuggestions: false, 
                                                              objItem: Mail));
 
             if (FolderCbo.Items.Count >= 2)

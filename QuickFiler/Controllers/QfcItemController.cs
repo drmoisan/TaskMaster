@@ -558,10 +558,10 @@ namespace QuickFiler.Controllers
         {
             _itemViewer.CboFolders.Items.Clear();
             _itemViewer.CboFolders.Items.AddRange(
-                _fldrHandler.FindFolder(SearchString: "*" + 
+                _fldrHandler.FindFolder(searchString: "*" + 
                 _itemViewer.TxtboxSearch.Text + "*",
-                ReloadCTFStagingFiles: false,
-                ReCalcSuggestions: false,
+                reloadCTFStagingFiles: false,
+                reCalcSuggestions: false,
                 objItem: Mail));
 
             if (_itemViewer.CboFolders.Items.Count >= 2)

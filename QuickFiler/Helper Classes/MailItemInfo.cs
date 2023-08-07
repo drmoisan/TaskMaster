@@ -147,7 +147,7 @@ namespace QuickFiler
         async public Task<bool> LoadAsync(Outlook.NameSpace olNs, bool darkMode=false)
         {
             _item = await Task.FromResult((MailItem)olNs.GetItemFromID(_entryId, _storeId));
-            _sender.Html = CaptureEmailDetailsModule.ConvertRecipientToHtml(_sender.Address, _sender.Name);
+            _sender.Html = EmailDetails.ConvertRecipientToHtml(_sender.Address, _sender.Name);
             _senderHtml = _sender.Html;
             LoadRecipients();
             _html = GetHTML();

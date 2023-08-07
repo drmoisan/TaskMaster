@@ -8,31 +8,18 @@ using Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
 {
-    public class RecipientInfo
+    public static class EmailDetails
     {
-        public RecipientInfo() { }
-        
-        public RecipientInfo(string name, string address, string html)
-        {
-            _name = name;
-            _address = address;
-            _html = html;
-        }
-
-        private string _name;
-        private string _address;
-        private string _html;
-
-        public string Name { get => _name; set => _name = value; }
-        public string Address { get => _address; set => _address = value; }
-        public string Html { get => _html; set => _html = value; }
-    }    
-
-    public static class CaptureEmailDetailsModule
-    {
-        private const int NumberOfFields = 13;
-        private readonly static Dictionary<string, string> dict_remap;
+        private const int _numberOfFields = 13;
+        private readonly static Dictionary<string, string> dictRemap;
         private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
+
+        #region Public Methods and Extensions
+        
+        public static string ConvertRecipientToHtml(string name, string address)
+        {
+              return $"{name} &lt;<a href=\"mailto:{address}\">{address}</a>&gt;";
+        }
 
         public static string[] Details(this MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap = null)
         {
@@ -113,31 +100,6 @@ namespace ToDoModel
             return action;
         }
 
-        private static string GetAttachmentNames(this MailItem OlMail)
-        {
-            int IntAttachment_Ct;
-            string attachmentNames = "";
-
-            IntAttachment_Ct = OlMail.Attachments.Count;
-            if (IntAttachment_Ct > 0)
-            {
-                var OlAtmts = OlMail.Attachments;
-                foreach (Attachment OlAtmt in OlAtmts)
-                {
-                    if (OlAtmt.Type != OlAttachmentType.olOLE)
-                    {
-                        attachmentNames = attachmentNames + "; " + OlAtmt.FileName;
-                    }
-                }
-                if (attachmentNames.Length > 2)
-                {
-                    attachmentNames = attachmentNames.Substring(2);
-                }
-            }
-            return attachmentNames;
-        }
-
-        // Private Function GetSenderAddress(OlMail As MailItem, PR_SMTP_ADDRESS As String) As String
         public static string GetSenderName(this MailItem olMail)
         {
             if (olMail.Sent == false)
@@ -200,27 +162,6 @@ namespace ToDoModel
             var address = olMail.GetSenderAddress();
             var html = ConvertRecipientToHtml(name, address);
             return new RecipientInfo(name, address, html);
-        }
-
-        private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder)
-        {
-            Folder OlParent = (Folder)OlMail.Parent;
-            string folderPath = OlParent.FolderPath;
-            int root_length = emailRootFolder.Length;
-            if (folderPath.Length > root_length)
-            {
-                folderPath = folderPath.Substring(root_length);
-
-                // If folder has been remapped, put the target folder
-                if (dict_remap is not null)
-                {
-                    if (dict_remap.ContainsKey(folderPath))
-                    {
-                        folderPath = dict_remap[folderPath];
-                    }
-                }
-            }
-            return folderPath;
         }
 
         public static string GetTriage(this MailItem OlMail)
@@ -286,33 +227,55 @@ namespace ToDoModel
             return olMail.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olCC);
         }
 
-        private static string GetRecipientHtml(Recipient olRecipient)
-        {
-            return ConvertRecipientToHtml(
-                GetRecipientName(olRecipient), 
-                GetRecipientAddress(olRecipient));
-        }
+        #endregion
 
-        private static RecipientInfo GetRecipientInfo(Recipient olRecipient)
-        {
-            string name = GetRecipientName(olRecipient);
-            string address = GetRecipientAddress(olRecipient);
-            string html = ConvertRecipientToHtml(name, address);
-            return new RecipientInfo(name, address, html);
-        }
+        #region Private Helper Methods
 
-        public static string ConvertRecipientToHtml(string name, string address)
+        private static string GetAttachmentNames(this MailItem OlMail)
         {
-              return $"{name} &lt;<a href=\"mailto:{address}\">{address}</a>&gt;";
+            int IntAttachment_Ct;
+            string attachmentNames = "";
+
+            IntAttachment_Ct = OlMail.Attachments.Count;
+            if (IntAttachment_Ct > 0)
+            {
+                var OlAtmts = OlMail.Attachments;
+                foreach (Attachment OlAtmt in OlAtmts)
+                {
+                    if (OlAtmt.Type != OlAttachmentType.olOLE)
+                    {
+                        attachmentNames = attachmentNames + "; " + OlAtmt.FileName;
+                    }
+                }
+                if (attachmentNames.Length > 2)
+                {
+                    attachmentNames = attachmentNames.Substring(2);
+                }
+            }
+            return attachmentNames;
         }
         
-        
-
-        private static string GetRecipientName(Recipient olRecipient)
+        private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder)
         {
-            return olRecipient.Name;
+            Folder OlParent = (Folder)OlMail.Parent;
+            string folderPath = OlParent.FolderPath;
+            int root_length = emailRootFolder.Length;
+            if (folderPath.Length > root_length)
+            {
+                folderPath = folderPath.Substring(root_length);
+
+                // If folder has been remapped, put the target folder
+                if (dictRemap is not null)
+                {
+                    if (dictRemap.ContainsKey(folderPath))
+                    {
+                        folderPath = dictRemap[folderPath];
+                    }
+                }
+            }
+            return folderPath;
         }
-        
+
         private static string GetRecipientAddress(Recipient OlRecipient)
         {
             var OlPA = OlRecipient.PropertyAccessor;
@@ -341,5 +304,27 @@ namespace ToDoModel
             }
             return StrSMTPAddress;
         }
+        
+        private static string GetRecipientName(Recipient olRecipient)
+        {
+            return olRecipient.Name;
+        }
+        
+        private static string GetRecipientHtml(Recipient olRecipient)
+        {
+            return ConvertRecipientToHtml(
+                GetRecipientName(olRecipient), 
+                GetRecipientAddress(olRecipient));
+        }
+
+        private static RecipientInfo GetRecipientInfo(Recipient olRecipient)
+        {
+            string name = GetRecipientName(olRecipient);
+            string address = GetRecipientAddress(olRecipient);
+            string html = ConvertRecipientToHtml(name, address);
+            return new RecipientInfo(name, address, html);
+        }
+
+        #endregion
     }
 }
