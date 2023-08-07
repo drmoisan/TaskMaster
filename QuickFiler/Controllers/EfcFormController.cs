@@ -226,19 +226,22 @@ namespace QuickFiler.Controllers
 
         private void SearchText_TextChanged(object sender, EventArgs e)
         {
-            //_formViewer.FolderListBox.Items.Clear();
-            //_formViewer.FolderListBox.Items.AddRange(
-            //    _folderHandler.FindFolder(SearchString: "*" +
-            //    _formViewer.SearchText.Text + "*",
-            //    ReloadCTFStagingFiles: false,
-            //    ReCalcSuggestions: false,
-            //    objItem: _mailItem));
+            var searchText = _formViewer.SearchText.Text;
+            if (searchText != "")
+            {
+                searchText = "*" + searchText + "*";
+            }
+
             _formViewer.FolderListBox.DataSource = _folderHandler.FindFolder(
-                SearchString: "*" +
-                _formViewer.SearchText.Text + "*",
+                SearchString: searchText,
                 ReloadCTFStagingFiles: false,
                 ReCalcSuggestions: false,
                 objItem: _mailItem);
+
+            if (_formViewer.FolderListBox.Items.Count > 0)
+            {
+                _formViewer.FolderListBox.SelectedIndex = 1;
+            }
         }
 
         #endregion
@@ -298,6 +301,10 @@ namespace QuickFiler.Controllers
             await _formViewer.UiSyncContext;
 
             _formViewer.FolderListBox.DataSource = _folderHandler.FolderArray;
+            if (_formViewer.FolderListBox.Items.Count > 0)
+            {
+                _formViewer.FolderListBox.SelectedIndex = 1;
+            }
         }
 
             #endregion

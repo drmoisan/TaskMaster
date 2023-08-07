@@ -147,11 +147,17 @@ namespace ToDoModel
                 EmailSearchRoot = _globals.Ol.ArchiveRootPath;
             }
             _folderList = new List<string>();
-            _folderList.Add("======= SEARCH RESULTS =======");
+            
+            var matchingFolders = GetMatchingFolders(SearchString, EmailSearchRoot);
+            if (matchingFolders is not null && matchingFolders.Count > 0)
+            {
+                _folderList.Add("======= SEARCH RESULTS =======");
+                _folderList.AddRange(matchingFolders);
+            }
+            
             // TODO: Either use the embedded UBound or pass as reference. It is hard to know where it is changed
             _upBound = 0;
 
-            GetMatchingFolders(SearchString, EmailSearchRoot);
 
             if (ReCalcSuggestions)
             {
@@ -209,21 +215,7 @@ namespace ToDoModel
                 _folderList.AddRange(_globals.AF.RecentsList);
             }
         }
-
-        //private void AddRecentsOld()
-        //{
-        //    _upBound = _upBound + 1;
-        //    Array.Resize(ref _folderArray, _upBound + 1);
-        //    _folderArray[_upBound] = "======= RECENT SELECTIONS ========";  // Seperator between search and recent selections
-
-        //    foreach (string folderName in _globals.AF.RecentsList)
-        //    {
-        //        _upBound = _upBound + 1;
-        //        Array.Resize(ref _folderArray, _upBound + 1);
-        //        _folderArray[_upBound] = folderName;
-        //    }
-        //}
-
+                
         private void RecalculateSuggestions(object ObjItem, bool ReloadCTFStagingFiles)
         {
             var OlMail = MailResolution.TryResolveMailItem(ObjItem);
@@ -302,32 +294,23 @@ namespace ToDoModel
             _folderList.Add("========= SUGGESTIONS =========");
             _folderList.AddRange(Suggestions.ToArray());
         }
-
-        //private void AddSuggestions()
-        //{
-        //        _upBound = _upBound + Suggestions.Count;
-        //        Array.Resize(ref _folderArray, _upBound + 1);
-        //        _folderArray[_upBound - Suggestions.Count] = "========= SUGGESTIONS =========";
-        //        for (int i = 0, loopTo = Suggestions.Count-1; i <= loopTo; i++)
-        //            _folderArray[_upBound - Suggestions.Count + i + 1] = Suggestions[i];
-        //}
-
-        private Folders GetMatchingFolders(string Name, string strEmailFolderPath)
+                
+        private List<string> GetMatchingFolders(string Name, string strEmailFolderPath)
         {
             _matchedFolder = null;
             _searchString = "";
             _wildcardFlag = false;
-
 
             if (Name.Trim().Length != 0)
             {
                 _searchString = Name;
                 (_regex, _searchPattern) = SimpleRegex.MakeRegex(_searchString);
                 
+                var matchingFolders = new List<string>();
                 var folders = GetFolder(strEmailFolderPath).Folders;
-                LoopFolders(folders, strEmailFolderPath);
+                LoopFolders(folders, ref matchingFolders, strEmailFolderPath);
 
-                return folders;
+                return matchingFolders;
             }
             else
             {
@@ -369,7 +352,7 @@ namespace ToDoModel
 
         }
 
-        private void LoopFolders(Folders folders, string strEmailFolderPath = "")
+        private void LoopFolders(Folders folders, ref List<string> matchingFolders, string strEmailFolderPath = "")
         {
             bool found;
             int intRootLen;
@@ -391,10 +374,8 @@ namespace ToDoModel
                     {
                         found = false;
                         _upBound = _upBound + 1;
-                        _folderList.Add(f.FolderPath.Substring(intRootLen));
-                        //Array.Resize(ref _folderArray, _upBound + 1);
-                        //// _folderList(_upBound - 1) = Right(f.FolderPath, Len(f.FolderPath) - 36) 'If starting at 0 in folder list
-                        //_folderArray[_upBound] = f.FolderPath.Substring(intRootLen); // If starting at 1 in folder list
+                        matchingFolders.Add(f.FolderPath.Substring(intRootLen));
+                        
                     }
                 }
                 if (found)
@@ -404,7 +385,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    LoopFolders(f.Folders, strEmailFolderPath);
+                    LoopFolders(f.Folders, ref matchingFolders, strEmailFolderPath);
                     if (_matchedFolder is not null)
                         break;
                 }

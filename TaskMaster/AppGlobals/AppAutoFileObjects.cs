@@ -1,4 +1,5 @@
-﻿using QuickFiler;
+﻿using Microsoft.VisualBasic;
+using QuickFiler;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +11,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
@@ -263,12 +265,27 @@ namespace TaskMaster
                  default,
                  TaskCreationOptions.None,
                  PriorityScheduler.BelowNormal);
-            
+
             await Task.Factory.StartNew(
                  () => _encoder = LoadEncoder(),
                  default,
                  TaskCreationOptions.None,
                  PriorityScheduler.BelowNormal);
+
+            await TaskPriority.Run(
+                PriorityScheduler.BelowNormal,
+                () =>
+                {
+                    var toRecode = this.SubjectMap.Where(x => x.Encoder is null || 
+                                                              x.FolderEncoded is null || 
+                                                              x.SubjectEncoded is null );
+                    if (toRecode.Any()) 
+                    {
+                        toRecode.ForEach(x => x.Encoder = this.Encoder);
+                        this.SubjectMap.Serialize();
+                    }
+                }); 
+
         }   
 
         private IList<ISubjectMapEntry> SubjectMapBackupLoader(string filepath)

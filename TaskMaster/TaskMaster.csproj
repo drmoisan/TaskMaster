@@ -417,7 +417,7 @@
     <ManifestKeyFile>TaskMaster_3_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>900DA4070DECB4E421E39B97E752836FC7F01387</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>58225ABE928F2C2FCDF34B4D1B5BA1A326621F8D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
