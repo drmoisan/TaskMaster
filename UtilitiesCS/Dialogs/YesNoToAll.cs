@@ -26,6 +26,7 @@ namespace UtilitiesCS
         internal static void RespondYesToAll() { Response = YesNoToAllResponse.YesToAll; }
         internal static void RespondNo() { Response = YesNoToAllResponse.No; }
         internal static void RespondNoToAll() { Response = YesNoToAllResponse.NoToAll; }
+        internal static void RespondCancel() { Response = YesNoToAllResponse.Empty; }
 
         private static YesNoToAllResponse _response = YesNoToAllResponse.Empty;
         public static YesNoToAllResponse Response { get => _response; set => _response = value; }
@@ -43,7 +44,9 @@ namespace UtilitiesCS
                 new DelegateButton("No",Properties.Resources.Cancel1,"No",
                     DialogResult.OK, new YesNoToAllDelegate(YesNoToAll.RespondNo)),
                 new DelegateButton("NoToAll",Properties.Resources.RepeatUntilFailure1,"NoToAll",
-                    DialogResult.OK, new YesNoToAllDelegate(YesNoToAll.RespondNoToAll))
+                    DialogResult.OK, new YesNoToAllDelegate(YesNoToAll.RespondNoToAll)),
+                new DelegateButton("Cancel","NoToAll",
+                    DialogResult.Cancel, new YesNoToAllDelegate(YesNoToAll.RespondCancel))
             };
             MyBox.ShowDialog(message, "Dialog",BoxIcon.Question, delegateButtons);
 

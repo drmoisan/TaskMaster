@@ -47,7 +47,7 @@ namespace QuickFiler.Interfaces
         void SetThemeDark(bool async);
         void SetThemeLight(bool async);
         void Cleanup();
-        void MoveMail();
+        Task MoveMail();
         DataFrame DfConversation { get; }
         string Subject { get; }
         string To { get; }

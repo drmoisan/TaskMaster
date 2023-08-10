@@ -1,5 +1,6 @@
 using System;
 using ToDoModel;
+using System.Threading.Tasks;
 
 namespace QuickFiler.Interfaces
 {
@@ -26,7 +27,7 @@ namespace QuickFiler.Interfaces
 
         #region Major Actions
         
-        void ExecuteMoves();        
+        Task ExecuteMoves();        
 		//void Iterate();
         void QuickFileMetrics_WRITE(string filename);
 

@@ -8,6 +8,7 @@ namespace UtilitiesCS
 
     public static class NavigateOlFolders
     {
+        
         public static Folder GetOutlookFolder(string FolderPath, Application OlApp)
         {
             Folder TestFolder;
@@ -39,6 +40,7 @@ namespace UtilitiesCS
             return TestFolder;
 
         }
+        
         public static string[] OlFolderlist_GetAll(IOlObjects OlObjects)
         {
             string[] OlFolderlist_GetAllRet = default;

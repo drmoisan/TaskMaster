@@ -25,6 +25,10 @@ namespace UtilitiesCS
                                             searchPattern.Split('*')
                                             .Select(x => Regex.Escape(x)));
             }
+            else
+            {
+                searchPattern = Regex.Escape(searchPattern);
+            }
             searchPattern = "^" + searchPattern + "$";
             return searchPattern;
         }

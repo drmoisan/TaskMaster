@@ -786,14 +786,15 @@ namespace QuickFiler.Legacy
                 if (blDoMove)
                 {
                     //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                    SortItemsToExistingFolder.Run(selItems: selItems,
-                                                                                picturesCheckbox: false,
-                                                                                sortFolderpath: FolderCbo.SelectedItem as string,
-                                                                                saveMsg: _chbxSaveMail.Checked,
-                                                                                attchments: Attchments,
-                                                                                removeFlowFile: _chbxDelFlow.Checked,
-                                                                                appGlobals: _globals, 
-                                                                                strRoot: _globals.Ol.ArchiveRootPath);
+                    SortItemsToExistingFolder.Run(mailItems: selItems,
+                                                  savePictures: false,
+                                                  destinationOlPath: FolderCbo.SelectedItem as string,
+                                                  saveMsg: _chbxSaveMail.Checked,
+                                                  saveAttachments: Attchments,
+                                                  removePreviousFsFiles: _chbxDelFlow.Checked,
+                                                  appGlobals: _globals,
+                                                  olAncestor: _globals.Ol.ArchiveRootPath,
+                                                  fsAncestorEquivalent: _globals.FS.FldrRoot);
                     SortItemsToExistingFolder.Cleanup_Files();
                 } // blDoMove
 

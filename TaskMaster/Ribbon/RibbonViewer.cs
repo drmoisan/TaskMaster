@@ -126,13 +126,27 @@ namespace TaskMaster
 
         public void Runtest(Office.IRibbonControl control)
         {
-            _controller.Runtest();
+            _controller.RunTry();
         }
 
         public void SortEmail_Click(Office.IRibbonControl control)
         {
             _controller.SortEmail();
         }
+
+        #endregion
+
+        #region TryMethods  
+        
+        public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
+        public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();
+        public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();
+        public void GetQfcDataModel_Click(Office.IRibbonControl control) => _controller.TryGetQfcDataModel();
+        public void GetTableInView_Click(Office.IRibbonControl control) => _controller.TryGetTableInView();
+        public void LegacySortMailToExistingRun2_Click(Office.IRibbonControl control) => _controller.TryLegacySortMailToExistingRun2();
+        public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.TryRebuildProjInfo();
+        public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.TryRecipientGetInfo();
+        public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.TrySubstituteIdRoot();
 
         #endregion
 

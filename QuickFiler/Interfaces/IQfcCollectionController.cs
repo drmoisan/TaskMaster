@@ -4,6 +4,7 @@ using System.Collections;
 using System.Windows.Forms;
 using UtilitiesCS;
 using System;
+using System.Threading.Tasks;
 
 namespace QuickFiler.Interfaces
 {
@@ -19,7 +20,7 @@ namespace QuickFiler.Interfaces
         void RemoveControls();
         void RemoveSpaceToCollapseConversation();
         void RemoveSpecificControlGroup(int intPosition);
-        void MoveEmails(StackObjectCS<MailItem> StackMovedItems);
+        Task MoveEmails(StackObjectCS<MailItem> StackMovedItems);
 
         // UI Select QfcItems
         int ActivateBySelection(int intNewSelection, bool blExpanded);

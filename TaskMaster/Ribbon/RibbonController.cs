@@ -154,35 +154,65 @@ namespace TaskMaster
             taskFlagger.Run();
         }
 
-        internal void Runtest()
+        #region Try specific methods
+        internal void RunTry()
         {
-            //Outlook.Table table = _globals.Ol.App.ActiveExplorer().GetTableInView();
+            
+        }
 
-            //var dc = new QuickFiler.Controllers.QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
-
-            //_globals.TD.ProjInfo.Rebuild(_globals.Ol.App);
-
-            //_globals.TD.IDList.SubstituteIdRoot("9710", "2501");
-
-            //var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
-            //Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
-            //Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
-            //Debug.WriteLine(df.PrettyText());
-            //df.Display();
-
-            // Dim table As Outlook.Table = conv.GetTable(WithFolder:=True, WithStore:=True)
-            // table.EnumerateTable()
-
-            //var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
-            //var conversation = (Outlook.Conversation)Mail.GetConversation();
-            //var df = conversation.GetDataFrame();
-            //df.PrettyPrint();
-            //var mInfo = new MailItemInfo(df, 0);
-
+        internal void TryGetConversationDataframe()
+        {
+            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
+            Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
+            Debug.WriteLine(df.PrettyText());
+            df.Display();
+        }
+        internal void TryGetConversationOutlookTable()
+        {
+            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
+            var table = conv.GetTable(WithFolder: true, WithStore: true);
+            table.EnumerateTable();
+        }
+        internal void TryGetMailItemInfo()
+        {
+            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            var conversation = (Outlook.Conversation)Mail.GetConversation();
+            var df = conversation.GetDataFrame();
+            df.PrettyPrint();
+            var mInfo = new MailItemInfo(df, 0);
+        }
+        internal void TryGetQfcDataModel()
+        {
+            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
+        }
+        internal void TryGetTableInView()
+        {
+            Outlook.Table table = _globals.Ol.App.ActiveExplorer().GetTableInView();
+        }
+        internal void TryRebuildProjInfo()
+        {
+            _globals.TD.ProjInfo.Rebuild(_globals.Ol.App);
+        }
+        internal void TryRecipientGetInfo()
+        {
             var Mail = (Outlook.MailItem)_globals.Ol.App.ActiveExplorer().Selection[1];
             var recips = Mail.Recipients.Cast<Recipient>();
             var info = recips.GetInfo();
         }
+        internal void TrySubstituteIdRoot()
+        {
+            _globals.TD.IDList.SubstituteIdRoot("9710", "2501");
+        }
+        internal void TryLegacySortMailToExistingRun2()
+        {
+            var mail = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+            var items = new List<Outlook.MailItem> { mail };
+            SortItemsToExistingFolder.Run2(items, false, "_ Active Projects\\Countertop Beta", false, false, false, _globals, null, null);
+        }
+
+        #endregion
 
         internal void SortEmail()
         {

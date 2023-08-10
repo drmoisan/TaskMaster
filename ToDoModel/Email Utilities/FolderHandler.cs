@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook; 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 using UtilitiesCS;
-
+using System.Windows.Forms;
+using System.IO;
+using System.Linq;
 
 namespace ToDoModel
 {
@@ -149,10 +153,10 @@ namespace ToDoModel
 
         private IApplicationGlobals _globals;
         private Folder _matchedFolder;
-        private Application _olApp;
+        private Outlook.Application _olApp;
         private Regex _regex;
         private string _searchString;
-        private const bool _stopAtFirstMatch = false;
+        
 
         #endregion
 
@@ -167,9 +171,9 @@ namespace ToDoModel
                 {
                     _folderList = new List<string>();
                     if (Suggestions.Count > 0)
-                        AddSuggestions();
+                        AddSuggestions(ref _folderList);
                     if (_globals.AF.RecentsList.Count > 0) 
-                        AddRecents();
+                        AddRecents(ref _folderList);
                 }
                 
                 return _folderList.ToArray();
@@ -199,42 +203,78 @@ namespace ToDoModel
         public string[] FindFolder(string searchString, object objItem, bool reloadCTFStagingFiles = true, string emailSearchRoot = "ARCHIVEROOT", bool reCalcSuggestions = false)
         {
             if (emailSearchRoot == "ARCHIVEROOT") { emailSearchRoot = _globals.Ol.ArchiveRootPath; }
-            
+
             _folderList = new List<string>();
-            
+
             // Add search results
-            var matchingFolders = GetMatchingFolders(searchString, emailSearchRoot);
-            if (matchingFolders is not null && matchingFolders.Count > 0)
-            {
-                _folderList.Add("======= SEARCH RESULTS =======");
-                _folderList.AddRange(matchingFolders);
-            }
-            
+            var matchingFolders = GetMatchingFolders(searchString, emailSearchRoot).OrderBy(x => x).ToList();
+            AddMatches(matchingFolders);
+
             // Add suggestions
             if (reCalcSuggestions)
             {
                 RecalculateSuggestions(objItem, reloadCTFStagingFiles);
             }
-            AddSuggestions();
-            
+            AddSuggestions(ref _folderList);
+
             // Add recents
-            AddRecents();
+            AddRecents(ref _folderList);
 
             return FolderArray;
         }
 
-        public Folder GetFolder(string FolderPath)
+        public static Folder GetFolder(string folderpath, Outlook.Application olApp)
         {
             Folder TestFolder;
             string[] foldersArray;
             int i;
 
-            if (FolderPath.Substring(0,2) == @"\\")
+            if (folderpath.Substring(0, 2) == @"\\")
             {
-                FolderPath = FolderPath.Substring(2);
+                folderpath = folderpath.Substring(2);
+            }
+            if (folderpath.Substring(0, 1) == @"\")
+            {
+                folderpath = folderpath.Substring(1);
             }
             // Convert folderpath to array
-            foldersArray = FolderPath.Split(@"\");
+            foldersArray = folderpath.Split(@"\");
+            TestFolder = (Folder)olApp.Session.Folders[foldersArray[0]];
+            if (TestFolder is not null)
+            {
+                var loopTo = foldersArray.Length - 1;
+                for (i = 1; i <= loopTo; i++)
+                {
+                    Folders SubFolders;
+                    SubFolders = TestFolder.Folders;
+                    TestFolder = (Folder)SubFolders[foldersArray[i]];
+                    if (TestFolder is null)
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return TestFolder;
+
+        }
+
+        public Folder GetFolder(string folderpath)
+        {
+            Folder TestFolder;
+            string[] foldersArray;
+            int i;
+
+            if (folderpath.Substring(0,2) == @"\\")
+            {
+                folderpath = folderpath.Substring(2);
+            }
+            if (folderpath.Substring(0, 1) == @"\")
+            {
+                folderpath = folderpath.Substring(1);
+            }
+            // Convert folderpath to array
+            foldersArray = folderpath.Split(@"\");
             TestFolder = (Folder)_olApp.Session.Folders[foldersArray[0]];
             if (TestFolder is not null)
             {
@@ -254,27 +294,108 @@ namespace ToDoModel
             return TestFolder;
 
         }
+
+        public Folder GetFolder(string selectedValue, bool mustMatch, bool throwEx)
+        {
+            var olFolder = this.GetFolder(selectedValue);
+            if (olFolder is null && mustMatch)
+            {
+                string message = $"Selected folder {selectedValue} does not exist. " +
+                    "Staging Files out of sync with current directory state.";
+                if (throwEx) { throw new ArgumentException(message, nameof(selectedValue)); }
+                else { MessageBox.Show(message); }
+
+            }
+            return olFolder;
+        }
+
+        public string InputNewFoldername(Folder parentFolder) //Internal
+        {
+            string newFolderName = " ";
+            while (newFolderName == " ")
+            {
+                newFolderName = InputBox.ShowDialog(
+                    $"Please enter a new subfolder name for {parentFolder.Name}",
+                    "New folder dialog", " ");
+
+                if (newFolderName != " " && newFolderName != "")
+                {
+                    if (!IsLegalFolderName(newFolderName))
+                    {
+                        MessageBox.Show("Folder name contains illegal characters. Please choose a different name.");
+                        newFolderName = " ";
+                    }
+                    else if (newFolderName.Length > 30)
+                    {
+                        MessageBox.Show("Outlook limits folder names to 30 characters. Please choose a different name.");
+                        newFolderName = " ";
+                    }
+                    else if (this.GetFolder(newFolderName) is not null)
+                    {
+                        MessageBox.Show("Folder already exists. Please choose a different name.");
+                        newFolderName = " ";
+                    }
+                }
+            }
+            return newFolderName;
+        }
+
+        private static char[] IllegalFolderCharacters { get => @"[\/:*?""<>|].".ToCharArray(); }
+
+        private bool IsLegalFolderName(string folderName)
+        {
+            return !folderName.Any(c => IllegalFolderCharacters.Contains(c));
+        }
         
+        public MAPIFolder CreateFolder(string parentBranchPath, string olRoot, string fsRoot)
+        {
+            if (olRoot.IsNullOrEmpty()) { olRoot = _globals.Ol.ArchiveRootPath; }
+            var parentFolderpath = $"{olRoot}{parentBranchPath}";
+            //var parentFolderpath = Path.Combine(olRoot, parentBranchPath);
+            var parentFolder = this.GetFolder(parentFolderpath, true, false);
+            if (parentFolder is null) { return null; }
+
+            string newFolderName = InputNewFoldername(parentFolder);
+            if (newFolderName == "") { return null; }
+
+            var olFolder = parentFolder.Folders.Add(newFolderName);
+
+            var fsFolderName = olFolder.ToFsFolderpath(olRoot, fsRoot);
+            
+            var fsFolder = Directory.CreateDirectory(fsFolderName);
+
+            return olFolder;
+        }
+
         #endregion
 
         #region Helper Functions
 
-        private void AddRecents()
+        public void AddRecents(ref List<string> folderList) // internal
         {
             if (_globals.AF.RecentsList.Count > 0)
             {
-                _folderList.Add("======= RECENT SELECTIONS ========");
-                _folderList.AddRange(_globals.AF.RecentsList);
+                folderList.Add("======= RECENT SELECTIONS ========");
+                folderList.AddRange(_globals.AF.RecentsList);
+            }
+        }
+        
+        public void AddMatches(List<string> matchingFolders) // internal
+        {
+            if (matchingFolders is not null && matchingFolders.Count > 0)
+            {
+                _folderList.Add("======= SEARCH RESULTS =======");
+                _folderList.AddRange(matchingFolders);
             }
         }
                 
-        private void AddSuggestions()
+        public void AddSuggestions(ref List<string> folderList) // internal
         {
-            _folderList.Add("========= SUGGESTIONS =========");
-            _folderList.AddRange(Suggestions.ToArray());
+            folderList.Add("========= SUGGESTIONS =========");
+            folderList.AddRange(Suggestions.ToArray());
         }
         
-        private List<string> GetMatchingFolders(string searchString, string strEmailFolderPath)
+        public List<string> GetMatchingFolders(string searchString, string strEmailFolderPath, bool includeChildren = true) // Internal
         {
             _matchedFolder = null;
 
@@ -294,46 +415,40 @@ namespace ToDoModel
             }
         }
 
-        private void LoopFolders(Folders folders, ref List<string> matchingFolders, string strEmailFolderPath = "")
+        public void LoopFolders(Folders folders, ref List<string> matchingFolders, string strEmailFolderPath = "", bool includeChildren = true) //Internal
         {
-            bool found;
-            int intRootLen;
-
             if (string.IsNullOrEmpty(strEmailFolderPath))
             {
                 strEmailFolderPath = _globals.Ol.ArchiveRootPath;
             }
 
-            intRootLen = strEmailFolderPath.Length;
             foreach (Folder f in folders)
             {
-                found = _regex.IsMatch(f.FolderPath);
-                
+                var relevantPath = GetRelevantOlPathPortion(f.FolderPath, strEmailFolderPath, includeChildren);
 
-                if (found)
+                if (_regex.IsMatch(relevantPath))
                 {
-                    if (_stopAtFirstMatch == false)
-                    {
-                        found = false;
-                        matchingFolders.Add(f.FolderPath.Substring(intRootLen));
-                        
-                    }
+                    matchingFolders.Add(relevantPath);    
                 }
-                if (found)
-                {
-                    _matchedFolder = f;
-                    break;
-                }
-                else
-                {
-                    LoopFolders(f.Folders, ref matchingFolders, strEmailFolderPath);
-                    if (_matchedFolder is not null)
-                        break;
-                }
+                
+                LoopFolders(f.Folders, ref matchingFolders, strEmailFolderPath, includeChildren);
             }
         }
         
-        private void RecalculateSuggestions(object ObjItem, bool ReloadCTFStagingFiles)
+        public string GetRelevantOlPathPortion(string path, string root, bool includeChildren)
+        {
+            if (includeChildren)
+            {
+                return path.Substring(root.Length);
+            }
+            else
+            {
+                var pathParts = path.Substring(root.Length).Split(@"\");
+                return pathParts[pathParts.Count() - 1];
+            }
+        }
+
+        public void RecalculateSuggestions(object ObjItem, bool ReloadCTFStagingFiles) // Internal
         {
             var OlMail = MailResolution.TryResolveMailItem(ObjItem);
             if (OlMail is not null)

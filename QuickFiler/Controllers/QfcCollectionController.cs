@@ -823,12 +823,12 @@ namespace QuickFiler.Controllers
             _itemGroups = null;
         }
 
-        public void MoveEmails(StackObjectCS<MailItem> stackMovedItems)
+        async public Task MoveEmails(StackObjectCS<MailItem> stackMovedItems)
         {
             foreach (var grp in _itemGroups)
             {
                 //TODO: function needed to shut off KeyboardDialog at this step if active
-                grp.ItemController.MoveMail();
+                await grp.ItemController.MoveMail();
                 stackMovedItems.Push(grp.MailItem);
             }
         }

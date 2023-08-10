@@ -63,7 +63,7 @@ namespace QuickFiler.Controllers
             _formController.LoadItems(listObjects);
         }
 
-        public void ExecuteMoves()
+        async public Task ExecuteMoves()
         {
             _formController.Groups.MoveEmails(DataModel.MovedItems);
             QuickFileMetrics_WRITE("9999TimeWritingEmail.csv");

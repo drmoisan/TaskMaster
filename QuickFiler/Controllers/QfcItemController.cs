@@ -869,7 +869,7 @@ namespace QuickFiler.Controllers
             { "&Cancel", ()=>{ } }
         }; }
 
-        public void MoveMail()
+        async public Task MoveMail()
         {
             if (Mail is not null)
             {
@@ -877,14 +877,15 @@ namespace QuickFiler.Controllers
                 bool attchments = (SelectedFolder != "Trash to Delete") ? false : _itemViewer.CbxAttachments.Checked;
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                SortItemsToExistingFolder.Run(selItems: selItems,
-                                                                            picturesCheckbox: false,
-                                                                            sortFolderpath: _itemViewer.CboFolders.SelectedItem as string,
-                                                                            saveMsg: _itemViewer.CbxEmailCopy.Checked,
-                                                                            attchments: attchments,
-                                                                            removeFlowFile: false,
-                                                                            appGlobals: _globals,
-                                                                            strRoot: _globals.Ol.ArchiveRootPath);
+                await SortItemsToExistingFolder.Run(mailItems: selItems,
+                                              savePictures: false,
+                                              destinationOlPath: _itemViewer.CboFolders.SelectedItem as string,
+                                              saveMsg: _itemViewer.CbxEmailCopy.Checked,
+                                              saveAttachments: attchments,
+                                              removePreviousFsFiles: false,
+                                              appGlobals: _globals,
+                                              olAncestor: _globals.Ol.ArchiveRootPath,
+                                              fsAncestorEquivalent: _globals.FS.FldrRoot);
                 SortItemsToExistingFolder.Cleanup_Files();
                 // blDoMove
             }

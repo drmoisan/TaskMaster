@@ -18,7 +18,7 @@ namespace QuickFiler.Controllers
         #region Constructors, Initializers, and Destructors
 
         public EfcFormController(IApplicationGlobals AppGlobals,
-                                 MailItem mailItem,
+                                 EfcDataModel dataModel,
                                  EfcViewer formViewer,
                                  EfcHomeController homeController,
                                  System.Action ParentCleanup,
@@ -28,7 +28,8 @@ namespace QuickFiler.Controllers
             _parentCleanup = ParentCleanup;
             _formViewer = formViewer;
             _homeController = homeController;
-            _mailItem = mailItem;
+            _dataModel = dataModel;
+            //_mailItem = mailItem;
             _initType = initType;
             LoadSettings();
             WireEventHandlers();
@@ -37,16 +38,18 @@ namespace QuickFiler.Controllers
 
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
+        private EfcDataModel _dataModel;
         private EfcViewer _formViewer;
         private EfcHomeController _homeController;
-        private FolderHandler _folderHandler;
-        private MailItem _mailItem;
+        //private FolderHandler _folderHandler;
+        //private MailItem _mailItem;
         private Enums.InitTypeEnum _initType;
 
         public void Cleanup()
         {
             _globals = null;
             _formViewer = null;
+            _dataModel = null;
             _parentCleanup.Invoke();
         }
 
@@ -56,15 +59,8 @@ namespace QuickFiler.Controllers
 
         public IntPtr FormHandle => throw new NotImplementedException();
 
-        //TODO: Implement SelectedFolder
-        public string SelectedFolder
-        {
-            get
-            {
-                return _formViewer.FolderListBox.SelectedItem as string;
-            }
-        }
-
+        public string SelectedFolder { get => _formViewer.FolderListBox.SelectedItem as string; }
+        
         private bool _saveAttachments;
         public bool SaveAttachments
         {
@@ -143,63 +139,42 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        //TODO: Implement ButtonOK_Click
-        public void ButtonOK_Click(object sender, EventArgs e)
+        async public void ButtonOK_Click(object sender, EventArgs e)
         {
-            ;
+            await _homeController.ExecuteMoves();
         }
 
-        //TODO: Implement ButtonRefresh_Click
         public void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            _dataModel.RefreshSuggestions();
+            _formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
+            if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }
 
-        //TODO: Implement ButtonCreate_Click
-        public void ButtonCreate_Click(object sender, EventArgs e)
+        async public void ButtonCreate_Click(object sender, EventArgs e)
         {
-            var selectedValue = _formViewer.FolderListBox.SelectedItem as string;
-            if (selectedValue == "" || selectedValue.Length < 3 || selectedValue.Substring(0, 3) == "===")
+            if (_initType == Enums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+
+            if (!IsValidSelection)
             {
-                MessageBox.Show("Please select a root folder to create a new folder under.");
+                MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
             }
             else 
-            { 
-                if (_initType == Enums.InitTypeEnum.Find)
-                {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    var newFolderName = InputBox.ShowDialog(
-                        $"Please enter a new subfolder for {_formViewer.FolderListBox.SelectedItem}",
-                        "New folder dialog");
-                    if (newFolderName != "")
-                    {
-                        //Check if a filesystem folder exists and create it if it doesn't
-                        var newFolder = Path.Combine(selectedValue, newFolderName);
-                        if (!Directory.Exists(newFolder))
-                        {
-                            Directory.CreateDirectory(newFolder);
-                        }
-                        //Check if an outlook folder exists and create it if it doesn't
-                        //var currentFolder = _globals.Ol.App.Session.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
-                        //var folderPath = selectedValue.Split('\\');
-                        //Folder newOutlookFolder = null;
-                        //foreach (var folder in folderPath)
-                        //{
-                        //    if (folder != "")
-                        //    {
-                        //        newOutlookFolder = currentFolder.Folders[folder];
-                        //        if (newOutlookFolder == null)
-                        //        {
-                        //            newOutlookFolder = currentFolder.Folders.Add(folder);
-                        //        }
-                        //        currentFolder = newOutlookFolder;
-                        //    }
-                        //}
-
-                    }
+            {
+                var folder = await Task.FromResult(_dataModel
+                                                   .FolderHandler
+                                                   .CreateFolder(SelectedFolder, 
+                                                                 _globals.Ol.ArchiveRootPath, 
+                                                                 _globals.FS.FldrRoot));
+                if (folder is not null) 
+                { 
+                    await _dataModel.MoveToFolder(folder.FolderPath,
+                                                  SaveAttachments,
+                                                  SaveEmail,
+                                                  SavePictures,
+                                                  MoveConversation);
+                    _formViewer.Close();
+                    Cleanup();
                 }
             }
         }
@@ -226,22 +201,8 @@ namespace QuickFiler.Controllers
 
         private void SearchText_TextChanged(object sender, EventArgs e)
         {
-            var searchText = _formViewer.SearchText.Text;
-            if (searchText != "")
-            {
-                searchText = "*" + searchText + "*";
-            }
-
-            _formViewer.FolderListBox.DataSource = _folderHandler.FindFolder(
-                searchString: searchText,
-                reloadCTFStagingFiles: false,
-                reCalcSuggestions: false,
-                objItem: _mailItem);
-
-            if (_formViewer.FolderListBox.Items.Count > 0)
-            {
-                _formViewer.FolderListBox.SelectedIndex = 1;
-            }
+            _formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
+            if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }
 
         #endregion
@@ -287,27 +248,27 @@ namespace QuickFiler.Controllers
 
         async public Task PopulateFolderCombobox(object folderList = null)
         {
-            if (folderList is null)
-            {
-                _folderHandler = await Task.Run(()=> new FolderHandler(
-                    _globals, _mailItem, FolderHandler.Options.FromField));
-            }
-            else
-            {
-                _folderHandler = await Task.Run(()=> new FolderHandler(
-                    _globals, folderList, FolderHandler.Options.FromArrayOrString));
-            }
+            await _dataModel.InitFolderHandler(folderList);
 
             await _formViewer.UiSyncContext;
 
-            _formViewer.FolderListBox.DataSource = _folderHandler.FolderArray;
+            _formViewer.FolderListBox.DataSource = _dataModel.FolderHandler.FolderArray;
             if (_formViewer.FolderListBox.Items.Count > 0)
             {
                 _formViewer.FolderListBox.SelectedIndex = 1;
             }
         }
 
-            #endregion
-
+        internal bool IsValidSelection
+        {
+            get
+            {
+                var selectedFolder = SelectedFolder;
+                return !(selectedFolder is null || selectedFolder == "" || selectedFolder.Length < 3 || selectedFolder.Substring(0, 3) == "===");
+            }
         }
+
+        #endregion
+
+    }
 }

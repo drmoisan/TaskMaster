@@ -29,7 +29,7 @@ namespace QuickFiler
                 _stopWatch = new cStopWatch();
                 _formViewer = new EfcViewer();
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
-                _formController = new EfcFormController(_globals, _dataModel.Mail, _formViewer, this, Cleanup, _initType);
+                _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType);
             }
         }
 
@@ -83,11 +83,12 @@ namespace QuickFiler
 
         #region Major Actions
 
-        public void ExecuteMoves() => _dataModel.MoveToFolder(_formController.SelectedFolder,
-                                                              _formController.SaveAttachments,
-                                                              _formController.SaveEmail,
-                                                              _formController.SavePictures,
-                                                              _formController.MoveConversation);
+        async public Task ExecuteMoves() => await _dataModel.MoveToFolder(
+            _formController.SelectedFolder,
+            _formController.SaveAttachments,
+            _formController.SaveEmail,
+            _formController.SavePictures,
+            _formController.MoveConversation);
 
         
         //TODO: Implement QuickFileMetrics_WRITE

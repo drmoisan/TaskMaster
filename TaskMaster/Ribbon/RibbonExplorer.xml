@@ -24,7 +24,17 @@
                 <button id="FlagAsTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
                 <button id="SortEmail" imageMso="MoveToFolder" onAction="SortEmail_Click" label="Sort Email" size="large"/>
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
-                <button id="Test" imageMso="TechnicalSupport" onAction="Runtest" label="Test" size="large"/>
+                <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" size="large" itemSize="large">
+                  <button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
+                  <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />
+                  <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
+                  <button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
+                  <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
+                  <button id="LegacySortMailToExistingRun2" imageMso="TraceDependentCells" onAction="LegacySortMailToExistingRun2_Click" label="LegacySortMailToExistingRun2" />
+                  <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
+                  <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
+                  <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />
+                </menu>
               </group>
             </tab>
         </tabs>

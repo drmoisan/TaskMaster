@@ -121,6 +121,7 @@
   <ItemGroup>
     <Compile Include="Data Model\ID\IDList.cs" />
     <Compile Include="Data Model\Project\ProjectInfo.cs" />
+    <Compile Include="Email Utilities\AttachmentInfo.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
     <Compile Include="Email Utilities\EmailDetails.cs" />
     <Compile Include="Common Functions\FileOperationsPST.cs" />

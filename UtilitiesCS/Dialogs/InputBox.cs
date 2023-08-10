@@ -11,7 +11,7 @@ namespace UtilitiesCS
     {
         public static string ShowDialog(string Prompt, string Title = "", string DefaultResponse = "")
         {
-            if (!InputBoxViewer.DpiCalled) { InputBoxViewer.DpiAware(); }
+            //if (!InputBoxViewer.DpiCalled) { InputBoxViewer.DpiAware(); }
             var viewer = new InputBoxViewer();
             viewer.AcceptButton = viewer.Ok;
             viewer.CancelButton = viewer.Cancel;
