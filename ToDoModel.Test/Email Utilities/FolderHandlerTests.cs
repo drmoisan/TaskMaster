@@ -123,7 +123,7 @@ namespace ToDoModel.Test
             Folder parentFolder = null;
 
             // Act
-            var result = folderHandler.InputNewFoldername(
+            var result = folderHandler.InputFoldername(
                 parentFolder);
 
             // Assert
@@ -258,7 +258,7 @@ namespace ToDoModel.Test
             string expected = "Folder 3";
 
             // Act
-            var actual = folderHandler.GetRelevantOlPathPortion(
+            var actual = folderHandler.GetOlSubpath(
                 path,
                 root,
                 includeChildren);
@@ -278,7 +278,7 @@ namespace ToDoModel.Test
             string expected = "\\Folder 1\\Folder 2\\Folder 3";
 
             // Act
-            var actual = folderHandler.GetRelevantOlPathPortion(
+            var actual = folderHandler.GetOlSubpath(
                 path,
                 root,
                 includeChildren);

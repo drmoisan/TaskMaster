@@ -119,6 +119,7 @@
   <ItemGroup>
     <Compile Include="EmailIntelligence\CtfIncidenceListTests.cs" />
     <Compile Include="EmailIntelligence\CtfMapTests.cs" />
+    <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

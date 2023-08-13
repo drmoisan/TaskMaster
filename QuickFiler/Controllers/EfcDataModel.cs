@@ -21,7 +21,7 @@ namespace QuickFiler.Controllers
             if (Mail is not null)
             {
                 _conversationResolver = new ConversationResolver(_globals, Mail);
-                _ = _conversationResolver.ResolveItems();
+                _ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItems());
             }
         }
 
@@ -34,12 +34,12 @@ namespace QuickFiler.Controllers
             if (folderList is null)
             {
                 _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, _mail, FolderHandler.Options.FromField));
+                    _globals, _mail, FolderHandler.InitOptions.FromField));
             }
             else
             {
                 _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, folderList, FolderHandler.Options.FromArrayOrString));
+                    _globals, folderList, FolderHandler.InitOptions.FromArrayOrString));
             }
         }
 
@@ -67,22 +67,33 @@ namespace QuickFiler.Controllers
             if (Mail is not null)
             {
                 IList<MailItem> items = PackageItems(moveConversation);
-                bool attchments = (folderpath != "Trash to Delete") ? false : saveAttachments;
+                bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                await SortItemsToExistingFolder.Run(mailItems: items,
+                await SortEmail.Run(mailItems: items,
                                                     savePictures: savePictures,
-                                                    destinationOlPath: folderpath,
+                                                    destinationOlStem: folderpath,
                                                     saveMsg: saveEmail,
                                                     saveAttachments: attchments,
                                                     removePreviousFsFiles: false,
                                                     appGlobals: _globals,
                                                     olAncestor: _globals.Ol.ArchiveRootPath,
                                                     fsAncestorEquivalent: _globals.FS.FldrRoot);
-                SortItemsToExistingFolder.Cleanup_Files();
+                SortEmail.Cleanup_Files();
                 // blDoMove
             }
             //stackMovedItems.Push(grp.MailItem);
+        }
+
+        async public Task MoveToFolder(MAPIFolder folder,
+                                       string olAncestor,
+                                       bool saveAttachments,
+                                       bool saveEmail,
+                                       bool savePictures,
+                                       bool moveConversation)
+        {
+                var folderpath = folder.FolderPath.Replace(olAncestor,"");
+                await MoveToFolder(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
         }
 
         public IList<MailItem> PackageItems(bool moveConversation)
@@ -101,7 +112,7 @@ namespace QuickFiler.Controllers
             return _folderHandler.FindFolder(
                         searchString: searchText,
                         reloadCTFStagingFiles: false,
-                        reCalcSuggestions: false,
+                        recalcSuggestions: false,
                         objItem: _mail);
         }
 

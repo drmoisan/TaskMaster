@@ -167,8 +167,8 @@ namespace QuickFiler.Controllers
         /// <param name="df"></param>
         public void PopulateConversation(DataFrame df)
         {
-            DfConversationExpanded = df.FilterConversation(false, true);
-            DfConversation = DfConversationExpanded.FilterConversation(true, true);
+            DfConversationExpanded = df.FilterConversation(((Folder)Mail.Parent).FolderPath, false, true);
+            DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).FolderPath, true, true);
             int count = DfConversation.Rows.Count();
             PopulateConversation(count);
         }
@@ -193,12 +193,12 @@ namespace QuickFiler.Controllers
             if (varList is null)
             {
                 _fldrHandler = new FolderHandler(
-                    _globals, _mailItem, FolderHandler.Options.FromField);
+                    _globals, _mailItem, FolderHandler.InitOptions.FromField);
             }
             else
             {
                 _fldrHandler = new FolderHandler(
-                    _globals, varList, FolderHandler.Options.FromArrayOrString);
+                    _globals, varList, FolderHandler.InitOptions.FromArrayOrString);
             }
 
             _itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
@@ -313,7 +313,7 @@ namespace QuickFiler.Controllers
                 {
                     var conversation = Mail.GetConversation();
                     DfConversationExpanded = conversation.GetConversationDf();
-                    DfConversation = DfConversationExpanded.FilterConversation(false, true);
+                    DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).FolderPath, false, true);
                 }
                 return _dfConversation; 
             }
@@ -333,7 +333,7 @@ namespace QuickFiler.Controllers
                 {
                     var conversation = Mail.GetConversation();
                     DfConversationExpanded = conversation.GetConversationDf();
-                    DfConversation = DfConversationExpanded.FilterConversation(false, true);
+                    DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).FolderPath,false, true);
                 }
                 return _dfConversationExpanded;
             } 
@@ -561,7 +561,7 @@ namespace QuickFiler.Controllers
                 _fldrHandler.FindFolder(searchString: "*" + 
                 _itemViewer.TxtboxSearch.Text + "*",
                 reloadCTFStagingFiles: false,
-                reCalcSuggestions: false,
+                recalcSuggestions: false,
                 objItem: Mail));
 
             if (_itemViewer.CboFolders.Items.Count >= 2)
@@ -877,16 +877,16 @@ namespace QuickFiler.Controllers
                 bool attchments = (SelectedFolder != "Trash to Delete") ? false : _itemViewer.CbxAttachments.Checked;
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                await SortItemsToExistingFolder.Run(mailItems: selItems,
+                await SortEmail.Run(mailItems: selItems,
                                               savePictures: false,
-                                              destinationOlPath: _itemViewer.CboFolders.SelectedItem as string,
+                                              destinationOlStem: _itemViewer.CboFolders.SelectedItem as string,
                                               saveMsg: _itemViewer.CbxEmailCopy.Checked,
                                               saveAttachments: attchments,
                                               removePreviousFsFiles: false,
                                               appGlobals: _globals,
                                               olAncestor: _globals.Ol.ArchiveRootPath,
                                               fsAncestorEquivalent: _globals.FS.FldrRoot);
-                SortItemsToExistingFolder.Cleanup_Files();
+                SortEmail.Cleanup_Files();
                 // blDoMove
             }
         }

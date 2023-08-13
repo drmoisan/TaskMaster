@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 namespace ToDoModel
 {
 
-    public static class SortItemsToExistingFolder
+    public static class SortEmail
     {
         public static void InitializeSortToExisting(string InitType = "Sort", bool QuickLoad = false, bool WholeConversation = true, string strSeed = "", object objItem = null)
         {
@@ -58,7 +58,7 @@ namespace ToDoModel
 
         async public static Task Run(IList<MailItem> mailItems,
                                      bool savePictures,
-                                     string destinationOlPath,
+                                     string destinationOlStem,
                                      bool saveMsg,
                                      bool saveAttachments,
                                      bool removePreviousFsFiles,
@@ -68,17 +68,27 @@ namespace ToDoModel
         {
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
 
-            (string saveFsPath, string deleteFsPath) = ResolvePaths(mailItems, destinationOlPath, appGlobals, olAncestor, fsAncestorEquivalent);
+            var destinationOlPath = $"{olAncestor}{destinationOlStem}";
+
+            (string saveFsPath, string deleteFsPath) = ResolvePaths(mailItems,
+                                                                    destinationOlPath,
+                                                                    appGlobals,
+                                                                    olAncestor,
+                                                                    fsAncestorEquivalent);
 
             foreach (var mailItem in mailItems)
-            {
+            {                
                 // If saveMsg is true, save the message as an .msg file
                 if (saveMsg) { await SaveMessageAsMSG(mailItem, saveFsPath); }
 
                 if (saveAttachments || savePictures)
                 {
                     // Get attachments to save and necessary info
-                    var attachments = GetAttachmentsInfo(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
+                    var attachments = GetAttachmentsInfo(mailItem,
+                                                         saveFsPath,
+                                                         deleteFsPath,
+                                                         saveAttachments,
+                                                         savePictures);
                     // Save to the file system
                     attachments.ForEach(async x => await x.SaveAttachment());
 
@@ -91,12 +101,12 @@ namespace ToDoModel
                 await Task.Run(()=>mailItem.SetUdf("AutoSorted", "Yes")).ConfigureAwait(false);
                 mailItem.UnRead = false;
                 await Task.Run(()=>mailItem.Save()).ConfigureAwait(false);
-                
+                                
                 // Update the Recents list
-                appGlobals.AF.RecentsList.Add(destinationOlPath);
+                appGlobals.AF.RecentsList.Add(destinationOlStem);
 
                 // Update Subject Map and Subject Encoder
-                appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlPath);
+                appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
                 var olDestination = FolderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
@@ -215,7 +225,10 @@ namespace ToDoModel
 
             // Resolve the file system deletion folder path if relevant
             string deleteFsPath = null;
-            if (olAncestor != appGlobals.Ol.EmailRootPath)
+            var currentFolder = (Folder)mailItems[0].Parent;
+            if ((currentFolder.FolderPath != appGlobals.Ol.EmailRootPath)&&
+                (currentFolder.FolderPath.Contains(olAncestor))&&
+                (currentFolder.FolderPath != olAncestor))
             {
                 deleteFsPath = ((Folder)mailItems[0].Parent).ToFsFolderpath(olAncestor, fsAncestorEquivalent);
             }
@@ -419,121 +432,7 @@ namespace ToDoModel
         #endregion
 
         #region old methods
-        //public static void Run3(IList<MailItem> mailItems,
-        //                       bool savePictures,
-        //                       string destinationFolderpath,
-        //                       bool saveMsg,
-        //                       bool saveAttachments,
-        //                       bool removeFlowFile,
-        //                       IApplicationGlobals appGlobals,
-        //                       string olBranch,
-        //                       string fsBranch)
-        //{
-        //    #region Private variables
-        //    string loc;
-        //    string FileSystem_LOC;
-
-        //    string FileSystem_DelLOC;
-
-        //    MailItem mailItem;
-
-        //    Folder sortFolder;
-        //    Folder folderCurrent;
-        //    string strFolderPath = "";
-        //    int i;
-        //    MailItem mailItemTemp;
-
-        //    var strOutput = new string[2];
-
-        //    #endregion
-
-        //    var _globals = appGlobals;
-
-        //    if ()
-
-
-        //    FileSystem_DelLOC = _globals.FS.FldrRoot;
-
-        //    // If Save_PDF = True Then
-        //    // Call SaveAsPDF.SaveMessageAsPDF(FileSystem_LOC, selItems)
-        //    // End If
-
-        //    if (saveMsg == true)
-        //    {
-        //        SaveMessageAsMSG(FileSystem_LOC, mailItems);
-        //    }
-        //    // 
-
-
-
-        //    // ****Save Attachment to OneDrive directory****
-
-        //    if (saveAttachments == true)
-        //    {
-        //        // Email_SortSaveAttachment.SaveAttachmentsFromSelection(SavePath:=FileSystem_LOC, Verify_Action:=Pictures_Checkbox, selItems:=selItems, save_images:=Pictures_Checkbox, SaveMSG:=Save_MSG)
-        //        SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: appGlobals, SavePath: FileSystem_LOC, Verify_Action: savePictures, selItems: mailItems, save_images: savePictures, SaveMSG: saveMsg);
-        //    }
-
-
-
-        //    if (removeFlowFile == true)
-        //    {
-        //        SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: appGlobals, SavePath: strFolderPath, DELFILE: true, selItems: mailItems);
-        //    }
-
-
-
-        //    // *************************************************************************
-        //    // *********** LABEL EMAIL AS AUTOSORTED AND MOVE TO EMAIL FOLDER***********
-        //    // *************************************************************************
-
-        //    // If strTemp2 = "" Then Add_Recent(SortFolderpath)
-        //    if (string.IsNullOrEmpty(strTemp2))
-        //        _globals.AF.RecentsList.AddRecent(destinationFolderpath);
-        //    loc = Path.Combine(olBranch, destinationFolderpath);
-        //    sortFolder = new FolderHandler(_globals).GetFolder(loc); // Call Function to turn text to Folder
-
-        //    // Call Flag_Fields_Categories.SetCategory("Autosort")
-        //    // Call Flag_Fields_Categories.SetUdf("Autosort", "True")
-        //    if (sortFolder is null)
-        //    {
-        //        MessageBox.Show(loc + " does not exist, skipping email move.");
-        //    }
-        //    else
-        //    {
-
-        //        for (i = mailItems.Count - 1; i >= 0; i -= 1)
-        //        {
-        //            if (mailItems[i] is MailItem)
-        //            {
-        //                if (!(mailItems[i] is MeetingItem))
-        //                {
-        //                    mailItem = (MailItem)mailItems[i];
-        //                    if (string.IsNullOrEmpty(strTemp2))
-        //                    {
-        //                        // Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
-        //                        UpdateForMove(mailItem, destinationFolderpath, appGlobals.AF.CtfMap, appGlobals.AF.SubjectMap);
-        //                    };
-        //                    try
-        //                    {
-        //                        mailItem.SetUdf("Autosort", "True");
-        //                        mailItem.UnRead = false;
-        //                        mailItem.Save();
-
-        //                        mailItemTemp = (MailItem)mailItem.Move(sortFolder);
-        //                        CaptureMoveDetails(mailItem, mailItemTemp, strOutput, _globals);
-        //                    }
-        //                    catch (System.Exception e)
-        //                    {
-        //                        Debug.WriteLine(e.Message);
-        //                        Debug.WriteLine(e.StackTrace);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
+        
         public static void Run2(IList<MailItem> mailItems, bool savePictures, string destinationFolderpath, bool saveMsg, bool saveAttachments, bool removeFlowFile, IApplicationGlobals appGlobals, string olRoot, string fsRoot)
         {
             #region Private variables
@@ -627,7 +526,7 @@ namespace ToDoModel
 
             // If strTemp2 = "" Then Add_Recent(SortFolderpath)
             if (string.IsNullOrEmpty(strTemp2))
-                _globals.AF.RecentsList.AddRecent(destinationFolderpath);
+                _globals.AF.RecentsList.Add(destinationFolderpath);
             loc = Path.Combine(olRoot, destinationFolderpath);
             sortFolder = new FolderHandler(_globals).GetFolder(loc); // Call Function to turn text to Folder
 
@@ -683,11 +582,6 @@ namespace ToDoModel
         private static void CaptureMoveDetails(MailItem MSG, MailItem oMailTmp, IApplicationGlobals _globals)
         {
             var strOutput = new string[2];
-
-            //if (_globals.Ol.MovedMails_Stack is null)
-            //    _globals.Ol.MovedMails_Stack = new StackObjectCS<object>();
-            //_globals.Ol.MovedMails_Stack.Push(MSG);
-            //_globals.Ol.MovedMails_Stack.Push(oMailTmp);
 
             // TODO: Change this into a JSON file
             WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);

@@ -273,7 +273,7 @@ namespace QuickFiler.Controllers
 
             // If strTemp2 = "" Then Add_Recent(SortFolderpath)
             if (string.IsNullOrEmpty(strTemp2))
-                _globals.AF.RecentsList.AddRecent(SortFolderpath);
+                _globals.AF.RecentsList.Add(SortFolderpath);
             loc = Path.Combine(StrRoot, SortFolderpath);
             sortFolder = new FolderHandler(_globals).GetFolder(loc); // Call Function to turn text to Folder
 

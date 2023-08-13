@@ -209,7 +209,7 @@ namespace TaskMaster
         {
             var mail = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
             var items = new List<Outlook.MailItem> { mail };
-            SortItemsToExistingFolder.Run2(items, false, "_ Active Projects\\Countertop Beta", false, false, false, _globals, null, null);
+            ToDoModel.SortEmail.Run2(items, false, "_ Active Projects\\Countertop Beta", false, false, false, _globals, null, null);
         }
 
         #endregion

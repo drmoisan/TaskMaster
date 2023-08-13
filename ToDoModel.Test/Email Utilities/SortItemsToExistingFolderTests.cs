@@ -34,7 +34,7 @@ namespace ToDoModel.Test
             object objItem = null;
 
                 // Act
-                SortItemsToExistingFolder.InitializeSortToExisting(
+                SortEmail.InitializeSortToExisting(
                         InitType,
                         QuickLoad,
                         WholeConversation,
@@ -58,7 +58,7 @@ namespace ToDoModel.Test
             IApplicationGlobals appGlobals = null;
 
             // Act
-            SortItemsToExistingFolder.Run(
+            SortEmail.Run(
                 savePictures,
                 destinationFolderpath,
                 saveMsg,
@@ -84,7 +84,7 @@ namespace ToDoModel.Test
             IApplicationGlobals appGlobals = null;
 
             // Act
-            SortItemsToExistingFolder.Run(
+            SortEmail.Run(
                 mailItems,
                 savePictures,
                 destinationFolderpath,
@@ -113,7 +113,7 @@ namespace ToDoModel.Test
             string fsAncestorEquivalent = null;
 
             // Act
-            SortItemsToExistingFolder.Run(
+            SortEmail.Run(
                 mailItems,
                 savePictures,
                 destinationOlPath,
@@ -194,7 +194,7 @@ namespace ToDoModel.Test
             string fsRoot = null;
 
             // Act
-            SortItemsToExistingFolder.Run2(
+            SortEmail.Run2(
                 mailItems,
                 savePictures,
                 destinationFolderpath,
@@ -216,7 +216,7 @@ namespace ToDoModel.Test
             // Arrange
 
             // Act
-            SortItemsToExistingFolder.Cleanup_Files();
+            SortEmail.Cleanup_Files();
 
             // Assert
             Assert.Fail();

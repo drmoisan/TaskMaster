@@ -26,8 +26,11 @@ namespace UtilitiesCS
                 viewer.Dispose();
                 return value;
             }
+            else
+            {
             viewer.Dispose();
-            return "";
+            return null;
+            }
         }
     }
 }

@@ -133,7 +133,7 @@ namespace ToDoModel
                 _errorMessages.Add($"The path {saveFolderPath} is too long to save. It must be smaller than {MAX_PATH - 10} characters");   
             }
 
-            if (deleteFolderPath.Length >= MAX_PATH)
+            if (deleteFolderPath is not null && deleteFolderPath.Length >= MAX_PATH)
             {
                 _errorMessages.Add($"The path {deleteFolderPath} is too long to save. It must be smaller than {MAX_PATH} characters");
             }

@@ -61,9 +61,16 @@ namespace QuickFiler.Helper_Classes
         {
             return await Task.Run(() =>
             {
-                return ConvHelper.GetMailItemList(df, ((Folder)_mailItem.Parent).StoreID, _globals.Ol.App, true)
-                                 .Cast<MailItem>()
-                                 .ToList();
+                var parentFolder = ((Folder)_mailItem.Parent);
+                var storeID = parentFolder.StoreID;
+                var lst = ConvHelper.GetMailItemList(df, storeID, _globals.Ol.App, true);
+                var lst2 = lst.Cast<MailItem>();
+                var lst3 = lst2.ToList();
+                                   
+                return lst3;
+                //return ConvHelper.GetMailItemList(df, ((Folder)_mailItem.Parent).StoreID, _globals.Ol.App, true)
+                //                 .Cast<MailItem>()
+                //                 .ToList();
             });
         }
 
@@ -71,7 +78,7 @@ namespace QuickFiler.Helper_Classes
         {
             var df = await Task.Run(() =>
             {
-                return _mailItem.GetConversation().GetConversationDf().FilterConversation(true, true);
+                return _mailItem.GetConversation().GetConversationDf().FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
             });
             return await ResolveItems(df);
         }
@@ -84,8 +91,8 @@ namespace QuickFiler.Helper_Classes
                 if ((_dfConversation is null) && (_mailItem is not null))
                 {
                     var conversation = _mailItem.GetConversation();
-                    DfConversationExpanded = conversation.GetConversationDf().FilterConversation(false, true);
-                    DfConversation = DfConversationExpanded.FilterConversation(true, true);
+                    DfConversationExpanded = conversation.GetConversationDf().FilterConversation(((Folder)_mailItem.Parent).FolderPath, false, true);
+                    DfConversation = DfConversationExpanded.FilterConversation(((Folder)_mailItem.Parent).FolderPath, true, true);
                 }
                 return _dfConversation;
             }
@@ -104,8 +111,8 @@ namespace QuickFiler.Helper_Classes
                 if ((_dfConversationExpanded is null) && (_mailItem is not null))
                 {
                     var conversation = _mailItem.GetConversation();
-                    DfConversationExpanded = conversation.GetConversationDf().FilterConversation(false, true);
-                    DfConversation = DfConversationExpanded.FilterConversation(true, true);
+                    DfConversationExpanded = conversation.GetConversationDf().FilterConversation(((Folder)_mailItem.Parent).FolderPath, false, true);
+                    DfConversation = DfConversationExpanded.FilterConversation(((Folder)_mailItem.Parent).FolderPath, true, true);
                 }
                 return _dfConversationExpanded;
             }

@@ -142,6 +142,9 @@ namespace QuickFiler.Controllers
         async public void ButtonOK_Click(object sender, EventArgs e)
         {
             await _homeController.ExecuteMoves();
+            await _formViewer.UiSyncContext;
+            _formViewer.Close();
+            Cleanup();
         }
 
         public void ButtonRefresh_Click(object sender, EventArgs e)
@@ -168,7 +171,8 @@ namespace QuickFiler.Controllers
                                                                  _globals.FS.FldrRoot));
                 if (folder is not null) 
                 { 
-                    await _dataModel.MoveToFolder(folder.FolderPath,
+                    await _dataModel.MoveToFolder(folder,
+                                                  _globals.Ol.ArchiveRootPath,
                                                   SaveAttachments,
                                                   SaveEmail,
                                                   SavePictures,

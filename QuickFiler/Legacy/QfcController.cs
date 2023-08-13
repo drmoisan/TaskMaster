@@ -703,8 +703,8 @@ namespace QuickFiler.Legacy
 
         public void PopulateFolderCombobox(object varList = null)
         {            
-            if (varList is null) { _fldrHandler = new FolderHandler(_globals, _mail, FolderHandler.Options.FromField); }
-            else { _fldrHandler = new FolderHandler(_globals, varList, FolderHandler.Options.FromArrayOrString); }
+            if (varList is null) { _fldrHandler = new FolderHandler(_globals, _mail, FolderHandler.InitOptions.FromField); }
+            else { _fldrHandler = new FolderHandler(_globals, varList, FolderHandler.InitOptions.FromArrayOrString); }
 
             FolderCbo.Items.AddRange(_fldrHandler.FolderArray);
             FolderCbo.SelectedIndex = 1;
@@ -786,16 +786,16 @@ namespace QuickFiler.Legacy
                 if (blDoMove)
                 {
                     //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                    SortItemsToExistingFolder.Run(mailItems: selItems,
+                    SortEmail.Run(mailItems: selItems,
                                                   savePictures: false,
-                                                  destinationOlPath: FolderCbo.SelectedItem as string,
+                                                  destinationOlStem: FolderCbo.SelectedItem as string,
                                                   saveMsg: _chbxSaveMail.Checked,
                                                   saveAttachments: Attchments,
                                                   removePreviousFsFiles: _chbxDelFlow.Checked,
                                                   appGlobals: _globals,
                                                   olAncestor: _globals.Ol.ArchiveRootPath,
                                                   fsAncestorEquivalent: _globals.FS.FldrRoot);
-                    SortItemsToExistingFolder.Cleanup_Files();
+                    SortEmail.Cleanup_Files();
                 } // blDoMove
 
             }
@@ -1683,7 +1683,7 @@ namespace QuickFiler.Legacy
                         else if (_intComboRightCtr == 1)
                         {
 
-                            SortItemsToExistingFolder.InitializeSortToExisting(InitType: "Sort", 
+                            SortEmail.InitializeSortToExisting(InitType: "Sort", 
                                                                                QuickLoad: false, 
                                                                                WholeConversation: false, 
                                                                                strSeed: FolderCbo.SelectedItem as string, 
@@ -1824,7 +1824,7 @@ namespace QuickFiler.Legacy
             FolderCbo.Items.Clear();
             FolderCbo.Items.AddRange(_fldrHandler.FindFolder(searchString: "*" + SearchTxt.Text + "*", 
                                                              reloadCTFStagingFiles: false, 
-                                                             reCalcSuggestions: false, 
+                                                             recalcSuggestions: false, 
                                                              objItem: Mail));
 
             if (FolderCbo.Items.Count >= 2)

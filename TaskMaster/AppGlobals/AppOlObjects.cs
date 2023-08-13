@@ -83,40 +83,51 @@ namespace TaskMaster
             }
         }
 
-        private Folder _olEmailRoot;
-        public Folder OlEmailRoot
+        private Folder _root;
+        public Folder Root
         {
             get
             {
-                if (_olEmailRoot is null)
-                    _olEmailRoot = (Folder)App.Session.DefaultStore.GetRootFolder();
-                return _olEmailRoot;
+                if (_root is null)
+                    _root = (Folder)App.Session.DefaultStore.GetRootFolder();
+                return _root;
+            }
+        }
+
+        private Folder _emailRoot;
+        public Folder EmailRoot
+        {
+            get
+            {
+                if (_emailRoot is null)
+                    _emailRoot = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                return _emailRoot;
             }
         }
         
-        private string _olEmailRootPath;
+        private string _emailRootPath;
         public string EmailRootPath
         {
             get
             {
-                if (_olEmailRootPath is null)
+                if (_emailRootPath is null)
                 {
-                    _olEmailRootPath = OlEmailRoot.FolderPath;
+                    _emailRootPath = EmailRoot.FolderPath;
                 }
-                return _olEmailRootPath;
+                return _emailRootPath;
             }
         }
 
-        private string _olArchiveRootPath;
+        private string _archiveRootPath;
         public string ArchiveRootPath
         {
             get
             {
-                if (_olArchiveRootPath is null)
+                if (_archiveRootPath is null)
                 {
-                    _olArchiveRootPath = Path.Combine(OlEmailRoot.FolderPath, "Archive");
+                    _archiveRootPath = Path.Combine(Root.FolderPath, "Archive");
                 }
-                return _olArchiveRootPath;
+                return _archiveRootPath;
             }
         }
 

@@ -142,7 +142,7 @@
     <Compile Include="Email Utilities\Load_CTF_AND_Subjects_AND_Recents.cs" />
     <Compile Include="Email Utilities\ModuleMailItemsSort.cs" />
     <Compile Include="Email Utilities\SaveAttachmentsModule.cs" />
-    <Compile Include="Email Utilities\SortItemsToExistingFolder.cs" />
+    <Compile Include="Email Utilities\SortEmail.cs" />
     <Compile Include="Email Utilities\SubjectMapModule.cs" />
     <Compile Include="Data Model\Flags\FlagDetails.cs" />
     <Compile Include="Data Model\ToDo\ToDoEvents.cs" />

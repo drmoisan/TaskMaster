@@ -25,7 +25,7 @@ namespace ToDoModel
             Suggestions = new Suggestions();
         }
 
-        public FolderHandler(IApplicationGlobals appGlobals, object objItem, Options options)
+        public FolderHandler(IApplicationGlobals appGlobals, object objItem, InitOptions options)
         {
             _globals = appGlobals;
             _olApp = appGlobals.Ol.App;
@@ -34,15 +34,15 @@ namespace ToDoModel
 
             switch(options)
             {
-                case Options.NoSuggestions:
+                case InitOptions.NoSuggestions:
                     break;
-                case Options.FromArrayOrString:
+                case InitOptions.FromArrayOrString:
                     InitializeFromArrayOrString(objItem);
                     break;
-                case Options.FromField:
+                case InitOptions.FromField:
                     InitializeFromEmail(objItem);
                     break;
-                case Options.Recalculate:
+                case InitOptions.Recalculate:
                     RecalculateSuggestions(objItem, false);
                     break;
                 default:
@@ -51,14 +51,14 @@ namespace ToDoModel
             
         }
 
-        public enum Options
+        public enum InitOptions
         {
             NoSuggestions = 0,
             FromArrayOrString = 1,
             FromField = 2,
             Recalculate = 4
         }
-                
+        
         private void InitializeFromEmail(object objItem)
         {
             var OlMail = MailResolution.TryResolveMailItem(objItem);
@@ -196,25 +196,37 @@ namespace ToDoModel
         /// </summary>
         /// <param name="searchString"></param>
         /// <param name="reloadCTFStagingFiles"></param>
-        /// <param name="emailSearchRoot"></param>
-        /// <param name="reCalcSuggestions"></param>
+        /// <param name="emailSearchRoots"></param>
+        /// <param name="recalcSuggestions"></param>
         /// <param name="objItem"></param>
         /// <returns></returns>
-        public string[] FindFolder(string searchString, object objItem, bool reloadCTFStagingFiles = true, string emailSearchRoot = "ARCHIVEROOT", bool reCalcSuggestions = false)
+        public string[] FindFolder(string searchString,
+                                   object objItem,
+                                   bool reloadCTFStagingFiles = true,
+                                   List<string> emailSearchRoots = null,
+                                   bool recalcSuggestions = false,
+                                   IEnumerable<(string root, string excludedFolder, bool excludeChildren)> exclusions = null)
         {
-            if (emailSearchRoot == "ARCHIVEROOT") { emailSearchRoot = _globals.Ol.ArchiveRootPath; }
+            if (emailSearchRoots is null) { emailSearchRoots = new() { _globals.Ol.ArchiveRootPath }; }
+            if (exclusions is null) { exclusions = new List<(string root, string excludedFolder, bool excludeChildren)>(); }
 
             _folderList = new List<string>();
 
             // Add search results
-            var matchingFolders = GetMatchingFolders(searchString, emailSearchRoot).OrderBy(x => x).ToList();
+            var matchingFolders = emailSearchRoots.Select(root => GetMatchingFolders(
+                                                          searchString, 
+                                                          root,
+                                                          includeChildren: true,
+                                                          exclusions.Where(x => x.root == root)
+                                                                    .Select(x => (x.excludedFolder, x.excludeChildren))))
+                                                  .SelectMany(x => x)
+                                                  .ToList();
+            
+            //var matchingFolders = GetMatchingFolders(searchString, emailSearchRoots);
             AddMatches(matchingFolders);
 
             // Add suggestions
-            if (reCalcSuggestions)
-            {
-                RecalculateSuggestions(objItem, reloadCTFStagingFiles);
-            }
+            if (recalcSuggestions) { RecalculateSuggestions(objItem, reloadCTFStagingFiles); }
             AddSuggestions(ref _folderList);
 
             // Add recents
@@ -223,147 +235,219 @@ namespace ToDoModel
             return FolderArray;
         }
 
+        /// <summary>
+        /// Function grabs a handle on the <seealso cref="Folder"/> based on a rooted <seealso cref="Folder"/>.FolderPath
+        /// </summary>
+        /// <param name="folderpath"> Rooted <seealso cref="Folder"/>.FolderPath</param>
+        /// <param name="olApp">Handle on the <seealso cref="Outlook.Application"/></param>
+        /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
+        /// or <c>null</c> if not found</returns>
         public static Folder GetFolder(string folderpath, Outlook.Application olApp)
         {
-            Folder TestFolder;
-            string[] foldersArray;
-            int i;
-
             if (folderpath.Substring(0, 2) == @"\\")
             {
                 folderpath = folderpath.Substring(2);
             }
-            if (folderpath.Substring(0, 1) == @"\")
-            {
-                folderpath = folderpath.Substring(1);
-            }
             // Convert folderpath to array
-            foldersArray = folderpath.Split(@"\");
-            TestFolder = (Folder)olApp.Session.Folders[foldersArray[0]];
-            if (TestFolder is not null)
+            var foldersArray = folderpath.Split(@"\");
+
+            var matchedFolder = GetFolder(olApp.Session.Folders, foldersArray[0]);
+            if (matchedFolder is null) { return null; }
+
+            for (int i = 1; i <= foldersArray.Length - 1; i++)
             {
-                var loopTo = foldersArray.Length - 1;
-                for (i = 1; i <= loopTo; i++)
-                {
-                    Folders SubFolders;
-                    SubFolders = TestFolder.Folders;
-                    TestFolder = (Folder)SubFolders[foldersArray[i]];
-                    if (TestFolder is null)
-                    {
-                        return null;
-                    }
-                }
+                matchedFolder = GetFolder(matchedFolder.Folders, foldersArray[i]);
+                if (matchedFolder is null) { return null; }
             }
 
-            return TestFolder;
-
+            return matchedFolder;
         }
 
+        /// <summary>
+        /// Function grabs a handle on the <seealso cref="Folder"/> based on a rooted <seealso cref="Folder"/>.FolderPath.
+        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="FolderHandler"/> instance.
+        /// </summary>
+        /// <param name="folderpath"> Rooted <seealso cref="Folder.FolderPath"/></param>
+        /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
+        /// or <c>null</c> if not found</returns>
+        /// <exception cref="ArgumentException"><paramref name="folderpath"/> should be rooted </exception>
         public Folder GetFolder(string folderpath)
         {
-            Folder TestFolder;
-            string[] foldersArray;
-            int i;
-
-            if (folderpath.Substring(0,2) == @"\\")
+            // Check that folderpath is rooted
+            var root = _globals.Ol.Root.FolderPath;
+            if (!folderpath.Contains(root))
             {
-                folderpath = folderpath.Substring(2);
+                throw new ArgumentException($"The parameter {nameof(folderpath)} value {folderpath} does not contain the root {root}", nameof(folderpath));
             }
-            if (folderpath.Substring(0, 1) == @"\")
-            {
-                folderpath = folderpath.Substring(1);
-            }
-            // Convert folderpath to array
-            foldersArray = folderpath.Split(@"\");
-            TestFolder = (Folder)_olApp.Session.Folders[foldersArray[0]];
-            if (TestFolder is not null)
-            {
-                var loopTo = foldersArray.Length - 1;
-                for (i = 1; i <= loopTo; i++)
-                {
-                    Folders SubFolders;
-                    SubFolders = TestFolder.Folders;
-                    TestFolder = (Folder)SubFolders[foldersArray[i]];
-                    if (TestFolder is null)
-                    {
-                        return null;
-                    }
-                }
-            }
-
-            return TestFolder;
-
+            
+            return GetFolder(folderpath, _olApp);
         }
 
-        public Folder GetFolder(string selectedValue, bool mustMatch, bool throwEx)
+        /// <summary>
+        /// Function grabs a handle on the <seealso cref="Folder"/> represented by the rooted <seealso cref="Folder"/>.FolderPath.
+        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="FolderHandler"/> instance. If the
+        /// targeted folder is not found, an exception is thrown or a message is delivered to the user based on the 
+        /// value of the <paramref name="throwEx"/> parameter.
+        /// </summary>
+        /// <param name="folderpath"> Rooted <seealso cref="Folder.FolderPath"/></param>
+        /// <param name="throwEx">Flag to determine if exception should be thrown or message delivered to user</param>
+        /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
+        /// or <c>null</c> if not found</returns>
+        /// <exception cref="ArgumentException"><paramref name="folderpath"/> should be rooted </exception>
+        public Folder GetFolder(string folderpath, bool throwEx)
         {
-            var olFolder = this.GetFolder(selectedValue);
-            if (olFolder is null && mustMatch)
+            // Check that folderpath is rooted
+            var root = _globals.Ol.Root.FolderPath;
+            if (!folderpath.Contains(root))
             {
-                string message = $"Selected folder {selectedValue} does not exist. " +
+                throw new ArgumentException($"The parameter {nameof(folderpath)} value {folderpath} does not contain the root {root}", nameof(folderpath)); 
+            }
+            
+            // Get the Folder
+            var olFolder = GetFolder(folderpath, _olApp);
+            
+            // If folder is null, throw exception or deliver message to user
+            if (olFolder is null)
+            {
+                string message = $"Selected folder {folderpath} does not exist. " +
                     "Staging Files out of sync with current directory state.";
-                if (throwEx) { throw new ArgumentException(message, nameof(selectedValue)); }
+                if (throwEx) { throw new ArgumentException(message, nameof(folderpath)); }
                 else { MessageBox.Show(message); }
 
             }
             return olFolder;
         }
 
-        public string InputNewFoldername(Folder parentFolder) //Internal
+        /// <summary>
+        /// Function selects the <seealso cref="Folder"/> in the <seealso cref="Folders"/> collection whose 
+        /// Name property matches the argument <paramref name="childName"/>.
+        /// </summary>
+        /// <param name="children"><seealso cref="Folders"/> collection to search</param>
+        /// <param name="childName">Name of the <seealso cref="Folder"/> to match</param>
+        /// <returns>The <seealso cref="Folder"/> if found or <c>null</c></returns>
+        public static Folder GetFolder(Folders children, string childName)
         {
-            string newFolderName = " ";
-            while (newFolderName == " ")
+            var folderLevelNames = children.Cast<MAPIFolder>().Select(x => x.Name).ToList();
+            if (folderLevelNames.Contains(childName))
             {
-                newFolderName = InputBox.ShowDialog(
-                    $"Please enter a new subfolder name for {parentFolder.Name}",
-                    "New folder dialog", " ");
+                return (Folder)children[childName];
+            }
+            else
+            {
+                return null;
+            }
+        }
 
-                if (newFolderName != " " && newFolderName != "")
+        /// <summary>
+        /// Method asks the user to input a name for a new child folder of the parent folder 
+        /// supplied as an argument. Utilizes <seealso cref="InputBox"/> to get the user input.
+        /// User is notified if name contains illegal characters, is too long, or represents an
+        /// Outlook.<seealso cref="Folder"/> that already exists
+        /// </summary>
+        /// <param name="parent">The parent Outlook.<seealso cref="Folder"/> under which the
+        /// new Outlook.<seealso cref="Folder"/> will be created</param>
+        /// <returns>The name of the new Outlook.<seealso cref="Folder"/> to create</returns>
+        public string InputFoldername(Folder parent) //Internal
+        {
+            string name = "";
+            while (name is not null && name == "")
+            {
+                name = InputBox.ShowDialog(
+                    $"Please enter a new subfolder name for {parent.Name}",
+                    "New folder dialog").Trim();
+
+                if (name is not null)
                 {
-                    if (!IsLegalFolderName(newFolderName))
+                    if (!IsLegalFolderName(name))
                     {
-                        MessageBox.Show("Folder name contains illegal characters. Please choose a different name.");
-                        newFolderName = " ";
+                        MessageBox.Show($"Folder name {name} contains the illegal characters "+
+                            $"{GetIllegalFolderChars(name).SentenceJoin()}. Please choose a different name.");
+                        name = "";
                     }
-                    else if (newFolderName.Length > 30)
+                    else if (name.Length > 30)
                     {
                         MessageBox.Show("Outlook limits folder names to 30 characters. Please choose a different name.");
-                        newFolderName = " ";
+                        name = "";
                     }
-                    else if (this.GetFolder(newFolderName) is not null)
+                    else if (GetFolder(parent.Folders, name) is not null)
                     {
                         MessageBox.Show("Folder already exists. Please choose a different name.");
-                        newFolderName = " ";
+                        name = "";
                     }
                 }
             }
-            return newFolderName;
+            return name;
         }
 
+        /// <summary>
+        /// Character array of illegal characters for either Outlook.<seealso cref="Folder"/> 
+        /// names or for System.IO.<seealso cref="DirectoryInfo"/> names.
+        /// </summary>
         private static char[] IllegalFolderCharacters { get => @"[\/:*?""<>|].".ToCharArray(); }
 
-        private bool IsLegalFolderName(string folderName)
+        /// <summary>
+        /// Method is used for error reporting to identify which characters in a string cannot
+        /// be used in either an Outlook.<seealso cref="Folder"/> name or a 
+        /// System.IO.<seealso cref="DirectoryInfo"/> name. See also <see cref="IllegalFolderCharacters"/>
+        /// </summary>
+        /// <param name="foldername">Name to check for illegal characters</param>
+        /// <returns>Array of characters in the foldername that are illegal</returns>
+        private char[] GetIllegalFolderChars(string foldername)
         {
-            return !folderName.Any(c => IllegalFolderCharacters.Contains(c));
+            return foldername.Where(c => IllegalFolderCharacters.Contains(c)).ToArray();
         }
-        
-        public MAPIFolder CreateFolder(string parentBranchPath, string olRoot, string fsRoot)
+
+        /// <summary>
+        /// Identifies if a foldername contains any illegal characters for either an
+        /// Outlook.<seealso cref="Folder"/> name or a System.IO.<seealso cref="DirectoryInfo"/> name.
+        /// </summary>
+        /// <param name="foldername">Name to check for illegal characters</param>
+        /// <returns><c>true</c> if no characters found. <c>false</c> if illegal 
+        /// characters are present</returns>
+        private bool IsLegalFolderName(string foldername)
         {
-            if (olRoot.IsNullOrEmpty()) { olRoot = _globals.Ol.ArchiveRootPath; }
-            var parentFolderpath = $"{olRoot}{parentBranchPath}";
-            //var parentFolderpath = Path.Combine(olRoot, parentBranchPath);
-            var parentFolder = this.GetFolder(parentFolderpath, true, false);
+            return !foldername.Any(c => IllegalFolderCharacters.Contains(c));
+        }
+
+        /// <summary>
+        /// Method creates new parallel folders in Outlook Email and the File System. Combines 
+        /// a relative folderpath with the fully rooted olAncestor folderpath to create an 
+        /// Outlook.<seealso cref="Folder"/>. The fully qualified Outlook folderpath applies the 
+        /// <seealso cref="FolderConverter.ToFsFolderpath(string, string, string)"/> extension to convert 
+        /// to a parallel folderpath. System.IO.<seealso cref="DirectoryInfo"/> creates 
+        /// this parallel folder in the file system.
+        /// </summary>
+        /// <param name="parentBranchPath">Parent FolderPath to Outlook.<seealso cref="Folder"/> 
+        /// excluding the FolderPath of the Outlook ancestor in the path</param>
+        /// <param name="olAncestor">Fully rooted Outlook.<seealso cref="Folder"/>.FolderPath of Ancestor <seealso cref="Folder"/></param>
+        /// <param name="fsAncestor">Fully qualified File System path</param>
+        /// <returns>The created Outlook.<seealso cref="Folder"/></returns>
+        public MAPIFolder CreateFolder(string parentBranchPath, string olAncestor, string fsAncestor)
+        {
+            // Set default root if not provided
+            if (olAncestor.IsNullOrEmpty()) { olAncestor = _globals.Ol.ArchiveRootPath; }
+            
+            // Fully root the folderpath
+            var parentFolderpath = $"{olAncestor}{parentBranchPath}";
+            
+            // Get the parent folder and return null if not found
+            var parentFolder = this.GetFolder(parentFolderpath, false);
             if (parentFolder is null) { return null; }
 
-            string newFolderName = InputNewFoldername(parentFolder);
-            if (newFolderName == "") { return null; }
+            // Get the new folder name from the user
+            string newFolderName = InputFoldername(parentFolder);
+            if (newFolderName is null) { return null; }
 
+            // Create the new folder in Outlook 
             var olFolder = parentFolder.Folders.Add(newFolderName);
 
-            var fsFolderName = olFolder.ToFsFolderpath(olRoot, fsRoot);
+            // Convert the Outlook folderpath to a filesystem folderpath
+            var fsFolderName = olFolder.ToFsFolderpath(olAncestor, fsAncestor);
             
+            // Create the new folder in the filesystem
             var fsFolder = Directory.CreateDirectory(fsFolderName);
 
+            // Return the new Outlook folder
             return olFolder;
         }
 
@@ -384,6 +468,7 @@ namespace ToDoModel
         {
             if (matchingFolders is not null && matchingFolders.Count > 0)
             {
+                matchingFolders = matchingFolders.OrderBy(x => x).ToList();
                 _folderList.Add("======= SEARCH RESULTS =======");
                 _folderList.AddRange(matchingFolders);
             }
@@ -395,55 +480,68 @@ namespace ToDoModel
             folderList.AddRange(Suggestions.ToArray());
         }
         
-        public List<string> GetMatchingFolders(string searchString, string strEmailFolderPath, bool includeChildren = true) // Internal
+        public List<string> GetMatchingFolders(string searchString,
+                                               string strEmailFolderPath,
+                                               bool includeChildren,
+                                               IEnumerable<(string excludedFolder, bool excludeChildren)> exclusions) // Internal
         {
             _matchedFolder = null;
 
+            var matchingFolders = new List<string>();
             if (searchString.Trim().Length != 0)
             {
                 (_regex, _) = SimpleRegex.MakeRegex(searchString);
                 
-                var matchingFolders = new List<string>();
                 var folders = GetFolder(strEmailFolderPath).Folders;
-                LoopFolders(folders, ref matchingFolders, strEmailFolderPath);
-
-                return matchingFolders;
+                LoopFolders(folders, ref matchingFolders, strEmailFolderPath, true, exclusions);
             }
-            else
-            {
-                return null;
-            }
+            
+            return matchingFolders;
+            
         }
 
-        public void LoopFolders(Folders folders, ref List<string> matchingFolders, string strEmailFolderPath = "", bool includeChildren = true) //Internal
+        public void LoopFolders(Folders folders,
+                                ref List<string> matchingFolders,
+                                string olAncestor,
+                                bool includeChildren,
+                                IEnumerable<(string excludedFolder, bool excludeChildren)> exclusions) //Internal
         {
-            if (string.IsNullOrEmpty(strEmailFolderPath))
-            {
-                strEmailFolderPath = _globals.Ol.ArchiveRootPath;
-            }
+            if (string.IsNullOrEmpty(olAncestor)) { olAncestor = _globals.Ol.ArchiveRootPath; }
 
             foreach (Folder f in folders)
             {
-                var relevantPath = GetRelevantOlPathPortion(f.FolderPath, strEmailFolderPath, includeChildren);
-
-                if (_regex.IsMatch(relevantPath))
+                var folderStem = GetOlSubpath(f.FolderPath, olAncestor, true);
+                if (exclusions.Any(x => x.excludedFolder == folderStem))
                 {
-                    matchingFolders.Add(relevantPath);    
+                    // If the folder is excluded, but not its children, then we need to loop through the children
+                    if (!exclusions.First(x => x.excludedFolder == folderStem).excludeChildren)
+                    {
+                        LoopFolders(f.Folders, ref matchingFolders, olAncestor, includeChildren, exclusions);
+                    }
                 }
+                else
+                {
+                    var relevantPath = GetOlSubpath(f.FolderPath, olAncestor, includeChildren);
+
+                    if (_regex.IsMatch(relevantPath))
+                    {
+                        matchingFolders.Add(folderStem);
+                    }
                 
-                LoopFolders(f.Folders, ref matchingFolders, strEmailFolderPath, includeChildren);
+                    LoopFolders(f.Folders, ref matchingFolders, olAncestor, includeChildren, exclusions);
+                }
             }
         }
         
-        public string GetRelevantOlPathPortion(string path, string root, bool includeChildren)
+        public string GetOlSubpath(string path, string olAncestor, bool includeChildren)
         {
             if (includeChildren)
             {
-                return path.Substring(root.Length);
+                return path.Substring(olAncestor.Length);
             }
             else
             {
-                var pathParts = path.Substring(root.Length).Split(@"\");
+                var pathParts = path.Substring(olAncestor.Length).Split(@"\");
                 return pathParts[pathParts.Count() - 1];
             }
         }

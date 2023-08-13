@@ -19,6 +19,11 @@ namespace UtilitiesCS
             return !folderName.Any(c => IllegalFolderCharacters.Contains(c));
         }
 
+        private static char[] GetIllegalFolderChars(string folderName)
+        {
+            return folderName.Where(c => IllegalFolderCharacters.Contains(c)).ToArray();
+        }
+
         public static string SanitizeFilename(string filename)
         {
             if (string.IsNullOrEmpty(filename)) throw new ArgumentNullException(nameof(filename));
@@ -28,30 +33,24 @@ namespace UtilitiesCS
 
         public static string ToFsFolderpath(this string olBranchPath, string olAncestorPath, string fsAncestorEquivalent) 
         {
-            if (string.IsNullOrEmpty(olBranchPath)) throw new ArgumentNullException(nameof(olBranchPath));
-            if (string.IsNullOrEmpty(olAncestorPath)) throw new ArgumentNullException(nameof(olAncestorPath));
-            if (string.IsNullOrEmpty(fsAncestorEquivalent)) throw new ArgumentNullException(nameof(fsAncestorEquivalent));
-            if (!IsLegalFolderName(olBranchPath)) throw new ArgumentException($"{nameof(olBranchPath)} has a value of {olBranchPath} which contains illegal characters", nameof(olBranchPath));
-            if (!IsLegalFolderName(olAncestorPath)) throw new ArgumentException($"{nameof(olAncestorPath)} has a value of {olAncestorPath} which contains illegal characters", nameof(olBranchPath));
+            if (string.IsNullOrEmpty(olBranchPath)) 
+                throw new ArgumentNullException(nameof(olBranchPath));
+            if (string.IsNullOrEmpty(olAncestorPath)) 
+                throw new ArgumentNullException(nameof(olAncestorPath));
+            if (string.IsNullOrEmpty(fsAncestorEquivalent)) 
+                throw new ArgumentNullException(nameof(fsAncestorEquivalent));
 
-            Uri olBranchURI = new Uri(olBranchPath);
-            Uri olRootURI = new Uri(olAncestorPath);
+            var fsPath = olBranchPath.Replace(olAncestorPath, fsAncestorEquivalent);
 
-            if (olRootURI.Scheme != olBranchURI.Scheme) 
-            {
-                throw new ArgumentException("OlFolderBranch and OlFolderRoot are not the same type of folderpath"); 
-            } 
+            var fsPathExDividers = fsPath.Substring(3).Replace($"{Path.DirectorySeparatorChar}", "");
+                        
+            if (!IsLegalFolderName(fsPathExDividers))
+                throw new ArgumentException(
+                    $"{nameof(fsPathExDividers)} has a value of {fsPathExDividers} which contains illegal characters {GetIllegalFolderChars(fsPathExDividers).SentenceJoin()}", 
+                    nameof(fsPath));
 
-            Uri relativeUri = olBranchURI.MakeRelativeUri(olRootURI);
-            
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-            if (relativePath[0].Equals("."))
-                throw new ArgumentOutOfRangeException(nameof(relativeUri), 
-                    $"{olBranchPath} is not a branch of {olAncestorPath}");
+            return fsPath;
 
-            relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-
-            return Path.GetFullPath(fsAncestorEquivalent + relativePath);
         }
 
         public static string ToFsFolderpath(this Folder olFolderBranch, string olAncestor, string fsAncestorEquivalent)

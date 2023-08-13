@@ -282,8 +282,21 @@ namespace UtilitiesCS
             return false;
         }
 
-        
-        
+        public static string SentenceJoin(this string[] array, string separator = ", ", string lastSeparator = " and ")
+        {
+            if (array.Length == 0) { return ""; }
+            if (array.Length == 1) { return array[0]; }
+            if (array.Length == 2) { return array[0] + lastSeparator + array[1]; }
+            return string.Join(separator, array.Take(array.Length - 1)) + lastSeparator + array[array.Length - 1];
+        }
+
+        public static string SentenceJoin(this char[] array, string separator = ", ", string lastSeparator = " and ")
+        {
+            if (array.Length == 0) { return ""; }
+            if (array.Length == 1) { return char.ToString(array[0]); }
+            if (array.Length == 2) { return array[0] + lastSeparator + array[1]; }
+            return string.Join(separator, array.Take(array.Length - 1)) + lastSeparator + array[array.Length - 1];
+        }
     }
 
     public static class ArrayIsAllocated
