@@ -7,7 +7,7 @@ namespace UtilitiesCS
         string ConditionalReminders { get; set; }
         string CtfInc { get; set; }
         string CtfMap { get; set; }
-        string EmailMoves { get; set; }
+        string MovedMails { get; set; }
         string EmailSession { get; set; }
         string EmailSessionTemp { get; set; }
         string RecentsFile { get; set; }

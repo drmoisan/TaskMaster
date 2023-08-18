@@ -24,33 +24,23 @@ namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
     {
-        public QfcDatamodel(Explorer ActiveExplorer, Outlook.Application OlApp) 
+        public QfcDatamodel(IApplicationGlobals appGlobals) 
         { 
-            _activeExplorer = ActiveExplorer;
-            _olApp = OlApp;
+            _globals = appGlobals;
+            _olApp = _globals.Ol.App;
+            _activeExplorer = _olApp.ActiveExplorer();
             _frame = InitDf(_activeExplorer);
-            //_masterQueue = new Queue<MailItem>(listEmailsInFolder);            
         }
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
         private Queue<MailItem> _masterQueue;
-        private StackObjectCS<MailItem> _movedObjects;
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
 
-        public StackObjectCS<MailItem> MovedItems 
-        {
-            get 
-            {
-                if (_movedObjects is null)
-                {
-                    _movedObjects = new StackObjectCS<MailItem>();
-                }
-                return _movedObjects; 
-            }
-        }
-
+        public ScoStack<IMovedMailInfo> MovedItems { get => _globals.AF.MovedMails; }
+        
         public IList<MailItem> InitEmailQueueAsync(int batchSize, BackgroundWorker worker)
         {
             // Extract first batch
@@ -132,8 +122,7 @@ namespace QuickFiler.Controllers
                 _masterQueue = new Queue<MailItem>();
                 return false;
             }
-            //try 
-            //{
+            
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
@@ -144,13 +133,7 @@ namespace QuickFiler.Controllers
             _masterQueue = new Queue<MailItem>(emailList);
 
             return true;
-            //}
-            //catch (System.Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //    _masterQueue = new Queue<MailItem>();
-            //    return false;
-            //}
+            
         }
                                 
         public IList<MailItem> DequeueNextItemGroup(int quantity)
@@ -163,6 +146,7 @@ namespace QuickFiler.Controllers
             return listObjects;
         }
 
+        //TODO: Implement UndoMove()
         public void UndoMove()
         {
             throw new NotImplementedException();

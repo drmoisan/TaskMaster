@@ -1684,10 +1684,10 @@ namespace QuickFiler.Legacy
                         {
 
                             SortEmail.InitializeSortToExisting(InitType: "Sort", 
-                                                                               QuickLoad: false, 
-                                                                               WholeConversation: false, 
-                                                                               strSeed: FolderCbo.SelectedItem as string, 
-                                                                               objItem: Mail);
+                                                               QuickLoad: false, 
+                                                               WholeConversation: false, 
+                                                               strSeed: FolderCbo.SelectedItem as string, 
+                                                               objItem: Mail);
                             _callbacks.RemoveSpecificControlGroup(Index);
                         }
                         else

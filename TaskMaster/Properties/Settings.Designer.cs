@@ -12,7 +12,7 @@ namespace TaskMaster.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -416,6 +416,54 @@ namespace TaskMaster.Properties {
             }
             set {
                 this["BackupFile_SubjectMap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999EmailMoves.tsv")]
+        public string FileName_MovedEmailsBackup {
+            get {
+                return ((string)(this["FileName_MovedEmailsBackup"]));
+            }
+            set {
+                this["FileName_MovedEmailsBackup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("99999EmailSession.csv")]
+        public string FileName_EmailSession {
+            get {
+                return ((string)(this["FileName_EmailSession"]));
+            }
+            set {
+                this["FileName_EmailSession"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("99999EmailSessionTmp.csv")]
+        public string FileName_EmailSessionTmp {
+            get {
+                return ((string)(this["FileName_EmailSessionTmp"]));
+            }
+            set {
+                this["FileName_EmailSessionTmp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999EmailMoves.json")]
+        public string FileName_MovedEmails {
+            get {
+                return ((string)(this["FileName_MovedEmails"]));
+            }
+            set {
+                this["FileName_MovedEmails"] = value;
             }
         }
     }

@@ -39,6 +39,13 @@ namespace UtilitiesCS
             Deserialize();
         }
 
+        public ScoCollection(string filename, string folderpath, bool askUserOnError)
+        {
+            Filename = filename;
+            Folderpath = folderpath;
+            Deserialize(askUserOnError);
+        }
+
         public ScoCollection(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
         {
             Filename = filename;

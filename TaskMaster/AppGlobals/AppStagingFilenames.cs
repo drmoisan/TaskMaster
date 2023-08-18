@@ -1,127 +1,125 @@
-﻿using UtilitiesCS;
+﻿using TaskMaster.Properties;
+using UtilitiesCS;
 
 namespace TaskMaster
 {
 
     public class AppStagingFilenames : IAppStagingFilenames
     {
-
-        private string _recentsFile = "9999999RecentsFile.txt";
-        private string _emailMoves = "999999EmailMoves.tsv";
-        private string _emailSession = "99999EmailSession.csv";
-        private string _emailSessionTemp = "99999EmailSession_Tmp.csv";
-        private string _ctfMap = "9999999CTF_Map.txt";
-        private string _ctfInc = "9999999CTF_Inc.txt";
-        private string _subjectMap = "9999999Subject_Map.txt";
-        private string _commonWords = "9999999CommonWords.txt";
-        private string _conditionalReminders = "999999ConditionalReminders.txt";
-
+        private string _conditionalReminders;
         public string ConditionalReminders
         {
-            get
-            {
-                return _conditionalReminders;
-            }
+            get => _conditionalReminders ?? InitProp(ref _conditionalReminders, Settings.Default.File_ConditionalReminders);
             set
             {
                 _conditionalReminders = value;
+                Settings.Default.File_ConditionalReminders = value;
+                Settings.Default.Save();
             }
         }
 
+        private string _commonWords;
         public string CommonWords
         {
-            get
-            {
-                return _commonWords;
-            }
+            get => _commonWords ?? InitProp(ref _commonWords, Settings.Default.File_Common_Words);
             set
             {
                 _commonWords = value;
+                Settings.Default.File_Common_Words = value;
+                Settings.Default.Save();
             }
         }
 
+        private string _subjectMap;
         public string SubjectMap
         {
-            get
-            {
-                return _subjectMap;
-            }
+            get => _subjectMap ?? InitProp(ref _subjectMap, Settings.Default.File_Subject_Map);
             set
             {
                 _subjectMap = value;
+                Settings.Default.File_Subject_Map = value;
+                Settings.Default.Save();
             }
         }
 
+        private string _ctfInc;
         public string CtfInc
         {
-            get
-            {
-                return _ctfInc;
-            }
+            get => _ctfInc ?? InitProp(ref _ctfInc, Settings.Default.File_CTF_Inc);
             set
             {
                 _ctfInc = value;
+                Settings.Default.File_CTF_Inc = value;
+                Settings.Default.Save();
             }
         }
 
+        private string _ctfMap;
         public string CtfMap
         {
-            get
-            {
-                return _ctfMap;
-            }
+            get => _ctfMap ?? InitProp(ref _ctfMap, Settings.Default.File_CTF_Map);
+            
             set
             {
                 _ctfMap = value;
+                Settings.Default.File_CTF_Map = value;
+                Settings.Default.Save();
             }
         }
 
+        private string _emailSessionTemp;
         public string EmailSessionTemp
         {
-            get
-            {
-                return _emailSessionTemp;
-            }
+            get => _emailSessionTemp ?? InitProp(ref _emailSessionTemp, Settings.Default.FileName_EmailSessionTmp);
+            
             set
             {
                 _emailSessionTemp = value;
+                Settings.Default.FileName_EmailSessionTmp = value;
+                Settings.Default.Save();
             }
         }
 
+        private string _emailSession;
         public string EmailSession
         {
-            get
-            {
-                return _emailSession;
-            }
+            get => _emailSession ?? InitProp(ref _emailSession, Settings.Default.FileName_EmailSession);
             set
             {
                 _emailSession = value;
+                Settings.Default.FileName_EmailSession = value;
+                Settings.Default.Save();
             }
         }
 
-        public string EmailMoves
+        private string _movedMails;
+        public string MovedMails
         {
-            get
-            {
-                return _emailMoves;
-            }
+            get => _movedMails ?? InitProp(ref _movedMails, Settings.Default.FileName_MovedEmailsBackup);
             set
             {
-                _emailMoves = value;
+                _movedMails = value;
+                Settings.Default.FileName_MovedEmailsBackup = value;
+                Settings.Default.Save();
             }
         }
 
+        private string _recentsFile;
         public string RecentsFile
         {
-            get
-            {
-                return _recentsFile;
-            }
+            get => _recentsFile ?? InitProp(ref _recentsFile, Settings.Default.FileName_Recents);
             set
             {
                 _recentsFile = value;
+                Settings.Default.FileName_Recents = value;
+                Settings.Default.Save();
             }
+        }
+
+        internal string InitProp(ref string prop, string value)
+        {
+            prop = value;
+            return value;
         }
     }
 }

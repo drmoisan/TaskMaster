@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
 
 namespace QuickFiler.Interfaces
 {
     public interface IFilerFormController
     {
 
-        void ButtonCancel_Click();
-        void ButtonOK_Click();
+        void ActionCancel();
+        Task ActionOk();
         void ButtonCancel_Click(object sender, EventArgs e);
         void ButtonOK_Click(object sender, EventArgs e);
         void Cleanup();

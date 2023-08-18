@@ -327,11 +327,11 @@ namespace QuickFiler.Controllers
             _globals.Ol.MovedMails_Stack.Push(oMailTmp);
 
             // TODO: Change this into a JSON file
-            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);
+            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath);
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
-            FileIO2.WriteTextFile(_globals.FS.Filenames.EmailMoves, strOutput, _globals.FS.FldrMyD);
+            FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
 
         //private static string SanitizeArrayLineTSV(ref string[] strOutput)

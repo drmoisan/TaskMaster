@@ -185,7 +185,7 @@ namespace TaskMaster
         }
         internal void TryGetQfcDataModel()
         {
-            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
+            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals);
         }
         internal void TryGetTableInView()
         {

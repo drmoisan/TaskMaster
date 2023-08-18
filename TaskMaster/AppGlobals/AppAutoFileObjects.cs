@@ -39,7 +39,8 @@ namespace TaskMaster
                 LoadRecentsListAsync(),
                 LoadCtfMapAsync(),
                 LoadCommonWordsAsync(),
-                LoadSubjectMapAndEncoderAsync()
+                LoadSubjectMapAndEncoderAsync(),
+                LoadMovedMailsAsync()
             };
             await Task.WhenAll(tasks);
             Debug.WriteLine($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
@@ -88,6 +89,22 @@ namespace TaskMaster
         }
 
         public int MaxRecents { get => _defaults.MaxRecents; set { _defaults.MaxRecents = value; _defaults.Save(); } }
+
+        private ScoStack<IMovedMailInfo> _movedMails;
+        public ScoStack<IMovedMailInfo> MovedMails { get => Initialized(_movedMails, LoadMovedMails); }
+        private ScoStack<IMovedMailInfo> LoadMovedMails()
+        {
+            var movedMails = new ScoStack<IMovedMailInfo>(filename: _defaults.FileName_MovedEmails,
+                                                          folderpath: _parent.FS.FldrPythonStaging,
+                                                          askUserOnError: false);
+            return movedMails;
+        }
+        async private Task LoadMovedMailsAsync()
+        {
+            await TaskPriority.Run(
+                PriorityScheduler.BelowNormal,
+                () => _movedMails = LoadMovedMails());
+        }
 
         public IRecentsList<string> RecentsList
         {

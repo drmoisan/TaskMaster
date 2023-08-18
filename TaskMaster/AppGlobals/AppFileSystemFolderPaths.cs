@@ -74,6 +74,7 @@ namespace TaskMaster
             _fldrPythonStaging = Path.Combine(_flow, "Combined", "data");
         }
 
+        //TODO: Cleanup Staging Files so that they are in one or two directories and not all over the place
         async private Task LoadFoldersAsync()
         {
             _appStaging = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskMaster");

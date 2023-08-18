@@ -21,7 +21,7 @@ namespace QuickFiler.Controllers
             _globals = AppGlobals;
             //InitAfObjects();
             _parentCleanup = ParentCleanup;
-            _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
+            _datamodel = new QfcDatamodel(_globals);
             _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, _globals, this);
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
@@ -67,7 +67,7 @@ namespace QuickFiler.Controllers
         {
             _formController.Groups.MoveEmails(DataModel.MovedItems);
             QuickFileMetrics_WRITE("9999TimeWritingEmail.csv");
-            _formController.Groups.RemoveControls();
+            _formController.Groups.RemoveControlsAsync();
             Iterate();
         }
 
@@ -128,7 +128,6 @@ namespace QuickFiler.Controllers
                 dataLineBeg, OlEndTime, ref OlAppointment);
 
             FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
-
         }
 
         public void Cleanup()

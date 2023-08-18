@@ -22,6 +22,8 @@ namespace ToDoModel
 
     public static class SortEmail
     {
+        #region Public Methods
+
         public static void InitializeSortToExisting(string InitType = "Sort", bool QuickLoad = false, bool WholeConversation = true, string strSeed = "", object objItem = null)
         {
             throw new NotImplementedException();
@@ -136,7 +138,17 @@ namespace ToDoModel
             
         }
 
-        #region Public Methods
+        public static void Cleanup_Files()
+        {
+            _responseSaveFile = YesNoToAllResponse.Empty;
+            _attachmentsOverwrite = YesNoToAllResponse.Empty;
+            _picturesOverwrite = YesNoToAllResponse.Empty;
+            _removeReadOnly = YesNoToAllResponse.Empty;
+        }
+
+        #endregion
+
+        #region Private Static Variables
 
         private static YesNoToAllResponse _responseSaveFile = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _attachmentsOverwrite = YesNoToAllResponse.Empty;
@@ -733,12 +745,11 @@ namespace ToDoModel
             }
         }
 
-        private static void PushToUndoStack(MailItem MSG, MailItem oMailTmp, IApplicationGlobals _globals)
+        private static void PushToUndoStack(MailItem beforeMove, MailItem afterMove, IApplicationGlobals _globals)
         {
-            if (_globals.Ol.MovedMails_Stack is null)
-                _globals.Ol.MovedMails_Stack = new StackObjectCS<object>();
-            _globals.Ol.MovedMails_Stack.Push(MSG);
-            _globals.Ol.MovedMails_Stack.Push(oMailTmp);
+            //TODO: Delete _globals.Ol.MovedMails_Stack because it is obsolete
+            var info = new MovedMailInfo(beforeMove, afterMove, _globals.Ol.Root.FolderPath);
+            _globals.AF.MovedMails.Push(info);
         }
         
         private static void CaptureMoveDetails(MailItem MSG, MailItem oMailTmp, IApplicationGlobals _globals)
@@ -746,11 +757,11 @@ namespace ToDoModel
             var strOutput = new string[2];
 
             // TODO: Change this into a JSON file
-            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);
+            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath);
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
-            FileIO2.WriteTextFile(_globals.FS.Filenames.EmailMoves, strOutput, _globals.FS.FldrMyD);
+            FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
 
         //private static string SanitizeArrayLineTSV(ref string[] strOutput)
@@ -911,13 +922,7 @@ namespace ToDoModel
             else { return GetCurrentExplorerFolder(ActiveExplorer); }
         }
 
-        public static void Cleanup_Files()
-        {
-            _responseSaveFile = YesNoToAllResponse.Empty;
-            _attachmentsOverwrite = YesNoToAllResponse.Empty;
-            _picturesOverwrite = YesNoToAllResponse.Empty;
-            _removeReadOnly = YesNoToAllResponse.Empty;
-        }
+        
 
         // Public Function DialogueThrowNotImplemented() As Boolean
         // Return MsgBox("")

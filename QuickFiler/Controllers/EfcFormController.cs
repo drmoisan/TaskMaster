@@ -57,7 +57,7 @@ namespace QuickFiler.Controllers
 
         #region Public Properties
 
-        public IntPtr FormHandle => throw new NotImplementedException();
+        public IntPtr FormHandle => _formViewer.Handle;
 
         public string SelectedFolder { get => _formViewer.FolderListBox.SelectedItem as string; }
         
@@ -118,11 +118,12 @@ namespace QuickFiler.Controllers
             _formViewer.Ok.Click += ButtonOK_Click;
             _formViewer.Cancel.Click += ButtonCancel_Click;
             _formViewer.Refresh.Click += ButtonRefresh_Click;
-            _formViewer.Create.Click += ButtonCreate_Click;
+            _formViewer.NewFolder.Click += ButtonCreate_Click;
+            _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
         }
-        
-        public void ButtonCancel_Click()
+               
+        public void ActionCancel()
         {
             _formViewer.Close();
             Cleanup();
@@ -130,21 +131,21 @@ namespace QuickFiler.Controllers
 
         public void ButtonCancel_Click(object sender, EventArgs e)
         {
-            ButtonCancel_Click();
+            ActionCancel();
         }
 
-        //TODO: Implement ButtonOK_Click
-        public void ButtonOK_Click()
+        async public Task ActionOk()
         {
-            throw new NotImplementedException();
+            _formViewer.Hide();
+            await _homeController.ExecuteMoves();
+            await _formViewer.UiSyncContext;
+            _formViewer.Dispose();
+            Cleanup();
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e)
         {
-            await _homeController.ExecuteMoves();
-            await _formViewer.UiSyncContext;
-            _formViewer.Close();
-            Cleanup();
+            await ActionOk();
         }
 
         public void ButtonRefresh_Click(object sender, EventArgs e)
@@ -181,6 +182,14 @@ namespace QuickFiler.Controllers
                     Cleanup();
                 }
             }
+        }
+
+        public void ButtonDelete_Click(object sender, EventArgs e)
+        {
+            var items = (string[])_formViewer.FolderListBox.DataSource;
+            var itemList = items.ToList();
+            itemList.Insert(0, "Trash to Delete");
+            _formViewer.FolderListBox.DataSource = itemList.ToArray();
         }
 
         private void SaveAttachments_CheckedChanged(object sender, EventArgs e)

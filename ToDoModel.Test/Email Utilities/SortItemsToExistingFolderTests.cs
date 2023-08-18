@@ -180,37 +180,6 @@ namespace ToDoModel.Test
         }
 
         [TestMethod]
-        public void Run2_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            IList<MailItem> mailItems = null;
-            bool savePictures = false;
-            string destinationFolderpath = null;
-            bool saveMsg = false;
-            bool saveAttachments = false;
-            bool removeFlowFile = false;
-            IApplicationGlobals appGlobals = null;
-            string olRoot = null;
-            string fsRoot = null;
-
-            // Act
-            SortEmail.Run2(
-                mailItems,
-                savePictures,
-                destinationFolderpath,
-                saveMsg,
-                saveAttachments,
-                removeFlowFile,
-                appGlobals,
-                olRoot,
-                fsRoot);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
         public void Cleanup_Files_StateUnderTest_ExpectedBehavior()
         {
             // Arrange

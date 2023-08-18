@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 using static ToDoModel.SuggestionsLegacy;
 
 namespace ToDoModel
@@ -18,7 +19,7 @@ namespace ToDoModel
 
         public Suggestions() { }
 
-        private ConcurrentDictionary<string, long> _folderNameScores = new();
+        private SCODictionary<string, long> _folderNameScores = new();
         private static char[] _wordChars = { '&' };
         private Regex _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
 

@@ -117,6 +117,7 @@
             // Message
             // 
             this.Message.BackColor = System.Drawing.SystemColors.Control;
+            this.Message.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Message.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Message.Font = new System.Drawing.Font("SF Pro Rounded", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Message.Location = new System.Drawing.Point(25, 8);

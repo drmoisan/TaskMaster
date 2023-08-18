@@ -813,6 +813,7 @@ namespace QuickFiler.Legacy
         #endregion
 
         #region Keyboard UI
+        
         public void ToggleKeyboardDialog()
         {
             ToggleEachQfc();
@@ -1024,6 +1025,7 @@ namespace QuickFiler.Legacy
         #endregion
 
         #region Properties and Helper Functions
+        
         internal QuickFileController Parent
         {
             get

@@ -218,6 +218,18 @@ namespace QuickFiler.Controllers
             _mailItem = null;
             _dfConversation = null;
             _fldrHandler = null;
+            _webViewEnvironment = null;
+            _themes = null;
+            _fldrHandler = null;
+            _tableLayoutPanels = null;
+            _explorerController = null;
+            _formController = null;
+            _homeController = null;
+            _keyboardHandler = null;
+            _itemPositionTips = null;
+            _itemInfo = null;
+            _itemViewer = null;
+            _timer = null;
         }
 
         #endregion
@@ -876,7 +888,6 @@ namespace QuickFiler.Controllers
                 IList<MailItem> selItems = PackageItems();
                 bool attchments = (SelectedFolder != "Trash to Delete") ? false : _itemViewer.CbxAttachments.Checked;
 
-                //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
                 await SortEmail.Run(mailItems: selItems,
                                               savePictures: false,
                                               destinationOlStem: _itemViewer.CboFolders.SelectedItem as string,

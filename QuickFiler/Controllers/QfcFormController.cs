@@ -24,7 +24,7 @@ namespace QuickFiler.Controllers
                                  QfcFormViewer formViewer,
                                  Enums.InitTypeEnum initType,
                                  System.Action parentCleanup,
-                                 IFilerHomeController parent)
+                                 QfcHomeController parent)
         { 
             _globals = appGlobals;
             _initType = initType;
@@ -33,6 +33,10 @@ namespace QuickFiler.Controllers
             _formViewer.SetController(this);
             _parentCleanup = parentCleanup;
             _parent = parent;
+            WriteMetrics = parent.QuickFileMetrics_WRITE;
+            Iterate = parent.Iterate;
+            _movedItems = parent.DataModel.MovedItems;
+            
             CaptureItemSettings();
             RemoveItemTemplate();
             SetupLightDark();
@@ -48,8 +52,6 @@ namespace QuickFiler.Controllers
 
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
-        private QfcFormViewer _formViewer;
-        private IQfcCollectionController _groups;
         private RowStyle _rowStyleTemplate;
         private RowStyle _rowStyleExpanded;
         private int itemPanelHeight;
@@ -59,6 +61,11 @@ namespace QuickFiler.Controllers
         private bool _blSuppressEvents = false;
         private IFilerHomeController _parent;
         private int _itemsPerIteration = -1;
+        private delegate void WriteMetricsDelegate(string filename);
+        private WriteMetricsDelegate WriteMetrics;
+        private delegate void IterateDelegate();
+        private IterateDelegate Iterate;
+        private ScoStack<IMovedMailInfo> _movedItems;
 
         #endregion
 
@@ -143,6 +150,9 @@ namespace QuickFiler.Controllers
             _groups = null;
             _rowStyleTemplate = null;
             _parent = null;
+            _movedItems = null;
+            WriteMetrics = null;
+            Iterate = null;
             _parentCleanup.Invoke();
             _parentCleanup = null;
         }
@@ -151,10 +161,16 @@ namespace QuickFiler.Controllers
 
         #region Public Properties
         
+        private IQfcCollectionController _groups;
         public IQfcCollectionController Groups { get => _groups; }
+        
         public IntPtr FormHandle { get => _formViewer.Handle; }
+        
+        private QfcFormViewer _formViewer;
         public QfcFormViewer FormViewer { get => _formViewer; }
+        
         public void ToggleOffNavigation(bool async) => _groups.ToggleOffNavigation(async);
+        
         public void ToggleOnNavigation(bool async) => _groups.ToggleOnNavigation(async);
 
         #endregion
@@ -205,9 +221,9 @@ namespace QuickFiler.Controllers
             _formViewer.BackColor = System.Drawing.SystemColors.ControlLightLight;
         }
 
-        public void ButtonCancel_Click(object sender, EventArgs e) => ButtonCancel_Click();
+        public void ButtonCancel_Click(object sender, EventArgs e) => ActionCancel();
 
-        public void ButtonCancel_Click()
+        public void ActionCancel()
         {
             _formViewer.Hide();
             _groups.Cleanup();
@@ -217,23 +233,37 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
-        public void ButtonOK_Click(object sender, EventArgs e) => ButtonOK_Click();
+        async public void ButtonOK_Click(object sender, EventArgs e) => await ActionOk();
 
-        public void ButtonOK_Click()
+        async public Task ActionOk()
         {
             if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 if (_blRunningModalCode == false)
                 {
-                    _blRunningModalCode = true;
-
                     if (_groups.ReadyForMove)
                     {
+                        _blRunningModalCode = true;
                         _blSuppressEvents = true;
-                        _parent.ExecuteMoves();
+
+                        // Move emails
+                        await _groups.MoveEmails(_movedItems);
+                        
+                        // Write move metrics
+                        await Task.Run(()=>WriteMetrics(_globals.FS.Filenames.EmailSession)).ConfigureAwait(false);
+                        
+                        // Switch to UI thread
+                        await _formViewer.UiSyncContext;
+                        
+                        // Cleanup the viewers and controllers for moved items
+                        _groups.RemoveControls();
+                        
+                        // Launch viewers and controllers for the next items in queue
+                        Iterate();
+
                         _blSuppressEvents = false;
+                        _blRunningModalCode = false;
                     }
-                    _blRunningModalCode = false;
                 }
                 else
                 {
@@ -242,7 +272,9 @@ namespace QuickFiler.Controllers
             }
             else
             {
-                _formViewer.Close();
+                throw new NotImplementedException(
+                    $"Method {nameof(QfcFormController)}.{nameof(ActionOk)} has not been "+
+                    $"implemented for {nameof(_initType)} {_initType}");
             }
         }
 

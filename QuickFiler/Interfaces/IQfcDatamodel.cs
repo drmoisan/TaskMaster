@@ -23,8 +23,7 @@ namespace QuickFiler.Interfaces
     {
         IList<MailItem> DequeueNextItemGroup(int quantity);
         void UndoMove();
-        StackObjectCS<MailItem> MovedItems { get; }
-        //IList<MailItem> LoadEmailDataBase(Explorer activeExplorer, IList<MailItem> listEmailsToLoad = null);
+        ScoStack<IMovedMailInfo> MovedItems { get; }
         IList<MailItem> InitEmailQueueAsync(int batchSize, BackgroundWorker worker);
     }
 }

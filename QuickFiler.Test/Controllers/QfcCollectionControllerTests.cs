@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using UtilitiesCS;
+using System.Threading.Tasks;
 
 namespace QuickFiler.Test.Controllers
 {
@@ -98,7 +99,7 @@ namespace QuickFiler.Test.Controllers
             var qfcCollectionController = this.CreateQfcCollectionController();
 
             // Act
-            qfcCollectionController.RemoveControls();
+            qfcCollectionController.RemoveControlsAsync();
 
             // Assert
             Assert.Fail();
@@ -302,15 +303,14 @@ namespace QuickFiler.Test.Controllers
         }
 
         [TestMethod]
-        public void MoveEmails_StateUnderTest_ExpectedBehavior()
+        async public Task MoveEmails_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
             var qfcCollectionController = this.CreateQfcCollectionController();
-            StackObjectCS<MailItem> stackMovedItems = null;
+            ScoStack<IMovedMailInfo> stackMovedItems = null;
 
             // Act
-            qfcCollectionController.MoveEmails(
-                stackMovedItems);
+            await qfcCollectionController.MoveEmails(stackMovedItems);
 
             // Assert
             Assert.Fail();
