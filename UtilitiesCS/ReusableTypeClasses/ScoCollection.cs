@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Deedle;
@@ -200,20 +201,68 @@ namespace UtilitiesCS
         public void Serialize(string filepath)
         {
             this.Filepath = filepath;
+            _ = Task.Run(() => SerializeThreadSafe(filepath));
+            //var settings = new JsonSerializerSettings();
+            //settings.TypeNameHandling = TypeNameHandling.Auto;
+            //settings.Formatting = Formatting.Indented;
+            //using (TextWriter writer = File.CreateText(filepath))
+            //{
+            //    var serializer = JsonSerializer.Create(settings);
+            //    serializer.Serialize(writer, this);
+            //}
+        }
 
-            var settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.Auto;
-            settings.Formatting = Formatting.Indented;
-            using (TextWriter writer = File.CreateText(filepath))
+        async public Task SerializeAsync()
+        {
+            if (Filepath != "")
             {
-                var serializer = JsonSerializer.Create(settings);
-                serializer.Serialize(writer, this);
+                await SerializeAsync(Filepath);
             }
-            //string output = JsonConvert.SerializeObject(this, settings);
-            //string output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            //File.WriteAllText(filepath, output);
+            else { await Task.CompletedTask; }
 
         }
+
+        public async Task SerializeAsync(string filepath)
+        {
+            this.Filepath = filepath;
+            await Task.Run(() => SerializeThreadSafe(filepath));
+        }
+
+        private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
+
+        public void SerializeThreadSafe(string filepath)
+        {
+
+            // Set Status to Locked
+            if (_readWriteLock.TryEnterWriteLock(-1))
+            {
+                try
+                {
+                    // Append text to the file
+                    using (StreamWriter sw = File.CreateText(filepath))
+                    {
+                        var settings = new JsonSerializerSettings();
+                        settings.TypeNameHandling = TypeNameHandling.Auto;
+                        settings.Formatting = Formatting.Indented;
+
+                        var serializer = JsonSerializer.Create(settings);
+                        serializer.Serialize(sw, this);
+                        sw.Close();
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    log.Error($"Error serializing to {filepath}", e);
+                }
+                finally
+                {
+                    // Release lock
+                    _readWriteLock.ExitWriteLock();
+                }
+            }
+
+        }
+
 
         public void Deserialize()
         {

@@ -94,7 +94,7 @@ namespace TaskMaster
             get
             {
                 if (_recentsList is null)
-                    _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrFlow, max: MaxRecents);
+                    _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents);
                 return _recentsList;
             }
             set
@@ -102,7 +102,7 @@ namespace TaskMaster
                 _recentsList = value;
                 if (_recentsList.Folderpath == "")
                 {
-                    _recentsList.Folderpath = _parent.FS.FldrFlow;
+                    _recentsList.Folderpath = _parent.FS.FldrPythonStaging;
                     _recentsList.Filename = Properties.Settings.Default.FileName_Recents;
                 }
                 _recentsList.Serialize();
@@ -111,7 +111,7 @@ namespace TaskMaster
         async private Task LoadRecentsListAsync()
         {
             await Task.Factory.StartNew(
-                () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrFlow, max: MaxRecents),
+                () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
                 default,
                 TaskCreationOptions.None,
                 PriorityScheduler.BelowNormal);

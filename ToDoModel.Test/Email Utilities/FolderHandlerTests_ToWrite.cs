@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace ToDoModel.Test
 {
 	[TestClass]
-    public class FolderHandlerTests
+    public class FolderHandlerTests_ToWrite
     {
         private MockRepository mockRepository;
         private Mock<IApplicationGlobals> mockApplicationGlobals;
@@ -42,7 +42,7 @@ namespace ToDoModel.Test
             string searchString = null;
             object objItem = null;
             bool reloadCTFStagingFiles = false;
-            string emailSearchRoot = null;
+            List<string> emailSearchRoots = null;
             bool reCalcSuggestions = false;
 
             // Act
@@ -50,7 +50,7 @@ namespace ToDoModel.Test
                 searchString,
                 objItem,
                 reloadCTFStagingFiles,
-                emailSearchRoot,
+                emailSearchRoots,
                 reCalcSuggestions);
 
             // Assert
@@ -100,13 +100,11 @@ namespace ToDoModel.Test
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             string selectedValue = null;
-            bool mustMatch = false;
             bool throwEx = false;
 
             // Act
             var result = folderHandler.GetFolder(
                 selectedValue,
-                mustMatch,
                 throwEx);
 
             // Assert
@@ -117,7 +115,7 @@ namespace ToDoModel.Test
         [TestMethod]
         public void InputNewFoldername_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for InputNewFoldername ExpectedBehavior
+            // ToDo: Write test for InputNewFoldername ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             Folder parentFolder = null;
@@ -134,7 +132,7 @@ namespace ToDoModel.Test
         [TestMethod]
         public void CreateFolder_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for CreateFolder ExpectedBehavior
+            // ToDo: Write test for CreateFolder ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             string parentBranchPath = null;
@@ -155,7 +153,7 @@ namespace ToDoModel.Test
         [TestMethod]
         public void AddRecents_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for AddRecents ExpectedBehavior
+            // ToDo: Write test for AddRecents ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             List<string> folderList = null;
@@ -172,7 +170,7 @@ namespace ToDoModel.Test
         [TestMethod]
         public void AddMatches_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for AddMatches ExpectedBehavior
+            // ToDo: Write test for AddMatches ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             List<string> matchingFolders = null;
@@ -189,7 +187,7 @@ namespace ToDoModel.Test
         [TestMethod]
         public void AddSuggestions_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for AddSuggestions ExpectedBehavior
+            // ToDo: Write test for AddSuggestions ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             List<string> folderList = null;
@@ -206,18 +204,20 @@ namespace ToDoModel.Test
         [TestMethod]
         public void GetMatchingFolders_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for GetMatchingFolders ExpectedBehavior
+            // ToDo: Write test for GetMatchingFolders ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             string searchString = null;
             string strEmailFolderPath = null;
             bool includeChildren = false;
+            IEnumerable<(string excludedFolder, bool excludeChildren)> exclusions = null;
 
             // Act
             var result = folderHandler.GetMatchingFolders(
                 searchString,
                 strEmailFolderPath,
-                includeChildren);
+                includeChildren,
+                exclusions);
 
             // Assert
             Assert.Fail();
@@ -227,20 +227,22 @@ namespace ToDoModel.Test
         [TestMethod]
         public void LoopFolders_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for LoopFolders ExpectedBehavior
+            // ToDo: Write test for LoopFolders ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             Folders folders = null;
             List<string> matchingFolders = null;
             string strEmailFolderPath = null;
             bool includeChildren = false;
+            IEnumerable<(string excludedFolder, bool excludeChildren)> exclusions = null;
 
             // Act
             folderHandler.LoopFolders(
                 folders,
                 ref matchingFolders,
                 strEmailFolderPath,
-                includeChildren);
+                includeChildren,
+                exclusions);
 
             // Assert
             Assert.Fail();
@@ -248,58 +250,15 @@ namespace ToDoModel.Test
         }
 
         [TestMethod]
-        public void GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior1()
-        {
-            // Arrange
-            var folderHandler = this.CreateFolderHandler();
-            string path = "\\\\email@company.com\\Folder 1\\Folder 2\\Folder 3";
-            string root = "\\\\email@company.com";
-            bool includeChildren = false;
-            string expected = "Folder 3";
-
-            // Act
-            var actual = folderHandler.GetOlSubpath(
-                path,
-                root,
-                includeChildren);
-
-            // Assert
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior2()
-        {
-            // Arrange
-            var folderHandler = this.CreateFolderHandler();
-            string path = "\\\\email@company.com\\Folder 1\\Folder 2\\Folder 3";
-            string root = "\\\\email@company.com";
-            bool includeChildren = true;
-            string expected = "\\Folder 1\\Folder 2\\Folder 3";
-
-            // Act
-            var actual = folderHandler.GetOlSubpath(
-                path,
-                root,
-                includeChildren);
-
-            // Assert
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
         public void RecalculateSuggestions_StateUnderTest_ExpectedBehavior()
         {
-            // Write test for RecalculateSuggestions ExpectedBehavior
+            // ToDo: Write test for RecalculateSuggestions ExpectedBehavior
             // Arrange
             var folderHandler = this.CreateFolderHandler();
             object ObjItem = null;
-            bool ReloadCTFStagingFiles = false;
 
             // Act
-            folderHandler.RecalculateSuggestions(
-                ObjItem,
-                ReloadCTFStagingFiles);
+            folderHandler.RefreshSuggestions(ObjItem);
 
             // Assert
             Assert.Fail();

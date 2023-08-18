@@ -71,14 +71,14 @@ namespace QuickFiler.Controllers
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
                 await SortEmail.Run(mailItems: items,
-                                                    savePictures: savePictures,
-                                                    destinationOlStem: folderpath,
-                                                    saveMsg: saveEmail,
-                                                    saveAttachments: attchments,
-                                                    removePreviousFsFiles: false,
-                                                    appGlobals: _globals,
-                                                    olAncestor: _globals.Ol.ArchiveRootPath,
-                                                    fsAncestorEquivalent: _globals.FS.FldrRoot);
+                                    savePictures: savePictures,
+                                    destinationOlStem: folderpath,
+                                    saveMsg: saveEmail,
+                                    saveAttachments: attchments,
+                                    removePreviousFsFiles: false,
+                                    appGlobals: _globals,
+                                    olAncestor: _globals.Ol.ArchiveRootPath,
+                                    fsAncestorEquivalent: _globals.FS.FldrRoot);
                 SortEmail.Cleanup_Files();
                 // blDoMove
             }
@@ -92,8 +92,12 @@ namespace QuickFiler.Controllers
                                        bool savePictures,
                                        bool moveConversation)
         {
-                var folderpath = folder.FolderPath.Replace(olAncestor,"");
-                await MoveToFolder(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
+            var folderpath = folder.FolderPath.Replace(olAncestor,"");
+            if (folderpath.StartsWith(@"\"))
+            {
+                folderpath = folderpath.Substring(1);
+            }
+            await MoveToFolder(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
         }
 
         public IList<MailItem> PackageItems(bool moveConversation)
@@ -118,7 +122,7 @@ namespace QuickFiler.Controllers
 
         public void RefreshSuggestions()
         {
-            _folderHandler.Suggestions.RefreshSuggestions(Mail, _globals, false);
+            _folderHandler.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
         }
     }
 }

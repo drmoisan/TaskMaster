@@ -217,11 +217,26 @@ namespace UtilitiesCS
                 Serialize(Filepath);
         }
 
-        public async void Serialize(string filepath)
+        public void Serialize(string filepath)
         {
             this.Filepath = filepath;
             _ = Task.Run(() => SerializeThreadSafe(filepath));
-            await Task.Delay(1);
+        }
+
+        async public Task SerializeAsync()
+        {
+            if (Filepath != "")
+            {
+                await SerializeAsync(Filepath);
+            }
+            else { await Task.CompletedTask;}
+
+        }
+
+        public async Task SerializeAsync(string filepath)
+        {
+            this.Filepath = filepath;
+            await Task.Run(() => SerializeThreadSafe(filepath));
         }
 
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
@@ -259,6 +274,7 @@ namespace UtilitiesCS
 
         }
 
+        
         //public void Serialize(string filepath)
         //{
         //    this.Filepath = filepath;
@@ -381,7 +397,8 @@ namespace UtilitiesCS
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
                 _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath),settings);
-
+                if (_innerList is null)
+                { throw new FileFormatException("File could not be deserialized correctly"); }
                 //_innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
             }
             catch (FileNotFoundException)

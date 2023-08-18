@@ -68,13 +68,15 @@ namespace ToDoModel
         {
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
 
-            var destinationOlPath = $"{olAncestor}{destinationOlStem}";
+            var destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
+            var conversationID = mailItems[0].ConversationID;
 
             (string saveFsPath, string deleteFsPath) = ResolvePaths(mailItems,
                                                                     destinationOlPath,
                                                                     appGlobals,
                                                                     olAncestor,
                                                                     fsAncestorEquivalent);
+
 
             foreach (var mailItem in mailItems)
             {                
@@ -84,33 +86,31 @@ namespace ToDoModel
                 if (saveAttachments || savePictures)
                 {
                     // Get attachments to save and necessary info
-                    var attachments = GetAttachmentsInfo(mailItem,
-                                                         saveFsPath,
-                                                         deleteFsPath,
-                                                         saveAttachments,
-                                                         savePictures);
+                    var attachments = GetAttachmentsInfoAsync(mailItem,
+                                                              saveFsPath,
+                                                              deleteFsPath,
+                                                              saveAttachments,
+                                                              savePictures);
                     // Save to the file system
-                    attachments.ForEach(async x => await x.SaveAttachment());
+                    await foreach (var attachment in attachments) { await attachment.SaveAttachmentAsync(); }
+                    //attachments.ForEach(x => x.SaveAttachment());
 
                     // Delete the original attachments if removePreviousFsFiles is true
-                    attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty())
-                               .ForEach(async x => await Task.Run(() => File.Delete(x.FilePathDelete)));
+                    var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
+                    await foreach (var attachment in toDelete) { await Task.Run(() => File.Delete(attachment.FilePathDelete)); }
                 }
                 
                 // Label the email as autosorted
                 await Task.Run(()=>mailItem.SetUdf("AutoSorted", "Yes")).ConfigureAwait(false);
                 mailItem.UnRead = false;
-                await Task.Run(()=>mailItem.Save()).ConfigureAwait(false);
-                                
-                // Update the Recents list
-                appGlobals.AF.RecentsList.Add(destinationOlStem);
-
+                await Task.Run(()=>mailItem.Save());
+                                                
                 // Update Subject Map and Subject Encoder
                 appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
                 var olDestination = FolderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
-                var mailItemTemp = (MailItem)mailItem.Move(olDestination);
+                var mailItemTemp = await Task.FromResult((MailItem)mailItem.Move(olDestination));
 
                 // Add the email to the Undo Stack
                 PushToUndoStack(mailItem, mailItemTemp, appGlobals);
@@ -120,15 +120,28 @@ namespace ToDoModel
                 
             }
 
-            appGlobals.AF.SubjectMap.Serialize();
-            appGlobals.AF.RecentsList.Serialize();
+            // Update the Recents list and save
+            appGlobals.AF.RecentsList.Add(destinationOlStem);
+            await appGlobals.AF.RecentsList.SerializeAsync();
+
+            // Update the CtfMap and save
+            appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);
+            await appGlobals.AF.CtfMap.SerializeAsync();
+
+            // Save the SubjectMap
+            await appGlobals.AF.SubjectMap.SerializeAsync();
+
+            // Save the SubjectEncoder
+            await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+            
         }
 
         #region Public Methods
 
-        private static YesNoToAllResponse ResponseSaveFile = YesNoToAllResponse.Empty;
+        private static YesNoToAllResponse _responseSaveFile = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _attachmentsOverwrite = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _picturesOverwrite = YesNoToAllResponse.Empty;
+        private static YesNoToAllResponse _removeReadOnly = YesNoToAllResponse.Empty;
 
         #endregion
 
@@ -156,19 +169,43 @@ namespace ToDoModel
             return attachments;
                            
         }
-        
-        async public static Task SaveAttachment(this AttachmentInfo attachment)
+
+        internal static IAsyncEnumerable<AttachmentInfo> GetAttachmentsInfoAsync(MailItem mailItem,
+                                                                                 string saveFsPath,
+                                                                                 string deleteFsPath,
+                                                                                 bool saveAttachments,
+                                                                                 bool savePictures)
         {
-            if (File.Exists(attachment.FilePathSave))
+            var attachments = mailItem.Attachments
+                                  .Cast<Attachment>()
+                                  .Where(x => x.Type != OlAttachmentType.olOLE)
+                                  .ToAsyncEnumerable()
+                                  .SelectAwait(async x => await AttachmentInfo.LoadAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath));
+            if (!saveAttachments)
             {
-                if (attachment.IsImage)
+                attachments = attachments.Where(x => x.IsImage);
+            }
+
+            if (!savePictures)
+            {
+                attachments = attachments.Where(x => !x.IsImage);
+            }
+            return attachments;
+
+        }
+
+        public static void SaveAttachment(this AttachmentInfo attachmentInfo)
+        {
+            if (File.Exists(attachmentInfo.FilePathSave))
+            {
+                if (attachmentInfo.IsImage)
                 {
                     if (_picturesOverwrite == YesNoToAllResponse.Empty)
                     {
-                        _picturesOverwrite = YesNoToAll.ShowDialog($"The file {attachment.FilePathSave} already exists. Overwrite?");
+                        _picturesOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
                     }
-                    await SaveCase(_picturesOverwrite, attachment.Attachment, attachment.FilePathSave, attachment.FilePathSaveAlt);
-                    
+                    SaveCase(_picturesOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+
                     if (_picturesOverwrite == YesNoToAllResponse.Yes || _picturesOverwrite == YesNoToAllResponse.No)
                     {
                         _picturesOverwrite = YesNoToAllResponse.Empty;
@@ -178,36 +215,161 @@ namespace ToDoModel
                 {
                     if (_attachmentsOverwrite == YesNoToAllResponse.Empty)
                     {
-                        _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachment.FilePathSave} already exists. Overwrite?");
+                        _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
                     }
-                    await SaveCase(_attachmentsOverwrite, attachment.Attachment, attachment.FilePathSave, attachment.FilePathSaveAlt);
+                    SaveCase(_attachmentsOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
                     if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
                     {
                         _attachmentsOverwrite = YesNoToAllResponse.Empty;
                     }
                 }
             }
-
+            else
+            {
+                //attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FolderPathSave);
+                attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FilePathSave);
+                //await Task.Run(() => attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FilePathSave));
+            }
         }
 
-        async internal static Task SaveCase(YesNoToAllResponse response, Attachment attachment, string filePathSave, string filePathSaveAlt)
+        async public static Task SaveAttachmentAsync(this AttachmentInfo attachmentInfo)
+        {
+            if (File.Exists(attachmentInfo.FilePathSave))
+            {
+                if (attachmentInfo.IsImage)
+                {
+                    if (_picturesOverwrite == YesNoToAllResponse.Empty)
+                    {
+                        _picturesOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
+                    }
+                    await SaveCaseAsync(_picturesOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+
+                    if (_picturesOverwrite == YesNoToAllResponse.Yes || _picturesOverwrite == YesNoToAllResponse.No)
+                    {
+                        _picturesOverwrite = YesNoToAllResponse.Empty;
+                    }
+                }
+                else
+                {
+                    if (_attachmentsOverwrite == YesNoToAllResponse.Empty)
+                    {
+                        _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
+                    }
+                    await SaveCaseAsync(_attachmentsOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+                    if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
+                    {
+                        _attachmentsOverwrite = YesNoToAllResponse.Empty;
+                    }
+                }
+            }
+            else 
+            { 
+                //await Task.Run(() => attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FolderPathSave));
+                await attachmentInfo.Attachment.TrySaveAttachmentAsync(attachmentInfo.FilePathSave);
+            }
+        }
+
+        async internal static Task SaveCaseAsync(YesNoToAllResponse response, Attachment attachment, string filePathSave, string filePathSaveAlt)
         {
             switch (response)
             {
                 case YesNoToAllResponse.NoToAll:
-                    await Task.Run(()=>attachment.SaveAsFile(filePathSaveAlt));
+                    await attachment.TrySaveAttachmentAsync(filePathSaveAlt);
                     break;
                 case YesNoToAllResponse.No:
-                    await Task.Run(() => attachment.SaveAsFile(filePathSaveAlt));
+                    await attachment.TrySaveAttachmentAsync(filePathSaveAlt);
                     break;
                 case YesNoToAllResponse.Yes:
-                    await Task.Run(() => attachment.SaveAsFile(filePathSave));
+                    await attachment.TrySaveAttachmentAsync(filePathSave);
                     break;
                 case YesNoToAllResponse.YesToAll:
-                    await Task.Run(() => attachment.SaveAsFile(filePathSave));
+                    await attachment.TrySaveAttachmentAsync(filePathSave);
                     break;
                 default:
                     await Task.CompletedTask;
+                    break;
+            }
+        }
+
+        async internal static Task<bool> TrySaveAttachmentAsync(this Attachment attachment, string filePathSave)
+        {
+            try
+            {
+                await Task.Run(()=>attachment.SaveAsFile(filePathSave));
+                return true;
+            }
+            catch (System.UnauthorizedAccessException e)
+            {
+                Debug.WriteLine(e.Message);
+
+                // Exception usually is thrown when readonly folder attribute is set.
+                // Check if _removeReadOnly is empty. 
+                // If so, ask if the user wants to remove the readonly attribute and retry saving
+                if (_removeReadOnly == YesNoToAllResponse.Empty)
+                {
+                    var message = $"The folder {Path.GetDirectoryName(filePathSave)} is read-only. Do you want to remove the readonly attribute?";
+                    _removeReadOnly = YesNoToAll.ShowDialog(message);
+                }
+
+                if ((_removeReadOnly == YesNoToAllResponse.Yes) || (_removeReadOnly == YesNoToAllResponse.YesToAll))
+                {
+                    var di = new DirectoryInfo(Path.GetDirectoryName(filePathSave));
+                    try
+                    {
+                        di.Attributes &= ~System.IO.FileAttributes.ReadOnly;
+                    }
+                    catch (System.Exception inner)
+                    {
+                        Debug.WriteLine(inner.Message);
+                        return false;
+                    }
+                    finally
+                    {
+                        if (_removeReadOnly == YesNoToAllResponse.Yes)
+                        {
+                            _removeReadOnly = YesNoToAllResponse.Empty;
+                        }
+                    }
+                    return await TrySaveAttachmentAsync(attachment, filePathSave);
+                }
+                else if ((_removeReadOnly == YesNoToAllResponse.No) || (_removeReadOnly == YesNoToAllResponse.NoToAll))
+                {
+                    Debug.WriteLine($"The file {filePathSave} was not saved.");
+                    if (_removeReadOnly == YesNoToAllResponse.No)
+                    {
+                        _removeReadOnly = YesNoToAllResponse.Empty;
+                    }
+                    return false;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+        
+        internal static void SaveCase(YesNoToAllResponse response, Attachment attachment, string filePathSave, string filePathSaveAlt)
+        {
+            switch (response)
+            {
+                case YesNoToAllResponse.NoToAll:
+                    attachment.SaveAsFile(filePathSaveAlt);
+                    break;
+                case YesNoToAllResponse.No:
+                    attachment.SaveAsFile(filePathSaveAlt);
+                    break;
+                case YesNoToAllResponse.Yes:
+                    attachment.SaveAsFile(filePathSave);
+                    break;
+                case YesNoToAllResponse.YesToAll:
+                    attachment.SaveAsFile(filePathSave);
+                    break;
+                default:
                     break;
             }
         }
@@ -362,7 +524,7 @@ namespace ToDoModel
 
                                     
 
-                                if ((int)_attachmentsOverwrite + (int)ResponseSaveFile == 0)
+                                if ((int)_attachmentsOverwrite + (int)_responseSaveFile == 0)
                                 {
                                     mailItem.Display();
                                 }
@@ -383,15 +545,15 @@ namespace ToDoModel
                                     }
                                 }
                                 // Response = MsgBox("Save file: " & strAtmtPath, vbYesNo + vbExclamation)
-                                else if (ResponseSaveFile == YesNoToAllResponse.Empty)
+                                else if (_responseSaveFile == YesNoToAllResponse.Empty)
                                 {
                                     response = YesNoToAll.ShowDialog("Save file: " + strAtmtPath);
                                     if (response == YesNoToAllResponse.NoToAll | response == YesNoToAllResponse.YesToAll)
-                                        ResponseSaveFile = response;
+                                        _responseSaveFile = response;
                                 }
                                 else
                                 {
-                                    response = ResponseSaveFile;
+                                    response = _responseSaveFile;
 
                                 }
 
@@ -691,7 +853,6 @@ namespace ToDoModel
             ctfMap.Add(mailItem.ConversationID, fldr, 1);
             subMap.Add(mailItem.Subject, fldr);
         }
-                
         
         private static void SaveMessageAsMSG(string fileSystem_LOC, IList<MailItem> selItems)
         {
@@ -752,9 +913,10 @@ namespace ToDoModel
 
         public static void Cleanup_Files()
         {
-            // Call WRITE_Text_File     - Writes to the recents list
-            // Call Email_AutoCategorize.CTF_Incidence_Text_File_WRITE - Writes to the CTF_Incidence file   
-            // Call Email_AutoCategorize.Subject_MAP_Text_File_WRITE - Writes to the Subject_MAP file
+            _responseSaveFile = YesNoToAllResponse.Empty;
+            _attachmentsOverwrite = YesNoToAllResponse.Empty;
+            _picturesOverwrite = YesNoToAllResponse.Empty;
+            _removeReadOnly = YesNoToAllResponse.Empty;
         }
 
         // Public Function DialogueThrowNotImplemented() As Boolean

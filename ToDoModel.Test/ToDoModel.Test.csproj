@@ -133,7 +133,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertAll.cs" />
-    <Compile Include="Email Utilities\FolderHandlerTests.cs" />
+    <Compile Include="Email Utilities\FolderHandlerTests_ToWrite.cs" />
+    <Compile Include="Email Utilities\FolderHandlerTests_Written.cs" />
     <Compile Include="Email Utilities\SortItemsToExistingFolderTests.cs" />
     <Compile Include="FolderPathsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

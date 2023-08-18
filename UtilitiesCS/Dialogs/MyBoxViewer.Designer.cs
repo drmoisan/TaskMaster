@@ -172,6 +172,7 @@
         private System.Windows.Forms.TableLayoutPanel L1v1L2h;
         internal System.Windows.Forms.TableLayoutPanel L2Bottom;
         internal System.Windows.Forms.TextBox TextMessage;
-        internal SVGControl.PictureBoxSVG SvgIcon;
+        //internal SVGControl.PictureBoxSVG SvgIcon;
+        internal System.Windows.Forms.PictureBox SvgIcon;
     }
 }

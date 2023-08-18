@@ -27,7 +27,7 @@ namespace UtilitiesCS
         public static string SanitizeFilename(string filename)
         {
             if (string.IsNullOrEmpty(filename)) throw new ArgumentNullException(nameof(filename));
-            var regex = new Regex($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]*");
+            var regex = new Regex($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]+");
             return regex.Replace(filename, "_");
         }
 

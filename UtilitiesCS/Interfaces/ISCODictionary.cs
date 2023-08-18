@@ -33,6 +33,8 @@ namespace UtilitiesCS.ReusableTypeClasses
         void Deserialize(string filepath, bool askUserOnError);
         void Serialize();
         void Serialize(string filepath);
+        Task SerializeAsync();
+        Task SerializeAsync(string filepath);
         Dictionary<TKey, TValue> ToDictionary();
         
         #endregion  

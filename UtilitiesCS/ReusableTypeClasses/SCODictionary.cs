@@ -136,6 +136,22 @@ namespace UtilitiesCS.ReusableTypeClasses
             await Task.Delay(1);
         }
 
+        async public Task SerializeAsync()
+        {
+            if (Filepath != "")
+            {
+                await SerializeAsync(Filepath);
+            }
+            else { await Task.CompletedTask; }
+
+        }
+
+        public async Task SerializeAsync(string filepath)
+        {
+            this.Filepath = filepath;
+            await Task.Run(() => SerializeThreadSafe(filepath));
+        }
+
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
         public void SerializeThreadSafe(string filepath)

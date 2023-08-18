@@ -37,13 +37,13 @@ namespace ToDoModel
                 case InitOptions.NoSuggestions:
                     break;
                 case InitOptions.FromArrayOrString:
-                    InitializeFromArrayOrString(objItem);
+                    FromArrayOrString(objItem);
                     break;
                 case InitOptions.FromField:
                     InitializeFromEmail(objItem);
                     break;
                 case InitOptions.Recalculate:
-                    RecalculateSuggestions(objItem, false);
+                    RefreshSuggestions(objItem);
                     break;
                 default:
                     throw new ArgumentException($"Unknown option value {options}");
@@ -59,15 +59,15 @@ namespace ToDoModel
             Recalculate = 4
         }
         
-        private void InitializeFromEmail(object objItem)
+        public void InitializeFromEmail(object objItem) //internal
         {
             var OlMail = MailResolution.TryResolveMailItem(objItem);
             if (OlMail is null) { throw new ArgumentException("Constructor Requires the Email Object to be passed as MailItem to use this flag"); }
             
-            InitializeFromFolderKeyField(false, OlMail);
+            FromFolderKey(OlMail);
         }
 
-        private void InitializeFromArrayOrString(object obj)
+        public void FromArrayOrString(object obj)
         {
             if (obj is null)
             {
@@ -88,62 +88,13 @@ namespace ToDoModel
             {
                 throw new ArgumentException($"Obj is of type {obj.GetType().Name}, but selected option requires a string or string array");
             }
-        }
+        }//internal
         
-        private void InitializeFromFolderKeyField(bool reloadCTFStagingFiles, MailItem olMail)
+        public void FromFolderKey(MailItem olMail)//internal
         {
-            int i;
-            string strTmp;
-
-            int intVarCt;
-
-            var objProperty = olMail.UserProperties.Find("FolderKey");
-            if (objProperty is null)
+            if (!Suggestions.LoadFromField(olMail, _globals))
             {
-                Suggestions.RefreshSuggestions(olMail, _globals, reloadCTFStagingFiles);
-            }
-            else
-            {
-                var foldersObject = objProperty.Value;
-
-                if (foldersObject is not Array)
-                {
-                    if ((foldersObject as string) == "Error")
-                    {
-                        Suggestions.RefreshSuggestions(olMail, _globals, reloadCTFStagingFiles);
-                    }
-                    else
-                    {
-                        strTmp = (string)foldersObject;
-                        Suggestions.AddSuggestion(strTmp, 1L);
-                    }
-                }
-                else
-                {
-                    string[] strFolders = (string[])foldersObject;
-                    intVarCt = strFolders.Length -1;
-                    if (intVarCt == 0)
-                    {
-                        if (strFolders[0] == "Error")
-                        {
-                            Suggestions.RefreshSuggestions(olMail, _globals, reloadCTFStagingFiles);
-                        }
-                        else
-                        {
-                            strTmp = strFolders[0];
-                            Suggestions.AddSuggestion(strTmp, 0);
-                        }
-                    }
-                    else
-                    {
-                        var loopTo = intVarCt;
-                        for (i = 0; i <= loopTo; i++)
-                        {
-                            strTmp = strFolders[i];
-                            Suggestions.AddSuggestion(strTmp, 0);
-                        }
-                    }
-                }
+                Suggestions.RefreshSuggestions(olMail: olMail, appGlobals: _globals);
             }
         }
         
@@ -226,7 +177,7 @@ namespace ToDoModel
             AddMatches(matchingFolders);
 
             // Add suggestions
-            if (recalcSuggestions) { RecalculateSuggestions(objItem, reloadCTFStagingFiles); }
+            if (recalcSuggestions) { RefreshSuggestions(objItem); }
             AddSuggestions(ref _folderList);
 
             // Add recents
@@ -254,7 +205,7 @@ namespace ToDoModel
             var matchedFolder = GetFolder(olApp.Session.Folders, foldersArray[0]);
             if (matchedFolder is null) { return null; }
 
-            for (int i = 1; i <= foldersArray.Length - 1; i++)
+            for (int i = 1; i < foldersArray.Length; i++)
             {
                 matchedFolder = GetFolder(matchedFolder.Folders, foldersArray[i]);
                 if (matchedFolder is null) { return null; }
@@ -477,7 +428,7 @@ namespace ToDoModel
         public void AddSuggestions(ref List<string> folderList) // internal
         {
             folderList.Add("========= SUGGESTIONS =========");
-            folderList.AddRange(Suggestions.ToArray());
+            folderList.AddRange(Suggestions.ToArray(5));
         }
         
         public List<string> GetMatchingFolders(string searchString,
@@ -546,19 +497,22 @@ namespace ToDoModel
             }
         }
 
-        public void RecalculateSuggestions(object ObjItem, bool ReloadCTFStagingFiles) // Internal
+        public void RefreshSuggestions(object objItem, int topNfolderKeys = -1) // Internal
         {
-            var OlMail = MailResolution.TryResolveMailItem(ObjItem);
-            if (OlMail is not null)
-            {
-                if (_globals.AF.SuggestionFilesLoaded == false)
-                    ReloadCTFStagingFiles = true;
-                Suggestions.RefreshSuggestions(OlMail, _globals, ReloadCTFStagingFiles);
-                BlUpdateSuggestions = false;
-            }
+            var OlMail = MailResolution.TryResolveMailItem(objItem);
+            if (OlMail is not null) { RefreshSuggestions(OlMail, topNfolderKeys);}
             else
             {
-                throw new ArgumentException($"Obj passed as {ObjItem.GetType().Name} but should have been MailItem");
+                throw new ArgumentException($"{nameof(objItem)} passed as {objItem.GetType().Name} could not be cast to MailItem");
+            }
+        }
+
+        public void RefreshSuggestions(MailItem mailItem, int topNfolderKeys = -1) // Internal
+        {
+            if (mailItem is not null)
+            {
+                Suggestions.RefreshSuggestions(olMail: mailItem, appGlobals: _globals, topNfolderKeys: topNfolderKeys);
+                BlUpdateSuggestions = false;
             }
         }
 

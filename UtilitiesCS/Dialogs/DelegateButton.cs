@@ -128,6 +128,8 @@ namespace UtilitiesCS
         public Button MakeButton(string text)
         {
             Button b = _template.Clone();
+            b.Visible = true;
+            b.Enabled = true;
             b.Text = text;
             return b;
         }

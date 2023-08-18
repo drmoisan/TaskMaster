@@ -17,38 +17,58 @@ namespace ToDoModel
 
         public AttachmentInfo(Attachment attachment, DateTime sentOn, string saveFolderPath)
         {
-            Task.Run(()=>Init(attachment, sentOn, saveFolderPath, null)).ConfigureAwait(false);
+            Init(attachment, sentOn, saveFolderPath, null);
         }
 
         public AttachmentInfo(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
-            Task.Run(() => Init(attachment, sentOn, saveFolderPath, deleteFolderPath)).ConfigureAwait(false);
+            Init(attachment, sentOn, saveFolderPath, deleteFolderPath);
         }
 
         async public static Task<AttachmentInfo> LoadAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             var _att = new AttachmentInfo();
-            await _att.Init(attachment,sentOn, saveFolderPath, deleteFolderPath);
+            await _att.InitAsync(attachment,sentOn, saveFolderPath, deleteFolderPath);
             return _att;
         }
-        
-        async public Task Init(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
+
+        public void Init(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
+        {
+            _attachment = attachment;
+
+            if (CheckParameters(attachment, sentOn, saveFolderPath, deleteFolderPath))
+            {
+                (_filenameSeed, _fileExtension) = GetAttachmentFilename(Attachment);
+                _filenameSeed = FolderConverter.SanitizeFilename(_filenameSeed);
+                _filenameSeed = PrependDatePrefix(_filenameSeed, sentOn);
+                _filePathSave = AdjustForMaxPath(saveFolderPath, _filenameSeed, _fileExtension);
+                _filePathSaveAlt = AdjustForMaxPath(saveFolderPath, _filenameSeed, _fileExtension, GetNameSuffix());
+
+                if (deleteFolderPath is not null)
+                {
+                    _folderPathDelete = deleteFolderPath;
+                    _filePathDelete = AdjustForMaxPath(deleteFolderPath, _filenameSeed, _fileExtension);
+                }
+            }
+        }
+
+        async public Task InitAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             _attachment = attachment;
 
             if (CheckParameters(attachment, sentOn, saveFolderPath, deleteFolderPath))
             {                
-                (var filenameSeed, _fileExtension) = GetAttachmentFilename(Attachment);
-                filenameSeed = FolderConverter.SanitizeFilename(filenameSeed);
-                (_filenameSeed, _fileExtension) = PrependDatePrefix(filenameSeed, sentOn);
-                _filePathSave = AdjustForMaxPath(saveFolderPath, filenameSeed, _fileExtension);
-                _filePathSaveAlt = AdjustForMaxPath(saveFolderPath, filenameSeed, _fileExtension, GetNameSuffix());
+                (_filenameSeed, _fileExtension) = GetAttachmentFilename(Attachment);
+                _filenameSeed = FolderConverter.SanitizeFilename(_filenameSeed);
+                _filenameSeed = PrependDatePrefix(_filenameSeed, sentOn);
+                _filePathSave = AdjustForMaxPath(saveFolderPath, _filenameSeed, _fileExtension);
+                _filePathSaveAlt = AdjustForMaxPath(saveFolderPath, _filenameSeed, _fileExtension, GetNameSuffix());
                 
                 if (deleteFolderPath is not null)
                 {
                     _folderPathDelete = deleteFolderPath;
-                    _filePathDelete = AdjustForMaxPath(deleteFolderPath, filenameSeed, _fileExtension);
-                }                
+                    _filePathDelete = AdjustForMaxPath(deleteFolderPath, _filenameSeed, _fileExtension);
+                }
             }
             await Task.CompletedTask;
 
@@ -145,8 +165,12 @@ namespace ToDoModel
         public (string Filename, string Extension) GetAttachmentFilename(Attachment attachment)
         {
             var filename = Path.GetFileNameWithoutExtension(attachment.FileName);
-
             var extension = Path.GetExtension(attachment.FileName);
+            if (filename.Length == 0) 
+            { 
+                filename = extension; 
+                extension = "";
+            }
             return (filename, extension);
         }
 
@@ -155,10 +179,10 @@ namespace ToDoModel
             return $"_{DateTime.Now.ToString("yyyyMMddHHmmss")}";
         }
         
-        public (string, string) PrependDatePrefix(string seed, DateTime date)
+        public string PrependDatePrefix(string seed, DateTime date)
         {
             var prefix = date.ToString("yyyyMMdd");
-            return (prefix, $"{prefix}_{seed}");
+            return $"{prefix}_{seed}";
         }
 
 
