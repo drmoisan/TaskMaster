@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 
 namespace UtilitiesCS
@@ -24,5 +25,6 @@ namespace UtilitiesCS
         string StoreId { get; set; }
 
         bool UndoMove();
+        string UndoMoveMessage(Outlook.Application olApp);
     }
 }

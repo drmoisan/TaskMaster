@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 using System.Collections.Generic;
@@ -124,17 +125,28 @@ namespace ToDoModel
 
             // Update the Recents list and save
             appGlobals.AF.RecentsList.Add(destinationOlStem);
-            await appGlobals.AF.RecentsList.SerializeAsync();
 
             // Update the CtfMap and save
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);
-            await appGlobals.AF.CtfMap.SerializeAsync();
 
-            // Save the SubjectMap
-            await appGlobals.AF.SubjectMap.SerializeAsync();
+            // Serialize the data
+            var tasks = new List<Task> 
+            { 
+                appGlobals.AF.RecentsList.SerializeAsync(),
+                appGlobals.AF.CtfMap.SerializeAsync(),
+                appGlobals.AF.SubjectMap.SerializeAsync(),
+                appGlobals.AF.MovedMails.SerializeAsync() 
+            };
 
-            // Save the SubjectEncoder
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            
             await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+            
+            //await appGlobals.AF.RecentsList.SerializeAsync();
+            //await appGlobals.AF.CtfMap.SerializeAsync();
+            //await appGlobals.AF.SubjectMap.SerializeAsync();
+            //await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+            //await appGlobals.AF.MovedMails.SerializeAsync();
             
         }
 
@@ -144,6 +156,32 @@ namespace ToDoModel
             _attachmentsOverwrite = YesNoToAllResponse.Empty;
             _picturesOverwrite = YesNoToAllResponse.Empty;
             _removeReadOnly = YesNoToAllResponse.Empty;
+        }
+
+        public static void Undo(ScoStack<IMovedMailInfo> movedStack, Outlook.Application olApp) 
+        {
+            DialogResult repeatResponse = DialogResult.Yes;
+            var i = movedStack.Count-1;
+
+            while (i >= 0 && repeatResponse == DialogResult.Yes)
+            {
+                var message = movedStack[i].UndoMoveMessage(olApp);
+                if (message is not null)
+                {
+                    var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
+                    if (undoResponse == DialogResult.Yes)
+                    {
+                        movedStack[i].UndoMove();
+                        movedStack.Pop(i--);
+                    }
+                    
+                }
+                else { i--; }
+                repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+            }
+            
+            if (repeatResponse == DialogResult.Yes) { MessageBox.Show("Nothing to undo"); }
+            movedStack.Serialize();
         }
 
         #endregion

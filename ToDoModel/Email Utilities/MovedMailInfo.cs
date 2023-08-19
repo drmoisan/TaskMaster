@@ -20,11 +20,11 @@ namespace ToDoModel
             _olRootPath = olRootPath;
             _mailItem = afterMove;
             var folderNew = (Folder)afterMove.Parent;
-            _folderPathNew = folderNew.FolderPath.Replace(_olRootPath, "");
+            _folderPathNew = folderNew.FolderPath.Replace($"{_olRootPath}\\", "");
             _storeId = folderNew.StoreID;
             _entryId = afterMove.EntryID;
             _folderOld = (Folder)beforeMove.Parent;
-            _folderPathOld = _folderOld.FolderPath.Replace(_olRootPath, "");
+            _folderPathOld = _folderOld.FolderPath.Replace($"{_olRootPath}\\", "");
         }
 
         private string _folderPathOld;
@@ -84,7 +84,7 @@ namespace ToDoModel
             set => _folderOld = value;
         }
 
-        internal bool NotNull(params object[] parameters) => parameters.Any(x => x is null);
+        internal bool NotNull(params object[] parameters) => !parameters.Any(x => x is null);
 
         public bool IsReadyToUndoMove { get => NotNull(MailItem, FolderOld);}
 
@@ -98,5 +98,27 @@ namespace ToDoModel
             return false;
         }
 
+        public string UndoMoveMessage(Outlook.Application olApp)
+        {
+            var ready = true;
+            if (!IsReadyToUndoMove)
+            {
+                OlApp = olApp;
+                if (!IsReadyToUndoMove)
+                {
+                    ready = false;
+                }
+            }
+            if (ready) 
+            {
+                return $"Undo Move of email?{Environment.NewLine}SentOn: {MailItem.SentOn.ToString("MM/dd/yyyy")}" +
+                       $"{System.Environment.NewLine}{MailItem.Subject}{System.Environment.NewLine}"+
+                       $"From: {FolderPathNew}{System.Environment.NewLine}To: {FolderPathOld}";
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

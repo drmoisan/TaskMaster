@@ -280,10 +280,9 @@ namespace QuickFiler.Controllers
 
         public void ButtonUndo_Click(object sender, EventArgs e) => ButtonUndo_Click();
 
-        // TODO: Implement ButtonUndo_Click
         public void ButtonUndo_Click()
         {
-            throw new NotImplementedException();
+            SortEmail.Undo(_movedItems, _globals.Ol.App);
         }
 
         public void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)

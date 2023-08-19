@@ -134,10 +134,15 @@ namespace TaskMaster
             _controller.SortEmail();
         }
 
+        public void UndoSort_Click(Office.IRibbonControl control)
+        {
+            _controller.UndoSort();
+        }
+
         #endregion
 
         #region TryMethods  
-        
+
         public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
         public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();
         public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();

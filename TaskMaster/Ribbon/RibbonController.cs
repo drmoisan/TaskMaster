@@ -154,6 +154,11 @@ namespace TaskMaster
             taskFlagger.Run();
         }
 
+        internal void UndoSort()
+        {
+            ToDoModel.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
+        }
+
         #region Try specific methods
         internal void RunTry()
         {
