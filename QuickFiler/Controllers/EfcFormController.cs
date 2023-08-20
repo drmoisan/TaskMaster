@@ -32,6 +32,10 @@ namespace QuickFiler.Controllers
             //_mailItem = mailItem;
             _initType = initType;
             LoadSettings();
+            _listTipsDetails = _formViewer.TipsLabels
+                               .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
+                               .ToList();
+            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off));
             WireEventHandlers();
             _ = PopulateFolderCombobox();
         }
@@ -44,6 +48,7 @@ namespace QuickFiler.Controllers
         //private FolderHandler _folderHandler;
         //private MailItem _mailItem;
         private Enums.InitTypeEnum _initType;
+        private IList<IQfcTipsDetails> _listTipsDetails;
 
         public void Cleanup()
         {
@@ -232,16 +237,32 @@ namespace QuickFiler.Controllers
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Minimized;
         }
 
-        //TODO: Implement ToggleOffNavigation
         public void ToggleOffNavigation(bool async)
         {
-            throw new NotImplementedException();
+            ToggleTips(async, Enums.ToggleState.Off);
         }
 
-        //TODO: Implement ToggleOnNavigation
         public void ToggleOnNavigation(bool async)
         {
-            throw new NotImplementedException();
+            ToggleTips(async, Enums.ToggleState.On);
+        }
+
+        public void ToggleTips(bool async)
+        {
+            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
+            {
+                if (async) { _formViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle())); }
+                else { _formViewer.Invoke(new System.Action(() => tipsDetails.Toggle())); }
+            }
+        }
+
+        public void ToggleTips(bool async, Enums.ToggleState desiredState)
+        {
+            foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
+            {
+                if (async) { _formViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(desiredState))); }
+                else { _formViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState))); }
+            }
         }
 
         internal void LoadSettings()

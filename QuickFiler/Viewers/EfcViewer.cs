@@ -19,6 +19,7 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            InitTipsLabelsList();
         }
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -36,6 +37,28 @@ namespace QuickFiler
         public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;
+        }
+
+        private IList<Label> _tipsLabels;
+        public IList<Label> TipsLabels { get => _tipsLabels; }
+
+        private void InitTipsLabelsList()
+        {
+            _tipsLabels = new List<Label>
+            {
+                LblAcSearch,
+                LblAcFolderList,
+                LblAcTrash,
+                LblAcAttachments,
+                LblAcEmail,
+                LblAcPictures,
+                LblAcConversation,
+                LblAcOk,
+                LblAcCancel,
+                LblAcRefresh,
+                LblAcNewFolder
+            };
+
         }
     }
 }
