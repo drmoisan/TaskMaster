@@ -27,7 +27,6 @@ namespace QuickFiler.Interfaces
 
         #region Major Actions
         
-        Task ExecuteMoves();        
 		//void Iterate();
         void QuickFileMetrics_WRITE(string filename);
 

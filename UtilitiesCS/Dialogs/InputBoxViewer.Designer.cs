@@ -96,7 +96,7 @@
             this.Cancel.Margin = new System.Windows.Forms.Padding(0, 7, 25, 7);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(169, 54);
-            this.Cancel.TabIndex = 1;
+            this.Cancel.TabIndex = 2;
             this.Cancel.Text = "Cancel";
             this.Cancel.UseVisualStyleBackColor = true;
             this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
@@ -109,7 +109,7 @@
             this.Ok.Margin = new System.Windows.Forms.Padding(0, 7, 25, 7);
             this.Ok.Name = "Ok";
             this.Ok.Size = new System.Drawing.Size(169, 54);
-            this.Ok.TabIndex = 0;
+            this.Ok.TabIndex = 1;
             this.Ok.Text = "OK";
             this.Ok.UseVisualStyleBackColor = true;
             this.Ok.Click += new System.EventHandler(this.Ok_Click);
@@ -126,6 +126,7 @@
             this.Message.Name = "Message";
             this.Message.Size = new System.Drawing.Size(584, 194);
             this.Message.TabIndex = 1;
+            this.Message.TabStop = false;
             this.Message.Text = "[Message]";
             // 
             // Input
@@ -136,7 +137,7 @@
             this.Input.Margin = new System.Windows.Forms.Padding(25);
             this.Input.Name = "Input";
             this.Input.Size = new System.Drawing.Size(775, 46);
-            this.Input.TabIndex = 1;
+            this.Input.TabIndex = 0;
             this.Input.Text = "[Input]";
             // 
             // InputBoxViewer

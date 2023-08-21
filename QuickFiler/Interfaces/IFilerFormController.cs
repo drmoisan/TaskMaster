@@ -8,8 +8,8 @@ namespace QuickFiler.Interfaces
     public interface IFilerFormController
     {
 
-        void ActionCancel();
-        Task ActionOk();
+        Task ActionCancelAsync();
+        Task ActionOkAsync();
         void ButtonCancel_Click(object sender, EventArgs e);
         void ButtonOK_Click(object sender, EventArgs e);
         void Cleanup();

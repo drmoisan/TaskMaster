@@ -1,9 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,20 +80,57 @@ namespace QuickFiler
         public cStopWatch StopWatch { get => _stopWatch; }
 
         public bool Loaded => throw new NotImplementedException();
+      
 
         #endregion
 
         #region Major Actions
 
-        async public Task ExecuteMoves() => await _dataModel.MoveToFolder(
-            _formController.SelectedFolder,
-            _formController.SaveAttachments,
-            _formController.SaveEmail,
-            _formController.SavePictures,
-            _formController.MoveConversation);
+        async public Task ExecuteMoves()
+        {
+            var selectedFolder = _formController.SelectedFolder;
+            var moveConversation = _formController.MoveConversation;
+            var convInfo = DataModel.ConversationResolver.ConversationInfo;
+            if (!moveConversation)
+            {
+                convInfo.Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID).ToList();
+            }
 
-        
-        //TODO: Implement QuickFileMetrics_WRITE
+            await _dataModel.MoveToFolder(selectedFolder,
+                                          _formController.SaveAttachments,
+                                          _formController.SaveEmail,
+                                          _formController.SavePictures,
+                                          moveConversation);
+            
+            QuickFileMetrics_WRITE(_globals.FS.Filenames.EmailSession, selectedFolder, convInfo);
+        }
+                
+        public void QuickFileMetrics_WRITE(string filename, string selectedFolder, List<MailItemInfo> moved)
+        {
+            if (moved is not null && moved.Count == 0) 
+            { 
+            
+                var curDateText = DateTime.Now.ToString("MM/dd/yyyy");
+                var curTimeText = DateTime.Now.ToString("hh:mm");
+                var dataLineBeg = curDateText + "," + curTimeText + ",";
+
+                var Duration = _stopWatch.timeElapsed;
+                var OlEndTime = DateTime.Now;
+                var OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
+           
+                Duration /= moved.Count;
+                var durationText = Duration.ToString("##0");
+                var durationMinutesText = (Duration / 60d).ToString("##0.00");
+
+                var dataLines = moved.Select(itemInfo => dataLineBeg + QfcCollectionController.xComma(itemInfo.Subject) +
+                    $",SingleSorted,{durationText},{durationMinutesText},{itemInfo.ToRecipientsName}" +
+                    $"{itemInfo.SenderName},Email,{selectedFolder},{itemInfo.SentDate.ToString("MM/dd/yyyy")}," +
+                    $"{itemInfo.SentDate.ToString("HH:mm:ss")}").ToArray();
+
+                FileIO2.WriteTextFile(filename, dataLines, _globals.FS.FldrMyD);
+            }
+        }
+
         public void QuickFileMetrics_WRITE(string filename)
         {
             throw new NotImplementedException();
@@ -100,10 +139,10 @@ namespace QuickFiler
         #endregion
 
         #region Helper Methods
-                
+
         //public IList<MailItem> PackageItems() => _conversationResolver.ConversationItems;
 
-        
+
         #endregion
     }
 }

@@ -898,7 +898,7 @@ namespace QuickFiler.Controllers
             return strOutput;
         }
 
-        public string xComma(string str)
+        public static string xComma(string str)
         {
             string xCommaRet = default;
             string strTmp;

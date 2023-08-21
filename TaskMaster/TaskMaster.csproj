@@ -359,6 +359,7 @@
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
+    <None Include="TaskMaster_1_TemporaryKey.pfx" />
     <None Include="TaskMaster_7_TemporaryKey.pfx" />
     <None Include="TaskMaster_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
@@ -411,10 +412,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_7_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>E4476997DD72712BDC65D596002D2E93FB676962</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>0949DC978E30F42B54777E9222BEDCDD2EF0E211</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -124,5 +124,6 @@ namespace QuickFiler.Controllers
         {
             _folderHandler.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
         }
+
     }
 }

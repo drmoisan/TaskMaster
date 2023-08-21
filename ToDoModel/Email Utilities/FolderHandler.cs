@@ -305,7 +305,7 @@ namespace ToDoModel
             {
                 name = InputBox.ShowDialog(
                     $"Please enter a new subfolder name for {parent.Name}",
-                    "New folder dialog").Trim();
+                    "New folder dialog");
 
                 if (name is not null)
                 {

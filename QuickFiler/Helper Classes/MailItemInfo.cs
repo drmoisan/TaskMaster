@@ -36,7 +36,6 @@ namespace QuickFiler
             _conversationIndex = (string)df["ConversationIndex"][indexRow];
         }
 
-        private string _entryId;
         private string _storeId;
         private RecipientInfo _sender;
         private RecipientInfo _toRecipients;
@@ -59,6 +58,9 @@ namespace QuickFiler
         
         private string _conversationIndex;
         public string ConversationIndex { get => Initialized(ref _conversationIndex); set => _conversationIndex = value; }
+        
+        private string _entryId;
+        public string EntryId { get => Initialized(ref _entryId); set => _entryId = value; }
         
         private string _folder;
         public string Folder { get => Initialized(ref _folder); set => _folder = value; }
@@ -125,6 +127,7 @@ namespace QuickFiler
         public bool LoadPriority()
         {
             if (_item is null) { throw new ArgumentNullException(); }
+            _entryId = _item.EntryID;
             _sender = _item.GetSenderInfo();
             _senderName = _sender.Name;
             _senderHtml = _sender.Html;

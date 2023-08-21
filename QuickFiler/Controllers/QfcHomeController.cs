@@ -63,14 +63,7 @@ namespace QuickFiler.Controllers
             _formController.LoadItems(listObjects);
         }
 
-        async public Task ExecuteMoves()
-        {
-            _formController.Groups.MoveEmails(DataModel.MovedItems);
-            QuickFileMetrics_WRITE("9999TimeWritingEmail.csv");
-            _formController.Groups.RemoveControlsAsync();
-            Iterate();
-        }
-
+        
         public void QuickFileMetrics_WRITE(string filename)
         {
 
@@ -83,14 +76,11 @@ namespace QuickFiler.Controllers
             AppointmentItem OlAppointment;
             Folder OlEmailCalendar;
 
-
             // Create a line of comma seperated valued to store data
             curDateText = DateTime.Now.ToString("MM/dd/yyyy");
-            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curDateText = " & curDateText
-
+            
             curTimeText = DateTime.Now.ToString("hh:mm");
-            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curTimeText = " & curTimeText
-
+            
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
             LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
@@ -123,8 +113,9 @@ namespace QuickFiler.Controllers
                 OlAppointment.Save();
             }
 
+
             string[] strOutput = _formController.Groups
-                .GetMoveDiagnostics(durationText, durationMinutesText, Duration, 
+                .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
                 dataLineBeg, OlEndTime, ref OlAppointment);
 
             FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);

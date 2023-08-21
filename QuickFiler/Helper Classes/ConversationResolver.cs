@@ -27,6 +27,9 @@ namespace QuickFiler.Helper_Classes
         private List<MailItemInfo> _conversationInfoExpanded;
         public List<MailItemInfo> ConversationInfoExpanded { get => _conversationInfoExpanded; set => _conversationInfoExpanded = value; }
 
+        private List<MailItemInfo> _conversationInfo;
+        public List<MailItemInfo> ConversationInfo { get => _conversationInfo; set => _conversationInfo = value; }
+
         private IList<MailItem> _conversationItems;
         public IList<MailItem> ConversationItems
         {
@@ -164,6 +167,9 @@ namespace QuickFiler.Helper_Classes
                                          .Select(indexRow => new MailItemInfo(df, indexRow))
                                          .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
                                          .ToList();
+
+            ConversationInfo = ConversationInfoExpanded.Where(
+                itemInfo => itemInfo.Folder == ((Folder)_mailItem.Parent).Name).ToList();
 
             if (_updateUI is not null)
                 await Task.Run(()=>_updateUI(ConversationInfoExpanded));

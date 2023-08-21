@@ -221,21 +221,22 @@ namespace QuickFiler.Controllers
             _formViewer.BackColor = System.Drawing.SystemColors.ControlLightLight;
         }
 
-        public void ButtonCancel_Click(object sender, EventArgs e) => ActionCancel();
+        async public void ButtonCancel_Click(object sender, EventArgs e) => await ActionCancelAsync();
 
-        public void ActionCancel()
+        async public Task ActionCancelAsync()
         {
+            await _formViewer.UiSyncContext;
             _formViewer.Hide();
             _groups.Cleanup();
             _globals = null;
             _groups = null;
-            _formViewer.Close();
+            _formViewer.Dispose();
             _parentCleanup.Invoke();
         }
 
-        async public void ButtonOK_Click(object sender, EventArgs e) => await ActionOk();
+        async public void ButtonOK_Click(object sender, EventArgs e) => await ActionOkAsync();
 
-        async public Task ActionOk()
+        async public Task ActionOkAsync()
         {
             if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
@@ -273,7 +274,7 @@ namespace QuickFiler.Controllers
             else
             {
                 throw new NotImplementedException(
-                    $"Method {nameof(QfcFormController)}.{nameof(ActionOk)} has not been "+
+                    $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been "+
                     $"implemented for {nameof(_initType)} {_initType}");
             }
         }

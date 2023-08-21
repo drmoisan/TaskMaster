@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers
 {
@@ -137,36 +138,22 @@ namespace QuickFiler.Controllers
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
         }
                
-        public void ActionCancel()
+        async public void ButtonCancel_Click(object sender, EventArgs e)
         {
-            _formViewer.Close();
-            Cleanup();
-        }
-
-        public void ButtonCancel_Click(object sender, EventArgs e)
-        {
-            ActionCancel();
-        }
-
-        async public Task ActionOk()
-        {
-            _formViewer.Hide();
-            await _homeController.ExecuteMoves();
-            await _formViewer.UiSyncContext;
-            _formViewer.Dispose();
-            Cleanup();
+            await ActionCancelAsync();
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e)
         {
-            await ActionOk();
+            await ActionOkAsync();
         }
 
-        public void ButtonRefresh_Click(object sender, EventArgs e)
+        async public void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            _dataModel.RefreshSuggestions();
-            _formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
-            if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
+            //_dataModel.RefreshSuggestions();
+            //_formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
+            //if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
+            await RefreshSuggestionsAsync();
         }
 
         async public void ButtonCreate_Click(object sender, EventArgs e)
@@ -198,12 +185,9 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public void ButtonDelete_Click(object sender, EventArgs e)
+        async public void ButtonDelete_Click(object sender, EventArgs e)
         {
-            var items = (string[])_formViewer.FolderListBox.DataSource;
-            var itemList = items.ToList();
-            itemList.Insert(0, "Trash to Delete");
-            _formViewer.FolderListBox.DataSource = itemList.ToArray();
+            await ActionDeleteAsync();
         }
 
         private void SaveAttachments_CheckedChanged(object sender, EventArgs e)
@@ -232,10 +216,116 @@ namespace QuickFiler.Controllers
             if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }
 
+        private Dictionary<char, Action<char>> _keyboardActions;
+        internal Dictionary<char, Action<char>> KeyboardActions => Initialized(_keyboardActions, GetKbdActions);
+        internal Dictionary<char, Action<char>> GetKbdActions()
+        {
+            return new()
+            {
+                { 'S', async (x) => await JumpToAsync(_formViewer.SearchText) },
+                { 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox) },
+                { 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments) },
+                { 'E', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail) },
+                { 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures) },
+                { 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation) },
+                { 'O', async (x) => await KbdExecuteAsync(ActionOkAsync) },
+                { 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync) },
+                { 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync) },
+                { 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync) },
+                { 'T', async (x) => await KbdExecuteAsync(ActionDeleteAsync) }
+            };
+        }
+
+        #endregion
+
+        #region Major Actions
+
+        async public Task ActionOkAsync()
+        {
+            await _formViewer.UiSyncContext;
+            _formViewer.Hide();
+            await _homeController.ExecuteMoves().ConfigureAwait(false);
+            await _formViewer.UiSyncContext;
+            _formViewer.Dispose();
+            Cleanup();
+        }
+
+        async public Task ActionCancelAsync()
+        {
+            await _formViewer.UiSyncContext;
+            _formViewer.Close();
+            Cleanup();
+        }
+
+        async public Task ActionDeleteAsync()
+        {             
+            await _formViewer.UiSyncContext;
+            var items = (string[])_formViewer.FolderListBox.DataSource;
+            var itemList = items.ToList();
+            itemList.Insert(0, "Trash to Delete");
+            _formViewer.FolderListBox.DataSource = itemList.ToArray();
+        }
+
+        async public Task CreateFolderAsync()
+        {
+            if (_initType == Enums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+
+            if (!IsValidSelection)
+            {
+                MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
+            }
+            else
+            {
+                await _formViewer.UiSyncContext;
+                _formViewer.Hide();
+                var folder = await Task.FromResult(_dataModel
+                                                   .FolderHandler
+                                                   .CreateFolder(SelectedFolder,
+                                                                 _globals.Ol.ArchiveRootPath,
+                                                                 _globals.FS.FldrRoot)).ConfigureAwait(false);
+                if (folder is not null)
+                {
+                    await _dataModel.MoveToFolder(folder,
+                                                  _globals.Ol.ArchiveRootPath,
+                                                  SaveAttachments,
+                                                  SaveEmail,
+                                                  SavePictures,
+                                                  MoveConversation).ConfigureAwait(false);
+                    await _formViewer.UiSyncContext;
+                    _formViewer.Dispose();
+                    Cleanup();
+                }
+            }
+        }
+
+        async public Task RefreshSuggestionsAsync()
+        {
+            await TaskPriority.Run(PriorityScheduler.AboveNormal, ()=> _dataModel.RefreshSuggestions());
+            var matches = await TaskPriority<string[]>.Run(
+                PriorityScheduler.AboveNormal, ()=> _dataModel.FindMatches(_formViewer.SearchText.Text));
+            
+            await _formViewer.UiSyncContext;
+            _formViewer.FolderListBox.DataSource = matches;
+            if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
+        }
+
         #endregion
 
         #region Helper Methods
 
+        async public Task KbdExecuteAsync(Func<Task> action)
+        {
+            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+            await action();
+        }
+
+        async internal Task JumpToAsync(Control control)
+        {
+            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+            await _formViewer.UiSyncContext;
+            control.Focus();
+        }
+        
         public void MaximizeFormViewer()
         {
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -245,27 +335,24 @@ namespace QuickFiler.Controllers
         {
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Minimized;
         }
+        
+        async public Task ToggleCheckboxAsync(CheckBox checkBox)
+        {
+            await _formViewer.UiSyncContext;
+            checkBox.Checked = !checkBox.Checked;
+            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+        }
 
         public void ToggleOffNavigation(bool async)
         {
-            _homeController.KeyboardHndlr.KdCharActions.Remove('S');
-            _homeController.KeyboardHndlr.KdCharActions.Remove('F');
-
+            KeyboardActions.Keys.ForEach(key => _homeController.KeyboardHndlr.KdCharActions.Remove(key));
             ToggleTips(async, Enums.ToggleState.Off);
         }
 
         public void ToggleOnNavigation(bool async)
         {
-            _homeController.KeyboardHndlr.KdCharActions.Add('S', (x) => _formViewer.SearchText.Focus());
-            _homeController.KeyboardHndlr.KdCharActions.Add('F', (x) => _formViewer.FolderListBox.Focus());
-
-
+            KeyboardActions.ForEach(x => _homeController.KeyboardHndlr.KdCharActions.Add(x.Key, x.Value));
             ToggleTips(async, Enums.ToggleState.On);
-        }
-
-        internal void JumpTo(Control control)
-        {
-            control.Focus();
         }
 
         public void ToggleTips(bool async)
@@ -321,6 +408,15 @@ namespace QuickFiler.Controllers
                 var selectedFolder = SelectedFolder;
                 return !(selectedFolder is null || selectedFolder == "" || selectedFolder.Length < 3 || selectedFolder.Substring(0, 3) == "===");
             }
+        }
+
+        public T Initialized<T>(T instance, Func<T> initializer)
+        {
+            if (instance is null)
+            {
+                instance = initializer();
+            }
+            return instance;
         }
 
         #endregion

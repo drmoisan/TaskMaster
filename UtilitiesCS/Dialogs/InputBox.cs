@@ -18,8 +18,7 @@ namespace UtilitiesCS
             viewer.Message.Text = Prompt;
             viewer.Text = Title;
             viewer.Input.Text = DefaultResponse;
-            viewer.Input.Focus();
-
+            viewer.Input.Select();
             DialogResult result = viewer.ShowDialog();
             if (result == DialogResult.OK)
             {

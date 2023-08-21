@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.Tlp = new System.Windows.Forms.TableLayoutPanel();
+            this.LblAcTrash = new System.Windows.Forms.Label();
+            this.LblAcFolderList = new System.Windows.Forms.Label();
+            this.LblAcSearch = new System.Windows.Forms.Label();
             this.SearchText = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -42,9 +45,6 @@
             this.SaveEmail = new System.Windows.Forms.CheckBox();
             this.SavePictures = new System.Windows.Forms.CheckBox();
             this.MoveConversation = new System.Windows.Forms.CheckBox();
-            this.LblAcSearch = new System.Windows.Forms.Label();
-            this.LblAcFolderList = new System.Windows.Forms.Label();
-            this.LblAcTrash = new System.Windows.Forms.Label();
             this.LblAcAttachments = new System.Windows.Forms.Label();
             this.LblAcEmail = new System.Windows.Forms.Label();
             this.LblAcPictures = new System.Windows.Forms.Label();
@@ -119,6 +119,51 @@
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.Tlp.Size = new System.Drawing.Size(2084, 783);
             this.Tlp.TabIndex = 0;
+            // 
+            // LblAcTrash
+            // 
+            this.LblAcTrash.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LblAcTrash.AutoSize = true;
+            this.LblAcTrash.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcTrash.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcTrash.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcTrash.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcTrash.Location = new System.Drawing.Point(1840, 112);
+            this.LblAcTrash.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcTrash.Name = "LblAcTrash";
+            this.LblAcTrash.Size = new System.Drawing.Size(34, 33);
+            this.LblAcTrash.TabIndex = 19;
+            this.LblAcTrash.Text = "T";
+            // 
+            // LblAcFolderList
+            // 
+            this.LblAcFolderList.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.LblAcFolderList.AutoSize = true;
+            this.LblAcFolderList.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcFolderList.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcFolderList.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcFolderList.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcFolderList.Location = new System.Drawing.Point(33, 262);
+            this.LblAcFolderList.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
+            this.LblAcFolderList.Name = "LblAcFolderList";
+            this.LblAcFolderList.Size = new System.Drawing.Size(34, 33);
+            this.LblAcFolderList.TabIndex = 18;
+            this.LblAcFolderList.Text = "F";
+            // 
+            // LblAcSearch
+            // 
+            this.LblAcSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LblAcSearch.AutoSize = true;
+            this.LblAcSearch.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcSearch.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcSearch.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcSearch.Location = new System.Drawing.Point(32, 112);
+            this.LblAcSearch.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcSearch.Name = "LblAcSearch";
+            this.LblAcSearch.Size = new System.Drawing.Size(35, 33);
+            this.LblAcSearch.TabIndex = 17;
+            this.LblAcSearch.Text = "S";
             // 
             // SearchText
             // 
@@ -206,6 +251,7 @@
             // Cancel
             // 
             this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.Cancel.Image = global::QuickFiler.Properties.Resources.Cancel;
             this.Cancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.Cancel.Location = new System.Drawing.Point(748, 611);
@@ -290,51 +336,6 @@
             this.MoveConversation.TabIndex = 16;
             this.MoveConversation.Text = "Conversation";
             this.MoveConversation.UseVisualStyleBackColor = true;
-            // 
-            // LblAcSearch
-            // 
-            this.LblAcSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblAcSearch.AutoSize = true;
-            this.LblAcSearch.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcSearch.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcSearch.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcSearch.Location = new System.Drawing.Point(32, 112);
-            this.LblAcSearch.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcSearch.Name = "LblAcSearch";
-            this.LblAcSearch.Size = new System.Drawing.Size(35, 33);
-            this.LblAcSearch.TabIndex = 17;
-            this.LblAcSearch.Text = "S";
-            // 
-            // LblAcFolderList
-            // 
-            this.LblAcFolderList.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.LblAcFolderList.AutoSize = true;
-            this.LblAcFolderList.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcFolderList.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcFolderList.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcFolderList.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcFolderList.Location = new System.Drawing.Point(33, 262);
-            this.LblAcFolderList.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
-            this.LblAcFolderList.Name = "LblAcFolderList";
-            this.LblAcFolderList.Size = new System.Drawing.Size(34, 33);
-            this.LblAcFolderList.TabIndex = 18;
-            this.LblAcFolderList.Text = "F";
-            // 
-            // LblAcTrash
-            // 
-            this.LblAcTrash.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblAcTrash.AutoSize = true;
-            this.LblAcTrash.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcTrash.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcTrash.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcTrash.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcTrash.Location = new System.Drawing.Point(1840, 112);
-            this.LblAcTrash.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcTrash.Name = "LblAcTrash";
-            this.LblAcTrash.Size = new System.Drawing.Size(34, 33);
-            this.LblAcTrash.TabIndex = 19;
-            this.LblAcTrash.Text = "T";
             // 
             // LblAcAttachments
             // 
@@ -458,8 +459,10 @@
             // 
             // EfcViewer
             // 
+            this.AcceptButton = this.Ok;
             this.AutoScaleDimensions = new System.Drawing.SizeF(19F, 37F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.Cancel;
             this.ClientSize = new System.Drawing.Size(2084, 783);
             this.Controls.Add(this.Tlp);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
