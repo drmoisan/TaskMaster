@@ -60,5 +60,18 @@ namespace QuickFiler
             };
 
         }
+        
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))
+            {
+                object sender = FromHandle(msg.HWnd);
+                var e = new KeyEventArgs(keyData);
+                _keyboardHandler.ToggleKeyboardDialog(sender, e);
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
     }
 }

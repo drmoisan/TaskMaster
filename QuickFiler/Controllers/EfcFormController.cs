@@ -116,6 +116,15 @@ namespace QuickFiler.Controllers
 
         public void WireEventHandlers()
         {
+            _homeController.KeyboardHndlr.KdCharActions = new Dictionary<char, Action<char>>();
+            _formViewer.ForAllControls(x =>
+            {
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(
+                    _homeController.KeyboardHndlr.KeyboardHandler_PreviewKeyDown);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(
+                    _homeController.KeyboardHndlr.KeyboardHandler_KeyDown);                            
+            },
+            new List<Control> {  });
             _formViewer.SaveAttachments.CheckedChanged += SaveAttachments_CheckedChanged;
             _formViewer.SaveEmail.CheckedChanged += SaveEmail_CheckedChanged;
             _formViewer.SavePictures.CheckedChanged += SavePictures_CheckedChanged;
@@ -239,12 +248,24 @@ namespace QuickFiler.Controllers
 
         public void ToggleOffNavigation(bool async)
         {
+            _homeController.KeyboardHndlr.KdCharActions.Remove('S');
+            _homeController.KeyboardHndlr.KdCharActions.Remove('F');
+
             ToggleTips(async, Enums.ToggleState.Off);
         }
 
         public void ToggleOnNavigation(bool async)
         {
+            _homeController.KeyboardHndlr.KdCharActions.Add('S', (x) => _formViewer.SearchText.Focus());
+            _homeController.KeyboardHndlr.KdCharActions.Add('F', (x) => _formViewer.FolderListBox.Focus());
+
+
             ToggleTips(async, Enums.ToggleState.On);
+        }
+
+        internal void JumpTo(Control control)
+        {
+            control.Focus();
         }
 
         public void ToggleTips(bool async)
