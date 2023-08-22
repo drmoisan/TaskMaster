@@ -168,7 +168,7 @@ namespace QuickFiler.Controllers
         public void PopulateConversation(DataFrame df)
         {
             DfConversationExpanded = df.FilterConversation(((Folder)Mail.Parent).FolderPath, false, true);
-            DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).FolderPath, true, true);
+            DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).Name, true, true);
             int count = DfConversation.Rows.Count();
             PopulateConversation(count);
         }

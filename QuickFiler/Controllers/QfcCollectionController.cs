@@ -268,7 +268,8 @@ namespace QuickFiler.Controllers
             RemoveSpecificControlGroup(selection);
 
             // TODO: Add the group to the pop out form 
-
+            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
+            popOutForm.Run();
         }
 
         public void RemoveControls()
@@ -841,9 +842,19 @@ namespace QuickFiler.Controllers
 
         #region Major Actions
 
+        async public Task CleanupAsync()
+        {
+            await RemoveControlsAsync();
+            _formViewer = null;
+            _globals = null;
+            _parent = null;
+            _itemTLP = null;
+            _itemGroups = null;
+        }
+        
         public void Cleanup()
         {
-            RemoveControlsAsync();
+            RemoveControls();
             _formViewer = null;
             _globals = null;
             _parent = null;
