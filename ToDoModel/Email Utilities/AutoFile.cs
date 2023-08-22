@@ -153,7 +153,7 @@ namespace ToDoModel
             if (objItem is MailItem)
             {
                 OlMail = (MailItem)objItem;
-                if (MailResolution_ToRemove.IsMailUnReadable(OlMail) == false)
+                if (MailResolution.IsMailUnReadable(OlMail) == false)
                 {
                     emailAddressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap, userAddress);
                     for (int i = emailAddressList.Count - 1; i >= 0; i -= 1)
@@ -226,7 +226,7 @@ namespace ToDoModel
             dictNAMES = ppl_dict.GroupBy(x => x.Value).ToDictionary(y => y.Key, z => false).ToSortedDictionary();
 
 
-            if (MailResolution_ToRemove.IsMailUnReadable(OlMail) == false)
+            if (MailResolution.IsMailUnReadable(OlMail) == false)
             {
                 addressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap, currentUserEmail);
             }

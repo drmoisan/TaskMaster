@@ -20,7 +20,7 @@ namespace QuickFiler.Controllers
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public QfcExplorerController(Enums.InitTypeEnum initType, IApplicationGlobals appGlobals, IQfcHomeController parent)
+        public QfcExplorerController(Enums.InitTypeEnum initType, IApplicationGlobals appGlobals, IFilerHomeController parent)
         {
             _initType = initType;
             _globals = appGlobals;
@@ -30,7 +30,7 @@ namespace QuickFiler.Controllers
         
         private Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
-        private IQfcHomeController _parent;
+        private IFilerHomeController _parent;
         private Explorer _activeExplorer;
         private Outlook.View _objView;
         private string _objViewMem;
@@ -130,9 +130,9 @@ namespace QuickFiler.Controllers
         //PRIORITY: Implement OpenQFItem
         async public Task OpenQFItem(MailItem mailItem)
         {
-            _parent.FormCtrlr.MinimizeQfcFormViewer();
+            _parent.FormCtrlr.MinimizeFormViewer();
             NavigateToOutlookFolder(mailItem);
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & AutoFile.AreConversationsGrouped(_activeExplorer))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
                 await Task.Run(() => ExplConvView_ToggleOff());
             
             if (_activeExplorer.IsItemSelectableInView(mailItem))
@@ -151,7 +151,7 @@ namespace QuickFiler.Controllers
                     "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                 if (result == DialogResult.Yes) { mailItem.Display(); }
             }
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort) & BlShowInConversations)
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort) & BlShowInConversations)
                 await Task.Run(() => ExplConvView_ToggleOn());
         }
 
@@ -211,7 +211,7 @@ namespace QuickFiler.Controllers
             }
             else if (folderCurrent.FolderPath.Contains(StrRoot) & (folderCurrent.FolderPath != StrRoot))
             {
-                strFolderPath = folderCurrent.ToFsFolder(OlFolderRoot: _globals.Ol.ArchiveRootPath, FsFolderRoot: _globals.FS.FldrRoot);
+                strFolderPath = folderCurrent.ToFsFolderpath(olAncestor: _globals.Ol.ArchiveRootPath, fsAncestorEquivalent: _globals.FS.FldrRoot);
             }
             // strFolderPath = _globals.FS.FldrRoot & Right(folderCurrent.FolderPath, Len(folderCurrent.FolderPath) - Len(_globals.Ol.ArchiveRootPath) - 1)
             else
@@ -273,7 +273,7 @@ namespace QuickFiler.Controllers
 
             // If strTemp2 = "" Then Add_Recent(SortFolderpath)
             if (string.IsNullOrEmpty(strTemp2))
-                _globals.AF.RecentsList.AddRecent(SortFolderpath);
+                _globals.AF.RecentsList.Add(SortFolderpath);
             loc = Path.Combine(StrRoot, SortFolderpath);
             sortFolder = new FolderHandler(_globals).GetFolder(loc); // Call Function to turn text to Folder
 
@@ -327,11 +327,11 @@ namespace QuickFiler.Controllers
             _globals.Ol.MovedMails_Stack.Push(oMailTmp);
 
             // TODO: Change this into a JSON file
-            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);
+            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath);
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
-            FileIO2.WriteTextFile(_globals.FS.Filenames.EmailMoves, strOutput, _globals.FS.FldrMyD);
+            FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
 
         //private static string SanitizeArrayLineTSV(ref string[] strOutput)

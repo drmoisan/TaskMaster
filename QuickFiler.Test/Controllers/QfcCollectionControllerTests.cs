@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using UtilitiesCS;
+using System.Threading.Tasks;
 
 namespace QuickFiler.Test.Controllers
 {
@@ -19,9 +20,9 @@ namespace QuickFiler.Test.Controllers
 
         private Mock<IApplicationGlobals> mockApplicationGlobals;
         private QfcFormViewer formViewer;
-        private Mock<IQfcFormController> mockQfcFormController;
+        private Mock<IFilerFormController> mockQfcFormController;
         private Mock<IQfcKeyboardHandler> mockKeyboardHandler;
-        private Mock<IQfcHomeController> mockHomeController;
+        private Mock<IFilerHomeController> mockHomeController;
 
         [TestInitialize]
         public void TestInitialize()
@@ -32,9 +33,9 @@ namespace QuickFiler.Test.Controllers
             //this.mockQfcFormViewer = this.mockRepository.Create<QfcFormViewer>();
             //this.mockQfcFormViewer.SetupAllProperties();
             this.formViewer = new QfcFormViewer();
-            this.mockQfcFormController = this.mockRepository.Create<IQfcFormController>();
+            this.mockQfcFormController = this.mockRepository.Create<IFilerFormController>();
             this.mockKeyboardHandler = this.mockRepository.Create<IQfcKeyboardHandler>();
-            this.mockHomeController = this.mockRepository.Create<IQfcHomeController>();
+            this.mockHomeController = this.mockRepository.Create<IFilerHomeController>();
         }
 
         private QfcCollectionController CreateQfcCollectionController()
@@ -43,7 +44,7 @@ namespace QuickFiler.Test.Controllers
                 this.mockApplicationGlobals.Object,
                 this.formViewer, //.Object,
                 false,
-                Enums.InitTypeEnum.InitSort,
+                Enums.InitTypeEnum.Sort,
                 this.mockHomeController.Object,
                 this.mockQfcFormController.Object);
         }
@@ -98,7 +99,7 @@ namespace QuickFiler.Test.Controllers
             var qfcCollectionController = this.CreateQfcCollectionController();
 
             // Act
-            qfcCollectionController.RemoveControls();
+            qfcCollectionController.RemoveControlsAsync();
 
             // Assert
             Assert.Fail();
@@ -302,15 +303,14 @@ namespace QuickFiler.Test.Controllers
         }
 
         [TestMethod]
-        public void MoveEmails_StateUnderTest_ExpectedBehavior()
+        async public Task MoveEmails_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
             var qfcCollectionController = this.CreateQfcCollectionController();
-            StackObjectCS<MailItem> stackMovedItems = null;
+            ScoStack<IMovedMailInfo> stackMovedItems = null;
 
             // Act
-            qfcCollectionController.MoveEmails(
-                stackMovedItems);
+            await qfcCollectionController.MoveEmails(stackMovedItems);
 
             // Assert
             Assert.Fail();

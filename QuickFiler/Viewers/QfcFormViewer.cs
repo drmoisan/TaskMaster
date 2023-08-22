@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,14 +17,18 @@ namespace QuickFiler
         public QfcFormViewer()
         {
             InitializeComponent();
+            _context = SynchronizationContext.Current;
             //this.KeyPreview = true;
         }
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private IQfcFormController _formController;
+        private IFilerFormController _formController;
         private IQfcKeyboardHandler _keyboardHandler;
 
-        public void SetController(IQfcFormController controller)
+        private SynchronizationContext _context;
+        public SynchronizationContext UiSyncContext { get => _context; }
+
+        public void SetController(IFilerFormController controller)
         {
             _formController = controller;
         }

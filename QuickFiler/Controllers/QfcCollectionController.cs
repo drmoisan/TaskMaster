@@ -20,8 +20,8 @@ namespace QuickFiler.Controllers
                                        QfcFormViewer viewerInstance,
                                        bool darkMode,
                                        Enums.InitTypeEnum InitType,
-                                       IQfcHomeController homeController,
-                                       IQfcFormController parent)
+                                       IFilerHomeController homeController,
+                                       IFilerFormController parent)
         {
 
             _formViewer = viewerInstance;
@@ -44,8 +44,8 @@ namespace QuickFiler.Controllers
         private QfcFormViewer _formViewer;
         private Enums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
-        private IQfcHomeController _homeController;
-        private IQfcFormController _parent;
+        private IFilerHomeController _homeController;
+        private IFilerFormController _parent;
         private int _itemHeight;
         private Panel _itemPanel;
         private TableLayoutPanel _itemTLP;
@@ -268,12 +268,12 @@ namespace QuickFiler.Controllers
             RemoveSpecificControlGroup(selection);
 
             // TODO: Add the group to the pop out form 
-
+            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
+            popOutForm.Run();
         }
 
         public void RemoveControls()
         {
-            //TODO: Optimize removal so all are removed at once using new helper
             if (_itemGroups is not null)
             {
                 var tlpState = TlpLayout;
@@ -284,15 +284,31 @@ namespace QuickFiler.Controllers
 
                 ResetPanelHeight();
 
-                int max = _itemGroups.Count - 1;
-                for (int i = max; i >= 0; i--)
-                {
-                    // Remove event managers and dispose unmanaged
-                    _itemGroups[i].ItemController.Cleanup();
+                _itemGroups.ForEach(grp => grp.ItemController.Cleanup());
 
-                    // Remove Handle on item viewer and controller
-                    _itemGroups.RemoveAt(i);
-                }
+                _itemGroups.Clear();
+
+                TlpLayout = tlpState;
+            }
+        }
+
+        async public Task RemoveControlsAsync()
+        {
+            if (_itemGroups is not null)
+            {
+                await _formViewer.UiSyncContext;
+
+                var tlpState = TlpLayout;
+                TlpLayout = false;
+
+                // Remove Item Viewers and Rows from the form
+                TableLayoutHelper.RemoveSpecificRow(_itemTLP, 0, _itemGroups.Count);
+
+                await ResetPanelHeightAsync();
+
+                _itemGroups.ForEach(grp => grp.ItemController.Cleanup());
+                
+                _itemGroups.Clear();
 
                 TlpLayout = tlpState;
             }
@@ -750,6 +766,21 @@ namespace QuickFiler.Controllers
             }
         }
 
+        async public Task ResetPanelHeightAsync()
+        {
+            await _formViewer.UiSyncContext;
+            var ht = (int)Math.Round(_itemTLP.RowStyles
+                                             .Cast<RowStyle>()
+                                             .Sum(rowStyle => rowStyle.Height)
+                                     ,0);
+            
+            _itemTLP.MinimumSize = new System.Drawing.Size(
+                _itemTLP.MinimumSize.Width, ht);
+
+            _itemTLP.Height = ht;
+            _itemTLP.Parent.Height = ht;
+        }
+        
         public void ResetPanelHeight()
         {
             var ht = 0;
@@ -762,8 +793,6 @@ namespace QuickFiler.Controllers
 
                 _itemTLP.MinimumSize = new System.Drawing.Size(
                     _itemTLP.MinimumSize.Width, ht);
-                //ht = _itemTLP.Height - (int)Math.Round(_itemTLP.RowStyles[_itemTLP.RowStyles.Count - 1].Height, 0);
-                //ht = Math.Max(_parent.SpaceForEmail, ht);
                 _itemTLP.Height = ht;
             }));
             var panel = _itemTLP.Parent;
@@ -813,6 +842,16 @@ namespace QuickFiler.Controllers
 
         #region Major Actions
 
+        async public Task CleanupAsync()
+        {
+            await RemoveControlsAsync();
+            _formViewer = null;
+            _globals = null;
+            _parent = null;
+            _itemTLP = null;
+            _itemGroups = null;
+        }
+        
         public void Cleanup()
         {
             RemoveControls();
@@ -823,13 +862,12 @@ namespace QuickFiler.Controllers
             _itemGroups = null;
         }
 
-        public void MoveEmails(StackObjectCS<MailItem> stackMovedItems)
+        async public Task MoveEmails(ScoStack<IMovedMailInfo> stackMovedItems)
         {
             foreach (var grp in _itemGroups)
             {
                 //TODO: function needed to shut off KeyboardDialog at this step if active
-                grp.ItemController.MoveMail();
-                stackMovedItems.Push(grp.MailItem);
+                await grp.ItemController.MoveMail();
             }
         }
 
@@ -871,7 +909,7 @@ namespace QuickFiler.Controllers
             return strOutput;
         }
 
-        public string xComma(string str)
+        public static string xComma(string str)
         {
             string xCommaRet = default;
             string strTmp;

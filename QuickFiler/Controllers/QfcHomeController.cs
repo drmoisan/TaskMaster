@@ -12,38 +12,36 @@ using System.IO;
 
 namespace QuickFiler.Controllers
 {
-    public class QfcHomeController : IQfcHomeController
+    public class QfcHomeController : IFilerHomeController
     {
         #region Constructors, Initializers, and Destructors
 
         public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
         {
             _globals = AppGlobals;
-            InitAfObjects();
+            //InitAfObjects();
             _parentCleanup = ParentCleanup;
-            _datamodel = new QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
-            _explorerController = new QfcExplorerController(Enums.InitTypeEnum.InitSort, _globals, this);
+            _datamodel = new QfcDatamodel(_globals);
+            _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, _globals, this);
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
-            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.InitSort, Cleanup, this);
+            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.Sort, Cleanup, this);
         }
 
-        
-        
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
 
         #endregion Constructors, Initializers, and Destructors
 
-        internal void InitAfObjects() 
-        {
-            if (_globals.AF.CtfMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CtfMap)}"); }
-            if (_globals.AF.RecentsList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.RecentsList)}"); }
-            if (_globals.AF.CommonWords is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CommonWords)}"); }
-            if (_globals.AF.SubjectMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.SubjectMap)}"); }
-            if (_globals.AF.Encoder is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.Encoder)}"); }
-            _globals.AF.SubjectMap.Where(x => x.Encoder is null).ForEach(x => x.Encoder = _globals.AF.Encoder);
-        }
+        //internal void InitAfObjects() 
+        //{
+        //    if (_globals.AF.CtfMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CtfMap)}"); }
+        //    if (_globals.AF.RecentsList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.RecentsList)}"); }
+        //    if (_globals.AF.CommonWords is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CommonWords)}"); }
+        //    if (_globals.AF.SubjectMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.SubjectMap)}"); }
+        //    if (_globals.AF.Encoder is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.Encoder)}"); }
+        //    _globals.AF.SubjectMap.Where(x => x.Encoder is null).ForEach(x => x.Encoder = _globals.AF.Encoder);
+        //}
 
         public void Run()
         {
@@ -65,14 +63,7 @@ namespace QuickFiler.Controllers
             _formController.LoadItems(listObjects);
         }
 
-        public void ExecuteMoves()
-        {
-            _formController.Groups.MoveEmails(DataModel.MovedItems);
-            QuickFileMetrics_WRITE("9999TimeWritingEmail.csv");
-            _formController.Groups.RemoveControls();
-            Iterate();
-        }
-
+        
         public void QuickFileMetrics_WRITE(string filename)
         {
 
@@ -85,14 +76,11 @@ namespace QuickFiler.Controllers
             AppointmentItem OlAppointment;
             Folder OlEmailCalendar;
 
-
             // Create a line of comma seperated valued to store data
             curDateText = DateTime.Now.ToString("MM/dd/yyyy");
-            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curDateText = " & curDateText
-
+            
             curTimeText = DateTime.Now.ToString("hh:mm");
-            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable curTimeText = " & curTimeText
-
+            
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
             LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
@@ -125,12 +113,12 @@ namespace QuickFiler.Controllers
                 OlAppointment.Save();
             }
 
+
             string[] strOutput = _formController.Groups
-                .GetMoveDiagnostics(durationText, durationMinutesText, Duration, 
+                .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
                 dataLineBeg, OlEndTime, ref OlAppointment);
 
             FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
-
         }
 
         public void Cleanup()
@@ -143,13 +131,14 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
-        public bool Loaded { get => _formViewer is not null; }
+        private bool _loaded = false;
+        public bool Loaded { get => _loaded; }
 
         private IQfcExplorerController _explorerController;
         public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
         
-        private IQfcFormController _formController;
-        public IQfcFormController FormCtrlr { get => _formController; }
+        private QfcFormController _formController;
+        public IFilerFormController FormCtrlr { get => _formController; }
         
         private IQfcKeyboardHandler _keyboardHandler;
         public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
@@ -161,10 +150,8 @@ namespace QuickFiler.Controllers
         public cStopWatch StopWatch { get => _stopWatch; }
 
         private QfcFormViewer _formViewer;
-        public QfcFormViewer FormViewer { get => _formViewer; }
+        //public QfcFormViewer FormViewer { get => _formViewer; }
 
         
-
-
     }
 }

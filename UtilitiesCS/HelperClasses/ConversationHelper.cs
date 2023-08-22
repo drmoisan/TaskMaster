@@ -159,14 +159,13 @@ namespace UtilitiesCS
         }
 
         //PERFORMANCE: Add async version of FilterConversation
-        public static DataFrame FilterConversation(this DataFrame df, bool SameFolder, bool MailOnly)
+        public static DataFrame FilterConversation(this DataFrame df, string foldername, bool SameFolder, bool MailOnly)
         {
             if (df != null)
             {
                 if (SameFolder)
                 {
-                    string FolderName = df["Folder Name"][0] as string;
-                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
+                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(foldername));
                 }
                 if (MailOnly)
                 {

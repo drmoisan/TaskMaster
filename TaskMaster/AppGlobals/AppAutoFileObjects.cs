@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using QuickFiler;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,6 +11,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
@@ -36,7 +39,8 @@ namespace TaskMaster
                 LoadRecentsListAsync(),
                 LoadCtfMapAsync(),
                 LoadCommonWordsAsync(),
-                LoadSubjectMapAndEncoderAsync()
+                LoadSubjectMapAndEncoderAsync(),
+                LoadMovedMailsAsync()
             };
             await Task.WhenAll(tasks);
             Debug.WriteLine($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
@@ -48,8 +52,10 @@ namespace TaskMaster
         private CtfMap _ctfMap;
         private ISerializableList<string> _commonWords;
         private Properties.Settings _defaults = Properties.Settings.Default;
-        
 
+        private System.Action _maximizeQuickFileWindow = null;
+        public System.Action MaximizeQuickFileWindow { get => _maximizeQuickFileWindow; set => _maximizeQuickFileWindow = value; }
+        
         public int LngConvCtPwr
         {
             get => _defaults.ConversationExponent;
@@ -84,12 +90,28 @@ namespace TaskMaster
 
         public int MaxRecents { get => _defaults.MaxRecents; set { _defaults.MaxRecents = value; _defaults.Save(); } }
 
+        private ScoStack<IMovedMailInfo> _movedMails;
+        public ScoStack<IMovedMailInfo> MovedMails { get => Initialized(_movedMails, LoadMovedMails); }
+        private ScoStack<IMovedMailInfo> LoadMovedMails()
+        {
+            var movedMails = new ScoStack<IMovedMailInfo>(filename: _defaults.FileName_MovedEmails,
+                                                          folderpath: _parent.FS.FldrPythonStaging,
+                                                          askUserOnError: false);
+            return movedMails;
+        }
+        async private Task LoadMovedMailsAsync()
+        {
+            await TaskPriority.Run(
+                PriorityScheduler.BelowNormal,
+                () => _movedMails = LoadMovedMails());
+        }
+
         public IRecentsList<string> RecentsList
         {
             get
             {
                 if (_recentsList is null)
-                    _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrFlow, max: MaxRecents);
+                    _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents);
                 return _recentsList;
             }
             set
@@ -97,7 +119,7 @@ namespace TaskMaster
                 _recentsList = value;
                 if (_recentsList.Folderpath == "")
                 {
-                    _recentsList.Folderpath = _parent.FS.FldrFlow;
+                    _recentsList.Folderpath = _parent.FS.FldrPythonStaging;
                     _recentsList.Filename = Properties.Settings.Default.FileName_Recents;
                 }
                 _recentsList.Serialize();
@@ -106,7 +128,7 @@ namespace TaskMaster
         async private Task LoadRecentsListAsync()
         {
             await Task.Factory.StartNew(
-                () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrFlow, max: MaxRecents),
+                () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
                 default,
                 TaskCreationOptions.None,
                 PriorityScheduler.BelowNormal);
@@ -260,12 +282,27 @@ namespace TaskMaster
                  default,
                  TaskCreationOptions.None,
                  PriorityScheduler.BelowNormal);
-            
+
             await Task.Factory.StartNew(
                  () => _encoder = LoadEncoder(),
                  default,
                  TaskCreationOptions.None,
                  PriorityScheduler.BelowNormal);
+
+            await TaskPriority.Run(
+                PriorityScheduler.BelowNormal,
+                () =>
+                {
+                    var toRecode = this.SubjectMap.Where(x => x.Encoder is null || 
+                                                              x.FolderEncoded is null || 
+                                                              x.SubjectEncoded is null );
+                    if (toRecode.Any()) 
+                    {
+                        toRecode.ForEach(x => x.Encoder = this.Encoder);
+                        this.SubjectMap.Serialize();
+                    }
+                }); 
+
         }   
 
         private IList<ISubjectMapEntry> SubjectMapBackupLoader(string filepath)

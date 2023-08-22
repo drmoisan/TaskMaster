@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 using static ToDoModel.SuggestionsLegacy;
 
 namespace ToDoModel
@@ -17,9 +19,7 @@ namespace ToDoModel
 
         public Suggestions() { }
 
-        private const int maxSuggestions = 5;
-
-        private ConcurrentDictionary<string, long> _folderNameScores = new();
+        private SCODictionary<string, long> _folderNameScores = new();
         private static char[] _wordChars = { '&' };
         private Regex _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
 
@@ -43,28 +43,53 @@ namespace ToDoModel
 
         #region public methods
 
-        public void RefreshSuggestions(MailItem OlMail,
-                                       IApplicationGlobals AppGlobals,
-                                       bool ReloadCTFStagingFiles = true,
-                                       bool InBackground = false,
+        public bool LoadFromField(MailItem olMail,
+                                  IApplicationGlobals appGlobals)
+        {
+            _folderNameScores.Clear();
+            AddConversationBasedSuggestions(olMail, appGlobals);
+            if (AddOlFolderKeys(olMail, appGlobals)) { return true; }
+            else { return false; }
+        }
+
+        public bool AddOlFolderKeys(MailItem olMail,
+                                    IApplicationGlobals appGlobals,
+                                    int topN = -1)
+        {            
+            var objProperty = olMail.UserProperties.Find("FolderKey");
+            if (objProperty is null) { return false; }
+            
+            var foldersObject = objProperty.Value;
+            if (foldersObject is null) { return false; }
+            else if (foldersObject is Array) { return AddArray(foldersObject, topN); }
+            else { return AddSuggestion(foldersObject, 0); }
+        }
+
+        public void RefreshSuggestions(MailItem olMail,
+                                       IApplicationGlobals appGlobals,
+                                       int topNfolderKeys = -1,
                                        bool parallel = false)
         {
-            var _globals = AppGlobals;
+            var _globals = appGlobals;
             _folderNameScores.Clear();
 
-            AddConversationBasedSuggestions(OlMail, _globals);
-            AddAnythingInAutoFileField(OlMail, _globals);
-            if ((OlMail.Subject is not null) && (OlMail.Subject.Length > 0))
+            AddConversationBasedSuggestions(olMail, _globals);
+            if (topNfolderKeys > 0)
             {
-                var target = new SubjectMapEntry(emailSubject: OlMail.Subject,
-                                                 emailSubjectCount: 1,
-                                                 commonWords: AppGlobals.AF.CommonWords,
-                                                 tokenizerRegex: _tokenizerRegex,
-                                                 encoder: AppGlobals.AF.Encoder);
-                if (!target.SubjectEncoded.SequenceEqual(new int[] { }))
-                {
-                    AddWordSequenceSuggestions(target, AppGlobals, parallel);
-                }
+                AddOlFolderKeys(olMail, _globals, topNfolderKeys);
+            }
+
+            AddWordSequenceSuggestions(olMail, appGlobals, parallel);
+        }
+
+        public bool AddSuggestion(object folderObject, long score)
+        {
+            var folder = folderObject as string;
+            if ((folder is null) || (folder == "Error")) { return false; }
+            else
+            {
+                AddSuggestion(folder, score);
+                return true;
             }
         }
 
@@ -74,24 +99,40 @@ namespace ToDoModel
                 _folderNameScores[folderPath] += score;
         }
 
-        public void FromArray(string[] folderPaths)
+        public bool AddArray(object foldersObject, int topN)
         {
-            _folderNameScores.Clear();
-            foreach (var folderPath in folderPaths)
+            string[] folders = foldersObject as string[];
+            return AddArray(folders, topN);
+        }
+
+        public bool AddArray(string[] folders, int topN)
+        {
+            if ((folders is null) || (folders[0] == "Error")) { return false; }
+            else
             {
-                AddSuggestion(folderPath, 0);
+                if (topN > 0) { folders = folders.Take(topN).ToArray(); }
+                folders.ForEach(folder => AddSuggestion(folder, 0));
+                return true;
             }
         }
 
-        public string[] ToArray() => _folderNameScores.Keys.ToArray();
+        public void FromArray(string[] folderPaths)
+        {
+            _folderNameScores.Clear(); 
+            AddArray(folderPaths, -1);
+        }
 
-        internal void AddConversationBasedSuggestions(MailItem OlMail, IApplicationGlobals _globals)
+        public string[] ToArray() => _folderNameScores.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
+
+        public string[] ToArray(int topN) => _folderNameScores.OrderByDescending(x=>x.Value).Take(topN).Select(x=>x.Key).ToArray();
+
+        internal void AddConversationBasedSuggestions(MailItem OlMail, IApplicationGlobals _globals, int topN = 5)
         {
             var map = _globals.AF.CtfMap;
             // Is the conversationID already mapped to an email Folder. If so, grab the index of it
             if (map.ContainsId(OlMail.ConversationID))
             {
-                var matches = map.TopEntriesById(OlMail.ConversationID, 5);
+                var matches = map.TopEntriesById(OlMail.ConversationID, topN);
                 foreach (var match in matches)
                 {
                     long score = match.EmailCount;
@@ -99,14 +140,6 @@ namespace ToDoModel
                     AddSuggestion(match.EmailFolder, score);
                 }
             }
-
-            //// Is the conversationID already mapped to an email Folder. If so, grab the index of it
-            //int Inc_Num = _globals.AF.CtfMap.FindId(OlMail.ConversationID);
-
-            //// If an incidence is found score it and add it to the list of suggestions
-            //if (Inc_Num > 0) { ScoreAndAddConv(_globals.AF.CtfMap.CTF_Inc[Inc_Num], 
-            //                                   _globals.AF.LngConvCtPwr, 
-            //                                   _globals.AF.Conversation_Weight); }
         }
 
         internal void ScoreAndAddConv(CtfIncidence ctfIncidence, int convCtPwr, int convWeight)
@@ -123,17 +156,22 @@ namespace ToDoModel
             }
         }
 
-        internal void AddAnythingInAutoFileField(MailItem OlMail, IApplicationGlobals _globals)
+        internal void AddWordSequenceSuggestions(MailItem olMail, IApplicationGlobals appGlobals, bool parallel = true)
         {
-            // TODO: Determine if this property still exists
-            dynamic objProperty = OlMail.UserProperties.Find("AutoFile");
-            if (objProperty is not null)
+            if ((olMail.Subject is not null) && (olMail.Subject.Length > 0))
             {
-                AddSuggestion(objProperty.Value, (long)Math.Round(Math.Pow(4d, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight));
-                throw new NotImplementedException("Please investigate what this is and why it fired");
+                var target = new SubjectMapEntry(emailSubject: olMail.Subject,
+                                                 emailSubjectCount: 1,
+                                                 commonWords: appGlobals.AF.CommonWords,
+                                                 tokenizerRegex: _tokenizerRegex,
+                                                 encoder: appGlobals.AF.Encoder);
+                if (!target.SubjectEncoded.SequenceEqual(new int[] { }))
+                {
+                    AddWordSequenceSuggestions(target, appGlobals, parallel);
+                }
             }
         }
-                
+
         internal void AddWordSequenceSuggestions(SubjectMapEntry target, IApplicationGlobals appGlobals, bool parallel = true)
         {
             int matchScore = appGlobals.AF.SmithWatterman_MatchScore;

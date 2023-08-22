@@ -257,8 +257,8 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.2\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -273,6 +273,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\EfcDataModel.cs" />
+    <Compile Include="Controllers\EfcFormController.cs" />
+    <Compile Include="Controllers\EfcHomeController.cs" />
+    <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\Theme.cs" />
@@ -283,8 +287,8 @@
     <Compile Include="Interfaces\IQfcCollectionController.cs" />
     <Compile Include="Interfaces\IQfcDatamodel.cs" />
     <Compile Include="Interfaces\IQfcExplorerController.cs" />
-    <Compile Include="Interfaces\IQfcFormController.cs" />
-    <Compile Include="Interfaces\IQfcHomeController.cs" />
+    <Compile Include="Interfaces\IFilerFormController.cs" />
+    <Compile Include="Interfaces\IFilerHomeController.cs" />
     <Compile Include="Interfaces\IQfcItemController.cs" />
     <Compile Include="Interfaces\IQfcKeyboardHandler.cs" />
     <Compile Include="Legacy\AcceleratorParser.cs" />
@@ -312,11 +316,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Helper Classes\ThemeHelper.cs" />
-    <Compile Include="Viewers\Form1.cs">
-      <SubType>Form</SubType>
+    <Compile Include="Viewers\QfcItemViewerExpanded.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Viewers\Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Viewers\QfcItemViewerExpanded.Designer.cs">
+      <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewers\QfcFormViewer.cs">
       <SubType>Form</SubType>
@@ -335,53 +339,17 @@
       <DependentUpon>QfcFormLegacyViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Controllers\QfcDatamodel.cs" />
-    <Compile Include="Viewers\QfcFormViewerExpanded.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Viewers\QfcFormViewerExpanded.Designer.cs">
-      <DependentUpon>QfcFormViewerExpanded.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\QfcFormViewerDark.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Viewers\QfcFormViewerDark.Designer.cs">
-      <DependentUpon>QfcFormViewerDark.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\QfcItemViewerExpandedLight.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Viewers\QfcItemViewerExpandedLight.Designer.cs">
-      <DependentUpon>QfcItemViewerExpandedLight.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\QfcItemViewerV1.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Viewers\QfcItemViewerV1.Designer.cs">
-      <DependentUpon>QfcItemViewerV1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\QFCItemViewerLightNew.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Viewers\QFCItemViewerLightNew.Designer.cs">
-      <DependentUpon>QFCItemViewerLightNew.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\QFCItemViewerDarkNew.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Viewers\QFCItemViewerDarkNew.Designer.cs">
-      <DependentUpon>QFCItemViewerDarkNew.cs</DependentUpon>
-    </Compile>
     <Compile Include="Viewers\QfcItemViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Viewers\QfcItemViewer.Designer.cs">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Viewers\QfcItemViewerLightSelected.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="Viewers\EfcViewer.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewers\QfcItemViewerLightSelected.Designer.cs">
-      <DependentUpon>QfcItemViewerLightSelected.cs</DependentUpon>
+    <Compile Include="Viewers\EfcViewer.Designer.cs">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -389,38 +357,20 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx">
+      <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcFormViewer.resx">
       <DependentUpon>QfcFormViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QfcFormViewerExpanded.resx">
-      <DependentUpon>QfcFormViewerExpanded.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QfcFormViewerDark.resx">
-      <DependentUpon>QfcFormViewerDark.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QfcItemViewerExpandedLight.resx">
-      <DependentUpon>QfcItemViewerExpandedLight.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QfcItemViewerV1.resx">
-      <DependentUpon>QfcItemViewerV1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Legacy\QfcFormLegacyViewer.resx">
       <DependentUpon>QfcFormLegacyViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QFCItemViewerLightNew.resx">
-      <DependentUpon>QFCItemViewerLightNew.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QFCItemViewerDarkNew.resx">
-      <DependentUpon>QFCItemViewerDarkNew.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\QfcItemViewerLightSelected.resx">
-      <DependentUpon>QfcItemViewerLightSelected.cs</DependentUpon>
+    <EmbeddedResource Include="Viewers\EfcViewer.resx">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -505,6 +455,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\EmailHeader.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewFolder.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Run.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewFolder.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -26,10 +26,11 @@ namespace QuickFiler
         private IList<Label> _tipsLabels;
         private IQfcItemController _controller;
         private CoreWebView2Environment _webViewEnvironment;
-        private SynchronizationContext _context;
 
         public IList<Label> TipsLabels { get => _tipsLabels; }
         public IQfcItemController Controller { get => _controller; set => _controller = value; }
+        
+        private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
 
         private void InitTipsLabelsList()

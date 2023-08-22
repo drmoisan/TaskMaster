@@ -74,6 +74,7 @@ namespace TaskMaster
             _fldrPythonStaging = Path.Combine(_flow, "Combined", "data");
         }
 
+        //TODO: Cleanup Staging Files so that they are in one or two directories and not all over the place
         async private Task LoadFoldersAsync()
         {
             _appStaging = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskMaster");
@@ -94,73 +95,21 @@ namespace TaskMaster
             await Task.WhenAll(a, b, c);
         }
 
-        public string FldrAppData
-        {
-            get
-            {
-                return _appStaging;
-            }
-        }
+        public string FldrAppData { get => _appStaging; }
 
-        public string FldrStaging
-        {
-            get
-            {
-                return _stagingPath;
-            }
-        }
+        public string FldrStaging { get => _stagingPath; }
+        
+        public string FldrMyD { get => _myD; }
 
-        public string FldrMyD
-        {
-            get
-            {
-                return _myD;
-            }
-        }
+        public string FldrRoot { get => _oneDrive; }
+        
+        public string FldrFlow { get => _flow; }
 
-        public string FldrRoot
-        {
-            get
-            {
-                return _oneDrive;
-            }
-        }
-
-        public string FldrFlow
-        {
-            get
-            {
-                return _flow;
-            }
-        }
-
-        public string FldrPreReads
-        {
-            get
-            {
-                return _prereads;
-            }
-        }
-
-        public string FldrPythonStaging
-        {
-            get
-            {
-                return _fldrPythonStaging;
-            }
-            set
-            {
-                _fldrPythonStaging = value;
-            }
-        }
-
-        public IAppStagingFilenames Filenames
-        {
-            get
-            {
-                return _filenames;
-            }
-        }
+        public string FldrPreReads { get => _prereads; }
+        
+        public string FldrPythonStaging { get => _fldrPythonStaging; set => _fldrPythonStaging = value; }
+        
+        public IAppStagingFilenames Filenames { get => _filenames; }
 
     }
 }

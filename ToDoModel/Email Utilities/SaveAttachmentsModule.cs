@@ -358,43 +358,12 @@ namespace ToDoModel
             return CGPathRet;
         }
 
-        // ######################################
-        // Run this macro for saving attachments.
-        // ######################################
-        // Private Sub ExecuteSavingDirect(SavePath As String)
-        // Dim lNum As Long
-
-        // lNum = SaveAttachmentsFromSelection(SavePath)
-
-        // If lNum > 0 Then
-        // MsgBox(CStr(lNum) & " attachment(s) was(were) saved successfully.", vbInformation, "Message from Attachment Saver")
-        // Else
-        // MsgBox("No attachment(s) in the selected Outlook items.", vbInformation, "Message from Attachment Saver")
-        // End If
-        // End Sub
-
+        
         public static void ReplaceCharsForFileName(ref string sName, string sChr)
         {
             string patternMatch = "[/\\\\:\\?<>|&%* {}\\[\\]!]*";
             var rg = new Regex(patternMatch);
             rg.Replace(sName, sChr);
-            //sName = sName.Replace("/", sChr);
-            //sName = sName.Replace(  @"\", sChr);
-            //sName = sName.Replace(":", sChr);
-            //sName = sName.Replace("?", sChr);
-            //sName = sName.Replace('"'.ToString(), sChr);
-            //sName = sName.Replace("<", sChr);
-            //sName = sName.Replace(">", sChr);
-            //sName = sName.Replace("|", sChr);
-            //sName = sName.Replace("&", sChr);
-            //sName = sName.Replace("%", sChr);
-            //sName = sName.Replace("*", sChr);
-            //sName = sName.Replace(" ", sChr);
-            //sName = sName.Replace("{", sChr);
-            //sName = sName.Replace("[", sChr);
-            //sName = sName.Replace("]", sChr);
-            //sName = sName.Replace("}", sChr);
-            //sName = sName.Replace("!", sChr);
         }
 
     }

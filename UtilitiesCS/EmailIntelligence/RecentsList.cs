@@ -15,8 +15,8 @@ namespace UtilitiesCS
 
         private int _max = 5;
         public int Max { get => _max; set => _max = value; }
-
-        public void AddRecent(T item)
+        
+        public new void Add(T item)
         {
             base.ensureList();
             if (base.Contains(item))

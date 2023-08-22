@@ -13,11 +13,21 @@ namespace UtilitiesCS.Threading
         {
             await Task.Factory.StartNew(action, default, TaskCreationOptions.None, scheduler);
         }
+
+        async public static Task Run(PriorityScheduler scheduler, Action action)
+        {
+            await Task.Factory.StartNew(action, default, TaskCreationOptions.None, scheduler);
+        }
     }
 
     public static class TaskPriority<T>
     {
         async public static Task<T> Run(Func<T> func, PriorityScheduler scheduler)
+        {
+            return await Task<T>.Factory.StartNew(func, default, TaskCreationOptions.None, scheduler);
+        }
+
+        async public static Task<T> Run(PriorityScheduler scheduler, Func<T> func)
         {
             return await Task<T>.Factory.StartNew(func, default, TaskCreationOptions.None, scheduler);
         }

@@ -66,7 +66,7 @@ namespace QuickFiler.Legacy
             _viewer.WindowState = FormWindowState.Maximized;
             // ShowWindow(_lFormHandle, SW_SHOWMAXIMIZED)
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 // ToggleOffline
                 foreach (QfcController currentQF in _listQFClass)
@@ -139,7 +139,7 @@ namespace QuickFiler.Legacy
                 colCtrls.Add(lbl3);
             }
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 // TURN OFF IF CONDITIONAL REMINDER
                 var lbl5 = new Label();
@@ -177,7 +177,7 @@ namespace QuickFiler.Legacy
             Pnl.Controls.Add(lblSubject);
             AssignDimensions(ref lblSubject, QfcConstants.LblSubject);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitConditionalReminder))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Reminder))
                 lblSubject.Width -= (2 * lblSubject.Left);
             lblSubject.Font = new Font(lblSubject.Font.FontFamily, 16f);
             lblSubject.Text = "<SUBJECT>";
@@ -186,7 +186,7 @@ namespace QuickFiler.Legacy
             var txtboxBody = new TextBox();
             Pnl.Controls.Add(txtboxBody);
             AssignDimensions(ref txtboxBody, QfcConstants.TxtBody);
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitConditionalReminder))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Reminder))
                 txtboxBody.Width = QfcConstants.Panel.Width - txtboxBody.Left - txtboxBody.Left;
             txtboxBody.Text = "<BODY>";
             txtboxBody.Font = new Font(txtboxBody.Font.FontFamily, 10f);
@@ -205,7 +205,7 @@ namespace QuickFiler.Legacy
             lblSentOn.Font = new Font(lblSentOn.Font.FontFamily, 10f);
             colCtrls.Add(lblSentOn);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 var comboFolder = new ComboBox();
                 Pnl.Controls.Add(comboFolder);
@@ -226,7 +226,7 @@ namespace QuickFiler.Legacy
             var chbxDelFlow = new CheckBox();
             var chbxSaveMail = new CheckBox();
             var inpt = new TextBox();
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 Pnl.Controls.Add(inpt);
                 inpt.Height = QfcConstants.Inpt.Height;
@@ -321,7 +321,7 @@ namespace QuickFiler.Legacy
             cbDelItem.TabStop = false;
             colCtrls.Add(cbDelItem);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 var lblConvCt = new Label();
                 Pnl.Controls.Add(lblConvCt);
@@ -346,7 +346,7 @@ namespace QuickFiler.Legacy
             lblPos.Visible = blDebug;
             colCtrls.Add(lblPos);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 var lblAcF = new Label();
                 Pnl.Controls.Add(lblAcF);
@@ -449,7 +449,7 @@ namespace QuickFiler.Legacy
             lblAcO.Visible = blDebug;
             colCtrls.Add(lblAcO);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 var lblAcA = new Label();
                 Pnl.Controls.Add(lblAcA);
@@ -813,6 +813,7 @@ namespace QuickFiler.Legacy
         #endregion
 
         #region Keyboard UI
+        
         public void ToggleKeyboardDialog()
         {
             ToggleEachQfc();
@@ -1024,6 +1025,7 @@ namespace QuickFiler.Legacy
         #endregion
 
         #region Properties and Helper Functions
+        
         internal QuickFileController Parent
         {
             get

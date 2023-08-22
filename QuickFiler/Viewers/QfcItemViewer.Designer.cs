@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h = new System.Windows.Forms.SplitContainer();
             this.L1h0L2hv = new System.Windows.Forms.TableLayoutPanel();
@@ -198,7 +198,7 @@
             this.LblSentOn.Name = "LblSentOn";
             this.LblSentOn.Size = new System.Drawing.Size(256, 29);
             this.LblSentOn.TabIndex = 6;
-            this.LblSentOn.Text = "12/31/2023 12:59 PM";
+            this.LblSentOn.Text = "12/31/2999 12:59 PM";
             // 
             // LblSender
             // 
@@ -211,7 +211,7 @@
             this.LblSender.Name = "LblSender";
             this.LblSender.Size = new System.Drawing.Size(545, 33);
             this.LblSender.TabIndex = 1;
-            this.LblSender.Text = "SPA - Corporate Communications {PEP}";
+            this.LblSender.Text = "[SENDER NAME]";
             // 
             // lblCaptionTriage
             // 
@@ -287,7 +287,7 @@
             this.LblConvCt.Padding = new System.Windows.Forms.Padding(6);
             this.LblConvCt.Size = new System.Drawing.Size(84, 56);
             this.LblConvCt.TabIndex = 3;
-            this.LblConvCt.Text = "15";
+            this.LblConvCt.Text = "99";
             // 
             // lblSubject
             // 
@@ -827,13 +827,13 @@
             // 
             this.L0v2h2_Web.AllowExternalDrop = true;
             this.L0v2h2_Web.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
-            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties2.Language = null;
-            coreWebView2CreationProperties2.ProfileName = null;
-            coreWebView2CreationProperties2.UserDataFolder = null;
-            this.L0v2h2_Web.CreationProperties = coreWebView2CreationProperties2;
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_Web.CreationProperties = coreWebView2CreationProperties1;
             this.L0v2h2_Web.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_Web.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_Web.Location = new System.Drawing.Point(0, 0);

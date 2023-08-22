@@ -53,6 +53,7 @@ namespace Tags
         private string strTagPrefix;
         private string strTemp;
 
+        //BUGFIX: CheckBoxController adds event to an object that is null
         public CheckBoxController()
         {
             ctrlCB.Click += (_, __) => ctrlCB_Click();

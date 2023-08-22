@@ -15,7 +15,7 @@ namespace QuickFiler.Test
     {
         private QfcFormViewer qf;
         private QfcItemViewer iv;
-        private Mock<IQfcFormController> formController;
+        private Mock<IFilerFormController> formController;
 
         
 
@@ -25,7 +25,7 @@ namespace QuickFiler.Test
             qf.ShowDialog();
             qf.Refresh();
             iv = new QfcItemViewer();
-            formController = new Mock<IQfcFormController>();
+            formController = new Mock<IFilerFormController>();
         }
         
         [TestMethod]
@@ -35,8 +35,8 @@ namespace QuickFiler.Test
             //QfcItemViewer iv = new QfcItemViewer();
             //Mock<IQfcFormController> formController = new Mock<IQfcFormController>();
             int itemHeight = iv.Height;
-            formController.Setup(x => x.ButtonCancel_Click()).Callback(qf.Hide);
-            formController.Setup(x => x.ButtonOK_Click()).Callback(qf.Hide);
+            formController.Setup(x => x.ActionCancelAsync()).Callback(qf.Hide);
+            formController.Setup(x => x.ActionOkAsync()).Callback(qf.Hide);
             qf.SetController(formController.Object);
             qf.Show();
             qf.Refresh();

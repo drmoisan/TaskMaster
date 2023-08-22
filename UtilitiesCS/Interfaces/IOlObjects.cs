@@ -11,7 +11,8 @@ namespace UtilitiesCS
         string UserEmailAddress { get; }
         Folder Inbox { get; }
         NameSpace NamespaceMAPI { get; }
-        Folder OlEmailRoot { get; }
+        Folder Root { get; }
+        Folder EmailRoot { get; }
         Reminders OlReminders { get; }
         Folder ToDoFolder { get; }
         StackObjectCS<object> MovedMails_Stack { get; set; }

@@ -10,7 +10,7 @@ namespace UtilitiesCS
     public class StackObjectCS<T> : IEnumerable<T>, ICollection<T>
     {
         #region Private
-
+        //TODO: Convert to ScoCollection
         private List<T> _list;
 
         #endregion

@@ -19,120 +19,46 @@ namespace TaskMaster
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            // Create the global variables
             _globals = new ApplicationGlobals(Application);
+            
+            // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();
-            Debug.WriteLine("Fired and forgetting");
+
+            // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();
             Console.SetOut(tw);
+
+            // Ensure that forms are ready for high resolution
             InitializeDPI();
 
+            // Send a reference to the ribbon controller and external utilities for future use
             _ribbonController.SetGlobals(_globals);
-            //Events_Hook();
+            _externalUtilities.SetGlobals(_globals, _ribbonController);
+
+            // Hook the Inbox and ToDo events
+            //_globals.Events.Hook();
         }
 
         private ApplicationGlobals _globals;
-
-        public List<string> CatFilterList;
-        private Items _OlToDoItems;
-
-        private Items OlToDoItems
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _OlToDoItems;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                if (_OlToDoItems != null)
-                {
-                    _OlToDoItems.ItemAdd -= OlToDoItems_ItemAdd;
-                    _OlToDoItems.ItemChange -= OlToDoItems_ItemChange;
-                }
-
-                _OlToDoItems = value;
-                if (_OlToDoItems != null)
-                {
-                    _OlToDoItems.ItemAdd += OlToDoItems_ItemAdd;
-                    _OlToDoItems.ItemChange += OlToDoItems_ItemChange;
-                }
-            }
-        }
-        private List<Items> ListOfPSTtodo;
-        private List<Items> ListToDoItems;
-        private Items _OlInboxItems;
-
-        private Items OlInboxItems
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _OlInboxItems;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                _OlInboxItems = value;
-            }
-        }
-        
-        private Reminders _OlReminders;
-        private Reminders OlReminders
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _OlReminders;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                _OlReminders = value;
-            }
-        }
-        private NameSpace OlNS;
-
+        private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
 
-        private readonly string _filenameProjectList;
-        private readonly string _filenameProjInfo2;
-        private readonly string _filenameProjInfo = "ProjInfo.bin";
-        public readonly string FilenameDictPpl = "pplkey.xml";
-        public readonly string StagingPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        public string EmailRoot;
-        private const string _appDataFolder = "TaskMaster";
-
-        public ProjectInfo ProjInfo;
-        public Dictionary<string, string> DictPPL;
-        private IIDList _IDList;
-
-        public IIDList IDList
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _IDList;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                _IDList = value;
-            }
-        }
-        public TreeOfToDoItems DM_CurView;
-        public FlagParser Cats;
-
+        /// <summary>
+        /// Overrides the default behavior of the COM add-in to create an XML ribbon
+        /// <seealso cref="RibbonViewer"/> which is controlled by 
+        /// <seealso cref="RibbonController"/>.
+        /// </summary>
+        /// <returns><seealso cref="IRibbonExtensibility"/> object</returns>
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
             _ribbonController = new RibbonController();
             return new RibbonViewer(_ribbonController);
         }
 
+        /// <summary>
+        /// Sets the DPI awareness for the application to enable high resolution with text scaling
+        /// </summary>
         [STAThread]
         public static void InitializeDPI()
         {
@@ -140,36 +66,18 @@ namespace TaskMaster
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
         }
 
-        
-
-        #region Explorer Event Hooks
-        internal void Events_Hook()
+        /// <summary>
+        /// Overrides the default behavior of the COM add-in to expose specific methods 
+        /// to other office applications so that they can be called from VBA.
+        /// </summary>
+        /// <returns>Instance of the <seealso cref="AddInUtilities"/> class</returns>
+        protected override object RequestComAddInAutomationService()
         {
-            {
-                OlToDoItems = _globals.Ol.ToDoFolder.Items;
-                OlInboxItems = _globals.Ol.Inbox.Items;
-                OlReminders = _globals.Ol.OlReminders;
-            }
-        }
+            if (_externalUtilities is null)
+                _externalUtilities = new AddInUtilities();
 
-        internal void Events_Unhook()
-        {
-            OlToDoItems = null;
-            OlInboxItems = null;
-            OlReminders = null;
+            return _externalUtilities;
         }
-
-        private void OlToDoItems_ItemAdd(object Item)
-        {
-            ToDoEvents.OlToDoItems_ItemAdd(Item, _globals);
-        }
-
-        private void OlToDoItems_ItemChange(object Item)
-        {
-            ToDoEvents.OlToDoItems_ItemChange(Item, OlToDoItems, _globals);
-        }
-        #endregion
-
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {

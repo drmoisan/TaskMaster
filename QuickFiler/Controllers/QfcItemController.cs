@@ -23,7 +23,7 @@ namespace QuickFiler.Controllers
         #region constructors
 
         public QfcItemController(IApplicationGlobals AppGlobals,
-                                 IQfcHomeController homeController,
+                                 IFilerHomeController homeController,
                                  IQfcCollectionController parent,
                                  QfcItemViewer itemViewer,
                                  int viewerPosition,
@@ -34,7 +34,7 @@ namespace QuickFiler.Controllers
         }
 
         public QfcItemController(IApplicationGlobals AppGlobals,
-                                 IQfcHomeController homeController,
+                                 IFilerHomeController homeController,
                                  IQfcCollectionController parent,
                                  QfcItemViewer itemViewer,
                                  int viewerPosition,
@@ -49,7 +49,7 @@ namespace QuickFiler.Controllers
         #region ItemViewer Setup and Disposal
 
         private void Initialize(IApplicationGlobals AppGlobals,
-                                IQfcHomeController homeController,
+                                IFilerHomeController homeController,
                                 IQfcCollectionController parent,
                                 QfcItemViewer itemViewer,
                                 int viewerPosition,
@@ -63,8 +63,8 @@ namespace QuickFiler.Controllers
             _itemViewer = itemViewer;
             _itemViewer.Controller = this;
             _itemNumber = viewerPosition;                           
-            _formController = _homeController.FormCtrlr;
-            _formHandle = _formController.FormHandle;               
+            //_formController = _homeController.FormCtrlr;
+            //_formHandle = _homeController.FormCtrlr.FormHandle;               
             _mailItem = mailItem;                                   
             _keyboardHandler = _homeController.KeyboardHndlr;            
             _parent = parent;                                       
@@ -167,8 +167,8 @@ namespace QuickFiler.Controllers
         /// <param name="df"></param>
         public void PopulateConversation(DataFrame df)
         {
-            DfConversationExpanded = df.FilterConversation(false, true);
-            DfConversation = DfConversationExpanded.FilterConversation(true, true);
+            DfConversationExpanded = df.FilterConversation(((Folder)Mail.Parent).FolderPath, false, true);
+            DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).Name, true, true);
             int count = DfConversation.Rows.Count();
             PopulateConversation(count);
         }
@@ -193,12 +193,12 @@ namespace QuickFiler.Controllers
             if (varList is null)
             {
                 _fldrHandler = new FolderHandler(
-                    _globals, _mailItem, FolderHandler.Options.FromField);
+                    _globals, _mailItem, FolderHandler.InitOptions.FromField);
             }
             else
             {
                 _fldrHandler = new FolderHandler(
-                    _globals, varList, FolderHandler.Options.FromArrayOrString);
+                    _globals, varList, FolderHandler.InitOptions.FromArrayOrString);
             }
 
             _itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
@@ -218,6 +218,18 @@ namespace QuickFiler.Controllers
             _mailItem = null;
             _dfConversation = null;
             _fldrHandler = null;
+            _webViewEnvironment = null;
+            _themes = null;
+            _fldrHandler = null;
+            _tableLayoutPanels = null;
+            _explorerController = null;
+            _formController = null;
+            _homeController = null;
+            _keyboardHandler = null;
+            _itemPositionTips = null;
+            _itemInfo = null;
+            _itemViewer = null;
+            _timer = null;
         }
 
         #endregion
@@ -236,8 +248,8 @@ namespace QuickFiler.Controllers
         private IntPtr _formHandle;
         private IQfcCollectionController _parent;
         private IQfcExplorerController _explorerController;
-        private IQfcFormController _formController;
-        private IQfcHomeController _homeController;
+        private IFilerFormController _formController;
+        private IFilerHomeController _homeController;
         private IQfcKeyboardHandler _keyboardHandler;
         private IQfcTipsDetails _itemPositionTips;
         private MailItemInfo _itemInfo;
@@ -313,7 +325,7 @@ namespace QuickFiler.Controllers
                 {
                     var conversation = Mail.GetConversation();
                     DfConversationExpanded = conversation.GetConversationDf();
-                    DfConversation = DfConversationExpanded.FilterConversation(false, true);
+                    DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).FolderPath, false, true);
                 }
                 return _dfConversation; 
             }
@@ -333,7 +345,7 @@ namespace QuickFiler.Controllers
                 {
                     var conversation = Mail.GetConversation();
                     DfConversationExpanded = conversation.GetConversationDf();
-                    DfConversation = DfConversationExpanded.FilterConversation(false, true);
+                    DfConversation = DfConversationExpanded.FilterConversation(((Folder)Mail.Parent).FolderPath,false, true);
                 }
                 return _dfConversationExpanded;
             } 
@@ -451,8 +463,8 @@ namespace QuickFiler.Controllers
             {
                 x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_keyboardHandler.KeyboardHandler_PreviewKeyDown);
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDown);
-                x.KeyUp += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyUp);
-                x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_keyboardHandler.KeyboardHandler_KeyPress);
+                //x.KeyUp += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyUp);
+                //x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_keyboardHandler.KeyboardHandler_KeyPress);
                 //Debug.WriteLine($"Registered handler for {x.Name}");
             },
             new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
@@ -558,10 +570,10 @@ namespace QuickFiler.Controllers
         {
             _itemViewer.CboFolders.Items.Clear();
             _itemViewer.CboFolders.Items.AddRange(
-                _fldrHandler.FindFolder(SearchString: "*" + 
+                _fldrHandler.FindFolder(searchString: "*" + 
                 _itemViewer.TxtboxSearch.Text + "*",
-                ReloadCTFStagingFiles: false,
-                ReCalcSuggestions: false,
+                reloadCTFStagingFiles: false,
+                recalcSuggestions: false,
                 objItem: Mail));
 
             if (_itemViewer.CboFolders.Items.Count >= 2)
@@ -869,23 +881,23 @@ namespace QuickFiler.Controllers
             { "&Cancel", ()=>{ } }
         }; }
 
-        public void MoveMail()
+        async public Task MoveMail()
         {
             if (Mail is not null)
             {
                 IList<MailItem> selItems = PackageItems();
                 bool attchments = (SelectedFolder != "Trash to Delete") ? false : _itemViewer.CbxAttachments.Checked;
 
-                //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
-                                                                            Pictures_Checkbox: false,
-                                                                            SortFolderpath: _itemViewer.CboFolders.SelectedItem as string,
-                                                                            Save_MSG: _itemViewer.CbxEmailCopy.Checked,
-                                                                            Attchments: attchments,
-                                                                            Remove_Flow_File: false,
-                                                                            AppGlobals: _globals,
-                                                                            StrRoot: _globals.Ol.ArchiveRootPath);
-                SortItemsToExistingFolder.Cleanup_Files();
+                await SortEmail.Run(mailItems: selItems,
+                                              savePictures: false,
+                                              destinationOlStem: _itemViewer.CboFolders.SelectedItem as string,
+                                              saveMsg: _itemViewer.CbxEmailCopy.Checked,
+                                              saveAttachments: attchments,
+                                              removePreviousFsFiles: false,
+                                              appGlobals: _globals,
+                                              olAncestor: _globals.Ol.ArchiveRootPath,
+                                              fsAncestorEquivalent: _globals.FS.FldrRoot);
+                SortEmail.Cleanup_Files();
                 // blDoMove
             }
         }
@@ -911,7 +923,10 @@ namespace QuickFiler.Controllers
         public void FlagAsTask()
         {
             List<MailItem> itemList = new() { Mail };
-            var flagTask = new FlagTasks(AppGlobals: _globals, ItemList: itemList, blFile: false, hWndCaller: _formHandle);
+            var flagTask = new FlagTasks(AppGlobals: _globals,
+                                         ItemList: itemList,
+                                         blFile: false,
+                                         hWndCaller: _homeController.FormCtrlr.FormHandle);
             _itemViewer.BtnFlagTask.DialogResult = flagTask.Run(modal: true);
             if (_itemViewer.BtnFlagTask.DialogResult == DialogResult.OK)
             {

@@ -449,7 +449,7 @@ namespace QuickFiler.Legacy
                                IQfcControllerCallbacks CallbackFunctions,
                                IApplicationGlobals AppGlobals,
                                IntPtr hwnd = default,
-                               Enums.InitTypeEnum InitTypeE = Enums.InitTypeEnum.InitSort)
+                               Enums.InitTypeEnum InitTypeE = Enums.InitTypeEnum.Sort)
         {
             // Wire global and delegate variables and handles
             _globals = AppGlobals;
@@ -580,7 +580,7 @@ namespace QuickFiler.Legacy
                                     }
                                 case "<SENDER>":
                                     {
-                                        _lblTmp.Text = Mail.Sent == true ? CaptureEmailDetailsModule.GetSenderAddress(Mail) : "Draft Message";
+                                        _lblTmp.Text = Mail.Sent == true ? EmailDetails.GetSenderAddress(Mail) : "Draft Message";
                                         _lblSender = _lblTmp;
                                         break;
                                     }
@@ -703,8 +703,8 @@ namespace QuickFiler.Legacy
 
         public void PopulateFolderCombobox(object varList = null)
         {            
-            if (varList is null) { _fldrHandler = new FolderHandler(_globals, _mail, FolderHandler.Options.FromField); }
-            else { _fldrHandler = new FolderHandler(_globals, varList, FolderHandler.Options.FromArrayOrString); }
+            if (varList is null) { _fldrHandler = new FolderHandler(_globals, _mail, FolderHandler.InitOptions.FromField); }
+            else { _fldrHandler = new FolderHandler(_globals, varList, FolderHandler.InitOptions.FromArrayOrString); }
 
             FolderCbo.Items.AddRange(_fldrHandler.FolderArray);
             FolderCbo.SelectedIndex = 1;
@@ -786,15 +786,16 @@ namespace QuickFiler.Legacy
                 if (blDoMove)
                 {
                     //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                    SortItemsToExistingFolder.MASTER_SortEmailsToExistingFolder(selItems: selItems,
-                                                                                Pictures_Checkbox: false,
-                                                                                SortFolderpath: FolderCbo.SelectedItem as string,
-                                                                                Save_MSG: _chbxSaveMail.Checked,
-                                                                                Attchments: Attchments,
-                                                                                Remove_Flow_File: _chbxDelFlow.Checked,
-                                                                                AppGlobals: _globals, 
-                                                                                StrRoot: _globals.Ol.ArchiveRootPath);
-                    SortItemsToExistingFolder.Cleanup_Files();
+                    SortEmail.Run(mailItems: selItems,
+                                                  savePictures: false,
+                                                  destinationOlStem: FolderCbo.SelectedItem as string,
+                                                  saveMsg: _chbxSaveMail.Checked,
+                                                  saveAttachments: Attchments,
+                                                  removePreviousFsFiles: _chbxDelFlow.Checked,
+                                                  appGlobals: _globals,
+                                                  olAncestor: _globals.Ol.ArchiveRootPath,
+                                                  fsAncestorEquivalent: _globals.FS.FldrRoot);
+                    SortEmail.Cleanup_Files();
                 } // blDoMove
 
             }
@@ -892,7 +893,7 @@ namespace QuickFiler.Legacy
 
             lblSentOn_Left = lblSentOn.Left;                 // SentOn X% Left Position
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 lbl5_Left = _lbl5.Left;
                 lblAcF_Left = lblAcF.Left;
@@ -983,7 +984,7 @@ namespace QuickFiler.Legacy
                             }
                     }
                 }
-                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 {
                     lblConvCt.Visible = true;
                     lblConvCt.BackColor = SystemColors.Control;
@@ -1036,7 +1037,7 @@ namespace QuickFiler.Legacy
                             }
                     }
                 }
-                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 {
                     lblConvCt.BackColor = Color.PaleTurquoise;
                     lblTriage.BackColor = Color.PaleTurquoise;
@@ -1106,7 +1107,7 @@ namespace QuickFiler.Legacy
             lblTriage.Left = (int)(lblTriage_Left + X3px);                          // Triage _left position + X3px
 
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 SearchTxt.Left = (int)(txt_Left + X1px);                                  // Folder search box X% _left position Y% Width
                 SearchTxt.Width = (int)(txt_Width + X2px);                                // Folder search box X% _left position Y% Width
@@ -1164,7 +1165,7 @@ namespace QuickFiler.Legacy
             // Private pos_lblAcD          As ctrlPosition
             // Private pos_lblAcO          As ctrlPosition
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 if (_blExpanded == false)
                 {
@@ -1322,7 +1323,7 @@ namespace QuickFiler.Legacy
                 lblAcO.Text = "^0";       // ACCELERATOR O for Open Email
                 lblAcO.Width *= 2;
                 lblAcM.Width *= 2;
-                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 {
                     lblAcF.Text = "F1";   // ACCELERATOR F for Folder Search
                     lblAcD.Text = "F4";   // ACCELERATOR D for Folder Dropdown
@@ -1341,7 +1342,7 @@ namespace QuickFiler.Legacy
                 lblAcO.Text = "O";        // ACCELERATOR O for Open Email
                 lblAcO.Width = (int)Math.Round(lblAcO.Width / 2d);
                 lblAcM.Width = (int)Math.Round(lblAcM.Width / 2d);
-                if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+                if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 {
                     lblAcF.Text = "F";   // ACCELERATOR F for Folder Search
                     lblAcD.Text = "D";   // ACCELERATOR D for Folder Dropdown
@@ -1476,25 +1477,25 @@ namespace QuickFiler.Legacy
 
         public void ToggleConversationCheckbox()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 ConversationCb.Checked = !ConversationCb.Checked;
         }
 
         public void ToggleSaveCopyOfMail()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 _chbxSaveMail.Checked = !_chbxSaveMail.Checked;
         }
 
         public void ToggleDeleteFlow()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 _chbxDelFlow.Checked = !_chbxDelFlow.Checked;
         }
 
         public void ToggleSaveAttachments()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 _chbxSaveAttach.Checked = !_chbxSaveAttach.Checked;
         }
 
@@ -1510,7 +1511,7 @@ namespace QuickFiler.Legacy
 
         public void JumpToFolderDropDown()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
             {
                 FolderCbo.Focus();
                 FolderCbo.DroppedDown = true;
@@ -1520,7 +1521,7 @@ namespace QuickFiler.Legacy
 
         public void JumpToSearchTextbox()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.InitSort))
+            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
                 SearchTxt.Focus();
         }
 
@@ -1682,11 +1683,11 @@ namespace QuickFiler.Legacy
                         else if (_intComboRightCtr == 1)
                         {
 
-                            SortItemsToExistingFolder.InitializeSortToExisting(InitType: "Sort", 
-                                                                               QuickLoad: false, 
-                                                                               WholeConversation: false, 
-                                                                               strSeed: FolderCbo.SelectedItem as string, 
-                                                                               objItem: Mail);
+                            SortEmail.InitializeSortToExisting(InitType: "Sort", 
+                                                               QuickLoad: false, 
+                                                               WholeConversation: false, 
+                                                               strSeed: FolderCbo.SelectedItem as string, 
+                                                               objItem: Mail);
                             _callbacks.RemoveSpecificControlGroup(Index);
                         }
                         else
@@ -1821,9 +1822,9 @@ namespace QuickFiler.Legacy
         {
 
             FolderCbo.Items.Clear();
-            FolderCbo.Items.AddRange(_fldrHandler.FindFolder(SearchString: "*" + SearchTxt.Text + "*", 
-                                                             ReloadCTFStagingFiles: false, 
-                                                             ReCalcSuggestions: false, 
+            FolderCbo.Items.AddRange(_fldrHandler.FindFolder(searchString: "*" + SearchTxt.Text + "*", 
+                                                             reloadCTFStagingFiles: false, 
+                                                             recalcSuggestions: false, 
                                                              objItem: Mail));
 
             if (FolderCbo.Items.Count >= 2)
