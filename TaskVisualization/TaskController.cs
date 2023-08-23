@@ -270,11 +270,11 @@ namespace TaskVisualization
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
                                                    selections: selections, 
-                                                   prefix_key: prefix.Key, 
+                                                   prefixKey: prefix.Key, 
                                                    objItemObject: _active.OlItem,
                                                    userEmailAddress: _userEmailAddress);
                 viewer.ShowDialog();
-                if (controller._exit_type != "Cancel")
+                if (controller.ExitType != "Cancel")
                 {
                     _active.People = controller.SelectionString();
                     _viewer.PeopleSelection.Text = _active.People;
@@ -303,11 +303,11 @@ namespace TaskVisualization
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
                                                    selections: selections, 
-                                                   prefix_key: prefix.Key, 
+                                                   prefixKey: prefix.Key, 
                                                    objItemObject: _active.OlItem, 
                                                    userEmailAddress: _userEmailAddress);
                 viewer.ShowDialog();
-                if (controller._exit_type != "Cancel")
+                if (controller.ExitType != "Cancel")
                 {
                     _active.Context = controller.SelectionString();
                     _viewer.CategorySelection.Text = _active.Context;
@@ -334,11 +334,11 @@ namespace TaskVisualization
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
                                                    selections: selections, 
-                                                   prefix_key: prefix.Key, 
+                                                   prefixKey: prefix.Key, 
                                                    objItemObject: _active.OlItem, 
                                                    userEmailAddress: _userEmailAddress);
                 var result = viewer.ShowDialog();
-                if (controller._exit_type != "Cancel")
+                if (controller.ExitType != "Cancel")
                 {
                     _active.Project = controller.SelectionString();
                     _viewer.ProjectSelection.Text = _active.Project;
@@ -367,11 +367,11 @@ namespace TaskVisualization
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
                                                    selections: selections, 
-                                                   prefix_key: prefix.Key, 
+                                                   prefixKey: prefix.Key, 
                                                    objItemObject: _active.OlItem, 
                                                    userEmailAddress: _userEmailAddress);
                 var result = viewer.ShowDialog();
-                if (controller._exit_type != "Cancel")
+                if (controller.ExitType != "Cancel")
                 {
                     _active.Topic = controller.SelectionString();
                     _viewer.TopicSelection.Text = _active.Topic;

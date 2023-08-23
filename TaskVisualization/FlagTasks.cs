@@ -135,7 +135,7 @@ namespace TaskVisualization
                 {
                     var flagController = new TagController(viewer_instance: optionsViewer, dictOptions: symbolSelectionDict, autoAssigner: null, prefixes: _defaultsToDo.PrefixList, userEmailAddress: _userEmailAddress);
                     optionsViewer.ShowDialog();
-                    if (flagController._exit_type != "Cancel")
+                    if (flagController._exitType != "Cancel")
                     {
                         listSelections = flagController.GetSelections();
                     }

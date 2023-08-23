@@ -7,44 +7,19 @@ using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 
 
-
 namespace Tags
 {
-
     public class TagController
     {
+        #region Contructors and Initializers
 
-        private readonly TagViewer _viewer;
-        private readonly SortedDictionary<string, bool> _dict_original;
-        private SortedDictionary<string, bool> _dict_options;
-        private SortedDictionary<string, bool> _filtered_options;
-        private List<string> _selections;
-        private List<string> _filtered_selections;
-        private readonly object _obj_item;
-        private readonly MailItem _olMail;
-        private readonly object _obj_caller;
-        private readonly IPrefix _prefix;
-        private readonly List<IPrefix> _prefixes;
-        private List<CheckBox> _col_cbx_ctrl = new List<CheckBox>();
-        private List<object> _col_cbx_event = new List<object>();
-        private readonly List<object> _col_colorbox = new List<object>();
-        private readonly bool _isMail;
-        public string _exit_type = "Cancel";
-        private int _cursor_position;
-        private string _userEmailAddress;
-        internal int int_focus;
-        private readonly IAutoAssign _autoAssigner;
-
-
-
-        #region Public Functions
         public TagController(TagViewer viewer_instance,
                              SortedDictionary<string, bool> dictOptions,
                              IAutoAssign autoAssigner,
                              List<IPrefix> prefixes,
                              string userEmailAddress,
                              List<string> selections = null,
-                             string prefix_key = "",
+                             string prefixKey = "",
                              object objItemObject = null,
                              object objCallerObj = null)
         {
@@ -52,190 +27,212 @@ namespace Tags
             viewer_instance.SetController(this);
             _autoAssigner = autoAssigner;
             _prefixes = prefixes;
-
             _viewer = viewer_instance;
-            _obj_item = objItemObject;
-            _dict_original = dictOptions;
-            _dict_options = _viewer.Hide_Archive.Checked == true ? FilterArchive(dictOptions) : dictOptions;
+            _objItem = objItemObject;
+            _dictOriginal = dictOptions;
+            _dictOptions = _viewer.HideArchive.Checked == true ? FilterArchive(dictOptions) : dictOptions;
             _userEmailAddress = userEmailAddress;
             _selections = selections;
+            _objCaller = objCallerObj;
+            
+            _olMail = ResolveMailItem(_objItem);
+            
+            if (_olMail is not null) { _isMail = true; }
 
-            if (_obj_item is not null)
+            _gridTemplate = CaptureAndRemoveTemplate();
+            
+            ResolvePrefix(prefixes, prefixKey);
+
+            SetAutoAssignState(autoAssigner);
+
+            LoadSelections(selections);
+
+            LoadControls(_dictOptions, _prefix.Value);
+
+            
+        }
+
+        public MailItem ResolveMailItem(object objItem) //internal
+        {
+            if ((objItem is not null) && (objItem is MailItem))
             {
-                if (_obj_item is MailItem)
-                {
-                    _olMail = (MailItem)_obj_item;
-                    _isMail = true;
-                }
-                else
-                {
-                    _isMail = false;
-                    _olMail = null;
-                }
+                return (MailItem)_objItem;
             }
+            else return null;
+        } 
 
-            _obj_caller = objCallerObj;
-            if (string.IsNullOrEmpty(prefix_key))
+        public void ResolvePrefix(List<IPrefix> prefixes, string prefixKey) //internal
+        {
+            // Set default prefix if none exists
+            if (string.IsNullOrEmpty(prefixKey))
             {
                 _prefix = new PrefixItem("", "", OlCategoryColor.olCategoryColorNone);
             }
-
-            else if (prefixes.Exists(x => (x.Key ?? "") == (prefix_key ?? "")))
+            // Else if it exists, set the Iprefix based on the prefixKey
+            else if (prefixes.Exists(x => (x.Key ?? "") == (prefixKey ?? "")))
             {
-                _prefix = prefixes.Find(x => (x.Key ?? "") == (prefix_key ?? ""));
+                _prefix = prefixes.Find(x => (x.Key ?? "") == (prefixKey ?? ""));
             }
-
+            // Else throw an error
             else
             {
-                throw new ArgumentException(nameof(prefixes) + " must contain " + nameof(prefix_key) + " value " + prefix_key);
-
+                throw new ArgumentException(nameof(prefixes) + " must contain " + nameof(prefixKey) + " value " + prefixKey);
             }
+        } 
 
+        public void SetAutoAssignState(IAutoAssign autoAssigner) //internal
+        {
+            // Determine if the autoAssign button should be visible and active
             if (autoAssigner is not null & _isMail)
             {
-                _viewer.button_autoassign.Visible = true;
-                _viewer.button_autoassign.Enabled = true;
+                _viewer.ButtonAutoassign.Visible = true;
+                _viewer.ButtonAutoassign.Enabled = true;
             }
             else
             {
-                _viewer.button_autoassign.Visible = false;
-                _viewer.button_autoassign.Enabled = false;
+                _viewer.ButtonAutoassign.Visible = false;
+                _viewer.ButtonAutoassign.Enabled = false;
             }
+        } 
 
-            bool _addPrefix = false;
-
-            if (selections is not null)
+        public void LoadSelections(List<string> selections) //internal
+        {
+            if ((selections is not null) && (_selections.Count > 0))
             {
-                if (_selections.Count > 0)
-                {
-                    int prefixLength = _prefix.Value.Length;
-                    if (prefixLength > 0)
-                    {
-                        if ((_selections[0]!=null) && (_selections[0].Length > prefixLength))
-                        {
-                            if (_selections[0].Substring(0, prefixLength -1) != _prefix.Value )
-                            {
-                                _addPrefix = true;
-                            }
-                        }
-                        else
-                        {
-                            _addPrefix = true;
-                        }
-                    }
+                var _addPrefix = IsPrefixMissing(_prefix, _selections[0]);
 
-                    foreach (string rawchoice in _selections)
+                foreach (string rawchoice in _selections)
+                {
+                    string choice = rawchoice;
+                    if (_addPrefix)
+                        choice = string.Concat(_prefix.Value, choice);
+                    if (_dictOptions.Keys.Contains(choice))
                     {
-                        string choice = rawchoice;
-                        if (_addPrefix)
-                            choice = string.Concat(_prefix.Value, choice);
-                        if (_dict_options.Keys.Contains(choice))
+                        _dictOptions[choice] = !_dictOptions[choice];
+                    }
+                    else
+                    {
+                        var tmp_response = MessageBox.Show($"{choice} does not exist. Would you like to add it?", "Dialog", MessageBoxButtons.YesNo);
+                        if (tmp_response == DialogResult.Yes)
                         {
-                            _dict_options[choice] = !_dict_options[choice];
-                        }
-                        else
-                        {
-                            var tmp_response = MessageBox.Show($"{choice} does not exist. Would you like to add it?", "Dialog", MessageBoxButtons.YesNo);
-                            if (tmp_response == DialogResult.Yes)
-                            {
-                                AddColorCategory(rawchoice);
-                            }
+                            AddColorCategory(rawchoice);
                         }
                     }
                 }
             }
+        } 
 
-            LoadControls(_dict_options, _prefix.Value);
-        }
-
-        public void ToggleChoice(string str_choice)
+        public bool IsPrefixMissing(IPrefix prefix, string sample) //internal
         {
-            _dict_options[str_choice] = !_dict_options[str_choice];
+            bool addPrefix = false;
+            int prefixLength = prefix.Value.Length;
+            if (prefixLength > 0)
+            {
+                if ((sample != null) && (sample.Length > prefixLength))
+                {
+                    if (sample.Substring(0, prefixLength - 1) != prefix.Value)
+                    {
+                        addPrefix = true;
+                    }
+                }
+                else
+                {
+                    addPrefix = true;
+                }
+            }
+
+            return addPrefix;
+        } 
+
+        public ControlPosition CaptureAndRemoveTemplate() //internal
+        {
+            var cp = ControlPosition.CreateTemplate(_viewer.TemplateCheckBox);
+            _viewer.L1v2L2_OptionsPanel.Controls.Remove(_viewer.TemplateCheckBox);
+            return cp;
         }
 
-        internal void ToggleOn(string str_choice)
-        {
-            _dict_options[str_choice] = true;
-        }
+        private readonly TagViewer _viewer;
+        private readonly SortedDictionary<string, bool> _dictOriginal;
+        private SortedDictionary<string, bool> _dictOptions;
+        private SortedDictionary<string, bool> _filteredOptions;
+        private List<string> _selections;
+        private List<string> _filteredSelections;
+        private object _objItem;
+        private MailItem _olMail;
+        private readonly object _objCaller;
+        private IPrefix _prefix;
+        private readonly List<IPrefix> _prefixes;
+        private List<CheckBox> _colCbxCtrl = new List<CheckBox>();
+        private List<CheckBoxController> _colCbxEvent = new();
+        private readonly List<object> _colColorbox = new List<object>();
+        private bool _isMail;
+        private string _exitType = "Cancel";
+        private int _cursorPosition;
+        private string _userEmailAddress;
+        internal int intFocus;
+        private readonly IAutoAssign _autoAssigner;
+        private ControlPosition _gridTemplate;
 
-        internal void ToggleOff(string str_choice)
-        {
-            _dict_options[str_choice] = false;
-        }
+        #endregion
+
+
+        #region Public Functions
+
+        public void ToggleChoice(string str_choice) => _dictOptions[str_choice] = !_dictOptions[str_choice];
+        
+        public void ToggleOn(string str_choice) => _dictOptions[str_choice] = true; //internal
+            
+        public void ToggleOff(string str_choice) => _dictOptions[str_choice] = false; //internal
 
         public void UpdateSelections()
         {
-            _selections = _dict_options.Where(x => x.Value).Select(x => x.Key).ToList();
-            _filtered_selections = _filtered_options.Where(x => x.Value).Select(x => x.Key).ToList();
+            _selections = _dictOptions.Where(x => x.Value).Select(x => x.Key).ToList();
+            _filteredSelections = _filteredOptions.Where(x => x.Value).Select(x => x.Key).ToList();
         }
 
-        internal void SearchAndReload()
+        internal void SearchAndReload() //internal
         {
             RemoveControls();
 
-            var filtered_options = _dict_options.Where(x => x.Key.IndexOf(_viewer.TextBox1.Text, StringComparison.OrdinalIgnoreCase) >= 0).ToSortedDictionary();
+            var filtered_options = _dictOptions.Where(x => x.Key.IndexOf(_viewer.SearchText.Text, StringComparison.OrdinalIgnoreCase) >= 0).ToSortedDictionary();
 
-            bool unused = LoadControls(filtered_options, _prefix.Value);
+            LoadControls(filtered_options, _prefix.Value);
         }
 
-        public string SelectionString()
-        {
-            var Tmp = _dict_options.Where(item => item.Value).Select(item => item.Key).ToList();
+        public string SelectionString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
+        
+        public bool ButtonNewActive { get => _viewer.ButtonNew.Visible; set => _viewer.ButtonNew.Visible = value; }
+        
+        public bool ButtonAutoAssignActive {  get => _viewer.ButtonAutoassign.Visible; set => _viewer.ButtonAutoassign.Visible = value; }
+        
+        public void SetSearchText(string searchText) => _viewer.SearchText.Text = searchText;
 
-            return string.Join(", ", Tmp);
-        }
+        public string ExitType { get => _exitType; }
 
-        public bool ButtonNewActive
-        {
-            get
-            {
-                return _viewer.button_new.Visible;
-            }
-            set
-            {
-                _viewer.button_new.Visible = value;
-            }
-        }
-
-        public bool ButtonAutoAssignActive
-        {
-            get
-            {
-                return _viewer.button_autoassign.Visible;
-            }
-            set
-            {
-                _viewer.button_autoassign.Visible = value;
-            }
-        }
-
-        public void SetSearchText(string searchText)
-        {
-            _viewer.TextBox1.Text = searchText;
-        }
         #endregion
 
         #region Public Mouse Events
-        internal void Cancel_Action()
+
+        public void Cancel_Action() //internal
         {
             _viewer.Hide();
-            _exit_type = "Cancel";
+            _exitType = "Cancel";
             _viewer.Dispose();
         }
 
-        internal void OK_Action()
+        public void OK_Action() //internal
         {
             _viewer.Hide();
-            _exit_type = "Normal";
+            _exitType = "Normal";
             _viewer.Dispose();
         }
 
-        internal void AutoAssign()
+        public void AutoAssign() //internal
         {
-            var col_choices = _autoAssigner.AutoFind(_obj_item);
+            var col_choices = _autoAssigner.AutoFind(_objItem);
             foreach (string str_choice in col_choices)
             {
-                if (_dict_options.ContainsKey(str_choice))
+                if (_dictOptions.ContainsKey(str_choice))
                 {
                     ToggleOn(str_choice);
                 }
@@ -248,7 +245,7 @@ namespace Tags
                 FilterToSelected();
         }
 
-        internal SortedDictionary<string, bool> FilterArchive(SortedDictionary<string, bool> source_dict)
+        public SortedDictionary<string, bool> FilterArchive(SortedDictionary<string, bool> source_dict) //internal
         {
 
             if (_autoAssigner is not null)
@@ -269,13 +266,13 @@ namespace Tags
 
         }
 
-        internal void ToggleArchive()
+        public void ToggleArchive() //internal
         {
-            _dict_options = _viewer.Hide_Archive.Checked == true ? FilterArchive(_dict_options) : _dict_original;
+            _dictOptions = _viewer.HideArchive.Checked == true ? FilterArchive(_dictOptions) : _dictOriginal;
             SearchAndReload();
         }
 
-        internal void AddColorCategory(string categoryName = "")
+        public void AddColorCategory(string categoryName = "") //internal
         {
             bool autoAdded = false;
             IList<string> colCatName = new List<string>();
@@ -331,15 +328,17 @@ namespace Tags
                 FilterToSelected();
         }
 
-        internal void FocusCheckbox(CheckBox cbx)
+        public void FocusCheckbox(CheckBox cbx) //internal
         {
-            int_focus = _col_cbx_ctrl.IndexOf(cbx);
+            intFocus = _colCbxCtrl.IndexOf(cbx);
             Select_Ctrl_By_Offset(0);
         }
+
         #endregion
 
-        #region Public Keyboard Events
-        internal void OptionsPanel_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        #region Keyboard Events
+
+        public void OptionsPanel_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e) //internal
         {
             switch (e.KeyCode)
             {
@@ -356,7 +355,7 @@ namespace Tags
             }
         }
 
-        internal void OptionsPanel_KeyDown(object sender, KeyEventArgs e)
+        public void OptionsPanel_KeyDown(object sender, KeyEventArgs e) //internal
         {
             switch (e.KeyCode)
             {
@@ -373,7 +372,7 @@ namespace Tags
             }
         }
 
-        internal void TagViewer_KeyDown(object sender, KeyEventArgs e)
+        public void TagViewer_KeyDown(object sender, KeyEventArgs e) //internal
         {
             switch (e.KeyCode)
             {
@@ -385,13 +384,13 @@ namespace Tags
             }
         }
 
-        internal void TextBox1_KeyDown(object sender, KeyEventArgs e)
+        public void TextBox1_KeyDown(object sender, KeyEventArgs e) //internal
         {
             switch (e.KeyCode)
             {
                 case Keys.Right:
                     {
-                        _cursor_position = _viewer.TextBox1.SelectionStart;
+                        _cursorPosition = _viewer.SearchText.SelectionStart;
                         break;
                     }
                 case Keys.Down:
@@ -402,13 +401,13 @@ namespace Tags
             }
         }
 
-        internal void TextBox1_KeyUp(object sender, KeyEventArgs e)
+        public void TextBox1_KeyUp(object sender, KeyEventArgs e) //internal
         {
             switch (e.KeyCode)
             {
                 case Keys.Right:
                     {
-                        if (_viewer.TextBox1.SelectionStart == _cursor_position)
+                        if (_viewer.SearchText.SelectionStart == _cursorPosition)
                         {
                             FilterToSelected();
                         }
@@ -423,44 +422,158 @@ namespace Tags
             }
         }
 
-        internal void Select_Ctrl_By_Offset(int increment)
+        
+        #endregion
+
+        #region Major Actions
+
+        public bool LoadControls(SortedDictionary<string, bool> dict_options, string prefix) //internal
         {
-            int newpos = int_focus + increment;
+            CheckBox ctrlCB;
+            string strChkName;
+            CheckBoxController clsCheckBox;
+
+            //const int cHt_var = 18;
+            //const int cHt_fxd = 6;
+            //const int cLt = 6;
+            //const int cWt = 300;
+
+            _filteredOptions = dict_options;
+            intFocus = 0;
+            _colCbxCtrl = new();
+            _colCbxEvent = new();
+
+            for (int i = 0, loopTo = _filteredOptions.Count - 1; i <= loopTo; i++)
+            {
+                strChkName = i.ToString("00") + " ChkBx";
+                ctrlCB = new CheckBox();
+                try
+                {
+                    _viewer.L1v2L2_OptionsPanel.Controls.Add(ctrlCB);
+                }
+                catch
+                {
+                    MessageBox.Show($"Error adding {nameof(CheckBox)} in {nameof(Tags)}.{nameof(LoadControls)}");
+                    return false;
+                }
+                
+                ctrlCB.Text = _filteredOptions.Keys.ElementAt(i).Substring(prefix.Length);
+                ctrlCB.Checked = _filteredOptions.Values.ElementAt(i);
+
+                try
+                {
+                    clsCheckBox = new CheckBoxController();
+                    clsCheckBox.Init(this, prefix);
+                    clsCheckBox.CtrlCB = ctrlCB;
+                }
+                catch
+                {
+                    MessageBox.Show("Error wiring checkbox event in Tags.LoadControls");
+                    return false;
+                }
+
+                // ctrlCB.AutoSize = True
+                _gridTemplate.Set(ctrlCB, i, 0);
+                
+                // _viewer.OptionsPanel.ScrollHeight = ctrlCB.Top + cHt_var
+                try
+                {
+                    _colCbxCtrl.Add(ctrlCB);
+                    _colCbxEvent.Add(clsCheckBox);
+                }
+                catch
+                {
+                    MessageBox.Show("Error saving checkbox control and event to collection");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void RemoveControls() //internal
+        {
+            int max = _colCbxCtrl.Count - 1;
+            for (int i = max; i >= 0; i -= 1)
+            {
+                _viewer.L1v2L2_OptionsPanel.Controls.Remove((Control)_colCbxCtrl[i]);
+                _colCbxCtrl.RemoveAt(i);
+                _colCbxEvent.RemoveAt(i);
+            }
+
+            max = _colColorbox.Count - 1;
+            for (int i = max; i >= 0; i -= 1)
+            {
+                _viewer.L1v2L2_OptionsPanel.Controls.Remove((Control)_colColorbox[i]);
+                bool unused = _colColorbox.Remove(i);
+            }
+        }
+
+        public void AddOption(string strOption, bool blClickTrue = false) //internal
+        {
+            _dictOptions.Add(strOption, blClickTrue);
+            _filteredOptions.Add(strOption, blClickTrue);
+        }
+
+        public void FilterToSelected() //internal
+        {
+            RemoveControls();
+            // _filtered_options = _dict_options.Where(Function(x) x.Value = True).Select(Function(x) x)
+            var tmp = (from x in _dictOptions
+                       where x.Value
+                       select x).ToDictionary(x => x.Key, x => x.Value);
+            _filteredOptions = new SortedDictionary<string, bool>(tmp);
+            bool unused = LoadControls(_filteredOptions, _prefix.Value);
+        }
+
+        public List<string> GetSelections()
+        {
+            return (from x in _dictOptions
+                    where x.Value == true
+                    select x.Key).ToList();
+        }
+
+        #endregion
+
+        #region UI Navigation
+
+        public void Select_Ctrl_By_Offset(int increment) //internal
+        {
+            int newpos = intFocus + increment;
             if (newpos == -1)
             {
-                _viewer.TextBox1.Select();
-                int_focus = newpos;
+                _viewer.SearchText.Select();
+                intFocus = newpos;
             }
-            else if (newpos <= _col_cbx_ctrl.Count - 1)
+            else if (newpos <= _colCbxCtrl.Count - 1)
             {
-                _col_cbx_ctrl[newpos].Focus();
-                CheckBox cbx = (CheckBox)_col_cbx_ctrl[newpos];
+                _colCbxCtrl[newpos].Focus();
+                CheckBox cbx = (CheckBox)_colCbxCtrl[newpos];
                 ControlPaint.DrawFocusRectangle(System.Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle);
-                int_focus = newpos;
+                intFocus = newpos;
             }
         }
 
-        internal void Select_Last_Control()
+        public void Select_Last_Control() //internal
         {
-            Select_Ctrl_By_Position(_col_cbx_ctrl.Count - 1);
+            Select_Ctrl_By_Position(_colCbxCtrl.Count - 1);
         }
 
-        internal void Select_First_Control()
+        public void Select_First_Control() //internal
         {
             Select_Ctrl_By_Position(0);
         }
 
-        internal void Select_PageDown()
+        public void Select_PageDown() //internal
         {
 
-            if (_viewer.OptionsPanel.VerticalScroll.Maximum > _viewer.OptionsPanel.Height)
+            if (_viewer.L1v2L2_OptionsPanel.VerticalScroll.Maximum > _viewer.L1v2L2_OptionsPanel.Height)
             {
-                int start = Math.Max(int_focus, 0);
-                int y = _viewer.OptionsPanel.Height;
-                var filteredIEnumerable = _col_cbx_ctrl.Select((n, i) => 
+                int start = Math.Max(intFocus, 0);
+                int y = _viewer.L1v2L2_OptionsPanel.Height;
+                var filteredIEnumerable = _colCbxCtrl.Select((n, i) =>
                                                        new { Value = n, Index = i })
-                                                       .Where(p => 
-                                                       (p.Index > int_focus) & 
+                                                       .Where(p =>
+                                                       (p.Index > intFocus) &
                                                        (p.Value.Bottom > y));
 
                 if (filteredIEnumerable.Count() == 0)
@@ -474,25 +587,24 @@ namespace Tags
 
                     Select_Ctrl_By_Position(idx);
 
-                    int y_scroll = _col_cbx_ctrl[idx].Top - _viewer.OptionsPanel.AutoScrollPosition.Y; 
+                    int y_scroll = _colCbxCtrl[idx].Top - _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.Y;
 
-                    _viewer.OptionsPanel.AutoScrollPosition = new System.Drawing.Point(
-                        _viewer.OptionsPanel.AutoScrollPosition.X, y_scroll);
+                    _viewer.L1v2L2_OptionsPanel.AutoScrollPosition = new System.Drawing.Point(
+                        _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.X, y_scroll);
 
                 }
 
             }
         }
 
-        internal void Select_PageUp()
+        public void Select_PageUp() //internal
         {
-
-            if (_viewer.OptionsPanel.VerticalScroll.Maximum > _viewer.OptionsPanel.Height)
+            if (_viewer.L1v2L2_OptionsPanel.VerticalScroll.Maximum > _viewer.L1v2L2_OptionsPanel.Height)
             {
-                int start = Math.Max(int_focus, 0);
+                int start = Math.Max(intFocus, 0);
                 int idx_top;
 
-                var filteredIEnumerable = _col_cbx_ctrl.Select((n, i) => new { Value = n, Index = i })
+                var filteredIEnumerable = _colCbxCtrl.Select((n, i) => new { Value = n, Index = i })
                                                        .Where(p => p.Value.Top < 0);
 
                 if (filteredIEnumerable.Count() == 0)
@@ -504,169 +616,39 @@ namespace Tags
                 {
                     idx_top = filteredIEnumerable.Last().Index;
                     Select_Ctrl_By_Position(idx_top);
-                    int y_scroll = (-1 * _viewer.OptionsPanel.AutoScrollPosition.Y) 
-                        - (_viewer.OptionsPanel.Height - _col_cbx_ctrl[idx_top].Height);
+                    int y_scroll = (-1 * _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.Y)
+                        - (_viewer.L1v2L2_OptionsPanel.Height - _colCbxCtrl[idx_top].Height);
 
-                    _viewer.OptionsPanel.AutoScrollPosition = new System.Drawing.Point(
-                        _viewer.OptionsPanel.AutoScrollPosition.X, y_scroll);
+                    _viewer.L1v2L2_OptionsPanel.AutoScrollPosition = new System.Drawing.Point(
+                        _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.X, y_scroll);
 
                 }
 
             }
         }
 
-        internal void Select_Ctrl_By_Position(int position)
+        public void Select_Ctrl_By_Position(int position) //internal
         {
-            if (position < -1 | position > _col_cbx_ctrl.Count - 1)
+            if (position < -1 | position > _colCbxCtrl.Count - 1)
             {
                 throw new ArgumentOutOfRangeException("Cannot select control with postition " + position);
             }
 
             else if (position == -1)
             {
-                _viewer.TextBox1.Select();
-                int_focus = position;
+                _viewer.SearchText.Select();
+                intFocus = position;
             }
 
             else
             {
-                _col_cbx_ctrl[position].Focus();
-                CheckBox cbx = (CheckBox)_col_cbx_ctrl[position];
+                _colCbxCtrl[position].Focus();
+                CheckBox cbx = (CheckBox)_colCbxCtrl[position];
                 ControlPaint.DrawFocusRectangle(System.Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle);
-                int_focus = position;
+                intFocus = position;
             }
         }
 
-
-
-        #endregion
-
-        #region Private Helper Functions
-
-        private bool LoadControls(SortedDictionary<string, bool> dict_options, string prefix)
-        {
-            CheckBox ctrlCB;
-            string strChkName;
-            CheckBoxController clsCheckBox;
-
-            const int cHt_var = 18;
-            const int cHt_fxd = 6;
-            const int cLt = 6;
-            const int cWt = 300;
-
-            _filtered_options = dict_options;
-            int_focus = 0;
-            _col_cbx_ctrl = new List<CheckBox>();
-            _col_cbx_event = new List<object>();
-
-            for (int i = 0, loopTo = _filtered_options.Count - 1; i <= loopTo; i++)
-            {
-                strChkName = i.ToString("00") + " ChkBx";
-                ctrlCB = new CheckBox();
-                try
-                {
-                    _viewer.OptionsPanel.Controls.Add(ctrlCB);
-                }
-                catch
-                {
-                    MessageBox.Show("Error adding checkbox in Tags.LoadControls");
-                    return false;
-                }
-                
-                ctrlCB.Text = _filtered_options.Keys.ElementAt(i).Substring(prefix.Length);
-                ctrlCB.Checked = _filtered_options.Values.ElementAt(i);
-
-                try
-                {
-                    clsCheckBox = new CheckBoxController();
-                    clsCheckBox.Init(this, prefix);
-                    clsCheckBox.ctrlCB = ctrlCB;
-                }
-                catch
-                {
-                    MessageBox.Show("Error wiring checkbox event in Tags.LoadControls");
-                    return false;
-                }
-
-                // ctrlCB.AutoSize = True
-                ctrlCB.Height = cHt_var;
-                ctrlCB.Top = cHt_var * i + cHt_fxd;
-                ctrlCB.Left = cLt;
-                ctrlCB.Width = cWt;
-
-                // _viewer.OptionsPanel.ScrollHeight = ctrlCB.Top + cHt_var
-                try
-                {
-                    _col_cbx_ctrl.Add(ctrlCB);
-                    _col_cbx_event.Add(clsCheckBox);
-                }
-                catch
-                {
-                    MessageBox.Show("Error saving checkbox control and event to collection");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private void RemoveControls()
-        {
-            int max = _col_cbx_ctrl.Count - 1;
-            for (int i = max; i >= 0; i -= 1)
-            {
-                _viewer.OptionsPanel.Controls.Remove((Control)_col_cbx_ctrl[i]);
-                _col_cbx_ctrl.RemoveAt(i);
-                _col_cbx_event.RemoveAt(i);
-            }
-
-            max = _col_colorbox.Count - 1;
-            for (int i = max; i >= 0; i -= 1)
-            {
-                _viewer.OptionsPanel.Controls.Remove((Control)_col_colorbox[i]);
-                bool unused = _col_colorbox.Remove(i);
-            }
-        }
-
-        private void AddOption(string strOption, bool blClickTrue = false)
-        {
-            _dict_options.Add(strOption, blClickTrue);
-            _filtered_options.Add(strOption, blClickTrue);
-        }
-
-        private void FilterToSelected()
-        {
-            RemoveControls();
-            // _filtered_options = _dict_options.Where(Function(x) x.Value = True).Select(Function(x) x)
-            var tmp = (from x in _dict_options
-                       where x.Value
-                       select x).ToDictionary(x => x.Key, x => x.Value);
-            _filtered_options = new SortedDictionary<string, bool>(tmp);
-            bool unused = LoadControls(_filtered_options, _prefix.Value);
-        }
-
-        public List<string> GetSelections()
-        {
-            return (from x in _dict_options
-                    where x.Value == true
-                    select x.Key).ToList();
-        }
-
-        private class PrefixItem : IPrefix
-        {
-
-            public PrefixItem(string key, string value, OlCategoryColor color)
-            {
-                Key = key;
-                Value = value;
-                Color = color;
-            }
-
-            public string Key { get; set; }
-
-            public string Value { get; set; }
-
-            public OlCategoryColor Color { get; set; }
-        }
 
         #endregion
 
