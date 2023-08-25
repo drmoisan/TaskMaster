@@ -85,17 +85,17 @@ namespace TaskVisualization
 
         private void CategorySelection_Click(object sender, EventArgs e)
         {
-            _controller.Assign_Context();
+            _controller.AssignContext();
         }
 
         private void ProjectSelection_Click(object sender, EventArgs e)
         {
-            _controller.Assign_Project();
+            _controller.AssignProject();
         }
 
         private void TopicSelection_Click(object sender, EventArgs e)
         {
-            _controller.Assign_Topic();
+            _controller.AssignTopic();
         }
 
         private void ShortcutPersonal_Click(object sender, EventArgs e)

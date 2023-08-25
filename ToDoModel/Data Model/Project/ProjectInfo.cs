@@ -113,7 +113,7 @@ namespace ToDoModel
                      {
                         var categories = x.Categories;
                         FlagParser parser = new(ref categories);
-                        var projectName = parser.get_Projects();
+                        var projectName = parser.GetProjects();
                         var programName = projectName.Split('-')[0];
                         IToDoProjectInfoEntry entry = new ToDoProjectInfoEntry(projectName, x.ID, programName);
                         return entry;

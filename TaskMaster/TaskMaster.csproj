@@ -403,6 +403,10 @@
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
+      <Project>{F2E1680E-1B15-4CF2-BAB0-54B8C8F6ABDF}</Project>
+      <Name>UtilitiesSwordfish.NET.General</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

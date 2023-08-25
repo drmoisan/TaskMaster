@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
@@ -100,7 +103,7 @@ namespace ToDoModel
         private bool _EC2;
         private int _VisibleTreeState;
         private bool _readonly = false;
-        private FlagParser _flags;
+        internal FlagParser _flags;
         private bool _flagAsTask = true;
 
         private void InitializeMail(MailItem OlMail)
@@ -207,13 +210,13 @@ namespace ToDoModel
         public void WriteFlagsBatch()
         {
             _olObject.SetCategories(_flags.Combine());
-            _olObject.SetUdf("TagContext", _flags.get_Context(false), OlUserPropertyType.olKeywords);
-            _olObject.SetUdf("TagPeople", _flags.get_People(false),OlUserPropertyType.olKeywords);
+            _olObject.SetUdf("TagContext", _flags.GetContext(false), OlUserPropertyType.olKeywords);
+            _olObject.SetUdf("TagPeople", _flags.GetPeople(false),OlUserPropertyType.olKeywords);
             // TODO: Assign ToDoID if project assignment changes
             // TODO: If ID exists and project reassigned, move any _children
-            _olObject.SetUdf("TagProject", _flags.get_Projects(false), OlUserPropertyType.olKeywords);
-            _olObject.SetUdf("TagTopic", _flags.get_Topics(false), OlUserPropertyType.olKeywords);
-            _olObject.SetUdf("KB", _flags.get_KB(false));
+            _olObject.SetUdf("TagProject", _flags.GetProjects(false), OlUserPropertyType.olKeywords);
+            _olObject.SetUdf("TagTopic", _flags.GetTopics(false), OlUserPropertyType.olKeywords);
+            _olObject.SetUdf("KB", _flags.GetKb(false));
         }
 
         public object OlItem
@@ -525,34 +528,63 @@ namespace ToDoModel
             }
         }
 
-        public string get_People(bool IncludePrefix = false)
-        {
-            EnsureInitialized(CallerName: "People");
-            return _flags.get_People(IncludePrefix);
-            // Set People and sanitize value
-        }
+        //public string get_People(bool IncludePrefix = false)
+        //{
+        //    EnsureInitialized(CallerName: "People");
+        //    return _flags.get_People(IncludePrefix);
+        //    // Set People and sanitize value
+        //}
 
-        public string People 
+        //public string People 
+        //{
+        //    get 
+        //    {
+        //        EnsureInitialized(CallerName: "People");
+        //        return _flags.GetPeople(false);
+        //    }
+        //    set 
+        //    {
+        //        _flags.SetPeople(value: value);
+        //        if (!_readonly)
+        //            SaveCatsToObj("TagPeople", _flags.GetPeople(false));
+        //    } 
+        //}
+
+
+        private FlagTranslator _people; 
+
+
+        public string People
         {
-            get 
+            get
             {
                 EnsureInitialized(CallerName: "People");
-                return _flags.get_People(false);
+                return _flags.GetPeople(false);
             }
-            set 
+            set
             {
-                _flags.set_People(value: value);
+                _flags.SetPeople(value: value);
                 if (!_readonly)
-                    SaveCatsToObj("TagPeople", _flags.get_People(false));
-            } 
+                    SaveCatsToObj("TagPeople", _flags.GetPeople(false));
+            }
+        }
+        private FlagTranslator LoadPeople()
+        {
+            FlagTranslator people = new(
+                () => _flags.GetPeople(false),
+                (value) => _flags.SetPeople(false, value),
+                () => _flags.GetPeopleList(true),
+                (value) => _flags.SetPeopleList(true, value));
+            return people;
         }
 
-        public void set_People(bool IncludePrefix = false, string value = default)
-        {
-            _flags.set_People(value: value);
-            if (!_readonly)
-                SaveCatsToObj("TagPeople", _flags.get_People(false));
-        }
+
+        //public void set_People(bool IncludePrefix = false, string value = default)
+        //{
+        //    _flags.set_People(value: value);
+        //    if (!_readonly)
+        //        SaveCatsToObj("TagPeople", _flags.get_People(false));
+        //}
 
         internal string Categories 
         {
@@ -564,36 +596,36 @@ namespace ToDoModel
             set => _olObject.SetCategories(value);
         }
 
-        public string get_Project(bool IncludePrefix = false)
-        {
-            EnsureInitialized(CallerName: "Project");
-            return _flags.get_Projects(IncludePrefix);
-            // Set Projects and sanitize value
-            // TODO: Assign ToDoID if project assignment changes
-            // TODO: If ID exists and project reassigned, move any _children 
-        }
+        //public string get_Project(bool IncludePrefix = false)
+        //{
+        //    EnsureInitialized(CallerName: "Project");
+        //    return _flags.get_Projects(IncludePrefix);
+        //    // Set Projects and sanitize value
+        //    // TODO: Assign ToDoID if project assignment changes
+        //    // TODO: If ID exists and project reassigned, move any _children 
+        //}
 
         public string Project 
         {
             get 
             {
                 EnsureInitialized(CallerName: "Project");
-                return _flags.get_Projects(false);
+                return _flags.GetProjects(false);
             }
             set 
             {
-                _flags.set_Projects(value: value);
+                _flags.SetProjects(value: value);
                 if (!_readonly)
-                    SaveCatsToObj("TagProject", _flags.get_Projects(false));
+                    SaveCatsToObj("TagProject", _flags.GetProjects(false));
             } 
         }
 
-        public void set_Project(bool IncludePrefix = false, string value = default)
-        {
-            _flags.set_Projects(value: value);
-            if (!_readonly)
-                SaveCatsToObj("TagProject", _flags.get_Projects(false));
-        }
+        //public void set_Project(bool IncludePrefix = false, string value = default)
+        //{
+        //    _flags.set_Projects(value: value);
+        //    if (!_readonly)
+        //        SaveCatsToObj("TagProject", _flags.get_Projects(false));
+        //}
 
         public string TagProgram
         {
@@ -627,64 +659,69 @@ namespace ToDoModel
             }
         }
         
-        public string get_Context(bool IncludePrefix = false)
-        {
-            EnsureInitialized(CallerName: "Context");
-            return _flags.get_Context(IncludePrefix);
-            // Set Context and sanitize value
-        }
+        //public string get_Context(bool IncludePrefix = false)
+        //{
+        //    EnsureInitialized(CallerName: "Context");
+        //    return _flags.get_Context(IncludePrefix);
+        //    // Set Context and sanitize value
+        //}
 
         public string Context
         {
-            get => _flags.get_Context(false);
+            get => _flags.GetContext(false);
             set
             {
-                _flags.set_Context(value: value);
+                _flags.SetContext(value: value);
                 if (!_readonly)
-                    SaveCatsToObj("TagContext", _flags.get_Context(false));
+                    SaveCatsToObj("TagContext", _flags.GetContext(false));
             }
         }
 
-        public void set_Context(bool IncludePrefix = false, string value = default)
-        {
-            _flags.set_Context(value: value);
-            if (!_readonly)
-                SaveCatsToObj("TagContext", _flags.get_Context(false));
-        }
+        //public void set_Context(bool IncludePrefix = false, string value = default)
+        //{
+        //    _flags.set_Context(value: value);
+        //    if (!_readonly)
+        //        SaveCatsToObj("TagContext", _flags.get_Context(false));
+        //}
 
-        public string get_Topic(bool IncludePrefix = false)
-        {
-            EnsureInitialized(CallerName: "Topic");
-            return _flags.get_Topics(IncludePrefix);
-            // Set Context and sanitize value
-        }
+        //public string get_Topic(bool IncludePrefix = false)
+        //{
+        //    EnsureInitialized(CallerName: "Topic");
+        //    return _flags.get_Topics(IncludePrefix);
+        //    // Set Context and sanitize value
+        //}
 
         public string Topic 
         { 
             get
             {
                 EnsureInitialized(CallerName: "Topic");
-                return _flags.get_Topics(false);
+                return _flags.GetTopics(false);
             } 
             set
             {
-                _flags.set_Topics(value: value);
+                _flags.SetTopics(value: value);
                 if (!_readonly)
-                    SaveCatsToObj("TagTopic", _flags.get_Topics(false));
+                    SaveCatsToObj("TagTopic", _flags.GetTopics(false));
             } 
         }
-        
-        public void set_Topic(bool IncludePrefix = false, string value = default)
+
+        private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            _flags.set_Topics(value: value);
-            if (!_readonly)
-                SaveCatsToObj("TagTopic", _flags.get_Topics(false));
+            
         }
+
+        //public void set_Topic(bool IncludePrefix = false, string value = default)
+        //{
+        //    _flags.set_Topics(value: value);
+        //    if (!_readonly)
+        //        SaveCatsToObj("TagTopic", _flags.get_Topics(false));
+        //}
 
         public string get_KB(bool IncludePrefix = false)
         {
             EnsureInitialized(CallerName: "KB");
-            return _flags.get_KB(IncludePrefix);
+            return _flags.GetKb(IncludePrefix);
             // Set Context and sanitize value
         }
 
@@ -693,21 +730,21 @@ namespace ToDoModel
             get
             {
                 EnsureInitialized(CallerName: "KB");
-                return _flags.get_KB(false);
+                return _flags.GetKb(false);
             }
             set
             {
-                _flags.set_KB(value: value);
+                _flags.SetKb(value: value);
                 if (!_readonly)
-                    SaveCatsToObj("KB", _flags.get_KB(false));
+                    SaveCatsToObj("KB", _flags.GetKb(false));
             }
         }
 
-        public void set_KB(bool IncludePrefix = false, string value = default)
+        public void SetKB(bool IncludePrefix = false, string value = default)
         {
-            _flags.set_KB(value: value);
+            _flags.SetKb(value: value);
             if (!_readonly)
-                SaveCatsToObj("KB", _flags.get_KB(false));
+                SaveCatsToObj("KB", _flags.GetKb(false));
         }
 
         private void SaveCatsToObj(string fieldName, string fieldValue)
@@ -718,19 +755,6 @@ namespace ToDoModel
                 dynamic olTemp = _olObject;
                 olTemp.Categories = _flags.Combine();
                 olTemp.Save();
-            }
-        }
-
-        private void EnsureInitialized(string CallerName)
-        {
-            if (_flags is null)
-            {
-                if (_olObject is null)
-                    throw new ArgumentNullException("Cannot get property " + CallerName + " if both _flags AND olObject are Null");
-                dynamic olItem = _olObject;
-                string argstrCats_All = olItem.Categories;
-                _flags = new FlagParser(ref argstrCats_All);
-                olItem.Categories = argstrCats_All;
             }
         }
 
@@ -1167,8 +1191,25 @@ namespace ToDoModel
         {
             return _olObject.GetUdfValue(fieldName, olFieldType);
         }
-                
-        
+
+        private void EnsureInitialized(string CallerName)
+        {
+            if (_flags is null)
+            {
+                if (_olObject is null)
+                    throw new ArgumentNullException("Cannot get property " + CallerName + " if both _flags AND olObject are Null");
+                dynamic olItem = _olObject;
+                string argstrCats_All = olItem.Categories;
+                _flags = new FlagParser(ref argstrCats_All);
+                olItem.Categories = argstrCats_All;
+            }
+        }
+
+        internal T Initialized<T>(T value, Action<T> initialize) 
+        { 
+            if (EqualityComparer<T>.Default.Equals(value, default(T))) { initialize(value); }
+            return value;
+        }
 
     }
 }

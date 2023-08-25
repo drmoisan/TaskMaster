@@ -296,7 +296,7 @@ namespace ToDoModel
 
         public void HideEmptyHeadersInView()
         {
-            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.get_Context())) { node.Value.ActiveBranch = false; } } };
+            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context)) { node.Value.ActiveBranch = false; } } };
 
             foreach (TreeNode<ToDoItem> node in ListOfToDoTree)
                 node.Traverse(action);

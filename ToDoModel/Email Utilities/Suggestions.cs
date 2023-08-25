@@ -19,7 +19,7 @@ namespace ToDoModel
 
         public Suggestions() { }
 
-        private SCODictionary<string, long> _folderNameScores = new();
+        private ScoDictionary<string, long> _folderNameScores = new();
         private static char[] _wordChars = { '&' };
         private Regex _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
 

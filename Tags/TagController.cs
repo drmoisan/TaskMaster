@@ -13,10 +13,10 @@ namespace Tags
     {
         #region Contructors and Initializers
 
-        public TagController(TagViewer viewer_instance,
+        public TagController(TagViewer viewerInstance,
                              SortedDictionary<string, bool> dictOptions,
                              IAutoAssign autoAssigner,
-                             List<IPrefix> prefixes,
+                             IList<IPrefix> prefixes,
                              string userEmailAddress,
                              List<string> selections = null,
                              string prefixKey = "",
@@ -24,10 +24,10 @@ namespace Tags
                              object objCallerObj = null)
         {
 
-            viewer_instance.SetController(this);
+            viewerInstance.SetController(this);
             _autoAssigner = autoAssigner;
             _prefixes = prefixes;
-            _viewer = viewer_instance;
+            _viewer = viewerInstance;
             _objItem = objItemObject;
             _dictOriginal = dictOptions;
             _dictOptions = _viewer.HideArchive.Checked == true ? FilterArchive(dictOptions) : dictOptions;
@@ -41,15 +41,16 @@ namespace Tags
 
             _gridTemplate = CaptureAndRemoveTemplate();
             
-            ResolvePrefix(prefixes, prefixKey);
+            ResolvePrefix(_prefixes, prefixKey);
 
-            SetAutoAssignState(autoAssigner);
+            SetAutoAssignState(_autoAssigner);
 
             LoadSelections(selections);
 
             LoadControls(_dictOptions, _prefix.Value);
 
-            
+            WireEvents();
+
         }
 
         public MailItem ResolveMailItem(object objItem) //internal
@@ -61,17 +62,17 @@ namespace Tags
             else return null;
         } 
 
-        public void ResolvePrefix(List<IPrefix> prefixes, string prefixKey) //internal
+        public void ResolvePrefix(IList<IPrefix> prefixes, string prefixKey) //internal
         {
             // Set default prefix if none exists
             if (string.IsNullOrEmpty(prefixKey))
             {
-                _prefix = new PrefixItem("", "", OlCategoryColor.olCategoryColorNone);
+                _prefix = new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
             }
             // Else if it exists, set the Iprefix based on the prefixKey
-            else if (prefixes.Exists(x => (x.Key ?? "") == (prefixKey ?? "")))
+            else if (prefixes.Exists(x => x.Key == prefixKey))
             {
-                _prefix = prefixes.Find(x => (x.Key ?? "") == (prefixKey ?? ""));
+                _prefix = prefixes.Find(x => (x.Key) == prefixKey );
             }
             // Else throw an error
             else
@@ -85,13 +86,13 @@ namespace Tags
             // Determine if the autoAssign button should be visible and active
             if (autoAssigner is not null & _isMail)
             {
-                _viewer.ButtonAutoassign.Visible = true;
-                _viewer.ButtonAutoassign.Enabled = true;
+                _viewer.ButtonAutoAssign.Visible = true;
+                _viewer.ButtonAutoAssign.Enabled = true;
             }
             else
             {
-                _viewer.ButtonAutoassign.Visible = false;
-                _viewer.ButtonAutoassign.Enabled = false;
+                _viewer.ButtonAutoAssign.Visible = false;
+                _viewer.ButtonAutoAssign.Enabled = false;
             }
         } 
 
@@ -161,7 +162,7 @@ namespace Tags
         private MailItem _olMail;
         private readonly object _objCaller;
         private IPrefix _prefix;
-        private readonly List<IPrefix> _prefixes;
+        private readonly IList<IPrefix> _prefixes;
         private List<CheckBox> _colCbxCtrl = new List<CheckBox>();
         private List<CheckBoxController> _colCbxEvent = new();
         private readonly List<object> _colColorbox = new List<object>();
@@ -176,7 +177,7 @@ namespace Tags
         #endregion
 
 
-        #region Public Functions
+        #region Public Functions and Properties
 
         public void ToggleChoice(string str_choice) => _dictOptions[str_choice] = !_dictOptions[str_choice];
         
@@ -190,20 +191,50 @@ namespace Tags
             _filteredSelections = _filteredOptions.Where(x => x.Value).Select(x => x.Key).ToList();
         }
 
-        internal void SearchAndReload() //internal
+        public void SearchAndReload() //internal
         {
-            RemoveControls();
+            // Get search strings 
+            var searchStrings = ParseSearchStrings(_viewer.SearchText.Text);
+            
+            // Filter the dictionary based on the search strings
+            var filtered = Search(_dictOptions, searchStrings);
+            
+            // If the filtered dictionary is different from the current filtered dictionary, then reload the controls
+            if (!_filteredOptions.SequenceEqual(filtered))
+            {
+                RemoveControls();
+                LoadControls(filtered, _prefix.Value); 
+            }
+        }
 
-            var filtered_options = _dictOptions.Where(x => x.Key.IndexOf(_viewer.SearchText.Text, StringComparison.OrdinalIgnoreCase) >= 0).ToSortedDictionary();
+        public SortedDictionary<string, bool> Search(SortedDictionary<string, bool> source, List<string> searchStrings)
+        {
+            // If there are no search strings, then the filtered dictionary is the original dictionary
+            if (searchStrings.Count == 0) { return source; }
 
-            LoadControls(filtered_options, _prefix.Value);
+            // Else, filter the original dictionary based on the search strings
+            return searchStrings.Select(search => source
+                                            .Where(x => x.Key.IndexOf(
+                                                search, StringComparison.OrdinalIgnoreCase) >= 0))
+                                            .SelectMany(x => x)
+                                            .Distinct()
+                                            .ToSortedDictionary();
+            
+        }
+
+        public List<string> ParseSearchStrings(string searchText)
+        {
+            searchText = searchText.Trim();
+            if (searchText.IsNullOrEmpty())
+                return new List<string>();
+            return searchText.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         public string SelectionString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
         
         public bool ButtonNewActive { get => _viewer.ButtonNew.Visible; set => _viewer.ButtonNew.Visible = value; }
         
-        public bool ButtonAutoAssignActive {  get => _viewer.ButtonAutoassign.Visible; set => _viewer.ButtonAutoassign.Visible = value; }
+        public bool ButtonAutoAssignActive {  get => _viewer.ButtonAutoAssign.Visible; set => _viewer.ButtonAutoAssign.Visible = value; }
         
         public void SetSearchText(string searchText) => _viewer.SearchText.Text = searchText;
 
@@ -211,23 +242,34 @@ namespace Tags
 
         #endregion
 
-        #region Public Mouse Events
+        #region Public Events
 
-        public void Cancel_Action() //internal
+        public void WireEvents() 
         {
-            _viewer.Hide();
-            _exitType = "Cancel";
-            _viewer.Dispose();
+            _viewer.L1v2L2_OptionsPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(L1v2L2_OptionsPanel_KeyDown);
+            _viewer.L1v2L2_OptionsPanel.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(OptionsPanel_PreviewKeyDown);
+            _viewer.ButtonOk.Click += new System.EventHandler(ButtonOk_Click);
+            _viewer.ButtonCancel.Click += new System.EventHandler(ButtonCancel_Click);
+            _viewer.ButtonNew.Click += new System.EventHandler(ButtonNew_Click);
+            _viewer.ButtonAutoAssign.Click += new System.EventHandler(ButtonAutoAssign_Click);
+            _viewer.SearchText.TextChanged += new System.EventHandler(SearchText_TextChanged);
+            _viewer.SearchText.KeyDown += new System.Windows.Forms.KeyEventHandler(SearchText_KeyDown);
+            _viewer.SearchText.KeyUp += new System.Windows.Forms.KeyEventHandler(SearchText_KeyUp);
+            _viewer.HideArchive.CheckedChanged += new System.EventHandler(HideArchive_CheckedChanged);
+            _viewer.KeyDown += new System.Windows.Forms.KeyEventHandler(TagViewer_KeyDown);
         }
-
-        public void OK_Action() //internal
+        
+        private void ButtonOk_Click(object sender, EventArgs e) => ButtonOk_Action();
+        
+        public void ButtonOk_Action() //internal
         {
-            _viewer.Hide();
+            _viewer.Close();
             _exitType = "Normal";
-            _viewer.Dispose();
         }
 
-        public void AutoAssign() //internal
+        private void ButtonNew_Click(object sender, EventArgs e) => AddColorCategory();
+
+        private void ButtonAutoAssign_Click(object sender, EventArgs e)
         {
             var col_choices = _autoAssigner.AutoFind(_objItem);
             foreach (string str_choice in col_choices)
@@ -245,7 +287,25 @@ namespace Tags
                 FilterToSelected();
         }
 
-        public SortedDictionary<string, bool> FilterArchive(SortedDictionary<string, bool> source_dict) //internal
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            _viewer.Close();
+            _exitType = "Cancel";
+        }
+
+        private void SearchText_TextChanged(object sender, EventArgs e) => SearchAndReload();
+
+        private void HideArchive_CheckedChanged(object sender, EventArgs e)
+        {
+            _dictOptions = _viewer.HideArchive.Checked == true ? FilterArchive(_dictOptions) : _dictOriginal;
+            SearchAndReload();
+        }
+
+        #endregion
+
+        #region Old Event Actions
+
+        public SortedDictionary<string, bool> FilterArchive(SortedDictionary<string, bool> sourceDict) //internal
         {
 
             if (_autoAssigner is not null)
@@ -254,22 +314,19 @@ namespace Tags
                 // Dim filtered_dict = (From x In source_dict
                 // Where Not exclude.Contains(x.Key)
                 // Select x).ToSortedDictionary()
-                var filtered_dict = (from x in source_dict
-                                     where exclude.IndexOf(x.Key, (int)StringComparison.OrdinalIgnoreCase) < 0
-                                     select x).ToSortedDictionary();
-                return filtered_dict;
+                //var filteredDict = (from x in sourceDict
+                //                    where exclude.FindIndex(x.Key, (int)StringComparison.OrdinalIgnoreCase) < 0
+                //                    select x).ToSortedDictionary();
+                var filteredDict = (from x in sourceDict
+                                    where !exclude.Contains(x.Key, StringComparison.OrdinalIgnoreCase)
+                                    select x).ToSortedDictionary();
+                return filteredDict;
             }
             else
             {
-                return source_dict;
+                return sourceDict;
             }
 
-        }
-
-        public void ToggleArchive() //internal
-        {
-            _dictOptions = _viewer.HideArchive.Checked == true ? FilterArchive(_dictOptions) : _dictOriginal;
-            SearchAndReload();
         }
 
         public void AddColorCategory(string categoryName = "") //internal
@@ -313,7 +370,7 @@ namespace Tags
                         msg = "Please enter a name or hit cancel:";
                     }
                 }
-                if (!string.IsNullOrEmpty(categoryName))
+                if (!string.IsNullOrEmpty(categoryName)&&_autoAssigner is not null)
                 {
                     var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
                     if (newCategory is not null)
@@ -337,6 +394,11 @@ namespace Tags
         #endregion
 
         #region Keyboard Events
+
+        private void L1v2L2_OptionsPanel_KeyDown(object sender, KeyEventArgs e)
+        {
+            
+        }
 
         public void OptionsPanel_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e) //internal
         {
@@ -378,13 +440,13 @@ namespace Tags
             {
                 case Keys.Enter:
                     {
-                        OK_Action();
+                        ButtonOk_Action();
                         break;
                     }
             }
         }
 
-        public void TextBox1_KeyDown(object sender, KeyEventArgs e) //internal
+        public void SearchText_KeyDown(object sender, KeyEventArgs e) //internal
         {
             switch (e.KeyCode)
             {
@@ -401,7 +463,7 @@ namespace Tags
             }
         }
 
-        public void TextBox1_KeyUp(object sender, KeyEventArgs e) //internal
+        public void SearchText_KeyUp(object sender, KeyEventArgs e) //internal
         {
             switch (e.KeyCode)
             {
@@ -416,7 +478,7 @@ namespace Tags
                     }
                 case Keys.Enter:
                     {
-                        OK_Action();
+                        ButtonOk_Action();
                         break;
                     }
             }
@@ -427,18 +489,13 @@ namespace Tags
 
         #region Major Actions
 
-        public bool LoadControls(SortedDictionary<string, bool> dict_options, string prefix) //internal
+        public bool LoadControls(SortedDictionary<string, bool> dictOptions, string prefix) //internal
         {
             CheckBox ctrlCB;
             string strChkName;
             CheckBoxController clsCheckBox;
 
-            //const int cHt_var = 18;
-            //const int cHt_fxd = 6;
-            //const int cLt = 6;
-            //const int cWt = 300;
-
-            _filteredOptions = dict_options;
+            _filteredOptions = dictOptions;
             intFocus = 0;
             _colCbxCtrl = new();
             _colCbxEvent = new();
@@ -473,7 +530,7 @@ namespace Tags
                 }
 
                 // ctrlCB.AutoSize = True
-                _gridTemplate.Set(ctrlCB, i, 0);
+                ControlPosition.Set(ctrlCB, _gridTemplate, i, 0);
                 
                 // _viewer.OptionsPanel.ScrollHeight = ctrlCB.Top + cHt_var
                 try
@@ -511,7 +568,8 @@ namespace Tags
         public void AddOption(string strOption, bool blClickTrue = false) //internal
         {
             _dictOptions.Add(strOption, blClickTrue);
-            _filteredOptions.Add(strOption, blClickTrue);
+            if (!_dictOptions.Equals(_filteredOptions))
+                _filteredOptions.Add(strOption, blClickTrue);
         }
 
         public void FilterToSelected() //internal
@@ -649,9 +707,13 @@ namespace Tags
             }
         }
 
-
         #endregion
 
+        #region Helper Functions
+
+
+
+        #endregion
 
     }
 }

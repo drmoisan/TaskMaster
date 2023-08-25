@@ -133,9 +133,9 @@ namespace TaskVisualization
 
                 using (var optionsViewer = new TagViewer())
                 {
-                    var flagController = new TagController(viewer_instance: optionsViewer, dictOptions: symbolSelectionDict, autoAssigner: null, prefixes: _defaultsToDo.PrefixList, userEmailAddress: _userEmailAddress);
+                    var flagController = new TagController(viewerInstance: optionsViewer, dictOptions: symbolSelectionDict, autoAssigner: null, prefixes: _defaultsToDo.PrefixList, userEmailAddress: _userEmailAddress);
                     optionsViewer.ShowDialog();
-                    if (flagController._exitType != "Cancel")
+                    if (flagController.ExitType != "Cancel")
                     {
                         listSelections = flagController.GetSelections();
                     }
@@ -173,7 +173,7 @@ namespace TaskVisualization
                 _globals = globals;
             }
 
-            public List<string> FilterList
+            public IList<string> FilterList
             {
                 get => _globals.TD.CategoryFilters.ToList();
             }
@@ -189,26 +189,23 @@ namespace TaskVisualization
 
             }
 
-            public IList<string> AddChoicesToDict(MailItem olMail, List<IPrefix> prefixes, string prefixKey, string currentUserEmail)
+            public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
             {
-
-                return AutoFile.dictPPL_AddMissingEntries(OlMail: olMail,
-                                                          ppl_dict: _globals.TD.DictPPL,
-                                                          dictRemap: _globals.TD.DictRemap,
-                                                          prefixes: prefixes,
-                                                          prefixKey: prefixKey,
-                                                          emailRootFolder: _globals.Ol.EmailRootPath,
-                                                          stagingPath: _globals.FS.FldrStaging,
-                                                          filename_dictppl: _globals.TD.DictPPL_Filename,
-                                                          dictPPLSave: _globals.TD.DictPPL_Save,
-                                                          currentUserEmail: currentUserEmail);
+                return _globals.TD.DictPPL.AddMissingEntries(olMail);
+                //return AutoFile.dictPPL_AddMissingEntries(olMail: olMail,
+                //                                          ppl_dict: _globals.TD.DictPPL,
+                //                                          dictRemap: _globals.TD.DictRemap,
+                //                                          prefixes: prefixes,
+                //                                          prefixKey: prefixKey,
+                //                                          emailRootFolder: _globals.Ol.EmailRootPath,
+                //                                          stagingPath: _globals.FS.FldrStaging,
+                //                                          currentUserEmail: currentUserEmail);
 
             }
 
             public Category AddColorCategory(IPrefix prefix, string categoryName)
             {
-
-                return CreateCategoryModule.CreateCategory(OlNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
+                return CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
             }
         }
 

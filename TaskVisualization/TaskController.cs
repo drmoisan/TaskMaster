@@ -261,11 +261,12 @@ namespace TaskVisualization
                                  select x).ToSortedDictionary();
 
             List<string> selections = Array.ConvertAll(_active.People.Split(','), x => x.Trim()).ToList();
+            
             selections.Remove("");
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewer_instance: viewer, 
+                var controller = new TagController(viewerInstance: viewer, 
                                                    dictOptions: filtered_cats, 
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
@@ -285,7 +286,7 @@ namespace TaskVisualization
         /// <summary>
     /// Loads a TagViewer with categories relevant to Context for assigment
     /// </summary>
-        public void Assign_Context()
+        public void AssignContext()
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "Context");
 
@@ -298,7 +299,7 @@ namespace TaskVisualization
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewer_instance: viewer, 
+                var controller = new TagController(viewerInstance: viewer, 
                                                    dictOptions: filtered_cats, 
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
@@ -316,7 +317,7 @@ namespace TaskVisualization
 
         }
 
-        public void Assign_Project()
+        public void AssignProject()
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "Project");
 
@@ -329,7 +330,7 @@ namespace TaskVisualization
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewer_instance: viewer, 
+                var controller = new TagController(viewerInstance: viewer, 
                                                    dictOptions: filtered_cats, 
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
@@ -349,7 +350,7 @@ namespace TaskVisualization
         /// <summary>
     /// Loads a TagViewer with categories relevant to Topics for assigment
     /// </summary>
-        public void Assign_Topic()
+        public void AssignTopic()
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "Topic");
 
@@ -362,7 +363,7 @@ namespace TaskVisualization
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewer_instance: viewer, 
+                var controller = new TagController(viewerInstance: viewer, 
                                                    dictOptions: filtered_cats, 
                                                    autoAssigner: _autoAssign, 
                                                    prefixes: _defaults.PrefixList, 
@@ -951,15 +952,15 @@ namespace TaskVisualization
                 }
                 else if (lbl.Equals(_viewer.XlProject))
                 {
-                    Assign_Project();
+                    AssignProject();
                 }
                 else if (lbl.Equals(_viewer.XlTopic))
                 {
-                    Assign_Topic();
+                    AssignTopic();
                 }
                 else if (lbl.Equals(_viewer.XlContext))
                 {
-                    Assign_Context();
+                    AssignContext();
                 }
                 else
                 {

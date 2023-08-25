@@ -7,8 +7,9 @@ using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Outlook;
 using Tags;
 using UtilitiesCS;
-using UtilitiesCS;
+using System.Globalization;
 using System.Windows.Forms;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel
 {
@@ -137,9 +138,9 @@ namespace ToDoModel
 
 
         public static IList<string> AutoFindPeople(object objItem,
-                                                   Dictionary<string, string> ppl_dict,
+                                                   IScoDictionary<string, string> ppl_dict,
                                                    string emailRootFolder,
-                                                   Dictionary<string, string> dictRemap,
+                                                   IScoDictionary<string, string> dictRemap,
                                                    string userAddress,
                                                    bool blNotifyMissing = true,
                                                    bool blExcludeFlagged = true)
@@ -155,7 +156,7 @@ namespace ToDoModel
                 OlMail = (MailItem)objItem;
                 if (MailResolution.IsMailUnReadable(OlMail) == false)
                 {
-                    emailAddressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap, userAddress);
+                    emailAddressList = CaptureEmailAddressesModule.GetEmailAddresses(OlMail, emailRootFolder, dictRemap, userAddress);
                     for (int i = emailAddressList.Count - 1; i >= 0; i -= 1)
                     {
                         strTmp = emailAddressList[i];
@@ -211,89 +212,106 @@ namespace ToDoModel
 
         public delegate void DictPPL_Save();
 
-        public static IList<string> dictPPL_AddMissingEntries(MailItem OlMail, Dictionary<string, string> ppl_dict, List<IPrefix> prefixes, string prefixKey, string emailRootFolder, string stagingPath, Dictionary<string, string> dictRemap, string filename_dictppl, DictPPL_Save dictPPLSave, string currentUserEmail)
-        {
+        //public static IList<string> dictPPL_AddMissingEntries(MailItem olMail, 
+        //                                                      IScoDictionary<string, string> ppl_dict, 
+        //                                                      IList<IPrefix> prefixes, 
+        //                                                      string prefixKey, 
+        //                                                      string emailRootFolder, 
+        //                                                      string stagingPath, 
+        //                                                      IScoDictionary<string, string> dictRemap, 
+        //                                                      string currentUserEmail)
+        //{
 
-            var addressList = new List<string>();
-            string strTmp3;
-            bool blNew = false;
-            // Dim catTmp As Outlook.Category
-            var colReturnCatNames = new List<string>();
-            Regex objRegex;
-            TagViewer _viewer;
-            SortedDictionary<string, bool> dictNAMES;
+        //    var addressList = new List<string>();
+        //    string strTmp3;
+        //    bool blNew = false;
+        //    // Dim catTmp As Outlook.Category
+        //    var colReturnCatNames = new List<string>();
+        //    Regex objRegex;
+        //    TagViewer _viewer;
+        //    SortedDictionary<string, bool> dictNAMES;
 
-            dictNAMES = ppl_dict.GroupBy(x => x.Value).ToDictionary(y => y.Key, z => false).ToSortedDictionary();
-
-
-            if (MailResolution.IsMailUnReadable(OlMail) == false)
-            {
-                addressList = CaptureEmailAddressesModule.CaptureEmailAddresses(OlMail, emailRootFolder, dictRemap, currentUserEmail);
-            }
-
-            // Discard any email addresses from the email that
-            // are already in the people dictionary
-            addressList = addressList.Where(x => !ppl_dict.ContainsKey(x)).Select(x => x).ToList();
+        //    dictNAMES = ppl_dict.GroupBy(x => x.Value).ToDictionary(y => y.Key, z => false).ToSortedDictionary();
 
 
-            foreach (string address in addressList)
-            {
+        //    if (MailResolution.IsMailUnReadable(olMail) == false)
+        //    {
+        //        //addressList = CaptureEmailAddressesModule.GetEmailAddresses(OlMail, emailRootFolder, dictRemap, currentUserEmail);
+        //        addressList = olMail.GetEmailAddresses(emailRootFolder, dictRemap, currentUserEmail);
+        //    }
 
-                var vbR = MessageBox.Show("Add entry for " + address, "Dialog",MessageBoxButtons.YesNo);
-                if (vbR == DialogResult.Yes)
-                {
-                    objRegex = new Regex(@"([a-zA-z\d]+)\.([a-zA-z\d]+)@([a-zA-z\d]+)\.com", RegexOptions.Multiline);
+        //    // Discard any email addresses from the email that
+        //    // are already in the people dictionary
+        //    addressList = addressList.Where(x => !ppl_dict.ContainsKey(x)).Select(x => x).ToList();
 
-                    string newPplTag = objRegex.Replace(address, ("$1 $2")); //Proper case
-                    var selections = new List<string>() { newPplTag };
+            
+        //    foreach (string address in addressList)
+        //    {
+        //        var vbR = MessageBox.Show($"Add mapping for {address}?", "Dialog",MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+        //        if (vbR == DialogResult.Cancel) { break; }
+        //        if (vbR == DialogResult.Yes)
+        //        {
+        //            objRegex = new Regex(@"([a-zA-z\d]+)\.([a-zA-z]+)\d*@([a-zA-z\d]+)\.com", RegexOptions.Multiline);
 
-                    // Check if it is a new address for existing contact
-                    _viewer = new TagViewer();
+        //            string newPplTag = objRegex.Replace(address, ("$1 $2")).Trim(); 
+                    
+        //            //Convert to Title case
+        //            if (!newPplTag.IsNullOrEmpty()) 
+        //            { 
+        //                newPplTag = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(newPplTag);
+        //            }
+                    
+        //            var selections = new List<string>() { newPplTag };
 
-                    var _controller = new TagController(viewer_instance: _viewer,
-                                                        dictOptions: dictNAMES,
-                                                        autoAssigner: null,
-                                                        prefixes: prefixes,
-                                                        selections: selections,
-                                                        prefixKey: prefixKey,
-                                                        objItemObject: OlMail,
-                                                        userEmailAddress: currentUserEmail)
-                    {
-                        ButtonNewActive = false,
-                        ButtonAutoAssignActive = false
-                    };
-                    _controller.SetSearchText(newPplTag);
+        //            // Check if it is a new address for existing contact
+        //            _viewer = new TagViewer();
 
-                    var unused = _viewer.ShowDialog();
-                    strTmp3 = _controller.SelectionString();
+        //            var _controller = new TagController(viewerInstance: _viewer,
+        //                                                dictOptions: dictNAMES,
+        //                                                autoAssigner: null,
+        //                                                prefixes: prefixes,
+        //                                                userEmailAddress: currentUserEmail,
+        //                                                selections: selections,
+        //                                                prefixKey: prefixKey,
+        //                                                objItemObject: olMail)
+        //            {
+        //                ButtonNewActive = false,
+        //                ButtonAutoAssignActive = false
+        //            };
+                    
+        //            _controller.SetSearchText(newPplTag);
 
-                    if (!string.IsNullOrEmpty(strTmp3))
-                    {
-                        ppl_dict.Add(address, strTmp3);
-                        blNew = true;
-                        colReturnCatNames.Add(strTmp3);
-                        // Commented out because it seems completely redundant
-                        // Else
-                        // newPplTag = InputBox("Enter name for " & address, DefaultResponse:=newPplTag)
-                        // catTmp = CreateCategory(My.Settings.Prefix_People, newPplTag, Globals.ThisAddIn._OlNS)
+        //            _viewer.ShowDialog();
+        //            strTmp3 = _controller.SelectionString();
 
-                        // If Not catTmp Is Nothing Then
-                        // ppl_dict.Add(address, My.Settings.Prefix_People & newPplTag)
-                        // blNew = True
-                        // colReturnCatNames.Add(My.Settings.Prefix_People & newPplTag)
-                        // End If
-                    }
-                }
-            }
-            if (blNew)
-            {
-                dictPPLSave();
-                // WriteDictPPL(Path.Combine(stagingPath, filename_dictppl), ppl_dict)
-            }
+        //            if (!string.IsNullOrEmpty(strTmp3))
+        //            {
+        //                ppl_dict.Add(address, strTmp3);
+        //                blNew = true;
+        //                colReturnCatNames.Add(strTmp3);
+        //                // Commented out because it seems completely redundant
+        //                // Else
+        //                // newPplTag = InputBox("Enter name for " & address, DefaultResponse:=newPplTag)
+        //                // catTmp = CreateCategory(My.Settings.Prefix_People, newPplTag, Globals.ThisAddIn._OlNS)
+
+        //                // If Not catTmp Is Nothing Then
+        //                // ppl_dict.Add(address, My.Settings.Prefix_People & newPplTag)
+        //                // blNew = True
+        //                // colReturnCatNames.Add(My.Settings.Prefix_People & newPplTag)
+        //                // End If
+        //            }
+        //        }
+        //    }
+        //    if (blNew)
+        //    {
+        //        ppl_dict.Serialize();
+        //        //dictPPLSave();
+        //        // WriteDictPPL(Path.Combine(stagingPath, filename_dictppl), ppl_dict)
+        //    }
 
 
-            return colReturnCatNames;
+        //    return colReturnCatNames;
 
-        }
+        //}
     }
 }

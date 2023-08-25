@@ -116,5 +116,8 @@
     <Setting Name="FileName_MovedEmails" Type="System.String" Scope="User">
       <Value Profile="(Default)">999999EmailMoves.json</Value>
     </Setting>
+    <Setting Name="FileName_PrefixList" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999PrefixList.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

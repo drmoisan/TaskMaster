@@ -3,8 +3,9 @@ using System.Collections;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.ReusableTypeClasses;
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
     public static class EmailDetails
     {
@@ -19,7 +20,7 @@ namespace ToDoModel
               return $"{name} &lt;<a href=\"mailto:{address}\">{address}</a>&gt;";
         }
 
-        public static string[] Details(this MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap = null)
+        public static string[] Details(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap = null)
         {
             string[] strAry;
 

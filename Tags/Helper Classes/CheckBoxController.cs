@@ -124,7 +124,7 @@ namespace Tags
 
                 case Keys.Enter:
                     {
-                        _parent.OK_Action();
+                        _parent.ButtonOk_Action();
                         break;
                     }
             }

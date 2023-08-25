@@ -10,8 +10,9 @@ namespace Tags
 {
     internal class PrefixItem : IPrefix
     {
-        public PrefixItem(string key, string value, OlCategoryColor color)
+        public PrefixItem(PrefixTypeEnum prefixType, string key, string value, OlCategoryColor color)
         {
+            _prefixType = prefixType;
             _key = key;
             Value = value;
             Color = color;
@@ -25,6 +26,9 @@ namespace Tags
 
         private OlCategoryColor _color;
         public OlCategoryColor Color { get => _color; set => _color = value; }
+
+        private PrefixTypeEnum _prefixType;
+        public PrefixTypeEnum PrefixType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
 }
