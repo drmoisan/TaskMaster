@@ -565,11 +565,28 @@ namespace Tags
             }
         }
 
-        public void AddOption(string strOption, bool blClickTrue = false) //internal
+        public void AddOption(string option, bool blClickTrue = false) //internal
         {
-            _dictOptions.Add(strOption, blClickTrue);
+            if (!_dictOptions.ContainsKey(option))
+            {
+                _dictOptions.Add(option, blClickTrue);
+            }
+            else
+            {
+                _dictOptions[option] = blClickTrue;
+            }
+                
             if (!_dictOptions.Equals(_filteredOptions))
-                _filteredOptions.Add(strOption, blClickTrue);
+            {
+                if (!_filteredOptions.ContainsKey(option))
+                {
+                    _filteredOptions.Add(option, blClickTrue);
+                }
+                else
+                {
+                    _filteredOptions[option] = blClickTrue;
+                }
+            }
         }
 
         public void FilterToSelected() //internal

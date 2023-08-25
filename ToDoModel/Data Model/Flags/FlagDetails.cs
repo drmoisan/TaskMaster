@@ -17,35 +17,26 @@ namespace ToDoModel
 {
     public class FlagDetails : INotifyCollectionChanged
     {
-        public FlagDetails() { }
+        #region Constructors and Initializers
 
-        public FlagDetails(string prefix) { this.Prefix = prefix; }
+        public FlagDetails() 
+        { 
+            Subscribe();
+            SubscribeWithPrefix();
+        }
+
+        public FlagDetails(string prefix) 
+        { 
+            this.Prefix = prefix; 
+            Subscribe();
+            SubscribeWithPrefix();
+        }
+
+        #endregion
+
+        #region Public Properties
 
         private ObservableCollection<string> _list = new();
-        private ObservableCollection<string> _listWithPrefix = new();
-
-        private string _prefix;
-        private string _withPrefix;
-        private string _noPrefix;
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        public void Subscribe()
-        {
-            if (_list is not null)
-            {
-                _list.CollectionChanged += List_CollectionChanged;
-            }
-        }
-
-        public void Unsubscribe()
-        {
-            if (_list is not null)
-            {
-                _list.CollectionChanged -= List_CollectionChanged;
-            }
-        }
-
         public ObservableCollection<string> List
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
@@ -77,6 +68,40 @@ namespace ToDoModel
             }
         }
 
+        private ObservableCollection<string> _listWithPrefix = new();
+        public ObservableCollection<string> ListWithPrefix { get => _listWithPrefix; }
+                                
+        private string _withPrefix = "";
+        public string WithPrefix { get => _withPrefix; }
+        
+        private string _noPrefix = "";
+        public string NoPrefix { get => _noPrefix; }
+        
+        private string _prefix = "";
+        public string Prefix { get => _prefix; set => _prefix = value; }
+
+        #endregion
+
+        #region INotifyCollectionChanged
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public void Subscribe()
+        {
+            if (_list is not null)
+            {
+                _list.CollectionChanged += List_CollectionChanged;
+            }
+        }
+
+        public void Unsubscribe()
+        {
+            if (_list is not null)
+            {
+                _list.CollectionChanged -= List_CollectionChanged;
+            }
+        }
+
         public void SubscribeWithPrefix()
         {
             if (_listWithPrefix is not null)
@@ -92,12 +117,6 @@ namespace ToDoModel
                 _listWithPrefix.CollectionChanged -= ListWithPrefix_CollectionChanged;
             }
         }
-
-        public ObservableCollection<string> ListWithPrefix { get => _listWithPrefix; }
-                                
-        public string WithPrefix { get => _withPrefix; }
-        public string NoPrefix { get => _noPrefix; }
-        public string Prefix { get => _prefix; set => _prefix = value; }
 
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -119,40 +138,10 @@ namespace ToDoModel
             CollectionChanged?.Invoke(this, e);
         }
 
-        
+        #endregion
 
-        //private void ListChange_Refresh()
-        //{
-        //    _withPrefix = string.Join(", ", _list.Select(x => Prefix + x));
-        //    _noPrefix = string.Join(", ", _list);
-        //}
 
-        //private sealed class RestrictedList<T> : INotifyCollectionChanged
-        //{
-        //    public RestrictedList(List<T> wrappedList, FlagDetails outer) 
-        //    {
-        //        _wrappedList = wrappedList ?? throw new ArgumentNullException(nameof(wrappedList));
-        //        _outer = outer;
-        //    }
-
-        //    private List<T> _wrappedList;
-        //    FlagDetails _outer;
-
-        //    public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        //    public void Add(T item)
-        //    {
-        //        _wrappedList.Add(item);
-        //        _outer.ListChange_Refresh();
-        //    }
-
-        //    public void Remove(T item)
-        //    {
-        //        _wrappedList.Remove(item);
-        //        _outer.ListChange_Refresh();
-        //    }
-
-        //}
+       
 
     }
 }

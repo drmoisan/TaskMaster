@@ -125,6 +125,7 @@ namespace ToDoModel
                     if (entry is not null) { newPeople.Add(entry); }
                 }
             }
+            if (!newPeople.IsNullOrEmpty()) { this.Serialize(); }
             return newPeople;            
         }
 

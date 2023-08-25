@@ -20,22 +20,8 @@ namespace TaskVisualization
 
         private readonly List<ToDoItem> _todoSelection;
         private readonly Explorer _olExplorer;
-        private TaskViewer __viewer;
-
-        private TaskViewer _viewer
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return __viewer;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                __viewer = value;
-            }
-        }
+        private TaskViewer _viewer;
+        
         private readonly TaskController _controller;
         private readonly ToDoDefaults _defaultsToDo = new ToDoDefaults();
         private readonly AutoAssign _autoAssign;

@@ -333,6 +333,11 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
                 else { response = DialogResult.Yes; }
             }
+            finally
+            {
+                if (response == DialogResult.Yes) { this.Serialize(); }
+                else if (response == DialogResult.No) { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
+            }
         }
 
         Dictionary<TKey, TValue> IScoDictionary<TKey, TValue>.ToDictionary()

@@ -14,6 +14,8 @@ namespace ToDoModel
     [Serializable()]
     public class ToDoItem : ICloneable
     {
+        //TODO: Convert PEOPLE, PROJECTS, CONTEXTS, and TOPICS to FlagTranslator
+        //TODO: Simplify Implementation by Leveraging new OutlookItem Class
         public ToDoItem(MailItem OlMail)
         {
             this._olObject = OlMail;

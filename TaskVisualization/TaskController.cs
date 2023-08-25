@@ -131,13 +131,13 @@ namespace TaskVisualization
             // _viewer.Show()
             // LoadFromFile values into viewer by field
             _viewer.TaskName.Text = _active.TaskSubject;
-            if (_active.Context != "")
+            if (!_active.Context.IsNullOrEmpty())
                 _viewer.CategorySelection.Text = _active.Context;
-            if (_active.People != "")
+            if (!_active.People.IsNullOrEmpty())
                 _viewer.PeopleSelection.Text = _active.People;
-            if (_active.Project != "")
+            if (!_active.Project.IsNullOrEmpty())
                 _viewer.ProjectSelection.Text = _active.Project;
-            if (_active.Topic != "")
+            if (!_active.Topic.IsNullOrEmpty())
                 _viewer.TopicSelection.Text = _active.Topic;
 
             switch (_active.Priority)
@@ -159,7 +159,7 @@ namespace TaskVisualization
                     }
             }
 
-            _viewer.KbSelector.SelectedItem = _active.KB == "" ? "Backlog" : _active.KB;
+            _viewer.KbSelector.SelectedItem = _active.KB.IsNullOrEmpty() ? "Backlog" : _active.KB;
 
             if (_active.TotalWork == 0)
                 _active.TotalWork = _defaults.DefaultTaskLength;
