@@ -503,7 +503,6 @@ namespace TaskVisualization
         #region Public Keyboard Events and Properties
         public bool KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
         {
-
             if (e.Alt)
             {
                 var tup = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
@@ -1159,6 +1158,59 @@ namespace TaskVisualization
             return xlCtrlLookup;
         }
 
+        private List<ControlRelationship> GetControlRelationships()
+        {
+            var list = new List<ControlRelationship>
+            {
+                new ControlRelationship(2, _viewer.XlTopic,  _options.HasFlag(FlagsToSet.topics),  _viewer.LblTopic.Text,  _viewer.LblTopic),
+                new ControlRelationship(2, _viewer.XlProject,  _options.HasFlag(FlagsToSet.projects),  _viewer.LblProject.Text,  _viewer.LblProject),
+                new ControlRelationship(2, _viewer.XlPeople,  _options.HasFlag(FlagsToSet.people),  _viewer.LblPeople.Text,  _viewer.LblPeople),
+                new ControlRelationship(2, _viewer.XlContext,  _options.HasFlag(FlagsToSet.context),  _viewer.LblContext.Text,  _viewer.LblContext),
+                new ControlRelationship(1, _viewer.XlTaskname,  _options.HasFlag(FlagsToSet.taskname),  _viewer.LblTaskname.Text,  _viewer.TaskName),
+                new ControlRelationship(1, _viewer.XlImportance,  _options.HasFlag(FlagsToSet.priority),  _viewer.LblPriority.Text,  _viewer.PriorityBox),
+                new ControlRelationship(1, _viewer.XlKanban,  _options.HasFlag(FlagsToSet.kbf),  _viewer.LblKbf.Text,  _viewer.KbSelector),
+                new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(FlagsToSet.worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
+                new ControlRelationship(4, _viewer.XlOk,  true,  _viewer.OKButton.Text,  _viewer.OKButton),
+                new ControlRelationship(4, _viewer.XlCancel,  true,  _viewer.Cancel_Button.Text,  _viewer.Cancel_Button),
+                new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(FlagsToSet.reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
+                new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(FlagsToSet.duedate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
+                new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
+                new ControlRelationship(3, _viewer.XlScUnprocessed,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutUnprocessed.Text,  _viewer.ShortcutUnprocessed),
+                new ControlRelationship(3, _viewer.XlScNews,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutNews.Text,  _viewer.ShortcutNews),
+                new ControlRelationship(3, _viewer.XlScEmail,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutEmail.Text,  _viewer.ShortcutEmail),
+                new ControlRelationship(3, _viewer.XlScReadingbusiness,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutReadingBusiness.Text,  _viewer.ShortcutReadingBusiness),
+                new ControlRelationship(3, _viewer.XlScCalls,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutCalls.Text,  _viewer.ShortcutCalls),
+                new ControlRelationship(3, _viewer.XlScInternet,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutInternet.Text,  _viewer.ShortcutInternet),
+                new ControlRelationship(3, _viewer.XlScPreread,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutPreRead.Text,  _viewer.ShortcutPreRead),
+                new ControlRelationship(3, _viewer.XlScMeeting,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutMeeting.Text,  _viewer.ShortcutMeeting),
+                new ControlRelationship(3, _viewer.XlScPersonal,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutPersonal.Text,  _viewer.ShortcutPersonal),
+                new ControlRelationship(3, _viewer.XlScBullpin,  _options.HasFlag(FlagsToSet.all),  _viewer.CbxBullpin.Text,  _viewer.CbxBullpin),
+                new ControlRelationship(3, _viewer.XlScToday,  _options.HasFlag(FlagsToSet.all),  _viewer.CbxToday.Text,  _viewer.CbxToday)
+            };
+            return list;
+        }
+        
+        private struct ControlRelationship 
+        {
+            public ControlRelationship() { }
+
+            public ControlRelationship(int group, Label accelerator, bool active, string caption, Control control)
+            {
+                Group = group;
+                Accelerator = accelerator;
+                Active = active;
+                Caption = caption;
+                Control = control;
+            }
+
+            public int Group;
+            public Label Accelerator;
+            public bool Active;
+            public string Caption;
+            public Control Control;
+            
+        }
+        
         #endregion
 
     }
