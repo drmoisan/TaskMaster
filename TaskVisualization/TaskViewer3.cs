@@ -1,29 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.CompilerServices;
 using UtilitiesCS;
 
 namespace TaskVisualization
 {
-    public partial class TaskViewer : Form
+
+    public partial class TaskViewer3
     {
-        public TaskViewer()
-        {
-            InitializeComponent();
-
-            KeyPreview = true;
-
-            _mouseFilter = new MouseDownFilter(this);
-            Application.AddMessageFilter(_mouseFilter);
-        }
 
         private MouseDownFilter __mouseFilter;
 
@@ -51,6 +37,22 @@ namespace TaskVisualization
             }
         }
         private TaskController _controller;
+
+        public TaskViewer3()
+        {
+
+            // This call is required by the designer.
+            InitializeComponent();
+
+            // Add any initialization after the InitializeComponent() call.
+            KeyPreview = true;
+
+            // Attach Handler to capture mouseclick anywhere on form
+            _mouseFilter = new MouseDownFilter(this);
+            Application.AddMessageFilter(_mouseFilter);
+
+        }
+
 
         public void SetController(TaskController controller)
         {
@@ -220,6 +222,5 @@ namespace TaskVisualization
                 // Debug.WriteLine("task_name_keypress suppressed keystrokes")
             }
         }
-
     }
 }
