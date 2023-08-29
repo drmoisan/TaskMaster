@@ -531,11 +531,20 @@ namespace TaskVisualization
         {
             if (e.Alt)
             {
-                var tup = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
-                _xlCtrlsActive = tup.dictActive;
-                _altActive = tup.altActive;
-                _altLevel = tup.level;
-                return true;
+                if (_altActive) 
+                { 
+                    var tup = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
+                    _xlCtrlsActive = tup.dictActive;
+                    _altActive = tup.altActive;
+                    _altLevel = tup.level;
+                    return true;               
+                }
+                else
+                {
+                    ToggleXlGroupNav(ForceState.force_on);
+                    _altActive = true;
+                    return true;
+                }
             }
             else if (_altActive)
             {
@@ -546,7 +555,12 @@ namespace TaskVisualization
                     _altActive = tup.altActive;
                     _altLevel = tup.level;
                 }
-
+                else if ((e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9) || (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9))
+                {
+                    var tup = ActivateXlGroup(e.KeyCode.ToString()[0]);
+                    _xlCtrlsActive = tup.dictActive;
+                    _altActive = tup.altActive;
+                    _altLevel = tup.level;                }
                 return true;
             }
             else
