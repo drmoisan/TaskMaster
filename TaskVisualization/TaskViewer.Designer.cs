@@ -123,7 +123,7 @@
             this.L0v_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26.73267F));
             this.L0v_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 61.38614F));
             this.L0v_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.88119F));
-            this.L0v_Tlp.Size = new System.Drawing.Size(1613, 1338);
+            this.L0v_Tlp.Size = new System.Drawing.Size(1620, 1338);
             this.L0v_Tlp.TabIndex = 0;
             // 
             // L0v1L2g_TlpTop
@@ -139,7 +139,7 @@
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.11259F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36F));
+            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v1L2g_TlpTop.Controls.Add(this.LblDuration, 2, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.XlWorktime, 1, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.LblKbf, 2, 5);
@@ -148,7 +148,6 @@
             this.L0v1L2g_TlpTop.Controls.Add(this.XlKanban, 1, 5);
             this.L0v1L2g_TlpTop.Controls.Add(this.TaskName, 2, 2);
             this.L0v1L2g_TlpTop.Controls.Add(this.XlImportance, 1, 4);
-            this.L0v1L2g_TlpTop.Controls.Add(this.XlTaskname, 1, 1);
             this.L0v1L2g_TlpTop.Controls.Add(this.PriorityBox, 3, 4);
             this.L0v1L2g_TlpTop.Controls.Add(this.KbSelector, 3, 5);
             this.L0v1L2g_TlpTop.Controls.Add(this.Duration, 3, 6);
@@ -158,10 +157,11 @@
             this.L0v1L2g_TlpTop.Controls.Add(this.XlDuedate, 7, 5);
             this.L0v1L2g_TlpTop.Controls.Add(this.DtReminder, 8, 4);
             this.L0v1L2g_TlpTop.Controls.Add(this.DtDuedate, 8, 5);
-            this.L0v1L2g_TlpTop.Controls.Add(this.XlSector1, 4, 1);
-            this.L0v1L2g_TlpTop.Controls.Add(this.C1S1, 1, 0);
             this.L0v1L2g_TlpTop.Controls.Add(this.C3S1, 7, 0);
             this.L0v1L2g_TlpTop.Controls.Add(this.C4S1, 9, 0);
+            this.L0v1L2g_TlpTop.Controls.Add(this.XlTaskname, 1, 2);
+            this.L0v1L2g_TlpTop.Controls.Add(this.XlSector1, 1, 1);
+            this.L0v1L2g_TlpTop.Controls.Add(this.C1S1, 4, 0);
             this.L0v1L2g_TlpTop.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v1L2g_TlpTop.Location = new System.Drawing.Point(3, 3);
             this.L0v1L2g_TlpTop.Name = "L0v1L2g_TlpTop";
@@ -174,7 +174,7 @@
             this.L0v1L2g_TlpTop.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.L0v1L2g_TlpTop.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.L0v1L2g_TlpTop.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.34F));
-            this.L0v1L2g_TlpTop.Size = new System.Drawing.Size(1607, 351);
+            this.L0v1L2g_TlpTop.Size = new System.Drawing.Size(1614, 351);
             this.L0v1L2g_TlpTop.TabIndex = 0;
             // 
             // LblDuration
@@ -262,11 +262,8 @@
             this.TaskName.Location = new System.Drawing.Point(76, 89);
             this.TaskName.Margin = new System.Windows.Forms.Padding(6);
             this.TaskName.Name = "TaskName";
-            this.TaskName.Size = new System.Drawing.Size(1487, 37);
+            this.TaskName.Size = new System.Drawing.Size(1489, 37);
             this.TaskName.TabIndex = 15;
-            this.TaskName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TaskName_KeyDown);
-            this.TaskName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TaskName_KeyPress);
-            this.TaskName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TaskName_KeyUp);
             // 
             // XlImportance
             // 
@@ -288,7 +285,7 @@
             this.XlTaskname.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlTaskname.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlTaskname.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlTaskname.Location = new System.Drawing.Point(32, 40);
+            this.XlTaskname.Location = new System.Drawing.Point(32, 90);
             this.XlTaskname.Margin = new System.Windows.Forms.Padding(0);
             this.XlTaskname.Name = "XlTaskname";
             this.XlTaskname.Size = new System.Drawing.Size(35, 35);
@@ -309,7 +306,7 @@
             this.PriorityBox.Location = new System.Drawing.Point(276, 172);
             this.PriorityBox.Margin = new System.Windows.Forms.Padding(6);
             this.PriorityBox.Name = "PriorityBox";
-            this.PriorityBox.Size = new System.Drawing.Size(422, 33);
+            this.PriorityBox.Size = new System.Drawing.Size(423, 33);
             this.PriorityBox.TabIndex = 23;
             this.PriorityBox.SelectedIndexChanged += new System.EventHandler(this.PriorityBox_SelectedIndexChanged);
             // 
@@ -327,7 +324,7 @@
             this.KbSelector.Location = new System.Drawing.Point(276, 222);
             this.KbSelector.Margin = new System.Windows.Forms.Padding(6);
             this.KbSelector.Name = "KbSelector";
-            this.KbSelector.Size = new System.Drawing.Size(422, 33);
+            this.KbSelector.Size = new System.Drawing.Size(423, 33);
             this.KbSelector.TabIndex = 7;
             this.KbSelector.SelectedIndexChanged += new System.EventHandler(this.KbSelector_SelectedIndexChanged);
             // 
@@ -340,7 +337,7 @@
             this.Duration.Location = new System.Drawing.Point(276, 272);
             this.Duration.Margin = new System.Windows.Forms.Padding(6);
             this.Duration.Name = "Duration";
-            this.Duration.Size = new System.Drawing.Size(422, 37);
+            this.Duration.Size = new System.Drawing.Size(423, 37);
             this.Duration.TabIndex = 9;
             // 
             // LblReminder
@@ -348,7 +345,7 @@
             this.LblReminder.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblReminder.AutoSize = true;
             this.LblReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblReminder.Location = new System.Drawing.Point(835, 176);
+            this.LblReminder.Location = new System.Drawing.Point(836, 176);
             this.LblReminder.Margin = new System.Windows.Forms.Padding(0);
             this.LblReminder.Name = "LblReminder";
             this.LblReminder.Size = new System.Drawing.Size(132, 30);
@@ -360,7 +357,7 @@
             this.LblDuedate.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblDuedate.AutoSize = true;
             this.LblDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblDuedate.Location = new System.Drawing.Point(841, 226);
+            this.LblDuedate.Location = new System.Drawing.Point(842, 226);
             this.LblDuedate.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.LblDuedate.Name = "LblDuedate";
             this.LblDuedate.Size = new System.Drawing.Size(128, 30);
@@ -373,7 +370,7 @@
             this.XlReminder.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlReminder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlReminder.Location = new System.Drawing.Point(1100, 173);
+            this.XlReminder.Location = new System.Drawing.Point(1101, 173);
             this.XlReminder.Margin = new System.Windows.Forms.Padding(0);
             this.XlReminder.Name = "XlReminder";
             this.XlReminder.Size = new System.Drawing.Size(35, 35);
@@ -386,7 +383,7 @@
             this.XlDuedate.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlDuedate.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlDuedate.Location = new System.Drawing.Point(1100, 223);
+            this.XlDuedate.Location = new System.Drawing.Point(1101, 223);
             this.XlDuedate.Margin = new System.Windows.Forms.Padding(0);
             this.XlDuedate.Name = "XlDuedate";
             this.XlDuedate.Size = new System.Drawing.Size(35, 35);
@@ -400,11 +397,11 @@
             this.DtReminder.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtReminder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtReminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtReminder.Location = new System.Drawing.Point(1144, 172);
+            this.DtReminder.Location = new System.Drawing.Point(1145, 172);
             this.DtReminder.Margin = new System.Windows.Forms.Padding(6);
             this.DtReminder.Name = "DtReminder";
             this.DtReminder.ShowCheckBox = true;
-            this.DtReminder.Size = new System.Drawing.Size(419, 31);
+            this.DtReminder.Size = new System.Drawing.Size(420, 31);
             this.DtReminder.TabIndex = 29;
             // 
             // DtDuedate
@@ -414,11 +411,11 @@
             this.DtDuedate.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtDuedate.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtDuedate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtDuedate.Location = new System.Drawing.Point(1144, 222);
+            this.DtDuedate.Location = new System.Drawing.Point(1145, 222);
             this.DtDuedate.Margin = new System.Windows.Forms.Padding(6);
             this.DtDuedate.Name = "DtDuedate";
             this.DtDuedate.ShowCheckBox = true;
-            this.DtDuedate.Size = new System.Drawing.Size(419, 31);
+            this.DtDuedate.Size = new System.Drawing.Size(420, 31);
             this.DtDuedate.TabIndex = 11;
             // 
             // XlSector1
@@ -427,7 +424,7 @@
             this.XlSector1.BackColor = System.Drawing.SystemColors.Highlight;
             this.XlSector1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlSector1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlSector1.Location = new System.Drawing.Point(666, 40);
+            this.XlSector1.Location = new System.Drawing.Point(32, 40);
             this.XlSector1.Margin = new System.Windows.Forms.Padding(0);
             this.XlSector1.Name = "XlSector1";
             this.XlSector1.Size = new System.Drawing.Size(35, 35);
@@ -438,7 +435,7 @@
             // C1S1
             // 
             this.C1S1.AutoSize = true;
-            this.C1S1.Location = new System.Drawing.Point(33, 0);
+            this.C1S1.Location = new System.Drawing.Point(668, 0);
             this.C1S1.Name = "C1S1";
             this.C1S1.Size = new System.Drawing.Size(24, 25);
             this.C1S1.TabIndex = 32;
@@ -448,7 +445,7 @@
             // C3S1
             // 
             this.C3S1.AutoSize = true;
-            this.C3S1.Location = new System.Drawing.Point(1101, 0);
+            this.C3S1.Location = new System.Drawing.Point(1102, 0);
             this.C3S1.Name = "C3S1";
             this.C3S1.Size = new System.Drawing.Size(24, 25);
             this.C3S1.TabIndex = 32;
@@ -458,7 +455,7 @@
             // C4S1
             // 
             this.C4S1.AutoSize = true;
-            this.C4S1.Location = new System.Drawing.Point(1532, 0);
+            this.C4S1.Location = new System.Drawing.Point(1534, 0);
             this.C4S1.Name = "C4S1";
             this.C4S1.Size = new System.Drawing.Size(24, 25);
             this.C4S1.TabIndex = 32;
@@ -491,14 +488,14 @@
             this.L0v3L1h_TlpOkCancel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.L0v3L1h_TlpOkCancel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 103F));
             this.L0v3L1h_TlpOkCancel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.L0v3L1h_TlpOkCancel.Size = new System.Drawing.Size(1607, 154);
+            this.L0v3L1h_TlpOkCancel.Size = new System.Drawing.Size(1614, 154);
             this.L0v3L1h_TlpOkCancel.TabIndex = 1;
             // 
             // OKButton
             // 
             this.OKButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.OKButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OKButton.Location = new System.Drawing.Point(500, 31);
+            this.OKButton.Location = new System.Drawing.Point(503, 31);
             this.OKButton.Margin = new System.Windows.Forms.Padding(6);
             this.OKButton.Name = "OKButton";
             this.OKButton.Size = new System.Drawing.Size(317, 91);
@@ -511,7 +508,7 @@
             // 
             this.Cancel_Button.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Cancel_Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Cancel_Button.Location = new System.Drawing.Point(869, 31);
+            this.Cancel_Button.Location = new System.Drawing.Point(872, 31);
             this.Cancel_Button.Margin = new System.Windows.Forms.Padding(6);
             this.Cancel_Button.Name = "Cancel_Button";
             this.Cancel_Button.Size = new System.Drawing.Size(317, 91);
@@ -526,7 +523,7 @@
             this.XlCancel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlCancel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlCancel.Location = new System.Drawing.Point(825, 59);
+            this.XlCancel.Location = new System.Drawing.Point(828, 59);
             this.XlCancel.Margin = new System.Windows.Forms.Padding(0);
             this.XlCancel.Name = "XlCancel";
             this.XlCancel.Size = new System.Drawing.Size(35, 35);
@@ -539,7 +536,7 @@
             this.XlOk.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlOk.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlOk.Location = new System.Drawing.Point(456, 59);
+            this.XlOk.Location = new System.Drawing.Point(459, 59);
             this.XlOk.Margin = new System.Windows.Forms.Padding(0);
             this.XlOk.Name = "XlOk";
             this.XlOk.Size = new System.Drawing.Size(35, 35);
@@ -563,7 +560,7 @@
             // C2S4
             // 
             this.C2S4.AutoSize = true;
-            this.C2S4.Location = new System.Drawing.Point(457, 0);
+            this.C2S4.Location = new System.Drawing.Point(460, 0);
             this.C2S4.Name = "C2S4";
             this.C2S4.Size = new System.Drawing.Size(24, 25);
             this.C2S4.TabIndex = 32;
@@ -573,7 +570,7 @@
             // C3S4
             // 
             this.C3S4.AutoSize = true;
-            this.C3S4.Location = new System.Drawing.Point(826, 0);
+            this.C3S4.Location = new System.Drawing.Point(829, 0);
             this.C3S4.Name = "C3S4";
             this.C3S4.Size = new System.Drawing.Size(24, 25);
             this.C3S4.TabIndex = 32;
@@ -592,7 +589,7 @@
             this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 38F));
+            this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 44F));
             this.L0v2L1g_Tlp.Controls.Add(this.XlScBullpin, 7, 10);
             this.L0v2L1g_Tlp.Controls.Add(this.LblTopic, 2, 4);
             this.L0v2L1g_Tlp.Controls.Add(this.LblProject, 2, 3);
@@ -651,7 +648,7 @@
             this.L0v2L1g_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 77F));
             this.L0v2L1g_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v2L1g_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.L0v2L1g_Tlp.Size = new System.Drawing.Size(1607, 815);
+            this.L0v2L1g_Tlp.Size = new System.Drawing.Size(1614, 815);
             this.L0v2L1g_Tlp.TabIndex = 2;
             // 
             // XlScBullpin
@@ -660,7 +657,7 @@
             this.XlScBullpin.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScBullpin.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScBullpin.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScBullpin.Location = new System.Drawing.Point(1136, 696);
+            this.XlScBullpin.Location = new System.Drawing.Point(1138, 696);
             this.XlScBullpin.Margin = new System.Windows.Forms.Padding(0);
             this.XlScBullpin.Name = "XlScBullpin";
             this.XlScBullpin.Size = new System.Drawing.Size(35, 35);
@@ -726,7 +723,7 @@
             this.CategorySelection.Location = new System.Drawing.Point(316, 87);
             this.CategorySelection.Margin = new System.Windows.Forms.Padding(6);
             this.CategorySelection.Name = "CategorySelection";
-            this.CategorySelection.Size = new System.Drawing.Size(1244, 44);
+            this.CategorySelection.Size = new System.Drawing.Size(1247, 44);
             this.CategorySelection.TabIndex = 30;
             this.CategorySelection.Text = "[Category Label]";
             this.CategorySelection.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -742,7 +739,7 @@
             this.PeopleSelection.Location = new System.Drawing.Point(316, 143);
             this.PeopleSelection.Margin = new System.Windows.Forms.Padding(6);
             this.PeopleSelection.Name = "PeopleSelection";
-            this.PeopleSelection.Size = new System.Drawing.Size(1244, 44);
+            this.PeopleSelection.Size = new System.Drawing.Size(1247, 44);
             this.PeopleSelection.TabIndex = 31;
             this.PeopleSelection.Text = "[Assigned People Flagged]";
             this.PeopleSelection.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -758,7 +755,7 @@
             this.ProjectSelection.Location = new System.Drawing.Point(316, 199);
             this.ProjectSelection.Margin = new System.Windows.Forms.Padding(6);
             this.ProjectSelection.Name = "ProjectSelection";
-            this.ProjectSelection.Size = new System.Drawing.Size(1244, 44);
+            this.ProjectSelection.Size = new System.Drawing.Size(1247, 44);
             this.ProjectSelection.TabIndex = 32;
             this.ProjectSelection.Text = "[Projects Flagged]";
             this.ProjectSelection.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -774,7 +771,7 @@
             this.TopicSelection.Location = new System.Drawing.Point(316, 255);
             this.TopicSelection.Margin = new System.Windows.Forms.Padding(6);
             this.TopicSelection.Name = "TopicSelection";
-            this.TopicSelection.Size = new System.Drawing.Size(1244, 44);
+            this.TopicSelection.Size = new System.Drawing.Size(1247, 44);
             this.TopicSelection.TabIndex = 33;
             this.TopicSelection.Text = "[Other Topics Flagged]";
             this.TopicSelection.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -787,7 +784,7 @@
             this.ShortcutInternet.Location = new System.Drawing.Point(316, 468);
             this.ShortcutInternet.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutInternet.Name = "ShortcutInternet";
-            this.ShortcutInternet.Size = new System.Drawing.Size(380, 66);
+            this.ShortcutInternet.Size = new System.Drawing.Size(381, 66);
             this.ShortcutInternet.TabIndex = 37;
             this.ShortcutInternet.Text = "Internet";
             this.ShortcutInternet.UseVisualStyleBackColor = false;
@@ -798,10 +795,10 @@
             this.ShortcutPreRead.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.ShortcutPreRead.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ShortcutPreRead.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShortcutPreRead.Location = new System.Drawing.Point(1180, 392);
+            this.ShortcutPreRead.Location = new System.Drawing.Point(1182, 392);
             this.ShortcutPreRead.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutPreRead.Name = "ShortcutPreRead";
-            this.ShortcutPreRead.Size = new System.Drawing.Size(380, 64);
+            this.ShortcutPreRead.Size = new System.Drawing.Size(381, 64);
             this.ShortcutPreRead.TabIndex = 36;
             this.ShortcutPreRead.Text = "PreRead";
             this.ShortcutPreRead.UseVisualStyleBackColor = false;
@@ -814,7 +811,7 @@
             this.ShortcutPersonal.Location = new System.Drawing.Point(316, 392);
             this.ShortcutPersonal.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutPersonal.Name = "ShortcutPersonal";
-            this.ShortcutPersonal.Size = new System.Drawing.Size(380, 64);
+            this.ShortcutPersonal.Size = new System.Drawing.Size(381, 64);
             this.ShortcutPersonal.TabIndex = 34;
             this.ShortcutPersonal.Text = "PERSONAL";
             this.ShortcutPersonal.UseVisualStyleBackColor = false;
@@ -825,10 +822,10 @@
             this.ShortcutMeeting.BackColor = System.Drawing.Color.Blue;
             this.ShortcutMeeting.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ShortcutMeeting.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.ShortcutMeeting.Location = new System.Drawing.Point(748, 392);
+            this.ShortcutMeeting.Location = new System.Drawing.Point(749, 392);
             this.ShortcutMeeting.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutMeeting.Name = "ShortcutMeeting";
-            this.ShortcutMeeting.Size = new System.Drawing.Size(380, 64);
+            this.ShortcutMeeting.Size = new System.Drawing.Size(381, 64);
             this.ShortcutMeeting.TabIndex = 35;
             this.ShortcutMeeting.Text = "Meeting";
             this.ShortcutMeeting.UseVisualStyleBackColor = false;
@@ -839,10 +836,10 @@
             this.ShortcutCalls.BackColor = System.Drawing.Color.Blue;
             this.ShortcutCalls.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ShortcutCalls.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.ShortcutCalls.Location = new System.Drawing.Point(748, 468);
+            this.ShortcutCalls.Location = new System.Drawing.Point(749, 468);
             this.ShortcutCalls.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutCalls.Name = "ShortcutCalls";
-            this.ShortcutCalls.Size = new System.Drawing.Size(380, 66);
+            this.ShortcutCalls.Size = new System.Drawing.Size(381, 66);
             this.ShortcutCalls.TabIndex = 38;
             this.ShortcutCalls.Text = "Calls";
             this.ShortcutCalls.UseVisualStyleBackColor = false;
@@ -853,10 +850,10 @@
             this.ShortcutReadingBusiness.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.ShortcutReadingBusiness.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ShortcutReadingBusiness.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShortcutReadingBusiness.Location = new System.Drawing.Point(1180, 468);
+            this.ShortcutReadingBusiness.Location = new System.Drawing.Point(1182, 468);
             this.ShortcutReadingBusiness.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutReadingBusiness.Name = "ShortcutReadingBusiness";
-            this.ShortcutReadingBusiness.Size = new System.Drawing.Size(380, 66);
+            this.ShortcutReadingBusiness.Size = new System.Drawing.Size(381, 66);
             this.ShortcutReadingBusiness.TabIndex = 39;
             this.ShortcutReadingBusiness.Text = "Reading - Business";
             this.ShortcutReadingBusiness.UseVisualStyleBackColor = false;
@@ -867,10 +864,10 @@
             this.ShortcutUnprocessed.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.ShortcutUnprocessed.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ShortcutUnprocessed.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShortcutUnprocessed.Location = new System.Drawing.Point(1180, 546);
+            this.ShortcutUnprocessed.Location = new System.Drawing.Point(1182, 546);
             this.ShortcutUnprocessed.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutUnprocessed.Name = "ShortcutUnprocessed";
-            this.ShortcutUnprocessed.Size = new System.Drawing.Size(380, 65);
+            this.ShortcutUnprocessed.Size = new System.Drawing.Size(381, 65);
             this.ShortcutUnprocessed.TabIndex = 40;
             this.ShortcutUnprocessed.Text = "Unprocessed > 2min";
             this.ShortcutUnprocessed.UseVisualStyleBackColor = false;
@@ -881,10 +878,10 @@
             this.ShortcutNews.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.ShortcutNews.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ShortcutNews.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShortcutNews.Location = new System.Drawing.Point(748, 546);
+            this.ShortcutNews.Location = new System.Drawing.Point(749, 546);
             this.ShortcutNews.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutNews.Name = "ShortcutNews";
-            this.ShortcutNews.Size = new System.Drawing.Size(380, 65);
+            this.ShortcutNews.Size = new System.Drawing.Size(381, 65);
             this.ShortcutNews.TabIndex = 41;
             this.ShortcutNews.Text = "News | Articles | Other";
             this.ShortcutNews.UseVisualStyleBackColor = false;
@@ -897,7 +894,7 @@
             this.ShortcutEmail.Location = new System.Drawing.Point(316, 546);
             this.ShortcutEmail.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutEmail.Name = "ShortcutEmail";
-            this.ShortcutEmail.Size = new System.Drawing.Size(380, 65);
+            this.ShortcutEmail.Size = new System.Drawing.Size(381, 65);
             this.ShortcutEmail.TabIndex = 42;
             this.ShortcutEmail.Text = "Email";
             this.ShortcutEmail.UseVisualStyleBackColor = false;
@@ -911,7 +908,7 @@
             this.ShortcutWaitingFor.Location = new System.Drawing.Point(316, 623);
             this.ShortcutWaitingFor.Margin = new System.Windows.Forms.Padding(6);
             this.ShortcutWaitingFor.Name = "ShortcutWaitingFor";
-            this.ShortcutWaitingFor.Size = new System.Drawing.Size(380, 65);
+            this.ShortcutWaitingFor.Size = new System.Drawing.Size(381, 65);
             this.ShortcutWaitingFor.TabIndex = 43;
             this.ShortcutWaitingFor.Text = "Waiting For";
             this.ShortcutWaitingFor.UseVisualStyleBackColor = false;
@@ -979,7 +976,7 @@
             this.XlScMeeting.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScMeeting.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScMeeting.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScMeeting.Location = new System.Drawing.Point(704, 406);
+            this.XlScMeeting.Location = new System.Drawing.Point(705, 406);
             this.XlScMeeting.Margin = new System.Windows.Forms.Padding(0);
             this.XlScMeeting.Name = "XlScMeeting";
             this.XlScMeeting.Size = new System.Drawing.Size(35, 35);
@@ -993,7 +990,7 @@
             this.XlScCalls.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScCalls.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScCalls.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScCalls.Location = new System.Drawing.Point(704, 483);
+            this.XlScCalls.Location = new System.Drawing.Point(705, 483);
             this.XlScCalls.Margin = new System.Windows.Forms.Padding(0);
             this.XlScCalls.Name = "XlScCalls";
             this.XlScCalls.Size = new System.Drawing.Size(35, 35);
@@ -1007,7 +1004,7 @@
             this.XlScNews.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScNews.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScNews.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScNews.Location = new System.Drawing.Point(704, 561);
+            this.XlScNews.Location = new System.Drawing.Point(705, 561);
             this.XlScNews.Margin = new System.Windows.Forms.Padding(0);
             this.XlScNews.Name = "XlScNews";
             this.XlScNews.Size = new System.Drawing.Size(35, 35);
@@ -1021,7 +1018,7 @@
             this.XlScPreread.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScPreread.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScPreread.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScPreread.Location = new System.Drawing.Point(1136, 406);
+            this.XlScPreread.Location = new System.Drawing.Point(1138, 406);
             this.XlScPreread.Margin = new System.Windows.Forms.Padding(0);
             this.XlScPreread.Name = "XlScPreread";
             this.XlScPreread.Size = new System.Drawing.Size(35, 35);
@@ -1035,7 +1032,7 @@
             this.XlScReadingbusiness.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScReadingbusiness.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScReadingbusiness.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScReadingbusiness.Location = new System.Drawing.Point(1136, 483);
+            this.XlScReadingbusiness.Location = new System.Drawing.Point(1138, 483);
             this.XlScReadingbusiness.Margin = new System.Windows.Forms.Padding(0);
             this.XlScReadingbusiness.Name = "XlScReadingbusiness";
             this.XlScReadingbusiness.Size = new System.Drawing.Size(35, 35);
@@ -1049,7 +1046,7 @@
             this.XlScUnprocessed.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScUnprocessed.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScUnprocessed.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScUnprocessed.Location = new System.Drawing.Point(1136, 561);
+            this.XlScUnprocessed.Location = new System.Drawing.Point(1138, 561);
             this.XlScUnprocessed.Margin = new System.Windows.Forms.Padding(0);
             this.XlScUnprocessed.Name = "XlScUnprocessed";
             this.XlScUnprocessed.Size = new System.Drawing.Size(35, 35);
@@ -1060,7 +1057,7 @@
             // CbxToday
             // 
             this.CbxToday.AutoSize = true;
-            this.CbxToday.Location = new System.Drawing.Point(748, 700);
+            this.CbxToday.Location = new System.Drawing.Point(749, 700);
             this.CbxToday.Margin = new System.Windows.Forms.Padding(6);
             this.CbxToday.Name = "CbxToday";
             this.CbxToday.Size = new System.Drawing.Size(214, 28);
@@ -1072,7 +1069,7 @@
             // CbxBullpin
             // 
             this.CbxBullpin.AutoSize = true;
-            this.CbxBullpin.Location = new System.Drawing.Point(1180, 700);
+            this.CbxBullpin.Location = new System.Drawing.Point(1182, 700);
             this.CbxBullpin.Margin = new System.Windows.Forms.Padding(6);
             this.CbxBullpin.Name = "CbxBullpin";
             this.CbxBullpin.Size = new System.Drawing.Size(221, 28);
@@ -1087,7 +1084,7 @@
             this.XlScToday.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlScToday.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlScToday.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlScToday.Location = new System.Drawing.Point(704, 696);
+            this.XlScToday.Location = new System.Drawing.Point(705, 696);
             this.XlScToday.Margin = new System.Windows.Forms.Padding(0);
             this.XlScToday.Name = "XlScToday";
             this.XlScToday.Size = new System.Drawing.Size(35, 35);
@@ -1206,7 +1203,7 @@
             // C3S2
             // 
             this.C3S2.AutoSize = true;
-            this.C3S2.Location = new System.Drawing.Point(705, 0);
+            this.C3S2.Location = new System.Drawing.Point(706, 0);
             this.C3S2.Name = "C3S2";
             this.C3S2.Size = new System.Drawing.Size(24, 25);
             this.C3S2.TabIndex = 32;
@@ -1216,7 +1213,7 @@
             // C4S2
             // 
             this.C4S2.AutoSize = true;
-            this.C4S2.Location = new System.Drawing.Point(1137, 0);
+            this.C4S2.Location = new System.Drawing.Point(1139, 0);
             this.C4S2.Name = "C4S2";
             this.C4S2.Size = new System.Drawing.Size(24, 25);
             this.C4S2.TabIndex = 32;
@@ -1227,7 +1224,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1613, 1338);
+            this.ClientSize = new System.Drawing.Size(1620, 1338);
             this.Controls.Add(this.L0v_Tlp);
             this.MinimumSize = new System.Drawing.Size(1209, 1010);
             this.Name = "TaskViewer";

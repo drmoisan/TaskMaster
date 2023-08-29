@@ -79,12 +79,12 @@ namespace TaskVisualization
             all = 4095
         }
 
-        internal enum ForceState
-        {
-            none = 0,
-            force_on = 1,
-            force_off = 2
-        }
+        //internal enum ForceState
+        //{
+        //    none = 0,
+        //    force_on = 1,
+        //    force_off = 2
+        //}
 
         #region Constructors and Initializers
 
@@ -184,14 +184,23 @@ namespace TaskVisualization
             }
 
             // Deactivate accelerator controls
+            NavTips.ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.Off));
             ToggleXl(
                 (from x in _xlCtrlLookup select x).ToDictionary(x => x.Key, x => 'A'),
-                ForceState.force_off);
+                Enums.ToggleState.Off);
 
             // Deactivate controls that are not set in _options
             if (_options != FlagsToSet.all)
                 ActivateOptions();
 
+            // Wire keypress event handler
+            _viewer.ForAllControls(control =>
+            {
+                if (control.GetType().GetEvent("KeyPress") is not null)
+                { 
+                    control.KeyPress += KeyboardHandler_KeyPress;
+                }
+            });
         }
 
         /// <summary>
@@ -410,7 +419,7 @@ namespace TaskVisualization
             if (_altActive)
             {
                 _altActive = false;
-                ToggleXl(_xlCtrlsActive, ForceState.force_off);
+                ToggleXl(_xlCtrlsActive, Enums.ToggleState.Off);
             }
         }
 
@@ -532,16 +541,15 @@ namespace TaskVisualization
             if (e.Alt)
             {
                 if (_altActive) 
-                { 
-                    var tup = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
-                    _xlCtrlsActive = tup.dictActive;
-                    _altActive = tup.altActive;
-                    _altLevel = tup.level;
+                {
+                    ToggleXlGroupNav(Enums.ToggleState.Off);
+                    (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
+                    _activeNavGroup = -1;
                     return true;               
                 }
                 else
                 {
-                    ToggleXlGroupNav(ForceState.force_on);
+                    ToggleXlGroupNav(Enums.ToggleState.On);
                     _altActive = true;
                     return true;
                 }
@@ -550,24 +558,28 @@ namespace TaskVisualization
             {
                 if (e.KeyCode >= Keys.A & e.KeyCode <= Keys.Z)
                 {
-                    var tup = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
-                    _xlCtrlsActive = tup.dictActive;
-                    _altActive = tup.altActive;
-                    _altLevel = tup.level;
+                    e.SuppressKeyPress = true;
+                    (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
+                    return true;
                 }
-                else if ((e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9) || (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9))
-                {
-                    var tup = ActivateXlGroup(e.KeyCode.ToString()[0]);
-                    _xlCtrlsActive = tup.dictActive;
-                    _altActive = tup.altActive;
-                    _altLevel = tup.level;                }
-                return true;
+                else { return false; }
             }
             else
             {
                 return false;
             }
 
+        }
+
+        public void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            string key = e.KeyChar.ToString();
+            int.TryParse(key, out int digit);
+            if (digit > 0 && digit <= 9)
+            {
+                (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(key[0], digit);
+                e.Handled = true;
+            }
         }
 
         public bool SuppressKeystrokes
@@ -911,28 +923,27 @@ namespace TaskVisualization
 
         #region Keyboard UI
 
-        private void ToggleXl(Dictionary<Label, char> dictLabels, ForceState state)
+        private void ToggleXl(Dictionary<Label, char> dictLabels, Enums.ToggleState desiredState)
         {
-            switch (state)
+            switch (desiredState)
             {
-                case ForceState.none:
-                    {
-                        foreach (var row in dictLabels)
-                            row.Key.Visible = !row.Key.Visible;
-                        break;
-                    }
-
-                case ForceState.force_on:
+                case Enums.ToggleState.On:
                     {
                         foreach (var row in dictLabels)
                             row.Key.Visible = true;
                         break;
                     }
 
-                case ForceState.force_off:
+                case Enums.ToggleState.Off:
                     {
                         foreach (var row in dictLabels)
                             row.Key.Visible = false;
+                        break;
+                    }
+                default:
+                    {
+                        foreach (var row in dictLabels)
+                            row.Key.Visible = !row.Key.Visible;
                         break;
                     }
             }
@@ -1015,40 +1026,78 @@ namespace TaskVisualization
 
         }
 
-        internal void ToggleXlGroupNav(ForceState desiredState) => ToggleXl(_xlCtrlsNav, desiredState);
+        internal void ToggleXlGroupNav(Enums.ToggleState desiredState) 
+        { 
+            _navTips.Where(tip => tip.GroupNumber == 0).ForEach(tip => tip.Toggle(desiredState, true));
+        }
 
-        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar)
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) DeactivateActiveXlGroup()
         {
-            int groupNumber = int.TryParse(selectedChar.ToString(), out groupNumber) ? groupNumber : 0;
-            if ((groupNumber != 0)&&(groupNumber!=_activeNavGroup))
+            if (_xlCtrlsActive is not null) { ToggleXl(_xlCtrlsActive, Enums.ToggleState.Off); }
+            if (_activeNavGroup != -1)
             {
-                var dictActivate = (from controlCaption in GetCaptionLookup(groupNumber)
-                                    where GetOptionsLookup(0)[controlCaption.Key]
+                NavTips.Where(x => x.GroupNumber == _activeNavGroup)
+                       .ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.Off));
+                _activeNavGroup = -1;
+            }
+            return (null, true, 0);
+        }
+
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar, int groupNumber)
+        {
+            if (groupNumber != _activeNavGroup)
+            {
+                DeactivateActiveXlGroup();
+
+                var captionLookup = GetCaptionLookup(groupNumber);
+                var dictActivate = (from controlCaption in captionLookup
+                                    where _xlCtrlOptions[controlCaption.Key]
                                     select controlCaption)
                                     .ToDictionary(
                                         controlCaption => controlCaption.Key,
-                                        controlCaption => controlCaption.Value[groupNumber]);
-                ToggleXl(dictActivate, ForceState.force_on);
-                UpdateCaptions(dictActivate);
-                return (dictActivate, true, 1);
+                                        controlCaption => controlCaption.Value[0]);
+                if (dictActivate.Count == 0)
+                {
+                    return (null, true, 0);
+                }
+                else
+                {
+                    NavTips.Where(x => x.GroupNumber == groupNumber)
+                           .ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.On));
+                    ToggleXl(dictActivate, Enums.ToggleState.On);
+                    UpdateCaptions(dictActivate);
+                    _activeNavGroup = groupNumber;
+                    return (dictActivate, true, 1);
+                }
             }
             else { return (null, true, 0); }
         }
 
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar)
+        {
+            int.TryParse(selectedChar.ToString(), out int groupNumber);
+            if (groupNumber != 0)
+            {
+                return ActivateXlGroup(selectedChar, groupNumber);
+            }
+            else 
+            { 
+                return (null, true, 0); 
+            }
+        }
+
         internal (Dictionary<Label, char> dictActive, bool altActive, int level) RecurseXl(Dictionary<Label, char> dictSeed, bool altActive, char selectedChar, int level)
         {
-
             Dictionary<Label, char> dictDeactivate;
             Dictionary<Label, char> dictActivate;
 
             if (!altActive)
             {
-
                 dictActivate = (from x in _xlCtrlCaptions
                                 where _xlCtrlOptions[x.Key]
                                 select x).ToDictionary(x => x.Key, x => char.ToUpper(x.Value[0]));
 
-                ToggleXl(dictActivate, ForceState.force_on);
+                ToggleXl(dictActivate, Enums.ToggleState.On);
                 UpdateCaptions(dictActivate);
 
                 return (dictActivate, true, 1);
@@ -1067,7 +1116,7 @@ namespace TaskVisualization
                 // Empty character is only passed if Alt key is pressed again.
                 // In this case, we should deactivate the accelerator dialogue
 
-                ToggleXl(dictSeed, ForceState.force_off);
+                ToggleXl(dictSeed, Enums.ToggleState.Off);
                 return (null, false, 0);
             }
 
@@ -1091,7 +1140,9 @@ namespace TaskVisualization
                             // If only 1 element, we have found a match. 
 
                             // Turn off all remaining accelerator labels, including the match
-                            ToggleXl(dictSeed, ForceState.force_off);
+                            DeactivateActiveXlGroup();
+                            ToggleXlGroupNav(Enums.ToggleState.Off);
+                            //ToggleXl(dictSeed, Enums.ToggleState.Off);
 
                             // Execute the designated action for the control
                             ExecuteXlAction(dictActivate.First().Key);
@@ -1108,7 +1159,7 @@ namespace TaskVisualization
                             dictDeactivate = (from x in dictSeed
                                               where x.Value != selectedChar
                                               select x).ToDictionary(x => x.Key, x => x.Value);
-                            ToggleXl(dictDeactivate, ForceState.force_off);
+                            ToggleXl(dictDeactivate, Enums.ToggleState.Off);
                             UpdateCaptions(dictActivate);
 
                             // Return values to seed the next recursion
@@ -1350,7 +1401,29 @@ namespace TaskVisualization
                 return _optionsGroups;
             }
         }
-        
+                
+        private IEnumerable<TipsController> _navTips;
+        internal IEnumerable<TipsController> NavTips 
+        { 
+            get => _navTips ??= new List<TipsController> 
+            {
+                new TipsController(_viewer.XlSector1, 0),
+                new TipsController (_viewer.XlSector2, 0),
+                new TipsController (_viewer.XlSector3, 0),
+                new TipsController (_viewer.XlSector4, 0),
+                new TipsController (_viewer.C1S1, 1),
+                new TipsController (_viewer.C3S1, 1),
+                new TipsController (_viewer.C4S1, 1),
+                new TipsController (_viewer.C2S2, 2),
+                new TipsController (_viewer.C3S2, 2),
+                new TipsController (_viewer.C4S2, 2),
+                new TipsController (_viewer.C2S2, 3),
+                new TipsController (_viewer.C3S2, 3),
+                new TipsController (_viewer.C4S2, 3),
+                new TipsController (_viewer.C2S4, 4),
+                new TipsController (_viewer.C3S4, 4)
+            };
+        }
 
         #endregion
 

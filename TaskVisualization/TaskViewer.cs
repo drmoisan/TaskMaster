@@ -214,25 +214,25 @@ namespace TaskVisualization
                 _controller.MouseFilter_FormClicked(sender, e);
         }
 
-        private void TaskName_KeyDown(object sender, KeyEventArgs e)
-        {
-            // Debug.WriteLine("task_name_keydown fired with " & e.KeyCode.ToChar)
-        }
+        //private void TaskName_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    // Debug.WriteLine("task_name_keydown fired with " & e.KeyCode.ToChar)
+        //}
 
-        private void TaskName_KeyUp(object sender, KeyEventArgs e)
-        {
-            // Debug.WriteLine("task_name_keyup fired with " & e.KeyCode.ToChar)
-        }
+        //private void TaskName_KeyUp(object sender, KeyEventArgs e)
+        //{
+        //    // Debug.WriteLine("task_name_keyup fired with " & e.KeyCode.ToChar)
+        //}
 
-        private void TaskName_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Debug.WriteLine("task_name_keypress fired with " & e.KeyChar)
-            if (_controller.SuppressKeystrokes)
-            {
-                e.Handled = true;
-                // Debug.WriteLine("task_name_keypress suppressed keystrokes")
-            }
-        }
+        //private void TaskName_KeyPress(object sender, KeyPressEventArgs e)
+        //{
+        //    // Debug.WriteLine("task_name_keypress fired with " & e.KeyChar)
+        //    if (_controller.SuppressKeystrokes)
+        //    {
+        //        e.Handled = true;
+        //        // Debug.WriteLine("task_name_keypress suppressed keystrokes")
+        //    }
+        //}
 
         #endregion
 
