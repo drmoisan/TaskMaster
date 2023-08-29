@@ -21,8 +21,8 @@ namespace TaskVisualization
 
             KeyPreview = true;
 
-            _mouseFilter = new MouseDownFilter(this);
-            Application.AddMessageFilter(_mouseFilter);
+            //_mouseFilter = new MouseDownFilter(this);
+            //Application.AddMessageFilter(_mouseFilter);
         }
 
         private MouseDownFilter __mouseFilter;
@@ -70,6 +70,19 @@ namespace TaskVisualization
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
+
+        private List<Label> _navColumns;
+        internal List<Label> NavColumns 
+        {
+            get 
+            { 
+                if (_navColumns is null)
+                    _navColumns = new() { C1S1, C2S2, C2S4, C3S1, C3S2, C3S4, C4S1, C4S2 };
+                return _navColumns;
+            }
+        }
+
+        #region Event Handlers
 
         private void Cancel_Button_Click(object sender, EventArgs e)
         {
@@ -220,6 +233,8 @@ namespace TaskVisualization
                 // Debug.WriteLine("task_name_keypress suppressed keystrokes")
             }
         }
+
+        #endregion
 
     }
 }

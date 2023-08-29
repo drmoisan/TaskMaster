@@ -32,7 +32,6 @@ namespace TaskVisualization
 
         public FlagTasks(IApplicationGlobals AppGlobals, IList ItemList = null, bool blFile = true, IntPtr hWndCaller = default, string strNameOfFunctionCalling = "")
         {
-
             _globals = AppGlobals;
             _olExplorer = AppGlobals.Ol.App.ActiveExplorer();
             _todoSelection = InitializeToDoList(ItemList);
@@ -40,19 +39,19 @@ namespace TaskVisualization
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
             _autoAssign = new AutoAssign(AppGlobals);
-            _controller = new TaskController(FormInstance: _viewer,
-                                             OlCategories: AppGlobals.Ol.NamespaceMAPI.Categories,
-                                             ToDoSelection: _todoSelection,
-                                             Defaults: _defaultsToDo,
-                                             AutoAssign: _autoAssign,
-                                             FlagOptions: _flagsToSet,
+            _controller = new TaskController(formInstance: _viewer,
+                                             olCategories: AppGlobals.Ol.NamespaceMAPI.Categories,
+                                             toDoSelection: _todoSelection,
+                                             defaults: _defaultsToDo,
+                                             autoAssign: _autoAssign,
+                                             flagOptions: _flagsToSet,
                                              userEmailAddress: AppGlobals.Ol.UserEmailAddress);
             _userEmailAddress = AppGlobals.Ol.UserEmailAddress;
         }
 
         public DialogResult Run(bool modal = false)
         {
-            _controller.LoadInitialValues();
+            _controller.Initialize();
             if (modal)
                 return _viewer.ShowDialog();
             else
