@@ -104,12 +104,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="TaskController.cs" />
-    <Compile Include="TaskViewer3.Designer.cs">
-      <DependentUpon>TaskViewer3.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TaskViewer3.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="TaskViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -123,9 +117,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>TaskVisualization.My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TaskViewer3.resx">
-      <DependentUpon>TaskViewer3.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TaskViewer.resx">
       <DependentUpon>TaskViewer.cs</DependentUpon>
