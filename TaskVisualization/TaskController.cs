@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -453,6 +454,7 @@ namespace TaskVisualization
             }
         }
 
+
         /// <summary>
         /// Handles cancel button click. Sets the controller exit type to 
         /// "Cancel" and disposes of the viewer
@@ -536,6 +538,7 @@ namespace TaskVisualization
         #endregion
 
         #region Public Keyboard Events and Properties
+        
         public bool KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Alt)
@@ -543,7 +546,11 @@ namespace TaskVisualization
                 if (_altActive) 
                 {
                     ToggleXlGroupNav(Enums.ToggleState.Off);
-                    (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
+                    if (_xlCtrlsActive is not null) 
+                    { 
+                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
+                    }
+                    _altActive = false;
                     _activeNavGroup = -1;
                     return true;               
                 }
@@ -561,6 +568,34 @@ namespace TaskVisualization
                     e.SuppressKeyPress = true;
                     (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
                     return true;
+                }
+                else if (e.KeyCode == Keys.Down)
+                {
+                    if (_activeNavGroup == -1) 
+                    {
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup('1', 1);
+                        return true;
+                    }
+                    else if (_activeNavGroup < (_xlCtrlsNav.Count)) 
+                    {
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup+1); 
+                        return true;
+                    }
+                    else { return false; }
+                }
+                else if (e.KeyCode == Keys.Up)
+                {
+                    if (_activeNavGroup == -1)
+                    {
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_xlCtrlsNav.Count);
+                        return true;
+                    }
+                    else if (_activeNavGroup > 1)
+                    {
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup-1);
+                        return true;
+                    }
+                    else { return false; }
                 }
                 else { return false; }
             }
@@ -589,6 +624,7 @@ namespace TaskVisualization
                 return _altActive;
             }
         }
+        
         #endregion
 
         #region Private Helper Properties and Functions
@@ -1036,8 +1072,9 @@ namespace TaskVisualization
             if (_xlCtrlsActive is not null) { ToggleXl(_xlCtrlsActive, Enums.ToggleState.Off); }
             if (_activeNavGroup != -1)
             {
-                NavTips.Where(x => x.GroupNumber == _activeNavGroup)
-                       .ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.Off));
+                var tips = NavTips.Where(x => x.GroupNumber == _activeNavGroup);
+                tips.ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.Off));
+                tips.ElementAt(0).TLP.BackColor = SystemColors.Control;
                 _activeNavGroup = -1;
             }
             return (null, true, 0);
@@ -1045,7 +1082,7 @@ namespace TaskVisualization
 
         internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar, int groupNumber)
         {
-            if (groupNumber != _activeNavGroup)
+            if ((groupNumber != _activeNavGroup)&&(groupNumber >= 1)&&(groupNumber <= _xlCtrlsNav.Count))
             {
                 DeactivateActiveXlGroup();
 
@@ -1062,8 +1099,9 @@ namespace TaskVisualization
                 }
                 else
                 {
-                    NavTips.Where(x => x.GroupNumber == groupNumber)
-                           .ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.On));
+                    var tips = NavTips.Where(x => x.GroupNumber == groupNumber);
+                    tips.ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.On));
+                    tips.ElementAt(0).TLP.BackColor = Color.LightCyan;
                     ToggleXl(dictActivate, Enums.ToggleState.On);
                     UpdateCaptions(dictActivate);
                     _activeNavGroup = groupNumber;
@@ -1083,6 +1121,18 @@ namespace TaskVisualization
             else 
             { 
                 return (null, true, 0); 
+            }
+        }
+
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(int groupNumber)
+        {
+            if (groupNumber != 0)
+            {
+                return ActivateXlGroup(groupNumber.ToString()[0], groupNumber);
+            }
+            else
+            {
+                return (null, true, 0);
             }
         }
 
@@ -1116,7 +1166,8 @@ namespace TaskVisualization
                 // Empty character is only passed if Alt key is pressed again.
                 // In this case, we should deactivate the accelerator dialogue
 
-                ToggleXl(dictSeed, Enums.ToggleState.Off);
+                DeactivateActiveXlGroup();
+                ToggleXlGroupNav(Enums.ToggleState.Off);
                 return (null, false, 0);
             }
 
@@ -1417,9 +1468,9 @@ namespace TaskVisualization
                 new TipsController (_viewer.C2S2, 2),
                 new TipsController (_viewer.C3S2, 2),
                 new TipsController (_viewer.C4S2, 2),
-                new TipsController (_viewer.C2S2, 3),
-                new TipsController (_viewer.C3S2, 3),
-                new TipsController (_viewer.C4S2, 3),
+                new TipsController (_viewer.C2S3, 3),
+                new TipsController (_viewer.C3S3, 3),
+                new TipsController (_viewer.C4S3, 3),
                 new TipsController (_viewer.C2S4, 4),
                 new TipsController (_viewer.C3S4, 4)
             };
