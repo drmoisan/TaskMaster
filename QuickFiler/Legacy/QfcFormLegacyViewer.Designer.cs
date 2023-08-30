@@ -23,7 +23,7 @@ namespace QuickFiler.Legacy
         }
 
         // Required by the Windows Form Designer
-        private System.ComponentModel.IContainer components;
+        private System.ComponentModel.IContainer components = null;
 
         // NOTE: The following procedure is required by the Windows Form Designer
         // It can be modified using the Windows Form Designer.  
@@ -55,22 +55,23 @@ namespace QuickFiler.Legacy
             this.L1v.Controls.Add(this.L1v1L2_PanelMain, 0, 0);
             this.L1v.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v.Location = new System.Drawing.Point(0, 0);
+            this.L1v.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.L1v.Name = "L1v";
             this.L1v.RowCount = 2;
             this.L1v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
-            this.L1v.Size = new System.Drawing.Size(914, 274);
+            this.L1v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 108F));
+            this.L1v.Size = new System.Drawing.Size(1828, 527);
             this.L1v.TabIndex = 0;
             // 
             // L1v2L2h
             // 
             this.L1v2L2h.ColumnCount = 7;
             this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
+            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 280F));
+            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 320F));
+            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 320F));
+            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
-            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
-            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-            this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.L1v2L2h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.L1v2L2h.Controls.Add(this.KeyboardDialog, 0, 0);
             this.L1v2L2h.Controls.Add(this.L1v2L2h3_ButtonOK, 2, 0);
@@ -78,22 +79,23 @@ namespace QuickFiler.Legacy
             this.L1v2L2h.Controls.Add(this.L1v2L2h4_ButtonUndo, 4, 0);
             this.L1v2L2h.Controls.Add(this.L1v2L2h5_SpnEmailPerLoad, 5, 0);
             this.L1v2L2h.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v2L2h.Location = new System.Drawing.Point(3, 221);
+            this.L1v2L2h.Location = new System.Drawing.Point(6, 425);
+            this.L1v2L2h.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.L1v2L2h.Name = "L1v2L2h";
             this.L1v2L2h.RowCount = 1;
             this.L1v2L2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v2L2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.L1v2L2h.Size = new System.Drawing.Size(908, 50);
+            this.L1v2L2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 96F));
+            this.L1v2L2h.Size = new System.Drawing.Size(1816, 96);
             this.L1v2L2h.TabIndex = 0;
             // 
             // KeyboardDialog
             // 
             this.KeyboardDialog.Dock = System.Windows.Forms.DockStyle.Fill;
             this.KeyboardDialog.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.KeyboardDialog.Location = new System.Drawing.Point(7, 3);
-            this.KeyboardDialog.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.KeyboardDialog.Location = new System.Drawing.Point(14, 6);
+            this.KeyboardDialog.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.KeyboardDialog.Name = "KeyboardDialog";
-            this.KeyboardDialog.Size = new System.Drawing.Size(140, 40);
+            this.KeyboardDialog.Size = new System.Drawing.Size(280, 73);
             this.KeyboardDialog.TabIndex = 5;
             this.KeyboardDialog.Visible = false;
             this.KeyboardDialog.TextChanged += new System.EventHandler(this.AcceleratorDialogue_TextChanged);
@@ -103,10 +105,10 @@ namespace QuickFiler.Legacy
             // L1v2L2h3_ButtonOK
             // 
             this.L1v2L2h3_ButtonOK.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v2L2h3_ButtonOK.Location = new System.Drawing.Point(301, 3);
-            this.L1v2L2h3_ButtonOK.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.L1v2L2h3_ButtonOK.Location = new System.Drawing.Point(602, 6);
+            this.L1v2L2h3_ButtonOK.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v2L2h3_ButtonOK.Name = "L1v2L2h3_ButtonOK";
-            this.L1v2L2h3_ButtonOK.Size = new System.Drawing.Size(146, 44);
+            this.L1v2L2h3_ButtonOK.Size = new System.Drawing.Size(292, 84);
             this.L1v2L2h3_ButtonOK.TabIndex = 0;
             this.L1v2L2h3_ButtonOK.Text = "OK";
             this.L1v2L2h3_ButtonOK.UseVisualStyleBackColor = true;
@@ -117,10 +119,10 @@ namespace QuickFiler.Legacy
             // L1v2L2h4_ButtonCancel
             // 
             this.L1v2L2h4_ButtonCancel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v2L2h4_ButtonCancel.Location = new System.Drawing.Point(461, 3);
-            this.L1v2L2h4_ButtonCancel.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.L1v2L2h4_ButtonCancel.Location = new System.Drawing.Point(922, 6);
+            this.L1v2L2h4_ButtonCancel.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v2L2h4_ButtonCancel.Name = "L1v2L2h4_ButtonCancel";
-            this.L1v2L2h4_ButtonCancel.Size = new System.Drawing.Size(146, 44);
+            this.L1v2L2h4_ButtonCancel.Size = new System.Drawing.Size(292, 84);
             this.L1v2L2h4_ButtonCancel.TabIndex = 1;
             this.L1v2L2h4_ButtonCancel.Text = "CANCEL";
             this.L1v2L2h4_ButtonCancel.UseVisualStyleBackColor = true;
@@ -129,9 +131,10 @@ namespace QuickFiler.Legacy
             // L1v2L2h4_ButtonUndo
             // 
             this.L1v2L2h4_ButtonUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v2L2h4_ButtonUndo.Location = new System.Drawing.Point(617, 3);
+            this.L1v2L2h4_ButtonUndo.Location = new System.Drawing.Point(1234, 6);
+            this.L1v2L2h4_ButtonUndo.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.L1v2L2h4_ButtonUndo.Name = "L1v2L2h4_ButtonUndo";
-            this.L1v2L2h4_ButtonUndo.Size = new System.Drawing.Size(54, 44);
+            this.L1v2L2h4_ButtonUndo.Size = new System.Drawing.Size(108, 84);
             this.L1v2L2h4_ButtonUndo.TabIndex = 2;
             this.L1v2L2h4_ButtonUndo.Text = "Undo";
             this.L1v2L2h4_ButtonUndo.UseVisualStyleBackColor = true;
@@ -141,10 +144,10 @@ namespace QuickFiler.Legacy
             // 
             this.L1v2L2h5_SpnEmailPerLoad.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.L1v2L2h5_SpnEmailPerLoad.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.L1v2L2h5_SpnEmailPerLoad.Location = new System.Drawing.Point(681, 4);
-            this.L1v2L2h5_SpnEmailPerLoad.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.L1v2L2h5_SpnEmailPerLoad.Location = new System.Drawing.Point(1362, 11);
+            this.L1v2L2h5_SpnEmailPerLoad.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v2L2h5_SpnEmailPerLoad.Name = "L1v2L2h5_SpnEmailPerLoad";
-            this.L1v2L2h5_SpnEmailPerLoad.Size = new System.Drawing.Size(66, 41);
+            this.L1v2L2h5_SpnEmailPerLoad.Size = new System.Drawing.Size(132, 74);
             this.L1v2L2h5_SpnEmailPerLoad.TabIndex = 3;
             this.L1v2L2h5_SpnEmailPerLoad.ValueChanged += new System.EventHandler(this.spn_EmailPerLoad_ValueChanged);
             // 
@@ -154,9 +157,10 @@ namespace QuickFiler.Legacy
             this.L1v1L2_PanelMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.L1v1L2_PanelMain.Controls.Add(this.L1v1L2L3v);
             this.L1v1L2_PanelMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2_PanelMain.Location = new System.Drawing.Point(3, 3);
+            this.L1v1L2_PanelMain.Location = new System.Drawing.Point(6, 6);
+            this.L1v1L2_PanelMain.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.L1v1L2_PanelMain.Name = "L1v1L2_PanelMain";
-            this.L1v1L2_PanelMain.Size = new System.Drawing.Size(908, 212);
+            this.L1v1L2_PanelMain.Size = new System.Drawing.Size(1816, 407);
             this.L1v1L2_PanelMain.TabIndex = 1;
             this.L1v1L2_PanelMain.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PanelMain_KeyUp);
             this.L1v1L2_PanelMain.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PanelMain_KeyDown);
@@ -173,29 +177,31 @@ namespace QuickFiler.Legacy
             this.L1v1L2L3v.Location = new System.Drawing.Point(0, 0);
             this.L1v1L2L3v.Margin = new System.Windows.Forms.Padding(0);
             this.L1v1L2L3v.Name = "L1v1L2L3v";
-            this.L1v1L2L3v.Padding = new System.Windows.Forms.Padding(10);
+            this.L1v1L2L3v.Padding = new System.Windows.Forms.Padding(20, 19, 20, 19);
             this.L1v1L2L3v.RowCount = 1;
             this.L1v1L2L3v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v1L2L3v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
-            this.L1v1L2L3v.Size = new System.Drawing.Size(906, 49);
+            this.L1v1L2L3v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 56F));
+            this.L1v1L2L3v.Size = new System.Drawing.Size(1814, 94);
             this.L1v1L2L3v.TabIndex = 1;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(13, 13);
+            this.button1.Location = new System.Drawing.Point(26, 25);
+            this.button1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(150, 44);
             this.button1.TabIndex = 2;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
             // 
             // QfcFormLegacyViewer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(914, 274);
+            this.ClientSize = new System.Drawing.Size(1828, 527);
             this.Controls.Add(this.L1v);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "QfcFormLegacyViewer";
             this.Text = "Quick File";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.QuickFileViewer_Closing);
