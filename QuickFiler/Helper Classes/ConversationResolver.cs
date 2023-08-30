@@ -18,6 +18,7 @@ namespace QuickFiler.Helper_Classes
         {
             _globals = appGlobals;
             _mailItem = mailItem;
+            _updateUI = updateUI;
         }
         
         private IApplicationGlobals _globals;

@@ -27,10 +27,10 @@ namespace ToDoModel
             if (categories is null)
                 categories = "";
 
-            ArrayExtensions.SearchOptions options = ArrayExtensions.SearchOptions.Standard;
+            //ArrayExtensions.SearchOptions options = ArrayExtensions.SearchOptions.Standard;
             
-            if (deleteSearchSubString)
-                options = ArrayExtensions.SearchOptions.DeleteFromMatches;
+            //if (deleteSearchSubString)
+            //    options = ArrayExtensions.SearchOptions.DeleteFromMatches;
             
             var categoryList = categories.Split(separator: ',', trim: true).ToList();
             _people.List = FindMatches(categoryList, _people.Prefix);
@@ -75,12 +75,12 @@ namespace ToDoModel
             list.ForEach(x => x.CollectionChanged += List_CollectionChanged);
         }
 
-        public string GetKb(bool IncludePrefix = false)
+        public string GetKb(bool includePrefix = false)
         {
-            return IncludePrefix ? _kb.WithPrefix : _kb.NoPrefix;
+            return includePrefix ? _kb.WithPrefix : _kb.NoPrefix;
         }
 
-        public void SetKb(bool IncludePrefix = false, string value = default)
+        public void SetKb(bool includePrefix = false, string value = default)
         {
             _kb.List = SplitToList(value, ",", _kb.Prefix);
         }
@@ -90,14 +90,14 @@ namespace ToDoModel
     /// SET splits a comma delimited String to a list excluding 
     /// the Prefix which is passed to the FlagDetails class.
     /// </summary>
-    /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
+    /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
     /// <returns>A string containing a comma separated Context names</returns>
-        public string GetContext(bool IncludePrefix = false)
+        public string GetContext(bool includePrefix = false)
         {
-            return IncludePrefix ? _context.WithPrefix : _context.NoPrefix;
+            return includePrefix ? _context.WithPrefix : _context.NoPrefix;
         }
 
-        public void SetContext(bool IncludePrefix = false, string value = default)
+        public void SetContext(bool includePrefix = false, string value = default)
         {
             _context.List = SplitToList(value, ",", _context.Prefix);
         }
@@ -115,14 +115,14 @@ namespace ToDoModel
     /// SET splits a comma delimited String to a list excluding 
     /// the Prefix which is passed to the FlagDetails class.
     /// </summary>
-    /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
+    /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
     /// <returns>A string containing a comma separated Project names</returns>
-        public string GetProjects(bool IncludePrefix = false)
+        public string GetProjects(bool includePrefix = false)
         {
-            return IncludePrefix ? _projects.WithPrefix : _projects.NoPrefix;
+            return includePrefix ? _projects.WithPrefix : _projects.NoPrefix;
         }
 
-        public void SetProjects(bool IncludePrefix = false, string value = default)
+        public void SetProjects(bool includePrefix = false, string value = default)
         {
             _projects.List = SplitToList(value, ",", _projects.Prefix);
         }
@@ -147,7 +147,7 @@ namespace ToDoModel
             return IncludePrefix ? _topics.WithPrefix : _topics.NoPrefix;
         }
 
-        public void SetTopics(bool IncludePrefix = false, string value = default)
+        public void SetTopics(bool includePrefix = false, string value = default)
         {
             _topics.List = SplitToList(value, ",", _topics.Prefix);
         }

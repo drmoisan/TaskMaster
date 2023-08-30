@@ -17,20 +17,19 @@ namespace QuickFiler.Legacy
 {
     public class QuickFileController 
     {
-        private bool _useOld = true;
         //private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region State Variables
         // Private state variables
-        private Folder _folderCurrent;
-        private int _intUniqueItemCounter;
-        private int _intEmailPosition;
+        //private Folder _folderCurrent;
+        //private int _intUniqueItemCounter;
+        //private int _intEmailPosition;
         private int _intEmailsPerIteration;
         private long _lngAcceleratorDialogueTop;
         private long _lngAcceleratorDialogueLeft;
         private bool _blSuppressEvents;
         private bool _blRunningModalCode = false;
-        private bool _boolRemoteMouseApp;
+        //private bool _boolRemoteMouseApp;
         private cStopWatch _stopWatch;
 
         // Public state variables
@@ -105,7 +104,7 @@ namespace QuickFiler.Legacy
             _olObjects = AppGlobals.Ol;
             _olApp = AppGlobals.Ol.App;
             _activeExplorer = AppGlobals.Ol.App.ActiveExplorer();
-            _folderCurrent = (Folder)_activeExplorer.CurrentFolder;
+            //_folderCurrent = (Folder)_activeExplorer.CurrentFolder;
             _movedMails = AppGlobals.Ol.MovedMails_Stack;
 
             // Set readonly window handles
@@ -132,7 +131,7 @@ namespace QuickFiler.Legacy
 
         private void InitializeModelProcessingMetrics()
         {
-            _intEmailPosition = 0;    // Reverse sort is 0   'Regular sort is 1
+            //_intEmailPosition = 0;    // Reverse sort is 0   'Regular sort is 1
         }
 
         private void InitializeFormConfigurations()

@@ -58,7 +58,7 @@ namespace ToDoModel.Test
             IApplicationGlobals appGlobals = null;
 
             // Act
-            SortEmail.Run(
+            SortEmail.RunAsync(
                 savePictures,
                 destinationFolderpath,
                 saveMsg,
@@ -84,7 +84,7 @@ namespace ToDoModel.Test
             IApplicationGlobals appGlobals = null;
 
             // Act
-            SortEmail.Run(
+            SortEmail.RunAsync(
                 mailItems,
                 savePictures,
                 destinationFolderpath,

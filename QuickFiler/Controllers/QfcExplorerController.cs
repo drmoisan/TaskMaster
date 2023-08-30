@@ -162,24 +162,18 @@ namespace QuickFiler.Controllers
         {
             string loc;
             string FileSystem_LOC;
-            string FileSystem_LOC2;
+            
             string FileSystem_DelLOC;
             // Dim selItems            As Selection    ' A collection of Outlook item objects in a folder.
             // Dim selItems            As Collection
-            object objItem;
             MailItem MSG;
-            object objFSO;       // Computer's file system object.
-            object objShell;       // Windows Shell application object.
-            object objFolder;       // The selected folder object from Browse for Folder dialog box.
-            object objSubFolders;
-            object objNewFolder;
+            
             Folder sortFolder;
             Folder folderCurrent;
             string strFolderPath = "";
             int i;
             MailItem oMailTmp;
-            string strTemp;
-            string[] strAry;
+            
             var strOutput = new string[2];
 
             // ******************

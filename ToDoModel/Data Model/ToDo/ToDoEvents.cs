@@ -11,7 +11,6 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS;
-using UtilitiesCS;
 //using Microsoft.VisualBasic;
 
 namespace ToDoModel

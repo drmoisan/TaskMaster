@@ -373,10 +373,6 @@
     <EmbeddedResource Include="Ribbon\RibbonExplorer.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">
-      <Project>{6b8006b4-9eb2-466e-a178-3e69ff42e16e}</Project>
-      <Name>EmailIntelligence</Name>
-    </ProjectReference>
     <ProjectReference Include="..\QuickFiler\QuickFiler.csproj">
       <Project>{71735d4f-611a-4470-9170-4d9437534377}</Project>
       <Name>QuickFiler</Name>
@@ -418,6 +414,22 @@
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>266A5E9A9EEC033AAAF6F6A573066BE80BB46A6E</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>VSTO40;DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>VSTO40;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

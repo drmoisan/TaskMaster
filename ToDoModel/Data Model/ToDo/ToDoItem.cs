@@ -552,10 +552,8 @@ namespace ToDoModel
         //    } 
         //}
 
-
+        //TODO: Convert People Property to use FlagTranslator
         private FlagTranslator _people; 
-
-
         public string People
         {
             get

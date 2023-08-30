@@ -344,7 +344,7 @@ namespace UtilitiesCS
                     FlagEx = false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 FlagEx = false;
             }

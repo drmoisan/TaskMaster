@@ -179,7 +179,7 @@ namespace TaskVisualization
         private readonly ToDoItem _active;
 
         private readonly SortedDictionary<string, bool> _dict_categories;
-        private string _exit_type = "Cancel";
+        //private string _exit_type = "Cancel";
         private readonly Dictionary<Label, string> _xlCtrlCaptions;
         private readonly Dictionary<Label, Control> _xlCtrlLookup;
         private readonly Dictionary<Label, bool> _xlCtrlOptions;
@@ -188,7 +188,7 @@ namespace TaskVisualization
         private int _activeNavGroup = -1;
         private bool _altActive = false;
         private int _altLevel = 0;
-        private readonly string _keyCapture = "";
+        //private readonly string _keyCapture = "";
         private readonly ToDoDefaults _defaults;
         private readonly IAutoAssign _autoAssign;
         private string _userEmailAddress;
@@ -437,7 +437,7 @@ namespace TaskVisualization
         public void Cancel_Action()
         {
             _viewer.Hide();
-            _exit_type = "Cancel";
+            //_exit_type = "Cancel";
             _viewer.DialogResult = DialogResult.Cancel;
             _viewer.Dispose();
         }
@@ -683,7 +683,7 @@ namespace TaskVisualization
                     throw new ArgumentOutOfRangeException("Duration cannot be negative");
                 }
             }
-            catch (InvalidCastException ex)
+            catch (InvalidCastException )
             {
                 MessageBox.Show("Could not convert to integer. Please put a positive integer in the duration box");
                 duration = -1;

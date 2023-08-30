@@ -10,7 +10,7 @@ namespace UtilitiesCS
     public static class EmailDetails
     {
         private const int _numberOfFields = 13;
-        private readonly static Dictionary<string, string> dictRemap;
+        
         private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
 
         #region Public Methods and Extensions
@@ -30,7 +30,7 @@ namespace UtilitiesCS
             // "http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
             strAry[1] = OlMail.GetTriage();
-            strAry[2] = OlMail.GetEmailFolderPath(emailRootFolder);
+            strAry[2] = OlMail.GetEmailFolderPath(emailRootFolder, dictRemap);
             strAry[3] = OlMail.SentOn.ToString(@"yyyy-MM-dd\Th:mm:ss\+\0\0\:\0\0");
 
             var recipients = GetRecipients(OlMail);
@@ -254,7 +254,7 @@ namespace UtilitiesCS
             return attachmentNames;
         }
         
-        private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder)
+        private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap)
         {
             Folder OlParent = (Folder)OlMail.Parent;
             string folderPath = OlParent.FolderPath;

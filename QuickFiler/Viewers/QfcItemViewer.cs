@@ -25,7 +25,7 @@ namespace QuickFiler
 
         private IList<Label> _tipsLabels;
         private IQfcItemController _controller;
-        private CoreWebView2Environment _webViewEnvironment;
+        
 
         public IList<Label> TipsLabels { get => _tipsLabels; }
         public IQfcItemController Controller { get => _controller; set => _controller = value; }

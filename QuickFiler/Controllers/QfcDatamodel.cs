@@ -218,7 +218,6 @@ namespace QuickFiler.Controllers
         public EmailSorter(SortOptionsEnum options) { _options = options; }
 
         private SortOptionsEnum _options = SortOptionsEnum.Default;
-        private int _sortCode = -1;
         private Dictionary<string, int> _triageImportantFirst = new Dictionary<string, int>
         {
             { "A", 1 },

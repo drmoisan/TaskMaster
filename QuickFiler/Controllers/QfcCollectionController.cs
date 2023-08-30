@@ -46,7 +46,7 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private IFilerHomeController _homeController;
         private IFilerFormController _parent;
-        private int _itemHeight;
+        //private int _itemHeight;
         private Panel _itemPanel;
         private TableLayoutPanel _itemTLP;
         private List<ItemGroup> _itemGroups;

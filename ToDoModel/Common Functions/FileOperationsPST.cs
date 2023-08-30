@@ -7,7 +7,6 @@ using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using System.IO;
 using UtilitiesCS;
-using UtilitiesCS;
 using System.Windows.Forms;
 using UtilitiesCS.OutlookExtensions;
 
@@ -111,7 +110,7 @@ namespace ToDoModel
                     __itemsPST = value;
                 }
             }
-            private readonly Store _store;
+            //private readonly Store _store;
             private readonly IApplicationGlobals _globals;
 
             public PSTEvents(Store Store, Items ItemsPST, IApplicationGlobals Globals)

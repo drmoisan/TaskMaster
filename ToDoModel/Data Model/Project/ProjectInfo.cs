@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using UtilitiesCS;
-using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 using Deedle;
 using Outlook = Microsoft.Office.Interop.Outlook;

@@ -132,7 +132,7 @@ namespace QuickFiler.Controllers
             _formViewer.MoveConversation.CheckedChanged += MoveConversation_CheckedChanged;
             _formViewer.Ok.Click += ButtonOK_Click;
             _formViewer.Cancel.Click += ButtonCancel_Click;
-            _formViewer.Refresh.Click += ButtonRefresh_Click;
+            _formViewer.RefreshPredicted.Click += ButtonRefresh_Click;
             _formViewer.NewFolder.Click += ButtonCreate_Click;
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
@@ -217,7 +217,7 @@ namespace QuickFiler.Controllers
         }
 
         private Dictionary<char, Action<char>> _keyboardActions;
-        internal Dictionary<char, Action<char>> KeyboardActions => Initialized(_keyboardActions, GetKbdActions);
+        internal Dictionary<char, Action<char>> KeyboardActions => Initialized(_keyboardActions, ()=> _keyboardActions = GetKbdActions());
         internal Dictionary<char, Action<char>> GetKbdActions()
         {
             return new()

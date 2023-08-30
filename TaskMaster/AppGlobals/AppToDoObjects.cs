@@ -57,7 +57,7 @@ namespace TaskMaster
         }
 
         private string _projInfo_Filename;
-        public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _defaults.FileName_ProjInfo);
+        public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _projInfo_Filename = _defaults.FileName_ProjInfo);
         private ProjectInfo _projInfo;
         public IProjectInfo ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
         async private Task LoadProjInfoAsync()
@@ -152,7 +152,7 @@ namespace TaskMaster
         }
 
         private string _fnameDictRemap;
-        public string FnameDictRemap => Initialized(_fnameDictRemap, () => _defaults.FileName_DictRemap);
+        public string FnameDictRemap => Initialized(_fnameDictRemap, () => _fnameDictRemap = _defaults.FileName_DictRemap);
 
         private ScoDictionary<string, string> _dictRemap;
         public IScoDictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictRemap());

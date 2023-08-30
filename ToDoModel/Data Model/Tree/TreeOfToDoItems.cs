@@ -40,11 +40,9 @@ namespace ToDoModel
 
         public void LoadTree(LoadOptions LoadType, Application Application)
         {
-            string strTemp;
-            string strPrev;
+            
             IList colItems;
-            strPrev = "";
-            strTemp = "";
+            
 
             try
             {

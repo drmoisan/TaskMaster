@@ -70,15 +70,15 @@ namespace QuickFiler.Controllers
                 bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                await SortEmail.Run(mailItems: items,
-                                    savePictures: savePictures,
-                                    destinationOlStem: folderpath,
-                                    saveMsg: saveEmail,
-                                    saveAttachments: attchments,
-                                    removePreviousFsFiles: false,
-                                    appGlobals: _globals,
-                                    olAncestor: _globals.Ol.ArchiveRootPath,
-                                    fsAncestorEquivalent: _globals.FS.FldrRoot);
+                await SortEmail.RunAsync(mailItems: items,
+                                         savePictures: savePictures,
+                                         destinationOlStem: folderpath,
+                                         saveMsg: saveEmail,
+                                         saveAttachments: attchments,
+                                         removePreviousFsFiles: false,
+                                         appGlobals: _globals,
+                                         olAncestor: _globals.Ol.ArchiveRootPath,
+                                         fsAncestorEquivalent: _globals.FS.FldrRoot);
                 SortEmail.Cleanup_Files();
                 // blDoMove
             }

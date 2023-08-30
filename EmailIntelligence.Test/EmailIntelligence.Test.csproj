@@ -87,10 +87,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">
-      <Project>{6b8006b4-9eb2-466e-a178-3e69ff42e16e}</Project>
-      <Name>EmailIntelligence</Name>
-    </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>

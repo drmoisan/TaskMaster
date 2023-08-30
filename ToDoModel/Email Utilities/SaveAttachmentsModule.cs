@@ -9,7 +9,7 @@ using Microsoft.Office.Interop.Outlook;
 
 
 using UtilitiesCS;
-using UtilitiesCS;
+
 
 namespace ToDoModel
 {
@@ -32,8 +32,7 @@ namespace ToDoModel
         {
 
             var _globals = AppGlobals;
-            object objFolder;       // The selected folder object from Browse for Folder dialog box.
-            object objSubFolders;
+            
             // Dim selItems            As Selection    ' A collection of Outlook item objects in a folder.
             object objNewFolder;       // A specific member of a Collection object either by position or by key.
                                        // A document or link to a document contained in an Outlook item.
@@ -47,7 +46,7 @@ namespace ToDoModel
             long lCountEachItem;         // The number of attachments in each Outlook item.
             long lCountAllItems;         // The number of attachments in all Outlook items.
             string strFolderPath;       // The selected folder path.
-            bool blnIsEnd;      // End all code execution.
+            
             bool blnIsSave;      // Consider if it is need to save.
             DateTime emailDate;         // Holds date of email
             DateTime emailDate2;         // Holds date of email + 1 day for error in FLOW
@@ -64,7 +63,7 @@ namespace ToDoModel
 
             // Dim Response            As Variant      ' Response to user input
 
-            blnIsEnd = false;
+            
             blnIsSave = false;
             blnFolderExists = true;
             lCountAllItems = 0L;

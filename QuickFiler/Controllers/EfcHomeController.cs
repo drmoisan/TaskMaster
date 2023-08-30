@@ -39,7 +39,6 @@ namespace QuickFiler
         private IApplicationGlobals _globals;
         private Enums.InitTypeEnum _initType;
         private System.Action _parentCleanup;
-        private ConversationResolver _conversationResolver;
 
         public void Run() 
         { 
