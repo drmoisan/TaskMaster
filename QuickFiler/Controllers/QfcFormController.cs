@@ -54,11 +54,11 @@ namespace QuickFiler.Controllers
         private System.Action _parentCleanup;
         private RowStyle _rowStyleTemplate;
         private RowStyle _rowStyleExpanded;
-        private int itemPanelHeight;
+        
         private Padding _itemMarginTemplate;
         private Enums.InitTypeEnum _initType;
         private bool _blRunningModalCode = false;
-        private bool _blSuppressEvents = false;
+        //private bool _blSuppressEvents = false;
         private IFilerHomeController _parent;
         private int _itemsPerIteration = -1;
         private delegate void WriteMetricsDelegate(string filename);
@@ -245,7 +245,7 @@ namespace QuickFiler.Controllers
                     if (_groups.ReadyForMove)
                     {
                         _blRunningModalCode = true;
-                        _blSuppressEvents = true;
+                        //_blSuppressEvents = true;
 
                         // Move emails
                         await _groups.MoveEmails(_movedItems);
@@ -262,7 +262,7 @@ namespace QuickFiler.Controllers
                         // Launch viewers and controllers for the next items in queue
                         Iterate();
 
-                        _blSuppressEvents = false;
+                        //_blSuppressEvents = false;
                         _blRunningModalCode = false;
                     }
                 }

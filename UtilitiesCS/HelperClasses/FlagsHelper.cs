@@ -120,6 +120,7 @@ namespace UtilitiesCS
             );
         }
     }
+    
     public static class FlagsHelper
     {
         public static T ToCombined<T>(this IEnumerable<T> list)

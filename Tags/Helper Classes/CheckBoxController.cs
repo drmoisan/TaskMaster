@@ -6,17 +6,30 @@ namespace Tags
 {
 
     public class CheckBoxController
-    {
+    {       
+        
+        public bool TrigByKeyChg;
+        private bool TrigByValChg;
+        private TagController _parent;
+        private string strTagPrefix;
+        private string strTemp;
 
+        public CheckBoxController() { }
 
-        // By declaring Public WithEvents we can handle
-        // events "collectively". In this case it is
-        // the click event on a date label, and by
-        // doing it this way we avoid writing click
-        // events for each and every data label.
+        public CheckBoxController(CheckBox checkBox)
+        {
+            CtrlCB = checkBox;
+        }
+
+        internal object Init(TagController parent, string strPrefix)
+        {
+            _parent = parent;
+            strTagPrefix = strPrefix;
+            return true;
+        }
+
         private CheckBox _ctrlCB;
-
-        public virtual CheckBox ctrlCB
+        public virtual CheckBox CtrlCB
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -29,7 +42,7 @@ namespace Tags
             {
                 if (_ctrlCB != null)
                 {
-                    _ctrlCB.Click -= (_, __) => ctrlCB_Click();
+                    _ctrlCB.Click -= ctrlCB_Click;
                     _ctrlCB.KeyDown -= ctrlCB_KeyDown;
                     _ctrlCB.GotFocus -= ctrlCB_GotFocus;
                     _ctrlCB.LostFocus -= ctrlCB_LostFocus;
@@ -39,7 +52,7 @@ namespace Tags
                 _ctrlCB = value;
                 if (_ctrlCB != null)
                 {
-                    _ctrlCB.Click += (_, __) => ctrlCB_Click();
+                    _ctrlCB.Click += ctrlCB_Click;
                     _ctrlCB.KeyDown += ctrlCB_KeyDown;
                     _ctrlCB.GotFocus += ctrlCB_GotFocus;
                     _ctrlCB.LostFocus += ctrlCB_LostFocus;
@@ -47,37 +60,14 @@ namespace Tags
                 }
             }
         }
-        public bool TrigByKeyChg;
-        private bool TrigByValChg;
-        private TagController _parent;
-        private string strTagPrefix;
-        private string strTemp;
 
-        //BUGFIX: CheckBoxController adds event to an object that is null
-        public CheckBoxController()
-        {
-            ctrlCB.Click += (_, __) => ctrlCB_Click();
-            ctrlCB.KeyDown += ctrlCB_KeyDown;
-            ctrlCB.GotFocus += ctrlCB_GotFocus;
-            ctrlCB.LostFocus += ctrlCB_LostFocus;
-            ctrlCB.PreviewKeyDown += ctrlCB_PreviewKeyDown;
-        }
-
-
-        internal object Init(TagController parent, string strPrefix)
-        {
-            _parent = parent;
-            strTagPrefix = strPrefix;
-            return true;
-        }
-
-        private void ctrlCB_Click()
+        private void ctrlCB_Click(object sender, EventArgs e)
         {
             if (!TrigByKeyChg)
             {
-                strTemp = strTagPrefix + ctrlCB.Text;
+                strTemp = strTagPrefix + CtrlCB.Text;
                 _parent.ToggleChoice(strTemp);
-                _parent.FocusCheckbox(ctrlCB);
+                _parent.FocusCheckbox(CtrlCB);
             }
             else if (TrigByValChg)
             {
@@ -87,7 +77,7 @@ namespace Tags
             else
             {
                 TrigByValChg = true;
-                ctrlCB.Checked = !ctrlCB.Checked;
+                CtrlCB.Checked = !CtrlCB.Checked;
             }
             // Me.ctrlCB.Value = Not Me.ctrlCB.Value
         }
@@ -134,7 +124,7 @@ namespace Tags
 
                 case Keys.Enter:
                     {
-                        _parent.OK_Action();
+                        _parent.ButtonOk_Action();
                         break;
                     }
             }

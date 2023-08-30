@@ -5,14 +5,16 @@ using System.Linq;
 using Microsoft.VisualBasic.CompilerServices;
 using System.Text.RegularExpressions;
 using UtilitiesCS;
-
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace ToDoModel
 {
     /// <summary>
     /// Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
     /// </summary>
-    public class FlagParser
+    public class FlagParser: INotifyCollectionChanged, INotifyPropertyChanged
     {
         /// <summary>
         /// Constructor for the FlagParser class accepts a comma delimited string containing 
@@ -25,10 +27,10 @@ namespace ToDoModel
             if (categories is null)
                 categories = "";
 
-            ArrayExtensions.SearchOptions options = ArrayExtensions.SearchOptions.Standard;
+            //ArrayExtensions.SearchOptions options = ArrayExtensions.SearchOptions.Standard;
             
-            if (deleteSearchSubString)
-                options = ArrayExtensions.SearchOptions.DeleteFromMatches;
+            //if (deleteSearchSubString)
+            //    options = ArrayExtensions.SearchOptions.DeleteFromMatches;
             
             var categoryList = categories.Split(separator: ',', trim: true).ToList();
             _people.List = FindMatches(categoryList, _people.Prefix);
@@ -46,7 +48,7 @@ namespace ToDoModel
             Today = categoryList.Remove(Properties.Settings.Default.Prefix_Today);
             Bullpin = categoryList.Remove(Properties.Settings.Default.Prefix_Bullpin);
             Other = categoryList.Count > 0 ? string.Join(", ", categoryList) : "";
-
+            WireEvents();
         }
 
         private readonly FlagDetails _people = new FlagDetails(Properties.Settings.Default.Prefix_People);
@@ -58,12 +60,27 @@ namespace ToDoModel
         private bool _today = false;
         private bool _bullpin = false;
 
-        public string get_KB(bool IncludePrefix = false)
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) 
         {
-            return IncludePrefix ? _kb.WithPrefix : _kb.NoPrefix;
+            CollectionChanged?.Invoke(sender, e);
         }
 
-        public void set_KB(bool IncludePrefix = false, string value = default)
+        public void WireEvents()
+        {
+            var list = new List<FlagDetails> { _people, _projects, _topics, _context, _kb };
+            list.ForEach(x => x.CollectionChanged += List_CollectionChanged);
+        }
+
+        public string GetKb(bool includePrefix = false)
+        {
+            return includePrefix ? _kb.WithPrefix : _kb.NoPrefix;
+        }
+
+        public void SetKb(bool includePrefix = false, string value = default)
         {
             _kb.List = SplitToList(value, ",", _kb.Prefix);
         }
@@ -73,19 +90,19 @@ namespace ToDoModel
     /// SET splits a comma delimited String to a list excluding 
     /// the Prefix which is passed to the FlagDetails class.
     /// </summary>
-    /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
+    /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
     /// <returns>A string containing a comma separated Context names</returns>
-        public string get_Context(bool IncludePrefix = false)
+        public string GetContext(bool includePrefix = false)
         {
-            return IncludePrefix ? _context.WithPrefix : _context.NoPrefix;
+            return includePrefix ? _context.WithPrefix : _context.NoPrefix;
         }
 
-        public void set_Context(bool IncludePrefix = false, string value = default)
+        public void SetContext(bool includePrefix = false, string value = default)
         {
             _context.List = SplitToList(value, ",", _context.Prefix);
         }
 
-        public List<string> ContextList
+        public ObservableCollection<string> ContextList
         {
             get
             {
@@ -98,19 +115,19 @@ namespace ToDoModel
     /// SET splits a comma delimited String to a list excluding 
     /// the Prefix which is passed to the FlagDetails class.
     /// </summary>
-    /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
+    /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
     /// <returns>A string containing a comma separated Project names</returns>
-        public string get_Projects(bool IncludePrefix = false)
+        public string GetProjects(bool includePrefix = false)
         {
-            return IncludePrefix ? _projects.WithPrefix : _projects.NoPrefix;
+            return includePrefix ? _projects.WithPrefix : _projects.NoPrefix;
         }
 
-        public void set_Projects(bool IncludePrefix = false, string value = default)
+        public void SetProjects(bool includePrefix = false, string value = default)
         {
             _projects.List = SplitToList(value, ",", _projects.Prefix);
         }
 
-        public List<string> ProjectList
+        public ObservableCollection<string> ProjectList
         {
             get
             {
@@ -125,17 +142,17 @@ namespace ToDoModel
         /// </summary>
         /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
         /// <returns>A string containing a comma separated Topic names</returns>
-        public string get_Topics(bool IncludePrefix = false)
+        public string GetTopics(bool IncludePrefix = false)
         {
             return IncludePrefix ? _topics.WithPrefix : _topics.NoPrefix;
         }
 
-        public void set_Topics(bool IncludePrefix = false, string value = default)
+        public void SetTopics(bool includePrefix = false, string value = default)
         {
             _topics.List = SplitToList(value, ",", _topics.Prefix);
         }
 
-        public List<string> TopicList
+        public ObservableCollection<string> TopicList
         {
             get
             {
@@ -150,23 +167,12 @@ namespace ToDoModel
         /// </summary>
         /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
         /// <returns>A string containing a comma separated Topic names</returns>
-        public string get_People(bool IncludePrefix = false)
-        {
-            return IncludePrefix ? _people.WithPrefix : _people.NoPrefix;
-        }
-
-        public void set_People(bool IncludePrefix = false, string value = default)
-        {
-            _people.List = SplitToList(value, ",", _people.Prefix);
-        }
-
-        public List<string> PeopleList
-        {
-            get
-            {
-                return _people.List;
-            }
-        }
+        public string GetPeople(bool IncludePrefix = false) => IncludePrefix ? _people.WithPrefix : _people.NoPrefix;
+        
+        public void SetPeople(bool IncludePrefix = false, string value = default) => _people.List = SplitToList(value, ",", _people.Prefix);
+        
+        public ObservableCollection<string> GetPeopleList(bool IncludePrefix = false) => IncludePrefix ? _people.ListWithPrefix : _people.List;
+        public void SetPeopleList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _people.List = value;
 
         public bool Today { get => _today; set => _today = value; }
         public bool Bullpin { get => _bullpin; set => _bullpin = value; }
@@ -228,29 +234,36 @@ namespace ToDoModel
 
         }
 
-        private List<string> SplitToList(string MainString, string Delimiter, string ReplaceString = "XXXXX")
+        private ObservableCollection<string> SplitToList(string MainString, string Delimiter, string ReplaceString = "XXXXX")
         {
-            List<string> list_return;
+            ObservableCollection<string> list_return;
             if (MainString is null)
             {
-                list_return = new List<string>();
+                list_return = new ObservableCollection<string>();
             }
             else if (string.IsNullOrEmpty(MainString))
             {
-                list_return = new List<string>();
+                list_return = new ObservableCollection<string>();
             }
             else
             {
-                list_return = MainString.Split(Delimiter[0]).Select(x => x.Replace(ReplaceString, "").Trim()).ToList();
+                list_return = new ObservableCollection<string>(MainString.Split(Delimiter[0]).Select(x => x.Replace(ReplaceString, "").Trim()));
             }
             return list_return;
         }
 
-        private List<string> FindMatches(List<string> source, string substring, bool return_nonmatches = false)
+        private ObservableCollection<string> FindMatches(List<string> source, string substring, bool return_nonmatches = false)
         {
-
-            var list_return = return_nonmatches ? source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) == -1).Select(x => x).ToList() : source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) != -1).Select(x => x.Replace(substring, "")).ToList();
-            return list_return;
+            if (return_nonmatches)
+            {
+                return new ObservableCollection<string>(source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) == -1));
+            }
+            else
+            {
+                return new ObservableCollection<string>(source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) != -1).Select(x => x.Replace(substring, "")).ToList());
+            }
+            //var list_return = return_nonmatches ? source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) == -1).Select(x => x).ToList() : source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) != -1).Select(x => x.Replace(substring, "")).ToList();
+            //return list_return;
 
         }
                 

@@ -32,12 +32,10 @@ namespace ToDoModel
 
         private double cMicroTimer()
         {
-            double cMicroTimerRet = default;
             // Returns seconds.
             // Dim cyTicks1 As Decimal
             long lpPerformanceCount;
             // Static cyFrequency As Decimal
-            cMicroTimerRet = 0d;
             // Get frequency.
             if (_cMicroTimer_lpFrequency == 0L)
                 PInvoke.QueryPerformanceFrequency(out _cMicroTimer_lpFrequency);

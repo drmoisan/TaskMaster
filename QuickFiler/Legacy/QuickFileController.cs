@@ -17,20 +17,19 @@ namespace QuickFiler.Legacy
 {
     public class QuickFileController 
     {
-        private bool _useOld = true;
         //private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region State Variables
         // Private state variables
-        private Folder _folderCurrent;
-        private int _intUniqueItemCounter;
-        private int _intEmailPosition;
+        //private Folder _folderCurrent;
+        //private int _intUniqueItemCounter;
+        //private int _intEmailPosition;
         private int _intEmailsPerIteration;
         private long _lngAcceleratorDialogueTop;
-        private long _lngAcceleratorDialogueLeft;
+        //private long _lngAcceleratorDialogueLeft;
         private bool _blSuppressEvents;
         private bool _blRunningModalCode = false;
-        private bool _boolRemoteMouseApp;
+        //private bool _boolRemoteMouseApp;
         private cStopWatch _stopWatch;
 
         // Public state variables
@@ -48,7 +47,7 @@ namespace QuickFiler.Legacy
         private long _heightFormMin;
         private long _heightPanelMainMax;
         private long _heightPanelMainMin;
-        private long _lngPanelMainSCTop;
+        //private long _lngPanelMainSCTop;
         private long _lngTopButtonOkMin;
         private long _lngTopButtonCancelMin;
         private long _lngTopButtonUndoMin;
@@ -58,30 +57,30 @@ namespace QuickFiler.Legacy
         /* Old design used absolute pixels for a particular resolution (1920 x 1080). 
          * This variable uses PInvoke to grab the current resolution and adjust. Autoscaling
          * is handled by forms class. This will be deprecated eventually. */
-        private double _multiplier;  
+        //private double _multiplier;  
         #endregion
         #region Global Variables, Window Handles and Collections
         // Globals
-        private IApplicationGlobals _globals;
+        private readonly IApplicationGlobals _globals;
         private readonly Explorer _activeExplorer;
-        private readonly IOlObjects _olObjects;
+        //private readonly IOlObjects _olObjects;
         private readonly Outlook.Application _olApp;
         private readonly QfcFormLegacyViewer _viewer;
         private StackObjectCS<object> _movedMails;
         private Enums.InitTypeEnum _initType;
 
         // Collections
-        private QfcGroupOperationsLegacy _legacy;
+        private readonly QfcGroupOperationsLegacy _legacy;
         private Queue<MailItem> _queueEmailsInFolder;
         internal Panel Frm;
 
         // Window Handles
-        private IntPtr _olAppHWnd;
-        private IntPtr _lFormHandle;
+        //private IntPtr _olAppHWnd;
+        //private IntPtr _lFormHandle;
 
         // Cleanup
         public delegate void ParentCleanupMethod();
-        private ParentCleanupMethod _parentCleanup;
+        private readonly ParentCleanupMethod _parentCleanup;
         #endregion
 
         public QuickFileController(
@@ -102,15 +101,15 @@ namespace QuickFiler.Legacy
 
             // Link _itemController to global variables 
             _globals = AppGlobals;
-            _olObjects = AppGlobals.Ol;
+            //_olObjects = AppGlobals.Ol;
             _olApp = AppGlobals.Ol.App;
             _activeExplorer = AppGlobals.Ol.App.ActiveExplorer();
-            _folderCurrent = (Folder)_activeExplorer.CurrentFolder;
+            //_folderCurrent = (Folder)_activeExplorer.CurrentFolder;
             _movedMails = AppGlobals.Ol.MovedMails_Stack;
 
             // Set readonly window handles
-            _lFormHandle = _viewer.Handle;
-            _olAppHWnd = PInvoke.GetAncestor((Windows.Win32.Foundation.HWND)_lFormHandle, Windows.Win32.UI.WindowsAndMessaging.GET_ANCESTOR_FLAGS.GA_PARENT);
+            //_lFormHandle = _viewer.Handle;
+            //_olAppHWnd = PInvoke.GetAncestor((Windows.Win32.Foundation.HWND)_lFormHandle, Windows.Win32.UI.WindowsAndMessaging.GET_ANCESTOR_FLAGS.GA_PARENT);
 
             InitializeFormConfigurations();
             _legacy = new QfcGroupOperationsLegacy(_viewer, _initType, _globals, this);
@@ -126,13 +125,13 @@ namespace QuickFiler.Legacy
             _stopWatch = new cStopWatch();
             _stopWatch.Start();
             var colEmails = DequeueNextEmailGroup(ref _queueEmailsInFolder, _intEmailsPerIteration);
-            _legacy.Multiplier = _multiplier;
+            //_legacy.Multiplier = _multiplier;
             _legacy.LoadControlsAndHandlers(colEmails);
         }
 
         private void InitializeModelProcessingMetrics()
         {
-            _intEmailPosition = 0;    // Reverse sort is 0   'Regular sort is 1
+            //_intEmailPosition = 0;    // Reverse sort is 0   'Regular sort is 1
         }
 
         private void InitializeFormConfigurations()
@@ -192,7 +191,7 @@ namespace QuickFiler.Legacy
 
         private void InitializeToleranceMinimums()
         {
-            _lngPanelMainSCTop = 0L;
+            //_lngPanelMainSCTop = 0L;
             _heightFormMin = _viewer.Height + QfcConstants.Panel.Height + QfcConstants.FrmSp;
             _heightPanelMainMin = QfcConstants.Panel.Height + QfcConstants.FrmSp;
             _lngTopButtonOkMin = _viewer.L1v2L2h3_ButtonOK.Top;
@@ -216,7 +215,7 @@ namespace QuickFiler.Legacy
             _viewer.KeyboardDialog.Top = (int)_lngAcceleratorDialogueTop;
             _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference);
             _lngTopSpnMin = _viewer.L1v2L2h5_SpnEmailPerLoad.Top;
-            _lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
+            //_lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
 
             // Resize form
             lngPreviousHeight = _viewer.Height;
@@ -227,7 +226,7 @@ namespace QuickFiler.Legacy
             _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_viewer.L1v2L2h4_ButtonUndo.Top + lngHeightDifference);
             _lngAcceleratorDialogueTop = _viewer.KeyboardDialog.Top + lngHeightDifference;
             _viewer.KeyboardDialog.Top = (int)_lngAcceleratorDialogueTop;
-            _lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
+            //_lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
             _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference);
 
             // Set Max Size of the main _tlp based on resizing
@@ -273,74 +272,74 @@ namespace QuickFiler.Legacy
 
         #region Data Model Manipulation
 
-        private void EliminateDuplicateConversationIDs(ref List<MailItem> listEmails)
-        {
-            //TODO: Convert listObjItems logic to List<T>
-            var dictID = new Dictionary<string, int>();
-            int i;
-            int max;
+        //private void EliminateDuplicateConversationIDs(ref List<MailItem> listEmails)
+        //{
+        //    //TODO: Convert listObjItems logic to List<T>
+        //    var dictID = new Dictionary<string, int>();
+        //    int i;
+        //    int max;
 
-            foreach (MailItem olMail in listEmails)
-            {
-                if (dictID.ContainsKey(olMail.ConversationID))
-                {
-                    dictID[olMail.ConversationID] += 1;
-                }
-                else
-                {
-                    //QUESTION: I believe this should be 1 so I updated the count
-                    dictID.Add(olMail.ConversationID, 1);
-                }
-            }
+        //    foreach (MailItem olMail in listEmails)
+        //    {
+        //        if (dictID.ContainsKey(olMail.ConversationID))
+        //        {
+        //            dictID[olMail.ConversationID] += 1;
+        //        }
+        //        else
+        //        {
+        //            //QUESTION: I believe this should be 1 so I updated the count
+        //            dictID.Add(olMail.ConversationID, 1);
+        //        }
+        //    }
 
-            max = listEmails.Count - 1;
+        //    max = listEmails.Count - 1;
 
-            for (i = max; i >= 0; i += -1)
-            {
-                MailItem objItem = (MailItem)listEmails[i];
-                // Debug.Print dictID(olMail.ConversationID)
-                if (dictID[objItem.ConversationID] > 1)
-                {
-                    listEmails.RemoveAt(i);
-                    dictID[objItem.ConversationID] = dictID[objItem.ConversationID] - 1;
-                }
-            }
-        }
+        //    for (i = max; i >= 0; i += -1)
+        //    {
+        //        MailItem objItem = (MailItem)listEmails[i];
+        //        // Debug.Print dictID(olMail.ConversationID)
+        //        if (dictID[objItem.ConversationID] > 1)
+        //        {
+        //            listEmails.RemoveAt(i);
+        //            dictID[objItem.ConversationID] = dictID[objItem.ConversationID] - 1;
+        //        }
+        //    }
+        //}
 
-        private List<object> ItemsToCollection(Items OlItems)
-        {
-            List<object> listObjItems = new List<object>();
-            foreach (var objItem in OlItems)
-                listObjItems.Add(objItem);
-            return listObjItems;
+        //private List<object> ItemsToCollection(Items OlItems)
+        //{
+        //    List<object> listObjItems = new List<object>();
+        //    foreach (var objItem in OlItems)
+        //        listObjItems.Add(objItem);
+        //    return listObjItems;
 
-        }
+        //}
 
-        private void DebugOutPutEmailCollection(List<object> listObjItems)
-        {
-            MailItem OlMail;
-            MeetingItem OlAppt;
-            string strLine;
-            int i;
+        //private void DebugOutPutEmailCollection(List<object> listObjItems)
+        //{
+        //    MailItem OlMail;
+        //    MeetingItem OlAppt;
+        //    string strLine;
+        //    int i;
 
-            i = 0;
-            foreach (var objItem in listObjItems)
-            {
-                i += 1;
-                strLine = "";
-                if (objItem is MailItem)
-                {
-                    OlMail = (MailItem)objItem;
-                    strLine = i + " " + objItem.GetUdfString("Triage") + " " + OlMail.SentOn.ToString("General Date") + " " + OlMail.Subject;
-                }
-                else if (objItem is AppointmentItem)
-                {
-                    OlAppt = (MeetingItem)objItem;
-                    strLine = i + " " + objItem.GetUdfString("Triage") + " " + OlAppt.SentOn.ToString("General Date") + " " + OlAppt.Subject;
-                }
-                Debug.WriteLine(strLine);
-            }
-        }
+        //    i = 0;
+        //    foreach (var objItem in listObjItems)
+        //    {
+        //        i += 1;
+        //        strLine = "";
+        //        if (objItem is MailItem)
+        //        {
+        //            OlMail = (MailItem)objItem;
+        //            strLine = i + " " + objItem.GetUdfString("Triage") + " " + OlMail.SentOn.ToString("General Date") + " " + OlMail.Subject;
+        //        }
+        //        else if (objItem is AppointmentItem)
+        //        {
+        //            OlAppt = (MeetingItem)objItem;
+        //            strLine = i + " " + objItem.GetUdfString("Triage") + " " + OlAppt.SentOn.ToString("General Date") + " " + OlAppt.Subject;
+        //        }
+        //        Debug.WriteLine(strLine);
+        //    }
+        //}
 
         private List<MailItem> DequeueNextEmailGroup(ref Queue<MailItem> MasterQueue, int Quantity)
         {
@@ -532,7 +531,7 @@ namespace QuickFiler.Legacy
                             }
                             else
                             {
-                                bool unused = _viewer.L1v1L2_PanelMain.Focus();
+                                _viewer.L1v1L2_PanelMain.Focus();
                             }
                             SendKeys.Send("{ESC}");
                             break;
@@ -621,8 +620,8 @@ namespace QuickFiler.Legacy
         internal void Cleanup()
         {
             ExplConvView_ReturnState();
-            _olAppHWnd = default;
-            _lFormHandle = default;
+            //_olAppHWnd = default;
+            //_lFormHandle = default;
             _parentCleanup.Invoke();
         }
 
@@ -683,8 +682,7 @@ namespace QuickFiler.Legacy
             DialogResult undoResponse;
             DialogResult repeatResponse = DialogResult.Yes;
 
-            if (_movedMails is null)
-                _movedMails = new StackObjectCS<object>();
+            _movedMails ??= new StackObjectCS<object>();
 
             i = _movedMails.Count - 1;
             listItems = _movedMails.ToList();
@@ -693,12 +691,12 @@ namespace QuickFiler.Legacy
             {
                 objTemp = listItems[i];
                 // objTemp = _movedObjects.Pop
-                if (objTemp is MailItem)
-                    oMail_Current = (MailItem)objTemp;
+                if (objTemp is MailItem item)
+                    oMail_Current = item;
                 // objTemp = _movedObjects.Pop
                 objTemp = listItems[i - 1];
-                if (objTemp is MailItem)
-                    oMail_Old = (MailItem)objTemp;
+                if (objTemp is MailItem item1)
+                    oMail_Old = item1;
 
                 // oMail_Old = _movedObjects.Pop
                 if (MailResolution.IsMailUnReadable(oMail_Current) == false & MailResolution.IsMailUnReadable(oMail_Old) == false)
@@ -711,7 +709,7 @@ namespace QuickFiler.Legacy
 
                     if (undoResponse == DialogResult.Yes & (oFolder_Current.FolderPath != oFolder_Old.FolderPath))
                     {
-                        var unused = oMail_Current.Move(oFolder_Old);
+                        oMail_Current.Move(oFolder_Old);
                         _movedMails.Pop(i);
                         _movedMails.Pop(i - 1);
                     }
@@ -740,29 +738,29 @@ namespace QuickFiler.Legacy
             }
         }
 
-        private void focusListener_ChangeFocus(bool gotFocus)
-        {
-            if (gotFocus)
-            {
-            }
-            // Debug.Print "Gained Focus"
-            // tn = TypeName(selection)
-            // CopyButton.Enabled = IIf(tn = "Series", True, False)
-            // On Error Resume Next
-            // AC = ActiveChart
-            // On Error GoTo 0
-            // If AC Is Nothing Then
-            // PasteButton.Enabled = False
-            // Else
-            // PasteButton.Enabled = readyToPaste 'TRUE if curve has been copied
-            // End If
-            else
-            {
-                Debug.Print("Lost Focus");
-                // 'GoingAway
+        //private void focusListener_ChangeFocus(bool gotFocus)
+        //{
+        //    if (gotFocus)
+        //    {
+        //    }
+        //    // Debug.Print "Gained Focus"
+        //    // tn = TypeName(selection)
+        //    // CopyButton.Enabled = IIf(tn = "Series", True, False)
+        //    // On Error Resume Next
+        //    // AC = ActiveChart
+        //    // On Error GoTo 0
+        //    // If AC Is Nothing Then
+        //    // PasteButton.Enabled = False
+        //    // Else
+        //    // PasteButton.Enabled = readyToPaste 'TRUE if curve has been copied
+        //    // End If
+        //    else
+        //    {
+        //        Debug.Print("Lost Focus");
+        //        // 'GoingAway
 
-            }
-        }
+        //    }
+        //}
 
         // Friend Sub Form_Dispose()
         // Cleanup()
@@ -796,8 +794,7 @@ namespace QuickFiler.Legacy
             try
             {
                 ObjView.Apply();
-                if (ObjViewTemp is not null)
-                    ObjViewTemp.Delete();
+                ObjViewTemp?.Delete();
                 BlShowInConversations = false;
             }
             catch (System.Exception)
@@ -805,8 +802,7 @@ namespace QuickFiler.Legacy
                 ObjViewTemp = GetSiblingView((Outlook.View)_activeExplorer.CurrentView, 
                                              "tmpNoConversation");
                 
-                if (ObjViewTemp is not null)
-                    ObjViewTemp.Delete();
+                ObjViewTemp?.Delete();
             }
         }
 
@@ -926,7 +922,7 @@ namespace QuickFiler.Legacy
         private void QuickFileMetrics_WRITE(string filename)
         {
 
-            string LOC_TXT_FILE;
+            //string LOC_TXT_FILE;
             string curDateText, curTimeText, durationText, durationMinutesText;
             double Duration;
             string dataLineBeg;
@@ -945,7 +941,7 @@ namespace QuickFiler.Legacy
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
-            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
+            //LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
 
             Duration = _stopWatch.timeElapsed;
             OlEndTime = DateTime.Now;
@@ -979,10 +975,10 @@ namespace QuickFiler.Legacy
 
         }
 
-        private void GetDetails(string durationText, string durationMinutesText, double Duration, ref string dataLine, string dataLineBeg, ref QfcController QF, DateTime OlEndTime, cInfoMail infoMail, ref AppointmentItem OlAppointment, string[] strOutput)
-        {
+        //private void GetDetails(string durationText, string durationMinutesText, double Duration, ref string dataLine, string dataLineBeg, ref QfcController QF, DateTime OlEndTime, cInfoMail infoMail, ref AppointmentItem OlAppointment, string[] strOutput)
+        //{
 
-        }
+        //}
 
 
         #endregion

@@ -261,13 +261,24 @@
     <Compile Include="Dialogs\DelegateButtonTemplate.Designer.cs">
       <DependentUpon>DelegateButtonTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="EmailIntelligence\AutoFile2.cs" />
+    <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\CtfMap.cs" />
+    <Compile Include="EmailIntelligence\EmailDetails.cs" />
+    <Compile Include="EmailIntelligence\RecipientInfo.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />
+    <Compile Include="HelperClasses\TipsController.cs" />
+    <Compile Include="Interfaces\IAutoAssign.cs" />
+    <Compile Include="Interfaces\IPeopleScoDictionary.cs" />
+    <Compile Include="Interfaces\IScoCollection.cs" />
     <Compile Include="Interfaces\IAppEvents.cs" />
     <Compile Include="Interfaces\IMovedMailInfo.cs" />
+    <Compile Include="OutlookExtensions\CategoryExtensions.cs" />
+    <Compile Include="OutlookExtensions\OutlookItem.cs" />
+    <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack.cs" />
     <Compile Include="Threading\PriorityScheduler.cs" />
     <Compile Include="Threading\TaskPriority.cs" />
@@ -285,7 +296,7 @@
     <Compile Include="Interfaces\IToDoObj.cs" />
     <Compile Include="Interfaces\IToDoObjects.cs" />
     <Compile Include="Interfaces\IToDoProjectInfoEntry.cs" />
-    <Compile Include="Interfaces\PrefixInterface.cs" />
+    <Compile Include="Interfaces\IPrefix.cs" />
     <Compile Include="OutlookExtensions\Calendar.cs" />
     <Compile Include="OutlookExtensions\ComType.cs" />
     <Compile Include="OutlookExtensions\CreateCategory.cs" />
@@ -293,7 +304,7 @@
     <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
     <Compile Include="OutlookExtensions\OlTableExtensions.cs" />
     <Compile Include="OutlookExtensions\OlToDoTable.cs" />
-    <Compile Include="Interfaces\ISCODictionary.cs" />
+    <Compile Include="Interfaces\IScoDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
     <Compile Include="Interfaces\EnumFindBy.cs" />
@@ -337,7 +348,7 @@
     <Compile Include="OutlookExtensions\UserDefinedFields.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Interfaces\ISerializableDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
+    <Compile Include="ReusableTypeClasses\ScoDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
     <Compile Include="To Depricate\CSVDictUtilities.cs" />
@@ -345,6 +356,7 @@
     <Compile Include="To Depricate\FlattenArray.cs" />
     <Compile Include="To Depricate\StackObjectVB.cs" />
     <Compile Include="To Depricate\StringManipulation.cs" />
+    <Compile Include="Windows Forms\ControlPosition.cs" />
     <Compile Include="Windows Forms\MouseDownFilter.cs" />
     <Compile Include="Windows Forms\OlvExtension.cs" />
     <Compile Include="Windows Forms\Resizer.cs" />

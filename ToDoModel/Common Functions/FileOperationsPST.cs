@@ -7,7 +7,6 @@ using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using System.IO;
 using UtilitiesCS;
-using UtilitiesCS;
 using System.Windows.Forms;
 using UtilitiesCS.OutlookExtensions;
 
@@ -111,7 +110,7 @@ namespace ToDoModel
                     __itemsPST = value;
                 }
             }
-            private readonly Store _store;
+            //private readonly Store _store;
             private readonly IApplicationGlobals _globals;
 
             public PSTEvents(Store Store, Items ItemsPST, IApplicationGlobals Globals)
@@ -163,13 +162,7 @@ namespace ToDoModel
                             {
 
                                 // Get Project Name
-                                strProject = todo.get_Project();
-
-                                // If IsArray(objProperty_Project.Value) Then
-                                // strProject = FlattenStringTree(objProperty_Project.Value)
-                                // Else
-                                // strProject = objProperty_Project.Value
-                                // End If
+                                strProject = todo.Project;
 
                                 // Check to see if the Project name returned a value before attempting to autocode
                                 if (strProject.Length != 0)
@@ -184,7 +177,7 @@ namespace ToDoModel
                                         if (strToDoID.Length == 2)
                                         {
                                             // Change the Item's todoid to be a node of the project
-                                            if (todo.get_Context() != "Tag PROJECTS")
+                                            if (todo.Context != "Tag PROJECTS")
                                             {
                                                 strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                                 todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
@@ -216,7 +209,7 @@ namespace ToDoModel
 
                             else if (strToDoID.Length == 0)
                             {
-                                strProject = todo.get_Project();
+                                strProject = todo.Project;
                                 // If IsArray(objProperty_Project.Value) Then
                                 // strProject = FlattenStringTree(objProperty_Project.Value)
                                 // Else
@@ -242,7 +235,6 @@ namespace ToDoModel
                         {
                             // Get Project Name
                             strProject = objProperty_Project.GetUdfString();
-                            //strProject = objProperty_Project is Array ? FlattenArray.FlattenArry((object[])objProperty_Project.Value) : (string)objProperty_Project.Value;
 
                             // If the project name is in our dictionary, autoadd the ToDoID to this item
                             if (strProject.Length != 0)
@@ -250,15 +242,12 @@ namespace ToDoModel
                                 // If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                 if (_globals.TD.ProjInfo.Contains_ProjectName(strProject))
                                 {
-                                    // strProjectToDo = ProjDict.ProjectDictionary(strProject)
                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                     // Add the next ToDoID available in that branch
                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
                                     todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                                    // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
-                                    // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
                                     _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
-                                    // Split_ToDoID(objItem:=Item)
+                                    
                                     todo.SplitID();
                                     // ***NEED CODE HERE***
                                     // ***NEED CODE HERE***

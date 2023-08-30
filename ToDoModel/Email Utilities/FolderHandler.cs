@@ -103,7 +103,7 @@ namespace ToDoModel
         #region Private Fields
 
         private IApplicationGlobals _globals;
-        private Folder _matchedFolder;
+        
         private Outlook.Application _olApp;
         private Regex _regex;
         private string _searchString;
@@ -436,7 +436,7 @@ namespace ToDoModel
                                                bool includeChildren,
                                                IEnumerable<(string excludedFolder, bool excludeChildren)> exclusions) // Internal
         {
-            _matchedFolder = null;
+
 
             var matchingFolders = new List<string>();
             if (searchString.Trim().Length != 0)

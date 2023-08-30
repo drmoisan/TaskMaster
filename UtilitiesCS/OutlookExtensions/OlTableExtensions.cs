@@ -172,7 +172,7 @@ namespace UtilitiesCS
             {
                 dict = kvps.ToDictionary();
             }
-            catch (System.InvalidOperationException ex)
+            catch (System.InvalidOperationException)
             {
                 foreach(var kvp in kvps)
                 {

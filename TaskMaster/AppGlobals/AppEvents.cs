@@ -45,10 +45,7 @@ namespace TaskMaster
                 }
             }
         }
-
-        private List<Items> ListOfPSTtodo;
-        private List<Items> ListToDoItems;
-
+        
         private Items _olInboxItems;
         private Items OlInboxItems
         {

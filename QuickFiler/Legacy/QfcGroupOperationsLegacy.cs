@@ -35,6 +35,7 @@ namespace QuickFiler.Legacy
             _initType = InitType;
             _globals = AppGlobals;
             _parent = ParentObject;
+            _lFormHandle = _viewer.Handle;
         }
 
         #region Viewer Operations

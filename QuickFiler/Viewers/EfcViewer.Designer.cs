@@ -39,7 +39,7 @@
             this.FolderListBox = new System.Windows.Forms.ListBox();
             this.Ok = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
-            this.Refresh = new System.Windows.Forms.Button();
+            this.RefreshPredicted = new System.Windows.Forms.Button();
             this.NewFolder = new System.Windows.Forms.Button();
             this.SaveAttachments = new System.Windows.Forms.CheckBox();
             this.SaveEmail = new System.Windows.Forms.CheckBox();
@@ -86,7 +86,7 @@
             this.Tlp.Controls.Add(this.FolderListBox, 2, 5);
             this.Tlp.Controls.Add(this.Ok, 5, 7);
             this.Tlp.Controls.Add(this.Cancel, 7, 7);
-            this.Tlp.Controls.Add(this.Refresh, 9, 7);
+            this.Tlp.Controls.Add(this.RefreshPredicted, 9, 7);
             this.Tlp.Controls.Add(this.NewFolder, 11, 7);
             this.Tlp.Controls.Add(this.SaveAttachments, 2, 7);
             this.Tlp.Controls.Add(this.SaveEmail, 2, 8);
@@ -265,21 +265,21 @@
             this.Cancel.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.Cancel.UseVisualStyleBackColor = true;
             // 
-            // Refresh
+            // RefreshPredicted
             // 
-            this.Refresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.Refresh.Image = global::QuickFiler.Properties.Resources.QuickRefresh1;
-            this.Refresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Refresh.Location = new System.Drawing.Point(1117, 611);
-            this.Refresh.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
-            this.Refresh.Name = "Refresh";
-            this.Tlp.SetRowSpan(this.Refresh, 4);
-            this.Refresh.Size = new System.Drawing.Size(299, 103);
-            this.Refresh.TabIndex = 12;
-            this.Refresh.Text = "Refresh\r\nPredicted";
-            this.Refresh.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.Refresh.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.Refresh.UseVisualStyleBackColor = true;
+            this.RefreshPredicted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.RefreshPredicted.Image = global::QuickFiler.Properties.Resources.QuickRefresh1;
+            this.RefreshPredicted.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.RefreshPredicted.Location = new System.Drawing.Point(1117, 611);
+            this.RefreshPredicted.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
+            this.RefreshPredicted.Name = "RefreshPredicted";
+            this.Tlp.SetRowSpan(this.RefreshPredicted, 4);
+            this.RefreshPredicted.Size = new System.Drawing.Size(299, 103);
+            this.RefreshPredicted.TabIndex = 12;
+            this.RefreshPredicted.Text = "Refresh\r\nPredicted";
+            this.RefreshPredicted.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.RefreshPredicted.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.RefreshPredicted.UseVisualStyleBackColor = true;
             // 
             // NewFolder
             // 
@@ -488,7 +488,7 @@
         internal System.Windows.Forms.CheckBox MoveConversation;
         internal System.Windows.Forms.Button Ok;
         internal System.Windows.Forms.Button Cancel;
-        internal System.Windows.Forms.Button Refresh;
+        internal System.Windows.Forms.Button RefreshPredicted;
         internal System.Windows.Forms.Button NewFolder;
         internal System.Windows.Forms.ListBox FolderListBox;
         internal System.Windows.Forms.TextBox SearchText;

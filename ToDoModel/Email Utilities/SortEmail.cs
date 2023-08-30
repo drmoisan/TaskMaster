@@ -30,7 +30,7 @@ namespace ToDoModel
             throw new NotImplementedException();
         }
 
-        async public static Task Run(bool savePictures,
+        async public static Task RunAsync(bool savePictures,
                                string destinationFolderpath,
                                bool saveMsg,
                                bool saveAttachments,
@@ -42,10 +42,10 @@ namespace ToDoModel
             {
                 MessageBox.Show("No mail items are selected.");
             }
-            else { await Run(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals); }
+            else { await RunAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals); }
         }
 
-        async public static Task Run(IList<MailItem> mailItems,
+        async public static Task RunAsync(IList<MailItem> mailItems,
                                bool savePictures,
                                string destinationFolderpath,
                                bool saveMsg,
@@ -56,10 +56,10 @@ namespace ToDoModel
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
             var olAncestor = FolderConverter.ResolveOlRoot(((Folder)mailItems[0].Parent).FolderPath, appGlobals);
             var fsAncestorEquivalent = appGlobals.FS.FldrRoot;
-            await Run(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            await RunAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
         }
 
-        async public static Task Run(IList<MailItem> mailItems,
+        async public static Task RunAsync(IList<MailItem> mailItems,
                                      bool savePictures,
                                      string destinationOlStem,
                                      bool saveMsg,
@@ -84,7 +84,7 @@ namespace ToDoModel
             foreach (var mailItem in mailItems)
             {                
                 // If saveMsg is true, save the message as an .msg file
-                if (saveMsg) { await SaveMessageAsMSG(mailItem, saveFsPath); }
+                if (saveMsg) { await SaveMessageAsMSGAsync(mailItem, saveFsPath); }
 
                 if (saveAttachments || savePictures)
                 {
@@ -149,6 +149,89 @@ namespace ToDoModel
             //await appGlobals.AF.MovedMails.SerializeAsync();
             
         }
+
+        public static void Run(IList<MailItem> mailItems,
+                                     bool savePictures,
+                                     string destinationOlStem,
+                                     bool saveMsg,
+                                     bool saveAttachments,
+                                     bool removePreviousFsFiles,
+                                     IApplicationGlobals appGlobals,
+                                     string olAncestor,
+                                     string fsAncestorEquivalent)
+        {
+            if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
+
+            var destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
+            var conversationID = mailItems[0].ConversationID;
+
+            (string saveFsPath, string deleteFsPath) = ResolvePaths(mailItems,
+                                                                    destinationOlPath,
+                                                                    appGlobals,
+                                                                    olAncestor,
+                                                                    fsAncestorEquivalent);
+
+
+            foreach (var mailItem in mailItems)
+            {
+                // If saveMsg is true, save the message as an .msg file
+                if (saveMsg) { SaveMessageAsMSG(mailItem, saveFsPath); }
+
+                if (saveAttachments || savePictures)
+                {
+                    // Get attachments to save and necessary info
+                    var attachments = GetAttachmentsInfo(mailItem,
+                                                         saveFsPath,
+                                                         deleteFsPath,
+                                                         saveAttachments,
+                                                         savePictures);
+                    // Save to the file system
+                    foreach (var attachment in attachments) { attachment.SaveAttachment(); }
+                    //attachments.ForEach(x => x.SaveAttachment());
+
+                    // Delete the original attachments if removePreviousFsFiles is true
+                    var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
+                    foreach (var attachment in toDelete) { File.Delete(attachment.FilePathDelete); }
+                }
+
+                // Label the email as autosorted
+                mailItem.SetUdf("AutoSorted", "Yes");
+                mailItem.UnRead = false;
+                mailItem.Save();
+
+                // Update Subject Map and Subject Encoder
+                appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
+
+                // Move the email to the destination folder
+                var olDestination = FolderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
+                var mailItemTemp = (MailItem)mailItem.Move(olDestination);
+
+                // Add the email to the Undo Stack
+                PushToUndoStack(mailItem, mailItemTemp, appGlobals);
+
+                // Capture the move details in the log
+                CaptureMoveDetails(mailItem, mailItemTemp, appGlobals);
+
+            }
+
+            // Update the Recents list and save
+            appGlobals.AF.RecentsList.Add(destinationOlStem);
+
+            // Update the CtfMap and save
+            appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);
+
+            // Serialize the data
+
+
+            appGlobals.AF.RecentsList.Serialize();
+            appGlobals.AF.CtfMap.Serialize();
+            appGlobals.AF.SubjectMap.Serialize();
+            appGlobals.AF.MovedMails.Serialize();
+            
+            appGlobals.AF.Encoder.Encoder.Serialize();
+
+        }
+
 
         public static void Cleanup_Files()
         {
@@ -448,14 +531,22 @@ namespace ToDoModel
             return (saveFsPath, deleteFsPath);
         }
 
-        async internal static Task SaveMessageAsMSG(MailItem mailItem, string fsLocation)
+        async internal static Task SaveMessageAsMSGAsync(MailItem mailItem, string fsLocation)
         {
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
             
             var strPath = AttachmentInfo.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
             await Task.Run(()=>mailItem.SaveAs(strPath, OlSaveAsType.olMSG));
         }
-        
+
+        internal static void SaveMessageAsMSG(MailItem mailItem, string fsLocation)
+        {
+            var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
+
+            var strPath = AttachmentInfo.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
+            mailItem.SaveAs(strPath, OlSaveAsType.olMSG);
+        }
+
         internal static void SaveAttachmentsOld(MailItem mailItem, string fsLocation, string DteString, string DteString2, bool save_images, bool DELFILE, bool Verify_Action)
         {
 

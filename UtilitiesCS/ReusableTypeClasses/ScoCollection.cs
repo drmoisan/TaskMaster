@@ -18,7 +18,7 @@ using Swordfish.NET.General.Collections;
 
 namespace UtilitiesCS
 {
-    public class ScoCollection<T> : IConcurrentObservableBase<T>, IList<T>, ICollection<T>, IList, ICollection
+    public class ScoCollection<T> : IConcurrentObservableBase<T>, IList<T>, ICollection<T>, IList, ICollection, IScoCollection<T>
     {
         #region Constructors
 
@@ -46,7 +46,7 @@ namespace UtilitiesCS
             Deserialize(askUserOnError);
         }
 
-        public ScoCollection(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        public ScoCollection(string filename, string folderpath, AltListLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
         {
             Filename = filename;
             Folderpath = folderpath;
@@ -123,7 +123,7 @@ namespace UtilitiesCS
         void IList.Remove(object value) => (_collection as IList).Remove(value);
         
         void IList.RemoveAt(int index) => (_collection as IList).RemoveAt(index);
-        
+
         #endregion
 
         #region ICollection Implementation
@@ -270,7 +270,6 @@ namespace UtilitiesCS
 
         }
 
-
         public void Deserialize()
         {
             if (Filepath != "") Deserialize(Filepath, true);
@@ -281,7 +280,7 @@ namespace UtilitiesCS
             if (Filepath != "") Deserialize(Filepath, askUserOnError);
         }
 
-        public void Deserialize(string filepath, CSVLoader<T> backupLoader, bool askUserOnError)
+        public void Deserialize(string filepath, AltListLoader<T> backupLoader, bool askUserOnError)
         {
             if (_filepath != filepath) this.Filepath = filepath;
 

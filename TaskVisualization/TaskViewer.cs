@@ -1,15 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.VisualBasic.CompilerServices;
 using UtilitiesCS;
 
 namespace TaskVisualization
 {
-
-    public partial class TaskViewer
+    public partial class TaskViewer : Form
     {
+        public TaskViewer()
+        {
+            InitializeComponent();
+
+            KeyPreview = true;
+
+            //_mouseFilter = new MouseDownFilter(this);
+            //Application.AddMessageFilter(_mouseFilter);
+        }
 
         private MouseDownFilter __mouseFilter;
 
@@ -38,22 +52,6 @@ namespace TaskVisualization
         }
         private TaskController _controller;
 
-        public TaskViewer()
-        {
-
-            // This call is required by the designer.
-            InitializeComponent();
-
-            // Add any initialization after the InitializeComponent() call.
-            KeyPreview = true;
-
-            // Attach Handler to capture mouseclick anywhere on form
-            _mouseFilter = new MouseDownFilter(this);
-            Application.AddMessageFilter(_mouseFilter);
-
-        }
-
-
         public void SetController(TaskController controller)
         {
             _controller = controller;
@@ -73,6 +71,19 @@ namespace TaskVisualization
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        private List<Label> _navColumns;
+        internal List<Label> NavColumns 
+        {
+            get 
+            { 
+                if (_navColumns is null)
+                    _navColumns = new() { C1S1, C2S2, C2S4, C3S1, C3S2, C3S4, C4S1, C4S2 };
+                return _navColumns;
+            }
+        }
+
+        #region Event Handlers
+
         private void Cancel_Button_Click(object sender, EventArgs e)
         {
             _controller.Cancel_Action();
@@ -85,17 +96,17 @@ namespace TaskVisualization
 
         private void CategorySelection_Click(object sender, EventArgs e)
         {
-            _controller.Assign_Context();
+            _controller.AssignContext();
         }
 
         private void ProjectSelection_Click(object sender, EventArgs e)
         {
-            _controller.Assign_Project();
+            _controller.AssignProject();
         }
 
         private void TopicSelection_Click(object sender, EventArgs e)
         {
-            _controller.Assign_Topic();
+            _controller.AssignTopic();
         }
 
         private void ShortcutPersonal_Click(object sender, EventArgs e)
@@ -203,24 +214,27 @@ namespace TaskVisualization
                 _controller.MouseFilter_FormClicked(sender, e);
         }
 
-        private void TaskName_KeyDown(object sender, KeyEventArgs e)
-        {
-            // Debug.WriteLine("task_name_keydown fired with " & e.KeyCode.ToChar)
-        }
+        //private void TaskName_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    // Debug.WriteLine("task_name_keydown fired with " & e.KeyCode.ToChar)
+        //}
 
-        private void TaskName_KeyUp(object sender, KeyEventArgs e)
-        {
-            // Debug.WriteLine("task_name_keyup fired with " & e.KeyCode.ToChar)
-        }
+        //private void TaskName_KeyUp(object sender, KeyEventArgs e)
+        //{
+        //    // Debug.WriteLine("task_name_keyup fired with " & e.KeyCode.ToChar)
+        //}
 
-        private void TaskName_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Debug.WriteLine("task_name_keypress fired with " & e.KeyChar)
-            if (_controller.SuppressKeystrokes)
-            {
-                e.Handled = true;
-                // Debug.WriteLine("task_name_keypress suppressed keystrokes")
-            }
-        }
+        //private void TaskName_KeyPress(object sender, KeyPressEventArgs e)
+        //{
+        //    // Debug.WriteLine("task_name_keypress fired with " & e.KeyChar)
+        //    if (_controller.SuppressKeystrokes)
+        //    {
+        //        e.Handled = true;
+        //        // Debug.WriteLine("task_name_keypress suppressed keystrokes")
+        //    }
+        //}
+
+        #endregion
+
     }
 }

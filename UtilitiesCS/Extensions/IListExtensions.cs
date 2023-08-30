@@ -8,6 +8,24 @@ namespace UtilitiesCS
 {
     public static class IListExtensions
     {
+        public static bool Exists<T>(this IList<T> list, Predicate<T> match)
+        {
+            return list.FindIndex(match) != -1;
+        }
+
+        public static T Find<T>(this IList<T> list, Predicate<T> match)
+        {
+            var index = list.FindIndex(0, list.Count, match);
+            if (index == -1)
+            {
+                return default(T);
+            }
+            else
+            {
+                return list[index];
+            }
+        }
+        
         public static int FindIndex<T>(this IList<T> list, Predicate<T> match)
         {
             return list.FindIndex(0, list.Count, match);
@@ -45,6 +63,16 @@ namespace UtilitiesCS
             }
 
             return -1;
+        }
+
+        public static int FindIndex(this IList<string> list, string value, StringComparison comparison)
+        {
+            return list.FindIndex(x => string.Equals(x, value, comparison));
+        }
+
+        public static bool Contains(this IList<string> list, string value, StringComparison comparison)
+        {
+            return list.FindIndex(value, comparison) != -1;
         }
     }
 }

@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using PInvoke = Windows.Win32.PInvoke;
 
+#nullable enable
+
 [assembly: InternalsVisibleTo("SVGControl.Test")]
 namespace SVGControl
 {
@@ -164,7 +166,6 @@ namespace SVGControl
             // Device paths are normalized by definition, so passing something of this format (i.e. \\?\C:\.\tmp, \\.\C:\foo)
             // to Windows APIs won't do anything by design. Additionally, GetFullPathName() in Windows doesn't root
             // them properly. As such we need to manually remove segments and not use GetFullPath().
-            ValueStringBuilder sb = new ValueStringBuilder();
             return IsDevice(combinedPath)
                 ? RemoveRelativeSegments(combinedPath, GetRootLength(combinedPath))
                 : GetFullPathInternal(combinedPath);
@@ -1262,8 +1263,8 @@ namespace SVGControl
         internal static string @WaitHandleCannotBeOpenedException_InvalidHandle => GetResourceString("WaitHandleCannotBeOpenedException_InvalidHandle", @"A WaitHandle with system-wide name '{0}' cannot be created. A WaitHandle of a different type might have the same name.");
 
 
-        private static global::System.Resources.ResourceManager s_resourceManager;
-        internal static global::System.Resources.ResourceManager ResourceManager => s_resourceManager ?? (s_resourceManager = new global::System.Resources.ResourceManager(typeof(SR)));
+        private static global::System.Resources.ResourceManager s_resourceManager = s_resourceManager = new global::System.Resources.ResourceManager(typeof(SR));
+        internal static global::System.Resources.ResourceManager ResourceManager => s_resourceManager;
 
         /// <summary>Failed to create system events window thread.</summary>
         internal static string @ErrorCreateSystemEvents => GetResourceString("ErrorCreateSystemEvents", @"Failed to create system events window thread.");

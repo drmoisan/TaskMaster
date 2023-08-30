@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.Services.Common;
 using UtilitiesCS;
-using UtilitiesCS;
+
 
 namespace ToDoModel
 {
@@ -42,7 +42,7 @@ namespace ToDoModel
             //TODO: Migrate Current SW Matrix which is not efficient because it is of object and mixes string and int.
             //TODO: Store AFSettings in local variables to avoid multiple calls
             int SW_CalcRet = default;
-            int LenX, LenY, x, y, calcA, calcB, calcC, tempa, tempB, tempC;
+            int LenX, LenY, x, y, calcA, calcB, calcC, tempa;
             var maxSmith_Watterman = default(int);
 
             int matchScore = AFSettings.SmithWatterman_MatchScore;

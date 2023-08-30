@@ -11,7 +11,7 @@ namespace UtilitiesCS
         /// <summary>
         /// Serializable concurrent observable dictionary containing word tokens and integer values
         /// </summary>
-        ISCODictionary<string, int> Encoder { get; }
+        IScoDictionary<string, int> Encoder { get; }
         
         /// <summary>
         /// Matches array of tokens against existing values. Integers are 

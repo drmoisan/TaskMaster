@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using UtilitiesCS;
-using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 using Deedle;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -113,7 +112,7 @@ namespace ToDoModel
                      {
                         var categories = x.Categories;
                         FlagParser parser = new(ref categories);
-                        var projectName = parser.get_Projects();
+                        var projectName = parser.GetProjects();
                         var programName = projectName.Split('-')[0];
                         IToDoProjectInfoEntry entry = new ToDoProjectInfoEntry(projectName, x.ID, programName);
                         return entry;

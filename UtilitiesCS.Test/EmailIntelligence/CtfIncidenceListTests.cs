@@ -122,7 +122,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var ctfIncidenceList = this.CreateCtfIncidenceList();
-            string filepath = null;
 
             // Act
             //var result = ctfIncidenceList.ReadTextFile(

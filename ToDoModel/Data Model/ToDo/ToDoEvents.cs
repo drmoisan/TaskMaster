@@ -11,7 +11,6 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS;
-using UtilitiesCS;
 //using Microsoft.VisualBasic;
 
 namespace ToDoModel
@@ -261,7 +260,7 @@ namespace ToDoModel
                 {
 
                     // Get Project Name
-                    string strProject = todo.get_Project();
+                    string strProject = todo.Project;
 
                     // Code the Program name
                     if (ProjInfo.Contains_ProjectName(strProject))
@@ -292,7 +291,7 @@ namespace ToDoModel
                                     if (strToDoID.Length == 2)
                                     {
                                         // Change the item's todoid to be a node of the project
-                                        if (todo.get_Context() != "@PROJECTS")
+                                        if (todo.Context != "@PROJECTS")
                                         {
                                             strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                             todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
@@ -319,7 +318,7 @@ namespace ToDoModel
 
                         else if (strToDoID.Length == 0)
                         {
-                            strProject = todo.get_Project();
+                            strProject = todo.Project;
                             if (ProjInfo.Contains_ProjectName(strProject))
                             {
                                 strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
@@ -380,10 +379,10 @@ namespace ToDoModel
                         }
                         olItem.Categories = strCats;
                         olItem.Save();
-                        todo.set_KB(value: "Completed");
+                        todo.SetKB(value: "Completed");
                     }
                 }
-                else if (todo.get_KB() == "Completed")
+                else if (todo.KB == "Completed")
                 {
                     dynamic olItem = Item;
                     string strCats = (string)(olItem.Categories);
@@ -421,7 +420,7 @@ namespace ToDoModel
                     }
                     olItem.Categories = strCats;
                     olItem.Save();
-                    todo.set_KB(value: strKB);
+                    todo.SetKB(value: strKB);
 
                 }
                 _blItemChangeRunning = false;
@@ -456,14 +455,14 @@ namespace ToDoModel
             var IDList = AppGlobals.TD.IDList;
             if (todo.ToDoID.Length == 0)
             {
-                if (todo.get_Project().Length != 0)
+                if (todo.Project.Length != 0)
                 {
-                    if (ProjInfo.Contains_ProjectName(todo.get_Project()))
+                    if (ProjInfo.Contains_ProjectName(todo.Project))
                     {
-                        string strProjectToDo = ProjInfo.Find_ByProjectName(todo.get_Project()).First().ProjectID;
+                        string strProjectToDo = ProjInfo.Find_ByProjectName(todo.Project).First().ProjectID;
                         // Add the next ToDoID available in that branch
                         todo.ToDoID = IDList.GetNextToDoID(strProjectToDo + "00");
-                        todo.TagProgram = ProjInfo.Find_ByProjectName(todo.get_Project()).First().ProgramName;
+                        todo.TagProgram = ProjInfo.Find_ByProjectName(todo.Project).First().ProgramName;
                         IDList.Serialize();
                         todo.SplitID();
                     }

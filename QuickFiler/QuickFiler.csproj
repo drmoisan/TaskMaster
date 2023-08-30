@@ -405,10 +405,6 @@
     <None Include="Resources\Web.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EmailIntelligence\EmailIntelligence.csproj">
-      <Project>{6b8006b4-9eb2-466e-a178-3e69ff42e16e}</Project>
-      <Name>EmailIntelligence</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
       <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
       <Name>SVGControl</Name>

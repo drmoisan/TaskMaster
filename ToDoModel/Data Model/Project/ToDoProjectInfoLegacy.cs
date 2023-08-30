@@ -8,7 +8,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using UtilitiesCS;
 using ToDoModel.Legacy;
-using UtilitiesCS;
 
 namespace ToDoModel.Legacy
 {

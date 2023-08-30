@@ -2,6 +2,6 @@
 {
     public interface IRecentsList<T>: ISerializableList<T>
     {
-        void Add(T item);
+        new void Add(T item);
     }
 }

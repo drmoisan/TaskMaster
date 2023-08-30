@@ -223,7 +223,7 @@ namespace QuickFiler.Controllers
             _fldrHandler = null;
             _tableLayoutPanels = null;
             _explorerController = null;
-            _formController = null;
+            //_formController = null;
             _homeController = null;
             _keyboardHandler = null;
             _itemPositionTips = null;
@@ -245,10 +245,9 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private IList<IQfcTipsDetails> _listTipsDetails;
         private IList<TableLayoutPanel> _tableLayoutPanels;
-        private IntPtr _formHandle;
         private IQfcCollectionController _parent;
         private IQfcExplorerController _explorerController;
-        private IFilerFormController _formController;
+        //private IFilerFormController _formController;
         private IFilerHomeController _homeController;
         private IQfcKeyboardHandler _keyboardHandler;
         private IQfcTipsDetails _itemPositionTips;
@@ -888,15 +887,15 @@ namespace QuickFiler.Controllers
                 IList<MailItem> selItems = PackageItems();
                 bool attchments = (SelectedFolder != "Trash to Delete") ? false : _itemViewer.CbxAttachments.Checked;
 
-                await SortEmail.Run(mailItems: selItems,
-                                              savePictures: false,
-                                              destinationOlStem: _itemViewer.CboFolders.SelectedItem as string,
-                                              saveMsg: _itemViewer.CbxEmailCopy.Checked,
-                                              saveAttachments: attchments,
-                                              removePreviousFsFiles: false,
-                                              appGlobals: _globals,
-                                              olAncestor: _globals.Ol.ArchiveRootPath,
-                                              fsAncestorEquivalent: _globals.FS.FldrRoot);
+                await SortEmail.RunAsync(mailItems: selItems,
+                                         savePictures: false,
+                                         destinationOlStem: _itemViewer.CboFolders.SelectedItem as string,
+                                         saveMsg: _itemViewer.CbxEmailCopy.Checked,
+                                         saveAttachments: attchments,
+                                         removePreviousFsFiles: false,
+                                         appGlobals: _globals,
+                                         olAncestor: _globals.Ol.ArchiveRootPath,
+                                         fsAncestorEquivalent: _globals.FS.FldrRoot);
                 SortEmail.Cleanup_Files();
                 // blDoMove
             }

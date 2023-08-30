@@ -466,5 +466,17 @@ namespace TaskMaster.Properties {
                 this["FileName_MovedEmails"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999PrefixList.json")]
+        public string FileName_PrefixList {
+            get {
+                return ((string)(this["FileName_PrefixList"]));
+            }
+            set {
+                this["FileName_PrefixList"] = value;
+            }
+        }
     }
 }

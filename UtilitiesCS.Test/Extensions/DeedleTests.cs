@@ -15,7 +15,6 @@ namespace UtilitiesCS.Test
         public void DeedleDoodles()
         {
 
-            DebugTextWriter tw;
             // Create a collection of anonymous types
             var rnd = new Random();
             var objects = Enumerable.Range(0, 10).Select(i =>

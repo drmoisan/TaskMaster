@@ -54,7 +54,6 @@ namespace QuickFiler.Legacy
         #endregion
 
         #region UI Controls WithEvents
-        private Control _mPassedControl;
 
         // Checkbox to Group Conversations
         private CheckBox _conversationCb;               // CONTROL WITH EVENTS
@@ -361,7 +360,7 @@ namespace QuickFiler.Legacy
         private MailItem _mail;
         public MailItem Mail { get => _mail; set => _mail = value; }
         private Folder _fldrOriginal;
-        private Folder _fldrTarget;
+
         #endregion
 
         #region Resizing Variables
@@ -384,7 +383,6 @@ namespace QuickFiler.Legacy
         private ctrlPosition pos_lblAcA;          // A Accelerator X% Left Position
         private ctrlPosition pos_lblAcW;          // W Accelerator X% Left Position
         private ctrlPosition pos_lblAcM;          // M Accelerator X% Left Position
-        private ctrlPosition pos_frm;
         private ctrlPosition pos_cbo;
         private ctrlPosition pos_chk;
         private ctrlPosition pos_body;
@@ -787,14 +785,14 @@ namespace QuickFiler.Legacy
                 {
                     //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
                     SortEmail.Run(mailItems: selItems,
-                                                  savePictures: false,
-                                                  destinationOlStem: FolderCbo.SelectedItem as string,
-                                                  saveMsg: _chbxSaveMail.Checked,
-                                                  saveAttachments: Attchments,
-                                                  removePreviousFsFiles: _chbxDelFlow.Checked,
-                                                  appGlobals: _globals,
-                                                  olAncestor: _globals.Ol.ArchiveRootPath,
-                                                  fsAncestorEquivalent: _globals.FS.FldrRoot);
+                                  savePictures: false,
+                                  destinationOlStem: FolderCbo.SelectedItem as string,
+                                  saveMsg: _chbxSaveMail.Checked,
+                                  saveAttachments: Attchments,
+                                  removePreviousFsFiles: _chbxDelFlow.Checked,
+                                  appGlobals: _globals,
+                                  olAncestor: _globals.Ol.ArchiveRootPath,
+                                  fsAncestorEquivalent: _globals.FS.FldrRoot);
                     SortEmail.Cleanup_Files();
                 } // blDoMove
 
@@ -819,14 +817,12 @@ namespace QuickFiler.Legacy
 
         public void kill()
         {
-            _mPassedControl = null;
             ConversationCb = null;
             FolderCbo = null;
             SearchTxt = null;
             ItemPanel = null;
             CbKll = null;
             Mail = null;
-            _fldrTarget = null;
             _lblTmp = null;
             // Set _suggestions = Nothing
             // Set _strFolders = Nothing

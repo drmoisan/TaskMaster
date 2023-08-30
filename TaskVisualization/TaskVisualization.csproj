@@ -104,11 +104,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="TaskController.cs" />
-    <Compile Include="TaskViewer.Designer.cs">
-      <DependentUpon>TaskViewer.cs</DependentUpon>
-    </Compile>
     <Compile Include="TaskViewer.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TaskViewer.Designer.cs">
+      <DependentUpon>TaskViewer.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

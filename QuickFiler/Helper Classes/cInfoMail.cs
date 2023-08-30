@@ -114,8 +114,6 @@ namespace QuickFiler
             Categories lcl_Categories = null,
             string lcl_strAction = "")
         {
-            int InitRet = default;
-
             try
             {
                 Subject = lcl_Subject;
@@ -141,7 +139,6 @@ namespace QuickFiler
         {
             try
             {
-                bool Init_wMailRet = default;
                 Subject = OlMail.Subject;
                 if (OlEndTime != default)
                     EndDate = OlEndTime;
