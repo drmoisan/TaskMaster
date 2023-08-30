@@ -7,8 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
@@ -19,74 +17,7 @@ namespace TaskVisualization
 
 
     public class TaskController
-    {
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        static extern bool PostMessage(IntPtr hWnd, int msg, int wParam, int lParam);
-
-        public const int WM_LBUTTONDOWN = 0x201;
-
-        private TaskViewer __viewer;
-
-        private TaskViewer _viewer
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return __viewer;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                __viewer = value;
-            }
-        }
-        private readonly List<ToDoItem> _todo_list;
-        private readonly ToDoItem _active;
-
-        private readonly SortedDictionary<string, bool> _dict_categories;
-        private string _exit_type = "Cancel";
-        private readonly Dictionary<Label, string> _xlCtrlCaptions;
-        private readonly Dictionary<Label, Control> _xlCtrlLookup;
-        private readonly Dictionary<Label, bool> _xlCtrlOptions;
-        private Dictionary<Label, char> _xlCtrlsActive;
-        private Dictionary<Label, char> _xlCtrlsNav;
-        private int _activeNavGroup = -1;
-        private bool _altActive = false;
-        private int _altLevel = 0;
-        private readonly string _keyCapture = "";
-        private readonly ToDoDefaults _defaults;
-        private readonly IAutoAssign _autoAssign;
-        private string _userEmailAddress;
-
-
-        [Flags]
-        public enum FlagsToSet
-        {
-            none = 0,
-            context = 1,
-            people = 2,
-            projects = 4,
-            topics = 8,
-            priority = 16,
-            taskname = 32,
-            worktime = 64,
-            today = 128,
-            bullpin = 256,
-            kbf = 512,
-            duedate = 1024,
-            reminder = 2048,
-            all = 4095
-        }
-
-        //internal enum ForceState
-        //{
-        //    none = 0,
-        //    force_on = 1,
-        //    force_off = 2
-        //}
-
+    {                        
         #region Constructors and Initializers
 
         /// <summary>
@@ -97,7 +28,6 @@ namespace TaskVisualization
         /// <param name="flagOptions">Enumeration of fields to activate</param>
         public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, string userEmailAddress, FlagsToSet flagOptions = FlagsToSet.all)
         {
-
             // Save parameters to internal variables
             _viewer = formInstance;
             _todo_list = toDoSelection;
@@ -173,12 +103,12 @@ namespace TaskVisualization
                 _active.TotalWork = _defaults.DefaultTaskLength;
             _viewer.Duration.Text = _active.TotalWork.ToString();
 
-            if (_active.ReminderTime != DateAndTime.DateValue("1/1/4501"))
+            if (_active.ReminderTime != new DateTime(4501,1,1))
             {
                 _viewer.DtReminder.Value = _active.ReminderTime;
                 _viewer.DtReminder.Checked = true;
             }
-            if (_active.DueDate != DateAndTime.DateValue("1/1/4501"))
+            if (_active.DueDate != new DateTime(4501, 1, 1))
             {
                 _viewer.DtDuedate.Value = _active.DueDate;
                 _viewer.DtDuedate.Checked = true;
@@ -236,6 +166,51 @@ namespace TaskVisualization
                 _options = value;
                 ActivateOptions();
             }
+        }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        static extern bool PostMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+        public const int WM_LBUTTONDOWN = 0x201;
+
+        private TaskViewer _viewer;
+
+        private readonly List<ToDoItem> _todo_list;
+        private readonly ToDoItem _active;
+
+        private readonly SortedDictionary<string, bool> _dict_categories;
+        private string _exit_type = "Cancel";
+        private readonly Dictionary<Label, string> _xlCtrlCaptions;
+        private readonly Dictionary<Label, Control> _xlCtrlLookup;
+        private readonly Dictionary<Label, bool> _xlCtrlOptions;
+        private Dictionary<Label, char> _xlCtrlsActive;
+        private Dictionary<Label, char> _xlCtrlsNav;
+        private int _activeNavGroup = -1;
+        private bool _altActive = false;
+        private int _altLevel = 0;
+        private readonly string _keyCapture = "";
+        private readonly ToDoDefaults _defaults;
+        private readonly IAutoAssign _autoAssign;
+        private string _userEmailAddress;
+
+
+        [Flags]
+        public enum FlagsToSet
+        {
+            none = 0,
+            context = 1,
+            people = 2,
+            projects = 4,
+            topics = 8,
+            priority = 16,
+            taskname = 32,
+            worktime = 64,
+            today = 128,
+            bullpin = 256,
+            kbf = 512,
+            duedate = 1024,
+            reminder = 2048,
+            all = 4095
         }
 
         #endregion
@@ -548,7 +523,7 @@ namespace TaskVisualization
                     ToggleXlGroupNav(Enums.ToggleState.Off);
                     if (_xlCtrlsActive is not null) 
                     { 
-                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, Conversions.ToChar(""), _altLevel);
+                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, '\0', _altLevel);
                     }
                     _altActive = false;
                     _activeNavGroup = -1;
@@ -641,196 +616,7 @@ namespace TaskVisualization
                 return _viewer.CategorySelection.Text != "[Category Label]" | _viewer.PeopleSelection.Text != "[Assigned People Flagged]" | _viewer.ProjectSelection.Text != "[ Projects Flagged ]" | _viewer.TopicSelection.Text != "[Other Topics Tagged]";
             }
         }
-                
-        //private void ActivateOptions()
-        //{
-        //    if (_options.HasFlag(FlagsToSet.all))
-        //    {
-        //        _viewer.ShortcutMeeting.Enabled = true;
-        //        _viewer.ShortcutCalls.Enabled = true;
-        //        _viewer.ShortcutPersonal.Enabled = true;
-        //        _viewer.ShortcutEmail.Enabled = true;
-        //        _viewer.ShortcutInternet.Enabled = true;
-        //        _viewer.ShortcutReadingBusiness.Enabled = true;
-        //        _viewer.ShortcutNews.Enabled = true;
-        //        _viewer.ShortcutUnprocessed.Enabled = true;
-        //        _viewer.ShortcutWaitingFor.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.ShortcutMeeting.Enabled = false;
-        //        _viewer.ShortcutCalls.Enabled = false;
-        //        _viewer.ShortcutPersonal.Enabled = false;
-        //        _viewer.ShortcutEmail.Enabled = false;
-        //        _viewer.ShortcutInternet.Enabled = false;
-        //        _viewer.ShortcutReadingBusiness.Enabled = false;
-        //        _viewer.ShortcutNews.Enabled = false;
-        //        _viewer.ShortcutUnprocessed.Enabled = false;
-        //        _viewer.ShortcutWaitingFor.Enabled = false;
-        //        _viewer.ShortcutPreRead.Enabled = false;
-
-        //        _viewer.ShortcutMeeting.Visible = false;
-        //        _viewer.ShortcutCalls.Visible = false;
-        //        _viewer.ShortcutPersonal.Visible = false;
-        //        _viewer.ShortcutEmail.Visible = false;
-        //        _viewer.ShortcutInternet.Visible = false;
-        //        _viewer.ShortcutReadingBusiness.Visible = false;
-        //        _viewer.ShortcutNews.Visible = false;
-        //        _viewer.ShortcutUnprocessed.Visible = false;
-        //        _viewer.ShortcutWaitingFor.Visible = false;
-        //        _viewer.ShortcutPreRead.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.context))
-        //    {
-        //        _viewer.CategorySelection.Enabled = true;
-        //        _viewer.LblContext.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.CategorySelection.Enabled = false;
-        //        _viewer.LblContext.Enabled = false;
-
-        //        _viewer.CategorySelection.Visible = false;
-        //        _viewer.LblContext.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.people))
-        //    {
-        //        _viewer.PeopleSelection.Enabled = true;
-        //        _viewer.LblPeople.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.PeopleSelection.Enabled = false;
-        //        _viewer.LblPeople.Enabled = false;
-
-        //        _viewer.PeopleSelection.Visible = false;
-        //        _viewer.LblPeople.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.projects))
-        //    {
-        //        _viewer.ProjectSelection.Enabled = true;
-        //        _viewer.LblProject.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.ProjectSelection.Enabled = false;
-        //        _viewer.LblProject.Enabled = false;
-
-        //        _viewer.ProjectSelection.Visible = false;
-        //        _viewer.LblProject.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.topics))
-        //    {
-        //        _viewer.TopicSelection.Enabled = true;
-        //        _viewer.LblTopic.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.TopicSelection.Enabled = false;
-        //        _viewer.LblTopic.Enabled = false;
-
-        //        _viewer.TopicSelection.Visible = false;
-        //        _viewer.LblTopic.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.priority))
-        //    {
-        //        _viewer.PriorityBox.Enabled = true;
-        //        _viewer.LblPriority.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.PriorityBox.Enabled = false;
-        //        _viewer.LblPriority.Enabled = false;
-
-        //        _viewer.PriorityBox.Visible = false;
-        //        _viewer.LblPriority.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.taskname))
-        //    {
-        //        _viewer.TaskName.Enabled = true;
-        //        _viewer.LblTaskname.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.TaskName.Enabled = false;
-        //        _viewer.LblTaskname.Enabled = false;
-
-        //        _viewer.TaskName.Visible = false;
-        //        _viewer.LblTaskname.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.worktime))
-        //    {
-        //        _viewer.Duration.Enabled = true;
-        //        _viewer.LblDuration.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.Duration.Enabled = false;
-        //        _viewer.LblDuration.Enabled = false;
-
-        //        _viewer.Duration.Visible = false;
-        //        _viewer.LblDuration.Visible = false;
-        //    }
-
-        //    _viewer.CbxToday.Enabled = _options.HasFlag(FlagsToSet.today);
-        //    _viewer.CbxToday.Visible = _options.HasFlag(FlagsToSet.today);
-
-        //    _viewer.CbxBullpin.Enabled = _options.HasFlag(FlagsToSet.bullpin);
-        //    _viewer.CbxBullpin.Visible = _options.HasFlag(FlagsToSet.bullpin);
-
-
-        //    if (_options.HasFlag(FlagsToSet.kbf))
-        //    {
-        //        _viewer.KbSelector.Enabled = true;
-        //        _viewer.LblKbf.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.KbSelector.Enabled = false;
-        //        _viewer.LblKbf.Enabled = false;
-
-        //        _viewer.KbSelector.Visible = false;
-        //        _viewer.LblKbf.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.duedate))
-        //    {
-        //        _viewer.DtDuedate.Enabled = true;
-        //        _viewer.LblDuedate.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.DtDuedate.Enabled = false;
-        //        _viewer.LblDuedate.Enabled = false;
-
-        //        _viewer.DtDuedate.Visible = false;
-        //        _viewer.LblDuedate.Visible = false;
-        //    }
-
-        //    if (_options.HasFlag(FlagsToSet.reminder))
-        //    {
-        //        _viewer.DtReminder.Enabled = true;
-        //        _viewer.LblReminder.Enabled = true;
-        //    }
-        //    else
-        //    {
-        //        _viewer.DtReminder.Enabled = false;
-        //        _viewer.LblReminder.Enabled = false;
-
-        //        _viewer.DtReminder.Visible = false;
-        //        _viewer.LblReminder.Visible = false;
-        //    }
-
-
-        //}
-
+        
         /// <summary>
         /// Sets value based on the flag type and value
         /// </summary>
@@ -891,7 +677,7 @@ namespace TaskVisualization
             int duration;
             try
             {
-                duration = Conversions.ToInteger(_viewer.Duration.Text);
+                duration = int.Parse(_viewer.Duration.Text);
                 if (duration < 0)
                 {
                     throw new ArgumentOutOfRangeException("Duration cannot be negative");
@@ -899,12 +685,12 @@ namespace TaskVisualization
             }
             catch (InvalidCastException ex)
             {
-                var unused1 = Interaction.MsgBox("Could not convert to integer. Please put a positive integer in the duration box");
+                MessageBox.Show("Could not convert to integer. Please put a positive integer in the duration box");
                 duration = -1;
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                var unused = Interaction.MsgBox(ex.Message);
+                MessageBox.Show(ex.Message);
                 duration = -1;
             }
 
@@ -989,7 +775,7 @@ namespace TaskVisualization
         private void UpdateCaptions(Dictionary<Label, char> dictLabels)
         {
             foreach (var row in dictLabels)
-                row.Key.Text = Conversions.ToString(row.Value);
+                row.Key.Text = row.Value.ToString();
         }
 
         private void ExecuteXlAction(Label lbl)
