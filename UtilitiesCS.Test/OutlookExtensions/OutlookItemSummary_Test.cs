@@ -4,6 +4,7 @@ using Moq;
 using UtilitiesCS;
 using System;
 using System.Collections.Generic;
+using UtilitiesCS.OutlookExtensions;
 
 namespace UtilitiesCS.Test
 {
@@ -186,6 +187,14 @@ namespace UtilitiesCS.Test
                 });
             string test = OlItemSummary.Extract(item.Object, options);
             Assert.AreEqual(target, test);
+        }
+
+        [TestMethod]
+        public void TestOutlookItemTryGet()
+        {
+            string random = "Trying";
+            var item = new OutlookItem(random as object);
+            var result = item.Try().Attachments;
         }
     }
 }

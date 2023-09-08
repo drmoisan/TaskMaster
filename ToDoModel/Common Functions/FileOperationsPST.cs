@@ -162,7 +162,7 @@ namespace ToDoModel
                             {
 
                                 // Get Project Name
-                                strProject = todo.Project;
+                                strProject = todo.Projects.AsStringNoPrefix;
 
                                 // Check to see if the Project name returned a value before attempting to autocode
                                 if (strProject.Length != 0)
@@ -176,18 +176,22 @@ namespace ToDoModel
 
                                         if (strToDoID.Length == 2)
                                         {
-                                            // Change the Item's todoid to be a node of the project
-                                            if (todo.Context != "Tag PROJECTS")
+                                            foreach (var context in todo.Context.AsListWithPrefix)
                                             {
-                                                strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                                todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                                                todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
-                                                // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
-                                                // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                                _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
-                                                // Split_ToDoID(objItem:=Item)
-                                                todo.SplitID();
+                                                if (context != "Tag PROJECTS")
+                                                {
+                                                    // Change the Item's todoid to be a node of the project
+                                                    strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
+                                                    todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
+                                                    // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
+                                                    // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
+                                                    _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
+                                                    // Split_ToDoID(objItem:=Item)
+                                                    todo.SplitID();
+                                                }
                                             }
+                                            
                                         }
                                     }
 
@@ -209,7 +213,7 @@ namespace ToDoModel
 
                             else if (strToDoID.Length == 0)
                             {
-                                strProject = todo.Project;
+                                strProject = todo.Projects.AsStringNoPrefix;
                                 // If IsArray(objProperty_Project.Value) Then
                                 // strProject = FlattenStringTree(objProperty_Project.Value)
                                 // Else

@@ -260,7 +260,7 @@ namespace ToDoModel
                 {
 
                     // Get Project Name
-                    string strProject = todo.Project;
+                    string strProject = todo.Projects.AsStringNoPrefix;
 
                     // Code the Program name
                     if (ProjInfo.Contains_ProjectName(strProject))
@@ -291,7 +291,7 @@ namespace ToDoModel
                                     if (strToDoID.Length == 2)
                                     {
                                         // Change the item's todoid to be a node of the project
-                                        if (todo.Context != "@PROJECTS")
+                                        if (todo.Context.AsStringNoPrefix != "@PROJECTS")
                                         {
                                             strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                             todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
@@ -318,7 +318,7 @@ namespace ToDoModel
 
                         else if (strToDoID.Length == 0)
                         {
-                            strProject = todo.Project;
+                            strProject = todo.Projects.AsStringNoPrefix;
                             if (ProjInfo.Contains_ProjectName(strProject))
                             {
                                 strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
@@ -455,17 +455,20 @@ namespace ToDoModel
             var IDList = AppGlobals.TD.IDList;
             if (todo.ToDoID.Length == 0)
             {
-                if (todo.Project.Length != 0)
+                if (todo.Projects.AsListWithPrefix.Count != 0)
                 {
-                    if (ProjInfo.Contains_ProjectName(todo.Project))
+                    foreach (var projectName in todo.Projects.AsListWithPrefix)
                     {
-                        string strProjectToDo = ProjInfo.Find_ByProjectName(todo.Project).First().ProjectID;
-                        // Add the next ToDoID available in that branch
-                        todo.ToDoID = IDList.GetNextToDoID(strProjectToDo + "00");
-                        todo.TagProgram = ProjInfo.Find_ByProjectName(todo.Project).First().ProgramName;
-                        IDList.Serialize();
-                        todo.SplitID();
-                    }
+                        if (ProjInfo.Contains_ProjectName(projectName))
+                        {
+                            string strProjectToDo = ProjInfo.Find_ByProjectName(projectName).First().ProjectID;
+                            // Add the next ToDoID available in that branch
+                            todo.ToDoID = IDList.GetNextToDoID(strProjectToDo + "00");
+                            todo.TagProgram = ProjInfo.Find_ByProjectName(projectName).First().ProgramName;
+                            IDList.Serialize();
+                            todo.SplitID();
+                        }
+                    }   
                 }
                 else
                 {

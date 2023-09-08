@@ -18,7 +18,7 @@ namespace Tags
                              IAutoAssign autoAssigner,
                              IList<IPrefix> prefixes,
                              string userEmailAddress,
-                             List<string> selections = null,
+                             IList<string> selections = null,
                              string prefixKey = "",
                              object objItemObject = null,
                              object objCallerObj = null)
@@ -96,7 +96,7 @@ namespace Tags
             }
         } 
 
-        public void LoadSelections(List<string> selections) //internal
+        public void LoadSelections(IList<string> selections) //internal
         {
             if ((selections is not null) && (_selections.Count > 0))
             {
@@ -156,8 +156,8 @@ namespace Tags
         private readonly SortedDictionary<string, bool> _dictOriginal;
         private SortedDictionary<string, bool> _dictOptions;
         private SortedDictionary<string, bool> _filteredOptions;
-        private List<string> _selections;
-        private List<string> _filteredSelections;
+        private IList<string> _selections;
+        private IList<string> _filteredSelections;
         private object _objItem;
         private MailItem _olMail;
         private readonly object _objCaller;
