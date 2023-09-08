@@ -436,7 +436,7 @@
     <ManifestKeyFile>TaskMaster_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>266A5E9A9EEC033AAAF6F6A573066BE80BB46A6E</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>1D27D8329AC0205E3F68CBB37FE5B9B60F68E438</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>

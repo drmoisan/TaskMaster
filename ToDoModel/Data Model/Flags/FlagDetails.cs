@@ -49,7 +49,7 @@ namespace ToDoModel
                 else
                 {
                     IEnumerable<string> temp;
-                    if (value.Count > 0 && value[0].Substring(0, Prefix.Length) == Prefix)
+                    if (value.Count > 0 && value[0].Length >= Prefix.Length && value[0].Substring(0, Prefix.Length) == Prefix)
                     {
                         temp = value.Select(x => x.Replace(Prefix, ""));
                     }

@@ -106,7 +106,7 @@ namespace ToDoModel
         
         private Outlook.Application _olApp;
         private Regex _regex;
-        private string _searchString;
+        //private string _searchString;
         
 
         #endregion

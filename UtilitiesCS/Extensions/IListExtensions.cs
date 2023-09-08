@@ -25,7 +25,48 @@ namespace UtilitiesCS
                 return list[index];
             }
         }
-        
+
+        public static int[] FindIndices<T>(this IList<T> list, Predicate<T> match)
+        {
+            return list.FindIndices(0, list.Count, match);
+        }
+
+        public static int[] FindIndices<T>(this IList<T> list, int startIndex, Predicate<T> match)
+        {
+            return list.FindIndices(startIndex, list.Count, match);
+        }
+
+        public static int[] FindIndices<T>(this IList<T> list, int startIndex, int count, Predicate<T> match)
+        {
+            if ((uint)startIndex > (uint)list.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} has a value of {startIndex} which is greater than the list length of {list.Count}");
+            }
+
+            if (count < 0 || startIndex > list.Count - count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count));
+            }
+
+            if (match == null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            var indices = new List<int>();
+
+            int num = startIndex + count;
+            for (int i = startIndex; i < num; i++)
+            {
+                if (match(list[i]))
+                {
+                    indices.Add(i);
+                }
+            }
+
+            return indices.ToArray();
+        }
+
         public static int FindIndex<T>(this IList<T> list, Predicate<T> match)
         {
             return list.FindIndex(0, list.Count, match);

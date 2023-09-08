@@ -231,7 +231,7 @@ namespace UtilitiesCS
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
 

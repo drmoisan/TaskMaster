@@ -10,7 +10,7 @@ namespace UtilitiesCS
     /// Helper class to access common Outlook item members. 
     /// <see href="https://learn.microsoft.com/en-us/office/client-developer/outlook/pia/how-to-create-a-helper-class-to-access-common-outlook-item-members"/> 
     /// </summary>
-    class OutlookItem
+    public class OutlookItem
     {
         private object _item;  // the wrapped Outlook item
         private Type _type;  // type for the Outlook item 
@@ -52,6 +52,7 @@ namespace UtilitiesCS
         private const string OlParent = "Parent";
         private const string OlPrintOut = "PrintOut";
         private const string OlPropertyAccessor = "PropertyAccessor";
+        private const string OlReminderTime = "ReminderTime";
         private const string OlSave = "Save";
         private const string OlSaveAs = "SaveAs";
         private const string OlSaved = "Saved";
@@ -73,15 +74,22 @@ namespace UtilitiesCS
         }
         #endregion
 
+        #region Internal Properties
+
+        internal object Item { get => _item; }
+        internal Type ItemType { get => _type; }
+        internal object[] Args { get => _args; }
+
+        #endregion
+
         #region Public Methods and Properties
         public Outlook.Actions Actions => this.GetPropertyValue(OlActions) as Outlook.Actions;
-        
+
         public Outlook.Application Application => this.GetPropertyValue(OlApplication) as Outlook.Application;
 
         public Outlook.Attachments Attachments => this.GetPropertyValue(OlAttachments) as Outlook.Attachments;
 
         public string BillingInformation { get => this.GetPropertyValue(OlBillingInformation).ToString(); set => SetPropertyValue(OlBillingInformation, value); }
-        
 
         public string Body { get => this.GetPropertyValue(OlBody).ToString(); set => SetPropertyValue(OlBody, value); }
 
@@ -164,6 +172,8 @@ namespace UtilitiesCS
 
         public void PrintOut() => this.CallMethod(OlPrintOut);
 
+        public DateTime ReminderTime { get => (DateTime)this.GetPropertyValue(OlReminderTime); set => SetPropertyValue(OlReminderTime, value); }
+
         public void Save() => this.CallMethod(OlSave);
 
         public void SaveAs(string path, Outlook.OlSaveAsType type)
@@ -191,8 +201,8 @@ namespace UtilitiesCS
         #endregion
 
         #region Private Helper Functions
-        
-        private object GetPropertyValue(string propertyName)
+
+        internal virtual object GetPropertyValue(string propertyName)
         {
             try
             {
@@ -214,7 +224,7 @@ namespace UtilitiesCS
             }
         }
 
-        private void SetPropertyValue(string propertyName, object propertyValue)
+        internal virtual void SetPropertyValue(string propertyName, object propertyValue)
         {
             try
             {
@@ -235,7 +245,7 @@ namespace UtilitiesCS
             }
         }
 
-        private object CallMethod(string methodName)
+        internal virtual object CallMethod(string methodName)
         {
             try
             {
@@ -257,7 +267,7 @@ namespace UtilitiesCS
             }
         }
 
-        private object CallMethod(string methodName, object[] args)
+        internal virtual object CallMethod(string methodName, object[] args)
         {
             try
             {
@@ -278,7 +288,7 @@ namespace UtilitiesCS
                 throw;
             }
         }
-        
+
         #endregion
 
     }
