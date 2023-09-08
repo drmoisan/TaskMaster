@@ -255,28 +255,67 @@ namespace UtilitiesCS
 
         #endregion 
 
-        public static string FlattenStringTree(this object[] branches, bool strictValidation = true)
+        
+        public static T[] FlattenArrayTree<T>(this object node)
         {
-            if (!Array.TrueForAll(branches, branch => branch is string))
+            return FlattenArrayTree<T>(node, true).ToArray();
+        }
+
+        public static T[] TryFlattenArrayTree<T>(this object node)
+        {
+            return FlattenArrayTree<T>(node, false).ToArray();
+        }
+
+        internal static List<T> FlattenArrayTree<T>(this object node, bool strict) 
+        { 
+            if (strict || node.IsArray() || node is T) 
+            { 
+                List<T> result = new List<T>();
+                FlattenArrayTree(node, strict, ref result);
+                return result;
+            }
+            else { return null; }
+        }
+        
+        internal static void FlattenArrayTree<T>(this object node, bool strict, ref List<T> result)
+        {
+            if (node.IsArray())
             {
-                for (int i = 0; i < branches.Length; i++)
+                if (node.IsArray<T>())
                 {
-                    if (branches[i] is Array) { branches[i] = FlattenStringTree((object[])branches[i]); }
-                    else if (!(branches[i] is string))
-                    {
-                        if (strictValidation)
-                        { throw new ArgumentException($"branches[{i}] is of type {branches[i].GetType().Name}"
-                                + $". Array elements in FlattenStringTree must be arrays or strings."); }
-                        branches[i] = "Error";
+                    var branches = (T[])node;
+                    result.AddRange(branches);
+                }
+                else
+                {
+                    var branches = (object[])node;
+                    foreach (var branch in branches) 
+                    { 
+                        branch.FlattenArrayTree(strict, ref result); 
                     }
                 }
             }
-            string result = string.Join(", ", branches);
-            if (result.Contains("Error")) { result = "Error"; }
-            
-            return result;
+            else if (node is T) { result.Append((T)node);}
+            else
+            {
+                if (strict)
+                {
+                    throw new ArgumentException($"node is of type {node.GetType().Name}. Array elements in " +
+                                                $"{nameof(FlattenArrayTree)} must be arrays or of type {typeof(T).Name}.");
+                }
+                else 
+                {
+                    result.Add(default(T));
+                }
+            }
         }
+        
+        
 
+        public static bool IsArray<T>(this object container) => container.GetType().IsArray && typeof(T).IsAssignableFrom(container.GetType().GetElementType());
+        public static bool IsArray(this object container) => container.GetType().IsArray;
+
+        //TODO: Implement IsTringArrayTree
         internal static bool IsStringArrayTree(this object[] branches, bool strictValidation)
         {
             return false;
@@ -297,6 +336,36 @@ namespace UtilitiesCS
             if (array.Length == 2) { return array[0] + lastSeparator + array[1]; }
             return string.Join(separator, array.Take(array.Length - 1)) + lastSeparator + array[array.Length - 1];
         }
+
+        #region Deprecated
+
+        [Obsolete("Use FlattenArrayTree instead")]
+        public static string FlattenStringTree(this object[] branches, bool strictValidation = true)
+        {
+            if (!Array.TrueForAll(branches, branch => branch is string))
+            {
+                for (int i = 0; i < branches.Length; i++)
+                {
+                    if (branches[i] is Array) { branches[i] = FlattenStringTree((object[])branches[i]); }
+                    else if (!(branches[i] is string))
+                    {
+                        if (strictValidation)
+                        {
+                            throw new ArgumentException($"branches[{i}] is of type {branches[i].GetType().Name}"
+                                + $". Array elements in FlattenStringTree must be arrays or strings.");
+                        }
+                        branches[i] = "Error";
+                    }
+                }
+            }
+            string result = string.Join(", ", branches);
+            if (result.Contains("Error")) { result = "Error"; }
+
+            return result;
+        }
+
+
+        #endregion
     }
 
     public static class ArrayIsAllocated

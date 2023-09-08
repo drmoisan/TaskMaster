@@ -69,14 +69,14 @@ namespace TaskVisualization
         public void Initialize()
         {
             _viewer.TaskName.Text = _active.TaskSubject;
-            if (!_active.Context.IsNullOrEmpty())
-                _viewer.CategorySelection.Text = _active.Context;
-            if (!_active.People.IsNullOrEmpty())
-                _viewer.PeopleSelection.Text = _active.People;
-            if (!_active.Project.IsNullOrEmpty())
-                _viewer.ProjectSelection.Text = _active.Project;
-            if (!_active.Topic.IsNullOrEmpty())
-                _viewer.TopicSelection.Text = _active.Topic;
+            if (!_active.Context.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
+            if (!_active.People.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
+            if (!_active.Projects.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+            if (!_active.Topics.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
 
             switch (_active.Priority)
             {
@@ -228,7 +228,7 @@ namespace TaskVisualization
                                  where x.Key.Contains(prefix.Value)
                                  select x).ToSortedDictionary();
 
-            List<string> selections = Array.ConvertAll(_active.People.Split(','), x => x.Trim()).ToList();
+            IList<string> selections = _active.People.AsListNoPrefix;
 
             selections.Remove("");
 
@@ -240,13 +240,13 @@ namespace TaskVisualization
                                                    prefixes: _defaults.PrefixList,
                                                    selections: selections,
                                                    prefixKey: prefix.Key,
-                                                   objItemObject: _active.OlItem,
+                                                   objItemObject: _active.OlItem.InnerObject,
                                                    userEmailAddress: _userEmailAddress);
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.People = controller.SelectionString();
-                    _viewer.PeopleSelection.Text = _active.People;
+                    _active.People.AsStringNoPrefix = controller.SelectionString();
+                    _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
                 }
             }
         }
@@ -262,7 +262,7 @@ namespace TaskVisualization
                                  where x.Key.Contains(prefix.Value)
                                  select x).ToSortedDictionary();
 
-            List<string> selections = Array.ConvertAll(_active.Context.Split(','), x => x.Trim()).ToList();
+            IList<string> selections = _active.Context.AsListNoPrefix;
             bool unused1 = selections.Remove("");
 
             using (var viewer = new TagViewer())
@@ -278,8 +278,8 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Context = controller.SelectionString();
-                    _viewer.CategorySelection.Text = _active.Context;
+                    _active.Context.AsStringNoPrefix = controller.SelectionString();
+                    _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                 }
             }
 
@@ -293,7 +293,7 @@ namespace TaskVisualization
                                  where x.Key.Contains(prefix.Value)
                                  select x).ToSortedDictionary();
 
-            List<string> selections = Array.ConvertAll(_active.Project.Split(','), x => x.Trim()).ToList();
+            IList<string> selections = _active.Projects.AsListNoPrefix;
             bool unused1 = selections.Remove("");
 
             using (var viewer = new TagViewer())
@@ -309,8 +309,8 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Project = controller.SelectionString();
-                    _viewer.ProjectSelection.Text = _active.Project;
+                    _active.Projects.AsStringNoPrefix = controller.SelectionString();
+                    _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
                 }
             }
         }
@@ -326,7 +326,7 @@ namespace TaskVisualization
                                  where x.Key.Contains(prefix.Value)
                                  select x).ToSortedDictionary();
 
-            List<string> selections = Array.ConvertAll(_active.Topic.Split(','), x => x.Trim()).ToList();
+            IList<string> selections = _active.Topics.AsListNoPrefix;
             bool unused1 = selections.Remove("");
 
             using (var viewer = new TagViewer())
@@ -342,8 +342,8 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Topic = controller.SelectionString();
-                    _viewer.TopicSelection.Text = _active.Topic;
+                    _active.Topics.AsStringNoPrefix = controller.SelectionString();
+                    _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                 }
             }
         }
@@ -451,11 +451,11 @@ namespace TaskVisualization
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "Context");
             _viewer.CategorySelection.Text = prefix.Value + "Personal";
-            _active.Context = prefix.Value + "Personal";
+            _active.Context.AsStringNoPrefix = prefix.Value + "Personal";
 
             prefix = _defaults.PrefixList.Find(x => x.Key == "Project");
             _viewer.ProjectSelection.Text = prefix.Value + "Personal - Other";
-            _active.Project = prefix.Value + "Personal - Other";
+            _active.Projects.AsStringNoPrefix = prefix.Value + "Personal - Other";
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
@@ -628,26 +628,26 @@ namespace TaskVisualization
             {
                 case FlagsToSet.context:
                     {
-                        _active.Context = value;
-                        _viewer.CategorySelection.Text = _active.Context;
+                        _active.Context.AsStringNoPrefix = value;
+                        _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                         break;
                     }
                 case FlagsToSet.people:
                     {
-                        _active.People = value;
-                        _viewer.PeopleSelection.Text = _active.People;
+                        _active.People.AsStringNoPrefix = value;
+                        _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
                         break;
                     }
                 case FlagsToSet.projects:
                     {
-                        _active.Project = value;
-                        _viewer.ProjectSelection.Text = _active.Project;
+                        _active.Projects.AsStringNoPrefix = value;
+                        _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
                         break;
                     }
                 case FlagsToSet.topics:
                     {
-                        _active.Topic = value;
-                        _viewer.TopicSelection.Text = _active.Topic;
+                        _active.Topics.AsStringNoPrefix = value;
+                        _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                         break;
                     }
                 case FlagsToSet.taskname:
@@ -715,9 +715,9 @@ namespace TaskVisualization
                 if (_options.HasFlag(FlagsToSet.people))
                     c.People = _active.People;
                 if (_options.HasFlag(FlagsToSet.projects))
-                    c.Project = _active.Project;
+                    c.Projects = _active.Projects;
                 if (_options.HasFlag(FlagsToSet.topics))
-                    c.Topic = _active.Topic;
+                    c.Topics = _active.Topics;
                 if (_options.HasFlag(FlagsToSet.today))
                     c.Today = _active.Today;
                 if (_options.HasFlag(FlagsToSet.bullpin))

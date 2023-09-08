@@ -277,7 +277,11 @@
     <Compile Include="Interfaces\IAppEvents.cs" />
     <Compile Include="Interfaces\IMovedMailInfo.cs" />
     <Compile Include="OutlookExtensions\CategoryExtensions.cs" />
+    <Compile Include="OutlookExtensions\IOutlookItem.cs" />
+    <Compile Include="OutlookExtensions\OutlookItemFlaggable.cs" />
+    <Compile Include="OutlookExtensions\OutlookItemTry.cs" />
     <Compile Include="OutlookExtensions\OutlookItem.cs" />
+    <Compile Include="OutlookExtensions\OutlookItemExtensions.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack.cs" />
     <Compile Include="Threading\PriorityScheduler.cs" />
