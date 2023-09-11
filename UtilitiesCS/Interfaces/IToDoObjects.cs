@@ -1,19 +1,22 @@
 ﻿using System.Collections.Generic;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
 
     public interface IToDoObjects
     {
-        Dictionary<string, string> DictPPL { get; }
-        string DictPPL_Filename { get; }
-        void DictPPL_Save();
-        Dictionary<string, string> DictRemap { get; }
+        IPeopleScoDictionary DictPPL { get; }
+        //Dictionary<string, string> DictPPL { get; }
+        //string DictPPL_Filename { get; }
+        //void DictPPL_Save();
+        IScoDictionary<string, string> DictRemap { get; }
         ISerializableList<string> CategoryFilters { get; }
         IIDList IDList { get; }
         IApplicationGlobals Parent { get; }
         IProjectInfo ProjInfo { get; }
+        ScoCollection<IPrefix> PrefixList { get; }
         string ProjInfo_Filename { get; }
         string FnameDictRemap { get; }
         string FnameIDList { get; }

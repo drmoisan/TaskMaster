@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Deedle;
@@ -17,7 +18,7 @@ using Swordfish.NET.General.Collections;
 
 namespace UtilitiesCS
 {
-    public class ScoCollection<T> : IConcurrentObservableBase<T>, IList<T>, ICollection<T>, IList, ICollection
+    public class ScoCollection<T> : IConcurrentObservableBase<T>, IList<T>, ICollection<T>, IList, ICollection, IScoCollection<T>
     {
         #region Constructors
 
@@ -38,7 +39,14 @@ namespace UtilitiesCS
             Deserialize();
         }
 
-        public ScoCollection(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        public ScoCollection(string filename, string folderpath, bool askUserOnError)
+        {
+            Filename = filename;
+            Folderpath = folderpath;
+            Deserialize(askUserOnError);
+        }
+
+        public ScoCollection(string filename, string folderpath, AltListLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
         {
             Filename = filename;
             Folderpath = folderpath;
@@ -115,7 +123,7 @@ namespace UtilitiesCS
         void IList.Remove(object value) => (_collection as IList).Remove(value);
         
         void IList.RemoveAt(int index) => (_collection as IList).RemoveAt(index);
-        
+
         #endregion
 
         #region ICollection Implementation
@@ -200,18 +208,65 @@ namespace UtilitiesCS
         public void Serialize(string filepath)
         {
             this.Filepath = filepath;
+            _ = Task.Run(() => SerializeThreadSafe(filepath));
+            //var settings = new JsonSerializerSettings();
+            //settings.TypeNameHandling = TypeNameHandling.Auto;
+            //settings.Formatting = Formatting.Indented;
+            //using (TextWriter writer = File.CreateText(filepath))
+            //{
+            //    var serializer = JsonSerializer.Create(settings);
+            //    serializer.Serialize(writer, this);
+            //}
+        }
 
-            var settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.Auto;
-            settings.Formatting = Formatting.Indented;
-            using (TextWriter writer = File.CreateText(filepath))
+        async public Task SerializeAsync()
+        {
+            if (Filepath != "")
             {
-                var serializer = JsonSerializer.Create(settings);
-                serializer.Serialize(writer, this);
+                await SerializeAsync(Filepath);
             }
-            //string output = JsonConvert.SerializeObject(this, settings);
-            //string output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            //File.WriteAllText(filepath, output);
+            else { await Task.CompletedTask; }
+
+        }
+
+        public async Task SerializeAsync(string filepath)
+        {
+            this.Filepath = filepath;
+            await Task.Run(() => SerializeThreadSafe(filepath));
+        }
+
+        private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
+
+        public void SerializeThreadSafe(string filepath)
+        {
+
+            // Set Status to Locked
+            if (_readWriteLock.TryEnterWriteLock(-1))
+            {
+                try
+                {
+                    // Append text to the file
+                    using (StreamWriter sw = File.CreateText(filepath))
+                    {
+                        var settings = new JsonSerializerSettings();
+                        settings.TypeNameHandling = TypeNameHandling.Auto;
+                        settings.Formatting = Formatting.Indented;
+
+                        var serializer = JsonSerializer.Create(settings);
+                        serializer.Serialize(sw, this);
+                        sw.Close();
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    log.Error($"Error serializing to {filepath}", e);
+                }
+                finally
+                {
+                    // Release lock
+                    _readWriteLock.ExitWriteLock();
+                }
+            }
 
         }
 
@@ -225,7 +280,7 @@ namespace UtilitiesCS
             if (Filepath != "") Deserialize(Filepath, askUserOnError);
         }
 
-        public void Deserialize(string filepath, CSVLoader<T> backupLoader, bool askUserOnError)
+        public void Deserialize(string filepath, AltListLoader<T> backupLoader, bool askUserOnError)
         {
             if (_filepath != filepath) this.Filepath = filepath;
 

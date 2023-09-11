@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using Microsoft.VisualBasic;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
@@ -17,14 +21,33 @@ namespace TaskMaster
             _parent = ParentInstance;
         }
 
-        private ProjectInfo _projInfo;
-        private Dictionary<string, string> _dictPPL;
-        private IIDList _idList;
-        private readonly ApplicationGlobals _parent;
-        private Dictionary<string, string> _dictRemap;
-        private ISerializableList<string> _catFilters;
+        async public Task LoadAsync()
+        {
+            var tasks = new List<Task> 
+            {
+                LoadDictPPLAsync(),
+                LoadDictRemapAsync(),
+                LoadProjInfoAsync(),
+                LoadIdListAsync(),
+                LoadCategoryFiltersAsync(),
+                LoadPrefixListAsync()
+            };
+            await Task.WhenAll(tasks);
+            Debug.WriteLine($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
+        }
+
         private Properties.Settings _defaults = Properties.Settings.Default;
-                        
+        
+        private T Initialized<T>(T obj, Func<T> initializer)
+        {
+            if (obj is null)
+            {
+                obj = initializer.Invoke();
+            }
+            return obj;
+        }
+
+        private readonly ApplicationGlobals _parent;
         public IApplicationGlobals Parent
         {
             get
@@ -33,168 +56,293 @@ namespace TaskMaster
             }
         }
 
-        public string ProjInfo_Filename
+        private string _projInfo_Filename;
+        public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _projInfo_Filename = _defaults.FileName_ProjInfo);
+        private ProjectInfo _projInfo;
+        public IProjectInfo ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
+        async private Task LoadProjInfoAsync()
         {
-            get
+            _projInfo = await Task.Factory.StartNew(
+                              () => new ProjectInfo(filename: _defaults.FileName_ProjInfo,
+                                                    folderpath: Parent.FS.FldrAppData), 
+                              default,
+                              TaskCreationOptions.None,
+                              PriorityScheduler.BelowNormal);
+            if (_projInfo.Count == 0) 
             {
-                return _defaults.FileName_ProjInfo;
+                await Task.Factory.StartNew(
+                      () => _projInfo.Rebuild(Parent.Ol.App),
+                      default,
+                      TaskCreationOptions.None,
+                      PriorityScheduler.BelowNormal);
             }
         }
-
-        public IProjectInfo ProjInfo
+        private IProjectInfo LoadProjInfo()
         {
-            get
-            {
-                if (_projInfo is null)
-                {
-                    _projInfo = new ProjectInfo(filename: _defaults.FileName_ProjInfo, 
-                                                folderpath: Parent.FS.FldrAppData);
-                    if (_projInfo.Count ==0) { _projInfo.Rebuild(Parent.Ol.App); }
-                }
-                return _projInfo;
-            }
+            var projectInfo = new ProjectInfo(filename: _defaults.FileName_ProjInfo,
+                                              folderpath: Parent.FS.FldrAppData);
+            if (projectInfo.Count == 0) { projectInfo.Rebuild(Parent.Ol.App); }
+            return projectInfo;
         }
 
-        public string DictPPL_Filename
+        //private string _dictPPL_Filename;
+        //public string DictPPL_Filename { get => Initialized(_dictPPL_Filename, () => _defaults.FilenameDictPpl);}
+        ////{
+        ////    get
+        ////    {
+        ////        if (_dictPPL_Filename is null)
+        ////            _dictPPL_Filename = _defaults.FilenameDictPpl;
+        ////        return _dictPPL_Filename;
+        ////    }
+        ////}
+        
+
+        ////TODO: Convert DictPPL to SCODictionary
+        //private Dictionary<string, string> _dictPPL;
+        //public Dictionary<string, string> DictPPL => Initialized(_dictPPL, () => LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename));
+        ////{
+        ////    get
+        ////    {
+        ////        if (_dictPPL is null)
+        ////            _dictPPL = LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename);
+        ////        return _dictPPL;
+        ////    }
+        ////}
+        //async private Task LoadDictPPLAsync() 
+        //{ _dictPPL = await LoadDictJSONAsync(Parent.FS.FldrStaging, DictPPL_Filename); }
+        //public void DictPPL_Save()
+        //{
+        //    File.WriteAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename), 
+        //                      JsonConvert.SerializeObject(_dictPPL, Formatting.Indented));
+        //}
+
+        private PeopleScoDictionary _dictPPL;
+        public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
+        private PeopleScoDictionary LoadDictPPL()
         {
-            get
-            {
-                return _defaults.FilenameDictPpl;
-            }
+            var dictPPL = new PeopleScoDictionary(filename: _defaults.FilenameDictPpl,
+                                                  folderpath: Parent.FS.FldrPythonStaging,
+                                                  appGlobals: Parent,
+                                                  prefix: PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People));
+            
+            return dictPPL;
+        }
+        async private Task LoadDictPPLAsync() => _dictPPL = await Task.Factory.StartNew(
+            () => LoadDictPPL(), default, TaskCreationOptions.None, PriorityScheduler.BelowNormal);
+        async private Task LoadPrefixAndDictPeopleAsync()
+        {
+            await LoadPrefixListAsync();
+            await LoadDictPPLAsync();
         }
 
-        public Dictionary<string, string> DictPPL
+        public string FnameIDList => _defaults.FileName_IDList;
+        
+        private IIDList _idList;
+        //TODO: Convert IDList to ScoCollection
+        public IIDList IDList => Initialized(_idList, () => LoadIDList());
+        async private Task LoadIdListAsync() => _idList = await TaskPriority<IIDList>.Run(() => LoadIDList(), PriorityScheduler.BelowNormal);
+        
+        private IIDList LoadIDList()
         {
-            get
-            {
-                if (_dictPPL is null)
-                    _dictPPL = LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename);
-                return _dictPPL;
-            }
+            var idList = new IDList(FnameIDList,
+                                    Parent.FS.FldrAppData,
+                                    Parent.Ol.App);
+            if (idList.Count == 0) { idList.RefreshIDList(); }
+            return idList;
         }
 
-        public void DictPPL_Save()
-        {
-            File.WriteAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename), 
-                              JsonConvert.SerializeObject(_dictPPL, Formatting.Indented));
-        }
+        private string _fnameDictRemap;
+        public string FnameDictRemap => Initialized(_fnameDictRemap, () => _fnameDictRemap = _defaults.FileName_DictRemap);
 
-        public string FnameIDList
+        private ScoDictionary<string, string> _dictRemap;
+        public IScoDictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictRemap());
+        private ScoDictionary<string, string> LoadDictRemap()
         {
-            get
-            {
-                return _defaults.FileName_IDList;
-            }
+            var dictRemap = new ScoDictionary<string, string>(filename: FnameDictRemap,
+                                                              folderpath: Parent.FS.FldrPythonStaging);
+            return dictRemap;
         }
+        async private Task LoadDictRemapAsync() => _dictRemap = await Task.Factory.StartNew(
+            () => LoadDictRemap(), default, TaskCreationOptions.None, PriorityScheduler.BelowNormal);
 
-        public IIDList IDList
-        {
-            get
-            {
-                if (_idList is null)
-                {
-                    _idList = new IDList(_defaults.FileName_IDList,
-                                         Parent.FS.FldrAppData,
-                                         Parent.Ol.App);
-                    if (_idList.Count == 0) { _idList.RefreshIDList(); }
-                }
-                return _idList;
-            }
-        }
+        //private Dictionary<string, string> _dictRemap;
+        //public Dictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictJSON(Parent.FS.FldrStaging, FnameDictRemap));
+        //async private Task LoadDictRemapAsync() => _dictRemap = await LoadDictJSONAsync(Parent.FS.FldrStaging, FnameDictRemap);
 
-        public string FnameDictRemap
-        {
-            get
-            {
-                return _defaults.FileName_DictRemap;
-            }
-        }
-
-        public Dictionary<string, string> DictRemap
-        {
-            get
-            {
-                if (_dictRemap is null)
-                {
-                    _dictRemap = LoadDictCSV(Parent.FS.FldrStaging, _defaults.FileName_DictRemap);
-                }
-                return _dictRemap;
-            }
-        }
-
+        //TODO: Convert CategoryFilters to ScoCollection
+        private ISerializableList<string> _catFilters;
         public ISerializableList<string> CategoryFilters
         {
-            get
-            {
-                if (_catFilters is null)
-                    _catFilters = new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
-                                                                folderpath: _parent.FS.FldrPythonStaging);
-                return _catFilters;
-            }
+            get => Initialized(_catFilters, () => new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
+                                                                               folderpath: _parent.FS.FldrPythonStaging));
             set
             {
                 _catFilters = value;
                 if (_catFilters.Folderpath == "")
                 {
-                    _catFilters.Folderpath = _parent.FS.FldrFlow;
-                    _catFilters.Filename = _defaults.FileName_Recents;
+                    _catFilters.Folderpath = _parent.FS.FldrPythonStaging;
+                    _catFilters.Filename = _defaults.FileName_CategoryFilters;
                 }
                 _catFilters.Serialize();
             }
         }
-
-        private Dictionary<string, string> LoadDictCSV(string fpath, string filename)
+        async private Task LoadCategoryFiltersAsync()
         {
-            var dict = CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv");
-            if (dict is not null)
-                WriteDictJSON(dict, Path.Combine(fpath, filename));
-            return dict;
+            _catFilters = await Task.Factory.StartNew(
+                () => new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
+                                                   folderpath: _parent.FS.FldrPythonStaging),
+                default,
+                TaskCreationOptions.None,
+                PriorityScheduler.BelowNormal);
         }
 
-        private Dictionary<string, string> LoadDictJSON(string fpath, string filename)
+        // Prefix List
+        private ScoCollection<IPrefix> _prefixList;
+        public ScoCollection<IPrefix> PrefixList => Initialized(_prefixList, () => LoadPrefixList());
+        private ScoCollection<IPrefix> LoadPrefixList()
         {
-
-            string filepath = Path.Combine(fpath, filename);
-            Dictionary<string, string> dict = null;
-            var response = MsgBoxResult.Ignore;
-
-            try
-            {
-                dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename)));
+            var prefixList = new ScoCollection<IPrefix>(filename: _defaults.FileName_PrefixList,
+                                                        folderpath: Parent.FS.FldrPythonStaging);
+            if (prefixList.Count == 0) 
+            { 
+                var tdDefaults = new ToDoDefaults();
+                foreach (var prefix in tdDefaults.PrefixList) { prefixList.Add(prefix); }
+                prefixList.Serialize();
             }
-            catch (FileNotFoundException ex)
-            {
-                response = Interaction.MsgBox(filepath + "not found. Load from CSV?", Constants.vbYesNo);
-            }
-            catch (Exception ex)
-            {
-                response = Interaction.MsgBox(filepath + "encountered a problem. " + ex.Message + "Load from CSV?", Constants.vbYesNo);
-            }
-            finally
-            {
-                if (response == Constants.vbYes)
-                {
-                    dict = LoadDictCSV(fpath, filename);
-                }
-                else if (response == Constants.vbNo)
-                {
-                    response = Interaction.MsgBox("Start a new blank dictionary?", Constants.vbYesNo);
-                    if (response == Constants.vbYes)
-                    {
-                        dict = new Dictionary<string, string>();
-                    }
-                    else
-                    {
-                        throw new ArgumentNullException("Cannot proceed without dictionary: " + filename);
-                    }
-                }
-            }
-            return dict;
+            return prefixList;
+        }
+        async private Task LoadPrefixListAsync()
+        {
+            _prefixList = await Task.Factory.StartNew(
+                              () => LoadPrefixList(),
+                              default,
+                              TaskCreationOptions.None,
+                              PriorityScheduler.BelowNormal);
         }
 
-        public void WriteDictJSON(Dictionary<string, string> dict, string filepath)
-        {
-            File.WriteAllText(filepath, JsonConvert.SerializeObject(dict, Formatting.Indented));
-        }
+
+        //private Dictionary<string, string> LoadDictCSV(string fpath, string filename)
+        //{
+        //    var dict = CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv");
+        //    if (dict is not null)
+        //        WriteDictJSON(dict, Path.Combine(fpath, filename));
+        //    return dict;
+        //}
+
+        //async private Task<Dictionary<string, string>> LoadDictCSVAsync(string fpath, string filename)
+        //{
+        //    var dict = await Task<Dictionary<string,string>>.Factory.StartNew(
+        //                     () => CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv"),
+        //                     default,
+        //                     TaskCreationOptions.None,
+        //                     PriorityScheduler.BelowNormal);
+
+        //    if (dict is not null)
+        //        _ = Task.Factory.StartNew(
+        //            () => WriteDictJSON(dict, Path.Combine(fpath, filename)),
+        //            default,
+        //            TaskCreationOptions.None,
+        //            PriorityScheduler.BelowNormal);
+        //    return dict;
+        //}
+
+        ////TODO: Deprecate LoadDictJSON
+        //private Dictionary<string, string> LoadDictJSON(string fpath, string filename)
+        //{
+
+        //    string filepath = Path.Combine(fpath, filename);
+        //    Dictionary<string, string> dict = null;
+        //    var response = DialogResult.Ignore;
+
+        //    try
+        //    {                
+        //        dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename)));
+        //    }
+        //    catch (FileNotFoundException ex)
+        //    {
+        //        response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo,MessageBoxIcon.Error);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+        //    }
+        //    finally
+        //    {
+        //        if (response == DialogResult.Yes)
+        //        {
+        //            dict = LoadDictCSV(fpath, filename);
+        //        }
+        //        else if (response == DialogResult.No)
+        //        {
+        //            response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+        //            if (response == DialogResult.Yes)
+        //            {
+        //                dict = new Dictionary<string, string>();
+        //            }
+        //            else
+        //            {
+        //                throw new ArgumentNullException("Cannot proceed without dictionary: " + filename);
+        //            }
+        //        }
+        //    }
+        //    return dict;
+        //}
+
+        //async private Task<Dictionary<string, string>> LoadDictJSONAsync(string fpath, string filename)
+        //{
+
+        //    string filepath = Path.Combine(fpath, filename);
+        //    Dictionary<string, string> dict = null;
+        //    var response = DialogResult.Ignore;
+
+        //    try
+        //    {
+        //        dict = await Task<Dictionary<string, string>>.Factory.StartNew(
+        //                     () => JsonConvert.DeserializeObject<Dictionary<string, string>>(
+        //                         File.ReadAllText(
+        //                            Path.Combine(
+        //                                Parent.FS.FldrStaging, 
+        //                                DictPPL_Filename))),
+        //                     default,
+        //                     TaskCreationOptions.None,
+        //                     PriorityScheduler.BelowNormal);
+        //    }
+        //    catch (FileNotFoundException)
+        //    {
+                
+        //        response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+        //    }
+        //    finally
+        //    {
+        //        if (response == DialogResult.Yes)
+        //        {
+        //            dict = await LoadDictCSVAsync(fpath, filename);
+        //        }
+        //        else if (response == DialogResult.No)
+        //        {
+        //            response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+        //            if (response == DialogResult.Yes)
+        //            {
+        //                dict = new Dictionary<string, string>();
+        //            }
+        //            else
+        //            {
+        //                throw new ArgumentNullException("Cannot proceed without dictionary: " + filename);
+        //            }
+        //        }
+        //    }
+        //    return dict;
+        //}
+
+        ////TODO: Deprecate WriteDictJSON
+        //public void WriteDictJSON(Dictionary<string, string> dict, string filepath)
+        //{
+        //    File.WriteAllText(filepath, JsonConvert.SerializeObject(dict, Formatting.Indented));
+        //}
+
     }
 }

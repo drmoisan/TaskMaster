@@ -11,14 +11,14 @@ namespace UtilitiesCS
     {
         public static string ShowDialog(string Prompt, string Title = "", string DefaultResponse = "")
         {
-            if (!InputBoxViewer.DpiCalled) { InputBoxViewer.DpiAware(); }
+            //if (!InputBoxViewer.DpiCalled) { InputBoxViewer.DpiAware(); }
             var viewer = new InputBoxViewer();
             viewer.AcceptButton = viewer.Ok;
             viewer.CancelButton = viewer.Cancel;
             viewer.Message.Text = Prompt;
             viewer.Text = Title;
             viewer.Input.Text = DefaultResponse;
-
+            viewer.Input.Select();
             DialogResult result = viewer.ShowDialog();
             if (result == DialogResult.OK)
             {
@@ -26,8 +26,11 @@ namespace UtilitiesCS
                 viewer.Dispose();
                 return value;
             }
+            else
+            {
             viewer.Dispose();
-            return "";
+            return null;
+            }
         }
     }
 }

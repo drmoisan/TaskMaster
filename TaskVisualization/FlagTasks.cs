@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic.CompilerServices;
 using Tags;
@@ -19,22 +20,8 @@ namespace TaskVisualization
 
         private readonly List<ToDoItem> _todoSelection;
         private readonly Explorer _olExplorer;
-        private TaskViewer __viewer;
-
-        private TaskViewer _viewer
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return __viewer;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                __viewer = value;
-            }
-        }
+        private TaskViewer _viewer;
+        
         private readonly TaskController _controller;
         private readonly ToDoDefaults _defaultsToDo = new ToDoDefaults();
         private readonly AutoAssign _autoAssign;
@@ -45,7 +32,6 @@ namespace TaskVisualization
 
         public FlagTasks(IApplicationGlobals AppGlobals, IList ItemList = null, bool blFile = true, IntPtr hWndCaller = default, string strNameOfFunctionCalling = "")
         {
-
             _globals = AppGlobals;
             _olExplorer = AppGlobals.Ol.App.ActiveExplorer();
             _todoSelection = InitializeToDoList(ItemList);
@@ -53,20 +39,24 @@ namespace TaskVisualization
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
             _autoAssign = new AutoAssign(AppGlobals);
-            _controller = new TaskController(FormInstance: _viewer,
-                                             OlCategories: AppGlobals.Ol.NamespaceMAPI.Categories,
-                                             ToDoSelection: _todoSelection,
-                                             Defaults: _defaultsToDo,
-                                             AutoAssign: _autoAssign,
-                                             FlagOptions: _flagsToSet,
+            _controller = new TaskController(formInstance: _viewer,
+                                             olCategories: AppGlobals.Ol.NamespaceMAPI.Categories,
+                                             toDoSelection: _todoSelection,
+                                             defaults: _defaultsToDo,
+                                             autoAssign: _autoAssign,
+                                             flagOptions: _flagsToSet,
                                              userEmailAddress: AppGlobals.Ol.UserEmailAddress);
             _userEmailAddress = AppGlobals.Ol.UserEmailAddress;
         }
 
-        public void Run()
+        public DialogResult Run(bool modal = false)
         {
-            _controller.LoadInitialValues();
-            _viewer.ShowDialog();
+            _controller.Initialize();
+            if (modal)
+                return _viewer.ShowDialog();
+            else
+                _viewer.Show();
+                return DialogResult.None;
         }
 
         private List<ToDoItem> InitializeToDoList(IList ItemList)
@@ -128,9 +118,9 @@ namespace TaskVisualization
 
                 using (var optionsViewer = new TagViewer())
                 {
-                    var flagController = new TagController(viewer_instance: optionsViewer, dictOptions: symbolSelectionDict, autoAssigner: null, prefixes: _defaultsToDo.PrefixList, userEmailAddress: _userEmailAddress);
+                    var flagController = new TagController(viewerInstance: optionsViewer, dictOptions: symbolSelectionDict, autoAssigner: null, prefixes: _defaultsToDo.PrefixList, userEmailAddress: _userEmailAddress);
                     optionsViewer.ShowDialog();
-                    if (flagController._exit_type != "Cancel")
+                    if (flagController.ExitType != "Cancel")
                     {
                         listSelections = flagController.GetSelections();
                     }
@@ -168,7 +158,7 @@ namespace TaskVisualization
                 _globals = globals;
             }
 
-            public List<string> FilterList
+            public IList<string> FilterList
             {
                 get => _globals.TD.CategoryFilters.ToList();
             }
@@ -184,26 +174,23 @@ namespace TaskVisualization
 
             }
 
-            public IList<string> AddChoicesToDict(MailItem olMail, List<IPrefix> prefixes, string prefixKey, string currentUserEmail)
+            public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
             {
-
-                return AutoFile.dictPPL_AddMissingEntries(OlMail: olMail,
-                                                          ppl_dict: _globals.TD.DictPPL,
-                                                          dictRemap: _globals.TD.DictRemap,
-                                                          prefixes: prefixes,
-                                                          prefixKey: prefixKey,
-                                                          emailRootFolder: _globals.Ol.EmailRootPath,
-                                                          stagingPath: _globals.FS.FldrStaging,
-                                                          filename_dictppl: _globals.TD.DictPPL_Filename,
-                                                          dictPPLSave: _globals.TD.DictPPL_Save,
-                                                          currentUserEmail: currentUserEmail);
+                return _globals.TD.DictPPL.AddMissingEntries(olMail);
+                //return AutoFile.dictPPL_AddMissingEntries(olMail: olMail,
+                //                                          ppl_dict: _globals.TD.DictPPL,
+                //                                          dictRemap: _globals.TD.DictRemap,
+                //                                          prefixes: prefixes,
+                //                                          prefixKey: prefixKey,
+                //                                          emailRootFolder: _globals.Ol.EmailRootPath,
+                //                                          stagingPath: _globals.FS.FldrStaging,
+                //                                          currentUserEmail: currentUserEmail);
 
             }
 
             public Category AddColorCategory(IPrefix prefix, string categoryName)
             {
-
-                return CreateCategoryModule.CreateCategory(OlNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
+                return CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
             }
         }
 

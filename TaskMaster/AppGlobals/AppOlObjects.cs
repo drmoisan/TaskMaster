@@ -7,87 +7,131 @@ namespace TaskMaster
 {
     public class AppOlObjects : IOlObjects
     {
-
-        private string _olEmailRootPath;
-        private string _olArchiveRootPath;
-        private StackObjectCS<object> _movedMails_Stack;
-        private string _userEmailAddress;
-
-        public AppOlObjects(Application OlApp)
+        public AppOlObjects(Application olApplication)
         {
-            App = OlApp;
+            _olApplication = olApplication;
         }
 
-        public Application App { get; private set; }
+        private Application _olApplication;
+        public Application App { get => _olApplication; }
 
-        public string View_Wide { get => Properties.Settings.Default.View_Wide; }
-        
-        public object View_Compact { get => Properties.Settings.Default.View_Wide; }
-        
+        private string _viewWide;
+        public string ViewWide 
+        {
+            get 
+            { 
+                if (_viewWide is null)
+                    _viewWide = Properties.Settings.Default.View_Wide;
+                return _viewWide;
+            }
+        }
+
+        private string _viewCompact;
+        public string ViewCompact
+        {
+            get
+            {
+                if (_viewCompact is null)
+                    _viewCompact = Properties.Settings.Default.View_Wide;
+                return _viewCompact;
+            }
+        }
+
+        private NameSpace _namespaceMAPI;
         public NameSpace NamespaceMAPI
         {
             get
             {
+                if (_namespaceMAPI is null)
+                {
+                    _namespaceMAPI = App.GetNamespace("MAPI");
+                }
                 return App.Application.GetNamespace("MAPI");
             }
         }
 
+        private Folder _toDoFolder;
         public Folder ToDoFolder
         {
             get
             {
-                return (Folder)NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+                if (_toDoFolder is null)
+                    _toDoFolder = (Folder)NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+                return _toDoFolder;
             }
         }
 
+        private Folder _inbox;
         public Folder Inbox
         {
             get
             {
-                return (Folder)NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                if (_inbox is null)
+                    _inbox = (Folder)NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                return _inbox;
             }
         }
 
+        private Reminders _olReminders;
         public Reminders OlReminders
         {
             get
             {
-                return App.Reminders;
+                if (_olReminders is null)
+                    _olReminders = App.Reminders;
+                return _olReminders;
             }
         }
 
-        public Folder OlEmailRoot
+        private Folder _root;
+        public Folder Root
         {
             get
             {
-                return (Folder)App.Session.DefaultStore.GetRootFolder();
+                if (_root is null)
+                    _root = (Folder)App.Session.DefaultStore.GetRootFolder();
+                return _root;
             }
         }
 
+        private Folder _emailRoot;
+        public Folder EmailRoot
+        {
+            get
+            {
+                if (_emailRoot is null)
+                    _emailRoot = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                return _emailRoot;
+            }
+        }
+        
+        private string _emailRootPath;
         public string EmailRootPath
         {
             get
             {
-                if (_olEmailRootPath is null)
+                if (_emailRootPath is null)
                 {
-                    _olEmailRootPath = OlEmailRoot.FolderPath;
+                    _emailRootPath = EmailRoot.FolderPath;
                 }
-                return _olEmailRootPath;
+                return _emailRootPath;
             }
         }
 
+        private string _archiveRootPath;
         public string ArchiveRootPath
         {
             get
             {
-                if (_olArchiveRootPath is null)
+                if (_archiveRootPath is null)
                 {
-                    _olArchiveRootPath = Path.Combine(OlEmailRoot.FolderPath, "Archive");
+                    _archiveRootPath = Path.Combine(Root.FolderPath, "Archive");
                 }
-                return _olArchiveRootPath;
+                return _archiveRootPath;
             }
         }
 
+        private StackObjectCS<object> _movedMails_Stack;
         public StackObjectCS<object> MovedMails_Stack
         {
             get
@@ -100,38 +144,7 @@ namespace TaskMaster
             }
         }
 
-        public bool ShowInConversations
-        {
-            get
-            {
-                if (App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations"))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            set
-            {
-                View objView = (View)App.ActiveExplorer().CurrentView;
-                if (value == false & App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations") == true)
-                {
-                    // Turn Off Conversation View
-                    objView.XML = Strings.Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, Compare: Constants.vbTextCompare);
-                    objView.Save();
-                }
-                else if (value == true & App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations") == false)
-                {
-                    // Turn On Conversation View
-                    string strReplace = "<arrangement>" + Constants.vbCrLf + "        <upgradetoconv>1</upgradetoconv>";
-                    objView.XML = Strings.Replace(objView.XML, "<arrangement>", strReplace, 1, Compare: Constants.vbTextCompare);
-                    objView.Save();
-                }
-            }
-        }
-
+        private string _userEmailAddress;
         public string UserEmailAddress
         {
             get
@@ -143,5 +156,38 @@ namespace TaskMaster
                 return _userEmailAddress;
             }
         }
+
+        //public bool ShowInConversations
+        //{
+        //    get
+        //    {
+        //        if (App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations"))
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    set
+        //    {
+        //        View objView = (View)App.ActiveExplorer().CurrentView;
+        //        if (value == false & App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations") == true)
+        //        {
+        //            // Turn Off Conversation View
+        //            objView.XML = Strings.Replace(objView.XML, "<upgradetoconv>1</upgradetoconv>", "", 1, Compare: Constants.vbTextCompare);
+        //            objView.Save();
+        //        }
+        //        else if (value == true & App.ActiveExplorer().CommandBars.GetPressedMso("ShowInConversations") == false)
+        //        {
+        //            // Turn On Conversation View
+        //            string strReplace = "<arrangement>" + Constants.vbCrLf + "        <upgradetoconv>1</upgradetoconv>";
+        //            objView.XML = Strings.Replace(objView.XML, "<arrangement>", strReplace, 1, Compare: Constants.vbTextCompare);
+        //            objView.Save();
+        //        }
+        //    }
+        //}
+
     }
 }

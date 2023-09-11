@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
@@ -21,6 +22,8 @@ namespace UtilitiesCS
         int FindIndex(Predicate<T> match);
         void Serialize();
         void Serialize(string filepath);
+        Task SerializeAsync();
+        Task SerializeAsync(string filepath);
         List<T> ToList();
         void FromList(IList<T> value);
     }

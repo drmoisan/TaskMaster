@@ -104,5 +104,20 @@
     <Setting Name="BackupFile_SubjectMap" Type="System.String" Scope="User">
       <Value Profile="(Default)">9999999Subject_Map.txt</Value>
     </Setting>
+    <Setting Name="FileName_MovedEmailsBackup" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999EmailMoves.tsv</Value>
+    </Setting>
+    <Setting Name="FileName_EmailSession" Type="System.String" Scope="User">
+      <Value Profile="(Default)">99999EmailSession.csv</Value>
+    </Setting>
+    <Setting Name="FileName_EmailSessionTmp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">99999EmailSessionTmp.csv</Value>
+    </Setting>
+    <Setting Name="FileName_MovedEmails" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999EmailMoves.json</Value>
+    </Setting>
+    <Setting Name="FileName_PrefixList" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999PrefixList.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

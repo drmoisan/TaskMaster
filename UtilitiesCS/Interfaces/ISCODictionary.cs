@@ -9,14 +9,16 @@ using System.Windows.Input;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public interface ISCODictionary<TKey, TValue>: IDictionary<TKey,TValue>, ICollection<KeyValuePair<TKey, TValue>>, ICollection, INotifyCollectionChanged, IDisposable
+    public interface IScoDictionary<TKey, TValue>: IDictionary<TKey,TValue>, ICollection<KeyValuePair<TKey, TValue>>, ICollection, INotifyCollectionChanged, IDisposable
     {
         #region ConcurrentObservableDictionary  
+        
         int IndexOfKey(TKey key);
         TValue RetrieveOrAdd(TKey key, Func<TValue> getValue);
         bool TryAdd(TKey key, TValue value);
         bool TryGetIndexOf(TKey key, out int index);
         new int Count { get; }
+        
         #endregion
 
         #region Serialization
@@ -33,8 +35,12 @@ namespace UtilitiesCS.ReusableTypeClasses
         void Deserialize(string filepath, bool askUserOnError);
         void Serialize();
         void Serialize(string filepath);
-        Dictionary<TKey, TValue> ToDictionary();
+        Task SerializeAsync();
+        Task SerializeAsync(string filepath);
         
         #endregion  
+        
+        Dictionary<TKey, TValue> ToDictionary();
+    
     }
 }

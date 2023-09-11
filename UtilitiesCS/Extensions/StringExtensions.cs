@@ -10,6 +10,9 @@ namespace UtilitiesCS
 {
     public static class StringExtensions
     {
+        public static bool IsNullOrEmpty(this string str) => string.IsNullOrEmpty(str);
+
+
         public static string[] Split(this string str, char separator, bool trim)
         {
             if (trim) { return str.Split(separator).Select(s => s.Trim()).ToArray(); } 
@@ -67,5 +70,6 @@ namespace UtilitiesCS
 
             return (index == min && s1.Length == s2.Length) ? -1 : index;
         }
+    
     }
 }

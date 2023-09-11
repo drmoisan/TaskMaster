@@ -29,8 +29,15 @@ namespace UtilitiesCS
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.OK;
-            this.Hide();
+            if (Input.Text == "") 
+            {
+                MessageBox.Show("Please enter a value or cancel.");
+            }
+            else 
+            {  
+                DialogResult = DialogResult.OK;
+                this.Hide();
+            }
         }
 
         private void Cancel_Click(object sender, EventArgs e)

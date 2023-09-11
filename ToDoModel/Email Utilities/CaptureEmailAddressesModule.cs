@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel
 {
 
     public static class CaptureEmailAddressesModule
     {
-        public static List<string> CaptureEmailAddresses(MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap, string currentUserEmail)
+        public static List<string> GetEmailAddresses(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
         {
             int i;
             int j;

@@ -40,11 +40,9 @@ namespace ToDoModel
 
         public void LoadTree(LoadOptions LoadType, Application Application)
         {
-            string strTemp;
-            string strPrev;
+            
             IList colItems;
-            strPrev = "";
-            strTemp = "";
+            
 
             try
             {
@@ -296,7 +294,7 @@ namespace ToDoModel
 
         public void HideEmptyHeadersInView()
         {
-            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.get_Context())) { node.Value.ActiveBranch = false; } } };
+            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
 
             foreach (TreeNode<ToDoItem> node in ListOfToDoTree)
                 node.Traverse(action);

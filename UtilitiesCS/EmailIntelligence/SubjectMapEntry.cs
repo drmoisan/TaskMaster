@@ -220,7 +220,16 @@ namespace UtilitiesCS
         public int Score { get => _score; set => _score = value; }
 
         [JsonIgnore]
-        public ISubjectMapEncoder Encoder { get => _encoder; set => _encoder = value; }
+        public ISubjectMapEncoder Encoder 
+        { 
+            get => _encoder;
+            set 
+            { 
+                _encoder = value;
+                if (ReadyToEncode(throwEx: false))
+                    this.Encode();
+            }
+        }
 
         public bool ReadyToEncode(ISubjectMapEncoder encoder)
         {

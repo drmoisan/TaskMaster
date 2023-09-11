@@ -84,11 +84,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="My Project\MyNamespace.Static.1.Designer.cs" />
-    <Compile Include="My Project\MyNamespace.Static.2.Designer.cs" />
-    <Compile Include="My Project\MyNamespace.Static.3.Designer.cs" />
-    <Compile Include="AutoAssignInterface.cs" />
-    <Compile Include="CheckBoxController.cs" />
+    <Compile Include="Helper Classes\CheckBoxController.cs" />
+    <Compile Include="Helper Classes\PrefixItem.cs" />
     <Compile Include="My Project\AssemblyInfo.cs" />
     <Compile Include="My Project\Application.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -99,12 +96,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="My Project\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="TagController.cs" />
+    <Compile Include="TagLauncher.cs" />
     <Compile Include="TagViewer.Designer.cs">
       <DependentUpon>TagViewer.cs</DependentUpon>
     </Compile>
@@ -129,17 +122,16 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.cs</LastGenOutput>
     </None>
-    <None Include="My Project\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <CustomToolNamespace>Tags.My</CustomToolNamespace>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
+      <Project>{F2E1680E-1B15-4CF2-BAB0-54B8C8F6ABDF}</Project>
+      <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

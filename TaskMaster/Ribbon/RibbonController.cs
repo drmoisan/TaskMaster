@@ -8,9 +8,11 @@ using TaskTree;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
-using UtilitiesCS;
 using QuickFiler.Interfaces;
 using System.Windows.Forms;
+using QuickFiler;
+using Microsoft.Office.Interop.Outlook;
+using System.Linq;
 
 namespace TaskMaster
 {
@@ -21,11 +23,9 @@ namespace TaskMaster
         private IApplicationGlobals _globals;
         private bool blHook = true;
         private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
-        private QuickFiler.Interfaces.IQfcHomeController _quickFiler;
+        private IFilerHomeController _quickFiler;
 
-        public RibbonController()
-        {
-        }
+        public RibbonController() { }
 
         internal void SetGlobals(IApplicationGlobals AppGlobals)
         {
@@ -127,17 +127,17 @@ namespace TaskMaster
         {
             if (blHook == true)
             {
-                Globals.ThisAddIn.Events_Unhook();
+                _globals.Events.Unhook();
                 blHook = false;
                 Ribbon.InvalidateControl("BtnHookToggle");
-                Interaction.MsgBox("Events Disconnected");
+                MessageBox.Show("Events Disconnected");
             }
             else
             {
-                Globals.ThisAddIn.Events_Hook();
+                _globals.Events.Hook();
                 blHook = true;
                 Ribbon.InvalidateControl("BtnHookToggle");
-                Interaction.MsgBox("Hooked Events");
+                MessageBox.Show("Hooked Events");
             }
         }
 
@@ -154,24 +154,75 @@ namespace TaskMaster
             taskFlagger.Run();
         }
 
-        internal void Runtest()
+        internal void UndoSort()
         {
-            //Outlook.Table table = _globals.Ol.App.ActiveExplorer().GetTableInView();
+            ToDoModel.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
+        }
 
-            //var dc = new QuickFiler.Controllers.QfcDatamodel(_globals.Ol.App.ActiveExplorer(), _globals.Ol.App);
+        #region Try specific methods
+        internal void RunTry()
+        {
+            
+        }
 
-            //_globals.TD.ProjInfo.Rebuild(_globals.Ol.App);
-
+        internal void TryGetConversationDataframe()
+        {
+            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
+            Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
+            Debug.WriteLine(df.PrettyText());
+            df.Display();
+        }
+        internal void TryGetConversationOutlookTable()
+        {
+            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
+            var table = conv.GetTable(WithFolder: true, WithStore: true);
+            table.EnumerateTable();
+        }
+        internal void TryGetMailItemInfo()
+        {
+            var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
+            var conversation = (Outlook.Conversation)Mail.GetConversation();
+            var df = conversation.GetDataFrame();
+            df.PrettyPrint();
+            var mInfo = new MailItemInfo(df, 0);
+        }
+        internal void TryGetQfcDataModel()
+        {
+            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals);
+        }
+        internal void TryGetTableInView()
+        {
+            Outlook.Table table = _globals.Ol.App.ActiveExplorer().GetTableInView();
+        }
+        internal void TryRebuildProjInfo()
+        {
+            _globals.TD.ProjInfo.Rebuild(_globals.Ol.App);
+        }
+        internal void TryRecipientGetInfo()
+        {
+            var Mail = (Outlook.MailItem)_globals.Ol.App.ActiveExplorer().Selection[1];
+            var recips = Mail.Recipients.Cast<Recipient>();
+            var info = recips.GetInfo();
+        }
+        internal void TrySubstituteIdRoot()
+        {
             _globals.TD.IDList.SubstituteIdRoot("9710", "2501");
+        }
+        internal void TryLegacySortMailToExistingRun2()
+        {
+            var mail = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+            var items = new List<Outlook.MailItem> { mail };
+            ToDoModel.SortEmail.Run2(items, false, "_ Active Projects\\Countertop Beta", false, false, false, _globals, null, null);
+        }
 
-            //var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
-            //Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
-            //Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
-            //Debug.WriteLine(df.PrettyText());
-            //df.Display();
+        #endregion
 
-            // Dim table As Outlook.Table = conv.GetTable(WithFolder:=True, WithStore:=True)
-            // table.EnumerateTable()
+        internal void SortEmail()
+        {
+            var sorter = new EfcHomeController(_globals, () => { });
+            sorter.Run();
         }
 
     }

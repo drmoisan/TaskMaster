@@ -23,7 +23,7 @@ namespace ToDoModel
 
         public TreeNode<T> Parent { get => _parent; set => _parent = value; }
 
-        public T Value { get => _tValue; private set => value = _tValue; }
+        public T Value { get => _tValue; private set => _tValue = value; }
 
         public bool IsAncestor(TreeNode<T> model)
         {

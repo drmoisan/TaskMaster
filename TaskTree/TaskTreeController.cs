@@ -18,6 +18,7 @@ namespace TaskTree
     {
         public TaskTreeController(IApplicationGlobals AppGlobals, TaskTreeForm Viewer, TreeOfToDoItems DataModel)
         {
+            _globals = AppGlobals;
             _viewer = Viewer;
             _dataModel = DataModel;
             _viewer.SetController(this);

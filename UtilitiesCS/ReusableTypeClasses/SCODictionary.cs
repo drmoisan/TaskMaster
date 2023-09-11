@@ -19,17 +19,17 @@ namespace UtilitiesCS.ReusableTypeClasses
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     [Serializable()]
-    public class SCODictionary<TKey, TValue>: ConcurrentObservableDictionary<TKey, TValue>, ISCODictionary<TKey, TValue>
+    public class ScoDictionary<TKey, TValue>: ConcurrentObservableDictionary<TKey, TValue>, IScoDictionary<TKey, TValue>
     {
         #region constructors
-        public SCODictionary() : base() { }
-        public SCODictionary(IDictionary<TKey, TValue> source) : base(source) { }
-        public SCODictionary(IEqualityComparer<TKey> equalityComparer) : base(equalityComparer) { }    
-        public SCODictionary(int capactity) : base(capactity) { }
-        public SCODictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer) : base(source, equalityComparer) { }
-        public SCODictionary(int capacity, IEqualityComparer<TKey> equalityComparer) : base(capacity, equalityComparer) { }
+        public ScoDictionary() : base() { }
+        public ScoDictionary(IDictionary<TKey, TValue> source) : base(source) { }
+        public ScoDictionary(IEqualityComparer<TKey> equalityComparer) : base(equalityComparer) { }    
+        public ScoDictionary(int capactity) : base(capactity) { }
+        public ScoDictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer) : base(source, equalityComparer) { }
+        public ScoDictionary(int capacity, IEqualityComparer<TKey> equalityComparer) : base(capacity, equalityComparer) { }
 
-        public SCODictionary(string filename,
+        public ScoDictionary(string filename,
                              string folderpath) : base()
         {
             Filename = filename;
@@ -43,7 +43,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         /// <param name="dictionary">Existing dictionary</param>
         /// <param name="filename">Name of json file to house the SCODictionary</param>
         /// <param name="folderpath">Location of json file</param>
-        public SCODictionary(IDictionary<TKey, TValue> dictionary,
+        public ScoDictionary(IDictionary<TKey, TValue> dictionary,
                              string filename,
                              string folderpath) : base(dictionary)
         {
@@ -52,9 +52,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             Serialize();
         }
 
-        public SCODictionary(string filename,
+        public ScoDictionary(string filename,
                              string folderpath,
-                             ISCODictionary<TKey, TValue>.AltLoader backupLoader,
+                             IScoDictionary<TKey, TValue>.AltLoader backupLoader,
                              string backupFilepath,
                              bool askUserOnError) : base()
         {
@@ -136,6 +136,22 @@ namespace UtilitiesCS.ReusableTypeClasses
             await Task.Delay(1);
         }
 
+        async public Task SerializeAsync()
+        {
+            if (Filepath != "")
+            {
+                await SerializeAsync(Filepath);
+            }
+            else { await Task.CompletedTask; }
+
+        }
+
+        public async Task SerializeAsync(string filepath)
+        {
+            this.Filepath = filepath;
+            await Task.Run(() => SerializeThreadSafe(filepath));
+        }
+
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
         public void SerializeThreadSafe(string filepath)
@@ -193,7 +209,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             if (Filepath != "") Deserialize(Filepath, askUserOnError);
         }
 
-        public void Deserialize(string filepath, ISCODictionary<TKey, TValue>.AltLoader backupLoader, bool askUserOnError)
+        public void Deserialize(string filepath, IScoDictionary<TKey, TValue>.AltLoader backupLoader, bool askUserOnError)
         {
             if (_filepath != filepath) this.Filepath = filepath;
 
@@ -317,9 +333,14 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
                 else { response = DialogResult.Yes; }
             }
+            finally
+            {
+                if (response == DialogResult.Yes) { this.Serialize(); }
+                else if (response == DialogResult.No) { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
+            }
         }
 
-        Dictionary<TKey, TValue> ISCODictionary<TKey, TValue>.ToDictionary()
+        Dictionary<TKey, TValue> IScoDictionary<TKey, TValue>.ToDictionary()
         {
             return new Dictionary<TKey, TValue>(this);
         }

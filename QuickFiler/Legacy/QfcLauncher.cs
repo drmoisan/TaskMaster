@@ -2,7 +2,7 @@
 using UtilitiesCS;
 using Microsoft.Office.Interop.Outlook;
 using System.Collections.Generic;
-using UtilitiesCS;
+
 
 namespace QuickFiler.Legacy
 {
@@ -21,7 +21,7 @@ namespace QuickFiler.Legacy
             _parentCleanup = ParentCleanup;
             _viewer = new QfcFormLegacyViewer();
             
-            var listEmailsInFolder = FolderSuggestionsModule.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()); //as List<MailItem>;
+            var listEmailsInFolder = FolderSuggestions.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()); //as List<MailItem>;
             Queue<MailItem> MasterQueue = new Queue<MailItem>();
             foreach (MailItem email in listEmailsInFolder) 
             { 

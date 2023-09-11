@@ -114,8 +114,6 @@ namespace QuickFiler
             Categories lcl_Categories = null,
             string lcl_strAction = "")
         {
-            int InitRet = default;
-
             try
             {
                 Subject = lcl_Subject;
@@ -141,13 +139,12 @@ namespace QuickFiler
         {
             try
             {
-                bool Init_wMailRet = default;
                 Subject = OlMail.Subject;
                 if (OlEndTime != default)
                     EndDate = OlEndTime;
                 if (lngDurationSec != 0)
                     DurationSec = lngDurationSec;
-                var recipients = CaptureEmailDetailsModule.GetRecipients(OlMail);
+                var recipients = EmailDetails.GetRecipients(OlMail);
                 SentTo = recipients.recipientsTo;
                 SentCC = recipients.recipientsCC;
                 SentFrom = OlMail.Sender.ToString();

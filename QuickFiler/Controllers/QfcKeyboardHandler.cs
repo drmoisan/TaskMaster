@@ -11,29 +11,25 @@ namespace QuickFiler.Controllers
 {
     internal class QfcKeyboardHandler : IQfcKeyboardHandler
     {
-        public QfcKeyboardHandler(QfcFormViewer viewer, IQfcHomeController parent) 
+        public QfcKeyboardHandler(QfcFormViewer viewer, IFilerHomeController parent) 
         { 
-            _viewer = viewer;
-            _viewer.SetKeyboardHandler(this);
+            viewer.SetKeyboardHandler(this);
             _parent = parent;
         }
-        
-        private QfcFormViewer _viewer;
-        private IQfcHomeController _parent;
+
+        public QfcKeyboardHandler(EfcViewer viewer, IFilerHomeController parent)
+        {
+            viewer.SetKeyboardHandler(this);
+            _parent = parent;
+        }
+
+        private IFilerHomeController _parent;
         private bool _kbdActive = false;
         private Dictionary<char, Action<char>> _kdCharActions = null;
         private Dictionary<Keys, Action<Keys>> _kdSpecActions = null;
-        private Dictionary<char, System.Action> _kuCharActions = null;
-        private Dictionary<Keys, System.Action> _kuSpecActions = null;
-        private Dictionary<char, System.Action> _kprsCharActions = null;
-        private Dictionary<Keys, System.Action> _kprsSpecActions = null;
 
         public Dictionary<char, Action<char>> KdCharActions { get => _kdCharActions; set => _kdCharActions = value; }
         public Dictionary<Keys, Action<Keys>> KdKeyActions { get => _kdSpecActions; set => _kdSpecActions = value;}
-        public Dictionary<char, System.Action> KuCharActions { get => _kuCharActions; set => _kuCharActions = value; }
-        public Dictionary<Keys, System.Action> KuKeyActions { get => _kuSpecActions; set => _kuSpecActions = value; }
-        public Dictionary<char, System.Action> KprsCharActions { get => _kprsCharActions; set => _kprsCharActions = value; }
-        public Dictionary<Keys, System.Action> KprsKeyActions { get => _kprsSpecActions; set => _kprsSpecActions = value; }
 
         public bool KbdActive 
         { 
@@ -41,30 +37,7 @@ namespace QuickFiler.Controllers
             set 
             { 
                 _kbdActive = value;
-                //if (value is false) 
-                //{ 
-                //    ActionsChar = null;
-                //    ActionsKey = null;
-                //}
             }
-        }
-
-        // TODO: Eliminate KeyboardDialog_Change
-        public void KeyboardDialog_Change()
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Eliminate KeyboardDialog_KeyDown
-        public void KeyboardDialog_KeyDown(object sender, KeyEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Eliminate KeyboardDialog_KeyUp
-        public void KeyboardDialog_KeyUp(object sender, KeyEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         public void KeyboardHandler_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -94,46 +67,10 @@ namespace QuickFiler.Controllers
             }
         }
 
-        // TODO: Implement or eliminate KeyboardsHandler_KeyPress
-        public void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-
-        // TODO: Implement or eliminate KeyboardsHandler_KeyUp
-        public void KeyboardHandler_KeyUp(object sender, KeyEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-
-        // TODO: Eliminate PanelMain_KeyDown
-        public void PanelMain_KeyDown(object sender, KeyEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Eliminate PanelMain_KeyPress
-        public void PanelMain_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Eliminate PanelMain_KeyUp
-        public void PanelMain_KeyUp(object sender, KeyEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO: Eliminate ResetAcceleratorSilently
-        public void ResetAcceleratorSilently()
-        {
-            throw new NotImplementedException();
-        }
-
         public void ToggleKeyboardDialog()
         {
-            if (_kbdActive) { _parent.FrmCtrlr.Groups.ToggleOffNavigation(async: false); }
-            else { _parent.FrmCtrlr.Groups.ToggleOnNavigation(async: false); }
+            if (_kbdActive) { _parent.FormCtrlr.ToggleOffNavigation(async: false); }
+            else { _parent.FormCtrlr.ToggleOnNavigation(async: false); }
             _kbdActive = !_kbdActive;
         }
         
@@ -141,18 +78,6 @@ namespace QuickFiler.Controllers
         {
             ToggleKeyboardDialog();
             e.Handled = true;
-        }
-
-        // Eliminate ToggleOffActiveItem
-        public bool ToggleOffActiveItem(bool parentBlExpanded)
-        {
-            throw new NotImplementedException();
-        }
-
-        // Eliminate ToggleRemoteMouseLabels
-        public void ToggleRemoteMouseLabels()
-        {
-            throw new NotImplementedException();
         }
 
         internal QfcItemViewer GetItemViewer(Control control)

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,6 +47,22 @@ namespace UtilitiesCS
                 Debug.WriteLine(++counter);
                 return false; 
             }
+        }
+
+        public static List<MailItem> OnlyMailItems(this Outlook.Selection selection)
+        {
+            return selection.Cast<object>().Where(x => x is MailItem).Select(x => (MailItem)x).ToList();
+        }
+
+        public static List<object> OnlySupportedObjects(this Outlook.Selection selection)
+        {
+            return selection.Cast<object>().Where(x => x.IsSupported()).ToList();
+        }
+        
+        private static bool IsSupported(this object item)
+        {
+            if (((item is MailItem) || (item is MeetingItem) || (item is AppointmentItem) || (item is TaskItem))) { return true; }
+            else { return false;}
         }
 
         private static void EnsureSupported(this object item)

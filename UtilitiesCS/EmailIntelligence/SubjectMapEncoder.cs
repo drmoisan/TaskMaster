@@ -19,17 +19,17 @@ namespace UtilitiesCS
             _filename = filename;
             _folderpath = folderpath;
             _subjectMap = subjectMap;
-            _encoder = new SCODictionary<string, int>(filename, folderpath);
+            _encoder = new ScoDictionary<string, int>(filename, folderpath);
         }
 
         private string _filename;
         private string _folderpath;
-        private ISCODictionary<string, int> _encoder;
-        private ISCODictionary<int, string> _decoder;
+        private IScoDictionary<string, int> _encoder;
+        private IScoDictionary<int, string> _decoder;
         private ISubjectMapSL _subjectMap;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
-        public ISCODictionary<int, string> Decoder 
+        public IScoDictionary<int, string> Decoder 
         { 
             get 
             { 
@@ -43,7 +43,7 @@ namespace UtilitiesCS
                     var iEnumerableOfKVPs = _encoder.Select(x => new KeyValuePair<int, string>(x.Value, x.Key));
                     try
                     {
-                        _decoder = new SCODictionary<int, string>(iEnumerableOfKVPs.ToDictionary());
+                        _decoder = new ScoDictionary<int, string>(iEnumerableOfKVPs.ToDictionary());
                     }
                     catch (InvalidOperationException)
                     {
@@ -63,12 +63,12 @@ namespace UtilitiesCS
                 return _decoder; 
             } 
         }
-        public ISCODictionary<string, int> Encoder
+        public IScoDictionary<string, int> Encoder
         {
             get
             {
                 if (_encoder is null)
-                    _encoder = new SCODictionary<string, int>(filename: _filename,
+                    _encoder = new ScoDictionary<string, int>(filename: _filename,
                                                               folderpath: _folderpath);
                 return _encoder;
             }
@@ -93,12 +93,12 @@ namespace UtilitiesCS
                            .Select((input, index) => new { input, index })
                            .ToDictionary(x => x.input, x => x.index);
 
-            _encoder = new SCODictionary<string, int>(dictionary: words,
+            _encoder = new ScoDictionary<string, int>(dictionary: words,
                                                       filename: _filename,
                                                       folderpath: _folderpath);
 
             _encoder.Serialize();
-            _decoder = new SCODictionary<int, string>(
+            _decoder = new ScoDictionary<int, string>(
                 _encoder.ToDictionary()
                 .Select(x => new KeyValuePair<int, string>(x.Value, x.Key))
                 .ToDictionary());

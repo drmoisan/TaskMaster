@@ -15,9 +15,8 @@ namespace QuickFiler.Interfaces
         /// <summary>
         /// Toggles special formatting for one group to highlight the group of controls that is active
         /// </summary>
-        void Accel_FocusToggle(); // Turn on or off the formatting to highlight this QfcItem
-        void Accel_FocusToggle(Enums.ToggleState desiredState);
-        void Accel_Toggle(bool async);
+        void ToggleFocus(); // Turn on or off the formatting to highlight this QfcItem
+        void ToggleFocus(Enums.ToggleState desiredState);
         int CounterEnter { get; set; }
         int CounterComboRight { get; set; }
         bool IsExpanded {  get; }
@@ -26,12 +25,13 @@ namespace QuickFiler.Interfaces
         string ConvOriginID { get; set; }
         int Height { get; }
         MailItem Mail { get; set; }
-        void ExpandCtrls1(); 
+        void ToggleExpansion(); 
         string SelectedFolder { get; }
-        int Position { get; set; }
+        int ItemNumber { get; set; }
+        int ItemIndex { get; set; }
         void PopulateFolderCombobox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
         bool SuppressEvents { get; set; }
-        void ApplyReadEmailFormat();
+        void ApplyReadEmailFormat(object state);
         void FlagAsTask();
         void MarkItemForDeletion();
         void JumpToSearchTextbox();
@@ -47,7 +47,7 @@ namespace QuickFiler.Interfaces
         void SetThemeDark(bool async);
         void SetThemeLight(bool async);
         void Cleanup();
-        void MoveMail();
+        Task MoveMail();
         DataFrame DfConversation { get; }
         string Subject { get; }
         string To { get; }

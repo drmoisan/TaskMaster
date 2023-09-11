@@ -31,8 +31,8 @@ namespace SVGControl
         }
 
         private SvgImageSelector _imageSvg;
-        private ResourceManager _resMgr;
-        private Assembly _parentCaller;
+        //private ResourceManager _resMgr;
+        //private Assembly _parentCaller;
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         [Browsable(true)]

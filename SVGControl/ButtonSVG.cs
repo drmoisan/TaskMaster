@@ -18,8 +18,6 @@ namespace SVGControl
 {
     public partial class ButtonSVG : Button
     { 
-        private SVGParser _parser;
-        private String _imagePath = "";
         private SvgImageSelector _imageSVG;
 
         public ButtonSVG()
