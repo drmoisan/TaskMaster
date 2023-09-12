@@ -18,7 +18,7 @@ using TaskVisualization;
 
 namespace QuickFiler.Controllers
 {
-    internal class QfcItemController : IQfcItemController, INotifyPropertyChanged
+    internal class QfcItemController : IQfcItemController, INotifyPropertyChanged, IItemControler
     {
         #region constructors
 

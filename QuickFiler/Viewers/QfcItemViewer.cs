@@ -21,14 +21,18 @@ namespace QuickFiler
             InitializeComponent();
             _context = SynchronizationContext.Current;
             InitTipsLabelsList();
+            InitLeftTipsLabelsList();
         }
 
-        private IList<Label> _tipsLabels;
-        private IQfcItemController _controller;
-        
 
+        private IList<Label> _tipsLabels;
         public IList<Label> TipsLabels { get => _tipsLabels; }
-        public IQfcItemController Controller { get => _controller; set => _controller = value; }
+
+        private IList<Label> _leftTipsLabels;
+        public IList<Label> LeftTipsLabels { get => _leftTipsLabels; }
+        
+        private IItemControler _controller;
+        public IItemControler Controller { get => _controller; set => _controller = value; }
         
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
@@ -45,11 +49,22 @@ namespace QuickFiler
                 LblAcConversation,
                 LblAcEmail,
                 LblAcFolder,
-                LblAcSearch
+                LblAcSearch,
+                LblAcBody
             };
 
         }
 
-        
+        private void InitLeftTipsLabelsList()
+        {
+            _leftTipsLabels = new List<Label>
+            {
+                LblAcOpen,
+                LblAcBody
+            };
+
+        }
+
+
     }
 }

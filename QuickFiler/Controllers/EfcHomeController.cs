@@ -31,6 +31,7 @@ namespace QuickFiler
                 _stopWatch = new cStopWatch();
                 _formViewer = new EfcViewer();
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+                _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, appGlobals, this);
                 _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType);
             }
         }
@@ -44,6 +45,7 @@ namespace QuickFiler
         { 
             if (_dataModel.Mail is not null)
             {
+                
                 _formViewer.Show();
             }
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }

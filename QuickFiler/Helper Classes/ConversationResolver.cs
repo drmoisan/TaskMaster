@@ -10,7 +10,7 @@ using UtilitiesCS;
 
 namespace QuickFiler.Helper_Classes
 {
-    internal class ConversationResolver
+    internal class ConversationResolver: INotifyPropertyChanged
     {
         public ConversationResolver(IApplicationGlobals appGlobals,
                                     MailItem mailItem,
@@ -23,13 +23,31 @@ namespace QuickFiler.Helper_Classes
         
         private IApplicationGlobals _globals;
         private MailItem _mailItem;
+        
         private System.Action<List<MailItemInfo>> _updateUI;
+        public System.Action<List<MailItemInfo>> UpdateUI { get => _updateUI; set => _updateUI = value; }
 
         private List<MailItemInfo> _conversationInfoExpanded;
-        public List<MailItemInfo> ConversationInfoExpanded { get => _conversationInfoExpanded; set => _conversationInfoExpanded = value; }
+        public List<MailItemInfo> ConversationInfoExpanded 
+        { 
+            get => _conversationInfoExpanded;
+            set 
+            {
+                _conversationInfoExpanded = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private List<MailItemInfo> _conversationInfo;
-        public List<MailItemInfo> ConversationInfo { get => _conversationInfo; set => _conversationInfo = value; }
+        public List<MailItemInfo> ConversationInfo 
+        { 
+            get => _conversationInfo;
+            set 
+            { 
+                _conversationInfo = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private IList<MailItem> _conversationItems;
         public IList<MailItem> ConversationItems
@@ -38,12 +56,15 @@ namespace QuickFiler.Helper_Classes
             {
                 if (_conversationItems is null)
                 {
-                    _conversationItems = ResolveItems(DfConversation).Result;
+                    _conversationItems = ResolveItemsAsync(DfConversation).Result;
                 }
                 return _conversationItems;
             }
 
-            set => _conversationItems = value;
+            set 
+            { 
+                _conversationItems = value;
+            }
         }
 
         private IList<MailItem> _conversationItemsExpanded;
@@ -53,7 +74,7 @@ namespace QuickFiler.Helper_Classes
             {
                 if (_conversationItemsExpanded is null)
                 {
-                    _conversationItemsExpanded = ResolveItems(DfConversationExpanded).Result;
+                    _conversationItemsExpanded = ResolveItemsAsync(DfConversationExpanded).Result;
                 }
                 return _conversationItemsExpanded;
             }
@@ -61,30 +82,27 @@ namespace QuickFiler.Helper_Classes
             set => _conversationItemsExpanded = value;
         }
 
-        async internal Task<List<MailItem>> ResolveItems(DataFrame df)
+        async internal Task<List<MailItem>> ResolveItemsAsync(DataFrame df)
         {
             return await Task.Run(() =>
             {
                 var parentFolder = ((Folder)_mailItem.Parent);
                 var storeID = parentFolder.StoreID;
-                var lst = ConvHelper.GetMailItemList(df, storeID, _globals.Ol.App, true);
-                var lst2 = lst.Cast<MailItem>();
-                var lst3 = lst2.ToList();
-                                   
-                return lst3;
-                //return ConvHelper.GetMailItemList(df, ((Folder)_mailItem.Parent).StoreID, _globals.Ol.App, true)
-                //                 .Cast<MailItem>()
-                //                 .ToList();
+                //var lst = ConvHelper.GetMailItemList(df, storeID, _globals.Ol.App, true);
+                //var lst2 = lst.Cast<MailItem>();
+                //var lst3 = lst2.ToList();       
+                //return lst3;
+                return ConvHelper.GetMailItemList(df, storeID, _globals.Ol.App, true).Cast<MailItem>().ToList();
             });
         }
 
-        async internal Task<List<MailItem>> ResolveItems()
+        async internal Task<List<MailItem>> ResolveItemsAsync()
         {
             var df = await Task.Run(() =>
             {
                 return _mailItem.GetConversation().GetConversationDf().FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
             });
-            return await ResolveItems(df);
+            return await ResolveItemsAsync(df);
         }
 
         private DataFrame _dfConversation;

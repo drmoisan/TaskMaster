@@ -3,6 +3,7 @@ using QuickFiler.Interfaces;
 using QuickFiler.Properties;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,10 +34,15 @@ namespace QuickFiler.Controllers
             //_mailItem = mailItem;
             _initType = initType;
             LoadSettings();
+            _itemViewer = _formViewer.ItemViewer;
+            _itemTlp = _formViewer.L0vh_TLP;
+            CaptureConfigureItemViewer();
+            _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel);
             _listTipsDetails = _formViewer.TipsLabels
                                .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
                                .ToList();
-            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off));
+            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off, true));
+
             WireEventHandlers();
             _ = PopulateFolderCombobox();
         }
@@ -46,11 +52,28 @@ namespace QuickFiler.Controllers
         private EfcDataModel _dataModel;
         private EfcViewer _formViewer;
         private EfcHomeController _homeController;
+        private EfcItemController _itemController;
+        private QfcItemViewer _itemViewer;
         //private FolderHandler _folderHandler;
         //private MailItem _mailItem;
         private Enums.InitTypeEnum _initType;
         private IList<IQfcTipsDetails> _listTipsDetails;
+        private TableLayoutPanel _itemTlp;
+        private int _itemViewerTlpRow;
+        private int _tlpHeightExpanded;
+        private int _tlpHeightCollapsed;
+        private int _tlpHeightDiff;
 
+        internal void CaptureConfigureItemViewer()
+        {
+            _tlpHeightExpanded = (int)Math.Round(_itemTlp.RowStyles[1].Height, 0);
+            var heightDiff = _tlpHeightExpanded - _itemViewer.Height;
+            _tlpHeightCollapsed = _itemViewer.MinimumSize.Height + heightDiff;
+            _tlpHeightDiff = _tlpHeightExpanded - _tlpHeightCollapsed;
+            _itemViewerTlpRow = _itemTlp.GetPositionFromControl(_itemViewer).Row;
+            ToggleExpansionStyle(Enums.ToggleState.Off);
+        }
+        
         public void Cleanup()
         {
             _globals = null;
@@ -225,10 +248,10 @@ namespace QuickFiler.Controllers
                 { 'S', async (x) => await JumpToAsync(_formViewer.SearchText) },
                 { 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox) },
                 { 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments) },
-                { 'E', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail) },
+                { 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail) },
                 { 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures) },
                 { 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation) },
-                { 'O', async (x) => await KbdExecuteAsync(ActionOkAsync) },
+                { 'K', async (x) => await KbdExecuteAsync(ActionOkAsync) },
                 { 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync) },
                 { 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync) },
                 { 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync) },
@@ -347,20 +370,22 @@ namespace QuickFiler.Controllers
         {
             KeyboardActions.Keys.ForEach(key => _homeController.KeyboardHndlr.KdCharActions.Remove(key));
             ToggleTips(async, Enums.ToggleState.Off);
+            _itemController.ToggleNavigation(async, Enums.ToggleState.Off);
         }
 
         public void ToggleOnNavigation(bool async)
         {
             KeyboardActions.ForEach(x => _homeController.KeyboardHndlr.KdCharActions.Add(x.Key, x.Value));
             ToggleTips(async, Enums.ToggleState.On);
+            _itemController.ToggleNavigation(async, Enums.ToggleState.On);
         }
 
         public void ToggleTips(bool async)
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
             {
-                if (async) { _formViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle())); }
-                else { _formViewer.Invoke(new System.Action(() => tipsDetails.Toggle())); }
+                if (async) { _formViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(true))); }
+                else { _formViewer.Invoke(new System.Action(() => tipsDetails.Toggle(true))); }
             }
         }
 
@@ -368,8 +393,8 @@ namespace QuickFiler.Controllers
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
             {
-                if (async) { _formViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(desiredState))); }
-                else { _formViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState))); }
+                if (async) { _formViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(desiredState, true))); }
+                else { _formViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState, true))); }
             }
         }
 
@@ -420,6 +445,23 @@ namespace QuickFiler.Controllers
         }
 
         #endregion
+
+        public void ToggleExpansionStyle(Enums.ToggleState desiredState)
+        {
+            if (desiredState == Enums.ToggleState.On)
+            {
+                _itemTlp.RowStyles[_itemViewerTlpRow].Height = _tlpHeightExpanded;
+                _formViewer.MinimumSize = new Size(_formViewer.MinimumSize.Width, _formViewer.MinimumSize.Height + _tlpHeightDiff);
+                _formViewer.Size = new Size(_formViewer.Size.Width, _formViewer.Size.Height + _tlpHeightDiff);
+            }
+            else
+            {
+                _itemTlp.RowStyles[_itemViewerTlpRow].Height = _tlpHeightCollapsed;
+                _formViewer.MinimumSize = new Size(_formViewer.MinimumSize.Width, _formViewer.MinimumSize.Height - _tlpHeightDiff);
+                _formViewer.Size = new Size(_formViewer.Size.Width, _formViewer.Size.Height - _tlpHeightDiff);
+            }
+        
+        }
 
     }
 }

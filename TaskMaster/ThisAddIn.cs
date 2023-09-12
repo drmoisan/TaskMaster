@@ -25,6 +25,9 @@ namespace TaskMaster
             // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();
 
+            // Initialize long loading elements on a low priority thread
+            _ = ItemViewerQueue.BuildQueueAsync(10);
+
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();
             Console.SetOut(tw);
