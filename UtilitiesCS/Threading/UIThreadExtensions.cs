@@ -1,10 +1,12 @@
-﻿using System;
+﻿using QuickFiler.Viewers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace UtilitiesCS
 {
@@ -17,6 +19,7 @@ namespace UtilitiesCS
             private readonly SynchronizationContext _context;
             public SynchronizationContextAwaiter(SynchronizationContext context)
             {
+                if(context is null) { throw new ArgumentNullException(nameof(context)); }
                 _context = context;
             }
 
@@ -31,5 +34,24 @@ namespace UtilitiesCS
         {
             return new SynchronizationContextAwaiter(context);
         }
+    
+        private static SyncContextForm _syncContextForm;
+
+        private static SynchronizationContext _uiContext;
+        
+        public static void InitUiContext()
+        {
+            _syncContextForm = new SyncContextForm();
+            _uiContext = _syncContextForm.UiSyncContext;
+            Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+        }
+        
+        public static SynchronizationContext GetUiContext()
+        { 
+            if (_uiContext is null) { InitUiContext(); }
+            return _uiContext;
+        }
+        
+
     }
 }

@@ -19,28 +19,33 @@ namespace TaskMaster
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            // Ensure that forms are ready for high resolution
+            InitializeDPI();
+
             // Create the global variables
             _globals = new ApplicationGlobals(Application);
-            
+
+            // Grab the sync context for the UI thread
+            UIThreadExtensions.InitUiContext();
+
             // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();
 
             // Initialize long loading elements on a low priority thread
-            _ = ItemViewerQueue.BuildQueueAsync(10);
+            EfcViewerQueue.BuildQueue(2);
+            ItemViewerQueue.BuildQueueWhenIdle(10);
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();
             Console.SetOut(tw);
-
-            // Ensure that forms are ready for high resolution
-            InitializeDPI();
-
+            
             // Send a reference to the ribbon controller and external utilities for future use
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
             // Hook the Inbox and ToDo events
             //_globals.Events.Hook();
+            Debug.WriteLine("ThisAddIn_Startup() complete");
         }
 
         private ApplicationGlobals _globals;

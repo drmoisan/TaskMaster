@@ -285,7 +285,15 @@
     <Compile Include="OutlookExtensions\OutlookItemExtensions.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack.cs" />
+    <Compile Include="Threading\ApplicationIdleTimer.cs" />
+    <Compile Include="Threading\IdleActionQueue.cs" />
     <Compile Include="Threading\PriorityScheduler.cs" />
+    <Compile Include="Threading\SyncContextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Threading\SyncContextForm.Designer.cs">
+      <DependentUpon>SyncContextForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Threading\TaskPriority.cs" />
     <Compile Include="Threading\UIThreadExtensions.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations.cs" />
@@ -356,6 +364,7 @@
     <Compile Include="ReusableTypeClasses\ScoDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
+    <Compile Include="Threading\AsyncIdleQueue.cs" />
     <Compile Include="To Depricate\CSVDictUtilities.cs" />
     <Compile Include="To Depricate\FileIO2.cs" />
     <Compile Include="To Depricate\FlattenArray.cs" />

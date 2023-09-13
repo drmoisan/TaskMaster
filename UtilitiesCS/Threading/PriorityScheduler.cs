@@ -20,6 +20,7 @@ namespace UtilitiesCS
         public static PriorityScheduler AboveNormal = new PriorityScheduler(ThreadPriority.AboveNormal);
         public static PriorityScheduler BelowNormal = new PriorityScheduler(ThreadPriority.BelowNormal);
         public static PriorityScheduler Lowest = new PriorityScheduler(ThreadPriority.Lowest);
+        
 
         private BlockingCollection<Task> _tasks = new BlockingCollection<Task>();
         private Thread[] _threads;

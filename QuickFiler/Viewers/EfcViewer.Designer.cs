@@ -1,4 +1,6 @@
-﻿namespace QuickFiler
+﻿using System;
+
+namespace QuickFiler
 {
     partial class EfcViewer
     {
@@ -55,6 +57,8 @@
             this.LblAcRefresh = new System.Windows.Forms.Label();
             this.LblAcNewFolder = new System.Windows.Forms.Label();
             this.ItemViewer = new QuickFiler.QfcItemViewer();
+            //this.ItemViewer = ItemViewerQueue.Dequeue();
+            //Console.WriteLine("ItemViewer Loaded");
             this.L0vh_TLP.SuspendLayout();
             this.Tlp.SuspendLayout();
             this.SuspendLayout();

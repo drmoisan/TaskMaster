@@ -3,10 +3,12 @@ using QuickFiler.Interfaces;
 using QuickFiler.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToDoModel;
@@ -275,7 +277,9 @@ namespace QuickFiler.Controllers
 
         async public Task ActionCancelAsync()
         {
+            //Debug.WriteLine($"Thread Id before await: {Thread.CurrentThread.ManagedThreadId}");
             await _formViewer.UiSyncContext;
+            //Debug.WriteLine($"Thread Id after await: {Thread.CurrentThread.ManagedThreadId}");
             _formViewer.Close();
             Cleanup();
         }

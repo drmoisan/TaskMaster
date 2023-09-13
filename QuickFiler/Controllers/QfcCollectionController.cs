@@ -233,7 +233,8 @@ namespace QuickFiler.Controllers
                                             bool blGroupConversation = true,
                                             int columnNumber = 0)
         {
-            QfcItemViewer itemViewer = new();
+            //QfcItemViewer itemViewer = new();
+            var itemViewer = ItemViewerQueue.Dequeue();
             _itemTLP.MinimumSize = new System.Drawing.Size(
                 _itemTLP.MinimumSize.Width,
                 _itemTLP.MinimumSize.Height +

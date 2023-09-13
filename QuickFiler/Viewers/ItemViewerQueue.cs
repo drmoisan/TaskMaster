@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,19 +27,25 @@ namespace QuickFiler
 
         private static Queue<QfcItemViewer> _queue = new Queue<QfcItemViewer>();
 
-        public async static Task BuildQueueAsync(int count)
+        public static void BuildQueueWhenIdle(int count)
         {
-            List<Task> tasks = new List<Task>();
             for (int i = 0; i < count; i++)
             {
-                tasks.Add(EnqueueAsync());
+                IdleActionQueue.AddEntry(() =>
+                {
+                    _queue.Enqueue(new QfcItemViewer());
+                    Console.WriteLine($"Enqueued {_queue.Count}");
+                });
             }
-            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
-        
-        internal async static Task EnqueueAsync() 
-        {             
-            await TaskPriority.Run(()=>_queue.Enqueue(new QfcItemViewer()), PriorityScheduler.Lowest);
+
+        public static void BuildQueue(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                _queue.Enqueue(new QfcItemViewer());
+                Console.WriteLine($"Enqueued {_queue.Count}");
+            }
         }
 
         public static QfcItemViewer Dequeue()
@@ -47,24 +54,27 @@ namespace QuickFiler
             if (_queue.Count > 0)
             {
                 viewer = _queue.Dequeue();
-                _ = EnqueueAsync();
+                Debug.WriteLine($"Dequeued 1, {_queue.Count} remaining");
+                BuildQueueWhenIdle(1);
+                //Debug.WriteLine($"Exiting dequeue, {_queue.Count} remaining");
             }
-            else 
-            { 
+            else
+            {
                 viewer = new QfcItemViewer();
-                _ = BuildQueueAsync(10);
+                BuildQueueWhenIdle(10);
             }
-            return _queue.Dequeue();
+            return viewer;
         }
 
-        public async static Task<IEnumerable<QfcItemViewer>> DequeueAsync(int count)
+        public static IEnumerable<QfcItemViewer> DequeueChunk(int count)
         {
-            if (count > _queue.Count)
+            if (_queue.Count < count)
             {
-                await BuildQueueAsync(count - _queue.Count);
+                BuildQueue(count - _queue.Count);
             }
-            _ = BuildQueueAsync(count);
+            BuildQueueWhenIdle(count);
             return _queue.DequeueChunk(count);
         }
+
     }
 }

@@ -15,6 +15,7 @@ using System.IO;
 using Microsoft.Web.WebView2.Core;
 using System.ComponentModel;
 using TaskVisualization;
+using System.Threading;
 
 namespace QuickFiler.Controllers
 {
@@ -78,7 +79,8 @@ namespace QuickFiler.Controllers
             _itemPositionTips.Toggle(Enums.ToggleState.Off, shareColumn: true);
 
             WireEvents();
-            InitializeWebView();
+            Task.Run(()=>InitializeWebViewAsync());
+            
         }
 
         #endregion
@@ -106,6 +108,30 @@ namespace QuickFiler.Controllers
                 _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
             }, ui);
             
+        }
+
+        internal async Task InitializeWebViewAsync()
+        {
+            // Create the cache directory 
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
+
+            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
+            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
+
+            await _itemViewer.UiSyncContext;
+            Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            // Create the environment manually
+            Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
+
+            // Do this so the task is continued on the UI Thread
+            TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
+
+            await task.ContinueWith(t =>
+            {
+                _webViewEnvironment = task.Result;
+                _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
+            }, ui);
         }
 
         internal void AdjustViewerForEfc()
