@@ -6,18 +6,16 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using UtilitiesCS;
 
 namespace QuickFiler
 {
-    public partial class EfcViewer : Form
+    public partial class EfcViewer3 : Form
     {
-        public EfcViewer()
+        public EfcViewer3()
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
@@ -62,7 +60,7 @@ namespace QuickFiler
             };
 
         }
-
+        
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))

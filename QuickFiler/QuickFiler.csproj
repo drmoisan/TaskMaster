@@ -68,6 +68,9 @@
     <Reference Include="MethodBoundaryAspect, Version=2.0.148.0, Culture=neutral, PublicKeyToken=296379d5065c9d61, processorArchitecture=MSIL">
       <HintPath>..\packages\MethodBoundaryAspect.Fody.2.0.148\lib\net462\MethodBoundaryAspect.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Analysis.0.20.1\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
@@ -182,6 +185,9 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Linq.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Async.6.0.1\lib\netstandard2.0\System.Linq.Async.dll</HintPath>
+    </Reference>
     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
       <Private>True</Private>
@@ -271,15 +277,23 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Uno.Diagnostics.Eventing, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Uno.Diagnostics.Eventing.2.0.1\lib\netstandard2.0\Uno.Diagnostics.Eventing.dll</HintPath>
+    </Reference>
+    <Reference Include="Uno.Fonts.Fluent, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Uno.Fonts.Fluent.2.3.0\lib\netstandard1.0\Uno.Fonts.Fluent.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\EfcDataModel.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
+    <Compile Include="Controllers\EfcItemController.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\Theme.cs" />
+    <Compile Include="Interfaces\IItemControler.cs" />
     <Compile Include="Interfaces\IQfcFormViewer.cs" />
     <Compile Include="Interfaces\IQfcTipsDetails.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
@@ -316,6 +330,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Helper Classes\ThemeHelper.cs" />
+    <Compile Include="Viewers\EfcViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewers\EfcViewer.Designer.cs">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\EfcViewerQueue.cs" />
+    <Compile Include="Viewers\ItemViewerQueue.cs" />
     <Compile Include="Viewers\QfcItemViewerExpanded.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -345,17 +367,20 @@
     <Compile Include="Viewers\QfcItemViewer.Designer.cs">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Viewers\EfcViewer.cs">
+    <Compile Include="Viewers\EfcViewer3.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewers\EfcViewer.Designer.cs">
-      <DependentUpon>EfcViewer.cs</DependentUpon>
+    <Compile Include="Viewers\EfcViewer3.Designer.cs">
+      <DependentUpon>EfcViewer3.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\EfcViewer.resx">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx">
       <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
@@ -368,9 +393,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\EfcViewer.resx">
-      <DependentUpon>EfcViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Viewers\EfcViewer3.resx">
+      <DependentUpon>EfcViewer3.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -474,8 +500,10 @@
     <Error Condition="!Exists('..\packages\Fody.6.0.5\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.6.0.5\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\MethodBoundaryAspect.Fody.2.0.148\build\MethodBoundaryAspect.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MethodBoundaryAspect.Fody.2.0.148\build\MethodBoundaryAspect.Fody.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets'))" />
   </Target>
   <Import Project="..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.targets" Condition="Exists('..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.targets')" />
   <Import Project="..\packages\Fody.6.0.5\build\Fody.targets" Condition="Exists('..\packages\Fody.6.0.5\build\Fody.targets')" />
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets')" />
+  <Import Project="..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets" Condition="Exists('..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets')" />
 </Project>

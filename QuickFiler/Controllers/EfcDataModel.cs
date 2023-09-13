@@ -21,7 +21,8 @@ namespace QuickFiler.Controllers
             if (Mail is not null)
             {
                 _conversationResolver = new ConversationResolver(_globals, Mail);
-                _ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItems());
+                var dfConvExp = _conversationResolver.DfConversationExpanded; // Load Synchronously
+                //_ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItemsAsync(dfConvExp));
             }
         }
 
@@ -45,6 +46,8 @@ namespace QuickFiler.Controllers
 
         ConversationResolver _conversationResolver;
         public ConversationResolver ConversationResolver { get => _conversationResolver; }
+        //async public Task ResolveConversationItemsAsync() => ConversationResolver.ConversationItems = await ConversationResolver.ResolveItemsAsync(ConversationResolver.DfConversationExpanded);
+        async public Task GetConversationInfoAsync() => await ConversationResolver.GetConversationInfoAsync();
 
         private MailItem _mail;
         public MailItem Mail
@@ -56,6 +59,20 @@ namespace QuickFiler.Controllers
                 return _mail;
             }
             set => _mail = value;
+        }
+
+        private MailItemInfo _mailInfo;
+        public MailItemInfo MailInfo
+        {
+            get
+            {
+                if (_mailInfo is null && Mail is not null)
+                {
+                    _mailInfo = new MailItemInfo(Mail);
+                    _mailInfo.LoadPriority();
+                }
+                return _mailInfo;
+            }
         }
 
         async public Task MoveToFolder(string folderpath, 

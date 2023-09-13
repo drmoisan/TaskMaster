@@ -29,8 +29,10 @@ namespace QuickFiler
             {
                 _initType = Enums.InitTypeEnum.Sort | Enums.InitTypeEnum.SortConv;
                 _stopWatch = new cStopWatch();
-                _formViewer = new EfcViewer();
+                //_formViewer = new EfcViewer();
+                _formViewer = EfcViewerQueue.Dequeue();
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+                _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, appGlobals, this);
                 _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType);
             }
         }

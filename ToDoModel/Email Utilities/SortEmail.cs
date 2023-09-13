@@ -141,13 +141,7 @@ namespace ToDoModel
             await Task.WhenAll(tasks).ConfigureAwait(false);
             
             await appGlobals.AF.Encoder.Encoder.SerializeAsync();
-            
-            //await appGlobals.AF.RecentsList.SerializeAsync();
-            //await appGlobals.AF.CtfMap.SerializeAsync();
-            //await appGlobals.AF.SubjectMap.SerializeAsync();
-            //await appGlobals.AF.Encoder.Encoder.SerializeAsync();
-            //await appGlobals.AF.MovedMails.SerializeAsync();
-            
+                        
         }
 
         public static void Run(IList<MailItem> mailItems,
