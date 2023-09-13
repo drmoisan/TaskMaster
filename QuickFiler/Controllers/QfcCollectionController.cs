@@ -19,7 +19,7 @@ namespace QuickFiler.Controllers
         public QfcCollectionController(IApplicationGlobals AppGlobals,
                                        QfcFormViewer viewerInstance,
                                        bool darkMode,
-                                       Enums.InitTypeEnum InitType,
+                                       QfEnums.InitTypeEnum InitType,
                                        IFilerHomeController homeController,
                                        IFilerFormController parent)
         {
@@ -42,7 +42,7 @@ namespace QuickFiler.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private QfcFormViewer _formViewer;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IFilerHomeController _homeController;
         private IFilerFormController _parent;

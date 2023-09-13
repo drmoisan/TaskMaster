@@ -1,5 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
-using static QuickFiler.Enums;
+using static QuickFiler.QfEnums;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace QuickFiler.Controllers
             //InitAfObjects();
             _parentCleanup = ParentCleanup;
             _datamodel = new QfcDatamodel(_globals);
-            _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, _globals, this);
+            _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
             _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.Sort, Cleanup, this);

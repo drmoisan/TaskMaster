@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0v = new System.Windows.Forms.TableLayoutPanel();
             this.L1h = new System.Windows.Forms.SplitContainer();
             this.L1h0L2hv = new System.Windows.Forms.TableLayoutPanel();
@@ -41,7 +41,7 @@
             this.LblActionable = new System.Windows.Forms.Label();
             this.L1h0L2hv2L3h = new System.Windows.Forms.TableLayoutPanel();
             this.LblConvCt = new System.Windows.Forms.Label();
-            this.lblSubject = new System.Windows.Forms.Label();
+            this.LblSubject = new System.Windows.Forms.Label();
             this.LblItemNumber = new System.Windows.Forms.Label();
             this.LblAcOpen = new System.Windows.Forms.Label();
             this.L1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
@@ -76,9 +76,9 @@
             this.CbxConversation = new System.Windows.Forms.CheckBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
             this.L0v2h = new System.Windows.Forms.TableLayoutPanel();
-            this.L0v2h2_Panel = new System.Windows.Forms.Panel();
-            this.L0v2h2_Web = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.LblAcBody = new System.Windows.Forms.Label();
+            this.L0v2h2_Panel = new System.Windows.Forms.Panel();
+            this.L0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.L0v.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1h)).BeginInit();
             this.L1h.Panel1.SuspendLayout();
@@ -98,7 +98,7 @@
             this.L1h1L2v3h.SuspendLayout();
             this.L0v2h.SuspendLayout();
             this.L0v2h2_Panel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_Web)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).BeginInit();
             this.SuspendLayout();
             // 
             // L0v
@@ -172,7 +172,7 @@
             this.L1h0L2hv1L3h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 122F));
             this.L1h0L2hv1L3h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 94F));
             this.L1h0L2hv1L3h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46F));
-            this.L1h0L2hv1L3h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 260F));
+            this.L1h0L2hv1L3h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 262F));
             this.L1h0L2hv1L3h.Controls.Add(this.LblSentOn, 8, 0);
             this.L1h0L2hv1L3h.Controls.Add(this.LblSender, 0, 0);
             this.L1h0L2hv1L3h.Controls.Add(this.lblCaptionTriage, 2, 0);
@@ -219,7 +219,7 @@
             this.lblCaptionTriage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblCaptionTriage.AutoSize = true;
             this.lblCaptionTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCaptionTriage.Location = new System.Drawing.Point(547, 0);
+            this.lblCaptionTriage.Location = new System.Drawing.Point(546, 0);
             this.lblCaptionTriage.Margin = new System.Windows.Forms.Padding(0);
             this.lblCaptionTriage.Name = "lblCaptionTriage";
             this.lblCaptionTriage.Size = new System.Drawing.Size(84, 29);
@@ -231,7 +231,7 @@
             this.LblTriage.AutoSize = true;
             this.LblTriage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.LblTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblTriage.Location = new System.Drawing.Point(631, 0);
+            this.LblTriage.Location = new System.Drawing.Point(630, 0);
             this.LblTriage.Margin = new System.Windows.Forms.Padding(0);
             this.LblTriage.Name = "LblTriage";
             this.LblTriage.Size = new System.Drawing.Size(31, 31);
@@ -242,7 +242,7 @@
             // 
             this.LblCaptionPredicted.AutoSize = true;
             this.LblCaptionPredicted.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblCaptionPredicted.Location = new System.Drawing.Point(685, 0);
+            this.LblCaptionPredicted.Location = new System.Drawing.Point(684, 0);
             this.LblCaptionPredicted.Margin = new System.Windows.Forms.Padding(0);
             this.LblCaptionPredicted.Name = "LblCaptionPredicted";
             this.LblCaptionPredicted.Size = new System.Drawing.Size(117, 33);
@@ -253,7 +253,7 @@
             // 
             this.LblActionable.AutoSize = true;
             this.LblActionable.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.LblActionable.Location = new System.Drawing.Point(807, 0);
+            this.LblActionable.Location = new System.Drawing.Point(806, 0);
             this.LblActionable.Margin = new System.Windows.Forms.Padding(0);
             this.LblActionable.Name = "LblActionable";
             this.LblActionable.Size = new System.Drawing.Size(90, 33);
@@ -266,7 +266,7 @@
             this.L1h0L2hv2L3h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1h0L2hv2L3h.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.L1h0L2hv2L3h.Controls.Add(this.LblConvCt, 1, 0);
-            this.L1h0L2hv2L3h.Controls.Add(this.lblSubject, 0, 0);
+            this.L1h0L2hv2L3h.Controls.Add(this.LblSubject, 0, 0);
             this.L1h0L2hv2L3h.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1h0L2hv2L3h.Location = new System.Drawing.Point(100, 33);
             this.L1h0L2hv2L3h.Margin = new System.Windows.Forms.Padding(0);
@@ -292,15 +292,15 @@
             // 
             // lblSubject
             // 
-            this.lblSubject.AutoSize = true;
-            this.lblSubject.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSubject.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lblSubject.Location = new System.Drawing.Point(0, 0);
-            this.lblSubject.Margin = new System.Windows.Forms.Padding(0);
-            this.lblSubject.Name = "lblSubject";
-            this.lblSubject.Size = new System.Drawing.Size(269, 55);
-            this.lblSubject.TabIndex = 2;
-            this.lblSubject.Text = "[SUBJECT]";
+            this.LblSubject.AutoSize = true;
+            this.LblSubject.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblSubject.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.LblSubject.Location = new System.Drawing.Point(0, 0);
+            this.LblSubject.Margin = new System.Windows.Forms.Padding(0);
+            this.LblSubject.Name = "lblSubject";
+            this.LblSubject.Size = new System.Drawing.Size(269, 55);
+            this.LblSubject.TabIndex = 2;
+            this.LblSubject.Text = "[SUBJECT]";
             // 
             // LblItemNumber
             // 
@@ -810,38 +810,9 @@
             this.L0v2h.Name = "L0v2h";
             this.L0v2h.RowCount = 1;
             this.L0v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L0v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.L0v2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 704F));
             this.L0v2h.Size = new System.Drawing.Size(2117, 704);
             this.L0v2h.TabIndex = 3;
-            // 
-            // L0v2h2_Panel
-            // 
-            this.L0v2h2_Panel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.L0v2h2_Panel.Controls.Add(this.L0v2h2_Web);
-            this.L0v2h2_Panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_Panel.Location = new System.Drawing.Point(103, 3);
-            this.L0v2h2_Panel.Name = "L0v2h2_Panel";
-            this.L0v2h2_Panel.Size = new System.Drawing.Size(2011, 698);
-            this.L0v2h2_Panel.TabIndex = 0;
-            // 
-            // L0v2h2_Web
-            // 
-            this.L0v2h2_Web.AllowExternalDrop = true;
-            this.L0v2h2_Web.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
-            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties2.Language = null;
-            coreWebView2CreationProperties2.ProfileName = null;
-            coreWebView2CreationProperties2.UserDataFolder = null;
-            this.L0v2h2_Web.CreationProperties = coreWebView2CreationProperties2;
-            this.L0v2h2_Web.DefaultBackgroundColor = System.Drawing.Color.Transparent;
-            this.L0v2h2_Web.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_Web.Location = new System.Drawing.Point(0, 0);
-            this.L0v2h2_Web.Name = "L0v2h2_Web";
-            this.L0v2h2_Web.Size = new System.Drawing.Size(2007, 694);
-            this.L0v2h2_Web.TabIndex = 5;
-            this.L0v2h2_Web.ZoomFactor = 1D;
             // 
             // LblAcBody
             // 
@@ -857,6 +828,35 @@
             this.LblAcBody.Size = new System.Drawing.Size(35, 33);
             this.LblAcBody.TabIndex = 7;
             this.LblAcBody.Text = "B";
+            // 
+            // L0v2h2_Panel
+            // 
+            this.L0v2h2_Panel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.L0v2h2_Panel.Controls.Add(this.L0v2h2_WebView2);
+            this.L0v2h2_Panel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L0v2h2_Panel.Location = new System.Drawing.Point(103, 3);
+            this.L0v2h2_Panel.Name = "L0v2h2_Panel";
+            this.L0v2h2_Panel.Size = new System.Drawing.Size(2011, 698);
+            this.L0v2h2_Panel.TabIndex = 0;
+            // 
+            // L0v2h2_Web
+            // 
+            this.L0v2h2_WebView2.AllowExternalDrop = true;
+            this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
+            this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+            this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L0v2h2_WebView2.Location = new System.Drawing.Point(0, 0);
+            this.L0v2h2_WebView2.Name = "L0v2h2_Web";
+            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2007, 694);
+            this.L0v2h2_WebView2.TabIndex = 5;
+            this.L0v2h2_WebView2.ZoomFactor = 1D;
             // 
             // QfcItemViewer
             // 
@@ -899,7 +899,7 @@
             this.L0v2h.ResumeLayout(false);
             this.L0v2h.PerformLayout();
             this.L0v2h2_Panel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_Web)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -918,7 +918,7 @@
         internal System.Windows.Forms.Label LblActionable;
         internal System.Windows.Forms.TableLayoutPanel L1h0L2hv2L3h;
         internal System.Windows.Forms.Label LblConvCt;
-        internal System.Windows.Forms.Label lblSubject;
+        internal System.Windows.Forms.Label LblSubject;
         internal System.Windows.Forms.Label LblItemNumber;
         internal System.Windows.Forms.Label LblAcOpen;
         internal System.Windows.Forms.TableLayoutPanel L1h1L2v;
@@ -951,7 +951,7 @@
         private BrightIdeasSoftware.OLVColumn infolder;
         public BrightIdeasSoftware.FastObjectListView TopicThread;
         internal System.Windows.Forms.TableLayoutPanel L1h0L2hv3h_TlpBodyToggle;
-        internal Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_Web;
+        internal Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_WebView2;
         internal System.Windows.Forms.Panel L0v2h2_Panel;
         internal BrightIdeasSoftware.OLVColumn SentDate;
         internal System.Windows.Forms.Label LblAcBody;

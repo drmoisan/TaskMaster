@@ -18,7 +18,7 @@ namespace QuickFiler.Legacy
     internal class QfcGroupOperationsLegacy : IAcceleratorCallbacks, IQfcControllerCallbacks
     {
         private readonly QfcFormLegacyViewer _viewer;
-        private readonly Enums.InitTypeEnum _initType;
+        private readonly QfEnums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private List<QfcController> _listQFClass;
         private int _intUniqueItemCounter;
@@ -29,7 +29,7 @@ namespace QuickFiler.Legacy
         private QuickFileController _parent;
         private double _multiplier = 1;
 
-        public QfcGroupOperationsLegacy(QfcFormLegacyViewer viewerInstance, Enums.InitTypeEnum InitType, IApplicationGlobals AppGlobals, QuickFileController ParentObject)
+        public QfcGroupOperationsLegacy(QfcFormLegacyViewer viewerInstance, QfEnums.InitTypeEnum InitType, IApplicationGlobals AppGlobals, QuickFileController ParentObject)
         {
             _viewer = viewerInstance;
             _initType = InitType;
@@ -67,7 +67,7 @@ namespace QuickFiler.Legacy
             _viewer.WindowState = FormWindowState.Maximized;
             // ShowWindow(_lFormHandle, SW_SHOWMAXIMIZED)
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 // ToggleOffline
                 foreach (QfcController currentQF in _listQFClass)
@@ -140,7 +140,7 @@ namespace QuickFiler.Legacy
                 colCtrls.Add(lbl3);
             }
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 // TURN OFF IF CONDITIONAL REMINDER
                 var lbl5 = new Label();
@@ -178,7 +178,7 @@ namespace QuickFiler.Legacy
             Pnl.Controls.Add(lblSubject);
             AssignDimensions(ref lblSubject, QfcConstants.LblSubject);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.Reminder))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Reminder))
                 lblSubject.Width -= (2 * lblSubject.Left);
             lblSubject.Font = new Font(lblSubject.Font.FontFamily, 16f);
             lblSubject.Text = "<SUBJECT>";
@@ -187,7 +187,7 @@ namespace QuickFiler.Legacy
             var txtboxBody = new TextBox();
             Pnl.Controls.Add(txtboxBody);
             AssignDimensions(ref txtboxBody, QfcConstants.TxtBody);
-            if (_initType.HasFlag(Enums.InitTypeEnum.Reminder))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Reminder))
                 txtboxBody.Width = QfcConstants.Panel.Width - txtboxBody.Left - txtboxBody.Left;
             txtboxBody.Text = "<BODY>";
             txtboxBody.Font = new Font(txtboxBody.Font.FontFamily, 10f);
@@ -206,7 +206,7 @@ namespace QuickFiler.Legacy
             lblSentOn.Font = new Font(lblSentOn.Font.FontFamily, 10f);
             colCtrls.Add(lblSentOn);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 var comboFolder = new ComboBox();
                 Pnl.Controls.Add(comboFolder);
@@ -227,7 +227,7 @@ namespace QuickFiler.Legacy
             var chbxDelFlow = new CheckBox();
             var chbxSaveMail = new CheckBox();
             var inpt = new TextBox();
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 Pnl.Controls.Add(inpt);
                 inpt.Height = QfcConstants.Inpt.Height;
@@ -322,7 +322,7 @@ namespace QuickFiler.Legacy
             cbDelItem.TabStop = false;
             colCtrls.Add(cbDelItem);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 var lblConvCt = new Label();
                 Pnl.Controls.Add(lblConvCt);
@@ -347,7 +347,7 @@ namespace QuickFiler.Legacy
             lblPos.Visible = blDebug;
             colCtrls.Add(lblPos);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 var lblAcF = new Label();
                 Pnl.Controls.Add(lblAcF);
@@ -450,7 +450,7 @@ namespace QuickFiler.Legacy
             lblAcO.Visible = blDebug;
             colCtrls.Add(lblAcO);
 
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 var lblAcA = new Label();
                 Pnl.Controls.Add(lblAcA);

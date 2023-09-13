@@ -9,7 +9,7 @@ namespace UtilitiesCS
     public interface ISubjectMapSL: ISerializableList<ISubjectMapEntry>
     {
         void Add(string subject, string folderName);
-        IList<ISubjectMapEntry> Find(string key, UtilitiesCS.EmailIntelligence.SubjectMap.FindBy findBy);
+        IList<ISubjectMapEntry> Find(string key, Enums.FindBy findBy);
         ISubjectMapEntry Find(string subject, string folderName);
         void SetTokenizerRegex(Regex tokenizerRegex);
         void EncodeAll(ISubjectMapEncoder encoder);

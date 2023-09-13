@@ -22,7 +22,7 @@ namespace QuickFiler.Controllers
 
         public QfcFormController(IApplicationGlobals appGlobals,
                                  QfcFormViewer formViewer,
-                                 Enums.InitTypeEnum initType,
+                                 QfEnums.InitTypeEnum initType,
                                  System.Action parentCleanup,
                                  QfcHomeController parent)
         { 
@@ -56,7 +56,7 @@ namespace QuickFiler.Controllers
         private RowStyle _rowStyleExpanded;
         
         private Padding _itemMarginTemplate;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
         private IFilerHomeController _parent;
@@ -238,7 +238,7 @@ namespace QuickFiler.Controllers
 
         async public Task ActionOkAsync()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 if (_blRunningModalCode == false)
                 {
@@ -300,7 +300,7 @@ namespace QuickFiler.Controllers
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
                                                   darkMode: Properties.Settings.Default.DarkMode,
-                                                  InitType: Enums.InitTypeEnum.Sort,
+                                                  InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
                                                   parent: this);
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);

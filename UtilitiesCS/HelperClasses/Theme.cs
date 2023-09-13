@@ -6,17 +6,29 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-using QuickFiler.Interfaces;
 using BrightIdeasSoftware;
+using UtilitiesCS.ReusableTypeClasses;
 
-namespace QuickFiler.Helper_Classes
+namespace UtilitiesCS
 {
     public class Theme
     {
-        public Theme() { }
+        #region Constructors and Initializers
+
         public Theme(string name,
-                     QfcItemViewer itemViewer,
-                     IQfcItemController parent,
+                     Label lblItemNumber,
+                     Label lblSender,
+                     Label lblSubject,
+                     IList<TableLayoutPanel> tableLayoutPanels,
+                     IList<Button> buttons,
+                     IList<IQfcTipsDetails> tipsDetailsLabels,
+                     TextBox textboxSearch,
+                     TextBox textboxBody,
+                     ComboBox comboFolders,
+                     FastObjectListView topicThread,
+                     Microsoft.Web.WebView2.WinForms.WebView2 webView2,
+                     Control viewer,
+                     Func<bool> mailRead,
                      Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme web2ViewScheme,
                      Action<Enums.ToggleState> htmlConverter,
                      Enums.ToggleState htmlDark,
@@ -44,8 +56,19 @@ namespace QuickFiler.Helper_Classes
                      Color defaultForeColor)
         {
             _name = name;
-            _itemViewer = itemViewer;
-            _parent = parent;
+            _lblItemNumber = lblItemNumber;
+            _lblSender = lblSender;
+            _lblSubject = lblSubject;
+            _tableLayoutPanels = tableLayoutPanels;
+            _buttons = buttons;
+            _tipsDetailsLabels = tipsDetailsLabels;
+            _textboxSearch = textboxSearch;
+            _textboxBody = textboxBody;
+            _comboFolders = comboFolders;
+            _topicThread = topicThread;
+            _webView2 = webView2;
+            _viewer = viewer;
+            MailRead = mailRead;
             _web2ViewScheme = web2ViewScheme;
             _htmlConverter = htmlConverter;
             _htmlDark = htmlDark;
@@ -73,12 +96,44 @@ namespace QuickFiler.Helper_Classes
             _defaultForeColor = defaultForeColor;
         }
 
+        private Label _lblItemNumber;
+        private Label _lblSender;
+        private Label _lblSubject;
+        private IList<TableLayoutPanel> _tableLayoutPanels;
+        private IList<Button> _buttons;
+        private IList<IQfcTipsDetails> _tipsDetailsLabels;
+        private TextBox _textboxSearch;
+        private TextBox _textboxBody;
+        private ComboBox _comboFolders;
+        private FastObjectListView _topicThread;
+        private Microsoft.Web.WebView2.WinForms.WebView2 _webView2;
+        private Control _viewer;
+        private Func<bool> MailRead;
+
+        public Theme() { }
+
+        public Theme(string name,
+                     ScoDictionary<string, ThemeControlGroup> controlGroups)
+        {
+            if (controlGroups is null) { throw new ArgumentNullException(nameof(controlGroups));}
+            _name = name;
+        }
+
+        
+        #endregion
+        
+
+        #region Public Properties
+
+        private ScoDictionary<string, ThemeControlGroup> _controlGroups;
+        public ScoDictionary<string, ThemeControlGroup> ControlGroups { get => _controlGroups; set => _controlGroups = value; }
+
         private Color _navBackColor;
+        public Color NavBackColor { get => _navBackColor; set => _navBackColor = value; }
+        
         private Color _navForeColor;
-        private IQfcItemController _parent;
-        private QfcItemViewer _itemViewer;
-        
-        
+        public Color NavForeColor { get => _navForeColor; set => _navForeColor = value; }
+                        
         private Action<Enums.ToggleState> _htmlConverter;
         public Action<Enums.ToggleState> HtmlConverter { get => _htmlConverter; set => _htmlConverter = value; }
         
@@ -151,105 +206,148 @@ namespace QuickFiler.Helper_Classes
         private string _name;
         public string Name { get => _name; set => _name = value; }
 
+        #endregion
+
+        #region Public Methods
+
         public void SetMailRead(bool async)
         {
-            if (async) { _itemViewer.BeginInvoke(new System.Action(() => SetMailRead())); }
-            else { _itemViewer.Invoke(new System.Action(() => SetMailRead())); }
+            if (_lblSender is null) {  throw new System.InvalidOperationException(
+                $"Variable {nameof(_lblSender)} is null");}
+            if (async) { _lblSender.BeginInvoke(new System.Action(() => SetMailRead())); }
+            else { _lblSender.Invoke(new System.Action(() => SetMailRead())); }
         }
 
         public void SetMailRead()
         {
-            _itemViewer.LblSender.SetTheme(backColor: _mailReadBackColor,
-                                           forecolor: _mailReadForeColor);
-            _itemViewer.lblSubject.SetTheme(backColor: _mailReadBackColor,
-                                            forecolor: _mailReadForeColor);
+            if (_lblSender is null)
+            {
+                throw new System.InvalidOperationException(
+                $"Variable {nameof(_lblSender)} is null");
+            }
+            if (_lblSubject is null)
+            {
+                throw new System.InvalidOperationException(
+                $"Variable {nameof(_lblSubject)} is null");
+            }
+            _lblSender.BackColor = _mailReadBackColor;
+            _lblSender.ForeColor = _mailReadForeColor;
+            _lblSubject.BackColor = _mailReadBackColor;
+            _lblSubject.ForeColor = _mailReadForeColor;
         }
 
         public void SetMailUnread(bool async)
         {
-            if (async) { _itemViewer.BeginInvoke(new System.Action(() => SetMailUnread())); }
-            else { _itemViewer.Invoke(new System.Action(() => SetMailUnread())); }
+            if (_lblSender is null)
+            {
+                throw new System.InvalidOperationException(
+                $"Variable {nameof(_lblSender)} is null");
+            }
+            if (async) { _lblSender.BeginInvoke(new System.Action(() => SetMailUnread())); }
+            else { _lblSender.Invoke(new System.Action(() => SetMailUnread())); }
         }
         
         private void SetMailUnread()
         {
-            _itemViewer.LblSender.SetTheme(backColor: _mailUnreadBackColor,
-                                            forecolor: _mailUnreadForeColor);
-            _itemViewer.lblSubject.SetTheme(backColor: _mailUnreadBackColor,
-                                            forecolor: _mailUnreadForeColor);
+            if (_lblSender is null)
+            {
+                throw new System.InvalidOperationException(
+                $"Variable {nameof(_lblSender)} is null");
+            }
+            if (_lblSubject is null)
+            {
+                throw new System.InvalidOperationException(
+                $"Variable {nameof(_lblSubject)} is null");
+            }
+            _lblSender.BackColor = _mailUnreadBackColor;
+            _lblSender.ForeColor = _mailUnreadForeColor;
+            _lblSubject.BackColor = _mailUnreadBackColor;
+            _lblSubject.ForeColor = _mailUnreadForeColor;
         }
 
-        public void SetTheme(bool async)
+        public void SetQfcTheme(bool async)
         {
-            if (async) { _itemViewer.BeginInvoke(new System.Action(() => SetTheme())); }
-            else { _itemViewer.Invoke(new System.Action(() => SetTheme())); }
+            if (async) { _lblSender.BeginInvoke(new System.Action(() => SetQfcTheme())); }
+            else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
         }
         
-        private void SetTheme()
+        private void SetQfcTheme()
         {
             // Active item navigation colors
-            _itemViewer.LblItemNumber.SetTheme(backColor: _navBackColor,
-                                        forecolor: _navForeColor);
+            _lblItemNumber.BackColor = _navBackColor;
+            _lblItemNumber.ForeColor = _navForeColor;
 
             // General thematic colors
-            foreach (TableLayoutPanel tlp in _parent.TableLayoutPanels)
+            foreach (TableLayoutPanel tlp in _tableLayoutPanels)
             {
-                tlp.SetTheme(backColor: TlpBackColor);
+                tlp.BackColor = TlpBackColor;
             }
 
             // Shortcut accelerator colors  
-            foreach (IQfcTipsDetails tipsDetails in _parent.ListTipsDetails)
+            foreach (var tipsDetails in _tipsDetailsLabels)
             {
-                tipsDetails.LabelControl.SetTheme(backColor: TipsDetailsBackColor,
-                                                    forecolor: TipsDetailsForeColor);
+                tipsDetails.LabelControl.BackColor = TipsDetailsBackColor;
+                tipsDetails.LabelControl.ForeColor = TipsDetailsForeColor;
             }
 
             // Mail item colors
-            if (_parent.Mail.UnRead == true) { SetMailUnread(); }
+            if (!MailRead()) { SetMailUnread(); }
             else { SetMailRead(); }
 
             // Button colors
-            foreach (Button btn in _parent.Buttons)
+            foreach (Button btn in _buttons)
             {
-                if (btn.DialogResult == DialogResult.OK) { btn.SetTheme(backColor: ButtonClickedColor); }
-                else { btn.SetTheme(backColor: ButtonBackColor); }
+                if (btn.DialogResult == DialogResult.OK) { btn.BackColor = ButtonClickedColor; }
+                else { btn.BackColor = ButtonBackColor; }
             }
 
             // Colors for the folder search
             // TODO: Override the draw function because these colors do not work as expected
-            _itemViewer.TxtboxSearch.BackColor = TxtboxSearchBackColor;
-            _itemViewer.TxtboxSearch.ForeColor = TxtboxSearchForeColor;
+            _textboxSearch.BackColor = TxtboxSearchBackColor;
+            _textboxSearch.ForeColor = TxtboxSearchForeColor;
 
             // Colors for email body
-            _itemViewer.TxtboxBody.BackColor = TxtboxBodyBackColor;
-            _itemViewer.TxtboxBody.ForeColor = TxtboxBodyForeColor;
+            _textboxBody.BackColor = TxtboxBodyBackColor;
+            _textboxBody.ForeColor = TxtboxBodyForeColor;
 
             // TODO: Override the draw function because these colors do not work as expected
-            _itemViewer.CboFolders.BackColor = CboFoldersBackColor;
-            _itemViewer.CboFolders.ForeColor = CboFoldersForeColor;
-            
-            _itemViewer.TopicThread.BackColor = DefaultBackColor;
-            _itemViewer.TopicThread.ForeColor = DefaultForeColor;
-            
+            _comboFolders.BackColor = CboFoldersBackColor;
+            _comboFolders.ForeColor = CboFoldersForeColor;
+
+            _topicThread.BackColor = DefaultBackColor;
+            _topicThread.ForeColor = DefaultForeColor;
+
             var headerstyle = new HeaderFormatStyle();
             headerstyle.SetBackColor(DefaultBackColor);
             headerstyle.SetForeColor(DefaultForeColor);
 
-            foreach (OLVColumn column in _itemViewer.TopicThread.Columns)
+            foreach (OLVColumn column in _topicThread.Columns)
             {
-                column.HeaderFormatStyle = headerstyle;    
+                column.HeaderFormatStyle = headerstyle;
             }
 
-            if (_itemViewer.L0v2h2_Web.CoreWebView2 is not null)
+            if (_webView2.CoreWebView2 is not null)
             {
-                _itemViewer.L0v2h2_Web.CoreWebView2.Profile.PreferredColorScheme = Web2ViewScheme;
+                _webView2.CoreWebView2.Profile.PreferredColorScheme = Web2ViewScheme;
                 HtmlConverter(HtmlDark);
             }
-            
+
             // Default colors   
-            _itemViewer.BackColor = DefaultBackColor;
-            _itemViewer.ForeColor = DefaultForeColor;
+            _viewer.BackColor = DefaultBackColor;
+            _viewer.ForeColor = DefaultForeColor;
         }
+
+        public void SetTheme()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetTheme(bool async)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
     }
 }

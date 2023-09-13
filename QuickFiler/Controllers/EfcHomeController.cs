@@ -27,19 +27,19 @@ namespace QuickFiler
 
             if (_dataModel.Mail is not null)
             {
-                _initType = Enums.InitTypeEnum.Sort | Enums.InitTypeEnum.SortConv;
+                _initType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
                 _stopWatch = new cStopWatch();
                 //_formViewer = new EfcViewer();
                 _formViewer = EfcViewerQueue.Dequeue();
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
-                _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, appGlobals, this);
+                _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, appGlobals, this);
                 _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType);
             }
         }
 
         private EfcViewer _formViewer;
         private IApplicationGlobals _globals;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private System.Action _parentCleanup;
 
         public void Run() 

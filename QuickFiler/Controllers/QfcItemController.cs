@@ -68,10 +68,12 @@ namespace QuickFiler.Controllers
             _mailItem = mailItem;                                   
             _keyboardHandler = _homeController.KeyboardHndlr;            
             _parent = parent;                                       
-            _themes = ThemeHelper.SetupThemes(this, _itemViewer, this.HtmlDarkConverter);
             _explorerController = _homeController.ExplorerCtlr;
 
             ResolveControlGroups(itemViewer);
+
+            // Setup the theme dictionary (Note: need control groups established prior to this)
+            _themes = QfcThemeHelper.SetupThemes(this, _itemViewer, this.HtmlDarkConverter);
 
             // Populate placeholder controls with 
             PopulateControls(mailItem, viewerPosition);
@@ -92,7 +94,7 @@ namespace QuickFiler.Controllers
             // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
             CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
 
-            _itemViewer.L0v2h2_Web.BeginInvoke(new System.Action(() =>
+            _itemViewer.L0v2h2_WebView2.BeginInvoke(new System.Action(() =>
             {
                 // Create the environment manually
                 Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
@@ -104,7 +106,7 @@ namespace QuickFiler.Controllers
                 task.ContinueWith(t =>
                 {
                     _webViewEnvironment = task.Result;
-                    _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
+                    _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
                 }, ui);
             }));
         }
@@ -140,7 +142,7 @@ namespace QuickFiler.Controllers
         internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
         {
             _itemViewer.LblSender.Text = itemInfo.SenderName;
-            _itemViewer.lblSubject.Text = itemInfo.Subject;
+            _itemViewer.LblSubject.Text = itemInfo.Subject;
             _itemViewer.TxtboxBody.Text = itemInfo.Body;
             _itemViewer.LblTriage.Text = itemInfo.Triage;
             _itemViewer.LblSentOn.Text = itemInfo.SentOn;
@@ -393,7 +395,7 @@ namespace QuickFiler.Controllers
 
         public string SentTime { get => _mailItem.SentOn.ToString("HH:mm"); }
 
-        public string Subject { get => _itemViewer.lblSubject.Text; }
+        public string Subject { get => _itemViewer.LblSubject.Text; }
 
         public bool SuppressEvents { get => _suppressEvents; set => _suppressEvents = value; }
 
@@ -481,7 +483,7 @@ namespace QuickFiler.Controllers
             _itemViewer.TxtboxSearch.TextChanged += new System.EventHandler(this.TxtboxSearch_TextChanged);
             _itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtboxSearch_KeyDown);
             _itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.CboFolders_KeyDown);
-            _itemViewer.L0v2h2_Web.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
+            _itemViewer.L0v2h2_WebView2.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
             PropertyChanged += new PropertyChangedEventHandler(Handler_PropertyChanged);
             _itemViewer.TopicThread.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
         }
@@ -493,7 +495,7 @@ namespace QuickFiler.Controllers
                 throw (e.InitializationException);
             }
             _isWebViewerInitialized = true;
-            _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.Html);
+            _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.Html);
             _itemViewer.L0v2h2_Panel.Visible = false;
         }
 
@@ -595,7 +597,7 @@ namespace QuickFiler.Controllers
             if ((objects is not null)&&(objects.Count !=0))
             {
                 var info = objects[0] as MailItemInfo;
-                _itemViewer.L0v2h2_Web.NavigateToString(info.Html);
+                _itemViewer.L0v2h2_WebView2.NavigateToString(info.Html);
             }
            
         }
@@ -672,7 +674,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
                 _itemViewer.TopicThread.Visible = true;
                 _itemViewer.L0v2h2_Panel.Visible = true;
-                _itemViewer.L0v2h2_Web.Visible = true;
+                _itemViewer.L0v2h2_WebView2.Visible = true;
                 _expanded = true;
                 if ((_itemInfo is not null)&&_itemInfo.UnRead == true)
                 {
@@ -686,7 +688,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
                 _itemViewer.TopicThread.Visible = false;
                 _itemViewer.L0v2h2_Panel.Visible = false;
-                _itemViewer.L0v2h2_Web.Visible = false;
+                _itemViewer.L0v2h2_WebView2.Visible = false;
                 _expanded = false;
                 if (_timer is not null) { _timer.Dispose(); }
             }
@@ -714,7 +716,7 @@ namespace QuickFiler.Controllers
                     ToggleTips(async: false, desiredState: Enums.ToggleState.Off);
                     UnregisterFocusActions();
                 }
-                _themes[_activeTheme].SetTheme(async: false);
+                _themes[_activeTheme].SetQfcTheme(async: false);
             }));
         }
 
@@ -740,7 +742,7 @@ namespace QuickFiler.Controllers
                     ToggleTips(async: false, desiredState: Enums.ToggleState.On);
                     RegisterFocusActions();
                 }
-                _themes[_activeTheme].SetTheme(async: false);
+                _themes[_activeTheme].SetQfcTheme(async: false);
             }));
         }
 
@@ -810,12 +812,12 @@ namespace QuickFiler.Controllers
         {
             if ((_activeTheme is null) || _activeTheme.Contains("Normal"))
             {
-                _themes["DarkNormal"].SetTheme(async);
+                _themes["DarkNormal"].SetQfcTheme(async);
                 _activeTheme = "DarkNormal";
             }
             else
             {
-                _themes["DarkActive"].SetTheme(async);
+                _themes["DarkActive"].SetQfcTheme(async);
                 _activeTheme = "DarkActive";
             }
             _isDarkMode = true;
@@ -825,7 +827,7 @@ namespace QuickFiler.Controllers
         {
             if (_isWebViewerInitialized)
             {
-                _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.ToggleDark(desiredState));
+                _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.ToggleDark(desiredState));
                 ConversationInfo.ForEach(item => item.ToggleDark(desiredState));
             }
         }
@@ -834,12 +836,12 @@ namespace QuickFiler.Controllers
         {
             if ((_activeTheme is null) || _activeTheme.Contains("Normal"))
             {
-                _themes["LightNormal"].SetTheme(async);
+                _themes["LightNormal"].SetQfcTheme(async);
                 _activeTheme = "LightNormal";
             }
             else
             {
-                _themes["LightActive"].SetTheme(async);
+                _themes["LightActive"].SetQfcTheme(async);
                 _activeTheme = "LightActive";
             }
             _isDarkMode = false;
@@ -876,7 +878,7 @@ namespace QuickFiler.Controllers
         public Dictionary<string, System.Action> RightKeyActions { get => new() 
         {
             { "&Pop Out", ()=>this._parent.PopOutControlGroup(ItemNumber)},
-            { "&Expand", ()=>{_itemViewer.lblSubject.Focus(); this.EnumerateConversation(); } },
+            { "&Expand", ()=>{_itemViewer.LblSubject.Focus(); this.EnumerateConversation(); } },
             { "&Cancel", ()=>{ } }
         }; }
 

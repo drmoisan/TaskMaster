@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UtilitiesCS.EmailIntelligence;
-using UtilitiesCS.EmailIntelligence.SubjectMap;
+
 
 namespace UtilitiesCS
 {
@@ -107,11 +107,11 @@ namespace UtilitiesCS
         /// <param name="key">String to match. For EmailSubject, key is standardized. For Folderpath, key is matched literally</param>
         /// <param name="findBy"><inheritdoc cref="FindBy"/></param>
         /// <returns>List of matching subject map entries</returns>
-        public IList<ISubjectMapEntry> Find(string key, FindBy findBy)
+        public IList<ISubjectMapEntry> Find(string key, Enums.FindBy findBy)
         {
             switch (findBy)
             {
-                case FindBy.Subject:
+                case Enums.FindBy.Subject:
                     key = key.StripCommonWords(_commonWords).ToLower();
                     return base.ToList().Where(entry => entry.EmailSubject == key).ToList();
 

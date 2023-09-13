@@ -105,7 +105,7 @@ namespace QuickFiler.Controllers
             task.ContinueWith(t =>
             {
                 _webViewEnvironment = task.Result;
-                _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
+                _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
             }, ui);
             
         }
@@ -130,7 +130,7 @@ namespace QuickFiler.Controllers
             await task.ContinueWith(t =>
             {
                 _webViewEnvironment = task.Result;
-                _itemViewer.L0v2h2_Web.EnsureCoreWebView2Async(_webViewEnvironment);
+                _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
             }, ui);
         }
 
@@ -171,7 +171,7 @@ namespace QuickFiler.Controllers
         {
             _itemInfo = dataModel.MailInfo;
             _itemViewer.LblSender.Text = _itemInfo.SenderName;
-            _itemViewer.lblSubject.Text = _itemInfo.Subject;
+            _itemViewer.LblSubject.Text = _itemInfo.Subject;
             _itemViewer.TxtboxBody.Text = _itemInfo.Body;
             _itemViewer.LblTriage.Text = _itemInfo.Triage;
             _itemViewer.LblSentOn.Text = _itemInfo.SentOn;
@@ -371,7 +371,7 @@ namespace QuickFiler.Controllers
 
         public string SentTime { get => _itemInfo.SentDate.ToString("HH:mm"); }
 
-        public string Subject { get => _itemViewer.lblSubject.Text; }
+        public string Subject { get => _itemViewer.LblSubject.Text; }
 
         public bool SuppressEvents { get => _suppressEvents; set => _suppressEvents = value; }
 
@@ -393,7 +393,7 @@ namespace QuickFiler.Controllers
             },
             new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
                         
-            _itemViewer.L0v2h2_Web.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
+            _itemViewer.L0v2h2_WebView2.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
             _dataModel.ConversationResolver.PropertyChanged += new PropertyChangedEventHandler(ConversationResolverPropertyChanged);
             _itemViewer.TopicThread.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
         }
@@ -413,7 +413,7 @@ namespace QuickFiler.Controllers
             _keyboardHandler.KdCharActions.Add('E', async (x) => await KbdExecuteAsync(this.ToggleExpansionAsync));
             if (_expanded)
             {
-                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_Web));
+                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
                 _keyboardHandler.KdCharActions.Add('D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
         }
@@ -455,7 +455,7 @@ namespace QuickFiler.Controllers
             if ((objects is not null) && (objects.Count != 0))
             {
                 var info = objects[0] as MailItemInfo;
-                _itemViewer.L0v2h2_Web.NavigateToString(info.Html);
+                _itemViewer.L0v2h2_WebView2.NavigateToString(info.Html);
             }
 
         }
@@ -467,7 +467,7 @@ namespace QuickFiler.Controllers
                 throw (e.InitializationException);
             }
             _isWebViewerInitialized = true;
-            _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.Html);
+            _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.Html);
             _itemViewer.L0v2h2_Panel.Visible = false;
         }
         
@@ -496,7 +496,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
                 _itemViewer.TopicThread.Visible = true;
                 _itemViewer.L0v2h2_Panel.Visible = true;
-                _itemViewer.L0v2h2_Web.Visible = true;
+                _itemViewer.L0v2h2_WebView2.Visible = true;
                 _expanded = true;
                 if ((_itemInfo is not null) && _itemInfo.UnRead == true)
                 {
@@ -504,7 +504,7 @@ namespace QuickFiler.Controllers
                     _timer.Change(4000, System.Threading.Timeout.Infinite);
                 }
                 // Register the keyboard actions and overwrite any others silently
-                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_Web));
+                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
                 _keyboardHandler.KdCharActions.Add('D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
             else
@@ -513,7 +513,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
                 _itemViewer.TopicThread.Visible = false;
                 _itemViewer.L0v2h2_Panel.Visible = false;
-                _itemViewer.L0v2h2_Web.Visible = false;
+                _itemViewer.L0v2h2_WebView2.Visible = false;
                 _expanded = false;
                 if (_timer is not null) { _timer.Dispose(); }
                 _keyboardHandler.KdCharActions.Remove('B');
@@ -532,14 +532,14 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
                 _itemViewer.TopicThread.Visible = true;
                 _itemViewer.L0v2h2_Panel.Visible = true;
-                _itemViewer.L0v2h2_Web.Visible = true;
+                _itemViewer.L0v2h2_WebView2.Visible = true;
                 _expanded = true;
                 if ((_itemInfo is not null) && _itemInfo.UnRead == true)
                 {
                     _timer = new System.Threading.Timer(ApplyReadEmailFormat);
                     _timer.Change(4000, System.Threading.Timeout.Infinite);
                 }
-                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_Web));
+                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
                 _keyboardHandler.KdCharActions.Add('D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
             else
@@ -548,7 +548,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
                 _itemViewer.TopicThread.Visible = false;
                 _itemViewer.L0v2h2_Panel.Visible = false;
-                _itemViewer.L0v2h2_Web.Visible = false;
+                _itemViewer.L0v2h2_WebView2.Visible = false;
                 _expanded = false;
                 if (_timer is not null) { _timer.Dispose(); }
                 _keyboardHandler.KdCharActions.Remove('B');
@@ -649,7 +649,7 @@ namespace QuickFiler.Controllers
         {
             if (_isWebViewerInitialized)
             {
-                _itemViewer.L0v2h2_Web.NavigateToString(_itemInfo.ToggleDark(desiredState));
+                _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.ToggleDark(desiredState));
                 _dataModel.ConversationResolver.ConversationInfoExpanded.ForEach(item => item.ToggleDark(desiredState));
                 //ConversationInfo.ForEach(item => item.ToggleDark(desiredState));
             }

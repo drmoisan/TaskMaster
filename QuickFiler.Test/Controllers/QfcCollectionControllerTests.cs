@@ -44,7 +44,7 @@ namespace QuickFiler.Test.Controllers
                 this.mockApplicationGlobals.Object,
                 this.formViewer, //.Object,
                 false,
-                Enums.InitTypeEnum.Sort,
+                QfEnums.InitTypeEnum.Sort,
                 this.mockHomeController.Object,
                 this.mockQfcFormController.Object);
         }

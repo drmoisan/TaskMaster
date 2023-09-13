@@ -26,7 +26,7 @@ namespace QuickFiler.Controllers
                                  EfcViewer formViewer,
                                  EfcHomeController homeController,
                                  System.Action ParentCleanup,
-                                 Enums.InitTypeEnum initType)
+                                 QfEnums.InitTypeEnum initType)
         {
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
@@ -58,7 +58,7 @@ namespace QuickFiler.Controllers
         private QfcItemViewer _itemViewer;
         //private FolderHandler _folderHandler;
         //private MailItem _mailItem;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private IList<IQfcTipsDetails> _listTipsDetails;
         private TableLayoutPanel _itemTlp;
         private int _itemViewerTlpRow;
@@ -183,7 +183,7 @@ namespace QuickFiler.Controllers
 
         async public void ButtonCreate_Click(object sender, EventArgs e)
         {
-            if (_initType == Enums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
 
             if (!IsValidSelection)
             {
@@ -295,7 +295,7 @@ namespace QuickFiler.Controllers
 
         async public Task CreateFolderAsync()
         {
-            if (_initType == Enums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
 
             if (!IsValidSelection)
             {

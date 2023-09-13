@@ -1,9 +1,8 @@
-﻿using QuickFiler.Controllers;
-using QuickFiler;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
-namespace QuickFiler.Interfaces
+
+namespace UtilitiesCS
 {
     public interface IQfcTipsDetails
     {
