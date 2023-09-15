@@ -2,7 +2,8 @@
 {
     public static class Enums
     {
-        public enum ToggleState { Off = 0, On = 1 }
+        [System.Flags]
+        public enum ToggleState { Off = 0, On = 1, Force = 2 }
 
         /// <summary>
         /// Enumeration that controls whether keypair matches are found by Subject or by Folder

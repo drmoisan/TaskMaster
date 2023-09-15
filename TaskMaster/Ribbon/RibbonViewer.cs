@@ -124,6 +124,11 @@ namespace TaskMaster
             _controller.LoadQuickFiler();
         }
 
+        //public async void QuickFiler_Click(Office.IRibbonControl control)
+        //{
+        //    await _controller.LoadQuickFilerAsync();
+        //}
+
         public void Runtest(Office.IRibbonControl control)
         {
             _controller.RunTry();

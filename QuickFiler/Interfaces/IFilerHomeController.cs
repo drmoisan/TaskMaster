@@ -9,6 +9,7 @@ namespace QuickFiler.Interfaces
         #region Constructors, Initializers, and Destructors
         
         void Run();
+        Task RunAsync();
         void Cleanup();
         
         #endregion

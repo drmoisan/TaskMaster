@@ -169,6 +169,28 @@ namespace QuickFiler.Controllers
             else { LoadSequentialCF(); }
         }
 
+        public async Task LoadConversationsAndFoldersAsync()
+        {
+            await AsyncEnumerable.Range(0, _itemGroups.Count)
+                                 .Select(i => (i,grp:_itemGroups[i]))
+                                 .ForEachAsync(async x => 
+                                 { 
+                                     x.grp.ItemController = new QfcItemController(AppGlobals: _globals,
+                                                                                  homeController: _homeController,
+                                                                                  parent: this,
+                                                                                  itemViewer: x.grp.ItemViewer,
+                                                                                  viewerPosition: x.i + 1,
+                                                                                  x.grp.MailItem);
+                                     var tasks = new List<Task>
+                                     {
+                                        x.grp.ItemController.InitializeAsync(),
+                                        Task.Run(() => x.grp.ItemController.PopulateConversation()),
+                                        Task.Run(() => x.grp.ItemController.PopulateFolderCombobox()),
+                                     };
+                                     await Task.WhenAll(tasks).ConfigureAwait(false);
+                                 });
+        }
+
         public void LoadParallelCF()
         {
             Parallel.ForEach(_itemGroups, grp =>
@@ -179,7 +201,8 @@ namespace QuickFiler.Controllers
                                                            itemViewer: grp.ItemViewer,
                                                            viewerPosition: _itemGroups.FindIndex(x => x.MailItem == grp.MailItem) + 1,
                                                            grp.MailItem);
-                
+                grp.ItemController.Initialize(false);
+
                 Parallel.Invoke(
                     () => grp.ItemController.PopulateConversation(),
                     () => grp.ItemController.PopulateFolderCombobox(),
@@ -190,7 +213,7 @@ namespace QuickFiler.Controllers
                     });
             });
         }
-
+        
         public void LoadSequentialCF()
         {
             int i = 0;
@@ -202,6 +225,7 @@ namespace QuickFiler.Controllers
                                                            itemViewer: grp.ItemViewer,
                                                            viewerPosition: ++i,
                                                            grp.MailItem);
+                grp.ItemController.Initialize(false);
                 grp.ItemController.PopulateConversation();
                 grp.ItemController.PopulateFolderCombobox();
                 if (_darkMode) { grp.ItemController.SetThemeDark(async: false); }
@@ -225,6 +249,25 @@ namespace QuickFiler.Controllers
             _formViewer.ResumeLayout();
             WireUpKeyboardHandler();
             LoadConversationsAndFolders();
+
+        }
+
+        public async Task LoadControlsAndHandlersAsync(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
+        {
+            _formViewer.SuspendLayout();
+            var tlpState = TlpLayout;
+            TlpLayout = false;
+            //_itemTLP.SuspendLayout();
+            _template = template;
+            _templateExpanded = templateExpanded;
+            TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
+            LoadItemGroupsAndViewers(listMailItems, template);
+            _formViewer.WindowState = FormWindowState.Maximized;
+            TlpLayout = tlpState;
+            //_itemTLP.ResumeLayout();
+            _formViewer.ResumeLayout();
+            WireUpKeyboardHandler();
+            await LoadConversationsAndFoldersAsync();
 
         }
 

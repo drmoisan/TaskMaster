@@ -16,6 +16,8 @@ namespace QuickFiler.Interfaces
         /// <summary>
         /// Toggles special formatting for one group to highlight the group of controls that is active
         /// </summary>
+        Task InitializeAsync();
+        void Initialize(bool async);
         void ToggleFocus(); // Turn on or off the formatting to highlight this QfcItem
         void ToggleFocus(Enums.ToggleState desiredState);
         int CounterEnter { get; set; }
@@ -60,7 +62,6 @@ namespace QuickFiler.Interfaces
         IList<IQfcTipsDetails> ListTipsDetails { get; }
         void ToggleNavigation(bool async);
         void ToggleNavigation(bool async, Enums.ToggleState desiredState);
-        void ToggleTips(bool async);
         void ToggleTips(bool async, Enums.ToggleState desiredState);
         public Dictionary<string, System.Action> RightKeyActions { get; }
     }

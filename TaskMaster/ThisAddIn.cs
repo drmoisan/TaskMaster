@@ -13,6 +13,9 @@ using Microsoft.Office.Core;
 using QuickFiler;
 using UtilitiesCS;
 
+
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
+
 namespace TaskMaster
 {
     public partial class ThisAddIn
@@ -45,9 +48,11 @@ namespace TaskMaster
 
             // Hook the Inbox and ToDo events
             //_globals.Events.Hook();
-            Debug.WriteLine("ThisAddIn_Startup() complete");
+            logger.Debug("ThisAddIn_Startup() complete");
+
         }
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;

@@ -306,6 +306,17 @@ namespace QuickFiler.Controllers
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
+        public async Task LoadItemsAsync(IList<MailItem> listObjects)
+        {
+            _groups = new QfcCollectionController(AppGlobals: _globals,
+                                                  viewerInstance: _formViewer,
+                                                  darkMode: Properties.Settings.Default.DarkMode,
+                                                  InitType: QfEnums.InitTypeEnum.Sort,
+                                                  homeController: _parent,
+                                                  parent: this);
+            await _groups.LoadControlsAndHandlersAsync(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+        }
+
         /// <summary>
         /// Maximizes the QfcFormViewer
         /// </summary>

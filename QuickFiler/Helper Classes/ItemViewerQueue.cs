@@ -11,20 +11,7 @@ namespace QuickFiler
 {
     public static class ItemViewerQueue
     {
-        //public ItemViewerQueue()
-        //{
-        //    _queue = new Queue<QfcItemViewer>();
-        //    _queueSize = Properties.Settings.Default.ItemViewerQueueSize;
-        //    _ = BuildQueueAsync(_queueSize);
-        //}
-
-        //public ItemViewerQueue(int queueSize)
-        //{
-        //    _queue = new Queue<QfcItemViewer>();
-        //    _queueSize = queueSize;
-        //    _ = BuildQueueAsync(_queueSize);
-        //}
-
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Queue<QfcItemViewer> _queue = new Queue<QfcItemViewer>();
 
         public static void BuildQueueWhenIdle(int count)
@@ -34,7 +21,7 @@ namespace QuickFiler
                 IdleActionQueue.AddEntry(() =>
                 {
                     _queue.Enqueue(new QfcItemViewer());
-                    Console.WriteLine($"Enqueued {_queue.Count}");
+                    logger.Debug($"Enqueued {_queue.Count}");
                 });
             }
         }
@@ -44,7 +31,7 @@ namespace QuickFiler
             for (int i = 0; i < count; i++)
             {
                 _queue.Enqueue(new QfcItemViewer());
-                Console.WriteLine($"Enqueued {_queue.Count}");
+                logger.Debug($"Enqueued {_queue.Count}");
             }
         }
 
@@ -54,14 +41,14 @@ namespace QuickFiler
             if (_queue.Count > 0)
             {
                 viewer = _queue.Dequeue();
-                Debug.WriteLine($"Dequeued 1, {_queue.Count} remaining");
+                logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueueWhenIdle(1);
-                //Debug.WriteLine($"Exiting dequeue, {_queue.Count} remaining");
+                
             }
             else
             {
                 viewer = new QfcItemViewer();
-                BuildQueueWhenIdle(10);
+                BuildQueueWhenIdle(1);
             }
             return viewer;
         }

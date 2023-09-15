@@ -137,6 +137,11 @@ namespace QuickFiler
             throw new NotImplementedException();
         }
 
+        public Task RunAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region Helper Methods

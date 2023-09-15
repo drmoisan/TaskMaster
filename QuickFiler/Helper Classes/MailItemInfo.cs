@@ -36,6 +36,28 @@ namespace QuickFiler
             _conversationIndex = (string)df["ConversationIndex"][indexRow];
         }
 
+        public static async Task<MailItemInfo> FromMailItemAsync(MailItem item)
+        {
+            var info = new MailItemInfo(item);
+            if (item is null) { throw new ArgumentNullException(); }
+            info.EntryId = item.EntryID;
+            info.SetSender(item.GetSenderInfo());
+            info.Subject = item.Subject;
+            info.Body = CompressPlainText(item.Body);
+            info.Triage = item.GetTriage();
+            info.SentOn = item.SentOn.ToString("g");
+            info.Actionable = item.GetActionTaken();
+            info.Folder = ((Folder)item.Parent).Name;
+            info.ConversationIndex = item.ConversationIndex;
+            info.UnRead = item.UnRead;
+            info.IsTaskFlagSet = (item.FlagStatus == OlFlagStatus.olFlagMarked || item.FlagStatus == OlFlagStatus.olFlagComplete);
+            await Task.Factory.StartNew(() => info.LoadRecipients(),
+                                              default,
+                                              TaskCreationOptions.None,
+                                              PriorityScheduler.BelowNormal);
+            return info;
+        }
+
         private string _storeId;
         private RecipientInfo _sender;
         private RecipientInfo _toRecipients;
@@ -67,7 +89,7 @@ namespace QuickFiler
         
         private MailItem _item;
         public MailItem Item { get => _item; set => _item = value; }
-        
+                
         private string _senderHtml;
         public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
         
@@ -172,11 +194,18 @@ namespace QuickFiler
             _ccRecipientsHtml = _ccRecipients.Html;
         }
 
+        internal void SetSender(RecipientInfo sender)
+        {
+            _sender = sender;
+            _senderName = sender.Name;
+            _senderHtml = sender.Html;
+        }
+        
         #endregion
 
         #region HTML and Plain Text Methods
 
-        internal string CompressPlainText(string text)
+        internal static string CompressPlainText(string text)
         {
             //text = text.Replace(System.Environment.NewLine, " ");
             text = text.Replace(Properties.Resources.Email_Prefix_To_Strip, "");

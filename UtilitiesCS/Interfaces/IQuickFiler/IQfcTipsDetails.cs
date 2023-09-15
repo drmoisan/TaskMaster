@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 
 namespace UtilitiesCS
@@ -12,8 +13,10 @@ namespace UtilitiesCS
         TableLayoutPanel TLP { get; }
         Type ResolveParentType();
         void Toggle();
-        void Toggle(Enums.ToggleState desiredState);
         void Toggle(bool shareColumn);
+        void Toggle(Enums.ToggleState desiredState);
         void Toggle(Enums.ToggleState desiredState, bool shareColumn);
+        Task ToggleAsync(Enums.ToggleState desiredState);
+        Task ToggleAsync(Enums.ToggleState desiredState, bool shareColumn);
     }
 }
