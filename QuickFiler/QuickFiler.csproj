@@ -335,6 +335,12 @@
     </Compile>
     <Compile Include="Helper Classes\EfcViewerQueue.cs" />
     <Compile Include="Helper Classes\ItemViewerQueue.cs" />
+    <Compile Include="Viewers\ItemViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\ItemViewer.Designer.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcItemViewerExpanded.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -378,6 +384,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\EfcViewer.resx">
       <DependentUpon>EfcViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\ItemViewer.resx">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx">
       <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>

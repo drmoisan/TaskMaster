@@ -29,7 +29,7 @@ namespace QuickFiler.Controllers
         public QfcItemController(IApplicationGlobals AppGlobals,
                                  IFilerHomeController homeController,
                                  IQfcCollectionController parent,
-                                 QfcItemViewer itemViewer,
+                                 ItemViewer itemViewer,
                                  int viewerPosition,
                                  MailItem mailItem)
         {
@@ -40,7 +40,7 @@ namespace QuickFiler.Controllers
         public QfcItemController(IApplicationGlobals AppGlobals,
                                  IFilerHomeController homeController,
                                  IQfcCollectionController parent,
-                                 QfcItemViewer itemViewer,
+                                 ItemViewer itemViewer,
                                  int viewerPosition,
                                  MailItem mailItem,
                                  bool async)
@@ -52,7 +52,7 @@ namespace QuickFiler.Controllers
         private void Initialize(IApplicationGlobals AppGlobals,
                                 IFilerHomeController homeController,
                                 IQfcCollectionController parent,
-                                QfcItemViewer itemViewer,
+                                ItemViewer itemViewer,
                                 int viewerPosition,
                                 MailItem mailItem,
                                 bool async)
@@ -107,7 +107,7 @@ namespace QuickFiler.Controllers
 
         
 
-        internal void SaveParameters(IApplicationGlobals AppGlobals, IFilerHomeController homeController, IQfcCollectionController parent, QfcItemViewer itemViewer, int viewerPosition, MailItem mailItem)
+        internal void SaveParameters(IApplicationGlobals AppGlobals, IFilerHomeController homeController, IQfcCollectionController parent, ItemViewer itemViewer, int viewerPosition, MailItem mailItem)
         {
             // Save parameters to private fields
             _globals = AppGlobals;
@@ -185,7 +185,7 @@ namespace QuickFiler.Controllers
             }, ui);
         }
 
-        internal void ResolveControlGroups(QfcItemViewer itemViewer)
+        internal void ResolveControlGroups(ItemViewer itemViewer)
         {
             var ctrls = itemViewer.GetAllChildren();
 
@@ -209,7 +209,7 @@ namespace QuickFiler.Controllers
 
         }
 
-        internal async Task ResolveControlGroupsAsync(QfcItemViewer itemViewer)
+        internal async Task ResolveControlGroupsAsync(ItemViewer itemViewer)
         {
             var ctrls = itemViewer.GetAllChildren();
 
@@ -391,7 +391,7 @@ namespace QuickFiler.Controllers
         private IQfcKeyboardHandler _keyboardHandler;
         private IQfcTipsDetails _itemPositionTips;
         private MailItemInfo _itemInfo;
-        private QfcItemViewer _itemViewer;
+        private ItemViewer _itemViewer;
         private string _activeTheme;
         private System.Threading.Timer _timer;
 
@@ -643,7 +643,7 @@ namespace QuickFiler.Controllers
             }
             _isWebViewerInitialized = true;
             _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.Html);
-            _itemViewer.L0v2h2_Panel.Visible = false;
+            //_itemViewer.L0v2h2_Panel.Visible = false;
         }
 
         internal void RegisterFocusActions()
@@ -841,7 +841,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
                 _itemViewer.TopicThread.Visible = true;
-                _itemViewer.L0v2h2_Panel.Visible = true;
+                //_itemViewer.L0v2h2_Panel.Visible = true;
                 _itemViewer.L0v2h2_WebView2.Visible = true;
                 _expanded = true;
                 if ((_itemInfo is not null)&&_itemInfo.UnRead == true)
@@ -857,7 +857,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
                 _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
                 _itemViewer.TopicThread.Visible = false;
-                _itemViewer.L0v2h2_Panel.Visible = false;
+                //_itemViewer.L0v2h2_Panel.Visible = false;
                 _itemViewer.L0v2h2_WebView2.Visible = false;
                 _expanded = false;
                 if (_timer is not null) { _timer.Dispose(); }

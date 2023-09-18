@@ -271,7 +271,7 @@ namespace QuickFiler.Controllers
 
         }
 
-        public QfcItemViewer LoadItemViewer(int indexNumber,
+        public ItemViewer LoadItemViewer(int indexNumber,
                                             RowStyle template,
                                             bool blGroupConversation = true,
                                             int columnNumber = 0)
@@ -473,7 +473,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        internal void ScrollIntoView(QfcItemViewer item)
+        internal void ScrollIntoView(ItemViewer item)
         {
             // If top is not visible, scroll top into view
             if (_itemPanel.Top - _itemPanel.AutoScrollPosition.Y > item.Top)
@@ -972,11 +972,12 @@ namespace QuickFiler.Controllers
             public ItemGroup() { }
             public ItemGroup(MailItem mailItem) { _mailItem = mailItem; }
 
-            private QfcItemViewer _itemViewer;
             private IQfcItemController _itemController;
             private MailItem _mailItem;
 
-            internal QfcItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
+            private ItemViewer _itemViewer;
+            internal ItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
+            
             internal IQfcItemController ItemController { get => _itemController; set => _itemController = value; }
             internal MailItem MailItem { get => _mailItem; set => _mailItem = value; }
 

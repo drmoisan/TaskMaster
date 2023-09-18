@@ -395,6 +395,7 @@
       <SubType>Code</SubType>
     </Compile>
     <None Include="TaskMaster_2_TemporaryKey.pfx" />
+    <None Include="TaskMaster_8_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
@@ -445,10 +446,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_8_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>1D27D8329AC0205E3F68CBB37FE5B9B60F68E438</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>005C1D99711B7A1E9AB7465F0DD678B5E1E3E2BD</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
