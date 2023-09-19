@@ -10,14 +10,18 @@ namespace UtilitiesCS.Threading
 {
     public class IdleActionQueue
     {
+        private const int IdleThreshold = 20;
+        private const int GUIActivityThreshold = 700;
+        private const double CPUUsageThreshold = 0.15;
+        
         private IdleActionQueue() { }
 
         static IdleActionQueue()
         {
             //System.Windows.Forms.Application.Idle += new EventHandler(OnApplicationIdle);
             ApplicationIdleTimer.ApplicationIdle += new ApplicationIdleTimer.ApplicationIdleEventHandler(OnApplicationIdle);
-            ApplicationIdleTimer.GUIActivityThreshold = 700;
-            ApplicationIdleTimer.CPUUsageThreshold = 0.15;
+            ApplicationIdleTimer.GUIActivityThreshold = GUIActivityThreshold;
+            ApplicationIdleTimer.CPUUsageThreshold = CPUUsageThreshold;
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -41,7 +45,7 @@ namespace UtilitiesCS.Threading
 
         private static async void OnApplicationIdle(ApplicationIdleTimer.ApplicationIdleEventArgs e)
         {
-            if (e.IdleDuration.TotalMilliseconds > 20)
+            if (e.IdleDuration.TotalMilliseconds > IdleThreshold)
             {
                 if (Entries.TryDequeue(out Action action))
                 {
