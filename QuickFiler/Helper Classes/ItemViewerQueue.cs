@@ -12,7 +12,7 @@ namespace QuickFiler
     public static class ItemViewerQueue
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static Queue<ItemViewer> _queue = new Queue<ItemViewer>();
+        private static Queue<ItemViewerLight> _queue = new Queue<ItemViewerLight>();
 
         public static void BuildQueueWhenIdle(int count)
         {
@@ -20,7 +20,7 @@ namespace QuickFiler
             {
                 IdleActionQueue.AddEntry(() =>
                 {
-                    _queue.Enqueue(new ItemViewer());
+                    _queue.Enqueue(new ItemViewerLight());
                     logger.Debug($"Enqueued {_queue.Count}");
                 });
             }
@@ -30,14 +30,14 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                _queue.Enqueue(new ItemViewer());
+                _queue.Enqueue(new ItemViewerLight());
                 logger.Debug($"Enqueued {_queue.Count}");
             }
         }
 
-        public static ItemViewer Dequeue()
+        public static ItemViewerLight Dequeue()
         {
-            ItemViewer viewer = null;
+            ItemViewerLight viewer = null;
             if (_queue.Count > 0)
             {
                 viewer = _queue.Dequeue();
@@ -47,13 +47,13 @@ namespace QuickFiler
             }
             else
             {
-                viewer = new ItemViewer();
+                viewer = new ItemViewerLight();
                 BuildQueueWhenIdle(1);
             }
             return viewer;
         }
 
-        public static IEnumerable<ItemViewer> DequeueChunk(int count)
+        public static IEnumerable<ItemViewerLight> DequeueChunk(int count)
         {
             if (_queue.Count < count)
             {

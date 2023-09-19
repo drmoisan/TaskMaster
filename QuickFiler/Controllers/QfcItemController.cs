@@ -29,7 +29,7 @@ namespace QuickFiler.Controllers
         public QfcItemController(IApplicationGlobals AppGlobals,
                                  IFilerHomeController homeController,
                                  IQfcCollectionController parent,
-                                 ItemViewer itemViewer,
+                                 ItemViewerLight itemViewer,
                                  int viewerPosition,
                                  MailItem mailItem)
         {
@@ -40,7 +40,7 @@ namespace QuickFiler.Controllers
         public QfcItemController(IApplicationGlobals AppGlobals,
                                  IFilerHomeController homeController,
                                  IQfcCollectionController parent,
-                                 ItemViewer itemViewer,
+                                 ItemViewerLight itemViewer,
                                  int viewerPosition,
                                  MailItem mailItem,
                                  bool async)
@@ -52,7 +52,7 @@ namespace QuickFiler.Controllers
         private void Initialize(IApplicationGlobals AppGlobals,
                                 IFilerHomeController homeController,
                                 IQfcCollectionController parent,
-                                ItemViewer itemViewer,
+                                ItemViewerLight itemViewer,
                                 int viewerPosition,
                                 MailItem mailItem,
                                 bool async)
@@ -107,7 +107,7 @@ namespace QuickFiler.Controllers
 
         
 
-        internal void SaveParameters(IApplicationGlobals AppGlobals, IFilerHomeController homeController, IQfcCollectionController parent, ItemViewer itemViewer, int viewerPosition, MailItem mailItem)
+        internal void SaveParameters(IApplicationGlobals AppGlobals, IFilerHomeController homeController, IQfcCollectionController parent, ItemViewerLight itemViewer, int viewerPosition, MailItem mailItem)
         {
             // Save parameters to private fields
             _globals = AppGlobals;
@@ -185,7 +185,7 @@ namespace QuickFiler.Controllers
             }, ui);
         }
 
-        internal void ResolveControlGroups(ItemViewer itemViewer)
+        internal void ResolveControlGroups(ItemViewerLight itemViewer)
         {
             var ctrls = itemViewer.GetAllChildren();
 
@@ -209,7 +209,7 @@ namespace QuickFiler.Controllers
 
         }
 
-        internal async Task ResolveControlGroupsAsync(ItemViewer itemViewer)
+        internal async Task ResolveControlGroupsAsync(ItemViewerLight itemViewer)
         {
             var ctrls = itemViewer.GetAllChildren();
 
@@ -391,7 +391,7 @@ namespace QuickFiler.Controllers
         private IQfcKeyboardHandler _keyboardHandler;
         private IQfcTipsDetails _itemPositionTips;
         private MailItemInfo _itemInfo;
-        private ItemViewer _itemViewer;
+        private ItemViewerLight _itemViewer;
         private string _activeTheme;
         private System.Threading.Timer _timer;
 
@@ -838,8 +838,9 @@ namespace QuickFiler.Controllers
             _parent.ToggleExpansionStyle(ItemIndex, desiredState);
             if (desiredState == Enums.ToggleState.On)
             {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
+                //_itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
+                //_itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
+                _itemViewer.TxtboxBody.Visible = false;
                 _itemViewer.TopicThread.Visible = true;
                 //_itemViewer.L0v2h2_Panel.Visible = true;
                 _itemViewer.L0v2h2_WebView2.Visible = true;
@@ -854,8 +855,9 @@ namespace QuickFiler.Controllers
             }
             else
             {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
+                //_itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
+                //_itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
+                _itemViewer.TxtboxBody.Visible = true;
                 _itemViewer.TopicThread.Visible = false;
                 //_itemViewer.L0v2h2_Panel.Visible = false;
                 _itemViewer.L0v2h2_WebView2.Visible = false;
@@ -923,11 +925,19 @@ namespace QuickFiler.Controllers
             _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(true)));
             if (async)
             {
-                _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(true)));
+                _itemViewer.BeginInvoke(new System.Action(() => 
+                { 
+                    _itemPositionTips.Toggle(true);
+                    _itemViewer.ToggleNav();
+                }));
             }
             else
             {
-                _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(true)));
+                _itemViewer.Invoke(new System.Action(() => 
+                { 
+                    _itemPositionTips.Toggle(true);
+                    _itemViewer.ToggleNav();
+                }));
             }
         }
 
@@ -935,11 +945,19 @@ namespace QuickFiler.Controllers
         {
             if (async)
             {
-                _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, true)));
+                _itemViewer.BeginInvoke(new System.Action(() => 
+                { 
+                    _itemPositionTips.Toggle(desiredState, true); 
+                    _itemViewer.ToggleNav(desiredState);
+                }));
             }
             else
             {
-                _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, true)));
+                _itemViewer.Invoke(new System.Action(() => 
+                { 
+                    _itemPositionTips.Toggle(desiredState, true);
+                    _itemViewer.ToggleNav(desiredState);
+                }));
             }
             
         }

@@ -39,7 +39,7 @@ namespace QuickFiler
         }
 
         public static Dictionary<string, Theme> SetupThemes(IQfcItemController controller,
-                                                           ItemViewer viewer,
+                                                           ItemViewerLight viewer,
                                                            Action<Enums.ToggleState> htmlConverter)
         {
             var themes = new Dictionary<string, Theme>

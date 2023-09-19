@@ -16,7 +16,7 @@ namespace QuickFiler.Interfaces
         // UI Add and Remove QfcItems
         void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
         Task LoadControlsAndHandlersAsync(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
-        ItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
+        ItemViewerLight LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
         void PopOutControlGroup(int intPosition);
         void RemoveControls();
         Task RemoveControlsAsync();

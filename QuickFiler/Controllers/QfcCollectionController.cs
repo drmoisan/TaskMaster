@@ -271,13 +271,14 @@ namespace QuickFiler.Controllers
 
         }
 
-        public ItemViewer LoadItemViewer(int indexNumber,
+        public ItemViewerLight LoadItemViewer(int indexNumber,
                                             RowStyle template,
                                             bool blGroupConversation = true,
                                             int columnNumber = 0)
         {
             //QfcItemViewer itemViewer = new();
             var itemViewer = ItemViewerQueue.Dequeue();
+            //var itemViewer = new ItemViewerLight();
             _itemTLP.MinimumSize = new System.Drawing.Size(
                 _itemTLP.MinimumSize.Width,
                 _itemTLP.MinimumSize.Height +
@@ -473,7 +474,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        internal void ScrollIntoView(ItemViewer item)
+        internal void ScrollIntoView(ItemViewerLight item)
         {
             // If top is not visible, scroll top into view
             if (_itemPanel.Top - _itemPanel.AutoScrollPosition.Y > item.Top)
@@ -975,8 +976,8 @@ namespace QuickFiler.Controllers
             private IQfcItemController _itemController;
             private MailItem _mailItem;
 
-            private ItemViewer _itemViewer;
-            internal ItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
+            private ItemViewerLight _itemViewer;
+            internal ItemViewerLight ItemViewer { get => _itemViewer; set => _itemViewer = value; }
             
             internal IQfcItemController ItemController { get => _itemController; set => _itemController = value; }
             internal MailItem MailItem { get => _mailItem; set => _mailItem = value; }
