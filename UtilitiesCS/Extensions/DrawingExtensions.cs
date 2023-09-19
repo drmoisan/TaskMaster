@@ -18,6 +18,11 @@ namespace UtilitiesCS
         {
             return Size.Round(new SizeF((float)pt.X * scaleRatio.X, (float)pt.Y * scaleRatio.Y));
         }
-        
+
+        public static Size MultiplyRound(this Size sz, PointF scaleRatio)
+        {
+            return Size.Round(new SizeF((float)sz.Width * scaleRatio.X, (float)sz.Height * scaleRatio.Y));
+        }
+
     }
 }

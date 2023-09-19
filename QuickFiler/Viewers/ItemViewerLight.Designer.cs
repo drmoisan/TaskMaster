@@ -1,4 +1,4 @@
-﻿namespace QuickFiler.Viewers
+﻿namespace QuickFiler
 {
     partial class ItemViewerLight
     {
@@ -28,8 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties9 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.MainPanel = new System.Windows.Forms.Panel();
+            this.LblConvCt = new System.Windows.Forms.Label();
+            this.LblAcOpen = new System.Windows.Forms.Label();
+            this.LblAcBody = new System.Windows.Forms.Label();
+            this.L0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
+            this.CboFolders = new System.Windows.Forms.ComboBox();
+            this.BtnDelItem = new System.Windows.Forms.Button();
+            this.BtnPopOut = new System.Windows.Forms.Button();
+            this.BtnFlagTask = new System.Windows.Forms.Button();
             this.TxtboxSearch = new System.Windows.Forms.TextBox();
             this.LblAcConversation = new System.Windows.Forms.Label();
             this.LblAcSearch = new System.Windows.Forms.Label();
@@ -50,23 +58,23 @@
             this.LblSubject = new System.Windows.Forms.Label();
             this.LblSender = new System.Windows.Forms.Label();
             this.LblItemNumber = new System.Windows.Forms.Label();
-            this.BtnFlagTask = new System.Windows.Forms.Button();
-            this.BtnDelItem = new System.Windows.Forms.Button();
-            this.BtnPopOut = new System.Windows.Forms.Button();
-            this.CboFolders = new System.Windows.Forms.ComboBox();
-            this.L0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
-            this.LblAcOpen = new System.Windows.Forms.Label();
-            this.LblAcBody = new System.Windows.Forms.Label();
+            this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
+            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.SentDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.LblAcDelete = new System.Windows.Forms.Label();
             this.LblAcPopOut = new System.Windows.Forms.Label();
             this.LblAcTask = new System.Windows.Forms.Label();
-            this.LblConvCt = new System.Windows.Forms.Label();
             this.MainPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).BeginInit();
             this.SuspendLayout();
             // 
             // MainPanel
             // 
+            this.MainPanel.Controls.Add(this.LblAcTask);
+            this.MainPanel.Controls.Add(this.LblAcPopOut);
+            this.MainPanel.Controls.Add(this.LblAcDelete);
             this.MainPanel.Controls.Add(this.LblConvCt);
             this.MainPanel.Controls.Add(this.LblAcOpen);
             this.MainPanel.Controls.Add(this.LblAcBody);
@@ -95,11 +103,125 @@
             this.MainPanel.Controls.Add(this.LblSubject);
             this.MainPanel.Controls.Add(this.LblSender);
             this.MainPanel.Controls.Add(this.LblItemNumber);
+            this.MainPanel.Controls.Add(this.TopicThread);
             this.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainPanel.Location = new System.Drawing.Point(0, 0);
             this.MainPanel.Name = "MainPanel";
             this.MainPanel.Size = new System.Drawing.Size(2123, 907);
             this.MainPanel.TabIndex = 0;
+            // 
+            // LblConvCt
+            // 
+            this.LblConvCt.AutoSize = true;
+            this.LblConvCt.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblConvCt.Location = new System.Drawing.Point(1253, 35);
+            this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
+            this.LblConvCt.Name = "LblConvCt";
+            this.LblConvCt.Padding = new System.Windows.Forms.Padding(6);
+            this.LblConvCt.Size = new System.Drawing.Size(84, 63);
+            this.LblConvCt.TabIndex = 57;
+            this.LblConvCt.Text = "99";
+            // 
+            // LblAcOpen
+            // 
+            this.LblAcOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LblAcOpen.AutoSize = true;
+            this.LblAcOpen.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcOpen.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblAcOpen.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcOpen.Location = new System.Drawing.Point(62, 93);
+            this.LblAcOpen.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcOpen.Name = "LblAcOpen";
+            this.LblAcOpen.Size = new System.Drawing.Size(38, 33);
+            this.LblAcOpen.TabIndex = 54;
+            this.LblAcOpen.Text = "O";
+            // 
+            // LblAcBody
+            // 
+            this.LblAcBody.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LblAcBody.AutoSize = true;
+            this.LblAcBody.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcBody.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblAcBody.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcBody.Location = new System.Drawing.Point(65, 204);
+            this.LblAcBody.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcBody.Name = "LblAcBody";
+            this.LblAcBody.Size = new System.Drawing.Size(35, 33);
+            this.LblAcBody.TabIndex = 55;
+            this.LblAcBody.Text = "B";
+            // 
+            // L0v2h2_WebView2
+            // 
+            this.L0v2h2_WebView2.AllowExternalDrop = true;
+            this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
+            this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 204);
+            this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
+            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2017, 700);
+            this.L0v2h2_WebView2.TabIndex = 53;
+            this.L0v2h2_WebView2.ZoomFactor = 1D;
+            // 
+            // CboFolders
+            // 
+            this.CboFolders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CboFolders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CboFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CboFolders.FormattingEnabled = true;
+            this.CboFolders.Location = new System.Drawing.Point(1490, 97);
+            this.CboFolders.Margin = new System.Windows.Forms.Padding(0, 7, 0, 0);
+            this.CboFolders.Name = "CboFolders";
+            this.CboFolders.Size = new System.Drawing.Size(636, 41);
+            this.CboFolders.TabIndex = 52;
+            // 
+            // BtnDelItem
+            // 
+            this.BtnDelItem.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BtnDelItem.BackColor = System.Drawing.SystemColors.Control;
+            this.BtnDelItem.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.BtnDelItem.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Red;
+            this.BtnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.BtnDelItem.Image = global::QuickFiler.Properties.Resources.Delete;
+            this.BtnDelItem.Location = new System.Drawing.Point(2023, 35);
+            this.BtnDelItem.Margin = new System.Windows.Forms.Padding(0);
+            this.BtnDelItem.Name = "BtnDelItem";
+            this.BtnDelItem.Size = new System.Drawing.Size(100, 58);
+            this.BtnDelItem.TabIndex = 50;
+            this.BtnDelItem.TabStop = false;
+            this.BtnDelItem.UseVisualStyleBackColor = true;
+            // 
+            // BtnPopOut
+            // 
+            this.BtnPopOut.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BtnPopOut.Image = global::QuickFiler.Properties.Resources.ApplicationFlyout;
+            this.BtnPopOut.Location = new System.Drawing.Point(1923, 35);
+            this.BtnPopOut.Margin = new System.Windows.Forms.Padding(0);
+            this.BtnPopOut.Name = "BtnPopOut";
+            this.BtnPopOut.Size = new System.Drawing.Size(100, 58);
+            this.BtnPopOut.TabIndex = 51;
+            this.BtnPopOut.TabStop = false;
+            this.BtnPopOut.UseVisualStyleBackColor = true;
+            // 
+            // BtnFlagTask
+            // 
+            this.BtnFlagTask.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BtnFlagTask.Image = global::QuickFiler.Properties.Resources.FlagDarkRed;
+            this.BtnFlagTask.Location = new System.Drawing.Point(1823, 35);
+            this.BtnFlagTask.Margin = new System.Windows.Forms.Padding(0);
+            this.BtnFlagTask.Name = "BtnFlagTask";
+            this.BtnFlagTask.Size = new System.Drawing.Size(100, 58);
+            this.BtnFlagTask.TabIndex = 49;
+            this.BtnFlagTask.TabStop = false;
+            this.BtnFlagTask.UseVisualStyleBackColor = true;
             // 
             // TxtboxSearch
             // 
@@ -363,106 +485,59 @@
             this.LblItemNumber.Text = "[#]";
             this.LblItemNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // BtnFlagTask
+            // TopicThread
             // 
-            this.BtnFlagTask.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnFlagTask.Image = global::QuickFiler.Properties.Resources.FlagDarkRed;
-            this.BtnFlagTask.Location = new System.Drawing.Point(1823, 35);
-            this.BtnFlagTask.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnFlagTask.Name = "BtnFlagTask";
-            this.BtnFlagTask.Size = new System.Drawing.Size(100, 58);
-            this.BtnFlagTask.TabIndex = 49;
-            this.BtnFlagTask.TabStop = false;
-            this.BtnFlagTask.UseVisualStyleBackColor = true;
+            this.TopicThread.AllColumns.Add(this.sender);
+            this.TopicThread.AllColumns.Add(this.SentDate);
+            this.TopicThread.AllColumns.Add(this.infolder);
+            this.TopicThread.AllowDrop = true;
+            this.TopicThread.BackColor = System.Drawing.SystemColors.Control;
+            this.TopicThread.CellEditEnterChangesRows = true;
+            this.TopicThread.CellEditUseWholeCell = false;
+            this.TopicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.sender,
+            this.SentDate,
+            this.infolder});
+            this.TopicThread.Cursor = System.Windows.Forms.Cursors.Default;
+            this.TopicThread.EmptyListMsg = "The fast list is empty";
+            this.TopicThread.FullRowSelect = true;
+            this.TopicThread.HideSelection = false;
+            this.TopicThread.Location = new System.Drawing.Point(115, 96);
+            this.TopicThread.MultiSelect = false;
+            this.TopicThread.Name = "TopicThread";
+            this.TopicThread.ShowGroups = false;
+            this.TopicThread.Size = new System.Drawing.Size(1219, 102);
+            this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
+            this.TopicThread.TabIndex = 9;
+            this.TopicThread.UseCompatibleStateImageBehavior = false;
+            this.TopicThread.View = System.Windows.Forms.View.Details;
+            this.TopicThread.VirtualMode = true;
+            this.TopicThread.Visible = false;
             // 
-            // BtnDelItem
+            // sender
             // 
-            this.BtnDelItem.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnDelItem.BackColor = System.Drawing.SystemColors.Control;
-            this.BtnDelItem.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.BtnDelItem.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Red;
-            this.BtnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.BtnDelItem.Image = global::QuickFiler.Properties.Resources.Delete;
-            this.BtnDelItem.Location = new System.Drawing.Point(2023, 35);
-            this.BtnDelItem.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnDelItem.Name = "BtnDelItem";
-            this.BtnDelItem.Size = new System.Drawing.Size(100, 58);
-            this.BtnDelItem.TabIndex = 50;
-            this.BtnDelItem.TabStop = false;
-            this.BtnDelItem.UseVisualStyleBackColor = true;
+            this.sender.AspectName = "SenderName";
+            this.sender.FillsFreeSpace = true;
+            this.sender.HeaderForeColor = System.Drawing.SystemColors.ControlText;
+            this.sender.MinimumWidth = 200;
+            this.sender.Text = "From";
+            this.sender.Width = 200;
             // 
-            // BtnPopOut
+            // SentDate
             // 
-            this.BtnPopOut.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnPopOut.Image = global::QuickFiler.Properties.Resources.ApplicationFlyout;
-            this.BtnPopOut.Location = new System.Drawing.Point(1923, 35);
-            this.BtnPopOut.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnPopOut.Name = "BtnPopOut";
-            this.BtnPopOut.Size = new System.Drawing.Size(100, 58);
-            this.BtnPopOut.TabIndex = 51;
-            this.BtnPopOut.TabStop = false;
-            this.BtnPopOut.UseVisualStyleBackColor = true;
+            this.SentDate.AspectName = "SentDate";
+            this.SentDate.FillsFreeSpace = true;
+            this.SentDate.MinimumWidth = 250;
+            this.SentDate.Text = "Received";
+            this.SentDate.Width = 250;
             // 
-            // CboFolders
+            // infolder
             // 
-            this.CboFolders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CboFolders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CboFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CboFolders.FormattingEnabled = true;
-            this.CboFolders.Location = new System.Drawing.Point(1490, 97);
-            this.CboFolders.Margin = new System.Windows.Forms.Padding(0, 7, 0, 0);
-            this.CboFolders.Name = "CboFolders";
-            this.CboFolders.Size = new System.Drawing.Size(636, 41);
-            this.CboFolders.TabIndex = 52;
-            // 
-            // L0v2h2_WebView2
-            // 
-            this.L0v2h2_WebView2.AllowExternalDrop = true;
-            this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
-            coreWebView2CreationProperties9.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties9.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties9.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties9.Language = null;
-            coreWebView2CreationProperties9.ProfileName = null;
-            coreWebView2CreationProperties9.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties9;
-            this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
-            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 204);
-            this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
-            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2017, 700);
-            this.L0v2h2_WebView2.TabIndex = 53;
-            this.L0v2h2_WebView2.ZoomFactor = 1D;
-            // 
-            // LblAcOpen
-            // 
-            this.LblAcOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcOpen.AutoSize = true;
-            this.LblAcOpen.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcOpen.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcOpen.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcOpen.Location = new System.Drawing.Point(62, 93);
-            this.LblAcOpen.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcOpen.Name = "LblAcOpen";
-            this.LblAcOpen.Size = new System.Drawing.Size(38, 33);
-            this.LblAcOpen.TabIndex = 54;
-            this.LblAcOpen.Text = "O";
-            // 
-            // LblAcBody
-            // 
-            this.LblAcBody.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcBody.AutoSize = true;
-            this.LblAcBody.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcBody.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcBody.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcBody.Location = new System.Drawing.Point(65, 204);
-            this.LblAcBody.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcBody.Name = "LblAcBody";
-            this.LblAcBody.Size = new System.Drawing.Size(35, 33);
-            this.LblAcBody.TabIndex = 55;
-            this.LblAcBody.Text = "B";
+            this.infolder.AspectName = "Folder";
+            this.infolder.FillsFreeSpace = true;
+            this.infolder.MinimumWidth = 200;
+            this.infolder.Text = "In Folder";
+            this.infolder.Width = 200;
             // 
             // LblAcDelete
             // 
@@ -506,37 +581,23 @@
             this.LblAcTask.TabIndex = 7;
             this.LblAcTask.Text = "T";
             // 
-            // LblConvCt
-            // 
-            this.LblConvCt.AutoSize = true;
-            this.LblConvCt.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblConvCt.Location = new System.Drawing.Point(1253, 35);
-            this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
-            this.LblConvCt.Name = "LblConvCt";
-            this.LblConvCt.Padding = new System.Windows.Forms.Padding(6);
-            this.LblConvCt.Size = new System.Drawing.Size(84, 63);
-            this.LblConvCt.TabIndex = 57;
-            this.LblConvCt.Text = "99";
-            // 
             // ItemViewerLight
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Controls.Add(this.LblAcDelete);
-            this.Controls.Add(this.LblAcPopOut);
-            this.Controls.Add(this.LblAcTask);
             this.Controls.Add(this.MainPanel);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.MinimumSize = new System.Drawing.Size(1516, 197);
             this.Name = "ItemViewerLight";
             this.Size = new System.Drawing.Size(2123, 907);
+            this.Resize += new System.EventHandler(this.ItemViewerLight_Resize);
             this.MainPanel.ResumeLayout(false);
             this.MainPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -574,5 +635,10 @@
         internal System.Windows.Forms.Label LblAcPopOut;
         internal System.Windows.Forms.Label LblAcTask;
         internal System.Windows.Forms.Label LblConvCt;
+        public BrightIdeasSoftware.FastObjectListView TopicThread;
+        private BrightIdeasSoftware.OLVColumn sender;
+        internal BrightIdeasSoftware.OLVColumn SentDate;
+        private BrightIdeasSoftware.OLVColumn infolder;
+
     }
 }

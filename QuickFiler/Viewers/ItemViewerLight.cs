@@ -8,17 +8,23 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS;
 
-namespace QuickFiler.Viewers
+namespace QuickFiler
 {
     public partial class ItemViewerLight : UserControl
     {
         public ItemViewerLight()
         {
             InitializeComponent();
+            InitResizers();
+            _context = SynchronizationContext.Current;
+            InitTips();
         }
 
         private List<Resizer> _resizers = new List<Resizer>();
+        private Size _originalSize;
+        private Size _originalSizeNoNav;
 
         private IList<Label> _tipsLabels;
         public IList<Label> TipsLabels { get => _tipsLabels; }
@@ -34,6 +40,21 @@ namespace QuickFiler.Viewers
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
+
+        private Enums.ToggleState _navState;
+        public void ToggleNav()
+        {
+            _navState ^= Enums.ToggleState.On;
+            _resizers.ForEach(r => r.ToggleNav(_navState));
+            ResizeControls();
+        }
+
+        public void ToggleNav(Enums.ToggleState desiredState)
+        {
+            _navState = desiredState;
+            _resizers.ForEach(r => r.ToggleNav(_navState));
+            ResizeControls();
+        }
 
         private void InitTips()
         {
@@ -75,6 +96,10 @@ namespace QuickFiler.Viewers
         private void InitResizers()
         {
             var navCols = GetNavColWidths();
+            
+            _originalSize = this.Size;
+            _originalSizeNoNav = new Size(_originalSize.Width - navCols.Sum(), _originalSize.Height);
+
             //Column 1 - Nav Column
             _resizers.Add(new Resizer(control: this.LblItemNumber, shiftRatio: new PointF(0.0f, 0.0f),stretchRatio: new PointF(0.0f, 0.0f),navShift: new Size(0, 0), navStretch: new Size(0, 0)));
             _resizers.Add(new Resizer(control: this.LblAcOpen, shiftRatio: new PointF(0.0f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(0, 0), navStretch: new Size(0, 0)));
@@ -85,6 +110,7 @@ namespace QuickFiler.Viewers
             _resizers.Add(new Resizer(control: this.LblSender, shiftRatio: new PointF(0.0f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth1, 0), navStretch: new Size(0, 0)));
             _resizers.Add(new Resizer(control: this.LblSubject, shiftRatio: new PointF(0.0f, 0.0f), stretchRatio: new PointF(0.45f, 0.0f), navShift: new Size(-navWidth1, 0), navStretch: new Size(0,0)));
             _resizers.Add(new Resizer(control: this.TxtboxBody, shiftRatio: new PointF(0.0f, 0.0f), stretchRatio: new PointF(0.45f, 0.0f), navShift: new Size(-navWidth1, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.TopicThread, shiftRatio: new PointF(0.0f, 0.0f), stretchRatio: new PointF(0.45f, 0.0f), navShift: new Size(-navWidth1, 0), navStretch: new Size(0, 0)));
 
             //Column Group 3
             _resizers.Add(new Resizer(control: this.lblCaptionTriage, shiftRatio: new PointF(0.2f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth1, 0), navStretch: new Size(0, 0)));
@@ -102,27 +128,53 @@ namespace QuickFiler.Viewers
 
             //Column Group 6
             var navWidth6 = navCols.Take(2).Sum();
+            _resizers.Add(new Resizer(control: this.LblAcConversation, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth6, 0), navStretch: new Size(0, 0)));
             _resizers.Add(new Resizer(control: this.CbxConversation, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth6, 0), navStretch: new Size(0, 0)));
-            _resizers.Add(new Resizer(control: this.TxtboxSearch, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth6, 0), navStretch: new Size(-navCols[2], 0)));
+            _resizers.Add(new Resizer(control: this.LblAcSearch, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth6, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.LblAcFolder, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth6, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.TxtboxSearch, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(1.00f, 0.0f), navShift: new Size(-navWidth6, 0), navStretch: new Size(-navCols[2], 0)));
             var navStretch2 = navCols[2] + navCols[3];
             _resizers.Add(new Resizer(control: this.CboFolders, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(1.0f, 0.0f), navShift: new Size(-navWidth6, 0), navStretch: new Size(-navStretch2, 0)));
 
 
             //Column Group 7
             var navWidth7 = navCols.Take(3).Sum();
-            _resizers.Add(new Resizer(control: this.CbxAttachments, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth7, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.LblAcAttachments, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.45f, 0.0f), navShift: new Size(-navWidth7, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.CbxAttachments, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.45f, 0.0f), navShift: new Size(-navWidth7, 0), navStretch: new Size(0, 0)));
 
             //Column Group 8
             var navWidth8 = navCols.Take(4).Sum();
-            _resizers.Add(new Resizer(control: this.BtnFlagTask, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
-            _resizers.Add(new Resizer(control: this.BtnPopOut, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
-            _resizers.Add(new Resizer(control: this.BtnDelItem, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
-            _resizers.Add(new Resizer(control: this.LblAcTask, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
-            _resizers.Add(new Resizer(control: this.LblAcPopOut, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
-            _resizers.Add(new Resizer(control: this.LblAcDelete, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.LblAcEmail, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.45f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.CbxEmailCopy, shiftRatio: new PointF(0.45f, 0.0f), stretchRatio: new PointF(0.45f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.BtnFlagTask, shiftRatio: new PointF(1.00f, 0.0f), stretchRatio: new PointF(1.00f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.BtnPopOut, shiftRatio: new PointF(1.00f, 0.0f), stretchRatio: new PointF(1.00f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.BtnDelItem, shiftRatio: new PointF(1.00f, 0.0f), stretchRatio: new PointF(1.00f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.LblAcTask, shiftRatio: new PointF(1.00f, 0.0f), stretchRatio: new PointF(1.00f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.LblAcPopOut, shiftRatio: new PointF(1.00f, 0.0f), stretchRatio: new PointF(1.00f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
+            _resizers.Add(new Resizer(control: this.LblAcDelete, shiftRatio: new PointF(1.00f, 0.0f), stretchRatio: new PointF(1.00f, 0.0f), navShift: new Size(-navWidth8, 0), navStretch: new Size(0, 0)));
 
             //Webview
-            _resizers.Add(new Resizer(control: this.L0v2h2_WebView2, shiftRatio: new PointF(0.0f, 0.0f), stretchRatio: new PointF(0.0f, 0.0f), navShift: new Size(-navWidth1, 0), navStretch: new Size(navCols.Skip(1).Sum(), 0)));
+            _resizers.Add(new Resizer(control: this.L0v2h2_WebView2, shiftRatio: new PointF(0.0f, 0.0f), stretchRatio: new PointF(1.0f, 1.0f), navShift: new Size(-navWidth1, 0), navStretch: new Size(navCols.Skip(1).Sum(), 0)));
+        }
+
+        internal void ResizeControls()
+        {
+            if (_resizers is not null)
+            {
+                var delta = this.Size - (_navState.HasFlag(Enums.ToggleState.On) ? _originalSize : _originalSizeNoNav);
+                _resizers.ForEach(r => r.Transform(delta));
+
+            }
+        }
+
+        private void ItemViewerLight_Resize(object sender, EventArgs e)
+        {
+            if (_resizers is not null) 
+            { 
+                var delta = this.Size - (_navState.HasFlag(Enums.ToggleState.On) ? _originalSize : _originalSizeNoNav);
+                _resizers.ForEach(r => r.Transform(delta));
+                
+            }
         }
     }
 }
