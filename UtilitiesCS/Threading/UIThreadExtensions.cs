@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using UtilitiesCS.Threading;
+using System.Windows.Threading;
 
 namespace UtilitiesCS
 {
@@ -45,11 +46,12 @@ namespace UtilitiesCS
             _syncContextForm = new SyncContextForm();
             _uiContext = _syncContextForm.UiSyncContext;
             Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            _uiDispatcher = Dispatcher.CurrentDispatcher;
             if (monitorUiThread)
             {
                 _threadMonitor = new ThreadMonitor(Thread.CurrentThread, delayThreshold: 300);
                 _threadMonitor.Run();
-            }
+            }   
         }
         
         public static SynchronizationContext GetUiContext()
@@ -59,5 +61,8 @@ namespace UtilitiesCS
         }
 
         private static ThreadMonitor _threadMonitor;
+        
+        public static Dispatcher UiDispatcher => _uiDispatcher;
+        private static Dispatcher _uiDispatcher;
     }
 }

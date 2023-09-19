@@ -26,6 +26,18 @@ namespace QuickFiler
             }
         }
 
+        public static void BuildQueueBackground(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+                {
+                    _queue.Enqueue(new ItemViewer());
+                    logger.Debug($"Enqueued {_queue.Count}");
+                }, System.Windows.Threading.DispatcherPriority.Background);
+            }
+        }
+
         public static void BuildQueue(int count)
         {
             for (int i = 0; i < count; i++)

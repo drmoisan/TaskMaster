@@ -36,7 +36,8 @@ namespace TaskMaster
 
             // Initialize long loading elements on a low priority thread
             EfcViewerQueue.BuildQueue(2);
-            ItemViewerQueue.BuildQueueWhenIdle(10);
+            //ItemViewerQueue.BuildQueueWhenIdle(10);
+            ItemViewerQueue.BuildQueueBackground(30);
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();
