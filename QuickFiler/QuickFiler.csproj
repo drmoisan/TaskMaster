@@ -292,6 +292,7 @@
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\QfcThemeHelper.cs" />
+    <Compile Include="Helper Classes\Resizer.cs" />
     <Compile Include="Interfaces\IItemControler.cs" />
     <Compile Include="Interfaces\IQfcFormViewer.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
@@ -341,6 +342,12 @@
     <Compile Include="Viewers\ItemViewer.Designer.cs">
       <DependentUpon>ItemViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewers\ItemViewerLight.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\ItemViewerLight.Designer.cs">
+      <DependentUpon>ItemViewerLight.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcItemViewerExpanded.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -387,6 +394,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\ItemViewer.resx">
       <DependentUpon>ItemViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\ItemViewerLight.resx">
+      <DependentUpon>ItemViewerLight.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx">
       <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>

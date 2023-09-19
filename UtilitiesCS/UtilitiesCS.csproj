@@ -284,6 +284,7 @@
     <Compile Include="EmailIntelligence\EmailDetails.cs" />
     <Compile Include="EmailIntelligence\RecipientInfo.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
+    <Compile Include="Extensions\DrawingExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />

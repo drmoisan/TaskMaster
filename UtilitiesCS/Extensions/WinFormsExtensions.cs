@@ -45,8 +45,6 @@ namespace UtilitiesCS
             }
         }
 
-        
-
         public static IEnumerable<Control> GetAllChildren(this Control root)
         {
             var stack = new Stack<Control>();
@@ -67,7 +65,6 @@ namespace UtilitiesCS
             handler.GetInvocationList()
                    .Any(existingHandler => existingHandler == prospectiveHandler);
 
-        
         public static T Clone<T>(this T controlToClone)
             where T : Control
         {
@@ -90,5 +87,7 @@ namespace UtilitiesCS
             return instance;
         }
         
+
+
     }
 }

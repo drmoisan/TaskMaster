@@ -55,7 +55,7 @@ namespace QuickFiler.Legacy
             this.L1v.Controls.Add(this.L1v1L2_PanelMain, 0, 0);
             this.L1v.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v.Location = new System.Drawing.Point(0, 0);
-            this.L1v.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v.Margin = new System.Windows.Forms.Padding(6);
             this.L1v.Name = "L1v";
             this.L1v.RowCount = 2;
             this.L1v.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -80,7 +80,7 @@ namespace QuickFiler.Legacy
             this.L1v2L2h.Controls.Add(this.L1v2L2h5_SpnEmailPerLoad, 5, 0);
             this.L1v2L2h.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v2L2h.Location = new System.Drawing.Point(6, 425);
-            this.L1v2L2h.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v2L2h.Margin = new System.Windows.Forms.Padding(6);
             this.L1v2L2h.Name = "L1v2L2h";
             this.L1v2L2h.RowCount = 1;
             this.L1v2L2h.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -132,7 +132,7 @@ namespace QuickFiler.Legacy
             // 
             this.L1v2L2h4_ButtonUndo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v2L2h4_ButtonUndo.Location = new System.Drawing.Point(1234, 6);
-            this.L1v2L2h4_ButtonUndo.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v2L2h4_ButtonUndo.Margin = new System.Windows.Forms.Padding(6);
             this.L1v2L2h4_ButtonUndo.Name = "L1v2L2h4_ButtonUndo";
             this.L1v2L2h4_ButtonUndo.Size = new System.Drawing.Size(108, 84);
             this.L1v2L2h4_ButtonUndo.TabIndex = 2;
@@ -158,7 +158,7 @@ namespace QuickFiler.Legacy
             this.L1v1L2_PanelMain.Controls.Add(this.L1v1L2L3v);
             this.L1v1L2_PanelMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v1L2_PanelMain.Location = new System.Drawing.Point(6, 6);
-            this.L1v1L2_PanelMain.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.L1v1L2_PanelMain.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2_PanelMain.Name = "L1v1L2_PanelMain";
             this.L1v1L2_PanelMain.Size = new System.Drawing.Size(1816, 407);
             this.L1v1L2_PanelMain.TabIndex = 1;
@@ -187,7 +187,7 @@ namespace QuickFiler.Legacy
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(26, 25);
-            this.button1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.button1.Margin = new System.Windows.Forms.Padding(6);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(150, 44);
             this.button1.TabIndex = 2;
@@ -201,7 +201,7 @@ namespace QuickFiler.Legacy
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1828, 527);
             this.Controls.Add(this.L1v);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "QfcFormLegacyViewer";
             this.Text = "Quick File";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.QuickFileViewer_Closing);
