@@ -1,10 +1,13 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using QuickFiler.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,17 +36,23 @@ namespace QuickFiler.Controllers
             _formViewer = formViewer;
             _homeController = homeController;
             _dataModel = dataModel;
-            //_mailItem = mailItem;
             _initType = initType;
-            LoadSettings();
             _itemViewer = _formViewer.ItemViewer;
             _itemTlp = _formViewer.L0vh_TLP;
+            
+            LoadSettings();
             CaptureConfigureItemViewer();
+            
             _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel);
+            
             _listTipsDetails = _formViewer.TipsLabels
                                .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
                                .ToList();
             _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off, true));
+            _listButtons  = _formViewer.GetAllChildren().Where(x => x is Button).Cast<Button>().ToList();
+            _listOthers = _formViewer.GetAllChildren().Where(x => !_listButtons.Contains(x) && !_formViewer.TipsLabels.Contains(x)).ToList();
+            _themes = EfcThemeHelper.SetupFormThemes(_formViewer.TipsLabels.Cast<Control>().ToList(), _listOthers, _listButtons.Cast<Control>().ToList());
+            _activeTheme = LoadTheme();
 
             WireEventHandlers();
             _ = PopulateFolderCombobox();
@@ -55,7 +64,7 @@ namespace QuickFiler.Controllers
         private EfcViewer _formViewer;
         private EfcHomeController _homeController;
         private EfcItemController _itemController;
-        private QfcItemViewer _itemViewer;
+        private ItemViewer _itemViewer;
         //private FolderHandler _folderHandler;
         //private MailItem _mailItem;
         private QfEnums.InitTypeEnum _initType;
@@ -65,6 +74,9 @@ namespace QuickFiler.Controllers
         private int _tlpHeightExpanded;
         private int _tlpHeightCollapsed;
         private int _tlpHeightDiff;
+        private Dictionary<string, Theme> _themes;
+        private List<Button> _listButtons;
+        private List<Control> _listOthers;
 
         internal void CaptureConfigureItemViewer()
         {
@@ -78,6 +90,7 @@ namespace QuickFiler.Controllers
         
         public void Cleanup()
         {
+            _globals.Ol.PropertyChanged -= DarkMode_Changed;
             _globals = null;
             _formViewer = null;
             _dataModel = null;
@@ -87,6 +100,26 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Public Properties
+
+        private string _activeTheme;
+        public string ActiveTheme
+        {
+            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) => _themes[x].SetTheme(async: true));
+        }
+        internal string LoadTheme()
+        {
+            var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
+            _themes[activeTheme].SetTheme();
+            return activeTheme;
+        }
+
+        private bool _darkMode;
+        public bool DarkMode
+        {
+            get => Initializer.GetOrLoad(ref _darkMode, () => _globals.Ol.DarkMode, false, _globals, _globals.Ol);
+            set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
+        }
 
         public IntPtr FormHandle => _formViewer.Handle;
 
@@ -161,6 +194,7 @@ namespace QuickFiler.Controllers
             _formViewer.NewFolder.Click += ButtonCreate_Click;
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
+            _globals.Ol.PropertyChanged += DarkMode_Changed;
         }
                
         async public void ButtonCancel_Click(object sender, EventArgs e)
@@ -259,6 +293,16 @@ namespace QuickFiler.Controllers
                 { 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync) },
                 { 'T', async (x) => await KbdExecuteAsync(ActionDeleteAsync) }
             };
+        }
+
+        internal void DarkMode_Changed(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(_globals.Ol.DarkMode))
+            {
+                _darkMode = _globals.Ol.DarkMode;
+                if (DarkMode) { ActiveTheme = "DarkNormal"; }
+                else { ActiveTheme = "LightNormal"; }
+            }
         }
 
         #endregion

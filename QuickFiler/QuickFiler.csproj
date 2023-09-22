@@ -12,7 +12,7 @@
     <RootNamespace>QuickFiler</RootNamespace>
     <AssemblyName>QuickFiler</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
@@ -291,6 +291,7 @@
     <Compile Include="Controllers\EfcItemController.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
+    <Compile Include="Helper Classes\EfcThemeHelper.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\QfcThemeHelper.cs" />
     <Compile Include="Interfaces\IItemControler.cs" />

@@ -154,6 +154,9 @@ namespace TaskMaster
             }
         }
 
+        internal void ToggleDarkMode() => _globals.Ol.DarkMode = !_globals.Ol.DarkMode;
+        internal bool IsDarkModeActive() => _globals.Ol.DarkMode;
+
         internal void HideHeadersNoChildren()
         {
             var dataTree = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());

@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace QuickFiler
 {
-    public static class QfcThemeHelper
+    internal static class QfcThemeHelper
     {
         public static void SetTheme(this TableLayoutPanel tlp, 
                                     Color backColor)

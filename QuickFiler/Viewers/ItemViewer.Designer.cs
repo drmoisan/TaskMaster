@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties3 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.L0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.CboFolders = new System.Windows.Forms.ComboBox();
@@ -141,13 +141,13 @@
             this.L0v2h2_WebView2.AllowExternalDrop = true;
             this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
             this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 18);
-            coreWebView2CreationProperties3.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties3.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties3.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties3.Language = null;
-            coreWebView2CreationProperties3.ProfileName = null;
-            coreWebView2CreationProperties3.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties3;
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 204);

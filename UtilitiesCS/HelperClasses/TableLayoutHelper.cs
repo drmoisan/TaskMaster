@@ -9,7 +9,7 @@ namespace UtilitiesCS
 {
     public static class TableLayoutHelper
     {
-        public static void InsertSpecificRow(TableLayoutPanel panel, int rowIndex, RowStyle templateStyle, int insertCount = 1) 
+        public static void InsertSpecificRow(this TableLayoutPanel panel, int rowIndex, RowStyle templateStyle, int insertCount = 1) 
         {
             if ((rowIndex < 0)||(rowIndex>panel.RowCount))
             {
@@ -40,7 +40,7 @@ namespace UtilitiesCS
 
         }
 
-        public static void RemoveSpecificRow(TableLayoutPanel panel, int rowIndex, int removeCount = 1)
+        public static void RemoveSpecificRow(this TableLayoutPanel panel, int rowIndex, int removeCount = 1)
         {
             if (rowIndex >= panel.RowCount)
             {
@@ -81,39 +81,46 @@ namespace UtilitiesCS
             panel.RowCount -= removeCount;
         }
 
-        public static void RemoveSpecificColumn(TableLayoutPanel panel, int colIndex)
+        public static void RemoveSpecificColumn(this TableLayoutPanel panel, int colIndex, int removeCount = 1)
         {
             if (colIndex >= panel.ColumnCount)
             {
                 return;
             }
 
-            // delete all controls of row that we want to delete
-            for (int i = 0; i < panel.ColumnCount; i++)
+            for (int i = colIndex; i < colIndex + removeCount; i++)
             {
-                var control = panel.GetControlFromPosition(i, colIndex);
-                panel.Controls.Remove(control);
-            }
-
-            // move up row controls that comes after row we want to remove
-            for (int i = colIndex + 1; i < panel.ColumnCount; i++)
-            {
+                // delete all controls of column or set of columns that we want to delete
                 for (int j = 0; j < panel.RowCount; j++)
                 {
                     var control = panel.GetControlFromPosition(i,j);
+                    if (control is not null)
+                        panel.Controls.Remove(control);
+                }
+
+            }
+
+            // move over column controls that come after row we want to remove
+            for (int i = colIndex + removeCount; i < panel.ColumnCount; i++)
+            {
+                for (int j = 0; j < panel.RowCount; j++)
+                {
+                    var control = panel.GetControlFromPosition(i, j);
                     if (control != null)
                     {
-                        panel.SetColumn(control, i - 1);
+                        panel.SetColumn(control, i - removeCount);
                     }
                 }
             }
 
-            var removeStyle = panel.ColumnCount - 1;
+            for (int i = colIndex + removeCount - 1; i >= colIndex; i--)
+            {
+                panel.ColumnStyles.RemoveAt(i);
+            }
+            
+            
 
-            if (panel.ColumnStyles.Count > removeStyle)
-                panel.ColumnStyles.RemoveAt(removeStyle);
-
-            panel.ColumnCount--;
+            panel.ColumnCount -= removeCount;
         }
 
         public static RowStyle Clone(this RowStyle sourceStyle)

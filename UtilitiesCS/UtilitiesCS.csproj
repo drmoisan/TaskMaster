@@ -284,9 +284,12 @@
     <Compile Include="EmailIntelligence\EmailDetails.cs" />
     <Compile Include="EmailIntelligence\RecipientInfo.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
+    <Compile Include="Extensions\DrawingExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />
+    <Compile Include="HelperClasses\GenericBitwise.cs" />
+    <Compile Include="HelperClasses\Initializer.cs" />
     <Compile Include="HelperClasses\Theme.cs" />
     <Compile Include="HelperClasses\ThemeControlGroup.cs" />
     <Compile Include="Extensions\QueueExtensions.cs" />
@@ -358,7 +361,7 @@
     <Compile Include="HelperClasses\ConversationHelper.cs" />
     <Compile Include="Extensions\DfMLNet.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
-    <Compile Include="HelperClasses\FlagsHelper.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceList.cs" />
     <Compile Include="EmailIntelligence\CtfIncidence.cs" />
     <Compile Include="Dialogs\DelegateButton.cs" />

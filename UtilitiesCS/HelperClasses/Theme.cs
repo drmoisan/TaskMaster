@@ -113,10 +113,11 @@ namespace UtilitiesCS
         public Theme() { }
 
         public Theme(string name,
-                     ScoDictionary<string, ThemeControlGroup> controlGroups)
+                     Dictionary<string, ThemeControlGroup> controlGroups)
         {
             if (controlGroups is null) { throw new ArgumentNullException(nameof(controlGroups));}
             _name = name;
+            _controlGroups = controlGroups;
         }
 
         
@@ -124,9 +125,6 @@ namespace UtilitiesCS
         
 
         #region Public Properties
-
-        private ScoDictionary<string, ThemeControlGroup> _controlGroups;
-        public ScoDictionary<string, ThemeControlGroup> ControlGroups { get => _controlGroups; set => _controlGroups = value; }
 
         private Color _navBackColor;
         public Color NavBackColor { get => _navBackColor; set => _navBackColor = value; }
@@ -205,6 +203,9 @@ namespace UtilitiesCS
        
         private string _name;
         public string Name { get => _name; set => _name = value; }
+
+        private Dictionary<string, ThemeControlGroup> _controlGroups;
+        public Dictionary<string, ThemeControlGroup> ControlGroups { get => _controlGroups; set => _controlGroups = value; }
 
         #endregion
 
@@ -339,12 +340,12 @@ namespace UtilitiesCS
 
         public void SetTheme()
         {
-            throw new NotImplementedException();
+            ControlGroups.ForEach(controlGroup => controlGroup.Value.ApplyTheme());
         }
 
         public void SetTheme(bool async)
         {
-            throw new NotImplementedException();
+            ControlGroups.ForEach(controlGroup => controlGroup.Value.ApplyTheme(async));
         }
 
         #endregion

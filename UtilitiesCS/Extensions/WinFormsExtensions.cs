@@ -45,7 +45,39 @@ namespace UtilitiesCS
             }
         }
 
-        
+        public static void ForAllControls<T>(this Control parent, T value, Action<Control, T> action, IList<Control> except)
+        {
+            if (!except.Contains(parent))
+            {
+                foreach (Control c in parent.Controls)
+                {
+                    ForAllControls(c, value, action, except);
+                }
+                action(parent, value);
+            }
+        }
+
+        public static void ForAllControls<T>(this Control parent, T value, Func<Control, T, T> function, IList<Control> except)
+        {
+            if (!except.Contains(parent))
+            {
+                T seedValue = function(parent, value);
+                foreach (Control c in parent.Controls)
+                {
+                    ForAllControls(c, seedValue, function, except);
+                }
+            }
+            
+        }
+
+        public static void ForAllControls<T>(this Control parent, T value, Func<Control, T, T> function)
+        {
+            T seedValue = function(parent, value);
+            foreach (Control c in parent.Controls)
+            {
+                ForAllControls(c, seedValue, function);
+            }
+        }
 
         public static IEnumerable<Control> GetAllChildren(this Control root)
         {
