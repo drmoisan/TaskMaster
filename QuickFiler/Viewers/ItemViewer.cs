@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+//using System.Web.UI.WebControls;
 using System.Windows.Forms;
 using UtilitiesCS;
 
@@ -38,28 +39,36 @@ namespace QuickFiler
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
 
-        public void RemoveControlsRightOf(Control furthestRight)
+        public void RemoveControlsColsRightOf(Control furthestRight)
         {
             if (furthestRight.Parent is TableLayoutPanel) 
             {
                 var tlp = (TableLayoutPanel)furthestRight.Parent;
                 var columnNumber = tlp.GetColumn(furthestRight);
+                tlp.SetColumnSpan(L0v2h2_WebView2, 10);
+
                 if (++columnNumber < tlp.ColumnCount)
                 {
                     var columnsToRemove = tlp.ColumnCount - columnNumber;
                     tlp.RemoveSpecificColumn(columnNumber, columnsToRemove);
+
                 }
             }
             else 
             { 
-                var controlsToRemove = ControlsRightOf(furthestRight);
-                for (int i = controlsToRemove.Count - 1; i >= 0; i--)
-                {
-                    var control = controlsToRemove[i];
-                    control.Parent.Controls.Remove(control);
-                    controlsToRemove.RemoveAt(i);
-                    control.Dispose();
-                }
+                RemoveControlsRightOf(furthestRight);
+            }
+        }
+
+        private void RemoveControlsRightOf(Control furthestRight)
+        {
+            var controlsToRemove = ControlsRightOf(furthestRight);
+            for (int i = controlsToRemove.Count - 1; i >= 0; i--)
+            {
+                var control = controlsToRemove[i];
+                control.Parent.Controls.Remove(control);
+                controlsToRemove.RemoveAt(i);
+                control.Dispose();
             }
         }
 
@@ -81,6 +90,7 @@ namespace QuickFiler
             _leftTipsLabels = new List<Label>
             {
                 LblAcOpen,
+                LblAcBody,
             };
 
             //_rightControls = ControlsRightOf(this.LblConvCt);
@@ -112,6 +122,11 @@ namespace QuickFiler
                 limit = furthestRight.Location + furthestRight.Size;
             }
             return controlLocation.Where(tup => tup.Point.X > limit.X).Select(tup => tup.Control).ToList();
+        }
+
+        private void L0v2h2_WebView2_ParentChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine("Parent Changed");
         }
     }
 }

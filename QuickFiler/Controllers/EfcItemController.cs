@@ -147,9 +147,9 @@ namespace QuickFiler.Controllers
         internal void AdjustViewerForEfc()
         {
             // Collapse the right side of the navigation, disable all right side controls, and make them invisible
-            //_itemViewer.L1h1L2v.ForAllControls(c => { c.Enabled = false; c.Visible = false; });
+            //_itemViewer.L1h1L2v.ForAllControl(c => { c.Enabled = false; c.Visible = false; });
             //_itemViewer.L1h.Panel2Collapsed = true;
-            _itemViewer.RemoveControlsRightOf(_itemViewer.LblConvCt);
+            _itemViewer.RemoveControlsColsRightOf(_itemViewer.LblConvCt);
             
             // Adjust the navigation formatting to account for the fact that there is no item position label
             var widthAdjustment = _itemViewer.LblItemNumber.Width - _itemViewer.LblAcOpen.Width;
@@ -515,7 +515,15 @@ namespace QuickFiler.Controllers
                 throw (e.InitializationException);
             }
             _isWebViewerInitialized = true;
-            _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.Html);
+            if (DarkMode)
+            {
+                _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.ToggleDark(Enums.ToggleState.On));
+            }
+            else
+            {
+                _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.ToggleDark(Enums.ToggleState.Off));
+            }
+            //_itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.Html);
             _itemViewer.L0v2h2_WebView2.Visible = false;
         }
         

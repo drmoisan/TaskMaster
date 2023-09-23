@@ -74,38 +74,49 @@ namespace QuickFiler.Helper_Classes
         }
 
         public static Dictionary<string, Theme> SetupFormThemes(IList<Control> tips,
-                                                                IList<Control> dflt2,
-                                                                IList<Control> buttons)
+                                                                IList<Control> highlighted,
+                                                                IList<Control> default2Color,
+                                                                IList<Control> buttons,
+                                                                IList<Control> checkboxes)
         {
             //dflt2 should have tlps, multiline textboxes
             //selectors should have combo, search
+            var darkDarkGrey = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30))))); //30,30,30
             var lightNormal = new Dictionary<string, ThemeControlGroup>
             {
                 //{ "Nav", new ThemeControlGroup(controls: nav, back: SystemColors.HotTrack, fore: SystemColors.Control) },
                 { "Tips", new ThemeControlGroup(controls: tips, back: Color.Black, fore: Color.White) },
-                { "Default2Color", new ThemeControlGroup(controls: dflt2, back: SystemColors.Control, fore: SystemColors.ControlText) },
-                { "Buttons", new ThemeControlGroup(controls: buttons, back: SystemColors.Control, fore: SystemColors.ControlText) },
+                { "highlighted", new ThemeControlGroup(controls: highlighted, back: Color.White, fore: SystemColors.ControlText) },
+                { "Default2Color", new ThemeControlGroup(controls: default2Color, back: SystemColors.Control, fore: SystemColors.ControlText) },
+                { "Buttons", new ThemeControlGroup(controls: buttons, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((Button)x).DialogResult == DialogResult.OK ) },
+                { "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((CheckBox)x).Checked ) },
             };
             var lightActive = new Dictionary<string, ThemeControlGroup>
             {
                 //{ "Nav", new ThemeControlGroup(controls: nav, back: Color.Green, fore: SystemColors.Control) },
                 { "Tips", new ThemeControlGroup(controls: tips, back: Color.Black, fore: Color.White) },
-                { "Default2Color", new ThemeControlGroup(controls: dflt2, back: Color.LightCyan, fore: SystemColors.ControlText) },
-                { "Buttons", new ThemeControlGroup(controls: buttons, back: SystemColors.Control, fore: SystemColors.ControlText) },
+                { "highlighted", new ThemeControlGroup(controls: highlighted, back: Color.White, fore: SystemColors.ControlText) },
+                { "Default2Color", new ThemeControlGroup(controls: default2Color, back: Color.LightCyan, fore: SystemColors.ControlText) },
+                { "Buttons", new ThemeControlGroup(controls: buttons, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((Button)x).DialogResult == DialogResult.OK ) },
+                { "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((CheckBox)x).Checked ) },
             };
             var darkNormal = new Dictionary<string, ThemeControlGroup>
             {
                 //{ "Nav", new ThemeControlGroup(controls: nav, back: Color.FromArgb(64,64,64), fore: SystemColors.Control) },
                 { "Tips", new ThemeControlGroup(controls: tips, back: Color.LightSkyBlue, fore: SystemColors.ControlText) },
-                { "Default2Color", new ThemeControlGroup(controls: dflt2, back: Color.Black, fore: Color.WhiteSmoke) },
-                { "Buttons", new ThemeControlGroup(controls: buttons, back: Color.DimGray, fore: Color.WhiteSmoke) },
+                { "highlighted", new ThemeControlGroup(controls: highlighted, back: darkDarkGrey, fore: Color.WhiteSmoke) },
+                { "Default2Color", new ThemeControlGroup(controls: default2Color, back: Color.Black, fore: Color.WhiteSmoke) },
+                { "Buttons", new ThemeControlGroup(controls: buttons, backMain: Color.DimGray, foreMain: Color.WhiteSmoke, backAlt: Color.DimGray, foreAlt: Color.WhiteSmoke, hover: Color.DarkGray, isAltHover: (x) => ((Button)x).DialogResult == DialogResult.OK ) },
+                { "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: Color.Black, foreMain: Color.WhiteSmoke, backAlt: Color.Black, foreAlt: Color.WhiteSmoke, hover: Color.DarkGray, isAltHover: (x) => ((CheckBox)x).Checked ) },
             };
             var darkActive = new Dictionary<string, ThemeControlGroup>
             {
                 //{ "Nav", new ThemeControlGroup(controls: nav, back: SystemColors.HotTrack, fore: SystemColors.Control) },
                 { "Tips", new ThemeControlGroup(controls: tips, back: Color.LightSkyBlue, fore: SystemColors.ControlText) },
-                { "Default2Color", new ThemeControlGroup(controls: dflt2, back: Color.FromArgb(64,64,64), fore:Color.WhiteSmoke) },
-                { "Buttons", new ThemeControlGroup(controls: buttons, back: Color.DimGray, fore: Color.WhiteSmoke) },
+                { "highlighted", new ThemeControlGroup(controls: highlighted, back: darkDarkGrey, fore: Color.WhiteSmoke) },
+                { "Default2Color", new ThemeControlGroup(controls: default2Color, back: Color.FromArgb(64,64,64), fore:Color.WhiteSmoke) },
+                { "Buttons", new ThemeControlGroup(controls: buttons, backMain: Color.DimGray, foreMain: Color.WhiteSmoke, backAlt: Color.DimGray, foreAlt: Color.WhiteSmoke, hover: Color.DarkGray, isAltHover: (x) => ((Button)x).DialogResult == DialogResult.OK ) },
+                { "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: Color.Black, foreMain: Color.WhiteSmoke, backAlt: Color.Black, foreAlt: Color.WhiteSmoke, hover: Color.DarkGray, isAltHover: (x) => ((CheckBox)x).Checked ) },
             };
 
             var themes = new Dictionary<string, Theme>
@@ -116,20 +127,20 @@ namespace QuickFiler.Helper_Classes
                 { "DarkActive", new Theme("DarkActive", darkActive) }
             };
 
-            themes["LightNormal"].ButtonMouseOverColor = Color.LightCyan;
-            themes["LightActive"].ButtonMouseOverColor = Color.LightCyan;
-            themes["DarkNormal"].ButtonMouseOverColor = Color.DarkGray;
-            themes["DarkActive"].ButtonMouseOverColor = Color.DarkGray;
+            //themes["LightNormal"].ButtonMouseOverColor = Color.LightCyan;
+            //themes["LightActive"].ButtonMouseOverColor = Color.LightCyan;
+            //themes["DarkNormal"].ButtonMouseOverColor = Color.DarkGray;
+            //themes["DarkActive"].ButtonMouseOverColor = Color.DarkGray;
 
-            themes["LightNormal"].ButtonBackColor = SystemColors.Control;
-            themes["LightActive"].ButtonBackColor = SystemColors.Control;
-            themes["DarkNormal"].ButtonBackColor = Color.DimGray;
-            themes["DarkActive"].ButtonBackColor = Color.DimGray;
+            //themes["LightNormal"].ButtonBackColor = SystemColors.Control;
+            //themes["LightActive"].ButtonBackColor = SystemColors.Control;
+            //themes["DarkNormal"].ButtonBackColor = Color.DimGray;
+            //themes["DarkActive"].ButtonBackColor = Color.DimGray;
 
-            themes["LightNormal"].ButtonClickedColor = SystemColors.Control;
-            themes["LightActive"].ButtonClickedColor = SystemColors.Control;
-            themes["DarkNormal"].ButtonClickedColor = Color.DimGray;
-            themes["DarkActive"].ButtonClickedColor = Color.DimGray;
+            //themes["LightNormal"].ButtonClickedColor = SystemColors.Control;
+            //themes["LightActive"].ButtonClickedColor = SystemColors.Control;
+            //themes["DarkNormal"].ButtonClickedColor = Color.DimGray;
+            //themes["DarkActive"].ButtonClickedColor = Color.DimGray;
 
             return themes;
 

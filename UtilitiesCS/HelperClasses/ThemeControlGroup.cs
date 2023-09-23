@@ -7,7 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
-
+using System.Reflection;
+using System.ComponentModel;
 
 namespace UtilitiesCS
 {
@@ -61,6 +62,24 @@ namespace UtilitiesCS
             _groupType = GroupTypeEnum.TwoFieldAlt;
         }
 
+        public ThemeControlGroup(IList<Control> controls,
+                                 Color foreMain,
+                                 Color backMain,
+                                 Color foreAlt,
+                                 Color backAlt,
+                                 Color hover,
+                                 Func<object, bool> isAltHover)
+        {
+            _controls = controls;
+            _foreColorMain = foreMain;
+            _backColorMain = backMain;
+            _foreColorAlt = foreAlt;
+            _backColorAlt = backAlt;
+            _hoverColor = hover;
+            IsAltHover = isAltHover;
+            _groupType = GroupTypeEnum.TwoFieldAltHover;
+        }
+
         public ThemeControlGroup(IList<object> objects,
                                  Color fore,
                                  Color back,
@@ -85,25 +104,26 @@ namespace UtilitiesCS
             _htmlDark = htmlDark;
             _groupType = GroupTypeEnum.WebView2;
         }
-                
+
+
         private enum GroupTypeEnum 
         { 
-            Unsupported = 0,
-            OneField = 1,
-            TwoField = 2,
-            TwoFieldAlt = 4,
-            TwoFieldObjWithSetter = 8,
-            WebView2 = 16
+            Unsupported,
+            OneField,
+            TwoField,
+            TwoFieldAlt,
+            TwoFieldAltHover,
+            TwoFieldObjWithSetter,
+            WebView2
         }
         private GroupTypeEnum _groupType;
-        
         private IList<Control> _controls;
-        private IList<Button> _buttons;
         private IList<object> _objects;
         private Action<IList<object>, Color, Color> ObjectSetter;
         private Color _foreColor;
         private Color _backColor;
         private Color _hoverColor;
+        private Color _clickedColor;
         private Color _foreColorMain;
         private Color _backColorMain;
         private Color _foreColorAlt;
@@ -113,7 +133,7 @@ namespace UtilitiesCS
         Action<Enums.ToggleState> _htmlConverter;
         Enums.ToggleState _htmlDark;
         private Func<bool> IsAlt;
-        
+        private Func<object, bool> IsAltHover;
 
         private string _groupName;
         public string GroupName { get => _groupName; set => _groupName = value; }
@@ -130,6 +150,9 @@ namespace UtilitiesCS
                     break;
                 case GroupTypeEnum.TwoFieldAlt:
                     ApplyThemeTwoFieldAlt();
+                    break;
+                case GroupTypeEnum.TwoFieldAltHover:
+                    ApplyThemeTwoFieldAltHover();
                     break;
                 case GroupTypeEnum.TwoFieldObjWithSetter:
                     ApplyThemeTwoFieldWithSetter();
@@ -186,6 +209,27 @@ namespace UtilitiesCS
             }
         }
 
+        private void ApplyThemeTwoFieldAltHover()
+        {
+            _controls.ForEach(control =>
+            {
+                control.RemoveEventHandlers("MouseEnter");
+                control.MouseEnter += Control_MouseEnter;
+                control.RemoveEventHandlers("MouseLeave");
+                control.MouseLeave += Control_MouseLeave;
+                if (IsAltHover(control))
+                {
+                    control.ForeColor = _foreColorAlt;
+                    control.BackColor = _backColorAlt;
+                }
+                else
+                {
+                    control.ForeColor = _foreColorMain;
+                    control.BackColor = _backColorMain;
+                }
+            });
+        }
+
         private void ApplyThemeTwoFieldWithSetter() => ObjectSetter(_objects, _foreColor, _backColor);
 
         private void ApplyThemeWebView2() 
@@ -197,6 +241,50 @@ namespace UtilitiesCS
             }
         }
 
+        private void Control_MouseEnter(object sender, EventArgs e) => ((Control)sender).BackColor = _hoverColor;
+
+        private void Control_MouseLeave(object sender, EventArgs e)
+        {
+            if (IsAltHover(sender)) { ((Control)sender).BackColor = _backColorAlt; } 
+            else { ((Control)sender).BackColor = _backColorMain; }
+        }
+                
+        //private void Button_MouseEnter(object sender, EventArgs e) => ((Button)sender).BackColor = _hoverColor;
+        
+        //private void Button_MouseLeave(object sender, EventArgs e) 
+        //{
+        //    if (((Button)sender).DialogResult == DialogResult.OK) { ((Button)sender).BackColor = _clickedColor; }
+        //    else { ((Button)sender).BackColor = _backColor; }
+        //}
+
+        //private void Checkbox_MouseEnter(object sender, EventArgs e) => ((CheckBox)sender).BackColor = _hoverColor;
+        
+        //private void Checkbox_MouseLeave(object sender, EventArgs e) 
+        //{ 
+        //    if (((CheckBox)sender).Checked) { ((CheckBox)sender).BackColor = _clickedColor; }
+        //    else { ((CheckBox)sender).BackColor = _backColor; }
+        //}
+
+        public void DeactivateEvents()
+        {
+            switch (_groupType)
+            {
+                case GroupTypeEnum.TwoFieldAltHover:
+                    DeactivateEventsTwoFieldAltHover();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void DeactivateEventsTwoFieldAltHover() 
+        {             
+            _controls.ForEach(control =>
+            {
+                control.RemoveEventHandlers("MouseEnter");
+                control.RemoveEventHandlers("MouseLeave");
+            });
+        }
 
     }
 }

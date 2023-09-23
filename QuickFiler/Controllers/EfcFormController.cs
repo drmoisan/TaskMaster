@@ -42,16 +42,21 @@ namespace QuickFiler.Controllers
             
             LoadSettings();
             CaptureConfigureItemViewer();
-            
+            ResolveControlGroups();
+
+            _formViewer.Show();
+            _formViewer.Refresh();
+
             _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel);
+
+            _formViewer.Hide();
+
+            _themes = EfcThemeHelper.SetupFormThemes(_formViewer.TipsLabels.Cast<Control>().ToList(),
+                                                     _listHighlighted,
+                                                     _listDefault, 
+                                                     _listButtons.Cast<Control>().ToList(),
+                                                     _listCheckBox);
             
-            _listTipsDetails = _formViewer.TipsLabels
-                               .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
-                               .ToList();
-            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off, true));
-            _listButtons  = _formViewer.GetAllChildren().Where(x => x is Button).Cast<Button>().ToList();
-            _listOthers = _formViewer.GetAllChildren().Where(x => !_listButtons.Contains(x) && !_formViewer.TipsLabels.Contains(x)).ToList();
-            _themes = EfcThemeHelper.SetupFormThemes(_formViewer.TipsLabels.Cast<Control>().ToList(), _listOthers, _listButtons.Cast<Control>().ToList());
             _activeTheme = LoadTheme();
 
             WireEventHandlers();
@@ -76,7 +81,9 @@ namespace QuickFiler.Controllers
         private int _tlpHeightDiff;
         private Dictionary<string, Theme> _themes;
         private List<Button> _listButtons;
-        private List<Control> _listOthers;
+        private List<Control> _listDefault;
+        private List<Control> _listCheckBox;
+        private List<Control> _listHighlighted;
 
         internal void CaptureConfigureItemViewer()
         {
@@ -95,6 +102,28 @@ namespace QuickFiler.Controllers
             _formViewer = null;
             _dataModel = null;
             _parentCleanup.Invoke();
+        }
+
+        internal void ResolveControlGroups()
+        {
+            _listTipsDetails = _formViewer.TipsLabels
+                               .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
+                               .ToList();
+            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off, true));
+
+            var starter = _formViewer.GetAllChildren(except: new List<Control> { _itemViewer, });
+
+            _listButtons  = starter.Where(x => x is Button).Cast<Button>().ToList();
+
+            _listCheckBox = starter.Where(x => (x is CheckBox)).ToList();
+
+            _listHighlighted = new List<Control> { _formViewer.SearchText, _formViewer.FolderListBox, };
+
+            _listDefault = starter.Where(x => !_formViewer.TipsLabels.Contains(x) && 
+                                              !_listButtons.Contains(x) && 
+                                              !_listHighlighted.Contains(x) &&
+                                              !_listCheckBox.Contains(x)) 
+                                  .ToList();
         }
 
         #endregion
@@ -195,6 +224,20 @@ namespace QuickFiler.Controllers
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
             _globals.Ol.PropertyChanged += DarkMode_Changed;
+
+            //_listHover.ForEach(x => 
+            //{
+            //    x.MouseEnter += Button_MouseEnter;
+            //    x.MouseLeave += Button_MouseLeave;
+            //});
+            //_formViewer.Ok.MouseEnter += Button_MouseEnter;
+            //_formViewer.Cancel.MouseEnter += Button_MouseEnter;
+            //_formViewer.RefreshPredicted.MouseEnter += Button_MouseEnter;
+            //_formViewer.NewFolder.MouseEnter += Button_MouseEnter;
+            //_formViewer.Ok.MouseLeave += Button_MouseLeave;
+            //_formViewer.Cancel.MouseLeave += Button_MouseLeave;
+            //_formViewer.RefreshPredicted.MouseLeave += Button_MouseLeave;
+            //_formViewer.NewFolder.MouseLeave += Button_MouseLeave;
         }
                
         async public void ButtonCancel_Click(object sender, EventArgs e)
