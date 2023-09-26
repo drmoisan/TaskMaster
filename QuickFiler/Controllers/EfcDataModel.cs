@@ -21,7 +21,7 @@ namespace QuickFiler.Controllers
             if (Mail is not null)
             {
                 _conversationResolver = new ConversationResolver(_globals, Mail);
-                var dfConvExp = _conversationResolver.DfConversationExpanded; // Load Synchronously
+                _conversationResolver.LoadDfConversationExpanded(); // Load Synchronously
                 //_ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItemsAsync(dfConvExp));
             }
         }

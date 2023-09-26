@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Analysis;
 using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,12 +46,13 @@ namespace QuickFiler.Interfaces
         void ToggleConversationCheckbox(Enums.ToggleState desiredState);
         IQfcCollectionController Parent { get; }
         void PopulateConversation();
-        void PopulateConversation(DataFrame df);
+        //void PopulateConversation(DataFrame df);
         void PopulateConversation(int countOnly);
+        void PopulateConversation(ConversationResolver resolver);
         void SetThemeDark(bool async);
         void SetThemeLight(bool async);
         void Cleanup();
-        Task MoveMail();
+        Task MoveMailAsync();
         DataFrame DfConversation { get; }
         string Subject { get; }
         string To { get; }

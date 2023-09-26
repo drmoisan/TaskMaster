@@ -13,14 +13,14 @@ namespace UtilitiesCS
     /// <summary>
     /// A serializable list of ISubjectMapEntry. See <see cref="ISubjectMapEntry"/>.
     /// </summary>
-    public class SubjectMapSL : SerializableList<ISubjectMapEntry>, ISubjectMapSL
+    public class SubjectMapSL : SerializableList<SubjectMapEntry>, ISubjectMapSL
     {
         public SubjectMapSL(ISerializableList<string> commonWords) : base() { _commonWords = commonWords; }
 
-        public SubjectMapSL(List<ISubjectMapEntry> listOfT,
+        public SubjectMapSL(List<SubjectMapEntry> listOfT,
                             ISerializableList<string> commonWords) : base(listOfT) { _commonWords = commonWords; }
 
-        public SubjectMapSL(IEnumerable<ISubjectMapEntry> IEnumerableOfT,
+        public SubjectMapSL(IEnumerable<SubjectMapEntry> IEnumerableOfT,
                             ISerializableList<string> commonWords) : base(IEnumerableOfT) { _commonWords = commonWords; }
 
         public SubjectMapSL(string filename,
@@ -39,7 +39,7 @@ namespace UtilitiesCS
         /// procedure will automatically use the backup loader if the primary laoder fails</param>
         public SubjectMapSL(string filename,
                             string folderpath,
-                            CSVLoader<ISubjectMapEntry> backupLoader,
+                            CSVLoader<SubjectMapEntry> backupLoader,
                             string backupFilepath,
                             bool askUserOnError,
                             ISerializableList<string> commonWords) : base(filename,
@@ -94,7 +94,7 @@ namespace UtilitiesCS
         /// <param name="subject"></param>
         /// <param name="folderName"></param>
         /// <returns></returns>
-        public ISubjectMapEntry Find(string subject, string folderName)
+        public SubjectMapEntry Find(string subject, string folderName)
         {
             int idx = base.FindIndex(entry => (entry.EmailSubject == subject) && (entry.Folderpath == folderName));
             if (idx != -1) { return base[idx]; }
@@ -107,7 +107,7 @@ namespace UtilitiesCS
         /// <param name="key">String to match. For EmailSubject, key is standardized. For Folderpath, key is matched literally</param>
         /// <param name="findBy"><inheritdoc cref="FindBy"/></param>
         /// <returns>List of matching subject map entries</returns>
-        public IList<ISubjectMapEntry> Find(string key, Enums.FindBy findBy)
+        public IList<SubjectMapEntry> Find(string key, Enums.FindBy findBy)
         {
             switch (findBy)
             {

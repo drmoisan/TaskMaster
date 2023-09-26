@@ -13,6 +13,7 @@ using System.IO;
 using ToDoModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace QuickFiler.Controllers
 {    
@@ -86,12 +87,17 @@ namespace QuickFiler.Controllers
 
         public void SetupLightDark()
         {
-            if (Properties.Settings.Default.DarkMode == true)
+            //if (Properties.Settings.Default.DarkMode == true)
+            //{
+            //    SetDarkMode();
+            //}
+            //_formViewer.DarkMode.Checked = Properties.Settings.Default.DarkMode;
+            //_formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            if (_globals.Ol.DarkMode == true)
             {
                 SetDarkMode();
             }
-            _formViewer.DarkMode.Checked = Properties.Settings.Default.DarkMode;
-            _formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            _globals.Ol.PropertyChanged += DarkMode_CheckedChanged;
         }
 
         public int SpaceForEmail
@@ -179,7 +185,8 @@ namespace QuickFiler.Controllers
 
         private void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
-            if (_formViewer.DarkMode.Checked == true)
+            //if (_formViewer.DarkMode.Checked == true)
+            if (_globals.Ol.DarkMode == true)
             {
                 SetDarkMode();
             }
@@ -234,7 +241,10 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
-        async public void ButtonOK_Click(object sender, EventArgs e) => await ActionOkAsync();
+        async public void ButtonOK_Click(object sender, EventArgs e) 
+        {
+            await ActionOkAsync(); 
+        }
 
         async public Task ActionOkAsync()
         {
@@ -242,20 +252,22 @@ namespace QuickFiler.Controllers
             {
                 if (_blRunningModalCode == false)
                 {
-                    if (_groups.ReadyForMove)
+                    if (await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_groups.ReadyForMove))
                     {
                         _blRunningModalCode = true;
                         //_blSuppressEvents = true;
 
                         // Move emails
-                        await _groups.MoveEmails(_movedItems);
-                        
-                        // Write move metrics
-                        await Task.Run(()=>WriteMetrics(_globals.FS.Filenames.EmailSession)).ConfigureAwait(false);
+                        await _groups.MoveEmailsAsync(_movedItems).ConfigureAwait(false);
                         
                         // Switch to UI thread
                         await _formViewer.UiSyncContext;
-                        
+
+                        // Write move metrics
+
+                        //await Task.Run(() => WriteMetrics(_globals.FS.Filenames.EmailSession));
+                        WriteMetrics(_globals.FS.Filenames.EmailSession);
+
                         // Cleanup the viewers and controllers for moved items
                         _groups.RemoveControls();
                         
@@ -299,7 +311,7 @@ namespace QuickFiler.Controllers
         {            
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
-                                                  darkMode: Properties.Settings.Default.DarkMode,
+                                                  darkMode: _globals.Ol.DarkMode,
                                                   InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
                                                   parent: this);

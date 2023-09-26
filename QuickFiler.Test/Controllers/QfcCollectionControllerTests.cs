@@ -310,7 +310,7 @@ namespace QuickFiler.Test.Controllers
             ScoStack<IMovedMailInfo> stackMovedItems = null;
 
             // Act
-            await qfcCollectionController.MoveEmails(stackMovedItems);
+            await qfcCollectionController.MoveEmailsAsync(stackMovedItems);
 
             // Assert
             Assert.Fail();

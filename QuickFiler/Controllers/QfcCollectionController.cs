@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
 using QuickFiler;
+using QuickFiler.Helper_Classes;
 
 namespace QuickFiler.Controllers
 {
@@ -661,7 +662,7 @@ namespace QuickFiler.Controllers
         /// <param name="baseEmailIndex">Index of base member in collection</param>
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Sorting suggestions from base member</param>
-        public void ToggleUnGroupConv(IList<MailItem> mailItems,
+        public void ToggleUnGroupConv(ConversationResolver resolver,
                                        string entryID,
                                        int conversationCount,
                                        object folderList)
@@ -678,7 +679,7 @@ namespace QuickFiler.Controllers
                                                  insertCount);
                 
                 EnumerateConversationMembers(entryID,
-                                             mailItems,
+                                             resolver,
                                              insertionIndex,
                                              conversationCount,
                                              folderList);
@@ -691,15 +692,16 @@ namespace QuickFiler.Controllers
         /// Expanded members are inserted into the base collection and conversation count and folder suggestions
         /// are replicated from the base member. This enables distinct actions to be taken with each member
         /// </summary>
-        /// <param name="mailItems">List of MailItems in a conversation</param>
+        /// <param name="mailInfoList">List of MailItems in a conversation</param>
         /// <param name="insertionIndex">Location of the Item Group collection where the base member is stored</param>
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Folder suggestions for the first email</param>
-        public void EnumerateConversationMembers(string entryID, IList<MailItem> mailItems, int insertionIndex, int conversationCount, object folderList)
+        public void EnumerateConversationMembers(string entryID, ConversationResolver resolver, int insertionIndex, int conversationCount, object folderList)
         {
-            var insertions = mailItems.Where(mailItem => mailItem.EntryID != entryID)
-                                      .OrderByDescending(mailItem => mailItem.SentOn)
-                                      .ToList();
+            var insertions = resolver.ConversationItems
+                                     .Where(mailItem => mailItem.EntryID != entryID)
+                                     .OrderByDescending(mailItem => mailItem.SentOn)
+                                     .ToList();
 
             //Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
             Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
@@ -714,7 +716,8 @@ namespace QuickFiler.Controllers
                                                            viewerPosition: i + insertionIndex + 1,
                                                            grp.MailItem);
 
-                grp.ItemController.PopulateConversation(conversationCount);
+                grp.ItemController.Initialize(false);
+                grp.ItemController.PopulateConversation(resolver);
                 grp.ItemController.PopulateFolderCombobox(folderList);
                 grp.ItemController.IsChild = true;
                 grp.ItemController.ConvOriginID = _itemGroups[insertionIndex-1].MailItem.EntryID;
@@ -850,13 +853,15 @@ namespace QuickFiler.Controllers
         public void SetupLightDark(bool initDarkMode)
         {
             _darkMode = initDarkMode;
-            _formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            //_formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            _globals.Ol.PropertyChanged += DarkMode_CheckedChanged;
             
         }
 
         public void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
-            if (_formViewer.DarkMode.Checked==true)
+            //if (_formViewer.DarkMode.Checked==true)
+            if (_globals.Ol.DarkMode)
             {
                 SetDarkMode(async: true);
             }
@@ -864,6 +869,7 @@ namespace QuickFiler.Controllers
             {
                 SetLightMode(async: true);
             }
+            _darkMode = _globals.Ol.DarkMode;
         }
 
         public void SetDarkMode(bool async)
@@ -906,13 +912,14 @@ namespace QuickFiler.Controllers
             _itemGroups = null;
         }
 
-        async public Task MoveEmails(ScoStack<IMovedMailInfo> stackMovedItems)
+        async public Task MoveEmailsAsync(ScoStack<IMovedMailInfo> stackMovedItems)
         {
-            foreach (var grp in _itemGroups)
-            {
-                //TODO: function needed to shut off KeyboardDialog at this step if active
-                await grp.ItemController.MoveMail();
-            }
+            //foreach (var grp in _itemGroups)
+            //{
+            //    //TODO: function needed to shut off KeyboardDialog at this step if active
+            //    await grp.ItemController.MoveMailAsync();
+            //}
+            await Task.WhenAll(_itemGroups.Select(grp => grp.ItemController.MoveMailAsync()));
         }
 
         public string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment)

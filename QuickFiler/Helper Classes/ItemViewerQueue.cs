@@ -21,7 +21,7 @@ namespace QuickFiler
                 IdleActionQueue.AddEntry(() =>
                 {
                     _queue.Enqueue(new ItemViewer());
-                    logger.Debug($"Enqueued {_queue.Count}");
+                    //logger.Debug($"Enqueued {_queue.Count}");
                 });
             }
         }
@@ -33,7 +33,7 @@ namespace QuickFiler
                 _ = UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
                 {
                     _queue.Enqueue(new ItemViewer());
-                    logger.Debug($"Enqueued {_queue.Count}");
+                    //logger.Debug($"Enqueued {_queue.Count}");
                 }, System.Windows.Threading.DispatcherPriority.Background);
             }
         }
@@ -43,7 +43,7 @@ namespace QuickFiler
             for (int i = 0; i < count; i++)
             {
                 _queue.Enqueue(new ItemViewer());
-                logger.Debug($"Enqueued {_queue.Count}");
+                //logger.Debug($"Enqueued {_queue.Count}");
             }
         }
 
@@ -53,7 +53,7 @@ namespace QuickFiler
             if (_queue.Count > 0)
             {
                 viewer = _queue.Dequeue();
-                logger.Debug($"Dequeued 1, {_queue.Count} remaining");
+                //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueueWhenIdle(1);
                 
             }

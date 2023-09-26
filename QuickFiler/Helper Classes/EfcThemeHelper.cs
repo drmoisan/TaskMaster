@@ -85,8 +85,8 @@ namespace QuickFiler.Helper_Classes
             var lightNormal = new Dictionary<string, ThemeControlGroup>
             {
                 //{ "Nav", new ThemeControlGroup(controls: nav, back: SystemColors.HotTrack, fore: SystemColors.Control) },
-                { "Tips", new ThemeControlGroup(controls: tips, back: Color.Black, fore: Color.White) },
-                { "highlighted", new ThemeControlGroup(controls: highlighted, back: Color.White, fore: SystemColors.ControlText) },
+                { "Tips", new ThemeControlGroup(controls: tips, back: SystemColors.ControlText, fore: SystemColors.Control) },
+                { "highlighted", new ThemeControlGroup(controls: highlighted, back: SystemColors.Window, fore: SystemColors.ControlText) },
                 { "Default2Color", new ThemeControlGroup(controls: default2Color, back: SystemColors.Control, fore: SystemColors.ControlText) },
                 { "Buttons", new ThemeControlGroup(controls: buttons, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((Button)x).DialogResult == DialogResult.OK ) },
                 { "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((CheckBox)x).Checked ) },
@@ -94,8 +94,8 @@ namespace QuickFiler.Helper_Classes
             var lightActive = new Dictionary<string, ThemeControlGroup>
             {
                 //{ "Nav", new ThemeControlGroup(controls: nav, back: Color.Green, fore: SystemColors.Control) },
-                { "Tips", new ThemeControlGroup(controls: tips, back: Color.Black, fore: Color.White) },
-                { "highlighted", new ThemeControlGroup(controls: highlighted, back: Color.White, fore: SystemColors.ControlText) },
+                { "Tips", new ThemeControlGroup(controls: tips, back: SystemColors.ControlText, fore: SystemColors.Control) },
+                { "highlighted", new ThemeControlGroup(controls: highlighted, back: SystemColors.Window, fore: SystemColors.ControlText) },
                 { "Default2Color", new ThemeControlGroup(controls: default2Color, back: Color.LightCyan, fore: SystemColors.ControlText) },
                 { "Buttons", new ThemeControlGroup(controls: buttons, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((Button)x).DialogResult == DialogResult.OK ) },
                 { "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((CheckBox)x).Checked ) },

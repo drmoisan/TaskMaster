@@ -21,7 +21,7 @@ namespace QuickFiler
                 IdleActionQueue.AddEntry(()=> 
                 { 
                     _queue.Enqueue(new EfcViewer());
-                    logger.Debug($"Enqueued {_queue.Count}");
+                    //logger.Debug($"Enqueued {_queue.Count}");
                 });
             }
         }

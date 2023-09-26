@@ -45,13 +45,13 @@ namespace UtilitiesCS
         {
             _syncContextForm = new SyncContextForm();
             _uiContext = _syncContextForm.UiSyncContext;
-            Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            //Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
             _uiDispatcher = Dispatcher.CurrentDispatcher;
-            if (monitorUiThread)
-            {
-                _threadMonitor = new ThreadMonitor(Thread.CurrentThread, delayThreshold: 300);
-                _threadMonitor.Run();
-            }   
+            //if (monitorUiThread)
+            //{
+            //    _threadMonitor = new ThreadMonitor(Thread.CurrentThread, delayThreshold: 300);
+            //    _threadMonitor.Run();
+            //}   
         }
         
         public static SynchronizationContext GetUiContext()
