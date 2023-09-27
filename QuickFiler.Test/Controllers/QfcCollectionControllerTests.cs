@@ -44,7 +44,7 @@ namespace QuickFiler.Test.Controllers
                 this.mockApplicationGlobals.Object,
                 this.formViewer, //.Object,
                 false,
-                Enums.InitTypeEnum.Sort,
+                QfEnums.InitTypeEnum.Sort,
                 this.mockHomeController.Object,
                 this.mockQfcFormController.Object);
         }
@@ -310,7 +310,7 @@ namespace QuickFiler.Test.Controllers
             ScoStack<IMovedMailInfo> stackMovedItems = null;
 
             // Act
-            await qfcCollectionController.MoveEmails(stackMovedItems);
+            await qfcCollectionController.MoveEmailsAsync(stackMovedItems);
 
             // Assert
             Assert.Fail();

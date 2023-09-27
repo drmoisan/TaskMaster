@@ -11,6 +11,7 @@ namespace QuickFiler
 {
     public static class EfcViewerQueue
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Queue<EfcViewer> _queue = new Queue<EfcViewer>();
                 
         public static void BuildQueue(int count)
@@ -20,7 +21,7 @@ namespace QuickFiler
                 IdleActionQueue.AddEntry(()=> 
                 { 
                     _queue.Enqueue(new EfcViewer());
-                    Console.WriteLine($"Enqueued {_queue.Count}");
+                    //logger.Debug($"Enqueued {_queue.Count}");
                 });
             }
         }
@@ -31,7 +32,7 @@ namespace QuickFiler
             if (_queue.Count > 0)
             {
                 viewer = _queue.Dequeue();
-                Debug.WriteLine($"Dequeued 1, {_queue.Count} remaining");
+                logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueue(1);
                 //Debug.WriteLine($"Exiting dequeue, {_queue.Count} remaining");
             }

@@ -104,7 +104,7 @@ namespace ToDoModel
                 }
                 
                 // Label the email as autosorted
-                await Task.Run(()=>mailItem.SetUdf("AutoSorted", "Yes")).ConfigureAwait(false);
+                await Task.Run(()=>mailItem.SetUdf("AutoSorted", "Yes"));
                 mailItem.UnRead = false;
                 await Task.Run(()=>mailItem.Save());
                                                 

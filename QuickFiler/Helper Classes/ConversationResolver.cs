@@ -6,11 +6,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ToDoModel;
 using UtilitiesCS;
 
 namespace QuickFiler.Helper_Classes
 {
-    internal class ConversationResolver: INotifyPropertyChanged
+    public class ConversationResolver: INotifyPropertyChanged
     {
         public ConversationResolver(IApplicationGlobals appGlobals,
                                     MailItem mailItem,
@@ -19,6 +20,7 @@ namespace QuickFiler.Helper_Classes
             _globals = appGlobals;
             _mailItem = mailItem;
             _updateUI = updateUI;
+            PropertyChanged += Handler_PropertyChanged;
         }
         
         private IApplicationGlobals _globals;
@@ -128,22 +130,21 @@ namespace QuickFiler.Helper_Classes
         private DataFrame _dfConversationExpanded;
         public DataFrame DfConversationExpanded
         {
-            get
-            {
-                if ((_dfConversationExpanded is null) && (_mailItem is not null))
-                {
-                    var conversation = _mailItem.GetConversation();
-                    DfConversationExpanded = conversation.GetConversationDf().FilterConversation(((Folder)_mailItem.Parent).FolderPath, false, true);
-                    DfConversation = DfConversationExpanded.FilterConversation(((Folder)_mailItem.Parent).FolderPath, true, true);
-                }
-                return _dfConversationExpanded;
-            }
+            get => Initializer.GetOrLoad(ref _dfConversationExpanded, LoadDfConversationExpanded, false, _mailItem);
             internal set
             {
                 _dfConversationExpanded = value;
                 NotifyPropertyChanged();
             }
         }
+        public DataFrame LoadDfConversationExpanded() 
+        {
+            var df = _mailItem.GetConversation().GetConversationDf().FilterConversation(((Folder)_mailItem.Parent).Name, false, true);
+            DfConversation = df.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
+            DfConversationExpanded = df;
+            return df; 
+        }
+
 
         private bool _isDarkMode;
         public bool IsDarkMode
@@ -183,15 +184,15 @@ namespace QuickFiler.Helper_Classes
 
             // Initialize the ConversationInfo list from the Dataframe with Synchronous code
             ConversationInfoExpanded = Enumerable.Range(0, df.Rows.Count())
-                                         .Select(indexRow => new MailItemInfo(df, indexRow))
-                                         .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
-                                         .ToList();
+                                       .Select(indexRow => new MailItemInfo(df, indexRow))
+                                       .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
+                                       .ToList();
 
             ConversationInfo = ConversationInfoExpanded.Where(
                 itemInfo => itemInfo.Folder == ((Folder)_mailItem.Parent).Name).ToList();
 
             if (_updateUI is not null)
-                await Task.Run(()=>_updateUI(ConversationInfoExpanded));
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_updateUI(ConversationInfoExpanded));
             
             // Run the async code in parallel to resolve the mailitem and load extended properties
             ConversationItems = Task.WhenAll(ConversationInfoExpanded.Select(async itemInfo =>

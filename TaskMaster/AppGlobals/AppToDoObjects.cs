@@ -16,6 +16,8 @@ namespace TaskMaster
 
     public class AppToDoObjects : IToDoObjects
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public AppToDoObjects(ApplicationGlobals ParentInstance)
         {
             _parent = ParentInstance;
@@ -33,7 +35,7 @@ namespace TaskMaster
                 LoadPrefixListAsync()
             };
             await Task.WhenAll(tasks);
-            Debug.WriteLine($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
+            //logger.Debug($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
         }
 
         private Properties.Settings _defaults = Properties.Settings.Default;

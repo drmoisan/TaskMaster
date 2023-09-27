@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
+using System.Runtime.CompilerServices;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
 using UtilitiesCS;
@@ -145,6 +148,9 @@ namespace TaskMaster
         }
 
         private string _userEmailAddress;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string UserEmailAddress
         {
             get
@@ -155,6 +161,25 @@ namespace TaskMaster
                 }
                 return _userEmailAddress;
             }
+        }
+
+        private bool _darkMode = Properties.Settings.Default.DarkMode;
+        [NotifyParentProperty(true)]
+        public bool DarkMode 
+        { 
+            get => _darkMode;
+            set 
+            { 
+                _darkMode = value;
+                Properties.Settings.Default.DarkMode = value;
+                Properties.Settings.Default.Save();
+                NotifyPropertyChanged();
+            }
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName="")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         //public bool ShowInConversations

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace UtilitiesCS
 {
@@ -45,6 +46,40 @@ namespace UtilitiesCS
             }
         }
 
+        public static void ForAllControls<T>(this Control parent, T value, Action<Control, T> action, IList<Control> except)
+        {
+            if (!except.Contains(parent))
+            {
+                foreach (Control c in parent.Controls)
+                {
+                    ForAllControls(c, value, action, except);
+                }
+                action(parent, value);
+            }
+        }
+
+        public static void ForAllControls<T>(this Control parent, T value, Func<Control, T, T> function, IList<Control> except)
+        {
+            if (!except.Contains(parent))
+            {
+                T seedValue = function(parent, value);
+                foreach (Control c in parent.Controls)
+                {
+                    ForAllControls(c, seedValue, function, except);
+                }
+            }
+            
+        }
+
+        public static void ForAllControls<T>(this Control parent, T value, Func<Control, T, T> function)
+        {
+            T seedValue = function(parent, value);
+            foreach (Control c in parent.Controls)
+            {
+                ForAllControls(c, seedValue, function);
+            }
+        }
+
         public static IEnumerable<Control> GetAllChildren(this Control root)
         {
             var stack = new Stack<Control>();
@@ -55,6 +90,22 @@ namespace UtilitiesCS
                 var next = stack.Pop();
                 foreach (Control child in next.Controls)
                     stack.Push(child);
+                yield return next;
+            }
+        }
+
+        public static IEnumerable<Control> GetAllChildren(this Control root, IList<Control> except)
+        {
+            var stack = new Stack<Control>();
+            if (!except.Contains(root))
+                stack.Push(root);
+
+            while (stack.Any())
+            {
+                var next = stack.Pop();
+                foreach (Control child in next.Controls)
+                    if (!except.Contains(child))
+                        stack.Push(child);
                 yield return next;
             }
         }
@@ -88,5 +139,24 @@ namespace UtilitiesCS
             return instance;
         }
         
+        public static (EventHandlerList EventHandlerList, object Object) GetEventHandlerList(this object control, string eventName)
+        {
+            eventName = "Event" + eventName;
+            FieldInfo f1 = typeof(Control).GetField(eventName,
+                               BindingFlags.Static | BindingFlags.NonPublic);
+
+            object obj = f1.GetValue(control);
+            PropertyInfo pi = control.GetType().GetProperty("Events",
+                                              BindingFlags.NonPublic | BindingFlags.Instance);
+
+            return ((EventHandlerList)pi.GetValue(control, null),obj);
+        }
+        
+        public static void RemoveEventHandlers(this Control control, string eventName)
+        { 
+            (var list, var obj) = control.GetEventHandlerList(eventName);
+            list.RemoveHandler(obj, list[obj]);
+        }
+
     }
 }

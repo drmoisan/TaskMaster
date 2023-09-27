@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using UtilitiesCS;
 using System;
 using System.Threading.Tasks;
+using QuickFiler.Helper_Classes;
 
 namespace QuickFiler.Interfaces
 {
@@ -15,13 +16,14 @@ namespace QuickFiler.Interfaces
 
         // UI Add and Remove QfcItems
         void LoadControlsAndHandlers(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
-        QfcItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
+        Task LoadControlsAndHandlersAsync(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
+        ItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
         void PopOutControlGroup(int intPosition);
         void RemoveControls();
         Task RemoveControlsAsync();
         void RemoveSpaceToCollapseConversation();
         void RemoveSpecificControlGroup(int intPosition);
-        Task MoveEmails(ScoStack<IMovedMailInfo> StackMovedItems);
+        Task MoveEmailsAsync(ScoStack<IMovedMailInfo> StackMovedItems);
 
         // UI Select QfcItems
         int ActivateBySelection(int intNewSelection, bool blExpanded);
@@ -35,7 +37,7 @@ namespace QuickFiler.Interfaces
         // UI Converations Expansion
         void ToggleGroupConv(int childCount, int indexOriginal);
         void ToggleGroupConv(string originalId);
-        void ToggleUnGroupConv(IList<MailItem> mailItems, string entryID, int conversationCount, object folderList);
+        void ToggleUnGroupConv(ConversationResolver resolver, string entryID, int conversationCount, object folderList);
         void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount);                        
 
         // UI Light Dark

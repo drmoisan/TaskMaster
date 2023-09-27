@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
 using QuickFiler;
+using QuickFiler.Helper_Classes;
 
 namespace QuickFiler.Controllers
 {
@@ -19,7 +20,7 @@ namespace QuickFiler.Controllers
         public QfcCollectionController(IApplicationGlobals AppGlobals,
                                        QfcFormViewer viewerInstance,
                                        bool darkMode,
-                                       Enums.InitTypeEnum InitType,
+                                       QfEnums.InitTypeEnum InitType,
                                        IFilerHomeController homeController,
                                        IFilerFormController parent)
         {
@@ -42,7 +43,7 @@ namespace QuickFiler.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private QfcFormViewer _formViewer;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IFilerHomeController _homeController;
         private IFilerFormController _parent;
@@ -169,6 +170,28 @@ namespace QuickFiler.Controllers
             else { LoadSequentialCF(); }
         }
 
+        public async Task LoadConversationsAndFoldersAsync()
+        {
+            await AsyncEnumerable.Range(0, _itemGroups.Count)
+                                 .Select(i => (i,grp:_itemGroups[i]))
+                                 .ForEachAsync(async x => 
+                                 { 
+                                     x.grp.ItemController = new QfcItemController(AppGlobals: _globals,
+                                                                                  homeController: _homeController,
+                                                                                  parent: this,
+                                                                                  itemViewer: x.grp.ItemViewer,
+                                                                                  viewerPosition: x.i + 1,
+                                                                                  x.grp.MailItem);
+                                     var tasks = new List<Task>
+                                     {
+                                        x.grp.ItemController.InitializeAsync(),
+                                        Task.Run(() => x.grp.ItemController.PopulateConversation()),
+                                        Task.Run(() => x.grp.ItemController.PopulateFolderCombobox()),
+                                     };
+                                     await Task.WhenAll(tasks).ConfigureAwait(false);
+                                 });
+        }
+
         public void LoadParallelCF()
         {
             Parallel.ForEach(_itemGroups, grp =>
@@ -179,7 +202,8 @@ namespace QuickFiler.Controllers
                                                            itemViewer: grp.ItemViewer,
                                                            viewerPosition: _itemGroups.FindIndex(x => x.MailItem == grp.MailItem) + 1,
                                                            grp.MailItem);
-                
+                grp.ItemController.Initialize(false);
+
                 Parallel.Invoke(
                     () => grp.ItemController.PopulateConversation(),
                     () => grp.ItemController.PopulateFolderCombobox(),
@@ -190,7 +214,7 @@ namespace QuickFiler.Controllers
                     });
             });
         }
-
+        
         public void LoadSequentialCF()
         {
             int i = 0;
@@ -202,6 +226,7 @@ namespace QuickFiler.Controllers
                                                            itemViewer: grp.ItemViewer,
                                                            viewerPosition: ++i,
                                                            grp.MailItem);
+                grp.ItemController.Initialize(false);
                 grp.ItemController.PopulateConversation();
                 grp.ItemController.PopulateFolderCombobox();
                 if (_darkMode) { grp.ItemController.SetThemeDark(async: false); }
@@ -228,7 +253,26 @@ namespace QuickFiler.Controllers
 
         }
 
-        public QfcItemViewer LoadItemViewer(int indexNumber,
+        public async Task LoadControlsAndHandlersAsync(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
+        {
+            _formViewer.SuspendLayout();
+            var tlpState = TlpLayout;
+            TlpLayout = false;
+            //_itemTLP.SuspendLayout();
+            _template = template;
+            _templateExpanded = templateExpanded;
+            TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
+            LoadItemGroupsAndViewers(listMailItems, template);
+            _formViewer.WindowState = FormWindowState.Maximized;
+            TlpLayout = tlpState;
+            //_itemTLP.ResumeLayout();
+            _formViewer.ResumeLayout();
+            WireUpKeyboardHandler();
+            await LoadConversationsAndFoldersAsync();
+
+        }
+
+        public ItemViewer LoadItemViewer(int indexNumber,
                                             RowStyle template,
                                             bool blGroupConversation = true,
                                             int columnNumber = 0)
@@ -430,7 +474,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        internal void ScrollIntoView(QfcItemViewer item)
+        internal void ScrollIntoView(ItemViewer item)
         {
             // If top is not visible, scroll top into view
             if (_itemPanel.Top - _itemPanel.AutoScrollPosition.Y > item.Top)
@@ -618,7 +662,7 @@ namespace QuickFiler.Controllers
         /// <param name="baseEmailIndex">Index of base member in collection</param>
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Sorting suggestions from base member</param>
-        public void ToggleUnGroupConv(IList<MailItem> mailItems,
+        public void ToggleUnGroupConv(ConversationResolver resolver,
                                        string entryID,
                                        int conversationCount,
                                        object folderList)
@@ -635,7 +679,7 @@ namespace QuickFiler.Controllers
                                                  insertCount);
                 
                 EnumerateConversationMembers(entryID,
-                                             mailItems,
+                                             resolver,
                                              insertionIndex,
                                              conversationCount,
                                              folderList);
@@ -648,15 +692,16 @@ namespace QuickFiler.Controllers
         /// Expanded members are inserted into the base collection and conversation count and folder suggestions
         /// are replicated from the base member. This enables distinct actions to be taken with each member
         /// </summary>
-        /// <param name="mailItems">List of MailItems in a conversation</param>
+        /// <param name="mailInfoList">List of MailItems in a conversation</param>
         /// <param name="insertionIndex">Location of the Item Group collection where the base member is stored</param>
         /// <param name="conversationCount">Number of qualifying conversation members</param>
         /// <param name="folderList">Folder suggestions for the first email</param>
-        public void EnumerateConversationMembers(string entryID, IList<MailItem> mailItems, int insertionIndex, int conversationCount, object folderList)
+        public void EnumerateConversationMembers(string entryID, ConversationResolver resolver, int insertionIndex, int conversationCount, object folderList)
         {
-            var insertions = mailItems.Where(mailItem => mailItem.EntryID != entryID)
-                                      .OrderByDescending(mailItem => mailItem.SentOn)
-                                      .ToList();
+            var insertions = resolver.ConversationItems
+                                     .Where(mailItem => mailItem.EntryID != entryID)
+                                     .OrderByDescending(mailItem => mailItem.SentOn)
+                                     .ToList();
 
             //Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
             Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
@@ -671,7 +716,8 @@ namespace QuickFiler.Controllers
                                                            viewerPosition: i + insertionIndex + 1,
                                                            grp.MailItem);
 
-                grp.ItemController.PopulateConversation(conversationCount);
+                grp.ItemController.Initialize(false);
+                grp.ItemController.PopulateConversation(resolver);
                 grp.ItemController.PopulateFolderCombobox(folderList);
                 grp.ItemController.IsChild = true;
                 grp.ItemController.ConvOriginID = _itemGroups[insertionIndex-1].MailItem.EntryID;
@@ -807,13 +853,15 @@ namespace QuickFiler.Controllers
         public void SetupLightDark(bool initDarkMode)
         {
             _darkMode = initDarkMode;
-            _formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            //_formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            _globals.Ol.PropertyChanged += DarkMode_CheckedChanged;
             
         }
 
         public void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
-            if (_formViewer.DarkMode.Checked==true)
+            //if (_formViewer.DarkMode.Checked==true)
+            if (_globals.Ol.DarkMode)
             {
                 SetDarkMode(async: true);
             }
@@ -821,6 +869,7 @@ namespace QuickFiler.Controllers
             {
                 SetLightMode(async: true);
             }
+            _darkMode = _globals.Ol.DarkMode;
         }
 
         public void SetDarkMode(bool async)
@@ -863,13 +912,14 @@ namespace QuickFiler.Controllers
             _itemGroups = null;
         }
 
-        async public Task MoveEmails(ScoStack<IMovedMailInfo> stackMovedItems)
+        async public Task MoveEmailsAsync(ScoStack<IMovedMailInfo> stackMovedItems)
         {
-            foreach (var grp in _itemGroups)
-            {
-                //TODO: function needed to shut off KeyboardDialog at this step if active
-                await grp.ItemController.MoveMail();
-            }
+            //foreach (var grp in _itemGroups)
+            //{
+            //    //TODO: function needed to shut off KeyboardDialog at this step if active
+            //    await grp.ItemController.MoveMailAsync();
+            //}
+            await Task.WhenAll(_itemGroups.Select(grp => grp.ItemController.MoveMailAsync()));
         }
 
         public string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment)
@@ -929,11 +979,12 @@ namespace QuickFiler.Controllers
             public ItemGroup() { }
             public ItemGroup(MailItem mailItem) { _mailItem = mailItem; }
 
-            private QfcItemViewer _itemViewer;
             private IQfcItemController _itemController;
             private MailItem _mailItem;
 
-            internal QfcItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
+            private ItemViewer _itemViewer;
+            internal ItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
+            
             internal IQfcItemController ItemController { get => _itemController; set => _itemController = value; }
             internal MailItem MailItem { get => _mailItem; set => _mailItem = value; }
 

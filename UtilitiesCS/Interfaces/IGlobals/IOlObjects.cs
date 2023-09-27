@@ -1,9 +1,10 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using System.ComponentModel;
 
 namespace UtilitiesCS
 {
 
-    public interface IOlObjects
+    public interface IOlObjects: INotifyPropertyChanged
     {
         Application App { get; }
         string EmailRootPath { get; }
@@ -18,5 +19,6 @@ namespace UtilitiesCS
         StackObjectCS<object> MovedMails_Stack { get; set; }
         string ViewWide { get; }
         string ViewCompact { get; }
+        bool DarkMode { get; set; }
     }
 }

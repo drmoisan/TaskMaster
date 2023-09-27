@@ -1,10 +1,13 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using QuickFiler.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,24 +29,35 @@ namespace QuickFiler.Controllers
                                  EfcViewer formViewer,
                                  EfcHomeController homeController,
                                  System.Action ParentCleanup,
-                                 Enums.InitTypeEnum initType)
+                                 QfEnums.InitTypeEnum initType)
         {
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
             _formViewer = formViewer;
             _homeController = homeController;
             _dataModel = dataModel;
-            //_mailItem = mailItem;
             _initType = initType;
-            LoadSettings();
             _itemViewer = _formViewer.ItemViewer;
             _itemTlp = _formViewer.L0vh_TLP;
+            
+            LoadSettings();
             CaptureConfigureItemViewer();
+            ResolveControlGroups();
+
+            _formViewer.Show();
+            _formViewer.Refresh();
+
             _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel);
-            _listTipsDetails = _formViewer.TipsLabels
-                               .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
-                               .ToList();
-            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off, true));
+
+            _formViewer.Hide();
+
+            _themes = EfcThemeHelper.SetupFormThemes(_formViewer.TipsLabels.Cast<Control>().ToList(),
+                                                     _listHighlighted,
+                                                     _listDefault, 
+                                                     _listButtons.Cast<Control>().ToList(),
+                                                     _listCheckBox);
+            
+            _activeTheme = LoadTheme();
 
             WireEventHandlers();
             _ = PopulateFolderCombobox();
@@ -55,16 +69,21 @@ namespace QuickFiler.Controllers
         private EfcViewer _formViewer;
         private EfcHomeController _homeController;
         private EfcItemController _itemController;
-        private QfcItemViewer _itemViewer;
+        private ItemViewer _itemViewer;
         //private FolderHandler _folderHandler;
         //private MailItem _mailItem;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private IList<IQfcTipsDetails> _listTipsDetails;
         private TableLayoutPanel _itemTlp;
         private int _itemViewerTlpRow;
         private int _tlpHeightExpanded;
         private int _tlpHeightCollapsed;
         private int _tlpHeightDiff;
+        private Dictionary<string, Theme> _themes;
+        private List<Button> _listButtons;
+        private List<Control> _listDefault;
+        private List<Control> _listCheckBox;
+        private List<Control> _listHighlighted;
 
         internal void CaptureConfigureItemViewer()
         {
@@ -78,15 +97,58 @@ namespace QuickFiler.Controllers
         
         public void Cleanup()
         {
+            _globals.Ol.PropertyChanged -= DarkMode_Changed;
             _globals = null;
             _formViewer = null;
             _dataModel = null;
             _parentCleanup.Invoke();
         }
 
+        internal void ResolveControlGroups()
+        {
+            _listTipsDetails = _formViewer.TipsLabels
+                               .Select(x => (IQfcTipsDetails)new QfcTipsDetails(x))
+                               .ToList();
+            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off, true));
+
+            var starter = _formViewer.GetAllChildren(except: new List<Control> { _itemViewer, });
+
+            _listButtons  = starter.Where(x => x is Button).Cast<Button>().ToList();
+
+            _listCheckBox = starter.Where(x => (x is CheckBox)).ToList();
+
+            _listHighlighted = new List<Control> { _formViewer.SearchText, _formViewer.FolderListBox, };
+
+            _listDefault = starter.Where(x => !_formViewer.TipsLabels.Contains(x) && 
+                                              !_listButtons.Contains(x) && 
+                                              !_listHighlighted.Contains(x) &&
+                                              !_listCheckBox.Contains(x)) 
+                                  .ToList();
+        }
+
         #endregion
 
         #region Public Properties
+
+        private string _activeTheme;
+        public string ActiveTheme
+        {
+            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) => _themes[x].SetTheme(async: true));
+        }
+        internal string LoadTheme()
+        {
+            var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
+            _themes[activeTheme].SetTheme();
+            return activeTheme;
+        }
+
+        private bool _darkMode;
+        public bool DarkMode
+        {
+            get => Initializer.GetOrLoad(ref _darkMode, () => _globals.Ol.DarkMode, false, _globals, _globals.Ol);
+            set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
+        }
 
         public IntPtr FormHandle => _formViewer.Handle;
 
@@ -161,6 +223,21 @@ namespace QuickFiler.Controllers
             _formViewer.NewFolder.Click += ButtonCreate_Click;
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
+            _globals.Ol.PropertyChanged += DarkMode_Changed;
+
+            //_listHover.ForEach(x => 
+            //{
+            //    x.MouseEnter += Button_MouseEnter;
+            //    x.MouseLeave += Button_MouseLeave;
+            //});
+            //_formViewer.Ok.MouseEnter += Button_MouseEnter;
+            //_formViewer.Cancel.MouseEnter += Button_MouseEnter;
+            //_formViewer.RefreshPredicted.MouseEnter += Button_MouseEnter;
+            //_formViewer.NewFolder.MouseEnter += Button_MouseEnter;
+            //_formViewer.Ok.MouseLeave += Button_MouseLeave;
+            //_formViewer.Cancel.MouseLeave += Button_MouseLeave;
+            //_formViewer.RefreshPredicted.MouseLeave += Button_MouseLeave;
+            //_formViewer.NewFolder.MouseLeave += Button_MouseLeave;
         }
                
         async public void ButtonCancel_Click(object sender, EventArgs e)
@@ -183,7 +260,7 @@ namespace QuickFiler.Controllers
 
         async public void ButtonCreate_Click(object sender, EventArgs e)
         {
-            if (_initType == Enums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
 
             if (!IsValidSelection)
             {
@@ -261,6 +338,16 @@ namespace QuickFiler.Controllers
             };
         }
 
+        internal void DarkMode_Changed(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(_globals.Ol.DarkMode))
+            {
+                _darkMode = _globals.Ol.DarkMode;
+                if (DarkMode) { ActiveTheme = "DarkNormal"; }
+                else { ActiveTheme = "LightNormal"; }
+            }
+        }
+
         #endregion
 
         #region Major Actions
@@ -295,7 +382,7 @@ namespace QuickFiler.Controllers
 
         async public Task CreateFolderAsync()
         {
-            if (_initType == Enums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
 
             if (!IsValidSelection)
             {

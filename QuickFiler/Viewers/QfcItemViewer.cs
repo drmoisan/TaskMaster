@@ -20,8 +20,7 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
-            InitTipsLabelsList();
-            InitLeftTipsLabelsList();
+            InitTips();
         }
 
 
@@ -30,14 +29,17 @@ namespace QuickFiler
 
         private IList<Label> _leftTipsLabels;
         public IList<Label> LeftTipsLabels { get => _leftTipsLabels; }
-        
+
+        private IList<Label> _expandedTipsLabels;
+        public IList<Label> ExpandedTipsLabels { get => _expandedTipsLabels; }
+
         private IItemControler _controller;
         public IItemControler Controller { get => _controller; set => _controller = value; }
         
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
 
-        private void InitTipsLabelsList()
+        private void InitTips()
         {
             _tipsLabels = new List<Label>
             {
@@ -50,21 +52,17 @@ namespace QuickFiler
                 LblAcEmail,
                 LblAcFolder,
                 LblAcSearch,
-                LblAcBody
             };
 
-        }
-
-        private void InitLeftTipsLabelsList()
-        {
             _leftTipsLabels = new List<Label>
             {
                 LblAcOpen,
-                LblAcBody
             };
 
+            _expandedTipsLabels = new List<Label>
+            {
+                LblAcBody,
+            };
         }
-
-
     }
 }

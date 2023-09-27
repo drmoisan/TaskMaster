@@ -9,7 +9,7 @@ namespace TaskMaster
 
     public class ApplicationGlobals : IApplicationGlobals
     {
-
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private AppFileSystemFolderPaths _fs;
         private AppOlObjects _olObjects;
         private AppToDoObjects _toDoObjects;
@@ -27,9 +27,9 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
-            Debug.WriteLine($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
+            logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
             await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
-            Debug.WriteLine($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
+            logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
         }
 
         public IFileSystemFolderPaths FS

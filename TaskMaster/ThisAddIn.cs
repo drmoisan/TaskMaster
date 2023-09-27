@@ -13,6 +13,9 @@ using Microsoft.Office.Core;
 using QuickFiler;
 using UtilitiesCS;
 
+
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
+
 namespace TaskMaster
 {
     public partial class ThisAddIn
@@ -33,7 +36,8 @@ namespace TaskMaster
 
             // Initialize long loading elements on a low priority thread
             EfcViewerQueue.BuildQueue(2);
-            ItemViewerQueue.BuildQueueWhenIdle(10);
+            //ItemViewerQueue.BuildQueueWhenIdle(10);
+            ItemViewerQueue.BuildQueueBackground(30);
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();
@@ -45,9 +49,11 @@ namespace TaskMaster
 
             // Hook the Inbox and ToDo events
             //_globals.Events.Hook();
-            Debug.WriteLine("ThisAddIn_Startup() complete");
+            logger.Debug("ThisAddIn_Startup() complete");
+
         }
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;

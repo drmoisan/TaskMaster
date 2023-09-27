@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using QuickFiler;
 using Microsoft.Office.Interop.Outlook;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace TaskMaster
 {
@@ -82,6 +83,18 @@ namespace TaskMaster
             }
         }
 
+        internal async Task LoadQuickFilerAsync()
+        {
+            bool loaded = false;
+            if (_quickFiler is not null)
+                loaded = _quickFiler.Loaded;
+            if (loaded == false)
+            {
+                _quickFiler = new QuickFiler.Controllers.QfcHomeController(_globals, ReleaseQuickFiler);
+                await _quickFiler.RunAsync();
+            }
+        }
+
         private void ReleaseQuickFilerLegacy()
         {
             _quickfileLegacy = null;
@@ -140,6 +153,9 @@ namespace TaskMaster
                 MessageBox.Show("Hooked Events");
             }
         }
+
+        internal void ToggleDarkMode() => _globals.Ol.DarkMode = !_globals.Ol.DarkMode;
+        internal bool IsDarkModeActive() => _globals.Ol.DarkMode;
 
         internal void HideHeadersNoChildren()
         {

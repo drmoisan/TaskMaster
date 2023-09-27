@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
+using TaskVisualization;
 
 namespace QuickFiler.Test
 {

@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using UtilitiesCS.Threading;
+using System.Windows.Threading;
 
 namespace UtilitiesCS
 {
@@ -39,11 +41,17 @@ namespace UtilitiesCS
 
         private static SynchronizationContext _uiContext;
         
-        public static void InitUiContext()
+        public static void InitUiContext(bool monitorUiThread = true)
         {
             _syncContextForm = new SyncContextForm();
             _uiContext = _syncContextForm.UiSyncContext;
-            Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            //Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            _uiDispatcher = Dispatcher.CurrentDispatcher;
+            //if (monitorUiThread)
+            //{
+            //    _threadMonitor = new ThreadMonitor(Thread.CurrentThread, delayThreshold: 300);
+            //    _threadMonitor.Run();
+            //}   
         }
         
         public static SynchronizationContext GetUiContext()
@@ -51,7 +59,10 @@ namespace UtilitiesCS
             if (_uiContext is null) { InitUiContext(); }
             return _uiContext;
         }
-        
 
+        private static ThreadMonitor _threadMonitor;
+        
+        public static Dispatcher UiDispatcher => _uiDispatcher;
+        private static Dispatcher _uiDispatcher;
     }
 }

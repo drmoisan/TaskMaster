@@ -18,6 +18,8 @@ namespace TaskMaster
 
     public class AppAutoFileObjects : IAppAutoFileObjects
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public AppAutoFileObjects(ApplicationGlobals parent)
         {
             _parent = parent;
@@ -43,7 +45,7 @@ namespace TaskMaster
                 LoadMovedMailsAsync()
             };
             await Task.WhenAll(tasks);
-            Debug.WriteLine($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
+            //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
         }
         
         private bool _sugFilesLoaded = false;
@@ -305,9 +307,9 @@ namespace TaskMaster
 
         }   
 
-        private IList<ISubjectMapEntry> SubjectMapBackupLoader(string filepath)
+        private IList<SubjectMapEntry> SubjectMapBackupLoader(string filepath)
         {
-            var subjectMapEntries = new List<ISubjectMapEntry>();
+            var subjectMapEntries = new List<SubjectMapEntry>();
 
             string[] fileContents = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: true);
             var rowQueue = new Queue<string>(fileContents);

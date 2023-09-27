@@ -113,7 +113,7 @@ namespace UtilitiesCS.Test
             Mock<TaskItem> item = new Mock<TaskItem>();
             item.SetupGet(x => x.Subject).Returns("TestSubjectString");
             item.SetupGet(x => x.CreationTime).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
-            OlItemSummary.Details options = GenericBitwise<OlItemSummary.Details>.Or(
+            OlItemSummary.Details options = GenericBitwiseStatic<OlItemSummary.Details>.Or(
                 new List<OlItemSummary.Details> 
                 { 
                     OlItemSummary.Details.Type, 
@@ -148,7 +148,7 @@ namespace UtilitiesCS.Test
                 {OlItemSummary.Details.Subject, "TestSubjectString" },
                 {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
             };
-            OlItemSummary.Details options = GenericBitwise<OlItemSummary.Details>.Or(
+            OlItemSummary.Details options = GenericBitwiseStatic<OlItemSummary.Details>.Or(
                 new List<OlItemSummary.Details>
                 {
                     OlItemSummary.Details.Subject,
@@ -179,7 +179,7 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Subject).Returns("TestSubjectString");
             item.SetupGet(x => x.SentOn).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             string target = "Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
-            OlItemSummary.Details options = GenericBitwise<OlItemSummary.Details>.Or(
+            OlItemSummary.Details options = GenericBitwiseStatic<OlItemSummary.Details>.Or(
                 new List<OlItemSummary.Details>
                 {
                     OlItemSummary.Details.Subject,

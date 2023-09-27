@@ -1,9 +1,9 @@
-﻿using QuickFiler.Controllers;
-using QuickFiler;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
-namespace QuickFiler.Interfaces
+
+namespace UtilitiesCS
 {
     public interface IQfcTipsDetails
     {
@@ -13,8 +13,10 @@ namespace QuickFiler.Interfaces
         TableLayoutPanel TLP { get; }
         Type ResolveParentType();
         void Toggle();
-        void Toggle(Enums.ToggleState desiredState);
         void Toggle(bool shareColumn);
+        void Toggle(Enums.ToggleState desiredState);
         void Toggle(Enums.ToggleState desiredState, bool shareColumn);
+        Task ToggleAsync(Enums.ToggleState desiredState);
+        Task ToggleAsync(Enums.ToggleState desiredState, bool shareColumn);
     }
 }

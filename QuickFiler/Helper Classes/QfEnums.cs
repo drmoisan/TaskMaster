@@ -1,7 +1,7 @@
 ﻿
 namespace QuickFiler
 {
-    public static class Enums
+    public static class QfEnums
     {
         public enum InitTypeEnum
         {
@@ -12,7 +12,7 @@ namespace QuickFiler
             SortConv = 16,               // 00000000 00010000   2^4
         }
 
-        public enum ToggleState { Off = 0, On = 1 }
+        //public enum ToggleState { Off = 0, On = 1 }
 
     }
 }

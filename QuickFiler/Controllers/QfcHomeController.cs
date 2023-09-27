@@ -1,5 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
-using static QuickFiler.Enums;
+using static QuickFiler.QfEnums;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace QuickFiler.Controllers
             //InitAfObjects();
             _parentCleanup = ParentCleanup;
             _datamodel = new QfcDatamodel(_globals);
-            _explorerController = new QfcExplorerController(Enums.InitTypeEnum.Sort, _globals, this);
+            _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
             _formViewer = new QfcFormViewer();
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
             _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.Sort, Cleanup, this);
@@ -33,20 +33,23 @@ namespace QuickFiler.Controllers
 
         #endregion Constructors, Initializers, and Destructors
 
-        //internal void InitAfObjects() 
-        //{
-        //    if (_globals.AF.CtfMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CtfMap)}"); }
-        //    if (_globals.AF.RecentsList is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.RecentsList)}"); }
-        //    if (_globals.AF.CommonWords is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.CommonWords)}"); }
-        //    if (_globals.AF.SubjectMap is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.SubjectMap)}"); }
-        //    if (_globals.AF.Encoder is null) { throw new ArgumentNullException($"Error trying to initialize {nameof(_globals.AF.Encoder)}"); }
-        //    _globals.AF.SubjectMap.Where(x => x.Encoder is null).ForEach(x => x.Encoder = _globals.AF.Encoder);
-        //}
 
         public void Run()
         {
             IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
             _formController.LoadItems(listEmail);
+            _stopWatch = new cStopWatch();
+            _stopWatch.Start();
+            _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            _formViewer.Show();
+            _formViewer.Refresh();
+        }
+
+        // Twice as slow as the synchronous version
+        public async Task RunAsync()
+        {
+            IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
+            await _formController.LoadItemsAsync(listEmail);
             _stopWatch = new cStopWatch();
             _stopWatch.Start();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;

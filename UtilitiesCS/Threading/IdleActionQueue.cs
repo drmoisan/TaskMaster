@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net.Repository.Hierarchy;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,23 @@ namespace UtilitiesCS.Threading
 {
     public class IdleActionQueue
     {
+        private const int IdleActionDuration = 20;
+        private const int GUIActivityThreshold = 700;
+        private const double CPUUsageThreshold = 0.15;
+        
         private IdleActionQueue() { }
 
         static IdleActionQueue()
         {
             //System.Windows.Forms.Application.Idle += new EventHandler(OnApplicationIdle);
             ApplicationIdleTimer.ApplicationIdle += new ApplicationIdleTimer.ApplicationIdleEventHandler(OnApplicationIdle);
-            ApplicationIdleTimer.GUIActivityThreshold = 500;
+            ApplicationIdleTimer.GUIActivityThreshold = GUIActivityThreshold;
+            ApplicationIdleTimer.CPUUsageThreshold = CPUUsageThreshold;
         }
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+
         public static void AddEntry(Action action)
         {
             Entries.Enqueue(action);
@@ -37,20 +47,19 @@ namespace UtilitiesCS.Threading
 
         private static async void OnApplicationIdle(ApplicationIdleTimer.ApplicationIdleEventArgs e)
         {
-            if (e.IdleDuration.TotalMilliseconds > 50)
+            if (e.IdleDuration.TotalMilliseconds > IdleActionDuration)
             {
                 if (Entries.TryDequeue(out Action action))
                 {
                     try
                     {
                         await UIThreadExtensions.GetUiContext();
-                        Console.WriteLine($"ApplicationIdle is trying to execute {nameof(action)}");
                         action();
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Failed to execute {nameof(action)}");
-                        Console.WriteLine(ex.Message);
+                        logger.Error($"Failed to execute {nameof(action)}");
+                        logger.Error(ex.Message);
                     }
                 }
             }

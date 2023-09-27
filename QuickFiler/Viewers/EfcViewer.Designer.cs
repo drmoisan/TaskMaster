@@ -56,9 +56,7 @@ namespace QuickFiler
             this.LblAcCancel = new System.Windows.Forms.Label();
             this.LblAcRefresh = new System.Windows.Forms.Label();
             this.LblAcNewFolder = new System.Windows.Forms.Label();
-            this.ItemViewer = new QuickFiler.QfcItemViewer();
-            //this.ItemViewer = ItemViewerQueue.Dequeue();
-            //Console.WriteLine("ItemViewer Loaded");
+            this.ItemViewer = new QuickFiler.ItemViewer();
             this.L0vh_TLP.SuspendLayout();
             this.Tlp.SuspendLayout();
             this.SuspendLayout();
@@ -492,7 +490,7 @@ namespace QuickFiler
             this.ItemViewer.MinimumSize = new System.Drawing.Size(1516, 197);
             this.ItemViewer.Name = "ItemViewer";
             this.ItemViewer.Size = new System.Drawing.Size(2012, 1018);
-            this.ItemViewer.TabIndex = 0;
+            this.ItemViewer.TabIndex = 2;
             // 
             // EfcViewer
             // 
@@ -537,7 +535,7 @@ namespace QuickFiler
         internal System.Windows.Forms.Label LblAcCancel;
         internal System.Windows.Forms.Label LblAcRefresh;
         internal System.Windows.Forms.Label LblAcNewFolder;
-        internal QfcItemViewer ItemViewer;
         internal System.Windows.Forms.TableLayoutPanel L0vh_TLP;
+        internal ItemViewer ItemViewer;
     }
 }

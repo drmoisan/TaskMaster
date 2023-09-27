@@ -80,9 +80,9 @@ namespace QuickFiler.Controllers
             e.Handled = true;
         }
 
-        internal QfcItemViewer GetItemViewer(Control control)
+        internal ItemViewer GetItemViewer(Control control)
         {
-            if (control as QfcItemViewer != null) { return (control as QfcItemViewer); }
+            if (control as ItemViewer != null) { return (control as ItemViewer); }
             else if (control.Parent != null) { return GetItemViewer(control.Parent); }
             else { return null; }
         }
@@ -91,7 +91,7 @@ namespace QuickFiler.Controllers
         
         public void CboFolders_KeyDown(object sender, KeyEventArgs e)
         {
-            QfcItemViewer viewer = null;
+            ItemViewer viewer = null;
             if (_cboKeys.Contains(e.KeyCode)) { viewer = GetItemViewer(sender as Control); }
 
             switch (e.KeyCode)

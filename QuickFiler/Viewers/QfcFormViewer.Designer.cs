@@ -39,7 +39,7 @@
             this.DarkMode = new SVGControl.ToggleSwitch(this.components);
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.QfcItemViewerTemplate = new QuickFiler.QfcItemViewer();
+            this.QfcItemViewerTemplate = new QuickFiler.ItemViewer();
             this.qfcItemViewerExpanded1 = new QuickFiler.QfcItemViewerExpanded();
             this.Worker = new System.ComponentModel.BackgroundWorker();
             this.L1v_TableLayout.SuspendLayout();
@@ -252,7 +252,7 @@
         public System.Windows.Forms.Panel L1v0L2_PanelMain;
         public System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
         public SVGControl.ToggleSwitch DarkMode;
-        public QfcItemViewer QfcItemViewerTemplate;
+        public ItemViewer QfcItemViewerTemplate;
         internal System.ComponentModel.BackgroundWorker Worker;
         private QfcItemViewerExpanded qfcItemViewerExpanded1;
     }

@@ -36,12 +36,50 @@ namespace QuickFiler
             _conversationIndex = (string)df["ConversationIndex"][indexRow];
         }
 
+        public static async Task<MailItemInfo> FromMailItemAsync(MailItem item)
+        {
+            var info = new MailItemInfo(item);
+            if (item is null) { throw new ArgumentNullException(); }
+            info.EntryId = item.EntryID;
+            info.SetSender(item.GetSenderInfo());
+            info.Subject = item.Subject;
+            info.Body = CompressPlainText(item.Body);
+            info.Triage = item.GetTriage();
+            info.SentOn = item.SentOn.ToString("g");
+            info.Actionable = item.GetActionTaken();
+            info.Folder = ((Folder)item.Parent).Name;
+            info.ConversationIndex = item.ConversationIndex;
+            info.UnRead = item.UnRead;
+            info.IsTaskFlagSet = (item.FlagStatus == OlFlagStatus.olFlagMarked || item.FlagStatus == OlFlagStatus.olFlagComplete);
+            await Task.Factory.StartNew(() => info.LoadRecipients(),
+                                              default,
+                                              TaskCreationOptions.None,
+                                              PriorityScheduler.BelowNormal);
+            return info;
+        }
+
         private string _storeId;
         private RecipientInfo _sender;
         private RecipientInfo _toRecipients;
         private RecipientInfo _ccRecipients;
         private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
 
+        [Flags] 
+        public enum PlainTextOptionsEnum
+        {
+            Original = 0,
+            ShowStripped = 1,
+            StripWarning = 2,
+            StripLinks = 4,
+            StripFormatting = 8,
+            StripReplyHeader = 16,
+            StripReplyBody = 32,
+            StripAllSilently = 62,
+            StripAll = 63
+        }
+
+        
+        
         #region Public Properties
 
         private string _actionable;
@@ -67,7 +105,10 @@ namespace QuickFiler
         
         private MailItem _item;
         public MailItem Item { get => _item; set => _item = value; }
-        
+                
+        private PlainTextOptionsEnum _plainTextOptions = PlainTextOptionsEnum.StripAll;
+        public PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
+
         private string _senderHtml;
         public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
         
@@ -124,6 +165,31 @@ namespace QuickFiler
             return (bool)variable;
         }
 
+        internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter, System.Action objectSaver)
+        {
+            variable = value;
+            if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
+            objectSetter(value);
+            if (objectSaver is not null) { objectSaver(); }   
+        }
+
+        internal T GetOrLoad<T>(ref T value, Func<T> loader)
+        {
+            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
+            return value;
+        }
+
+        internal T GetOrLoad<T>(ref T value, Func<T> loader, params object[] dependencies)
+        {
+            if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
+            if (dependencies.Any(x => x is null))
+            {
+                var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
+                throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
+            }
+            return GetOrLoad(ref value, loader);
+        }
+
         public bool LoadPriority()
         {
             if (_item is null) { throw new ArgumentNullException(); }
@@ -172,21 +238,59 @@ namespace QuickFiler
             _ccRecipientsHtml = _ccRecipients.Html;
         }
 
+        internal void SetSender(RecipientInfo sender)
+        {
+            _sender = sender;
+            _senderName = sender.Name;
+            _senderHtml = sender.Html;
+        }
+
         #endregion
 
         #region HTML and Plain Text Methods
 
-        internal string CompressPlainText(string text)
+        internal static string CompressPlainText(string text) 
+        { 
+            return CompressPlainText(text, PlainTextOptionsEnum.StripAll); 
+        }
+
+
+        internal static string CompressPlainText(string text, PlainTextOptionsEnum options)
         {
-            //text = text.Replace(System.Environment.NewLine, " ");
-            text = text.Replace(Properties.Resources.Email_Prefix_To_Strip, "");
-            text = Regex.Replace(text, @"<https://[^>]+>", " <link> "); //Strip links
-            text = Regex.Replace(text, @"[\s]", " ");
+            if (options.HasFlag(PlainTextOptionsEnum.StripWarning)) 
+                text = text.Replace(Properties.Resources.Email_Prefix_To_Strip, "");
+            
+            if (options.HasFlag(PlainTextOptionsEnum.StripLinks))
+            {
+                var replacementText = "";
+                if (options.HasFlag(PlainTextOptionsEnum.ShowStripped))
+                    replacementText = "<link>";
+                text = Regex.Replace(text, @"<https://[^>]+>", replacementText); //Strip links
+            }
+            
+            if (options.HasFlag(PlainTextOptionsEnum.StripReplyHeader) || options.HasFlag(PlainTextOptionsEnum.StripReplyBody))
+            {
+                var replacementText = "";
+                if (options.HasFlag(PlainTextOptionsEnum.ShowStripped | PlainTextOptionsEnum.StripReplyHeader) && 
+                    !options.HasFlag(PlainTextOptionsEnum.StripReplyBody)) 
+                    replacementText = "<EOM> Chain: $3";
+                else if (!options.HasFlag(PlainTextOptionsEnum.StripReplyHeader))
+                    replacementText += "$1";
+                else if (!options.HasFlag(PlainTextOptionsEnum.StripReplyBody))
+                    replacementText += "$3";
+
+                text = Regex.Replace(text, @"(From:([^\n]*\n){1,4}Subject: {0,1}[rR][eE]:.*)(.|\n|\r)*\z", replacementText); //Strip reply footer
+            }
+
+            if (options.HasFlag(PlainTextOptionsEnum.StripFormatting))
+                text = Regex.Replace(text, @"[\s]", " ");
             text = Regex.Replace(text, @"[ ]{2,}", " ");
             text = text.Trim();
             text += " <EOM>";
             return text;
         }
+
+        //text = Regex.Replace(text, @"From:([^\n]*\n){1,4}Subject: {0,1}[rR][eE]:(.|\n|\r)*\z", "");
 
         internal string EmailHeader2
         {
@@ -242,7 +346,11 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
         }
 
         private bool? _unread;
-        public bool UnRead { get => Initialized(ref _unread); set => _unread = value; }
+        public bool UnRead 
+        { 
+            get => (bool)GetOrLoad(ref _unread, loader: () => _item.UnRead, dependencies: _item)!;
+            set => SetAndSave(ref _unread, value, (x)=>_item.UnRead = x ?? false, ()=>_item.Save()); 
+        }
 
         private bool? _isTaskFlagSet;
         public bool IsTaskFlagSet { get => Initialized(ref _isTaskFlagSet); set => _isTaskFlagSet = value; }

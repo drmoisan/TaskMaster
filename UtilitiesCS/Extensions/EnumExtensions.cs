@@ -18,21 +18,22 @@ namespace UtilitiesCS
     /// by @madreflection and doctor-jones
     /// </summary>
     /// <typeparam _name="TFlagEnum"></typeparam>
-    public static class GenericBitwise<TFlagEnum> where TFlagEnum : Enum
+    public static class GenericBitwiseStatic<TFlagEnum> where TFlagEnum : Enum
     {
         private static readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _and = And().Compile();
         private static readonly Func<TFlagEnum, TFlagEnum> _not = Not().Compile();
         private static readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _or = Or().Compile();
         private static readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _xor = Xor().Compile();
 
-        static GenericBitwise()
-        {
-            //_and = And().Compile();
-            //_not = Not().Compile();
-            //_or = Or().Compile();
-            //_xor = Xor().Compile();
-        }
+        //static GenericBitwise()
+        //{
+        //    //_and = And().Compile();
+        //    //_not = Not().Compile();
+        //    //_or = Or().Compile();
+        //    //_xor = Xor().Compile();
+        //}
 
+        //public static TFlagEnum operator &(GenericBitwiseOrig<TFlagEnum> a, GenericBitwiseOrig<TFlagEnum> b) => And(a, b);
         public static TFlagEnum And(TFlagEnum value1, TFlagEnum value2) => _and(value1, value2);
         public static TFlagEnum And(IEnumerable<TFlagEnum> list) => list.Aggregate(And);
         public static TFlagEnum Not(TFlagEnum value) => _not(value);
@@ -120,9 +121,23 @@ namespace UtilitiesCS
             );
         }
     }
+
     
-    public static class FlagsHelper
+
+
+    public static class EnumExtensions
     {
+        public static bool HasFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
+        {
+            if(flagsToCheck is null || flagsToCheck.Length == 0) { return false; }
+            return optionsSelected.HasFlag(GenericBitwiseStatic<TEnum>.Or(flagsToCheck));
+        }
+
+        public static TEnum AddFlags<TEnum>(this IEnumerable<TEnum> flags) where TEnum : Enum
+        {
+            return GenericBitwiseStatic<TEnum>.Or(flags);
+        }
+        
         public static T ToCombined<T>(this IEnumerable<T> list)
             where T : Enum
         {

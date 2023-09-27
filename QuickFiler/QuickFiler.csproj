@@ -12,7 +12,7 @@
     <RootNamespace>QuickFiler</RootNamespace>
     <AssemblyName>QuickFiler</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
@@ -64,6 +64,9 @@
     </Reference>
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net.Ext.Json, Version=2.0.10.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.Ext.Json.2.0.10.1\lib\net452\log4net.Ext.Json.dll</HintPath>
     </Reference>
     <Reference Include="MethodBoundaryAspect, Version=2.0.148.0, Culture=neutral, PublicKeyToken=296379d5065c9d61, processorArchitecture=MSIL">
       <HintPath>..\packages\MethodBoundaryAspect.Fody.2.0.148\lib\net462\MethodBoundaryAspect.dll</HintPath>
@@ -266,6 +269,8 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -277,12 +282,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Uno.Diagnostics.Eventing, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Uno.Diagnostics.Eventing.2.0.1\lib\netstandard2.0\Uno.Diagnostics.Eventing.dll</HintPath>
-    </Reference>
-    <Reference Include="Uno.Fonts.Fluent, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Uno.Fonts.Fluent.2.3.0\lib\netstandard1.0\Uno.Fonts.Fluent.dll</HintPath>
-    </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\EfcDataModel.cs" />
@@ -291,11 +291,11 @@
     <Compile Include="Controllers\EfcItemController.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
+    <Compile Include="Helper Classes\EfcThemeHelper.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
-    <Compile Include="Helper Classes\Theme.cs" />
+    <Compile Include="Helper Classes\QfcThemeHelper.cs" />
     <Compile Include="Interfaces\IItemControler.cs" />
     <Compile Include="Interfaces\IQfcFormViewer.cs" />
-    <Compile Include="Interfaces\IQfcTipsDetails.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
     <Compile Include="Controllers\QfcTipsDetails.cs" />
     <Compile Include="Interfaces\IQfcCollectionController.cs" />
@@ -307,7 +307,7 @@
     <Compile Include="Interfaces\IQfcKeyboardHandler.cs" />
     <Compile Include="Legacy\AcceleratorParser.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
-    <Compile Include="Helper Classes\Enums.cs" />
+    <Compile Include="Helper Classes\QfEnums.cs" />
     <Compile Include="Helper Classes\FormFocusListener.cs" />
     <Compile Include="Legacy\IAcceleratorCallbacks.cs" />
     <Compile Include="Legacy\IQfcItemControllerLegacy.cs" />
@@ -329,15 +329,20 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Helper Classes\ThemeHelper.cs" />
     <Compile Include="Viewers\EfcViewer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Viewers\EfcViewer.Designer.cs">
       <DependentUpon>EfcViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Viewers\EfcViewerQueue.cs" />
-    <Compile Include="Viewers\ItemViewerQueue.cs" />
+    <Compile Include="Helper Classes\EfcViewerQueue.cs" />
+    <Compile Include="Helper Classes\ItemViewerQueue.cs" />
+    <Compile Include="Viewers\ItemViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\ItemViewer.Designer.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcItemViewerExpanded.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -381,6 +386,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\EfcViewer.resx">
       <DependentUpon>EfcViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\ItemViewer.resx">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx">
       <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
@@ -500,10 +508,8 @@
     <Error Condition="!Exists('..\packages\Fody.6.0.5\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.6.0.5\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\MethodBoundaryAspect.Fody.2.0.148\build\MethodBoundaryAspect.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MethodBoundaryAspect.Fody.2.0.148\build\MethodBoundaryAspect.Fody.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets'))" />
-    <Error Condition="!Exists('..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets'))" />
   </Target>
   <Import Project="..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.targets" Condition="Exists('..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.targets')" />
   <Import Project="..\packages\Fody.6.0.5\build\Fody.targets" Condition="Exists('..\packages\Fody.6.0.5\build\Fody.targets')" />
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets')" />
-  <Import Project="..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets" Condition="Exists('..\packages\Uno.SourceGenerationTasks.4.2.0\build\netstandard1.0\Uno.SourceGenerationTasks.targets')" />
 </Project>
