@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Analysis;
 using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -58,6 +59,12 @@ namespace QuickFiler.Helper_Classes
             return resolver;
         }
 
+        public async Task BackgroundInitInfoItemsAsync(CancellationToken token)
+        {
+            await LoadConversationInfoAsync(token, true);
+            await LoadConversationItemsAsync(token, true);
+        }
+
         private CancellationToken _token;
         internal CancellationToken Token { get => _token; set => _token = value; }
 
@@ -79,7 +86,7 @@ namespace QuickFiler.Helper_Classes
         {
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
             var convInfoExpanded = Enumerable.Range(0, Count.Expanded)
-                                             .Select(indexRow => new MailItemInfo(Df.Expanded, indexRow))
+                                             .Select(indexRow => MailItemInfo.FromDf(Df.Expanded, indexRow, olNs))
                                              .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
                                              .ToList();
 
@@ -141,7 +148,7 @@ namespace QuickFiler.Helper_Classes
             TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
             TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
 
-            await Task.Factory.StartNew(() => LoadConversationItems(),
+            await Task.Factory.StartNew(() => ConversationItems = LoadConversationItems(),
                                         token,
                                         options,
                                         priority);
@@ -169,7 +176,7 @@ namespace QuickFiler.Helper_Classes
             TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
             TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
             await Task.Factory.StartNew(
-                () => LoadDf(),
+                () => _df = LoadDf(),
                 token,
                 options,
                 priority);
@@ -207,7 +214,7 @@ namespace QuickFiler.Helper_Classes
         {
             if (e.PropertyName == nameof(Df))
             {
-                _ = LoadConversationItemsAsync(_token, true).ConfigureAwait(false);
+                _ = BackgroundInitInfoItemsAsync(_token).ConfigureAwait(false);
             }
         }
 

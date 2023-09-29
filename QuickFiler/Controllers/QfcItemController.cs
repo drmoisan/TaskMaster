@@ -335,7 +335,7 @@ namespace QuickFiler.Controllers
         public void PopulateConversation()
         {
             ConversationResolver = new ConversationResolver(_globals, Mail, _token, SetTopicThread);
-            ConversationResolver.LoadDf();
+           
             PopulateConversation(ConversationResolver.Count.SameFolder);
             //PopulateConversation(_mailItem.GetConversationDf());
         }

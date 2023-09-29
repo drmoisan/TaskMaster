@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
+using System.Windows.Forms.VisualStyles;
 
 namespace QuickFiler
 {
@@ -18,6 +19,8 @@ namespace QuickFiler
     /// </summary>
     public class MailItemInfo 
     {
+        #region Constructors, Initializers, and Destructors
+
         public MailItemInfo() { }
 
         public MailItemInfo(MailItem item)
@@ -34,6 +37,14 @@ namespace QuickFiler
             _folder = (string)df["Folder Name"][indexRow];
             DateTime.TryParse((string)df["SentOn"][indexRow], out _sentDate);
             _conversationIndex = (string)df["ConversationIndex"][indexRow];
+        }
+
+        public static MailItemInfo FromDf(DataFrame df, long indexRow, Outlook.NameSpace olNs)
+        {
+            var info = new MailItemInfo(df, indexRow);
+            info.ResolveMail(olNs, strict: true);
+            info.LoadPriority();
+            return info;
         }
 
         public static async Task<MailItemInfo> FromDfAsync(DataFrame df, long indexRow, Outlook.NameSpace olNs, CancellationToken token, bool background)
@@ -66,17 +77,6 @@ namespace QuickFiler
             return info;
         }
 
-        public async Task<MailItem> ResolveMailAsync(Outlook.NameSpace olNs, CancellationToken token, bool background)
-        {
-            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.Highest;
-            
-            return await Task.Factory.StartNew(
-                () => (MailItem)olNs.GetItemFromID(_entryId, _storeId),
-                token,
-                TaskCreationOptions.None,
-                priority);
-        }
-
         public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -100,7 +100,26 @@ namespace QuickFiler
             return info;
         }
 
+        public MailItem ResolveMail(Outlook.NameSpace olNs, bool strict = false)
+        {
+            return Initializer.GetOrLoad(
+                ref _item, 
+                () => (MailItem)olNs.GetItemFromID(_entryId, _storeId), 
+                strict, 
+                _entryId, 
+                _storeId);
+        }
 
+        public async Task<MailItem> ResolveMailAsync(Outlook.NameSpace olNs, CancellationToken token, bool background)
+        {
+            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.Highest;
+            
+            return await Task.Factory.StartNew(
+                () => ResolveMail(olNs, strict: true),
+                token,
+                TaskCreationOptions.None,
+                priority);
+        }
 
         async public Task<bool> LoadAsync(Outlook.NameSpace olNs, bool darkMode = false)
         {
@@ -115,68 +134,6 @@ namespace QuickFiler
             _actionable = _item.GetActionTaken();
 
             return true;
-        }
-
-
-        private string _storeId;
-        private RecipientInfo _sender;
-        private RecipientInfo _toRecipients;
-        private RecipientInfo _ccRecipients;
-        private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
-
-        [Flags]
-        public enum PlainTextOptionsEnum
-        {
-            Original = 0,
-            ShowStripped = 1,
-            StripWarning = 2,
-            StripLinks = 4,
-            StripFormatting = 8,
-            StripReplyHeader = 16,
-            StripReplyBody = 32,
-            StripAllSilently = 62,
-            StripAll = 63
-        }
-
-        #region Initialization Methods
-
-        internal string Initialized(ref string variable)
-        {
-            if (variable is null) { LoadPriority(); }
-            return variable;
-        }
-
-        internal bool Initialized(ref bool? variable)
-        {
-            // check if one of the nullable variables is null which would indicate
-            // the need to initialize
-            if (variable is null) { LoadPriority(); }
-            return (bool)variable;
-        }
-
-        internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter, System.Action objectSaver)
-        {
-            variable = value;
-            if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
-            objectSetter(value);
-            if (objectSaver is not null) { objectSaver(); }
-        }
-
-        internal T GetOrLoad<T>(ref T value, Func<T> loader)
-        {
-            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
-            return value;
-        }
-
-        internal T GetOrLoad<T>(ref T value, Func<T> loader, params object[] dependencies)
-        {
-            if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
-            if (dependencies.Any(x => x is null))
-            {
-                var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
-                throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
-            }
-            return GetOrLoad(ref value, loader);
         }
 
         public bool LoadPriority()
@@ -219,9 +176,47 @@ namespace QuickFiler
             _senderHtml = sender.Html;
         }
 
+        
+        #endregion
+
+        #region Private variables and enums
+        
+        private string _storeId;
+        private RecipientInfo _sender;
+        private RecipientInfo _toRecipients;
+        private RecipientInfo _ccRecipients;
+        private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
+
+        [Flags]
+        public enum PlainTextOptionsEnum
+        {
+            Original = 0,
+            ShowStripped = 1,
+            StripWarning = 2,
+            StripLinks = 4,
+            StripFormatting = 8,
+            StripReplyHeader = 16,
+            StripReplyBody = 32,
+            StripAllSilently = 62,
+            StripAll = 63
+        }
+
         #endregion
 
         #region Public Properties
+
+        internal string Initialized(ref string variable)
+        {
+            if (variable is null) { LoadPriority(); }
+            return variable;
+        }
+        internal bool Initialized(ref bool? variable)
+        {
+            // check if one of the nullable variables is null which would indicate
+            // the need to initialize
+            if (variable is null) { LoadPriority(); }
+            return (bool)variable;
+        }
 
         private string _actionable;
         public string Actionable { get => Initialized(ref _actionable); set => _actionable = value; }
@@ -391,8 +386,8 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
         private bool? _unread;
         public bool UnRead
         {
-            get => (bool)GetOrLoad(ref _unread, loader: () => _item.UnRead, dependencies: _item)!;
-            set => SetAndSave(ref _unread, value, (x) => _item.UnRead = x ?? false, () => _item.Save());
+            get => (bool)Initializer.GetOrLoad(ref _unread, loader: () => _item.UnRead, strict: false, dependencies: _item)!;
+            set => Initializer.SetAndSave(ref _unread, value, (x) => _item.UnRead = x ?? false, () => _item.Save(), null, false);
         }
 
         private bool? _isTaskFlagSet;
