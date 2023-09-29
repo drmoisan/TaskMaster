@@ -3,6 +3,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Collections;
 using System.Linq;
 using System.Text;
@@ -24,9 +25,10 @@ namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
     {
-        public QfcDatamodel(IApplicationGlobals appGlobals) 
+        public QfcDatamodel(IApplicationGlobals appGlobals, CancellationToken token) 
         { 
             _globals = appGlobals;
+            _token = token;
             _olApp = _globals.Ol.App;
             _activeExplorer = _olApp.ActiveExplorer();
             _frame = InitDf(_activeExplorer);
@@ -35,14 +37,18 @@ namespace QuickFiler.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
-        private Queue<MailItem> _masterQueue;
+        private ConcurrentQueue<MailItem> _masterQueue;
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
+        private CancellationToken _token;
+        private BackgroundWorker _worker;
 
         public ScoStack<IMovedMailInfo> MovedItems { get => _globals.AF.MovedMails; }
         
-        public IList<MailItem> InitEmailQueueAsync(int batchSize, BackgroundWorker worker)
+        public IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker)
         {
+            _worker = worker;
+            
             // Extract first batch
             var firstIteration = _frame.GetRowsAt(Enumerable.Range(0, batchSize).ToArray());
 
@@ -57,7 +63,6 @@ namespace QuickFiler.Controllers
             var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
 
             SetupWorker(worker);
-
             worker.RunWorkerAsync();
 
             return emailList;
@@ -66,8 +71,9 @@ namespace QuickFiler.Controllers
         public void SetupWorker(System.ComponentModel.BackgroundWorker worker) 
         {
             worker.WorkerSupportsCancellation = true;
+            _token.Register(() => worker.CancelAsync());
             worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
-            worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
+            //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
         }
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
@@ -119,31 +125,62 @@ namespace QuickFiler.Controllers
             if((_frame is null) || (_frame.RowCount == 0))
             {
                 MessageBox.Show("Email Frame is empty");
-                _masterQueue = new Queue<MailItem>();
+                _masterQueue = new ConcurrentQueue<MailItem>();
                 return false;
             }
             
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
-            // Convert array of IEmailInfo to List<MailItem>
-            var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
+            // Old Batch Process
+            //// Convert array of IEmailInfo to List<MailItem>
+            //var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
 
-            // Cast list to queue
-            _masterQueue = new Queue<MailItem>(emailList);
+            //// Cast list to queue
+            //_masterQueue = new Queue<MailItem>(emailList);
+
+            _masterQueue = new ConcurrentQueue<MailItem>();
+
+            rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ForEach(item => _masterQueue.Enqueue(item));
 
             return true;
             
         }
                                 
-        public IList<MailItem> DequeueNextItemGroup(int quantity)
+        public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
         {
             int i;
+            CancellationTokenSource toSrc = new CancellationTokenSource();
+            toSrc.CancelAfter(timeOut);
+            CancellationToken toToken = toSrc.Token;
+
             IList<MailItem> listObjects = new List<MailItem>();
+
+            // Wait for the queue to be sufficiently populated or terminate populating
+            await WaitForQueue(quantity, toToken);
+
+            toToken.ThrowIfCancellationRequested();
+            _token.ThrowIfCancellationRequested();
+
+            // Adjust quantity to the lesser of the queue size or the requested quantity
             int adjustedQuantity = quantity < _masterQueue.Count ? quantity : _masterQueue.Count;
+
             for (i = 1; i <= adjustedQuantity; i++)
-                listObjects.Add(_masterQueue.Dequeue());
+            {
+                if (_masterQueue.TryDequeue(out MailItem item))
+                    listObjects.Add(item);
+            }
+
             return listObjects;
+        }
+
+        internal async Task WaitForQueue(int quantity, CancellationToken toToken)
+        {
+            while (_worker.IsBusy && (_masterQueue is null || _masterQueue.Count < quantity))
+            {
+                toToken.ThrowIfCancellationRequested();
+                await Task.Delay(20);
+            }
         }
 
         //TODO: Implement UndoMove()

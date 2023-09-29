@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using System.Threading.Tasks;
 
 
 namespace QuickFiler.Interfaces
@@ -21,9 +22,9 @@ namespace QuickFiler.Interfaces
 
     public interface IQfcDatamodel
     {
-        IList<MailItem> DequeueNextItemGroup(int quantity);
+        Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut);
         void UndoMove();
         ScoStack<IMovedMailInfo> MovedItems { get; }
-        IList<MailItem> InitEmailQueueAsync(int batchSize, BackgroundWorker worker);
+        IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker);
     }
 }

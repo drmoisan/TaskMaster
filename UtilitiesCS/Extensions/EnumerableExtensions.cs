@@ -53,6 +53,24 @@ namespace UtilitiesCS
             }
         }
 
+        public static async IAsyncEnumerable<(TFirst, TSecond)> Zip<TFirst, TSecond>(this IAsyncEnumerable<TFirst> first, IAsyncEnumerable<TSecond> second)
+        {
+            await using var e1 = first.GetAsyncEnumerator();
+            await using var e2 = second.GetAsyncEnumerator();
+
+            while (true)
+            {
+                var t1 = e1.MoveNextAsync().AsTask();
+                var t2 = e2.MoveNextAsync().AsTask();
+                await Task.WhenAll(t1, t2);
+
+                if (!t1.Result || !t2.Result)
+                    yield break;
+
+                yield return (e1.Current, e2.Current);
+            }
+        }
+
 
     }
 }

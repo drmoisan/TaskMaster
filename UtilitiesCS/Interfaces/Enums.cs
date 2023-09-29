@@ -24,5 +24,14 @@
             Folder = 2
         }
 
+        
+        public enum WorkerState
+        {
+            Idle = 0,
+            Working = 1,
+            Paused = 2,
+            Stopped = 3,
+            Completed = 4
+        }
     }
 }

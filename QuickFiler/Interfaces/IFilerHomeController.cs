@@ -1,6 +1,7 @@
 using System;
 using ToDoModel;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace QuickFiler.Interfaces
 {
@@ -16,6 +17,8 @@ namespace QuickFiler.Interfaces
 
         #region Public Properties
 
+        CancellationTokenSource TokenSource { get; }
+        CancellationToken Token { get; }
         bool Loaded { get; }
 		cStopWatch StopWatch { get; }
         //IQfcDatamodel DataModel { get; }

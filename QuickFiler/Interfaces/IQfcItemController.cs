@@ -53,7 +53,6 @@ namespace QuickFiler.Interfaces
         void SetThemeLight(bool async);
         void Cleanup();
         Task MoveMailAsync();
-        DataFrame DfConversation { get; }
         string Subject { get; }
         string To { get; }
         string Sender { get; }

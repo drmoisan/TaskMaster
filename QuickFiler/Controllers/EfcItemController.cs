@@ -202,11 +202,12 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void PopulateConversation()
         {
-            var count = _dataModel.ConversationResolver.DfConversationExpanded.Rows.Count;
+            var count = _dataModel.ConversationResolver.Count.SameFolder;
             _itemViewer.LblConvCt.Text = count.ToString();
             if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
 
-            _ = Task.Run(() => _dataModel.GetConversationInfoAsync());
+            // Could be redundant to event handler in ConversationResolver
+            _ = Task.Run(() => _dataModel.ConversationResolver.LoadConversationItemsAsync(_homeController.Token, backgroundLoad: true));
         }
                 
         internal void ResolveControlGroups(ItemViewer itemViewer)
@@ -488,11 +489,11 @@ namespace QuickFiler.Controllers
 
         public async void ConversationResolverPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(_dataModel.ConversationResolver.ConversationInfoExpanded))
+            if (e.PropertyName == nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded))
             {
                 // Switch to UI Thread
                 await _itemViewer.UiSyncContext;
-                _itemViewer.TopicThread.SetObjects(_dataModel.ConversationResolver.ConversationInfoExpanded);
+                _itemViewer.TopicThread.SetObjects(_dataModel.ConversationResolver.ConversationInfo.Expanded);
                 _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
             }
         }
@@ -729,7 +730,7 @@ namespace QuickFiler.Controllers
             if (_isWebViewerInitialized)
             {
                 _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.ToggleDark(desiredState));
-                _dataModel.ConversationResolver.ConversationInfoExpanded.ForEach(item => item.ToggleDark(desiredState));
+                _dataModel.ConversationResolver.ConversationInfo.Expanded.ForEach(item => item.ToggleDark(desiredState));
                 //ConversationInfo.ForEach(item => item.ToggleDark(desiredState));
             }
         }

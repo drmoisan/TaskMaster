@@ -289,9 +289,13 @@
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcItemController.cs" />
+    <Compile Include="Controllers\QfcQueue.cs" />
+    <Compile Include="Controllers\QfcItemGroup.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\DebugTextWriter.cs" />
     <Compile Include="Helper Classes\EfcThemeHelper.cs" />
+    <Compile Include="Helper Classes\IConversationResolver.cs" />
+    <Compile Include="Helper Classes\IMailItemInfo.cs" />
     <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\QfcThemeHelper.cs" />
     <Compile Include="Interfaces\IItemControler.cs" />

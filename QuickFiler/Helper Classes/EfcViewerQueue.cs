@@ -18,11 +18,19 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                IdleActionQueue.AddEntry(()=> 
-                { 
-                    _queue.Enqueue(new EfcViewer());
-                    //logger.Debug($"Enqueued {_queue.Count}");
-                });
+                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(
+                    () =>
+                    {
+                        _queue.Enqueue(new EfcViewer());
+                        //logger.Debug($"Enqueued {_queue.Count}");
+                    }, 
+                    System.Windows.Threading.DispatcherPriority.Background);
+
+                //IdleActionQueue.AddEntry(()=> 
+                //{ 
+                //    _queue.Enqueue(new EfcViewer());
+                //    //logger.Debug($"Enqueued {_queue.Count}");
+                //});
             }
         }
                         

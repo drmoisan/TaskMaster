@@ -14,6 +14,8 @@ namespace UtilitiesCS
 {
     public static class DfDeedle
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static Frame<int, string> GetEmailDataInView(Explorer activeExplorer)
         {
             Outlook.Table table = activeExplorer.GetTableInView();
@@ -29,8 +31,11 @@ namespace UtilitiesCS
             
             var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
             {
-                DateTime sentOn;
-                DateTime.TryParse(data[i, columnInfo["SentOn"]].ToString(), out sentOn);
+                DateTime sentOn = DateTime.MaxValue;
+                var dateField = data[i, columnInfo["SentOn"]];
+                if (dateField is not null) { DateTime.TryParse(dateField.ToString(), out sentOn); }
+                if (dateField is null) { sentOn = DateTime.MaxValue; }
+                
                 return new
                 {
                     EntryId = data[i, columnInfo["EntryID"]],
@@ -41,6 +46,19 @@ namespace UtilitiesCS
                     StoreId = storeID
                 };
             });
+
+            //string[,] strAry = new string[records.Count(), 6];
+            //var r2 = records.ToList();
+            //Enumerable.Range(0, data.GetLength(0)).ForEach(i =>
+            //{
+            //    strAry[i,0] = r2[i].EntryId.ToString();
+            //    strAry[i, 1] = r2[i].MessageClass.ToString();
+            //    strAry[i, 2] = r2[i].SentOn.ToString();
+            //    strAry[i, 3] = r2[i].ConversationId.ToString();
+            //    strAry[i, 4] = r2[i].Triage.ToString();
+            //    strAry[i, 5] = r2[i].StoreId.ToString();
+            //});
+            //logger.Debug(strAry.ToFormattedText());
 
             var df = Frame.FromRecords(records);
             

@@ -506,7 +506,7 @@ namespace QuickFiler.Controllers
 
         async public Task PopulateFolderCombobox(object folderList = null)
         {
-            await _dataModel.InitFolderHandler(folderList);
+            await _dataModel.InitFolderHandlerAsync(folderList);
 
             await _formViewer.UiSyncContext;
 

@@ -14,6 +14,7 @@ using QuickFiler;
 using Microsoft.Office.Interop.Outlook;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace TaskMaster
 {
@@ -206,7 +207,9 @@ namespace TaskMaster
         }
         internal void TryGetQfcDataModel()
         {
-            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals);
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
+            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals, token);
         }
         internal void TryGetTableInView()
         {

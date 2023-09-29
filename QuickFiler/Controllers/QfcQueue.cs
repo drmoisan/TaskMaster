@@ -1,10 +1,12 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
@@ -13,8 +15,10 @@ namespace QuickFiler.Controllers
 {
     public class QfcQueue : INotifyCollectionChanged, INotifyPropertyChanged
     {
-        public QfcQueue() { }
-        
+        public QfcQueue(CancellationToken token) { _token = token; }
+
+        private CancellationToken _token;
+
         private TableLayoutPanel _tlpTemplate;
         public TableLayoutPanel TlpTemplate 
         { 
@@ -38,7 +42,10 @@ namespace QuickFiler.Controllers
             return (tlp, itemGroups);
         }
 
-        public async Task EnqueueAsync(IList<MailItem> items)
+        public async Task EnqueueAsync(IList<MailItem> items,
+                                       IApplicationGlobals appGlobals,
+                                       IFilerHomeController _homeController,
+                                       IQfcCollectionController _qfcCollectionController)
         {
             if (items is null) { throw new ArgumentNullException(nameof(items)); }
             if (items.Count == 0) { throw new ArgumentException("items is empty"); }
@@ -46,8 +53,20 @@ namespace QuickFiler.Controllers
             var tlp = await UiIdleCallAsync(() => _tlpTemplate.Clone(name: "BackgroundTableLayout"));
             var itemTasks = Enumerable.Range(0, items.Count)
                                       .ToAsyncEnumerable()
-                                      .SelectAwait(async i => await AddAsync(tlp, items[i], i))
-                                      .ToListAsync();
+                                      .SelectAwait(async i => (i:i, grp: await AddAsync(tlp, items[i], i)))
+                                      //.ToListAsync();
+                                      .SelectAwait(async x => 
+                                      { 
+                                          x.grp.ItemController = new QfcItemController(AppGlobals: appGlobals,
+                                                                                     homeController: _homeController,
+                                                                                     parent: _qfcCollectionController,
+                                                                                     itemViewer: x.grp.ItemViewer,
+                                                                                     viewerPosition: x.i + 1,
+                                                                                     x.grp.MailItem);
+                                          await x.grp.ItemController.InitializeAsync();
+                                          return x.grp;
+                                      }).ToListAsync();
+            
             var itemGroups = await itemTasks;
             _queue.Enqueue((tlp, itemGroups));
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue));
@@ -56,7 +75,7 @@ namespace QuickFiler.Controllers
         internal async Task<QfcItemGroup> AddAsync(TableLayoutPanel tlp, MailItem mailItem, int indexNumber)
         {
             var grp = new QfcItemGroup(mailItem);
-            var viewer = ItemViewerQueue.Dequeue();
+            var viewer = ItemViewerQueue.Dequeue(_token);
             grp.ItemViewer = viewer;
             await UiIdleCallAsync(() => AddViewerToTlp(tlp, viewer, indexNumber));
             return grp;

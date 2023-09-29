@@ -14,6 +14,7 @@ using ToDoModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using OneOf.Types;
 
 namespace QuickFiler.Controllers
 {    
@@ -23,6 +24,7 @@ namespace QuickFiler.Controllers
 
         public QfcFormController(IApplicationGlobals appGlobals,
                                  QfcFormViewer formViewer,
+                                 QfcQueue qfcQueue,
                                  QfEnums.InitTypeEnum initType,
                                  System.Action parentCleanup,
                                  QfcHomeController parent)
@@ -37,9 +39,10 @@ namespace QuickFiler.Controllers
             WriteMetrics = parent.QuickFileMetrics_WRITE;
             Iterate = parent.Iterate;
             _movedItems = parent.DataModel.MovedItems;
+            _qfcQueue = qfcQueue;
             
             CaptureItemSettings();
-            RemoveItemTemplate();
+            RemoveTemplatesAndSetupTlp();
             SetupLightDark();
             RegisterFormEventHandlers();
         }
@@ -60,13 +63,13 @@ namespace QuickFiler.Controllers
         private QfEnums.InitTypeEnum _initType;
         private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
-        private IFilerHomeController _parent;
-        private int _itemsPerIteration = -1;
+        private QfcHomeController _parent;
         private delegate void WriteMetricsDelegate(string filename);
         private WriteMetricsDelegate WriteMetrics;
         private delegate void IterateDelegate();
         private IterateDelegate Iterate;
         private ScoStack<IMovedMailInfo> _movedItems;
+        private QfcQueue _qfcQueue;
 
         #endregion
 
@@ -80,19 +83,22 @@ namespace QuickFiler.Controllers
             //_formViewer.L1v0L2_PanelMain.Height
         }
 
-        public void RemoveItemTemplate()
+        public void RemoveTemplatesAndSetupTlp()
         {
-            TableLayoutHelper.RemoveSpecificRow(_formViewer.L1v0L2L3v_TableLayout, 0, 2);
+            ref TableLayoutPanel tlp = ref _formViewer.L1v0L2L3v_TableLayout;
+            TableLayoutHelper.RemoveSpecificRow(tlp, 0, 2);
+
+            var count = ItemsPerIteration;
+            tlp.InsertSpecificRow(0, _rowStyleTemplate, count);
+            tlp.MinimumSize = new System.Drawing.Size(
+                tlp.MinimumSize.Width,
+                tlp.MinimumSize.Height +
+                (int)Math.Round(_rowStyleTemplate.Height * count, 0));
+            _qfcQueue.TlpTemplate = tlp;
         }
 
         public void SetupLightDark()
         {
-            //if (Properties.Settings.Default.DarkMode == true)
-            //{
-            //    SetDarkMode();
-            //}
-            //_formViewer.DarkMode.Checked = Properties.Settings.Default.DarkMode;
-            //_formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
             if (_globals.Ol.DarkMode == true)
             {
                 SetDarkMode();
@@ -114,18 +120,17 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public int ItemsPerIteration
+        private int _itemsPerIteration = -1;
+        public int ItemsPerIteration 
         {
-            get
-            {
-                if (_itemsPerIteration == -1)
-                {
-                    _itemsPerIteration = (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0);
-                    _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = _itemsPerIteration));
-                }
-                return _itemsPerIteration;
-            }
-            set => _itemsPerIteration = value;
+            get => Initializer.GetOrLoad(ref _itemsPerIteration, (x) => x != -1, LoadItemsPerIteration);
+            set => Initializer.SetAndSave(ref _itemsPerIteration, value, (x) => _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = x)));
+        }
+        public int LoadItemsPerIteration()
+        {
+            var result = (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0);
+            _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = result));
+            return result;
         }
 
         public void RegisterFormEventHandlers()
@@ -167,14 +172,14 @@ namespace QuickFiler.Controllers
 
         #region Public Properties
         
-        private IQfcCollectionController _groups;
+        private QfcCollectionController _groups;
         public IQfcCollectionController Groups { get => _groups; }
         
         public IntPtr FormHandle { get => _formViewer.Handle; }
         
         private QfcFormViewer _formViewer;
         public QfcFormViewer FormViewer { get => _formViewer; }
-        
+
         public void ToggleOffNavigation(bool async) => _groups.ToggleOffNavigation(async);
         
         public void ToggleOnNavigation(bool async) => _groups.ToggleOnNavigation(async);
@@ -232,6 +237,7 @@ namespace QuickFiler.Controllers
 
         async public Task ActionCancelAsync()
         {
+            _parent.TokenSource.Cancel();
             await _formViewer.UiSyncContext;
             _formViewer.Hide();
             _groups.Cleanup();
@@ -258,21 +264,34 @@ namespace QuickFiler.Controllers
                         //_blSuppressEvents = true;
 
                         // Move emails
-                        await _groups.MoveEmailsAsync(_movedItems).ConfigureAwait(false);
-                        
+                        //await _groups.MoveEmailsAsync(_movedItems).ConfigureAwait(false);
+
                         // Switch to UI thread
-                        await _formViewer.UiSyncContext;
+                        //await _formViewer.UiSyncContext;
 
                         // Write move metrics
 
                         //await Task.Run(() => WriteMetrics(_globals.FS.Filenames.EmailSession));
-                        WriteMetrics(_globals.FS.Filenames.EmailSession);
+                        //WriteMetrics(_globals.FS.Filenames.EmailSession);
 
                         // Cleanup the viewers and controllers for moved items
-                        _groups.RemoveControls();
-                        
+                        //_groups.RemoveControls();
+
                         // Launch viewers and controllers for the next items in queue
-                        Iterate();
+                        // Iterate();
+                        
+                        if (_qfcQueue.Count > 0) 
+                        {
+                            (var tlp, var itemGroups) = _qfcQueue.Dequeue();
+                            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
+                        }
+                        else 
+                        { 
+                            _groups.CacheMoveObjects(); 
+                        }
+                        _parent.SwapStopWatch();
+                        _ = BackGroundMove();
+                        _ = _parent.IterateQueueAsync();
 
                         //_blSuppressEvents = false;
                         _blRunningModalCode = false;
@@ -291,6 +310,20 @@ namespace QuickFiler.Controllers
             }
         }
 
+        internal async Task BackGroundMove()
+        {
+            // Move emails
+            await _groups.MoveEmailsAsync(_movedItems).ConfigureAwait(false);
+
+            // Write Move Metrics
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(
+                () => WriteMetrics(_globals.FS.Filenames.EmailSession),
+                System.Windows.Threading.DispatcherPriority.ContextIdle);
+
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => _groups.CleanupBackground());
+
+        }
+
         public void ButtonUndo_Click(object sender, EventArgs e) => ButtonUndo_Click();
 
         public void ButtonUndo_Click()
@@ -300,12 +333,51 @@ namespace QuickFiler.Controllers
 
         public void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
         {
-            ItemsPerIteration = (int)_formViewer.L1v1L2h5_SpnEmailPerLoad.Value;
+            var count = (int)_formViewer.L1v1L2h5_SpnEmailPerLoad.Value;
+            if (count != _itemsPerIteration && count > 0)
+            {
+                ref TableLayoutPanel tlp = ref _formViewer.L1v0L2L3v_TableLayout;
+                AdjustTlp(_formViewer.L1v0L2L3v_TableLayout, count);
+                AdjustTlp(_qfcQueue.TlpTemplate, count);
+                _itemsPerIteration = count;
+            }
+        }
+
+        internal void AdjustTlp(TableLayoutPanel tlp, int newCount)
+        {
+            var oldCount = tlp.RowCount - 1;
+            if (oldCount != newCount) 
+            { 
+                var diff = newCount - Math.Max(0, oldCount);
+                if (diff > 0)
+                {
+                    tlp.InsertSpecificRow(oldCount, _rowStyleTemplate, diff);
+                    tlp.MinimumSize = new System.Drawing.Size(
+                        tlp.MinimumSize.Width,
+                        tlp.MinimumSize.Height +
+                        (int)Math.Round(_rowStyleTemplate.Height * diff, 0));
+                }
+                else
+                {
+                    tlp.RemoveSpecificRow(newCount, diff);
+                    tlp.MinimumSize = new System.Drawing.Size(
+                        tlp.MinimumSize.Width,
+                        tlp.MinimumSize.Height -
+                        (int)Math.Round(_rowStyleTemplate.Height * diff, 0));
+                }
+            }
         }
 
         #endregion
 
         #region Major Actions
+
+        public void LoadItems(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
+        {
+            _groups.LoadControlsAndHandlers(tlp, itemGroups);
+        }
+
+        
 
         public void LoadItems(IList<MailItem> listObjects)
         {            

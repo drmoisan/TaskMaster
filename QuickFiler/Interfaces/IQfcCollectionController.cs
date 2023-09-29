@@ -46,6 +46,7 @@ namespace QuickFiler.Interfaces
 
         // Helper Functions
         int EmailsLoaded { get; }
+        int EmailsToMove { get; }
         bool ReadyForMove { get; }
         void ResetPanelHeight();
 

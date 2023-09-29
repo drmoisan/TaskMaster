@@ -116,7 +116,15 @@ namespace UtilitiesCS
             handler.GetInvocationList()
                    .Any(existingHandler => existingHandler == prospectiveHandler);
 
-        
+        public static T Clone<T>(this T controlToClone, string name)
+            where T : Control
+        {
+            T instance = controlToClone.Clone<T>();
+            instance.Name = name;
+            return instance;
+        }
+
+
         public static T Clone<T>(this T controlToClone)
             where T : Control
         {
@@ -124,7 +132,7 @@ namespace UtilitiesCS
 
             T instance = Activator.CreateInstance<T>();
 
-            var excluded = new List<string>() { "WindowTarget", "Name", "Parent" };
+            var excluded = new List<string>() { "WindowTarget", "Name", "Parent", "LayoutSettings" };
             
             foreach (PropertyInfo propInfo in controlProperties)
             {

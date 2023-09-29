@@ -18,5 +18,6 @@ namespace UtilitiesCS
         void Toggle(Enums.ToggleState desiredState, bool shareColumn);
         Task ToggleAsync(Enums.ToggleState desiredState);
         Task ToggleAsync(Enums.ToggleState desiredState, bool shareColumn);
+        bool IsNavColumn { get; set; }
     }
 }

@@ -48,10 +48,11 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public static async ValueTask<IQfcTipsDetails> CreateAsync(System.Windows.Forms.Label labelControl, SynchronizationContext uiContext)
+        public static async ValueTask<IQfcTipsDetails> CreateAsync(System.Windows.Forms.Label labelControl, SynchronizationContext uiContext, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
             var tip = new QfcTipsDetails(labelControl, uiContext);
-            await tip.InitializeAsync();
+            await tip.InitializeAsync(token);
             return tip;
         }
 
@@ -74,8 +75,10 @@ namespace QuickFiler.Controllers
             return _labelControl.Parent.GetType();
         }
 
-        internal async Task InitializeAsync()
+        internal async Task InitializeAsync(CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
+            _token = token;
             await _uiContext;
             _parentType = ResolveParentType();
             SetParentProperties(_parentType);
@@ -93,6 +96,7 @@ namespace QuickFiler.Controllers
         private Enums.ToggleState _state;
         private Type _parentType;
         private SynchronizationContext _uiContext;
+        private CancellationToken _token;
 
         private System.Windows.Forms.Label _labelControl;
         public System.Windows.Forms.Label LabelControl { get => _labelControl; internal set => _labelControl = value; }
@@ -102,10 +106,12 @@ namespace QuickFiler.Controllers
         
         private int _columnNumber;
         public int ColumnNumber { get => _columnNumber; }
-        
+
+        private bool _isNavColumn = false;
+        public bool IsNavColumn { get => _isNavColumn; set => _isNavColumn = value; }
+
         private System.Single _columnWidth;
-        public float ColumnWidth { get => _columnWidth; }
-        
+        public float ColumnWidth { get => _columnWidth; }        
 
         public void Toggle()
         {
@@ -137,14 +143,14 @@ namespace QuickFiler.Controllers
             {
                 _labelControl.Visible = true;
                 _labelControl.Enabled = true;
-                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
                     _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
             }
             else
             {
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;
-                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
                     _tlp.ColumnStyles[_columnNumber].Width = 0;
             }
             _state = desiredState;
@@ -171,6 +177,7 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleAsync(Enums.ToggleState desiredState)
         {
+            _token.ThrowIfCancellationRequested();
             if (desiredState.HasFlag(Enums.ToggleState.On))
             {
                 await _uiContext;
@@ -192,6 +199,7 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleAsync(Enums.ToggleState desiredState, bool sharedColumn)
         {
+            _token.ThrowIfCancellationRequested();
             if (desiredState.HasFlag(Enums.ToggleState.On))
             {
                 await _uiContext;

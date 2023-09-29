@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToDoModel;
@@ -21,9 +22,10 @@ namespace QuickFiler
 
         public EfcHomeController(IApplicationGlobals appGlobals, System.Action parentCleanup, MailItem mail = null)
         {
+            CreateCancellationToken();
             _globals = appGlobals;
             _parentCleanup = parentCleanup;
-            _dataModel = new EfcDataModel(_globals, mail);
+            _dataModel = new EfcDataModel(_globals, mail, this.Token);
 
             if (_dataModel.Mail is not null)
             {
@@ -81,7 +83,18 @@ namespace QuickFiler
         public cStopWatch StopWatch { get => _stopWatch; }
 
         public bool Loaded => throw new NotImplementedException();
-      
+
+        internal void CreateCancellationToken()
+        {
+            _tokenSource = new CancellationTokenSource();
+            _token = _tokenSource.Token;
+        }
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; }
+
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; }
+
 
         #endregion
 
@@ -91,7 +104,7 @@ namespace QuickFiler
         {
             var selectedFolder = _formController.SelectedFolder;
             var moveConversation = _formController.MoveConversation;
-            var convInfo = DataModel.ConversationResolver.ConversationInfo;
+            var convInfo = DataModel.ConversationResolver.ConversationInfo.SameFolder;
             if (!moveConversation)
             {
                 convInfo.Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID).ToList();

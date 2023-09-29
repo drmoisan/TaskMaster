@@ -10,10 +10,11 @@ using System.Windows.Forms;
 using UtilitiesCS;
 using QuickFiler;
 using QuickFiler.Helper_Classes;
+using System.Threading;
 
 namespace QuickFiler.Controllers
 {
-    internal class QfcCollectionController : IQfcCollectionController
+    public class QfcCollectionController : IQfcCollectionController
     {
         #region Constructors
 
@@ -26,7 +27,7 @@ namespace QuickFiler.Controllers
         {
 
             _formViewer = viewerInstance;
-            _itemTLP = _formViewer.L1v0L2L3v_TableLayout;
+            _itemTlp = _formViewer.L1v0L2L3v_TableLayout;
             _itemPanel = _formViewer.L1v0L2_PanelMain;
             _initType = InitType;
             _globals = AppGlobals;
@@ -40,7 +41,7 @@ namespace QuickFiler.Controllers
 
         #region Private Variables
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private QfcFormViewer _formViewer;
         private QfEnums.InitTypeEnum _initType;
@@ -49,8 +50,11 @@ namespace QuickFiler.Controllers
         private IFilerFormController _parent;
         //private int _itemHeight;
         private Panel _itemPanel;
-        private TableLayoutPanel _itemTLP;
-        private List<ItemGroup> _itemGroups;
+        private TableLayoutPanel _itemTlp;
+        private TableLayoutPanel _itemTlpToMove;
+        private TableLayoutPanel _templateTlp;
+        private List<QfcItemGroup> _itemGroups;
+        private List<QfcItemGroup> _itemGroupsToMove;
         private bool _darkMode;
         private RowStyle _template;
         private RowStyle _templateExpanded;
@@ -73,6 +77,8 @@ namespace QuickFiler.Controllers
                 return _itemGroups.Count;
             } 
         }
+
+        public int EmailsToMove => _itemGroupsToMove.Count;
 
         public bool ReadyForMove
         {
@@ -118,11 +124,11 @@ namespace QuickFiler.Controllers
                     _tlpLayout = value;
                     if (_tlpLayout)
                     {
-                        _itemTLP.ResumeLayout(true);
+                        _itemTlp.ResumeLayout(true);
                     }
                     else
                     {
-                        _itemTLP.SuspendLayout();
+                        _itemTlp.SuspendLayout();
                     }
                 }
             }
@@ -134,12 +140,12 @@ namespace QuickFiler.Controllers
 
         public void LoadItemGroupsAndViewers(IList<MailItem> items, RowStyle template)
         {
-            _itemGroups = new List<ItemGroup>();
+            _itemGroups = new List<QfcItemGroup>();
             _keyboardHandler.KdCharActions = new Dictionary<char, Action<char>>();
             int i = 0;
             foreach (MailItem mailItem in items)
             {
-                ItemGroup grp = new(mailItem);
+                QfcItemGroup grp = new(mailItem);
                 _itemGroups.Add(grp);
                 grp.ItemViewer = LoadItemViewer(i, template, true);
                 i++;
@@ -234,6 +240,44 @@ namespace QuickFiler.Controllers
             }
         }
 
+        internal void SwapTlp(TableLayoutPanel tlp)
+        {
+            // Cache parent of current tlp and cache the original tlp to a variable for background processing
+            var tlpParent = _formViewer.L1v0L2L3v_TableLayout.Parent;
+            _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
+
+            // Remove current tlp from parent and replace with new tlp
+            _formViewer.L1v0L2L3v_TableLayout.Parent = null;
+            _formViewer.L1v0L2L3v_TableLayout = tlp;
+            _formViewer.L1v0L2L3v_TableLayout.Parent = tlpParent;
+            _formViewer.L1v0L2L3v_TableLayout.Visible = true;
+            // Cache handle of new tlp
+            _itemTlp = _formViewer.L1v0L2L3v_TableLayout;
+        }
+
+        internal void SwapItemGroups(List<QfcItemGroup> itemGroups)
+        {
+            // Cache current item groups to process in background
+            _itemGroupsToMove = _itemGroups;
+
+            // Replace current item groups with new item groups to process
+            _itemGroups = itemGroups;
+        }
+
+        public void CacheMoveObjects()
+        {
+            _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
+            _itemGroupsToMove = _itemGroups;
+        }
+
+        public void LoadControlsAndHandlers(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
+        {
+            _formViewer.SuspendLayout();
+            SwapTlp(tlp);
+            SwapItemGroups(itemGroups);
+            _formViewer.ResumeLayout();
+        }
+
         public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
         {
             _formViewer.SuspendLayout();
@@ -242,7 +286,14 @@ namespace QuickFiler.Controllers
             //_itemTLP.SuspendLayout();
             _template = template;
             _templateExpanded = templateExpanded;
-            TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
+            //_itemTlp.InsertSpecificRow(0, template, listMailItems.Count);
+            //_itemTlp.MinimumSize = new System.Drawing.Size(
+            //    _itemTlp.MinimumSize.Width,
+            //    _itemTlp.MinimumSize.Height +
+            //    (int)Math.Round(template.Height * listMailItems.Count, 0));
+
+            CaptureTlpTemplate();
+            
             LoadItemGroupsAndViewers(listMailItems, template);
             _formViewer.WindowState = FormWindowState.Maximized;
             TlpLayout = tlpState;
@@ -261,7 +312,7 @@ namespace QuickFiler.Controllers
             //_itemTLP.SuspendLayout();
             _template = template;
             _templateExpanded = templateExpanded;
-            TableLayoutHelper.InsertSpecificRow(_itemTLP, 0, template, listMailItems.Count);
+            TableLayoutHelper.InsertSpecificRow(_itemTlp, 0, template, listMailItems.Count);
             LoadItemGroupsAndViewers(listMailItems, template);
             _formViewer.WindowState = FormWindowState.Maximized;
             TlpLayout = tlpState;
@@ -277,24 +328,18 @@ namespace QuickFiler.Controllers
                                             bool blGroupConversation = true,
                                             int columnNumber = 0)
         {
-            //QfcItemViewer itemViewer = new();
-            var itemViewer = ItemViewerQueue.Dequeue();
-            _itemTLP.MinimumSize = new System.Drawing.Size(
-                _itemTLP.MinimumSize.Width,
-                _itemTLP.MinimumSize.Height +
-                (int)Math.Round(template.Height, 0));
-            // moved to caller for efficencies of multiple insertions
-            //TableLayoutHelper.InsertSpecificRow(_itemTLP, itemNumber - 1, template.Clone());
-            itemViewer.Parent = _itemTLP;
+            var itemViewer = ItemViewerQueue.Dequeue(_homeController.Token);
+
+            itemViewer.Parent = _itemTlp;
             if (columnNumber == 0)
             {
-                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(columnNumber, indexNumber));
-                _itemTLP.SetColumnSpan(itemViewer, 2);
+                _itemTlp.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(columnNumber, indexNumber));
+                _itemTlp.SetColumnSpan(itemViewer, 2);
             }
             else
             {
-                _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(1, indexNumber));
-                _itemTLP.SetColumnSpan(itemViewer, 1);
+                _itemTlp.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(1, indexNumber));
+                _itemTlp.SetColumnSpan(itemViewer, 1);
             }
 
             itemViewer.AutoSize = true;
@@ -325,7 +370,7 @@ namespace QuickFiler.Controllers
                 TlpLayout = false;
 
                 // Remove Item Viewers and Rows from the form
-                TableLayoutHelper.RemoveSpecificRow(_itemTLP, 0, _itemGroups.Count);
+                TableLayoutHelper.RemoveSpecificRow(_itemTlp, 0, _itemGroups.Count);
 
                 ResetPanelHeight();
 
@@ -335,6 +380,17 @@ namespace QuickFiler.Controllers
 
                 TlpLayout = tlpState;
             }
+        }
+
+        public void CleanupBackground()
+        {
+            if (_itemGroupsToMove is not null)
+            {
+                _itemGroupsToMove.ForEach(grp => grp.ItemController.Cleanup());
+                _itemGroupsToMove.Clear();
+            }
+            if (_itemTlpToMove is not null)
+                _itemTlpToMove.Dispose();
         }
 
         async public Task RemoveControlsAsync()
@@ -347,7 +403,7 @@ namespace QuickFiler.Controllers
                 TlpLayout = false;
 
                 // Remove Item Viewers and Rows from the form
-                TableLayoutHelper.RemoveSpecificRow(_itemTLP, 0, _itemGroups.Count);
+                TableLayoutHelper.RemoveSpecificRow(_itemTlp, 0, _itemGroups.Count);
 
                 await ResetPanelHeightAsync();
 
@@ -378,7 +434,7 @@ namespace QuickFiler.Controllers
             TlpLayout = false;
 
             // Remove the controls from the form
-            TableLayoutHelper.RemoveSpecificRow(_itemTLP, selection - 1);
+            TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
 
             // Remove the group from the list of groups
             _itemGroups.RemoveAt(selection - 1);
@@ -510,23 +566,23 @@ namespace QuickFiler.Controllers
             float heightChange = 0;
             if (desiredState == Enums.ToggleState.On)
             {
-                heightChange = _templateExpanded.Height - _itemTLP.RowStyles[itemIndex].Height;
-                _itemTLP.RowStyles[itemIndex] = _templateExpanded.Clone();
+                heightChange = _templateExpanded.Height - _itemTlp.RowStyles[itemIndex].Height;
+                _itemTlp.RowStyles[itemIndex] = _templateExpanded.Clone();
             }
             else 
             {
-                heightChange = _template.Height - _itemTLP.RowStyles[itemIndex].Height;
-                _itemTLP.RowStyles[itemIndex] = _template.Clone();
+                heightChange = _template.Height - _itemTlp.RowStyles[itemIndex].Height;
+                _itemTlp.RowStyles[itemIndex] = _template.Clone();
             }
                 
-            _itemTLP.MinimumSize = new System.Drawing.Size(
-                    _itemTLP.MinimumSize.Width,
-                    _itemTLP.MinimumSize.Height +
+            _itemTlp.MinimumSize = new System.Drawing.Size(
+                    _itemTlp.MinimumSize.Width,
+                    _itemTlp.MinimumSize.Height +
                     (int)Math.Round(heightChange, 0));
             
             if (heightChange < 0)
             {
-                _itemTLP.Invoke(new System.Action(() => _itemTLP.Height += (int)Math.Round(heightChange, 0)));
+                _itemTlp.Invoke(new System.Action(() => _itemTlp.Height += (int)Math.Round(heightChange, 0)));
             }
 
             if (desiredState == Enums.ToggleState.On)
@@ -600,7 +656,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         /// <param name="grp">Item group containing the item viewer</param>
         /// <param name="desiredState">Checked is true or false</param>
-        public void ChangeConversationSilently(ItemGroup grp, bool desiredState)
+        public void ChangeConversationSilently(QfcItemGroup grp, bool desiredState)
         {
             var suppressionState = grp.ItemController.SuppressEvents;
             grp.ItemController.SuppressEvents = true;
@@ -641,7 +697,7 @@ namespace QuickFiler.Controllers
             int removalIndex = indexOriginal + 1;
 
             var qfOriginal = _itemGroups[indexOriginal].ItemController;
-            TableLayoutHelper.RemoveSpecificRow(_itemTLP, removalIndex, childCount);
+            TableLayoutHelper.RemoveSpecificRow(_itemTlp, removalIndex, childCount);
             
             for (int i = 0; i < childCount; i++)
             {
@@ -650,6 +706,11 @@ namespace QuickFiler.Controllers
             }
 
             RenumberGroups();
+
+            _itemTlp.MinimumSize = new System.Drawing.Size(
+                _itemTlp.MinimumSize.Width,
+                _itemTlp.MinimumSize.Height -
+                (int)Math.Round(_template.Height * childCount, 0));
 
             TlpLayout = tlpState;
         }
@@ -698,13 +759,18 @@ namespace QuickFiler.Controllers
         /// <param name="folderList">Folder suggestions for the first email</param>
         public void EnumerateConversationMembers(string entryID, ConversationResolver resolver, int insertionIndex, int conversationCount, object folderList)
         {
-            var insertions = resolver.ConversationItems
+            var insertions = resolver.ConversationItems.SameFolder
                                      .Where(mailItem => mailItem.EntryID != entryID)
                                      .OrderByDescending(mailItem => mailItem.SentOn)
                                      .ToList();
 
+            _itemTlp.MinimumSize = new System.Drawing.Size(
+                _itemTlp.MinimumSize.Width,
+                _itemTlp.MinimumSize.Height +
+                (int)Math.Round(_template.Height * insertions.Count, 0));
+
             //Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
-            Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
+            Enumerable.Range(0, insertions.Count).ForEach(i =>
             {
                 var grp = _itemGroups[i + insertionIndex];
                 grp.ItemViewer = LoadItemViewer(i + insertionIndex, _template, false, 1);
@@ -734,8 +800,8 @@ namespace QuickFiler.Controllers
         {
             int indexOriginal = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.ConvOriginID == originalId);
             var itemViewer = _itemGroups[indexOriginal].ItemViewer;
-            _itemTLP.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(0, indexOriginal));
-            _itemTLP.SetColumnSpan(itemViewer, 2);
+            _itemTlp.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(0, indexOriginal));
+            _itemTlp.SetColumnSpan(itemViewer, 2);
             _itemGroups[indexOriginal].ItemController.ConvOriginID = "";
             _itemGroups[indexOriginal].ItemController.IsChild = false;
             childCount--;
@@ -745,6 +811,13 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Helper Functions
+
+        internal void CaptureTlpTemplate() 
+        {
+            //logger.Debug($"Current Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            _templateTlp = _formViewer.L1v0L2L3v_TableLayout.Clone();
+            _templateTlp.Name = "TemplateTableLayout";
+        }
 
         /// <summary>
         /// Creates empty item groups and inserts them into the 
@@ -756,14 +829,14 @@ namespace QuickFiler.Controllers
         {
             for (int i = 0; i < insertCount; i++)
             {
-                var grp = new ItemGroup();
+                var grp = new QfcItemGroup();
                 _itemGroups.Insert(insertionIndex, grp);
             }
         }
         
         public void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount)
         {
-            TableLayoutHelper.InsertSpecificRow(panel: _itemTLP,
+            TableLayoutHelper.InsertSpecificRow(panel: _itemTlp,
                                                 rowIndex: insertionIndex,
                                                 templateStyle: _template,
                                                 insertCount: insertCount);
@@ -816,33 +889,33 @@ namespace QuickFiler.Controllers
         async public Task ResetPanelHeightAsync()
         {
             await _formViewer.UiSyncContext;
-            var ht = (int)Math.Round(_itemTLP.RowStyles
+            var ht = (int)Math.Round(_itemTlp.RowStyles
                                              .Cast<RowStyle>()
                                              .Sum(rowStyle => rowStyle.Height)
                                      ,0);
             
-            _itemTLP.MinimumSize = new System.Drawing.Size(
-                _itemTLP.MinimumSize.Width, ht);
+            _itemTlp.MinimumSize = new System.Drawing.Size(
+                _itemTlp.MinimumSize.Width, ht);
 
-            _itemTLP.Height = ht;
-            _itemTLP.Parent.Height = ht;
+            _itemTlp.Height = ht;
+            _itemTlp.Parent.Height = ht;
         }
         
         public void ResetPanelHeight()
         {
             var ht = 0;
-            _itemTLP.Invoke(new System.Action(() =>
+            _itemTlp.Invoke(new System.Action(() =>
             {
-                for (int i = 0; i < _itemTLP.RowStyles.Count - 1; i++)
+                for (int i = 0; i < _itemTlp.RowStyles.Count - 1; i++)
                 {
-                    ht += (int)Math.Round(_itemTLP.RowStyles[i].Height, 0);
+                    ht += (int)Math.Round(_itemTlp.RowStyles[i].Height, 0);
                 }
 
-                _itemTLP.MinimumSize = new System.Drawing.Size(
-                    _itemTLP.MinimumSize.Width, ht);
-                _itemTLP.Height = ht;
+                _itemTlp.MinimumSize = new System.Drawing.Size(
+                    _itemTlp.MinimumSize.Width, ht);
+                _itemTlp.Height = ht;
             }));
-            var panel = _itemTLP.Parent;
+            var panel = _itemTlp.Parent;
             panel.Invoke(new System.Action(() => panel.Height = ht));
         }
 
@@ -874,7 +947,7 @@ namespace QuickFiler.Controllers
 
         public void SetDarkMode(bool async)
         {
-            foreach (ItemGroup itemGroup in _itemGroups)
+            foreach (QfcItemGroup itemGroup in _itemGroups)
             {
                 itemGroup.ItemController.SetThemeDark(async);
             }
@@ -882,7 +955,7 @@ namespace QuickFiler.Controllers
 
         public void SetLightMode(bool async)
         {
-            foreach (ItemGroup itemGroup in _itemGroups)
+            foreach (QfcItemGroup itemGroup in _itemGroups)
             {
                 itemGroup.ItemController.SetThemeLight(async);
             }
@@ -898,7 +971,7 @@ namespace QuickFiler.Controllers
             _formViewer = null;
             _globals = null;
             _parent = null;
-            _itemTLP = null;
+            _itemTlp = null;
             _itemGroups = null;
         }
         
@@ -908,7 +981,7 @@ namespace QuickFiler.Controllers
             _formViewer = null;
             _globals = null;
             _parent = null;
-            _itemTLP = null;
+            _itemTlp = null;
             _itemGroups = null;
         }
 
@@ -919,17 +992,17 @@ namespace QuickFiler.Controllers
             //    //TODO: function needed to shut off KeyboardDialog at this step if active
             //    await grp.ItemController.MoveMailAsync();
             //}
-            await Task.WhenAll(_itemGroups.Select(grp => grp.ItemController.MoveMailAsync()));
+            await Task.WhenAll(_itemGroupsToMove.Select(grp => grp.ItemController.MoveMailAsync()));
         }
 
         public string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment)
         {
             int k;
-            string[] strOutput = new string[EmailsLoaded + 1];
-            var loopTo = EmailsLoaded;
+            string[] strOutput = new string[_itemGroupsToMove.Count + 1];
+            var loopTo = _itemGroupsToMove.Count;
             for (k = 0; k < loopTo; k++)
             {
-                var QF = _itemGroups[k].ItemController;
+                var QF = _itemGroupsToMove[k].ItemController;
                 var infoMail = new cInfoMail();
                 if (infoMail.Init_wMail(QF.Mail, OlEndTime: OlEndTime, lngDurationSec: (int)Math.Round(Duration)))
                 {
@@ -974,21 +1047,6 @@ namespace QuickFiler.Controllers
 
         #endregion
 
-        public class ItemGroup
-        {
-            public ItemGroup() { }
-            public ItemGroup(MailItem mailItem) { _mailItem = mailItem; }
-
-            private IQfcItemController _itemController;
-            private MailItem _mailItem;
-
-            private ItemViewer _itemViewer;
-            internal ItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
-            
-            internal IQfcItemController ItemController { get => _itemController; set => _itemController = value; }
-            internal MailItem MailItem { get => _mailItem; set => _mailItem = value; }
-
-        }
-                
+                        
     }
 }
