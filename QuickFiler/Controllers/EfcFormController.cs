@@ -204,7 +204,8 @@ namespace QuickFiler.Controllers
 
         public void WireEventHandlers()
         {
-            _homeController.KeyboardHndlr.KdCharActions = new Dictionary<char, Action<char>>();
+            //_homeController.KeyboardHndlr.CharActions = new Dictionary<char, Action<char>>();
+            _homeController.KeyboardHndlr.CharActions = new KbdActions<char, KaChar, Action<char>>();
             _formViewer.ForAllControls(x =>
             {
                 x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(
@@ -459,14 +460,14 @@ namespace QuickFiler.Controllers
 
         public void ToggleOffNavigation(bool async)
         {
-            KeyboardActions.Keys.ForEach(key => _homeController.KeyboardHndlr.KdCharActions.Remove(key));
+            KeyboardActions.Keys.ForEach(key => _homeController.KeyboardHndlr.CharActions.Remove("Controller", key));
             ToggleTips(async, Enums.ToggleState.Off);
             _itemController.ToggleNavigation(async, Enums.ToggleState.Off);
         }
 
         public void ToggleOnNavigation(bool async)
         {
-            KeyboardActions.ForEach(x => _homeController.KeyboardHndlr.KdCharActions.Add(x.Key, x.Value));
+            KeyboardActions.ForEach(x => _homeController.KeyboardHndlr.CharActions.Add("Controller", x.Key, x.Value));
             ToggleTips(async, Enums.ToggleState.On);
             _itemController.ToggleNavigation(async, Enums.ToggleState.On);
         }

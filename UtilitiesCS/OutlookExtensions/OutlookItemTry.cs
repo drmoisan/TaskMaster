@@ -19,7 +19,7 @@ namespace UtilitiesCS.OutlookExtensions
         private object _item;  // the wrapped Outlook item
         private Type _type;  // type for the Outlook item 
         private object[] _args;  // dummy argument array
-        private System.Type _typeOlObjectClass;
+        //private System.Type _typeOlObjectClass;
 
         public OutlookItemTry(OutlookItem olItem)
         {

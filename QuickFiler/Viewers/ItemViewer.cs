@@ -22,7 +22,7 @@ namespace QuickFiler
             InitControlGroups();
         }
         
-        private IList<Control> _rightControls;
+        //private IList<Control> _rightControls;
 
         private IList<Label> _tipsLabels;
         public IList<Label> TipsLabels { get => _tipsLabels; }

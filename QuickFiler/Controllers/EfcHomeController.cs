@@ -25,7 +25,7 @@ namespace QuickFiler
             CreateCancellationToken();
             _globals = appGlobals;
             _parentCleanup = parentCleanup;
-            _dataModel = new EfcDataModel(_globals, mail, this.Token);
+            _dataModel = new EfcDataModel(_globals, mail, this.TokenSource, this.Token);
 
             if (_dataModel.Mail is not null)
             {

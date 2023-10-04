@@ -32,7 +32,7 @@ namespace QuickFiler.Controllers
             _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
             _qfcQueue = new QfcQueue(Token);
-            _formController = new QfcFormController(_globals, _formViewer, _qfcQueue, InitTypeEnum.Sort, Cleanup, this);
+            _formController = new QfcFormController(_globals, _formViewer, _qfcQueue, InitTypeEnum.Sort, Cleanup, this, Token);
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

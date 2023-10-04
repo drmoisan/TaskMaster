@@ -51,7 +51,7 @@ namespace QuickFiler
         {
             token.ThrowIfCancellationRequested();
 
-            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.Highest;
+            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
 
             var info = new MailItemInfo(df, indexRow);
             await info.ResolveMailAsync(olNs, token, background);
@@ -112,7 +112,7 @@ namespace QuickFiler
 
         public async Task<MailItem> ResolveMailAsync(Outlook.NameSpace olNs, CancellationToken token, bool background)
         {
-            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.Highest;
+            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
             
             return await Task.Factory.StartNew(
                 () => ResolveMail(olNs, strict: true),

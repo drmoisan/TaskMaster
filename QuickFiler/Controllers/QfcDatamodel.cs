@@ -132,14 +132,14 @@ namespace QuickFiler.Controllers
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
-            // Old Batch Process
-            //// Convert array of IEmailInfo to List<MailItem>
-            //var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
+            // Batch Process
+            // Convert array of IEmailInfo to List<MailItem>
+            var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
 
-            //// Cast list to queue
-            //_masterQueue = new Queue<MailItem>(emailList);
+            //// Cast list to concurrent queue
+            _masterQueue = new ConcurrentQueue<MailItem>(emailList);
 
-            _masterQueue = new ConcurrentQueue<MailItem>();
+            //_masterQueue = new ConcurrentQueue<MailItem>();
 
             rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ForEach(item => _masterQueue.Enqueue(item));
 
@@ -179,7 +179,7 @@ namespace QuickFiler.Controllers
             while (_worker.IsBusy && (_masterQueue is null || _masterQueue.Count < quantity))
             {
                 toToken.ThrowIfCancellationRequested();
-                await Task.Delay(20);
+                await Task.Delay(200);
             }
         }
 

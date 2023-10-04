@@ -150,6 +150,7 @@ namespace ToDoModel
         /// <param name="emailSearchRoots"></param>
         /// <param name="recalcSuggestions"></param>
         /// <param name="objItem"></param>
+        /// <param name="exclusions">Folders to exclude from the search results</param>
         /// <returns></returns>
         public string[] FindFolder(string searchString,
                                    object objItem,
@@ -218,7 +219,7 @@ namespace ToDoModel
         /// Function grabs a handle on the <seealso cref="Folder"/> based on a rooted <seealso cref="Folder"/>.FolderPath.
         /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="FolderHandler"/> instance.
         /// </summary>
-        /// <param name="folderpath"> Rooted <seealso cref="Folder.FolderPath"/></param>
+        /// <param name="folderpath"> Rooted <seealso cref="MAPIFolder.FolderPath"/></param>
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
         /// or <c>null</c> if not found</returns>
         /// <exception cref="ArgumentException"><paramref name="folderpath"/> should be rooted </exception>
@@ -230,7 +231,7 @@ namespace ToDoModel
             {
                 throw new ArgumentException($"The parameter {nameof(folderpath)} value {folderpath} does not contain the root {root}", nameof(folderpath));
             }
-            
+
             return GetFolder(folderpath, _olApp);
         }
 
@@ -240,7 +241,7 @@ namespace ToDoModel
         /// targeted folder is not found, an exception is thrown or a message is delivered to the user based on the 
         /// value of the <paramref name="throwEx"/> parameter.
         /// </summary>
-        /// <param name="folderpath"> Rooted <seealso cref="Folder.FolderPath"/></param>
+        /// <param name="folderpath"> Rooted <seealso cref="MAPIFolder.FolderPath"/></param>
         /// <param name="throwEx">Flag to determine if exception should be thrown or message delivered to user</param>
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
         /// or <c>null</c> if not found</returns>

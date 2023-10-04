@@ -10,13 +10,13 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 using System.Collections.Generic;
-using Microsoft.TeamFoundation.Common;
+//using Microsoft.TeamFoundation.Common;
 using Microsoft.VisualBasic;
 using Deedle;
 using Microsoft.Office.Core;
-using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
+//using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.Services.WebApi;
+//using Microsoft.VisualStudio.Services.WebApi;
 
 namespace ToDoModel
 {
@@ -37,7 +37,12 @@ namespace ToDoModel
                                bool removeFlowFile,
                                IApplicationGlobals appGlobals)
         {
-            var mailItems = appGlobals.Ol.App.ActiveExplorer().Selection.OnlyMailItems();
+            var mailItems = appGlobals.Ol.App.ActiveExplorer()
+                                             .Selection
+                                             .Cast<object>()
+                                             .Where(x => x is MailItem)
+                                             .Select(x => (MailItem)x)
+                                             .ToList();
             if (mailItems.Count == 0)
             {
                 MessageBox.Show("No mail items are selected.");
@@ -269,6 +274,8 @@ namespace ToDoModel
         private static YesNoToAllResponse _attachmentsOverwrite = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _picturesOverwrite = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _removeReadOnly = YesNoToAllResponse.Empty;
+
+        private const int MAX_PATH = 256;
 
         #endregion
 

@@ -12,6 +12,7 @@ using ToDoModel;
 using Microsoft.Office.Core;
 using QuickFiler;
 using UtilitiesCS;
+using UtilitiesCS.Threading;
 
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
@@ -38,6 +39,9 @@ namespace TaskMaster
             EfcViewerQueue.BuildQueue(2);
             //ItemViewerQueue.BuildQueueWhenIdle(10);
             ItemViewerQueue.BuildQueueBackground(30);
+            
+            // Initialize IdleAction Queue so that breakpoint is hit after UI
+            IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();

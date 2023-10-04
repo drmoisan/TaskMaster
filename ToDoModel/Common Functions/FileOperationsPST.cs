@@ -135,14 +135,15 @@ namespace ToDoModel
 
             private void _itemsPST_ItemChange(object Item)
             {
+                var olItem = new OutlookItem(Item);
                 // TODO: Morph Functionality to handle proactively rather than reactively
                 if (__itemsPST_ItemChange_blIsRunning == false)
                 {
 
                     __itemsPST_ItemChange_blIsRunning = true;
-                    var todo = new ToDoItem(Item, OnDemand: true);
-                    UserProperty objProperty_ToDoID = Item.GetUdf("ToDoID");
-                    UserProperty objProperty_Project = Item.GetUdf("TagProject");
+                    var todo = new ToDoItem(olItem, OnDemand: true);
+                    UserProperty objProperty_ToDoID = olItem.GetUdf("ToDoID");
+                    UserProperty objProperty_Project = olItem.GetUdf("TagProject");
 
 
                     // AUTOCODE ToDoID based on Project
@@ -268,9 +269,9 @@ namespace ToDoModel
                     // If So, adjust Kan Ban fields and categories
                     if (todo.Complete)
                     {
-                        if (Item.GetCategories().Contains("Tag KB Completed"))
+                        if (olItem.GetCategories().Contains("Tag KB Completed"))
                         {
-                            string strCats = Item.GetCategories().Replace("Tag KB Backlog", "").Replace(",,", ",");
+                            string strCats = olItem.GetCategories().Replace("Tag KB Backlog", "").Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB InProgress", "").Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB Planned", "").Replace(",,", ",");
                             
@@ -284,13 +285,13 @@ namespace ToDoModel
                             {
                                 strCats += "Tag KB Completed";
                             }
-                            Item.SetCategories(strCats);
+                            olItem.SetCategories(strCats);
                             todo.KB = "Completed";
                         }
                     }
                     else if (todo.KB == "Completed")
                     {
-                        string strCats = Item.GetCategories();
+                        string strCats = olItem.GetCategories();
 
                         // Strip Completed from categories
                         if (strCats.Contains("Tag KB Completed"))
@@ -323,7 +324,7 @@ namespace ToDoModel
                         {
                             strCats = strReplace;
                         }
-                        Item.SetCategories(strCats);
+                        olItem.SetCategories(strCats);
                         todo.KB = strKB;
 
                     }

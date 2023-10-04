@@ -17,17 +17,22 @@ namespace TaskVisualization
 
 
     public class TaskController
-    {                        
+    {
         #region Constructors and Initializers
 
         /// <summary>
         /// Constructor initializes the controller for the TaskViewer
         /// </summary>
         /// <param name="formInstance">Instance of TaskViewer</param>
+        /// <param name="olCategories"></param>
         /// <param name="toDoSelection">List of ToDoItems</param>
+        /// <param name="defaults"></param>
+        /// <param name="autoAssign">Class implementing <seealso cref="IAutoAssign"/> interface</param>
+        /// <param name="userEmailAddress">Email address of user to avoid auto-tagging everything with user tag</param>
         /// <param name="flagOptions">Enumeration of fields to activate</param>
         public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, string userEmailAddress, FlagsToSet flagOptions = FlagsToSet.all)
         {
+            //TODO: Add description of olCategories and defaults in documentation
             // Save parameters to internal variables
             _viewer = formInstance;
             _todo_list = toDoSelection;

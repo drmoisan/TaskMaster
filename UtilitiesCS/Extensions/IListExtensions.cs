@@ -115,5 +115,7 @@ namespace UtilitiesCS
         {
             return list.FindIndex(value, comparison) != -1;
         }
+    
+        public static bool IsNullOrEmpty(this IList<string> list) => list is null || list.Count == 0;
     }
 }

@@ -17,11 +17,11 @@ namespace UtilitiesCS
     /// </example>
     public class PriorityScheduler : TaskScheduler
     {
-        public static PriorityScheduler Highest = new PriorityScheduler(ThreadPriority.Highest);
+        //public static PriorityScheduler Highest = new PriorityScheduler(ThreadPriority.Highest);
         public static PriorityScheduler Normal = new PriorityScheduler(ThreadPriority.Normal);
         public static PriorityScheduler AboveNormal = new PriorityScheduler(ThreadPriority.AboveNormal);
         public static PriorityScheduler BelowNormal = new PriorityScheduler(ThreadPriority.BelowNormal);
-        public static PriorityScheduler Lowest = new PriorityScheduler(ThreadPriority.Lowest);
+        //public static PriorityScheduler Lowest = new PriorityScheduler(ThreadPriority.Lowest);
         
         
         private BlockingCollection<Task> _tasks = new BlockingCollection<Task>();

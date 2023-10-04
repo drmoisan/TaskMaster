@@ -15,14 +15,14 @@ namespace QuickFiler.Controllers
 {
     internal class EfcDataModel
     {
-        public EfcDataModel(IApplicationGlobals appGlobals, MailItem mail, CancellationToken token)
+        public EfcDataModel(IApplicationGlobals appGlobals, MailItem mail, CancellationTokenSource tokenSource, CancellationToken token)
         {
             _globals = appGlobals;
             _token = token;
             _mail = mail;
             if (Mail is not null)
             {
-                _conversationResolver = new ConversationResolver(_globals, Mail, token);
+                _conversationResolver = new ConversationResolver(_globals, Mail, tokenSource, token);
                 _conversationResolver.LoadDf(); // Load Synchronously
                 //_ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItemsAsync(dfConvExp));
             }

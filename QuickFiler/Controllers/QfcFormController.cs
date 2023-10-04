@@ -27,8 +27,10 @@ namespace QuickFiler.Controllers
                                  QfcQueue qfcQueue,
                                  QfEnums.InitTypeEnum initType,
                                  System.Action parentCleanup,
-                                 QfcHomeController parent)
-        { 
+                                 QfcHomeController parent,
+                                 CancellationToken token)
+        {
+            _token = token;
             _globals = appGlobals;
             _initType = initType;
             _formViewer = formViewer;
@@ -89,6 +91,8 @@ namespace QuickFiler.Controllers
             TableLayoutHelper.RemoveSpecificRow(tlp, 0, 2);
 
             var count = ItemsPerIteration;
+            //_itemsPerIteration = 1;
+            //count = 1;
             tlp.InsertSpecificRow(0, _rowStyleTemplate, count);
             tlp.MinimumSize = new System.Drawing.Size(
                 tlp.MinimumSize.Width,
@@ -184,6 +188,9 @@ namespace QuickFiler.Controllers
         
         public void ToggleOnNavigation(bool async) => _groups.ToggleOnNavigation(async);
 
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; }
+
         #endregion
 
         #region Event Handlers
@@ -261,25 +268,9 @@ namespace QuickFiler.Controllers
                     if (await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_groups.ReadyForMove))
                     {
                         _blRunningModalCode = true;
-                        //_blSuppressEvents = true;
-
-                        // Move emails
-                        //await _groups.MoveEmailsAsync(_movedItems).ConfigureAwait(false);
-
-                        // Switch to UI thread
-                        //await _formViewer.UiSyncContext;
-
-                        // Write move metrics
-
-                        //await Task.Run(() => WriteMetrics(_globals.FS.Filenames.EmailSession));
-                        //WriteMetrics(_globals.FS.Filenames.EmailSession);
-
-                        // Cleanup the viewers and controllers for moved items
-                        //_groups.RemoveControls();
-
-                        // Launch viewers and controllers for the next items in queue
-                        // Iterate();
                         
+                        if (_parent.KeyboardHndlr.KbdActive) { _parent.KeyboardHndlr.ToggleKeyboardDialog(); }
+
                         if (_qfcQueue.Count > 0) 
                         {
                             (var tlp, var itemGroups) = _qfcQueue.Dequeue();
@@ -386,7 +377,8 @@ namespace QuickFiler.Controllers
                                                   darkMode: _globals.Ol.DarkMode,
                                                   InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
-                                                  parent: this);
+                                                  parent: this,
+                                                  token: Token);
             _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
@@ -397,7 +389,8 @@ namespace QuickFiler.Controllers
                                                   darkMode: Properties.Settings.Default.DarkMode,
                                                   InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
-                                                  parent: this);
+                                                  parent: this,
+                                                  token: Token);
             await _groups.LoadControlsAndHandlersAsync(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 

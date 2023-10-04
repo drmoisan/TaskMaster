@@ -125,13 +125,17 @@ namespace UtilitiesCS
         /// <param name="columnNames">Array of column names to remove</param>
         public static void RemoveColumns(this Outlook.Table table, string[] columnNames)
         {
+            if (table is not null && columnNames is not null && columnNames.Count() > 0)
+            {
+                columnNames.ForEach(column => table.Columns.Remove(column));
+            }
+        }
+
+        public static void RemoveColumns(this Outlook.Table table)
+        {
             if (table is not null)
             {
-                if ((columnNames is not null)&&(columnNames.Count() > 0))
-                {
-                    if (columnNames[0].ToLower() == "removeall") { table.Columns.RemoveAll(); }
-                    else { foreach (var column in columnNames) { table.Columns.Remove(column); } }   
-                }  
+                table.Columns.RemoveAll(); 
             }
         }
 

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using UtilitiesCS;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace QuickFiler.Test.Controllers
 {
@@ -23,6 +24,8 @@ namespace QuickFiler.Test.Controllers
         private Mock<IFilerFormController> mockQfcFormController;
         private Mock<IQfcKeyboardHandler> mockKeyboardHandler;
         private Mock<IFilerHomeController> mockHomeController;
+        private CancellationTokenSource tokenSource;
+        private CancellationToken token;
 
         [TestInitialize]
         public void TestInitialize()
@@ -36,6 +39,8 @@ namespace QuickFiler.Test.Controllers
             this.mockQfcFormController = this.mockRepository.Create<IFilerFormController>();
             this.mockKeyboardHandler = this.mockRepository.Create<IQfcKeyboardHandler>();
             this.mockHomeController = this.mockRepository.Create<IFilerHomeController>();
+            this.tokenSource = new CancellationTokenSource();
+            this.token = this.tokenSource.Token;
         }
 
         private QfcCollectionController CreateQfcCollectionController()
@@ -46,7 +51,8 @@ namespace QuickFiler.Test.Controllers
                 false,
                 QfEnums.InitTypeEnum.Sort,
                 this.mockHomeController.Object,
-                this.mockQfcFormController.Object);
+                this.mockQfcFormController.Object,
+                this.token);
         }
 
         [TestMethod]
@@ -93,13 +99,13 @@ namespace QuickFiler.Test.Controllers
 
         
         [TestMethod]
-        public void RemoveControls_StateUnderTest_ExpectedBehavior()
+        public async Task RemoveControlsAsync_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
             var qfcCollectionController = this.CreateQfcCollectionController();
 
             // Act
-            qfcCollectionController.RemoveControlsAsync();
+            await qfcCollectionController.RemoveControlsAsync();
 
             // Assert
             Assert.Fail();

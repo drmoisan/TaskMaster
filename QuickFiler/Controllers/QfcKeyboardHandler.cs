@@ -1,11 +1,17 @@
 ﻿using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
+using Swordfish.NET.Collections;
+using Microsoft.Office.Interop.Outlook;
+using System.Windows.Input;
+
 
 namespace QuickFiler.Controllers
 {
@@ -25,11 +31,24 @@ namespace QuickFiler.Controllers
 
         private IFilerHomeController _parent;
         private bool _kbdActive = false;
-        private Dictionary<char, Action<char>> _kdCharActions = null;
-        private Dictionary<Keys, Action<Keys>> _kdSpecActions = null;
 
-        public Dictionary<char, Action<char>> KdCharActions { get => _kdCharActions; set => _kdCharActions = value; }
-        public Dictionary<Keys, Action<Keys>> KdKeyActions { get => _kdSpecActions; set => _kdSpecActions = value;}
+        private KbdActions<char, KaChar, Action<char>> _charActions = null;
+        public KbdActions<char, KaChar, Action<char>> CharActions { get => _charActions; set => _charActions = value; }
+
+        //private Dictionary<char, Action<char>> _charActions = null;
+        //public Dictionary<char, Action<char>> CharActions { get => _charActions; set => _charActions = value; }
+
+        private Dictionary<char, Func<char, Task>> _charActionsAsync = null;
+        public Dictionary<char, Func<char, Task>> CharActionsAsync { get => _charActionsAsync; set => _charActionsAsync = value; }
+
+        //private Dictionary<char, Func<char, Task>> _charActionsAsync = null;
+        //public Dictionary<char, Func<char, Task>> CharActionsAsync { get => _charActionsAsync; set => _charActionsAsync = value; }
+
+        private KbdActions<Keys, KaKey,Action<Keys>> _keyActions = null;
+        public KbdActions<Keys, KaKey, Action<Keys>> KeyActions { get => _keyActions; set => _keyActions = value;}
+
+        private Dictionary<Keys, Func<Keys, Task>> _keyActionsAysnc = null;
+        public Dictionary<Keys, Func<Keys, Task>> KeyActionsAsync { get => _keyActionsAysnc; set => _keyActionsAysnc = value; }
 
         public bool KbdActive 
         { 
@@ -42,7 +61,7 @@ namespace QuickFiler.Controllers
 
         public void KeyboardHandler_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (KbdActive && (KdKeyActions != null) && KdKeyActions.ContainsKey(e.KeyCode))
+            if (KbdActive && (KeyActions != null) && KeyActions.ContainsKey(e.KeyCode))
             {
                 e.IsInputKey = true;
             }
@@ -52,18 +71,38 @@ namespace QuickFiler.Controllers
         {
             if (KbdActive)
             {
-                if ((KdKeyActions != null) && KdKeyActions.ContainsKey(e.KeyCode))
+                if ((KeyActions != null) && KeyActions.ContainsKey(e.KeyCode))
                 {
                     e.SuppressKeyPress = true;
                     e.Handled = true;
-                    KdKeyActions[e.KeyCode].DynamicInvoke(e.KeyCode);
+                    KeyActions[e.KeyCode].DynamicInvoke(e.KeyCode);
                 }
-                else if ((KdCharActions != null) && KdCharActions.ContainsKey((char)e.KeyValue))
+                else if ((CharActions != null) && CharActions.ContainsKey((char)e.KeyValue))
                 {
                     e.SuppressKeyPress = true;
                     e.Handled = true;
-                    KdCharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
+                    CharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
                 }   
+            }
+        }
+
+        public async void KeyboardHandler_KeyDownAsync(object sender, KeyEventArgs e)
+        {
+            if (KbdActive)
+            {
+                if ((KeyActionsAsync != null) && KeyActionsAsync.ContainsKey(e.KeyCode))
+                {
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
+                    //KdKeyActionsAsync[e.KeyCode].DynamicInvoke(e.KeyCode);
+                    await KeyActionsAsync[e.KeyCode](e.KeyCode);                    
+                }
+                else if ((CharActionsAsync != null) && CharActionsAsync.ContainsKey((char)e.KeyValue))
+                {
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
+                    await CharActionsAsync[(char)e.KeyValue]((char)e.KeyValue);
+                }
             }
         }
 
@@ -77,6 +116,23 @@ namespace QuickFiler.Controllers
         public void ToggleKeyboardDialog(object sender, KeyEventArgs e)
         {
             ToggleKeyboardDialog();
+            e.Handled = true;
+        }
+
+        public async Task ToggleKeyboardDialogAsync()
+        {
+            // TODO: Convert ToggleKeyboardDialogAsync function to Async
+            if (_kbdActive) { _parent.FormCtrlr.ToggleOffNavigation(async: false); }
+            else { _parent.FormCtrlr.ToggleOnNavigation(async: false); }
+            _kbdActive = !_kbdActive;
+
+            await Task.CompletedTask;
+            throw new NotImplementedException();
+        }
+
+        public async void ToggleKeyboardDialogAsync(object sender, KeyEventArgs e)
+        {
+            await ToggleKeyboardDialogAsync();
             e.Handled = true;
         }
 
@@ -183,5 +239,203 @@ namespace QuickFiler.Controllers
                     }
             }
         }
+    }
+    
+    public class KbdActions<T, U, V> where U : IKbdAction<T,V>, new()
+    {
+        public KbdActions() 
+        {
+            _list = new ConcurrentObservableCollection<U>();
+        }
+        
+        public KbdActions(IEnumerable<U> list)
+        {
+            _list = new ConcurrentObservableCollection<U>(list);
+        }
+
+        private ConcurrentObservableCollection<U> _list = new();
+
+        public V this[T key]
+        {
+            get => this.Find(key).Delegate;
+
+            set
+            {
+                var element = this.Find(key);
+                if (element is not null)
+                {
+                    element.Delegate = value;
+                }
+            }
+        }
+
+        public bool ContainsKey(T key) => _list.Any(x => x.KeyEquals(key));
+
+        public U Find(T key)
+        {
+            var matches = _list.Where(x => x.KeyEquals(key));
+            var count = matches.Count();
+            switch (count)
+            {
+                case 0:
+                    return default(U);
+                case 1:
+                    return matches.First();
+                default:
+                    var message = $"Multiple sources have registered actions for Key {key}. SourceId list ";
+                    message += $"[{matches.Select(x => x.SourceId).SentenceJoin()}]";
+                    throw new InvalidOperationException(message);
+            }
+        }
+
+        public int FindIndex(T key)
+        {
+            var matches = _list.Where(x => x.KeyEquals(key));
+            var count = matches.Count();
+            switch (count)
+            {
+                case 0:
+                    return -1;
+                case 1:
+                    return _list.FindIndex(x => x.KeyEquals(key));
+                default:
+                    var message = $"Multiple sources have registered actions for Key {key}. SourceId list ";
+                    message += $"[{matches.Select(x => x.SourceId).SentenceJoin()}]";
+                    throw new InvalidOperationException(message);
+            }
+        }
+
+        public void Add(string sourceId, T key, V @delegate)
+        {
+            if (_list.Any(x => x.SourceId == sourceId && x.KeyEquals(key)))
+            {
+                string message = $"Cannot add key because it already exists. Key {key} SourceId {sourceId}";
+                throw new ArgumentException(message);
+            }
+            U instance = new();
+            instance.SourceId = sourceId;
+            instance.Key = key;
+            instance.Delegate = @delegate;
+            _list.Add(instance);
+        }
+
+        public bool Remove(string sourceId, T key)
+        {
+            var index = _list.FindIndex(x => x.SourceId == sourceId && x.KeyEquals(key));
+            if (index == -1) { return false; }
+            else
+            {
+                _list.RemoveAt(index);
+                return true;
+            }
+        }
+
+    }
+
+    public interface IKbdAction<T, U>
+    {
+        string SourceId { get; set; }
+        T Key { get; set; }
+        U Delegate { get; set; }
+        bool KeyEquals(T other);
+        //Type DelegateType { get; }
+    }
+
+    public class KaKey: IKbdAction<Keys, Action<Keys>>
+    {
+        public KaKey() { }
+
+        public KaKey(string sourceId, Keys key, Action<Keys> action)
+        {
+            SourceId = sourceId;
+            Key = key;
+            Delegate = action;
+        }
+        
+        private string _sourceId;
+        public string SourceId { get => _sourceId; set => _sourceId = value; }
+        
+        private Keys _key;
+        public Keys Key { get => _key; set => _key = value; }
+        
+        private Action<Keys> _action;
+        public Action<Keys> Delegate { get => _action; set => _action = value; }
+
+        public Type DelegateType { get => typeof(Action<Keys>); }
+        //Key IKbdAction<Keys, Action<Keys>>.Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public bool KeyEquals(Keys other) => Key == other;
+        
+    }
+
+    public class KaKeyAsync: IKbdAction<Keys, Func<Keys, Task>>
+    {
+        public KaKeyAsync() { }
+        
+        public KaKeyAsync(string sourceId, Keys key, Func<Keys, Task> function)
+        {
+            SourceId = sourceId;
+            Key = key;
+            Delegate = function;
+        }
+
+        private string _sourceId;
+        public string SourceId { get => _sourceId; set => _sourceId = value; }
+
+        private Keys _key;
+        public Keys Key { get => _key; set => _key = value; }
+
+        private Func<Keys, Task> _function;
+        public Func<Keys, Task> Delegate { get => _function; set => _function = value; }
+
+        public bool KeyEquals(Keys other) => Key == other;
+    }
+
+    public class KaChar: IKbdAction<char, Action<char>>
+    {
+        public KaChar() { }
+
+        public KaChar(string sourceId, char key, Action<char> action)
+        {
+            SourceId = sourceId;
+            Key = key;
+            Delegate = action;
+        }
+
+        private string _sourceId;
+        public string SourceId { get => _sourceId; set => _sourceId = value; }
+
+        private char _key;
+        public char Key { get => _key; set => _key = value; }
+
+        private Action<char> _action;
+        public Action<char> Delegate { get => _action; set => _action = value; }
+
+        public Type DelegateType { get => typeof(Action<Keys>); }
+
+        public bool KeyEquals(char other) => Key == other;
+    }
+
+    public class KaCharAsync
+    {
+        public KaCharAsync() { }
+
+        public KaCharAsync(string sourceId, char key, Func<char, Task> function)
+        {
+            SourceId = sourceId;
+            Key = key;
+            Delegate = function;
+        }
+
+        private string _sourceId;
+        public string SourceId { get => _sourceId; set => _sourceId = value; }
+
+        private char _key;
+        public char Key { get => _key; set => _key = value; }
+
+        private Func<char, Task> _function;
+        public Func<char, Task> Delegate { get => _function; set => _function = value; }
+
+        public bool KeyEquals(char other) => Key == other;
     }
 }

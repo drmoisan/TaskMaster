@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Windows.Forms;
+using QuickFiler.Controllers;
 
 namespace QuickFiler.Interfaces
 {
@@ -11,8 +12,9 @@ namespace QuickFiler.Interfaces
         void ToggleKeyboardDialog(object sender, KeyEventArgs e); 
         void KeyboardHandler_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e);
         void KeyboardHandler_KeyDown(object sender, KeyEventArgs e);
-        Dictionary<char, Action<char>> KdCharActions { get; set; }
-        Dictionary<Keys, Action<Keys>> KdKeyActions { get; set; }
+        KbdActions<char, KaChar, Action<char>> CharActions { get; set; }
+        //Dictionary<char, Action<char>> CharActions { get; set; }
+        KbdActions<Keys, KaKey, Action<Keys>> KeyActions { get; set; }
         void CboFolders_KeyDown(object sender, KeyEventArgs e);
     }
 }

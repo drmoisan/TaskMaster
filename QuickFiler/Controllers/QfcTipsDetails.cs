@@ -205,7 +205,7 @@ namespace QuickFiler.Controllers
                 await _uiContext;
                 _labelControl.Visible = true;
                 _labelControl.Enabled = true;
-                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
                     _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
             }
             else
@@ -213,7 +213,7 @@ namespace QuickFiler.Controllers
                 await _uiContext;
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;
-                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
                     _tlp.ColumnStyles[_columnNumber].Width = 0;
             }
             _state = desiredState;

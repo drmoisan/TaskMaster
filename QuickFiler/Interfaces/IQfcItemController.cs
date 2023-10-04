@@ -21,6 +21,7 @@ namespace QuickFiler.Interfaces
         void Initialize(bool async);
         void ToggleFocus(); // Turn on or off the formatting to highlight this QfcItem
         void ToggleFocus(Enums.ToggleState desiredState);
+        Task ToggleFocusAsync();
         int CounterEnter { get; set; }
         int CounterComboRight { get; set; }
         bool IsExpanded {  get; }
@@ -63,6 +64,7 @@ namespace QuickFiler.Interfaces
         IList<IQfcTipsDetails> ListTipsDetails { get; }
         void ToggleNavigation(bool async);
         void ToggleNavigation(bool async, Enums.ToggleState desiredState);
+        Task ToggleNavigationAsync(Enums.ToggleState desiredState);
         void ToggleTips(bool async, Enums.ToggleState desiredState);
         public Dictionary<string, System.Action> RightKeyActions { get; }
     }

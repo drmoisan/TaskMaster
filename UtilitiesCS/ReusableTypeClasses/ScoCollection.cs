@@ -73,8 +73,9 @@ namespace UtilitiesCS
         public int Count => _collection.Count;
 
         public bool IsReadOnly => _collection.IsReadOnly;
-       
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        // { add { } remove { } } suggested to avoid compiler warning on interface implementation
+        public event NotifyCollectionChangedEventHandler CollectionChanged { add { } remove { } }
 
         public void Add(T item) => _collection.Add(item);
         

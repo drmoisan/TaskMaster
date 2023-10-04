@@ -274,6 +274,11 @@ namespace UtilitiesCS
             //else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
         }
         
+        public async Task SetQfcThemeAsync()
+        {
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=> SetQfcTheme());
+        }
+
         private void SetQfcTheme()
         {
             // Active item navigation colors

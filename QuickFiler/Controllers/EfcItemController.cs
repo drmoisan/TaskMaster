@@ -255,7 +255,7 @@ namespace QuickFiler.Controllers
         private List<Control> _navCtrls;
         private List<Control> _tipsCtrls;
         private List<Control> _dflt2Ctrls;
-        private List<Control> _selectorsCtrls;
+        private List<Control> _selectorsCtrls = null;
         private List<Control> _mailCtrls;
 
         #endregion
@@ -451,36 +451,36 @@ namespace QuickFiler.Controllers
         {
             if (!overwriteDuplicates) 
             {
-                actions = actions.Where(action => !_keyboardHandler.KdCharActions.ContainsKey(action.Key)).ToDictionary();       
+                actions = actions.Where(action => !_keyboardHandler.CharActions.ContainsKey(action.Key)).ToDictionary();       
             }
-            actions.ForEach(action => _keyboardHandler.KdCharActions[action.Key] = action.Value);
+            actions.ForEach(action => _keyboardHandler.CharActions[action.Key] = action.Value);
         }
         
         internal void RegisterFocusActions()
         {
-            _keyboardHandler.KdCharActions.Add('O', (x) => _ = _explorerController.OpenQFItem(_itemInfo.Item));
-            _keyboardHandler.KdCharActions.Add('E', async (x) => await KbdExecuteAsync(this.ToggleExpansionAsync));
+            _keyboardHandler.CharActions.Add("Item", 'O', (x) => _ = _explorerController.OpenQFItem(_itemInfo.Item));
+            _keyboardHandler.CharActions.Add("Item", 'E', async (x) => await KbdExecuteAsync(this.ToggleExpansionAsync));
             if (_expanded)
             {
-                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
-                _keyboardHandler.KdCharActions.Add('D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
+                _keyboardHandler.CharActions.Add("Item", 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
+                _keyboardHandler.CharActions.Add("Item", 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
         }
 
         internal void UnregisterFocusActions()
         {
-            _keyboardHandler.KdCharActions.Remove('O');
-            _keyboardHandler.KdCharActions.Remove('E');
+            _keyboardHandler.CharActions.Remove("Item", 'O');
+            _keyboardHandler.CharActions.Remove("Item", 'E');
             if (_expanded)
             {
-                _keyboardHandler.KdCharActions.Remove('B');
-                _keyboardHandler.KdCharActions.Remove('D');
+                _keyboardHandler.CharActions.Remove("Item", 'B');
+                _keyboardHandler.CharActions.Remove("Item", 'D');
             }
         }
 
         internal void UnregisterActions(List<char> keys)
         {
-            keys.ForEach(key => _keyboardHandler.KdCharActions.Remove(key));
+            keys.ForEach(key => _keyboardHandler.CharActions.Remove("Item", key));
         }
         
         #endregion
@@ -588,8 +588,8 @@ namespace QuickFiler.Controllers
                     _timer.Change(4000, System.Threading.Timeout.Infinite);
                 }
                 // Register the keyboard actions and overwrite any others silently
-                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
-                _keyboardHandler.KdCharActions.Add('D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
+                _keyboardHandler.CharActions.Add("Item", 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
+                _keyboardHandler.CharActions.Add("Item", 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
             else
             {
@@ -600,8 +600,8 @@ namespace QuickFiler.Controllers
                 _itemViewer.L0v2h2_WebView2.Visible = false;
                 _expanded = false;
                 if (_timer is not null) { _timer.Dispose(); }
-                _keyboardHandler.KdCharActions.Remove('B');
-                _keyboardHandler.KdCharActions.Remove('D');
+                _keyboardHandler.CharActions.Remove("Item", 'B');
+                _keyboardHandler.CharActions.Remove("Item", 'D');
             }
         }
 
