@@ -11,6 +11,7 @@ using UtilitiesCS;
 using QuickFiler;
 using QuickFiler.Helper_Classes;
 using System.Threading;
+using System.Net.NetworkInformation;
 
 namespace QuickFiler.Controllers
 {
@@ -139,6 +140,7 @@ namespace QuickFiler.Controllers
         {
             _itemGroups = new List<QfcItemGroup>();
             _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
+            _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
             int i = 0;
             foreach (MailItem mailItem in items)
             {
@@ -165,6 +167,24 @@ namespace QuickFiler.Controllers
                 {
                     new KaKey("Collection", Keys.Up, (k) => SelectPreviousItem()),
                     new KaKey("Collection", Keys.Down, (k) => SelectNextItem())
+                });
+        }
+
+        public void WireUpAsyncKeyboardHandler()
+        {
+            // Treatment as char limits to 9 numbered items and 26 character items
+            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
+            {
+                _kbdHandler.CharActionsAsync.Add(
+                    "Collection",
+                    (i + 1).ToString()[0],
+                    (c) => ChangeByIndexAsync(int.Parse(c.ToString()) - 1));
+            }
+            _kbdHandler.KeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
+                new List<KaKeyAsync>
+                {
+                    new KaKeyAsync("Collection", Keys.Up, (k) => SelectPreviousItemAsync()),
+                    new KaKeyAsync("Collection", Keys.Down, (k) => SelectNextItemAsync())
                 });
         }
 
@@ -298,7 +318,8 @@ namespace QuickFiler.Controllers
             TlpLayout = tlpState;
             //_itemTLP.ResumeLayout();
             _formViewer.ResumeLayout();
-            WireUpKeyboardHandler();
+            //WireUpKeyboardHandler();
+            WireUpAsyncKeyboardHandler();
             LoadConversationsAndFolders();
 
         }
@@ -317,7 +338,8 @@ namespace QuickFiler.Controllers
             TlpLayout = tlpState;
             //_itemTLP.ResumeLayout();
             _formViewer.ResumeLayout();
-            WireUpKeyboardHandler();
+            //WireUpKeyboardHandler();
+            WireUpAsyncKeyboardHandler();
             await LoadConversationsAndFoldersAsync();
 
         }
@@ -356,9 +378,22 @@ namespace QuickFiler.Controllers
             // Remove the group from the form
             RemoveSpecificControlGroup(selection);
 
-            // TODO: Add the group to the pop out form 
             var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
             popOutForm.Run();
+        }
+
+        public async Task PopOutControlGroupAsync(int selection)
+        {
+            Token.ThrowIfCancellationRequested();
+
+            // Get mail item from the group            
+            MailItem mailItem = _itemGroups[selection - 1].MailItem;
+
+            // Remove the group from the form
+            await RemoveSpecificControlGroupAsync(selection);
+
+            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
+            await popOutForm.RunAsync();
         }
 
         public void RemoveControls()
@@ -460,6 +495,54 @@ namespace QuickFiler.Controllers
 
         }
 
+        public async Task RemoveSpecificControlGroupAsync(int selection)
+        {
+            // If the group is active, turn off the active item and select a new item
+            bool activeUI = _itemGroups[selection - 1].ItemController.IsActiveUI;
+            bool expanded = _itemGroups[selection - 1].ItemController.IsExpanded;
+            if (activeUI) { await ToggleOffActiveItemAsync(false); }
+
+            UpdateSelectionForRemoval(selection);
+
+            bool tlpState = TlpLayout;
+            
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            {
+                tlpState = TlpLayout;
+                TlpLayout = false;
+
+                // Remove the controls from the form
+                TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
+            });
+            
+            // Remove the group from the list of groups
+            _itemGroups.RemoveAt(selection - 1);
+
+            if (_itemGroups.Count > 0)
+            {
+                // Renumber the remaining groups
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => RenumberGroups());
+
+                // Restore UI to previous state with newly selected item
+                if (activeUI)
+                {
+                    await _itemGroups[ActiveIndex].ItemController.ToggleFocusAsync(Enums.ToggleState.On);
+                    if (expanded) { await _itemGroups[ActiveIndex].ItemController.ToggleExpansionAsync(); }
+                }
+            }
+            else if (_itemGroups.Count == 0 && _kbdHandler.KbdActive)
+            {
+                await _kbdHandler.ToggleKeyboardDialogAsync();
+            }
+
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+            { 
+                TlpLayout = tlpState;
+                ResetPanelHeight();
+            });
+
+        }
+
         #endregion
 
         #region UI Select QfcItems
@@ -533,6 +616,26 @@ namespace QuickFiler.Controllers
             }
         }
 
+        public async Task ChangeByIndexAsync(int idx)
+        {
+            bool expanded = false;
+            if ((ActiveIndex != idx) && (idx < _itemGroups.Count))
+            {
+                bool tlpState = true;
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+                { 
+                    tlpState = TlpLayout;
+                    TlpLayout = false;
+                });
+
+                if (ActiveIndex != -1)
+                    expanded = await ToggleOffActiveItemAsync(false);
+                await ActivateBySelectionAsync(idx + 1, expanded);
+
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
+            }
+        }
+
         public void SelectNextItem()
         {
             if (ActiveSelection < _itemGroups.Count)
@@ -546,6 +649,24 @@ namespace QuickFiler.Controllers
             }
         }
 
+        public async Task SelectNextItemAsync()
+        {
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => SelectNextItem());
+            //if (ActiveSelection < _itemGroups.Count)
+            //{
+            //    bool tlpState = true;
+            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            //    {
+            //        tlpState = TlpLayout;
+            //        TlpLayout = false;
+            //    });
+
+            //    await ChangeByIndexAsync(ActiveIndex + 1);
+
+            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
+            //}
+        }
+
         public void SelectPreviousItem()
         {
             if (ActiveIndex > 0)
@@ -557,6 +678,26 @@ namespace QuickFiler.Controllers
                 
                 TlpLayout = tlpState;
             }
+        }
+
+        public async Task SelectPreviousItemAsync()
+        {
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => SelectPreviousItem());
+
+
+            //if (ActiveIndex > 0)
+            //{
+            //    bool tlpState = true;
+            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+            //    { 
+            //        tlpState = TlpLayout;
+            //        TlpLayout = false;
+            //    });
+
+            //    await ChangeByIndexAsync(ActiveIndex - 1);
+
+            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
+            //}
         }
 
         internal void ScrollIntoView(ItemViewer item)
@@ -618,6 +759,13 @@ namespace QuickFiler.Controllers
                 ScrollIntoView(_itemGroups[itemIndex].ItemViewer);
         }
 
+        public async Task ToggleExpansionStyleAsync(int itemIndex, Enums.ToggleState desiredState)
+        {
+            Token.ThrowIfCancellationRequested();
+
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>ToggleExpansionStyle(itemIndex, desiredState));
+        }
+
         public void ToggleOffNavigation(bool async)
         {
             if (ActiveIndex != -1) { ToggleOffActiveItem(false); }
@@ -628,6 +776,22 @@ namespace QuickFiler.Controllers
                             async: async,
                             desiredState: Enums.ToggleState.Off));
             //_keyboardHandler.KbdActive = false;
+        }
+
+        public async Task ToggleOffNavigationAsync()
+        {
+            bool tlpState = true;
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            {
+                tlpState = TlpLayout;
+                TlpLayout = false;
+            });
+
+            if (ActiveIndex != -1) { await ToggleOffActiveItemAsync(false); }
+            var tasks = _itemGroups.Select(itemGroup => itemGroup.ItemController.ToggleNavigationAsync(Enums.ToggleState.Off)).ToList();
+            await Task.WhenAll(tasks);
+
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
         }
 
         public void ToggleOnNavigation(bool async)
@@ -646,16 +810,22 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleOnNavigationAsync()
         {
-            await _itemGroups.ToAsyncEnumerable()
-                             .ForEachAsync(async itemGroup => 
-                                await itemGroup.ItemController.ToggleNavigationAsync(
-                                desiredState: Enums.ToggleState.On));
+            bool tlpState = true;
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            {
+                tlpState = TlpLayout;
+                TlpLayout = false;
+            });
 
-            // TODO: Make Async
+            var tasks = _itemGroups.Select(itemGroup => itemGroup.ItemController.ToggleNavigationAsync(Enums.ToggleState.On)).ToList();
+            await Task.WhenAll(tasks);
+
             if (ActiveIndex != -1)
             {
-                ActivateByIndex(ActiveIndex, false);
+                await ActivateByIndexAsync(ActiveIndex, false);
             }
+
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
         }
 
         public bool ToggleOffActiveItem(bool parentBlExpanded)
@@ -678,9 +848,29 @@ namespace QuickFiler.Controllers
             return blExpanded;
         }
 
+        public async Task<bool> ToggleOffActiveItemAsync(bool parentBlExpanded)
+        {
+            bool blExpanded = parentBlExpanded;
+            if ((ActiveIndex != -1) && _kbdHandler.KbdActive)
+            {
+                //adjusted to _intActiveSelection -1 to accommodate zero based
+                IQfcItemController itemController = _itemGroups[ActiveIndex].ItemController;
+
+                if (itemController.IsExpanded)
+                {
+                    //TODO: Replace MoveDownPix Function
+                    //MoveDownPix(_intActiveSelection + 1, (int)Math.Round(itemController.ItemPanel.Height * -0.5d));
+                    await itemController.ToggleExpansionAsync();
+                    blExpanded = true;
+                }
+                await itemController.ToggleFocusAsync(Enums.ToggleState.Off);
+            }
+            return blExpanded;
+        }
+
         #endregion
-                
-        # region UI Converations Expansion
+
+        #region UI Converations Expansion
 
         /// <summary>
         /// Changes the conversation checkbox state of the item viewer at the 
@@ -1082,9 +1272,10 @@ namespace QuickFiler.Controllers
             return xCommaRet;
             // xComma = StripAccents(strTmp)
         }
+                
 
         #endregion
 
-                        
+
     }
 }

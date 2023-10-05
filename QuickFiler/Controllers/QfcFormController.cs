@@ -141,11 +141,9 @@ namespace QuickFiler.Controllers
         {
             _formViewer.ForAllControls(x =>
             {
-                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHndlr.KeyboardHandler_PreviewKeyDown);
-                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
-                //x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyUp);
-                //x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyPress);
-                // Debug.WriteLine($"Registered handler for {x.Name}");
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHndlr.KeyboardHandler_PreviewKeyDownAsync);
+                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> { _formViewer.QfcItemViewerTemplate });
 
@@ -185,8 +183,9 @@ namespace QuickFiler.Controllers
         public QfcFormViewer FormViewer { get => _formViewer; }
 
         public void ToggleOffNavigation(bool async) => _groups.ToggleOffNavigation(async);
-        
+        public async Task ToggleOffNavigationAsync() => await _groups.ToggleOffNavigationAsync();
         public void ToggleOnNavigation(bool async) => _groups.ToggleOnNavigation(async);
+        public async Task ToggleOnNavigationAsync() => await _groups.ToggleOnNavigationAsync();
 
         private CancellationToken _token;
         public CancellationToken Token { get => _token; }

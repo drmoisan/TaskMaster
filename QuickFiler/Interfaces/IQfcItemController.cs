@@ -66,6 +66,9 @@ namespace QuickFiler.Interfaces
         void ToggleNavigation(bool async, Enums.ToggleState desiredState);
         Task ToggleNavigationAsync(Enums.ToggleState desiredState);
         void ToggleTips(bool async, Enums.ToggleState desiredState);
+        Task ToggleExpansionAsync();
+        Task ToggleFocusAsync(Enums.ToggleState off);
+
         public Dictionary<string, System.Action> RightKeyActions { get; }
     }
 }

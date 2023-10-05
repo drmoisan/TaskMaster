@@ -178,45 +178,30 @@ namespace QuickFiler.Controllers
         public async Task ToggleAsync(Enums.ToggleState desiredState)
         {
             _token.ThrowIfCancellationRequested();
-            if (desiredState.HasFlag(Enums.ToggleState.On))
-            {
-                await _uiContext;
-                _labelControl.Visible = true;
-                _labelControl.Enabled = true;
-                if (_parentType == typeof(TableLayoutPanel) && (_tlp.RowCount == 1))
-                    _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
-            }
-            else
-            {
-                await _uiContext;
-                _labelControl.Visible = false;
-                _labelControl.Enabled = false;
-                if (_parentType == typeof(TableLayoutPanel) && (_tlp.RowCount == 1))
-                    _tlp.ColumnStyles[_columnNumber].Width = 0;
-            }
-            _state = desiredState;
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => Toggle(desiredState));
+            //if (desiredState.HasFlag(Enums.ToggleState.On))
+            //{
+            //    await _uiContext;
+            //    _labelControl.Visible = true;
+            //    _labelControl.Enabled = true;
+            //    if (_parentType == typeof(TableLayoutPanel) && (_tlp.RowCount == 1))
+            //        _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
+            //}
+            //else
+            //{
+            //    await _uiContext;
+            //    _labelControl.Visible = false;
+            //    _labelControl.Enabled = false;
+            //    if (_parentType == typeof(TableLayoutPanel) && (_tlp.RowCount == 1))
+            //        _tlp.ColumnStyles[_columnNumber].Width = 0;
+            //}
+            //_state = desiredState;
         }
 
         public async Task ToggleAsync(Enums.ToggleState desiredState, bool sharedColumn)
         {
             _token.ThrowIfCancellationRequested();
-            if (desiredState.HasFlag(Enums.ToggleState.On))
-            {
-                await _uiContext;
-                _labelControl.Visible = true;
-                _labelControl.Enabled = true;
-                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
-                    _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
-            }
-            else
-            {
-                await _uiContext;
-                _labelControl.Visible = false;
-                _labelControl.Enabled = false;
-                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
-                    _tlp.ColumnStyles[_columnNumber].Width = 0;
-            }
-            _state = desiredState;
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>Toggle(desiredState, sharedColumn));
         }
     }
 }

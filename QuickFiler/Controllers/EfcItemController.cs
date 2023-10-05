@@ -18,6 +18,7 @@ using TaskVisualization;
 using System.Threading;
 using BrightIdeasSoftware;
 using static Deedle.FrameBuilder;
+using Newtonsoft.Json.Linq;
 
 namespace QuickFiler.Controllers
 {
@@ -29,10 +30,10 @@ namespace QuickFiler.Controllers
                                  IFilerHomeController homeController,
                                  EfcFormController parent,
                                  ItemViewer itemViewer,
-                                 EfcDataModel dataModel)
+                                 EfcDataModel dataModel,
+                                 CancellationToken token)
         {
-            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async: true);
-
+            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async: true, token);
         }
 
         public EfcItemController(IApplicationGlobals AppGlobals,
@@ -40,9 +41,10 @@ namespace QuickFiler.Controllers
                                  EfcFormController parent,
                                  ItemViewer itemViewer,
                                  EfcDataModel dataModel,
-                                 bool async)
+                                 bool async,
+                                 CancellationToken token)
         {
-            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async);
+            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async, token);
         }
 
         private void Initialize(IApplicationGlobals AppGlobals,
@@ -50,8 +52,10 @@ namespace QuickFiler.Controllers
                                 EfcFormController parent,
                                 ItemViewer itemViewer,
                                 EfcDataModel dataModel,
-                                bool async)
+                                bool async,
+                                CancellationToken token)
         {
+            _token = token;
             _globals = AppGlobals;
             _homeController = homeController;
 
@@ -422,6 +426,9 @@ namespace QuickFiler.Controllers
 
         public IList<TableLayoutPanel> TableLayoutPanels { get => _tableLayoutPanels; }
 
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; set => _token = value; }
+
         #endregion
 
         #region Event Wiring
@@ -431,8 +438,9 @@ namespace QuickFiler.Controllers
             //Debug.WriteLine($"Wiring keyboard for item {this.Position}, {this.Subject}");
             _itemViewer.ForAllControls(x =>
             {
-                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_keyboardHandler.KeyboardHandler_PreviewKeyDown);
-                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDown);
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_keyboardHandler.KeyboardHandler_PreviewKeyDownAsync);
+                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDown);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
                         
@@ -674,6 +682,12 @@ namespace QuickFiler.Controllers
             }
         }
 
+        public async Task ToggleNavigationAsync(Enums.ToggleState desiredState)
+        {
+            await ToggleTipsAsync(desiredState);
+        }
+
+
         public void ToggleTips(bool async)
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
@@ -690,6 +704,22 @@ namespace QuickFiler.Controllers
                 if (async) { _itemViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(desiredState, true))); }
                 else { _itemViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState, true))); }
             }
+        }
+
+        public async Task ToggleTipsAsync(Enums.ToggleState desiredState)
+        {
+            Token.ThrowIfCancellationRequested();
+
+            // Attempt to remove blocking await code and start all tasks simultaneously. 
+            var tasks = _listTipsDetails.Select(x => x.ToggleAsync(desiredState, shareColumn: true)).ToList();
+            // TODO: Check if this creates a deadlock
+            await Task.WhenAll(tasks);
+
+            // Original async code
+            //foreach (var tip in _listTipsDetails)
+            //{
+            //    await tip.ToggleAsync(desiredState, shareColumn: true);
+            //}
         }
 
         public void ToggleSaveAttachments()
@@ -781,7 +811,7 @@ namespace QuickFiler.Controllers
             await _itemViewer.UiSyncContext;
             control.Focus();
         }
-        
+                
         public Dictionary<string, System.Action> RightKeyActions
         {
             get => new()

@@ -35,7 +35,7 @@ namespace QuickFiler
                 _formViewer = EfcViewerQueue.Dequeue();
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
                 _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, appGlobals, this);
-                _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType);
+                _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType, Token);
             }
         }
 
@@ -49,6 +49,15 @@ namespace QuickFiler
             if (_dataModel.Mail is not null)
             {
                 _formViewer.Show();
+            }
+            else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
+        public async Task RunAsync()
+        {
+            if (_dataModel.Mail is not null)
+            {
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_formViewer.Show());
             }
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
@@ -149,12 +158,7 @@ namespace QuickFiler
         {
             throw new NotImplementedException();
         }
-
-        public Task RunAsync()
-        {
-            throw new NotImplementedException();
-        }
-
+                
         #endregion
 
         #region Helper Methods

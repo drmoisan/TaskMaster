@@ -29,8 +29,10 @@ namespace QuickFiler.Controllers
                                  EfcViewer formViewer,
                                  EfcHomeController homeController,
                                  System.Action ParentCleanup,
-                                 QfEnums.InitTypeEnum initType)
+                                 QfEnums.InitTypeEnum initType,
+                                 CancellationToken token)
         {
+            _token = token;
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
             _formViewer = formViewer;
@@ -47,7 +49,7 @@ namespace QuickFiler.Controllers
             _formViewer.Show();
             _formViewer.Refresh();
 
-            _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel);
+            _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel, token);
 
             _formViewer.Hide();
 
@@ -198,6 +200,9 @@ namespace QuickFiler.Controllers
             }
         }
 
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; set => _token = value; }
+
         #endregion
 
         #region Event Handlers
@@ -209,9 +214,11 @@ namespace QuickFiler.Controllers
             _formViewer.ForAllControls(x =>
             {
                 x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(
-                    _homeController.KeyboardHndlr.KeyboardHandler_PreviewKeyDown);
+                    _homeController.KeyboardHndlr.KeyboardHandler_PreviewKeyDownAsync);
+                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(
+                //    _homeController.KeyboardHndlr.KeyboardHandler_KeyDown);
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(
-                    _homeController.KeyboardHndlr.KeyboardHandler_KeyDown);                            
+                    _homeController.KeyboardHndlr.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> {  });
             _formViewer.SaveAttachments.CheckedChanged += SaveAttachments_CheckedChanged;
@@ -225,20 +232,6 @@ namespace QuickFiler.Controllers
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
             _globals.Ol.PropertyChanged += DarkMode_Changed;
-
-            //_listHover.ForEach(x => 
-            //{
-            //    x.MouseEnter += Button_MouseEnter;
-            //    x.MouseLeave += Button_MouseLeave;
-            //});
-            //_formViewer.Ok.MouseEnter += Button_MouseEnter;
-            //_formViewer.Cancel.MouseEnter += Button_MouseEnter;
-            //_formViewer.RefreshPredicted.MouseEnter += Button_MouseEnter;
-            //_formViewer.NewFolder.MouseEnter += Button_MouseEnter;
-            //_formViewer.Ok.MouseLeave += Button_MouseLeave;
-            //_formViewer.Cancel.MouseLeave += Button_MouseLeave;
-            //_formViewer.RefreshPredicted.MouseLeave += Button_MouseLeave;
-            //_formViewer.NewFolder.MouseLeave += Button_MouseLeave;
         }
                
         async public void ButtonCancel_Click(object sender, EventArgs e)
@@ -319,25 +312,66 @@ namespace QuickFiler.Controllers
             if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }
 
-        private Dictionary<char, Action<char>> _keyboardActions;
-        internal Dictionary<char, Action<char>> KeyboardActions => Initialized(_keyboardActions, ()=> _keyboardActions = GetKbdActions());
-        internal Dictionary<char, Action<char>> GetKbdActions()
+        private KbdActions<char, KaCharAsync, Func<char, Task>> _characterAsyncActions;
+        internal KbdActions<char, KaCharAsync, Func<char, Task>> CharacterAsyncActions => Initializer.GetOrLoad(ref _characterAsyncActions, GetAsyncCharacterActions);
+        internal KbdActions<char, KaCharAsync, Func<char, Task>> GetAsyncCharacterActions()
         {
-            return new()
+            return new KbdActions<char, KaCharAsync, Func<char, Task>>(new List<KaCharAsync>
             {
-                { 'S', async (x) => await JumpToAsync(_formViewer.SearchText) },
-                { 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox) },
-                { 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments) },
-                { 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail) },
-                { 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures) },
-                { 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation) },
-                { 'K', async (x) => await KbdExecuteAsync(ActionOkAsync) },
-                { 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync) },
-                { 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync) },
-                { 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync) },
-                { 'T', async (x) => await KbdExecuteAsync(ActionDeleteAsync) }
-            };
+                new KaCharAsync("Controller", 'S', (x) => JumpToAsync(_formViewer.SearchText)),
+                new KaCharAsync("Controller", 'F', (x) => JumpToAsync(_formViewer.FolderListBox)),
+                new KaCharAsync("Controller", 'A', (x) => ToggleCheckboxAsync(_formViewer.SaveAttachments)),
+                new KaCharAsync("Controller", 'M', (x) => ToggleCheckboxAsync(_formViewer.SaveEmail)),
+                new KaCharAsync("Controller", 'P', (x) => ToggleCheckboxAsync(_formViewer.SavePictures)),
+                new KaCharAsync("Controller", 'C', (x) => ToggleCheckboxAsync(_formViewer.MoveConversation)),
+                new KaCharAsync("Controller", 'K', (x) => KbdExecuteAsync(ActionOkAsync)),
+                new KaCharAsync("Controller", 'X', (x) => KbdExecuteAsync(ActionCancelAsync)),
+                new KaCharAsync("Controller", 'R', (x) => KbdExecuteAsync(RefreshSuggestionsAsync)),
+                new KaCharAsync("Controller", 'N', (x) => KbdExecuteAsync(CreateFolderAsync)),
+                new KaCharAsync("Controller", 'T', (x) => KbdExecuteAsync(ActionDeleteAsync)),
+            });
         }
+
+        //private Dictionary<char, Action<char>> _kbdActions;
+        //public Dictionary<char, Action<char>> KbdActions => Initializer.GetOrLoad(ref _kbdActions, GetKbdActions);
+        //internal Dictionary<char, Action<char>> GetKbdActions()
+        //{
+        //    return new()
+        //    {
+        //        { 'S', async (x) => await JumpToAsync(_formViewer.SearchText) },
+        //        { 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox) },
+        //        { 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments) },
+        //        { 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail) },
+        //        { 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures) },
+        //        { 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation) },
+        //        { 'K', async (x) => await KbdExecuteAsync(ActionOkAsync) },
+        //        { 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync) },
+        //        { 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync) },
+        //        { 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync) },
+        //        { 'T', async (x) => await KbdExecuteAsync(ActionDeleteAsync) }
+        //    };
+        //}
+
+        private KbdActions<char, KaChar, Action<char>> _characterActions;
+        public KbdActions<char, KaChar, Action<char>> CharacterActions => Initializer.GetOrLoad(ref _characterActions, GetKbdActions);
+        internal KbdActions<char, KaChar, Action<char>> GetKbdActions()
+        {
+            return new KbdActions<char, KaChar, Action<char>>(new List<KaChar>
+            {
+                new KaChar("Controller", 'S', async (x) => await JumpToAsync(_formViewer.SearchText)),
+                new KaChar("Controller", 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox)),
+                new KaChar("Controller", 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments)),
+                new KaChar("Controller", 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail)),
+                new KaChar("Controller", 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures)),
+                new KaChar("Controller", 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation)),
+                new KaChar("Controller", 'K', async (x) => await KbdExecuteAsync(ActionOkAsync)),
+                new KaChar("Controller", 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync)),
+                new KaChar("Controller", 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync)),
+                new KaChar("Controller", 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync)),
+                new KaChar("Controller", 'T', async (x) => await KbdExecuteAsync(ActionDeleteAsync)),
+            });
+        }
+
 
         internal void DarkMode_Changed(object sender, PropertyChangedEventArgs e)
         {
@@ -460,16 +494,30 @@ namespace QuickFiler.Controllers
 
         public void ToggleOffNavigation(bool async)
         {
-            KeyboardActions.Keys.ForEach(key => _homeController.KeyboardHndlr.CharActions.Remove("Controller", key));
+            CharacterActions.Keys.ForEach(key => _homeController.KeyboardHndlr.CharActions.Remove("Controller", key));
             ToggleTips(async, Enums.ToggleState.Off);
             _itemController.ToggleNavigation(async, Enums.ToggleState.Off);
         }
 
+        public async Task ToggleOffNavigationAsync()
+        {
+            CharacterAsyncActions.Keys.ForEach(key => _homeController.KeyboardHndlr.CharActions.Remove("Controller", key));
+            await ToggleTipsAsync(Enums.ToggleState.Off);
+            await _itemController.ToggleNavigationAsync(Enums.ToggleState.Off);
+        }
+
         public void ToggleOnNavigation(bool async)
         {
-            KeyboardActions.ForEach(x => _homeController.KeyboardHndlr.CharActions.Add("Controller", x.Key, x.Value));
+            CharacterActions.ForEach(x => _homeController.KeyboardHndlr.CharActions.Add(x));
             ToggleTips(async, Enums.ToggleState.On);
             _itemController.ToggleNavigation(async, Enums.ToggleState.On);
+        }
+
+        public async Task ToggleOnNavigationAsync()
+        {
+            CharacterAsyncActions.ForEach(x => _homeController.KeyboardHndlr.CharActionsAsync.Add(x));
+            await ToggleTipsAsync(Enums.ToggleState.On);
+            await _itemController.ToggleNavigationAsync(Enums.ToggleState.On);
         }
 
         public void ToggleTips(bool async)
@@ -489,6 +537,23 @@ namespace QuickFiler.Controllers
                 else { _formViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState, true))); }
             }
         }
+
+        public async Task ToggleTipsAsync(Enums.ToggleState desiredState)
+        {
+            Token.ThrowIfCancellationRequested();
+
+            // Attempt to remove blocking await code and start all tasks simultaneously. 
+            var tasks = _listTipsDetails.Select(x => x.ToggleAsync(desiredState, shareColumn: true)).ToList();
+            // TODO: Check if this creates a deadlock
+            await Task.WhenAll(tasks);
+
+            // Original async code
+            //foreach (var tip in _listTipsDetails)
+            //{
+            //    await tip.ToggleAsync(desiredState, shareColumn: true);
+            //}
+        }
+
 
         internal void LoadSettings()
         {

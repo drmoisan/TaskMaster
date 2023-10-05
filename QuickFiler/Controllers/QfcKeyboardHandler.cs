@@ -11,6 +11,8 @@ using UtilitiesCS.ReusableTypeClasses;
 using Swordfish.NET.Collections;
 using Microsoft.Office.Interop.Outlook;
 using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Collections;
 
 
 namespace QuickFiler.Controllers
@@ -35,20 +37,15 @@ namespace QuickFiler.Controllers
         private KbdActions<char, KaChar, Action<char>> _charActions = null;
         public KbdActions<char, KaChar, Action<char>> CharActions { get => _charActions; set => _charActions = value; }
 
-        //private Dictionary<char, Action<char>> _charActions = null;
-        //public Dictionary<char, Action<char>> CharActions { get => _charActions; set => _charActions = value; }
-
-        private Dictionary<char, Func<char, Task>> _charActionsAsync = null;
-        public Dictionary<char, Func<char, Task>> CharActionsAsync { get => _charActionsAsync; set => _charActionsAsync = value; }
-
-        //private Dictionary<char, Func<char, Task>> _charActionsAsync = null;
-        //public Dictionary<char, Func<char, Task>> CharActionsAsync { get => _charActionsAsync; set => _charActionsAsync = value; }
+        private KbdActions<char, KaCharAsync, Func<char, Task>> _charActionsAsync;
+        public KbdActions<char, KaCharAsync, Func<char, Task>> CharActionsAsync { get => _charActionsAsync; set => _charActionsAsync = value; }
 
         private KbdActions<Keys, KaKey,Action<Keys>> _keyActions = null;
-        public KbdActions<Keys, KaKey, Action<Keys>> KeyActions { get => _keyActions; set => _keyActions = value;}
+        public KbdActions<Keys, KaKey, Action<Keys>> KeyActions { get => _keyActions; 
+            set => _keyActions = value;}
 
-        private Dictionary<Keys, Func<Keys, Task>> _keyActionsAysnc = null;
-        public Dictionary<Keys, Func<Keys, Task>> KeyActionsAsync { get => _keyActionsAysnc; set => _keyActionsAysnc = value; }
+        private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _keyActionsAsync;
+        public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> KeyActionsAsync { get => _keyActionsAsync; set => _keyActionsAsync = value; }
 
         public bool KbdActive 
         { 
@@ -62,6 +59,14 @@ namespace QuickFiler.Controllers
         public void KeyboardHandler_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             if (KbdActive && (KeyActions != null) && KeyActions.ContainsKey(e.KeyCode))
+            {
+                e.IsInputKey = true;
+            }
+        }
+
+        public void KeyboardHandler_PreviewKeyDownAsync(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (KbdActive && (KeyActionsAsync != null) && KeyActionsAsync.ContainsKey(e.KeyCode))
             {
                 e.IsInputKey = true;
             }
@@ -94,7 +99,6 @@ namespace QuickFiler.Controllers
                 {
                     e.SuppressKeyPress = true;
                     e.Handled = true;
-                    //KdKeyActionsAsync[e.KeyCode].DynamicInvoke(e.KeyCode);
                     await KeyActionsAsync[e.KeyCode](e.KeyCode);                    
                 }
                 else if ((CharActionsAsync != null) && CharActionsAsync.ContainsKey((char)e.KeyValue))
@@ -105,7 +109,7 @@ namespace QuickFiler.Controllers
                 }
             }
         }
-
+                
         public void ToggleKeyboardDialog()
         {
             if (_kbdActive) { _parent.FormCtrlr.ToggleOffNavigation(async: false); }
@@ -121,13 +125,9 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleKeyboardDialogAsync()
         {
-            // TODO: Convert ToggleKeyboardDialogAsync function to Async
-            if (_kbdActive) { _parent.FormCtrlr.ToggleOffNavigation(async: false); }
-            else { _parent.FormCtrlr.ToggleOnNavigation(async: false); }
+            if (_kbdActive) { await _parent.FormCtrlr.ToggleOffNavigationAsync(); }
+            else { await _parent.FormCtrlr.ToggleOnNavigationAsync(); }
             _kbdActive = !_kbdActive;
-
-            await Task.CompletedTask;
-            throw new NotImplementedException();
         }
 
         public async void ToggleKeyboardDialogAsync(object sender, KeyEventArgs e)
@@ -239,9 +239,108 @@ namespace QuickFiler.Controllers
                     }
             }
         }
+
+        public async void CboFolders_KeyDownAsync(object sender, KeyEventArgs e)
+        {
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+            { 
+                ItemViewer viewer = null;
+                if (_cboKeys.Contains(e.KeyCode)) { viewer = GetItemViewer(sender as Control); }
+
+                switch (e.KeyCode)
+                {
+                    case Keys.Escape:
+                        {
+                            viewer.Controller.CounterEnter = 1;
+                            viewer.Controller.CounterComboRight = 0;
+                            viewer.CboFolders.DroppedDown = false;
+                            e.SuppressKeyPress = true;
+                            e.Handled = true;
+                            break;
+                        }
+                    case Keys.Up:
+                        {
+                            viewer.Controller.CounterEnter = 0;
+                            break;
+                        }
+                    case Keys.Down:
+                        {
+                            viewer.Controller.CounterEnter = 0;
+                            break;
+                        }
+                    case Keys.Right:
+                        {
+                            viewer.Controller.CounterEnter = 0;
+                            switch (viewer.Controller.CounterComboRight)
+                            {
+                                case 0:
+                                    {
+                                        viewer.CboFolders.DroppedDown = true;
+                                        viewer.Controller.CounterComboRight++;
+                                        break;
+                                    }
+                                case 1:
+                                    {
+                                        viewer.CboFolders.DroppedDown = false;
+                                        viewer.Controller.CounterComboRight = 0;
+                                        MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?",
+                                            "Dialog", BoxIcon.Question, viewer.Controller.RightKeyActions);
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        MessageBox.Show(
+                                            "Error in intComboRightCtr ... setting to 0 and continuing",
+                                            "Error",
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Error);
+                                        viewer.Controller.CounterComboRight = 0;
+                                        break;
+                                    }
+                            }
+                            e.SuppressKeyPress = true;
+                            e.Handled = true;
+                            break;
+                        }
+                    case Keys.Left:
+                        {
+                            viewer.Controller.CounterEnter = 1;
+                            viewer.Controller.CounterComboRight = 0;
+                            if (viewer.CboFolders.DroppedDown)
+                            {
+                                viewer.CboFolders.DroppedDown = false;
+                                e.SuppressKeyPress = true;
+                                e.Handled = true;
+                            }
+                            else { this.KeyboardHandler_KeyDownAsync(sender, e); }
+
+                            break;
+                        }
+                    case Keys.Return:
+                        {
+                            if (viewer.Controller.CounterEnter == 1)
+                            {
+                                viewer.Controller.CounterEnter = 0;
+                                viewer.Controller.CounterComboRight = 0;
+                                KeyboardHandler_KeyDownAsync(sender, e);
+                            }
+                            else
+                            {
+                                viewer.Controller.CounterEnter = 1;
+                                viewer.Controller.CounterComboRight = 0;
+                                viewer.CboFolders.DroppedDown = false;
+                                e.SuppressKeyPress = true;
+                                e.Handled = true;
+                            }
+                            break;
+                        }
+                }
+            });
+        }
+
     }
-    
-    public class KbdActions<T, U, V> where U : IKbdAction<T,V>, new()
+
+    public class KbdActions<T, U, V> : IEnumerable<U> where U : IKbdAction<T,V>, new()
     {
         public KbdActions() 
         {
@@ -319,6 +418,16 @@ namespace QuickFiler.Controllers
             _list.Add(instance);
         }
 
+        public void Add(U instance)
+        {
+            if (_list.Any(x => x.SourceId == instance.SourceId && x.KeyEquals(instance.Key)))
+            {
+                string message = $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";
+                throw new ArgumentException(message);
+            }
+            _list.Add(instance);
+        }
+
         public bool Remove(string sourceId, T key)
         {
             var index = _list.FindIndex(x => x.SourceId == sourceId && x.KeyEquals(key));
@@ -330,6 +439,11 @@ namespace QuickFiler.Controllers
             }
         }
 
+        public IEnumerator<U> GetEnumerator() => _list.GetEnumerator();
+        
+        IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
+        
+        public ICollection<T> Keys { get => _list.Select(x => x.Key).ToList(); }
     }
 
     public interface IKbdAction<T, U>
@@ -362,7 +476,6 @@ namespace QuickFiler.Controllers
         public Action<Keys> Delegate { get => _action; set => _action = value; }
 
         public Type DelegateType { get => typeof(Action<Keys>); }
-        //Key IKbdAction<Keys, Action<Keys>>.Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public bool KeyEquals(Keys other) => Key == other;
         
@@ -416,7 +529,7 @@ namespace QuickFiler.Controllers
         public bool KeyEquals(char other) => Key == other;
     }
 
-    public class KaCharAsync
+    public class KaCharAsync: IKbdAction<char, Func<char, Task>>
     {
         public KaCharAsync() { }
 

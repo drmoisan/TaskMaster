@@ -19,10 +19,12 @@ namespace QuickFiler.Interfaces
         Task LoadControlsAndHandlersAsync(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
         ItemViewer LoadItemViewer(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
         void PopOutControlGroup(int intPosition);
+        Task PopOutControlGroupAsync(int selection);
         void RemoveControls();
         Task RemoveControlsAsync();
         void RemoveSpaceToCollapseConversation();
         void RemoveSpecificControlGroup(int intPosition);
+        Task RemoveSpecificControlGroupAsync(int selection);
         Task MoveEmailsAsync(ScoStack<IMovedMailInfo> StackMovedItems);
 
         // UI Select QfcItems
@@ -33,6 +35,7 @@ namespace QuickFiler.Interfaces
         void ToggleOffNavigation(bool async);
         void ToggleOnNavigation(bool async);
         void ToggleExpansionStyle(int itemIndex, Enums.ToggleState desiredState);
+        Task ToggleExpansionStyleAsync(int itemIndex, Enums.ToggleState desiredState);
 
         // UI Converations Expansion
         void ToggleGroupConv(int childCount, int indexOriginal);
@@ -53,6 +56,6 @@ namespace QuickFiler.Interfaces
         void Cleanup();
 
         string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment);
-
+        
     }
 }

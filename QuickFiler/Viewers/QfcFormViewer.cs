@@ -44,12 +44,16 @@ namespace QuickFiler
             {
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
-                _keyboardHandler.ToggleKeyboardDialog(sender, e);
+                //_keyboardHandler.ToggleKeyboardDialog(sender, e);
+                e.Handled = true;
+                _ = _keyboardHandler.ToggleKeyboardDialogAsync();
                 return true;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
-                        
+
+        
+
     }
 }
