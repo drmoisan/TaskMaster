@@ -62,6 +62,7 @@ namespace QuickFiler.Interfaces
         IList<TableLayoutPanel> TableLayoutPanels { get; }
         IList<Button> Buttons { get; }
         IList<IQfcTipsDetails> ListTipsDetails { get; }
+        IList<IQfcTipsDetails> ListTipsExpanded { get; }
         void ToggleNavigation(bool async);
         void ToggleNavigation(bool async, Enums.ToggleState desiredState);
         Task ToggleNavigationAsync(Enums.ToggleState desiredState);

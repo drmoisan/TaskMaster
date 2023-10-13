@@ -588,12 +588,15 @@ namespace TaskVisualization
 
         public void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e)
         {
-            string key = e.KeyChar.ToString();
-            int.TryParse(key, out int digit);
-            if (digit > 0 && digit <= 9)
+            if (_altActive)
             {
-                (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(key[0], digit);
-                e.Handled = true;
+                string key = e.KeyChar.ToString();
+                int.TryParse(key, out int digit);
+                if (digit > 0 && digit <= 9)
+                {
+                    (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(key[0], digit);
+                    e.Handled = true;
+                }
             }
         }
 

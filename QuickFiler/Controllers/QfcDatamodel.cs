@@ -25,6 +25,13 @@ namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
     {
+        private QfcDatamodel(IApplicationGlobals appGlobals) 
+        { 
+            _globals = appGlobals;
+            _olApp = _globals.Ol.App;
+            _activeExplorer = _olApp.ActiveExplorer();
+        }
+
         public QfcDatamodel(IApplicationGlobals appGlobals, CancellationToken token) 
         { 
             _globals = appGlobals;
@@ -34,17 +41,31 @@ namespace QuickFiler.Controllers
             _frame = InitDf(_activeExplorer);
         }
 
+        public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource) 
+        { 
+            var model = new QfcDatamodel(appGlobals);
+            model.Token = token;
+            model.TokenSource = tokenSource;
+            await model.InitDfAsync(appGlobals.Ol.App.ActiveExplorer()).ConfigureAwait(false);
+            return model;
+        }
+
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
         private ConcurrentQueue<MailItem> _masterQueue;
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
-        private CancellationToken _token;
         private BackgroundWorker _worker;
 
         public ScoStack<IMovedMailInfo> MovedItems { get => _globals.AF.MovedMails; }
         
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; set => _token = value; }
+        
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
+
         public IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker)
         {
             _worker = worker;
@@ -64,6 +85,24 @@ namespace QuickFiler.Controllers
 
             SetupWorker(worker);
             worker.RunWorkerAsync();
+
+            return emailList;
+        }
+
+        public async Task<IList<MailItem>> InitEmailQueueAsync(int batchSize,
+                                                               BackgroundWorker worker,
+                                                               CancellationToken token,
+                                                               CancellationTokenSource tokenSource)
+        {
+            token.ThrowIfCancellationRequested();
+
+            _token = token;
+            _tokenSource = tokenSource;
+            _worker = worker;
+
+            var emailList = await Task.Factory.StartNew(() => InitEmailQueue(batchSize, worker), 
+                                                        token,
+                                                        TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             return emailList;
         }
@@ -204,6 +243,42 @@ namespace QuickFiler.Controllers
 
             return dfSorted;
             
+        }
+
+        public async Task InitDfAsync(Explorer activeExplorer)
+        {
+            bool offline = _globals.Ol.NamespaceMAPI.Offline;
+            var commandBars = activeExplorer.CommandBars;
+
+            if (!offline)
+            {
+                //Press CommandBars MSO for offline mode
+                commandBars.ExecuteMso("ToggleOnline");
+            }
+            await Task.Delay(200);
+            Frame<int, string> df = null;
+            
+            try
+            {
+                df = await DfDeedle.GetEmailDataInViewAsync(activeExplorer, Token, TokenSource);
+            }
+            catch (System.Exception e)
+            {
+                if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+                throw e;
+            }
+
+            if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+
+            // Filter out non-email items
+            df = df.FilterRowsBy("MessageClass", "IPM.Note");
+            //df.Display(new List<string> { "RowKey" });
+            // Filter to the latest email in each conversation
+            var dfFiltered = MostRecentByConversation(df);
+
+            // Sort by triage classification and then date
+            _frame = SortTriageDate(dfFiltered);
+
         }
 
         public Frame<int, string> SortTriageDate(Frame<int, string> df)

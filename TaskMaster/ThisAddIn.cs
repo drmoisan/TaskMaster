@@ -30,7 +30,7 @@ namespace TaskMaster
             _globals = new ApplicationGlobals(Application);
 
             // Grab the sync context for the UI thread
-            UIThreadExtensions.InitUiContext();
+            UIThreadExtensions.InitUiContext(monitorUiThread: false);
 
             // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();

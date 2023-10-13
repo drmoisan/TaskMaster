@@ -10,6 +10,7 @@ using UtilitiesCS;
 using System.Windows.Forms;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace ToDoModel
 {
@@ -332,6 +333,48 @@ namespace ToDoModel
         }
 
         /// <summary>
+        /// Async version of <see cref="InputFoldername(Folder)"/> which does the following:
+        /// <inheritdoc cref="InputFoldername(Folder)"/>
+        /// </summary>
+        /// <param name="parent"><inheritdoc cref="InputFoldername(Folder)"/></param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>A task with the name of the new Outlook.<seealso cref="Folder"/> to create</returns>
+        public async Task<string> InputFoldernameAsync(Folder parent, CancellationToken token) //Internal
+        {
+            token.ThrowIfCancellationRequested();
+            string name = "";
+            while (name is not null && name == "")
+            {
+                await UIThreadExtensions.GetUiContext();
+                name = InputBox.ShowDialog(
+                    $"Please enter a new subfolder name for {parent.Name}",
+                    "New folder dialog");
+
+                token.ThrowIfCancellationRequested();
+                if (name is not null)
+                {
+                    if (!IsLegalFolderName(name))
+                    {
+                        MessageBox.Show($"Folder name {name} contains the illegal characters " +
+                            $"{GetIllegalFolderChars(name).SentenceJoin()}. Please choose a different name.");
+                        name = "";
+                    }
+                    else if (name.Length > 30)
+                    {
+                        MessageBox.Show("Outlook limits folder names to 30 characters. Please choose a different name.");
+                        name = "";
+                    }
+                    else if (GetFolder(parent.Folders, name) is not null)
+                    {
+                        MessageBox.Show("Folder already exists. Please choose a different name.");
+                        name = "";
+                    }
+                }
+            }
+            return name;
+        }
+
+        /// <summary>
         /// Character array of illegal characters for either Outlook.<seealso cref="Folder"/> 
         /// names or for System.IO.<seealso cref="DirectoryInfo"/> names.
         /// </summary>
@@ -362,12 +405,15 @@ namespace ToDoModel
         }
 
         /// <summary>
-        /// Method creates new parallel folders in Outlook Email and the File System. Combines 
-        /// a relative folderpath with the fully rooted olAncestor folderpath to create an 
-        /// Outlook.<seealso cref="Folder"/>. The fully qualified Outlook folderpath applies the 
-        /// <seealso cref="FolderConverter.ToFsFolderpath(string, string, string)"/> extension to convert 
-        /// to a parallel folderpath. System.IO.<seealso cref="DirectoryInfo"/> creates 
-        /// this parallel folder in the file system.
+        /// Method creates new parallel folders in Outlook Email and the File System. 
+        /// <list type="bullet">
+        /// <item>Combines a relative folderpath with the fully rooted olAncestor folderpath 
+        /// to create an Outlook.<seealso cref="Folder"/>. </item>
+        /// <item>The fully qualified Outlook folderpath applies the 
+        /// <seealso cref="FolderConverter.ToFsFolderpath(string, string, string)"/> extension 
+        /// to convert to a parallel folderpath.</item>
+        /// <item>System.IO.<seealso cref="DirectoryInfo"/> creates this parallel folder in the file system.</item>
+        /// </list>
         /// </summary>
         /// <param name="parentBranchPath">Parent FolderPath to Outlook.<seealso cref="Folder"/> 
         /// excluding the FolderPath of the Outlook ancestor in the path</param>
@@ -396,6 +442,46 @@ namespace ToDoModel
             // Convert the Outlook folderpath to a filesystem folderpath
             var fsFolderName = olFolder.ToFsFolderpath(olAncestor, fsAncestor);
             
+            // Create the new folder in the filesystem
+            var fsFolder = Directory.CreateDirectory(fsFolderName);
+
+            // Return the new Outlook folder
+            return olFolder;
+        }
+
+        /// <summary>
+        /// <para>Async version of <see cref="CreateFolder(string, string, string)"/> which does the following:</para>
+        /// <inheritdoc cref="CreateFolder(string, string, string)"/>
+        /// </summary>
+        /// <param name="parentBranchPath"><inheritdoc cref="CreateFolder(string, string, string)"/></param>
+        /// <param name="olAncestor"><inheritdoc cref="CreateFolder(string, string, string)"/></param>
+        /// <param name="fsAncestor"><inheritdoc cref="CreateFolder(string, string, string)"/></param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>A Task of the created Outlook.<seealso cref="MAPIFolder"/></returns>
+        public async Task<MAPIFolder> CreateFolderAsync(string parentBranchPath, string olAncestor, string fsAncestor, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            // Set default root if not provided
+            if (olAncestor.IsNullOrEmpty()) { olAncestor = _globals.Ol.ArchiveRootPath; }
+
+            // Fully root the folderpath
+            var parentFolderpath = $"{olAncestor}{parentBranchPath}";
+
+            // Get the parent folder and return null if not found
+            var parentFolder = this.GetFolder(parentFolderpath, false);
+            if (parentFolder is null) { return null; }
+
+            // Get the new folder name from the user
+            string newFolderName = await InputFoldernameAsync(parentFolder, token);
+            if (newFolderName is null) { return null; }
+
+            // Create the new folder in Outlook 
+            var olFolder = parentFolder.Folders.Add(newFolderName);
+
+            // Convert the Outlook folderpath to a filesystem folderpath
+            var fsFolderName = olFolder.ToFsFolderpath(olAncestor, fsAncestor);
+
             // Create the new folder in the filesystem
             var fsFolder = Directory.CreateDirectory(fsFolderName);
 
@@ -489,7 +575,14 @@ namespace ToDoModel
         {
             if (includeChildren)
             {
-                return path.Substring(olAncestor.Length);
+                if (olAncestor.EndsWith('\\'.ToString()))
+                {
+                    return path.Substring(olAncestor.Length);
+                }
+                else
+                {
+                    return path.Substring(olAncestor.Length + 1);
+                }
             }
             else
             {

@@ -91,8 +91,13 @@ namespace TaskMaster
                 loaded = _quickFiler.Loaded;
             if (loaded == false)
             {
-                _quickFiler = new QuickFiler.Controllers.QfcHomeController(_globals, ReleaseQuickFiler);
+                if (SynchronizationContext.Current is null)
+                {
+                    SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                }
+                _quickFiler = await QuickFiler.Controllers.QfcHomeController.CreateAsync(_globals, ReleaseQuickFiler);
                 await _quickFiler.RunAsync();
+                
             }
         }
 

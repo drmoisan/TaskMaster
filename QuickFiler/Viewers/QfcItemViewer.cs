@@ -20,6 +20,7 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitTips();
         }
 
@@ -38,6 +39,9 @@ namespace QuickFiler
         
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
+
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         private void InitTips()
         {

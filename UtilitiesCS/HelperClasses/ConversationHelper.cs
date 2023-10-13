@@ -15,6 +15,7 @@ using System.Xml.Linq;
 using static System.Net.WebRequestMethods;
 using System.Threading;
 using System.Windows.Forms;
+using Fizzler;
 
 namespace UtilitiesCS
 {
@@ -172,11 +173,18 @@ namespace UtilitiesCS
             return null;
         }
 
+        public static async Task<DataFrame> GetConversationDfAsync(this MailItem mailItem, CancellationToken token)
+        {
+            var conv = await TimeOutTask.RunWithTimeout(()=> mailItem.GetConversation(), token, 1000, 3, false);
+            var df = await conv.GetDataFrameAsync(token);
+            return df;
+        }
+
         public static async Task<DataFrame> GetConversationDfAsync(
             this MailItem mailItem, 
-            CancellationTokenSource tokenSource,
             CancellationToken token, 
             int timeout,
+            int retryCount,
             TaskCreationOptions options,
             TaskScheduler scheduler)
         {
@@ -184,40 +192,38 @@ namespace UtilitiesCS
 
             var timeoutCancellation = new CancellationTokenSource(timeout);
             var combinedCancellation = CancellationTokenSource.CreateLinkedTokenSource(token, timeoutCancellation.Token);
-            bool retry = true;
-            int retryCount = 0;
+            
             DataFrame df = null;
             
-            while (retry)
+            try
             {
-                try
-                {
-                    retry = false;
-                    await Task.Factory.StartNew(
-                        () =>
-                        {
-                            Outlook.Conversation conv = mailItem.GetConversation();
-                            df = conv.GetDataFrame();
-                        },
-                        combinedCancellation.Token,
-                        options,
-                        scheduler);
-                }
-                catch (OperationCanceledException e)
-                {
-                    token.ThrowIfCancellationRequested();
+                await Task.Factory.StartNew(
+                    () =>
+                    {
+                        Outlook.Conversation conv = mailItem.GetConversation();
+                        df = conv.GetDataFrame();
+                    },
+                    combinedCancellation.Token,
+                    options,
+                    scheduler);
+            }
+            catch (OperationCanceledException e)
+            {
+                token.ThrowIfCancellationRequested();
                     
-                    logger.Debug($"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} time for email {mailItem.Subject}");
-                    retry = retryCount++ < 2;
-                    if (!retry) 
-                    { 
-                        //tokenSource.Cancel(); 
-                        var message = $"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} times for email {mailItem.Subject} and was canceled";
-                        logger.Debug($"{message} {e.StackTrace}");
-                        MessageBox.Show(message, "Operation Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                logger.Debug($"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} time for email {mailItem.Subject}");
+                if (retryCount < 2)
+                { 
+                    df = await mailItem.GetConversationDfAsync(token, timeout, retryCount + 1, options, scheduler);
+                }
+                else 
+                {     
+                    var message = $"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} times for email {mailItem.Subject} and was canceled";
+                    logger.Debug($"{message} {e.StackTrace}");
+                    MessageBox.Show(message, "Operation Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+            
             return df;
         }
 
@@ -279,35 +285,43 @@ namespace UtilitiesCS
             return table;
         }
 
+        internal static string[] ConversationColumnSchemas => new string[]
+            {
+                "SentOn",
+                OlTableExtensions.SchemaFolderName,
+                OlTableExtensions.SchemaSenderName,
+                OlTableExtensions.SchemaSenderSmtpAddress,
+                OlTableExtensions.SchemaSenderAddrType,
+                "EntryID",
+                OlTableExtensions.SchemaMessageStore,
+                OlTableExtensions.SchemaConversationDepth,
+                OlTableExtensions.SchemaConversationIndex
+            };
+        
         public static DataFrame GetDataFrame(this Outlook.Conversation conversation)
         {
-            var columnsToAdd = new string[]
-                {
-                    "SentOn",
-                    OlTableExtensions.SchemaFolderName,
-                    OlTableExtensions.SchemaSenderName,
-                    OlTableExtensions.SchemaSenderSmtpAddress,
-                    OlTableExtensions.SchemaSenderAddrType,
-                    "EntryID",
-                    OlTableExtensions.SchemaMessageStore,
-                    OlTableExtensions.SchemaConversationDepth,
-                    OlTableExtensions.SchemaConversationIndex
+            Table table = conversation.GetConversationTable();
 
-                };
-
-            Outlook.Table table = conversation.GetTable();
-            if (table != null)
-            {
-                table.RemoveColumns(new string[] { "EntryID"});
-                
-                foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
-            }
-            
             (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
-            
+
             return data.ToDataFrame(columnInfo.Keys.ToArray());
         }
-                
+
+        public static async Task<DataFrame> GetDataFrameAsync(this Outlook.Conversation conversation, CancellationToken token)
+        {
+            Table table = await TimeOutTask.RunWithTimeout(GetConversationTable, conversation, token, 1000, 3, false);
+            (object[,] data, Dictionary<string, int> columnInfo) = await TimeOutTask.RunWithTimeout(()=>table.ETL(), token, 1000, 3, false);
+            return data.ToDataFrame(columnInfo.Keys.ToArray());
+        }
+
+        public static Table GetConversationTable(this Conversation conversation)
+        {
+            Outlook.Table table = conversation.GetTable();
+            table.RemoveColumns(new string[] { "EntryID" });
+            ConversationColumnSchemas.ForEach(schema => table.Columns.Add(schema));
+            return table;
+        }
+
         public static Outlook.Table GetTable(this Outlook.Conversation conversation, bool WithFolder, bool WithStore) 
         { 
             if (conversation != null)

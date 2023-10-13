@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Deedle.Internal;
+using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using static UtilitiesCS.ConvHelper;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -12,6 +14,8 @@ namespace UtilitiesCS
 {
     public static class OlTableExtensions
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Property Schema Constants
 
         const string PROPTAG_SPECIFIER = "http://schemas.microsoft.com/mapi/proptag/";
@@ -235,6 +239,7 @@ namespace UtilitiesCS
         public static (object[,] data, Dictionary<string, int> columnInfo) ETL(this Outlook.Table table,
                                                                                Dictionary<string, Func<object, string>> objectConverters = null)
         {
+            //logger.Debug($"Calling {nameof(GetColumnDictionary)} ...");
             var columnDictionary = table.GetColumnDictionary();
             object[,] data = null;
             
@@ -244,10 +249,42 @@ namespace UtilitiesCS
                (objectConverters is not null && 
                objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
             {
+                //logger.Debug($"Calling {nameof(EtlByRow)} ...");
                 data = EtlByRow(table, objectConverters, columnDictionary);
             }
             else { data = (object[,])table.GetArray(table.GetRowCount()); }
             return (data, columnDictionary);
+        }
+
+        public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsync(
+            this Outlook.Table table,
+            CancellationToken token,
+            CancellationTokenSource tokenSource,
+            int counter,
+            Dictionary<string, Func<object, string>> objectConverters = null)
+        {
+            token.ThrowIfCancellationRequested();
+
+            var rowCount = table.GetRowCount();
+            int milliseconds = 250 * rowCount;
+            var attempts = 3;
+            object[,] data = null;
+            Dictionary<string, int> columnInfo = null;
+
+            //logger.Debug($"Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
+            try
+            {
+                (data, columnInfo) = await Task.Factory.StartNew(() => table.ETL(objectConverters),
+                    token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(milliseconds, attempts);
+            }
+            catch (TimeoutException)
+            {
+                logger.Error($"{nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling");
+                tokenSource.Cancel();
+            }
+            
+            
+            return (data, columnInfo);
         }
 
         /// <summary>
@@ -261,6 +298,8 @@ namespace UtilitiesCS
         /// <returns>2D object array with string data</returns>
         private static object[,] EtlByRow(Table table, Dictionary<string, Func<object, string>> objectConverters, Dictionary<string, int> columnDictionary)
         {
+            //logger.Debug($"Setting up EtlByRow");
+            
             // Get the column headers of the binary fields
             var binFields = BinaryToStringFields.Where(x => columnDictionary.ContainsKey(x));
             
@@ -268,24 +307,38 @@ namespace UtilitiesCS
             var binIndices = binFields.Select(x => columnDictionary[x]).OrderBy(x => x);
 
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
-            
-            // Create the data array to hold the extracted data
-            var data = new object[table.GetRowCount(), columnDictionary.Count];
-            
-            // Iterate over each row in the Outlook.Table
-            int rowNumber = -1;
-            while (!table.EndOfTable)
+
+            // Cast the table to an IEnumerable of Outlook.Row
+            //logger.Debug($"Casting {nameof(Outlook.Table)} to IEnumerable<{nameof(Outlook.Row)}");
+            var rows = table.GetRows().ToArray();
+
+            //logger.Debug($"Converting rows to jagged array of object[]");
+            var query = Enumerable.Range(0, rows.Count());
+            if (rows is not null && rows.Count() > 200)
             {
-                Outlook.Row row = table.GetNextRow();
-                EtlRow(ref data,
-                                  row,
-                                  objectConverters,
-                                  columnDictionary,
-                                  binIndices,
-                                  objFields,
-                                  objIndices,
-                                  ++rowNumber);
+                query = query.AsParallel();
             }
+            var jagged = query.Select(i => EtlRow(rows.ElementAt(i), 
+                                                  objectConverters, 
+                                                  columnDictionary, 
+                                                  binIndices, 
+                                                  objFields, 
+                                                  objIndices, 
+                                                  i)).ToArray();
+            //logger.Debug($"Converting jagged array of object[] to 2D object array");
+            var data = jagged.To2D();
+
+            // Create the data array to hold the extracted data
+            // var data = new object[table.GetRowCount(), columnDictionary.Count];
+            //
+            // Iterate over each row in the Outlook.Table
+            // int rowNumber = -1;//
+            //while (!table.EndOfTable)
+            //{
+            //    logger.Debug($"Getting row {rowNumber}");
+            //    Outlook.Row row = table.GetNextRow();
+            //    EtlRow(ref data, row, objectConverters, columnDictionary, binIndices, objFields, objIndices, ++rowNumber);
+            //}
 
             return data;
         }
@@ -343,6 +396,20 @@ namespace UtilitiesCS
             WriteValuesToData(ref data, columnDictionary, binIndices, rowNumber, binStrings, objIndices, objStrings, rawValues);
         }
 
+        private static object[] EtlRow(Outlook.Row row,
+                                   Dictionary<string, Func<object, string>> objectConverters,
+                                   Dictionary<string, int> columnDictionary,
+                                   IOrderedEnumerable<int> binIndices,
+                                   IEnumerable<string> objFields,
+                                   IEnumerable<int> objIndices,
+                                   int rowNumber)
+        {
+            object[] rawValues = (object[])row.GetValues();
+            var binStrings = ConvertBinColumnsToString(row, binIndices);
+            var objStrings = ConvertObjectColumnsToString(row, objIndices, objFields, objectConverters);
+            return rawValues.ToObjectRow(binIndices, binStrings, objIndices, objStrings);
+        }
+
         /// <summary>
         /// Load transformed values into the data array
         /// </summary>
@@ -369,6 +436,20 @@ namespace UtilitiesCS
                 else if (objIndices is not null && objIndices.Contains(j)) { data[rowNumber, j] = objStrings[j]; }
                 else { data[rowNumber, j] = rawValues[j]; }
             }
+            //logger.Debug(data.SliceRow(rowNumber).Select(x => (x ?? "null").ToString()).SentenceJoin());
+        }
+
+        internal static object[] ToObjectRow(this object[] rawValues,
+                                             IOrderedEnumerable<int> binIndices,
+                                             Dictionary<int, string> binStrings,
+                                             IEnumerable<int> objIndices,
+                                             Dictionary<int, string> objStrings)
+        {
+            if (binIndices is not null) { binIndices.ForEach(i => rawValues[i] = binStrings[i]); }
+            if (objIndices is not null) { objIndices.ForEach(i => rawValues[i] = objStrings[i]); }
+
+            //logger.Debug(rawValues.Select(x => (x ?? "null").ToString()).SentenceJoin());
+            return rawValues;
         }
 
         /// <summary>
@@ -437,6 +518,50 @@ namespace UtilitiesCS
             return view.GetTable();
         }
 
+        public static async Task<Outlook.Table> GetTableInViewAsync(this Explorer activeExplorer, CancellationToken token, int counter)
+        {
+            Outlook.Table table = null;
+            Outlook.TableView view = activeExplorer.CurrentView as Outlook.TableView;
+            if (view is null)
+            {
+                throw new InvalidOperationException(
+                    $"Current view in Outlook, {((Outlook.View)activeExplorer.CurrentView).Name}," +
+                    $" cannot be cast to {nameof(Outlook.TableView)}");
+            }
+            
+            try
+            {
+                table = await Task.Factory.StartNew(
+                    () => view.GetTable(), 
+                    token, 
+                    TaskCreationOptions.LongRunning, 
+                    TaskScheduler.Default).TimeoutAfter(1000);
+
+                //table = await Task.Run(() => view.GetTable(), combinedTokenSource.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    table = null;
+                }
+                else
+                {
+                    Console.WriteLine($"Task timed out on try {counter}");
+                    if (counter < 2)
+                    {
+                        table = await activeExplorer.GetTableInViewAsync(token, counter+1);
+                    }
+                    else
+                    {
+                        table = null;
+                    }
+                } 
+            }
+
+            return table;
+        }
+
         public static Outlook.Table GetTable(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns)
         {
             if (store is null) { throw new ArgumentNullException(nameof(store)); }
@@ -458,6 +583,17 @@ namespace UtilitiesCS
             table.RemoveColumns(removeColumns);
             table.AddColumns(addColumns);
             return table;
+        }
+
+        public static IEnumerable<Outlook.Row> GetRows(this Outlook.Table table)
+        {
+            //int i = 0;
+            table.MoveToStart();
+            while (!table.EndOfTable)
+            {
+                //logger.Debug($"Getting row {i++}");
+                yield return table.GetNextRow();
+            }
         }
 
         public static string[] GetColumnHeaders(this Outlook.Table table)

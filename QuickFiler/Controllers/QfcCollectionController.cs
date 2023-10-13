@@ -136,63 +136,129 @@ namespace QuickFiler.Controllers
 
         #region UI Add and Remove QfcItems
 
-        public void LoadItemGroupsAndViewers(IList<MailItem> items, RowStyle template)
+        public void LoadControlsAndHandlers_01(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
+        {
+            _formViewer.SuspendLayout();
+            SwapTlp(tlp);
+            SwapItemGroups(itemGroups);
+            _formViewer.ResumeLayout();
+        }
+
+        public void LoadControlsAndHandlers_01(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
+        {
+            // Freeze the form while loading controls
+            _formViewer.SuspendLayout();
+            var tlpState = TlpLayout;
+            TlpLayout = false;
+
+            // Save the QfcItem template styles
+            _template = template;
+            _templateExpanded = templateExpanded;
+
+            // Save the TLP template
+            CaptureTlpTemplate();
+
+            LoadItemGroupsAndViewers_02(listMailItems, template);
+
+            _formViewer.WindowState = FormWindowState.Maximized;
+            TlpLayout = tlpState;
+
+            _formViewer.ResumeLayout();
+            //WireUpKeyboardHandler();
+            WireUpAsyncKeyboardHandler();
+            LoadConversationsAndFolders_04();
+
+        }
+
+        public async Task LoadControlsAndHandlersAsync_01(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
+        {
+            // Freeze the form while loading controls
+            _formViewer.SuspendLayout();
+            var tlpState = TlpLayout;
+            TlpLayout = false;
+
+            // Save the QfcItem template styles
+            _template = template;
+            _templateExpanded = templateExpanded;
+            
+            // Prep the TLP
+            TableLayoutHelper.InsertSpecificRow(_itemTlp, 0, template, listMailItems.Count);
+            CaptureTlpTemplate();
+
+            // Load the Item Viewers, Item Controllers, and Initialize
+            await LoadGroups_02(listMailItems, template);
+            //LoadItemGroupsAndViewers_02(listMailItems, template);
+            WireUpAsyncKeyboardHandler();
+            //await LoadConversationsAndFoldersAsync();
+            
+            // Restore state of window
+            _formViewer.WindowState = FormWindowState.Maximized;
+            TlpLayout = tlpState;
+            _formViewer.ResumeLayout();
+
+        }
+
+        public async Task LoadGroups_02(IList<MailItem> items, RowStyle template) 
+        {
+            //_itemGroups = new List<QfcItemGroup>();
+            _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
+            _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+            _itemGroups = await items.ToAsyncEnumerable()
+                               .SelectAwait((mailItem, i) => LoadGroup_03(template, mailItem, i))
+                               .ToListAsync();
+            //var tmp = items.ToAsyncEnumerable().Select((mailItem, i) => LoadGroup_03(template, mailItem, i)).ToListAsync();
+                           
+        }
+
+        private async ValueTask<QfcItemGroup> LoadGroup_03(RowStyle template, MailItem mailItem, int i)
+        {
+            //var grpTask = Task.Factory.StartNew(() => 
+            //{ 
+                
+            //});
+
+            var grp = new QfcItemGroup(mailItem);
+            grp.ItemViewer = LoadItemViewer_03(i, template, true);
+            grp.ItemController = await QfcItemController.CreateSequentialAsync(_globals,
+                _homeController, this, grp.ItemViewer, i + 1, grp.MailItem, Token);
+            grp.ItemController.PopulateFolderCombobox();
+            if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
+            else { grp.ItemController.SetThemeLight(async: true); }
+            return grp;
+        }
+
+        //private async ValueTask<QfcItemGroup> LoadGroup_03(RowStyle template, MailItem mailItem, int i)
+        //{
+        //    var grp = new QfcItemGroup(mailItem);
+        //    grp.ItemViewer = LoadItemViewer_03(i, template, true);
+        //    grp.ItemController = await QfcItemController.CreateSequentialAsync(_globals,
+        //        _homeController, this, grp.ItemViewer, i + 1, grp.MailItem, Token);
+        //    grp.ItemController.PopulateFolderCombobox();
+        //    if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
+        //    else { grp.ItemController.SetThemeLight(async: true); }
+        //    return grp;
+        //}
+
+        public void LoadItemGroupsAndViewers_02(IList<MailItem> items, RowStyle template)
         {
             _itemGroups = new List<QfcItemGroup>();
             _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+            
             int i = 0;
             foreach (MailItem mailItem in items)
             {
                 QfcItemGroup grp = new(mailItem);
                 _itemGroups.Add(grp);
-                grp.ItemViewer = LoadItemViewer(i, template, true);
+                grp.ItemViewer = LoadItemViewer_03(i, template, true);
                 i++;
             }
 
         }
 
-        public void WireUpKeyboardHandler()
+        public void LoadConversationsAndFolders_04()
         {
-            // Treatment as char limits to 9 numbered items and 26 character items
-            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
-            {
-                _kbdHandler.CharActions.Add(
-                    "Collection",
-                    (i + 1).ToString()[0],
-                    (c) => ChangeByIndex(int.Parse(c.ToString()) - 1));
-            }
-            _kbdHandler.KeyActions = new KbdActions<Keys, KaKey, Action<Keys>>(
-                new List<KaKey>
-                {
-                    new KaKey("Collection", Keys.Up, (k) => SelectPreviousItem()),
-                    new KaKey("Collection", Keys.Down, (k) => SelectNextItem())
-                });
-        }
-
-        public void WireUpAsyncKeyboardHandler()
-        {
-            // Treatment as char limits to 9 numbered items and 26 character items
-            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
-            {
-                _kbdHandler.CharActionsAsync.Add(
-                    "Collection",
-                    (i + 1).ToString()[0],
-                    (c) => ChangeByIndexAsync(int.Parse(c.ToString()) - 1));
-            }
-            _kbdHandler.KeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
-                new List<KaKeyAsync>
-                {
-                    new KaKeyAsync("Collection", Keys.Up, (k) => SelectPreviousItemAsync()),
-                    new KaKeyAsync("Collection", Keys.Down, (k) => SelectNextItemAsync())
-                });
-        }
-
-        public void LoadConversationsAndFolders()
-        {
-            bool parallel = Properties.Settings.Default.ParallelLoad;
-            if (parallel) { LoadParallelCF(); }
-            else { LoadSequentialCF(); }
+            LoadSequential_5(); 
         }
 
         public async Task LoadConversationsAndFoldersAsync()
@@ -217,30 +283,7 @@ namespace QuickFiler.Controllers
                                  });
         }
 
-        public void LoadParallelCF()
-        {
-            Parallel.ForEach(_itemGroups, grp =>
-            {
-                grp.ItemController = new QfcItemController(AppGlobals: _globals,
-                                                           homeController: _homeController,
-                                                           parent: this,
-                                                           itemViewer: grp.ItemViewer,
-                                                           viewerPosition: _itemGroups.FindIndex(x => x.MailItem == grp.MailItem) + 1,
-                                                           grp.MailItem);
-                grp.ItemController.Initialize(false);
-
-                Parallel.Invoke(
-                    () => grp.ItemController.PopulateConversation(),
-                    () => grp.ItemController.PopulateFolderCombobox(),
-                    () =>
-                    {
-                        if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
-                        else { grp.ItemController.SetThemeLight(async: true); }
-                    });
-            });
-        }
-        
-        public void LoadSequentialCF()
+        public void LoadSequential_5()
         {
             int i = 0;
             foreach (var grp in _itemGroups)
@@ -259,6 +302,28 @@ namespace QuickFiler.Controllers
             }
         }
 
+        public async Task LoadSequentialAsync()
+        {
+            await AsyncEnumerable.Range(0, _itemGroups.Count)
+                                 .Select(i => (i, grp: _itemGroups[i]))
+                                 .ForEachAsync(async x =>
+                                 {
+                                     x.grp.ItemController = new QfcItemController(AppGlobals: _globals,
+                                                                                  homeController: _homeController,
+                                                                                  parent: this,
+                                                                                  itemViewer: x.grp.ItemViewer,
+                                                                                  viewerPosition: x.i + 1,
+                                                                                  x.grp.MailItem);
+                                     var tasks = new List<Task>
+                                     {
+                                        x.grp.ItemController.InitializeAsync(),
+                                        Task.Run(() => x.grp.ItemController.PopulateConversation()),
+                                        Task.Run(() => x.grp.ItemController.PopulateFolderCombobox()),
+                                     };
+                                     await Task.WhenAll(tasks).ConfigureAwait(false);
+                                 });
+        }
+        
         internal void SwapTlp(TableLayoutPanel tlp)
         {
             // Cache parent of current tlp and cache the original tlp to a variable for background processing
@@ -288,66 +353,11 @@ namespace QuickFiler.Controllers
             _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
             _itemGroupsToMove = _itemGroups;
         }
-
-        public void LoadControlsAndHandlers(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
-        {
-            _formViewer.SuspendLayout();
-            SwapTlp(tlp);
-            SwapItemGroups(itemGroups);
-            _formViewer.ResumeLayout();
-        }
-
-        public void LoadControlsAndHandlers(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
-        {
-            _formViewer.SuspendLayout();
-            var tlpState = TlpLayout;
-            TlpLayout = false;
-            //_itemTLP.SuspendLayout();
-            _template = template;
-            _templateExpanded = templateExpanded;
-            //_itemTlp.InsertSpecificRow(0, template, listMailItems.Count);
-            //_itemTlp.MinimumSize = new System.Drawing.Size(
-            //    _itemTlp.MinimumSize.Width,
-            //    _itemTlp.MinimumSize.Height +
-            //    (int)Math.Round(template.Height * listMailItems.Count, 0));
-
-            CaptureTlpTemplate();
-            
-            LoadItemGroupsAndViewers(listMailItems, template);
-            _formViewer.WindowState = FormWindowState.Maximized;
-            TlpLayout = tlpState;
-            //_itemTLP.ResumeLayout();
-            _formViewer.ResumeLayout();
-            //WireUpKeyboardHandler();
-            WireUpAsyncKeyboardHandler();
-            LoadConversationsAndFolders();
-
-        }
-
-        public async Task LoadControlsAndHandlersAsync(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
-        {
-            _formViewer.SuspendLayout();
-            var tlpState = TlpLayout;
-            TlpLayout = false;
-            //_itemTLP.SuspendLayout();
-            _template = template;
-            _templateExpanded = templateExpanded;
-            TableLayoutHelper.InsertSpecificRow(_itemTlp, 0, template, listMailItems.Count);
-            LoadItemGroupsAndViewers(listMailItems, template);
-            _formViewer.WindowState = FormWindowState.Maximized;
-            TlpLayout = tlpState;
-            //_itemTLP.ResumeLayout();
-            _formViewer.ResumeLayout();
-            //WireUpKeyboardHandler();
-            WireUpAsyncKeyboardHandler();
-            await LoadConversationsAndFoldersAsync();
-
-        }
-
-        public ItemViewer LoadItemViewer(int indexNumber,
-                                            RowStyle template,
-                                            bool blGroupConversation = true,
-                                            int columnNumber = 0)
+                
+        public ItemViewer LoadItemViewer_03(int indexNumber,
+                                         RowStyle template,
+                                         bool blGroupConversation = true,
+                                         int columnNumber = 0)
         {
             var itemViewer = ItemViewerQueue.Dequeue(_homeController.Token);
 
@@ -543,6 +553,44 @@ namespace QuickFiler.Controllers
 
         }
 
+        public void WireUpKeyboardHandler()
+        {
+            // Treatment as char limits to 9 numbered items and 26 character items
+            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
+            {
+                _kbdHandler.CharActions.Add(
+                    "Collection",
+                    (i + 1).ToString()[0],
+                    (c) => ChangeByIndex(int.Parse(c.ToString()) - 1));
+            }
+            _kbdHandler.KeyActions = new KbdActions<Keys, KaKey, Action<Keys>>(
+                new List<KaKey>
+                {
+                    new KaKey("Collection", Keys.Up, (k) => SelectPreviousItem()),
+                    new KaKey("Collection", Keys.Down, (k) => SelectNextItem())
+                });
+        }
+
+        public void WireUpAsyncKeyboardHandler()
+        {
+            // Treatment as char limits to 9 numbered items and 26 character items
+            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
+            {
+                _kbdHandler.CharActionsAsync.Add(
+                    "Collection",
+                    (i + 1).ToString()[0],
+                    (c) => ChangeByIndexAsync(int.Parse(c.ToString()) - 1));
+            }
+            _kbdHandler.KeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
+                new List<KaKeyAsync>
+                {
+                    new KaKeyAsync("Collection", Keys.Up, (k) => SelectPreviousItemAsync()),
+                    new KaKeyAsync("Collection", Keys.Down, (k) => SelectNextItemAsync())
+                });
+        }
+
+
+
         #endregion
 
         #region UI Select QfcItems
@@ -571,6 +619,7 @@ namespace QuickFiler.Controllers
                 itemController.ToggleFocus();
                 if (blExpanded) { itemController.ToggleExpansion(); }
                 ScrollIntoView(itemViewer);
+                itemViewer.LblSubject.Focus();
 
                 ActiveSelection = intNewSelection;
 
@@ -652,19 +701,6 @@ namespace QuickFiler.Controllers
         public async Task SelectNextItemAsync()
         {
             await UIThreadExtensions.UiDispatcher.InvokeAsync(() => SelectNextItem());
-            //if (ActiveSelection < _itemGroups.Count)
-            //{
-            //    bool tlpState = true;
-            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
-            //    {
-            //        tlpState = TlpLayout;
-            //        TlpLayout = false;
-            //    });
-
-            //    await ChangeByIndexAsync(ActiveIndex + 1);
-
-            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
-            //}
         }
 
         public void SelectPreviousItem()
@@ -683,21 +719,6 @@ namespace QuickFiler.Controllers
         public async Task SelectPreviousItemAsync()
         {
             await UIThreadExtensions.UiDispatcher.InvokeAsync(() => SelectPreviousItem());
-
-
-            //if (ActiveIndex > 0)
-            //{
-            //    bool tlpState = true;
-            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
-            //    { 
-            //        tlpState = TlpLayout;
-            //        TlpLayout = false;
-            //    });
-
-            //    await ChangeByIndexAsync(ActiveIndex - 1);
-
-            //    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
-            //}
         }
 
         internal void ScrollIntoView(ItemViewer item)
@@ -1006,7 +1027,7 @@ namespace QuickFiler.Controllers
             Enumerable.Range(0, insertions.Count).ForEach(i =>
             {
                 var grp = _itemGroups[i + insertionIndex];
-                grp.ItemViewer = LoadItemViewer(i + insertionIndex, _template, false, 1);
+                grp.ItemViewer = LoadItemViewer_03(i + insertionIndex, _template, false, 1);
                 grp.MailItem = insertions[i];
                 grp.ItemController = new QfcItemController(AppGlobals: _globals,
                                                            homeController: _homeController,

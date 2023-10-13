@@ -97,6 +97,7 @@ namespace QuickFiler.Controllers
             Task.Run(()=>InitializeWebViewAsync());
         }
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region Item Setup and Disposal Methods

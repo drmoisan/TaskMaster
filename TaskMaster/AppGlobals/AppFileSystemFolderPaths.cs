@@ -58,10 +58,11 @@ namespace TaskMaster
         private void LoadFolders()
         {
             _appStaging = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskMaster");
-            _ = Task.Factory.StartNew(() => CreateMissingPaths(_appStaging),
-                                      default,
-                                      TaskCreationOptions.None,
-                                      PriorityScheduler.BelowNormal);
+            _ = Task.Run(() => CreateMissingPaths(_appStaging));
+            //_ = Task.Factory.StartNew(() => CreateMissingPaths(_appStaging),
+            //                          default,
+            //                          TaskCreationOptions.None,
+            //                          PriorityScheduler.BelowNormal);
 
             _stagingPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             _myD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);

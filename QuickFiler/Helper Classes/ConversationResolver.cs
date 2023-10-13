@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Analysis;
+﻿using log4net.Repository.Hierarchy;
+using Microsoft.Data.Analysis;
 using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using System;
@@ -27,7 +28,7 @@ namespace QuickFiler.Helper_Classes
 
     public class ConversationResolver : INotifyPropertyChanged, IConversationResolver
     {
-        private ConversationResolver(IApplicationGlobals appGlobals, MailItem mailItem) 
+        public ConversationResolver(IApplicationGlobals appGlobals, MailItem mailItem) 
         { 
             _globals = appGlobals;
             _mailItem = mailItem;
@@ -51,7 +52,7 @@ namespace QuickFiler.Helper_Classes
                                       MailItem mailItem,
                                       CancellationTokenSource tokenSource,
                                       CancellationToken token,
-                                      bool backgroundLoad,
+                                      bool loadAll,
                                       System.Action<List<MailItemInfo>> updateUI = null)
         {
             var resolver = new ConversationResolver(appGlobals, mailItem);
@@ -61,17 +62,19 @@ namespace QuickFiler.Helper_Classes
             if (updateUI is not null)
                 resolver.UpdateUI = updateUI;
 
-            if (backgroundLoad)
+            if (loadAll)
             {
-                await resolver.LoadDfAsync(token, backgroundLoad);
-                await resolver.LoadConversationInfoAsync(token, backgroundLoad);
-                await resolver.LoadConversationItemsAsync(token, backgroundLoad);
+                await resolver.LoadDfAsync(token, loadAll);
+                await resolver.LoadConversationInfoAsync(token, loadAll);
+                await resolver.LoadConversationItemsAsync(token, loadAll);
                 resolver.PropertyChanged += resolver.Handler_PropertyChanged;
             }
             else
             {
                 resolver.PropertyChanged += resolver.Handler_PropertyChanged;
-                _ = resolver.LoadConversationItemsAsync(token, backgroundLoad);
+                // Not sure why this was here. Going to comment it out for now
+                //_ = resolver.LoadConversationItemsAsync(token, backgroundLoad);
+                await resolver.LoadDfAsync(token, loadAll);
             }
 
             return resolver;
@@ -116,7 +119,7 @@ namespace QuickFiler.Helper_Classes
             var df = Df.Expanded;
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
             var convInfoExpanded = Enumerable.Range(0, Count.Expanded)
-                                                .Select(indexRow => MailItemInfo.FromDf(df, indexRow, olNs))
+                                                .Select(indexRow => MailItemInfo.FromDf(df, indexRow, olNs, Token))
                                                 .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
                                                 .ToList();
 
@@ -130,7 +133,7 @@ namespace QuickFiler.Helper_Classes
         {
             token.ThrowIfCancellationRequested();
 
-            TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
+            //TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
             TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
 
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
@@ -177,13 +180,13 @@ namespace QuickFiler.Helper_Classes
         {
             token.ThrowIfCancellationRequested();
 
-            TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
+            //TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
             TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
 
             await Task.Factory.StartNew(() => ConversationItems = LoadConversationItems(),
-                                        token,
-                                        options,
-                                        priority);
+                                        token);//,
+                                        //options,
+                                        //priority);
         }
 
         #endregion
@@ -194,15 +197,17 @@ namespace QuickFiler.Helper_Classes
         public Pair<DataFrame> Df
         {
             get => Initializer.GetOrLoad(ref _df, LoadDf, DfNotifyIfNotNull, false, _mailItem);
+            set => _df = value;
         }
+
         internal Pair<DataFrame> LoadDf() 
         { 
-            var priority = PriorityScheduler.AboveNormal;
-            var options = TaskCreationOptions.None;
-            return LoadDf(priority, options);
-        }
-        internal Pair<DataFrame> LoadDf(TaskScheduler priority, TaskCreationOptions options)
-        {
+        //    var priority = PriorityScheduler.AboveNormal;
+        //    var options = TaskCreationOptions.None;
+        //    return LoadDf(priority, options);
+        //}
+        //internal Pair<DataFrame> LoadDf(TaskScheduler priority, TaskCreationOptions options)
+        //{
             // Attempt to call async synchronously caused dealock
             //var dfRaw = _mailItem.GetConversationDfAsync(TokenSource, Token, 1000, options, priority).GetAwaiter().GetResult();
                         
@@ -212,7 +217,8 @@ namespace QuickFiler.Helper_Classes
                                             ((Folder)_mailItem.Parent).Name, 
                                             false, 
                                             true);
-            
+
+            //Console.WriteLine(((Folder)_mailItem.Parent).Name);
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
             
             return new Pair<DataFrame>(dfSameFolder, dfExpanded); 
@@ -226,18 +232,13 @@ namespace QuickFiler.Helper_Classes
         {
             token.ThrowIfCancellationRequested();
             
-            TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
             TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
-            await Task.Factory.StartNew(
-                () => 
-                {
-                    var options = TaskCreationOptions.AttachedToParent;
-                    var scheduler = TaskScheduler.Current;
-                    _df = LoadDf(scheduler, options); 
-                },
-                token,
-                options,
-                priority);
+            var dfRaw = await _mailItem.GetConversationDfAsync(Token).ConfigureAwait(false);
+            var dfExpanded = dfRaw.FilterConversation(((Folder)_mailItem.Parent).Name, false, true);
+            var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
+            Df = new Pair<DataFrame>(dfSameFolder, dfExpanded);
+            
+            
         }
 
         private Pair<int> _count;

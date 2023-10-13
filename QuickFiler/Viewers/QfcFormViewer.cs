@@ -18,6 +18,7 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             //this.KeyPreview = true;
         }
 
@@ -27,6 +28,9 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
+
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         public void SetController(IFilerFormController controller)
         {

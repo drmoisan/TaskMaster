@@ -4,6 +4,7 @@ using System.ComponentModel;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using System.Threading.Tasks;
+using System.Threading;
 
 
 namespace QuickFiler.Interfaces
@@ -26,5 +27,6 @@ namespace QuickFiler.Interfaces
         void UndoMove();
         ScoStack<IMovedMailInfo> MovedItems { get; }
         IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker);
+        Task<IList<MailItem>> InitEmailQueueAsync(int batchSize, BackgroundWorker worker, CancellationToken token, CancellationTokenSource tokenSource);
     }
 }

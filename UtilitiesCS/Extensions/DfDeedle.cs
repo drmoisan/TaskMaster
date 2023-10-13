@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.OutlookExtensions;
 using System.Data;
+using System.Threading;
+using System.Windows;
+using UtilitiesCS;
 
 namespace UtilitiesCS
 {
@@ -20,12 +23,8 @@ namespace UtilitiesCS
         {
             Outlook.Table table = activeExplorer.GetTableInView();
             var storeID = activeExplorer.CurrentFolder.StoreID;
-            table.Columns.Add("SentOn");
-            table.Columns.Add(OlTableExtensions.SchemaConversationId);
-            table.Columns.Add(OlTableExtensions.SchemaTriage);
-            table.Columns.Remove("Subject");
-            table.Columns.Remove("CreationTime");
-            table.Columns.Remove("LastModificationTime");
+
+            AddQfcColumns(table);
 
             (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
             
@@ -63,6 +62,97 @@ namespace UtilitiesCS
             var df = Frame.FromRecords(records);
             
             return df;
+        }
+
+        public static async Task<Frame<int, string>> GetEmailDataInViewAsync(Explorer activeExplorer, CancellationToken token, CancellationTokenSource tokenSource)
+        {
+            token.ThrowIfCancellationRequested();
+            
+            logger.Debug($"{nameof(GetEmailDataInViewAsync)}: {activeExplorer.CurrentFolder.Name}");
+
+            //logger.Debug($"Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
+            Outlook.Table table = await activeExplorer.GetTableInViewAsync(token, 0);
+            //table.EnumerateTable();
+            var storeID = activeExplorer.CurrentFolder.StoreID;
+
+            //logger.Debug($"Calling {nameof(AddQfcColumnsAsync)} ...");
+            await AddQfcColumnsAsync(table, token, 0);
+
+            //logger.Debug($"Calling {nameof(OlTableExtensions.EtlAsync)} ...");
+            (object[,] data, Dictionary<string, int> columnInfo) = await table.EtlAsync(token, tokenSource, 0);
+
+            //logger.Debug($"Calling {nameof(Array2DToDf)} ...");
+            Frame<int, string> df = await Task.Factory.StartNew(() => Array2DToDf(storeID, data, columnInfo),
+                token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
+
+            logger.Debug($"{nameof(GetEmailDataInViewAsync)} complete");
+            return df;
+        }
+
+        private static Frame<int, string> Array2DToDf(string storeID, object[,] data, Dictionary<string, int> columnInfo)
+        {
+            var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
+            {
+                DateTime sentOn = DateTime.MaxValue;
+                var dateField = data[i, columnInfo["SentOn"]];
+                if (dateField is not null) { DateTime.TryParse(dateField.ToString(), out sentOn); }
+                if (dateField is null) { sentOn = DateTime.MaxValue; }
+
+                return new
+                {
+                    EntryId = data[i, columnInfo["EntryID"]],
+                    MessageClass = data[i, columnInfo["MessageClass"]].ToString(),
+                    SentOn = sentOn,
+                    ConversationId = data[i, columnInfo["ConversationId"]],
+                    Triage = (string)data[i, columnInfo["Triage"]] ?? "Z",
+                    StoreId = storeID
+                };
+            });
+
+            //string[,] strAry = new string[records.Count(), 6];
+            //var r2 = records.ToList();
+            //Enumerable.Range(0, data.GetLength(0)).ForEach(i =>
+            //{
+            //    strAry[i,0] = r2[i].EntryId.ToString();
+            //    strAry[i, 1] = r2[i].MessageClass.ToString();
+            //    strAry[i, 2] = r2[i].SentOn.ToString();
+            //    strAry[i, 3] = r2[i].ConversationId.ToString();
+            //    strAry[i, 4] = r2[i].Triage.ToString();
+            //    strAry[i, 5] = r2[i].StoreId.ToString();
+            //});
+            //logger.Debug(strAry.ToFormattedText());
+
+            var df = Frame.FromRecords(records);
+            return df;
+        }
+
+        private static void AddQfcColumns(Table table)
+        {
+            table.Columns.Add("SentOn");
+            table.Columns.Add(OlTableExtensions.SchemaConversationId);
+            table.Columns.Add(OlTableExtensions.SchemaTriage);
+            table.Columns.Remove("Subject");
+            table.Columns.Remove("CreationTime");
+            table.Columns.Remove("LastModificationTime");
+        }
+
+        private static async Task AddQfcColumnsAsync(Table table, CancellationToken token, int counter)
+        {
+            try
+            {
+                await Task.Factory.StartNew(() => AddQfcColumns(table),
+                token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default).TimeoutAfter(1000);
+            }
+            catch (TaskCanceledException)
+            {
+                if (!token.IsCancellationRequested && counter < 2)
+                {
+                    await AddQfcColumnsAsync(table, token, counter + 1);
+                }
+            }
+            
         }
 
         internal static Series<int, string> GetColumnEid(object[] slice)

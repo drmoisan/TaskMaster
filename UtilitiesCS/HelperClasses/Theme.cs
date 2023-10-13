@@ -22,6 +22,7 @@ namespace UtilitiesCS
                      IList<TableLayoutPanel> tableLayoutPanels,
                      IList<Button> buttons,
                      IList<IQfcTipsDetails> tipsDetailsLabels,
+                     IList<IQfcTipsDetails> tipsExpanded,
                      TextBox textboxSearch,
                      TextBox textboxBody,
                      ComboBox comboFolders,
@@ -62,6 +63,7 @@ namespace UtilitiesCS
             _tableLayoutPanels = tableLayoutPanels;
             _buttons = buttons;
             _tipsDetailsLabels = tipsDetailsLabels;
+            _tipsExpanded = tipsExpanded;
             _textboxSearch = textboxSearch;
             _textboxBody = textboxBody;
             _comboFolders = comboFolders;
@@ -102,6 +104,7 @@ namespace UtilitiesCS
         private IList<TableLayoutPanel> _tableLayoutPanels;
         private IList<Button> _buttons;
         private IList<IQfcTipsDetails> _tipsDetailsLabels;
+        IList<IQfcTipsDetails> _tipsExpanded;
         private TextBox _textboxSearch;
         private TextBox _textboxBody;
         private ComboBox _comboFolders;
@@ -293,6 +296,12 @@ namespace UtilitiesCS
 
             // Shortcut accelerator colors  
             foreach (var tipsDetails in _tipsDetailsLabels)
+            {
+                tipsDetails.LabelControl.BackColor = TipsDetailsBackColor;
+                tipsDetails.LabelControl.ForeColor = TipsDetailsForeColor;
+            }
+
+            foreach (var tipsDetails in _tipsExpanded)
             {
                 tipsDetails.LabelControl.BackColor = TipsDetailsBackColor;
                 tipsDetails.LabelControl.ForeColor = TipsDetailsForeColor;

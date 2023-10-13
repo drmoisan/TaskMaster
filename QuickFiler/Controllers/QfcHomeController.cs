@@ -20,6 +20,8 @@ namespace QuickFiler.Controllers
     {
         #region Constructors, Initializers, and Destructors
 
+        private QfcHomeController() { }
+
         public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
         {
             CreateCancellationToken();
@@ -35,14 +37,49 @@ namespace QuickFiler.Controllers
             _formController = new QfcFormController(_globals, _formViewer, _qfcQueue, InitTypeEnum.Sort, Cleanup, this, Token);
         }
 
+        public static async Task<QfcHomeController> CreateAsync(IApplicationGlobals appGlobals, System.Action parentCleanup)
+        {
+            
+            var controller = new QfcHomeController();
+            await controller.InitAsync(appGlobals, parentCleanup);
+            controller.Loaded = true;
+            //await init.ContinueWith(t => controller.Loaded = true, controller.Token, TaskContinuationOptions.NotOnCanceled, controller.UiScheduler);
+            return controller;
+        }
+
+        internal async Task InitAsync(IApplicationGlobals appGlobals, System.Action parentCleanup)
+        {
+            
+            CreateCancellationToken();
+            _globals = appGlobals;
+            _parentCleanup = parentCleanup;
+            var datamodelTask = QfcDatamodel.LoadAsync(_globals, this.Token, this.TokenSource);
+                        
+            //Run the rest of the synchronous code on the UI thread
+            //await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+            //var uiTask = Task.Factory.StartNew(() =>
+            //{
+            _formViewer = new QfcFormViewer();
+            _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
+            _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+            _qfcQueue = new QfcQueue(Token);
+            _formController = new QfcFormController(
+                _globals, _formViewer, _qfcQueue, 
+                InitTypeEnum.Sort, Cleanup, this, Token);
+            //}, Token, TaskCreationOptions.None, UiScheduler);
+            _datamodel = await datamodelTask;
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private IApplicationGlobals _globals;
-        private System.Action _parentCleanup;
         private QfcQueue _qfcQueue;
-
+        private System.Action _parentCleanup;
+        
         #endregion Constructors, Initializers, and Destructors
-
 
         public void Run()
         {
@@ -58,13 +95,15 @@ namespace QuickFiler.Controllers
         // Twice as slow as the synchronous version
         public async Task RunAsync()
         {
-            IList<MailItem> listEmail = _datamodel.InitEmailQueue(_formController.ItemsPerIteration, _formViewer.Worker);
+            logger.Debug($"{nameof(RunAsync)} is beginning");
+            IList<MailItem> listEmail = await _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker, Token, TokenSource);
             await _formController.LoadItemsAsync(listEmail);
             _stopWatch = new cStopWatch();
             _stopWatch.Start();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();
             _formViewer.Refresh();
+            logger.Debug($"{nameof(RunAsync)} is complete");
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -207,7 +246,7 @@ namespace QuickFiler.Controllers
         }
 
         private bool _loaded = false;
-        public bool Loaded { get => _loaded; }
+        public bool Loaded { get => _loaded; internal set => _loaded = value; }
 
         private IQfcExplorerController _explorerController;
         public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
@@ -219,7 +258,10 @@ namespace QuickFiler.Controllers
         public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
         
         private IQfcDatamodel _datamodel;
-        public IQfcDatamodel DataModel { get => _datamodel; }
+        public IQfcDatamodel DataModel { get => _datamodel; internal set => _datamodel = value; }
+
+        private TaskScheduler _uiScheduler;
+        internal TaskScheduler UiScheduler { get => _uiScheduler; }
 
         private cStopWatch _stopWatchMoved;
         private cStopWatch _stopWatch;

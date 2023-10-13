@@ -40,7 +40,7 @@ namespace QuickFiler.Controllers
             _parent = parent;
             WriteMetrics = parent.QuickFileMetrics_WRITE;
             Iterate = parent.Iterate;
-            _movedItems = parent.DataModel.MovedItems;
+            _movedItems = _globals.AF.MovedMails;
             _qfcQueue = qfcQueue;
             
             CaptureItemSettings();
@@ -364,7 +364,7 @@ namespace QuickFiler.Controllers
 
         public void LoadItems(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
         {
-            _groups.LoadControlsAndHandlers(tlp, itemGroups);
+            _groups.LoadControlsAndHandlers_01(tlp, itemGroups);
         }
 
         
@@ -378,7 +378,7 @@ namespace QuickFiler.Controllers
                                                   homeController: _parent,
                                                   parent: this,
                                                   token: Token);
-            _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+            _groups.LoadControlsAndHandlers_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
         public async Task LoadItemsAsync(IList<MailItem> listObjects)
@@ -390,7 +390,7 @@ namespace QuickFiler.Controllers
                                                   homeController: _parent,
                                                   parent: this,
                                                   token: Token);
-            await _groups.LoadControlsAndHandlersAsync(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+            await _groups.LoadControlsAndHandlersAsync_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
         /// <summary>

@@ -39,11 +39,11 @@ namespace QuickFiler
             _conversationIndex = (string)df["ConversationIndex"][indexRow];
         }
 
-        public static MailItemInfo FromDf(DataFrame df, long indexRow, Outlook.NameSpace olNs)
+        public static MailItemInfo FromDf(DataFrame df, long indexRow, Outlook.NameSpace olNs, CancellationToken token = default)
         {
             var info = new MailItemInfo(df, indexRow);
             info.ResolveMail(olNs, strict: true);
-            info.LoadPriority();
+            info.LoadPriority(token);
             return info;
         }
 
@@ -51,14 +51,14 @@ namespace QuickFiler
         {
             token.ThrowIfCancellationRequested();
 
-            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
+            //TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
 
             var info = new MailItemInfo(df, indexRow);
             await info.ResolveMailAsync(olNs, token, background);
 
             token.ThrowIfCancellationRequested();
             await Task.Factory.StartNew(
-                () => 
+                () =>
                 {
                     info.Subject = info.Item.Subject;
                     info.Body = CompressPlainText(info.Item.Body);
@@ -68,11 +68,11 @@ namespace QuickFiler
                     info.ConversationIndex = info.Item.ConversationIndex;
                     info.UnRead = info.Item.UnRead;
                     info.IsTaskFlagSet = (info.Item.FlagStatus == OlFlagStatus.olFlagMarked || info.Item.FlagStatus == OlFlagStatus.olFlagComplete);
-                    info.LoadRecipients(); 
+                    info.LoadRecipients();
                 },
-                token,
-                TaskCreationOptions.None,
-                priority);
+                token);//,
+                //TaskCreationOptions.None,
+                //priority);
 
             return info;
         }
@@ -95,8 +95,9 @@ namespace QuickFiler
             info.IsTaskFlagSet = (item.FlagStatus == OlFlagStatus.olFlagMarked || item.FlagStatus == OlFlagStatus.olFlagComplete);
             await Task.Factory.StartNew(() => info.LoadRecipients(),
                                               token,
-                                              TaskCreationOptions.None,
-                                              PriorityScheduler.BelowNormal);
+                                              TaskCreationOptions.LongRunning,
+                                              TaskScheduler.Default);
+                                              
             return info;
         }
 
@@ -112,13 +113,13 @@ namespace QuickFiler
 
         public async Task<MailItem> ResolveMailAsync(Outlook.NameSpace olNs, CancellationToken token, bool background)
         {
-            TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
-            
+            //TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
+
             return await Task.Factory.StartNew(
                 () => ResolveMail(olNs, strict: true),
-                token,
-                TaskCreationOptions.None,
-                priority);
+                token);//,
+                //TaskCreationOptions.None,
+                //priority);
         }
 
         async public Task<bool> LoadAsync(Outlook.NameSpace olNs, bool darkMode = false)
@@ -136,7 +137,7 @@ namespace QuickFiler
             return true;
         }
 
-        public bool LoadPriority()
+        public bool LoadPriority(CancellationToken token = default)
         {
             if (_item is null) { throw new ArgumentNullException(); }
             _entryId = _item.EntryID;
@@ -153,9 +154,7 @@ namespace QuickFiler
             _unread = _item.UnRead;
             _isTaskFlagSet = (_item.FlagStatus == OlFlagStatus.olFlagMarked);
             _ = Task.Factory.StartNew(() => LoadRecipients(),
-                                      default,
-                                      TaskCreationOptions.None,
-                                      PriorityScheduler.BelowNormal);
+                                      token);
             return true;
         }
 

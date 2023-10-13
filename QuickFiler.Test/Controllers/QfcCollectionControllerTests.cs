@@ -65,7 +65,7 @@ namespace QuickFiler.Test.Controllers
             RowStyle templateExpanded = null;
 
             // Act
-            qfcCollectionController.LoadControlsAndHandlers(
+            qfcCollectionController.LoadControlsAndHandlers_01(
                 listMailItems,
                 template,
                 templateExpanded);
@@ -86,7 +86,7 @@ namespace QuickFiler.Test.Controllers
             int columnNumber = 0;
 
             // Act
-            var result = qfcCollectionController.LoadItemViewer(
+            var result = qfcCollectionController.LoadItemViewer_03(
                 itemNumber,
                 template,
                 blGroupConversation,

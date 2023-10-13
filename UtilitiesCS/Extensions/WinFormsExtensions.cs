@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 using UtilitiesCS.ReusableTypeClasses;
 using System.Threading.Channels;
 using System.Collections;
+using System.Diagnostics;
 
 namespace UtilitiesCS
 {
@@ -99,9 +100,6 @@ namespace UtilitiesCS
             }
         }
 
-               
-
-
         public static IEnumerable<Control> GetAllChildren(this Control root, IList<Control> except)
         {
             var stack = new Stack<Control>();
@@ -115,6 +113,43 @@ namespace UtilitiesCS
                     if (!except.Contains(child))
                         stack.Push(child);
                 yield return next;
+            }
+        }
+
+        public static T GetAncestor<T>(this Control control) where T: class
+        {
+            var parent = control.Parent;
+            if (parent is T) { return parent as T; }
+            else if (parent.Parent is not null) { return parent.GetAncestor<T>(); }
+            else { return null; }
+        }
+
+        public static T GetAncestor<T>(this Control control, bool strict) where T : class
+        {
+            var result = control.GetAncestor<T>();
+            if (result is not null || !strict) { return result; }
+            else
+            {
+                throw new ArgumentOutOfRangeException(
+                    $"{nameof(GetAncestor)} could not find an ancestor of type {typeof(T).Name} " +
+                    $"in the control hierarchy of {control.Name}.");
+            }
+        }
+
+        internal static U ThrowIfNotResolved<T, U>(Func<T, U> resolver, T arg)
+        {
+            U result = resolver(arg);
+            if (result is not null) { return result; }
+            else
+            {
+                var methodBase = new StackTrace().GetFrame(1).GetMethod();
+                //var callerName = methodBase.Name;
+                var parameters = methodBase.GetParameters();
+                var message = $"{parameters[0].Name} could not find an ItemViewer "
+                                + $"in the control hierarchy of {parameters[1].Name}.  " +
+                                $"This method must be assigned to a {nameof(ComboBox)} " +
+                                $"that is a child of an {typeof(T).Name}";
+                throw new ArgumentOutOfRangeException(message);
             }
         }
 
@@ -142,6 +177,8 @@ namespace UtilitiesCS
             (var list, var obj) = control.GetEventHandlerList(eventName);
             list.RemoveHandler(obj, list[obj]);
         }
+
+
 
         #region Clone<T>
 

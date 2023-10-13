@@ -46,12 +46,12 @@ namespace QuickFiler.Controllers
             CaptureConfigureItemViewer();
             ResolveControlGroups();
 
-            _formViewer.Show();
-            _formViewer.Refresh();
+            //_formViewer.Show();
+            //_formViewer.Refresh();
 
             _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel, token);
 
-            _formViewer.Hide();
+            //_formViewer.Hide();
 
             _themes = EfcThemeHelper.SetupFormThemes(_formViewer.TipsLabels.Cast<Control>().ToList(),
                                                      _listHighlighted,
@@ -64,6 +64,8 @@ namespace QuickFiler.Controllers
             WireEventHandlers();
             _ = PopulateFolderCombobox();
         }
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
@@ -256,29 +258,31 @@ namespace QuickFiler.Controllers
         {
             if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
 
-            if (!IsValidSelection)
-            {
-                MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
-            }
-            else 
-            {
-                var folder = await Task.FromResult(_dataModel
-                                                   .FolderHandler
-                                                   .CreateFolder(SelectedFolder, 
-                                                                 _globals.Ol.ArchiveRootPath, 
-                                                                 _globals.FS.FldrRoot));
-                if (folder is not null) 
-                { 
-                    await _dataModel.MoveToFolder(folder,
-                                                  _globals.Ol.ArchiveRootPath,
-                                                  SaveAttachments,
-                                                  SaveEmail,
-                                                  SavePictures,
-                                                  MoveConversation);
-                    _formViewer.Close();
-                    Cleanup();
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(async () => 
+            { 
+                if (!IsValidSelection)
+                {
+                    MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
                 }
-            }
+                else 
+                {
+                    var folder = await _dataModel.FolderHandler.CreateFolderAsync(SelectedFolder,
+                                                                                  _globals.Ol.ArchiveRootPath,
+                                                                                  _globals.FS.FldrRoot,
+                                                                                  Token);
+                    if (folder is not null)
+                    {
+                        await _dataModel.MoveToFolder(folder,
+                                                      _globals.Ol.ArchiveRootPath,
+                                                      SaveAttachments,
+                                                      SaveEmail,
+                                                      SavePictures,
+                                                      MoveConversation);
+                        _formViewer.Close();
+                        Cleanup();
+                    }
+                }
+            });
         }
 
         async public void ButtonDelete_Click(object sender, EventArgs e)
@@ -449,9 +453,11 @@ namespace QuickFiler.Controllers
 
         async public Task RefreshSuggestionsAsync()
         {
-            await TaskPriority.Run(PriorityScheduler.AboveNormal, ()=> _dataModel.RefreshSuggestions());
-            var matches = await TaskPriority<string[]>.Run(
-                PriorityScheduler.AboveNormal, ()=> _dataModel.FindMatches(_formViewer.SearchText.Text));
+            await Task.Run(() => _dataModel.RefreshSuggestions(), Token);
+            //await TaskPriority.Run(PriorityScheduler.AboveNormal, ()=> _dataModel.RefreshSuggestions());
+            var matches = await Task.Run(() => _dataModel.FindMatches(_formViewer.SearchText.Text), Token);
+            //var matches = await TaskPriority<string[]>.Run(
+            //    PriorityScheduler.AboveNormal, ()=> _dataModel.FindMatches(_formViewer.SearchText.Text));
             
             await _formViewer.UiSyncContext;
             _formViewer.FolderListBox.DataSource = matches;

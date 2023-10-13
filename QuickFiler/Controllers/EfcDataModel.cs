@@ -23,7 +23,7 @@ namespace QuickFiler.Controllers
             if (Mail is not null)
             {
                 _conversationResolver = new ConversationResolver(_globals, Mail, tokenSource, token);
-                _conversationResolver.LoadDf(); // Load Synchronously
+                _conversationResolver.Df = _conversationResolver.LoadDf(); // Load Synchronously
                 //_ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItemsAsync(dfConvExp));
             }
         }
@@ -70,7 +70,7 @@ namespace QuickFiler.Controllers
                 if (_mailInfo is null && Mail is not null)
                 {
                     _mailInfo = new MailItemInfo(Mail);
-                    _mailInfo.LoadPriority();
+                    _mailInfo.LoadPriority(_token);
                 }
                 return _mailInfo;
             }

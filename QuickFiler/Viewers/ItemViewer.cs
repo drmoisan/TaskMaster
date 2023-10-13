@@ -19,6 +19,7 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitControlGroups();
         }
         
@@ -38,6 +39,9 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
+        
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         public void RemoveControlsColsRightOf(Control furthestRight)
         {
