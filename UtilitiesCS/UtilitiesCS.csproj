@@ -302,6 +302,13 @@
     <Compile Include="Extensions\ExtToChar.cs" />
     <Compile Include="HelperClasses\GenericBitwise.cs" />
     <Compile Include="HelperClasses\Initializer.cs" />
+    <Compile Include="HelperClasses\ProgressTracker.cs" />
+    <Compile Include="HelperClasses\ProgressViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HelperClasses\ProgressViewer.Designer.cs">
+      <DependentUpon>ProgressViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="HelperClasses\Theme.cs" />
     <Compile Include="HelperClasses\ThemeControlGroup.cs" />
     <Compile Include="Extensions\QueueExtensions.cs" />
@@ -464,6 +471,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\InputBoxViewer.resx">
       <DependentUpon>InputBoxViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HelperClasses\ProgressViewer.resx">
+      <DependentUpon>ProgressViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

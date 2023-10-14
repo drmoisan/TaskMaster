@@ -28,9 +28,11 @@ namespace QuickFiler.Controllers
                                  QfEnums.InitTypeEnum initType,
                                  System.Action parentCleanup,
                                  QfcHomeController parent,
+                                 CancellationTokenSource tokenSource,
                                  CancellationToken token)
         {
             _token = token;
+            _tokenSource = tokenSource;
             _globals = appGlobals;
             _initType = initType;
             _formViewer = formViewer;
@@ -189,6 +191,9 @@ namespace QuickFiler.Controllers
 
         private CancellationToken _token;
         public CancellationToken Token { get => _token; }
+
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; }
 
         #endregion
 
@@ -377,6 +382,7 @@ namespace QuickFiler.Controllers
                                                   InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
                                                   parent: this,
+                                                  tokenSource: TokenSource,
                                                   token: Token);
             _groups.LoadControlsAndHandlers_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
@@ -389,6 +395,7 @@ namespace QuickFiler.Controllers
                                                   InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
                                                   parent: this,
+                                                  tokenSource: TokenSource,
                                                   token: Token);
             await _groups.LoadControlsAndHandlersAsync_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }

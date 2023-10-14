@@ -54,7 +54,7 @@ namespace QuickFiler
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        public async Task RunAsync()
+        public async Task RunAsync(ProgressTracker progress = null)
         {
             if (_dataModel.Mail is not null)
             {

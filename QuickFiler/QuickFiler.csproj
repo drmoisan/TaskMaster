@@ -385,12 +385,6 @@
     <Compile Include="Viewers\EfcViewer3.Designer.cs">
       <DependentUpon>EfcViewer3.cs</DependentUpon>
     </Compile>
-    <Compile Include="Viewers\QfcLoadingProgress.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Viewers\QfcLoadingProgress.Designer.cs">
-      <DependentUpon>QfcLoadingProgress.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

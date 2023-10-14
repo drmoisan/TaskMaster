@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
@@ -47,9 +48,11 @@ namespace QuickFiler.Interfaces
         void ToggleConversationCheckbox(Enums.ToggleState desiredState);
         IQfcCollectionController Parent { get; }
         void PopulateConversation();
+        Task PopulateConversationAsync(CancellationTokenSource tokenSource, CancellationToken token, bool loadAll);
         //void PopulateConversation(DataFrame df);
         void PopulateConversation(int countOnly);
         void PopulateConversation(ConversationResolver resolver);
+        Task PopulateFolderComboboxAsync(CancellationToken token, object varList = null);
         void SetThemeDark(bool async);
         void SetThemeLight(bool async);
         void Cleanup();

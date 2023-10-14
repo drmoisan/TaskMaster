@@ -64,28 +64,29 @@ namespace UtilitiesCS
             return df;
         }
 
-        public static async Task<Frame<int, string>> GetEmailDataInViewAsync(Explorer activeExplorer, CancellationToken token, CancellationTokenSource tokenSource)
+        public static async Task<Frame<int, string>> GetEmailDataInViewAsync(Explorer activeExplorer, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress)
         {
             token.ThrowIfCancellationRequested();
             
-            logger.Debug($"{nameof(GetEmailDataInViewAsync)}: {activeExplorer.CurrentFolder.Name}");
+            //logger.Debug($"{nameof(GetEmailDataInViewAsync)}: {activeExplorer.CurrentFolder.Name}");
 
-            //logger.Debug($"Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
             Outlook.Table table = await activeExplorer.GetTableInViewAsync(token, 0);
             //table.EnumerateTable();
             var storeID = activeExplorer.CurrentFolder.StoreID;
 
-            //logger.Debug($"Calling {nameof(AddQfcColumnsAsync)} ...");
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(AddQfcColumnsAsync)} ...");
             await AddQfcColumnsAsync(table, token, 0);
 
-            //logger.Debug($"Calling {nameof(OlTableExtensions.EtlAsync)} ...");
-            (object[,] data, Dictionary<string, int> columnInfo) = await table.EtlAsync(token, tokenSource, 0);
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.EtlAsync)} ...");
+            (object[,] data, Dictionary<string, int> columnInfo) = await table.EtlAsync(token, tokenSource, 0, progress.Increment(2).SpawnChild(96));
 
-            //logger.Debug($"Calling {nameof(Array2DToDf)} ...");
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Array2DToDf)} ...");
             Frame<int, string> df = await Task.Factory.StartNew(() => Array2DToDf(storeID, data, columnInfo),
                 token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
 
-            logger.Debug($"{nameof(GetEmailDataInViewAsync)} complete");
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(GetEmailDataInViewAsync)} complete");
+            progress.Report(100);
             return df;
         }
 

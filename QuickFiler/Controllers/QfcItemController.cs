@@ -102,7 +102,7 @@ namespace QuickFiler.Controllers
                     if (_globals.Ol.DarkMode) { SetThemeDark(async: true); }
                     else { SetThemeLight(async: true); }
                 },_token),
-                PopulateControlsAsync(Mail, ItemNumber),
+                PopulateControlsAsync(Mail, ItemNumber, true),
                 ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force),
                 ToggleNavigationAsync(desiredState: Enums.ToggleState.Off),
                 Task.Run(()=>WireEvents()),
@@ -127,16 +127,15 @@ namespace QuickFiler.Controllers
             if (_globals.Ol.DarkMode) { SetThemeDark(async: true); }
             else { SetThemeLight(async: true); }
             
+            await PopulateControlsAsync(Mail, ItemNumber, false);
             
-            PopulateControls(Mail, ItemNumber);
-            ToggleTips(async: true, desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force);
-            ToggleNavigation(async: true, desiredState: Enums.ToggleState.Off);
+            await ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force);
+            //ToggleTips(async: true, desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force);
+            await ToggleNavigationAsync(desiredState: Enums.ToggleState.Off);
             WireEvents();
 
-            //var cr = new ConversationResolver(_globals, Mail);
-            //await cr.LoadDfAsync(_token, false);
-            var cr = await ConversationResolver.LoadAsync(_globals, Mail, _tokenSource, _token, false, SetTopicThread);
-            await PopulateConversationAsync(cr, _token, false);
+            //var cr = await ConversationResolver.LoadAsync(_globals, Mail, _tokenSource, _token, false, SetTopicThread);
+            //await PopulateConversationAsync(cr, _token, false);
                         
             _ = InitializeWebViewAsync();
 
@@ -336,11 +335,11 @@ namespace QuickFiler.Controllers
             //        _token);
         }
         
-        internal async Task PopulateControlsAsync(MailItem mailItem, int viewerPosition)
+        internal async Task PopulateControlsAsync(MailItem mailItem, int viewerPosition, bool loadAll)
         {
             _token.ThrowIfCancellationRequested();
 
-            _itemInfo = await MailItemInfo.FromMailItemAsync(mailItem, _token);
+            _itemInfo = await MailItemInfo.FromMailItemAsync(mailItem, _token, loadAll);
             
             AssignControls(_itemInfo, viewerPosition);
 
@@ -385,17 +384,20 @@ namespace QuickFiler.Controllers
             PopulateConversation(ConversationResolver.Count.SameFolder);
         }
 
-        public async Task PopulateConversationAsync(CancellationTokenSource tokenSource, CancellationToken token, bool backgroundLoad)
+        public async Task PopulateConversationAsync(CancellationTokenSource tokenSource, CancellationToken token, bool loadAll)
         {
-            ConversationResolver = await ConversationResolver.LoadAsync(_globals, Mail, tokenSource, token, backgroundLoad, SetTopicThread);
+            token.ThrowIfCancellationRequested();
+
+            ConversationResolver = await ConversationResolver.LoadAsync(_globals, Mail, tokenSource, token, loadAll, SetTopicThread);
+            await RenderConversationCountAsync(ConversationResolver.Count.SameFolder, token, loadAll);
         }
         
-        public async Task PopulateConversationAsync(ConversationResolver resolver, CancellationToken token, bool backgroundLoad)
+        public async Task PopulateConversationAsync(ConversationResolver resolver, CancellationToken token, bool loadAll)
         {
             token.ThrowIfCancellationRequested();
 
             ConversationResolver = resolver;
-            await RenderConversationCountAsync(ConversationResolver.Count.SameFolder, token, backgroundLoad);
+            await RenderConversationCountAsync(ConversationResolver.Count.SameFolder, token, loadAll);
         }
 
         /// <summary>
@@ -443,7 +445,7 @@ namespace QuickFiler.Controllers
                 token);
         }
 
-        public void PopulateFolderCombobox(object varList = null)
+        internal void LoadFolderHandler(object varList = null)
         {
             if (varList is null)
             {
@@ -455,6 +457,16 @@ namespace QuickFiler.Controllers
                 _fldrHandler = new FolderHandler(
                     _globals, varList, FolderHandler.InitOptions.FromArrayOrString);
             }
+        }
+
+        internal async Task LoadFolderHandlerAsync(object varList = null) 
+        { 
+            await Task.Factory.StartNew(()=>LoadFolderHandler(varList), _token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+        
+        public void PopulateFolderCombobox(object varList = null)
+        {
+            LoadFolderHandler(varList);
 
             UIThreadExtensions.UiDispatcher.BeginInvoke(()=>
             //_itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
@@ -463,6 +475,16 @@ namespace QuickFiler.Controllers
                 _itemViewer.CboFolders.SelectedIndex = 1;
             });
 
+        }
+
+        public async Task PopulateFolderComboboxAsync(CancellationToken token, object varList = null)
+        {
+            token.ThrowIfCancellationRequested();
+
+            await LoadFolderHandlerAsync(varList);
+
+            _itemViewer.CboFolders.Items.AddRange(_fldrHandler.FolderArray);
+            _itemViewer.CboFolders.SelectedIndex = 1;
         }
 
         public void Cleanup()
@@ -1154,14 +1176,14 @@ namespace QuickFiler.Controllers
 
         public void ToggleNavigation(bool async)
         {
-            _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(true)));
+            _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
             if (async)
             {
-                _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(true)));
+                _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
             }
             else
             {
-                _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(true)));
+                _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(false)));
             }
         }
 
@@ -1169,18 +1191,18 @@ namespace QuickFiler.Controllers
         {
             if (async)
             {
-                _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, true)));
+                _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, false)));
             }
             else
             {
-                _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, true)));
+                _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, false)));
             }
             
         }
 
         public async Task ToggleNavigationAsync(Enums.ToggleState desiredState)
         {
-            await _itemPositionTips.ToggleAsync(desiredState, true);
+            await _itemPositionTips.ToggleAsync(desiredState, false);
         }
 
         public void ToggleTips(bool async, Enums.ToggleState desiredState)
@@ -1188,10 +1210,10 @@ namespace QuickFiler.Controllers
             InvokeBeginInvoke(async, new System.Action(() => 
             { 
                 _tableLayoutPanels.ForEach(x => x.SuspendLayout());
-                ListTipsDetails.ForEach(x => x.Toggle(desiredState, shareColumn: true));
+                ListTipsDetails.ForEach(x => x.Toggle(desiredState, shareColumn: false));
                 if (_expanded || desiredState.HasFlag(Enums.ToggleState.Force))
                 { 
-                    ListTipsExpanded.ForEach(x => x.Toggle(desiredState, shareColumn: true)); 
+                    ListTipsExpanded.ForEach(x => x.Toggle(desiredState, shareColumn: false)); 
                 }
                 _tableLayoutPanels.ForEach(x => x.ResumeLayout());
             }));
@@ -1206,7 +1228,7 @@ namespace QuickFiler.Controllers
             
             foreach (var tip in ListTipsDetails)
             {
-                await tip.ToggleAsync(desiredState, shareColumn: true);
+                await tip.ToggleAsync(desiredState, shareColumn: false);
             }
             //await ListTipsExpanded.ToAsyncEnumerable().ForEachAsync(async x => await x.ToggleAsync(desiredState, shareColumn: true));
             //var tasks = ListTipsExpanded.Select(x => x.ToggleAsync(desiredState, shareColumn: true));
@@ -1216,7 +1238,7 @@ namespace QuickFiler.Controllers
             {
                 foreach (var tip in ListTipsExpanded)
                 {
-                    await tip.ToggleAsync(desiredState, shareColumn: true);
+                    await tip.ToggleAsync(desiredState, shareColumn: false);
                 }
                 //await ListTipsExpanded.ToAsyncEnumerable().ForEachAsync(async x => await x.ToggleAsync(desiredState, shareColumn: true));
                 //tasks = tasks.Concat(ListTipsExpanded.Select(x => x.ToggleAsync(desiredState, shareColumn: true)));

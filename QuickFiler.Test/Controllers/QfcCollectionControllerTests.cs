@@ -52,6 +52,7 @@ namespace QuickFiler.Test.Controllers
                 QfEnums.InitTypeEnum.Sort,
                 this.mockHomeController.Object,
                 this.mockQfcFormController.Object,
+                this.tokenSource,
                 this.token);
         }
 

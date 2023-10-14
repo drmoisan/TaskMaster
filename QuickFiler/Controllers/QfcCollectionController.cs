@@ -25,9 +25,11 @@ namespace QuickFiler.Controllers
                                        QfEnums.InitTypeEnum InitType,
                                        IFilerHomeController homeController,
                                        IFilerFormController parent,
+                                       CancellationTokenSource tokenSource,
                                        CancellationToken token)
         {
             _token = token;
+            _tokenSource = tokenSource;
             _formViewer = viewerInstance;
             _itemTlp = _formViewer.L1v0L2L3v_TableLayout;
             _itemPanel = _formViewer.L1v0L2_PanelMain;
@@ -73,6 +75,9 @@ namespace QuickFiler.Controllers
 
         private CancellationToken _token;
         public CancellationToken Token { get => _token; set => _token = value; }
+
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
 
         public int EmailsLoaded => _itemGroups.Count;
 
@@ -186,7 +191,7 @@ namespace QuickFiler.Controllers
             CaptureTlpTemplate();
 
             // Load the Item Viewers, Item Controllers, and Initialize
-            await LoadGroups_02(listMailItems, template);
+            await LoadGroups_02b(listMailItems, template);
             //LoadItemGroupsAndViewers_02(listMailItems, template);
             WireUpAsyncKeyboardHandler();
             //await LoadConversationsAndFoldersAsync();
@@ -198,25 +203,76 @@ namespace QuickFiler.Controllers
 
         }
 
-        public async Task LoadGroups_02(IList<MailItem> items, RowStyle template) 
+        public async Task LoadGroups_02b(IList<MailItem> items, RowStyle template) 
         {
             //_itemGroups = new List<QfcItemGroup>();
             _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
-            _itemGroups = await items.ToAsyncEnumerable()
-                               .SelectAwait((mailItem, i) => LoadGroup_03(template, mailItem, i))
-                               .ToListAsync();
+            
+            var grpTasks = items.Select((mailItem, i) => LoadGroup_03b(template, mailItem, i)).ToList();
+
+            await Task.WhenAll(grpTasks);
+
+            _itemGroups = grpTasks.Select(x => x.Result).ToList();
             //var tmp = items.ToAsyncEnumerable().Select((mailItem, i) => LoadGroup_03(template, mailItem, i)).ToListAsync();
                            
         }
 
+        //public async Task LoadGroups_02(IList<MailItem> items, RowStyle template)
+        //{
+        //    //_itemGroups = new List<QfcItemGroup>();
+        //    _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
+        //    _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+        //    _itemGroups = await items.ToAsyncEnumerable()
+        //                       .SelectAwait((mailItem, i) => LoadGroup_03(template, mailItem, i))
+        //                       .ToListAsync();
+        //    //var tmp = items.ToAsyncEnumerable().Select((mailItem, i) => LoadGroup_03(template, mailItem, i)).ToListAsync();
+
+        //}
+
+        private Task<QfcItemGroup> LoadGroup_03b(RowStyle template, MailItem mailItem, int i)
+        {
+            var ui = TaskScheduler.FromCurrentSynchronizationContext();
+
+            var grpTask = Task.Factory.StartNew(() =>
+            {
+                var grp = new QfcItemGroup(mailItem);
+                grp.ItemViewer = LoadItemViewer_03(i, template, true);
+                return grp;
+            }, Token, TaskCreationOptions.None, ui);
+            
+            var grpTask2 = grpTask.ContinueWith(async x =>
+            {
+                var grp = x.Result;
+                grp.ItemController = await QfcItemController.CreateSequentialAsync(
+                    _globals, _homeController, this, grp.ItemViewer, i + 1, grp.MailItem, Token);
+                return grp;
+            }, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui).Unwrap();
+            
+            var grpTask3 = grpTask2.ContinueWith(x => 
+            {
+                var grp = x.Result;
+                //var tasks = new List<Task>
+                //{
+                //    grp.ItemController.PopulateConversationAsync(TokenSource, Token, false),
+                //    Task.Run(() => grp.ItemController.PopulateConversation()),
+                //    Task.Run(() => grp.ItemController.PopulateFolderCombobox()),
+                //};
+                Task.Factory.StartNew(() => grp.ItemController.PopulateConversationAsync(TokenSource, Token, false), Token, TaskCreationOptions.AttachedToParent, ui);
+                Task.Factory.StartNew(() => grp.ItemController.PopulateFolderComboboxAsync(Token), Token, TaskCreationOptions.AttachedToParent, ui);
+                //Task.Factory.StartNew(() =>
+                //{
+                //    if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
+                //    else { grp.ItemController.SetThemeLight(async: true); }
+                //}, Token, TaskCreationOptions.AttachedToParent, ui);
+                return grp;
+            }, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui);
+            
+            return grpTask3;
+        }
+
         private async ValueTask<QfcItemGroup> LoadGroup_03(RowStyle template, MailItem mailItem, int i)
         {
-            //var grpTask = Task.Factory.StartNew(() => 
-            //{ 
-                
-            //});
-
             var grp = new QfcItemGroup(mailItem);
             grp.ItemViewer = LoadItemViewer_03(i, template, true);
             grp.ItemController = await QfcItemController.CreateSequentialAsync(_globals,
@@ -226,18 +282,6 @@ namespace QuickFiler.Controllers
             else { grp.ItemController.SetThemeLight(async: true); }
             return grp;
         }
-
-        //private async ValueTask<QfcItemGroup> LoadGroup_03(RowStyle template, MailItem mailItem, int i)
-        //{
-        //    var grp = new QfcItemGroup(mailItem);
-        //    grp.ItemViewer = LoadItemViewer_03(i, template, true);
-        //    grp.ItemController = await QfcItemController.CreateSequentialAsync(_globals,
-        //        _homeController, this, grp.ItemViewer, i + 1, grp.MailItem, Token);
-        //    grp.ItemController.PopulateFolderCombobox();
-        //    if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
-        //    else { grp.ItemController.SetThemeLight(async: true); }
-        //    return grp;
-        //}
 
         public void LoadItemGroupsAndViewers_02(IList<MailItem> items, RowStyle template)
         {

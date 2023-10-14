@@ -26,6 +26,7 @@ namespace TaskMaster
         private bool blHook = true;
         private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
         private IFilerHomeController _quickFiler;
+        private bool _quickFilerLoaded = false;
 
         public RibbonController() { }
 
@@ -86,18 +87,10 @@ namespace TaskMaster
 
         internal async Task LoadQuickFilerAsync()
         {
-            bool loaded = false;
-            if (_quickFiler is not null)
-                loaded = _quickFiler.Loaded;
-            if (loaded == false)
+            if (!_quickFilerLoaded)
             {
-                if (SynchronizationContext.Current is null)
-                {
-                    SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
-                }
-                _quickFiler = await QuickFiler.Controllers.QfcHomeController.CreateAsync(_globals, ReleaseQuickFiler);
-                await _quickFiler.RunAsync();
-                
+                _quickFilerLoaded = true;
+                _quickFiler = await QuickFiler.Controllers.QfcHomeController.LaunchAsync(_globals, ReleaseQuickFiler);
             }
         }
 
@@ -109,6 +102,7 @@ namespace TaskMaster
         private void ReleaseQuickFiler()
         {
             _quickFiler = null;
+            _quickFilerLoaded = false;
         }
 
         internal void ReviseProjectInfo()

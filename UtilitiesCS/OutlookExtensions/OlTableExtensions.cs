@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+//using System.Web.UI;
+//using System.Web.UI.WebControls;
 using Deedle.Internal;
 using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
@@ -237,9 +239,10 @@ namespace UtilitiesCS
         /// object in the column into string representation</param>
         /// <returns>2D object array with string data</returns>
         public static (object[,] data, Dictionary<string, int> columnInfo) ETL(this Outlook.Table table,
-                                                                               Dictionary<string, Func<object, string>> objectConverters = null)
+                                                                               Dictionary<string, Func<object, string>> objectConverters = null,
+                                                                               ProgressTracker progress = null)
         {
-            //logger.Debug($"Calling {nameof(GetColumnDictionary)} ...");
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
             var columnDictionary = table.GetColumnDictionary();
             object[,] data = null;
             
@@ -249,8 +252,8 @@ namespace UtilitiesCS
                (objectConverters is not null && 
                objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
             {
-                //logger.Debug($"Calling {nameof(EtlByRow)} ...");
-                data = EtlByRow(table, objectConverters, columnDictionary);
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
+                data = EtlByRow(table, objectConverters, columnDictionary, progress);
             }
             else { data = (object[,])table.GetArray(table.GetRowCount()); }
             return (data, columnDictionary);
@@ -261,6 +264,7 @@ namespace UtilitiesCS
             CancellationToken token,
             CancellationTokenSource tokenSource,
             int counter,
+            ProgressTracker progress,
             Dictionary<string, Func<object, string>> objectConverters = null)
         {
             token.ThrowIfCancellationRequested();
@@ -271,15 +275,15 @@ namespace UtilitiesCS
             object[,] data = null;
             Dictionary<string, int> columnInfo = null;
 
-            //logger.Debug($"Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
             try
             {
-                (data, columnInfo) = await Task.Factory.StartNew(() => table.ETL(objectConverters),
+                (data, columnInfo) = await Task.Factory.StartNew(() => table.ETL(objectConverters, progress),
                     token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(milliseconds, attempts);
             }
             catch (TimeoutException)
             {
-                logger.Error($"{nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling");
+                logger.Error($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling");
                 tokenSource.Cancel();
             }
             
@@ -296,51 +300,94 @@ namespace UtilitiesCS
         /// object in the column into string representation</param>
         /// <param name="columnDictionary">Dictionary with column indices and column names</param>
         /// <returns>2D object array with string data</returns>
-        private static object[,] EtlByRow(Table table, Dictionary<string, Func<object, string>> objectConverters, Dictionary<string, int> columnDictionary)
+        private static object[,] EtlByRow(Table table, Dictionary<string, Func<object, string>> objectConverters, Dictionary<string, int> columnDictionary, ProgressTracker progress = null)
         {
-            //logger.Debug($"Setting up EtlByRow");
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
             
-            // Get the column headers of the binary fields
-            var binFields = BinaryToStringFields.Where(x => columnDictionary.ContainsKey(x));
-            
-            // Get the indices of the binary fields
-            var binIndices = binFields.Select(x => columnDictionary[x]).OrderBy(x => x);
-
+            (var binFields, var binIndices) = GetBinFields(columnDictionary);
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
+            var rows = table.CastToRowArray(progress?.SpawnChild(65));
+            
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
 
-            // Cast the table to an IEnumerable of Outlook.Row
-            //logger.Debug($"Casting {nameof(Outlook.Table)} to IEnumerable<{nameof(Outlook.Row)}");
-            var rows = table.GetRows().ToArray();
+            var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
+            var data = jagged.To2D();
 
-            //logger.Debug($"Converting rows to jagged array of object[]");
-            var query = Enumerable.Range(0, rows.Count());
-            if (rows is not null && rows.Count() > 200)
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
+            return data;
+        }
+
+        private static object[][] EtlByRow(this Row[] rows, 
+                                           Dictionary<string, Func<object, string>> objectConverters,
+                                           IOrderedEnumerable<int>binIndices,
+                                           IEnumerable<string>objFields,
+                                           IEnumerable<int>objIndices,
+                                           ProgressTracker progress) 
+        {
+            int completed = 0;
+            int rowCount = rows.Count();
+            var query = Enumerable.Range(0, rowCount);
+            if (rows is not null && rowCount > 200)
             {
                 query = query.AsParallel();
             }
-            var jagged = query.Select(i => EtlRow(rows.ElementAt(i), 
-                                                  objectConverters, 
-                                                  columnDictionary, 
-                                                  binIndices, 
-                                                  objFields, 
-                                                  objIndices, 
-                                                  i)).ToArray();
-            //logger.Debug($"Converting jagged array of object[] to 2D object array");
-            var data = jagged.To2D();
+            var query2 = query.Select(i => EtlRow(ref completed,
+                                                  rows[i],
+                                                  objectConverters,
+                                                  binIndices,
+                                                  objFields,
+                                                  objIndices));
 
-            // Create the data array to hold the extracted data
-            // var data = new object[table.GetRowCount(), columnDictionary.Count];
-            //
-            // Iterate over each row in the Outlook.Table
-            // int rowNumber = -1;//
-            //while (!table.EndOfTable)
-            //{
-            //    logger.Debug($"Getting row {rowNumber}");
-            //    Outlook.Row row = table.GetNextRow();
-            //    EtlRow(ref data, row, objectConverters, columnDictionary, binIndices, objFields, objIndices, ++rowNumber);
-            //}
+            object[][] jagged;
+            
+            if (progress is null)
+            {
+                jagged = query2.ToArray();
+            }
+            else
+            {
+                using (new Timer(
+                _ => progress.Report((int)((double)completed / rowCount), $"Etl row {completed} of {rowCount}"), null, 0, 500))
+                {
+                    jagged = query2.ToArray();
+                }
+            }
+            
+            return jagged;
+            //return new object[][] { };
+        }
 
-            return data;
+
+        private static (IEnumerable<string>, IOrderedEnumerable<int>) GetBinFields(Dictionary<string, int> columnDictionary) 
+        {
+            // Get the column headers of the binary fields
+            var binFields = BinaryToStringFields.Where(x => columnDictionary.ContainsKey(x));
+
+            // Get the indices of the binary fields
+            var binIndices = binFields.Select(x => columnDictionary[x]).OrderBy(x => x);
+
+            return (binFields, binIndices);
+        }
+
+        private static Row[] CastToRowArray(this Table table, ProgressTracker progress) 
+        {
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Casting {nameof(Outlook.Table)} to IEnumerable<{nameof(Outlook.Row)}");
+            Row[] rows;
+            var rowCount = table.GetRowCount();
+            int completed = 0;
+            if (progress is not null)
+            {
+                progress.Report(0, $"Capturing email table rows {(int)((double)completed*(double)rowCount/100)} of {rowCount}");
+                using (new Timer(_ => progress.Report(
+                    completed, 
+                    $"Capturing email table rows {(int)((double)completed * (double)rowCount / 100)} of {rowCount}"), 
+                    null, 0, 500))
+                {
+                    rows = table.GetRows().WithProgressReporting(rowCount, (x) => completed = x).ToArray();
+                }
+            }
+            else { rows = table.GetRows().ToArray(); }
+            return rows;
         }
 
         /// <summary>
@@ -396,18 +443,19 @@ namespace UtilitiesCS
             WriteValuesToData(ref data, columnDictionary, binIndices, rowNumber, binStrings, objIndices, objStrings, rawValues);
         }
 
-        private static object[] EtlRow(Outlook.Row row,
-                                   Dictionary<string, Func<object, string>> objectConverters,
-                                   Dictionary<string, int> columnDictionary,
-                                   IOrderedEnumerable<int> binIndices,
-                                   IEnumerable<string> objFields,
-                                   IEnumerable<int> objIndices,
-                                   int rowNumber)
+        private static object[] EtlRow(ref int rowsCompleted,
+                                       Outlook.Row row,
+                                       Dictionary<string, Func<object, string>> objectConverters,
+                                       IOrderedEnumerable<int> binIndices,
+                                       IEnumerable<string> objFields,
+                                       IEnumerable<int> objIndices)
         {
             object[] rawValues = (object[])row.GetValues();
             var binStrings = ConvertBinColumnsToString(row, binIndices);
             var objStrings = ConvertObjectColumnsToString(row, objIndices, objFields, objectConverters);
-            return rawValues.ToObjectRow(binIndices, binStrings, objIndices, objStrings);
+            var objectRow = rawValues.ToObjectRow(binIndices, binStrings, objIndices, objStrings);
+            Interlocked.Increment(ref rowsCompleted);
+            return objectRow;
         }
 
         /// <summary>
@@ -447,7 +495,6 @@ namespace UtilitiesCS
         {
             if (binIndices is not null) { binIndices.ForEach(i => rawValues[i] = binStrings[i]); }
             if (objIndices is not null) { objIndices.ForEach(i => rawValues[i] = objStrings[i]); }
-
             //logger.Debug(rawValues.Select(x => (x ?? "null").ToString()).SentenceJoin());
             return rawValues;
         }

@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Threading;
 using static Deedle.FrameBuilder;
+using log4net.Repository.Hierarchy;
 //using static UtilitiesCS.OlItemSummary;
 
 
@@ -25,6 +26,9 @@ namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private QfcDatamodel(IApplicationGlobals appGlobals) 
         { 
             _globals = appGlobals;
@@ -41,12 +45,17 @@ namespace QuickFiler.Controllers
             _frame = InitDf(_activeExplorer);
         }
 
-        public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource) 
-        { 
+        public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress) 
+        {
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
+            progress.Report(0, "Initializing Data Model");
+
             var model = new QfcDatamodel(appGlobals);
             model.Token = token;
             model.TokenSource = tokenSource;
-            await model.InitDfAsync(appGlobals.Ol.App.ActiveExplorer()).ConfigureAwait(false);
+
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
+            await model.InitDfAsync(appGlobals.Ol.App.ActiveExplorer(), progress.Increment(2)).ConfigureAwait(false);
             return model;
         }
 
@@ -245,40 +254,58 @@ namespace QuickFiler.Controllers
             
         }
 
-        public async Task InitDfAsync(Explorer activeExplorer)
+        /// <summary>
+        /// If Outlook is not in offline mode, save the state and toggle it to offline mode
+        /// </summary>
+        /// <param name="offline"></param>
+        /// <returns></returns>
+        private async Task<bool> ToggleOfflineMode(bool offline)
         {
-            bool offline = _globals.Ol.NamespaceMAPI.Offline;
-            var commandBars = activeExplorer.CommandBars;
-
             if (!offline)
             {
-                //Press CommandBars MSO for offline mode
-                commandBars.ExecuteMso("ToggleOnline");
+                var commandBars = _activeExplorer.CommandBars;
+                if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+                await Task.Delay(5);
             }
-            await Task.Delay(200);
-            Frame<int, string> df = null;
+            return offline;
+        }
+
+        public async Task InitDfAsync(Explorer activeExplorer, ProgressTracker progress)
+        {
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
+
+            var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
             
+            Frame<int, string> df = null;
+                        
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
             try
             {
-                df = await DfDeedle.GetEmailDataInViewAsync(activeExplorer, Token, TokenSource);
+                df = await DfDeedle.GetEmailDataInViewAsync(
+                    activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
+                    .ConfigureAwait(false);
             }
             catch (System.Exception e)
             {
-                if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+                await ToggleOfflineMode(offline);
                 throw e;
             }
 
-            if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+            // Restore online mode if it was previously so
+            await ToggleOfflineMode(offline);
 
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
             // Filter out non-email items
             df = df.FilterRowsBy("MessageClass", "IPM.Note");
-            //df.Display(new List<string> { "RowKey" });
+            
             // Filter to the latest email in each conversation
             var dfFiltered = MostRecentByConversation(df);
 
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
             // Sort by triage classification and then date
             _frame = SortTriageDate(dfFiltered);
 
+            progress.Report(100);
         }
 
         public Frame<int, string> SortTriageDate(Frame<int, string> df)

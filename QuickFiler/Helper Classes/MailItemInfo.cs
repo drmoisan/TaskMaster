@@ -77,9 +77,10 @@ namespace QuickFiler
             return info;
         }
 
-        public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, CancellationToken token)
+        public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, CancellationToken token, bool loadAll)
         {
             token.ThrowIfCancellationRequested();
+
             var info = new MailItemInfo(item);
             if (item is null) { throw new ArgumentNullException(); }
             info.EntryId = item.EntryID;
@@ -93,10 +94,11 @@ namespace QuickFiler
             info.ConversationIndex = item.ConversationIndex;
             info.UnRead = item.UnRead;
             info.IsTaskFlagSet = (item.FlagStatus == OlFlagStatus.olFlagMarked || item.FlagStatus == OlFlagStatus.olFlagComplete);
-            await Task.Factory.StartNew(() => info.LoadRecipients(),
-                                              token,
-                                              TaskCreationOptions.LongRunning,
-                                              TaskScheduler.Default);
+            var recipientTask = Task.Factory.StartNew(() => info.LoadRecipients(),
+                                                      token,
+                                                      TaskCreationOptions.LongRunning,
+                                                      TaskScheduler.Default);
+            if (loadAll) { await recipientTask; }
                                               
             return info;
         }

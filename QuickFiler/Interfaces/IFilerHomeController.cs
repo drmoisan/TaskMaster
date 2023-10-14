@@ -2,6 +2,7 @@ using System;
 using ToDoModel;
 using System.Threading.Tasks;
 using System.Threading;
+using UtilitiesCS;
 
 namespace QuickFiler.Interfaces
 {
@@ -10,7 +11,7 @@ namespace QuickFiler.Interfaces
         #region Constructors, Initializers, and Destructors
         
         void Run();
-        Task RunAsync();
+        Task RunAsync(ProgressTracker progress);
         void Cleanup();
         
         #endregion
