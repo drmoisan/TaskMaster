@@ -21,7 +21,6 @@ namespace QuickFiler.Controllers
 
         public QfcCollectionController(IApplicationGlobals AppGlobals,
                                        QfcFormViewer viewerInstance,
-                                       bool darkMode,
                                        QfEnums.InitTypeEnum InitType,
                                        IFilerHomeController homeController,
                                        IFilerFormController parent,
@@ -38,7 +37,7 @@ namespace QuickFiler.Controllers
             _homeController = homeController;
             _kbdHandler = _homeController.KeyboardHndlr;
             _parent = parent;
-            SetupLightDark(darkMode);
+            SetupLightDark(_globals.Ol.DarkMode);
         }
 
         #endregion
@@ -177,6 +176,8 @@ namespace QuickFiler.Controllers
 
         public async Task LoadControlsAndHandlersAsync_01(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
         {
+            Token.ThrowIfCancellationRequested();
+
             // Freeze the form while loading controls
             _formViewer.SuspendLayout();
             var tlpState = TlpLayout;
@@ -205,6 +206,8 @@ namespace QuickFiler.Controllers
 
         public async Task LoadGroups_02b(IList<MailItem> items, RowStyle template) 
         {
+            Token.ThrowIfCancellationRequested();
+
             //_itemGroups = new List<QfcItemGroup>();
             _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
@@ -231,7 +234,7 @@ namespace QuickFiler.Controllers
         //}
 
         private Task<QfcItemGroup> LoadGroup_03b(RowStyle template, MailItem mailItem, int i)
-        {
+        {   
             var ui = TaskScheduler.FromCurrentSynchronizationContext();
 
             var grpTask = Task.Factory.StartNew(() =>

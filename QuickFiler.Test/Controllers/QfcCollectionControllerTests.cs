@@ -48,7 +48,6 @@ namespace QuickFiler.Test.Controllers
             return new QfcCollectionController(
                 this.mockApplicationGlobals.Object,
                 this.formViewer, //.Object,
-                false,
                 QfEnums.InitTypeEnum.Sort,
                 this.mockHomeController.Object,
                 this.mockQfcFormController.Object,

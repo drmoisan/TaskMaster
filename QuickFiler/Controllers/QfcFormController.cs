@@ -93,8 +93,8 @@ namespace QuickFiler.Controllers
             TableLayoutHelper.RemoveSpecificRow(tlp, 0, 2);
 
             var count = ItemsPerIteration;
-            //_itemsPerIteration = 1;
-            //count = 1;
+            _itemsPerIteration = 1;
+            count = 1;
             tlp.InsertSpecificRow(0, _rowStyleTemplate, count);
             tlp.MinimumSize = new System.Drawing.Size(
                 tlp.MinimumSize.Width,
@@ -272,23 +272,11 @@ namespace QuickFiler.Controllers
                     if (await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_groups.ReadyForMove))
                     {
                         _blRunningModalCode = true;
-                        
+
                         if (_parent.KeyboardHndlr.KbdActive) { _parent.KeyboardHndlr.ToggleKeyboardDialog(); }
 
-                        if (_qfcQueue.Count > 0) 
-                        {
-                            (var tlp, var itemGroups) = _qfcQueue.Dequeue();
-                            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
-                        }
-                        else 
-                        { 
-                            _groups.CacheMoveObjects(); 
-                        }
-                        _parent.SwapStopWatch();
-                        _ = BackGroundMove();
-                        _ = _parent.IterateQueueAsync();
+                        await MoveAndIterate();
 
-                        //_blSuppressEvents = false;
                         _blRunningModalCode = false;
                     }
                 }
@@ -303,6 +291,27 @@ namespace QuickFiler.Controllers
                     $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been "+
                     $"implemented for {nameof(_initType)} {_initType}");
             }
+        }
+
+        private async Task MoveAndIterate()
+        {
+            if (_qfcQueue.Count > 0)
+            {
+                (var tlp, var itemGroups) = _qfcQueue.Dequeue();
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
+                
+                _parent.SwapStopWatch();
+                _ = BackGroundMove();
+            }
+            else
+            {
+                _groups.CacheMoveObjects();
+                _parent.SwapStopWatch();
+                _ = BackGroundMove();
+
+            }
+            
+            _ = _parent.IterateQueueAsync();
         }
 
         internal async Task BackGroundMove()
@@ -378,7 +387,6 @@ namespace QuickFiler.Controllers
         {            
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
-                                                  darkMode: _globals.Ol.DarkMode,
                                                   InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
                                                   parent: this,
@@ -389,9 +397,10 @@ namespace QuickFiler.Controllers
 
         public async Task LoadItemsAsync(IList<MailItem> listObjects)
         {
+            Token.ThrowIfCancellationRequested();
+
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
-                                                  darkMode: Properties.Settings.Default.DarkMode,
                                                   InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
                                                   parent: this,

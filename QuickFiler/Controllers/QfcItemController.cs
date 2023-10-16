@@ -284,6 +284,8 @@ namespace QuickFiler.Controllers
                             .Select(x => (Button)x)
                             .ToList();
 
+
+
         }
 
         internal async Task ResolveControlGroupsAsync(ItemViewer itemViewer)
@@ -361,8 +363,10 @@ namespace QuickFiler.Controllers
             if (itemInfo.IsTaskFlagSet) { _itemViewer.BtnFlagTask.DialogResult = DialogResult.OK; }
             else { _itemViewer.BtnFlagTask.DialogResult = DialogResult.Cancel; }
             _itemViewer.LblItemNumber.Text = viewerPosition.ToString();
+            
             _optionEmailCopy = _itemViewer.CbxEmailCopy.Checked;
             _optionAttachments = _itemViewer.CbxAttachments.Checked;
+            _optionConversationChecked = _itemViewer.CbxConversation.Checked;
         }
 
         /// <summary>
@@ -822,13 +826,13 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
-        private bool _cbxConversationChecked;
+        private bool _optionConversationChecked;
         internal void CbxConversation_CheckedChanged(object sender, EventArgs e)
         {
-            _cbxConversationChecked = _itemViewer.CbxConversation.Checked;
+            _optionConversationChecked = _itemViewer.CbxConversation.Checked;
             if (!SuppressEvents)
             {
-                if (_cbxConversationChecked) { CollapseConversation(); }
+                if (_optionConversationChecked) { CollapseConversation(); }
                 else { EnumerateConversation(); }
             }
         }
@@ -879,6 +883,17 @@ namespace QuickFiler.Controllers
                 _itemViewer.CboFolders.Focus();
                 e.SuppressKeyPress = true;
                 e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.Return)
+            {
+                if(_itemViewer.CboFolders.DroppedDown == true)
+                {
+                    _itemViewer.CboFolders.DroppedDown = false;
+                }
+                else
+                {
+                    _kbdHandler.KeyboardHandler_KeyDownAsync(sender, e);
+                }
             }
             else
             {
@@ -1367,7 +1382,7 @@ namespace QuickFiler.Controllers
             if (Mail is not null)
             {
                 IList<MailItem> selItems = PackageItems();
-                bool attchments = (SelectedFolder != "Trash to Delete") ? false : _optionAttachments;
+                bool attachments = (SelectedFolder == "Trash to Delete") ? false : _optionAttachments;
 
                 //await SortEmail.RunAsync(mailItems: selItems,
                 //                         savePictures: false,
@@ -1382,7 +1397,7 @@ namespace QuickFiler.Controllers
                                          savePictures: false,
                                          destinationOlStem: SelectedFolder,
                                          saveMsg: _optionEmailCopy,
-                                         saveAttachments: attchments,
+                                         saveAttachments: attachments,
                                          removePreviousFsFiles: false,
                                          appGlobals: _globals,
                                          olAncestor: _globals.Ol.ArchiveRootPath,
@@ -1394,7 +1409,7 @@ namespace QuickFiler.Controllers
 
         internal IList<MailItem> PackageItems()
         {
-            return _cbxConversationChecked ? ConversationResolver.ConversationItems.SameFolder : new List<MailItem> { Mail };
+            return _optionConversationChecked ? ConversationResolver.ConversationItems.SameFolder : new List<MailItem> { Mail };
         }
                
         public void FlagAsTask()

@@ -94,8 +94,6 @@ namespace QuickFiler.Controllers
             _datamodel = await dataModelTask;
         }
 
-        private ProgressViewer _progressViewer;
-        ProgressTracker _progress;
         private IApplicationGlobals _globals;
         private QfcQueue _qfcQueue;
         private System.Action _parentCleanup;
@@ -160,7 +158,7 @@ namespace QuickFiler.Controllers
 
         public async Task IterateQueueAsync()
         {
-            if (this.Token.IsCancellationRequested) { throw new OperationCanceledException();}
+            Token.ThrowIfCancellationRequested();
 
             try
             {

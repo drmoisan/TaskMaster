@@ -126,7 +126,7 @@ namespace QuickFiler.Helper_Classes
             var convInfoSameFolder = convInfoExpanded.Where(
                 itemInfo => itemInfo.Folder == ((Folder)_mailItem.Parent).Name).ToList();
 
-            return new Pair<List<MailItemInfo>>(convInfoExpanded, convInfoSameFolder);
+            return new Pair<List<MailItemInfo>>(sameFolder: convInfoSameFolder, expanded: convInfoExpanded);
             
         }
         public async Task<Pair<List<MailItemInfo>>> LoadConversationInfoAsync(CancellationToken token, bool backgroundLoad)
@@ -155,7 +155,7 @@ namespace QuickFiler.Helper_Classes
             var convInfoSameFolder = convInfoExpanded.Where(
                 itemInfo => itemInfo.Folder == ((Folder)_mailItem.Parent).Name).ToList();
 
-            var pair = new Pair<List<MailItemInfo>>(convInfoSameFolder, convInfoExpanded);
+            var pair = new Pair<List<MailItemInfo>>(sameFolder: convInfoSameFolder, expanded: convInfoExpanded);
             ConversationInfo = pair;
             return pair;
         }
@@ -174,7 +174,7 @@ namespace QuickFiler.Helper_Classes
         {
             var sameFolder = ConversationInfo.SameFolder.Select(itemInfo => itemInfo.Item).ToList();
             var expanded = ConversationInfo.Expanded.Select(itemInfo => itemInfo.Item).ToList();
-            return new Pair<IList<MailItem>>(sameFolder, expanded);
+            return new Pair<IList<MailItem>>(sameFolder: sameFolder, expanded: expanded);
         }
         public async Task LoadConversationItemsAsync(CancellationToken token, bool backgroundLoad)
         {
@@ -197,7 +197,8 @@ namespace QuickFiler.Helper_Classes
         public Pair<DataFrame> Df
         {
             get => Initializer.GetOrLoad(ref _df, LoadDf, DfNotifyIfNotNull, false, _mailItem);
-            set => _df = value;
+            set => Initializer.SetAndSave(ref _df, value, (x) => NotifyPropertyChanged(nameof(Df)));
+            //set => _df = value;
         }
 
         internal Pair<DataFrame> LoadDf() 
@@ -221,7 +222,7 @@ namespace QuickFiler.Helper_Classes
             //Console.WriteLine(((Folder)_mailItem.Parent).Name);
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
             
-            return new Pair<DataFrame>(dfSameFolder, dfExpanded); 
+            return new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded); 
             
         }
         internal void DfNotifyIfNotNull(Pair<DataFrame> df)
@@ -236,7 +237,7 @@ namespace QuickFiler.Helper_Classes
             var dfRaw = await _mailItem.GetConversationDfAsync(Token).ConfigureAwait(false);
             var dfExpanded = dfRaw.FilterConversation(((Folder)_mailItem.Parent).Name, false, true);
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
-            Df = new Pair<DataFrame>(dfSameFolder, dfExpanded);
+            Df = new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
             
             
         }
