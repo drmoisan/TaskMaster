@@ -160,10 +160,19 @@ namespace QuickFiler.Controllers
         {
             Token.ThrowIfCancellationRequested();
 
+            if (_datamodel.Complete) { return; }
             try
             {
                 var listObjects = await _datamodel.DequeueNextItemGroupAsync(_formController.ItemsPerIteration, 2000);
-                await _qfcQueue.EnqueueAsync(listObjects, _globals, this, _formController.Groups).ConfigureAwait(false);
+                if (listObjects.Count > 0)
+                {
+                    await _qfcQueue.EnqueueAsync(listObjects, _globals, this, _formController.Groups).ConfigureAwait(false);
+                }
+                else 
+                { 
+                    logger.Debug($"{nameof(IterateQueueAsync)} completed");
+                    await _qfcQueue.CompleteAddingAsync(Token, 10000);
+                }
             }
             catch (OperationCanceledException)
             {

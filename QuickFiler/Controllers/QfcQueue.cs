@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -17,7 +18,11 @@ namespace QuickFiler.Controllers
     {
         public QfcQueue(CancellationToken token) { _token = token; }
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private CancellationToken _token;
+        private int jobsRunning = 0;
 
         private TableLayoutPanel _tlpTemplate;
         public TableLayoutPanel TlpTemplate 
@@ -30,19 +35,85 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private Queue<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue = new();
+        private BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue = 
+            new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(
+                new ConcurrentQueue<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(),4);
         //public Queue<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> Queue { get => _queue; }
 
         #region Queue Functions
 
+        public async Task CompleteAddingAsync(CancellationToken token, int timeout) 
+        { 
+            CancellationTokenSource functionTimeoutSource = new CancellationTokenSource(timeout);
+            CancellationTokenSource linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, functionTimeoutSource.Token);
+
+            try
+            {
+                while (jobsRunning > 0)
+                {
+                    logger.Debug($"{nameof(CompleteAddingAsync)} waiting for {jobsRunning} jobs to complete");
+                    await Task.Delay(100, linkedTokenSource.Token);
+                }
+                _queue.CompleteAdding();
+            }
+            catch (OperationCanceledException e)
+            {
+                if (!token.IsCancellationRequested) { logger.Debug($"{nameof(CompleteAddingAsync)} timed out after {timeout} milliseconds"); }
+                throw e;
+            }
+            
+        }
+        
         public (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) Dequeue()
         {
-            (TableLayoutPanel tlp, List<QfcItemGroup> itemGroups) = _queue.Dequeue();
+            (TableLayoutPanel tlp, List<QfcItemGroup> itemGroups) = _queue.Take();
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
             return (tlp, itemGroups);
         }
 
-        
+        public async Task<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> TryDequeueAsync(CancellationToken token, int timeout)
+        {
+            token.ThrowIfCancellationRequested();
+
+            if (_queue.Count == 0 && jobsRunning == 0) 
+            {
+                logger.Debug($"{nameof(TryDequeueAsync)} attempted with no jobs running and nothing in the queue. Returning default.");
+                return default; 
+            }
+
+            var functionTimeoutSource = new CancellationTokenSource(timeout);
+            var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, functionTimeoutSource.Token);
+            
+            int queueTimeout = Math.Min(timeout, 100);
+            int pollInterval = 100;
+
+            (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) result = default;
+            try 
+            {
+                while (!_queue.IsCompleted && !token.IsCancellationRequested && result == default)
+                {
+                    if (!_queue.TryTake(out result, queueTimeout, token))
+                    {
+                        logger.Debug($"{nameof(TryDequeueAsync)} attempted to take before {jobsRunning} queuing job(s) are complete. Waiting {pollInterval} milliseconds");
+                        await Task.Delay(pollInterval, token);
+                    }
+                }
+
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
+                
+            }
+            catch (OperationCanceledException)
+            {
+                if (!token.IsCancellationRequested)
+                {
+                    logger.Debug($"{nameof(TryDequeueAsync)} timed out after {timeout} milliseconds");
+                }
+            }
+            
+            return result;
+
+        }                
+
         public async Task EnqueueAsync(IList<MailItem> items,
                                        IApplicationGlobals appGlobals,
                                        IFilerHomeController _homeController,
@@ -50,6 +121,8 @@ namespace QuickFiler.Controllers
         {
             if (items is null) { throw new ArgumentNullException(nameof(items)); }
             if (items.Count == 0) { throw new ArgumentException("items is empty"); }
+
+            Interlocked.Increment(ref jobsRunning);
 
             var tlp = await UiIdleCallAsync(() => _tlpTemplate.Clone(name: "BackgroundTableLayout"));
             var itemTasks = Enumerable.Range(0, items.Count)
@@ -69,7 +142,8 @@ namespace QuickFiler.Controllers
                                       }).ToListAsync();
             
             var itemGroups = await itemTasks;
-            _queue.Enqueue((tlp, itemGroups));
+            _queue.Add((tlp, itemGroups));
+            Interlocked.Decrement(ref jobsRunning);
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue));
         }
 
@@ -94,6 +168,8 @@ namespace QuickFiler.Controllers
         }
 
         public int Count => _queue.Count;
+
+        public int JobsRunning => jobsRunning;
 
         #endregion
 

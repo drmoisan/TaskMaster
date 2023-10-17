@@ -93,8 +93,8 @@ namespace QuickFiler.Controllers
             TableLayoutHelper.RemoveSpecificRow(tlp, 0, 2);
 
             var count = ItemsPerIteration;
-            _itemsPerIteration = 1;
-            count = 1;
+            //_itemsPerIteration = 1;
+            //count = 1;
             tlp.InsertSpecificRow(0, _rowStyleTemplate, count);
             tlp.MinimumSize = new System.Drawing.Size(
                 tlp.MinimumSize.Width,
@@ -265,53 +265,56 @@ namespace QuickFiler.Controllers
 
         async public Task ActionOkAsync()
         {
-            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
-            {
-                if (_blRunningModalCode == false)
-                {
-                    if (await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_groups.ReadyForMove))
-                    {
-                        _blRunningModalCode = true;
-
-                        if (_parent.KeyboardHndlr.KbdActive) { _parent.KeyboardHndlr.ToggleKeyboardDialog(); }
-
-                        await MoveAndIterate();
-
-                        _blRunningModalCode = false;
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else
+            if (!_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 throw new NotImplementedException(
-                    $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been "+
+                    $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been " +
                     $"implemented for {nameof(_initType)} {_initType}");
             }
+            
+            else if (_blRunningModalCode)
+            {
+                MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (_groups.ReadyForMove)
+            {
+                _blRunningModalCode = true;
+                
+                if (_parent.KeyboardHndlr.KbdActive) { _parent.KeyboardHndlr.ToggleKeyboardDialog(); }
+                await MoveAndIterate();
+                
+                _blRunningModalCode = false;
+            }
+
         }
 
         private async Task MoveAndIterate()
         {
-            if (_qfcQueue.Count > 0)
+
+            if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
             {
-                (var tlp, var itemGroups) = _qfcQueue.Dequeue();
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
-                
+                (var tlp, var itemGroups) = await _qfcQueue.TryDequeueAsync(Token, 4000);
+                //await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
+                LoadItems(tlp, itemGroups);
                 _parent.SwapStopWatch();
                 _ = BackGroundMove();
+                _ = _parent.IterateQueueAsync();
+            }
+            else if (_formViewer.Worker.IsBusy)
+            {
+                MessageBox.Show("Still loading emails. Please try again in a few seconds.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
                 _groups.CacheMoveObjects();
                 _parent.SwapStopWatch();
-                _ = BackGroundMove();
-
+                var moveTask = BackGroundMove();
+                MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await moveTask;
+                _ = ActionCancelAsync();
             }
-            
-            _ = _parent.IterateQueueAsync();
+
+
         }
 
         internal async Task BackGroundMove()

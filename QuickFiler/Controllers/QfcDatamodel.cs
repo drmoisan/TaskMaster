@@ -67,6 +67,9 @@ namespace QuickFiler.Controllers
         private Frame<int, string> _frame;
         private BackgroundWorker _worker;
 
+        private bool _complete = false;
+        public bool Complete { get => _complete; set => _complete = value; }
+        
         public ScoStack<IMovedMailInfo> MovedItems { get => _globals.AF.MovedMails; }
         
         private CancellationToken _token;
@@ -213,6 +216,8 @@ namespace QuickFiler.Controllers
             // Adjust quantity to the lesser of the queue size or the requested quantity
             int adjustedQuantity = quantity < _masterQueue.Count ? quantity : _masterQueue.Count;
 
+            if (adjustedQuantity == 0) { Complete = true;}
+            
             for (i = 1; i <= adjustedQuantity; i++)
             {
                 if (_masterQueue.TryDequeue(out MailItem item))

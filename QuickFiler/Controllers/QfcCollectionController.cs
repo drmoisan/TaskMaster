@@ -208,7 +208,6 @@ namespace QuickFiler.Controllers
         {
             Token.ThrowIfCancellationRequested();
 
-            //_itemGroups = new List<QfcItemGroup>();
             _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
             
@@ -217,7 +216,6 @@ namespace QuickFiler.Controllers
             await Task.WhenAll(grpTasks);
 
             _itemGroups = grpTasks.Select(x => x.Result).ToList();
-            //var tmp = items.ToAsyncEnumerable().Select((mailItem, i) => LoadGroup_03(template, mailItem, i)).ToListAsync();
                            
         }
 
@@ -255,19 +253,10 @@ namespace QuickFiler.Controllers
             var grpTask3 = grpTask2.ContinueWith(x => 
             {
                 var grp = x.Result;
-                //var tasks = new List<Task>
-                //{
-                //    grp.ItemController.PopulateConversationAsync(TokenSource, Token, false),
-                //    Task.Run(() => grp.ItemController.PopulateConversation()),
-                //    Task.Run(() => grp.ItemController.PopulateFolderCombobox()),
-                //};
+                
                 Task.Factory.StartNew(() => grp.ItemController.PopulateConversationAsync(TokenSource, Token, false), Token, TaskCreationOptions.AttachedToParent, ui);
                 Task.Factory.StartNew(() => grp.ItemController.PopulateFolderComboboxAsync(Token), Token, TaskCreationOptions.AttachedToParent, ui);
-                //Task.Factory.StartNew(() =>
-                //{
-                //    if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
-                //    else { grp.ItemController.SetThemeLight(async: true); }
-                //}, Token, TaskCreationOptions.AttachedToParent, ui);
+                
                 return grp;
             }, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui);
             
@@ -549,6 +538,7 @@ namespace QuickFiler.Controllers
 
             TlpLayout = tlpState;
             ResetPanelHeight();
+            if (_itemGroups.Count == 0) { _parent.ActionOkAsync(); }
 
         }
 
@@ -596,6 +586,7 @@ namespace QuickFiler.Controllers
             { 
                 TlpLayout = tlpState;
                 ResetPanelHeight();
+                if (_itemGroups.Count == 0) { _parent.ActionOkAsync(); }
             });
 
         }
@@ -614,7 +605,8 @@ namespace QuickFiler.Controllers
                 new List<KaKey>
                 {
                     new KaKey("Collection", Keys.Up, (k) => SelectPreviousItem()),
-                    new KaKey("Collection", Keys.Down, (k) => SelectNextItem())
+                    new KaKey("Collection", Keys.Down, (k) => SelectNextItem()),
+                    new KaKey("Collection", Keys.Down, (k) => _parent.ActionOkAsync())
                 });
         }
 
@@ -632,10 +624,10 @@ namespace QuickFiler.Controllers
                 new List<KaKeyAsync>
                 {
                     new KaKeyAsync("Collection", Keys.Up, (k) => SelectPreviousItemAsync()),
-                    new KaKeyAsync("Collection", Keys.Down, (k) => SelectNextItemAsync())
+                    new KaKeyAsync("Collection", Keys.Down, (k) => SelectNextItemAsync()),
+                    new KaKeyAsync("Collection", Keys.Return, (k) => _parent.ActionOkAsync())
                 });
         }
-
 
 
         #endregion

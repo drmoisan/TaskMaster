@@ -28,5 +28,6 @@ namespace QuickFiler.Interfaces
         ScoStack<IMovedMailInfo> MovedItems { get; }
         IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker);
         Task<IList<MailItem>> InitEmailQueueAsync(int batchSize, BackgroundWorker worker, CancellationToken token, CancellationTokenSource tokenSource);
+        bool Complete { get; set; }
     }
 }

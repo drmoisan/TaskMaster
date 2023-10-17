@@ -466,7 +466,7 @@ namespace ToDoModel
             if (olAncestor.IsNullOrEmpty()) { olAncestor = _globals.Ol.ArchiveRootPath; }
 
             // Fully root the folderpath
-            var parentFolderpath = $"{olAncestor}{parentBranchPath}";
+            var parentFolderpath = $"{olAncestor}\\{parentBranchPath}";
 
             // Get the parent folder and return null if not found
             var parentFolder = this.GetFolder(parentFolderpath, false);
