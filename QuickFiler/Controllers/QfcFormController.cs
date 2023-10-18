@@ -93,8 +93,8 @@ namespace QuickFiler.Controllers
             TableLayoutHelper.RemoveSpecificRow(tlp, 0, 2);
 
             var count = ItemsPerIteration;
-            //_itemsPerIteration = 1;
-            //count = 1;
+            _itemsPerIteration = 1;
+            count = 1;
             tlp.InsertSpecificRow(0, _rowStyleTemplate, count);
             tlp.MinimumSize = new System.Drawing.Size(
                 tlp.MinimumSize.Width,
@@ -201,6 +201,7 @@ namespace QuickFiler.Controllers
 
         private void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
+            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
             //if (_formViewer.DarkMode.Checked == true)
             if (_globals.Ol.DarkMode == true)
             {
@@ -244,7 +245,11 @@ namespace QuickFiler.Controllers
             _formViewer.BackColor = System.Drawing.SystemColors.ControlLightLight;
         }
 
-        async public void ButtonCancel_Click(object sender, EventArgs e) => await ActionCancelAsync();
+        async public void ButtonCancel_Click(object sender, EventArgs e) 
+        {
+            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            await ActionCancelAsync(); 
+        }
 
         async public Task ActionCancelAsync()
         {
@@ -260,6 +265,7 @@ namespace QuickFiler.Controllers
 
         async public void ButtonOK_Click(object sender, EventArgs e) 
         {
+            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
             await ActionOkAsync(); 
         }
 
@@ -297,8 +303,11 @@ namespace QuickFiler.Controllers
                 //await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
                 LoadItems(tlp, itemGroups);
                 _parent.SwapStopWatch();
-                _ = BackGroundMove();
-                _ = _parent.IterateQueueAsync();
+                var move = BackGroundMove();
+                var iterate = _parent.IterateQueueAsync();
+                
+                await move;
+                await iterate;
             }
             else if (_formViewer.Worker.IsBusy)
             {
@@ -311,7 +320,7 @@ namespace QuickFiler.Controllers
                 var moveTask = BackGroundMove();
                 MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 await moveTask;
-                _ = ActionCancelAsync();
+                await ActionCancelAsync();
             }
 
 
@@ -320,7 +329,7 @@ namespace QuickFiler.Controllers
         internal async Task BackGroundMove()
         {
             // Move emails
-            await _groups.MoveEmailsAsync(_movedItems).ConfigureAwait(false);
+            await _groups.MoveEmailsAsync(_movedItems);
 
             // Write Move Metrics
             await UIThreadExtensions.UiDispatcher.InvokeAsync(

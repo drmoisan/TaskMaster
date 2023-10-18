@@ -18,6 +18,7 @@ namespace QuickFiler.Interfaces
 
         #region Public Properties
 
+        SynchronizationContext UiSyncContext { get; }
         CancellationTokenSource TokenSource { get; }
         CancellationToken Token { get; }
         bool Loaded { get; }

@@ -91,6 +91,8 @@ namespace TaskMaster
             {
                 _quickFilerLoaded = true;
                 _quickFiler = await QuickFiler.Controllers.QfcHomeController.LaunchAsync(_globals, ReleaseQuickFiler);
+                if (_quickFiler is null)
+                    _quickFilerLoaded = false;
             }
         }
 

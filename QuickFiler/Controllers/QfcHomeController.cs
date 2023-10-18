@@ -27,7 +27,8 @@ namespace QuickFiler.Controllers
 
         private QfcHomeController() { }
 
-        public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
+        public QfcHomeController(IApplicationGlobals AppGlobals,
+                                 System.Action ParentCleanup)
         {
             
             _globals = AppGlobals;
@@ -37,39 +38,64 @@ namespace QuickFiler.Controllers
             _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
             _formViewer = new QfcFormViewer();
             _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            _uiSyncContext = _formViewer.UiSyncContext;
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
             _qfcQueue = new QfcQueue(Token);
             _formController = new QfcFormController(_globals, _formViewer, _qfcQueue, InitTypeEnum.Sort, Cleanup, this, TokenSource, Token);
         }
 
-        public static async Task<QfcHomeController> LaunchAsync(IApplicationGlobals appGlobals, System.Action parentCleanup)
+        public static async Task<QfcHomeController> LaunchAsync(IApplicationGlobals appGlobals,
+                                                                System.Action parentCleanup)
         {
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} is beginning");
+            
+            // Create uninitialized instance of QfcHomeController
+            var controller = new QfcHomeController();
+
             // Establish a SynchronizationContext for the UI thread
             if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(LaunchAsync)} is beginning");
-            
+            // Create cancellation token and progress tracker
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-
             var progress = new ProgressTracker(tokenSource);
             
-            var controller = new QfcHomeController();
-            
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcHomeController)}.{nameof(InitAsync)} ...");
-            await controller.InitAsync(appGlobals, parentCleanup, tokenSource, token, progress.SpawnChild(86));
-            controller.Loaded = true;
+            try
+            {
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"Calling {nameof(QfcHomeController)}.{nameof(InitAsync)} ...");
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcHomeController)}.{nameof(RunAsync)} ...");
+                await controller.InitAsync(appGlobals, parentCleanup, tokenSource, token, progress.SpawnChild(86));
+                controller.Loaded = true;
 
-            await controller.RunAsync(progress.SpawnChild());
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"Calling {nameof(QfcHomeController)}.{nameof(RunAsync)} ...");
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(LaunchAsync)} is complete");
+                await controller.RunAsync(progress.SpawnChild());
+
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} is complete");
+
+            }
+            catch (OperationCanceledException)
+            {
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} was cancelled");
+                
+                controller = null;
+            }
+                        
             return controller;
         }
 
-        internal async Task InitAsync(IApplicationGlobals appGlobals, System.Action parentCleanup, CancellationTokenSource tokenSource, CancellationToken token, ProgressTracker progress)
+        internal async Task InitAsync(IApplicationGlobals appGlobals,
+                                      System.Action parentCleanup,
+                                      CancellationTokenSource tokenSource,
+                                      CancellationToken token,
+                                      ProgressTracker progress)
         {
             _token = token;
             _tokenSource = tokenSource;
@@ -82,6 +108,7 @@ namespace QuickFiler.Controllers
             // Load all components Synchronously with minimal initialization
             _formViewer = new QfcFormViewer();
             _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            _uiSyncContext = _formViewer.UiSyncContext;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
@@ -287,6 +314,8 @@ namespace QuickFiler.Controllers
         private bool _loaded = false;
         public bool Loaded { get => _loaded; internal set => _loaded = value; }
 
+        #region Public Properties
+
         private IQfcExplorerController _explorerController;
         public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
         
@@ -319,6 +348,11 @@ namespace QuickFiler.Controllers
 
         private CancellationToken _token;
         public CancellationToken Token { get => _token; }
+
+        private SynchronizationContext _uiSyncContext;
+        public SynchronizationContext UiSyncContext { get => _uiSyncContext; }
+
+        #endregion
 
     }
 }

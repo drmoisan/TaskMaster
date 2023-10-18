@@ -71,6 +71,10 @@ namespace UtilitiesCS
         {
             _subjectTokens = emailSubject.Tokenize(_tokenizerRegex);
             _subjectTokens = _subjectTokens.StripCommonWords(_commonWords);
+            if (_subjectTokens.Count() == 0) 
+            { 
+                throw new System.InvalidOperationException($"{nameof(emailSubject)} {emailSubject} has no valid tokens"); 
+            }
             _subjectText = string.Join(" ",_subjectTokens);
             _subjectWordLengths = _subjectTokens.Select(x => x.Length).ToArray();
             _subjectEmailCount = emailSubjectCount;
@@ -90,11 +94,17 @@ namespace UtilitiesCS
         internal void Init(string emailFolder, string emailSubject, int emailSubjectCount)
         {
             _folderPath = emailFolder;
-            if (_folderPath is not null)
-            {
+            if (_folderPath is null) { throw new System.ArgumentNullException(emailFolder, $"{nameof(emailFolder)} is null");}
+            //if (_folderPath is not null) 
+            //{
                 _folderName = emailFolder.Split("\\").Last();
                 _folderTokens = _folderName.Tokenize(_tokenizerRegex);
                 _folderWordLengths = _folderTokens.Select(x => x.Length).ToArray();
+            //}
+
+            if (_folderTokens.Count() == 0)
+            {
+                throw new System.InvalidOperationException($"{nameof(emailFolder)} {emailFolder} has no valid tokens"); 
             }
 
             _subjectText = emailSubject;
@@ -102,6 +112,10 @@ namespace UtilitiesCS
             if ((_commonWords is not null)&(_subjectTokens.Length > 0)) 
             { 
                 _subjectTokens.StripCommonWords(_commonWords); 
+            }
+            if (_subjectTokens.Count() == 0)
+            {
+                throw new System.InvalidOperationException($"{nameof(emailSubject)} {emailSubject} has no valid tokens");
             }
             _subjectWordLengths = _subjectTokens.Select(x => x.Length).ToArray();
             _subjectEmailCount = emailSubjectCount;

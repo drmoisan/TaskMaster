@@ -46,6 +46,7 @@ namespace QuickFiler
         {
             if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))
             {
+                SynchronizationContext.SetSynchronizationContext(UiSyncContext);
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
                 //_keyboardHandler.ToggleKeyboardDialog(sender, e);

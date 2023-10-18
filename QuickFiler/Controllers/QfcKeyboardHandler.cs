@@ -15,6 +15,7 @@ using System.Collections.ObjectModel;
 using System.Collections;
 using System.Web.UI.WebControls;
 using System.Diagnostics;
+using System.Threading;
 
 
 namespace QuickFiler.Controllers
@@ -98,6 +99,8 @@ namespace QuickFiler.Controllers
 
         public async void KeyboardHandler_KeyDownAsync(object sender, KeyEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
             await KeyDownTaskAsync(sender, e);
         }
 
@@ -135,6 +138,8 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleKeyboardDialogAsync()
         {
+            //if (SynchronizationContext.Current is null)
+            //    SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
             if (_kbdActive) { await _parent.FormCtrlr.ToggleOffNavigationAsync(); }
             else { await _parent.FormCtrlr.ToggleOnNavigationAsync(); }
             _kbdActive = !_kbdActive;

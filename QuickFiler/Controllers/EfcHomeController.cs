@@ -33,6 +33,7 @@ namespace QuickFiler
                 _stopWatch = new cStopWatch();
                 //_formViewer = new EfcViewer();
                 _formViewer = EfcViewerQueue.Dequeue();
+                _uiSyncContext = _formViewer.UiSyncContext;
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
                 _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, appGlobals, this);
                 _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType, Token);
@@ -105,6 +106,8 @@ namespace QuickFiler
         private CancellationToken _token;
         public CancellationToken Token { get => _token; }
 
+        private SynchronizationContext _uiSyncContext;
+        public SynchronizationContext UiSyncContext { get => _uiSyncContext; }
 
         #endregion
 

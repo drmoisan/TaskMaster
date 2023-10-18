@@ -135,6 +135,12 @@ namespace QuickFiler.Controllers
                 }
             }
         }    
+        public bool SafeSetTlpLayout(bool state)
+        {
+            var originalState = TlpLayout;
+            TlpLayout = state;
+            return originalState;
+        }
 
         #endregion
 
@@ -152,8 +158,7 @@ namespace QuickFiler.Controllers
         {
             // Freeze the form while loading controls
             _formViewer.SuspendLayout();
-            var tlpState = TlpLayout;
-            TlpLayout = false;
+            var tlpState = SafeSetTlpLayout(false);
 
             // Save the QfcItem template styles
             _template = template;
@@ -168,7 +173,7 @@ namespace QuickFiler.Controllers
             TlpLayout = tlpState;
 
             _formViewer.ResumeLayout();
-            //WireUpKeyboardHandler();
+            
             WireUpAsyncKeyboardHandler();
             LoadConversationsAndFolders_04();
 
@@ -180,8 +185,7 @@ namespace QuickFiler.Controllers
 
             // Freeze the form while loading controls
             _formViewer.SuspendLayout();
-            var tlpState = TlpLayout;
-            TlpLayout = false;
+            var tlpState = SafeSetTlpLayout(false);
 
             // Save the QfcItem template styles
             _template = template;
@@ -728,8 +732,7 @@ namespace QuickFiler.Controllers
         {
             if (ActiveSelection < _itemGroups.Count)
             {
-                var tlpState = TlpLayout;
-                TlpLayout = false;
+                var tlpState = SafeSetTlpLayout(false);
 
                 ChangeByIndex(ActiveIndex + 1);
 
@@ -840,18 +843,14 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleOffNavigationAsync()
         {
-            bool tlpState = true;
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
-            {
-                tlpState = TlpLayout;
-                TlpLayout = false;
-            });
-
+            var tlpState = SafeSetTlpLayout(false);
+            TlpLayout = false;
+            
             if (ActiveIndex != -1) { await ToggleOffActiveItemAsync(false); }
             var tasks = _itemGroups.Select(itemGroup => itemGroup.ItemController.ToggleNavigationAsync(Enums.ToggleState.Off)).ToList();
             await Task.WhenAll(tasks);
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
+            TlpLayout = tlpState;
         }
 
         public void ToggleOnNavigation(bool async)
@@ -870,13 +869,8 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleOnNavigationAsync()
         {
-            bool tlpState = true;
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
-            {
-                tlpState = TlpLayout;
-                TlpLayout = false;
-            });
-
+            var tlpState = SafeSetTlpLayout(false);
+            
             var tasks = _itemGroups.Select(itemGroup => itemGroup.ItemController.ToggleNavigationAsync(Enums.ToggleState.On)).ToList();
             await Task.WhenAll(tasks);
 
@@ -885,7 +879,7 @@ namespace QuickFiler.Controllers
                 await ActivateByIndexAsync(ActiveIndex, false);
             }
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
+            TlpLayout = tlpState;
         }
 
         public bool ToggleOffActiveItem(bool parentBlExpanded)
@@ -913,13 +907,10 @@ namespace QuickFiler.Controllers
             bool blExpanded = parentBlExpanded;
             if ((ActiveIndex != -1) && _kbdHandler.KbdActive)
             {
-                //adjusted to _intActiveSelection -1 to accommodate zero based
                 IQfcItemController itemController = _itemGroups[ActiveIndex].ItemController;
 
                 if (itemController.IsExpanded)
                 {
-                    //TODO: Replace MoveDownPix Function
-                    //MoveDownPix(_intActiveSelection + 1, (int)Math.Round(itemController.ItemPanel.Height * -0.5d));
                     await itemController.ToggleExpansionAsync();
                     blExpanded = true;
                 }
@@ -930,7 +921,7 @@ namespace QuickFiler.Controllers
 
         #endregion
 
-        #region UI Converations Expansion
+        #region UI Conversation Expansion
 
         /// <summary>
         /// Changes the conversation checkbox state of the item viewer at the 
@@ -1021,8 +1012,8 @@ namespace QuickFiler.Controllers
                                        int conversationCount,
                                        object folderList)
         {
-            var tlpState = TlpLayout;
-            TlpLayout = false;
+            var tlpState = SafeSetTlpLayout(false);
+
             int baseEmailIndex = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.Mail.EntryID == entryID);
             int insertionIndex = baseEmailIndex + 1;
             int insertCount = conversationCount - 1;
@@ -1280,7 +1271,9 @@ namespace QuickFiler.Controllers
 
         async public Task MoveEmailsAsync(ScoStack<IMovedMailInfo> stackMovedItems)
         {
-            await Task.WhenAll(_itemGroupsToMove.Select(grp => grp.ItemController.MoveMailAsync()));
+            await _itemGroupsToMove.ToAsyncEnumerable().ForEachAsync(async grp => await grp.ItemController.MoveMailAsync());
+            //_itemGroupsToMove.ForEach(async grp => await grp.ItemController.MoveMailAsync());
+            //await Task.WhenAll(_itemGroupsToMove.Select(grp => grp.ItemController.MoveMailAsync()));
         }
 
         public string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment)

@@ -290,27 +290,34 @@ namespace QuickFiler.Controllers
                     activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
                     .ConfigureAwait(false);
             }
+            catch (TaskCanceledException e)
+            {
+                await ToggleOfflineMode(offline);
+            }
             catch (System.Exception e)
             {
                 await ToggleOfflineMode(offline);
                 throw e;
             }
 
-            // Restore online mode if it was previously so
-            await ToggleOfflineMode(offline);
+            if (df is not null)
+            {
+                // Restore online mode if it was previously so
+                await ToggleOfflineMode(offline);
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
-            // Filter out non-email items
-            df = df.FilterRowsBy("MessageClass", "IPM.Note");
-            
-            // Filter to the latest email in each conversation
-            var dfFiltered = MostRecentByConversation(df);
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
+                // Filter out non-email items
+                df = df.FilterRowsBy("MessageClass", "IPM.Note");
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
-            // Sort by triage classification and then date
-            _frame = SortTriageDate(dfFiltered);
+                // Filter to the latest email in each conversation
+                var dfFiltered = MostRecentByConversation(df);
 
-            progress.Report(100);
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
+                // Sort by triage classification and then date
+                _frame = SortTriageDate(dfFiltered);
+
+                progress.Report(100);
+            }    
         }
 
         public Frame<int, string> SortTriageDate(Frame<int, string> df)

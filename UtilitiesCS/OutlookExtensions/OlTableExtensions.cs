@@ -275,6 +275,61 @@ namespace UtilitiesCS
             object[,] data = null;
             Dictionary<string, int> columnInfo = null;
 
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
+            var columnDictionary = table.GetColumnDictionary();
+
+            table.MoveToStart();
+
+            try
+            {
+
+                if (BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x)) ||
+                   (objectConverters is not null &&
+                   objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
+                {
+                    logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRowAsync)} ...");
+                    data = await EtlByRowAsync(table, objectConverters, columnDictionary, token, milliseconds, attempts, progress);
+                }
+                else
+                {
+                    data = await Task.Factory.StartNew(() => (object[,])table.GetArray(table.GetRowCount()),
+                        token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(milliseconds, attempts);
+                }
+                
+            }
+
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
+            //try
+            //{
+            //    (data, columnInfo) = await Task.Factory.StartNew(() => table.ETL(objectConverters, progress),
+            //        token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(milliseconds, attempts);
+            //}
+            catch (TimeoutException)
+            {
+                logger.Error($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling");
+                tokenSource.Cancel();
+            }
+
+
+            return (data, columnDictionary);
+        }
+
+        public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsyncOld(
+            this Outlook.Table table,
+            CancellationToken token,
+            CancellationTokenSource tokenSource,
+            int counter,
+            ProgressTracker progress,
+            Dictionary<string, Func<object, string>> objectConverters = null)
+        {
+            token.ThrowIfCancellationRequested();
+
+            var rowCount = table.GetRowCount();
+            int milliseconds = 250 * rowCount;
+            var attempts = 3;
+            object[,] data = null;
+            Dictionary<string, int> columnInfo = null;
+
             logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
             try
             {
@@ -289,6 +344,36 @@ namespace UtilitiesCS
             
             
             return (data, columnInfo);
+        }
+
+        private static async Task<object[,]> EtlByRowAsync(Table table,
+                                                           Dictionary<string, Func<object, string>> objectConverters,
+                                                           Dictionary<string, int> columnDictionary,
+                                                           CancellationToken token,
+                                                           int timeout,
+                                                           int attempts,
+                                                           ProgressTracker progress = null)
+        {
+            token.ThrowIfCancellationRequested();
+            
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
+            (var binFields, var binIndices) = GetBinFields(columnDictionary);
+            (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
+            
+            //var rows = table.CastToRowArray(progress?.SpawnChild(65));
+            var rows = await Task.Factory.StartNew(() => table.CastToRowArray(progress?.SpawnChild(65)),
+                token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
+
+            token.ThrowIfCancellationRequested();
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
+            var jagged = await Task.Factory.StartNew(() => rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild()),
+                token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
+            
+            //var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
+            var data = jagged.To2D();
+
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
+            return data;
         }
 
         /// <summary>
@@ -357,6 +442,8 @@ namespace UtilitiesCS
             //return new object[][] { };
         }
 
+
+        
 
         private static (IEnumerable<string>, IOrderedEnumerable<int>) GetBinFields(Dictionary<string, int> columnDictionary) 
         {
