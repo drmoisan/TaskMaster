@@ -24,7 +24,7 @@ namespace TaskMaster
         private RibbonViewer _viewer;
         private IApplicationGlobals _globals;
         private bool blHook = true;
-        private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
+        //private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
         private IFilerHomeController _quickFiler;
         private bool _quickFilerLoaded = false;
 
@@ -61,17 +61,17 @@ namespace TaskMaster
             taskTreeViewer.Show();
         }
 
-        internal void LoadQuickFilerOld()
-        {
-            bool loaded = false;
-            if (_quickfileLegacy is not null)
-                loaded = _quickfileLegacy.Loaded;
-            if (loaded == false)
-            {
-                _quickfileLegacy = new QuickFiler.Legacy.QfcLauncher(_globals, ReleaseQuickFilerLegacy);
-                _quickfileLegacy.Run();
-            }
-        }
+        //internal void LoadQuickFilerOld()
+        //{
+        //    bool loaded = false;
+        //    if (_quickfileLegacy is not null)
+        //        loaded = _quickfileLegacy.Loaded;
+        //    if (loaded == false)
+        //    {
+        //        _quickfileLegacy = new QuickFiler.Legacy.QfcLauncher(_globals, ReleaseQuickFilerLegacy);
+        //        _quickfileLegacy.Run();
+        //    }
+        //}
 
         internal void LoadQuickFiler()
         {
@@ -96,10 +96,10 @@ namespace TaskMaster
             }
         }
 
-        private void ReleaseQuickFilerLegacy()
-        {
-            _quickfileLegacy = null;
-        }
+        //private void ReleaseQuickFilerLegacy()
+        //{
+        //    _quickfileLegacy = null;
+        //}
 
         private void ReleaseQuickFiler()
         {

@@ -89,8 +89,11 @@ namespace UtilitiesCS
                 }
                 catch (ArgumentNullException e)
                 {
-                    
-                    throw;
+                    logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
+                }
+                catch (InvalidOperationException e) 
+                {
+                    logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
                 }
                 
             }

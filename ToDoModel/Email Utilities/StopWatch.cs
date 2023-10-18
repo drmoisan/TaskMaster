@@ -1,13 +1,12 @@
 ﻿using System;
-using PInvoke = Windows.Win32.PInvoke;
+using System.Timers;
+//using PInvoke = Windows.Win32.PInvoke;
 
 namespace ToDoModel
 {
 
-    public class cStopWatch
+    public class StopWatch
     {
-
-
 
         // Private Declare Function getFrequency Lib "kernel32" _
         // Alias "QueryPerformanceFrequency" (ByRef cyFrequency As Decimal) As Long
@@ -22,12 +21,12 @@ namespace ToDoModel
         // Alias "QueryPerformanceCounter" (cyTickCount As Decimal) As Long
         // #End If
 
-        private double pStart;                    // When the current timing session started (since last pause)
-        private double pCum;                      // cumulative time passed so far
-        public bool isPaused;                 // is
-        public int InstanceNum;               // Instance of the class
-        public DateTime timeInit;
-        public DateTime timeEnd;
+        private double _start;                    
+        private double _cum;                      
+        public bool IsPaused;                 
+        public int InstanceNum;               
+        public DateTime TimeInit;
+        public DateTime TimeEnd;
         private long _cMicroTimer_lpFrequency = default;
 
         private double cMicroTimer()
@@ -56,51 +55,51 @@ namespace ToDoModel
         public void Start()
         {
             // cumulative time passed
-            isPaused = false;
-            pCum = 0d;
-            timeInit = DateTime.Now;
+            IsPaused = false;
+            _cum = 0d;
+            TimeInit = DateTime.Now;
             reStart();
         }
         public void reStart()
         {
 
             // start timing and schedule an update
-            pStart = cMicroTimer();
-            isPaused = false;
+            _start = cMicroTimer();
+            IsPaused = false;
         }
 
         public void Pause()
         {
             // this should be called when the pause toggle Button is pressed
 
-            if (!isPaused)
+            if (!IsPaused)
             {
                 // pause requested
-                pCum = Elapsed + pCum;
-                isPaused = true;
+                _cum = Elapsed + _cum;
+                IsPaused = true;
             }
         }
 
         public void StopTimer()
         {
             Pause();
-            timeEnd = DateTime.Now;
+            TimeEnd = DateTime.Now;
         }
 
-        public double timeElapsed
+        public double TimeElapsed
         {
             get
             {
                 double timeElapsedRet = default;
                 double Temp;
                 // timeElapsed = Elapsed + pCum
-                if (isPaused == true)
+                if (IsPaused == true)
                 {
-                    timeElapsedRet = pCum;
+                    timeElapsedRet = _cum;
                 }
                 else
                 {
-                    Temp = Elapsed + pCum;
+                    Temp = Elapsed + _cum;
                     return Temp;
                 }
 
@@ -114,7 +113,7 @@ namespace ToDoModel
             {
                 // return time elapsed
                 // Elapsed = cMicroTimer() - pStart
-                return cMicroTimer() - pStart;
+                return cMicroTimer() - _start;
             }
         }
 

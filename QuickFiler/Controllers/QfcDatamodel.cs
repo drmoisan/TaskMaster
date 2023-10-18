@@ -290,7 +290,7 @@ namespace QuickFiler.Controllers
                     activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
                     .ConfigureAwait(false);
             }
-            catch (TaskCanceledException e)
+            catch (TaskCanceledException)
             {
                 await ToggleOfflineMode(offline);
             }

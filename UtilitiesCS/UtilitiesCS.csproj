@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\build\net20\Microsoft.Windows.CsWin32.props" Condition="Exists('..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\build\net20\Microsoft.Windows.CsWin32.props')" />
   <Import Project="..\packages\Microsoft.Windows.SDK.Win32Metadata.46.0.5-preview\build\net20\Microsoft.Windows.SDK.Win32Metadata.props" Condition="Exists('..\packages\Microsoft.Windows.SDK.Win32Metadata.46.0.5-preview\build\net20\Microsoft.Windows.SDK.Win32Metadata.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -481,15 +480,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\analyzers\cs\MessagePack.Annotations.dll" />
-    <Analyzer Include="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\analyzers\cs\MessagePack.dll" />
-    <Analyzer Include="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\analyzers\cs\Microsoft.Bcl.AsyncInterfaces.dll" />
-    <Analyzer Include="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\analyzers\cs\Microsoft.Windows.CsWin32.dll" />
-    <Analyzer Include="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\analyzers\cs\Microsoft.Windows.SDK.Win32Docs.dll" />
-    <Analyzer Include="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\analyzers\cs\System.Text.Encodings.Web.dll" />
-    <Analyzer Include="..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\analyzers\cs\System.Text.Json.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="NativeMethods.txt" />
     <Content Include="Resources\ActivateWorkflow.svg" />
     <None Include="Resources\QuestionMark.svg" />
@@ -529,7 +519,6 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.Win32Metadata.46.0.5-preview\build\net20\Microsoft.Windows.SDK.Win32Metadata.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.Win32Metadata.46.0.5-preview\build\net20\Microsoft.Windows.SDK.Win32Metadata.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\build\net20\Microsoft.Windows.CsWin32.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.CsWin32.0.2.206-beta\build\net20\Microsoft.Windows.CsWin32.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1988-prerelease\build\Microsoft.Web.WebView2.targets')" />

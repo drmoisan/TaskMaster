@@ -22,7 +22,7 @@ namespace QuickFiler.Interfaces
         CancellationTokenSource TokenSource { get; }
         CancellationToken Token { get; }
         bool Loaded { get; }
-		cStopWatch StopWatch { get; }
+		StopWatch StopWatch { get; }
         //IQfcDatamodel DataModel { get; }
         IQfcExplorerController ExplorerCtlr { get; set; }
 		IFilerFormController FormCtrlr { get; }

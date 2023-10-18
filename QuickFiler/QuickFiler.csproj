@@ -312,24 +312,18 @@
     <Compile Include="Interfaces\IFilerHomeController.cs" />
     <Compile Include="Interfaces\IQfcItemController.cs" />
     <Compile Include="Interfaces\IQfcKeyboardHandler.cs" />
-    <Compile Include="Legacy\AcceleratorParser.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
     <Compile Include="Helper Classes\QfEnums.cs" />
     <Compile Include="Helper Classes\FormFocusListener.cs" />
-    <Compile Include="Legacy\IAcceleratorCallbacks.cs" />
-    <Compile Include="Legacy\IQfcItemControllerLegacy.cs" />
-    <Compile Include="Legacy\IQfcControllerCallbacks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Legacy\QfcController.cs" />
     <Compile Include="Controllers\QfcCollectionController.cs" />
     <Compile Include="Controllers\QfcExplorerController.cs" />
     <Compile Include="Controllers\QfcFormController.cs" />
-    <Compile Include="Legacy\QfcGroupOperationsLegacy.cs" />
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -362,16 +356,7 @@
     <Compile Include="Viewers\QfcFormViewer.Designer.cs">
       <DependentUpon>QfcFormViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Legacy\QuickFileController.cs" />
-    <Compile Include="Legacy\QfcConstants.cs" />
     <Compile Include="Controllers\QfcKeyboardHandler.cs" />
-    <Compile Include="Legacy\QfcLauncher.cs" />
-    <Compile Include="Legacy\QfcFormLegacyViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Legacy\QfcFormLegacyViewer.Designer.cs">
-      <DependentUpon>QfcFormLegacyViewer.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\QfcDatamodel.cs" />
     <Compile Include="Viewers\QfcItemViewer.cs">
       <SubType>UserControl</SubType>
@@ -402,9 +387,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcFormViewer.resx">
       <DependentUpon>QfcFormViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Legacy\QfcFormLegacyViewer.resx">
-      <DependentUpon>QfcFormLegacyViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcItemViewer.resx">
       <DependentUpon>QfcItemViewer.cs</DependentUpon>

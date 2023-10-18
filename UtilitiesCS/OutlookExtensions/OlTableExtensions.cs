@@ -273,7 +273,6 @@ namespace UtilitiesCS
             int milliseconds = 250 * rowCount;
             var attempts = 3;
             object[,] data = null;
-            Dictionary<string, int> columnInfo = null;
 
             logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
             var columnDictionary = table.GetColumnDictionary();
