@@ -118,7 +118,6 @@
     </Compile>
     <Compile Include="Helper Classes\MailItemInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AcceleratorParser_Test.cs" />
     <Compile Include="QfcViewer_Test.cs" />
     <Compile Include="SetupAssemblyInitializer.cs" />
     <Compile Include="UnitTest1.cs" />

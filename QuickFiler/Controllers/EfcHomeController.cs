@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToDoModel;
 using UtilitiesCS;
+using System.Diagnostics;
 
 namespace QuickFiler
 {
@@ -30,7 +31,7 @@ namespace QuickFiler
             if (_dataModel.Mail is not null)
             {
                 _initType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
-                _stopWatch = new StopWatch();
+                _stopWatch = new Stopwatch();
                 //_formViewer = new EfcViewer();
                 _formViewer = EfcViewerQueue.Dequeue();
                 _uiSyncContext = _formViewer.UiSyncContext;
@@ -90,8 +91,8 @@ namespace QuickFiler
         private EfcDataModel _dataModel;
         internal EfcDataModel DataModel { get => _dataModel; set => _dataModel = value; }
                 
-        private StopWatch _stopWatch;
-        public StopWatch StopWatch { get => _stopWatch; }
+        private System.Diagnostics.Stopwatch _stopWatch;
+        public System.Diagnostics.Stopwatch StopWatch { get => _stopWatch; }
 
         public bool Loaded => throw new NotImplementedException();
 
@@ -141,7 +142,7 @@ namespace QuickFiler
                 var curTimeText = DateTime.Now.ToString("hh:mm");
                 var dataLineBeg = curDateText + "," + curTimeText + ",";
 
-                var Duration = _stopWatch.TimeElapsed;
+                var Duration = _stopWatch.Elapsed.Seconds;
                 var OlEndTime = DateTime.Now;
                 var OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
            

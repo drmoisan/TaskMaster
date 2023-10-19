@@ -3,6 +3,7 @@ using ToDoModel;
 using System.Threading.Tasks;
 using System.Threading;
 using UtilitiesCS;
+using System.Diagnostics;
 
 namespace QuickFiler.Interfaces
 {
@@ -22,7 +23,7 @@ namespace QuickFiler.Interfaces
         CancellationTokenSource TokenSource { get; }
         CancellationToken Token { get; }
         bool Loaded { get; }
-		StopWatch StopWatch { get; }
+		Stopwatch StopWatch { get; }
         //IQfcDatamodel DataModel { get; }
         IQfcExplorerController ExplorerCtlr { get; set; }
 		IFilerFormController FormCtrlr { get; }

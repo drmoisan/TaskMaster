@@ -161,7 +161,6 @@
     <Compile Include="Email Utilities\FolderHandler.cs" />
     <Compile Include="Email Utilities\CommonWordsModule.cs" />
     <Compile Include="Email Utilities\Conversation_To_Folder.cs" />
-    <Compile Include="Email Utilities\StopWatch.cs" />
     <Compile Include="Email Utilities\MovedMailInfo.cs" />
     <Compile Include="Email Utilities\SmithWaterman.cs" />
     <Compile Include="Email Utilities\Suggestions.cs" />

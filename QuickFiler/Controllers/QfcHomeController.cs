@@ -15,6 +15,7 @@ using UtilitiesCS.Threading;
 using System.Threading;
 using QuickFiler.Viewers;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace QuickFiler.Controllers
 {
@@ -131,7 +132,7 @@ namespace QuickFiler.Controllers
         {
             IList<MailItem> listEmail = _datamodel.InitEmailQueue(_formController.ItemsPerIteration, _formViewer.Worker);
             _formController.LoadItems(listEmail);
-            _stopWatch = new StopWatch();
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();
@@ -155,7 +156,7 @@ namespace QuickFiler.Controllers
             progress.Report(100);
 
             logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Showing and Refreshing {nameof(QfcFormViewer)} ...");
-            _stopWatch = new StopWatch();
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();
@@ -221,7 +222,7 @@ namespace QuickFiler.Controllers
         
         public void Iterate()
         {
-            _stopWatch = new StopWatch();
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
 
             IList<MailItem> listObjects = _datamodel.DequeueNextItemGroupAsync(_formController.ItemsPerIteration, 2000).GetAwaiter().GetResult();
@@ -230,7 +231,7 @@ namespace QuickFiler.Controllers
 
         public void Iterate2()
         {
-            _stopWatch = new StopWatch();
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
             (var tlp, var itemGroups) = _qfcQueue.Dequeue();
             _formController.LoadItems(tlp, itemGroups);
@@ -240,7 +241,7 @@ namespace QuickFiler.Controllers
         public void SwapStopWatch()
         {
             _stopWatchMoved = _stopWatch;
-            _stopWatch = new StopWatch();
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
         }
         
@@ -265,7 +266,7 @@ namespace QuickFiler.Controllers
 
             LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
 
-            Duration = _stopWatchMoved.TimeElapsed;
+            Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
             OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
 
@@ -331,9 +332,9 @@ namespace QuickFiler.Controllers
         private TaskScheduler _uiScheduler;
         internal TaskScheduler UiScheduler { get => _uiScheduler; }
 
-        private StopWatch _stopWatchMoved;
-        private StopWatch _stopWatch;
-        public StopWatch StopWatch { get => _stopWatch; }
+        private Stopwatch _stopWatchMoved;
+        private Stopwatch _stopWatch;
+        public Stopwatch StopWatch { get => _stopWatch; }
 
         private QfcFormViewer _formViewer;
         //public QfcFormViewer FormViewer { get => _formViewer; }

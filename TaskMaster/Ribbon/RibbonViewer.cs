@@ -114,10 +114,10 @@ namespace TaskMaster
             // MessageBox.Show("Not Implemented");
         }
 
-        public void QuickFilerOld_Click(Office.IRibbonControl control)
-        {
-            _controller.LoadQuickFilerOld();
-        }
+        //public void QuickFilerOld_Click(Office.IRibbonControl control)
+        //{
+        //    _controller.LoadQuickFilerOld();
+        //}
 
         //public void QuickFiler_Click(Office.IRibbonControl control)
         //{
