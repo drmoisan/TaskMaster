@@ -18,7 +18,6 @@ using TaskVisualization;
 using System.Threading;
 using BrightIdeasSoftware;
 using static Deedle.FrameBuilder;
-using Newtonsoft.Json.Linq;
 
 namespace QuickFiler.Controllers
 {

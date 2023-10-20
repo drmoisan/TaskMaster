@@ -1,7 +1,6 @@
 ﻿using log4net.Repository.Hierarchy;
 using Microsoft.Data.Analysis;
 using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

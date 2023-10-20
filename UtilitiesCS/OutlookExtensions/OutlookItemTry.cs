@@ -1,5 +1,4 @@
-﻿using ExCSS;
-using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Outlook = Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
@@ -11,7 +10,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ToDoModel;
 using UtilitiesCS;
 using System.Diagnostics;
 

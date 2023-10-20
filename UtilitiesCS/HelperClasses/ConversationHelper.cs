@@ -15,7 +15,6 @@ using System.Xml.Linq;
 using static System.Net.WebRequestMethods;
 using System.Threading;
 using System.Windows.Forms;
-using Fizzler;
 
 namespace UtilitiesCS
 {

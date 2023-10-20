@@ -1,16 +1,16 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("QuickFiler")]
+[assembly: AssemblyTitle("TaskVisualization")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Dan Moisan")]
-[assembly: AssemblyProduct("QuickFiler")]
-[assembly: AssemblyCopyright("Copyright © Dan Moisan Inc 2023")]
+[assembly: AssemblyCompany("PepsiCo Inc")]
+[assembly: AssemblyProduct("TaskVisualization")]
+[assembly: AssemblyCopyright("Copyright � PepsiCo Inc 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f68514f3-3762-4520-b434-e9c5267f0f12")]
+[assembly: Guid("94cb83a2-ee73-47b8-9027-d5ef0b529bae")]
 
 // Version information for an assembly consists of the following four values:
 //

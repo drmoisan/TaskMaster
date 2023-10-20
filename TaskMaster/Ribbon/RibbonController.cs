@@ -44,7 +44,7 @@ namespace TaskMaster
         {
             // _globals.TD.IDList_Refresh()
             _globals.TD.IDList.RefreshIDList(_globals.Ol.App);
-            Interaction.MsgBox("ID Refresh Complete");
+            MessageBox.Show("ID Refresh Complete");
         }
 
         internal void SplitToDoID()
