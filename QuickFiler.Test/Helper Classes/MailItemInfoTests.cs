@@ -3,7 +3,7 @@ using Moq;
 using QuickFiler;
 using System;
 using Microsoft.Office.Interop.Outlook;
-using ToDoModel;
+
 using FluentAssertions;
 
 namespace QuickFiler.Test

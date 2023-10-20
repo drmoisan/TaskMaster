@@ -15,7 +15,7 @@ namespace QuickFiler.Test
     public class QfcViewer_Test
     {
         private QfcFormViewer qf;
-        private QfcItemViewer iv;
+        private ItemViewer iv;
         private Mock<IFilerFormController> formController;
 
         
@@ -25,7 +25,7 @@ namespace QuickFiler.Test
             qf = new QfcFormViewer();
             qf.ShowDialog();
             qf.Refresh();
-            iv = new QfcItemViewer();
+            iv = new ItemViewer();
             formController = new Mock<IFilerFormController>();
         }
         

@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
 
+[assembly: InternalsVisibleTo("QuickFiler.Test")]
 namespace QuickFiler.Controllers
 {
     internal class QfcTipsDetails : IQfcTipsDetails
