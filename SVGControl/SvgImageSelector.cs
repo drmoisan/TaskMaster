@@ -17,7 +17,6 @@ using Fizzler;
 using System.Globalization;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.CompilerServices;
-using BrightIdeasSoftware;
 
 namespace SVGControl
 {
