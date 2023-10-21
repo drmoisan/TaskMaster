@@ -19,10 +19,11 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitControlGroups();
         }
         
-        private IList<Control> _rightControls;
+        //private IList<Control> _rightControls;
 
         private IList<Label> _tipsLabels;
         public IList<Label> TipsLabels { get => _tipsLabels; }
@@ -38,6 +39,9 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
+        
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         public void RemoveControlsColsRightOf(Control furthestRight)
         {

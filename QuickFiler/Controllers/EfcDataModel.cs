@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
@@ -14,40 +15,40 @@ namespace QuickFiler.Controllers
 {
     internal class EfcDataModel
     {
-        public EfcDataModel(IApplicationGlobals appGlobals, MailItem mail)
+        public EfcDataModel(IApplicationGlobals appGlobals, MailItem mail, CancellationTokenSource tokenSource, CancellationToken token)
         {
             _globals = appGlobals;
+            _token = token;
             _mail = mail;
             if (Mail is not null)
             {
-                _conversationResolver = new ConversationResolver(_globals, Mail);
-                _conversationResolver.LoadDfConversationExpanded(); // Load Synchronously
+                _conversationResolver = new ConversationResolver(_globals, Mail, tokenSource, token);
+                _conversationResolver.Df = _conversationResolver.LoadDf(); // Load Synchronously
                 //_ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItemsAsync(dfConvExp));
             }
         }
 
         private IApplicationGlobals _globals;
+        private CancellationToken _token;
         
         private FolderHandler _folderHandler;
         public FolderHandler FolderHandler { get => _folderHandler; }
-        async public Task InitFolderHandler(object folderList = null)
+        async public Task InitFolderHandlerAsync(object folderList = null)
         {
             if (folderList is null)
             {
                 _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, _mail, FolderHandler.InitOptions.FromField));
+                    _globals, _mail, FolderHandler.InitOptions.FromField), _token);
             }
             else
             {
                 _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, folderList, FolderHandler.InitOptions.FromArrayOrString));
+                    _globals, folderList, FolderHandler.InitOptions.FromArrayOrString), _token);
             }
         }
 
         ConversationResolver _conversationResolver;
         public ConversationResolver ConversationResolver { get => _conversationResolver; }
-        //async public Task ResolveConversationItemsAsync() => ConversationResolver.ConversationItems = await ConversationResolver.ResolveItemsAsync(ConversationResolver.DfConversationExpanded);
-        async public Task GetConversationInfoAsync() => await ConversationResolver.GetConversationInfoAsync();
 
         private MailItem _mail;
         public MailItem Mail
@@ -69,7 +70,7 @@ namespace QuickFiler.Controllers
                 if (_mailInfo is null && Mail is not null)
                 {
                     _mailInfo = new MailItemInfo(Mail);
-                    _mailInfo.LoadPriority();
+                    _mailInfo.LoadPriority(_token);
                 }
                 return _mailInfo;
             }
@@ -119,7 +120,7 @@ namespace QuickFiler.Controllers
 
         public IList<MailItem> PackageItems(bool moveConversation)
         {
-            if (moveConversation) { return _conversationResolver.ConversationItems; }
+            if (moveConversation) { return _conversationResolver.ConversationItems.SameFolder; }
             else { return new List<MailItem>() { Mail };}
         }
 

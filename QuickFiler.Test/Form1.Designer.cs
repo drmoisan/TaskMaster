@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.ControlGroup3 = new QuickFiler.QfcItemViewer();
-            this.ControlGroup1 = new QuickFiler.QfcItemViewer();
-            this.ControlGroup2 = new QuickFiler.QfcItemViewer();
+            this.ControlGroup3 = new QuickFiler.ItemViewer();
+            this.ControlGroup1 = new QuickFiler.ItemViewer();
+            this.ControlGroup2 = new QuickFiler.ItemViewer();
             this.Button2 = new System.Windows.Forms.Button();
             this.Button1 = new System.Windows.Forms.Button();
             this.MainPanel = new System.Windows.Forms.Panel();
@@ -214,11 +214,11 @@
         #endregion
 
         internal System.Windows.Forms.TableLayoutPanel TableLayoutPanel1;
-        internal QfcItemViewer ControlGroup1;
+        internal ItemViewer ControlGroup1;
         internal System.Windows.Forms.Button Button2;
         internal System.Windows.Forms.Button Button1;
-        internal QfcItemViewer ControlGroup3;
-        internal QfcItemViewer ControlGroup2;
+        internal ItemViewer ControlGroup3;
+        internal ItemViewer ControlGroup2;
         internal System.Windows.Forms.Panel MainPanel;
         internal System.Windows.Forms.TableLayoutPanel MainLayoutPanel;
         internal System.Windows.Forms.TableLayoutPanel TableLayoutPanel2;

@@ -29,10 +29,10 @@ namespace QuickFiler.Controllers
                                  IFilerHomeController homeController,
                                  EfcFormController parent,
                                  ItemViewer itemViewer,
-                                 EfcDataModel dataModel)
+                                 EfcDataModel dataModel,
+                                 CancellationToken token)
         {
-            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async: true);
-
+            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async: true, token);
         }
 
         public EfcItemController(IApplicationGlobals AppGlobals,
@@ -40,9 +40,10 @@ namespace QuickFiler.Controllers
                                  EfcFormController parent,
                                  ItemViewer itemViewer,
                                  EfcDataModel dataModel,
-                                 bool async)
+                                 bool async,
+                                 CancellationToken token)
         {
-            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async);
+            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async, token);
         }
 
         private void Initialize(IApplicationGlobals AppGlobals,
@@ -50,8 +51,10 @@ namespace QuickFiler.Controllers
                                 EfcFormController parent,
                                 ItemViewer itemViewer,
                                 EfcDataModel dataModel,
-                                bool async)
+                                bool async,
+                                CancellationToken token)
         {
+            _token = token;
             _globals = AppGlobals;
             _homeController = homeController;
 
@@ -93,6 +96,7 @@ namespace QuickFiler.Controllers
             Task.Run(()=>InitializeWebViewAsync());
         }
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region Item Setup and Disposal Methods
@@ -202,11 +206,12 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void PopulateConversation()
         {
-            var count = _dataModel.ConversationResolver.DfConversationExpanded.Rows.Count;
+            var count = _dataModel.ConversationResolver.Count.SameFolder;
             _itemViewer.LblConvCt.Text = count.ToString();
             if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
 
-            _ = Task.Run(() => _dataModel.GetConversationInfoAsync());
+            // Could be redundant to event handler in ConversationResolver
+            _ = Task.Run(() => _dataModel.ConversationResolver.LoadConversationItemsAsync(_homeController.Token, backgroundLoad: true));
         }
                 
         internal void ResolveControlGroups(ItemViewer itemViewer)
@@ -254,7 +259,7 @@ namespace QuickFiler.Controllers
         private List<Control> _navCtrls;
         private List<Control> _tipsCtrls;
         private List<Control> _dflt2Ctrls;
-        private List<Control> _selectorsCtrls;
+        private List<Control> _selectorsCtrls = null;
         private List<Control> _mailCtrls;
 
         #endregion
@@ -421,6 +426,9 @@ namespace QuickFiler.Controllers
 
         public IList<TableLayoutPanel> TableLayoutPanels { get => _tableLayoutPanels; }
 
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; set => _token = value; }
+
         #endregion
 
         #region Event Wiring
@@ -430,8 +438,9 @@ namespace QuickFiler.Controllers
             //Debug.WriteLine($"Wiring keyboard for item {this.Position}, {this.Subject}");
             _itemViewer.ForAllControls(x =>
             {
-                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_keyboardHandler.KeyboardHandler_PreviewKeyDown);
-                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDown);
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_keyboardHandler.KeyboardHandler_PreviewKeyDownAsync);
+                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDown);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
                         
@@ -450,36 +459,36 @@ namespace QuickFiler.Controllers
         {
             if (!overwriteDuplicates) 
             {
-                actions = actions.Where(action => !_keyboardHandler.KdCharActions.ContainsKey(action.Key)).ToDictionary();       
+                actions = actions.Where(action => !_keyboardHandler.CharActions.ContainsKey(action.Key)).ToDictionary();       
             }
-            actions.ForEach(action => _keyboardHandler.KdCharActions[action.Key] = action.Value);
+            actions.ForEach(action => _keyboardHandler.CharActions[action.Key] = action.Value);
         }
         
         internal void RegisterFocusActions()
         {
-            _keyboardHandler.KdCharActions.Add('O', (x) => _ = _explorerController.OpenQFItem(_itemInfo.Item));
-            _keyboardHandler.KdCharActions.Add('E', async (x) => await KbdExecuteAsync(this.ToggleExpansionAsync));
+            _keyboardHandler.CharActions.Add("Item", 'O', (x) => _ = _explorerController.OpenQFItem(_itemInfo.Item));
+            _keyboardHandler.CharActions.Add("Item", 'E', async (x) => await KbdExecuteAsync(this.ToggleExpansionAsync));
             if (_expanded)
             {
-                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
-                _keyboardHandler.KdCharActions.Add('D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
+                _keyboardHandler.CharActions.Add("Item", 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
+                _keyboardHandler.CharActions.Add("Item", 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
         }
 
         internal void UnregisterFocusActions()
         {
-            _keyboardHandler.KdCharActions.Remove('O');
-            _keyboardHandler.KdCharActions.Remove('E');
+            _keyboardHandler.CharActions.Remove("Item", 'O');
+            _keyboardHandler.CharActions.Remove("Item", 'E');
             if (_expanded)
             {
-                _keyboardHandler.KdCharActions.Remove('B');
-                _keyboardHandler.KdCharActions.Remove('D');
+                _keyboardHandler.CharActions.Remove("Item", 'B');
+                _keyboardHandler.CharActions.Remove("Item", 'D');
             }
         }
 
         internal void UnregisterActions(List<char> keys)
         {
-            keys.ForEach(key => _keyboardHandler.KdCharActions.Remove(key));
+            keys.ForEach(key => _keyboardHandler.CharActions.Remove("Item", key));
         }
         
         #endregion
@@ -488,11 +497,11 @@ namespace QuickFiler.Controllers
 
         public async void ConversationResolverPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(_dataModel.ConversationResolver.ConversationInfoExpanded))
+            if (e.PropertyName == nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded))
             {
                 // Switch to UI Thread
                 await _itemViewer.UiSyncContext;
-                _itemViewer.TopicThread.SetObjects(_dataModel.ConversationResolver.ConversationInfoExpanded);
+                _itemViewer.TopicThread.SetObjects(_dataModel.ConversationResolver.ConversationInfo.Expanded);
                 _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
             }
         }
@@ -587,8 +596,8 @@ namespace QuickFiler.Controllers
                     _timer.Change(4000, System.Threading.Timeout.Infinite);
                 }
                 // Register the keyboard actions and overwrite any others silently
-                _keyboardHandler.KdCharActions.Add('B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
-                _keyboardHandler.KdCharActions.Add('D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
+                _keyboardHandler.CharActions.Add("Item", 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
+                _keyboardHandler.CharActions.Add("Item", 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
             else
             {
@@ -599,8 +608,8 @@ namespace QuickFiler.Controllers
                 _itemViewer.L0v2h2_WebView2.Visible = false;
                 _expanded = false;
                 if (_timer is not null) { _timer.Dispose(); }
-                _keyboardHandler.KdCharActions.Remove('B');
-                _keyboardHandler.KdCharActions.Remove('D');
+                _keyboardHandler.CharActions.Remove("Item", 'B');
+                _keyboardHandler.CharActions.Remove("Item", 'D');
             }
         }
 
@@ -673,6 +682,12 @@ namespace QuickFiler.Controllers
             }
         }
 
+        public async Task ToggleNavigationAsync(Enums.ToggleState desiredState)
+        {
+            await ToggleTipsAsync(desiredState);
+        }
+
+
         public void ToggleTips(bool async)
         {
             foreach (IQfcTipsDetails tipsDetails in _listTipsDetails)
@@ -689,6 +704,22 @@ namespace QuickFiler.Controllers
                 if (async) { _itemViewer.BeginInvoke(new System.Action(() => tipsDetails.Toggle(desiredState, true))); }
                 else { _itemViewer.Invoke(new System.Action(() => tipsDetails.Toggle(desiredState, true))); }
             }
+        }
+
+        public async Task ToggleTipsAsync(Enums.ToggleState desiredState)
+        {
+            Token.ThrowIfCancellationRequested();
+
+            // Attempt to remove blocking await code and start all tasks simultaneously. 
+            var tasks = _listTipsDetails.Select(x => x.ToggleAsync(desiredState, shareColumn: true)).ToList();
+            // TODO: Check if this creates a deadlock
+            await Task.WhenAll(tasks);
+
+            // Original async code
+            //foreach (var tip in _listTipsDetails)
+            //{
+            //    await tip.ToggleAsync(desiredState, shareColumn: true);
+            //}
         }
 
         public void ToggleSaveAttachments()
@@ -729,7 +760,7 @@ namespace QuickFiler.Controllers
             if (_isWebViewerInitialized)
             {
                 _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.ToggleDark(desiredState));
-                _dataModel.ConversationResolver.ConversationInfoExpanded.ForEach(item => item.ToggleDark(desiredState));
+                _dataModel.ConversationResolver.ConversationInfo.Expanded.ForEach(item => item.ToggleDark(desiredState));
                 //ConversationInfo.ForEach(item => item.ToggleDark(desiredState));
             }
         }
@@ -780,7 +811,7 @@ namespace QuickFiler.Controllers
             await _itemViewer.UiSyncContext;
             control.Focus();
         }
-        
+                
         public Dictionary<string, System.Action> RightKeyActions
         {
             get => new()

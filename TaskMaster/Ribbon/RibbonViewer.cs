@@ -114,20 +114,20 @@ namespace TaskMaster
             // MessageBox.Show("Not Implemented");
         }
 
-        public void QuickFilerOld_Click(Office.IRibbonControl control)
-        {
-            _controller.LoadQuickFilerOld();
-        }
-
-        public void QuickFiler_Click(Office.IRibbonControl control)
-        {
-            _controller.LoadQuickFiler();
-        }
-
-        //public async void QuickFiler_Click(Office.IRibbonControl control)
+        //public void QuickFilerOld_Click(Office.IRibbonControl control)
         //{
-        //    await _controller.LoadQuickFilerAsync();
+        //    _controller.LoadQuickFilerOld();
         //}
+
+        //public void QuickFiler_Click(Office.IRibbonControl control)
+        //{
+        //    _controller.LoadQuickFiler();
+        //}
+
+        public async void QuickFiler_Click(Office.IRibbonControl control)
+        {
+            await _controller.LoadQuickFilerAsync();
+        }
 
         public void Runtest(Office.IRibbonControl control)
         {

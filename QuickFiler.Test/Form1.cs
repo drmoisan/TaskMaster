@@ -20,7 +20,7 @@ namespace QuickFiler.Test
 
         private void LoadControlGroup()
         {
-            var _controlGroup = new QfcItemViewer();
+            var _controlGroup = new ItemViewer();
             TableLayoutPanel1.SuspendLayout();
             TableLayoutPanel1.RowCount += 1;
             TableLayoutPanel1.RowStyles.Insert(TableLayoutPanel1.RowCount - 2, new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0f));
@@ -30,7 +30,7 @@ namespace QuickFiler.Test
 
         }
 
-        private void SetControlGroupOptions(QfcItemViewer group)
+        private void SetControlGroupOptions(ItemViewer group)
         {
             group.AutoSize = true;
             group.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;

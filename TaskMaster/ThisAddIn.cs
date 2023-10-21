@@ -12,9 +12,10 @@ using ToDoModel;
 using Microsoft.Office.Core;
 using QuickFiler;
 using UtilitiesCS;
+using UtilitiesCS.Threading;
 
 
-[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 
 namespace TaskMaster
 {
@@ -22,6 +23,7 @@ namespace TaskMaster
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            logger.Debug($"Application Starting");
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
@@ -29,7 +31,7 @@ namespace TaskMaster
             _globals = new ApplicationGlobals(Application);
 
             // Grab the sync context for the UI thread
-            UIThreadExtensions.InitUiContext();
+            UIThreadExtensions.InitUiContext(monitorUiThread: false);
 
             // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();
@@ -38,6 +40,9 @@ namespace TaskMaster
             EfcViewerQueue.BuildQueue(2);
             //ItemViewerQueue.BuildQueueWhenIdle(10);
             ItemViewerQueue.BuildQueueBackground(30);
+            
+            // Initialize IdleAction Queue so that breakpoint is hit after UI
+            IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();

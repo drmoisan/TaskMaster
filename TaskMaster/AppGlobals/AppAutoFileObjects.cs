@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
@@ -103,9 +104,10 @@ namespace TaskMaster
         }
         async private Task LoadMovedMailsAsync()
         {
-            await TaskPriority.Run(
-                PriorityScheduler.BelowNormal,
-                () => _movedMails = LoadMovedMails());
+            //await TaskPriority.Run(
+            //    PriorityScheduler.BelowNormal,
+            //    () => _movedMails = LoadMovedMails());
+            await Task.Run(() => _movedMails = LoadMovedMails());
         }
 
         public IRecentsList<string> RecentsList
@@ -128,12 +130,12 @@ namespace TaskMaster
             }
         }
         async private Task LoadRecentsListAsync()
-        {
+        {   
             await Task.Factory.StartNew(
                 () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
                 default,
-                TaskCreationOptions.None,
-                PriorityScheduler.BelowNormal);
+                TaskCreationOptions.None, 
+                TaskScheduler.Current);
         }   
 
         public CtfMap CtfMap
@@ -169,9 +171,10 @@ namespace TaskMaster
                                                _parent.FS.FldrPythonStaging,
                                                _defaults.BackupFile_CTF_Inc),
                                            askUserOnError: true),
-                default,
-                TaskCreationOptions.None,
-                PriorityScheduler.BelowNormal);
+                default(CancellationToken));
+                //default,
+                //TaskCreationOptions.None,
+                //PriorityScheduler.BelowNormal);
         }
 
         public ISerializableList<string> CommonWords
@@ -207,9 +210,10 @@ namespace TaskMaster
                                                                   backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
                                                                                                _defaults.BackupFile_CommonWords),
                                                                   askUserOnError: false),
-                default,
-                TaskCreationOptions.None,
-                PriorityScheduler.BelowNormal);
+                default(CancellationToken));
+                //default,
+                //TaskCreationOptions.None,
+                //PriorityScheduler.BelowNormal);
         }
 
         private IList<string> CommonWordsBackupLoader(string filepath)
@@ -281,18 +285,23 @@ namespace TaskMaster
         {
             await Task.Factory.StartNew(
                  () => _subjectMap = LoadSubjectMap(),
-                 default,
-                 TaskCreationOptions.None,
-                 PriorityScheduler.BelowNormal);
+                 default(CancellationToken),
+                 TaskCreationOptions.LongRunning,
+                 TaskScheduler.Current);
+            //default,
+            //TaskCreationOptions.None,
+            //PriorityScheduler.BelowNormal);
 
             await Task.Factory.StartNew(
                  () => _encoder = LoadEncoder(),
-                 default,
-                 TaskCreationOptions.None,
-                 PriorityScheduler.BelowNormal);
+                 default(CancellationToken));
+            //default,
+            //TaskCreationOptions.None,
+            //PriorityScheduler.BelowNormal);
 
-            await TaskPriority.Run(
-                PriorityScheduler.BelowNormal,
+            //await TaskPriority.Run(
+            //    PriorityScheduler.BelowNormal,
+            await Task.Run(
                 () =>
                 {
                     var toRecode = this.SubjectMap.Where(x => x.Encoder is null || 

@@ -258,7 +258,12 @@ namespace Tags
             _viewer.HideArchive.CheckedChanged += new System.EventHandler(HideArchive_CheckedChanged);
             _viewer.KeyDown += new System.Windows.Forms.KeyEventHandler(TagViewer_KeyDown);
         }
-        
+
+        private void L1v2L2_OptionsPanel_KeyDown(object sender, KeyEventArgs e)
+        {
+            
+        }
+
         private void ButtonOk_Click(object sender, EventArgs e) => ButtonOk_Action();
         
         public void ButtonOk_Action() //internal
@@ -394,12 +399,7 @@ namespace Tags
         #endregion
 
         #region Keyboard Events
-
-        private void L1v2L2_OptionsPanel_KeyDown(object sender, KeyEventArgs e)
-        {
-            
-        }
-
+        
         public void OptionsPanel_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e) //internal
         {
             switch (e.KeyCode)
@@ -483,7 +483,6 @@ namespace Tags
                     }
             }
         }
-
         
         #endregion
 

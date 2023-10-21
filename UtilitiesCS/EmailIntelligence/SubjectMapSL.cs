@@ -15,6 +15,8 @@ namespace UtilitiesCS
     /// </summary>
     public class SubjectMapSL : SerializableList<SubjectMapEntry>, ISubjectMapSL
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public SubjectMapSL(ISerializableList<string> commonWords) : base() { _commonWords = commonWords; }
 
         public SubjectMapSL(List<SubjectMapEntry> listOfT,
@@ -77,10 +79,23 @@ namespace UtilitiesCS
             // If it doesn't exist, add an entry. If it does exist, increase the count
             if (idx == -1)
             {
-                base.Add(new SubjectMapEntry(emailFolder: folderName, 
-                                             emailSubject: subject, 
-                                             emailSubjectCount: 1, 
-                                             commonWords: _commonWords));
+                try
+                {
+                    var sme = new SubjectMapEntry(emailFolder: folderName,
+                                              emailSubject: subject,
+                                              emailSubjectCount: 1,
+                                              commonWords: _commonWords);
+                    base.Add(sme);
+                }
+                catch (ArgumentNullException e)
+                {
+                    logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
+                }
+                catch (InvalidOperationException e) 
+                {
+                    logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
+                }
+                
             }
             else
             {

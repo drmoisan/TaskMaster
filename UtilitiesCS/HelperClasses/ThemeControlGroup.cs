@@ -123,7 +123,7 @@ namespace UtilitiesCS
         private Color _foreColor;
         private Color _backColor;
         private Color _hoverColor;
-        private Color _clickedColor;
+        //private Color _clickedColor;
         private Color _foreColorMain;
         private Color _backColorMain;
         private Color _foreColorAlt;

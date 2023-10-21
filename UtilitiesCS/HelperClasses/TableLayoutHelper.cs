@@ -123,10 +123,10 @@ namespace UtilitiesCS
             panel.ColumnCount -= removeCount;
         }
 
-        public static RowStyle Clone(this RowStyle sourceStyle)
-        {
-            if (sourceStyle == null) { throw new ArgumentNullException(); }
-            return new RowStyle(sourceStyle.SizeType, sourceStyle.Height);
-        }
+        //public static RowStyle Clone(this RowStyle sourceStyle)
+        //{
+        //    if (sourceStyle == null) { throw new ArgumentNullException(); }
+        //    return new RowStyle(sourceStyle.SizeType, sourceStyle.Height);
+        //}
     }
 }

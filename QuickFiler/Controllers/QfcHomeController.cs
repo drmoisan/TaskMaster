@@ -9,36 +9,130 @@ using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
 using System.IO;
+using System.ComponentModel;
+using System.Windows.Forms;
+using UtilitiesCS.Threading;
+using System.Threading;
+using QuickFiler.Viewers;
+using System.Globalization;
+using System.Diagnostics;
 
 namespace QuickFiler.Controllers
 {
     public class QfcHomeController : IFilerHomeController
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Constructors, Initializers, and Destructors
 
-        public QfcHomeController(IApplicationGlobals AppGlobals, System.Action ParentCleanup)
+        private QfcHomeController() { }
+
+        public QfcHomeController(IApplicationGlobals AppGlobals,
+                                 System.Action ParentCleanup)
         {
+            
             _globals = AppGlobals;
             //InitAfObjects();
             _parentCleanup = ParentCleanup;
-            _datamodel = new QfcDatamodel(_globals);
+            _datamodel = new QfcDatamodel(_globals, this.Token);
             _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
             _formViewer = new QfcFormViewer();
+            _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            _uiSyncContext = _formViewer.UiSyncContext;
             _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
-            _formController = new QfcFormController(_globals, _formViewer, InitTypeEnum.Sort, Cleanup, this);
+            _qfcQueue = new QfcQueue(Token);
+            _formController = new QfcFormController(_globals, _formViewer, _qfcQueue, InitTypeEnum.Sort, Cleanup, this, TokenSource, Token);
+        }
+
+        public static async Task<QfcHomeController> LaunchAsync(IApplicationGlobals appGlobals,
+                                                                System.Action parentCleanup)
+        {
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} is beginning");
+            
+            // Create uninitialized instance of QfcHomeController
+            var controller = new QfcHomeController();
+
+            // Establish a SynchronizationContext for the UI thread
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            
+            // Create cancellation token and progress tracker
+            var tokenSource = new CancellationTokenSource();
+            var token = tokenSource.Token;
+            var progress = new ProgressTracker(tokenSource);
+            
+            try
+            {
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"Calling {nameof(QfcHomeController)}.{nameof(InitAsync)} ...");
+
+                await controller.InitAsync(appGlobals, parentCleanup, tokenSource, token, progress.SpawnChild(86));
+                controller.Loaded = true;
+
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"Calling {nameof(QfcHomeController)}.{nameof(RunAsync)} ...");
+
+                await controller.RunAsync(progress.SpawnChild());
+
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} is complete");
+
+            }
+            catch (OperationCanceledException)
+            {
+                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                    $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} was cancelled");
+                
+                controller = null;
+            }
+                        
+            return controller;
+        }
+
+        internal async Task InitAsync(IApplicationGlobals appGlobals,
+                                      System.Action parentCleanup,
+                                      CancellationTokenSource tokenSource,
+                                      CancellationToken token,
+                                      ProgressTracker progress)
+        {
+            _token = token;
+            _tokenSource = tokenSource;
+            _globals = appGlobals;
+            _parentCleanup = parentCleanup;
+            
+            // Load the data model in the background
+            var dataModelTask = QfcDatamodel.LoadAsync(_globals, this.Token, this.TokenSource, progress);
+                        
+            // Load all components Synchronously with minimal initialization
+            _formViewer = new QfcFormViewer();
+            _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            _uiSyncContext = _formViewer.UiSyncContext;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
+            _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+            _qfcQueue = new QfcQueue(Token);
+            _formController = new QfcFormController(
+                _globals, _formViewer, _qfcQueue, 
+                InitTypeEnum.Sort, Cleanup, this, TokenSource, Token);
+            
+            // Wait for the data model to finish loading asynchronously
+            _datamodel = await dataModelTask;
         }
 
         private IApplicationGlobals _globals;
+        private QfcQueue _qfcQueue;
         private System.Action _parentCleanup;
-
+        
         #endregion Constructors, Initializers, and Destructors
-
 
         public void Run()
         {
-            IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
+            IList<MailItem> listEmail = _datamodel.InitEmailQueue(_formController.ItemsPerIteration, _formViewer.Worker);
             _formController.LoadItems(listEmail);
-            _stopWatch = new cStopWatch();
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();
@@ -46,26 +140,110 @@ namespace QuickFiler.Controllers
         }
 
         // Twice as slow as the synchronous version
-        public async Task RunAsync()
+        public async Task RunAsync(ProgressTracker progress)
         {
-            IList<MailItem> listEmail = _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker);
+            
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcDatamodel.InitEmailQueueAsync)} ...");
+            progress.Report(0, "Initializing Email Queue");
+            
+            IList<MailItem> listEmail = await _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker, Token, TokenSource);
+            
+            progress.Report(30, "Initializing Qfc Items");
+
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
             await _formController.LoadItemsAsync(listEmail);
-            _stopWatch = new cStopWatch();
+
+            progress.Report(100);
+
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Showing and Refreshing {nameof(QfcFormViewer)} ...");
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();
             _formViewer.Refresh();
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(RunAsync)} is complete");
         }
 
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                // The user canceled the operation.
+                //MessageBox.Show("Operation was canceled");
+                logger.Debug($"{nameof(QfcDatamodel)} background worker cancelled");
+            }
+            else if (e.Error != null)
+            {
+                // There was an error during the operation.
+                string msg = String.Format("An error occurred: {0}", e.Error.Message);
+                MessageBox.Show(msg);
+            }
+            else
+            {
+                _ = IterateQueueAsync();
+            }
+        }
+
+        public async Task IterateQueueAsync()
+        {
+            Token.ThrowIfCancellationRequested();
+
+            if (_datamodel.Complete) { return; }
+            try
+            {
+                var listObjects = await _datamodel.DequeueNextItemGroupAsync(_formController.ItemsPerIteration, 2000);
+                if (listObjects.Count > 0)
+                {
+                    await _qfcQueue.EnqueueAsync(listObjects, _globals, this, _formController.Groups).ConfigureAwait(false);
+                }
+                else 
+                { 
+                    logger.Debug($"{nameof(IterateQueueAsync)} completed");
+                    await _qfcQueue.CompleteAddingAsync(Token, 10000);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                logger.Debug($"{nameof(IterateQueueAsync)} cancelled");
+            }
+            catch (System.Exception ex)
+            {
+                if (this.Token.IsCancellationRequested)
+                {
+                    logger.Debug($"{nameof(IterateQueueAsync)} cancelled");
+                }
+                else
+                {
+                    throw ex;
+                }     
+            }
+            
+        }
+        
         public void Iterate()
         {
-            _stopWatch = new cStopWatch();
+            _stopWatch = new Stopwatch();
             _stopWatch.Start();
 
-            IList<MailItem> listObjects = _datamodel.DequeueNextItemGroup(_formController.ItemsPerIteration);
+            IList<MailItem> listObjects = _datamodel.DequeueNextItemGroupAsync(_formController.ItemsPerIteration, 2000).GetAwaiter().GetResult();
             _formController.LoadItems(listObjects);
         }
 
+        public void Iterate2()
+        {
+            _stopWatch = new Stopwatch();
+            _stopWatch.Start();
+            (var tlp, var itemGroups) = _qfcQueue.Dequeue();
+            _formController.LoadItems(tlp, itemGroups);
+            _ = IterateQueueAsync();
+        }
+
+        public void SwapStopWatch()
+        {
+            _stopWatchMoved = _stopWatch;
+            _stopWatch = new Stopwatch();
+            _stopWatch.Start();
+        }
         
         public void QuickFileMetrics_WRITE(string filename)
         {
@@ -88,11 +266,11 @@ namespace QuickFiler.Controllers
 
             LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
 
-            Duration = _stopWatch.timeElapsed;
+            Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
             OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
 
-            var emailsLoaded = _formController.Groups.EmailsLoaded;
+            var emailsLoaded = _formController.Groups.EmailsToMove;
 
             if (emailsLoaded > 0)
             {
@@ -104,7 +282,7 @@ namespace QuickFiler.Controllers
 
             durationMinutesText = (Duration / 60d).ToString("##0.00");
 
-            OlEmailCalendar = Calendar.GetCalendar("Email Time", _globals.Ol.App.Session);
+            OlEmailCalendar = UtilitiesCS.Calendar.GetCalendar("Email Time", _globals.Ol.App.Session);
             OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
             {
                 OlAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
@@ -135,7 +313,9 @@ namespace QuickFiler.Controllers
         }
 
         private bool _loaded = false;
-        public bool Loaded { get => _loaded; }
+        public bool Loaded { get => _loaded; internal set => _loaded = value; }
+
+        #region Public Properties
 
         private IQfcExplorerController _explorerController;
         public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
@@ -147,14 +327,33 @@ namespace QuickFiler.Controllers
         public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
         
         private IQfcDatamodel _datamodel;
-        public IQfcDatamodel DataModel { get => _datamodel; }
-        
-        private cStopWatch _stopWatch;
-        public cStopWatch StopWatch { get => _stopWatch; }
+        public IQfcDatamodel DataModel { get => _datamodel; internal set => _datamodel = value; }
+
+        private TaskScheduler _uiScheduler;
+        internal TaskScheduler UiScheduler { get => _uiScheduler; }
+
+        private Stopwatch _stopWatchMoved;
+        private Stopwatch _stopWatch;
+        public Stopwatch StopWatch { get => _stopWatch; }
 
         private QfcFormViewer _formViewer;
         //public QfcFormViewer FormViewer { get => _formViewer; }
 
-        
+        internal void CreateCancellationToken()
+        {
+            _tokenSource = new CancellationTokenSource();
+            _token = _tokenSource.Token;
+        }
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; }
+
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; }
+
+        private SynchronizationContext _uiSyncContext;
+        public SynchronizationContext UiSyncContext { get => _uiSyncContext; }
+
+        #endregion
+
     }
 }

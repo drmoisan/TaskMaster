@@ -40,9 +40,6 @@ namespace UtilitiesCS.Test.HelperClasses
         public void DependenciesNotNull_ExpectedState_False_MultipleParamsNull()
         {
             bool strict = false;
-            string variable1 = null;
-            List<bool> variable2 = null;
-            int variable3 = 1;
             var test = Initializer.DependenciesNotNull(strict, null);
             Assert.IsFalse(test);
         }
@@ -71,7 +68,7 @@ namespace UtilitiesCS.Test.HelperClasses
             string variable1 = null;
             List<bool> variable2 = null;
             int variable3 = 1;
-            var test = Initializer.DependenciesNotNull(strict, null);
+            var test = Initializer.DependenciesNotNull(strict, variable1, variable2, variable3);
             Assert.IsFalse(test);
         }
     }

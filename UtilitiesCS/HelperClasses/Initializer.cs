@@ -69,10 +69,42 @@ namespace UtilitiesCS
             return variable;
         }
 
+        public static T GetOrLoad<T>(ref T variable, Func<T> loader, Action<T> callbackOnSet)
+        {
+            if (EqualityComparer<T>.Default.Equals(variable, default(T))) 
+            { 
+                variable = loader();
+                callbackOnSet(variable);
+            }
+            return variable;
+        }
+
         public static T GetOrLoad<T>(ref T variable, Func<T> loader, bool strict, params object[] dependencies)
         {
             if (DependenciesNotNull(strict, dependencies)) { return GetOrLoad(ref variable, loader); }
             else { return default(T); }
+        }
+
+        public static T GetOrLoad<T>(ref T variable, Func<T> loader, Action<T> callbackOnSet, bool strict, params object[] dependencies)
+        {
+            if (DependenciesNotNull(strict, dependencies)) { return GetOrLoad(ref variable, loader, callbackOnSet); }
+            else { return default(T); }
+        }
+
+        public static T GetOrLoad<T>(ref T variable, Func<T, bool> isInitialized, Func<T> loader, bool strict, params object[] dependencies)
+        {
+            if (DependenciesNotNull(strict, dependencies)) { return GetOrLoad(ref variable, loader); }
+            else { return variable; }
+        }
+
+        public static T GetOrLoad<T>(ref T variable, Func<T, bool> isInitialized, Func<T> loader)
+        {
+            if (isInitialized(variable)) { return variable; }
+            else 
+            {
+                variable = loader();
+                return variable;
+            }
         }
 
         public static T GetOrLoad<T>(ref T variable, T defaultValue, Func<T> loader, params object[] dependencies)

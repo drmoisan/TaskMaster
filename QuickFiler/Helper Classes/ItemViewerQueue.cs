@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using UtilitiesCS;
 using UtilitiesCS.Threading;
 
@@ -18,11 +20,20 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                IdleActionQueue.AddEntry(() =>
-                {
-                    _queue.Enqueue(new ItemViewer());
-                    //logger.Debug($"Enqueued {_queue.Count}");
-                });
+                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(
+                    () =>
+                    {
+                        _queue.Enqueue(new ItemViewer());
+                        //logger.Debug($"Enqueued {_queue.Count}");
+                    },
+                    System.Windows.Threading.DispatcherPriority.ContextIdle);
+                
+                // IdleActionQueue implementation
+                //IdleActionQueue.AddEntry(() =>
+                //{
+                //    _queue.Enqueue(new ItemViewer());
+                //    //logger.Debug($"Enqueued {_queue.Count}");
+                //});
             }
         }
 
@@ -30,11 +41,13 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
-                {
-                    _queue.Enqueue(new ItemViewer());
-                    //logger.Debug($"Enqueued {_queue.Count}");
-                }, System.Windows.Threading.DispatcherPriority.Background);
+                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(
+                    () =>
+                    {
+                        _queue.Enqueue(new ItemViewer());
+                        //logger.Debug($"Enqueued {_queue.Count}");
+                    }, 
+                    System.Windows.Threading.DispatcherPriority.Background);
             }
         }
 
@@ -47,7 +60,7 @@ namespace QuickFiler
             }
         }
 
-        public static ItemViewer Dequeue()
+        public static ItemViewer Dequeue(CancellationToken token)
         {
             ItemViewer viewer = null;
             if (_queue.Count > 0)
@@ -59,7 +72,7 @@ namespace QuickFiler
             }
             else
             {
-                viewer = new ItemViewer();
+                viewer = UIThreadExtensions.UiDispatcher.Invoke(() => new ItemViewer(), DispatcherPriority.Render);
                 BuildQueueWhenIdle(1);
             }
             return viewer;
@@ -67,11 +80,12 @@ namespace QuickFiler
 
         public static IEnumerable<ItemViewer> DequeueChunk(int count)
         {
-            if (_queue.Count < count)
+            var countOriginal = _queue.Count;
+            if (countOriginal < count)
             {
-                BuildQueue(count - _queue.Count);
+                UIThreadExtensions.UiDispatcher.Invoke(() => BuildQueue(count - countOriginal), DispatcherPriority.Render);
             }
-            BuildQueueWhenIdle(count);
+            BuildQueueWhenIdle(countOriginal);
             return _queue.DequeueChunk(count);
         }
 

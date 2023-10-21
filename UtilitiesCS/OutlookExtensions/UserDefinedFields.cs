@@ -15,7 +15,9 @@ namespace UtilitiesCS.OutlookExtensions
     public static class UserDefinedFields
     {
         public static UserProperty GetUdf(this OutlookItem item, string fieldName) => item.UserProperties.Find(fieldName);
-        
+        public static UserProperty GetUdf(this MailItem item, string fieldName) => item.UserProperties.Find(fieldName);
+
+        public static string GetUdfString(this MailItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
         public static string GetUdfString(this OutlookItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
         public static string GetUdfString(this UserProperty property) => (string)property.GetUdfValue(OlUserPropertyType.olText, true);
 
@@ -408,7 +410,6 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="value">Value to assign to the user defined field</param>
         /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
         /// <returns>true if successful. false if unsuccessful</returns>
-        [Obsolete("Use SetUdf with OutlookItem instead")]
         public static bool SetUdf(this MailItem item,
                                   string udfName,
                                   object value,

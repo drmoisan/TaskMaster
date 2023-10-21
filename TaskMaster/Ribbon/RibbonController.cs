@@ -14,6 +14,7 @@ using QuickFiler;
 using Microsoft.Office.Interop.Outlook;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace TaskMaster
 {
@@ -23,8 +24,9 @@ namespace TaskMaster
         private RibbonViewer _viewer;
         private IApplicationGlobals _globals;
         private bool blHook = true;
-        private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
+        //private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
         private IFilerHomeController _quickFiler;
+        private bool _quickFilerLoaded = false;
 
         public RibbonController() { }
 
@@ -42,7 +44,7 @@ namespace TaskMaster
         {
             // _globals.TD.IDList_Refresh()
             _globals.TD.IDList.RefreshIDList(_globals.Ol.App);
-            Interaction.MsgBox("ID Refresh Complete");
+            MessageBox.Show("ID Refresh Complete");
         }
 
         internal void SplitToDoID()
@@ -59,17 +61,17 @@ namespace TaskMaster
             taskTreeViewer.Show();
         }
 
-        internal void LoadQuickFilerOld()
-        {
-            bool loaded = false;
-            if (_quickfileLegacy is not null)
-                loaded = _quickfileLegacy.Loaded;
-            if (loaded == false)
-            {
-                _quickfileLegacy = new QuickFiler.Legacy.QfcLauncher(_globals, ReleaseQuickFilerLegacy);
-                _quickfileLegacy.Run();
-            }
-        }
+        //internal void LoadQuickFilerOld()
+        //{
+        //    bool loaded = false;
+        //    if (_quickfileLegacy is not null)
+        //        loaded = _quickfileLegacy.Loaded;
+        //    if (loaded == false)
+        //    {
+        //        _quickfileLegacy = new QuickFiler.Legacy.QfcLauncher(_globals, ReleaseQuickFilerLegacy);
+        //        _quickfileLegacy.Run();
+        //    }
+        //}
 
         internal void LoadQuickFiler()
         {
@@ -85,24 +87,24 @@ namespace TaskMaster
 
         internal async Task LoadQuickFilerAsync()
         {
-            bool loaded = false;
-            if (_quickFiler is not null)
-                loaded = _quickFiler.Loaded;
-            if (loaded == false)
+            if (!_quickFilerLoaded)
             {
-                _quickFiler = new QuickFiler.Controllers.QfcHomeController(_globals, ReleaseQuickFiler);
-                await _quickFiler.RunAsync();
+                _quickFilerLoaded = true;
+                _quickFiler = await QuickFiler.Controllers.QfcHomeController.LaunchAsync(_globals, ReleaseQuickFiler);
+                if (_quickFiler is null)
+                    _quickFilerLoaded = false;
             }
         }
 
-        private void ReleaseQuickFilerLegacy()
-        {
-            _quickfileLegacy = null;
-        }
+        //private void ReleaseQuickFilerLegacy()
+        //{
+        //    _quickfileLegacy = null;
+        //}
 
         private void ReleaseQuickFiler()
         {
             _quickFiler = null;
+            _quickFilerLoaded = false;
         }
 
         internal void ReviseProjectInfo()
@@ -206,7 +208,9 @@ namespace TaskMaster
         }
         internal void TryGetQfcDataModel()
         {
-            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals);
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
+            var dc = new QuickFiler.Controllers.QfcDatamodel(_globals, token);
         }
         internal void TryGetTableInView()
         {

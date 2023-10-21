@@ -22,6 +22,7 @@ namespace UtilitiesCS
                      IList<TableLayoutPanel> tableLayoutPanels,
                      IList<Button> buttons,
                      IList<IQfcTipsDetails> tipsDetailsLabels,
+                     IList<IQfcTipsDetails> tipsExpanded,
                      TextBox textboxSearch,
                      TextBox textboxBody,
                      ComboBox comboFolders,
@@ -62,6 +63,7 @@ namespace UtilitiesCS
             _tableLayoutPanels = tableLayoutPanels;
             _buttons = buttons;
             _tipsDetailsLabels = tipsDetailsLabels;
+            _tipsExpanded = tipsExpanded;
             _textboxSearch = textboxSearch;
             _textboxBody = textboxBody;
             _comboFolders = comboFolders;
@@ -102,6 +104,7 @@ namespace UtilitiesCS
         private IList<TableLayoutPanel> _tableLayoutPanels;
         private IList<Button> _buttons;
         private IList<IQfcTipsDetails> _tipsDetailsLabels;
+        IList<IQfcTipsDetails> _tipsExpanded;
         private TextBox _textboxSearch;
         private TextBox _textboxBody;
         private ComboBox _comboFolders;
@@ -268,10 +271,17 @@ namespace UtilitiesCS
 
         public void SetQfcTheme(bool async)
         {
-            if (async) { _lblSender.BeginInvoke(new System.Action(() => SetQfcTheme())); }
-            else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
+            if (async) { UIThreadExtensions.UiDispatcher.InvokeAsync(() => SetQfcTheme()); }
+            else { UIThreadExtensions.UiDispatcher.Invoke(() => SetQfcTheme()); }
+            //if (async) { _lblSender.BeginInvoke(new System.Action(() => SetQfcTheme())); }
+            //else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
         }
         
+        public async Task SetQfcThemeAsync()
+        {
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=> SetQfcTheme());
+        }
+
         private void SetQfcTheme()
         {
             // Active item navigation colors
@@ -286,6 +296,12 @@ namespace UtilitiesCS
 
             // Shortcut accelerator colors  
             foreach (var tipsDetails in _tipsDetailsLabels)
+            {
+                tipsDetails.LabelControl.BackColor = TipsDetailsBackColor;
+                tipsDetails.LabelControl.ForeColor = TipsDetailsForeColor;
+            }
+
+            foreach (var tipsDetails in _tipsExpanded)
             {
                 tipsDetails.LabelControl.BackColor = TipsDetailsBackColor;
                 tipsDetails.LabelControl.ForeColor = TipsDetailsForeColor;

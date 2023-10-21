@@ -8,7 +8,7 @@ using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
-using Windows.Win32;
+//using Windows.Win32;
 using UtilitiesCS.OutlookExtensions;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]

@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SVGControl")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PepsiCo Inc")]
+[assembly: AssemblyCompany("Dan Moisan")]
 [assembly: AssemblyProduct("SVGControl")]
-[assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")]
+[assembly: AssemblyCopyright("Copyright © Dan Moisan Inc 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
