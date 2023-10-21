@@ -940,6 +940,11 @@ namespace ToDoModel
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath);
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
+            
+            //BUGFIX: This is not threadsafe and generates an exception. Need to set this
+            //up as a class that will take in lines to write into a queue and will 
+            //flush to the System.IO based on a Timer frequency if there has been a change
+            //Look into channel functionality
             FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
 

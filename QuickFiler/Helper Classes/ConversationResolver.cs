@@ -235,7 +235,9 @@ namespace QuickFiler.Helper_Classes
             TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
             var dfRaw = await _mailItem.GetConversationDfAsync(Token).ConfigureAwait(false);
             var dfExpanded = dfRaw.FilterConversation(((Folder)_mailItem.Parent).Name, false, true);
+            dfExpanded = dfExpanded.Filter(dfExpanded["SentOn"].ElementwiseNotEquals<string>(""));
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
+            
             Df = new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
             
             

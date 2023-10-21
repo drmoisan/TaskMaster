@@ -92,8 +92,8 @@ namespace QuickFiler.Controllers
             TableLayoutHelper.RemoveSpecificRow(tlp, 0, 2);
 
             var count = ItemsPerIteration;
-            _itemsPerIteration = 1;
-            count = 1;
+            //_itemsPerIteration = 1;
+            //count = 1;
             tlp.InsertSpecificRow(0, _rowStyleTemplate, count);
             tlp.MinimumSize = new System.Drawing.Size(
                 tlp.MinimumSize.Width,

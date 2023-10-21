@@ -15,7 +15,7 @@ using UtilitiesCS;
 using UtilitiesCS.Threading;
 
 
-[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 
 namespace TaskMaster
 {
@@ -23,6 +23,7 @@ namespace TaskMaster
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            logger.Debug($"Application Starting");
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
