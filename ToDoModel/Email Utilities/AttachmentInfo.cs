@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
-using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
+//using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 
 namespace ToDoModel
 {
     public class AttachmentInfo
     {
+        #region Constructors and Initializers
+
         public AttachmentInfo() { }
 
         public AttachmentInfo(Attachment attachment, DateTime sentOn, string saveFolderPath)
@@ -74,7 +76,11 @@ namespace ToDoModel
 
         }
 
+        #endregion
+
         #region Public Properties
+
+        public const int MAX_PATH = 256;
 
         private Attachment _attachment;
         public Attachment Attachment { get => _attachment; set => _attachment = value; }

@@ -54,7 +54,7 @@ namespace UtilitiesCS
             return maxLengthsByColumn;
         }
 
-        private static string ToFormattedText(this string[,] strings)
+        public static string ToFormattedText(this string[,] strings)
         {
             StringBuilder sb = new();
             int[] maxLengthsByColumn = GetMaxLengthsByColumn(strings);
@@ -71,7 +71,7 @@ namespace UtilitiesCS
             return sb.ToString();
         }
 
-        private static string ToMarkdown(this string[,] strings)
+        public static string ToMarkdown(this string[,] strings)
         {
             StringBuilder sb = new();
             int[] maxLengthsByColumn = GetMaxLengthsByColumn(strings);

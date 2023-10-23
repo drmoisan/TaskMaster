@@ -6,21 +6,23 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UtilitiesCS.EmailIntelligence;
-using UtilitiesCS.EmailIntelligence.SubjectMap;
+
 
 namespace UtilitiesCS
 {
     /// <summary>
     /// A serializable list of ISubjectMapEntry. See <see cref="ISubjectMapEntry"/>.
     /// </summary>
-    public class SubjectMapSL : SerializableList<ISubjectMapEntry>, ISubjectMapSL
+    public class SubjectMapSL : SerializableList<SubjectMapEntry>, ISubjectMapSL
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public SubjectMapSL(ISerializableList<string> commonWords) : base() { _commonWords = commonWords; }
 
-        public SubjectMapSL(List<ISubjectMapEntry> listOfT,
+        public SubjectMapSL(List<SubjectMapEntry> listOfT,
                             ISerializableList<string> commonWords) : base(listOfT) { _commonWords = commonWords; }
 
-        public SubjectMapSL(IEnumerable<ISubjectMapEntry> IEnumerableOfT,
+        public SubjectMapSL(IEnumerable<SubjectMapEntry> IEnumerableOfT,
                             ISerializableList<string> commonWords) : base(IEnumerableOfT) { _commonWords = commonWords; }
 
         public SubjectMapSL(string filename,
@@ -39,7 +41,7 @@ namespace UtilitiesCS
         /// procedure will automatically use the backup loader if the primary laoder fails</param>
         public SubjectMapSL(string filename,
                             string folderpath,
-                            CSVLoader<ISubjectMapEntry> backupLoader,
+                            CSVLoader<SubjectMapEntry> backupLoader,
                             string backupFilepath,
                             bool askUserOnError,
                             ISerializableList<string> commonWords) : base(filename,
@@ -77,10 +79,23 @@ namespace UtilitiesCS
             // If it doesn't exist, add an entry. If it does exist, increase the count
             if (idx == -1)
             {
-                base.Add(new SubjectMapEntry(emailFolder: folderName, 
-                                             emailSubject: subject, 
-                                             emailSubjectCount: 1, 
-                                             commonWords: _commonWords));
+                try
+                {
+                    var sme = new SubjectMapEntry(emailFolder: folderName,
+                                              emailSubject: subject,
+                                              emailSubjectCount: 1,
+                                              commonWords: _commonWords);
+                    base.Add(sme);
+                }
+                catch (ArgumentNullException e)
+                {
+                    logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
+                }
+                catch (InvalidOperationException e) 
+                {
+                    logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
+                }
+                
             }
             else
             {
@@ -94,7 +109,7 @@ namespace UtilitiesCS
         /// <param name="subject"></param>
         /// <param name="folderName"></param>
         /// <returns></returns>
-        public ISubjectMapEntry Find(string subject, string folderName)
+        public SubjectMapEntry Find(string subject, string folderName)
         {
             int idx = base.FindIndex(entry => (entry.EmailSubject == subject) && (entry.Folderpath == folderName));
             if (idx != -1) { return base[idx]; }
@@ -107,11 +122,11 @@ namespace UtilitiesCS
         /// <param name="key">String to match. For EmailSubject, key is standardized. For Folderpath, key is matched literally</param>
         /// <param name="findBy"><inheritdoc cref="FindBy"/></param>
         /// <returns>List of matching subject map entries</returns>
-        public IList<ISubjectMapEntry> Find(string key, FindBy findBy)
+        public IList<SubjectMapEntry> Find(string key, Enums.FindBy findBy)
         {
             switch (findBy)
             {
-                case FindBy.Subject:
+                case Enums.FindBy.Subject:
                     key = key.StripCommonWords(_commonWords).ToLower();
                     return base.ToList().Where(entry => entry.EmailSubject == key).ToList();
 

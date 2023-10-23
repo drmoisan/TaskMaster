@@ -138,7 +138,7 @@ namespace TaskVisualization
                     // Dim flagsList2 = flagsList.OfType(Of TaskController.FlagsToSet)()
                     // Dim flagsList = (From x In symbolsDict Where listSelections.Contains(x.Key) Select x.Value).ToList()
                     // Dim selectedFlags As TaskController.FlagsToSet = GenericBitwise(Of TaskController.FlagsToSet).And(flagsList)
-                    TaskController.FlagsToSet selectedFlags = (TaskController.FlagsToSet)Conversions.ToInteger(GenericBitwise<TaskController.FlagsToSet>.Or(flagsList));
+                    TaskController.FlagsToSet selectedFlags = (TaskController.FlagsToSet)Conversions.ToInteger(GenericBitwiseStatic<TaskController.FlagsToSet>.Or(flagsList));
                     return selectedFlags;
                 }
             }

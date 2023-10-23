@@ -6,6 +6,7 @@ using UtilitiesCS;
 using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
 
 namespace ToDoModel.Test
 {
@@ -23,31 +24,31 @@ namespace ToDoModel.Test
             this.mockAttachment = this.mockRepository.Create<Attachment>();
         }
 
+        //[TestMethod]
+        //public void InitializeSortToExisting_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    string InitType = null;
+        //    bool QuickLoad = false;
+        //    bool WholeConversation = false;
+        //    string strSeed = null;
+        //    object objItem = null;
+
+        //        // Act
+        //        SortEmail.InitializeSortToExisting(
+        //                InitType,
+        //                QuickLoad,
+        //                WholeConversation,
+        //                strSeed,
+        //                objItem);
+
+        //    // Assert
+        //    Assert.Fail();
+        //    this.mockRepository.VerifyAll();
+        //}
+
         [TestMethod]
-        public void InitializeSortToExisting_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            string InitType = null;
-            bool QuickLoad = false;
-            bool WholeConversation = false;
-            string strSeed = null;
-            object objItem = null;
-
-                // Act
-                SortEmail.InitializeSortToExisting(
-                        InitType,
-                        QuickLoad,
-                        WholeConversation,
-                        strSeed,
-                        objItem);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void Run_StateUnderTest_ExpectedBehavior()
+        public async Task Run_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
             bool savePictures = false;
@@ -58,7 +59,7 @@ namespace ToDoModel.Test
             IApplicationGlobals appGlobals = null;
 
             // Act
-            SortEmail.RunAsync(
+            await SortEmail.RunAsync(
                 savePictures,
                 destinationFolderpath,
                 saveMsg,
@@ -72,7 +73,7 @@ namespace ToDoModel.Test
         }
 
         [TestMethod]
-        public void Run_StateUnderTest_ExpectedBehavior1()
+        public async Task Run_StateUnderTest_ExpectedBehavior1()
         {
             // Arrange
             IList<MailItem> mailItems = null;
@@ -84,7 +85,7 @@ namespace ToDoModel.Test
             IApplicationGlobals appGlobals = null;
 
             // Act
-            SortEmail.RunAsync(
+            await SortEmail.RunAsync(
                 mailItems,
                 savePictures,
                 destinationFolderpath,

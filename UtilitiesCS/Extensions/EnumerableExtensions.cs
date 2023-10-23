@@ -45,11 +45,44 @@ namespace UtilitiesCS
             }
         }
 
-        public static void ForEach<T>(this IEnumerable<T> enumeration, Action<T> action)
+        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
-            foreach (T item in enumeration)
+            foreach (T item in enumerable)
             {
                 action(item);
+            }
+        }
+
+        public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<int> progress)
+        {
+            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+
+            int completed = 0;
+            foreach (var item in enumerable)
+            {
+                yield return item;
+
+                completed++;
+                progress((int)(((double)completed / count) * 100));
+            }
+        }
+
+
+        public static async IAsyncEnumerable<(TFirst, TSecond)> Zip<TFirst, TSecond>(this IAsyncEnumerable<TFirst> first, IAsyncEnumerable<TSecond> second)
+        {
+            await using var e1 = first.GetAsyncEnumerator();
+            await using var e2 = second.GetAsyncEnumerator();
+
+            while (true)
+            {
+                var t1 = e1.MoveNextAsync().AsTask();
+                var t2 = e2.MoveNextAsync().AsTask();
+                await Task.WhenAll(t1, t2);
+
+                if (!t1.Result || !t2.Result)
+                    yield break;
+
+                yield return (e1.Current, e2.Current);
             }
         }
 

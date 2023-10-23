@@ -3,7 +3,7 @@ using Moq;
 using QuickFiler;
 using System;
 using Microsoft.Office.Interop.Outlook;
-using ToDoModel;
+
 using FluentAssertions;
 
 namespace QuickFiler.Test
@@ -17,9 +17,6 @@ namespace QuickFiler.Test
         private Mock<UserProperty> mockTriage;
         private Mock<UserProperties> mockUserProperties;
         private DateTime now = DateTime.Now;
-
-
-
 
         [TestInitialize]
         public void TestInitialize()
@@ -53,7 +50,7 @@ namespace QuickFiler.Test
 
             // Add user properties to mail item
             this.mockMailItem.Setup(x => x.UserProperties).Returns(this.mockUserProperties.Object);
-            
+            this.mockMailItem.Setup(x => x.EntryID).Returns("MockEntryIdNumber");
             this.mockMailItem.Setup(x => x.SentOn).Returns(now);
             this.mockMailItem.Setup(x => x.Sent).Returns(true);
             this.mockMailItem.Setup(x => x.IsMarkedAsTask).Returns(true);
@@ -67,6 +64,7 @@ namespace QuickFiler.Test
         [TestMethod]
         public void SenderName_Get_StateUnderTest_ExpectedBehavior()
         {
+            //TODO: Incomplete. Need to finish setting up the mail item mock
             // Arrange
             var mailItemInfo = this.CreateMailItemInfo();
             var expected = "SenderName";
@@ -81,6 +79,7 @@ namespace QuickFiler.Test
         [TestMethod]
         public void ExtractBasics_StateUnderTest_ExpectedBehavior()
         {
+            //TODO: Incomplete. Need to finish setting up the mail item mock
             // Arrange
             var mailItemInfo = this.CreateMailItemInfo();
             var expected = new MailItemInfo()

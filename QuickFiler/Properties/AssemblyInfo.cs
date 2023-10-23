@@ -8,14 +8,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("QuickFiler")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PepsiCo Inc")]
+[assembly: AssemblyCompany("Dan Moisan")]
 [assembly: AssemblyProduct("QuickFiler")]
-[assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")]
+[assembly: AssemblyCopyright("Copyright © Dan Moisan Inc 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-
-// Making assembly visible to testing module
-[assembly: InternalsVisibleTo("QuickFiler.Test",AllInternalsVisible = true)]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -23,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("71735d4f-611a-4470-9170-4d9437534377")]
+[assembly: Guid("f68514f3-3762-4520-b434-e9c5267f0f12")]
 
 // Version information for an assembly consists of the following four values:
 //

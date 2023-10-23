@@ -6,10 +6,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS;
 
 namespace QuickFiler
 {
@@ -19,6 +21,7 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitTipsLabelsList();
         }
 
@@ -26,6 +29,9 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
+
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         private EfcFormController _formController;
         internal void SetController(EfcFormController controller)
@@ -60,7 +66,7 @@ namespace QuickFiler
             };
 
         }
-        
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))

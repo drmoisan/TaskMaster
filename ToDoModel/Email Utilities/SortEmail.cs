@@ -10,13 +10,14 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 using System.Collections.Generic;
-using Microsoft.TeamFoundation.Common;
+//using Microsoft.TeamFoundation.Common;
 using Microsoft.VisualBasic;
 using Deedle;
 using Microsoft.Office.Core;
-using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
+//using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.Services.WebApi;
+using System.Web.Profile;
+//using Microsoft.VisualStudio.Services.WebApi;
 
 namespace ToDoModel
 {
@@ -24,6 +25,8 @@ namespace ToDoModel
     public static class SortEmail
     {
         #region Public Methods
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public static void InitializeSortToExisting(string InitType = "Sort", bool QuickLoad = false, bool WholeConversation = true, string strSeed = "", object objItem = null)
         {
@@ -37,7 +40,12 @@ namespace ToDoModel
                                bool removeFlowFile,
                                IApplicationGlobals appGlobals)
         {
-            var mailItems = appGlobals.Ol.App.ActiveExplorer().Selection.OnlyMailItems();
+            var mailItems = appGlobals.Ol.App.ActiveExplorer()
+                                             .Selection
+                                             .Cast<object>()
+                                             .Where(x => x is MailItem)
+                                             .Select(x => (MailItem)x)
+                                             .ToList();
             if (mailItems.Count == 0)
             {
                 MessageBox.Show("No mail items are selected.");
@@ -82,7 +90,7 @@ namespace ToDoModel
 
 
             foreach (var mailItem in mailItems)
-            {                
+            {
                 // If saveMsg is true, save the message as an .msg file
                 if (saveMsg) { await SaveMessageAsMSGAsync(mailItem, saveFsPath); }
 
@@ -95,25 +103,61 @@ namespace ToDoModel
                                                               saveAttachments,
                                                               savePictures);
                     // Save to the file system
-                    await foreach (var attachment in attachments) { await attachment.SaveAttachmentAsync(); }
+                    //await foreach (var attachment in attachments) { await attachment.SaveAttachmentAsync(); }
+                    await attachments.ForEachAsync(async x => await x.SaveAttachmentAsync());
                     //attachments.ForEach(x => x.SaveAttachment());
 
                     // Delete the original attachments if removePreviousFsFiles is true
                     var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
                     await foreach (var attachment in toDelete) { await Task.Run(() => File.Delete(attachment.FilePathDelete)); }
                 }
-                
+
                 // Label the email as autosorted
-                await Task.Run(()=>mailItem.SetUdf("AutoSorted", "Yes")).ConfigureAwait(false);
+                await Task.Run(() => mailItem.SetUdf("AutoSorted", "Yes"));
                 mailItem.UnRead = false;
-                await Task.Run(()=>mailItem.Save());
-                                                
+                await Task.Run(() => mailItem.Save());
+
                 // Update Subject Map and Subject Encoder
                 appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
-                var olDestination = FolderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
-                var mailItemTemp = await Task.FromResult((MailItem)mailItem.Move(olDestination));
+                Folder olDestination = null;
+                try
+                {
+                    olDestination = FolderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error getting folder {destinationOlPath}", e);
+                    // Hacky solve to determine at debug time if I want to continue or not
+                    var stop = true;
+                    if (stop) { throw e; }
+                }
+                if (olDestination is null)
+                {
+                    logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
+                }
+                
+                MailItem mailItemTemp = null;
+                try
+                {
+                    if (olDestination is not null)
+                    {
+                        mailItemTemp = await Task.Run(() => (MailItem)mailItem.Move(olDestination));
+                    }
+                    else 
+                    { 
+                        logger.Debug($"Folder with path {destinationOlPath} could not be resolved so the mail cannot be moved");
+                    }
+                    
+                }
+                catch (System.Exception e)
+                {
+                    // Hacky solve to determine at debug time if I want to continue or not
+                    var stop = true;
+                    if (stop) { throw e; }
+                }
+                
 
                 // Add the email to the Undo Stack
                 PushToUndoStack(mailItem, mailItemTemp, appGlobals);
@@ -141,13 +185,7 @@ namespace ToDoModel
             await Task.WhenAll(tasks).ConfigureAwait(false);
             
             await appGlobals.AF.Encoder.Encoder.SerializeAsync();
-            
-            //await appGlobals.AF.RecentsList.SerializeAsync();
-            //await appGlobals.AF.CtfMap.SerializeAsync();
-            //await appGlobals.AF.SubjectMap.SerializeAsync();
-            //await appGlobals.AF.Encoder.Encoder.SerializeAsync();
-            //await appGlobals.AF.MovedMails.SerializeAsync();
-            
+                        
         }
 
         public static void Run(IList<MailItem> mailItems,
@@ -273,8 +311,12 @@ namespace ToDoModel
 
         private static YesNoToAllResponse _responseSaveFile = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _attachmentsOverwrite = YesNoToAllResponse.Empty;
+        private static YesNoToAllResponse _attachmentsAltName = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _picturesOverwrite = YesNoToAllResponse.Empty;
         private static YesNoToAllResponse _removeReadOnly = YesNoToAllResponse.Empty;
+
+
+        private const int MAX_PATH = 256;
 
         #endregion
 
@@ -351,6 +393,8 @@ namespace ToDoModel
                         _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
                     }
                     SaveCase(_attachmentsOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+                    
+                    // Reset response about overwriting attachments when it is not "ToAll"
                     if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
                     {
                         _attachmentsOverwrite = YesNoToAllResponse.Empty;
@@ -388,6 +432,7 @@ namespace ToDoModel
                     {
                         _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
                     }
+                    
                     await SaveCaseAsync(_attachmentsOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
                     if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
                     {
@@ -406,18 +451,29 @@ namespace ToDoModel
         {
             switch (response)
             {
-                case YesNoToAllResponse.NoToAll:
-                    await attachment.TrySaveAttachmentAsync(filePathSaveAlt);
+                case YesNoToAllResponse r when (r == YesNoToAllResponse.NoToAll || r == YesNoToAllResponse.No):
+                    if (_attachmentsAltName == YesNoToAllResponse.Empty)
+                    {
+                        _attachmentsAltName = YesNoToAll.ShowDialog($"The file {filePathSave} already exists. Save with an alternate name?");
+                        //await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_attachmentsAltName = YesNoToAll.ShowDialog($"The file {filePathSave} already exists. Save with an alternate name?"));
+                    }
+                    
+                    if (_attachmentsAltName == YesNoToAllResponse.Yes || _attachmentsAltName == YesNoToAllResponse.YesToAll)
+                    {
+                        await attachment.TrySaveAttachmentAsync(filePathSaveAlt);
+                    }
+                    
+                    // Reset the Alt name response if it is not set "ToAll"
+                    if (_attachmentsAltName == YesNoToAllResponse.Yes || _attachmentsAltName == YesNoToAllResponse.No)
+                    {
+                        _attachmentsAltName = YesNoToAllResponse.Empty;
+                    }
                     break;
-                case YesNoToAllResponse.No:
-                    await attachment.TrySaveAttachmentAsync(filePathSaveAlt);
-                    break;
-                case YesNoToAllResponse.Yes:
+
+                case YesNoToAllResponse r when (r == YesNoToAllResponse.YesToAll || r == YesNoToAllResponse.Yes):
                     await attachment.TrySaveAttachmentAsync(filePathSave);
                     break;
-                case YesNoToAllResponse.YesToAll:
-                    await attachment.TrySaveAttachmentAsync(filePathSave);
-                    break;
+
                 default:
                     await Task.CompletedTask;
                     break;
@@ -490,16 +546,10 @@ namespace ToDoModel
         {
             switch (response)
             {
-                case YesNoToAllResponse.NoToAll:
+                case (YesNoToAllResponse.NoToAll | YesNoToAllResponse.No):
                     attachment.SaveAsFile(filePathSaveAlt);
                     break;
-                case YesNoToAllResponse.No:
-                    attachment.SaveAsFile(filePathSaveAlt);
-                    break;
-                case YesNoToAllResponse.Yes:
-                    attachment.SaveAsFile(filePathSave);
-                    break;
-                case YesNoToAllResponse.YesToAll:
+                case (YesNoToAllResponse.Yes | YesNoToAllResponse.YesToAll):
                     attachment.SaveAsFile(filePathSave);
                     break;
                 default:
@@ -890,6 +940,11 @@ namespace ToDoModel
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath);
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
+            
+            //BUGFIX: This is not threadsafe and generates an exception. Need to set this
+            //up as a class that will take in lines to write into a queue and will 
+            //flush to the System.IO based on a Timer frequency if there has been a change
+            //Look into channel functionality
             FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
 

@@ -7,6 +7,7 @@ using Microsoft.Office.Interop.Outlook;
 using System.Collections;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS;
+using System.Windows.Forms.VisualStyles;
 
 namespace ToDoModel
 {
@@ -47,11 +48,11 @@ namespace ToDoModel
             try
             {
                 // ***STEP 1: LOAD RAW [ITEMS] TO A LIST AND SORT THEM***
-                var TreeItems = GetToDoList(LoadType, Application);
-                TreeItems = (List<object>)this.MergeSort<object>(TreeItems, this.CompareItemsByToDoID);
+                var itemsForTree = GetToDoList(LoadType, Application);
+                itemsForTree.MergeSort(this.CompareItemsByToDoID, inplace: true);
 
-                colItems = new List<object>();
-                var colNoID = new List<object>();
+                colItems = new List<OutlookItem>();
+                var colNoID = new List<OutlookItem>();
                 ToDoItem tmpToDo = null;
                 TreeNode<ToDoItem> ToDoNode;
                 TreeNode<ToDoItem> NodeParent;
@@ -59,7 +60,7 @@ namespace ToDoModel
 
                 // ***STEP 2: ADD ITEMS TO A FLAT TREE & ASSIGN IDs TO THOSE THAT DON'T HAVE THEM***
                 // Iterate through ToDo items in List
-                foreach (var objItem in TreeItems)
+                foreach (var objItem in itemsForTree)
                 {
                     // Cast objItem to temporary ToDoItem
                     if (objItem is MailItem)
@@ -130,28 +131,25 @@ namespace ToDoModel
             }
         }
 
-        public List<object> GetToDoList(LoadOptions LoadType, Application Application)
+        public List<OutlookItem> GetToDoList(LoadOptions LoadType, Application Application)
         {
-            Items OlItems;
+            
             View objView;
-            Folder OlFolder;
+            
             string strFilter;
-            var ListObjects = new List<object>();
 
             objView = (View)Application.ActiveExplorer().CurrentView;
             strFilter = "@SQL=" + objView.Filter;
 
-            foreach (Store oStore in Application.Session.Stores)
+            var stores = Application.Session.Stores.Cast<Store>();
+            var result = stores.Select(store =>
             {
-                OlItems = null;
-                OlFolder = (Folder)oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
-                OlItems = strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll ? OlFolder.Items : OlFolder.Items.Restrict(strFilter);
-
-                foreach (var objItem in OlItems)
-                    ListObjects.Add(objItem);
-            }
-
-            return ListObjects;
+                var folder = (Folder)store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+                var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
+                return olObjects.Cast<object>().Select(x => new OutlookItem(x)).ToList();
+            }).SelectMany(x=>x).ToList();
+            
+            return result;
         }
 
         #endregion
@@ -171,7 +169,7 @@ namespace ToDoModel
             return CompareItemsByToDoID(todoIDLeft, todoIDRight);
         }
 
-        internal int CompareItemsByToDoID(object objItemLeft, object objItemRight)
+        internal int CompareItemsByToDoID(OutlookItem objItemLeft, OutlookItem objItemRight)
         {
             string todoIDLeft = objItemLeft.GetUdfString("ToDoID");
             string todoIDRight = objItemRight.GetUdfString("ToDoID");
@@ -298,55 +296,6 @@ namespace ToDoModel
 
             foreach (TreeNode<ToDoItem> node in ListOfToDoTree)
                 node.Traverse(action);
-        }
-
-        
-        internal IList<T> MergeSort<T>(IList<T> coll, Comparison<T> comparison)
-        {
-            var Result = new List<T>();
-            var Left = new Queue<T>();
-            var Right = new Queue<T>();
-            if (coll.Count <= 1)
-                return coll;
-            int midpoint = (int)Math.Round(coll.Count / 2d);
-
-            for (int i = 0, loopTo = midpoint - 1; i <= loopTo; i++)
-                Left.Enqueue(coll[i]);
-
-            for (int i = midpoint, loopTo1 = coll.Count - 1; i <= loopTo1; i++)
-                Right.Enqueue(coll[i]);
-
-
-            Left = new Queue<T>(MergeSort(Left.ToList(), comparison));
-            Right = new Queue<T>(MergeSort(Right.ToList(), comparison));
-            Result = Merge(Left, Right, comparison);
-            return Result;
-        }
-        
-        internal List<T> Merge<T>(Queue<T> Left, Queue<T> Right, Comparison<T> comparison)
-        {
-            var Result = new List<T>();
-
-            while (Left.Count > 0 && Right.Count > 0)
-            {
-                int cmp = comparison(Left.Peek(), Right.Peek());
-                if (cmp < 0)
-                {
-                    Result.Add(Left.Dequeue());
-                }
-                else
-                {
-                    Result.Add(Right.Dequeue());
-                }
-            }
-
-            while (Left.Count > 0)
-                Result.Add(Left.Dequeue());
-
-            while (Right.Count > 0)
-                Result.Add(Right.Dequeue());
-
-            return Result;
         }
 
         #region Debugging Helper Functions

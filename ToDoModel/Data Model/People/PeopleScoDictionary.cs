@@ -1,5 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
-using Microsoft.TeamFoundation.Common;
+//using Microsoft.TeamFoundation.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -60,6 +60,8 @@ namespace ToDoModel
         /// <param name="dictionary">Existing dictionary</param>
         /// <param name="filename">Name of json file to house the PeopleScoDictionary</param>
         /// <param name="folderpath">Location of json file</param>
+        /// <param name="appGlobals">Reference to global variables</param>
+        /// <param name="prefix">Reference to class implementing <seealso cref="IPrefix"/> interface</param>
         public PeopleScoDictionary(IDictionary<string, string> dictionary,
                                    string filename,
                                    string folderpath,

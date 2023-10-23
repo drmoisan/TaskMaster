@@ -12,6 +12,10 @@ using ToDoModel;
 using Microsoft.Office.Core;
 using QuickFiler;
 using UtilitiesCS;
+using UtilitiesCS.Threading;
+
+
+[assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 
 namespace TaskMaster
 {
@@ -19,27 +23,42 @@ namespace TaskMaster
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            logger.Debug($"Application Starting");
+            // Ensure that forms are ready for high resolution
+            InitializeDPI();
+
             // Create the global variables
             _globals = new ApplicationGlobals(Application);
-            
+
+            // Grab the sync context for the UI thread
+            UIThreadExtensions.InitUiContext(monitorUiThread: false);
+
             // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();
+
+            // Initialize long loading elements on a low priority thread
+            EfcViewerQueue.BuildQueue(2);
+            //ItemViewerQueue.BuildQueueWhenIdle(10);
+            ItemViewerQueue.BuildQueueBackground(30);
+            
+            // Initialize IdleAction Queue so that breakpoint is hit after UI
+            IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();
             Console.SetOut(tw);
-
-            // Ensure that forms are ready for high resolution
-            InitializeDPI();
-
+            
             // Send a reference to the ribbon controller and external utilities for future use
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
             // Hook the Inbox and ToDo events
             //_globals.Events.Hook();
+            logger.Debug("ThisAddIn_Startup() complete");
+
         }
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;

@@ -113,7 +113,7 @@ namespace ToDoModel
         {
             var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
                                                 folderEnum: OlDefaultFolders.olFolderToDo,
-                                                removeColumns: null, //new string[] {"RemoveAll"},
+                                                removeColumns: null, 
                                                 addColumns: new string[]
                                                 {
                                                     OlTableExtensions.SchemaToDoID,
@@ -140,7 +140,7 @@ namespace ToDoModel
             {
                 var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
                                                     folderEnum: OlDefaultFolders.olFolderToDo,
-                                                    removeColumns: null, //new string[] {"RemoveAll"},
+                                                    removeColumns: null, 
                                                     addColumns: new string[]
                                                     {
                                                         OlTableExtensions.SchemaToDoID,
@@ -157,7 +157,7 @@ namespace ToDoModel
                     string storeID = row["Store"].ToString();
                     string todoOld = row["ToDoID"].ToString();
                     string todoNew = todoOld.Replace(oldPrefix, newPrefix);
-                    object item = _olApp.Session.GetItemFromID(entryID, storeID);
+                    var item = new OutlookItem(_olApp.Session.GetItemFromID(entryID, storeID));
                     item.SetUdf("ToDoID", todoNew);
                     this.Remove(todoOld);
                     this.Add(todoNew);

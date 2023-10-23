@@ -18,6 +18,7 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             //this.KeyPreview = true;
         }
 
@@ -27,6 +28,9 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
+
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         public void SetController(IFilerFormController controller)
         {
@@ -42,14 +46,19 @@ namespace QuickFiler
         {
             if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))
             {
+                SynchronizationContext.SetSynchronizationContext(UiSyncContext);
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
-                _keyboardHandler.ToggleKeyboardDialog(sender, e);
+                //_keyboardHandler.ToggleKeyboardDialog(sender, e);
+                e.Handled = true;
+                _ = _keyboardHandler.ToggleKeyboardDialogAsync();
                 return true;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
-                        
+
+        
+
     }
 }

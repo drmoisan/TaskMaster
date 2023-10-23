@@ -16,7 +16,10 @@ namespace QuickFiler.Interfaces
         void MaximizeFormViewer();
         void MinimizeFormViewer();
         void ToggleOffNavigation(bool async);
+        Task ToggleOffNavigationAsync();
         void ToggleOnNavigation(bool async);
+        Task ToggleOnNavigationAsync();
+
         IntPtr FormHandle { get; }
         
         // Removed methods never called through the interface so they

@@ -114,14 +114,19 @@ namespace TaskMaster
             // MessageBox.Show("Not Implemented");
         }
 
-        public void QuickFilerOld_Click(Office.IRibbonControl control)
-        {
-            _controller.LoadQuickFilerOld();
-        }
+        //public void QuickFilerOld_Click(Office.IRibbonControl control)
+        //{
+        //    _controller.LoadQuickFilerOld();
+        //}
 
-        public void QuickFiler_Click(Office.IRibbonControl control)
+        //public void QuickFiler_Click(Office.IRibbonControl control)
+        //{
+        //    _controller.LoadQuickFiler();
+        //}
+
+        public async void QuickFiler_Click(Office.IRibbonControl control)
         {
-            _controller.LoadQuickFiler();
+            await _controller.LoadQuickFilerAsync();
         }
 
         public void Runtest(Office.IRibbonControl control)
@@ -139,10 +144,12 @@ namespace TaskMaster
             _controller.UndoSort();
         }
 
+        public bool ToggleDarkMode_GetPressed(Office.IRibbonControl control) => _controller.IsDarkModeActive();
+        public void ToggleDarkMode_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleDarkMode();
+        
         #endregion
 
         #region TryMethods  
-
         public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
         public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();
         public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();

@@ -43,6 +43,7 @@ namespace TaskMaster
             if (_globals is not null)
             {
                 _ribbonController.LoadQuickFiler();
+                //_ = _ribbonController.LoadQuickFilerAsync();
             }
         }
 

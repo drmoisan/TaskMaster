@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
@@ -8,10 +7,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ToDoModel;
 using UtilitiesCS;
+using System.Diagnostics;
 
 namespace QuickFiler
 {
@@ -21,30 +21,44 @@ namespace QuickFiler
 
         public EfcHomeController(IApplicationGlobals appGlobals, System.Action parentCleanup, MailItem mail = null)
         {
+            CreateCancellationToken();
             _globals = appGlobals;
             _parentCleanup = parentCleanup;
-            _dataModel = new EfcDataModel(_globals, mail);
+            _dataModel = new EfcDataModel(_globals, mail, this.TokenSource, this.Token);
 
             if (_dataModel.Mail is not null)
             {
-                _initType = Enums.InitTypeEnum.Sort | Enums.InitTypeEnum.SortConv;
-                _stopWatch = new cStopWatch();
-                _formViewer = new EfcViewer();
+                _initType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
+                _stopWatch = new Stopwatch();
+                //_formViewer = new EfcViewer();
+                _formViewer = EfcViewerQueue.Dequeue();
+                _uiSyncContext = _formViewer.UiSyncContext;
                 _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
-                _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType);
+                _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, appGlobals, this);
+                _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType, Token);
             }
         }
 
         private EfcViewer _formViewer;
         private IApplicationGlobals _globals;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private System.Action _parentCleanup;
 
+        [STAThread]
         public void Run() 
         { 
             if (_dataModel.Mail is not null)
             {
                 _formViewer.Show();
+            }
+            else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
+        public async Task RunAsync(ProgressTracker progress = null)
+        {
+            if (_dataModel.Mail is not null)
+            {
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_formViewer.Show());
             }
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
@@ -75,11 +89,24 @@ namespace QuickFiler
         private EfcDataModel _dataModel;
         internal EfcDataModel DataModel { get => _dataModel; set => _dataModel = value; }
                 
-        private cStopWatch _stopWatch;
-        public cStopWatch StopWatch { get => _stopWatch; }
+        private System.Diagnostics.Stopwatch _stopWatch;
+        public System.Diagnostics.Stopwatch StopWatch { get => _stopWatch; }
 
         public bool Loaded => throw new NotImplementedException();
-      
+
+        internal void CreateCancellationToken()
+        {
+            _tokenSource = new CancellationTokenSource();
+            _token = _tokenSource.Token;
+        }
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; }
+
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; }
+
+        private SynchronizationContext _uiSyncContext;
+        public SynchronizationContext UiSyncContext { get => _uiSyncContext; }
 
         #endregion
 
@@ -89,7 +116,7 @@ namespace QuickFiler
         {
             var selectedFolder = _formController.SelectedFolder;
             var moveConversation = _formController.MoveConversation;
-            var convInfo = DataModel.ConversationResolver.ConversationInfo;
+            var convInfo = DataModel.ConversationResolver.ConversationInfo.SameFolder;
             if (!moveConversation)
             {
                 convInfo.Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID).ToList();
@@ -113,7 +140,7 @@ namespace QuickFiler
                 var curTimeText = DateTime.Now.ToString("hh:mm");
                 var dataLineBeg = curDateText + "," + curTimeText + ",";
 
-                var Duration = _stopWatch.timeElapsed;
+                var Duration = _stopWatch.Elapsed.Seconds;
                 var OlEndTime = DateTime.Now;
                 var OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
            
@@ -134,7 +161,7 @@ namespace QuickFiler
         {
             throw new NotImplementedException();
         }
-
+                
         #endregion
 
         #region Helper Methods

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
@@ -16,6 +17,8 @@ namespace TaskMaster
 
     public class AppToDoObjects : IToDoObjects
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public AppToDoObjects(ApplicationGlobals ParentInstance)
         {
             _parent = ParentInstance;
@@ -33,7 +36,7 @@ namespace TaskMaster
                 LoadPrefixListAsync()
             };
             await Task.WhenAll(tasks);
-            Debug.WriteLine($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
+            //logger.Debug($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
         }
 
         private Properties.Settings _defaults = Properties.Settings.Default;
@@ -62,19 +65,21 @@ namespace TaskMaster
         public IProjectInfo ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
         async private Task LoadProjInfoAsync()
         {
-            _projInfo = await Task.Factory.StartNew(
-                              () => new ProjectInfo(filename: _defaults.FileName_ProjInfo,
-                                                    folderpath: Parent.FS.FldrAppData), 
-                              default,
-                              TaskCreationOptions.None,
-                              PriorityScheduler.BelowNormal);
+            _projInfo = await Task.Run(() => new ProjectInfo(filename: _defaults.FileName_ProjInfo, folderpath: Parent.FS.FldrAppData));
+            //_projInfo = await Task.Factory.StartNew(
+            //                  () => new ProjectInfo(filename: _defaults.FileName_ProjInfo,
+            //                                        folderpath: Parent.FS.FldrAppData), 
+            //                  default,
+            //                  TaskCreationOptions.None,
+            //                  PriorityScheduler.BelowNormal);
             if (_projInfo.Count == 0) 
             {
-                await Task.Factory.StartNew(
-                      () => _projInfo.Rebuild(Parent.Ol.App),
-                      default,
-                      TaskCreationOptions.None,
-                      PriorityScheduler.BelowNormal);
+                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
+                //await Task.Factory.StartNew(
+                //      () => _projInfo.Rebuild(Parent.Ol.App),
+                //      default,
+                //      TaskCreationOptions.None,
+                //      PriorityScheduler.BelowNormal);
             }
         }
         private IProjectInfo LoadProjInfo()
@@ -128,7 +133,7 @@ namespace TaskMaster
             return dictPPL;
         }
         async private Task LoadDictPPLAsync() => _dictPPL = await Task.Factory.StartNew(
-            () => LoadDictPPL(), default, TaskCreationOptions.None, PriorityScheduler.BelowNormal);
+            () => LoadDictPPL(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         async private Task LoadPrefixAndDictPeopleAsync()
         {
             await LoadPrefixListAsync();
@@ -140,7 +145,7 @@ namespace TaskMaster
         private IIDList _idList;
         //TODO: Convert IDList to ScoCollection
         public IIDList IDList => Initialized(_idList, () => LoadIDList());
-        async private Task LoadIdListAsync() => _idList = await TaskPriority<IIDList>.Run(() => LoadIDList(), PriorityScheduler.BelowNormal);
+        async private Task LoadIdListAsync() => _idList = await Task.Run(() => LoadIDList());
         
         private IIDList LoadIDList()
         {
@@ -163,7 +168,7 @@ namespace TaskMaster
             return dictRemap;
         }
         async private Task LoadDictRemapAsync() => _dictRemap = await Task.Factory.StartNew(
-            () => LoadDictRemap(), default, TaskCreationOptions.None, PriorityScheduler.BelowNormal);
+            () => LoadDictRemap(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
         //private Dictionary<string, string> _dictRemap;
         //public Dictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictJSON(Parent.FS.FldrStaging, FnameDictRemap));
@@ -191,9 +196,10 @@ namespace TaskMaster
             _catFilters = await Task.Factory.StartNew(
                 () => new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
                                                    folderpath: _parent.FS.FldrPythonStaging),
-                default,
-                TaskCreationOptions.None,
-                PriorityScheduler.BelowNormal);
+                default(CancellationToken));
+                //default,
+                //TaskCreationOptions.None,
+                //PriorityScheduler.BelowNormal);
         }
 
         // Prefix List
@@ -215,9 +221,10 @@ namespace TaskMaster
         {
             _prefixList = await Task.Factory.StartNew(
                               () => LoadPrefixList(),
-                              default,
-                              TaskCreationOptions.None,
-                              PriorityScheduler.BelowNormal);
+                              default(CancellationToken));
+                              //default,
+                              //TaskCreationOptions.None,
+                              //PriorityScheduler.BelowNormal);
         }
 
 

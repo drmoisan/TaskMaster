@@ -236,7 +236,7 @@ namespace ToDoModel
                                });
         }
 
-        internal ParallelQuery<FolderScoring> QueryFolder(ParallelQuery<ISubjectMapEntry> map,
+        internal ParallelQuery<FolderScoring> QueryFolder(ParallelQuery<SubjectMapEntry> map,
                                                           SubjectMapEntry target,
                                                           int matchScore,
                                                           int mismatchScore,
@@ -288,7 +288,7 @@ namespace ToDoModel
         }
 
 
-        internal IEnumerable<FolderScoring> QuerySubject(List<ISubjectMapEntry> map,
+        internal IEnumerable<FolderScoring> QuerySubject(List<SubjectMapEntry> map,
                                                          SubjectMapEntry target,
                                                          int matchScore,
                                                          int mismatchScore,
@@ -324,7 +324,7 @@ namespace ToDoModel
         }
 
 
-        internal IEnumerable<FolderScoring> QueryFolder(List<ISubjectMapEntry> map,
+        internal IEnumerable<FolderScoring> QueryFolder(List<SubjectMapEntry> map,
                                                         SubjectMapEntry target,
                                                         int matchScore,
                                                         int mismatchScore,
@@ -384,68 +384,7 @@ namespace ToDoModel
             public int Score;
         }
 
-        //internal void AddWordSequenceSuggestionsP(SubjectMapEntry target, IApplicationGlobals appGlobals)
-        //{
-        //    var map = appGlobals.AF.SubjectMap.ToList();
-        //    var map2 = map.AsParallel();
-        //    var querySubject = map.AsParallel()
-        //                       .Where(entry => entry.SubjectEncoded is not null)
-        //                       .Select(entry =>
-        //                       {
-        //                           int subjScore = SmithWaterman.SW_CalcInt(entry.SubjectEncoded,
-        //                                                                    entry.SubjectWordLengths,
-        //                                                                    target.SubjectEncoded,
-        //                                                                    target.SubjectWordLengths,
-        //                                                                    appGlobals.AF);
-        //                           int subjScoreWt = (int)Math.Round(
-        //                               Math.Pow(subjScore, appGlobals.AF.LngConvCtPwr) * entry.EmailSubjectCount);
-
-        //                           entry.Score = subjScoreWt;
-        //                           return entry;
-        //                       })
-        //                       .GroupBy(entry => entry.Folderpath,
-        //                                entry => entry,
-        //                                (folderpath, grouping) => new FolderScoring
-        //                                {
-        //                                    FolderPath = folderpath,
-        //                                    FolderName = grouping.Select(x => x.Foldername).First(),
-        //                                    FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-        //                                    FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
-        //                                    Score = grouping.Select(x => x.Score).Sum()
-        //                                });
-
-        //    var queryFolder = map.AsParallel()
-        //                      .GroupBy(entry => entry.Folderpath,
-        //                               entry => entry,
-        //                               (folderpath, grouping) => new FolderScoring
-        //                               {
-        //                                   FolderPath = folderpath,
-        //                                   FolderName = grouping.Select(x => x.Foldername).First(),
-        //                                   FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-        //                                   FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
-        //                                   Score = 0
-        //                               })
-        //                      .Select(entry =>
-        //                      {
-        //                          int fldrScore = SmithWaterman.SW_CalcInt(entry.FolderEncoding,
-        //                                                                   entry.FolderWordLengths,
-        //                                                                   target.SubjectEncoded,
-        //                                                                   target.SubjectWordLengths,
-        //                                                                   appGlobals.AF);
-        //                          entry.Score = (int)(fldrScore * fldrScore);
-        //                          return entry;
-        //                      });
-
-        //    ParallelQuery<FolderScoring> queryCombined = QueryCombined(querySubject, queryFolder);
-
-        //    foreach (var entry in queryCombined)
-        //    {
-        //        if (entry.Score > 5)
-        //        {
-        //            AddSuggestion(entry.FolderPath, entry.Score);
-        //        }
-        //    }
-        //}
+        
 
     }
 }

@@ -14,7 +14,7 @@ namespace ToDoModel
     /// <summary>
     /// Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
     /// </summary>
-    public class FlagParser: INotifyCollectionChanged, INotifyPropertyChanged
+    public class FlagParser: INotifyCollectionChanged//, INotifyPropertyChanged
     {
         /// <summary>
         /// Constructor for the FlagParser class accepts a comma delimited string containing 
@@ -203,7 +203,7 @@ namespace ToDoModel
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
         
-        public event PropertyChangedEventHandler PropertyChanged;
+        //public event PropertyChangedEventHandler PropertyChanged;
 
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) 
         {
