@@ -38,6 +38,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilitiesSwordfish.NET.Test", "UtilitiesSwordfish.Test\UtilitiesSwordfish.NET.Test.csproj", "{9A04D222-2B52-4E93-9B92-CC6EF54D5848}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tags.Test", "Tags.Test\Tags.Test.csproj", "{486C1CAE-5C32-406E-963F-79F654EC9B07}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FFF74854-AD9D-023E-1A6A-EE7DBBD4AF72} = {FFF74854-AD9D-023E-1A6A-EE7DBBD4AF72}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

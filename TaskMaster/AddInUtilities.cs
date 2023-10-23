@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using TaskVisualization;
 using UtilitiesCS;
 using Outlook = Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
 
 namespace TaskMaster
 {
@@ -10,7 +11,7 @@ namespace TaskMaster
     public interface IAddInUtilities
     {
         void MaximizeQuickFilerWindow();
-        void LaunchQuickFiler();
+        Task LaunchQuickFilerAsync();
         void LaunchSortEmail();
         void LaunchFlagAsTask();
     }
@@ -38,11 +39,11 @@ namespace TaskMaster
             }
         }
 
-        public void LaunchQuickFiler()
+        public async Task LaunchQuickFilerAsync()
         {
             if (_globals is not null)
             {
-                _ribbonController.LoadQuickFiler();
+                await _ribbonController.LoadQuickFilerAsync();
                 //_ = _ribbonController.LoadQuickFilerAsync();
             }
         }

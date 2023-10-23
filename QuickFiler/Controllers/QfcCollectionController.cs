@@ -259,7 +259,7 @@ namespace QuickFiler.Controllers
                 var grp = x.Result;
                 
                 Task.Factory.StartNew(() => grp.ItemController.PopulateConversationAsync(TokenSource, Token, false), Token, TaskCreationOptions.AttachedToParent, ui);
-                Task.Factory.StartNew(() => grp.ItemController.PopulateFolderComboboxAsync(Token), Token, TaskCreationOptions.AttachedToParent, ui);
+                Task.Factory.StartNew(() => grp.ItemController.PopulateFolderComboBoxAsync(Token), Token, TaskCreationOptions.AttachedToParent, ui);
                 
                 return grp;
             }, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui);
@@ -273,7 +273,7 @@ namespace QuickFiler.Controllers
             grp.ItemViewer = LoadItemViewer_03(i, template, true);
             grp.ItemController = await QfcItemController.CreateSequentialAsync(_globals,
                 _homeController, this, grp.ItemViewer, i + 1, grp.MailItem, Token);
-            grp.ItemController.PopulateFolderCombobox();
+            grp.ItemController.PopulateFolderComboBox();
             if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
             else { grp.ItemController.SetThemeLight(async: true); }
             return grp;
@@ -317,7 +317,7 @@ namespace QuickFiler.Controllers
                                      {
                                         x.grp.ItemController.InitializeAsync(),
                                         Task.Run(() => x.grp.ItemController.PopulateConversation()),
-                                        Task.Run(() => x.grp.ItemController.PopulateFolderCombobox()),
+                                        Task.Run(() => x.grp.ItemController.PopulateFolderComboBox()),
                                      };
                                      await Task.WhenAll(tasks).ConfigureAwait(false);
                                  });
@@ -336,7 +336,7 @@ namespace QuickFiler.Controllers
                                                            grp.MailItem);
                 grp.ItemController.Initialize(false);
                 grp.ItemController.PopulateConversation();
-                grp.ItemController.PopulateFolderCombobox();
+                grp.ItemController.PopulateFolderComboBox();
                 if (_darkMode) { grp.ItemController.SetThemeDark(async: false); }
                 else { grp.ItemController.SetThemeLight(async: false); }
             }
@@ -358,7 +358,7 @@ namespace QuickFiler.Controllers
                                      {
                                         x.grp.ItemController.InitializeAsync(),
                                         Task.Run(() => x.grp.ItemController.PopulateConversation()),
-                                        Task.Run(() => x.grp.ItemController.PopulateFolderCombobox()),
+                                        Task.Run(() => x.grp.ItemController.PopulateFolderComboBox()),
                                      };
                                      await Task.WhenAll(tasks).ConfigureAwait(false);
                                  });
@@ -1068,7 +1068,7 @@ namespace QuickFiler.Controllers
 
                 grp.ItemController.Initialize(false);
                 grp.ItemController.PopulateConversation(resolver);
-                grp.ItemController.PopulateFolderCombobox(folderList);
+                grp.ItemController.PopulateFolderComboBox(folderList);
                 grp.ItemController.IsChild = true;
                 grp.ItemController.ConvOriginID = _itemGroups[insertionIndex-1].MailItem.EntryID;
                 if (_kbdHandler.KbdActive) { grp.ItemController.ToggleNavigation(async: true, desiredState: Enums.ToggleState.On); }

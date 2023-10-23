@@ -35,7 +35,7 @@ namespace QuickFiler.Interfaces
         string SelectedFolder { get; }
         int ItemNumber { get; set; }
         int ItemIndex { get; set; }
-        void PopulateFolderCombobox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
+        void PopulateFolderComboBox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
         bool SuppressEvents { get; set; }
         void ApplyReadEmailFormat(object state);
         void FlagAsTask();
@@ -52,7 +52,7 @@ namespace QuickFiler.Interfaces
         //void PopulateConversation(DataFrame df);
         void PopulateConversation(int countOnly);
         void PopulateConversation(ConversationResolver resolver);
-        Task PopulateFolderComboboxAsync(CancellationToken token, object varList = null);
+        Task PopulateFolderComboBoxAsync(CancellationToken token, object varList = null);
         void SetThemeDark(bool async);
         void SetThemeLight(bool async);
         void Cleanup();

@@ -24,7 +24,6 @@ namespace TaskMaster
         private RibbonViewer _viewer;
         private IApplicationGlobals _globals;
         private bool blHook = true;
-        //private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
         private IFilerHomeController _quickFiler;
         private bool _quickFilerLoaded = false;
 
@@ -55,23 +54,11 @@ namespace TaskMaster
         internal void LoadTaskTree()
         {
             var taskTreeViewer = new TaskTreeForm();
-            var dataModel = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
+            var dataModel = new TreeOfToDoItems([]);
             dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals.Ol.App);
             var taskTreeController = new TaskTreeController(_globals, taskTreeViewer, dataModel);
             taskTreeViewer.Show();
         }
-
-        //internal void LoadQuickFilerOld()
-        //{
-        //    bool loaded = false;
-        //    if (_quickfileLegacy is not null)
-        //        loaded = _quickfileLegacy.Loaded;
-        //    if (loaded == false)
-        //    {
-        //        _quickfileLegacy = new QuickFiler.Legacy.QfcLauncher(_globals, ReleaseQuickFilerLegacy);
-        //        _quickfileLegacy.Run();
-        //    }
-        //}
 
         internal void LoadQuickFiler()
         {
@@ -96,11 +83,7 @@ namespace TaskMaster
             }
         }
 
-        //private void ReleaseQuickFilerLegacy()
-        //{
-        //    _quickfileLegacy = null;
-        //}
-
+        
         private void ReleaseQuickFiler()
         {
             _quickFiler = null;
@@ -126,7 +109,7 @@ namespace TaskMaster
             ToDoEvents.MigrateToDoIDs(_globals.Ol.App);
         }
 
-        internal string GetHookButtonText(Office.IRibbonControl control)
+        internal string GetHookButtonText(Office.IRibbonControl _)
         {
             if (blHook)
             {
@@ -161,7 +144,7 @@ namespace TaskMaster
 
         internal void HideHeadersNoChildren()
         {
-            var dataTree = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
+            var dataTree = new TreeOfToDoItems([]);
             dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, Globals.ThisAddIn.Application);
             dataTree.HideEmptyHeadersInView();
         }
@@ -223,8 +206,8 @@ namespace TaskMaster
         internal void TryRecipientGetInfo()
         {
             var Mail = (Outlook.MailItem)_globals.Ol.App.ActiveExplorer().Selection[1];
-            var recips = Mail.Recipients.Cast<Recipient>();
-            var info = recips.GetInfo();
+            var recipients = Mail.Recipients.Cast<Recipient>();
+            var info = recipients.GetInfo();
         }
         internal void TrySubstituteIdRoot()
         {
