@@ -1393,7 +1393,7 @@ namespace QuickFiler.Controllers
                 //                         appGlobals: _globals,
                 //                         olAncestor: _globals.Ol.ArchiveRootPath,
                 //                         fsAncestorEquivalent: _globals.FS.FolderRoot);
-                await SortEmail.RunAsync(mailItems: selItems,
+                await SortEmail.SortAsync(mailItems: selItems,
                                          savePictures: false,
                                          destinationOlStem: SelectedFolder,
                                          saveMsg: _optionEmailCopy,

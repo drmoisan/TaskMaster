@@ -33,7 +33,7 @@ namespace ToDoModel
             throw new NotImplementedException();
         }
 
-        async public static Task RunAsync(bool savePictures,
+        async public static Task SortAsync(bool savePictures,
                                string destinationFolderpath,
                                bool saveMsg,
                                bool saveAttachments,
@@ -50,10 +50,10 @@ namespace ToDoModel
             {
                 MessageBox.Show("No mail items are selected.");
             }
-            else { await RunAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals); }
+            else { await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals); }
         }
 
-        async public static Task RunAsync(IList<MailItem> mailItems,
+        async public static Task SortAsync(IList<MailItem> mailItems,
                                bool savePictures,
                                string destinationFolderpath,
                                bool saveMsg,
@@ -64,10 +64,10 @@ namespace ToDoModel
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
             var olAncestor = FolderConverter.ResolveOlRoot(((Folder)mailItems[0].Parent).FolderPath, appGlobals);
             var fsAncestorEquivalent = appGlobals.FS.FldrRoot;
-            await RunAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
         }
 
-        async public static Task RunAsync(IList<MailItem> mailItems,
+        async public static Task SortAsync(IList<MailItem> mailItems,
                                      bool savePictures,
                                      string destinationOlStem,
                                      bool saveMsg,
@@ -188,7 +188,7 @@ namespace ToDoModel
                         
         }
 
-        public static void Run(IList<MailItem> mailItems,
+        public static void Sort(IList<MailItem> mailItems,
                                      bool savePictures,
                                      string destinationOlStem,
                                      bool saveMsg,
@@ -322,11 +322,12 @@ namespace ToDoModel
 
         #region Helper Methods
 
-        internal static IEnumerable<AttachmentInfo> GetAttachmentsInfo(MailItem mailItem,
-                                                                       string saveFsPath,
-                                                                       string deleteFsPath,
-                                                                       bool saveAttachments,
-                                                                       bool savePictures)
+        internal static IEnumerable<AttachmentInfo> GetAttachmentsInfo(
+            MailItem mailItem,
+            string saveFsPath,
+            string deleteFsPath,
+            bool saveAttachments,
+            bool savePictures)
         {
             var attachments = mailItem.Attachments
                                       .Cast<Attachment>()
@@ -345,17 +346,18 @@ namespace ToDoModel
                            
         }
 
-        internal static IAsyncEnumerable<AttachmentInfo> GetAttachmentsInfoAsync(MailItem mailItem,
-                                                                                 string saveFsPath,
-                                                                                 string deleteFsPath,
-                                                                                 bool saveAttachments,
-                                                                                 bool savePictures)
+        internal static IAsyncEnumerable<AttachmentInfo> GetAttachmentsInfoAsync(
+            MailItem mailItem,
+            string saveFsPath,
+            string deleteFsPath,
+            bool saveAttachments,
+            bool savePictures)
         {
             var attachments = mailItem.Attachments
-                                  .Cast<Attachment>()
-                                  .Where(x => x.Type != OlAttachmentType.olOLE)
-                                  .ToAsyncEnumerable()
-                                  .SelectAwait(async x => await AttachmentInfo.LoadAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath));
+                                      .Cast<Attachment>()
+                                      .Where(x => x.Type != OlAttachmentType.olOLE)
+                                      .ToAsyncEnumerable()
+                                      .SelectAwait(async x => await AttachmentInfo.LoadAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath));
             if (!saveAttachments)
             {
                 attachments = attachments.Where(x => x.IsImage);
@@ -447,7 +449,11 @@ namespace ToDoModel
             }
         }
 
-        async internal static Task SaveCaseAsync(YesNoToAllResponse response, Attachment attachment, string filePathSave, string filePathSaveAlt)
+        async internal static Task SaveCaseAsync(
+            YesNoToAllResponse response,
+            Attachment attachment,
+            string filePathSave,
+            string filePathSaveAlt)
         {
             switch (response)
             {
@@ -480,7 +486,9 @@ namespace ToDoModel
             }
         }
 
-        async internal static Task<bool> TrySaveAttachmentAsync(this Attachment attachment, string filePathSave)
+        async internal static Task<bool> TrySaveAttachmentAsync(
+            this Attachment attachment,
+            string filePathSave)
         {
             try
             {
@@ -542,7 +550,11 @@ namespace ToDoModel
             }
         }
         
-        internal static void SaveCase(YesNoToAllResponse response, Attachment attachment, string filePathSave, string filePathSaveAlt)
+        internal static void SaveCase(
+            YesNoToAllResponse response,
+            Attachment attachment,
+            string filePathSave,
+            string filePathSaveAlt)
         {
             switch (response)
             {
@@ -563,7 +575,12 @@ namespace ToDoModel
             return extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif" || extension == ".bmp";
         }
 
-        private static (string saveFsPath, string deleteFsPath) ResolvePaths(IList<MailItem> mailItems, string destinationOlPath, IApplicationGlobals appGlobals, string olAncestor, string fsAncestorEquivalent)
+        private static (string saveFsPath, string deleteFsPath) ResolvePaths(
+            IList<MailItem> mailItems,
+            string destinationOlPath,
+            IApplicationGlobals appGlobals,
+            string olAncestor,
+            string fsAncestorEquivalent)
         {
             // Resolve the file system destination folder path 
             var saveFsPath = destinationOlPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
@@ -581,7 +598,9 @@ namespace ToDoModel
             return (saveFsPath, deleteFsPath);
         }
 
-        async internal static Task SaveMessageAsMSGAsync(MailItem mailItem, string fsLocation)
+        async internal static Task SaveMessageAsMSGAsync(
+            MailItem mailItem,
+            string fsLocation)
         {
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
             
@@ -589,7 +608,9 @@ namespace ToDoModel
             await Task.Run(()=>mailItem.SaveAs(strPath, OlSaveAsType.olMSG));
         }
 
-        internal static void SaveMessageAsMSG(MailItem mailItem, string fsLocation)
+        internal static void SaveMessageAsMSG(
+            MailItem mailItem,
+            string fsLocation)
         {
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
 
@@ -597,7 +618,14 @@ namespace ToDoModel
             mailItem.SaveAs(strPath, OlSaveAsType.olMSG);
         }
 
-        internal static void SaveAttachmentsOld(MailItem mailItem, string fsLocation, string DteString, string DteString2, bool save_images, bool DELFILE, bool Verify_Action)
+        internal static void SaveAttachmentsOld(
+            MailItem mailItem,
+            string fsLocation,
+            string DteString,
+            string DteString2,
+            bool save_images,
+            bool DELFILE,
+            bool Verify_Action)
         {
 
             #region tocollapse
@@ -786,7 +814,16 @@ namespace ToDoModel
 
         #region old methods
         
-        public static void Run2(IList<MailItem> mailItems, bool savePictures, string destinationFolderpath, bool saveMsg, bool saveAttachments, bool removeFlowFile, IApplicationGlobals appGlobals, string olRoot, string fsRoot)
+        public static void Run2(
+            IList<MailItem> mailItems,
+            bool savePictures,
+            string destinationFolderpath,
+            bool saveMsg,
+            bool saveAttachments,
+            bool removeFlowFile,
+            IApplicationGlobals appGlobals,
+            string olRoot,
+            string fsRoot)
         {
             #region Private variables
             string loc;
@@ -924,14 +961,20 @@ namespace ToDoModel
             }
         }
 
-        private static void PushToUndoStack(MailItem beforeMove, MailItem afterMove, IApplicationGlobals _globals)
+        private static void PushToUndoStack(
+            MailItem beforeMove,
+            MailItem afterMove,
+            IApplicationGlobals _globals)
         {
             //TODO: Delete _globals.Ol.MovedMails_Stack because it is obsolete
             var info = new MovedMailInfo(beforeMove, afterMove, _globals.Ol.Root.FolderPath);
             _globals.AF.MovedMails.Push(info);
         }
         
-        private static void CaptureMoveDetails(MailItem MSG, MailItem oMailTmp, IApplicationGlobals _globals)
+        private static void CaptureMoveDetails(
+            MailItem mailItem,
+            MailItem oMailTmp,
+            IApplicationGlobals _globals)
         {
             var strOutput = new string[2];
 

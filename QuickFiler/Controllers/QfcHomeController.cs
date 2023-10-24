@@ -13,9 +13,12 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using UtilitiesCS.Threading;
 using System.Threading;
+using System.Collections.Concurrent;
 using QuickFiler.Viewers;
 using System.Globalization;
 using System.Diagnostics;
+using static Microsoft.FSharp.Core.ByRefKinds;
+using System.Timers;
 
 namespace QuickFiler.Controllers
 {
@@ -301,6 +304,122 @@ namespace QuickFiler.Controllers
 
             FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
         }
+
+        public async Task WriteMetricsAsync(string filename)
+        {
+
+            string LOC_TXT_FILE;
+            string curDateText, curTimeText, durationText, durationMinutesText;
+            double Duration;
+            string dataLineBeg;
+            DateTime OlEndTime;
+            DateTime OlStartTime;
+            AppointmentItem OlAppointment;
+            Folder OlEmailCalendar;
+
+            // Create a line of comma seperated valued to store data
+            curDateText = DateTime.Now.ToString("MM/dd/yyyy");
+
+            curTimeText = DateTime.Now.ToString("hh:mm");
+
+            dataLineBeg = curDateText + "," + curTimeText + ",";
+
+            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
+
+            Duration = _stopWatchMoved.Elapsed.Seconds;
+            OlEndTime = DateTime.Now;
+            OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
+
+            var emailsLoaded = _formController.Groups.EmailsToMove;
+
+            if (emailsLoaded > 0)
+            {
+                Duration /= emailsLoaded;
+            }
+
+            durationText = Duration.ToString("##0");
+            // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
+
+            durationMinutesText = (Duration / 60d).ToString("##0.00");
+
+            OlEmailCalendar = UtilitiesCS.Calendar.GetCalendar("Email Time", _globals.Ol.App.Session);
+            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
+            {
+                OlAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
+                OlAppointment.Start = OlStartTime;
+                OlAppointment.End = OlEndTime;
+                OlAppointment.Categories = "@ Email";
+                OlAppointment.ReminderSet = false;
+                OlAppointment.Sensitivity = OlSensitivity.olPrivate;
+                OlAppointment.Save();
+            }
+
+
+            string[] strOutput = _formController.Groups
+                .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
+                dataLineBeg, OlEndTime, ref OlAppointment);
+
+            _fileName = filename;
+            await NonBlockingProducer(strOutput, Token);
+        }
+
+        private BlockingCollection<string> _metrics = new BlockingCollection<string> (new ConcurrentQueue<string>());
+        private int _metricsConsumers = 0;
+        private static object _lockObject = new object();
+        private static string _fileName;
+        private static string _folderPath;
+
+        private async Task NonBlockingProducer(string[] lines, CancellationToken ct)
+        {
+            foreach (string line in lines)
+            {
+                ct.ThrowIfCancellationRequested();
+                await NonBlockingProducer(line, ct);
+            }
+        }
+
+        private async Task NonBlockingProducer(string line, CancellationToken ct)
+        {
+            bool success = false;
+
+            do
+            {
+                // Cancellation causes OCE. We know how to handle it.
+                try
+                {
+                    // A shorter timeout causes more failures.
+                    success = _metrics.TryAdd(line, 20, ct);
+                }
+                catch (OperationCanceledException)
+                {
+                    if (ct.IsCancellationRequested) { break; }
+                    else 
+                    { 
+                        logger.Debug($"Timeout adding {line}");
+                        await Task.Delay(20);
+                    }
+                }
+            } while (!success);
+            if (Interlocked.CompareExchange(ref _metricsConsumers, 0, 2) == 2)
+            {
+                Interlocked.Decrement(ref _metricsConsumers);
+                var timer = new System.Timers.Timer(2000);
+                timer.Elapsed += TimedConsumer;
+            }
+            
+        }
+
+        private void TimedConsumer(object source, ElapsedEventArgs e)
+        {
+            Interlocked.Decrement(ref _metricsConsumers);
+            var strOutput = _metrics.GetConsumingEnumerable().ToArray();
+            if (strOutput.Length > 0)
+            {
+                FileIO2.WriteTextFile(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyD);
+            }
+            
+        }
+
 
         public void Cleanup()
         {

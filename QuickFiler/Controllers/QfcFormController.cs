@@ -39,7 +39,8 @@ namespace QuickFiler.Controllers
             _formViewer.SetController(this);
             _parentCleanup = parentCleanup;
             _parent = parent;
-            WriteMetrics = parent.QuickFileMetrics_WRITE;
+            //WriteMetrics = parent.QuickFileMetrics_WRITE;
+            WriteMetrics = parent.WriteMetricsAsync;
             Iterate = parent.Iterate;
             _movedItems = _globals.AF.MovedMails;
             _qfcQueue = qfcQueue;
@@ -67,7 +68,7 @@ namespace QuickFiler.Controllers
         private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
         private QfcHomeController _parent;
-        private delegate void WriteMetricsDelegate(string filename);
+        private delegate Task WriteMetricsDelegate(string filename);
         private WriteMetricsDelegate WriteMetrics;
         private delegate void IterateDelegate();
         private IterateDelegate Iterate;
@@ -332,7 +333,7 @@ namespace QuickFiler.Controllers
 
             // Write Move Metrics
             await UIThreadExtensions.UiDispatcher.InvokeAsync(
-                () => WriteMetrics(_globals.FS.Filenames.EmailSession),
+                async () => await WriteMetrics(_globals.FS.Filenames.EmailSession),
                 System.Windows.Threading.DispatcherPriority.ContextIdle);
 
             await UIThreadExtensions.UiDispatcher.InvokeAsync(() => _groups.CleanupBackground());

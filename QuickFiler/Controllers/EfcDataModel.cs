@@ -88,7 +88,7 @@ namespace QuickFiler.Controllers
                 bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                await SortEmail.RunAsync(mailItems: items,
+                await SortEmail.SortAsync(mailItems: items,
                                          savePictures: savePictures,
                                          destinationOlStem: folderpath,
                                          saveMsg: saveEmail,
