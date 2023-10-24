@@ -142,9 +142,9 @@ namespace QuickFiler.Controllers
         {
             _formViewer.ForAllControls(x =>
             {
-                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHndlr.KeyboardHandler_PreviewKeyDownAsync);
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHandler.KeyboardHandler_PreviewKeyDownAsync);
                 //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
-                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDownAsync);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHandler.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> { _formViewer.QfcItemViewerTemplate });
 
@@ -285,7 +285,7 @@ namespace QuickFiler.Controllers
             {
                 _blRunningModalCode = true;
                 
-                if (_parent.KeyboardHndlr.KbdActive) { _parent.KeyboardHndlr.ToggleKeyboardDialog(); }
+                if (_parent.KeyboardHandler.KbdActive) { _parent.KeyboardHandler.ToggleKeyboardDialog(); }
                 await MoveAndIterate();
                 
                 _blRunningModalCode = false;

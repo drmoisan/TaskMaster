@@ -62,9 +62,9 @@ namespace QuickFiler.Controllers
             _itemViewer = itemViewer;
             _itemViewer.Controller = this;
             _dataModel = dataModel;
-            _keyboardHandler = _homeController.KeyboardHndlr;
+            _keyboardHandler = _homeController.KeyboardHandler;
             _parent = parent;
-            _explorerController = _homeController.ExplorerCtlr;
+            _explorerController = _homeController.ExplorerController;
 
             // Adjust the viewer for Efc purposes
             AdjustViewerForEfc();
@@ -211,7 +211,7 @@ namespace QuickFiler.Controllers
             if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
 
             // Could be redundant to event handler in ConversationResolver
-            _ = Task.Run(() => _dataModel.ConversationResolver.LoadConversationItemsAsync(_homeController.Token, backgroundLoad: true));
+            // _ = Task.Run(() => _dataModel.ConversationResolver.LoadConversationItemsAsync(_homeController.Token, backgroundLoad: true));
         }
                 
         internal void ResolveControlGroups(ItemViewer itemViewer)
@@ -464,25 +464,25 @@ namespace QuickFiler.Controllers
             actions.ForEach(action => _keyboardHandler.CharActions[action.Key] = action.Value);
         }
         
-        internal void RegisterFocusActions()
+        internal void RegisterAsyncFocusActions()
         {
-            _keyboardHandler.CharActions.Add("Item", 'O', (x) => _ = _explorerController.OpenQFItem(_itemInfo.Item));
-            _keyboardHandler.CharActions.Add("Item", 'E', async (x) => await KbdExecuteAsync(this.ToggleExpansionAsync));
+            _keyboardHandler.CharActionsAsync.Add("Item", 'O', (x) => _ = _explorerController.OpenQFItem(_itemInfo.Item));
+            _keyboardHandler.CharActionsAsync.Add("Item", 'E', async (x) => await KbdExecuteAsync(this.ToggleExpansionAsync));
             if (_expanded)
             {
-                _keyboardHandler.CharActions.Add("Item", 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
-                _keyboardHandler.CharActions.Add("Item", 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
+                _keyboardHandler.CharActionsAsync.Add("Item", 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
+                _keyboardHandler.CharActionsAsync.Add("Item", 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
             }
         }
 
-        internal void UnregisterFocusActions()
+        internal void UnregisterAsyncFocusActions()
         {
-            _keyboardHandler.CharActions.Remove("Item", 'O');
-            _keyboardHandler.CharActions.Remove("Item", 'E');
+            _keyboardHandler.CharActionsAsync.Remove("Item", 'O');
+            _keyboardHandler.CharActionsAsync.Remove("Item", 'E');
             if (_expanded)
             {
-                _keyboardHandler.CharActions.Remove("Item", 'B');
-                _keyboardHandler.CharActions.Remove("Item", 'D');
+                _keyboardHandler.CharActionsAsync.Remove("Item", 'B');
+                _keyboardHandler.CharActionsAsync.Remove("Item", 'D');
             }
         }
 
@@ -658,12 +658,12 @@ namespace QuickFiler.Controllers
             if (_activeUI)
             {
                 _activeUI = false;
-                UnregisterFocusActions();
+                UnregisterAsyncFocusActions();
             }
             else
             {
                 _activeUI = true;
-                RegisterFocusActions();
+                RegisterAsyncFocusActions();
             }
         }
 
@@ -673,18 +673,28 @@ namespace QuickFiler.Controllers
             if (desiredState == Enums.ToggleState.Off && _activeUI)
             {
                 _activeUI = false;
-                UnregisterFocusActions();
+                UnregisterAsyncFocusActions();
             }
             else if(desiredState == Enums.ToggleState.On && !_activeUI)
             {
                 _activeUI = true;
-                RegisterFocusActions();
+                RegisterAsyncFocusActions();
             }
         }
 
         public async Task ToggleNavigationAsync(Enums.ToggleState desiredState)
         {
             await ToggleTipsAsync(desiredState);
+            if (desiredState == Enums.ToggleState.Off && _activeUI)
+            {
+                _activeUI = false;
+                UnregisterAsyncFocusActions();
+            }
+            else if (desiredState == Enums.ToggleState.On && !_activeUI)
+            {
+                _activeUI = true;
+                RegisterAsyncFocusActions();
+            }
         }
 
 
@@ -801,13 +811,13 @@ namespace QuickFiler.Controllers
 
         async public Task KbdExecuteAsync(Func<Task> action)
         {
-            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
             await action();
         }
 
         async internal Task JumpToAsync(Control control)
         {
-            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
             await _itemViewer.UiSyncContext;
             control.Focus();
         }

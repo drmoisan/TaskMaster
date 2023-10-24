@@ -35,7 +35,7 @@ namespace QuickFiler.Controllers
             _initType = InitType;
             _globals = AppGlobals;
             _homeController = homeController;
-            _kbdHandler = _homeController.KeyboardHndlr;
+            _kbdHandler = _homeController.KeyboardHandler;
             _parent = parent;
             SetupLightDark(_globals.Ol.DarkMode);
         }

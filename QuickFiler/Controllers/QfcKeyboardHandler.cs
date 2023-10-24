@@ -37,20 +37,20 @@ namespace QuickFiler.Controllers
         private IFilerHomeController _parent;
         private bool _kbdActive = false;
 
-        private KbdActions<char, KaChar, Action<char>> _charActions = null;
+        private KbdActions<char, KaChar, Action<char>> _charActions = [];
         public KbdActions<char, KaChar, Action<char>> CharActions { get => _charActions; set => _charActions = value; }
 
-        private KbdActions<char, KaCharAsync, Func<char, Task>> _charActionsAsync;
+        private KbdActions<char, KaCharAsync, Func<char, Task>> _charActionsAsync = [];
         public KbdActions<char, KaCharAsync, Func<char, Task>> CharActionsAsync { get => _charActionsAsync; set => _charActionsAsync = value; }
 
-        private KbdActions<Keys, KaKey, Action<Keys>> _keyActions = null;
+        private KbdActions<Keys, KaKey, Action<Keys>> _keyActions = [];
         public KbdActions<Keys, KaKey, Action<Keys>> KeyActions
         {
             get => _keyActions;
             set => _keyActions = value;
         }
 
-        private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _keyActionsAsync;
+        private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _keyActionsAsync = [];
         public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> KeyActionsAsync { get => _keyActionsAsync; set => _keyActionsAsync = value; }
 
         public bool KbdActive
@@ -125,8 +125,8 @@ namespace QuickFiler.Controllers
 
         public void ToggleKeyboardDialog()
         {
-            if (_kbdActive) { _parent.FormCtrlr.ToggleOffNavigation(async: false); }
-            else { _parent.FormCtrlr.ToggleOnNavigation(async: false); }
+            if (_kbdActive) { _parent.FormController.ToggleOffNavigation(async: false); }
+            else { _parent.FormController.ToggleOnNavigation(async: false); }
             _kbdActive = !_kbdActive;
         }
 
@@ -138,15 +138,15 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleKeyboardDialogAsync()
         {
-            //if (SynchronizationContext.Current is null)
-            //    SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
-            if (_kbdActive) { await _parent.FormCtrlr.ToggleOffNavigationAsync(); }
-            else { await _parent.FormCtrlr.ToggleOnNavigationAsync(); }
+            if (_kbdActive) { await _parent.FormController.ToggleOffNavigationAsync(); }
+            else { await _parent.FormController.ToggleOnNavigationAsync(); }
             _kbdActive = !_kbdActive;
         }
 
         public async void ToggleKeyboardDialogAsync(object sender, KeyEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
             await ToggleKeyboardDialogAsync();
             e.Handled = true;
         }

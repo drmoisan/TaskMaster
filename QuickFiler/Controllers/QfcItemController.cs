@@ -153,8 +153,8 @@ namespace QuickFiler.Controllers
 
             // Set references to other controllers
             _itemViewer.Controller = this;
-            _kbdHandler = _homeController.KeyboardHndlr;
-            _explorerController = _homeController.ExplorerCtlr;
+            _kbdHandler = _homeController.KeyboardHandler;
+            _explorerController = _homeController.ExplorerController;
             _token = _homeController.Token;
             _tokenSource = _homeController.TokenSource;
         }
@@ -967,13 +967,13 @@ namespace QuickFiler.Controllers
 
         async public Task KbdExecuteAsync(Func<Task> action, bool deactivateKbd)
         {
-            if (deactivateKbd) { _homeController.KeyboardHndlr.ToggleKeyboardDialog(); }
+            if (deactivateKbd) { _homeController.KeyboardHandler.ToggleKeyboardDialog(); }
             await action();
         }
 
         async public Task KbdExecuteAsync<T>(Func<T, Task> action, T parameter, bool deactivateKbd)
         {
-            if (deactivateKbd) { _homeController.KeyboardHndlr.ToggleKeyboardDialog(); }
+            if (deactivateKbd) { _homeController.KeyboardHandler.ToggleKeyboardDialog(); }
             await action(parameter);
         }
 
@@ -1418,7 +1418,7 @@ namespace QuickFiler.Controllers
             var flagTask = new FlagTasks(AppGlobals: _globals,
                                          ItemList: itemList,
                                          blFile: false,
-                                         hWndCaller: _homeController.FormCtrlr.FormHandle);
+                                         hWndCaller: _homeController.FormController.FormHandle);
             _itemViewer.BtnFlagTask.DialogResult = flagTask.Run(modal: true);
             if (_itemViewer.BtnFlagTask.DialogResult == DialogResult.OK)
             {
@@ -1434,7 +1434,7 @@ namespace QuickFiler.Controllers
                 var flagTask = new FlagTasks(AppGlobals: _globals,
                                          ItemList: itemList,
                                          blFile: false,
-                                         hWndCaller: _homeController.FormCtrlr.FormHandle);
+                                         hWndCaller: _homeController.FormController.FormHandle);
                 _itemViewer.BtnFlagTask.DialogResult = flagTask.Run(modal: true);
                 if (_itemViewer.BtnFlagTask.DialogResult == DialogResult.OK)
                 {

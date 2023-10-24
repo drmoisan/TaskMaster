@@ -78,13 +78,13 @@ namespace QuickFiler
         #region Public Properties
 
         private IQfcExplorerController _explorerController;
-        public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
+        public IQfcExplorerController ExplorerController { get => _explorerController; set => _explorerController = value; }
 
         private EfcFormController _formController;
-        public IFilerFormController FormCtrlr { get => _formController; }
+        public IFilerFormController FormController { get => _formController; }
 
         private IQfcKeyboardHandler _keyboardHandler;
-        public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
+        public IQfcKeyboardHandler KeyboardHandler { get => _keyboardHandler; set => _keyboardHandler = value; }
 
         private EfcDataModel _dataModel;
         internal EfcDataModel DataModel { get => _dataModel; set => _dataModel = value; }

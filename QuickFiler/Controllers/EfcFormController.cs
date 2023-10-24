@@ -211,16 +211,15 @@ namespace QuickFiler.Controllers
 
         public void WireEventHandlers()
         {
-            //_homeController.KeyboardHndlr.CharActions = new Dictionary<char, Action<char>>();
-            _homeController.KeyboardHndlr.CharActions = new KbdActions<char, KaChar, Action<char>>();
+            //_homeController.KeyboardHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
+            //_homeController.KeyboardHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+            
             _formViewer.ForAllControls(x =>
             {
                 x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(
-                    _homeController.KeyboardHndlr.KeyboardHandler_PreviewKeyDownAsync);
-                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(
-                //    _homeController.KeyboardHndlr.KeyboardHandler_KeyDown);
+                    _homeController.KeyboardHandler.KeyboardHandler_PreviewKeyDownAsync);
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(
-                    _homeController.KeyboardHndlr.KeyboardHandler_KeyDownAsync);
+                    _homeController.KeyboardHandler.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> {  });
             _formViewer.SaveAttachments.CheckedChanged += SaveAttachments_CheckedChanged;
@@ -470,13 +469,13 @@ namespace QuickFiler.Controllers
 
         async public Task KbdExecuteAsync(Func<Task> action)
         {
-            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+            _homeController.KeyboardHandler.ToggleKeyboardDialog();
             await action();
         }
 
         async internal Task JumpToAsync(Control control)
         {
-            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+            _homeController.KeyboardHandler.ToggleKeyboardDialog();
             await _formViewer.UiSyncContext;
             control.Focus();
         }
@@ -495,33 +494,33 @@ namespace QuickFiler.Controllers
         {
             await _formViewer.UiSyncContext;
             checkBox.Checked = !checkBox.Checked;
-            _homeController.KeyboardHndlr.ToggleKeyboardDialog();
+            _homeController.KeyboardHandler.ToggleKeyboardDialog();
         }
 
         public void ToggleOffNavigation(bool async)
         {
-            CharacterActions.Keys.ForEach(key => _homeController.KeyboardHndlr.CharActions.Remove("Controller", key));
+            CharacterActions.Keys.ForEach(key => _homeController.KeyboardHandler.CharActions.Remove("Controller", key));
             ToggleTips(async, Enums.ToggleState.Off);
             _itemController.ToggleNavigation(async, Enums.ToggleState.Off);
         }
 
         public async Task ToggleOffNavigationAsync()
         {
-            CharacterAsyncActions.Keys.ForEach(key => _homeController.KeyboardHndlr.CharActions.Remove("Controller", key));
+            CharacterAsyncActions.Keys.ForEach(key => _homeController.KeyboardHandler.CharActionsAsync.Remove("Controller", key));
             await ToggleTipsAsync(Enums.ToggleState.Off);
             await _itemController.ToggleNavigationAsync(Enums.ToggleState.Off);
         }
 
         public void ToggleOnNavigation(bool async)
         {
-            CharacterActions.ForEach(x => _homeController.KeyboardHndlr.CharActions.Add(x));
+            CharacterActions.ForEach(x => _homeController.KeyboardHandler.CharActions.Add(x));
             ToggleTips(async, Enums.ToggleState.On);
             _itemController.ToggleNavigation(async, Enums.ToggleState.On);
         }
 
         public async Task ToggleOnNavigationAsync()
         {
-            CharacterAsyncActions.ForEach(x => _homeController.KeyboardHndlr.CharActionsAsync.Add(x));
+            CharacterAsyncActions.ForEach(x => _homeController.KeyboardHandler.CharActionsAsync.Add(x));
             await ToggleTipsAsync(Enums.ToggleState.On);
             await _itemController.ToggleNavigationAsync(Enums.ToggleState.On);
         }
