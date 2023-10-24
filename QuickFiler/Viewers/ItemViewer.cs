@@ -22,7 +22,7 @@ namespace QuickFiler
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitControlGroups();
         }
-        
+
         //private IList<Control> _rightControls;
 
         private IList<Label> _tipsLabels;
@@ -39,13 +39,13 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
-        
+
         private TaskScheduler _uiScheduler;
         public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         public void RemoveControlsColsRightOf(Control furthestRight)
         {
-            if (furthestRight.Parent is TableLayoutPanel) 
+            if (furthestRight.Parent is TableLayoutPanel)
             {
                 var tlp = (TableLayoutPanel)furthestRight.Parent;
                 var columnNumber = tlp.GetColumn(furthestRight);
@@ -58,8 +58,8 @@ namespace QuickFiler
 
                 }
             }
-            else 
-            { 
+            else
+            {
                 RemoveControlsRightOf(furthestRight);
             }
         }

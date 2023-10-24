@@ -289,19 +289,27 @@
     <Compile Include="Viewers\EfcViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewers\EfcViewer.Designer.cs" />
+    <Compile Include="Viewers\EfcViewer.Designer.cs">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\ItemViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Viewers\ItemViewer.Designer.cs" />
+    <Compile Include="Viewers\ItemViewer.Designer.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcFormViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewers\QfcFormViewer.Designer.cs" />
+    <Compile Include="Viewers\QfcFormViewer.Designer.cs">
+      <DependentUpon>QfcFormViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcItemViewerExpanded.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Viewers\QfcItemViewerExpanded.Designer.cs" />
+    <Compile Include="Viewers\QfcItemViewerExpanded.Designer.cs">
+      <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
@@ -330,10 +338,22 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\EfcViewer.resx" />
-    <EmbeddedResource Include="Viewers\ItemViewer.resx" />
-    <EmbeddedResource Include="Viewers\QfcFormViewer.resx" />
-    <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx" />
+    <EmbeddedResource Include="Viewers\EfcViewer.resx">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\ItemViewer.resx">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcFormViewer.resx">
+      <DependentUpon>QfcFormViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx">
+      <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\ApplicationFlyout.png" />

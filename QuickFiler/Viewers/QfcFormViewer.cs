@@ -58,7 +58,7 @@ namespace QuickFiler
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        
+
 
     }
 }
