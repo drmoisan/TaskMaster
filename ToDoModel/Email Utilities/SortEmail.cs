@@ -77,7 +77,11 @@ namespace ToDoModel
                                      string olAncestor,
                                      string fsAncestorEquivalent)
         {
-            if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
+            TraceUtility.LogMethodCall(mailItems, savePictures, destinationOlStem, saveMsg, 
+                saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
+
+            if (mailItems is null || mailItems.Count == 0) 
+            { throw new ArgumentNullException($"{mailItems} is null or empty"); }
 
             var destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
             var conversationID = mailItems[0].ConversationID;
@@ -353,6 +357,7 @@ namespace ToDoModel
             bool saveAttachments,
             bool savePictures)
         {
+            TraceUtility.LogMethodCall(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
             var attachments = mailItem.Attachments
                                       .Cast<Attachment>()
                                       .Where(x => x.Type != OlAttachmentType.olOLE)
@@ -413,6 +418,8 @@ namespace ToDoModel
 
         async public static Task SaveAttachmentAsync(this AttachmentInfo attachmentInfo)
         {
+            TraceUtility.LogMethodCall(attachmentInfo);
+
             if (File.Exists(attachmentInfo.FilePathSave))
             {
                 if (attachmentInfo.IsImage)
@@ -582,6 +589,8 @@ namespace ToDoModel
             string olAncestor,
             string fsAncestorEquivalent)
         {
+            TraceUtility.LogMethodCall(mailItems, destinationOlPath, appGlobals, olAncestor, fsAncestorEquivalent);
+
             // Resolve the file system destination folder path 
             var saveFsPath = destinationOlPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
 
@@ -602,6 +611,8 @@ namespace ToDoModel
             MailItem mailItem,
             string fsLocation)
         {
+            TraceUtility.LogMethodCall(mailItem, fsLocation);
+
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
             
             var strPath = AttachmentInfo.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
@@ -976,6 +987,8 @@ namespace ToDoModel
             MailItem oMailTmp,
             IApplicationGlobals _globals)
         {
+            TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
+
             var strOutput = new string[2];
 
             // TODO: Change this into a JSON file

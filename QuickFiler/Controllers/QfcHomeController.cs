@@ -307,6 +307,7 @@ namespace QuickFiler.Controllers
 
         public async Task WriteMetricsAsync(string filename)
         {
+            TraceUtility.LogMethodCall(filename);
 
             string LOC_TXT_FILE;
             string curDateText, curTimeText, durationText, durationMinutesText;
@@ -341,7 +342,20 @@ namespace QuickFiler.Controllers
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
 
             durationMinutesText = (Duration / 60d).ToString("##0.00");
+            WriteMoveToCalendar(OlEndTime, OlStartTime, out OlAppointment, out OlEmailCalendar, emailsLoaded);
 
+            string[] strOutput = _formController.Groups
+                .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
+                dataLineBeg, OlEndTime, ref OlAppointment);
+
+            _fileName = filename;
+            await NonBlockingProducer(strOutput, Token);
+        }
+
+        private void WriteMoveToCalendar(DateTime OlEndTime, DateTime OlStartTime, out AppointmentItem OlAppointment, out Folder OlEmailCalendar, int emailsLoaded)
+        {
+            TraceUtility.LogMethodCall(OlEndTime, OlStartTime, emailsLoaded);
+            
             OlEmailCalendar = UtilitiesCS.Calendar.GetCalendar("Email Time", _globals.Ol.App.Session);
             OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
             {
@@ -353,14 +367,6 @@ namespace QuickFiler.Controllers
                 OlAppointment.Sensitivity = OlSensitivity.olPrivate;
                 OlAppointment.Save();
             }
-
-
-            string[] strOutput = _formController.Groups
-                .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
-                dataLineBeg, OlEndTime, ref OlAppointment);
-
-            _fileName = filename;
-            await NonBlockingProducer(strOutput, Token);
         }
 
         private BlockingCollection<string> _metrics = new BlockingCollection<string> (new ConcurrentQueue<string>());
@@ -371,6 +377,8 @@ namespace QuickFiler.Controllers
 
         private async Task NonBlockingProducer(string[] lines, CancellationToken ct)
         {
+            TraceUtility.LogMethodCall(lines, ct);
+
             foreach (string line in lines)
             {
                 ct.ThrowIfCancellationRequested();
@@ -411,6 +419,8 @@ namespace QuickFiler.Controllers
 
         private void TimedConsumer(object source, ElapsedEventArgs e)
         {
+            TraceUtility.LogMethodCall(source, e);
+
             Interlocked.Decrement(ref _metricsConsumers);
             var strOutput = _metrics.GetConsumingEnumerable().ToArray();
             if (strOutput.Length > 0)

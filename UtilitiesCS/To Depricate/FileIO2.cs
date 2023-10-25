@@ -30,6 +30,8 @@ namespace UtilitiesCS
 
         public static void WriteTextFile(string filename, string[] strOutput, string folderpath)
         {
+            TraceUtility.LogMethodCall(filename, strOutput, folderpath);
+
             string filepath = Path.Combine(folderpath, filename);
             var listOutput = new List<string>(strOutput);
             foreach (var output in listOutput)

@@ -1379,20 +1379,13 @@ namespace QuickFiler.Controllers
 
         async public Task MoveMailAsync()
         {
+            TraceUtility.LogMethodCall();
+
             if (Mail is not null)
             {
                 IList<MailItem> selItems = PackageItems();
                 bool attachments = SelectedFolder != "Trash to Delete" && _optionAttachments;
 
-                //await SortEmail.RunAsync(mailItems: selItems,
-                //                         savePictures: false,
-                //                         destinationOlStem: _itemViewer.CboFolders.SelectedItem as string,
-                //                         saveMsg: _itemViewer.CbxEmailCopy.Checked,
-                //                         saveAttachments: attachments,
-                //                         removePreviousFsFiles: false,
-                //                         appGlobals: _globals,
-                //                         olAncestor: _globals.Ol.ArchiveRootPath,
-                //                         fsAncestorEquivalent: _globals.FS.FolderRoot);
                 await SortEmail.SortAsync(mailItems: selItems,
                                          savePictures: false,
                                          destinationOlStem: SelectedFolder,
@@ -1403,7 +1396,6 @@ namespace QuickFiler.Controllers
                                          olAncestor: _globals.Ol.ArchiveRootPath,
                                          fsAncestorEquivalent: _globals.FS.FldrRoot);
                 SortEmail.Cleanup_Files();
-                // blDoMove
             }
         }
 

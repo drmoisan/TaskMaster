@@ -271,6 +271,8 @@ namespace QuickFiler.Controllers
 
         async public Task ActionOkAsync()
         {
+            TraceUtility.LogMethodCall();
+
             if (!_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 throw new NotImplementedException(
@@ -296,6 +298,7 @@ namespace QuickFiler.Controllers
 
         private async Task MoveAndIterate()
         {
+            TraceUtility.LogMethodCall();
 
             if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
             {
@@ -328,6 +331,8 @@ namespace QuickFiler.Controllers
 
         internal async Task BackGroundMove()
         {
+            TraceUtility.LogMethodCall();
+
             // Move emails
             await _groups.MoveEmailsAsync(_movedItems);
 

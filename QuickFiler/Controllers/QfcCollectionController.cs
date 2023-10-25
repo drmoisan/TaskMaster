@@ -1271,13 +1271,23 @@ namespace QuickFiler.Controllers
 
         async public Task MoveEmailsAsync(ScoStack<IMovedMailInfo> stackMovedItems)
         {
+            TraceUtility.LogMethodCall(stackMovedItems);
+
             await _itemGroupsToMove.ToAsyncEnumerable().ForEachAsync(async grp => await grp.ItemController.MoveMailAsync());
             //_itemGroupsToMove.ForEach(async grp => await grp.ItemController.MoveMailAsync());
             //await Task.WhenAll(_itemGroupsToMove.Select(grp => grp.ItemController.MoveMailAsync()));
         }
 
-        public string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment)
+        public string[] GetMoveDiagnostics(
+            string durationText,
+            string durationMinutesText,
+            double Duration,
+            string dataLineBeg,
+            DateTime OlEndTime,
+            ref AppointmentItem OlAppointment)
         {
+            TraceUtility.LogMethodCall(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, OlAppointment);
+            
             int k;
             string[] strOutput = new string[_itemGroupsToMove.Count + 1];
             var loopTo = _itemGroupsToMove.Count;
