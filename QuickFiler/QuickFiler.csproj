@@ -264,9 +264,7 @@
     <Compile Include="Helper Classes\EfcThemeHelper.cs" />
     <Compile Include="Helper Classes\EfcViewerQueue.cs" />
     <Compile Include="Helper Classes\IConversationResolver.cs" />
-    <Compile Include="Helper Classes\IMailItemInfo.cs" />
     <Compile Include="Helper Classes\ItemViewerQueue.cs" />
-    <Compile Include="Helper Classes\MailItemInfo.cs" />
     <Compile Include="Helper Classes\QfcThemeHelper.cs" />
     <Compile Include="Helper Classes\QfEnums.cs" />
     <Compile Include="Interfaces\IFilerFormController.cs" />

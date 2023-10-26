@@ -328,28 +328,19 @@ namespace QuickFiler.Controllers
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
             _itemInfo = new MailItemInfo(mailItem);
-            _itemInfo.LoadPriority(_token);
+            _itemInfo.LoadPriority(_globals.Ol.EmailPrefixToStrip, _token);
             AssignControls(_itemInfo, viewerPosition);
 
-            //UIThreadExtensions.UiDispatcher.Invoke(
-            //        () => AssignControls(_itemInfo, viewerPosition),
-            //        DispatcherPriority.Render,
-            //        _token);
         }
         
         internal async Task PopulateControlsAsync(MailItem mailItem, int viewerPosition, bool loadAll)
         {
             _token.ThrowIfCancellationRequested();
 
-            _itemInfo = await MailItemInfo.FromMailItemAsync(mailItem, _token, loadAll);
+            _itemInfo = await MailItemInfo.FromMailItemAsync(mailItem, _globals.Ol.EmailPrefixToStrip, _token, loadAll);
             
             AssignControls(_itemInfo, viewerPosition);
 
-            //await UIThreadExtensions.UiDispatcher.InvokeAsync(
-            //    ()=>AssignControls(_itemInfo, viewerPosition),
-            //    System.Windows.Threading.DispatcherPriority.Normal, 
-            //    _token);
-            
         }
 
         internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)

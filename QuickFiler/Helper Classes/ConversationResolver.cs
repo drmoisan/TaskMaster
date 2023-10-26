@@ -118,9 +118,10 @@ namespace QuickFiler.Helper_Classes
             var df = Df.Expanded;
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
             var convInfoExpanded = Enumerable.Range(0, Count.Expanded)
-                                                .Select(indexRow => MailItemInfo.FromDf(df, indexRow, olNs, Token))
-                                                .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
-                                                .ToList();
+                                             .Select(indexRow => MailItemInfo.FromDf(
+                                                 df, indexRow, olNs, _globals.Ol.EmailPrefixToStrip, Token))
+                                             .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
+                                             .ToList();
 
             var convInfoSameFolder = convInfoExpanded.Where(
                 itemInfo => itemInfo.Folder == ((Folder)_mailItem.Parent).Name).ToList();
@@ -139,7 +140,8 @@ namespace QuickFiler.Helper_Classes
 
             var tasksConvInfoExp = Enumerable.Range(0, Count.Expanded)
                                              .Select(indexRow => MailItemInfo
-                                             .FromDfAsync(Df.Expanded, indexRow, olNs, token, backgroundLoad));
+                                             .FromDfAsync(Df.Expanded, indexRow, olNs, 
+                                             _globals.Ol.EmailPrefixToStrip, token, backgroundLoad));
 
             var convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp))
                                    .OrderByDescending(itemInfo => itemInfo.ConversationIndex)

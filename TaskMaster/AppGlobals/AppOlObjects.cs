@@ -134,6 +134,8 @@ namespace TaskMaster
             }
         }
 
+        public string EmailPrefixToStrip => Properties.Resources.Email_Prefix_To_Strip;
+        
         private StackObjectCS<object> _movedMails_Stack;
         public StackObjectCS<object> MovedMails_Stack
         {

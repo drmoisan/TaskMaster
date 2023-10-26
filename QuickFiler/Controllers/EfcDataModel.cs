@@ -70,7 +70,7 @@ namespace QuickFiler.Controllers
                 if (_mailInfo is null && Mail is not null)
                 {
                     _mailInfo = new MailItemInfo(Mail);
-                    _mailInfo.LoadPriority(_token);
+                    _mailInfo.LoadPriority(_globals.Ol.EmailPrefixToStrip, _token);
                 }
                 return _mailInfo;
             }

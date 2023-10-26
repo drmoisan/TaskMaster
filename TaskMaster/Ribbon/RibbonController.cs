@@ -187,7 +187,7 @@ namespace TaskMaster
             var conversation = (Outlook.Conversation)Mail.GetConversation();
             var df = conversation.GetDataFrame();
             df.PrettyPrint();
-            var mInfo = new MailItemInfo(df, 0);
+            var mInfo = new MailItemInfo(df, 0, _globals.Ol.EmailPrefixToStrip);
         }
         internal void TryGetQfcDataModel()
         {

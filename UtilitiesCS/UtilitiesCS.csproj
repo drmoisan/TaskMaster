@@ -318,6 +318,8 @@
     <Compile Include="EmailIntelligence\CtfMap.cs" />
     <Compile Include="EmailIntelligence\CtfMapEntry.cs" />
     <Compile Include="EmailIntelligence\EmailDetails.cs" />
+    <Compile Include="EmailIntelligence\MailItemInfo.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IMailItemInfo.cs" />
     <Compile Include="EmailIntelligence\RecentsList.cs" />
     <Compile Include="EmailIntelligence\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMapEncoder.cs" />

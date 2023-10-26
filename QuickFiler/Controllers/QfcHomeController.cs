@@ -373,7 +373,7 @@ namespace QuickFiler.Controllers
         private int _metricsConsumers = 0;
         private static object _lockObject = new object();
         private static string _fileName;
-        private static string _folderPath;
+        //private static string _folderPath;
 
         private async Task NonBlockingProducer(string[] lines, CancellationToken ct)
         {

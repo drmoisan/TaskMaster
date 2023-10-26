@@ -10,6 +10,7 @@ namespace UtilitiesCS
         string EmailRootPath { get; }
         string ArchiveRootPath { get; }
         string UserEmailAddress { get; }
+        string EmailPrefixToStrip { get; }
         Folder Inbox { get; }
         NameSpace NamespaceMAPI { get; }
         Folder Root { get; }

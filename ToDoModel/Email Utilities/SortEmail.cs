@@ -994,7 +994,7 @@ namespace ToDoModel
             // TODO: Change this into a JSON file
             WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
-            string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath);
+            string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath).Skip(1).ToArray();
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
             
             //BUGFIX: This is not threadsafe and generates an exception. Need to set this
@@ -1028,19 +1028,20 @@ namespace ToDoModel
 
         private static string SanitizeArrayLineTSV(ref string[] strOutput)
         {
-            if (strOutput.IsInitialized())
-            {
-                return string.Join("\t",strOutput
-                             .Where(s => !string.IsNullOrEmpty(s))
-                             .Select(s => StripTabsCrLf(s))
-                             .ToArray());
-            }
-            else { return ""; }
+            //if (strOutput.IsInitialized())
+            //{
+            var line = string.Join("\t",strOutput
+                         .Where(s => !string.IsNullOrEmpty(s))
+                         .Select(s => StripTabsCrLf(s))
+                         .ToArray());
+            return line;
+            //}
+            //else { return ""; }
         }
 
         internal static string StripTabsCrLf(string str)
         {
-            var _regex = new Regex(@"[\t\n\r]*");
+            var _regex = new Regex(@"[\t\n\r]+");
             string result = _regex.Replace(str, " ");
 
             // ensure max of one space per word

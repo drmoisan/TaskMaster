@@ -8,11 +8,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using ToDoModel;
-using UtilitiesCS;
 using System.Windows.Forms.VisualStyles;
+using UtilitiesCS;
 
-namespace QuickFiler
+namespace UtilitiesCS //QuickFiler
 {
     /// <summary>
     /// Class to cache information about a mail item.
@@ -28,32 +27,33 @@ namespace QuickFiler
             _item = item;
         }
 
-        public MailItemInfo(DataFrame df, long indexRow)
+        public MailItemInfo(DataFrame df, long indexRow, string emailPrefixToStrip)
         {
             _entryId = (string)df["EntryID"][indexRow];
             _storeId = (string)df["Store"][indexRow];
             _senderName = (string)df["SenderName"][indexRow];
             _sender = new RecipientInfo() { Name = _senderName, Address = (string)df["SenderSmtpAddress"][indexRow] };
             _folder = (string)df["Folder Name"][indexRow];
+            _emailPrefixToStrip = emailPrefixToStrip;
             DateTime.TryParse((string)df["SentOn"][indexRow], out _sentDate);
             _conversationIndex = (string)df["ConversationIndex"][indexRow];
         }
 
-        public static MailItemInfo FromDf(DataFrame df, long indexRow, Outlook.NameSpace olNs, CancellationToken token = default)
+        public static MailItemInfo FromDf(DataFrame df, long indexRow, Outlook.NameSpace olNs, string emailPrefixToStrip, CancellationToken token = default)
         {
-            var info = new MailItemInfo(df, indexRow);
+            var info = new MailItemInfo(df, indexRow, emailPrefixToStrip);
             info.ResolveMail(olNs, strict: true);
-            info.LoadPriority(token);
+            info.LoadPriority(emailPrefixToStrip, token);
             return info;
         }
 
-        public static async Task<MailItemInfo> FromDfAsync(DataFrame df, long indexRow, Outlook.NameSpace olNs, CancellationToken token, bool background)
+        public static async Task<MailItemInfo> FromDfAsync(DataFrame df, long indexRow, Outlook.NameSpace olNs, string emailPrefixToStrip, CancellationToken token, bool background)
         {
             token.ThrowIfCancellationRequested();
 
             //TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
 
-            var info = new MailItemInfo(df, indexRow);
+            var info = new MailItemInfo(df, indexRow, emailPrefixToStrip);
             await info.ResolveMailAsync(olNs, token, background);
 
             token.ThrowIfCancellationRequested();
@@ -61,7 +61,7 @@ namespace QuickFiler
                 () =>
                 {
                     info.Subject = info.Item.Subject;
-                    info.Body = CompressPlainText(info.Item.Body);
+                    info.Body = CompressPlainText(info.Item.Body, emailPrefixToStrip);
                     info.Triage = info.Item.GetTriage();
                     info.SentOn = info.Item.SentOn.ToString("g");
                     info.Actionable = info.Item.GetActionTaken();
@@ -77,7 +77,7 @@ namespace QuickFiler
             return info;
         }
 
-        public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, CancellationToken token, bool loadAll)
+        public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, string emailPrefixToStrip, CancellationToken token, bool loadAll)
         {
             token.ThrowIfCancellationRequested();
 
@@ -86,7 +86,7 @@ namespace QuickFiler
             info.EntryId = item.EntryID;
             info.SetSender(item.GetSenderInfo());
             info.Subject = item.Subject;
-            info.Body = CompressPlainText(item.Body);
+            info.Body = CompressPlainText(item.Body, emailPrefixToStrip);
             info.Triage = item.GetTriage();
             info.SentOn = item.SentOn.ToString("g");
             info.Actionable = item.GetActionTaken();
@@ -139,7 +139,7 @@ namespace QuickFiler
             return true;
         }
 
-        public bool LoadPriority(CancellationToken token = default)
+        public bool LoadPriority(string emailPrefixToStrip, CancellationToken token = default)
         {
             if (_item is null) { throw new ArgumentNullException(); }
             _entryId = _item.EntryID;
@@ -147,7 +147,7 @@ namespace QuickFiler
             _senderName = _sender.Name;
             _senderHtml = _sender.Html;
             _subject = _item.Subject;
-            _body = CompressPlainText(_item.Body);
+            _body = CompressPlainText(_item.Body, emailPrefixToStrip);
             _triage = _item.GetTriage();
             _sentOn = _item.SentOn.ToString("g");
             _actionable = _item.GetActionTaken();
@@ -188,34 +188,20 @@ namespace QuickFiler
         private RecipientInfo _ccRecipients;
         private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
 
-        [Flags]
-        public enum PlainTextOptionsEnum
-        {
-            Original = 0,
-            ShowStripped = 1,
-            StripWarning = 2,
-            StripLinks = 4,
-            StripFormatting = 8,
-            StripReplyHeader = 16,
-            StripReplyBody = 32,
-            StripAllSilently = 62,
-            StripAll = 63
-        }
-
         #endregion
 
         #region Public Properties
 
         internal string Initialized(ref string variable)
         {
-            if (variable is null) { LoadPriority(); }
+            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
             return variable;
         }
         internal bool Initialized(ref bool? variable)
         {
             // check if one of the nullable variables is null which would indicate
             // the need to initialize
-            if (variable is null) { LoadPriority(); }
+            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
             return (bool)variable;
         }
 
@@ -234,6 +220,9 @@ namespace QuickFiler
         private string _conversationIndex;
         public string ConversationIndex { get => Initialized(ref _conversationIndex); set => _conversationIndex = value; }
 
+        private string _emailPrefixToStrip = "";
+        public string EmailPrefixToStrip { get => _emailPrefixToStrip; internal set => _emailPrefixToStrip = value; }
+
         private string _entryId;
         public string EntryId { get => Initialized(ref _entryId); set => _entryId = value; }
 
@@ -243,8 +232,8 @@ namespace QuickFiler
         private MailItem _item;
         public MailItem Item { get => _item; set => _item = value; }
 
-        private PlainTextOptionsEnum _plainTextOptions = PlainTextOptionsEnum.StripAll;
-        public PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
+        private IMailItemInfo.PlainTextOptionsEnum _plainTextOptions = IMailItemInfo.PlainTextOptionsEnum.StripAll;
+        public IMailItemInfo.PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
 
         private string _senderHtml;
         public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
@@ -288,40 +277,40 @@ namespace QuickFiler
 
         #region HTML and Plain Text Methods
 
-        internal static string CompressPlainText(string text)
+        internal static string CompressPlainText(string text, string emailPrefixToStrip)
         {
-            return CompressPlainText(text, PlainTextOptionsEnum.StripAll);
+            return CompressPlainText(text, IMailItemInfo.PlainTextOptionsEnum.StripAll, emailPrefixToStrip);
         }
 
-
-        internal static string CompressPlainText(string text, PlainTextOptionsEnum options)
+        internal static string CompressPlainText(string text, IMailItemInfo.PlainTextOptionsEnum options, string emailPrefixToStrip)
         {
-            if (options.HasFlag(PlainTextOptionsEnum.StripWarning))
-                text = text.Replace(Properties.Resources.Email_Prefix_To_Strip, "");
+            if (options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripWarning) && emailPrefixToStrip != "")
+                text = text.Replace(emailPrefixToStrip, "");
 
-            if (options.HasFlag(PlainTextOptionsEnum.StripLinks))
+            if (options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripLinks))
             {
                 var replacementText = "";
-                if (options.HasFlag(PlainTextOptionsEnum.ShowStripped))
+                if (options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.ShowStripped))
                     replacementText = "<link>";
                 text = Regex.Replace(text, @"<https://[^>]+>", replacementText); //Strip links
             }
 
-            if (options.HasFlag(PlainTextOptionsEnum.StripReplyHeader) || options.HasFlag(PlainTextOptionsEnum.StripReplyBody))
+            if (options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripReplyHeader) || 
+                options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripReplyBody))
             {
                 var replacementText = "";
-                if (options.HasFlag(PlainTextOptionsEnum.ShowStripped | PlainTextOptionsEnum.StripReplyHeader) &&
-                    !options.HasFlag(PlainTextOptionsEnum.StripReplyBody))
+                if (options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.ShowStripped | IMailItemInfo.PlainTextOptionsEnum.StripReplyHeader) &&
+                    !options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripReplyBody))
                     replacementText = "<EOM> Chain: $3";
-                else if (!options.HasFlag(PlainTextOptionsEnum.StripReplyHeader))
+                else if (!options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripReplyHeader))
                     replacementText += "$1";
-                else if (!options.HasFlag(PlainTextOptionsEnum.StripReplyBody))
+                else if (!options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripReplyBody))
                     replacementText += "$3";
 
                 text = Regex.Replace(text, @"(From:([^\n]*\n){1,4}Subject: {0,1}[rR][eE]:.*)(.|\n|\r)*\z", replacementText); //Strip reply footer
             }
 
-            if (options.HasFlag(PlainTextOptionsEnum.StripFormatting))
+            if (options.HasFlag(IMailItemInfo.PlainTextOptionsEnum.StripFormatting))
                 text = Regex.Replace(text, @"[\s]", " ");
             text = Regex.Replace(text, @"[ ]{2,}", " ");
             text = text.Trim();
