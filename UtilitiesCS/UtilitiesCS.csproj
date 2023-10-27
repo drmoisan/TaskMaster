@@ -319,6 +319,9 @@
     <Compile Include="EmailIntelligence\CtfMapEntry.cs" />
     <Compile Include="EmailIntelligence\EmailDetails.cs" />
     <Compile Include="EmailIntelligence\MailItemInfo.cs" />
+    <Compile Include="Interfaces\ITimerWrapper.cs" />
+    <Compile Include="HelperClasses\TimedDiskWriter.cs" />
+    <Compile Include="HelperClasses\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IMailItemInfo.cs" />
     <Compile Include="EmailIntelligence\RecentsList.cs" />
     <Compile Include="EmailIntelligence\RecipientInfo.cs" />
@@ -364,6 +367,7 @@
     <Compile Include="Interfaces\Enums.cs" />
     <Compile Include="Interfaces\IAppEvents.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IMovedMailInfo.cs" />
+    <Compile Include="Interfaces\IGenericTimer.cs" />
     <Compile Include="Interfaces\IGlobals\IAppAutoFileObjects.cs" />
     <Compile Include="Interfaces\IGlobals\IApplicationGlobals.cs" />
     <Compile Include="Interfaces\IGlobals\IAppStagingFilenames.cs" />

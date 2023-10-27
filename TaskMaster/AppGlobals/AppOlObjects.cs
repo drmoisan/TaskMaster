@@ -1,19 +1,24 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
+using ToDoModel;
 using UtilitiesCS;
 
 namespace TaskMaster
 {
     public class AppOlObjects : IOlObjects
     {
-        public AppOlObjects(Application olApplication)
+        public AppOlObjects(Application olApplication, IApplicationGlobals appGlobals)
         {
+            _globals = appGlobals;
             _olApplication = olApplication;
         }
+
+        private IApplicationGlobals _globals;
 
         private Application _olApplication;
         public Application App { get => _olApplication; }
@@ -147,6 +152,18 @@ namespace TaskMaster
             {
                 _movedMails_Stack = value;
             }
+        }
+
+        private TimedDiskWriter<string> _emailMoveWriter;
+        public TimedDiskWriter<string> EmailMoveWriter => Initializer.GetOrLoad(ref _emailMoveWriter, LoadEmailMoveWriter);
+        public TimedDiskWriter<string> LoadEmailMoveWriter()
+        {
+            var writer = new TimedDiskWriter<string>();
+            writer.Config.WriteInterval = TimeSpan.FromSeconds(5);
+            writer.Config.TryAddTimeout = 20;
+            SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
+            writer.DiskWriter = (items) => FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, items.ToArray(), _globals.FS.FldrMyD);
+            return writer;
         }
 
         private string _userEmailAddress;

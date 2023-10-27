@@ -52,7 +52,7 @@ namespace ToDoModel
             }
             else { await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals); }
         }
-
+        
         async public static Task SortAsync(IList<MailItem> mailItems,
                                bool savePictures,
                                string destinationFolderpath,
@@ -66,6 +66,27 @@ namespace ToDoModel
             var fsAncestorEquivalent = appGlobals.FS.FldrRoot;
             await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
         }
+
+        async public static Task SortAsync(IList<MailItemInfo> mailInfoList,
+                                           bool savePictures,
+                                           string destinationOlStem,
+                                           bool saveMsg,
+                                           bool saveAttachments,
+                                           bool removePreviousFsFiles,
+                                           IApplicationGlobals appGlobals,
+                                           string olAncestor,
+                                           string fsAncestorEquivalent)
+        {
+            TraceUtility.LogMethodCall(mailInfoList, savePictures, destinationOlStem, saveMsg,
+                saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
+
+            if (mailInfoList is null || mailInfoList.Count == 0)
+            { throw new ArgumentNullException($"{mailInfoList} is null or empty"); }
+            
+            await Task.CompletedTask;
+            throw new NotImplementedException();
+        }
+
 
         async public static Task SortAsync(IList<MailItem> mailItems,
                                      bool savePictures,
@@ -83,20 +104,15 @@ namespace ToDoModel
             if (mailItems is null || mailItems.Count == 0) 
             { throw new ArgumentNullException($"{mailItems} is null or empty"); }
 
-            var destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
             var conversationID = mailItems[0].ConversationID;
 
-            (string saveFsPath, string deleteFsPath) = ResolvePaths(mailItems,
-                                                                    destinationOlPath,
-                                                                    appGlobals,
-                                                                    olAncestor,
-                                                                    fsAncestorEquivalent);
-
+            ResolvePaths(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent,
+                out string destinationOlPath, out string saveFsPath, out string deleteFsPath);
 
             foreach (var mailItem in mailItems)
             {
                 // If saveMsg is true, save the message as an .msg file
-                if (saveMsg) { await SaveMessageAsMSGAsync(mailItem, saveFsPath); }
+                if (saveMsg) { await SaveMessageAsMsgAsync(mailItem, saveFsPath); }
 
                 if (saveAttachments || savePictures)
                 {
@@ -204,15 +220,10 @@ namespace ToDoModel
         {
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
 
-            var destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
             var conversationID = mailItems[0].ConversationID;
 
-            (string saveFsPath, string deleteFsPath) = ResolvePaths(mailItems,
-                                                                    destinationOlPath,
-                                                                    appGlobals,
-                                                                    olAncestor,
-                                                                    fsAncestorEquivalent);
-
+            ResolvePaths(mailItems,destinationOlStem,appGlobals,olAncestor,fsAncestorEquivalent, 
+                out string destinationOlPath,out string saveFsPath, out string deleteFsPath);
 
             foreach (var mailItem in mailItems)
             {
@@ -582,20 +593,31 @@ namespace ToDoModel
             return extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif" || extension == ".bmp";
         }
 
-        private static (string saveFsPath, string deleteFsPath) ResolvePaths(
+        //private static (string saveFsPath, string deleteFsPath) ResolvePaths(
+        //    IList<MailItem> mailItems,
+        //    string destinationOlPath,
+        //    IApplicationGlobals appGlobals,
+        //    string olAncestor,
+        //    string fsAncestorEquivalent)
+        private static void ResolvePaths(
             IList<MailItem> mailItems,
-            string destinationOlPath,
+            string destinationOlStem,
             IApplicationGlobals appGlobals,
             string olAncestor,
-            string fsAncestorEquivalent)
+            string fsAncestorEquivalent,
+            out string destinationOlPath,
+            out string saveFsPath, 
+            out string deleteFsPath)
         {
-            TraceUtility.LogMethodCall(mailItems, destinationOlPath, appGlobals, olAncestor, fsAncestorEquivalent);
+            TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
+
+            destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
 
             // Resolve the file system destination folder path 
-            var saveFsPath = destinationOlPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
+            saveFsPath = destinationOlPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
 
             // Resolve the file system deletion folder path if relevant
-            string deleteFsPath = null;
+            deleteFsPath = null;
             var currentFolder = (Folder)mailItems[0].Parent;
             if ((currentFolder.FolderPath != appGlobals.Ol.EmailRootPath)&&
                 (currentFolder.FolderPath.Contains(olAncestor))&&
@@ -604,10 +626,9 @@ namespace ToDoModel
                 deleteFsPath = ((Folder)mailItems[0].Parent).ToFsFolderpath(olAncestor, fsAncestorEquivalent);
             }
 
-            return (saveFsPath, deleteFsPath);
         }
 
-        async internal static Task SaveMessageAsMSGAsync(
+        async internal static Task SaveMessageAsMsgAsync(
             MailItem mailItem,
             string fsLocation)
         {
@@ -989,19 +1010,18 @@ namespace ToDoModel
         {
             TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
-            var strOutput = new string[2];
-
             // TODO: Change this into a JSON file
             WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath).Skip(1).ToArray();
-            strOutput[1] = SanitizeArrayLineTSV(ref strAry);
-            
+            //strOutput[1] = SanitizeArrayLineTSV(ref strAry);
+            var output = SanitizeArrayLineTSV(ref strAry);
+
             //BUGFIX: This is not threadsafe and generates an exception. Need to set this
             //up as a class that will take in lines to write into a queue and will 
             //flush to the System.IO based on a Timer frequency if there has been a change
             //Look into channel functionality
-            FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
+            //FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
 
         //private static string SanitizeArrayLineTSV(ref string[] strOutput)
@@ -1031,7 +1051,8 @@ namespace ToDoModel
             //if (strOutput.IsInitialized())
             //{
             var line = string.Join("\t",strOutput
-                         .Where(s => !string.IsNullOrEmpty(s))
+                         //.Where(s => !string.IsNullOrEmpty(s))
+                         .Select(s => s ?? "")
                          .Select(s => StripTabsCrLf(s))
                          .ToArray());
             return line;
@@ -1051,7 +1072,7 @@ namespace ToDoModel
             return result;
         }
 
-        private static void WriteCSV_StartNewFileIfDoesNotExist(string strFileName, string strFileLocation)
+        public static void WriteCSV_StartNewFileIfDoesNotExist(string strFileName, string strFileLocation)
         {
             string[] strOutput = null;
             string[,] strAryOutput;

@@ -258,7 +258,7 @@ namespace UtilitiesCS
         {
             Folder OlParent = (Folder)OlMail.Parent;
             string folderPath = OlParent.FolderPath;
-            int root_length = emailRootFolder.Length;
+            int root_length = emailRootFolder.Length + 1;
             if (folderPath.Length > root_length)
             {
                 folderPath = folderPath.Substring(root_length);

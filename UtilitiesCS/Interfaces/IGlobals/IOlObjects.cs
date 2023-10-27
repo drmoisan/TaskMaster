@@ -21,5 +21,6 @@ namespace UtilitiesCS
         string ViewWide { get; }
         string ViewCompact { get; }
         bool DarkMode { get; set; }
+        TimedDiskWriter<string> EmailMoveWriter { get; }
     }
 }

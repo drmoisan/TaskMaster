@@ -16,10 +16,10 @@ namespace TaskMaster
         private AppAutoFileObjects _autoFileObjects;
         private AppEvents _events;
 
-        public ApplicationGlobals(Application OlApp)
+        public ApplicationGlobals(Application olApp)
         {
             _fs = new AppFileSystemFolderPaths();
-            _olObjects = new AppOlObjects(OlApp);
+            _olObjects = new AppOlObjects(olApp, this);
             _toDoObjects = new AppToDoObjects(this);
             _autoFileObjects = new AppAutoFileObjects(this);
             _events = new AppEvents(this);
