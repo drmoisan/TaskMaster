@@ -325,11 +325,31 @@ namespace TaskMaster
 
             while (rowQueue.Count > 0)
             {
-                subjectMapEntries.Add(
-                    new SubjectMapEntry(emailFolder: rowQueue.Dequeue(),
-                                        emailSubject: rowQueue.Dequeue(),
-                                        emailSubjectCount: int.Parse(rowQueue.Dequeue()),
-                                        commonWords: CommonWords));
+                string emailFolderPath = "not set"; 
+                string emailSubject = "not set";
+                int emailSubjectCount = -1;
+                try
+                {
+                    emailFolderPath = rowQueue.Dequeue();
+                    emailSubject = rowQueue.Dequeue();
+                    emailSubjectCount = int.Parse(rowQueue.Dequeue());
+                    
+                    subjectMapEntries.Add(
+                        new SubjectMapEntry(
+                            emailFolder: emailFolderPath,
+                            emailSubject: emailSubject,
+                            emailSubjectCount: emailSubjectCount,
+                            commonWords: CommonWords));
+                    
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Error loading subject map from backup file on item \n " +
+                        $"Email Folder: {emailFolderPath} \n" +
+                        $"Email Subject: {emailSubject} \n" +
+                        $"Email Count {emailSubjectCount} \n" +
+                        $"{e.Message}", e);
+                }
             }
             return subjectMapEntries;
         }

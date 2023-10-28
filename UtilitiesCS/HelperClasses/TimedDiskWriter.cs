@@ -149,13 +149,14 @@ namespace UtilitiesCS
         internal void OnTimedEvent(object sender, TimeElapsedEventArgs e)
         {
             //var items = Queue.GetConsumingEnumerable();
-            if (Queue.Any())
+            var items = new List<T>();
+            while (Queue.TryTake(out var item))
             {
-                var items = new List<T>();
-                while (Queue.TryTake(out var item))
-                {
-                    items.Add(item);
-                }
+                items.Add(item);
+            }
+            
+            if (items.Any())
+            {
                 DiskWriter(items);
             }
             else 
@@ -232,7 +233,7 @@ namespace UtilitiesCS
             if (e.PropertyName == nameof(Config.WriteInterval))
             {
                 StopTimer();
-                StartTimer();
+                TryStartTimer();
             }
         }
 

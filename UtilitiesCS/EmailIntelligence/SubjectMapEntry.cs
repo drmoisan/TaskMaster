@@ -27,9 +27,9 @@ namespace UtilitiesCS
         }
         public SubjectMapEntry(string emailFolder, string emailSubject, int emailSubjectCount, IList<string> commonWords)
         {
-            _tokenizerRegex = Tokenizer.GetRegex();
+            _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
             Init(emailFolder: emailFolder,
-                 emailSubject: emailSubject.StripCommonWords(commonWords),
+                 emailSubject: emailSubject.StripCommonWords(commonWords, _tokenizerRegex),
                  emailSubjectCount: emailSubjectCount,
                  commonWords: commonWords);
         }
@@ -95,12 +95,10 @@ namespace UtilitiesCS
         {
             _folderPath = emailFolder;
             if (_folderPath is null) { throw new System.ArgumentNullException(emailFolder, $"{nameof(emailFolder)} is null");}
-            //if (_folderPath is not null) 
-            //{
-                _folderName = emailFolder.Split("\\").Last();
-                _folderTokens = _folderName.Tokenize(_tokenizerRegex);
-                _folderWordLengths = _folderTokens.Select(x => x.Length).ToArray();
-            //}
+            
+            _folderName = emailFolder.Split("\\").Last();
+            _folderTokens = _folderName.Tokenize(_tokenizerRegex);
+            _folderWordLengths = _folderTokens.Select(x => x.Length).ToArray();
 
             if (_folderTokens.Count() == 0)
             {

@@ -1017,10 +1017,7 @@ namespace ToDoModel
             //strOutput[1] = SanitizeArrayLineTSV(ref strAry);
             var output = SanitizeArrayLineTSV(ref strAry);
 
-            //BUGFIX: This is not threadsafe and generates an exception. Need to set this
-            //up as a class that will take in lines to write into a queue and will 
-            //flush to the System.IO based on a Timer frequency if there has been a change
-            //Look into channel functionality
+            _globals.Ol.EmailMoveWriter.Enqueue(output);
             //FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
 
