@@ -211,7 +211,7 @@ namespace ToDoModel
                       .Where(entry => entry.SubjectEncoded is not null)
                       .Select(entry =>
                       {
-                          int subjScore = SmithWaterman.SW_CalcInt(entry.SubjectEncoded,
+                          int subjScore = SmithWaterman.CalculateScore(entry.SubjectEncoded,
                                                                    entry.SubjectWordLengths,
                                                                    target.SubjectEncoded,
                                                                    target.SubjectWordLengths,
@@ -257,7 +257,7 @@ namespace ToDoModel
                                })
                       .Select(entry =>
                       {
-                          int fldrScore = SmithWaterman.SW_CalcInt(entry.FolderEncoding,
+                          int fldrScore = SmithWaterman.CalculateScore(entry.FolderEncoding,
                                                                    entry.FolderWordLengths,
                                                                    target.SubjectEncoded,
                                                                    target.SubjectWordLengths,
@@ -298,7 +298,7 @@ namespace ToDoModel
             return map.Where(entry => entry.SubjectEncoded is not null)
                       .Select(entry =>
                       {
-                            int subjScore = SmithWaterman.SW_CalcInt(entry.SubjectEncoded,
+                            int subjScore = SmithWaterman.CalculateScore(entry.SubjectEncoded,
                                                                      entry.SubjectWordLengths,
                                                                      target.SubjectEncoded,
                                                                      target.SubjectWordLengths,
@@ -343,7 +343,7 @@ namespace ToDoModel
                                })
                       .Select(entry =>
                       {
-                            int fldrScore = SmithWaterman.SW_CalcInt(entry.FolderEncoding,
+                            int fldrScore = SmithWaterman.CalculateScore(entry.FolderEncoding,
                                                                      entry.FolderWordLengths,
                                                                      target.SubjectEncoded,
                                                                      target.SubjectWordLengths,

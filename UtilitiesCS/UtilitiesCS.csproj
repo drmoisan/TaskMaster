@@ -389,7 +389,7 @@
     <Compile Include="Interfaces\IToDo\IToDoProjectInfoEntry.cs" />
     <Compile Include="Interfaces\ITypes\IObservableDictionary.cs" />
     <Compile Include="Interfaces\ITypes\IScoCollection.cs" />
-    <Compile Include="Interfaces\ITypes\ISCODictionary.cs" />
+    <Compile Include="Interfaces\ITypes\IScoDictionary.cs" />
     <Compile Include="Interfaces\ITypes\ISerializableDictionary.cs" />
     <Compile Include="Interfaces\ITypes\ISerializableList.cs" />
     <Compile Include="OutlookExtensions\Calendar.cs" />

@@ -228,7 +228,7 @@ namespace ToDoModel
             {
                 {
                     // Run Smith Waterman on Email Subject and the SubjectMap
-                    SWVal = SmithWaterman.SW_Calc(SubjectStripped, subMap[i].EmailSubject, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
+                    SWVal = SmithWaterman.CalculateScore(SubjectStripped, subMap[i].EmailSubject, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
 
                     // Calculate a weighted score
                     Val = (int)Math.Round(Math.Pow(SWVal, AppGlobals.AF.LngConvCtPwr) * subMap[i].EmailSubjectCount);
@@ -240,7 +240,7 @@ namespace ToDoModel
                         strTmpFldr = Path.GetDirectoryName(subMap[i].Folderpath);
                         
                         // Run Smith Waterman on Email Subject and the distinct Email Folder Names
-                        Val1 = SmithWaterman.SW_Calc(SubjectStripped, strTmpFldr, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
+                        Val1 = SmithWaterman.CalculateScore(SubjectStripped, strTmpFldr, ref Matrix, AppGlobals.AF, SmithWaterman.SW_Options.ByWords);
                         
                         // Combine the two scores using relative weights
                         Val = Val1 * Val1 + Val;
@@ -262,7 +262,7 @@ namespace ToDoModel
                                .Where(entry => entry.SubjectEncoded is not null)
                                .Select(entry =>
                                {
-                                   int subjScore = SmithWaterman.SW_CalcInt(entry.SubjectEncoded,
+                                   int subjScore = SmithWaterman.CalculateScore(entry.SubjectEncoded,
                                                                             entry.SubjectWordLengths,
                                                                             target.SubjectEncoded,
                                                                             target.SubjectWordLengths,
@@ -299,7 +299,7 @@ namespace ToDoModel
                                        })
                               .Select(entry =>
                               {
-                                  int fldrScore = SmithWaterman.SW_CalcInt(entry.FolderEncoding,
+                                  int fldrScore = SmithWaterman.CalculateScore(entry.FolderEncoding,
                                                                            entry.FolderWordLengths,
                                                                            target.SubjectEncoded,
                                                                            target.SubjectWordLengths,

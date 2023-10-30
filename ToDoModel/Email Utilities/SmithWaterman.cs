@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
+
 //using Microsoft.VisualStudio.Services.Common;
 using UtilitiesCS;
 
@@ -10,10 +12,9 @@ namespace ToDoModel
 
     public static class SmithWaterman
     {
-        // Global Const Match_Score = 1
-        // Global Const Mismatch_Score = 0
-        // Global Const Gap_penalty = -1
-        // Global Const Word_Match_Optimal = 5
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public enum SW_Options
         {
             ByWords = 0,
@@ -37,11 +38,10 @@ namespace ToDoModel
             return sentence.ToCharArray().Select(c => c.ToString()).ToArray();
         }
 
-        public static int SW_Calc(string Str_X, string Str_Y, ref object[,] Matrix, IAppAutoFileObjects AFSettings, SW_Options SWOptions = SW_Options.ByWords)
+        public static int CalculateScore(string Str_X, string Str_Y, ref object[,] Matrix, IAppAutoFileObjects AFSettings, SW_Options SWOptions = SW_Options.ByWords)
         {
             //TODO: Migrate Current SW Matrix which is not efficient because it is of object and mixes string and int.
-            //TODO: Store AFSettings in local variables to avoid multiple calls
-            int SW_CalcRet = default;
+            int result = default;
             int LenX, LenY, x, y, calcA, calcB, calcC, tempa;
             var maxSmith_Watterman = default(int);
 
@@ -117,83 +117,78 @@ namespace ToDoModel
 
             // Call Printout(flatcsv)
             // MsgBox (maxSmith_Watterman & " of " & Max(LenX + 1, LenY + 1))
-            SW_CalcRet = maxSmith_Watterman;
+            result = maxSmith_Watterman;
 
             // StopWatch_SW.Pause
-            return SW_CalcRet;
+            return result;
             
         }
 
-        public static int SW_CalcInt(int[] words_X,
-                                     int[] wordLength_X,
-                                     int[] words_Y,
-                                     int[] wordLength_Y,
-                                     int matchScore,
-                                     int mismatchScore,
-                                     int gapPenalty)
+        public static int CalculateScore(int[] wordsX,
+                                         int[] wordLengthX,
+                                         int[] wordsY,
+                                         int[] wordLengthY,
+                                         int matchScore,
+                                         int mismatchScore,
+                                         int gapPenalty)
         {
-            // Check if any of the parameters are null and throw an exception showing which one and the call stack            // Check if any of the parameters are null and throw an exception showing which one and the call stack
-            if (words_X == null || wordLength_X == null || words_Y == null || wordLength_Y == null)
-            {
-                var stackTrace = new StackTrace();
-                var callingMethod = stackTrace.GetFrame(1).GetMethod();
-                Debug.WriteLine(stackTrace.ToString());
-                throw new ArgumentNullException($"One of the parameters in {callingMethod} is null");
-            }
+            ValidateInputs(wordsX, wordLengthX, wordsY, wordLengthY);
+            DeclareMatrix(wordsX, wordsY, out int lengthX, out int lengthY, out int maxValue, out int[,] matrix);
             
-            int SW_CalcRet = default;
-            int LenX, LenY, x, y, calcA, calcB, calcC, tempa;
+            //LogMatrixState(matrix);
+
+                        
+            for (int x = 3; x < lengthX + 3; x++)
+                matrix[x, 1] = wordsX[x - 3];
             
-            var maxSmith_Watterman = default(int);    
-                
-            LenX = words_X.Length;
-            LenY = words_Y.Length;
-            int[,] Matrix = new int[LenX + 3 + 1, LenY + 3 + 1];
-            //flatcsv = new string[LenY + 3 + 1];
+            for (int y = 3; y < lengthY + 3; y++)
+                matrix[1, y] = wordsY[y - 3];
+            
+            //for (int x = 2; x < lengthX + 3; x++)
+            //    matrix[x, 2] = 0;
 
-            // *********************************
-            // **********Initialize*************
-            var loopTo = LenX + 3;
-            for (x = 3; x < loopTo; x++)
-                Matrix[x, 1] = words_X[x - 3];
+            //for (int y = 2; y < lengthY + 3; y++)
+            //    matrix[2, y] = 0;
 
-            var loopTo1 = LenY + 3;
-            for (y = 3; y < loopTo1; y++)
-                Matrix[1, y] = words_Y[y - 3];
+            //LogMatrixState(matrix);
 
-            var loopTo2 = LenX + 3;
-            for (x = 2; x < loopTo2; x++)
-                Matrix[x, 2] = 0;
-
-            var loopTo3 = LenY + 3;
-            for (y = 2; y < loopTo3; y++)
-                Matrix[2, y] = 0;
+            int result = default;
+            int calcA, calcB, calcC, tempA;
             // *********************************
 
             // *********************************
 
-            var loopTo4 = LenX + 3;
-            for (x = 3; x < loopTo4; x++)
+            var loopTo4 = lengthX + 3;
+            for (int x = 3; x < loopTo4; x++)
             {
-                var loopTo5 = LenY + 3;
-                for (y = 3; y < loopTo5; y++)
+                var loopTo5 = lengthY + 3;
+                for (int y = 3; y < loopTo5; y++)
                 {
-                    calcA = (int)Matrix[x - 1, y - 1];
-                    if (Matrix[x, 1] == Matrix[1, y])
+                    calcA = (int)matrix[x - 1, y - 1];
+                    if (matrix[x, 1] == matrix[1, y])
                     {
-                        calcA = calcA + matchScore * wordLength_X[x-3];
+                        calcA = calcA + matchScore * wordLengthX[x - 3];
                     }
                     else
                     {
                         calcA = calcA + mismatchScore;
                     }
 
-                    calcB = (int)((int)Matrix[x, y - 1] + gapPenalty * wordLength_Y[y-3]);
-                    calcC = (int)((int)Matrix[x - 1, y] + gapPenalty * wordLength_X[x-3]);
-                    tempa = max(0, calcA, calcB, calcC);
-                    Matrix[x, y] = tempa;
-                    if (tempa > maxSmith_Watterman)
-                        maxSmith_Watterman = tempa;
+                    calcB = (int)((int)matrix[x, y - 1] + gapPenalty * wordLengthY[y - 3]);
+                    try
+                    {
+                        calcC = (int)((int)matrix[x - 1, y] + gapPenalty * wordLengthX[x - 3]);
+                    }
+                    catch (Exception e)
+                    {
+                        LogMatrixState(matrix);
+                        logger.Error(e);
+                        calcC = 0;
+                    }
+                    tempA = max(0, calcA, calcB, calcC);
+                    matrix[x, y] = tempA;
+                    if (tempA > maxValue)
+                        maxValue = tempA;
                 }
             }
 
@@ -209,13 +204,42 @@ namespace ToDoModel
 
             // Call Printout(flatcsv)
             // MsgBox (maxSmith_Watterman & " of " & Max(LenX + 1, LenY + 1))
-            SW_CalcRet = maxSmith_Watterman;
+            result = maxValue;
 
             // StopWatch_SW.Pause
-            return SW_CalcRet;
+            return result;
 
         }
 
+        internal static void LogMatrixState(int[,] matrix)
+        {
+            string[,] matrixString = new string[matrix.GetLength(0), matrix.GetLength(1)];
+            for (int x = 0; x < matrix.GetLength(0); x++)
+                for (int y = 0; y < matrix.GetLength(1); y++)
+                    matrixString[x, y] = matrix[x, y].ToString();
+            var matrixText = matrixString.ToFormattedText();
+            logger.Debug($"\n{matrixText}");
+        }
+
+        private static void DeclareMatrix(int[] wordsX, int[] wordsY, out int lengthX, out int lengthY, out int maxSmith_Watterman, out int[,] Matrix)
+        {
+            lengthX = wordsX.Length;
+            lengthY = wordsY.Length;
+
+            maxSmith_Watterman = 0;
+            Matrix = new int[lengthX + 3 + 1, lengthY + 3 + 1];
+        }
+
+        private static void ValidateInputs(int[] words_X, int[] wordLength_X, int[] words_Y, int[] wordLength_Y)
+        {
+            if (words_X == null || wordLength_X == null || words_Y == null || wordLength_Y == null)
+            {
+                var stackTrace = new StackTrace();
+                var callingMethod = stackTrace.GetFrame(1).GetMethod();
+                Debug.WriteLine(stackTrace.ToString());
+                throw new ArgumentNullException($"One of the parameters in {callingMethod} is null");
+            }
+        }
 
         public static int max(params int[] values)
         {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using log4net.Repository.Hierarchy;
 
 namespace UtilitiesCS
 {
@@ -15,7 +16,7 @@ namespace UtilitiesCS
     /// </summary>
     public class SubjectMapEntry : ISubjectMapEntry
     {
-        public SubjectMapEntry() { _tokenizerRegex = Tokenizer.GetRegex(); }
+        public SubjectMapEntry() { _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern()); }
         public SubjectMapEntry(Regex tokenizerRegex) { _tokenizerRegex = tokenizerRegex; }
         public SubjectMapEntry(string emailFolder, string emailSubject, int emailSubjectCount, IList<string> commonWords, Regex tokenizerRegex)
         {
@@ -43,7 +44,7 @@ namespace UtilitiesCS
         }
         public SubjectMapEntry(string emailSubject, int emailSubjectCount, IList<string> commonWords)
         {
-            _tokenizerRegex = Tokenizer.GetRegex();
+            _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
             Init(emailSubject: emailSubject.StripCommonWords(commonWords),
                  emailSubjectCount: emailSubjectCount,
                  commonWords: commonWords);
@@ -56,7 +57,7 @@ namespace UtilitiesCS
         }
         public SubjectMapEntry(string emailSubject, int emailSubjectCount)
         {
-            _tokenizerRegex = Tokenizer.GetRegex();
+            _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
             Init(emailSubject: emailSubject,
                  emailSubjectCount: emailSubjectCount);
         }
@@ -80,7 +81,20 @@ namespace UtilitiesCS
             _subjectEmailCount = emailSubjectCount;
             if (ReadyToEncode(_subjectTokens, false))
             {
-                _subjectEncoded = _encoder.Encode(_subjectTokens);
+                try
+                {
+                    _subjectEncoded = _encoder.Encode(_subjectTokens);
+                    if (_subjectEncoded.Length != _subjectWordLengths.Length)
+                    {
+                        throw new System.InvalidOperationException($"{nameof(_subjectEncoded)} length {_subjectEncoded.Length} does not match {nameof(_subjectWordLengths)} length {_subjectWordLengths.Length}");
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    throw e;
+                }
+                
+
             }
         }
         internal void Init(string emailFolder, string emailSubject, int emailSubjectCount, IList<string> commonWords)
@@ -146,7 +160,18 @@ namespace UtilitiesCS
                 _folderWordLengths = _folderTokens.Select(x => x.Length).ToArray();
                 if (ReadyToEncode(_folderTokens, false))
                 {
-                    _folderEncoded = _encoder.Encode(_folderTokens);
+                    try
+                    {
+                        _folderEncoded = _encoder.Encode(_folderTokens);
+                        if (_folderEncoded.Length != _folderWordLengths.Length)
+                        {
+                            throw new System.InvalidOperationException($"{nameof(_folderEncoded)} length {_folderEncoded.Length} does not match {nameof(_folderWordLengths)} length {_folderWordLengths.Length}");
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        throw e;
+                    }
                 }
             }
         }
@@ -172,9 +197,17 @@ namespace UtilitiesCS
                     _subjectText = string.Join(" ", _subjectTokens);
                     _subjectWordLengths = _subjectTokens.Select(x => x.Length).ToArray();
 
-                    if (ReadyToEncode(_subjectTokens, false))
+                    try
                     {
-                        _subjectEncoded = _encoder.Encode(_subjectTokens);
+                        _subjectEncoded = _encoder?.Encode(_subjectTokens);
+                        if (_subjectEncoded.Length != _subjectWordLengths.Length)
+                        {
+                            throw new System.InvalidOperationException($"{nameof(_subjectEncoded)} length {_subjectEncoded.Length} does not match {nameof(_subjectWordLengths)} length {_subjectWordLengths.Length}");
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        throw e;
                     }
                 }
             } 
@@ -191,7 +224,18 @@ namespace UtilitiesCS
                 // Encode folder only if it is null, we have an active encoder, and we are ready to encode
                 if (_folderEncoded is null && _encoder is not null && ReadyToEncode(_folderTokens, false))
                 {
-                    _folderEncoded = _encoder.Encode(_folderTokens);
+                    try
+                    {
+                        _folderEncoded = _encoder.Encode(_folderTokens);
+                        if (_folderEncoded.Length != _folderWordLengths.Length)
+                        {
+                            throw new System.InvalidOperationException($"{nameof(_folderEncoded)} length {_folderEncoded.Length} does not match {nameof(_folderWordLengths)} length {_folderWordLengths.Length}");
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        throw e;
+                    }
                 }
                 return _folderEncoded;
             }
@@ -212,7 +256,18 @@ namespace UtilitiesCS
                 // Encode subject only if it is null, we have an active encoder, and we are ready to encode
                 if (_subjectEncoded is null && _encoder is not null && ReadyToEncode(_subjectTokens, false))
                 {
-                    _subjectEncoded = _encoder.Encode(_subjectTokens);
+                    try
+                    {
+                        _subjectEncoded = _encoder.Encode(_subjectTokens);
+                        if (_subjectEncoded.Length != _subjectWordLengths.Length)
+                        {
+                            throw new System.InvalidOperationException($"{nameof(_subjectEncoded)} length {_subjectEncoded.Length} does not match {nameof(_subjectWordLengths)} length {_subjectWordLengths.Length}");
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        throw e;
+                    }
                 }
                 return _subjectEncoded; 
             }
