@@ -17,6 +17,7 @@ namespace UtilitiesCS
         IApplicationGlobals Parent { get; }
         IProjectInfo ProjInfo { get; }
         ScoCollection<IPrefix> PrefixList { get; }
+        ScoCollection<IPrefix> LoadPrefixList();
         string ProjInfo_Filename { get; }
         string FnameDictRemap { get; }
         string FnameIDList { get; }

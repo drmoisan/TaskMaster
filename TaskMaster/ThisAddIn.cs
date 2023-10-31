@@ -38,11 +38,11 @@ namespace TaskMaster
 
             // Initialize long loading elements on a low priority thread
             EfcViewerQueue.BuildQueue(2);
-            //ItemViewerQueue.BuildQueueWhenIdle(10);
             ItemViewerQueue.BuildQueueBackground(30);
             
             // Initialize IdleAction Queue so that breakpoint is hit after UI
             IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
+            //IdleActionQueue.AddEntry(() => _globals.TD.LoadPrefixList());
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new DebugTextWriter();

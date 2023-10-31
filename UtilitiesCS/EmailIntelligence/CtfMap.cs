@@ -17,8 +17,8 @@ namespace UtilitiesCS
         public CtfMap(string filename,
                       string folderpath,
                       string backupFilepath,
-                      bool askUserOnError) : base(filename: filename, 
-                                                  folderpath: folderpath,
+                      bool askUserOnError) : base(fileName: filename, 
+                                                  folderPath: folderpath,
                                                   backupLoader: ReadTextFile,
                                                   backupFilepath: backupFilepath,
                                                   askUserOnError: askUserOnError) { }
@@ -64,9 +64,9 @@ namespace UtilitiesCS
 
         #region Backup Loader
 
-        public static IList<CtfMapEntry> ReadTextFile(string filepath)
+        public static IList<CtfMapEntry> ReadTextFile(string filePath)
         {
-            string[] fileContents = ReadFileToArray(filepath);
+            string[] fileContents = ReadFileToArray(filePath);
             Queue<string> lines = ArrayToQueue(fileContents);
             IList<CtfMapEntry> listCTF = ProcessQueue(lines);
 

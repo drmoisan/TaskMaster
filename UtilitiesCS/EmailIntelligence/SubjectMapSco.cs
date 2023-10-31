@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -13,19 +14,19 @@ namespace UtilitiesCS
     /// <summary>
     /// A serializable list of ISubjectMapEntry. See <see cref="ISubjectMapEntry"/>.
     /// </summary>
-    public class SubjectMapSL : SerializableList<SubjectMapEntry>, ISubjectMapSL
+    public class SubjectMapSco : ScoCollection<SubjectMapEntry>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SubjectMapSL(ISerializableList<string> commonWords) : base() { _commonWords = commonWords; }
+        public SubjectMapSco(ISerializableList<string> commonWords) : base() { _commonWords = commonWords; }
 
-        public SubjectMapSL(List<SubjectMapEntry> listOfT,
+        public SubjectMapSco(List<SubjectMapEntry> listOfT,
                             ISerializableList<string> commonWords) : base(listOfT) { _commonWords = commonWords; }
 
-        public SubjectMapSL(IEnumerable<SubjectMapEntry> IEnumerableOfT,
+        public SubjectMapSco(IEnumerable<SubjectMapEntry> IEnumerableOfT,
                             ISerializableList<string> commonWords) : base(IEnumerableOfT) { _commonWords = commonWords; }
 
-        public SubjectMapSL(string filename,
+        public SubjectMapSco(string filename,
                             string folderpath,
                             ISerializableList<string> commonWords) : base(filename, folderpath) { _commonWords = commonWords; }
 
@@ -39,16 +40,18 @@ namespace UtilitiesCS
         /// <param name="backupFilepath">Fully qualified filepath to backup file</param>
         /// <param name="askUserOnError">Determines whether to ask the user for direction if initial load fails. If false, 
         /// procedure will automatically use the backup loader if the primary laoder fails</param>
-        public SubjectMapSL(string filename,
-                            string folderpath,
-                            CSVLoader<SubjectMapEntry> backupLoader,
-                            string backupFilepath,
-                            bool askUserOnError,
-                            ISerializableList<string> commonWords) : base(filename,
-                                                                          folderpath,
-                                                                          backupLoader,
-                                                                          backupFilepath,
-                                                                          askUserOnError)
+        public SubjectMapSco(
+            string filename,
+            string folderpath,
+            ScoCollection<SubjectMapEntry>.AltListLoader backupLoader,
+            string backupFilepath,
+            bool askUserOnError,
+            ISerializableList<string> commonWords) : 
+            base(filename,
+                 folderpath,
+                 backupLoader,
+                 backupFilepath,
+                 askUserOnError)
         { _commonWords = commonWords; }
 
         private ISerializableList<string> _commonWords;

@@ -219,7 +219,7 @@ namespace ToDoModel
             int SWVal, Val, Val1;
             string strTmpFldr;
             
-            ISubjectMapSL subMap = AppGlobals.AF.SubjectMap;
+            SubjectMapSco subMap = AppGlobals.AF.SubjectMap;
 
             SubjectStripped = OlMail.Subject.StripCommonWords(AppGlobals.AF.CommonWords); // Eliminate common words from the subject
             string folderpath = "default";

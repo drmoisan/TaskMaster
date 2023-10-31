@@ -319,6 +319,7 @@
     <Compile Include="EmailIntelligence\CtfMapEntry.cs" />
     <Compile Include="EmailIntelligence\EmailDetails.cs" />
     <Compile Include="EmailIntelligence\MailItemInfo.cs" />
+    <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="Interfaces\ITimerWrapper.cs" />
     <Compile Include="HelperClasses\TimedDiskWriter.cs" />
     <Compile Include="HelperClasses\TimerWrapper.cs" />
@@ -327,7 +328,7 @@
     <Compile Include="EmailIntelligence\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMapEntry.cs" />
-    <Compile Include="EmailIntelligence\SubjectMapSL.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapSco.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\DfMLNet.cs" />
@@ -385,10 +386,11 @@
     <Compile Include="Interfaces\IToDo\IProjectInfoLegacy.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEncoder.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEntry.cs" />
-    <Compile Include="Interfaces\IToDo\ISubjectMapSL.cs" />
+    <Compile Include="Interfaces\IToDo\ISubjectMapSco.cs" />
     <Compile Include="Interfaces\IToDo\IToDoProjectInfoEntry.cs" />
     <Compile Include="Interfaces\ITypes\IObservableDictionary.cs" />
     <Compile Include="Interfaces\ITypes\IScoCollection.cs" />
+    <Compile Include="Interfaces\ITypes\IScoCollection2.cs" />
     <Compile Include="Interfaces\ITypes\IScoDictionary.cs" />
     <Compile Include="Interfaces\ITypes\ISerializableDictionary.cs" />
     <Compile Include="Interfaces\ITypes\ISerializableList.cs" />
@@ -418,6 +420,8 @@
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
+    <Compile Include="ReusableTypeClasses\ScoCollection4.cs" />
+    <Compile Include="ReusableTypeClasses\ScoCollection1.cs" />
     <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
@@ -434,6 +438,7 @@
     <Compile Include="Threading\SyncContextForm.Designer.cs" />
     <Compile Include="Threading\TaskPriority.cs" />
     <Compile Include="Threading\ThreadMonitor.cs" />
+    <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
     <Compile Include="Threading\TimeOutTask.cs" />
     <Compile Include="Threading\UIThreadExtensions.cs" />
     <Compile Include="To Depricate\CSVDictUtilities.cs" />

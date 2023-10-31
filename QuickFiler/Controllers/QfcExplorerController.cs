@@ -232,7 +232,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSL subMap)
+        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSco subMap)
         {
             ctfMap.Add(mailItem.ConversationID, fldr, 1);
             subMap.Add(mailItem.Subject, fldr);

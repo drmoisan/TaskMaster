@@ -15,6 +15,15 @@ namespace UtilitiesCS.HelperClasses
             this.timer.Elapsed += this.WhenTimerElapsed;
         }
 
+        public static TimerWrapper StartNew(TimeSpan interval, bool autoReset, Action callback)
+        {
+            var timer = new TimerWrapper(interval);
+            timer.AutoReset = autoReset;
+            timer.Elapsed += (sender, args) => callback();
+            timer.StartTimer();
+            return timer;
+        }
+
         private readonly System.Timers.Timer timer;
         private bool disposed = false;
 

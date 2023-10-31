@@ -205,10 +205,10 @@ namespace TaskMaster
         // Prefix List
         private ScoCollection<IPrefix> _prefixList;
         public ScoCollection<IPrefix> PrefixList => Initialized(_prefixList, () => LoadPrefixList());
-        private ScoCollection<IPrefix> LoadPrefixList()
+        public ScoCollection<IPrefix> LoadPrefixList()
         {
-            var prefixList = new ScoCollection<IPrefix>(filename: _defaults.FileName_PrefixList,
-                                                        folderpath: Parent.FS.FldrPythonStaging);
+            var prefixList = new ScoCollection<IPrefix>(fileName: _defaults.FileName_PrefixList,
+                                                        folderPath: Parent.FS.FldrPythonStaging);
             if (prefixList.Count == 0) 
             { 
                 var tdDefaults = new ToDoDefaults();

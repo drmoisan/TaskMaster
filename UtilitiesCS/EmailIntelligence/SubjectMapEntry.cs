@@ -12,7 +12,7 @@ namespace UtilitiesCS
     /// Subject Map Entry holds information regarding email folders and the subject line of 
     /// the emails within the folder. Each entry contains a unique combination of a folder 
     /// name and an email subject. Class is to be used in conjunction with <see cref="SubjectMapEncoder"/> and 
-    /// <see cref="SubjectMapSL"/>
+    /// <see cref="SubjectMapSco"/>
     /// </summary>
     public class SubjectMapEntry : ISubjectMapEntry
     {
@@ -84,7 +84,7 @@ namespace UtilitiesCS
                 try
                 {
                     _subjectEncoded = _encoder.Encode(_subjectTokens);
-                    if (_subjectEncoded.Length != _subjectWordLengths.Length)
+                    if (_subjectEncoded is not null && _subjectEncoded.Length != _subjectWordLengths.Length)
                     {
                         throw new System.InvalidOperationException($"{nameof(_subjectEncoded)} length {_subjectEncoded.Length} does not match {nameof(_subjectWordLengths)} length {_subjectWordLengths.Length}");
                     }
@@ -200,7 +200,7 @@ namespace UtilitiesCS
                     try
                     {
                         _subjectEncoded = _encoder?.Encode(_subjectTokens);
-                        if (_subjectEncoded.Length != _subjectWordLengths.Length)
+                        if (_subjectEncoded is not null && _subjectEncoded.Length != _subjectWordLengths.Length)
                         {
                             throw new System.InvalidOperationException($"{nameof(_subjectEncoded)} length {_subjectEncoded.Length} does not match {nameof(_subjectWordLengths)} length {_subjectWordLengths.Length}");
                         }
@@ -259,7 +259,7 @@ namespace UtilitiesCS
                     try
                     {
                         _subjectEncoded = _encoder.Encode(_subjectTokens);
-                        if (_subjectEncoded.Length != _subjectWordLengths.Length)
+                        if (_subjectEncoded is not null && _subjectEncoded.Length != _subjectWordLengths.Length)
                         {
                             throw new System.InvalidOperationException($"{nameof(_subjectEncoded)} length {_subjectEncoded.Length} does not match {nameof(_subjectWordLengths)} length {_subjectWordLengths.Length}");
                         }

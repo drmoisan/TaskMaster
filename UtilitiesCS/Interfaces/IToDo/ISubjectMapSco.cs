@@ -6,7 +6,7 @@ namespace UtilitiesCS
 {
     
 
-    public interface ISubjectMapSL: ISerializableList<SubjectMapEntry>
+    public interface ISubjectMapSco: IScoCollection<SubjectMapEntry>
     {
         void Add(string subject, string folderName);
         IList<SubjectMapEntry> Find(string key, Enums.FindBy findBy);

@@ -2,6 +2,7 @@
 using QuickFiler;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -154,23 +155,29 @@ namespace TaskMaster
             set
             {
                 _ctfMap = value;
-                if (_ctfMap.Filepath == "")
+                if (_ctfMap.FilePath == "")
                 {
-                    _ctfMap.Folderpath = _parent.FS.FldrPythonStaging;
-                    _ctfMap.Filename = _defaults.File_CTF_Inc;
+                    _ctfMap.FolderPath = _parent.FS.FldrPythonStaging;
+                    _ctfMap.FileName = _defaults.File_CTF_Inc;
                 }
                 _ctfMap.Serialize();
             }
         }
+        public CtfMap LoadCtfMap()
+        {
+            var map = new CtfMap(
+                filename: _defaults.File_CTF_Inc,
+                folderpath: _parent.FS.FldrPythonStaging,
+                backupFilepath: Path.Combine(
+                    _parent.FS.FldrPythonStaging,
+                    _defaults.BackupFile_CTF_Inc),
+                askUserOnError: true);
+            return map;
+        }
         async private Task LoadCtfMapAsync()
         {
             await Task.Factory.StartNew(
-                () => _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc,
-                                           folderpath: _parent.FS.FldrPythonStaging,
-                                           backupFilepath: Path.Combine(
-                                               _parent.FS.FldrPythonStaging,
-                                               _defaults.BackupFile_CTF_Inc),
-                                           askUserOnError: true),
+                () => _ctfMap = LoadCtfMap(),
                 default(CancellationToken));
                 //default,
                 //TaskCreationOptions.None,
@@ -247,8 +254,8 @@ namespace TaskMaster
             return encoder;
         }
 
-        private ISubjectMapSL _subjectMap;
-        public ISubjectMapSL SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
+        private SubjectMapSco _subjectMap;
+        public SubjectMapSco SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
         //{
         //    get
         //    {
@@ -268,9 +275,9 @@ namespace TaskMaster
         //    }
 
         //}
-        private SubjectMapSL LoadSubjectMap()
+        private SubjectMapSco LoadSubjectMap()
         {
-            var subMap = new SubjectMapSL(filename: _defaults.File_Subject_Map,
+            var subMap = new SubjectMapSco(filename: _defaults.File_Subject_Map,
                                           folderpath: _parent.FS.FldrPythonStaging,
                                           backupLoader: SubjectMapBackupLoader,
                                           backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
@@ -278,9 +285,12 @@ namespace TaskMaster
                                           askUserOnError: false,
                                           commonWords: CommonWords);
 
-            subMap.PropertyChanged += SubjectMap_PropertyChanged;
+            subMap.CollectionChanged += SubjectMap_CollectionChanged;
             return subMap;
         }
+
+        
+
         async private Task LoadSubjectMapAndEncoderAsync()
         {
             await Task.Factory.StartNew(
@@ -354,15 +364,16 @@ namespace TaskMaster
             return subjectMapEntries;
         }
         
-        internal void SubjectMap_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        internal void SubjectMap_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            ISubjectMapSL map = (ISubjectMapSL)sender;
-            if (e.PropertyName == "Add")
+            SubjectMapSco map = (SubjectMapSco)sender;
+            
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                var entry = map[map.Count - 1];
+                var entry = map.Last();
                 entry.Encode(Encoder);
             }
-            else if (e.PropertyName == "BackupLoader") 
+            else if (e.Action == NotifyCollectionChangedAction.Reset) 
             {
                 Encoder.RebuildEncoding(map);
             }

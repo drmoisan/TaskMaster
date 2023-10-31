@@ -1118,7 +1118,7 @@ namespace ToDoModel
             }
         }
         
-        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSL subMap)
+        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, SubjectMapSco subMap)
         {
             ctfMap.Add(mailItem.ConversationID, fldr, 1);
             subMap.Add(mailItem.Subject, fldr);

@@ -14,7 +14,7 @@ namespace UtilitiesCS
         //TODO: Make this class inherit from Serializable Dictionary
         public SubjectMapEncoder() { }
 
-        public SubjectMapEncoder(string filename, string folderpath, ISubjectMapSL subjectMap)
+        public SubjectMapEncoder(string filename, string folderpath, SubjectMapSco subjectMap)
         {
             _filename = filename;
             _folderpath = folderpath;
@@ -26,7 +26,7 @@ namespace UtilitiesCS
         private string _folderpath;
         private IScoDictionary<string, int> _encoder;
         private IScoDictionary<int, string> _decoder;
-        private ISubjectMapSL _subjectMap;
+        private SubjectMapSco _subjectMap;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
         public IScoDictionary<int, string> Decoder 
@@ -81,7 +81,7 @@ namespace UtilitiesCS
             RebuildEncoding(_subjectMap);
         }
 
-        public void RebuildEncoding(ISubjectMapSL map)
+        public void RebuildEncoding(SubjectMapSco map)
         {
             var words = map.ToList()
                            .Select(x => string.Concat(x.EmailSubject,

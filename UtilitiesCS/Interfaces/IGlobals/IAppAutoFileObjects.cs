@@ -9,6 +9,7 @@ namespace UtilitiesCS
     public interface IAppAutoFileObjects
     {
         Task LoadAsync();
+        CtfMap LoadCtfMap();
         int Conversation_Weight { get; set; }
         int LngConvCtPwr { get; set; }
         int MaxRecents { get; set; }
@@ -19,7 +20,7 @@ namespace UtilitiesCS
         int SmithWatterman_MatchScore { get; set; }
         int SmithWatterman_MismatchScore { get; set; }
         int SmithWatterman_GapPenalty { get; set; }
-        public ISubjectMapSL SubjectMap { get;  }
+        public SubjectMapSco SubjectMap { get;  }
         ISubjectMapEncoder Encoder { get; }
         System.Action MaximizeQuickFileWindow { get; set; }
         ScoStack<IMovedMailInfo> MovedMails { get; }

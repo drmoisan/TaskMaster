@@ -407,10 +407,8 @@ namespace Swordfish.NET.Collections {
         /// </summary>
         protected ObservableCollection<T> WriteCollection
         {
-            get
-            {
-                return _baseCollection;
-            }
+            get => _baseCollection;
+            set => _baseCollection = value;
         }
 
         protected ObservableCollection<T> ReadCollection

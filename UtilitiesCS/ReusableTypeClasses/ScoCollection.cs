@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Swordfish.NET.Collections;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -10,244 +12,176 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Deedle;
-using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using Swordfish.NET.Collections;
-using Swordfish.NET.General.Collections;
+using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
-    public class ScoCollection<T> : IConcurrentObservableBase<T>, IList<T>, ICollection<T>, IList, ICollection, IScoCollection<T>
+    public class ScoCollection<T> : ConcurrentObservableCollection<T>
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Constructors
 
-        public ScoCollection() 
-        {
-            _collection = new();
-        }
-        
-        public ScoCollection(IEnumerable<T> enumerable) 
-        { 
-            _collection = new(enumerable);
-        }
+        public ScoCollection() : base() { }
 
-        public ScoCollection(string filename, string folderpath)
+        public ScoCollection(IEnumerable<T> enumerable) : base(enumerable) { }
+
+        public ScoCollection(
+            string fileName,
+            string folderPath) : base()
         {
-            Filename = filename;
-            Folderpath = folderpath;
+            FileName = fileName;
+            FolderPath = folderPath;
             Deserialize();
         }
 
-        public ScoCollection(string filename, string folderpath, bool askUserOnError)
+        public ScoCollection(
+            string fileName,
+            string folderPath,
+            bool askUserOnError) : base()
         {
-            Filename = filename;
-            Folderpath = folderpath;
+            FileName = fileName;
+            FolderPath = folderPath;
             Deserialize(askUserOnError);
         }
 
-        public ScoCollection(string filename, string folderpath, AltListLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        public ScoCollection(
+            string fileName,
+            string folderPath,
+            AltListLoader backupLoader,
+            string backupFilepath,
+            bool askUserOnError) : base()
         {
-            Filename = filename;
-            Folderpath = folderpath;
+            FileName = fileName;
+            FolderPath = folderPath;
             _backupFilepath = backupFilepath;
-            Deserialize(_filepath, backupLoader, askUserOnError);
+            Deserialize(_disk, backupLoader, backupFilepath, askUserOnError);
         }
 
-        #endregion
+        public delegate IList<T> AltListLoader(string filePath);
+        private string _backupFilepath;
 
-        #region Private Variables
+        #endregion Constructors
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private ConcurrentObservableCollection<T> _collection;
-        private string _backupFilepath = "";
+        #region Helper Methods
 
-        #endregion
+        private ScoCollection<T> DeserializeJson(FilePathHelper disk)
+        {
+            ScoCollection<T> collection;
+            var settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.Auto;
+            settings.Formatting = Formatting.Indented;
+            collection = JsonConvert.DeserializeObject<ScoCollection<T>>(
+                File.ReadAllText(disk.FilePath), settings);
+            return collection;
+        }
 
-        #region IConcurrentObservableBase Implementation
+        private ScoCollection<T> LoadFromBackup(AltListLoader backupLoader, string backupFilepath, FilePathHelper disk)
+        {
+            ScoCollection<T> collection;
+            logger.Debug($"Attempting to load {Path.GetFileName(backupFilepath)} from backup");
+            collection = new ScoCollection<T>(backupLoader(backupFilepath));
 
-        public T this[int index] { get => _collection[index]; set => _collection[index] = value; }
-        
-        public ImmutableCollectionBase<T> Snapshot => _collection.Snapshot;
+            //NotifyPropertyChanged("BackupLoader");
+            collection.Serialize(disk.FilePath);
+            return collection;
+        }
 
-        public int Count => _collection.Count;
+        private ScoCollection<T> CreateEmpty(DialogResult response, FilePathHelper disk)
+        {
+            if (response == DialogResult.Yes)
+            {
+                var collection = new ScoCollection<T> { };
+                collection.Serialize(disk.FilePath);
+                return collection;
+            }
+            else { throw new ArgumentNullException(
+                "Must have a list or create one to continue executing"); }
+        }
 
-        public bool IsReadOnly => _collection.IsReadOnly;
+        private DialogResult AskUser(bool askUserOnError, string messageText)
+        {
+            DialogResult response;
+            if (askUserOnError)
+            {
+                response = MessageBox.Show(
+                    messageText,
+                    "Error",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Error);
+            }
+            else
+            {
+                response = DialogResult.Yes;
+            }
 
-        // { add { } remove { } } suggested to avoid compiler warning on interface implementation
-        public event NotifyCollectionChangedEventHandler CollectionChanged { add { } remove { } }
+            return response;
+        }
 
-        public void Add(T item) => _collection.Add(item);
-        
-        public void Clear() => _collection.Clear();
-        
-        public bool Contains(T item) => _collection.Contains(item);
-        
-        public void CopyTo(T[] array, int arrayIndex) => _collection.CopyTo(array, arrayIndex);
-        
-        public void Dispose() => _collection.Dispose();
-        
-        public IEnumerator<T> GetEnumerator() => _collection.GetEnumerator();
-        
-        public int IndexOf(T item) => _collection.IndexOf(item);
-        
-        public void Insert(int index, T item) => _collection.Insert(index, item);
-        
-        public bool Remove(T item) => _collection.Remove(item);
-        
-        public void RemoveAt(int index) => _collection.RemoveAt(index);
-        
-        public IDisposable Subscribe(IObserver<NotifyCollectionChangedEventArgs> observer) => _collection.Subscribe(observer);
-                
-        IEnumerator IEnumerable.GetEnumerator() => (_collection as IEnumerable).GetEnumerator();
+        public List<T> ToList() { return new List<T>(this); }
 
-        #endregion
-
-        #region IList Implementation
-
-        object IList.this[int index] { get => (_collection as IList)[index]; set => (_collection as IList)[index] = value; }
-
-        bool IList.IsReadOnly => (_collection as IList).IsReadOnly;
-
-        bool IList.IsFixedSize => (_collection as IList).IsFixedSize;
-
-        int IList.Add(object value) => (_collection as IList).Add(value);
-        
-        void IList.Clear() => (_collection as IList).Clear();
-        
-        bool IList.Contains(object value) => (_collection as IList).Contains(value);
-        
-        int IList.IndexOf(object value) => (_collection as IList).IndexOf(value);
-        
-        void IList.Insert(int index, object value) => (_collection as IList).Insert(index, value);
-        
-        void IList.Remove(object value) => (_collection as IList).Remove(value);
-        
-        void IList.RemoveAt(int index) => (_collection as IList).RemoveAt(index);
-
-        #endregion
-
-        #region ICollection Implementation
-
-        int ICollection.Count => (_collection as ICollection).Count;
-
-        object ICollection.SyncRoot => (_collection as ICollection).SyncRoot;
-
-        bool ICollection.IsSynchronized => (_collection as ICollection).IsSynchronized;
-
-        void ICollection.CopyTo(Array array, int index) => (_collection as ICollection).CopyTo(array, index);
+        public void FromList(IList<T> value) 
+        { 
+            var collection = new ScoCollection<T>(value);
+            this.Clear();
+            DoBaseWrite(() => WriteCollection = collection?.DoBaseRead(() => ReadCollection));
+        }
 
         #endregion
 
         #region Serialization
-        private string _filepath = "";
-        private string _filename = "";
-        private string _folderpath = "";
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private FilePathHelper _disk = new FilePathHelper();
+        
+        public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
+        
+        public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value;}
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public string Filepath
-        {
-            get
-            {
-                return _filepath;
-            }
-            set
-            {
-                _filepath = value;
-                var fileExtension = Path.GetExtension(value);
-                _folderpath = Path.GetDirectoryName(_filepath);
-                _filename = Path.GetFileName(_filepath);
-                if ((value != "") && (fileExtension == "") && Directory.Exists(value))
-                {
-                    throw new ArgumentException(
-                        $"{value} is a Folder Path and was passed to the field named 'Filepath'. " +
-                        "Either pass this to the 'FileName' field or include a folderpath.");
-                }
-            }
-        }
-
-        public string Folderpath
-        {
-            get
-            {
-                return _folderpath;
-            }
-            set
-            {
-                _folderpath = value;
-                if (_filename != "")
-                    _filepath = Path.Combine(_folderpath, _filename);
-            }
-        }
-
-        public string Filename
-        {
-            get
-            {
-                return _filename;
-            }
-            set
-            {
-                _filename = value;
-                if (_folderpath != "")
-                    _filepath = Path.Combine(_folderpath, _filename);
-            }
-        }
-
+        public string FileName { get => _disk.FileName; set => _disk.FileName = value;}
+        
         public void Serialize()
         {
-            if (Filepath != "")
-                Serialize(Filepath);
+            if (FilePath != "")
+                Serialize(FilePath);
         }
 
-        public void Serialize(string filepath)
+        public void Serialize(string filePath)
         {
-            this.Filepath = filepath;
-            _ = Task.Run(() => SerializeThreadSafe(filepath));
-            //var settings = new JsonSerializerSettings();
-            //settings.TypeNameHandling = TypeNameHandling.Auto;
-            //settings.Formatting = Formatting.Indented;
-            //using (TextWriter writer = File.CreateText(filepath))
-            //{
-            //    var serializer = JsonSerializer.Create(settings);
-            //    serializer.Serialize(writer, this);
-            //}
+            this.FilePath = filePath;
+            RequestSerialization(filePath);
         }
 
         async public Task SerializeAsync()
         {
-            if (Filepath != "")
+            if (FilePath != "")
             {
-                await SerializeAsync(Filepath);
+                await SerializeAsync(FilePath);
             }
             else { await Task.CompletedTask; }
 
         }
 
-        public async Task SerializeAsync(string filepath)
+        public async Task SerializeAsync(string filePath)
         {
-            this.Filepath = filepath;
-            await Task.Run(() => SerializeThreadSafe(filepath));
+            this.FilePath = filePath;
+            //await Task.Run(() => SerializeThreadSafe(filePath));
+            RequestSerialization(filePath);
+            // Hack for now since i just made the async function sync. Need to remove
+            await Task.CompletedTask;
         }
 
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
-        public void SerializeThreadSafe(string filepath)
+        public void SerializeThreadSafe(string filePath)
         {
-
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
                 try
                 {
-                    // Append text to the file
-                    using (StreamWriter sw = File.CreateText(filepath))
+                    using (StreamWriter sw = File.CreateText(filePath))
                     {
                         var settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -256,11 +190,12 @@ namespace UtilitiesCS
                         var serializer = JsonSerializer.Create(settings);
                         serializer.Serialize(sw, this);
                         sw.Close();
+                        _serializationRequested = new ThreadSafeSingleShotGuard();
                     }
                 }
                 catch (System.Exception e)
                 {
-                    log.Error($"Error serializing to {filepath}", e);
+                    logger.Error($"Error serializing to {filePath}", e);
                 }
                 finally
                 {
@@ -271,159 +206,203 @@ namespace UtilitiesCS
 
         }
 
+        private ThreadSafeSingleShotGuard _serializationRequested = new();
+        private TimerWrapper _timer;
+        private void RequestSerialization(string filePath)
+        {
+            if (_serializationRequested.CheckAndSetFirstCall)
+            {
+                _timer = new TimerWrapper(TimeSpan.FromSeconds(3));
+                _timer.Elapsed += (sender, e) => SerializeThreadSafe(filePath);
+                _timer.AutoReset = false;
+                _timer.StartTimer();
+            }
+        }
+
         public void Deserialize()
         {
-            if (Filepath != "") Deserialize(Filepath, true);
+            if (FilePath != "") Deserialize(_disk, true);
         }
 
         public void Deserialize(bool askUserOnError)
         {
-            if (Filepath != "") Deserialize(Filepath, askUserOnError);
+            if (FilePath != "") Deserialize(_disk, askUserOnError);
         }
 
-        public void Deserialize(string filepath, AltListLoader<T> backupLoader, bool askUserOnError)
+        public void Deserialize(string fileName, string folderPath, bool askUserOnError)
         {
-            if (_filepath != filepath) this.Filepath = filepath;
+            _disk = new FilePathHelper(fileName, folderPath);
+            Deserialize(_disk, askUserOnError);
+        }
 
+        internal void Deserialize(FilePathHelper disk, bool askUserOnError)
+        {
+            ScoCollection<T> collection = null;
+            bool writeCollection = false;
             DialogResult response = DialogResult.Ignore;
 
             try
             {
-                _collection = JsonConvert.DeserializeObject<ConcurrentObservableCollection<T>>(File.ReadAllText(filepath));
+                collection = DeserializeJson(disk);
+                if (collection is null)
+                {
+                    throw new InvalidOperationException($"{_disk.FilePath} deserialized to null.");
+                }
             }
             catch (FileNotFoundException e)
             {
-                log.Error(e.Message);
-                if (askUserOnError)
-                {
-                    response = MessageBox.Show($"{filepath} not found. Load from backup?",
-                                               "File Not Found",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
-                }
-                else
-                {
-                    response = DialogResult.Yes;
-                }
+                logger.Error(e.Message);
+                response = AskUser(askUserOnError,
+                    $"{disk.FilePath} not found. Need a list to " +
+                    $"continue. Create a new list or abort execution?");
+                collection = CreateEmpty(response, disk);
+                writeCollection = true;
             }
             catch (System.Exception e)
             {
-                log.Error(e.Message);
-                if (askUserOnError)
-                {
-                    response = MessageBox.Show($"{filepath} encountered a problem. {e.Message} " +
-                                               " Load from backup?",
-                                               "Error!",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
-                }
-                else
-                {
-                    response = DialogResult.Yes;
-                }
+                logger.Error($"Error! {e.Message}");
+                response = AskUser(askUserOnError,
+                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
+                    $"Need a list to continue. Create a new list or abort execution?");
+                collection = CreateEmpty(response, disk);
+                writeCollection = true;
             }
-            finally
+
+            DoBaseWrite(() => WriteCollection = collection?.DoBaseRead(() => collection?.ReadCollection));
+            if (writeCollection)
             {
-                if (response == DialogResult.Yes)
-                {
-                    if (_backupFilepath != "")
-                    {
-                        _collection = new ConcurrentObservableCollection<T>(backupLoader(_backupFilepath));
-                    }
-                    else
-                    {
-                        log.Debug($"Attempting to load {Path.GetFileName(filepath)} from backup");
-
-                        var folder = Path.GetDirectoryName(filepath);
-                        var filename = Path.GetFileNameWithoutExtension(filepath) + ".csv";
-                        _collection = new ConcurrentObservableCollection<T>(backupLoader(Path.Combine(folder, filename)));
-                    }
-                    NotifyPropertyChanged("BackupLoader");
-                    Serialize();
-                }
-                else if (response == DialogResult.No)
-                {
-                    if (askUserOnError)
-                    {
-                        response = MessageBox.Show("Need a list to continue. " +
-                                                   "Create a new List Or Stop Execution?",
-                                                   "Error",
-                                                   MessageBoxButtons.YesNo,
-                                                   MessageBoxIcon.Error);
-                    }
-                    else { response = DialogResult.Yes; }
-
-                    if (response == DialogResult.Yes)
-                    {
-                        _collection = new ConcurrentObservableCollection<T> { };
-                    }
-                    else { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
-                }
+                Serialize();
             }
-
         }
 
-        public void Deserialize(string filepath, bool askUserOnError)
+        public void Deserialize(string fileName, string folderPath, AltListLoader backupLoader, string backupFilepath, bool askUserOnError)
         {
-            if (_filepath != filepath) this.Filepath = filepath;
+            _disk = new FilePathHelper(fileName, folderPath);
+            Deserialize(_disk, backupLoader, backupFilepath, askUserOnError);
+        }
 
+        internal void Deserialize(FilePathHelper disk, AltListLoader backupLoader, string backupFilepath, bool askUserOnError)
+        {
+            ScoCollection<T> collection = null;
+            bool writeCollection = false;
             DialogResult response = DialogResult.Ignore;
 
             try
             {
-                var settings = new JsonSerializerSettings();
-                settings.TypeNameHandling = TypeNameHandling.Auto;
-                settings.Formatting = Formatting.Indented;
-                _collection = JsonConvert.DeserializeObject<ConcurrentObservableCollection<T>>(File.ReadAllText(filepath), settings);
-
-                //_collection = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                collection = DeserializeJson(disk);
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException e)
             {
-                log.Error($"File {filepath} does not exist.");
-                if (askUserOnError)
-                {
-                    response = MessageBox.Show($"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
-                                               "File Not Found",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
-                }
-                else { response = DialogResult.Yes; }
+                logger.Error(e.Message);
+                response = AskUser(askUserOnError,
+                    $"{disk.FilePath} not found. Load from backup?");
             }
             catch (System.Exception e)
             {
-                log.Error($"Error! {e.Message}");
-                if (askUserOnError)
-                {
-                    response = MessageBox.Show(filepath + " encountered a problem. " +
-                                               e.Message + " Create a new list? Excecution will stop if answer is no.",
-                                               "Error",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
-                }
-                else { response = DialogResult.Yes; }
+                logger.Error(e.Message);
+                response = AskUser(askUserOnError,
+                    $"{disk.FilePath} encountered a problem. Load from backup?");
             }
             finally
             {
-                if (response == DialogResult.Yes)
+                if (response == DialogResult.Yes && !backupFilepath.IsNullOrEmpty())
                 {
-                    _collection = new ConcurrentObservableCollection<T> { };
-                    this.Serialize();
+                    collection = LoadFromBackup(backupLoader, backupFilepath, disk);
+                    writeCollection = true;
                 }
-                else if (_collection == null)
+                else if (response != DialogResult.Ignore)
                 {
-                    throw new ArgumentNullException("Must have a list or create one to continue executing");
+                    var response2 = AskUser(askUserOnError,
+                        $"Need a list to continue. Create a new list or abort execution?");
+                    collection = CreateEmpty(response2, disk);
+                    writeCollection = true;
                 }
+            }
+            
+            DoBaseWrite(() => WriteCollection = collection?.DoBaseRead(() => collection?.ReadCollection));
+            if (writeCollection)
+            {
+                Serialize();
             }
         }
 
-        public List<T> ToList() { return new List<T>(_collection); }
+        #endregion Serialization
 
-        public void FromList(IList<T> value) { _collection = new ConcurrentObservableCollection<T>(value); }
+        #region Dead Code
+
+
+        //public static ScoCollection<T> Deserialize(string fileName, string folderPath, bool askUserOnError)
+        //{
+        //    var disk = new FilePathHelper(fileName, folderPath);
+        //    ScoCollection<T> collection = null;
+
+        //    DialogResult response = DialogResult.Ignore;
+
+        //    try
+        //    {
+        //        collection = DeserializeJson(disk);
+        //        return collection;
+        //    }
+        //    catch (FileNotFoundException e)
+        //    {
+        //        logger.Error(e.Message);
+        //        response = AskUser(askUserOnError,
+        //            $"{disk.FilePath} not found. Need a list to " +
+        //            $"continue. Create a new list or abort execution?");
+        //        collection = CreateEmpty(response, disk);                
+        //    }
+        //    catch (System.Exception e)
+        //    {
+        //        logger.Error($"Error! {e.Message}");
+        //        response = AskUser(askUserOnError,
+        //            $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
+        //            $"Need a list to continue. Create a new list or abort execution?");
+        //        collection = CreateEmpty(response, disk);
+        //    }
+
+        //    return collection;
+        //}
+
+        //public static ScoCollection<T> Deserialize(string fileName, string folderPath, AltListLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        //{
+        //    var disk = new FilePathHelper(fileName, folderPath);
+        //    ScoCollection<T> collection = null;
+        //    DialogResult response = DialogResult.Ignore;
+
+        //    try
+        //    {
+        //        collection = DeserializeJson(disk);
+        //    }
+        //    catch (FileNotFoundException e)
+        //    {
+        //        logger.Error(e.Message);
+        //        response = AskUser(askUserOnError,  
+        //            $"{disk.FilePath} not found. Load from backup?");
+        //    }
+        //    catch (System.Exception e)
+        //    {
+        //        logger.Error(e.Message);
+        //        response = AskUser(askUserOnError, 
+        //            $"{disk.FilePath} encountered a problem. Load from backup?");
+        //    }
+        //    finally
+        //    {
+        //        if (response == DialogResult.Yes && !backupFilepath.IsNullOrEmpty())
+        //        {
+        //            collection = LoadFromBackup(backupLoader, backupFilepath, disk);
+        //        }
+        //        else
+        //        {
+        //            var response2 = AskUser(askUserOnError,
+        //                $"Need a list to continue. Create a new list or abort execution?");
+        //            collection = CreateEmpty(response2, disk);
+        //        }
+        //    }
+
+        //    return collection;
+
+        //}
 
         #endregion
-
     }
-
-
 }
