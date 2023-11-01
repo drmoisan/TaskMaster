@@ -68,11 +68,16 @@
     <Compile Include="TaskViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TaskViewer.Designer.cs" />
+    <Compile Include="TaskViewer.Designer.cs">
+      <DependentUpon>TaskViewer.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx" />
-    <EmbeddedResource Include="TaskViewer.resx" />
+    <EmbeddedResource Include="TaskViewer.resx">
+      <DependentUpon>TaskViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tags\Tags.csproj">

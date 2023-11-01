@@ -51,9 +51,7 @@ namespace TaskMaster
         }
         
         private bool _sugFilesLoaded = false;
-        private RecentsList<string> _recentsList;
         private IApplicationGlobals _parent;
-        private CtfMap _ctfMap;
         private ISerializableList<string> _commonWords;
         private Properties.Settings _defaults = Properties.Settings.Default;
 
@@ -111,6 +109,7 @@ namespace TaskMaster
             await Task.Run(() => _movedMails = LoadMovedMails());
         }
 
+        private RecentsList<string> _recentsList;
         public RecentsList<string> RecentsList
         {
             get
@@ -138,7 +137,8 @@ namespace TaskMaster
                 TaskCreationOptions.None, 
                 TaskScheduler.Current);
         }   
-
+        
+        private CtfMap _ctfMap;
         public CtfMap CtfMap
         {
             get
@@ -222,7 +222,6 @@ namespace TaskMaster
                 //TaskCreationOptions.None,
                 //PriorityScheduler.BelowNormal);
         }
-
         private IList<string> CommonWordsBackupLoader(string filepath)
         {
             string[] cw = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: false);
@@ -231,20 +230,6 @@ namespace TaskMaster
 
         private ISubjectMapEncoder _encoder;
         public ISubjectMapEncoder Encoder => Initialized(_encoder, LoadEncoder);
-        //{ 
-        //    get 
-        //    {
-        //        if (_encoder is null) 
-        //        {
-        //            _encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
-        //                                             folderpath: _parent.FS.FldrPythonStaging,
-        //                                             subjectMap: SubjectMap);
-        //            if (_encoder.Encoder.Count == 0) { _encoder.RebuildEncoding(SubjectMap); }
-        //        }
-                
-        //        return _encoder; 
-        //    }
-        //}
         private ISubjectMapEncoder LoadEncoder()
         {
             var encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
@@ -256,25 +241,6 @@ namespace TaskMaster
 
         private SubjectMapSco _subjectMap;
         public SubjectMapSco SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
-        //{
-        //    get
-        //    {
-        //        if (_subjectMap is null)
-        //        {
-        //            _subjectMap = new SubjectMapSL(filename: _defaults.File_Subject_Map,
-        //                                           folderpath: _parent.FS.FldrPythonStaging,
-        //                                           backupLoader: SubjectMapBackupLoader,
-        //                                           backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
-        //                                                                        _defaults.BackupFile_SubjectMap),
-        //                                           askUserOnError: false,
-        //                                           commonWords: CommonWords);
-
-        //            _subjectMap.PropertyChanged += SubjectMap_PropertyChanged;
-        //        }
-        //        return _subjectMap;
-        //    }
-
-        //}
         private SubjectMapSco LoadSubjectMap()
         {
             var subMap = new SubjectMapSco(filename: _defaults.File_Subject_Map,
@@ -288,8 +254,6 @@ namespace TaskMaster
             subMap.CollectionChanged += SubjectMap_CollectionChanged;
             return subMap;
         }
-
-        
 
         async private Task LoadSubjectMapAndEncoderAsync()
         {
