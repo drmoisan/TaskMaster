@@ -51,7 +51,7 @@ namespace TaskMaster
         }
         
         private bool _sugFilesLoaded = false;
-        private IRecentsList<string> _recentsList;
+        private RecentsList<string> _recentsList;
         private IApplicationGlobals _parent;
         private CtfMap _ctfMap;
         private ISerializableList<string> _commonWords;
@@ -111,7 +111,7 @@ namespace TaskMaster
             await Task.Run(() => _movedMails = LoadMovedMails());
         }
 
-        public IRecentsList<string> RecentsList
+        public RecentsList<string> RecentsList
         {
             get
             {
@@ -122,10 +122,10 @@ namespace TaskMaster
             set
             {
                 _recentsList = value;
-                if (_recentsList.Folderpath == "")
+                if (_recentsList.FolderPath == "")
                 {
-                    _recentsList.Folderpath = _parent.FS.FldrPythonStaging;
-                    _recentsList.Filename = Properties.Settings.Default.FileName_Recents;
+                    _recentsList.FolderPath = _parent.FS.FldrPythonStaging;
+                    _recentsList.FileName = Properties.Settings.Default.FileName_Recents;
                 }
                 _recentsList.Serialize();
             }

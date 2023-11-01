@@ -13,7 +13,7 @@ namespace UtilitiesCS
         int Conversation_Weight { get; set; }
         int LngConvCtPwr { get; set; }
         int MaxRecents { get; set; }
-        IRecentsList<string> RecentsList { get; set; }
+        RecentsList<string> RecentsList { get; set; }
         CtfMap CtfMap { get; set; }
         ISerializableList<string> CommonWords { get; set; }
         bool SuggestionFilesLoaded { get; set; }

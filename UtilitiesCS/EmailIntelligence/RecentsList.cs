@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public class RecentsList<T> : SerializableList<T>, IRecentsList<T>
+    public class RecentsList<T> : ScoCollection<T>
     {
         public RecentsList() : base() { }
         public RecentsList(List<T> listOfT, int max) : base(listOfT) { Max = max; }
@@ -18,7 +18,6 @@ namespace UtilitiesCS
         
         public new void Add(T item)
         {
-            base.ensureList();
             if (base.Contains(item))
             {
                 base.Remove(item);

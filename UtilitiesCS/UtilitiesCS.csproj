@@ -374,7 +374,6 @@
     <Compile Include="Interfaces\IGlobals\IAppStagingFilenames.cs" />
     <Compile Include="Interfaces\IGlobals\IFileSystemFolderPaths.cs" />
     <Compile Include="Interfaces\IGlobals\IOlObjects.cs" />
-    <Compile Include="Interfaces\IGlobals\IRecentsList.cs" />
     <Compile Include="Interfaces\IGlobals\IToDoObj.cs" />
     <Compile Include="Interfaces\IGlobals\IToDoObjects.cs" />
     <Compile Include="Interfaces\IQuickFiler\IQfcTipsDetails.cs" />
