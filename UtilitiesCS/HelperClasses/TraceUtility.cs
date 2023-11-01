@@ -87,19 +87,28 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    var assemblyName = sf.GetFrame(++i).GetMethod().DeclaringType.Assembly.GetName().Name;
-                    if (ProjectNames.Contains(assemblyName))
+                    if(++i >= sf.FrameCount) 
                     {
-                        methodCalledBy = sf.GetFrame(i).GetMethod();
-                        if (methodCalledBy.Name == "MoveNext")
+                        methodCalledBy = null;
+                        repeat = false;
+                    }
+                    else
+                    {
+                        var assemblyName = sf.GetFrame(i).GetMethod().DeclaringType.Assembly.GetName().Name;
+                        if (ProjectNames.Contains(assemblyName))
                         {
-                            methodCalledBy = null;
-                        }
-                        else
-                        {
-                            repeat = false;
+                            methodCalledBy = sf.GetFrame(i).GetMethod();
+                            if (methodCalledBy.Name == "MoveNext")
+                            {
+                                methodCalledBy = null;
+                            }
+                            else
+                            {
+                                repeat = false;
+                            }
                         }
                     }
+                    
                 }
                 catch (Exception)
                 {

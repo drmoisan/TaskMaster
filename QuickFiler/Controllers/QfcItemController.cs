@@ -466,8 +466,11 @@ namespace QuickFiler.Controllers
             UIThreadExtensions.UiDispatcher.BeginInvoke(()=>
             //_itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
             {
-                _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
-                _itemViewer.CboFolders.SelectedIndex = 1;
+                if (_folderHandler.FolderArray.Length > 0)
+                {
+                    _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
+                    _itemViewer.CboFolders.SelectedIndex = 1;
+                }
             });
 
         }
