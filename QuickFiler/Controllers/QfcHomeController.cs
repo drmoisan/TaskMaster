@@ -43,7 +43,7 @@ namespace QuickFiler.Controllers
             _formViewer = new QfcFormViewer();
             _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
             _uiSyncContext = _formViewer.UiSyncContext;
-            _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+            _keyboardHandler = new KeyboardHandler(_formViewer, this);
             _qfcQueue = new QfcQueue(Token);
             _formController = new QfcFormController(_globals, _formViewer, _qfcQueue, InitTypeEnum.Sort, Cleanup, this, TokenSource, Token);
         }
@@ -115,7 +115,7 @@ namespace QuickFiler.Controllers
             _uiSyncContext = _formViewer.UiSyncContext;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
-            _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+            _keyboardHandler = new KeyboardHandler(_formViewer, this);
             _qfcQueue = new QfcQueue(Token);
             _formController = new QfcFormController(
                 _globals, _formViewer, _qfcQueue, 

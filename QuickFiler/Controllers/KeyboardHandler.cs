@@ -20,15 +20,15 @@ using System.Threading;
 
 namespace QuickFiler.Controllers
 {
-    internal class QfcKeyboardHandler : IQfcKeyboardHandler
+    internal class KeyboardHandler : IQfcKeyboardHandler
     {
-        public QfcKeyboardHandler(QfcFormViewer viewer, IFilerHomeController parent)
+        public KeyboardHandler(QfcFormViewer viewer, IFilerHomeController parent)
         {
             viewer.SetKeyboardHandler(this);
             _parent = parent;
         }
 
-        public QfcKeyboardHandler(EfcViewer viewer, IFilerHomeController parent)
+        public KeyboardHandler(EfcViewer viewer, IFilerHomeController parent)
         {
             viewer.SetKeyboardHandler(this);
             _parent = parent;

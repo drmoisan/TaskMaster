@@ -149,10 +149,11 @@ namespace QuickFiler.Controllers
             },
             new List<Control> { _formViewer.QfcItemViewerTemplate });
 
-            _formViewer.L1v1L2h2_ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
-            _formViewer.L1v1L2h3_ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
-            _formViewer.L1v1L2h4_ButtonUndo.Click += new System.EventHandler(this.ButtonUndo_Click);
-            _formViewer.L1v1L2h5_SpnEmailPerLoad.ValueChanged += new System.EventHandler(this.SpnEmailPerLoad_ValueChanged);
+            _formViewer.L1v1L2h2_ButtonOK.Click += this.ButtonOK_Click;
+            _formViewer.L1v1L2h3_ButtonCancel.Click += this.ButtonCancel_Click;
+            _formViewer.L1v1L2h4_ButtonUndo.Click += this.ButtonUndo_Click;
+            _formViewer.L1v1L2h5_SpnEmailPerLoad.ValueChanged += this.SpnEmailPerLoad_ValueChanged;
+            _formViewer.L1v1L2h5_BtnSkip.Click += this.ButtonSkip_Click;
         }
         
         /// <summary>
@@ -215,7 +216,6 @@ namespace QuickFiler.Controllers
 
         private void SetDarkMode()
         {
-            _formViewer.L1v1L2h0_KeyboardDialog.BackColor = System.Drawing.Color.DimGray;
             _formViewer.L1v1L2h2_ButtonOK.BackColor = System.Drawing.Color.DimGray;
             _formViewer.L1v1L2h2_ButtonOK.ForeColor = System.Drawing.Color.WhiteSmoke;
             _formViewer.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = false;
@@ -231,7 +231,6 @@ namespace QuickFiler.Controllers
 
         private void SetLightMode()
         {
-            _formViewer.L1v1L2h0_KeyboardDialog.BackColor = System.Drawing.SystemColors.Window;
             _formViewer.L1v1L2h2_ButtonOK.BackColor = System.Drawing.SystemColors.Control;
             _formViewer.L1v1L2h2_ButtonOK.ForeColor = System.Drawing.SystemColors.ControlText;
             _formViewer.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = true;
@@ -386,6 +385,35 @@ namespace QuickFiler.Controllers
                         tlp.MinimumSize.Height -
                         (int)Math.Round(_rowStyleTemplate.Height * diff, 0));
                 }
+            }
+        }
+
+        async public void ButtonSkip_Click(object sender, EventArgs e)
+        {
+            if (SynchronizationContext.Current is null) 
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            
+            await SkipGroupAsync();
+        }
+
+        async public Task SkipGroupAsync()
+        {
+            if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
+            {
+                (var tlp, var itemGroups) = await _qfcQueue.TryDequeueAsync(Token, 4000);
+                LoadItems(tlp, itemGroups);
+                _parent.SwapStopWatch();
+                var iterate = _parent.IterateQueueAsync();
+                _groups.CleanupBackground();
+                await iterate;
+            }
+            else if (_formViewer.Worker.IsBusy)
+            {
+                MessageBox.Show("Still loading emails. Please try again in a few seconds.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                MessageBox.Show("Cannot skip. This is the last group.", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

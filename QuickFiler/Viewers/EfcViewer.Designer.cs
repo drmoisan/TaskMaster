@@ -57,8 +57,8 @@ namespace QuickFiler
             this.LblAcRefresh = new System.Windows.Forms.Label();
             this.LblAcNewFolder = new System.Windows.Forms.Label();
             this.ItemViewer = new QuickFiler.ItemViewer();
-            this.MenuStrip = new System.Windows.Forms.MenuStrip();
-            this.OptionsStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.OptionsStrip = new System.Windows.Forms.MenuStrip();
+            this.OptionsItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.attachmentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.conversationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,7 +70,7 @@ namespace QuickFiler
             this.manageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.L0vh_TLP.SuspendLayout();
             this.Tlp.SuspendLayout();
-            this.MenuStrip.SuspendLayout();
+            this.OptionsStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // L0vh_TLP
@@ -81,7 +81,7 @@ namespace QuickFiler
             this.L0vh_TLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.L0vh_TLP.Controls.Add(this.Tlp, 1, 2);
             this.L0vh_TLP.Controls.Add(this.ItemViewer, 1, 1);
-            this.L0vh_TLP.Controls.Add(this.MenuStrip, 1, 0);
+            this.L0vh_TLP.Controls.Add(this.OptionsStrip, 1, 0);
             this.L0vh_TLP.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0vh_TLP.Location = new System.Drawing.Point(0, 0);
             this.L0vh_TLP.Name = "L0vh_TLP";
@@ -505,25 +505,26 @@ namespace QuickFiler
             this.ItemViewer.Size = new System.Drawing.Size(2012, 1018);
             this.ItemViewer.TabIndex = 2;
             // 
-            // MenuStrip
-            // 
-            this.MenuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.OptionsStrip});
-            this.MenuStrip.Location = new System.Drawing.Point(30, 0);
-            this.MenuStrip.Name = "MenuStrip";
-            this.MenuStrip.Size = new System.Drawing.Size(2024, 42);
-            this.MenuStrip.TabIndex = 3;
-            this.MenuStrip.Text = "menuStrip1";
-            // 
             // OptionsStrip
             // 
-            this.OptionsStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OptionsStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
+            this.OptionsStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.OptionsStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OptionsItem});
+            this.OptionsStrip.Location = new System.Drawing.Point(30, 0);
+            this.OptionsStrip.Name = "OptionsStrip";
+            this.OptionsStrip.Size = new System.Drawing.Size(2024, 48);
+            this.OptionsStrip.TabIndex = 3;
+            this.OptionsStrip.Text = "menuStrip1";
+            // 
+            // OptionsItem
+            // 
+            this.OptionsItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.moveOptionsToolStripMenuItem,
             this.categoryOptionsToolStripMenuItem});
-            this.OptionsStrip.Name = "OptionsStrip";
-            this.OptionsStrip.Size = new System.Drawing.Size(118, 38);
-            this.OptionsStrip.Text = "&Options";
+            this.OptionsItem.Name = "OptionsItem";
+            this.OptionsItem.Size = new System.Drawing.Size(118, 44);
+            this.OptionsItem.Text = "&Options";
             // 
             // moveOptionsToolStripMenuItem
             // 
@@ -539,25 +540,25 @@ namespace QuickFiler
             // attachmentsToolStripMenuItem
             // 
             this.attachmentsToolStripMenuItem.Name = "attachmentsToolStripMenuItem";
-            this.attachmentsToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
+            this.attachmentsToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
             this.attachmentsToolStripMenuItem.Text = "Attachments";
             // 
             // conversationToolStripMenuItem
             // 
             this.conversationToolStripMenuItem.Name = "conversationToolStripMenuItem";
-            this.conversationToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
+            this.conversationToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
             this.conversationToolStripMenuItem.Text = "Conversation";
             // 
             // emailToolStripMenuItem
             // 
             this.emailToolStripMenuItem.Name = "emailToolStripMenuItem";
-            this.emailToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
+            this.emailToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
             this.emailToolStripMenuItem.Text = "Email";
             // 
             // picturesToolStripMenuItem
             // 
             this.picturesToolStripMenuItem.Name = "picturesToolStripMenuItem";
-            this.picturesToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
+            this.picturesToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
             this.picturesToolStripMenuItem.Text = "Pictures";
             // 
             // categoryOptionsToolStripMenuItem
@@ -602,8 +603,8 @@ namespace QuickFiler
             this.L0vh_TLP.PerformLayout();
             this.Tlp.ResumeLayout(false);
             this.Tlp.PerformLayout();
-            this.MenuStrip.ResumeLayout(false);
-            this.MenuStrip.PerformLayout();
+            this.OptionsStrip.ResumeLayout(false);
+            this.OptionsStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -645,7 +646,7 @@ namespace QuickFiler
         private System.Windows.Forms.ToolStripMenuItem selectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manageToolStripMenuItem;
-        internal System.Windows.Forms.ToolStripMenuItem OptionsStrip;
-        internal System.Windows.Forms.MenuStrip MenuStrip;
+        internal System.Windows.Forms.ToolStripMenuItem OptionsItem;
+        internal System.Windows.Forms.MenuStrip OptionsStrip;
     }
 }

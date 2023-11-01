@@ -47,6 +47,8 @@ namespace QuickFiler.Controllers
             SetupThemes();
             WireEventHandlers();
             _ = PopulateFolderCombobox();
+
+            _formViewer.OptionsItem.ShowDropDown();
         }
 
         #endregion Constructors
@@ -305,7 +307,7 @@ namespace QuickFiler.Controllers
         {
             await ActionDeleteAsync();
         }
-
+                
         private void SaveAttachments_CheckedChanged(object sender, EventArgs e)
         {
             SaveAttachments = _formViewer.SaveAttachments.Checked;
@@ -349,6 +351,7 @@ namespace QuickFiler.Controllers
                 new KaCharAsync("Controller", 'R', (x) => KbdExecuteAsync(RefreshSuggestionsAsync)),
                 new KaCharAsync("Controller", 'N', (x) => KbdExecuteAsync(CreateFolderAsync)),
                 new KaCharAsync("Controller", 'T', (x) => KbdExecuteAsync(ActionDeleteAsync)),
+                new KaCharAsync("Controller", 'Z', (x) => KbdExecuteAsync(ShowOptionsMenuAsync)),
             });
         }
 
@@ -389,9 +392,9 @@ namespace QuickFiler.Controllers
                 new KaChar("Controller", 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync)),
                 new KaChar("Controller", 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync)),
                 new KaChar("Controller", 'T', async (x) => await KbdExecuteAsync(ActionDeleteAsync)),
+                new KaChar("Controller", 'Z', async (x) => await KbdExecuteAsync(ShowOptionsMenuAsync)),
             });
         }
-
 
         internal void DarkMode_Changed(object sender, PropertyChangedEventArgs e)
         {
@@ -483,17 +486,17 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Helper Methods
-
+        
         async public Task KbdExecuteAsync(Func<Task> action)
         {
-            _homeController.KeyboardHandler.ToggleKeyboardDialog();
+            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
             await action();
         }
 
         async internal Task JumpToAsync(Control control)
         {
-            _homeController.KeyboardHandler.ToggleKeyboardDialog();
-            await _formViewer.UiSyncContext;
+            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
+            //await _formViewer.UiSyncContext;
             control.Focus();
         }
         
@@ -506,12 +509,17 @@ namespace QuickFiler.Controllers
         {
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Minimized;
         }
+
+        async internal Task ShowOptionsMenuAsync()
+        {
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(
+                () => _formViewer.OptionsItem.ShowDropDown());
+        }
         
         async public Task ToggleCheckboxAsync(CheckBox checkBox)
         {
-            await _formViewer.UiSyncContext;
+            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
             checkBox.Checked = !checkBox.Checked;
-            _homeController.KeyboardHandler.ToggleKeyboardDialog();
         }
 
         public void ToggleOffNavigation(bool async)
@@ -614,15 +622,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public T Initialized<T>(T instance, Func<T> initializer)
-        {
-            if (instance is null)
-            {
-                instance = initializer();
-            }
-            return instance;
-        }
-
         #endregion
 
         public void ToggleExpansionStyle(Enums.ToggleState desiredState)
@@ -632,9 +631,11 @@ namespace QuickFiler.Controllers
                 _itemTlp.RowStyles[_itemViewerTlpRow].Height = _tlpHeightExpanded;
                 _formViewer.MinimumSize = new Size(_formViewer.MinimumSize.Width, _formViewer.MinimumSize.Height + _tlpHeightDiff);
                 _formViewer.Size = new Size(_formViewer.Size.Width, _formViewer.Size.Height + _tlpHeightDiff);
+                _formViewer.WindowState = FormWindowState.Maximized;
             }
             else
             {
+                _formViewer.WindowState = FormWindowState.Normal;
                 _itemTlp.RowStyles[_itemViewerTlpRow].Height = _tlpHeightCollapsed;
                 _formViewer.MinimumSize = new Size(_formViewer.MinimumSize.Width, _formViewer.MinimumSize.Height - _tlpHeightDiff);
                 _formViewer.Size = new Size(_formViewer.Size.Width, _formViewer.Size.Height - _tlpHeightDiff);

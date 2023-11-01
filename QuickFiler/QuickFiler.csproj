@@ -255,7 +255,7 @@
     <Compile Include="Controllers\QfcHomeController.cs" />
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Controllers\QfcItemGroup.cs" />
-    <Compile Include="Controllers\QfcKeyboardHandler.cs" />
+    <Compile Include="Controllers\KeyboardHandler.cs" />
     <Compile Include="Controllers\QfcQueue.cs" />
     <Compile Include="Controllers\QfcTipsDetails.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />

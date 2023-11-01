@@ -206,6 +206,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void PopulateConversation()
         {
+            _dataModel.ConversationResolver.UpdateUI = SetTopicThread;
             var count = _dataModel.ConversationResolver.Count.SameFolder;
             _itemViewer.LblConvCt.Text = count.ToString();
             if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
@@ -237,7 +238,14 @@ namespace QuickFiler.Controllers
             _dflt2Ctrls = new List<Control> { _itemViewer.L0vh_Tlp, _itemViewer.TxtboxBody, _itemViewer.TopicThread };
             _mailCtrls = new List<Control> { _itemViewer.LblSender, _itemViewer.LblSubject, };
         }
-        
+
+        public void SetTopicThread(List<MailItemInfo> conversationInfo)
+        {
+            // Set the TopicThread to the ConversationInfo list
+            _itemViewer.TopicThread.SetObjects(conversationInfo);
+            _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
+        }
+
         #endregion
 
         #region Private Fields and Variables
@@ -617,30 +625,45 @@ namespace QuickFiler.Controllers
         {
             _parent.ToggleExpansionStyle(desiredState);
             
-            await _itemViewer.UiSyncContext;
             if (desiredState == Enums.ToggleState.On)
             {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
-                _itemViewer.TopicThread.Visible = true;
-                //_itemViewer.L0v2h2_Panel.Visible = true;
-                _itemViewer.L0v2h2_WebView2.Visible = true;
-                _expanded = true;
-                if ((_itemInfo is not null) && _itemInfo.UnRead == true)
-                {
-                    _timer = new System.Threading.Timer(ApplyReadEmailFormat);
-                    _timer.Change(4000, System.Threading.Timeout.Infinite);
-                }
+                await Task.Factory.StartNew(
+                    () => ToggleExpansionOn(), 
+                    default, 
+                    TaskCreationOptions.None, 
+                    _itemViewer.UiScheduler);
             }
             else
             {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
-                _itemViewer.TopicThread.Visible = false;
-                //_itemViewer.L0v2h2_Panel.Visible = false;
-                _itemViewer.L0v2h2_WebView2.Visible = false;
-                _expanded = false;
-                if (_timer is not null) { _timer.Dispose(); }
+                await Task.Factory.StartNew(
+                    () => ToggleExpansionOff(), 
+                    default, 
+                    TaskCreationOptions.None, 
+                    _itemViewer.UiScheduler);
+            }
+        }
+
+        private void ToggleExpansionOff()
+        {
+            _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
+            _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
+            _itemViewer.TopicThread.Visible = false;
+            _itemViewer.L0v2h2_WebView2.Visible = false;
+            _expanded = false;
+            if (_timer is not null) { _timer.Dispose(); }
+        }
+
+        private void ToggleExpansionOn()
+        {
+            _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
+            _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
+            _itemViewer.TopicThread.Visible = true;
+            _itemViewer.L0v2h2_WebView2.Visible = true;
+            _expanded = true;
+            if ((_itemInfo is not null) && _itemInfo.UnRead == true)
+            {
+                _timer = new System.Threading.Timer(ApplyReadEmailFormat);
+                _timer.Change(4000, System.Threading.Timeout.Infinite);
             }
         }
 

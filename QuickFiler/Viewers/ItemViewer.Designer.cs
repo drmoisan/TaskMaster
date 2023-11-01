@@ -131,7 +131,7 @@
             this.L0vh_Tlp.RowCount = 4;
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 58F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 108F));
+            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L0vh_Tlp.Size = new System.Drawing.Size(2123, 907);
             this.L0vh_Tlp.TabIndex = 0;
@@ -150,9 +150,9 @@
             this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 204);
+            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 216);
             this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
-            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2017, 700);
+            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2017, 688);
             this.L0v2h2_WebView2.TabIndex = 40;
             this.L0v2h2_WebView2.ZoomFactor = 1D;
             this.L0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
@@ -613,7 +613,7 @@
             this.L1h0L2hv3h_TlpBodyToggle.Name = "L1h0L2hv3h_TlpBodyToggle";
             this.L1h0L2hv3h_TlpBodyToggle.RowCount = 1;
             this.L1h0L2hv3h_TlpBodyToggle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(1231, 102);
+            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(1231, 114);
             this.L1h0L2hv3h_TlpBodyToggle.TabIndex = 38;
             // 
             // TopicThread
@@ -638,7 +638,7 @@
             this.TopicThread.MultiSelect = false;
             this.TopicThread.Name = "TopicThread";
             this.TopicThread.ShowGroups = false;
-            this.TopicThread.Size = new System.Drawing.Size(1, 96);
+            this.TopicThread.Size = new System.Drawing.Size(1, 108);
             this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.TopicThread.TabIndex = 9;
             this.TopicThread.UseCompatibleStateImageBehavior = false;
@@ -681,7 +681,7 @@
             this.TxtboxBody.Multiline = true;
             this.TxtboxBody.Name = "TxtboxBody";
             this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(1219, 102);
+            this.TxtboxBody.Size = new System.Drawing.Size(1219, 114);
             this.TxtboxBody.TabIndex = 6;
             this.TxtboxBody.TabStop = false;
             this.TxtboxBody.Text = "[BODY]";
@@ -694,7 +694,7 @@
             this.LblAcBody.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcBody.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcBody.Location = new System.Drawing.Point(65, 201);
+            this.LblAcBody.Location = new System.Drawing.Point(65, 213);
             this.LblAcBody.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcBody.Name = "LblAcBody";
             this.LblAcBody.Size = new System.Drawing.Size(35, 33);

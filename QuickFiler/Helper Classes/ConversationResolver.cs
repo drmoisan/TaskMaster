@@ -96,8 +96,15 @@ namespace QuickFiler.Helper_Classes
         private IApplicationGlobals _globals;
         private MailItem _mailItem;
 
+        private bool _fullyLoaded = false;
+        public bool FullyLoaded { get => _fullyLoaded; private set => _fullyLoaded = value; }
+
         private System.Action<List<MailItemInfo>> _updateUI;
-        public System.Action<List<MailItemInfo>> UpdateUI { get => _updateUI; set => _updateUI = value; }
+        public System.Action<List<MailItemInfo>> UpdateUI 
+        { 
+            get => _updateUI; 
+            set => Initializer.SetAndSave(ref _updateUI, value, (x) => NotifyPropertyChanged(nameof(UpdateUI))); 
+        }
 
         #region ConversationInfo
 
@@ -147,10 +154,10 @@ namespace QuickFiler.Helper_Classes
                                    .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
                                    .ToList();
 
-            if (_updateUI is not null)
+            if (UpdateUI is not null)
             {
                 token.ThrowIfCancellationRequested();
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => _updateUI(ConversationInfo.Expanded));
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
             }
 
             var convInfoSameFolder = convInfoExpanded.Where(
@@ -199,20 +206,11 @@ namespace QuickFiler.Helper_Classes
         {
             get => Initializer.GetOrLoad(ref _df, LoadDf, DfNotifyIfNotNull, false, _mailItem);
             set => Initializer.SetAndSave(ref _df, value, (x) => NotifyPropertyChanged(nameof(Df)));
-            //set => _df = value;
         }
 
         internal Pair<DataFrame> LoadDf() 
         { 
-        //    var priority = PriorityScheduler.AboveNormal;
-        //    var options = TaskCreationOptions.None;
-        //    return LoadDf(priority, options);
-        //}
-        //internal Pair<DataFrame> LoadDf(TaskScheduler priority, TaskCreationOptions options)
-        //{
-            // Attempt to call async synchronously caused dealock
-            //var dfRaw = _mailItem.GetConversationDfAsync(TokenSource, Token, 1000, options, priority).GetAwaiter().GetResult();
-                        
+                       
             var dfExpanded = _mailItem.GetConversation()
                                       .GetConversationDf()
                                       .FilterConversation(
@@ -220,7 +218,6 @@ namespace QuickFiler.Helper_Classes
                                             false, 
                                             true);
 
-            //Console.WriteLine(((Folder)_mailItem.Parent).Name);
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
             
             return new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded); 
@@ -234,7 +231,6 @@ namespace QuickFiler.Helper_Classes
         {
             token.ThrowIfCancellationRequested();
             
-            TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
             var dfRaw = await _mailItem.GetConversationDfAsync(Token).ConfigureAwait(false);
             var dfExpanded = dfRaw.FilterConversation(((Folder)_mailItem.Parent).Name, false, true);
             dfExpanded = dfExpanded.Filter(dfExpanded["SentOn"].ElementwiseNotEquals<string>(""));
@@ -270,11 +266,20 @@ namespace QuickFiler.Helper_Classes
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void Handler_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        public async void Handler_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Df))
             {
-                _ = BackgroundInitInfoItemsAsync(_token).ConfigureAwait(false);
+                FullyLoaded = false;
+                await BackgroundInitInfoItemsAsync(_token).ConfigureAwait(false);
+                FullyLoaded = true;
+            }
+            else if (e.PropertyName == nameof(UpdateUI))
+            {
+                if (FullyLoaded)
+                {
+                    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
+                }
             }
         }
 

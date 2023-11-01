@@ -33,7 +33,7 @@ namespace QuickFiler
                 //_formViewer = new EfcViewer();
                 _formViewer = EfcViewerQueue.Dequeue();
                 _uiSyncContext = _formViewer.UiSyncContext;
-                _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+                _keyboardHandler = new KeyboardHandler(_formViewer, this);
                 _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, appGlobals, this);
                 _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType, Token);
             }

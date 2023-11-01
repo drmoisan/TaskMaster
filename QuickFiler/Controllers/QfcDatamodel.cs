@@ -18,9 +18,6 @@ using System.Windows.Forms;
 using System.Threading;
 using static Deedle.FrameBuilder;
 using log4net.Repository.Hierarchy;
-//using static UtilitiesCS.OlItemSummary;
-
-
 
 namespace QuickFiler.Controllers
 {
