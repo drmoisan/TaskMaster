@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace TaskVisualization
 {
-    public partial class CategoryFilterViewer : Form
+    public partial class EditFilterViewer : Form
     {
-        public CategoryFilterViewer()
+        public EditFilterViewer()
         {
             InitializeComponent();
         }

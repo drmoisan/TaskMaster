@@ -56,21 +56,21 @@ namespace QuickFiler
             this.LblAcCancel = new System.Windows.Forms.Label();
             this.LblAcRefresh = new System.Windows.Forms.Label();
             this.LblAcNewFolder = new System.Windows.Forms.Label();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ItemViewer = new QuickFiler.ItemViewer();
+            this.MenuStrip = new System.Windows.Forms.MenuStrip();
+            this.OptionsStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.moveOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.attachmentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.conversationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.emailToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.picturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.conversationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.categoryOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.manageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ItemViewer = new QuickFiler.ItemViewer();
             this.L0vh_TLP.SuspendLayout();
             this.Tlp.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
+            this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // L0vh_TLP
@@ -81,7 +81,7 @@ namespace QuickFiler
             this.L0vh_TLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.L0vh_TLP.Controls.Add(this.Tlp, 1, 2);
             this.L0vh_TLP.Controls.Add(this.ItemViewer, 1, 1);
-            this.L0vh_TLP.Controls.Add(this.menuStrip1, 1, 0);
+            this.L0vh_TLP.Controls.Add(this.MenuStrip, 1, 0);
             this.L0vh_TLP.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0vh_TLP.Location = new System.Drawing.Point(0, 0);
             this.L0vh_TLP.Name = "L0vh_TLP";
@@ -492,26 +492,38 @@ namespace QuickFiler
             this.LblAcNewFolder.TabIndex = 24;
             this.LblAcNewFolder.Text = "N";
             // 
-            // menuStrip1
+            // ItemViewer
             // 
-            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.optionsToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(30, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(2024, 40);
-            this.menuStrip1.TabIndex = 3;
-            this.menuStrip1.Text = "menuStrip1";
+            this.ItemViewer.AutoSize = true;
+            this.ItemViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ItemViewer.Controller = null;
+            this.ItemViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ItemViewer.Location = new System.Drawing.Point(36, 56);
+            this.ItemViewer.Margin = new System.Windows.Forms.Padding(6);
+            this.ItemViewer.MinimumSize = new System.Drawing.Size(1516, 197);
+            this.ItemViewer.Name = "ItemViewer";
+            this.ItemViewer.Size = new System.Drawing.Size(2012, 1018);
+            this.ItemViewer.TabIndex = 2;
             // 
-            // optionsToolStripMenuItem
+            // MenuStrip
             // 
-            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OptionsStrip});
+            this.MenuStrip.Location = new System.Drawing.Point(30, 0);
+            this.MenuStrip.Name = "MenuStrip";
+            this.MenuStrip.Size = new System.Drawing.Size(2024, 42);
+            this.MenuStrip.TabIndex = 3;
+            this.MenuStrip.Text = "menuStrip1";
+            // 
+            // OptionsStrip
+            // 
+            this.OptionsStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.moveOptionsToolStripMenuItem,
             this.categoryOptionsToolStripMenuItem});
-            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(118, 36);
-            this.optionsToolStripMenuItem.Text = "&Options";
+            this.OptionsStrip.Name = "OptionsStrip";
+            this.OptionsStrip.Size = new System.Drawing.Size(118, 38);
+            this.OptionsStrip.Text = "&Options";
             // 
             // moveOptionsToolStripMenuItem
             // 
@@ -530,6 +542,12 @@ namespace QuickFiler
             this.attachmentsToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
             this.attachmentsToolStripMenuItem.Text = "Attachments";
             // 
+            // conversationToolStripMenuItem
+            // 
+            this.conversationToolStripMenuItem.Name = "conversationToolStripMenuItem";
+            this.conversationToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
+            this.conversationToolStripMenuItem.Text = "Conversation";
+            // 
             // emailToolStripMenuItem
             // 
             this.emailToolStripMenuItem.Name = "emailToolStripMenuItem";
@@ -541,12 +559,6 @@ namespace QuickFiler
             this.picturesToolStripMenuItem.Name = "picturesToolStripMenuItem";
             this.picturesToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
             this.picturesToolStripMenuItem.Text = "Pictures";
-            // 
-            // conversationToolStripMenuItem
-            // 
-            this.conversationToolStripMenuItem.Name = "conversationToolStripMenuItem";
-            this.conversationToolStripMenuItem.Size = new System.Drawing.Size(287, 44);
-            this.conversationToolStripMenuItem.Text = "Conversation";
             // 
             // categoryOptionsToolStripMenuItem
             // 
@@ -577,19 +589,6 @@ namespace QuickFiler
             this.manageToolStripMenuItem.Size = new System.Drawing.Size(234, 44);
             this.manageToolStripMenuItem.Text = "&Manage";
             // 
-            // ItemViewer
-            // 
-            this.ItemViewer.AutoSize = true;
-            this.ItemViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ItemViewer.Controller = null;
-            this.ItemViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ItemViewer.Location = new System.Drawing.Point(36, 56);
-            this.ItemViewer.Margin = new System.Windows.Forms.Padding(6);
-            this.ItemViewer.MinimumSize = new System.Drawing.Size(1516, 197);
-            this.ItemViewer.Name = "ItemViewer";
-            this.ItemViewer.Size = new System.Drawing.Size(2012, 1018);
-            this.ItemViewer.TabIndex = 2;
-            // 
             // EfcViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -603,8 +602,8 @@ namespace QuickFiler
             this.L0vh_TLP.PerformLayout();
             this.Tlp.ResumeLayout(false);
             this.Tlp.PerformLayout();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.MenuStrip.ResumeLayout(false);
+            this.MenuStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -637,8 +636,6 @@ namespace QuickFiler
         internal System.Windows.Forms.Label LblAcNewFolder;
         internal System.Windows.Forms.TableLayoutPanel L0vh_TLP;
         internal ItemViewer ItemViewer;
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem moveOptionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem attachmentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem conversationToolStripMenuItem;
@@ -648,5 +645,7 @@ namespace QuickFiler
         private System.Windows.Forms.ToolStripMenuItem selectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manageToolStripMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem OptionsStrip;
+        internal System.Windows.Forms.MenuStrip MenuStrip;
     }
 }

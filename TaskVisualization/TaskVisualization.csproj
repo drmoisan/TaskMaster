@@ -61,11 +61,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CategoryFilterViewer.cs">
+    <Compile Include="EditFilterViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CategoryFilterViewer.Designer.cs">
-      <DependentUpon>CategoryFilterViewer.cs</DependentUpon>
+    <Compile Include="EditFilterViewer.designer.cs">
+      <DependentUpon>EditFilterViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="FlagTasks.cs" />
     <Compile Include="Form1.cs">
@@ -84,8 +84,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CategoryFilterViewer.resx">
-      <DependentUpon>CategoryFilterViewer.cs</DependentUpon>
+    <EmbeddedResource Include="EditFilterViewer.resx">
+      <DependentUpon>EditFilterViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

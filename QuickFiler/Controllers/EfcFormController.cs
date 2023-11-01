@@ -22,7 +22,7 @@ namespace QuickFiler.Controllers
 {
     internal class EfcFormController : IFilerFormController
     {
-        #region Constructors, Initializers, and Destructors
+        #region Constructors
 
         public EfcFormController(IApplicationGlobals AppGlobals,
                                  EfcDataModel dataModel,
@@ -32,38 +32,26 @@ namespace QuickFiler.Controllers
                                  QfEnums.InitTypeEnum initType,
                                  CancellationToken token)
         {
-            _token = token;
-            _globals = AppGlobals;
-            _parentCleanup = ParentCleanup;
-            _formViewer = formViewer;
-            _homeController = homeController;
-            _dataModel = dataModel;
-            _initType = initType;
-            _itemViewer = _formViewer.ItemViewer;
-            _itemTlp = _formViewer.L0vh_TLP;
+            SaveParameters(AppGlobals, dataModel, formViewer, 
+                homeController, ParentCleanup, initType, token);
             
-            LoadSettings();
+            Initialize();
+        }
+
+        internal void Initialize()
+        {
+            LoadUserSettings();
             CaptureConfigureItemViewer();
             ResolveControlGroups();
-
-            //_formViewer.Show();
-            //_formViewer.Refresh();
-
-            _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel, token);
-
-            //_formViewer.Hide();
-
-            _themes = EfcThemeHelper.SetupFormThemes(_formViewer.TipsLabels.Cast<Control>().ToList(),
-                                                     _listHighlighted,
-                                                     _listDefault, 
-                                                     _listButtons.Cast<Control>().ToList(),
-                                                     _listCheckBox);
-            
-            _activeTheme = LoadTheme();
-
+            _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel, _token);
+            SetupThemes();
             WireEventHandlers();
             _ = PopulateFolderCombobox();
         }
+
+        #endregion Constructors
+
+        #region Private Properties
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -88,6 +76,10 @@ namespace QuickFiler.Controllers
         private List<Control> _listDefault;
         private List<Control> _listCheckBox;
         private List<Control> _listHighlighted;
+
+        #endregion Private Properties
+
+        #region Setup and Cleanup Methods
 
         internal void CaptureConfigureItemViewer()
         {
@@ -130,7 +122,32 @@ namespace QuickFiler.Controllers
                                   .ToList();
         }
 
-        #endregion
+        private void SaveParameters(IApplicationGlobals AppGlobals, EfcDataModel dataModel, EfcViewer formViewer, EfcHomeController homeController, System.Action ParentCleanup, QfEnums.InitTypeEnum initType, CancellationToken token)
+        {
+            _token = token;
+            _globals = AppGlobals;
+            _parentCleanup = ParentCleanup;
+            _formViewer = formViewer;
+            _homeController = homeController;
+            _dataModel = dataModel;
+            _initType = initType;
+            _itemViewer = _formViewer.ItemViewer;
+            _itemTlp = _formViewer.L0vh_TLP;
+        }
+
+        internal void SetupThemes()
+        {
+            _themes = EfcThemeHelper.SetupFormThemes(
+                _formViewer.TipsLabels.Cast<Control>().ToList(),
+                _listHighlighted,
+                _listDefault,
+                _listButtons.Cast<Control>().ToList(),
+                _listCheckBox);
+
+            _activeTheme = LoadTheme(); 
+        }
+
+        #endregion Setup and Cleanup Methods
 
         #region Public Properties
 
@@ -560,7 +577,7 @@ namespace QuickFiler.Controllers
         }
 
 
-        internal void LoadSettings()
+        internal void LoadUserSettings()
         {
             _saveAttachments = Settings.Default.SaveAttachments;
             _formViewer.SaveAttachments.Checked = _saveAttachments;
