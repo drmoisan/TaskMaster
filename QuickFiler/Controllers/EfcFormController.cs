@@ -48,7 +48,6 @@ namespace QuickFiler.Controllers
             WireEventHandlers();
             _ = PopulateFolderCombobox();
 
-            _formViewer.OptionsItem.ShowDropDown();
         }
 
         #endregion Constructors
@@ -241,10 +240,10 @@ namespace QuickFiler.Controllers
                     _homeController.KeyboardHandler.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> {  });
-            _formViewer.SaveAttachments.CheckedChanged += SaveAttachments_CheckedChanged;
-            _formViewer.SaveEmail.CheckedChanged += SaveEmail_CheckedChanged;
-            _formViewer.SavePictures.CheckedChanged += SavePictures_CheckedChanged;
-            _formViewer.MoveConversation.CheckedChanged += MoveConversation_CheckedChanged;
+            _formViewer.SaveAttachmentsMenuItem.CheckedChanged += SaveAttachments_CheckedChanged;
+            _formViewer.SaveEmailMenuItem.CheckedChanged += SaveEmail_CheckedChanged;
+            _formViewer.SavePicturesMenuItem.CheckedChanged += SavePictures_CheckedChanged;
+            _formViewer.ConversationMenuItem.CheckedChanged += MoveConversation_CheckedChanged;
             _formViewer.Ok.Click += ButtonOK_Click;
             _formViewer.Cancel.Click += ButtonCancel_Click;
             _formViewer.RefreshPredicted.Click += ButtonRefresh_Click;
@@ -310,22 +309,22 @@ namespace QuickFiler.Controllers
                 
         private void SaveAttachments_CheckedChanged(object sender, EventArgs e)
         {
-            SaveAttachments = _formViewer.SaveAttachments.Checked;
+            SaveAttachments = _formViewer.SaveAttachmentsMenuItem.Checked;
         }
 
         private void SaveEmail_CheckedChanged(object sender, EventArgs e)
         {
-            SaveEmail = _formViewer.SaveEmail.Checked;
+            SaveEmail = _formViewer.SaveEmailMenuItem.Checked;
         }
 
         private void SavePictures_CheckedChanged(object sender, EventArgs e)
         {
-            SavePictures = _formViewer.SavePictures.Checked;
+            SavePictures = _formViewer.SavePicturesMenuItem.Checked;
         }
 
         private void MoveConversation_CheckedChanged(object sender, EventArgs e)
         {
-            MoveConversation = _formViewer.MoveConversation.Checked;
+            MoveConversation = _formViewer.ConversationMenuItem.Checked;
         }
 
         private void SearchText_TextChanged(object sender, EventArgs e)
@@ -342,16 +341,16 @@ namespace QuickFiler.Controllers
             {
                 new KaCharAsync("Controller", 'S', (x) => JumpToAsync(_formViewer.SearchText)),
                 new KaCharAsync("Controller", 'F', (x) => JumpToAsync(_formViewer.FolderListBox)),
-                new KaCharAsync("Controller", 'A', (x) => ToggleCheckboxAsync(_formViewer.SaveAttachments)),
-                new KaCharAsync("Controller", 'M', (x) => ToggleCheckboxAsync(_formViewer.SaveEmail)),
-                new KaCharAsync("Controller", 'P', (x) => ToggleCheckboxAsync(_formViewer.SavePictures)),
-                new KaCharAsync("Controller", 'C', (x) => ToggleCheckboxAsync(_formViewer.MoveConversation)),
+                //new KaCharAsync("Controller", 'A', (x) => ToggleCheckboxAsync(_formViewer.SaveAttachments)),
+                //new KaCharAsync("Controller", 'M', (x) => ToggleCheckboxAsync(_formViewer.SaveEmail)),
+                //new KaCharAsync("Controller", 'P', (x) => ToggleCheckboxAsync(_formViewer.SavePictures)),
+                //new KaCharAsync("Controller", 'C', (x) => ToggleCheckboxAsync(_formViewer.MoveConversation)),
                 new KaCharAsync("Controller", 'K', (x) => KbdExecuteAsync(ActionOkAsync)),
                 new KaCharAsync("Controller", 'X', (x) => KbdExecuteAsync(ActionCancelAsync)),
                 new KaCharAsync("Controller", 'R', (x) => KbdExecuteAsync(RefreshSuggestionsAsync)),
                 new KaCharAsync("Controller", 'N', (x) => KbdExecuteAsync(CreateFolderAsync)),
                 new KaCharAsync("Controller", 'T', (x) => KbdExecuteAsync(ActionDeleteAsync)),
-                new KaCharAsync("Controller", 'Z', (x) => KbdExecuteAsync(ShowOptionsMenuAsync)),
+                new KaCharAsync("Controller", 'M', (x) => KbdExecuteAsync(()=>ShowMenu(_formViewer.MoveOptionsMenu))),
             });
         }
 
@@ -383,16 +382,16 @@ namespace QuickFiler.Controllers
             {
                 new KaChar("Controller", 'S', async (x) => await JumpToAsync(_formViewer.SearchText)),
                 new KaChar("Controller", 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox)),
-                new KaChar("Controller", 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments)),
-                new KaChar("Controller", 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail)),
-                new KaChar("Controller", 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures)),
-                new KaChar("Controller", 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation)),
+                //new KaChar("Controller", 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments)),
+                //new KaChar("Controller", 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail)),
+                //new KaChar("Controller", 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures)),
+                //new KaChar("Controller", 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation)),
                 new KaChar("Controller", 'K', async (x) => await KbdExecuteAsync(ActionOkAsync)),
                 new KaChar("Controller", 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync)),
                 new KaChar("Controller", 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync)),
                 new KaChar("Controller", 'N', async (x) => await KbdExecuteAsync(CreateFolderAsync)),
                 new KaChar("Controller", 'T', async (x) => await KbdExecuteAsync(ActionDeleteAsync)),
-                new KaChar("Controller", 'Z', async (x) => await KbdExecuteAsync(ShowOptionsMenuAsync)),
+                new KaChar("Controller", 'M', async (x) => await KbdExecuteAsync(()=>ShowMenu(_formViewer.MoveOptionsMenu))),
             });
         }
 
@@ -493,6 +492,12 @@ namespace QuickFiler.Controllers
             await action();
         }
 
+        async public Task KbdExecuteAsync(System.Action action)
+        {
+            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
+            action();
+        }
+
         async internal Task JumpToAsync(Control control)
         {
             await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
@@ -510,12 +515,8 @@ namespace QuickFiler.Controllers
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Minimized;
         }
 
-        async internal Task ShowOptionsMenuAsync()
-        {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(
-                () => _formViewer.OptionsItem.ShowDropDown());
-        }
-        
+        internal void ShowMenu(ToolStripMenuItem menu) => menu.ShowDropDown();
+
         async public Task ToggleCheckboxAsync(CheckBox checkBox)
         {
             await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
@@ -588,16 +589,16 @@ namespace QuickFiler.Controllers
         internal void LoadUserSettings()
         {
             _saveAttachments = Settings.Default.SaveAttachments;
-            _formViewer.SaveAttachments.Checked = _saveAttachments;
+            _formViewer.SaveAttachmentsMenuItem.Checked = _saveAttachments;
 
             _saveEmail = Settings.Default.SaveEmail;
-            _formViewer.SaveEmail.Checked = _saveEmail;
+            _formViewer.SaveEmailMenuItem.Checked = _saveEmail;
 
             _savePictures = Settings.Default.SavePictures;
-            _formViewer.SavePictures.Checked = _savePictures;
+            _formViewer.SavePicturesMenuItem.Checked = _savePictures;
 
             _moveConversation = Settings.Default.MoveConversation;
-            _formViewer.MoveConversation.Checked = _moveConversation;
+            _formViewer.ConversationMenuItem.Checked = _moveConversation;
         }
 
         async public Task PopulateFolderCombobox(object folderList = null)

@@ -44,33 +44,29 @@ namespace QuickFiler
             this.Cancel = new System.Windows.Forms.Button();
             this.RefreshPredicted = new System.Windows.Forms.Button();
             this.NewFolder = new System.Windows.Forms.Button();
-            this.SaveAttachments = new System.Windows.Forms.CheckBox();
-            this.SaveEmail = new System.Windows.Forms.CheckBox();
-            this.SavePictures = new System.Windows.Forms.CheckBox();
-            this.MoveConversation = new System.Windows.Forms.CheckBox();
-            this.LblAcAttachments = new System.Windows.Forms.Label();
             this.LblAcEmail = new System.Windows.Forms.Label();
-            this.LblAcPictures = new System.Windows.Forms.Label();
-            this.LblAcConversation = new System.Windows.Forms.Label();
+            this.LblAcFilters = new System.Windows.Forms.Label();
             this.LblAcOk = new System.Windows.Forms.Label();
             this.LblAcCancel = new System.Windows.Forms.Label();
             this.LblAcRefresh = new System.Windows.Forms.Label();
             this.LblAcNewFolder = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.filtersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.emptyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.manageToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.emptyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
+            this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.ConversationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SaveAttachmentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SaveEmailMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SavePicturesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ItemViewer = new QuickFiler.ItemViewer();
-            this.OptionsStrip = new System.Windows.Forms.MenuStrip();
-            this.OptionsItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.moveOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.attachmentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.conversationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.emailToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.picturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.categoryOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.manageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.L0vh_TLP.SuspendLayout();
             this.Tlp.SuspendLayout();
-            this.OptionsStrip.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
+            this.MoveOptionsStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // L0vh_TLP
@@ -81,12 +77,11 @@ namespace QuickFiler
             this.L0vh_TLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.L0vh_TLP.Controls.Add(this.Tlp, 1, 2);
             this.L0vh_TLP.Controls.Add(this.ItemViewer, 1, 1);
-            this.L0vh_TLP.Controls.Add(this.OptionsStrip, 1, 0);
             this.L0vh_TLP.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0vh_TLP.Location = new System.Drawing.Point(0, 0);
             this.L0vh_TLP.Name = "L0vh_TLP";
             this.L0vh_TLP.RowCount = 4;
-            this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1030F));
             this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
@@ -123,20 +118,16 @@ namespace QuickFiler
             this.Tlp.Controls.Add(this.Cancel, 6, 6);
             this.Tlp.Controls.Add(this.RefreshPredicted, 8, 6);
             this.Tlp.Controls.Add(this.NewFolder, 10, 6);
-            this.Tlp.Controls.Add(this.SaveAttachments, 1, 6);
-            this.Tlp.Controls.Add(this.SaveEmail, 1, 7);
-            this.Tlp.Controls.Add(this.SavePictures, 1, 8);
-            this.Tlp.Controls.Add(this.MoveConversation, 1, 9);
-            this.Tlp.Controls.Add(this.LblAcAttachments, 0, 6);
             this.Tlp.Controls.Add(this.LblAcEmail, 0, 7);
-            this.Tlp.Controls.Add(this.LblAcPictures, 0, 8);
-            this.Tlp.Controls.Add(this.LblAcConversation, 0, 9);
+            this.Tlp.Controls.Add(this.LblAcFilters, 0, 8);
             this.Tlp.Controls.Add(this.LblAcOk, 3, 7);
             this.Tlp.Controls.Add(this.LblAcCancel, 5, 7);
             this.Tlp.Controls.Add(this.LblAcRefresh, 7, 7);
             this.Tlp.Controls.Add(this.LblAcNewFolder, 9, 7);
+            this.Tlp.Controls.Add(this.menuStrip1, 1, 8);
+            this.Tlp.Controls.Add(this.MoveOptionsStrip, 1, 7);
             this.Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Tlp.Location = new System.Drawing.Point(35, 1085);
+            this.Tlp.Location = new System.Drawing.Point(35, 1065);
             this.Tlp.Margin = new System.Windows.Forms.Padding(5);
             this.Tlp.Name = "Tlp";
             this.Tlp.RowCount = 10;
@@ -152,7 +143,7 @@ namespace QuickFiler
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.Tlp.Size = new System.Drawing.Size(2014, 704);
+            this.Tlp.Size = new System.Drawing.Size(2014, 724);
             this.Tlp.TabIndex = 1;
             // 
             // LblAcTrash
@@ -259,12 +250,13 @@ namespace QuickFiler
             // 
             this.Tlp.SetColumnSpan(this.FolderListBox, 14);
             this.FolderListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FolderListBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FolderListBox.FormattingEnabled = true;
-            this.FolderListBox.ItemHeight = 25;
+            this.FolderListBox.ItemHeight = 31;
             this.FolderListBox.Location = new System.Drawing.Point(45, 232);
             this.FolderListBox.Margin = new System.Windows.Forms.Padding(5);
             this.FolderListBox.Name = "FolderListBox";
-            this.FolderListBox.Size = new System.Drawing.Size(1965, 257);
+            this.FolderListBox.Size = new System.Drawing.Size(1965, 277);
             this.FolderListBox.TabIndex = 11;
             // 
             // Ok
@@ -272,7 +264,7 @@ namespace QuickFiler
             this.Ok.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.Ok.Image = global::QuickFiler.Properties.Resources.Run;
             this.Ok.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Ok.Location = new System.Drawing.Point(346, 562);
+            this.Ok.Location = new System.Drawing.Point(346, 582);
             this.Ok.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
             this.Ok.Name = "Ok";
             this.Tlp.SetRowSpan(this.Ok, 4);
@@ -289,7 +281,7 @@ namespace QuickFiler
             this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.Cancel.Image = global::QuickFiler.Properties.Resources.Cancel;
             this.Cancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Cancel.Location = new System.Drawing.Point(715, 562);
+            this.Cancel.Location = new System.Drawing.Point(715, 582);
             this.Cancel.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
             this.Cancel.Name = "Cancel";
             this.Tlp.SetRowSpan(this.Cancel, 4);
@@ -305,7 +297,7 @@ namespace QuickFiler
             this.RefreshPredicted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.RefreshPredicted.Image = global::QuickFiler.Properties.Resources.QuickRefresh1;
             this.RefreshPredicted.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.RefreshPredicted.Location = new System.Drawing.Point(1084, 562);
+            this.RefreshPredicted.Location = new System.Drawing.Point(1084, 582);
             this.RefreshPredicted.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
             this.RefreshPredicted.Name = "RefreshPredicted";
             this.Tlp.SetRowSpan(this.RefreshPredicted, 4);
@@ -321,7 +313,7 @@ namespace QuickFiler
             this.NewFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.NewFolder.Image = global::QuickFiler.Properties.Resources.NewFolder1;
             this.NewFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.NewFolder.Location = new System.Drawing.Point(1453, 562);
+            this.NewFolder.Location = new System.Drawing.Point(1453, 582);
             this.NewFolder.Margin = new System.Windows.Forms.Padding(15, 14, 15, 14);
             this.NewFolder.Name = "NewFolder";
             this.Tlp.SetRowSpan(this.NewFolder, 4);
@@ -332,61 +324,6 @@ namespace QuickFiler
             this.NewFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.NewFolder.UseVisualStyleBackColor = true;
             // 
-            // SaveAttachments
-            // 
-            this.SaveAttachments.AutoSize = true;
-            this.SaveAttachments.Location = new System.Drawing.Point(43, 527);
-            this.SaveAttachments.Name = "SaveAttachments";
-            this.SaveAttachments.Size = new System.Drawing.Size(163, 29);
-            this.SaveAttachments.TabIndex = 13;
-            this.SaveAttachments.Text = "Attachments";
-            this.SaveAttachments.UseVisualStyleBackColor = true;
-            // 
-            // SaveEmail
-            // 
-            this.SaveEmail.AutoSize = true;
-            this.SaveEmail.Location = new System.Drawing.Point(43, 572);
-            this.SaveEmail.Name = "SaveEmail";
-            this.SaveEmail.Size = new System.Drawing.Size(97, 29);
-            this.SaveEmail.TabIndex = 14;
-            this.SaveEmail.Text = "Email";
-            this.SaveEmail.UseVisualStyleBackColor = true;
-            // 
-            // SavePictures
-            // 
-            this.SavePictures.AutoSize = true;
-            this.SavePictures.Location = new System.Drawing.Point(43, 617);
-            this.SavePictures.Name = "SavePictures";
-            this.SavePictures.Size = new System.Drawing.Size(122, 29);
-            this.SavePictures.TabIndex = 15;
-            this.SavePictures.Text = "Pictures";
-            this.SavePictures.UseVisualStyleBackColor = true;
-            // 
-            // MoveConversation
-            // 
-            this.MoveConversation.AutoSize = true;
-            this.MoveConversation.Location = new System.Drawing.Point(43, 662);
-            this.MoveConversation.Name = "MoveConversation";
-            this.MoveConversation.Size = new System.Drawing.Size(171, 29);
-            this.MoveConversation.TabIndex = 16;
-            this.MoveConversation.Text = "Conversation";
-            this.MoveConversation.UseVisualStyleBackColor = true;
-            // 
-            // LblAcAttachments
-            // 
-            this.LblAcAttachments.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.LblAcAttachments.AutoSize = true;
-            this.LblAcAttachments.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcAttachments.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcAttachments.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcAttachments.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcAttachments.Location = new System.Drawing.Point(2, 529);
-            this.LblAcAttachments.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
-            this.LblAcAttachments.Name = "LblAcAttachments";
-            this.LblAcAttachments.Size = new System.Drawing.Size(35, 33);
-            this.LblAcAttachments.TabIndex = 20;
-            this.LblAcAttachments.Text = "A";
-            // 
             // LblAcEmail
             // 
             this.LblAcEmail.Anchor = System.Windows.Forms.AnchorStyles.Top;
@@ -395,42 +332,27 @@ namespace QuickFiler
             this.LblAcEmail.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcEmail.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcEmail.Location = new System.Drawing.Point(0, 574);
+            this.LblAcEmail.Location = new System.Drawing.Point(0, 594);
             this.LblAcEmail.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.LblAcEmail.Name = "LblAcEmail";
             this.LblAcEmail.Size = new System.Drawing.Size(39, 33);
             this.LblAcEmail.TabIndex = 21;
             this.LblAcEmail.Text = "M";
             // 
-            // LblAcPictures
+            // LblAcFilters
             // 
-            this.LblAcPictures.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.LblAcPictures.AutoSize = true;
-            this.LblAcPictures.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcPictures.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcPictures.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcPictures.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcPictures.Location = new System.Drawing.Point(2, 619);
-            this.LblAcPictures.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
-            this.LblAcPictures.Name = "LblAcPictures";
-            this.LblAcPictures.Size = new System.Drawing.Size(35, 33);
-            this.LblAcPictures.TabIndex = 22;
-            this.LblAcPictures.Text = "P";
-            // 
-            // LblAcConversation
-            // 
-            this.LblAcConversation.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.LblAcConversation.AutoSize = true;
-            this.LblAcConversation.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcConversation.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcConversation.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcConversation.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcConversation.Location = new System.Drawing.Point(1, 664);
-            this.LblAcConversation.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
-            this.LblAcConversation.Name = "LblAcConversation";
-            this.LblAcConversation.Size = new System.Drawing.Size(37, 33);
-            this.LblAcConversation.TabIndex = 23;
-            this.LblAcConversation.Text = "C";
+            this.LblAcFilters.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.LblAcFilters.AutoSize = true;
+            this.LblAcFilters.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcFilters.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcFilters.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcFilters.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcFilters.Location = new System.Drawing.Point(3, 639);
+            this.LblAcFilters.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
+            this.LblAcFilters.Name = "LblAcFilters";
+            this.LblAcFilters.Size = new System.Drawing.Size(34, 33);
+            this.LblAcFilters.TabIndex = 22;
+            this.LblAcFilters.Text = "F";
             // 
             // LblAcOk
             // 
@@ -440,7 +362,7 @@ namespace QuickFiler
             this.LblAcOk.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcOk.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcOk.Location = new System.Drawing.Point(293, 574);
+            this.LblAcOk.Location = new System.Drawing.Point(293, 594);
             this.LblAcOk.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.LblAcOk.Name = "LblAcOk";
             this.LblAcOk.Size = new System.Drawing.Size(35, 33);
@@ -455,7 +377,7 @@ namespace QuickFiler
             this.LblAcCancel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcCancel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcCancel.Location = new System.Drawing.Point(662, 574);
+            this.LblAcCancel.Location = new System.Drawing.Point(662, 594);
             this.LblAcCancel.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.LblAcCancel.Name = "LblAcCancel";
             this.LblAcCancel.Size = new System.Drawing.Size(35, 33);
@@ -470,7 +392,7 @@ namespace QuickFiler
             this.LblAcRefresh.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcRefresh.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcRefresh.Location = new System.Drawing.Point(1030, 574);
+            this.LblAcRefresh.Location = new System.Drawing.Point(1030, 594);
             this.LblAcRefresh.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.LblAcRefresh.Name = "LblAcRefresh";
             this.LblAcRefresh.Size = new System.Drawing.Size(37, 33);
@@ -485,12 +407,124 @@ namespace QuickFiler
             this.LblAcNewFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcNewFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcNewFolder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcNewFolder.Location = new System.Drawing.Point(1399, 574);
+            this.LblAcNewFolder.Location = new System.Drawing.Point(1399, 594);
             this.LblAcNewFolder.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.LblAcNewFolder.Name = "LblAcNewFolder";
             this.LblAcNewFolder.Size = new System.Drawing.Size(37, 33);
             this.LblAcNewFolder.TabIndex = 24;
             this.LblAcNewFolder.Text = "N";
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.filtersToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(40, 634);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(254, 40);
+            this.menuStrip1.TabIndex = 26;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // filtersToolStripMenuItem
+            // 
+            this.filtersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectToolStripMenuItem1,
+            this.manageToolStripMenuItem1});
+            this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
+            this.filtersToolStripMenuItem.Size = new System.Drawing.Size(97, 36);
+            this.filtersToolStripMenuItem.Text = "&Filters";
+            // 
+            // selectToolStripMenuItem1
+            // 
+            this.selectToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.emptyToolStripMenuItem});
+            this.selectToolStripMenuItem1.Name = "selectToolStripMenuItem1";
+            this.selectToolStripMenuItem1.Size = new System.Drawing.Size(234, 44);
+            this.selectToolStripMenuItem1.Text = "Select";
+            // 
+            // emptyToolStripMenuItem
+            // 
+            this.emptyToolStripMenuItem.Name = "emptyToolStripMenuItem";
+            this.emptyToolStripMenuItem.Size = new System.Drawing.Size(214, 44);
+            this.emptyToolStripMenuItem.Text = "Empty";
+            // 
+            // manageToolStripMenuItem1
+            // 
+            this.manageToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.emptyToolStripMenuItem1});
+            this.manageToolStripMenuItem1.Name = "manageToolStripMenuItem1";
+            this.manageToolStripMenuItem1.Size = new System.Drawing.Size(234, 44);
+            this.manageToolStripMenuItem1.Text = "Manage";
+            // 
+            // emptyToolStripMenuItem1
+            // 
+            this.emptyToolStripMenuItem1.Name = "emptyToolStripMenuItem1";
+            this.emptyToolStripMenuItem1.Size = new System.Drawing.Size(214, 44);
+            this.emptyToolStripMenuItem1.Text = "Empty";
+            // 
+            // MoveOptionsStrip
+            // 
+            this.MoveOptionsStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
+            this.MoveOptionsStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.MoveOptionsStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MoveOptionsMenu});
+            this.MoveOptionsStrip.Location = new System.Drawing.Point(40, 589);
+            this.MoveOptionsStrip.Name = "MoveOptionsStrip";
+            this.MoveOptionsStrip.Size = new System.Drawing.Size(254, 40);
+            this.MoveOptionsStrip.TabIndex = 25;
+            this.MoveOptionsStrip.Text = "menuStrip1";
+            // 
+            // MoveOptionsMenu
+            // 
+            this.MoveOptionsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ConversationMenuItem,
+            this.SaveAttachmentsMenuItem,
+            this.SaveEmailMenuItem,
+            this.SavePicturesMenuItem});
+            this.MoveOptionsMenu.Name = "MoveOptionsMenu";
+            this.MoveOptionsMenu.Size = new System.Drawing.Size(186, 36);
+            this.MoveOptionsMenu.Text = "&Move Options";
+            // 
+            // ConversationMenuItem
+            // 
+            this.ConversationMenuItem.Checked = true;
+            this.ConversationMenuItem.CheckOnClick = true;
+            this.ConversationMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ConversationMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.ConversationMenuItem.Name = "ConversationMenuItem";
+            this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
+            this.ConversationMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.C)));
+            this.ConversationMenuItem.Size = new System.Drawing.Size(502, 44);
+            this.ConversationMenuItem.Text = "Move &Conversation";
+            // 
+            // SaveAttachmentsMenuItem
+            // 
+            this.SaveAttachmentsMenuItem.CheckOnClick = true;
+            this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
+            this.SaveAttachmentsMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.A)));
+            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(502, 44);
+            this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
+            // 
+            // SaveEmailMenuItem
+            // 
+            this.SaveEmailMenuItem.CheckOnClick = true;
+            this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
+            this.SaveEmailMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.M)));
+            this.SaveEmailMenuItem.Size = new System.Drawing.Size(502, 44);
+            this.SaveEmailMenuItem.Text = "Save E&mail Copy";
+            // 
+            // SavePicturesMenuItem
+            // 
+            this.SavePicturesMenuItem.CheckOnClick = true;
+            this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
+            this.SavePicturesMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.P)));
+            this.SavePicturesMenuItem.Size = new System.Drawing.Size(502, 44);
+            this.SavePicturesMenuItem.Text = "Save &Pictures";
             // 
             // ItemViewer
             // 
@@ -498,97 +532,12 @@ namespace QuickFiler
             this.ItemViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.ItemViewer.Controller = null;
             this.ItemViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ItemViewer.Location = new System.Drawing.Point(36, 56);
+            this.ItemViewer.Location = new System.Drawing.Point(36, 36);
             this.ItemViewer.Margin = new System.Windows.Forms.Padding(6);
             this.ItemViewer.MinimumSize = new System.Drawing.Size(1516, 197);
             this.ItemViewer.Name = "ItemViewer";
             this.ItemViewer.Size = new System.Drawing.Size(2012, 1018);
             this.ItemViewer.TabIndex = 2;
-            // 
-            // OptionsStrip
-            // 
-            this.OptionsStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
-            this.OptionsStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.OptionsStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.OptionsItem});
-            this.OptionsStrip.Location = new System.Drawing.Point(30, 0);
-            this.OptionsStrip.Name = "OptionsStrip";
-            this.OptionsStrip.Size = new System.Drawing.Size(2024, 48);
-            this.OptionsStrip.TabIndex = 3;
-            this.OptionsStrip.Text = "menuStrip1";
-            // 
-            // OptionsItem
-            // 
-            this.OptionsItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.moveOptionsToolStripMenuItem,
-            this.categoryOptionsToolStripMenuItem});
-            this.OptionsItem.Name = "OptionsItem";
-            this.OptionsItem.Size = new System.Drawing.Size(118, 44);
-            this.OptionsItem.Text = "&Options";
-            // 
-            // moveOptionsToolStripMenuItem
-            // 
-            this.moveOptionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.attachmentsToolStripMenuItem,
-            this.conversationToolStripMenuItem,
-            this.emailToolStripMenuItem,
-            this.picturesToolStripMenuItem});
-            this.moveOptionsToolStripMenuItem.Name = "moveOptionsToolStripMenuItem";
-            this.moveOptionsToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.moveOptionsToolStripMenuItem.Text = "&Move Options";
-            // 
-            // attachmentsToolStripMenuItem
-            // 
-            this.attachmentsToolStripMenuItem.Name = "attachmentsToolStripMenuItem";
-            this.attachmentsToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.attachmentsToolStripMenuItem.Text = "Attachments";
-            // 
-            // conversationToolStripMenuItem
-            // 
-            this.conversationToolStripMenuItem.Name = "conversationToolStripMenuItem";
-            this.conversationToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.conversationToolStripMenuItem.Text = "Conversation";
-            // 
-            // emailToolStripMenuItem
-            // 
-            this.emailToolStripMenuItem.Name = "emailToolStripMenuItem";
-            this.emailToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.emailToolStripMenuItem.Text = "Email";
-            // 
-            // picturesToolStripMenuItem
-            // 
-            this.picturesToolStripMenuItem.Name = "picturesToolStripMenuItem";
-            this.picturesToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.picturesToolStripMenuItem.Text = "Pictures";
-            // 
-            // categoryOptionsToolStripMenuItem
-            // 
-            this.categoryOptionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectToolStripMenuItem,
-            this.manageToolStripMenuItem});
-            this.categoryOptionsToolStripMenuItem.Name = "categoryOptionsToolStripMenuItem";
-            this.categoryOptionsToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.categoryOptionsToolStripMenuItem.Text = "&Category Options";
-            // 
-            // selectToolStripMenuItem
-            // 
-            this.selectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.noneToolStripMenuItem});
-            this.selectToolStripMenuItem.Name = "selectToolStripMenuItem";
-            this.selectToolStripMenuItem.Size = new System.Drawing.Size(234, 44);
-            this.selectToolStripMenuItem.Text = "&Select";
-            // 
-            // noneToolStripMenuItem
-            // 
-            this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
-            this.noneToolStripMenuItem.Size = new System.Drawing.Size(206, 44);
-            this.noneToolStripMenuItem.Text = "None";
-            // 
-            // manageToolStripMenuItem
-            // 
-            this.manageToolStripMenuItem.Name = "manageToolStripMenuItem";
-            this.manageToolStripMenuItem.Size = new System.Drawing.Size(234, 44);
-            this.manageToolStripMenuItem.Text = "&Manage";
             // 
             // EfcViewer
             // 
@@ -596,6 +545,7 @@ namespace QuickFiler
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2084, 1824);
             this.Controls.Add(this.L0vh_TLP);
+            this.MainMenuStrip = this.MoveOptionsStrip;
             this.MinimumSize = new System.Drawing.Size(2110, 1895);
             this.Name = "EfcViewer";
             this.Text = "EfcViewer";
@@ -603,8 +553,10 @@ namespace QuickFiler
             this.L0vh_TLP.PerformLayout();
             this.Tlp.ResumeLayout(false);
             this.Tlp.PerformLayout();
-            this.OptionsStrip.ResumeLayout(false);
-            this.OptionsStrip.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.MoveOptionsStrip.ResumeLayout(false);
+            this.MoveOptionsStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -623,30 +575,25 @@ namespace QuickFiler
         internal System.Windows.Forms.Button Cancel;
         internal System.Windows.Forms.Button RefreshPredicted;
         internal System.Windows.Forms.Button NewFolder;
-        internal System.Windows.Forms.CheckBox SaveAttachments;
-        internal System.Windows.Forms.CheckBox SaveEmail;
-        internal System.Windows.Forms.CheckBox SavePictures;
-        internal System.Windows.Forms.CheckBox MoveConversation;
-        internal System.Windows.Forms.Label LblAcAttachments;
         internal System.Windows.Forms.Label LblAcEmail;
-        internal System.Windows.Forms.Label LblAcPictures;
-        internal System.Windows.Forms.Label LblAcConversation;
+        internal System.Windows.Forms.Label LblAcFilters;
         internal System.Windows.Forms.Label LblAcOk;
         internal System.Windows.Forms.Label LblAcCancel;
         internal System.Windows.Forms.Label LblAcRefresh;
         internal System.Windows.Forms.Label LblAcNewFolder;
         internal System.Windows.Forms.TableLayoutPanel L0vh_TLP;
         internal ItemViewer ItemViewer;
-        private System.Windows.Forms.ToolStripMenuItem moveOptionsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem attachmentsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem conversationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem emailToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem picturesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem categoryOptionsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem selectToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem manageToolStripMenuItem;
-        internal System.Windows.Forms.ToolStripMenuItem OptionsItem;
-        internal System.Windows.Forms.MenuStrip OptionsStrip;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem filtersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem emptyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem manageToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem emptyToolStripMenuItem1;
+        internal System.Windows.Forms.MenuStrip MoveOptionsStrip;
+        public System.Windows.Forms.ToolStripMenuItem ConversationMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem SaveAttachmentsMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem SaveEmailMenuItem;
+        public System.Windows.Forms.ToolStripMenuItem SavePicturesMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem MoveOptionsMenu;
     }
 }

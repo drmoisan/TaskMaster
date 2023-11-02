@@ -169,8 +169,8 @@ namespace UtilitiesCS
         {
             if (_controls is not null) 
             { 
-                if (async) { _controls[0].BeginInvoke(new Action(() => ApplyTheme())); }
-                else { _controls[0].Invoke(new Action(() => ApplyTheme())); }
+                if (async) { UIThreadExtensions.UiDispatcher.InvokeAsync(new Action(() => ApplyTheme())); }
+                else { UIThreadExtensions.UiDispatcher.Invoke(new Action(() => ApplyTheme())); }
             }
             else { ApplyTheme(); }
         }
