@@ -77,5 +77,18 @@ namespace QuickFiler
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
+
+        private void MenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            var menuItem = (ToolStripMenuItem)sender;
+            if (menuItem.Checked)
+            {
+                menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            }
+            else
+            {
+                menuItem.Image = null;
+            }
+        }
     }
 }

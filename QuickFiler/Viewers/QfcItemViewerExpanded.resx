@@ -117,4 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="CheckBoxChecked" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6
+        JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA7CAAAOwgEVKEqAAAAAmElE
+        QVQ4T72T3QmDMBgAs0Zf8usAztTFOoY+dBjfO4R+V/KBSKKNFQOHUXNnCGguGSGESZgbmbL+DczW2kcL
+        OFm/MRBjtM65nnlzAFnWjd77F/dNgSwPIr8Fx7NigO2xWEVQWRjX74oBtrdeWJOhGFCBraaUOp3rtg8D
+        kCMc1ofr9stKNQBIch7Pmgy7gV+4PPDfz3R+GLMAkaSU28rcAd0AAAAASUVORK5CYII=
+</value>
+  </data>
 </root>

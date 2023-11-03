@@ -312,6 +312,12 @@
     <Compile Include="Viewers\QfcItemViewerExpanded.Designer.cs">
       <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewers\ToolStripMenuItemCb.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Viewers\ToolStripMenuItemCb.Designer.cs">
+      <DependentUpon>ToolStripMenuItemCb.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
@@ -363,6 +369,7 @@
     <Content Include="Resources\AppStartPageBackground.png" />
     <Content Include="Resources\Cancel.png" />
     <Content Include="Resources\Cancel.svg" />
+    <None Include="Resources\CheckBoxChecked.png" />
     <Content Include="Resources\Close.png" />
     <Content Include="Resources\Close.svg" />
     <Content Include="Resources\DatabaseModelRefresh.svg" />
