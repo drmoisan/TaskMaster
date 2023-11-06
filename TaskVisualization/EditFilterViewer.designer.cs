@@ -30,8 +30,8 @@
         {
             this.L0_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.L0v2L1h_TlpOkCancel = new System.Windows.Forms.TableLayoutPanel();
-            this.OKButton = new System.Windows.Forms.Button();
-            this.Cancel_Button = new System.Windows.Forms.Button();
+            this.BtnOk = new System.Windows.Forms.Button();
+            this.BtnCancel = new System.Windows.Forms.Button();
             this.XlCancel = new System.Windows.Forms.Label();
             this.XlOk = new System.Windows.Forms.Label();
             this.C2S4 = new System.Windows.Forms.Label();
@@ -42,7 +42,7 @@
             this.LblProject = new System.Windows.Forms.Label();
             this.LblPeople = new System.Windows.Forms.Label();
             this.LblContext = new System.Windows.Forms.Label();
-            this.CategorySelection = new System.Windows.Forms.Label();
+            this.ContextSelection = new System.Windows.Forms.Label();
             this.PeopleSelection = new System.Windows.Forms.Label();
             this.ProjectSelection = new System.Windows.Forms.Label();
             this.TopicSelection = new System.Windows.Forms.Label();
@@ -87,8 +87,8 @@
             this.L0v2L1h_TlpOkCancel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 329F));
             this.L0v2L1h_TlpOkCancel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.L0v2L1h_TlpOkCancel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.L0v2L1h_TlpOkCancel.Controls.Add(this.OKButton, 3, 1);
-            this.L0v2L1h_TlpOkCancel.Controls.Add(this.Cancel_Button, 5, 1);
+            this.L0v2L1h_TlpOkCancel.Controls.Add(this.BtnOk, 3, 1);
+            this.L0v2L1h_TlpOkCancel.Controls.Add(this.BtnCancel, 5, 1);
             this.L0v2L1h_TlpOkCancel.Controls.Add(this.XlCancel, 4, 1);
             this.L0v2L1h_TlpOkCancel.Controls.Add(this.XlOk, 2, 1);
             this.L0v2L1h_TlpOkCancel.Controls.Add(this.C2S4, 2, 0);
@@ -103,29 +103,31 @@
             this.L0v2L1h_TlpOkCancel.Size = new System.Drawing.Size(1522, 144);
             this.L0v2L1h_TlpOkCancel.TabIndex = 4;
             // 
-            // OKButton
+            // BtnOk
             // 
-            this.OKButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.OKButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OKButton.Location = new System.Drawing.Point(438, 26);
-            this.OKButton.Margin = new System.Windows.Forms.Padding(6);
-            this.OKButton.Name = "OKButton";
-            this.OKButton.Size = new System.Drawing.Size(317, 91);
-            this.OKButton.TabIndex = 2;
-            this.OKButton.Text = "OK";
-            this.OKButton.UseVisualStyleBackColor = true;
+            this.BtnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.BtnOk.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.BtnOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnOk.Location = new System.Drawing.Point(438, 26);
+            this.BtnOk.Margin = new System.Windows.Forms.Padding(6);
+            this.BtnOk.Name = "BtnOk";
+            this.BtnOk.Size = new System.Drawing.Size(317, 91);
+            this.BtnOk.TabIndex = 2;
+            this.BtnOk.Text = "OK";
+            this.BtnOk.UseVisualStyleBackColor = true;
             // 
-            // Cancel_Button
+            // BtnCancel
             // 
-            this.Cancel_Button.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Cancel_Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Cancel_Button.Location = new System.Drawing.Point(807, 26);
-            this.Cancel_Button.Margin = new System.Windows.Forms.Padding(6);
-            this.Cancel_Button.Name = "Cancel_Button";
-            this.Cancel_Button.Size = new System.Drawing.Size(317, 91);
-            this.Cancel_Button.TabIndex = 3;
-            this.Cancel_Button.Text = "Cancel";
-            this.Cancel_Button.UseVisualStyleBackColor = true;
+            this.BtnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.BtnCancel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.BtnCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnCancel.Location = new System.Drawing.Point(807, 26);
+            this.BtnCancel.Margin = new System.Windows.Forms.Padding(6);
+            this.BtnCancel.Name = "BtnCancel";
+            this.BtnCancel.Size = new System.Drawing.Size(317, 91);
+            this.BtnCancel.TabIndex = 3;
+            this.BtnCancel.Text = "Cancel";
+            this.BtnCancel.UseVisualStyleBackColor = true;
             // 
             // XlCancel
             // 
@@ -186,7 +188,7 @@
             this.L0v1L1g_Tlp.Controls.Add(this.LblProject, 2, 4);
             this.L0v1L1g_Tlp.Controls.Add(this.LblPeople, 2, 3);
             this.L0v1L1g_Tlp.Controls.Add(this.LblContext, 2, 2);
-            this.L0v1L1g_Tlp.Controls.Add(this.CategorySelection, 3, 2);
+            this.L0v1L1g_Tlp.Controls.Add(this.ContextSelection, 3, 2);
             this.L0v1L1g_Tlp.Controls.Add(this.PeopleSelection, 3, 3);
             this.L0v1L1g_Tlp.Controls.Add(this.ProjectSelection, 3, 4);
             this.L0v1L1g_Tlp.Controls.Add(this.TopicSelection, 3, 5);
@@ -276,19 +278,19 @@
             this.LblContext.TabIndex = 26;
             this.LblContext.Text = "Context Flag:";
             // 
-            // CategorySelection
+            // ContextSelection
             // 
-            this.CategorySelection.BackColor = System.Drawing.SystemColors.Window;
-            this.CategorySelection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.CategorySelection.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CategorySelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CategorySelection.Location = new System.Drawing.Point(276, 96);
-            this.CategorySelection.Margin = new System.Windows.Forms.Padding(6);
-            this.CategorySelection.Name = "CategorySelection";
-            this.CategorySelection.Size = new System.Drawing.Size(1210, 44);
-            this.CategorySelection.TabIndex = 30;
-            this.CategorySelection.Text = "[Category Label]";
-            this.CategorySelection.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ContextSelection.BackColor = System.Drawing.SystemColors.Window;
+            this.ContextSelection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ContextSelection.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ContextSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ContextSelection.Location = new System.Drawing.Point(276, 96);
+            this.ContextSelection.Margin = new System.Windows.Forms.Padding(6);
+            this.ContextSelection.Name = "ContextSelection";
+            this.ContextSelection.Size = new System.Drawing.Size(1210, 44);
+            this.ContextSelection.TabIndex = 30;
+            this.ContextSelection.Text = "[Context Flagged]";
+            this.ContextSelection.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // PeopleSelection
             // 
@@ -477,7 +479,7 @@
         internal System.Windows.Forms.Label LblProject;
         internal System.Windows.Forms.Label LblPeople;
         internal System.Windows.Forms.Label LblContext;
-        internal System.Windows.Forms.Label CategorySelection;
+        internal System.Windows.Forms.Label ContextSelection;
         internal System.Windows.Forms.Label PeopleSelection;
         internal System.Windows.Forms.Label ProjectSelection;
         internal System.Windows.Forms.Label TopicSelection;
@@ -486,8 +488,8 @@
         internal System.Windows.Forms.Label XlPeople;
         internal System.Windows.Forms.Label XlTopic;
         private System.Windows.Forms.TableLayoutPanel L0v2L1h_TlpOkCancel;
-        internal System.Windows.Forms.Button OKButton;
-        internal System.Windows.Forms.Button Cancel_Button;
+        internal System.Windows.Forms.Button BtnOk;
+        internal System.Windows.Forms.Button BtnCancel;
         internal System.Windows.Forms.Label XlCancel;
         internal System.Windows.Forms.Label XlOk;
         internal System.Windows.Forms.Label C2S4;
@@ -497,6 +499,6 @@
         internal System.Windows.Forms.Label XlFolders;
         internal System.Windows.Forms.Label LblFolders;
         internal System.Windows.Forms.Label FoldersSelected;
-        private System.Windows.Forms.TextBox FilterName;
+        internal System.Windows.Forms.TextBox FilterName;
     }
 }

@@ -122,5 +122,8 @@
     <Setting Name="DarkMode" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="FileName_Filters" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999Filters.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

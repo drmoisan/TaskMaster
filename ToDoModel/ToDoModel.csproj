@@ -87,8 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common Functions\FileOperationsPST.cs" />
-    <Compile Include="Data Model\Flags\FlagDetails.cs" />
-    <Compile Include="Data Model\Flags\FlagParser.cs" />
     <Compile Include="Data Model\ID\BaseChanger.cs" />
     <Compile Include="Data Model\ID\IDList.cs" />
     <Compile Include="Data Model\ID\IDListUtilities.cs" />
@@ -102,7 +100,6 @@
     <Compile Include="Data Model\Project\ToDoProjectInfoEntry.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoLegacy.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoUtilities.cs" />
-    <Compile Include="Data Model\ToDo\FlagTranslator.cs" />
     <Compile Include="Data Model\ToDo\ToDoDefaults.cs" />
     <Compile Include="Data Model\ToDo\ToDoEvents.cs" />
     <Compile Include="Data Model\ToDo\ToDoItem.cs" />

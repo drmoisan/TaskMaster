@@ -44,7 +44,8 @@ namespace TaskMaster
                 LoadCtfMapAsync(),
                 LoadCommonWordsAsync(),
                 LoadSubjectMapAndEncoderAsync(),
-                LoadMovedMailsAsync()
+                LoadMovedMailsAsync(),
+                LoadFiltersAsync(),
             };
             await Task.WhenAll(tasks);
             //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
@@ -239,8 +240,35 @@ namespace TaskMaster
             return encoder;
         }
 
+        
         private SubjectMapSco _subjectMap;
         public SubjectMapSco SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
+
+        private ObserverHelper<NotifyCollectionChangedEventArgs> _filterObserver;
+        private ScoCollection<FilterEntry> _filters;
+        public ScoCollection<FilterEntry> Filters => Initializer.GetOrLoad(ref _filters, LoadFilters); 
+        private ScoCollection<FilterEntry> LoadFilters()
+        {
+            var filters = new ScoCollection<FilterEntry>(
+                fileName: _defaults.FileName_Filters,
+                folderPath: _parent.FS.FldrPythonStaging);
+            _filterObserver = new ObserverHelper<NotifyCollectionChangedEventArgs>("FilterObserver", (x)=>Filters.Serialize());
+            filters.Subscribe(_filterObserver);
+            //filters.CollectionChanged += ScoFilterEntry_CollectionChanged;
+            return filters;
+        }
+        async private Task LoadFiltersAsync()
+        {
+            await Task.Factory.StartNew(
+                () => _filters = LoadFilters(),
+                default(CancellationToken));
+        }
+        private void ScoFilterEntry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var collection= (ScoCollection<FilterEntry>)sender;
+            collection.Serialize();
+        }
+
         private SubjectMapSco LoadSubjectMap()
         {
             var subMap = new SubjectMapSco(filename: _defaults.File_Subject_Map,
@@ -343,5 +371,6 @@ namespace TaskMaster
             }
         }
 
+        
     }
 }

@@ -53,6 +53,30 @@ namespace Tags
 
         }
 
+        public TagController(TagViewer viewerInstance,
+                             SortedDictionary<string, bool> dictOptions,
+                             IList<string> selections = null,
+                             IPrefix prefix = null)
+        {
+            viewerInstance.SetController(this);
+            _viewer = viewerInstance;
+            _dictOriginal = dictOptions;
+            _dictOptions = dictOptions;
+            _selections = selections;
+            _isMail = false;
+
+            _gridTemplate = CaptureAndRemoveTemplate();
+            SetAutoAssignState(null);
+
+            _prefix = prefix ?? GetDefaultPrefix();
+
+            LoadSelections(selections);
+
+            LoadControls(_dictOptions, _prefix.Value);
+
+            WireEvents();
+        }
+
         public MailItem ResolveMailItem(object objItem) //internal
         {
             if ((objItem is not null) && (objItem is MailItem))
@@ -62,12 +86,14 @@ namespace Tags
             else return null;
         } 
 
+        internal IPrefix GetDefaultPrefix() => new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
+
         public void ResolvePrefix(IList<IPrefix> prefixes, string prefixKey) //internal
         {
             // Set default prefix if none exists
-            if (string.IsNullOrEmpty(prefixKey))
+            if (prefixes is null || string.IsNullOrEmpty(prefixKey))
             {
-                _prefix = new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
+                _prefix = GetDefaultPrefix();
             }
             // Else if it exists, set the Iprefix based on the prefixKey
             else if (prefixes.Exists(x => x.Key == prefixKey))

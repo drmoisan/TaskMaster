@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.Threading;
@@ -250,6 +251,7 @@ namespace QuickFiler.Controllers
             _formViewer.NewFolder.Click += ButtonCreate_Click;
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
+            _formViewer.EditFiltersMenuItem.Click += EditFiltersMenuItem_Click;
             _globals.Ol.PropertyChanged += DarkMode_Changed;
         }
                
@@ -331,6 +333,13 @@ namespace QuickFiler.Controllers
         {
             _formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
             if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
+        }
+
+        public void EditFiltersMenuItem_Click(object sender, EventArgs e)
+        {
+            var filters = new ManageFilters();
+            filters.LoadFilters(_globals);
+            filters.Show();
         }
 
         private KbdActions<char, KaCharAsync, Func<char, Task>> _characterAsyncActions;

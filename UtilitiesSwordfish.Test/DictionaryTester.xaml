@@ -5,52 +5,53 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-  <DockPanel LastChildFill="True">
-    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="2" Margin="2"  DockPanel.Dock="Top" HorizontalAlignment="Stretch">
-      <TextBlock HorizontalAlignment="Center">Observable Dictionary Demonstration</TextBlock>
-    </Border>
-    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="2" Margin="2"  DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
-      <DockPanel HorizontalAlignment="Stretch" LastChildFill="True">
-        <Button DockPanel.Dock="Left" Click="AddNewOrUpdate_Click">Add New Random or Update</Button>
-        <Button DockPanel.Dock="Left" Click="AddNew_Click">Add New Random</Button>
-        <TextBlock x:Name="LastActionMessage" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-      </DockPanel>
-    </Border>
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="1*"/>
-        <ColumnDefinition Width="1*"/>
-      </Grid.ColumnDefinitions>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-      </Grid.RowDefinitions>
-      <ListView x:Name="KeyValueList" Grid.Column="0" SelectionChanged="KeyValueList_SelectionChanged"/>
-      <ListView x:Name="KeyList" Grid.Column="1" SelectionChanged="KeyList_SelectionChanged">
-        <ListView.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Path=Key}"/>
-          </DataTemplate>
-        </ListView.ItemTemplate>
-      </ListView>
-      <ListView x:Name="ValueList" Grid.Column="2">
-        <ListView.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Path=Value}"/>
-          </DataTemplate>
-        </ListView.ItemTemplate>
-      </ListView>
-      <DockPanel LastChildFill="True" Grid.Column="0" Grid.Row="1">
-        <Button DockPanel.Dock="Right" Click="KeyValueRemove_Click">Delete</Button>
-        <TextBlock Text="{Binding ElementName=KeyValueList, Path=SelectedItem}"/>
-      </DockPanel>
-      <DockPanel LastChildFill="True" Grid.Column="1" Grid.Row="1">
-        <Button DockPanel.Dock="Right" Click="KeyUpdate_Click">Update</Button>
-        <Button DockPanel.Dock="Right" Click="KeyRemove_Click">Delete</Button>
-        <TextBlock Text="{Binding ElementName=KeyList, Path=SelectedItem}"/>
-      </DockPanel>
-    </Grid>
-  </DockPanel>
+    <DockPanel LastChildFill="True">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="2" Margin="2"  DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+            <TextBlock HorizontalAlignment="Center">Observable Dictionary Demonstration</TextBlock>
+        </Border>
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="2" Margin="2"  DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
+            <DockPanel HorizontalAlignment="Stretch" LastChildFill="True">
+                <Button DockPanel.Dock="Left" Click="AddNewOrUpdate_Click">Add New Random or Update</Button>
+                <Button DockPanel.Dock="Left" Click="AddNew_Click">Add New Random</Button>
+                <TextBlock x:Name="LastActionMessage" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </DockPanel>
+        </Border>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="18*"/>
+                <ColumnDefinition Width="25*"/>
+                <ColumnDefinition Width="25*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ListView x:Name="KeyValueList" Grid.Column="0" SelectionChanged="KeyValueList_SelectionChanged" Grid.ColumnSpan="2"/>
+            <ListView x:Name="KeyList" Grid.Column="2" SelectionChanged="KeyList_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Key}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <ListView x:Name="ValueList" Grid.Column="3">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Value}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <DockPanel LastChildFill="True" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,224,0,0" Grid.RowSpan="2">
+                <Button DockPanel.Dock="Right" Click="KeyValueRemove_Click">Delete</Button>
+                <TextBlock Text="{Binding ElementName=KeyValueList, Path=SelectedItem}"/>
+            </DockPanel>
+            <DockPanel LastChildFill="True" Grid.Column="2" Margin="0,224,0,0" Grid.RowSpan="2">
+                <Button DockPanel.Dock="Right" Click="KeyUpdate_Click">Update</Button>
+                <Button DockPanel.Dock="Right" Click="KeyRemove_Click">Delete</Button>
+                <TextBlock Text="{Binding ElementName=KeyList, Path=SelectedItem}"/>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
 </UserControl>

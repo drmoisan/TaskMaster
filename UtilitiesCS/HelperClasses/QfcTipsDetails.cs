@@ -1,4 +1,4 @@
-﻿using QuickFiler.Interfaces;
+﻿//using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using UtilitiesCS;
+//using UtilitiesCS;
 
-[assembly: InternalsVisibleTo("QuickFiler.Test")]
-namespace QuickFiler.Controllers
+//[assembly: InternalsVisibleTo("QuickFiler.Test")]
+namespace UtilitiesCS
 {
-    internal class QfcTipsDetails : IQfcTipsDetails
+    public class QfcTipsDetails : IQfcTipsDetails
     {
         private QfcTipsDetails(System.Windows.Forms.Label labelControl, SynchronizationContext uiContext) 
         { 

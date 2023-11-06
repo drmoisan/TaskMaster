@@ -490,5 +490,17 @@ namespace TaskMaster.Properties {
                 this["DarkMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999Filters.json")]
+        public string FileName_Filters {
+            get {
+                return ((string)(this["FileName_Filters"]));
+            }
+            set {
+                this["FileName_Filters"] = value;
+            }
+        }
     }
 }

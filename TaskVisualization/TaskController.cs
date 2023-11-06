@@ -15,7 +15,6 @@ using UtilitiesCS;
 namespace TaskVisualization
 {
 
-
     public class TaskController
     {
         #region Constructors and Initializers

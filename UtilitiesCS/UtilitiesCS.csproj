@@ -318,7 +318,14 @@
     <Compile Include="EmailIntelligence\CtfMap.cs" />
     <Compile Include="EmailIntelligence\CtfMapEntry.cs" />
     <Compile Include="EmailIntelligence\EmailDetails.cs" />
+    <Compile Include="EmailIntelligence\FilterEntry.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagClassNoItem.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagDetails.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagParser.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
+    <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
     <Compile Include="EmailIntelligence\MailItemInfo.cs" />
+    <Compile Include="HelperClasses\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="Interfaces\ITimerWrapper.cs" />
     <Compile Include="HelperClasses\TimedDiskWriter.cs" />
@@ -394,7 +401,7 @@
     <Compile Include="Interfaces\ITypes\ISerializableDictionary.cs" />
     <Compile Include="Interfaces\ITypes\ISerializableList.cs" />
     <Compile Include="OutlookExtensions\Calendar.cs" />
-    <Compile Include="OutlookExtensions\CategoryExtensions.cs" />
+    <Compile Include="OutlookExtensions\CategoryExt.cs" />
     <Compile Include="OutlookExtensions\ComType.cs" />
     <Compile Include="OutlookExtensions\CreateCategory.cs" />
     <Compile Include="OutlookExtensions\ExplorerActions.cs" />
@@ -415,12 +422,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="ReusableTypeClasses\AsyncQueue.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\ObserverHelper.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
-    <Compile Include="ReusableTypeClasses\ScoCollection4.cs" />
-    <Compile Include="ReusableTypeClasses\ScoCollection1.cs" />
     <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
@@ -463,6 +474,10 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Dialogs\DelegateButtonTemplate.resx">

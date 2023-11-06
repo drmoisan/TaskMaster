@@ -56,15 +56,15 @@ namespace QuickFiler
             this.selectToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.emptyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.manageToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.emptyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.NewFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.EditFiltersMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
             this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.ConversationMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.SaveAttachmentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.SaveEmailMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.SavePicturesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ConversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SaveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SaveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SavePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.ItemViewer = new QuickFiler.ItemViewer();
-            this.entry2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.L0vh_TLP.SuspendLayout();
             this.Tlp.SuspendLayout();
             this.FilterMenuStrip.SuspendLayout();
@@ -418,7 +418,6 @@ namespace QuickFiler
             // 
             // FilterMenuStrip
             // 
-            this.FilterMenuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.FilterMenuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.FilterMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FiltersMenu});
@@ -434,14 +433,13 @@ namespace QuickFiler
             this.selectToolStripMenuItem1,
             this.manageToolStripMenuItem1});
             this.FiltersMenu.Name = "FiltersMenu";
-            this.FiltersMenu.Size = new System.Drawing.Size(97, 36);
+            this.FiltersMenu.Size = new System.Drawing.Size(97, 38);
             this.FiltersMenu.Text = "&Filters";
             // 
             // selectToolStripMenuItem1
             // 
             this.selectToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.emptyToolStripMenuItem,
-            this.entry2ToolStripMenuItem});
+            this.emptyToolStripMenuItem});
             this.selectToolStripMenuItem1.Name = "selectToolStripMenuItem1";
             this.selectToolStripMenuItem1.Size = new System.Drawing.Size(359, 44);
             this.selectToolStripMenuItem1.Text = "Select";
@@ -450,22 +448,29 @@ namespace QuickFiler
             // 
             this.emptyToolStripMenuItem.CheckOnClick = true;
             this.emptyToolStripMenuItem.Name = "emptyToolStripMenuItem";
-            this.emptyToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
+            this.emptyToolStripMenuItem.Size = new System.Drawing.Size(214, 44);
             this.emptyToolStripMenuItem.Text = "Empty";
             // 
             // manageToolStripMenuItem1
             // 
             this.manageToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.emptyToolStripMenuItem1});
+            this.NewFilterMenuItem,
+            this.EditFiltersMenuItem});
             this.manageToolStripMenuItem1.Name = "manageToolStripMenuItem1";
             this.manageToolStripMenuItem1.Size = new System.Drawing.Size(359, 44);
             this.manageToolStripMenuItem1.Text = "Manage";
             // 
-            // emptyToolStripMenuItem1
+            // NewFilterMenuItem
             // 
-            this.emptyToolStripMenuItem1.Name = "emptyToolStripMenuItem1";
-            this.emptyToolStripMenuItem1.Size = new System.Drawing.Size(359, 44);
-            this.emptyToolStripMenuItem1.Text = "Empty";
+            this.NewFilterMenuItem.Name = "NewFilterMenuItem";
+            this.NewFilterMenuItem.Size = new System.Drawing.Size(359, 44);
+            this.NewFilterMenuItem.Text = "Add New Filter";
+            // 
+            // EditFiltersMenuItem
+            // 
+            this.EditFiltersMenuItem.Name = "EditFiltersMenuItem";
+            this.EditFiltersMenuItem.Size = new System.Drawing.Size(359, 44);
+            this.EditFiltersMenuItem.Text = "Edit Existing Filters";
             // 
             // MoveOptionsStrip
             // 
@@ -492,9 +497,7 @@ namespace QuickFiler
             // 
             // ConversationMenuItem
             // 
-            this.ConversationMenuItem.Checked = true;
             this.ConversationMenuItem.CheckOnClick = true;
-            this.ConversationMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ConversationMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
             this.ConversationMenuItem.Name = "ConversationMenuItem";
             this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
@@ -506,9 +509,7 @@ namespace QuickFiler
             // 
             // SaveAttachmentsMenuItem
             // 
-            this.SaveAttachmentsMenuItem.Checked = true;
             this.SaveAttachmentsMenuItem.CheckOnClick = true;
-            this.SaveAttachmentsMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SaveAttachmentsMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
             this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
             this.SaveAttachmentsMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -519,9 +520,7 @@ namespace QuickFiler
             // 
             // SaveEmailMenuItem
             // 
-            this.SaveEmailMenuItem.Checked = true;
             this.SaveEmailMenuItem.CheckOnClick = true;
-            this.SaveEmailMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SaveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
             this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
             this.SaveEmailMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -532,9 +531,7 @@ namespace QuickFiler
             // 
             // SavePicturesMenuItem
             // 
-            this.SavePicturesMenuItem.Checked = true;
             this.SavePicturesMenuItem.CheckOnClick = true;
-            this.SavePicturesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SavePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
             this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
             this.SavePicturesMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -555,15 +552,6 @@ namespace QuickFiler
             this.ItemViewer.Name = "ItemViewer";
             this.ItemViewer.Size = new System.Drawing.Size(2012, 1018);
             this.ItemViewer.TabIndex = 2;
-            // 
-            // entry2ToolStripMenuItem
-            // 
-            this.entry2ToolStripMenuItem.Checked = true;
-            this.entry2ToolStripMenuItem.CheckOnClick = true;
-            this.entry2ToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.entry2ToolStripMenuItem.Name = "entry2ToolStripMenuItem";
-            this.entry2ToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
-            this.entry2ToolStripMenuItem.Text = "Entry2";
             // 
             // EfcViewer
             // 
@@ -614,13 +602,13 @@ namespace QuickFiler
         private System.Windows.Forms.ToolStripMenuItem selectToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem emptyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manageToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem emptyToolStripMenuItem1;
         internal System.Windows.Forms.MenuStrip MoveOptionsStrip;
-        public System.Windows.Forms.ToolStripMenuItem ConversationMenuItem;
-        public System.Windows.Forms.ToolStripMenuItem SaveAttachmentsMenuItem;
-        public System.Windows.Forms.ToolStripMenuItem SaveEmailMenuItem;
-        public System.Windows.Forms.ToolStripMenuItem SavePicturesMenuItem;
+        public ToolStripMenuItemCb ConversationMenuItem;
+        public ToolStripMenuItemCb SaveAttachmentsMenuItem;
+        public ToolStripMenuItemCb SaveEmailMenuItem;
+        public ToolStripMenuItemCb SavePicturesMenuItem;
         internal System.Windows.Forms.ToolStripMenuItem MoveOptionsMenu;
-        private System.Windows.Forms.ToolStripMenuItem entry2ToolStripMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem NewFilterMenuItem;
+        internal System.Windows.Forms.ToolStripMenuItem EditFiltersMenuItem;
     }
 }

@@ -17,10 +17,11 @@ namespace QuickFiler.Viewers
             {
                 base.Image = Properties.Resources.CheckBoxChecked;
             }
-            else
+            if (CheckOnClick)
             {
-                base.Image = null;
+                base.Click += ToolStripMenuItemCb_Click;
             }
+            
             base.Invalidate();
         }
 

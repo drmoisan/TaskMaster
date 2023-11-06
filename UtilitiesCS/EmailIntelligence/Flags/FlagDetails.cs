@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Swordfish.NET.Collections;
 using UtilitiesCS.ReusableTypeClasses;
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
     public class FlagDetails : INotifyCollectionChanged
     {

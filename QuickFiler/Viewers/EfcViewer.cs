@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TaskVisualization;
 using UtilitiesCS;
 
 namespace QuickFiler
@@ -89,6 +90,11 @@ namespace QuickFiler
             {
                 menuItem.Image = null;
             }
+        }
+
+        private void EditFiltersMenuItem_Click(object sender, EventArgs e)
+        {
+            _formController.EditFiltersMenuItem_Click(sender, e);
         }
     }
 }

@@ -24,5 +24,6 @@ namespace UtilitiesCS
         ISubjectMapEncoder Encoder { get; }
         System.Action MaximizeQuickFileWindow { get; set; }
         ScoStack<IMovedMailInfo> MovedMails { get; }
+        ScoCollection<FilterEntry> Filters { get; }
     }
 }

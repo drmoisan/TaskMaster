@@ -70,6 +70,7 @@
     <Compile Include="Extensions\DeedleTests.cs" />
     <Compile Include="HelperClasses\SimpleRegex_Test.cs" />
     <Compile Include="Dialogs\YesNoToAll_Test.cs" />
+    <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -85,9 +86,7 @@
   <ItemGroup>
     <None Include="Resources\AboutBox.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ReusableTypeClasses\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Reference Include="Castle.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.5.1.1\lib\net462\Castle.Core.dll</HintPath>

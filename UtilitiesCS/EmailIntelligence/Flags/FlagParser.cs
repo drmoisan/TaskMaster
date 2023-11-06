@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.VisualBasic.CompilerServices;
 using System.Text.RegularExpressions;
 using UtilitiesCS;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
     /// <summary>
     /// Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
@@ -20,34 +19,39 @@ namespace ToDoModel
         /// Constructor for the FlagParser class accepts a comma delimited string containing 
         /// color categories and initializes
         /// </summary>
-        /// <param name="categories"></param>
+        /// <param name="categoryString"></param>
         /// <param name="deleteSearchSubString"></param>
-        public FlagParser(ref string categories, bool deleteSearchSubString = false)
+        public FlagParser(ref string categoryString, bool deleteSearchSubString = false)
         {
-            if (categories is null)
-                categories = "";
+            if (categoryString is null)
+                categoryString = "";
 
-            //ArrayExtensions.SearchOptions options = ArrayExtensions.SearchOptions.Standard;
-            
-            //if (deleteSearchSubString)
-            //    options = ArrayExtensions.SearchOptions.DeleteFromMatches;
-            
-            var categoryList = categories.Split(separator: ',', trim: true).ToList();
-            _people.List = FindMatches(categoryList, _people.Prefix);
-            _projects.List = FindMatches(categoryList, _projects.Prefix);
-            _topics.List = FindMatches(categoryList, _topics.Prefix);
-            _context.List = FindMatches(categoryList, _context.Prefix);
-            _kb.List = FindMatches(categoryList, _kb.Prefix);
+            var categories = categoryString.Split(separator: ',', trim: true).ToList();
+            Initialize(categories);
+        }
 
-            categoryList = categoryList.Except(_people.ListWithPrefix)
+        public FlagParser(IList<string> categories)
+        {
+            Initialize(categories);
+        }
+
+        internal void Initialize(IList<string> categories)
+        {
+            _people.List = FindMatches(categories, _people.Prefix);
+            _projects.List = FindMatches(categories, _projects.Prefix);
+            _topics.List = FindMatches(categories, _topics.Prefix);
+            _context.List = FindMatches(categories, _context.Prefix);
+            _kb.List = FindMatches(categories, _kb.Prefix);
+
+            categories = categories.Except(_people.ListWithPrefix)
                                        .Except(_projects.ListWithPrefix)
                                        .Except(_topics.ListWithPrefix)
                                        .Except(_context.ListWithPrefix)
                                        .Except(_kb.ListWithPrefix).ToList();
 
-            Today = categoryList.Remove(Properties.Settings.Default.Prefix_Today);
-            Bullpin = categoryList.Remove(Properties.Settings.Default.Prefix_Bullpin);
-            Other = categoryList.Count > 0 ? string.Join(", ", categoryList) : "";
+            Today = categories.Remove(Properties.Settings.Default.Prefix_Today);
+            Bullpin = categories.Remove(Properties.Settings.Default.Prefix_Bullpin);
+            Other = categories.Count > 0 ? string.Join(", ", categories) : "";
             WireEvents();
         }
 
@@ -188,6 +192,10 @@ namespace ToDoModel
             _kb.List = SplitToList(value, ",", _kb.Prefix);
         }
 
+        public ObservableCollection<string> GetKbList(bool IncludePrefix = false) => IncludePrefix ? _kb.ListWithPrefix : _kb.List;
+        public void SetKbList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _kb.List = value;
+
+
         private bool _today = false;
         public bool Today { get => _today; set => _today = value; }
 
@@ -267,7 +275,7 @@ namespace ToDoModel
             return list_return;
         }
 
-        private ObservableCollection<string> FindMatches(List<string> source, string substring, bool return_nonmatches = false)
+        private ObservableCollection<string> FindMatches(IList<string> source, string substring, bool return_nonmatches = false)
         {
             if (return_nonmatches)
             {

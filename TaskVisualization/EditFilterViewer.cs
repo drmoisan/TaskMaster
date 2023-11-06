@@ -16,5 +16,17 @@ namespace TaskVisualization
         {
             InitializeComponent();
         }
+
+        public List<Label> GetTips() => new List<Label>
+        {
+            this.XlCancel,
+            this.XlContext,
+            this.XlFilterName,
+            this.XlFolders,
+            this.XlOk,
+            this.XlPeople,
+            this.XlProject,
+            this.XlTopic,
+        };
     }
 }

@@ -435,7 +435,7 @@ namespace ToDoModel
             set => SetAndSave(ref _topic, value, (x) => UdfCategorySetter("TagTopic", x.AsStringNoPrefix));
         }
         private FlagTranslator LoadTopic() => new(_flags.GetTopics, _flags.SetTopics, _flags.GetTopicList, _flags.SetTopicList);
-        async private Task LoadTopicAsync() => await Task.Run(() => _context = LoadContext());
+        async private Task LoadTopicAsync() => await Task.Run(() => _topic = LoadTopic());
 
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

@@ -1011,7 +1011,7 @@ namespace ToDoModel
             TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
             // TODO: Change this into a JSON file
-            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
+            //WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath).Skip(1).ToArray();
             //strOutput[1] = SanitizeArrayLineTSV(ref strAry);
