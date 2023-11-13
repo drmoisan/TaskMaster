@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using log4net.Repository.Hierarchy;
+using System;
 
 namespace UtilitiesCS
 {
@@ -16,6 +17,9 @@ namespace UtilitiesCS
     /// </summary>
     public class SubjectMapEntry : ISubjectMapEntry
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public SubjectMapEntry() { _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern()); }
         public SubjectMapEntry(Regex tokenizerRegex) { _tokenizerRegex = tokenizerRegex; }
         public SubjectMapEntry(string emailFolder, string emailSubject, int emailSubjectCount, IList<string> commonWords, Regex tokenizerRegex)
@@ -131,6 +135,40 @@ namespace UtilitiesCS
             }
             _subjectWordLengths = _subjectTokens.Select(x => x.Length).ToArray();
             _subjectEmailCount = emailSubjectCount;
+        }
+        public bool TryRepair(bool encode)
+        {
+            try
+            {
+                Init(_folderPath, _subjectText, _subjectEmailCount);
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message);
+                return false;
+            }
+            if (!encode)
+                return true;
+
+            if (this.ReadyToEncode(false))
+            {
+                this.Encode();
+                return true;
+            }
+            else { return false; }
+        }
+        
+        public bool Validate()
+        {
+            if (_folderTokens.Length != _folderWordLengths.Length || 
+                _subjectTokens.Length != _subjectTokens.Length)
+            {
+                return TryRepair(true);
+            }
+            else
+            {
+                return true;
+            }
         }
 
         private string _folderPath;
@@ -422,6 +460,12 @@ namespace UtilitiesCS
                     return null;
                 }
             }
+        }
+
+        public bool Equals(ISubjectMapEntry other)
+        {
+            return this.EmailSubject == other.EmailSubject && 
+                this.Folderpath == other.Folderpath;
         }
     }
 }

@@ -232,13 +232,50 @@ namespace ToDoModel
 
         private static void ValidateInputs(int[] words_X, int[] wordLength_X, int[] words_Y, int[] wordLength_Y)
         {
-            if (words_X == null || wordLength_X == null || words_Y == null || wordLength_Y == null)
+            ThrowIfNull(words_X, wordLength_X, words_Y, wordLength_Y);
+            ThrowIfLengthsDiffer(words_X, wordLength_X);
+            ThrowIfLengthsDiffer(words_Y, wordLength_Y);
+        }
+
+        private static void ThrowIfNull(params object[] parameters)
+        {
+            int i = 0;
+            foreach (object parameter in parameters)
             {
-                var stackTrace = new StackTrace();
-                var callingMethod = stackTrace.GetFrame(1).GetMethod();
-                Debug.WriteLine(stackTrace.ToString());
-                throw new ArgumentNullException($"One of the parameters in {callingMethod} is null");
+                if (parameter is null)
+                {
+                    var stackTrace = new StackTrace();
+                    var frame = stackTrace.GetFrame(1);
+                    var callingMethod = frame.GetMethod();
+                    var parameterName = callingMethod.GetParameters()[i].Name;
+                    var message = $"{callingMethod.Name} received a null parameter named {parameterName}";
+                    logger.Warn(message);
+                    throw new ArgumentNullException(message);
+                }
+                i++;
             }
+        }
+
+        private static void ThrowIfLengthsDiffer(params object[] parameters)
+        {
+            var lengths = parameters.Select(x => ((Array)x).Length).ToArray();
+            var val = lengths.First();
+            for (int i = 0; i < lengths.Count(); i++)
+            {
+                if(lengths[i] != val)
+                {
+                    var stackTrace = new StackTrace();
+                    var frame = stackTrace.GetFrame(1);
+                    var callingMethod = frame.GetMethod();
+                    var parameterReferences = callingMethod.GetParameters();
+                    var message = $"{callingMethod.Name} parameter {parameterReferences[0].Name} has " +
+                        $"a length of {lengths[0]}, but parameter {parameterReferences[i].Name} has " +
+                        $"a length of {lengths[i]}. The two arrays should have the same length.";
+                    logger.Warn(message);
+                    throw new ArgumentOutOfRangeException(message);
+                }
+            }
+            
         }
 
         public static int max(params int[] values)
@@ -250,10 +287,6 @@ namespace ToDoModel
             }
             return max;
         }
-
-
-
-
 
     }
 }

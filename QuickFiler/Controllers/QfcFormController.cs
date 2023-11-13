@@ -426,8 +426,6 @@ namespace QuickFiler.Controllers
             _groups.LoadControlsAndHandlers_01(tlp, itemGroups);
         }
 
-        
-
         public void LoadItems(IList<MailItem> listObjects)
         {            
             _groups = new QfcCollectionController(AppGlobals: _globals,

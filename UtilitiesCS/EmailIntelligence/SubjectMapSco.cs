@@ -137,5 +137,15 @@ namespace UtilitiesCS
                     return base.ToList().Where(entry => entry.Folderpath == key).ToList();
             }
         }
+    
+        public bool TryRepair(SubjectMapEntry entry)
+        {
+            var idx = this.FindIndex(x => x == entry);
+            if (idx == -1) { return false;  }
+            var result = this[idx].TryRepair(true);
+            if (!result) { return false; }
+            this.Serialize();
+            return true;
+        }
     }
 }

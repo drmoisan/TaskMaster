@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using log4net.Repository.Hierarchy;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Concurrent;
@@ -9,7 +10,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
-using static ToDoModel.SuggestionsLegacy;
 
 namespace ToDoModel
 {
@@ -18,6 +18,9 @@ namespace ToDoModel
         #region constructors and private variables
 
         public Suggestions() { }
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private ScoDictionary<string, long> _folderNameScores = new();
         private static char[] _wordChars = { '&' };
@@ -160,14 +163,24 @@ namespace ToDoModel
         {
             if ((olMail.Subject is not null) && (olMail.Subject.Length > 0))
             {
-                var target = new SubjectMapEntry(emailSubject: olMail.Subject,
-                                                 emailSubjectCount: 1,
-                                                 commonWords: appGlobals.AF.CommonWords,
-                                                 tokenizerRegex: _tokenizerRegex,
-                                                 encoder: appGlobals.AF.Encoder);
-                if (!target.SubjectEncoded.SequenceEqual(new int[] { }))
+                try
                 {
-                    AddWordSequenceSuggestions(target, appGlobals, parallel);
+                    var target = new SubjectMapEntry(
+                        emailSubject: olMail.Subject,
+                        emailSubjectCount: 1,
+                        commonWords: appGlobals.AF.CommonWords,
+                        tokenizerRegex: _tokenizerRegex,
+                        encoder: appGlobals.AF.Encoder);
+
+                    if (!target.SubjectEncoded.SequenceEqual(new int[] { }))
+                    {
+                        AddWordSequenceSuggestions(target, appGlobals, parallel);
+                    }
+
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error(e.Message);
                 }
             }
         }
@@ -180,9 +193,12 @@ namespace ToDoModel
             int convCtPwr = appGlobals.AF.LngConvCtPwr;
 
             dynamic map;
-            if (parallel) { map = appGlobals.AF.SubjectMap.ToList().AsParallel(); }
-            else { map = appGlobals.AF.SubjectMap.ToList(); }
-            
+            //if (parallel) { map = appGlobals.AF.SubjectMap.ToList().AsParallel(); }
+            //else { map = appGlobals.AF.SubjectMap.ToList(); }
+            if (parallel) { map = appGlobals.AF.SubjectMap.AsParallel(); }
+            else { map = appGlobals.AF.SubjectMap; }
+
+
             var querySubject = QuerySubject(map, target, matchScore, mismatchScore, gapPenalty, convCtPwr);
             var queryFolder = QueryFolder(map, target, matchScore, mismatchScore, gapPenalty);
             var queryCombined = QueryCombined(querySubject, queryFolder);
@@ -208,18 +224,25 @@ namespace ToDoModel
                                                            int convCtPwr)
         {
             return map.AsParallel()
-                      .Where(entry => entry.SubjectEncoded is not null)
+                      .Where(entry => 
+                      {
+                          if (!entry.Validate())                          
+                              return false;                          
+                          return entry.SubjectEncoded is not null;                          
+                       })
                       .Select(entry =>
                       {
-                          int subjScore = SmithWaterman.CalculateScore(entry.SubjectEncoded,
-                                                                   entry.SubjectWordLengths,
-                                                                   target.SubjectEncoded,
-                                                                   target.SubjectWordLengths,
-                                                                   matchScore,
-                                                                   mismatchScore,
-                                                                   gapPenalty);
+                          int subjScore = SmithWaterman.CalculateScore(
+                              entry.SubjectEncoded,
+                              entry.SubjectWordLengths,
+                              target.SubjectEncoded,
+                              target.SubjectWordLengths,
+                              matchScore,
+                              mismatchScore,
+                              gapPenalty);
+
                           int subjScoreWt = (int)Math.Round(
-                                     Math.Pow(subjScore, convCtPwr) * entry.EmailSubjectCount);
+                              Math.Pow(subjScore, convCtPwr) * entry.EmailSubjectCount);
 
                           entry.Score = subjScoreWt;
                           return entry;
@@ -244,8 +267,12 @@ namespace ToDoModel
 
         {
             return map.AsParallel()
-                      .Where(entry => entry.FolderEncoded is not null)
-                      .GroupBy(entry => entry.Folderpath,
+                      .Where(entry =>
+                      {
+                          if (!entry.Validate())
+                              return false;
+                          return entry.FolderEncoded is not null;
+                      }).GroupBy(entry => entry.Folderpath,
                                entry => entry,
                                (folderpath, grouping) => new FolderScoring
                                {

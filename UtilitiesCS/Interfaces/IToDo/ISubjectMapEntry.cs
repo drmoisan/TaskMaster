@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace UtilitiesCS
@@ -8,7 +9,7 @@ namespace UtilitiesCS
     /// the emails within the folder. Each entry contains a unique combination of a folder 
     /// name and an email subject. Class is to be used in conjunction with 
     /// </summary>
-    public interface ISubjectMapEntry
+    public interface ISubjectMapEntry: IEquatable<ISubjectMapEntry>
     {
         /// <summary>
         /// String with the path of an email folder relative to the inbox
@@ -115,5 +116,9 @@ namespace UtilitiesCS
         /// <param name="throwEx">Flag to determine if returns false or throws exception</param>
         /// <returns>true or false</returns>
         bool ReadyToEncode(string[] tokens, bool throwEx);
+
+        bool TryRepair(bool encode);
+
+        bool Validate();
     }
 }

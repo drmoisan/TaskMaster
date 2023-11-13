@@ -617,13 +617,26 @@ namespace QuickFiler.Controllers
         public void WireUpAsyncKeyboardHandler()
         {
             // Treatment as char limits to 9 numbered items and 26 character items
-            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
+            //for (int i = 0; i < _itemGroups.Count && i < 10; i++)
+            //{
+            //    _kbdHandler.CharActionsAsync.Add(
+            //        "Collection",
+            //        (i + 1).ToString()[0],
+            //        (c) => ChangeByIndexAsync(int.Parse(c.ToString()) - 1));
+            //}
+            for (int i = 0; i < _itemGroups.Count; i++)
             {
-                _kbdHandler.CharActionsAsync.Add(
+                //_kbdHandler.StringActionsAsync.Add(
+                var grp = _itemGroups[i];
+                var stringAsyncAction = new KaStringAsync(
                     "Collection",
-                    (i + 1).ToString()[0],
-                    (c) => ChangeByIndexAsync(int.Parse(c.ToString()) - 1));
+                    (i + 1).ToString(),
+                    (s) => ChangeByIndexAsync(int.Parse(s) - 1),
+                    //(s) => grp.ItemViewer.LblItemNumber.Text = s,
+                    null,null);
+                _kbdHandler.StringActionsAsync.Add(stringAsyncAction);
             }
+
             _kbdHandler.KeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
                 new List<KaKeyAsync>
                 {

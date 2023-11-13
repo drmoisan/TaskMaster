@@ -53,6 +53,12 @@ namespace QuickFiler.Controllers
         private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _keyActionsAsync = [];
         public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> KeyActionsAsync { get => _keyActionsAsync; set => _keyActionsAsync = value; }
 
+        private StringBuilder _filterBuilder = new StringBuilder();
+        public void ClearFilter() => _filterBuilder = new StringBuilder();
+
+        private KbdActions<string, KaStringAsync, Func<string, Task>> _stringActionsAsync = [];
+        public KbdActions<string, KaStringAsync, Func<string, Task>> StringActionsAsync { get => _stringActionsAsync; set => _stringActionsAsync = value; }
+
         public bool KbdActive
         {
             get => _kbdActive;
@@ -94,6 +100,7 @@ namespace QuickFiler.Controllers
                     e.Handled = true;
                     CharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
                 }
+             
             }
         }
 
@@ -120,6 +127,31 @@ namespace QuickFiler.Controllers
                     e.Handled = true;
                     await CharActionsAsync[(char)e.KeyValue]((char)e.KeyValue);
                 }
+                else if (StringActionsAsync != null)
+                {
+                    _filterBuilder.Append(char.ToLower((char)e.KeyValue));
+                    if (StringActionsAsync.ContainsKey(_filterBuilder.ToString()))
+                    {
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+
+                        if (_filterBuilder.Length ==1)
+                            StringActionsAsync.ForEach(x => x.Activated = true);
+                        var actions = StringActionsAsync.FilterKeys(_filterBuilder.ToString());
+                        if (actions.Length == 0)
+                            _filterBuilder.Length = 0;
+                        else if (actions.Length == 1)
+                        {
+                            var keyName = actions[0].Key;
+                            await StringActionsAsync[keyName](keyName);
+                            _filterBuilder.Length = 0;
+                        }
+                    }
+                    else
+                    {
+                        _filterBuilder.Length--;
+                    }
+                } 
             }
         }
 
@@ -443,217 +475,5 @@ namespace QuickFiler.Controllers
             }
         }
 
-    }
-
-    public class KbdActions<T, U, V> : IEnumerable<U> where U : IKbdAction<T,V>, new()
-    {
-        public KbdActions() 
-        {
-            _list = new ConcurrentObservableCollection<U>();
-        }
-        
-        public KbdActions(IEnumerable<U> list)
-        {
-            _list = new ConcurrentObservableCollection<U>(list);
-        }
-
-        private ConcurrentObservableCollection<U> _list = new();
-
-        public V this[T key]
-        {
-            get => this.Find(key).Delegate;
-
-            set
-            {
-                var element = this.Find(key);
-                if (element is not null)
-                {
-                    element.Delegate = value;
-                }
-            }
-        }
-
-        public bool ContainsKey(T key) => _list.Any(x => x.KeyEquals(key));
-
-        public U Find(T key)
-        {
-            var matches = _list.Where(x => x.KeyEquals(key));
-            var count = matches.Count();
-            switch (count)
-            {
-                case 0:
-                    return default(U);
-                case 1:
-                    return matches.First();
-                default:
-                    var message = $"Multiple sources have registered actions for Key {key}. SourceId list ";
-                    message += $"[{matches.Select(x => x.SourceId).SentenceJoin()}]";
-                    throw new InvalidOperationException(message);
-            }
-        }
-
-        public int FindIndex(T key)
-        {
-            var matches = _list.Where(x => x.KeyEquals(key));
-            var count = matches.Count();
-            switch (count)
-            {
-                case 0:
-                    return -1;
-                case 1:
-                    return _list.FindIndex(x => x.KeyEquals(key));
-                default:
-                    var message = $"Multiple sources have registered actions for Key {key}. SourceId list ";
-                    message += $"[{matches.Select(x => x.SourceId).SentenceJoin()}]";
-                    throw new InvalidOperationException(message);
-            }
-        }
-
-        public void Add(string sourceId, T key, V @delegate)
-        {
-            if (_list.Any(x => x.SourceId == sourceId && x.KeyEquals(key)))
-            {
-                string message = $"Cannot add key because it already exists. Key {key} SourceId {sourceId}";
-                throw new ArgumentException(message);
-            }
-            U instance = new();
-            instance.SourceId = sourceId;
-            instance.Key = key;
-            instance.Delegate = @delegate;
-            _list.Add(instance);
-        }
-
-        public void Add(U instance)
-        {
-            if (_list.Any(x => x.SourceId == instance.SourceId && x.KeyEquals(instance.Key)))
-            {
-                string message = $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";
-                throw new ArgumentException(message);
-            }
-            _list.Add(instance);
-        }
-
-        public bool Remove(string sourceId, T key)
-        {
-            var index = _list.FindIndex(x => x.SourceId == sourceId && x.KeyEquals(key));
-            if (index == -1) { return false; }
-            else
-            {
-                _list.RemoveAt(index);
-                return true;
-            }
-        }
-
-        public IEnumerator<U> GetEnumerator() => _list.GetEnumerator();
-        
-        IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
-        
-        public ICollection<T> Keys { get => _list.Select(x => x.Key).ToList(); }
-    }
-
-    public interface IKbdAction<T, U>
-    {
-        string SourceId { get; set; }
-        T Key { get; set; }
-        U Delegate { get; set; }
-        bool KeyEquals(T other);
-        //Type DelegateType { get; }
-    }
-
-    public class KaKey: IKbdAction<Keys, Action<Keys>>
-    {
-        public KaKey() { }
-
-        public KaKey(string sourceId, Keys key, Action<Keys> action)
-        {
-            SourceId = sourceId;
-            Key = key;
-            Delegate = action;
-        }
-        
-        private string _sourceId;
-        public string SourceId { get => _sourceId; set => _sourceId = value; }
-        
-        private Keys _key;
-        public Keys Key { get => _key; set => _key = value; }
-        
-        private Action<Keys> _action;
-        public Action<Keys> Delegate { get => _action; set => _action = value; }
-
-        public Type DelegateType { get => typeof(Action<Keys>); }
-
-        public bool KeyEquals(Keys other) => Key == other;
-        
-    }
-
-    public class KaKeyAsync: IKbdAction<Keys, Func<Keys, Task>>
-    {
-        public KaKeyAsync() { }
-        
-        public KaKeyAsync(string sourceId, Keys key, Func<Keys, Task> function)
-        {
-            SourceId = sourceId;
-            Key = key;
-            Delegate = function;
-        }
-
-        private string _sourceId;
-        public string SourceId { get => _sourceId; set => _sourceId = value; }
-
-        private Keys _key;
-        public Keys Key { get => _key; set => _key = value; }
-
-        private Func<Keys, Task> _function;
-        public Func<Keys, Task> Delegate { get => _function; set => _function = value; }
-
-        public bool KeyEquals(Keys other) => Key == other;
-    }
-
-    public class KaChar: IKbdAction<char, Action<char>>
-    {
-        public KaChar() { }
-
-        public KaChar(string sourceId, char key, Action<char> action)
-        {
-            SourceId = sourceId;
-            Key = key;
-            Delegate = action;
-        }
-
-        private string _sourceId;
-        public string SourceId { get => _sourceId; set => _sourceId = value; }
-
-        private char _key;
-        public char Key { get => _key; set => _key = value; }
-
-        private Action<char> _action;
-        public Action<char> Delegate { get => _action; set => _action = value; }
-
-        public Type DelegateType { get => typeof(Action<Keys>); }
-
-        public bool KeyEquals(char other) => Key == other;
-    }
-
-    public class KaCharAsync: IKbdAction<char, Func<char, Task>>
-    {
-        public KaCharAsync() { }
-
-        public KaCharAsync(string sourceId, char key, Func<char, Task> function)
-        {
-            SourceId = sourceId;
-            Key = key;
-            Delegate = function;
-        }
-
-        private string _sourceId;
-        public string SourceId { get => _sourceId; set => _sourceId = value; }
-
-        private char _key;
-        public char Key { get => _key; set => _key = value; }
-
-        private Func<char, Task> _function;
-        public Func<char, Task> Delegate { get => _function; set => _function = value; }
-
-        public bool KeyEquals(char other) => Key == other;
-    }
+    }    
 }
