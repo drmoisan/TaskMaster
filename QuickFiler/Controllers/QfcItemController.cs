@@ -35,10 +35,11 @@ namespace QuickFiler.Controllers
                                  IQfcCollectionController parent,
                                  ItemViewer itemViewer,
                                  int viewerPosition,
+                                 int itemNumberDigits,
                                  MailItem mailItem)
         {
             //Initialize(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem, async: true);
-            SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem);
+            SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem);
         }
 
         public QfcItemController(IApplicationGlobals AppGlobals,
@@ -46,11 +47,12 @@ namespace QuickFiler.Controllers
                                  IQfcCollectionController parent,
                                  ItemViewer itemViewer,
                                  int viewerPosition,
+                                 int itemNumberDigits,
                                  MailItem mailItem,
                                  bool async)
         {
             //Initialize(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem, async);
-            SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem);
+            SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem);
         }
 
         private void Initialize(IApplicationGlobals AppGlobals,
@@ -58,10 +60,11 @@ namespace QuickFiler.Controllers
                                 IQfcCollectionController parent,
                                 ItemViewer itemViewer,
                                 int viewerPosition,
+                                int itemNumberDigits,
                                 MailItem mailItem,
                                 bool async)
         {
-            SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem);
+            SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem);
 
             Initialize(async);
         }
@@ -141,15 +144,23 @@ namespace QuickFiler.Controllers
 
         }
 
-        internal void SaveParameters(IApplicationGlobals AppGlobals, IFilerHomeController homeController, IQfcCollectionController parent, ItemViewer itemViewer, int viewerPosition, MailItem mailItem)
+        internal void SaveParameters(
+            IApplicationGlobals AppGlobals,
+            IFilerHomeController homeController,
+            IQfcCollectionController parent,
+            ItemViewer itemViewer,
+            int viewerPosition,
+            int itemNumberDigits,
+            MailItem mailItem)
         {
             // Save parameters to private fields
             _globals = AppGlobals;
             _homeController = homeController;
             _parent = parent;
             _itemViewer = itemViewer;
-            _itemNumber = viewerPosition;
             _mailItem = mailItem;
+            _itemNumberDigits = itemNumberDigits;
+            ItemNumber = viewerPosition;
 
             // Set references to other controllers
             _itemViewer.Controller = this;
@@ -159,34 +170,38 @@ namespace QuickFiler.Controllers
             _tokenSource = _homeController.TokenSource;
         }
 
-        public static async Task<QfcItemController> CreateAsync(IApplicationGlobals AppGlobals,
-                                                                IFilerHomeController homeController,
-                                                                IQfcCollectionController parent,
-                                                                ItemViewer itemViewer,
-                                                                int viewerPosition,
-                                                                MailItem mailItem,
-                                                                CancellationToken token)
+        public static async Task<QfcItemController> CreateAsync(
+            IApplicationGlobals AppGlobals,
+            IFilerHomeController homeController,
+            IQfcCollectionController parent,
+            ItemViewer itemViewer,
+            int viewerPosition,
+            int itemNumberDigits,
+            MailItem mailItem,
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
             var controller = new QfcItemController();
-            controller.SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem);
+            controller.SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem);
             await controller.InitializeAsync();
             return controller;
         }
 
-        public static async Task<QfcItemController> CreateSequentialAsync(IApplicationGlobals AppGlobals,
-                                                                IFilerHomeController homeController,
-                                                                IQfcCollectionController parent,
-                                                                ItemViewer itemViewer,
-                                                                int viewerPosition,
-                                                                MailItem mailItem,
-                                                                CancellationToken token)
+        public static async Task<QfcItemController> CreateSequentialAsync(
+            IApplicationGlobals AppGlobals,
+            IFilerHomeController homeController,
+            IQfcCollectionController parent,
+            ItemViewer itemViewer,
+            int viewerPosition,
+            int itemNumberDigits,
+            MailItem mailItem,
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
             var controller = new QfcItemController();
-            controller.SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, mailItem);
+            controller.SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem);
             await controller.InitializeSequentialAsync();
             return controller;
         }
@@ -231,13 +246,6 @@ namespace QuickFiler.Controllers
 
             // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
             CoreWebView2EnvironmentOptions options = new("–incognito ");
-
-            //await UIThreadExtensions.UiDispatcher.InvokeAsync(async () => 
-            //{
-            //    _webViewEnvironment = await CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
-            //    _token.ThrowIfCancellationRequested();
-            //    await _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
-            //}, System.Windows.Threading.DispatcherPriority.Background, _token);
 
             // Switch to UI Thread
             await _itemViewer.UiSyncContext;
@@ -589,10 +597,35 @@ namespace QuickFiler.Controllers
             set
             {
                 _itemNumber = value;
-                _itemViewer.LblItemNumber.Text = _itemNumber.ToString();
+                if (ItemNumberDigits == 1)
+                {
+                    _itemViewer.LblItemNumber.Text = _itemNumber.ToString();
+                }
+                else
+                {
+                    _itemViewer.LblItemNumber.Text = _itemNumber.ToString("00");
+                }
             }
         }
         public int ItemIndex { get => ItemNumber - 1; set => _itemNumber = value + 1; }
+
+        private int _itemNumberDigits = 1;
+        public int ItemNumberDigits 
+        { 
+            get => _itemNumberDigits;
+            set 
+            { 
+                _itemNumberDigits = value; 
+                if (value == 1)
+                {
+                    _itemViewer.LblItemNumber.Text = _itemNumber.ToString();
+                }
+                else
+                {
+                    _itemViewer.LblItemNumber.Text = _itemNumber.ToString("00");
+                }
+            }
+        }
 
         private string _selectedFolder;
         public string SelectedFolder { get => _selectedFolder; }

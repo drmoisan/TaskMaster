@@ -351,16 +351,42 @@ namespace QuickFiler.Controllers
             SortEmail.Undo(_movedItems, _globals.Ol.App);
         }
 
-        public void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
+        public async void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
         {
-            var count = (int)_formViewer.L1v1L2h5_SpnEmailPerLoad.Value;
-            if (count != _itemsPerIteration && count > 0)
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+
+            while (!_parent.WorkerComplete)
             {
-                ref TableLayoutPanel tlp = ref _formViewer.L1v0L2L3v_TableLayout;
-                AdjustTlp(_formViewer.L1v0L2L3v_TableLayout, count);
-                AdjustTlp(_qfcQueue.TlpTemplate, count);
-                _itemsPerIteration = count;
+                await Task.Delay(100);
             }
+                        
+            var count = (int)_formViewer.L1v1L2h5_SpnEmailPerLoad.Value;
+            switch (count)
+            {
+                case int n when n == _itemsPerIteration:
+                    // group actions for count equal to _itemsPerIteration. Do nothing.
+                    break;
+                case int n when n > _itemsPerIteration:
+                    // group actions for count greater than _itemsPerIteration
+                    _groups.UnregisterNavigation();
+                    await _qfcQueue.ChangeIterationSize(
+                        (_formViewer.L1v0L2L3v_TableLayout, _groups.ItemGroups), count, _rowStyleTemplate);
+                    _groups.RegisterNavigation();
+                    _itemsPerIteration = count;
+                    break;
+                case int n when n > 0:
+                    // group actions for count less than _itemsPerIteration but greater than 0
+                    break;
+                default:
+                    // group actions for count less than or equal to 0
+                    // invalid value. maintain current setting.
+                    _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = _itemsPerIteration;
+                    break;
+            }
+            
+
+            
         }
 
         internal void AdjustTlp(TableLayoutPanel tlp, int newCount)

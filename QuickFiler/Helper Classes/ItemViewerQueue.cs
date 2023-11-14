@@ -24,16 +24,8 @@ namespace QuickFiler
                     () =>
                     {
                         _queue.Enqueue(new ItemViewer());
-                        //logger.Debug($"Enqueued {_queue.Count}");
                     },
                     System.Windows.Threading.DispatcherPriority.ContextIdle);
-                
-                // IdleActionQueue implementation
-                //IdleActionQueue.AddEntry(() =>
-                //{
-                //    _queue.Enqueue(new ItemViewer());
-                //    //logger.Debug($"Enqueued {_queue.Count}");
-                //});
             }
         }
 

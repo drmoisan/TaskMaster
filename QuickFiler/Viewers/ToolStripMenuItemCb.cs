@@ -53,7 +53,7 @@ namespace QuickFiler.Viewers
                 Checked = !Checked;
         }
 
-        public new event EventHandler Click;
+        //public new event EventHandler Click;
 
         private bool _checkOnClick;
         public new bool CheckOnClick 

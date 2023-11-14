@@ -20,6 +20,8 @@ namespace UtilitiesCS
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        #region Constructors and Initializers
+
         public SubjectMapEntry() { _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern()); }
         public SubjectMapEntry(Regex tokenizerRegex) { _tokenizerRegex = tokenizerRegex; }
         public SubjectMapEntry(string emailFolder, string emailSubject, int emailSubjectCount, IList<string> commonWords, Regex tokenizerRegex)
@@ -136,56 +138,14 @@ namespace UtilitiesCS
             _subjectWordLengths = _subjectTokens.Select(x => x.Length).ToArray();
             _subjectEmailCount = emailSubjectCount;
         }
-        public bool TryRepair(bool encode)
-        {
-            try
-            {
-                Init(_folderPath, _subjectText, _subjectEmailCount);
-            }
-            catch (System.Exception e)
-            {
-                logger.Error(e.Message);
-                return false;
-            }
-            if (!encode)
-                return true;
 
-            if (this.ReadyToEncode(false))
-            {
-                this.Encode();
-                return true;
-            }
-            else { return false; }
-        }
-        
-        public bool Validate()
-        {
-            if (_folderTokens.Length != _folderWordLengths.Length || 
-                _subjectTokens.Length != _subjectTokens.Length)
-            {
-                return TryRepair(true);
-            }
-            else
-            {
-                return true;
-            }
-        }
+        #endregion Constructors and Initializers
+                
+        #region Public Properties
 
-        private string _folderPath;
-        private string _folderName;
-        private string[] _folderTokens;
-        private int[] _folderEncoded;
-        private int[] _folderWordLengths;
-        private string _subjectText;
-        private int _subjectEmailCount;
-        private string[] _subjectTokens;
-        private int[] _subjectEncoded;
-        private int[] _subjectWordLengths;  
-        private int _score = 0;
+        [JsonIgnore]
+        public IList<string> CommonWords { get => _commonWords; set => _commonWords = value; }
         private IList<string> _commonWords;
-        private ISubjectMapEncoder _encoder;
-        private Regex _tokenizerRegex;
-        private char[] _wordChars = { '&' };
 
         public string Folderpath 
         { 
@@ -213,8 +173,10 @@ namespace UtilitiesCS
                 }
             }
         }
+        private string _folderPath;
         
         public string Foldername { get => _folderName; }
+        private string _folderName;
         
         public string EmailSubject 
         { 
@@ -250,10 +212,26 @@ namespace UtilitiesCS
                 }
             } 
         }
+        private string _subjectText;
         
         public int EmailSubjectCount { get => _subjectEmailCount; set => _subjectEmailCount = value; }
+        private int _subjectEmailCount;
+
+        [JsonIgnore]
+        public ISubjectMapEncoder Encoder 
+        { 
+            get => _encoder;
+            set 
+            { 
+                _encoder = value;
+                if (ReadyToEncode(throwEx: false))
+                    this.Encode();
+            }
+        }
+        private ISubjectMapEncoder _encoder;
         
         public int[] FolderWordLengths { get => _folderWordLengths; set => _folderWordLengths = value; }
+        private int[] _folderWordLengths;
 
         public int[] FolderEncoded 
         {
@@ -286,6 +264,11 @@ namespace UtilitiesCS
                 _folderEncoded = value;
             }
         }
+        private int[] _folderEncoded;
+
+        [JsonIgnore]
+        public int Score { get => _score; set => _score = value; }
+        private int _score = 0;
 
         public int[] SubjectEncoded 
         {
@@ -318,84 +301,21 @@ namespace UtilitiesCS
                 _subjectEncoded = value; 
             } 
         }
+        private int[] _subjectEncoded;
         
         public int[] SubjectWordLengths { get => _subjectWordLengths; set => _subjectWordLengths = value; }
+        private int[] _subjectWordLengths;  
+                        
+        public Regex TokenizerRegex { get => _tokenizerRegex; set => _tokenizerRegex = value; }
+        private Regex _tokenizerRegex;
 
-        [JsonIgnore]
-        public int Score { get => _score; set => _score = value; }
+        #endregion Public Properties
 
-        [JsonIgnore]
-        public ISubjectMapEncoder Encoder 
-        { 
-            get => _encoder;
-            set 
-            { 
-                _encoder = value;
-                if (ReadyToEncode(throwEx: false))
-                    this.Encode();
-            }
-        }
+        private string[] _folderTokens;
+        private string[] _subjectTokens;
+        private char[] _wordChars = { '&' };
 
-        public bool ReadyToEncode(ISubjectMapEncoder encoder)
-        {
-            _encoder = encoder;
-            return ReadyToEncode(true);
-        }
-
-        public bool ReadyToEncode(bool throwEx)
-        {
-            if (IsNull(_encoder, nameof(_encoder), throwEx)) return false;
-            
-            string[] tokens = TokensToEncode(throwEx);
-
-            if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0) return false;
-            
-            _encoder.AugmentTokenDict(tokens); 
-            
-            return true;
-        }
-
-        public bool ReadyToEncode(string[] tokens, bool throwEx)
-        {
-            if (IsNull(_encoder, nameof(_encoder), throwEx)) { return false; }
-
-            //if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0) { return false; }
-            if (IsNull(tokens, nameof(tokens), throwEx)) { return false; }
-
-            _encoder.AugmentTokenDict(tokens);
-
-            return true;
-        }
-
-        public void SetCommonWords(IList<string> commonWords) => _commonWords = commonWords;
-
-        internal bool IsNull(object value, string name, bool throwEx)
-        {
-            if (value is null)
-            {
-                if (!throwEx) { return true; }
-                else { throw new System.ArgumentNullException(name, $"{name} is null or has not been initialized"); }
-            }
-            return false;
-        }
-
-        internal string[] TokensToEncode(bool throwEx)
-        {
-            if ((_folderTokens is null) || (_folderTokens.Length == 0)) 
-            {
-                if (throwEx)
-                {
-                    throw new System.ArgumentNullException(
-                        nameof(_folderTokens), $"{nameof(_folderTokens)} is null or empty");
-                }
-                else 
-                { 
-                    return null; 
-                }
-            }
-            else if ((_subjectTokens is null) || (_subjectTokens.Length == 0)) { return _folderTokens; }
-            else { return _folderTokens.Union(_subjectTokens).ToArray(); }
-        }
+        #region Public and Internal Methods
 
         internal void Encode()
         {
@@ -467,5 +387,102 @@ namespace UtilitiesCS
             return this.EmailSubject == other.EmailSubject && 
                 this.Folderpath == other.Folderpath;
         }
+
+        public bool ReadyToEncode(ISubjectMapEncoder encoder)
+        {
+            _encoder = encoder;
+            return ReadyToEncode(true);
+        }
+
+        public bool ReadyToEncode(bool throwEx)
+        {
+            if (IsNull(_encoder, nameof(_encoder), throwEx)) return false;
+            
+            string[] tokens = TokensToEncode(throwEx);
+
+            if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0) return false;
+            
+            _encoder.AugmentTokenDict(tokens); 
+            
+            return true;
+        }
+
+        public bool ReadyToEncode(string[] tokens, bool throwEx)
+        {
+            if (IsNull(_encoder, nameof(_encoder), throwEx)) { return false; }
+
+            //if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0) { return false; }
+            if (IsNull(tokens, nameof(tokens), throwEx)) { return false; }
+
+            _encoder.AugmentTokenDict(tokens);
+
+            return true;
+        }
+
+        internal bool IsNull(object value, string name, bool throwEx)
+        {
+            if (value is null)
+            {
+                if (!throwEx) { return true; }
+                else { throw new System.ArgumentNullException(name, $"{name} is null or has not been initialized"); }
+            }
+            return false;
+        }
+
+        internal string[] TokensToEncode(bool throwEx)
+        {
+            if ((_folderTokens is null) || (_folderTokens.Length == 0)) 
+            {
+                if (throwEx)
+                {
+                    throw new System.ArgumentNullException(
+                        nameof(_folderTokens), $"{nameof(_folderTokens)} is null or empty");
+                }
+                else 
+                { 
+                    return null; 
+                }
+            }
+            else if ((_subjectTokens is null) || (_subjectTokens.Length == 0)) { return _folderTokens; }
+            else { return _folderTokens.Union(_subjectTokens).ToArray(); }
+        }
+
+        public bool TryRepair(bool encode)
+        {
+            try
+            {
+                Init(_folderPath, _subjectText, _subjectEmailCount);
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message);
+                return false;
+            }
+            if (!encode)
+                return true;
+
+            if (this.ReadyToEncode(false))
+            {
+                this.Encode();
+                return true;
+            }
+            else { return false; }
+        }
+
+        public bool Validate()
+        {
+            if (_folderTokens.Length != _folderWordLengths.Length ||
+                _subjectTokens.Length != _subjectTokens.Length)
+            {
+                return TryRepair(true);
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        #endregion Public and Internal Methods
+
     }
 }

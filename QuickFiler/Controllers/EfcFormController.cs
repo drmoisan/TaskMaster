@@ -257,51 +257,58 @@ namespace QuickFiler.Controllers
                
         async public void ButtonCancel_Click(object sender, EventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+
             await ActionCancelAsync();
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+
             await ActionOkAsync();
         }
 
         async public void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            //_dataModel.RefreshSuggestions();
-            //_formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
-            //if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            
             await RefreshSuggestionsAsync();
         }
 
         async public void ButtonCreate_Click(object sender, EventArgs e)
         {
-            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(async () => 
-            { 
-                if (!IsValidSelection)
+            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
+                        
+            if (!IsValidSelection)
+            {
+                MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
+            }
+            else 
+            {
+                var folder = await _dataModel.FolderHandler.CreateFolderAsync(SelectedFolder,
+                                                                                _globals.Ol.ArchiveRootPath,
+                                                                                _globals.FS.FldrRoot,
+                                                                                Token);
+                if (folder is not null)
                 {
-                    MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
+                    await _dataModel.MoveToFolder(folder,
+                                                    _globals.Ol.ArchiveRootPath,
+                                                    SaveAttachments,
+                                                    SaveEmail,
+                                                    SavePictures,
+                                                    MoveConversation);
+                    _formViewer.Close();
+                    Cleanup();
                 }
-                else 
-                {
-                    var folder = await _dataModel.FolderHandler.CreateFolderAsync(SelectedFolder,
-                                                                                  _globals.Ol.ArchiveRootPath,
-                                                                                  _globals.FS.FldrRoot,
-                                                                                  Token);
-                    if (folder is not null)
-                    {
-                        await _dataModel.MoveToFolder(folder,
-                                                      _globals.Ol.ArchiveRootPath,
-                                                      SaveAttachments,
-                                                      SaveEmail,
-                                                      SavePictures,
-                                                      MoveConversation);
-                        _formViewer.Close();
-                        Cleanup();
-                    }
-                }
-            });
+            }
+            
         }
 
         async public void ButtonDelete_Click(object sender, EventArgs e)
@@ -481,12 +488,9 @@ namespace QuickFiler.Controllers
         async public Task RefreshSuggestionsAsync()
         {
             await Task.Run(() => _dataModel.RefreshSuggestions(), Token);
-            //await TaskPriority.Run(PriorityScheduler.AboveNormal, ()=> _dataModel.RefreshSuggestions());
             var matches = await Task.Run(() => _dataModel.FindMatches(_formViewer.SearchText.Text), Token);
-            //var matches = await TaskPriority<string[]>.Run(
-            //    PriorityScheduler.AboveNormal, ()=> _dataModel.FindMatches(_formViewer.SearchText.Text));
             
-            await _formViewer.UiSyncContext;
+            
             _formViewer.FolderListBox.DataSource = matches;
             if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }

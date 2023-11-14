@@ -56,7 +56,6 @@ namespace QuickFiler.Controllers
         private TableLayoutPanel _itemTlp;
         private TableLayoutPanel _itemTlpToMove;
         private TableLayoutPanel _templateTlp;
-        private List<QfcItemGroup> _itemGroups;
         private List<QfcItemGroup> _itemGroupsToMove;
         private bool _darkMode;
         private RowStyle _template;
@@ -142,6 +141,9 @@ namespace QuickFiler.Controllers
             return originalState;
         }
 
+        private List<QfcItemGroup> _itemGroups;
+        internal List<QfcItemGroup> ItemGroups { get => _itemGroups; }
+
         #endregion
 
         #region UI Add and Remove QfcItems
@@ -165,7 +167,7 @@ namespace QuickFiler.Controllers
             _templateExpanded = templateExpanded;
 
             // Save the TLP template
-            CaptureTlpTemplate();
+            //CaptureTlpTemplate();
 
             LoadItemGroupsAndViewers_02(listMailItems, template);
 
@@ -191,9 +193,10 @@ namespace QuickFiler.Controllers
             _template = template;
             _templateExpanded = templateExpanded;
             
+            // Repeat calls. Was first called by QfcFormController
             // Prep the TLP
-            TableLayoutHelper.InsertSpecificRow(_itemTlp, 0, template, listMailItems.Count);
-            CaptureTlpTemplate();
+            //TableLayoutHelper.InsertSpecificRow(_itemTlp, 0, template, listMailItems.Count);
+            //CaptureTlpTemplate();
 
             // Load the Item Viewers, Item Controllers, and Initialize
             await LoadGroups_02b(listMailItems, template);
@@ -214,8 +217,10 @@ namespace QuickFiler.Controllers
 
             _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
-            
-            var grpTasks = items.Select((mailItem, i) => LoadGroup_03b(template, mailItem, i)).ToList();
+
+            var digits = items.Count >= 10 ? 2 : 1;
+
+            var grpTasks = items.Select((mailItem, i) => LoadGroup_03b(template, mailItem, i, digits)).ToList();
 
             await Task.WhenAll(grpTasks);
 
@@ -235,7 +240,7 @@ namespace QuickFiler.Controllers
 
         //}
 
-        private Task<QfcItemGroup> LoadGroup_03b(RowStyle template, MailItem mailItem, int i)
+        private Task<QfcItemGroup> LoadGroup_03b(RowStyle template, MailItem mailItem, int i, int digits)
         {   
             var ui = TaskScheduler.FromCurrentSynchronizationContext();
 
@@ -250,7 +255,7 @@ namespace QuickFiler.Controllers
             {
                 var grp = x.Result;
                 grp.ItemController = await QfcItemController.CreateSequentialAsync(
-                    _globals, _homeController, this, grp.ItemViewer, i + 1, grp.MailItem, Token);
+                    _globals, _homeController, this, grp.ItemViewer, i + 1, digits, grp.MailItem, Token);
                 return grp;
             }, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui).Unwrap();
             
@@ -267,12 +272,12 @@ namespace QuickFiler.Controllers
             return grpTask3;
         }
 
-        private async ValueTask<QfcItemGroup> LoadGroup_03(RowStyle template, MailItem mailItem, int i)
+        private async ValueTask<QfcItemGroup> LoadGroup_03(RowStyle template, MailItem mailItem, int i, int digits)
         {
             var grp = new QfcItemGroup(mailItem);
             grp.ItemViewer = LoadItemViewer_03(i, template, true);
             grp.ItemController = await QfcItemController.CreateSequentialAsync(_globals,
-                _homeController, this, grp.ItemViewer, i + 1, grp.MailItem, Token);
+                _homeController, this, grp.ItemViewer, i + 1, digits, grp.MailItem, Token);
             grp.ItemController.PopulateFolderComboBox();
             if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
             else { grp.ItemController.SetThemeLight(async: true); }
@@ -312,6 +317,7 @@ namespace QuickFiler.Controllers
                                                                                   parent: this,
                                                                                   itemViewer: x.grp.ItemViewer,
                                                                                   viewerPosition: x.i + 1,
+                                                                                  itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
                                                                                   x.grp.MailItem);
                                      var tasks = new List<Task>
                                      {
@@ -333,6 +339,7 @@ namespace QuickFiler.Controllers
                                                            parent: this,
                                                            itemViewer: grp.ItemViewer,
                                                            viewerPosition: ++i,
+                                                           itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
                                                            grp.MailItem);
                 grp.ItemController.Initialize(false);
                 grp.ItemController.PopulateConversation();
@@ -353,6 +360,7 @@ namespace QuickFiler.Controllers
                                                                                   parent: this,
                                                                                   itemViewer: x.grp.ItemViewer,
                                                                                   viewerPosition: x.i + 1,
+                                                                                  itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
                                                                                   x.grp.MailItem);
                                      var tasks = new List<Task>
                                      {
@@ -381,11 +389,15 @@ namespace QuickFiler.Controllers
 
         internal void SwapItemGroups(List<QfcItemGroup> itemGroups)
         {
+            UnregisterNavigation();
+            
             // Cache current item groups to process in background
             _itemGroupsToMove = _itemGroups;
 
             // Replace current item groups with new item groups to process
             _itemGroups = itemGroups;
+
+            RegisterNavigation();
         }
 
         public void CacheMoveObjects()
@@ -441,7 +453,7 @@ namespace QuickFiler.Controllers
 
             // Remove the group from the form
             await RemoveSpecificControlGroupAsync(selection);
-
+            
             var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
             await popOutForm.RunAsync();
         }
@@ -548,6 +560,8 @@ namespace QuickFiler.Controllers
 
         public async Task RemoveSpecificControlGroupAsync(int selection)
         {
+            UnregisterNavigation();
+            
             // If the group is active, turn off the active item and select a new item
             bool activeUI = _itemGroups[selection - 1].ItemController.IsActiveUI;
             bool expanded = _itemGroups[selection - 1].ItemController.IsExpanded;
@@ -592,9 +606,9 @@ namespace QuickFiler.Controllers
                 ResetPanelHeight();
                 if (_itemGroups.Count == 0) { _parent.ActionOkAsync(); }
             });
-
+            RegisterNavigation();
         }
-
+        
         public void WireUpKeyboardHandler()
         {
             // Treatment as char limits to 9 numbered items and 26 character items
@@ -616,34 +630,65 @@ namespace QuickFiler.Controllers
 
         public void WireUpAsyncKeyboardHandler()
         {
-            // Treatment as char limits to 9 numbered items and 26 character items
-            //for (int i = 0; i < _itemGroups.Count && i < 10; i++)
-            //{
-            //    _kbdHandler.CharActionsAsync.Add(
-            //        "Collection",
-            //        (i + 1).ToString()[0],
-            //        (c) => ChangeByIndexAsync(int.Parse(c.ToString()) - 1));
-            //}
-            for (int i = 0; i < _itemGroups.Count; i++)
-            {
-                //_kbdHandler.StringActionsAsync.Add(
-                var grp = _itemGroups[i];
-                var stringAsyncAction = new KaStringAsync(
-                    "Collection",
-                    (i + 1).ToString(),
-                    (s) => ChangeByIndexAsync(int.Parse(s) - 1),
-                    //(s) => grp.ItemViewer.LblItemNumber.Text = s,
-                    null,null);
-                _kbdHandler.StringActionsAsync.Add(stringAsyncAction);
-            }
+            RegisterNavigation();
+            _kbdHandler.KeyActionsAsync = GenerateKeyAsyncActions();
+        }
 
-            _kbdHandler.KeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
-                new List<KaKeyAsync>
-                {
+        internal KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> GenerateKeyAsyncActions()
+        {
+            var keyActions = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
+                               new List<KaKeyAsync>
+                               {
                     new KaKeyAsync("Collection", Keys.Up, (k) => SelectPreviousItemAsync()),
                     new KaKeyAsync("Collection", Keys.Down, (k) => SelectNextItemAsync()),
                     new KaKeyAsync("Collection", Keys.Return, (k) => _parent.ActionOkAsync())
                 });
+            return keyActions;
+        }
+
+        internal void RegisterNavigation()
+        {
+            for (int i = 0; i < _itemGroups.Count; i++)
+            {
+                RegisterNavigationAsyncAction(i, _itemGroups.Count >= 10 ? 2: 1);
+            }
+        }
+
+        internal void UnregisterNavigation()
+        {
+            var digits = _itemGroups.Count >= 10 ? 2 : 1;
+            for (int i = 0; i < _itemGroups.Count; i++)
+            {
+                if (digits == 1)
+                {
+                    _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString());
+                }
+                else
+                {
+                    _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString("00"));
+                }
+            }
+        }
+
+        internal void RegisterNavigationAsyncAction(int itemIndex, int digits)
+        {
+            _kbdHandler.StringActionsAsync.Add(GenerateStringKbdAction(itemIndex, digits));
+        }
+        
+        internal KaStringAsync GenerateStringKbdAction(int i, int digits)
+        {
+            var grp = _itemGroups[i];
+            string key = "";
+            if (digits == 1) { key = (i + 1).ToString(); }
+            else if (digits == 2) { key = (i + 1).ToString("00"); }
+
+            var stringAsyncAction = new KaStringAsync(
+                "Collection",
+                key,
+                (s) => ChangeByIndexAsync(int.Parse(s) - 1),
+                //(s) => grp.ItemViewer.LblItemNumber.Text = s,
+                null, null);
+            return stringAsyncAction;
         }
 
 
@@ -1077,6 +1122,7 @@ namespace QuickFiler.Controllers
                                                            parent: this,
                                                            itemViewer: grp.ItemViewer,
                                                            viewerPosition: i + insertionIndex + 1,
+                                                           itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
                                                            grp.MailItem);
 
                 grp.ItemController.Initialize(false);

@@ -35,6 +35,7 @@ namespace QuickFiler.Interfaces
         string SelectedFolder { get; }
         int ItemNumber { get; set; }
         int ItemIndex { get; set; }
+        int ItemNumberDigits { get; set; }
         void PopulateFolderComboBox(object varList = null); // Handles just the UI aspect. Relies on FolderSuggestionsModule.Folder_Suggestions
         bool SuppressEvents { get; set; }
         void ApplyReadEmailFormat(object state);

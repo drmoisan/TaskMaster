@@ -315,14 +315,19 @@ namespace ToDoModel
         }
 
 
-        internal IEnumerable<FolderScoring> QuerySubject(List<SubjectMapEntry> map,
+        internal IEnumerable<FolderScoring> QuerySubject(SubjectMapSco map,
                                                          SubjectMapEntry target,
                                                          int matchScore,
                                                          int mismatchScore,
                                                          int gapPenalty,
                                                          int convCtPwr)
         {
-            return map.Where(entry => entry.SubjectEncoded is not null)
+            return map.Where(entry =>
+                       {
+                           if (!entry.Validate())
+                               return false;
+                           return entry.SubjectEncoded is not null;
+                       })
                       .Select(entry =>
                       {
                             int subjScore = SmithWaterman.CalculateScore(entry.SubjectEncoded,
@@ -351,13 +356,18 @@ namespace ToDoModel
         }
 
 
-        internal IEnumerable<FolderScoring> QueryFolder(List<SubjectMapEntry> map,
+        internal IEnumerable<FolderScoring> QueryFolder(SubjectMapSco map,
                                                         SubjectMapEntry target,
                                                         int matchScore,
                                                         int mismatchScore,
                                                         int gapPenalty)                                                                  
         {
-            return map.Where(entry => entry.FolderEncoded is not null)
+            return map.Where(entry =>
+                      {
+                          if (!entry.Validate())
+                              return false;
+                          return entry.FolderEncoded is not null;
+                      })
                       .GroupBy(entry => entry.Folderpath,
                                entry => entry,
                                (folderpath, grouping) => new FolderScoring

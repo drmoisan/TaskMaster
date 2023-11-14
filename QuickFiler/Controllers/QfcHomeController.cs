@@ -44,7 +44,7 @@ namespace QuickFiler.Controllers
             _formViewer.Worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
             _uiSyncContext = _formViewer.UiSyncContext;
             _keyboardHandler = new KeyboardHandler(_formViewer, this);
-            _qfcQueue = new QfcQueue(Token);
+            _qfcQueue = new QfcQueue(Token, this, _globals);
             _formController = new QfcFormController(_globals, _formViewer, _qfcQueue, InitTypeEnum.Sort, Cleanup, this, TokenSource, Token);
         }
 
@@ -116,7 +116,7 @@ namespace QuickFiler.Controllers
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, _globals, this);
             _keyboardHandler = new KeyboardHandler(_formViewer, this);
-            _qfcQueue = new QfcQueue(Token);
+            _qfcQueue = new QfcQueue(Token, this, _globals);
             _formController = new QfcFormController(
                 _globals, _formViewer, _qfcQueue, 
                 InitTypeEnum.Sort, Cleanup, this, TokenSource, Token);
@@ -128,6 +128,8 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private QfcQueue _qfcQueue;
         private System.Action _parentCleanup;
+        
+        
         
         #endregion Constructors, Initializers, and Destructors
 
@@ -184,6 +186,7 @@ namespace QuickFiler.Controllers
             else
             {
                 _ = IterateQueueAsync();
+                WorkerComplete = true;
             }
         }
 
@@ -197,7 +200,7 @@ namespace QuickFiler.Controllers
                 var listObjects = await _datamodel.DequeueNextItemGroupAsync(_formController.ItemsPerIteration, 2000);
                 if (listObjects.Count > 0)
                 {
-                    await _qfcQueue.EnqueueAsync(listObjects, _globals, this, _formController.Groups).ConfigureAwait(false);
+                    await _qfcQueue.EnqueueAsync(listObjects, _formController.Groups).ConfigureAwait(false);
                 }
                 else 
                 { 
@@ -478,6 +481,9 @@ namespace QuickFiler.Controllers
 
         private CancellationToken _token;
         public CancellationToken Token { get => _token; }
+
+        private bool _workerComplete = false;
+        internal bool WorkerComplete { get => _workerComplete; private set => _workerComplete = value; }
 
         private SynchronizationContext _uiSyncContext;
         public SynchronizationContext UiSyncContext { get => _uiSyncContext; }

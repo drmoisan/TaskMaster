@@ -250,6 +250,7 @@
     <Compile Include="Controllers\EfcItemController.cs" />
     <Compile Include="Controllers\KaChar.cs" />
     <Compile Include="Controllers\KaKey.cs" />
+    <Compile Include="Controllers\KaStringAsync.cs" />
     <Compile Include="Controllers\KbdActions.cs" />
     <Compile Include="Controllers\QfcCollectionController.cs" />
     <Compile Include="Controllers\QfcDatamodel.cs" />

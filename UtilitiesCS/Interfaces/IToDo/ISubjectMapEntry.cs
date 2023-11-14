@@ -12,6 +12,12 @@ namespace UtilitiesCS
     public interface ISubjectMapEntry: IEquatable<ISubjectMapEntry>
     {
         /// <summary>
+        /// List of common words to strip from tokens to make token 
+        /// list as distinct as possible
+        /// </summary>
+        IList<string> CommonWords { get; set; }
+        
+        /// <summary>
         /// String with the path of an email folder relative to the inbox
         /// </summary>
         string Folderpath { get; set; }
@@ -55,11 +61,6 @@ namespace UtilitiesCS
         /// Smith Waterman score
         /// </summary>
         int Score { get; set; }
-
-        /// <summary>
-        /// List of words to strip from subjects
-        /// </summary>
-        void SetCommonWords(IList<string> commonWords);
 
         /// <summary>
         /// Reference to encoder to be used to encode the folder name and subject

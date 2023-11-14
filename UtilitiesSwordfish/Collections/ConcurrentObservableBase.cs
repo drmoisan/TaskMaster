@@ -17,6 +17,7 @@ using System.Threading;
 using System.Windows.Threading;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Security.Cryptography;
 
 namespace Swordfish.NET.Collections {
 
@@ -122,8 +123,19 @@ namespace Swordfish.NET.Collections {
             // the IObservable.OnNext method.
             _baseCollection.CollectionChanged += HandleBaseCollectionChanged;
 
+            // ***DRM Comment: Doesn't appear to be firing***
             // Bubble up the notify collection changed event from the view model
             _viewModel.CollectionChanged += (sender, e) =>
+            {
+                if (CollectionChanged != null)
+                {
+                    CollectionChanged(sender, e);
+                }
+            };
+
+            // DRM Hack -> Bubble up the notify collection changed event from the base collection.
+            // Could create duplicate events, but this is the only way I can currently get it to fire
+            _baseCollection.CollectionChanged += (sender, e) =>
             {
                 if (CollectionChanged != null)
                 {
@@ -481,6 +493,7 @@ namespace Swordfish.NET.Collections {
             {
                 observer.OnNext(value);
             }
+
         }
 
         protected void OnError(Exception exception)
