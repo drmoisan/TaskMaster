@@ -12,6 +12,7 @@ namespace UtilitiesCS
     using System.Diagnostics;
     using System.Text;
     using System.Windows.Forms;
+    using System.Windows.Input;
 
     /// <summary>
     /// Class written to transform Dataframe objects for printing
@@ -22,6 +23,12 @@ namespace UtilitiesCS
         public static void PrettyPrint(this DataFrameRow row) => Console.WriteLine(Pretty(row));
 
         public static string PrettyText(this DataFrame df) => ToStringArray2D(df).ToFormattedText();
+
+        public static string PrettyText<TKey,TValue>(this IDictionary<TKey,TValue> dict)
+        {
+            
+            return "";
+        }
 
         public static string Pretty(this DataFrameRow row) => row.Select(x => x?.ToString() ?? string.Empty).StringJoin();
 
@@ -43,7 +50,7 @@ namespace UtilitiesCS
             return strings;
         }
 
-        private static int[] GetMaxLengthsByColumn(this string[,] strings)
+        internal static int[] GetMaxLengthsByColumn(this string[,] strings)
         {
             int[] maxLengthsByColumn = new int[strings.GetLength(1)];
 
@@ -53,6 +60,42 @@ namespace UtilitiesCS
 
             return maxLengthsByColumn;
         }
+
+        internal static int[] GetMaxLengthsByColumn<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+        {
+            int[] columnLengths = new int[2];
+
+            columnLengths[0] = dict.Keys.Select(key => key.ToString().Length).Max();
+            columnLengths[1] = dict.Values.Select(value => value.ToString().Length).Max();
+
+            return columnLengths;
+        }
+
+        public static string ToFormattedText(this IDictionary<string, float> dict, float decimalPlaces)
+        {
+            var keyConverter = new Func<string, string>(key => key);
+            var valueConverter = new Func<float, string>(value => value.ToString($"N{decimalPlaces}"));
+            return dict.ToFormattedText(keyConverter, valueConverter);
+        }
+
+        public static string ToFormattedText(this IDictionary<string, long> dict)
+        {
+            var keyConverter = new Func<string, string>(key => key);
+            var valueConverter = new Func<long, string>(value => value.ToString($"N0"));
+            return dict.ToFormattedText(keyConverter, valueConverter);
+        }
+
+        public static string ToFormattedText<TKey, TValue>(this IDictionary<TKey, TValue> dict, Func<TKey, string> keyConverter, Func<TValue, string> valueConverter)
+        {
+            int[] columnLengths = dict.GetMaxLengthsByColumn();
+
+            var texts = dict.Select(kvp => 
+                $"{keyConverter(kvp.Key).PadRight(columnLengths[0])} " +
+                $"{valueConverter(kvp.Value).PadLeft(columnLengths[1])}").ToArray();
+            var text = string.Join(Environment.NewLine, texts);
+            return text;
+        }
+
 
         public static string ToFormattedText(this string[,] strings)
         {

@@ -15,12 +15,12 @@ namespace ToDoModel
 {
     public class Suggestions
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         #region constructors and private variables
 
         public Suggestions() { }
-
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private ScoDictionary<string, long> _folderNameScores = new();
         private static char[] _wordChars = { '&' };
@@ -29,6 +29,9 @@ namespace ToDoModel
         #endregion
 
         #region public properties
+
+        private VerboseLogger<Suggestions> _verboseLogger = new();
+        public VerboseLogger<Suggestions> Vlog => _verboseLogger;
 
         public int Count { get => _folderNameScores.Count; }
 
@@ -83,6 +86,9 @@ namespace ToDoModel
             }
 
             AddWordSequenceSuggestions(olMail, appGlobals, parallel);
+
+            Vlog.LogObject(_folderNameScores, nameof(_folderNameScores));
+            
         }
 
         public bool AddSuggestion(object folderObject, long score)
@@ -172,6 +178,8 @@ namespace ToDoModel
                         tokenizerRegex: _tokenizerRegex,
                         encoder: appGlobals.AF.Encoder);
 
+                    if (Vlog.IsVerbose()) { target.LogObjectState(); }
+
                     if (!target.SubjectEncoded.SequenceEqual(new int[] { }))
                     {
                         AddWordSequenceSuggestions(target, appGlobals, parallel);
@@ -197,7 +205,6 @@ namespace ToDoModel
             //else { map = appGlobals.AF.SubjectMap.ToList(); }
             if (parallel) { map = appGlobals.AF.SubjectMap.AsParallel(); }
             else { map = appGlobals.AF.SubjectMap; }
-
 
             var querySubject = QuerySubject(map, target, matchScore, mismatchScore, gapPenalty, convCtPwr);
             var queryFolder = QueryFolder(map, target, matchScore, mismatchScore, gapPenalty);
@@ -322,6 +329,7 @@ namespace ToDoModel
                                                          int gapPenalty,
                                                          int convCtPwr)
         {
+            //int threshhold = 1000;
             return map.Where(entry =>
                        {
                            if (!entry.Validate())
@@ -330,13 +338,17 @@ namespace ToDoModel
                        })
                       .Select(entry =>
                       {
-                            int subjScore = SmithWaterman.CalculateScore(entry.SubjectEncoded,
-                                                                     entry.SubjectWordLengths,
-                                                                     target.SubjectEncoded,
-                                                                     target.SubjectWordLengths,
-                                                                     matchScore,
-                                                                     mismatchScore,
-                                                                     gapPenalty);
+                            //var thresh = entry.Folderpath == "Reference\\HR - Personal - Offers LOIs Expats" ? (int)Math.Round(Math.Pow(threshhold / entry.EmailSubjectCount, 1/convCtPwr),0): -1;
+                            var thresh = -1;
+                            int subjScore = SmithWaterman.CalculateScore(
+                                entry.SubjectEncoded,
+                                entry.SubjectWordLengths,
+                                target.SubjectEncoded,
+                                target.SubjectWordLengths,
+                                matchScore,
+                                mismatchScore,
+                                gapPenalty, 
+                                entry.EmailSubject, target.EmailSubject, thresh);
                             int subjScoreWt = (int)Math.Round(
                                        Math.Pow(subjScore, convCtPwr) * entry.EmailSubjectCount);
 
@@ -362,6 +374,7 @@ namespace ToDoModel
                                                         int mismatchScore,
                                                         int gapPenalty)                                                                  
         {
+            //int threshhold = 1000;
             return map.Where(entry =>
                       {
                           if (!entry.Validate())
@@ -380,13 +393,16 @@ namespace ToDoModel
                                })
                       .Select(entry =>
                       {
-                            int fldrScore = SmithWaterman.CalculateScore(entry.FolderEncoding,
+                          //var thresh = entry.FolderPath == "Reference\\HR - Personal - Offers LOIs Expats" ? (int)Math.Round(Math.Pow(threshhold, 0.5), 0):-1;
+                          var thresh = -1;
+                          int fldrScore = SmithWaterman.CalculateScore(entry.FolderEncoding,
                                                                      entry.FolderWordLengths,
                                                                      target.SubjectEncoded,
                                                                      target.SubjectWordLengths,
                                                                      matchScore,
                                                                      mismatchScore,
-                                                                     gapPenalty);
+                                                                     gapPenalty,
+                                                                     entry.FolderName, target.EmailSubject, thresh);
                             entry.Score = (int)(fldrScore * fldrScore);
                             return entry;
                       });

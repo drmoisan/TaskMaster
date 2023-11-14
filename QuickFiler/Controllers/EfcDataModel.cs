@@ -140,6 +140,7 @@ namespace QuickFiler.Controllers
 
         public void RefreshSuggestions()
         {
+            _folderHandler.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
             _folderHandler.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
         }
 

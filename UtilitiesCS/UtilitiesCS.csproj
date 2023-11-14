@@ -327,6 +327,7 @@
     <Compile Include="EmailIntelligence\MailItemInfo.cs" />
     <Compile Include="HelperClasses\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
+    <Compile Include="HelperClasses\VerboseLogger.cs" />
     <Compile Include="Interfaces\ITimerWrapper.cs" />
     <Compile Include="HelperClasses\TimedDiskWriter.cs" />
     <Compile Include="HelperClasses\TimerWrapper.cs" />
@@ -428,6 +429,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ReusableTypeClasses\AsyncQueue.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\DenMatrix.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\JaggedMatrix.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\Matrix.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\DataConverter2d.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ObserverHelper.cs" />

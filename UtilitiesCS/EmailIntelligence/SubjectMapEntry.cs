@@ -311,9 +311,13 @@ namespace UtilitiesCS
 
         #endregion Public Properties
 
+        #region Private Properties
+
         private string[] _folderTokens;
         private string[] _subjectTokens;
         private char[] _wordChars = { '&' };
+
+        #endregion Private Properties
 
         #region Public and Internal Methods
 
@@ -388,6 +392,8 @@ namespace UtilitiesCS
                 this.Folderpath == other.Folderpath;
         }
 
+        public void LogObjectState() => logger.Debug(JsonConvert.SerializeObject(this));
+        
         public bool ReadyToEncode(ISubjectMapEncoder encoder)
         {
             _encoder = encoder;

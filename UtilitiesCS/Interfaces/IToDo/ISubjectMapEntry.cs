@@ -47,6 +47,8 @@ namespace UtilitiesCS
         /// </summary>
         int[] FolderWordLengths { get; set; }
 
+        void LogObjectState();
+
         /// <summary>
         /// Array of integers representing the subject
         /// </summary>

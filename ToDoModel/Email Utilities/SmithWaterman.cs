@@ -130,7 +130,39 @@ namespace ToDoModel
                                          int[] wordLengthY,
                                          int matchScore,
                                          int mismatchScore,
+                                         int gapPenalty,
+                                         string xString,
+                                         string yString,
+                                         int logThreshhold)
+        {
+            
+            var tup = CalculateMatrixTuple(wordsX, wordLengthX, wordsY, wordLengthY, matchScore, mismatchScore, gapPenalty);
+            if (logThreshhold > -1 && tup.Score > logThreshhold)
+                LogMatrixState(tup.Matrix, xString, yString);
+            return tup.Score;
+        }
+
+        public static int CalculateScore(int[] wordsX,
+                                         int[] wordLengthX,
+                                         int[] wordsY,
+                                         int[] wordLengthY,
+                                         int matchScore,
+                                         int mismatchScore,
                                          int gapPenalty)
+        {
+
+            var tup = CalculateMatrixTuple(wordsX, wordLengthX, wordsY, wordLengthY, matchScore, mismatchScore, gapPenalty);
+            return tup.Score;
+        }
+
+        public static (int[,] Matrix, int Score) CalculateMatrixTuple(
+            int[] wordsX,
+            int[] wordLengthX,
+            int[] wordsY,
+            int[] wordLengthY,
+            int matchScore,
+            int mismatchScore,
+            int gapPenalty)
         {
             ValidateInputs(wordsX, wordLengthX, wordsY, wordLengthY);
             DeclareMatrix(wordsX, wordsY, out int lengthX, out int lengthY, out int maxValue, out int[,] matrix);
@@ -144,11 +176,6 @@ namespace ToDoModel
             for (int y = 3; y < lengthY + 3; y++)
                 matrix[1, y] = wordsY[y - 3];
             
-            //for (int x = 2; x < lengthX + 3; x++)
-            //    matrix[x, 2] = 0;
-
-            //for (int y = 2; y < lengthY + 3; y++)
-            //    matrix[2, y] = 0;
 
             //LogMatrixState(matrix);
 
@@ -192,33 +219,31 @@ namespace ToDoModel
                 }
             }
 
-            //var loopTo6 = LenY + 3;
-            //for (y = 1; y <= loopTo6; y++)
-            //{
-            //    flatcsv[y] = "";
-            //    var loopTo7 = LenX + 2;
-            //    for (x = 1; x <= loopTo7; x++)
-            //        flatcsv[y] = string.Concat(flatcsv[y], Matrix[x, y].ToString(), ", ");
-            //    flatcsv[y] = string.Concat(flatcsv[y], Matrix[LenX + 3, y].ToString());
-            //}
-
-            // Call Printout(flatcsv)
-            // MsgBox (maxSmith_Watterman & " of " & Max(LenX + 1, LenY + 1))
             result = maxValue;
 
-            // StopWatch_SW.Pause
-            return result;
+            
+            return (matrix, result);
 
         }
 
         internal static void LogMatrixState(int[,] matrix)
+        {
+            logger.Debug($"\n{GetFormattedMatrixText(matrix)}");
+        }
+
+        internal static void LogMatrixState(int[,] matrix, string xString, string yString)
+        {
+            logger.Debug($"Smith-Watterman Matrix for \n{xString} and \n{yString}\n{GetFormattedMatrixText(matrix)}");
+        }
+
+        internal static string GetFormattedMatrixText(int[,] matrix)
         {
             string[,] matrixString = new string[matrix.GetLength(0), matrix.GetLength(1)];
             for (int x = 0; x < matrix.GetLength(0); x++)
                 for (int y = 0; y < matrix.GetLength(1); y++)
                     matrixString[x, y] = matrix[x, y].ToString();
             var matrixText = matrixString.ToFormattedText();
-            logger.Debug($"\n{matrixText}");
+            return matrixText;
         }
 
         private static void DeclareMatrix(int[] wordsX, int[] wordsY, out int lengthX, out int lengthY, out int maxSmith_Watterman, out int[,] Matrix)
