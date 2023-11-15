@@ -30,6 +30,8 @@
         {
             this.L1v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.L1v1L2h_TableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.L1v1L2h5_BtnSkip = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.L1v1L2h2_ButtonOK = new System.Windows.Forms.Button();
             this.L1v1L2h3_ButtonCancel = new System.Windows.Forms.Button();
             this.L1v1L2h4_ButtonUndo = new System.Windows.Forms.Button();
@@ -39,8 +41,6 @@
             this.QfcItemViewerTemplate = new QuickFiler.ItemViewer();
             this.qfcItemViewerExpanded1 = new QuickFiler.QfcItemViewerExpanded();
             this.Worker = new System.ComponentModel.BackgroundWorker();
-            this.button1 = new System.Windows.Forms.Button();
-            this.L1v1L2h5_BtnSkip = new System.Windows.Forms.Button();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();
@@ -90,6 +90,29 @@
             this.L1v1L2h_TableLayout.Size = new System.Drawing.Size(1984, 96);
             this.L1v1L2h_TableLayout.TabIndex = 0;
             // 
+            // L1v1L2h5_BtnSkip
+            // 
+            this.L1v1L2h5_BtnSkip.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L1v1L2h5_BtnSkip.Enabled = false;
+            this.L1v1L2h5_BtnSkip.Location = new System.Drawing.Point(1318, 6);
+            this.L1v1L2h5_BtnSkip.Margin = new System.Windows.Forms.Padding(6);
+            this.L1v1L2h5_BtnSkip.Name = "L1v1L2h5_BtnSkip";
+            this.L1v1L2h5_BtnSkip.Size = new System.Drawing.Size(148, 84);
+            this.L1v1L2h5_BtnSkip.TabIndex = 5;
+            this.L1v1L2h5_BtnSkip.Text = "Skip Group";
+            this.L1v1L2h5_BtnSkip.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button1.Location = new System.Drawing.Point(1158, 6);
+            this.button1.Margin = new System.Windows.Forms.Padding(6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(148, 84);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Filters";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // L1v1L2h2_ButtonOK
             // 
             this.L1v1L2h2_ButtonOK.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -126,6 +149,7 @@
             // L1v1L2h5_SpnEmailPerLoad
             // 
             this.L1v1L2h5_SpnEmailPerLoad.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.L1v1L2h5_SpnEmailPerLoad.Enabled = false;
             this.L1v1L2h5_SpnEmailPerLoad.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.L1v1L2h5_SpnEmailPerLoad.Location = new System.Drawing.Point(1486, 11);
             this.L1v1L2h5_SpnEmailPerLoad.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
@@ -192,28 +216,6 @@
             this.qfcItemViewerExpanded1.Name = "qfcItemViewerExpanded1";
             this.qfcItemViewerExpanded1.Size = new System.Drawing.Size(1972, 1006);
             this.qfcItemViewerExpanded1.TabIndex = 1;
-            // 
-            // button1
-            // 
-            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button1.Location = new System.Drawing.Point(1158, 6);
-            this.button1.Margin = new System.Windows.Forms.Padding(6);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(148, 84);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Filters";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // L1v1L2h5_BtnSkip
-            // 
-            this.L1v1L2h5_BtnSkip.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h5_BtnSkip.Location = new System.Drawing.Point(1318, 6);
-            this.L1v1L2h5_BtnSkip.Margin = new System.Windows.Forms.Padding(6);
-            this.L1v1L2h5_BtnSkip.Name = "L1v1L2h5_BtnSkip";
-            this.L1v1L2h5_BtnSkip.Size = new System.Drawing.Size(148, 84);
-            this.L1v1L2h5_BtnSkip.TabIndex = 5;
-            this.L1v1L2h5_BtnSkip.Text = "Skip Group";
-            this.L1v1L2h5_BtnSkip.UseVisualStyleBackColor = true;
             // 
             // QfcFormViewer
             // 

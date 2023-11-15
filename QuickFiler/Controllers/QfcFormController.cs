@@ -356,11 +356,6 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            if (!_parent.WorkerComplete)
-            {
-                
-                return;
-            }
             while (!_parent.WorkerComplete)
             {
                 

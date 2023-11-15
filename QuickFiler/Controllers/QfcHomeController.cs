@@ -144,7 +144,6 @@ namespace QuickFiler.Controllers
             _formViewer.Refresh();
         }
 
-        // Twice as slow as the synchronous version
         public async Task RunAsync(ProgressTracker progress)
         {
             
@@ -185,6 +184,9 @@ namespace QuickFiler.Controllers
             }
             else
             {
+                logger.Debug("Background load of email database complete.");
+                _formViewer.L1v1L2h5_SpnEmailPerLoad.Enabled = true;
+                _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
                 _ = IterateQueueAsync();
                 WorkerComplete = true;
             }
