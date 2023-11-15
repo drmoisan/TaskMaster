@@ -420,7 +420,7 @@ namespace QuickFiler.Controllers
             
         }
 
-        private void TimedConsumer(object source, ElapsedEventArgs e)
+        private async void TimedConsumer(object source, ElapsedEventArgs e)
         {
             TraceUtility.LogMethodCall(source, e);
 
@@ -428,7 +428,7 @@ namespace QuickFiler.Controllers
             var strOutput = _metrics.GetConsumingEnumerable().ToArray();
             if (strOutput.Length > 0)
             {
-                FileIO2.WriteTextFile(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyD);
+                await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyD, default);
             }
             
         }

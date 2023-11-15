@@ -87,14 +87,14 @@
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.Core.dll</HintPath>
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2151.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2151.40\lib\net45\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.2151.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2151.40\lib\net45\Microsoft.Web.WebView2.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.2151.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2151.40\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
@@ -325,6 +325,18 @@
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
     <Compile Include="EmailIntelligence\MailItemInfo.cs" />
+    <Compile Include="HelperClasses\DvgForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HelperClasses\DvgForm.Designer.cs">
+      <DependentUpon>DvgForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HelperClasses\ProgressViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HelperClasses\ProgressViewer.Designer.cs">
+      <DependentUpon>ProgressViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="HelperClasses\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="HelperClasses\VerboseLogger.cs" />
@@ -351,10 +363,6 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\WinFormsExtensions.cs" />
     <Compile Include="HelperClasses\ConversationHelper.cs" />
-    <Compile Include="HelperClasses\DgvForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HelperClasses\DgvForm.Designer.cs" />
     <Compile Include="HelperClasses\GenericBitwise.cs" />
     <Compile Include="HelperClasses\Initializer.cs" />
     <Compile Include="HelperClasses\MailResolution.cs" />
@@ -362,10 +370,6 @@
     <Compile Include="HelperClasses\OlItemSummary.cs" />
     <Compile Include="HelperClasses\PrettyPrint.cs" />
     <Compile Include="HelperClasses\ProgressTracker.cs" />
-    <Compile Include="HelperClasses\ProgressViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HelperClasses\ProgressViewer.Designer.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
     <Compile Include="HelperClasses\TableLayoutHelper.cs" />
     <Compile Include="HelperClasses\Theme.cs" />
@@ -495,8 +499,14 @@
     <EmbeddedResource Include="Dialogs\MyBoxViewer.resx">
       <DependentUpon>MyBoxViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="HelperClasses\DgvForm.resx" />
-    <EmbeddedResource Include="HelperClasses\ProgressViewer.resx" />
+    <EmbeddedResource Include="HelperClasses\DvgForm.resx">
+      <DependentUpon>DvgForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HelperClasses\ProgressViewer.resx">
+      <DependentUpon>ProgressViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -564,10 +574,10 @@
     <Error Condition="!Exists('..\packages\Microsoft.ML.CpuMath.2.0.1\build\netstandard2.0\Microsoft.ML.CpuMath.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.CpuMath.2.0.1\build\netstandard2.0\Microsoft.ML.CpuMath.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets'))" />
     <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets" Condition="Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets')" />
-  <Import Project="..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets')" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets')" />
 </Project>
