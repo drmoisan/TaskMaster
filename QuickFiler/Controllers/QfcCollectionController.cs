@@ -973,11 +973,11 @@ namespace QuickFiler.Controllers
             {
                 IQfcItemController itemController = _itemGroups[ActiveIndex].ItemController;
 
-                if (itemController.IsExpanded)
-                {
-                    await itemController.ToggleExpansionAsync();
-                    blExpanded = true;
-                }
+                //if (itemController.IsExpanded)
+                //{
+                //    await itemController.ToggleExpansionAsync();
+                //    blExpanded = true;
+                //}
                 await itemController.ToggleFocusAsync(Enums.ToggleState.Off);
             }
             return blExpanded;

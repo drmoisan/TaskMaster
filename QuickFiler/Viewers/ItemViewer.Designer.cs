@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewer));
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties3 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
             this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -258,13 +258,13 @@
             this.L0v2h2_WebView2.AllowExternalDrop = true;
             this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
             this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
-            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties2.Language = null;
-            coreWebView2CreationProperties2.ProfileName = null;
-            coreWebView2CreationProperties2.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties2;
+            coreWebView2CreationProperties3.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties3.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties3.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties3.Language = null;
+            coreWebView2CreationProperties3.ProfileName = null;
+            coreWebView2CreationProperties3.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties3;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 216);
@@ -414,7 +414,7 @@
             this.L0vh_Tlp.SetColumnSpan(this.L1h0L2hv3h_TlpBodyToggle, 10);
             this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 0F));
-            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 0, 0);
+            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 1, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TxtboxBody, 0, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1h0L2hv3h_TlpBodyToggle.Location = new System.Drawing.Point(103, 96);

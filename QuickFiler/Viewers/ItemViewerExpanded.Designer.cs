@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewerExpanded));
             this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
@@ -220,13 +220,13 @@
             this.L0v2h2_WebView2.AllowExternalDrop = true;
             this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
             this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
-            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties1.Language = null;
-            coreWebView2CreationProperties1.ProfileName = null;
-            coreWebView2CreationProperties1.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
+            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties2.Language = null;
+            coreWebView2CreationProperties2.ProfileName = null;
+            coreWebView2CreationProperties2.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties2;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 269);
@@ -374,9 +374,9 @@
             // 
             this.L1h0L2hv3h_TlpBodyToggle.ColumnCount = 2;
             this.L0vh_Tlp.SetColumnSpan(this.L1h0L2hv3h_TlpBodyToggle, 10);
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 0, 0);
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 0F));
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 1, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TxtboxBody, 0, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1h0L2hv3h_TlpBodyToggle.Location = new System.Drawing.Point(103, 96);
@@ -398,10 +398,11 @@
             this.TxtboxBody.Multiline = true;
             this.TxtboxBody.Name = "TxtboxBody";
             this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(605, 167);
+            this.TxtboxBody.Size = new System.Drawing.Size(1, 167);
             this.TxtboxBody.TabIndex = 6;
             this.TxtboxBody.TabStop = false;
             this.TxtboxBody.Text = "[BODY]";
+            this.TxtboxBody.Visible = false;
             // 
             // LblAcBody
             // 
@@ -734,11 +735,11 @@
             this.TopicThread.EmptyListMsg = "The fast list is empty";
             this.TopicThread.FullRowSelect = true;
             this.TopicThread.HideSelection = false;
-            this.TopicThread.Location = new System.Drawing.Point(620, 3);
+            this.TopicThread.Location = new System.Drawing.Point(3, 3);
             this.TopicThread.MultiSelect = false;
             this.TopicThread.Name = "TopicThread";
             this.TopicThread.ShowGroups = false;
-            this.TopicThread.Size = new System.Drawing.Size(611, 161);
+            this.TopicThread.Size = new System.Drawing.Size(1228, 161);
             this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.TopicThread.TabIndex = 9;
             this.TopicThread.UseCompatibleStateImageBehavior = false;

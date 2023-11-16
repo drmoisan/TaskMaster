@@ -721,7 +721,8 @@ namespace QuickFiler.Controllers
                 //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_kbdHandler.KeyboardHandler_KeyDown);
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(_kbdHandler.KeyboardHandler_KeyDownAsync);
             },
-            new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
+            //new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
+            new List<Control> { _itemViewer.CboFolders, });
 
             _itemViewer.ConversationMenuItem.CheckedChanged += this.CbxConversation_CheckedChanged;
             _itemViewer.BtnFlagTask.Click += new System.EventHandler(this.BtnFlagTask_Click);

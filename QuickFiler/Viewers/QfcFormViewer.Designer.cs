@@ -184,7 +184,7 @@
             this.L1v0L2L3v_TableLayout.Name = "L1v0L2L3v_TableLayout";
             this.L1v0L2L3v_TableLayout.RowCount = 3;
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 221F));
-            this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1018F));
+            this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1218F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(2119, 1337);
             this.L1v0L2L3v_TableLayout.TabIndex = 0;
@@ -214,7 +214,7 @@
             this.QfcItemViewerExpandedTemplate.Margin = new System.Windows.Forms.Padding(6);
             this.QfcItemViewerExpandedTemplate.MinimumSize = new System.Drawing.Size(1516, 197);
             this.QfcItemViewerExpandedTemplate.Name = "QfcItemViewerExpandedTemplate";
-            this.QfcItemViewerExpandedTemplate.Size = new System.Drawing.Size(2107, 1006);
+            this.QfcItemViewerExpandedTemplate.Size = new System.Drawing.Size(2107, 1206);
             this.QfcItemViewerExpandedTemplate.TabIndex = 1;
             // 
             // QfcFormViewer
