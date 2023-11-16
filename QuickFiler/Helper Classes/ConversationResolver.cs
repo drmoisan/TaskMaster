@@ -27,6 +27,9 @@ namespace QuickFiler.Helper_Classes
 
     public class ConversationResolver : INotifyPropertyChanged, IConversationResolver
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public ConversationResolver(IApplicationGlobals appGlobals, MailItem mailItem) 
         { 
             _globals = appGlobals;
@@ -271,8 +274,15 @@ namespace QuickFiler.Helper_Classes
             if (e.PropertyName == nameof(Df))
             {
                 FullyLoaded = false;
-                await BackgroundInitInfoItemsAsync(_token).ConfigureAwait(false);
-                FullyLoaded = true;
+                try
+                {
+                    await BackgroundInitInfoItemsAsync(_token).ConfigureAwait(false);
+                    FullyLoaded = true;
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.Debug("Background load of ConversationResolver cancelled"); 
+                }
             }
             else if (e.PropertyName == nameof(UpdateUI))
             {

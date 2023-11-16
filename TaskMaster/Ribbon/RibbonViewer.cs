@@ -159,7 +159,8 @@ namespace TaskMaster
         public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.TryRebuildProjInfo();
         public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.TryRecipientGetInfo();
         public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.TrySubstituteIdRoot();
-
+        public void GetImage_Click(Office.IRibbonControl control) => _controller.TryGetImage();
+        
         #endregion
 
         #region Helpers

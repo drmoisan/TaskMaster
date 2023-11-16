@@ -757,16 +757,16 @@ namespace QuickFiler.Controllers
 
         public void ToggleSaveAttachments()
         {
-            _itemViewer.CbxAttachments.Invoke(new System.Action(() =>
-                _itemViewer.CbxAttachments.Checked =
-                !_itemViewer.CbxAttachments.Checked));
+            UIThreadExtensions.UiDispatcher.Invoke(() =>
+                _itemViewer.SaveAttachmentsMenuItem.Checked =
+                !_itemViewer.SaveAttachmentsMenuItem.Checked);
         }
 
         public void ToggleSaveCopyOfMail()
-        {
-            _itemViewer.CbxEmailCopy.Invoke(new System.Action(() =>
-                _itemViewer.CbxEmailCopy.Checked =
-                !_itemViewer.CbxEmailCopy.Checked));
+        {   
+            UIThreadExtensions.UiDispatcher.Invoke(() =>
+                _itemViewer.SaveEmailMenuItem.Checked =
+                !_itemViewer.SaveEmailMenuItem.Checked);
         }
 
         #endregion

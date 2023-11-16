@@ -9,6 +9,7 @@ using FluentAssertions;
 using Deedle.Internal;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Office.Core;
 
 namespace QuickFiler.Test
 {
@@ -153,5 +154,6 @@ namespace QuickFiler.Test
             Assert.IsTrue(result);
             actual.Should().BeEquivalentTo(expected);
         }
+                
     }
 }

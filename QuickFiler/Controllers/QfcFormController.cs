@@ -74,6 +74,7 @@ namespace QuickFiler.Controllers
         private IterateDelegate Iterate;
         private ScoStack<IMovedMailInfo> _movedItems;
         private QfcQueue _qfcQueue;
+        private TlpCellStates _states;
 
         #endregion
 
@@ -81,10 +82,45 @@ namespace QuickFiler.Controllers
 
         public void CaptureItemSettings()
         {
+            _formViewer.Show();
             _rowStyleTemplate = _formViewer.L1v0L2L3v_TableLayout.RowStyles[0];
             _rowStyleExpanded = _formViewer.L1v0L2L3v_TableLayout.RowStyles[1];
             _itemMarginTemplate = _formViewer.QfcItemViewerTemplate.Margin;
-            //_formViewer.L1v0L2_PanelMain.Height
+
+            _states = new(new List<KeyValuePair<string, List<TlpCellSnapShot>>>()
+            {
+                new KeyValuePair<string, List<TlpCellSnapShot>>("Expanded", new List<TlpCellSnapShot>()
+                {
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
+                        _formViewer.QfcItemViewerExpandedTemplate.TxtboxBody),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
+                        _formViewer.QfcItemViewerExpandedTemplate.TopicThread),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerExpandedTemplate.L0v2h2_WebView2),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerExpandedTemplate.LblAcOpen),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerExpandedTemplate.LblAcBody),
+                }),
+                new KeyValuePair<string, List<TlpCellSnapShot>>("Compressed", new List<TlpCellSnapShot>()
+                {
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
+                        _formViewer.QfcItemViewerTemplate.TxtboxBody),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
+                        _formViewer.QfcItemViewerTemplate.TopicThread),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerTemplate.L0v2h2_WebView2),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerTemplate.LblAcOpen),
+                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                        _formViewer.QfcItemViewerTemplate.LblAcBody),
+                }),
+            }); 
+            _formViewer.Hide();
         }
 
         public void RemoveTemplatesAndSetupTlp()
@@ -101,6 +137,7 @@ namespace QuickFiler.Controllers
                 tlp.MinimumSize.Height +
                 (int)Math.Round(_rowStyleTemplate.Height * count, 0));
             _qfcQueue.TlpTemplate = tlp;
+            _qfcQueue.TlpStates = _states;
         }
 
         public void SetupLightDark()
@@ -461,7 +498,8 @@ namespace QuickFiler.Controllers
                                                   homeController: _parent,
                                                   parent: this,
                                                   tokenSource: TokenSource,
-                                                  token: Token);
+                                                  token: Token,
+                                                  _states);
             _groups.LoadControlsAndHandlers_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
@@ -475,7 +513,8 @@ namespace QuickFiler.Controllers
                                                   homeController: _parent,
                                                   parent: this,
                                                   tokenSource: TokenSource,
-                                                  token: Token);
+                                                  token: Token,
+                                                  _states);
             await _groups.LoadControlsAndHandlersAsync_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 

@@ -81,6 +81,10 @@
     <Reference Include="office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Svg.3.4.5\lib\net462\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.AppContext.4.3.0\lib\net463\System.AppContext.dll</HintPath>
@@ -101,6 +105,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=7.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.7.0.2\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
@@ -270,6 +275,7 @@
     <Compile Include="Helper Classes\ItemViewerQueue.cs" />
     <Compile Include="Helper Classes\QfcThemeHelper.cs" />
     <Compile Include="Helper Classes\QfEnums.cs" />
+    <Compile Include="Helper Classes\TlpCellSnapShot.cs" />
     <Compile Include="Interfaces\IFilerFormController.cs" />
     <Compile Include="Interfaces\IFilerHomeController.cs" />
     <Compile Include="Interfaces\IItemControler.cs" />
@@ -304,6 +310,12 @@
     <Compile Include="Viewers\ItemViewer.Designer.cs">
       <DependentUpon>ItemViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewers\ItemViewerExpanded.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\ItemViewerExpanded.Designer.cs">
+      <DependentUpon>ItemViewerExpanded.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcFormViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -325,7 +337,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
-      <Project>{481e1cb9-3bd9-470f-92df-f8f1fe957b06}</Project>
+      <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
       <Name>SVGControl</Name>
     </ProjectReference>
     <ProjectReference Include="..\TaskVisualization\TaskVisualization.csproj">
@@ -358,6 +370,10 @@
       <DependentUpon>ItemViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\ItemViewerExpanded.resx">
+      <DependentUpon>ItemViewerExpanded.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewers\QfcFormViewer.resx">
       <DependentUpon>QfcFormViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -383,18 +399,30 @@
     <Content Include="Resources\EmailHeader.html" />
     <Content Include="Resources\FlagDarkRed.png" />
     <Content Include="Resources\FlagDarkRed.svg" />
+    <None Include="Resources\Forward1.png" />
     <Content Include="Resources\NewFolder.png" />
     <Content Include="Resources\NewFolder.svg" />
     <Content Include="Resources\QuickFind.png" />
     <Content Include="Resources\QuickFind.svg" />
     <Content Include="Resources\QuickRefresh.png" />
     <Content Include="Resources\QuickRefresh.svg" />
+    <None Include="Resources\Forward4.afdesign" />
+    <None Include="Resources\Reply.afdesign" />
+    <None Include="Resources\Reply.svg" />
+    <None Include="Resources\Reply2.afdesign" />
+    <None Include="Resources\Reply3.afdesign" />
+    <None Include="Resources\Reply4.afdesign" />
+    <None Include="Resources\ReplyAll.afdesign" />
+    <None Include="Resources\ReplyAll.png" />
+    <None Include="Resources\Reply.png" />
     <Content Include="Resources\Run.png" />
     <Content Include="Resources\Run.svg" />
     <Content Include="Resources\TextBlock.png" />
     <Content Include="Resources\TextBlock.svg" />
     <Content Include="Resources\Web.png" />
     <Content Include="Resources\Web.svg" />
+    <None Include="Resources\ReplyAll3.afdesign" />
+    <None Include="Resources\ReplyAll4.afdesign" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

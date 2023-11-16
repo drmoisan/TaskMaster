@@ -15,6 +15,9 @@ using Microsoft.Office.Interop.Outlook;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Drawing.Imaging;
+using stdole;
+using System;
 
 namespace TaskMaster
 {
@@ -212,6 +215,28 @@ namespace TaskMaster
         internal void TrySubstituteIdRoot()
         {
             _globals.TD.IDList.SubstituteIdRoot("9710", "2501");
+        }
+        internal void TryGetImage()
+        {
+            var ae = _globals.Ol.App.ActiveExplorer();
+            //var image = ae.CommandBars.GetImageMso("ReplyAll", 38, 38);
+            var image3 = ae.CommandBars.GetImageMso("Forward", 38, 38);
+            //var image5 = ae.CommandBars.GetImageMso("Reply", 100, 100);
+
+            //System.Drawing.Image image2 = GetImage(image);
+            //image2.Save(@"C:\Temp\ReplyAll.png", ImageFormat.Png);
+
+            System.Drawing.Image image4 = GetImage(image3);
+            image4.Save(@"C:\Temp\Forward.png", ImageFormat.Png);
+
+            //System.Drawing.Image image6 = GetImage(image5);
+            //image6.Save(@"C:\Temp\Reply.png", ImageFormat.Png);
+
+
+        }
+        internal System.Drawing.Image GetImage(IPictureDisp disp)
+        {
+            return System.Drawing.Image.FromHbitmap((IntPtr)disp.Handle, (IntPtr)disp.hPal);
         }
         internal void TryLegacySortMailToExistingRun2()
         {

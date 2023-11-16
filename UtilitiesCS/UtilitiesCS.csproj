@@ -466,13 +466,14 @@
     <Compile Include="To Depricate\StackObjectVB.cs" />
     <Compile Include="To Depricate\StringManipulation.cs" />
     <Compile Include="Windows Forms\ControlPosition.cs" />
+    <Compile Include="Windows Forms\ImageHelper.cs" />
     <Compile Include="Windows Forms\MouseDownFilter.cs" />
     <Compile Include="Windows Forms\OlvExtension.cs" />
     <Compile Include="Windows Forms\Resizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
-      <Project>{481e1cb9-3bd9-470f-92df-f8f1fe957b06}</Project>
+      <Project>{d0fee0d9-901a-4fb8-97d1-96a8f634b83c}</Project>
       <Name>SVGControl</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">

@@ -1,6 +1,6 @@
 ﻿namespace QuickFiler
 {
-    partial class ItemViewer
+    partial class ItemViewerExpanded
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,15 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewer));
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewerExpanded));
             this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
             this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.ConversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SaveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SaveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SavePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.LblAcSearch = new System.Windows.Forms.Label();
             this.CboFolders = new System.Windows.Forms.ComboBox();
             this.LblSearch = new System.Windows.Forms.Label();
@@ -53,10 +49,6 @@
             this.LblSubject = new System.Windows.Forms.Label();
             this.LblAcOpen = new System.Windows.Forms.Label();
             this.L1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
-            this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
-            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.SentDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.TxtboxBody = new System.Windows.Forms.TextBox();
             this.LblAcBody = new System.Windows.Forms.Label();
             this.LblAcFolder = new System.Windows.Forms.Label();
@@ -75,12 +67,20 @@
             this.LblAcTask = new System.Windows.Forms.Label();
             this.BtnFlagTask = new System.Windows.Forms.Button();
             this.LblAcMoveOptions = new System.Windows.Forms.Label();
+            this.ConversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SaveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SaveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SavePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.SentDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
             this.L0vh_Tlp.SuspendLayout();
             this.MoveOptionsStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).BeginInit();
             this.L1h0L2hv3h_TlpBodyToggle.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).BeginInit();
             this.L1h1L2v1h3Panel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).BeginInit();
             this.SuspendLayout();
             // 
             // L0vh_Tlp
@@ -131,9 +131,8 @@
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 97F));
+            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.L0vh_Tlp.Size = new System.Drawing.Size(2280, 907);
             this.L0vh_Tlp.TabIndex = 0;
             // 
@@ -160,43 +159,6 @@
             this.MoveOptionsMenu.Name = "MoveOptionsMenu";
             this.MoveOptionsMenu.Size = new System.Drawing.Size(186, 36);
             this.MoveOptionsMenu.Text = "&Move Options";
-            // 
-            // ConversationMenuItem
-            // 
-            this.ConversationMenuItem.CheckOnClick = true;
-            this.ConversationMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("ConversationMenuItem.Image")));
-            this.ConversationMenuItem.Name = "ConversationMenuItem";
-            this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
-            this.ConversationMenuItem.Size = new System.Drawing.Size(355, 44);
-            this.ConversationMenuItem.Text = "Move &Conversation";
-            this.ConversationMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
-            // 
-            // SaveAttachmentsMenuItem
-            // 
-            this.SaveAttachmentsMenuItem.CheckOnClick = true;
-            this.SaveAttachmentsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SaveAttachmentsMenuItem.Image")));
-            this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
-            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(355, 44);
-            this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
-            this.SaveAttachmentsMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
-            // 
-            // SaveEmailMenuItem
-            // 
-            this.SaveEmailMenuItem.CheckOnClick = true;
-            this.SaveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
-            this.SaveEmailMenuItem.Size = new System.Drawing.Size(355, 44);
-            this.SaveEmailMenuItem.Text = "Save E&mail Copy";
-            this.SaveEmailMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
-            // 
-            // SavePicturesMenuItem
-            // 
-            this.SavePicturesMenuItem.CheckOnClick = true;
-            this.SavePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
-            this.SavePicturesMenuItem.Size = new System.Drawing.Size(355, 44);
-            this.SavePicturesMenuItem.Text = "Save &Pictures";
-            this.SavePicturesMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // LblAcSearch
             // 
@@ -258,18 +220,18 @@
             this.L0v2h2_WebView2.AllowExternalDrop = true;
             this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
             this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
-            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties2.Language = null;
-            coreWebView2CreationProperties2.ProfileName = null;
-            coreWebView2CreationProperties2.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties2;
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 216);
+            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 269);
             this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
-            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2174, 688);
+            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2174, 635);
             this.L0v2h2_WebView2.TabIndex = 40;
             this.L0v2h2_WebView2.ZoomFactor = 1D;
             this.L0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
@@ -400,20 +362,20 @@
             this.LblAcOpen.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcOpen.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcOpen.Location = new System.Drawing.Point(62, 93);
+            this.LblAcOpen.Location = new System.Drawing.Point(63, 93);
             this.LblAcOpen.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcOpen.Name = "LblAcOpen";
             this.L0vh_Tlp.SetRowSpan(this.LblAcOpen, 2);
-            this.LblAcOpen.Size = new System.Drawing.Size(38, 33);
+            this.LblAcOpen.Size = new System.Drawing.Size(37, 33);
             this.LblAcOpen.TabIndex = 22;
-            this.LblAcOpen.Text = "O";
+            this.LblAcOpen.Text = "D";
             // 
             // L1h0L2hv3h_TlpBodyToggle
             // 
             this.L1h0L2hv3h_TlpBodyToggle.ColumnCount = 2;
             this.L0vh_Tlp.SetColumnSpan(this.L1h0L2hv3h_TlpBodyToggle, 10);
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 0F));
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 0, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TxtboxBody, 0, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -422,63 +384,8 @@
             this.L1h0L2hv3h_TlpBodyToggle.RowCount = 1;
             this.L0vh_Tlp.SetRowSpan(this.L1h0L2hv3h_TlpBodyToggle, 2);
             this.L1h0L2hv3h_TlpBodyToggle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(1234, 114);
+            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(1234, 167);
             this.L1h0L2hv3h_TlpBodyToggle.TabIndex = 38;
-            // 
-            // TopicThread
-            // 
-            this.TopicThread.AllColumns.Add(this.sender);
-            this.TopicThread.AllColumns.Add(this.SentDate);
-            this.TopicThread.AllColumns.Add(this.infolder);
-            this.TopicThread.AllowDrop = true;
-            this.TopicThread.BackColor = System.Drawing.SystemColors.Control;
-            this.TopicThread.CellEditEnterChangesRows = true;
-            this.TopicThread.CellEditUseWholeCell = false;
-            this.TopicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.sender,
-            this.SentDate,
-            this.infolder});
-            this.TopicThread.Cursor = System.Windows.Forms.Cursors.Default;
-            this.TopicThread.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TopicThread.EmptyListMsg = "The fast list is empty";
-            this.TopicThread.FullRowSelect = true;
-            this.TopicThread.HideSelection = false;
-            this.TopicThread.Location = new System.Drawing.Point(1237, 3);
-            this.TopicThread.MultiSelect = false;
-            this.TopicThread.Name = "TopicThread";
-            this.TopicThread.ShowGroups = false;
-            this.TopicThread.Size = new System.Drawing.Size(1, 108);
-            this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
-            this.TopicThread.TabIndex = 9;
-            this.TopicThread.UseCompatibleStateImageBehavior = false;
-            this.TopicThread.View = System.Windows.Forms.View.Details;
-            this.TopicThread.VirtualMode = true;
-            this.TopicThread.Visible = false;
-            // 
-            // sender
-            // 
-            this.sender.AspectName = "SenderName";
-            this.sender.FillsFreeSpace = true;
-            this.sender.HeaderForeColor = System.Drawing.SystemColors.ControlText;
-            this.sender.MinimumWidth = 200;
-            this.sender.Text = "From";
-            this.sender.Width = 200;
-            // 
-            // SentDate
-            // 
-            this.SentDate.AspectName = "SentDate";
-            this.SentDate.FillsFreeSpace = true;
-            this.SentDate.MinimumWidth = 250;
-            this.SentDate.Text = "Received";
-            this.SentDate.Width = 250;
-            // 
-            // infolder
-            // 
-            this.infolder.AspectName = "Folder";
-            this.infolder.FillsFreeSpace = true;
-            this.infolder.MinimumWidth = 200;
-            this.infolder.Text = "In Folder";
-            this.infolder.Width = 200;
             // 
             // TxtboxBody
             // 
@@ -491,7 +398,7 @@
             this.TxtboxBody.Multiline = true;
             this.TxtboxBody.Name = "TxtboxBody";
             this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(1222, 114);
+            this.TxtboxBody.Size = new System.Drawing.Size(605, 167);
             this.TxtboxBody.TabIndex = 6;
             this.TxtboxBody.TabStop = false;
             this.TxtboxBody.Text = "[BODY]";
@@ -504,7 +411,7 @@
             this.LblAcBody.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LblAcBody.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcBody.Location = new System.Drawing.Point(65, 213);
+            this.LblAcBody.Location = new System.Drawing.Point(65, 266);
             this.LblAcBody.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcBody.Name = "LblAcBody";
             this.LblAcBody.Size = new System.Drawing.Size(35, 33);
@@ -747,7 +654,98 @@
             this.LblAcMoveOptions.TabIndex = 10;
             this.LblAcMoveOptions.Text = "M";
             // 
-            // ItemViewer
+            // ConversationMenuItem
+            // 
+            this.ConversationMenuItem.CheckOnClick = true;
+            this.ConversationMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("ConversationMenuItem.Image")));
+            this.ConversationMenuItem.Name = "ConversationMenuItem";
+            this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
+            this.ConversationMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.ConversationMenuItem.Text = "Move &Conversation";
+            this.ConversationMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
+            // 
+            // SaveAttachmentsMenuItem
+            // 
+            this.SaveAttachmentsMenuItem.CheckOnClick = true;
+            this.SaveAttachmentsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SaveAttachmentsMenuItem.Image")));
+            this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
+            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
+            this.SaveAttachmentsMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
+            // 
+            // SaveEmailMenuItem
+            // 
+            this.SaveEmailMenuItem.CheckOnClick = true;
+            this.SaveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
+            this.SaveEmailMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.SaveEmailMenuItem.Text = "Save E&mail Copy";
+            this.SaveEmailMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
+            // 
+            // SavePicturesMenuItem
+            // 
+            this.SavePicturesMenuItem.CheckOnClick = true;
+            this.SavePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
+            this.SavePicturesMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.SavePicturesMenuItem.Text = "Save &Pictures";
+            this.SavePicturesMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
+            // 
+            // sender
+            // 
+            this.sender.AspectName = "SenderName";
+            this.sender.FillsFreeSpace = true;
+            this.sender.HeaderForeColor = System.Drawing.SystemColors.ControlText;
+            this.sender.MinimumWidth = 200;
+            this.sender.Text = "From";
+            this.sender.Width = 200;
+            // 
+            // SentDate
+            // 
+            this.SentDate.AspectName = "SentDate";
+            this.SentDate.FillsFreeSpace = true;
+            this.SentDate.MinimumWidth = 250;
+            this.SentDate.Text = "Received";
+            this.SentDate.Width = 250;
+            // 
+            // infolder
+            // 
+            this.infolder.AspectName = "Folder";
+            this.infolder.FillsFreeSpace = true;
+            this.infolder.MinimumWidth = 200;
+            this.infolder.Text = "In Folder";
+            this.infolder.Width = 200;
+            // 
+            // TopicThread
+            // 
+            this.TopicThread.AllColumns.Add(this.sender);
+            this.TopicThread.AllColumns.Add(this.SentDate);
+            this.TopicThread.AllColumns.Add(this.infolder);
+            this.TopicThread.AllowDrop = true;
+            this.TopicThread.BackColor = System.Drawing.SystemColors.Control;
+            this.TopicThread.CellEditEnterChangesRows = true;
+            this.TopicThread.CellEditUseWholeCell = false;
+            this.TopicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.sender,
+            this.SentDate,
+            this.infolder});
+            this.TopicThread.Cursor = System.Windows.Forms.Cursors.Default;
+            this.TopicThread.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TopicThread.EmptyListMsg = "The fast list is empty";
+            this.TopicThread.FullRowSelect = true;
+            this.TopicThread.HideSelection = false;
+            this.TopicThread.Location = new System.Drawing.Point(620, 3);
+            this.TopicThread.MultiSelect = false;
+            this.TopicThread.Name = "TopicThread";
+            this.TopicThread.ShowGroups = false;
+            this.TopicThread.Size = new System.Drawing.Size(611, 161);
+            this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
+            this.TopicThread.TabIndex = 9;
+            this.TopicThread.UseCompatibleStateImageBehavior = false;
+            this.TopicThread.View = System.Windows.Forms.View.Details;
+            this.TopicThread.VirtualMode = true;
+            // 
+            // ItemViewerExpanded
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -756,7 +754,7 @@
             this.Controls.Add(this.L0vh_Tlp);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.MinimumSize = new System.Drawing.Size(1516, 197);
-            this.Name = "ItemViewer";
+            this.Name = "ItemViewerExpanded";
             this.Size = new System.Drawing.Size(2280, 907);
             this.L0vh_Tlp.ResumeLayout(false);
             this.L0vh_Tlp.PerformLayout();
@@ -765,9 +763,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).EndInit();
             this.L1h0L2hv3h_TlpBodyToggle.ResumeLayout(false);
             this.L1h0L2hv3h_TlpBodyToggle.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).EndInit();
             this.L1h1L2v1h3Panel.ResumeLayout(false);
             this.L1h1L2v1h3Panel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -788,10 +786,6 @@
         internal System.Windows.Forms.Label LblSearch;
         internal System.Windows.Forms.Label LblAcFolder;
         internal System.Windows.Forms.TextBox TxtboxBody;
-        public BrightIdeasSoftware.FastObjectListView TopicThread;
-        private BrightIdeasSoftware.OLVColumn sender;
-        internal BrightIdeasSoftware.OLVColumn SentDate;
-        private BrightIdeasSoftware.OLVColumn infolder;
         internal System.Windows.Forms.Label LblAcBody;
         internal Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_WebView2;
         public System.Windows.Forms.TableLayoutPanel L0vh_Tlp;
@@ -818,5 +812,9 @@
         public Viewers.ToolStripMenuItemCb SaveEmailMenuItem;
         public Viewers.ToolStripMenuItemCb SavePicturesMenuItem;
         internal System.Windows.Forms.Label LblAcMoveOptions;
+        public BrightIdeasSoftware.FastObjectListView TopicThread;
+        private BrightIdeasSoftware.OLVColumn sender;
+        internal BrightIdeasSoftware.OLVColumn SentDate;
+        private BrightIdeasSoftware.OLVColumn infolder;
     }
 }

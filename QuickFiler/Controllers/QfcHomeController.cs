@@ -185,8 +185,11 @@ namespace QuickFiler.Controllers
             else
             {
                 logger.Debug("Background load of email database complete.");
-                _formViewer.L1v1L2h5_SpnEmailPerLoad.Enabled = true;
-                _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
+                UIThreadExtensions.UiDispatcher.Invoke(() =>
+                {
+                    _formViewer.L1v1L2h5_SpnEmailPerLoad.Enabled = true;
+                    _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
+                });
                 _ = IterateQueueAsync();
                 WorkerComplete = true;
             }
@@ -425,16 +428,13 @@ namespace QuickFiler.Controllers
         private async void TimedConsumer(object source, ElapsedEventArgs e)
         {
             TraceUtility.LogMethodCall(source, e);
-
             Interlocked.Decrement(ref _metricsConsumers);
             var strOutput = _metrics.GetConsumingEnumerable().ToArray();
             if (strOutput.Length > 0)
             {
                 await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyD, default);
             }
-            
         }
-
 
         public void Cleanup()
         {

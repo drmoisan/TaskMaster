@@ -13,9 +13,9 @@ using UtilitiesCS;
 
 namespace QuickFiler
 {
-    public partial class ItemViewer : UserControl
+    public partial class ItemViewerExpanded : UserControl
     {
-        public ItemViewer()
+        public ItemViewerExpanded()
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;

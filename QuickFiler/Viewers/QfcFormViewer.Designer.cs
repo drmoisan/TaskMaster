@@ -38,9 +38,9 @@
             this.L1v1L2h5_SpnEmailPerLoad = new System.Windows.Forms.NumericUpDown();
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.QfcItemViewerTemplate = new QuickFiler.ItemViewer();
-            this.qfcItemViewerExpanded1 = new QuickFiler.QfcItemViewerExpanded();
             this.Worker = new System.ComponentModel.BackgroundWorker();
+            this.QfcItemViewerTemplate = new QuickFiler.ItemViewer();
+            this.QfcItemViewerExpandedTemplate = new QuickFiler.ItemViewerExpanded();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();
@@ -61,7 +61,7 @@
             this.L1v_TableLayout.RowCount = 2;
             this.L1v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 108F));
-            this.L1v_TableLayout.Size = new System.Drawing.Size(1996, 1515);
+            this.L1v_TableLayout.Size = new System.Drawing.Size(2165, 1293);
             this.L1v_TableLayout.TabIndex = 0;
             // 
             // L1v1L2h_TableLayout
@@ -82,19 +82,19 @@
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h4_ButtonUndo, 3, 0);
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h5_SpnEmailPerLoad, 6, 0);
             this.L1v1L2h_TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h_TableLayout.Location = new System.Drawing.Point(6, 1413);
+            this.L1v1L2h_TableLayout.Location = new System.Drawing.Point(6, 1191);
             this.L1v1L2h_TableLayout.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h_TableLayout.Name = "L1v1L2h_TableLayout";
             this.L1v1L2h_TableLayout.RowCount = 1;
             this.L1v1L2h_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v1L2h_TableLayout.Size = new System.Drawing.Size(1984, 96);
+            this.L1v1L2h_TableLayout.Size = new System.Drawing.Size(2153, 96);
             this.L1v1L2h_TableLayout.TabIndex = 0;
             // 
             // L1v1L2h5_BtnSkip
             // 
             this.L1v1L2h5_BtnSkip.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1v1L2h5_BtnSkip.Enabled = false;
-            this.L1v1L2h5_BtnSkip.Location = new System.Drawing.Point(1318, 6);
+            this.L1v1L2h5_BtnSkip.Location = new System.Drawing.Point(1402, 6);
             this.L1v1L2h5_BtnSkip.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h5_BtnSkip.Name = "L1v1L2h5_BtnSkip";
             this.L1v1L2h5_BtnSkip.Size = new System.Drawing.Size(148, 84);
@@ -105,7 +105,7 @@
             // button1
             // 
             this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button1.Location = new System.Drawing.Point(1158, 6);
+            this.button1.Location = new System.Drawing.Point(1242, 6);
             this.button1.Margin = new System.Windows.Forms.Padding(6);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(148, 84);
@@ -116,7 +116,7 @@
             // L1v1L2h2_ButtonOK
             // 
             this.L1v1L2h2_ButtonOK.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h2_ButtonOK.Location = new System.Drawing.Point(366, 6);
+            this.L1v1L2h2_ButtonOK.Location = new System.Drawing.Point(450, 6);
             this.L1v1L2h2_ButtonOK.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v1L2h2_ButtonOK.Name = "L1v1L2h2_ButtonOK";
             this.L1v1L2h2_ButtonOK.Size = new System.Drawing.Size(292, 84);
@@ -127,7 +127,7 @@
             // L1v1L2h3_ButtonCancel
             // 
             this.L1v1L2h3_ButtonCancel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h3_ButtonCancel.Location = new System.Drawing.Point(686, 6);
+            this.L1v1L2h3_ButtonCancel.Location = new System.Drawing.Point(770, 6);
             this.L1v1L2h3_ButtonCancel.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v1L2h3_ButtonCancel.Name = "L1v1L2h3_ButtonCancel";
             this.L1v1L2h3_ButtonCancel.Size = new System.Drawing.Size(292, 84);
@@ -138,7 +138,7 @@
             // L1v1L2h4_ButtonUndo
             // 
             this.L1v1L2h4_ButtonUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1v1L2h4_ButtonUndo.Location = new System.Drawing.Point(998, 6);
+            this.L1v1L2h4_ButtonUndo.Location = new System.Drawing.Point(1082, 6);
             this.L1v1L2h4_ButtonUndo.Margin = new System.Windows.Forms.Padding(6);
             this.L1v1L2h4_ButtonUndo.Name = "L1v1L2h4_ButtonUndo";
             this.L1v1L2h4_ButtonUndo.Size = new System.Drawing.Size(148, 84);
@@ -151,7 +151,7 @@
             this.L1v1L2h5_SpnEmailPerLoad.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.L1v1L2h5_SpnEmailPerLoad.Enabled = false;
             this.L1v1L2h5_SpnEmailPerLoad.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.L1v1L2h5_SpnEmailPerLoad.Location = new System.Drawing.Point(1486, 11);
+            this.L1v1L2h5_SpnEmailPerLoad.Location = new System.Drawing.Point(1570, 11);
             this.L1v1L2h5_SpnEmailPerLoad.Margin = new System.Windows.Forms.Padding(14, 6, 14, 6);
             this.L1v1L2h5_SpnEmailPerLoad.Name = "L1v1L2h5_SpnEmailPerLoad";
             this.L1v1L2h5_SpnEmailPerLoad.Size = new System.Drawing.Size(132, 74);
@@ -167,7 +167,7 @@
             this.L1v0L2_PanelMain.Location = new System.Drawing.Point(6, 6);
             this.L1v0L2_PanelMain.Margin = new System.Windows.Forms.Padding(6);
             this.L1v0L2_PanelMain.Name = "L1v0L2_PanelMain";
-            this.L1v0L2_PanelMain.Size = new System.Drawing.Size(1984, 1395);
+            this.L1v0L2_PanelMain.Size = new System.Drawing.Size(2153, 1173);
             this.L1v0L2_PanelMain.TabIndex = 1;
             // 
             // L1v0L2L3v_TableLayout
@@ -177,7 +177,7 @@
             this.L1v0L2L3v_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.L1v0L2L3v_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L1v0L2L3v_TableLayout.Controls.Add(this.QfcItemViewerTemplate, 0, 0);
-            this.L1v0L2L3v_TableLayout.Controls.Add(this.qfcItemViewerExpanded1, 0, 1);
+            this.L1v0L2L3v_TableLayout.Controls.Add(this.QfcItemViewerExpandedTemplate, 0, 1);
             this.L1v0L2L3v_TableLayout.Dock = System.Windows.Forms.DockStyle.Top;
             this.L1v0L2L3v_TableLayout.Location = new System.Drawing.Point(0, 0);
             this.L1v0L2L3v_TableLayout.Margin = new System.Windows.Forms.Padding(6);
@@ -186,7 +186,7 @@
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 221F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1018F));
             this.L1v0L2L3v_TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(1984, 1337);
+            this.L1v0L2L3v_TableLayout.Size = new System.Drawing.Size(2119, 1337);
             this.L1v0L2L3v_TableLayout.TabIndex = 0;
             // 
             // QfcItemViewerTemplate
@@ -200,31 +200,32 @@
             this.QfcItemViewerTemplate.Margin = new System.Windows.Forms.Padding(12);
             this.QfcItemViewerTemplate.MinimumSize = new System.Drawing.Size(1370, 183);
             this.QfcItemViewerTemplate.Name = "QfcItemViewerTemplate";
-            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(1960, 197);
+            this.QfcItemViewerTemplate.Size = new System.Drawing.Size(2095, 197);
             this.QfcItemViewerTemplate.TabIndex = 0;
             // 
-            // qfcItemViewerExpanded1
+            // QfcItemViewerExpandedTemplate
             // 
-            this.qfcItemViewerExpanded1.AutoSize = true;
-            this.qfcItemViewerExpanded1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.L1v0L2L3v_TableLayout.SetColumnSpan(this.qfcItemViewerExpanded1, 2);
-            this.qfcItemViewerExpanded1.Controller = null;
-            this.qfcItemViewerExpanded1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.qfcItemViewerExpanded1.Location = new System.Drawing.Point(6, 227);
-            this.qfcItemViewerExpanded1.Margin = new System.Windows.Forms.Padding(6);
-            this.qfcItemViewerExpanded1.MinimumSize = new System.Drawing.Size(1516, 197);
-            this.qfcItemViewerExpanded1.Name = "qfcItemViewerExpanded1";
-            this.qfcItemViewerExpanded1.Size = new System.Drawing.Size(1972, 1006);
-            this.qfcItemViewerExpanded1.TabIndex = 1;
+            this.QfcItemViewerExpandedTemplate.AutoSize = true;
+            this.QfcItemViewerExpandedTemplate.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.L1v0L2L3v_TableLayout.SetColumnSpan(this.QfcItemViewerExpandedTemplate, 2);
+            this.QfcItemViewerExpandedTemplate.Controller = null;
+            this.QfcItemViewerExpandedTemplate.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.QfcItemViewerExpandedTemplate.Location = new System.Drawing.Point(6, 227);
+            this.QfcItemViewerExpandedTemplate.Margin = new System.Windows.Forms.Padding(6);
+            this.QfcItemViewerExpandedTemplate.MinimumSize = new System.Drawing.Size(1516, 197);
+            this.QfcItemViewerExpandedTemplate.Name = "QfcItemViewerExpandedTemplate";
+            this.QfcItemViewerExpandedTemplate.Size = new System.Drawing.Size(2107, 1006);
+            this.QfcItemViewerExpandedTemplate.TabIndex = 1;
             // 
             // QfcFormViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1996, 1515);
+            this.ClientSize = new System.Drawing.Size(2165, 1293);
             this.Controls.Add(this.L1v_TableLayout);
             this.Margin = new System.Windows.Forms.Padding(6);
+            this.MinimumSize = new System.Drawing.Size(2191, 402);
             this.Name = "QfcFormViewer";
             this.Text = "Quick File";
             this.L1v_TableLayout.ResumeLayout(false);
@@ -250,8 +251,8 @@
         public System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
         public ItemViewer QfcItemViewerTemplate;
         internal System.ComponentModel.BackgroundWorker Worker;
-        private QfcItemViewerExpanded qfcItemViewerExpanded1;
         public System.Windows.Forms.Button button1;
         public System.Windows.Forms.Button L1v1L2h5_BtnSkip;
+        public ItemViewerExpanded QfcItemViewerExpandedTemplate;
     }
 }

@@ -22,7 +22,9 @@ namespace QuickFiler.Controllers
 
         #region Constructors and Private Members
 
-        public QfcQueue(CancellationToken token, QfcHomeController homeController, IApplicationGlobals appGlobals) 
+        public QfcQueue(CancellationToken token,
+                        QfcHomeController homeController,
+                        IApplicationGlobals appGlobals) 
         { 
             _token = token; 
             _homeController = homeController;
@@ -163,6 +165,9 @@ namespace QuickFiler.Controllers
             }
         }
 
+        private TlpCellStates _tlpStates;
+        public TlpCellStates TlpStates { get => _tlpStates; set => _tlpStates = value; }
+
         internal async Task<QfcItemGroup> AddAsync(TableLayoutPanel tlp, MailItem mailItem, int indexNumber)
         {
             var grp = new QfcItemGroup(mailItem);
@@ -230,7 +235,8 @@ namespace QuickFiler.Controllers
                             itemViewer: x.grp.ItemViewer,
                             viewerPosition: x.i + 1,
                             itemNumberDigits: digits,
-                            x.grp.MailItem);
+                            x.grp.MailItem,
+                            TlpStates);
                         await x.grp.ItemController.InitializeAsync();
                         return x.grp;
                     })
