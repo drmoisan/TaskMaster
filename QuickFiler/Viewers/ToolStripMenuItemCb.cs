@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 
 
@@ -15,7 +16,7 @@ namespace QuickFiler.Viewers
             InitializeComponent();
             if (Checked)
             {
-                base.Image = Properties.Resources.CheckBoxChecked;
+                Image = Properties.Resources.CheckBoxChecked;
             }
             //if (CheckOnClick)
             //{
@@ -42,6 +43,8 @@ namespace QuickFiler.Viewers
                 {
                     base.Image = null;
                 }
+                //base.CheckedChanged?.Invoke(sender, e);
+                CheckedChanged?.Invoke(this, new EventArgs());
                 base.Invalidate();                
             }
             
@@ -53,6 +56,7 @@ namespace QuickFiler.Viewers
                 Checked = !Checked;
         }
 
+        public new event EventHandler CheckedChanged;
         //public new event EventHandler Click;
 
         private bool _checkOnClick;
@@ -73,6 +77,12 @@ namespace QuickFiler.Viewers
                 }
             }
 
+        }
+
+        private new Image Image
+        {
+            get => base.Image;
+            set => base.Image = value;
         }
     }
 }

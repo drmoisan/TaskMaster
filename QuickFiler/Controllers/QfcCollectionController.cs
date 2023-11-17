@@ -110,7 +110,7 @@ namespace QuickFiler.Controllers
                     }
                 }
                 if (!blReadyForMove)
-                    MessageBox.Show("Error Notification", strNotifications, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(strNotifications, "Error Notification", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return blReadyForMove;
             }
         }

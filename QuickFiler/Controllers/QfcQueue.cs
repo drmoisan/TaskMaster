@@ -76,6 +76,8 @@ namespace QuickFiler.Controllers
 
         public async Task<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> TryDequeueAsync(CancellationToken token, int timeout)
         {
+            TraceUtility.LogMethodCall();
+
             token.ThrowIfCancellationRequested();
 
             if (_queue.Count == 0 && _jobsRunning == 0) 
@@ -93,7 +95,7 @@ namespace QuickFiler.Controllers
             (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) result = default;
             try 
             {
-                while (!_queue.IsCompleted && !token.IsCancellationRequested && result == default)
+                while (!_queue.IsCompleted && !token.IsCancellationRequested && result == default && _queue.Count + _jobsRunning > 0)
                 {
                     if (!_queue.TryTake(out result, queueTimeout, token))
                     {
@@ -101,8 +103,8 @@ namespace QuickFiler.Controllers
                         await Task.Delay(pollInterval, token);
                     }
                 }
-
-                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
+                if (result != default)
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
                 
             }
             catch (OperationCanceledException)
@@ -120,21 +122,34 @@ namespace QuickFiler.Controllers
         public async Task EnqueueAsync(IList<MailItem> items,
                                        IQfcCollectionController qfcCollectionController)
         {
+            TraceUtility.LogMethodCall();
+
             if (items is null) { throw new ArgumentNullException(nameof(items)); }
             if (items.Count == 0) { throw new ArgumentException("items is empty"); }
             _qfcCollectionController = qfcCollectionController;
 
             Interlocked.Increment(ref _jobsRunning);
-
+            logger.Debug($"{nameof(EnqueueAsync)} called and jobsRunning increased to {_jobsRunning}");
+            
             var tlp = await UiIdleCallAsync(() => _tlpTemplate.Clone(name: "BackgroundTableLayout"));
+
+            try
+            {
+                var itemGroups = await LoadControllersViewersAsync(items, _globals, 
+                    _homeController, qfcCollectionController, tlp, 0);
+                _queue.Add((tlp, itemGroups));
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"{nameof(EnqueueAsync)} failed to load controllers and viewers. \n {e.Message}");
+            }
+            finally
+            {
+                Interlocked.Decrement(ref _jobsRunning);
+                logger.Debug($"{nameof(EnqueueAsync)} completed and jobsRunning decreased to {_jobsRunning}");
             
-            var itemGroups = await LoadControllersViewersAsync(items, _globals, 
-                _homeController, qfcCollectionController, tlp, 0);
-            
-            _queue.Add((tlp, itemGroups));
-            
-            Interlocked.Decrement(ref _jobsRunning);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue));
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue));
+            }
         }
 
         public async Task JobsToFinish(int pollInterval, CancellationToken token)
@@ -170,6 +185,8 @@ namespace QuickFiler.Controllers
 
         internal async Task<QfcItemGroup> AddAsync(TableLayoutPanel tlp, MailItem mailItem, int indexNumber)
         {
+            TraceUtility.LogMethodCall();
+
             var grp = new QfcItemGroup(mailItem);
             var viewer = ItemViewerQueue.Dequeue(_token);
             grp.ItemViewer = viewer;
@@ -179,6 +196,8 @@ namespace QuickFiler.Controllers
 
         internal void AddViewerToTlp(TableLayoutPanel tlp, ItemViewer viewer, int indexNumber)
         {
+            TraceUtility.LogMethodCall();
+
             viewer.Parent = tlp;
             tlp.SetCellPosition(viewer, new TableLayoutPanelCellPosition(0, indexNumber));
             tlp.SetColumnSpan(viewer, 2);
@@ -221,6 +240,8 @@ namespace QuickFiler.Controllers
             TableLayoutPanel tlp,
             int start)
         {
+            TraceUtility.LogMethodCall();
+
             var digits = start + items.Count >= 10 ? 2:1;
             var itemTasks = Enumerable.Range(start, items.Count)
                     .ToAsyncEnumerable()
@@ -261,6 +282,8 @@ namespace QuickFiler.Controllers
             // Externally visible queue is now empty, but job is marked as running
             _queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(
                 new ConcurrentQueue<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>()); 
+            
+            logger.Debug($"{nameof(ChangeIterationSize)} called and jobsRunning increased to {_jobsRunning}");
             Interlocked.Increment(ref _jobsRunning);
 
             var queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(
@@ -304,7 +327,7 @@ namespace QuickFiler.Controllers
             // Set the externally visible queue to the new queue and mark the job as complete
             _queue = queue;
             Interlocked.Decrement(ref _jobsRunning);
-            
+            logger.Debug($"{nameof(ChangeIterationSize)} completed and jobsRunning decreased to {_jobsRunning}");
         }
 
         public void RenumberGroups(List<QfcItemGroup> itemGroups)

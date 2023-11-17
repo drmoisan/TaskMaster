@@ -79,6 +79,8 @@ namespace UtilitiesCS //QuickFiler
 
         public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, string emailPrefixToStrip, CancellationToken token, bool loadAll)
         {
+            TraceUtility.LogMethodCall();
+
             token.ThrowIfCancellationRequested();
 
             var info = new MailItemInfo(item);

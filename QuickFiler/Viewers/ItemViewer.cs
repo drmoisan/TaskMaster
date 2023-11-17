@@ -21,10 +21,6 @@ namespace QuickFiler
             _context = SynchronizationContext.Current;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitControlGroups();
-            MenuItem_CheckedChanged(this.ConversationMenuItem);
-            MenuItem_CheckedChanged(this.SaveAttachmentsMenuItem);
-            MenuItem_CheckedChanged(this.SaveEmailMenuItem);
-            MenuItem_CheckedChanged(this.SavePicturesMenuItem);
         }
 
         //private IList<Control> _rightControls;
@@ -159,6 +155,11 @@ namespace QuickFiler
             {
                 menuItem.Image = null;
             }
+        }
+
+        private void MoveOptionsMenu_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

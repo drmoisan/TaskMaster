@@ -96,6 +96,8 @@ namespace QuickFiler.Controllers
 
         public async Task InitializeAsync()
         {
+            TraceUtility.LogMethodCall();
+
             // Group controls into collections
             _token.ThrowIfCancellationRequested();
             await ResolveControlGroupsAsync(_itemViewer);
@@ -111,13 +113,14 @@ namespace QuickFiler.Controllers
                 PopulateControlsAsync(Mail, ItemNumber, true),
                 ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force),
                 ToggleNavigationAsync(desiredState: Enums.ToggleState.Off),
-                Task.Run(()=>WireEvents()),
                 Task.Run(()=>PopulateConversation()),
                 Task.Run(()=>PopulateFolderComboBox()),
             };
 
             await Task.WhenAll(tasks);
-            
+
+            await Task.Run(() => WireEvents());
+
             await InitializeWebViewAsync();
             
         }
@@ -245,6 +248,8 @@ namespace QuickFiler.Controllers
 
         internal async Task InitializeWebViewAsync()
         {
+            TraceUtility.LogMethodCall();
+
             _token.ThrowIfCancellationRequested();
 
             // Create the cache directory 
@@ -350,6 +355,8 @@ namespace QuickFiler.Controllers
         
         internal async Task PopulateControlsAsync(MailItem mailItem, int viewerPosition, bool loadAll)
         {
+            TraceUtility.LogMethodCall();
+
             _token.ThrowIfCancellationRequested();
 
             _itemInfo = await MailItemInfo.FromMailItemAsync(mailItem, _globals.Ol.EmailPrefixToStrip, _token, loadAll);
@@ -360,6 +367,8 @@ namespace QuickFiler.Controllers
 
         internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
         {
+            TraceUtility.LogMethodCall();
+
             _itemViewer.LblSender.Text = itemInfo.SenderName;
             _itemViewer.LblSubject.Text = itemInfo.Subject;
             _itemViewer.TxtboxBody.Text = itemInfo.Body;
@@ -370,9 +379,18 @@ namespace QuickFiler.Controllers
             else { _itemViewer.BtnFlagTask.DialogResult = DialogResult.Cancel; }
             _itemViewer.LblItemNumber.Text = viewerPosition.ToString();
             
-            _optionEmailCopy = _itemViewer.SaveEmailMenuItem.Checked;
-            _optionAttachments = _itemViewer.SaveAttachmentsMenuItem.Checked;
-            _optionConversationChecked = _itemViewer.ConversationMenuItem.Checked;
+            
+            _optionConversationChecked = _globals.QfSettings.MoveEntireConversation;
+            _itemViewer.ConversationMenuItem.Checked = _optionConversationChecked;
+
+            _optionEmailCopy = _globals.QfSettings.SaveEmailCopy;
+            _itemViewer.SaveEmailMenuItem.Checked = _optionEmailCopy;
+
+            _optionAttachments = _globals.QfSettings.SaveAttachments;
+            _itemViewer.SaveAttachmentsMenuItem.Checked = _optionAttachments;
+
+            _optionsPictures = _globals.QfSettings.SavePictures;
+            _itemViewer.SavePicturesMenuItem.Checked = _optionsPictures;
         }
 
         /// <summary>
@@ -476,6 +494,8 @@ namespace QuickFiler.Controllers
         
         public void PopulateFolderComboBox(object varList = null)
         {
+            TraceUtility.LogMethodCall();
+
             LoadFolderHandler(varList);
 
             UIThreadExtensions.UiDispatcher.BeginInvoke(()=>
@@ -545,8 +565,10 @@ namespace QuickFiler.Controllers
         private ItemViewer _itemViewer;
         private string _activeTheme;
         private System.Threading.Timer _emailIsReadTimer;
+        private bool _optionConversationChecked;
         private bool _optionEmailCopy;
         private bool _optionAttachments;
+        private bool _optionsPictures;
         private CancellationToken _token;
         private CancellationTokenSource _tokenSource;
         private TlpCellStates _tlpStates;
@@ -873,9 +895,10 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
-        private bool _optionConversationChecked;
         internal void CbxConversation_CheckedChanged(object sender, EventArgs e)
         {
+            TraceUtility.LogMethodCall();
+
             _optionConversationChecked = _itemViewer.ConversationMenuItem.Checked;
             if (!SuppressEvents)
             {
@@ -1308,6 +1331,8 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleTipsAsync(Enums.ToggleState desiredState)
         {
+            TraceUtility.LogMethodCall();
+
             _token.ThrowIfCancellationRequested();
 
             //List<Task> tasks = new List<Task>();
@@ -1414,6 +1439,8 @@ namespace QuickFiler.Controllers
 
         internal void CollapseConversation()
         {
+            TraceUtility.LogMethodCall();
+
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             var entryID = _convOriginID != "" ? _convOriginID :  Mail.EntryID;
             _parent.ToggleGroupConv(entryID);
@@ -1421,6 +1448,8 @@ namespace QuickFiler.Controllers
 
         internal void EnumerateConversation() 
         {
+            TraceUtility.LogMethodCall();
+
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             _parent.ToggleUnGroupConv(ConversationResolver,
                                        Mail.EntryID,
@@ -1460,7 +1489,7 @@ namespace QuickFiler.Controllers
                 bool attachments = SelectedFolder != "Trash to Delete" && _optionAttachments;
 
                 await SortEmail.SortAsync(mailItems: selItems,
-                                         savePictures: false,
+                                         savePictures: _optionsPictures,
                                          destinationOlStem: SelectedFolder,
                                          saveMsg: _optionEmailCopy,
                                          saveAttachments: attachments,
