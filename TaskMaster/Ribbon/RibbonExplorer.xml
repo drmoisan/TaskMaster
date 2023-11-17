@@ -25,19 +25,29 @@
                 <button id="SortEmail" imageMso="MoveToFolder" onAction="SortEmail_Click" label="Sort Email" size="large"/>
                 <button id="UndoSort" imageMso="Undo" onAction="UndoSort_Click" label="Undo Sort" size="large"/>
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
-                <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" size="large" itemSize="large">
-                  <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
-                  <button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
-                  <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />
-                  <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
-                  <button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
-                  <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
-                  <button id="LegacySortMailToExistingRun2" imageMso="TraceDependentCells" onAction="LegacySortMailToExistingRun2_Click" label="LegacySortMailToExistingRun2" />
-                  <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
-                  <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
-                  <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />
-                  <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
-                </menu>
+                <menu id="Settings" imageMso="ContentTypeSettings" label="Settings" size="large" itemSize="large">
+                  <menu id="QuickFilerSettings" imageMso="ContentTypeSettings" label="Quick Filer" itemSize="large">
+                    <menu id="ItemSortSettings" imageMso="CustomizeSearchFolder" label="Item Sort Settings" itemSize ="normal">            
+                      <checkBox id="MoveEntireConversationDefault" label="Move Entire Conversation" getPressed="MoveEntireConversation_GetPressed" onAction="MoveEntireConversation_Clicked"/>
+                      <checkBox id="SaveAttachmentsDefault" label="Save Attachments" getPressed="SaveAttachments_GetPressed" onAction="SaveAttachments_Clicked"/>
+                      <checkBox id="SaveEmailCopyDefault" label="Save Email Copy" getPressed="SaveEmailCopy_GetPressed" onAction="SaveEmailCopy_Clicked"/>
+                      <checkBox id="SavePicturesDefault" label="Save Pictures" getPressed="SavePictures_GetPressed" onAction="SavePictures_Clicked"/>
+                    </menu>
+                  </menu>  
+                  <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" itemSize="large">
+                    <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
+                    <button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
+                    <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />
+                    <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
+                    <button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
+                    <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
+                    <button id="LegacySortMailToExistingRun2" imageMso="TraceDependentCells" onAction="LegacySortMailToExistingRun2_Click" label="LegacySortMailToExistingRun2" />
+                    <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
+                    <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
+                    <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />
+                    <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
+                  </menu> 
+                </menu>  
               </group>
             </tab>
         </tabs>

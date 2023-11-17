@@ -12,5 +12,6 @@ namespace UtilitiesCS
         IToDoObjects TD { get; }
         IAppAutoFileObjects AF { get; }
         IAppEvents Events { get; }
+        IAppQuickFilerSettings QfSettings { get; }
     }
 }

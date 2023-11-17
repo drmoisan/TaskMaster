@@ -23,6 +23,7 @@ namespace QuickFiler
             InitializeComponent();
             _context = SynchronizationContext.Current;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            //InitMenuItems();
             InitTipsLabelsList();
         }
 
@@ -79,18 +80,55 @@ namespace QuickFiler
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private void MenuItem_CheckedChanged(object sender, EventArgs e)
-        {
-            var menuItem = (ToolStripMenuItem)sender;
-            if (menuItem.Checked)
-            {
-                menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            }
-            else
-            {
-                menuItem.Image = null;
-            }
-        }
+        //private void InitMenuItems()
+        //{
+        //    MenuItem_CheckedChanged(ConversationMenuItem);
+        //    MenuItem_CheckedChanged(SaveAttachmentsMenuItem);
+        //    MenuItem_CheckedChanged(SaveEmailMenuItem);
+        //    MenuItem_CheckedChanged(SavePicturesMenuItem);
+        //}
+
+        //private void MenuItem_CheckedChanged(object sender, EventArgs e)
+        //{
+        //    var menuItem = (ToolStripMenuItem)sender;
+        //    MenuItem_CheckedChanged(menuItem);
+        //}
+
+        //private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
+        //{
+        //    if (menuItem.Checked)
+        //    {
+        //        menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+        //    }
+        //    else
+        //    {
+        //        menuItem.Image = null;
+        //    }
+        //}
+
+        //private void MenuItem_Click(object sender, EventArgs e)
+        //{
+        //    var menuItem = (ToolStripMenuItem)sender;
+        //    menuItem.Checked = !menuItem.Checked;
+        //}
+
+        //private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
+        //{
+        //    if (menuItem.Checked)
+        //    {
+        //        menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+        //    }
+        //    else
+        //    {
+        //        menuItem.Image = null;
+        //    }
+        //}
+
+        //private void MenuItem_Click(object sender, EventArgs e)
+        //{
+        //    var menuItem = (ToolStripMenuItem)sender;
+        //    menuItem.Checked = !menuItem.Checked;
+        //}
 
         private void EditFiltersMenuItem_Click(object sender, EventArgs e)
         {

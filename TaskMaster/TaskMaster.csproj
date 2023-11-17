@@ -339,6 +339,7 @@
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
+    <Compile Include="AppGlobals\AppQuickFilerSettings.cs" />
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />
     <Compile Include="AppGlobals\ToDoObj.cs" />

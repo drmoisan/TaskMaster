@@ -184,7 +184,8 @@ namespace QuickFiler.Controllers
             set
             {
                 _saveAttachments = value;
-                Settings.Default.SaveAttachments = value;
+                // Should be set elsewhere as a user default
+                //Settings.Default.SaveAttachments = value;
             }
         }
 
@@ -195,7 +196,8 @@ namespace QuickFiler.Controllers
             set
             {
                 _saveEmail = value;
-                Settings.Default.SaveEmail = value;
+                // Should be set elsewhere as a user default
+                //Settings.Default.SaveEmail = value;
             }
         }
 
@@ -206,7 +208,8 @@ namespace QuickFiler.Controllers
             set
             {
                 _savePictures = value;
-                Settings.Default.SavePictures = value;
+                // Should be set elsewhere as a user default
+                //Settings.Default.SavePictures = value;
             }
         }
 
@@ -217,7 +220,8 @@ namespace QuickFiler.Controllers
             set
             {
                 _moveConversation = value;
-                Settings.Default.MoveConversation = value;
+                // Should be set elsewhere as a user default
+                //Settings.Default.MoveConversation = value;
             }
         }
 

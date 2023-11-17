@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewer));
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties3 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
             this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -146,7 +146,7 @@
             this.MoveOptionsStrip.Location = new System.Drawing.Point(1380, 0);
             this.MoveOptionsStrip.Name = "MoveOptionsStrip";
             this.L0vh_Tlp.SetRowSpan(this.MoveOptionsStrip, 2);
-            this.MoveOptionsStrip.Size = new System.Drawing.Size(200, 40);
+            this.MoveOptionsStrip.Size = new System.Drawing.Size(200, 42);
             this.MoveOptionsStrip.TabIndex = 43;
             this.MoveOptionsStrip.Text = "menuStrip1";
             // 
@@ -158,7 +158,7 @@
             this.SaveEmailMenuItem,
             this.SavePicturesMenuItem});
             this.MoveOptionsMenu.Name = "MoveOptionsMenu";
-            this.MoveOptionsMenu.Size = new System.Drawing.Size(186, 36);
+            this.MoveOptionsMenu.Size = new System.Drawing.Size(186, 38);
             this.MoveOptionsMenu.Text = "&Move Options";
             // 
             // ConversationMenuItem
@@ -167,36 +167,32 @@
             this.ConversationMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("ConversationMenuItem.Image")));
             this.ConversationMenuItem.Name = "ConversationMenuItem";
             this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
-            this.ConversationMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.ConversationMenuItem.Size = new System.Drawing.Size(359, 44);
             this.ConversationMenuItem.Text = "Move &Conversation";
-            this.ConversationMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // SaveAttachmentsMenuItem
             // 
             this.SaveAttachmentsMenuItem.CheckOnClick = true;
             this.SaveAttachmentsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SaveAttachmentsMenuItem.Image")));
             this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
-            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(359, 44);
             this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
-            this.SaveAttachmentsMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // SaveEmailMenuItem
             // 
             this.SaveEmailMenuItem.CheckOnClick = true;
             this.SaveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
             this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
-            this.SaveEmailMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.SaveEmailMenuItem.Size = new System.Drawing.Size(359, 44);
             this.SaveEmailMenuItem.Text = "Save E&mail Copy";
-            this.SaveEmailMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // SavePicturesMenuItem
             // 
             this.SavePicturesMenuItem.CheckOnClick = true;
             this.SavePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
             this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
-            this.SavePicturesMenuItem.Size = new System.Drawing.Size(355, 44);
+            this.SavePicturesMenuItem.Size = new System.Drawing.Size(359, 44);
             this.SavePicturesMenuItem.Text = "Save &Pictures";
-            this.SavePicturesMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // LblAcSearch
             // 
@@ -258,13 +254,13 @@
             this.L0v2h2_WebView2.AllowExternalDrop = true;
             this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
             this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
-            coreWebView2CreationProperties3.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties3.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties3.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties3.Language = null;
-            coreWebView2CreationProperties3.ProfileName = null;
-            coreWebView2CreationProperties3.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties3;
+            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties2.Language = null;
+            coreWebView2CreationProperties2.ProfileName = null;
+            coreWebView2CreationProperties2.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties2;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 216);

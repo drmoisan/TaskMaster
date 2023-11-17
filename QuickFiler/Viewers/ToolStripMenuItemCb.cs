@@ -17,10 +17,10 @@ namespace QuickFiler.Viewers
             {
                 base.Image = Properties.Resources.CheckBoxChecked;
             }
-            if (CheckOnClick)
-            {
-                base.Click += ToolStripMenuItemCb_Click;
-            }
+            //if (CheckOnClick)
+            //{
+            //    base.Click += ToolStripMenuItemCb_Click;
+            //}
             
             base.Invalidate();
         }
@@ -64,6 +64,7 @@ namespace QuickFiler.Viewers
                 _checkOnClick = value;
                 if (_checkOnClick)
                 {
+                    base.Click -= ToolStripMenuItemCb_Click;
                     base.Click += ToolStripMenuItemCb_Click;
                 }
                 else

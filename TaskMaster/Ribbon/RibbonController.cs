@@ -25,14 +25,14 @@ namespace TaskMaster
     public class RibbonController
     {
         private RibbonViewer _viewer;
-        private IApplicationGlobals _globals;
+        private ApplicationGlobals _globals;
         private bool blHook = true;
         private IFilerHomeController _quickFiler;
         private bool _quickFilerLoaded = false;
 
         public RibbonController() { }
 
-        internal void SetGlobals(IApplicationGlobals AppGlobals)
+        internal void SetGlobals(ApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
         }
@@ -162,6 +162,22 @@ namespace TaskMaster
         {
             ToDoModel.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
         }
+
+        #region SettingsMenu
+        
+        internal bool IsMoveEntireConversationActive() => _globals.QfSettings.MoveEntireConversation;
+        internal void ToggleMoveEntireConversation() => _globals.InternalQfSettings.MoveEntireConversation = !_globals.InternalQfSettings.MoveEntireConversation;
+        
+        internal bool IsSaveAttachmentsActive() => _globals.QfSettings.SaveAttachments;
+        internal void ToggleSaveAttachments() => _globals.InternalQfSettings.SaveAttachments = !_globals.InternalQfSettings.SaveAttachments;
+        
+        internal bool IsSavePicturesActive() => _globals.QfSettings.SavePictures;
+        internal void ToggleSavePictures() => _globals.InternalQfSettings.SavePictures = !_globals.InternalQfSettings.SavePictures;
+        
+        internal bool IsSaveEmailCopyActive() => _globals.QfSettings.SaveEmailCopy;
+        internal void ToggleSaveEmailCopy() => _globals.InternalQfSettings.SaveEmailCopy = !_globals.InternalQfSettings.SaveEmailCopy;
+
+        #endregion SettingsMenu
 
         #region Try specific methods
         internal void RunTry()

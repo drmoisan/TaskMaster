@@ -146,8 +146,25 @@ namespace TaskMaster
 
         public bool ToggleDarkMode_GetPressed(Office.IRibbonControl control) => _controller.IsDarkModeActive();
         public void ToggleDarkMode_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleDarkMode();
-        
+
         #endregion
+
+        #region SettingsMenu
+
+        public bool MoveEntireConversation_GetPressed(Office.IRibbonControl control) => _controller.IsMoveEntireConversationActive();
+        public void MoveEntireConversation_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleMoveEntireConversation();
+        
+        public bool SaveAttachments_GetPressed(Office.IRibbonControl control) => _controller.IsSaveAttachmentsActive();
+        public void SaveAttachments_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveAttachments();
+        
+        public bool SaveEmailCopy_GetPressed(Office.IRibbonControl control) => _controller.IsSaveEmailCopyActive();
+        public void SaveEmailCopy_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveEmailCopy();
+        
+        public bool SavePictures_GetPressed(Office.IRibbonControl control) => _controller.IsSavePicturesActive();
+        public void SavePictures_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSavePictures();
+
+
+        #endregion SettingsMenu
 
         #region TryMethods  
         public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
