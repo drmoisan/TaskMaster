@@ -747,12 +747,13 @@ namespace QuickFiler.Controllers
             new List<Control> { _itemViewer.CboFolders, });
 
             _itemViewer.ConversationMenuItem.CheckedChanged += this.CbxConversation_CheckedChanged;
-            _itemViewer.BtnFlagTask.Click += new System.EventHandler(this.BtnFlagTask_Click);
-            _itemViewer.BtnPopOut.Click += new System.EventHandler(this.BtnPopOut_Click);
-            _itemViewer.BtnDelItem.Click += new System.EventHandler(this.BtnDelItem_Click);
-            _itemViewer.BtnReply.Click += new System.EventHandler(this.BtnReply_Click);
-            _itemViewer.BtnReplyAll.Click += new System.EventHandler(this.BtnReplyAll_Click);
-            _itemViewer.BtnForward.Click += new System.EventHandler(this.BtnForward_Click);
+            _itemViewer.BtnFlagTask.Click += this.BtnFlagTask_Click;
+            _itemViewer.BtnPopOut.Click += this.BtnPopOut_Click;
+            _itemViewer.BtnDelItem.Click += this.BtnDelItem_Click;
+            _itemViewer.BtnReply.Click += this.BtnReply_Click;
+            _itemViewer.BtnReplyAll.Click += this.BtnReplyAll_Click;
+            _itemViewer.BtnForward.Click += this.BtnForward_Click;
+            _itemViewer.TxtboxBody.DoubleClick += this.TxtboxBody_DoubleClick;
             
             foreach (var btn in _buttons)
             {
@@ -918,6 +919,11 @@ namespace QuickFiler.Controllers
         internal async void BtnReplyAll_Click(object sender, EventArgs e) => await ReplyAll();
 
         internal async void BtnForward_Click(object sender, EventArgs e) => await Forward();
+
+        internal async void TxtboxBody_DoubleClick(object sender, EventArgs e)
+        {
+            await Task.Run(() => Mail.Display());
+        }
 
         private void Button_MouseEnter(object sender, EventArgs e)
         {
