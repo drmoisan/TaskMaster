@@ -274,34 +274,11 @@ namespace QuickFiler.Controllers
 
         public async Task InitDfAsync(Explorer activeExplorer, ProgressTracker progress)
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
-
-            var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
             
-            Frame<int, string> df = null;
-                        
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
-            try
-            {
-                df = await DfDeedle.GetEmailDataInViewAsync(
-                    activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
-                    .ConfigureAwait(false);
-            }
-            catch (TaskCanceledException)
-            {
-                await ToggleOfflineMode(offline);
-            }
-            catch (System.Exception e)
-            {
-                await ToggleOfflineMode(offline);
-                throw e;
-            }
+            var df = await GetEmailsInViewDfAsync(activeExplorer, progress).ConfigureAwait(false);
 
             if (df is not null)
             {
-                // Restore online mode if it was previously so
-                await ToggleOfflineMode(offline);
-
                 logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
                 // Filter out non-email items
                 df = df.FilterRowsBy("MessageClass", "IPM.Note");
@@ -314,7 +291,41 @@ namespace QuickFiler.Controllers
                 _frame = SortTriageDate(dfFiltered);
 
                 progress.Report(100);
-            }    
+            }
+        }
+
+        private async Task<Frame<int, string>> GetEmailsInViewDfAsync(Explorer activeExplorer, ProgressTracker progress)
+        {
+            Frame<int, string> df = null;
+
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
+            var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
+            
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
+            try
+            {
+                df = await DfDeedle.GetEmailDataInViewAsync(
+                    activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
+                    .ConfigureAwait(false);
+                await ToggleOfflineMode(offline);
+                
+                //df.DisplayDialog();
+                
+                return df;
+            }
+            catch (TaskCanceledException)
+            {
+                logger.Debug($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Task cancelled");
+                await ToggleOfflineMode(offline);
+                return null;
+            }
+            catch (System.Exception e)
+            {
+                await ToggleOfflineMode(offline);
+                logger.Error($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Error. \n {e.Message}\n{e.StackTrace}");
+                throw e;
+            }
+
         }
 
         public Frame<int, string> SortTriageDate(Frame<int, string> df)
@@ -362,6 +373,9 @@ namespace QuickFiler.Controllers
 
     internal class EmailSorter
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public EmailSorter() { }
         public EmailSorter(SortOptionsEnum options) { _options = options; }
 
@@ -386,9 +400,22 @@ namespace QuickFiler.Controllers
 
         public long GetSortKey(string triage, DateTime dateTime)
         {
-            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) && _options.HasFlag(SortOptionsEnum.DateRecentFirst))
+            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) && 
+                _options.HasFlag(SortOptionsEnum.DateRecentFirst))
             {
-                return (long)(100000000000000 * _triageImportantLast[triage]) + GetDateKey(dateTime); 
+                try
+                {
+                    var triageKey = (long)(100000000000000 * _triageImportantLast[triage]) 
+                        + GetDateKey(dateTime);
+                    return triageKey;
+                }
+                catch (KeyNotFoundException e)
+                {
+                    logger.Error($"Triage value {triage} not found in " +
+                        $"dictionary from date {GetDateKey(dateTime)} " +
+                        $"\n {e.Message} \n {e.StackTrace}");
+                    throw;
+                }
             }
             return -1;
         }

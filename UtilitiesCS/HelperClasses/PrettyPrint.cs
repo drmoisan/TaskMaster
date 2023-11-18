@@ -50,6 +50,53 @@ namespace UtilitiesCS
             return strings;
         }
 
+        public static DataTable ArraytoDatatable(object[,] numbers)
+        {
+            DataTable dt = new DataTable();
+            for (int i = 0; i < numbers.GetLength(1); i++)
+            {
+                dt.Columns.Add("Column" + (i + 1));
+            }
+
+            for (var i = 0; i < numbers.GetLength(0); ++i)
+            {
+                DataRow row = dt.NewRow();
+                for (var j = 0; j < numbers.GetLength(1); ++j)
+                {
+                    row[j] = numbers[i, j];
+                }
+                dt.Rows.Add(row);
+            }
+            return dt;
+        }
+
+        public static DataTable ArraytoDatatable(object[,] numbers, string[] headers)
+        {
+            if (numbers.GetLength(1) != headers.Length)
+            {
+                throw new ArgumentException($"Number of headers {headers.Length} " +
+                    $"must match number of columns {numbers.GetLength(1)}");
+            }
+
+            DataTable dt = new DataTable();
+            for (int i = 0; i < numbers.GetLength(1); i++)
+            {
+                dt.Columns.Add(headers[i]);
+            }
+
+            for (var i = 0; i < numbers.GetLength(0); ++i)
+            {
+                DataRow row = dt.NewRow();
+                for (var j = 0; j < numbers.GetLength(1); ++j)
+                {
+                    row[j] = numbers[i, j];
+                }
+                dt.Rows.Add(row);
+            }
+            return dt;
+        }
+
+
         internal static int[] GetMaxLengthsByColumn(this string[,] strings)
         {
             int[] maxLengthsByColumn = new int[strings.GetLength(1)];
@@ -188,6 +235,54 @@ namespace UtilitiesCS
             dfViewer.Refresh();
             Debug.WriteLine($"Size is {dfViewer.Size.ToString()}");
             dfViewer.Dgv.Dock = DockStyle.Fill;
+        }
+        public static void DisplayDialog(this DataTable table)
+        {
+            DgvForm dfViewer = new DgvForm();
+            dfViewer.Show();
+            
+            int diffHeight = dfViewer.Height - dfViewer.Dgv.Height;
+            int diffWidth = dfViewer.Width - dfViewer.Dgv.Width;
+            dfViewer.Dgv.Dock = DockStyle.None;
+
+            dfViewer.Dgv.DataSource = table;
+
+            
+            for (int i = 0; i < dfViewer.Dgv.Columns.Count - 1; i++)
+            {
+                dfViewer.Dgv.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            }
+            dfViewer.Dgv.Columns[dfViewer.Dgv.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+
+            int dgvWidth = 0;
+            for (int i = 0; i <= dfViewer.Dgv.Columns.Count - 1; i++)
+            {
+                // Store Auto Sized Widths:
+                int colw = dfViewer.Dgv.Columns[i].Width;
+
+                // Remove AutoSizing:
+                dfViewer.Dgv.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+
+                // Set Width to calculated AutoSize value:
+                dfViewer.Dgv.Columns[i].Width = colw;
+                dgvWidth += colw;
+            }
+
+            dfViewer.Hide();
+            dfViewer.Dgv.Width = dgvWidth + dfViewer.Dgv.RowHeadersWidth;
+            int lastRowHeight = dfViewer.Dgv.Rows[dfViewer.Dgv.Rows.Count - 1].Height;
+            dfViewer.Dgv.Height = dfViewer.Dgv.Rows
+                                  .Cast<DataGridViewRow>()
+                                  .Select(row => row.Height)
+                                  .Sum() + dfViewer.Dgv.ColumnHeadersHeight;
+            //dfViewer.Width = dgvWidth + diffWidth + dfViewer.Dgv.RowHeadersWidth;
+            dfViewer.Width = dfViewer.Dgv.Width + diffWidth + 6;
+            dfViewer.Height = dfViewer.Dgv.Height + diffHeight + 6;
+            dfViewer.Refresh();
+            Debug.WriteLine($"Size is {dfViewer.Size.ToString()}");
+            dfViewer.Dgv.Dock = DockStyle.Fill;
+            dfViewer.ShowDialog();
         }
     }
 }

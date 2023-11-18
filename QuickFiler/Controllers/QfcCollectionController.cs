@@ -637,19 +637,59 @@ namespace QuickFiler.Controllers
         public void WireUpAsyncKeyboardHandler()
         {
             RegisterNavigation();
-            _kbdHandler.KeyActionsAsync = GenerateKeyAsyncActions();
+            RegisterAsyncKeyActions();
+            RegisterAlwaysOnAsyncKeyActions();
         }
 
-        internal KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> GenerateKeyAsyncActions()
+        internal void RegisterAsyncKeyActions()
         {
-            var keyActions = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
-                               new List<KaKeyAsync>
-                               {
+            _kbdHandler.KeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
+                new List<KaKeyAsync>
+                {
                     new KaKeyAsync("Collection", Keys.Up, (k) => SelectPreviousItemAsync()),
                     new KaKeyAsync("Collection", Keys.Down, (k) => SelectNextItemAsync()),
-                    new KaKeyAsync("Collection", Keys.Return, (k) => _parent.ActionOkAsync())
                 });
-            return keyActions;
+        }
+
+        internal void RegisterAlwaysOnAsyncKeyActions()
+        {
+            _kbdHandler.AlwaysOnKeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
+                new List<KaKeyAsync>
+                {
+                    new KaKeyAsync("Collection", Keys.Return, (k) => CustomReturnKeyHandler())
+                });
+        }
+
+        internal async Task CustomReturnKeyHandler()
+        {
+            var anyOpen = AnyOpenDropDowns(true, Token);
+            if (!anyOpen)
+            {
+                await _parent.ActionOkAsync();
+            }
+        }
+
+        internal bool AnyOpenDropDowns(bool close, CancellationToken token)
+        {
+            return _itemGroups.Any(grp => DropDownState(grp.ItemViewer.CboFolders, close));
+        }
+
+        internal async Task<bool> AnyOpenDropDownsAsync(bool close, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            return await Task.Factory.StartNew(
+                () => _itemGroups.Any(grp => DropDownState(grp.ItemViewer.CboFolders, close)),
+                token,
+                TaskCreationOptions.None,
+                _formViewer.UiScheduler);
+        }
+        
+        private bool DropDownState(ComboBox comboBox, bool close)
+        {
+            var state = comboBox.DroppedDown;
+            if (close && state) { comboBox.DroppedDown = false; }
+            return state; 
         }
 
         internal void RegisterNavigation()

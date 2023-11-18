@@ -80,9 +80,10 @@ namespace UtilitiesCS
 
             logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.EtlAsync)} ...");
             (object[,] data, Dictionary<string, int> columnInfo) = await table.EtlAsync(token, tokenSource, 0, progress.Increment(2).SpawnChild(96));
+            //(PrettyPrinters.ArraytoDatatable(data, columnInfo.Keys.Cast<string>().ToArray())).DisplayDialog();
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Array2DToDf)} ...");
-            Frame<int, string> df = await Task.Factory.StartNew(() => Array2DToDf(storeID, data, columnInfo),
+            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Email2dArrayToDf)} ...");
+            Frame<int, string> df = await Task.Factory.StartNew(() => Email2dArrayToDf(storeID, data, columnInfo),
                 token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
 
             logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(GetEmailDataInViewAsync)} complete");
@@ -90,41 +91,69 @@ namespace UtilitiesCS
             return df;
         }
 
-        private static Frame<int, string> Array2DToDf(string storeID, object[,] data, Dictionary<string, int> columnInfo)
+        private static Frame<int, string> Email2dArrayToDf(string storeID, object[,] data, Dictionary<string, int> columnInfo)
         {
-            var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
-            {
-                DateTime sentOn = DateTime.MaxValue;
-                var dateField = data[i, columnInfo["SentOn"]];
-                if (dateField is not null) { DateTime.TryParse(dateField.ToString(), out sentOn); }
-                if (dateField is null) { sentOn = DateTime.MaxValue; }
-
-                return new
-                {
-                    EntryId = data[i, columnInfo["EntryID"]],
-                    MessageClass = data[i, columnInfo["MessageClass"]].ToString(),
-                    SentOn = sentOn,
-                    ConversationId = data[i, columnInfo["ConversationId"]],
-                    Triage = (string)data[i, columnInfo["Triage"]] ?? "Z",
-                    StoreId = storeID
-                };
-            });
-
-            //string[,] strAry = new string[records.Count(), 6];
-            //var r2 = records.ToList();
-            //Enumerable.Range(0, data.GetLength(0)).ForEach(i =>
-            //{
-            //    strAry[i,0] = r2[i].EntryId.ToString();
-            //    strAry[i, 1] = r2[i].MessageClass.ToString();
-            //    strAry[i, 2] = r2[i].SentOn.ToString();
-            //    strAry[i, 3] = r2[i].ConversationId.ToString();
-            //    strAry[i, 4] = r2[i].Triage.ToString();
-            //    strAry[i, 5] = r2[i].StoreId.ToString();
-            //});
-            //logger.Debug(strAry.ToFormattedText());
-
+            IEnumerable<EmailRecord> records = Email2dToRecords(storeID, data, columnInfo);
             var df = Frame.FromRecords(records);
             return df;
+        }
+
+        private static IEnumerable<EmailRecord> Email2dToRecords(string storeID, object[,] data, Dictionary<string, int> columnInfo)
+        {
+            var acceptableTriage = new string[] { "Z", "A", "B", "C", };
+            var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
+            {
+                var record = new EmailRecord
+                (
+                    entryId: (string)data[i, columnInfo["EntryID"]],
+                    messageClass: data[i, columnInfo["MessageClass"]].ToString(),
+                    sentOn: DateFrom2dPosition(data, columnInfo["SentOn"], i),
+                    conversationId: (string)data[i, columnInfo["ConversationId"]],
+                    triage: AcceptableTriage((string)data[i, columnInfo["Triage"]] ?? "Z"),
+                    storeId: (string)storeID
+                );
+                return record;
+            });
+            
+            
+            return records;
+        }
+
+        private struct EmailRecord
+        {
+            public EmailRecord() { }
+            public EmailRecord(string entryId, string messageClass, DateTime sentOn, string conversationId, string triage, string storeId)
+            {
+                EntryId = entryId;
+                MessageClass = messageClass;
+                SentOn = sentOn;
+                ConversationId = conversationId;
+                Triage = triage;
+                StoreId = storeId;
+            }
+            public string EntryId = default;
+            public string MessageClass = default;
+            public DateTime SentOn = default;
+            public string ConversationId = default;
+            public string Triage = default;
+            public string StoreId = default;
+        }
+
+        private static string AcceptableTriage(string triage)
+        {
+            var acceptableTriage = new string[] { "Z", "A", "B", "C", };
+            if (!acceptableTriage.Contains(triage)) { return "Z"; }
+            return triage;
+        }
+        
+        private static DateTime DateFrom2dPosition(object[,] data, int column, int row)
+        {
+            DateTime date = DateTime.MaxValue;
+            var dateField = data[row, column];
+            if (dateField is not null) { DateTime.TryParse(dateField.ToString(), out date); }
+            if (dateField is null) { date = DateTime.MaxValue; }
+
+            return date;
         }
 
         private static void AddQfcColumns(Table table)
@@ -225,6 +254,20 @@ namespace UtilitiesCS
         {
             DataTable table = df.ToDataTable(rowKeyNames);
             table.Display();
+        }
+
+        public static void DisplayDialog(this Frame<int, string> df)
+        {
+            var rowNames = new List<string> { "Rows"};
+            DataTable table = df.ToDataTable(rowNames);
+            table.DisplayDialog();
+        }
+
+        public static void DisplayDialog(this Frame<int, string> df, IEnumerable<string> rowKeyNames)
+        {
+            var rowNames = rowKeyNames.ToArray();
+            DataTable table = df.ToDataTable(rowNames);
+            table.DisplayDialog();
         }
 
         //public static  GetDfColumn(string columnName, object[] columnData)

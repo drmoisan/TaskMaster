@@ -50,6 +50,9 @@ namespace QuickFiler.Controllers
             set => _keyActions = value;
         }
 
+        private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _alwaysOnKeyActionsAsync = [];
+        public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> AlwaysOnKeyActionsAsync { get => _alwaysOnKeyActionsAsync; set => _alwaysOnKeyActionsAsync = value; }
+
         private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _keyActionsAsync = [];
         public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> KeyActionsAsync { get => _keyActionsAsync; set => _keyActionsAsync = value; }
 
@@ -113,6 +116,13 @@ namespace QuickFiler.Controllers
 
         public async Task KeyDownTaskAsync(object sender, KeyEventArgs e)
         {
+            if ((AlwaysOnKeyActionsAsync != null) && AlwaysOnKeyActionsAsync.ContainsKey(e.KeyCode)) 
+            { 
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+                await AlwaysOnKeyActionsAsync[e.KeyCode](e.KeyCode);
+            }
+
             if (KbdActive)
             {
                 if ((KeyActionsAsync != null) && KeyActionsAsync.ContainsKey(e.KeyCode))

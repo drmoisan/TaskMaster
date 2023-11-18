@@ -761,7 +761,7 @@ namespace QuickFiler.Controllers
             }
                         
             _itemViewer.TxtboxSearch.TextChanged += new System.EventHandler(this.TextBoxSearch_TextChanged);
-            _itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBoxSearch_KeyDown);
+            //_itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBoxSearch_KeyDown);
             _itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_kbdHandler.CboFolders_KeyDownAsync);
             //_itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_kbdHandler.CboFolders_KeyDown);
             _itemViewer.CboFolders.SelectedIndexChanged += this.CboFolders_SelectedIndexChanged;
@@ -949,32 +949,6 @@ namespace QuickFiler.Controllers
             if (_itemViewer.CboFolders.Items.Count >= 2)
                 _itemViewer.CboFolders.SelectedIndex = 1;
             _itemViewer.CboFolders.DroppedDown = true;
-        }
-
-        internal void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Down)
-            {
-                _itemViewer.CboFolders.DroppedDown = true;
-                _itemViewer.CboFolders.Focus();
-                e.SuppressKeyPress = true;
-                e.Handled = true;
-            }
-            else if (e.KeyCode == Keys.Return)
-            {
-                if(_itemViewer.CboFolders.DroppedDown == true)
-                {
-                    _itemViewer.CboFolders.DroppedDown = false;
-                }
-                else
-                {
-                    _kbdHandler.KeyboardHandler_KeyDownAsync(sender, e);
-                }
-            }
-            else
-            {
-                _kbdHandler.KeyboardHandler_KeyDownAsync(sender, e);
-            }
         }
 
         private void TopicThread_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
