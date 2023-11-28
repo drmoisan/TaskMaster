@@ -64,10 +64,9 @@
     <Compile Include="TaskTreeForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TaskTreeForm.Designer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TaskTreeForm.resx" />
+    <Compile Include="TaskTreeForm.Designer.cs">
+      <DependentUpon>TaskTreeForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
@@ -82,6 +81,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TaskTreeForm.resx">
+      <DependentUpon>TaskTreeForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

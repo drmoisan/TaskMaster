@@ -172,11 +172,11 @@ namespace ToDoModel
         /// recursively calls DataModel_ToDoTree.ReNumberChildrenIDs() and then invokes the
         /// ListOfIDsLegacy.Save() Method
         /// </summary>
-        /// <param name="OlApp">Pointer to Outlook Application</param>
-        public void CompressToDoIDs(Outlook.Application OlApp)
+        /// <param name="appGlobals">Pointer to Outlook Application</param>
+        public void CompressToDoIDs(IApplicationGlobals appGlobals)
         {
             var _dataModel = new TreeOfToDoItems();
-            _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, OlApp);
+            _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, appGlobals);
             _dataModel.ReNumberIDs(this);
         }
 

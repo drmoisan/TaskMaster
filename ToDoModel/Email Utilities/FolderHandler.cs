@@ -424,9 +424,17 @@ namespace ToDoModel
         {
             // Set default root if not provided
             if (olAncestor.IsNullOrEmpty()) { olAncestor = _globals.Ol.ArchiveRootPath; }
-            
+
             // Fully root the folderpath
-            var parentFolderpath = $"{olAncestor}{parentBranchPath}";
+            string parentFolderpath;
+            if (olAncestor.EndsWith('\\'.ToString()) | parentBranchPath[0] == '\\')
+            {
+                parentFolderpath = $"{olAncestor}{parentBranchPath}";
+            }
+            else
+            {
+                parentFolderpath = $"{olAncestor}\\{parentBranchPath}";
+            }
             
             // Get the parent folder and return null if not found
             var parentFolder = this.GetFolder(parentFolderpath, false);

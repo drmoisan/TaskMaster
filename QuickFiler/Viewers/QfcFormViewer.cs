@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS;
 
 namespace QuickFiler
 {
@@ -58,7 +59,34 @@ namespace QuickFiler
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        private List<Control> _panels;
+        public List<Control> Panels => Initializer.GetOrLoad(ref _panels, LoadPanels); 
+        private List<Control> LoadPanels()
+        {
+            var panels = new List<Control> 
+            { 
+                this.L1v_TableLayout,
+                this.L1v1L2h_TableLayout,
+                this.L1v0L2L3v_TableLayout,
+                this.L1v0L2_PanelMain,
+            };
+            return panels;
+        }
 
+        private List<Control> _buttons;
+        public List<Control> Buttons => Initializer.GetOrLoad(ref _buttons, LoadButtons);
+        private List<Control> LoadButtons()
+        {
+            var buttons = new List<Control>
+            {
+                this.L1v1L2h2_ButtonOK,
+                this.L1v1L2h3_ButtonCancel,
+                this.L1v1L2h4_ButtonUndo,
+                this.ButtonFilters,
+                this.L1v1L2h5_BtnSkip,
+            };
+            return buttons;
+        }
 
     }
 }

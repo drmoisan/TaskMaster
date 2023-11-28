@@ -6,7 +6,7 @@ using ToDoModel;
 
 namespace TaskTree
 {
-    public partial class TaskTreeForm: Form
+    public partial class TaskTreeForm : Form
     {
         private TaskTreeController _controller;
 

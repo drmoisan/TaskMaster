@@ -157,6 +157,21 @@ namespace QuickFiler
             }
         }
 
+        public List<Component> MenuItems => Initializer.GetOrLoad(ref _menuItems, LoadMenuItems);
+        private List<Component> _menuItems;
+        private List<Component> LoadMenuItems()
+        {
+            var menuItems = new List<Component>
+            {
+                this.MoveOptionsMenu,
+                this.ConversationMenuItem,
+                this.SaveAttachmentsMenuItem,
+                this.SaveEmailMenuItem,
+                this.SavePicturesMenuItem,
+            };
+            return menuItems;
+        }
+
         private void MoveOptionsMenu_Click(object sender, EventArgs e)
         {
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.Analysis;
-using Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,21 +9,19 @@ using ToDoModel;
 using UtilitiesCS;
 using System.Windows.Forms;
 using QuickFiler.Helper_Classes;
-using System.Diagnostics;
 using System.IO;
 using Microsoft.Web.WebView2.Core;
 using System.ComponentModel;
 using TaskVisualization;
 using System.Threading;
-using UtilitiesCS.Threading;
 using System.Windows.Threading;
-using log4net.Repository.Hierarchy;
+using QuickFiler.Viewers;
 
 namespace QuickFiler.Controllers
 {
     internal class QfcItemController : IQfcItemController, INotifyPropertyChanged, IItemControler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         #region Constructors
 
@@ -300,7 +297,7 @@ namespace QuickFiler.Controllers
                          .Select(x => (TableLayoutPanel)x)
                          .ToList();
 
-            _buttons = controls.Where(x => x is Button)
+            Buttons = controls.Where(x => x is Button)
                             .Select(x => (Button)x)
                             .ToList();
 
@@ -339,7 +336,7 @@ namespace QuickFiler.Controllers
                          .Select(x => (TableLayoutPanel)x)
                          .ToList();
 
-            _buttons = controls.Where(x => x is Button)
+            Buttons = controls.Where(x => x is Button)
                             .Select(x => (Button)x)
                             .ToList();
 
@@ -505,6 +502,7 @@ namespace QuickFiler.Controllers
                 {
                     _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
                     _itemViewer.CboFolders.SelectedIndex = 1;
+                    _selectedFolder = _itemViewer.CboFolders.SelectedItem as string;
                 }
             });
 
@@ -518,6 +516,7 @@ namespace QuickFiler.Controllers
 
             _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
             _itemViewer.CboFolders.SelectedIndex = 1;
+            _selectedFolder = _itemViewer.CboFolders.SelectedItem as string;
         }
 
         public void Cleanup()
@@ -578,7 +577,7 @@ namespace QuickFiler.Controllers
         #region Exposed properties
 
         private IList<Button> _buttons;
-        public IList<Button> Buttons { get => _buttons; }
+        public IList<Button> Buttons { get => _buttons; private set => _buttons = value; }
 
         private string _convOriginID = "";
         public string ConvOriginID { get => _convOriginID; set => _convOriginID = value; }
@@ -755,12 +754,18 @@ namespace QuickFiler.Controllers
             _itemViewer.BtnForward.Click += this.BtnForward_Click;
             _itemViewer.TxtboxBody.DoubleClick += this.TxtboxBody_DoubleClick;
             
-            foreach (var btn in _buttons)
+            foreach (var btn in Buttons)
             {
                 btn.MouseEnter += this.Button_MouseEnter;
                 btn.MouseLeave += this.Button_MouseLeave;
             }
-                        
+
+            foreach (ToolStripMenuItem menuItem in _itemViewer.MenuItems)
+            {
+                menuItem.MouseEnter += this.MenuItem_MouseEnter;
+                menuItem.MouseLeave += this.MenuItem_MouseLeave;
+            }
+
             _itemViewer.TxtboxSearch.TextChanged += new System.EventHandler(this.TextBoxSearch_TextChanged);
             //_itemViewer.TxtboxSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBoxSearch_KeyDown);
             _itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_kbdHandler.CboFolders_KeyDownAsync);
@@ -768,7 +773,7 @@ namespace QuickFiler.Controllers
             _itemViewer.CboFolders.SelectedIndexChanged += this.CboFolders_SelectedIndexChanged;
             _itemViewer.L0v2h2_WebView2.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
             _itemViewer.TopicThread.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
-            
+            _itemViewer.TxtboxSearch.KeyDown += this.TextBoxSearch_KeyDown;
             _itemViewer.SaveEmailMenuItem.CheckedChanged += this.CbxEmailCopy_CheckedChanged; 
             _itemViewer.SaveAttachmentsMenuItem.CheckedChanged += this.CbxAttachments_CheckedChanged;
             
@@ -810,9 +815,9 @@ namespace QuickFiler.Controllers
             // TODO: Reference controls from new menu
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Right, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.Off));
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Left, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.On));
-            //_kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'O', (x) => _ = _explorerController.OpenQFItem(Mail));
-            //_kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'C', (x) => this.ToggleCheckboxAsync(_itemViewer.CbxConversation));
             //_kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'A', (x) => this.ToggleCheckboxAsync(_itemViewer.CbxAttachments));
+            _kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'C', (x) => this.ToggleCbMenuItemAsync(_itemViewer.ConversationMenuItem));
+            _kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'O', (x) => _ = _explorerController.OpenQFItem(Mail));
             _kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'M', (x) => this.KbdExecuteAsync(MenuDropDown, true));
             _kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'R', (x) => this.KbdExecuteAsync(Reply, true));
             _kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'L', (x) => this.KbdExecuteAsync(ReplyAll, true));
@@ -863,9 +868,9 @@ namespace QuickFiler.Controllers
         {
             //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Right);
             //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Left);
-            //_kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'O');
-            //_kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'C');
             //_kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'A');
+            _kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'C');
+            _kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'O');
             _kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'M');
             _kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'R');
             _kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'L');
@@ -910,7 +915,7 @@ namespace QuickFiler.Controllers
 
         internal void BtnFlagTask_Click(object sender, EventArgs e) => FlagAsTask();
         
-        internal void BtnPopOut_Click(object sender, EventArgs e) => _parent.PopOutControlGroup(ItemNumber);
+        internal async void BtnPopOut_Click(object sender, EventArgs e) => await _parent.PopOutControlGroupAsync(ItemNumber);
 
         internal void BtnDelItem_Click(object sender, EventArgs e) => MarkItemForDeletion();
 
@@ -929,7 +934,12 @@ namespace QuickFiler.Controllers
         {
             ((Button)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor; 
         }
-        
+
+        private void MenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor;
+        }
+
         private void Button_MouseLeave(object sender, EventArgs e)
         {
             if (((Button)sender).DialogResult == DialogResult.OK)
@@ -940,6 +950,12 @@ namespace QuickFiler.Controllers
             {
                 ((Button)sender).BackColor = _themes[_activeTheme].ButtonBackColor;
             }
+        }
+
+        private void MenuItem_MouseLeave(object sender, EventArgs e)
+        { 
+            ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonBackColor;
+            
         }
 
         internal void TextBoxSearch_TextChanged(object sender, EventArgs e)
@@ -955,6 +971,17 @@ namespace QuickFiler.Controllers
             if (_itemViewer.CboFolders.Items.Count >= 2)
                 _itemViewer.CboFolders.SelectedIndex = 1;
             _itemViewer.CboFolders.DroppedDown = true;
+        }
+
+        internal void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down)
+            {
+                _itemViewer.CboFolders.DroppedDown = true;
+                _itemViewer.CboFolders.Focus();
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
         }
 
         private void TopicThread_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
@@ -1060,10 +1087,24 @@ namespace QuickFiler.Controllers
             forward.Display();
         }
 
+        async public Task ToggleCbMenuItemAsync(ToolStripMenuItemCb menuItem)
+        {
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => menuItem.Checked = !menuItem.Checked);
+        }
+
+        async public Task ToggleCbMenuItemAsync(ToolStripMenuItemCb menuItem, Enums.ToggleState desiredState)
+        {
+            var booleanState = desiredState.HasFlag(Enums.ToggleState.On);
+
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            {
+                if (menuItem.Checked != booleanState) { menuItem.Checked = booleanState; }
+            });
+        }
+
         async public Task ToggleCheckboxAsync(CheckBox checkBox)
         {
             await UIThreadExtensions.UiDispatcher.InvokeAsync(() => checkBox.Checked = !checkBox.Checked);
-            //await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
         }
 
         async public Task ToggleCheckboxAsync(CheckBox checkBox, Enums.ToggleState desiredState)
@@ -1467,16 +1508,26 @@ namespace QuickFiler.Controllers
             {
                 IList<MailItem> selItems = PackageItems();
                 bool attachments = SelectedFolder != "Trash to Delete" && _optionAttachments;
+                try
+                {
+                    await SortEmail.SortAsync(
+                        mailItems: selItems,
+                        savePictures: _optionsPictures,
+                        destinationOlStem: SelectedFolder,
+                        saveMsg: _optionEmailCopy,
+                        saveAttachments: attachments,
+                        removePreviousFsFiles: false,
+                        appGlobals: _globals,
+                        olAncestor: _globals.Ol.ArchiveRootPath,
+                        fsAncestorEquivalent: _globals.FS.FldrRoot);
+                }
+                catch (System.Exception e)
+                {
+                    logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
+                    logger.Error($"{e}");
+                    MessageBox.Show($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
+                }
 
-                await SortEmail.SortAsync(mailItems: selItems,
-                                         savePictures: _optionsPictures,
-                                         destinationOlStem: SelectedFolder,
-                                         saveMsg: _optionEmailCopy,
-                                         saveAttachments: attachments,
-                                         removePreviousFsFiles: false,
-                                         appGlobals: _globals,
-                                         olAncestor: _globals.Ol.ArchiveRootPath,
-                                         fsAncestorEquivalent: _globals.FS.FldrRoot);
                 SortEmail.Cleanup_Files();
             }
         }

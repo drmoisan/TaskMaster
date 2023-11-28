@@ -75,6 +75,7 @@ namespace QuickFiler.Controllers
         private ScoStack<IMovedMailInfo> _movedItems;
         private QfcQueue _qfcQueue;
         private TlpCellStates _states;
+        private Dictionary<string, Theme> _themes;
 
         #endregion
 
@@ -142,10 +143,8 @@ namespace QuickFiler.Controllers
 
         public void SetupLightDark()
         {
-            if (_globals.Ol.DarkMode == true)
-            {
-                SetDarkMode();
-            }
+            _themes = QfcThemeHelper.SetupFormThemes(_formViewer.Panels, _formViewer.Buttons);
+            _activeTheme = LoadTheme();
             _globals.Ol.PropertyChanged += DarkMode_CheckedChanged;
         }
 
@@ -213,7 +212,27 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Public Properties
-        
+
+        private string _activeTheme;
+        public string ActiveTheme
+        {
+            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) => _themes[x].SetTheme(async: true));
+        }
+        internal string LoadTheme()
+        {
+            var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
+            _themes[activeTheme].SetTheme();
+            return activeTheme;
+        }
+
+        private bool _darkMode;
+        public bool DarkMode
+        {
+            get => Initializer.GetOrLoad(ref _darkMode, () => _globals.Ol.DarkMode, false, _globals, _globals.Ol);
+            set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
+        }
+
         private QfcCollectionController _groups;
         public IQfcCollectionController Groups { get => _groups; }
         
@@ -240,46 +259,40 @@ namespace QuickFiler.Controllers
         private void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
             SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
-            //if (_formViewer.DarkMode.Checked == true)
-            if (_globals.Ol.DarkMode == true)
-            {
-                SetDarkMode();
-            }
-            else
-            {
-                SetLightMode();
-            }
+            _darkMode = _globals.Ol.DarkMode;
+            if (DarkMode) { ActiveTheme = "DarkNormal"; }
+            else { ActiveTheme = "LightNormal"; }
         }
 
-        private void SetDarkMode()
-        {
-            _formViewer.L1v1L2h2_ButtonOK.BackColor = System.Drawing.Color.DimGray;
-            _formViewer.L1v1L2h2_ButtonOK.ForeColor = System.Drawing.Color.WhiteSmoke;
-            _formViewer.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = false;
-            _formViewer.L1v1L2h3_ButtonCancel.BackColor = System.Drawing.Color.DimGray;
-            _formViewer.L1v1L2h3_ButtonCancel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            _formViewer.L1v1L2h3_ButtonCancel.UseVisualStyleBackColor = false;
-            _formViewer.L1v1L2h4_ButtonUndo.BackColor = System.Drawing.Color.DimGray;
-            _formViewer.L1v1L2h4_ButtonUndo.ForeColor = System.Drawing.Color.WhiteSmoke;
-            _formViewer.L1v1L2h5_SpnEmailPerLoad.BackColor = System.Drawing.Color.DimGray;
-            _formViewer.L1v1L2h5_SpnEmailPerLoad.ForeColor = System.Drawing.Color.Gainsboro;
-            _formViewer.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-        }
+        //private void SetDarkMode()
+        //{
+        //    _formViewer.L1v1L2h2_ButtonOK.BackColor = System.Drawing.Color.DimGray;
+        //    _formViewer.L1v1L2h2_ButtonOK.ForeColor = System.Drawing.Color.WhiteSmoke;
+        //    _formViewer.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = false;
+        //    _formViewer.L1v1L2h3_ButtonCancel.BackColor = System.Drawing.Color.DimGray;
+        //    _formViewer.L1v1L2h3_ButtonCancel.ForeColor = System.Drawing.Color.WhiteSmoke;
+        //    _formViewer.L1v1L2h3_ButtonCancel.UseVisualStyleBackColor = false;
+        //    _formViewer.L1v1L2h4_ButtonUndo.BackColor = System.Drawing.Color.DimGray;
+        //    _formViewer.L1v1L2h4_ButtonUndo.ForeColor = System.Drawing.Color.WhiteSmoke;
+        //    _formViewer.L1v1L2h5_SpnEmailPerLoad.BackColor = System.Drawing.Color.DimGray;
+        //    _formViewer.L1v1L2h5_SpnEmailPerLoad.ForeColor = System.Drawing.Color.Gainsboro;
+        //    _formViewer.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+        //}
 
-        private void SetLightMode()
-        {
-            _formViewer.L1v1L2h2_ButtonOK.BackColor = System.Drawing.SystemColors.Control;
-            _formViewer.L1v1L2h2_ButtonOK.ForeColor = System.Drawing.SystemColors.ControlText;
-            _formViewer.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = true;
-            _formViewer.L1v1L2h3_ButtonCancel.BackColor = System.Drawing.SystemColors.Control;
-            _formViewer.L1v1L2h3_ButtonCancel.ForeColor = System.Drawing.SystemColors.ControlText;
-            _formViewer.L1v1L2h3_ButtonCancel.UseVisualStyleBackColor = true;
-            _formViewer.L1v1L2h4_ButtonUndo.BackColor = System.Drawing.SystemColors.Control;
-            _formViewer.L1v1L2h4_ButtonUndo.ForeColor = System.Drawing.SystemColors.ControlText;
-            _formViewer.L1v1L2h5_SpnEmailPerLoad.BackColor = System.Drawing.SystemColors.Window;
-            _formViewer.L1v1L2h5_SpnEmailPerLoad.ForeColor = System.Drawing.SystemColors.WindowText;
-            _formViewer.BackColor = System.Drawing.SystemColors.ControlLightLight;
-        }
+        //private void SetLightMode()
+        //{
+        //    _formViewer.L1v1L2h2_ButtonOK.BackColor = System.Drawing.SystemColors.Control;
+        //    _formViewer.L1v1L2h2_ButtonOK.ForeColor = System.Drawing.SystemColors.ControlText;
+        //    _formViewer.L1v1L2h2_ButtonOK.UseVisualStyleBackColor = true;
+        //    _formViewer.L1v1L2h3_ButtonCancel.BackColor = System.Drawing.SystemColors.Control;
+        //    _formViewer.L1v1L2h3_ButtonCancel.ForeColor = System.Drawing.SystemColors.ControlText;
+        //    _formViewer.L1v1L2h3_ButtonCancel.UseVisualStyleBackColor = true;
+        //    _formViewer.L1v1L2h4_ButtonUndo.BackColor = System.Drawing.SystemColors.Control;
+        //    _formViewer.L1v1L2h4_ButtonUndo.ForeColor = System.Drawing.SystemColors.ControlText;
+        //    _formViewer.L1v1L2h5_SpnEmailPerLoad.BackColor = System.Drawing.SystemColors.Window;
+        //    _formViewer.L1v1L2h5_SpnEmailPerLoad.ForeColor = System.Drawing.SystemColors.WindowText;
+        //    _formViewer.BackColor = System.Drawing.SystemColors.ControlLightLight;
+        //}
 
         async public void ButtonCancel_Click(object sender, EventArgs e) 
         {

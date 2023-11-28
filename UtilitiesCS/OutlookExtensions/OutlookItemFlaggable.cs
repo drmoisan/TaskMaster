@@ -20,6 +20,14 @@ namespace UtilitiesCS.OutlookExtensions
             _olType = this.GetOlItemType();
         }
 
+        public OutlookItemFlaggable(OutlookItem item) : base()
+        {
+            base._item = item.InnerObject;
+            base._type = item.InnerObject.GetType();
+            base._args = item.Args;
+            _olType = this.GetOlItemType();
+        }
+
         private OlItemType _olType;
         private const string _olFlagStatus = "FlagStatus";
         private const string _olTaskDueDate = "TaskDueDate";
@@ -156,7 +164,7 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get
             {
-                var taskSubject = this.TryGetPropertyValue(_olTaskSubject, _olTaskSubject) ?? throw new ArgumentException(GetTypeErrorMessage(nameof(TaskSubject)));
+                var taskSubject = this.TryGetPropertyValue(_olTaskSubject, _olSubject) ?? throw new ArgumentException(GetTypeErrorMessage(nameof(TaskSubject)));
                 return (string)taskSubject;
             }
             set

@@ -64,7 +64,6 @@ namespace ToDoModel
         public TreeNode<T> InsertChild(TreeNode<T> node)
         {
             node.Parent = this;
-            // node.ID = strID
             Children.Insert(0, node);
             return node;
         }
@@ -97,7 +96,6 @@ namespace ToDoModel
 
         public object FindByDelegate(Func<T, string, bool> comparator, string StringToCompare)
         {
-
             foreach (var node in Children)
             {
                 if (comparator(Value, StringToCompare))

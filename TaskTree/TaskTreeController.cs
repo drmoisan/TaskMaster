@@ -321,8 +321,9 @@ namespace TaskTree
 
         internal void FormatRow(object sender, FormatRowEventArgs e)
         {
-            ToDoItem objToDo = (ToDoItem)e.Model;
-            e.Item.Font = objToDo.Complete ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout) : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
+            var node = (TreeNode<ToDoItem>)e.Model;
+            var todo = node.Value;
+            e.Item.Font = todo.Complete ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout) : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
         }
 
         internal void ToggleExpandCollapseAll()

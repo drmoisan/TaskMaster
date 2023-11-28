@@ -52,6 +52,8 @@ namespace QuickFiler
                               lblSubject: viewer.LblSubject,
                               tableLayoutPanels: controller.TableLayoutPanels,
                               buttons: controller.Buttons,
+                              menuItems: viewer.MenuItems,
+                              menuStrip: viewer.MoveOptionsStrip,
                               tipsDetailsLabels: controller.ListTipsDetails,
                               tipsExpanded: controller.ListTipsExpanded,
                               textboxSearch: viewer.TxtboxSearch,
@@ -95,6 +97,8 @@ namespace QuickFiler
                               lblSubject: viewer.LblSubject,
                               tableLayoutPanels: controller.TableLayoutPanels,
                               buttons: controller.Buttons,
+                              menuItems: viewer.MenuItems,
+                              menuStrip: viewer.MoveOptionsStrip,
                               tipsDetailsLabels: controller.ListTipsDetails,
                               tipsExpanded: controller.ListTipsExpanded,
                               textboxSearch: viewer.TxtboxSearch,
@@ -138,6 +142,8 @@ namespace QuickFiler
                               lblSubject: viewer.LblSubject,
                               tableLayoutPanels: controller.TableLayoutPanels,
                               buttons: controller.Buttons,
+                              menuItems: viewer.MenuItems,
+                              menuStrip: viewer.MoveOptionsStrip,
                               tipsDetailsLabels: controller.ListTipsDetails,
                               tipsExpanded: controller.ListTipsExpanded,
                               textboxSearch: viewer.TxtboxSearch,
@@ -181,6 +187,8 @@ namespace QuickFiler
                               lblSubject: viewer.LblSubject,
                               tableLayoutPanels: controller.TableLayoutPanels,
                               buttons: controller.Buttons,
+                              menuItems: viewer.MenuItems,
+                              menuStrip: viewer.MoveOptionsStrip,
                               tipsDetailsLabels: controller.ListTipsDetails,
                               tipsExpanded: controller.ListTipsExpanded,
                               textboxSearch: viewer.TxtboxSearch,
@@ -216,6 +224,37 @@ namespace QuickFiler
                               defaultBackColor: Color.FromArgb(64,64,64),
                               defaultForeColor: Color.WhiteSmoke)
                 }
+            };
+            return themes;
+        }
+
+        public static Dictionary<string, Theme> SetupFormThemes(IList<Control> panels, IList<Control> buttons) 
+        {
+            var darkDarkGrey = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30))))); //30,30,30
+            var lightNormal = new Dictionary<string, ThemeControlGroup>
+            {
+                //{ "Nav", new ThemeControlGroup(controls: nav, back: SystemColors.HotTrack, fore: SystemColors.Control) },
+                //{ "Tips", new ThemeControlGroup(controls: tips, back: SystemColors.ControlText, fore: SystemColors.Control) },
+                //{ "highlighted", new ThemeControlGroup(controls: highlighted, back: SystemColors.Window, fore: SystemColors.ControlText) },
+                { "Default2Color", new ThemeControlGroup(controls: panels, back: SystemColors.Control, fore: SystemColors.ControlText) },
+                { "Buttons", new ThemeControlGroup(controls: buttons, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => false) },
+                //{ "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((CheckBox)x).Checked ) },
+            };
+            var darkNormal = new Dictionary<string, ThemeControlGroup>
+            {
+                //{ "Nav", new ThemeControlGroup(controls: nav, back: Color.FromArgb(64,64,64), fore: SystemColors.Control) },
+                //{ "Tips", new ThemeControlGroup(controls: tips, back: Color.LightSkyBlue, fore: SystemColors.ControlText) },
+                //{ "highlighted", new ThemeControlGroup(controls: highlighted, back: darkDarkGrey, fore: Color.WhiteSmoke) },
+                { "Default2Color", new ThemeControlGroup(controls: panels, back: Color.Black, fore: Color.WhiteSmoke) },
+                { "Buttons", new ThemeControlGroup(controls: buttons, backMain: Color.DimGray, foreMain: Color.WhiteSmoke, backAlt: Color.DimGray, foreAlt: Color.WhiteSmoke, hover: Color.DarkGray, isAltHover: (x) => false ) },
+                //{ "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: Color.Black, foreMain: Color.WhiteSmoke, backAlt: Color.Black, foreAlt: Color.WhiteSmoke, hover: Color.DarkGray, isAltHover: (x) => ((CheckBox)x).Checked ) },
+            };
+            var themes = new Dictionary<string, Theme>
+            {
+                { "LightNormal", new Theme("LightNormal", lightNormal) },
+                //{ "LightActive", new Theme("LightActive", lightActive) },
+                { "DarkNormal", new Theme("DarkNormal", darkNormal) },
+                //{ "DarkActive", new Theme("DarkActive", darkActive) }
             };
             return themes;
         }

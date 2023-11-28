@@ -22,6 +22,9 @@ namespace QuickFiler.Controllers
 {
     internal class KeyboardHandler : IQfcKeyboardHandler
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public KeyboardHandler(QfcFormViewer viewer, IFilerHomeController parent)
         {
             viewer.SetKeyboardHandler(this);

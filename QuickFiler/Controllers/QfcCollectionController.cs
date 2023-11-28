@@ -12,11 +12,15 @@ using QuickFiler;
 using QuickFiler.Helper_Classes;
 using System.Threading;
 using System.Net.NetworkInformation;
+using System.Runtime.Remoting.Contexts;
 
 namespace QuickFiler.Controllers
 {
     public class QfcCollectionController : IQfcCollectionController
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Constructors
 
         public QfcCollectionController(IApplicationGlobals AppGlobals,
@@ -46,7 +50,7 @@ namespace QuickFiler.Controllers
 
         #region Private Variables
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
 
         private QfcFormViewer _formViewer;
         private QfEnums.InitTypeEnum _initType;
@@ -80,9 +84,35 @@ namespace QuickFiler.Controllers
         private CancellationTokenSource _tokenSource;
         public CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
 
-        public int EmailsLoaded => _itemGroups.Count;
+        private int _digits = 1;
+        internal int Digits 
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get 
+            {
+                var digitNeed = _itemGroups?.Count >= 10 ? 2 : 1;
+                if (_digits != digitNeed)
+                {
+                    SetVisualDigits(digitNeed);
+                    _digits = digitNeed;
+                }
+                return _digits; 
+            }
+            
+        }
 
-        public int EmailsToMove => _itemGroupsToMove.Count;
+        private void SetVisualDigits(int digits)
+        {
+            if (EmailsLoaded > 0)
+            {
+                var format = string.Join("",Enumerable.Range(0, digits).Select(x=>"0").ToArray());
+                _itemGroups.ForEach(grp => grp.ItemViewer.LblItemNumber.Text = grp.ItemController.ItemNumber.ToString(format));
+            }
+        }
+        
+        public int EmailsLoaded => _itemGroups?.Count ?? 0;
+
+        public int EmailsToMove => _itemGroupsToMove?.Count ?? 0;
 
         public bool ReadyForMove
         {
@@ -157,6 +187,7 @@ namespace QuickFiler.Controllers
             SwapTlp(tlp);
             SwapItemGroups(itemGroups);
             _formViewer.ResumeLayout();
+            ActiveIndex = -1;
         }
 
         public void LoadControlsAndHandlers_01(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
@@ -694,18 +725,18 @@ namespace QuickFiler.Controllers
 
         internal void RegisterNavigation()
         {
+            var digits = Digits;
             for (int i = 0; i < _itemGroups.Count; i++)
             {
-                RegisterNavigationAsyncAction(i, _itemGroups.Count >= 10 ? 2: 1);
+                RegisterNavigationAsyncAction(i, digits);
             }
         }
 
         internal void UnregisterNavigation()
         {
-            var digits = _itemGroups.Count >= 10 ? 2 : 1;
             for (int i = 0; i < _itemGroups.Count; i++)
             {
-                if (digits == 1)
+                if (Digits == 1)
                 {
                     _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString());
                 }
@@ -1081,7 +1112,9 @@ namespace QuickFiler.Controllers
         {
             var tlpState = TlpLayout;
             TlpLayout = false;
-
+            
+            UnregisterNavigation();
+            
             int removalIndex = indexOriginal + 1;
 
             var qfOriginal = _itemGroups[indexOriginal].ItemController;
@@ -1100,6 +1133,7 @@ namespace QuickFiler.Controllers
                 _itemTlp.MinimumSize.Height -
                 (int)Math.Round(_template.Height * childCount, 0));
 
+            RegisterNavigation();
             TlpLayout = tlpState;
         }
 
@@ -1118,6 +1152,8 @@ namespace QuickFiler.Controllers
         {
             var tlpState = SafeSetTlpLayout(false);
 
+            UnregisterNavigation();
+
             int baseEmailIndex = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.Mail.EntryID == entryID);
             int insertionIndex = baseEmailIndex + 1;
             int insertCount = conversationCount - 1;
@@ -1133,6 +1169,8 @@ namespace QuickFiler.Controllers
                                              conversationCount,
                                              folderList);
             }
+            
+            RegisterNavigation();
             TlpLayout = tlpState;
         }
 
@@ -1379,7 +1417,8 @@ namespace QuickFiler.Controllers
         {
             TraceUtility.LogMethodCall(stackMovedItems);
 
-            await _itemGroupsToMove.ToAsyncEnumerable().ForEachAsync(async grp => await grp.ItemController.MoveMailAsync());
+            await _itemGroupsToMove.ToAsyncEnumerable().ForEachAsync(
+                async grp => await grp.ItemController.MoveMailAsync());
             //_itemGroupsToMove.ForEach(async grp => await grp.ItemController.MoveMailAsync());
             //await Task.WhenAll(_itemGroupsToMove.Select(grp => grp.ItemController.MoveMailAsync()));
         }

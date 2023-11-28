@@ -236,5 +236,12 @@ namespace TaskVisualization
 
         #endregion
 
+        private void TaskViewer_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down || e.KeyCode == Keys.Up)
+            {
+                e.IsInputKey = true;
+            }
+        }
     }
 }

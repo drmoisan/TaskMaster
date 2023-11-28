@@ -1,4 +1,5 @@
-﻿using QuickFiler.Interfaces;
+﻿using log4net.Repository.Hierarchy;
+using QuickFiler.Interfaces;
 using Swordfish.NET.Collections;
 using System;
 using System.Collections;
@@ -12,6 +13,9 @@ namespace QuickFiler.Controllers
 {
     public class KbdActions<TKey, UClass, VDelegate> : IEnumerable<UClass> where UClass : IKbdAction<TKey, VDelegate>, new()
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public KbdActions()
         {
             _list = new ConcurrentObservableCollection<UClass>();
@@ -72,6 +76,7 @@ namespace QuickFiler.Controllers
                 default:
                     var message = $"Multiple sources have registered actions for Key {key}. SourceId list ";
                     message += $"[{matches.Select(x => x.SourceId).SentenceJoin()}]";
+                    logger.Error(message);
                     throw new InvalidOperationException(message);
             }
         }
@@ -81,6 +86,7 @@ namespace QuickFiler.Controllers
             if (_list.Any(x => x.SourceId == sourceId && x.KeyEquals(key)))
             {
                 string message = $"Cannot add key because it already exists. Key {key} SourceId {sourceId}";
+                logger.Error(message);
                 throw new ArgumentException(message);
             }
             UClass instance = new();
@@ -95,7 +101,9 @@ namespace QuickFiler.Controllers
             if (_list.Any(x => x.SourceId == instance.SourceId && x.KeyEquals(instance.Key)))
             {
                 string message = $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";
-                throw new ArgumentException(message);
+                
+                logger.Error(message);
+                throw new ArgumentException(message, nameof(instance));
             }
             _list.Add(instance);
         }

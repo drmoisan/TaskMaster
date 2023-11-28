@@ -58,7 +58,7 @@ namespace TaskMaster
         {
             var taskTreeViewer = new TaskTreeForm();
             var dataModel = new TreeOfToDoItems([]);
-            dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals.Ol.App);
+            dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals);
             var taskTreeController = new TaskTreeController(_globals, taskTreeViewer, dataModel);
             taskTreeViewer.Show();
         }
@@ -102,7 +102,7 @@ namespace TaskMaster
 
         internal void CompressIDs()
         {
-            _globals.TD.IDList.CompressToDoIDs(_globals.Ol.App);
+            _globals.TD.IDList.CompressToDoIDs(_globals);
             MessageBox.Show("ID Compression Complete");
         }
 
@@ -148,7 +148,7 @@ namespace TaskMaster
         internal void HideHeadersNoChildren()
         {
             var dataTree = new TreeOfToDoItems([]);
-            dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, Globals.ThisAddIn.Application);
+            dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals);
             dataTree.HideEmptyHeadersInView();
         }
 

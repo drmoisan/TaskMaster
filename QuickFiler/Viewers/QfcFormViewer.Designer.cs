@@ -31,16 +31,16 @@
             this.L1v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.L1v1L2h_TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.L1v1L2h5_BtnSkip = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.ButtonFilters = new System.Windows.Forms.Button();
             this.L1v1L2h2_ButtonOK = new System.Windows.Forms.Button();
             this.L1v1L2h3_ButtonCancel = new System.Windows.Forms.Button();
             this.L1v1L2h4_ButtonUndo = new System.Windows.Forms.Button();
             this.L1v1L2h5_SpnEmailPerLoad = new System.Windows.Forms.NumericUpDown();
             this.L1v0L2_PanelMain = new System.Windows.Forms.Panel();
             this.L1v0L2L3v_TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.QfcItemViewerTemplate = new QuickFiler.ItemViewer();
             this.QfcItemViewerExpandedTemplate = new QuickFiler.ItemViewerExpanded();
+            this.Worker = new System.ComponentModel.BackgroundWorker();
             this.L1v_TableLayout.SuspendLayout();
             this.L1v1L2h_TableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L1v1L2h5_SpnEmailPerLoad)).BeginInit();
@@ -76,7 +76,7 @@
             this.L1v1L2h_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
             this.L1v1L2h_TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h5_BtnSkip, 5, 0);
-            this.L1v1L2h_TableLayout.Controls.Add(this.button1, 4, 0);
+            this.L1v1L2h_TableLayout.Controls.Add(this.ButtonFilters, 4, 0);
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h2_ButtonOK, 1, 0);
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h3_ButtonCancel, 2, 0);
             this.L1v1L2h_TableLayout.Controls.Add(this.L1v1L2h4_ButtonUndo, 3, 0);
@@ -102,16 +102,16 @@
             this.L1v1L2h5_BtnSkip.Text = "Skip Group";
             this.L1v1L2h5_BtnSkip.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // ButtonFilters
             // 
-            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button1.Location = new System.Drawing.Point(1242, 6);
-            this.button1.Margin = new System.Windows.Forms.Padding(6);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(148, 84);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Filters";
-            this.button1.UseVisualStyleBackColor = true;
+            this.ButtonFilters.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ButtonFilters.Location = new System.Drawing.Point(1242, 6);
+            this.ButtonFilters.Margin = new System.Windows.Forms.Padding(6);
+            this.ButtonFilters.Name = "ButtonFilters";
+            this.ButtonFilters.Size = new System.Drawing.Size(148, 84);
+            this.ButtonFilters.TabIndex = 4;
+            this.ButtonFilters.Text = "Filters";
+            this.ButtonFilters.UseVisualStyleBackColor = true;
             // 
             // L1v1L2h2_ButtonOK
             // 
@@ -251,7 +251,7 @@
         public System.Windows.Forms.TableLayoutPanel L1v0L2L3v_TableLayout;
         public ItemViewer QfcItemViewerTemplate;
         internal System.ComponentModel.BackgroundWorker Worker;
-        public System.Windows.Forms.Button button1;
+        public System.Windows.Forms.Button ButtonFilters;
         public System.Windows.Forms.Button L1v1L2h5_BtnSkip;
         public ItemViewerExpanded QfcItemViewerExpandedTemplate;
     }

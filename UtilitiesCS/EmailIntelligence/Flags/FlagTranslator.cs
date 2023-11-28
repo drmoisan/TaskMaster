@@ -37,6 +37,9 @@ namespace UtilitiesCS
         private Action<bool, ObservableCollection<string>> _setListFunc;
         public Action<bool, ObservableCollection<string>> SetListFunc { get => _setListFunc; set => _setListFunc = value; }
 
+        public new string ToString() => AsStringNoPrefix;
+        public string AsString() => AsStringNoPrefix;
+
         public string AsStringWithPrefix { get => _getStrFunc(true); set => _setStrFunc(true, value); }
         public string AsStringNoPrefix { get => _getStrFunc(false); set => _setStrFunc(false, value); }
         public ObservableCollection<string> AsListWithPrefix { get => _getListFunc(true); set => _setListFunc(true, value); }
