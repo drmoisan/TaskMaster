@@ -325,6 +325,7 @@
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
     <Compile Include="EmailIntelligence\MailItemInfo.cs" />
+    <Compile Include="HelperClasses\DebugTextWriter.cs" />
     <Compile Include="HelperClasses\DvgForm.cs">
       <SubType>Form</SubType>
     </Compile>

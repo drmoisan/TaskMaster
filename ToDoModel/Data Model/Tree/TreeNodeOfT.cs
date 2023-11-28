@@ -119,9 +119,25 @@ namespace ToDoModel
             return null;
         }
 
+        public IEnumerable<TreeNode<T>> Descendents(bool includeSelf = false)
+        {
+            TreeNode<T>[] nodes = includeSelf ?[this]: [];
+            return nodes.Concat(Children.SelectMany(x => x.Descendents(true)));
+        }
+
+        public IEnumerable<TreeNode<T>> FindAll(Func<TreeNode<T>, bool> comparator) 
+        {
+            return new List<TreeNode<T>>();
+        }
+
         public IEnumerable<T> Flatten()
         {
             return new[] { Value }.Concat(Children.SelectMany(x => x.Flatten()));
+        }
+
+        public IEnumerable<T> FlattenIf(Func<T, bool> comparator)
+        {
+            return Flatten().Where(comparator);
         }
     }
 }

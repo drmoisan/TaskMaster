@@ -11,12 +11,18 @@ using BrightIdeasSoftware;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
+using Microsoft.Office.Interop.Outlook;
 
 namespace TaskTree
 {
     public class TaskTreeController
     {
-        public TaskTreeController(IApplicationGlobals AppGlobals, TaskTreeForm Viewer, TreeOfToDoItems DataModel)
+        #region Constructors and Initializers
+        
+        public TaskTreeController(
+            IApplicationGlobals AppGlobals,
+            TaskTreeForm Viewer,
+            TreeOfToDoItems DataModel)
         {
             _globals = AppGlobals;
             _viewer = Viewer;
@@ -24,37 +30,50 @@ namespace TaskTree
             _viewer.SetController(this);
         }
 
-        
-        public List<TreeNode<ToDoItem>> ToDoTree = new List<TreeNode<ToDoItem>>();
-        private readonly Resizer rs = new Resizer();
-        private readonly Resizer rscol = new Resizer();
-        private bool expanded = false;
-        private bool filtercompleted = true;
-        private TaskTreeForm _viewer;
-        private IApplicationGlobals _globals;
-        public TreeOfToDoItems _dataModel = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
-
         public void InitializeTreeListView()
         {
 
             {
-                _viewer.TLV.CanExpandGetter = (x => ((TreeNode<ToDoItem>)x).ChildCount > 0);
-                _viewer.TLV.ChildrenGetter = (x => ((TreeNode<ToDoItem>)x).Children);
-                _viewer.TLV.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-                _viewer.TLV.Roots = _dataModel.ListOfToDoTree;
-                _viewer.TLV.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
+                _viewer.TreeLv.CanExpandGetter = x => ((TreeNode<ToDoItem>)x).ChildCount > 0;
+                _viewer.TreeLv.ChildrenGetter = x => ((TreeNode<ToDoItem>)x).Children;
+                _viewer.TreeLv.ParentGetter = x => ((TreeNode<ToDoItem>)x).Parent;
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+                _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
+
+                _viewer.TreeLv.CheckedObjects = _dataModel.ListOfToDoTree
+                    .SelectMany(node => node.Descendents(true).Where(x => x.Value.Complete))
+                    .ToList();
+
+                _viewer.TreeLv.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
             }
 
-            SimpleDropSink sink1 = (SimpleDropSink)_viewer.TLV.DropSink;
+            SimpleDropSink sink1 = (SimpleDropSink)_viewer.TreeLv.DropSink;
             sink1.AcceptExternal = true;
             sink1.CanDropBetween = true;
             sink1.CanDropOnBackground = true;
 
-            rs.FindAllControls(_viewer);
-            rs.SetResizeDimensions(_viewer.SplitContainer1, Resizer.ResizeDimensions.None, true);
-            rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position | Resizer.ResizeDimensions.Size, true);
-            rs.PrintDict();
+            _rs.FindAllControls(_viewer);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1, Resizer.ResizeDimensions.None, true);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position | Resizer.ResizeDimensions.Size, true);
+            _rs.PrintDict();
         }
+
+        #endregion Constructors and Initializers
+
+        #region Private Fields
+
+        public List<TreeNode<ToDoItem>> ToDoTree = new List<TreeNode<ToDoItem>>();
+        private readonly Resizer _rs = new Resizer();
+        private readonly Resizer _rscol = new Resizer();
+        private bool _expanded = false;
+        private bool _filterCompleted = true;
+        private TaskTreeForm _viewer;
+        private IApplicationGlobals _globals;
+        public TreeOfToDoItems _dataModel = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
+
+        #endregion Private Fields
+
+        #region Event Handlers
 
         internal void HandleModelCanDrop(object sender, ModelDropEventArgs e)
         {
@@ -136,11 +155,36 @@ namespace TaskTree
                     }
             }
             e.RefreshObjects();
-            if (filtercompleted)
-                _viewer.TLV.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-            _viewer.TLV.Sort();
+            if (_filterCompleted)
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+            _viewer.TreeLv.Sort();
             // this.lastSortColumn = Column;
             // this.lastSortOrder = order;
+        }
+
+        #endregion Event Handlers
+
+        #region UI Helper Functions
+
+        internal void ActivateOlItem(dynamic item)
+        {
+            if (item is not null)
+            {
+                var activeExplorer = _globals.Ol.App.ActiveExplorer();
+                if (activeExplorer.IsItemSelectableInView(item))
+                {
+                    activeExplorer.ClearSelection();
+                    activeExplorer.AddToSelection(item);
+                }
+                else { item.Display(); }
+            }
+        }
+
+        internal void FormatRow(object sender, FormatRowEventArgs e)
+        {
+            var node = (TreeNode<ToDoItem>)e.Model;
+            var todo = node.Value;
+            e.Item.Font = todo.Complete ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout) : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
         }
 
         internal void MoveObjectsToRoots(TreeListView targetTree, TreeListView sourceTree, IList toMove)
@@ -258,6 +302,61 @@ namespace TaskTree
             }
         }
 
+        internal void ToggleExpandCollapseAll()
+        {
+            if (_expanded)
+            {
+                _viewer.TreeLv.CollapseAll();
+            }
+            else
+            {
+                _viewer.TreeLv.ExpandAll();
+            }
+            _expanded = !_expanded;
+
+        }
+
+        internal void ResizeForm()
+        {
+            _rs.ResizeAllControls(_viewer);
+            _viewer.TreeLv.AutoScaleColumnsToContainer();
+        }
+
+        internal void RebuildTreeVisual()
+        {
+            _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
+            _viewer.TreeLv.RebuildAll(preserveState: false);
+        }
+
+        internal void ToggleHideComplete()
+        {
+            if (_filterCompleted)
+            {
+                _viewer.TreeLv.ModelFilter = null;
+                _filterCompleted = false;
+            }
+            else
+            {
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+                _filterCompleted = true;
+            }
+        }
+
+        internal void TreeLvActivateItem()
+        {
+            var node = GetSelectedTreeNode();
+            if (node is not null) 
+            {
+                var objItem = node.Value.GetItem();
+                if (IsValidType(objItem)) { ActivateOlItem(objItem); }
+                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
+            }
+        }
+
+        #endregion UI Helper Functions
+
+        #region Data Model Helper Functions
+
         private TreeNode<ToDoItem> FindChildByID(string ID, List<TreeNode<ToDoItem>> nodes)
         {
             //QUESTION: Why is this method here? Shouldn't it be part of the class ToDoTree?
@@ -285,86 +384,16 @@ namespace TaskTree
         
         internal TreeNode<ToDoItem> GetSelectedTreeNode()
         {
-            var item = _viewer.TLV.GetItem(_viewer.TLV.SelectedIndex).RowObject;
+            var item = _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject;
             return item as TreeNode<ToDoItem>;
         }
-                
+
         internal bool IsValidType(object item)
         {
             return ((item is Outlook.MailItem) || (item is Outlook.TaskItem));
         }
         
-        internal void ActivateOlItem(dynamic item)
-        {
-            if (item is not null)
-            {
-                var activeExplorer = _globals.Ol.App.ActiveExplorer();
-                if (activeExplorer.IsItemSelectableInView(item))
-                {
-                    activeExplorer.ClearSelection();
-                    activeExplorer.AddToSelection(item);
-                }
-                else { item.Display(); }
-            }
-        }
-
-        internal void TlvActivateItem()
-        {
-            var node = GetSelectedTreeNode();
-            if (node is not null) 
-            {
-                var objItem = node.Value.GetItem();
-                if (IsValidType(objItem)) { ActivateOlItem(objItem); }
-                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
-            }
-        }
-
-        internal void FormatRow(object sender, FormatRowEventArgs e)
-        {
-            var node = (TreeNode<ToDoItem>)e.Model;
-            var todo = node.Value;
-            e.Item.Font = todo.Complete ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout) : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
-        }
-
-        internal void ToggleExpandCollapseAll()
-        {
-            if (expanded)
-            {
-                _viewer.TLV.CollapseAll();
-            }
-            else
-            {
-                _viewer.TLV.ExpandAll();
-            }
-            expanded = !expanded;
-
-        }
-
-        internal void ResizeForm()
-        {
-            rs.ResizeAllControls(_viewer);
-            _viewer.TLV.AutoScaleColumnsToContainer();
-        }
-
-        internal void ToggleHideComplete()
-        {
-            if (filtercompleted)
-            {
-                _viewer.TLV.ModelFilter = null;
-                filtercompleted = false;
-            }
-            else
-            {
-                _viewer.TLV.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-                filtercompleted = true;
-            }
-        }
-
-        internal void RebuildTreeVisual()
-        {
-            _viewer.TLV.Roots = _dataModel.ListOfToDoTree;
-            _viewer.TLV.RebuildAll(preserveState: false);
-        }
+        #endregion Data Model Helper Functions
 
         #region debugging helper functions
 
