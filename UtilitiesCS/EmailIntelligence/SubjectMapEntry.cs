@@ -259,7 +259,9 @@ namespace UtilitiesCS
             {
                 if (value is null)
                 {
-                    Debug.WriteLine("SubjectEncoded set to null");
+                    var stack = TraceUtility.GetMyStack(new StackTrace());
+                    logger.Debug($"SubjectEncoded set to null. See stack:\n" +
+                        $"{string.Join(" -> ",stack.Select(x => x.Name).ToArray())}");
                 }
                 _folderEncoded = value;
             }

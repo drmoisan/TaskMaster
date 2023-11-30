@@ -297,23 +297,23 @@ namespace ToDoModel
         public static void Undo(ScoStack<IMovedMailInfo> movedStack, Outlook.Application olApp) 
         {
             DialogResult repeatResponse = DialogResult.Yes;
-            var i = movedStack.Count-1;
+            var i = 0;
 
-            while (i >= 0 && repeatResponse == DialogResult.Yes)
+            while (i < movedStack.Count && repeatResponse == DialogResult.Yes)
             {
                 var message = movedStack[i].UndoMoveMessage(olApp);
-                if (message is not null)
+                if (message is null) { i++; }
+                else
                 {
                     var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
                     if (undoResponse == DialogResult.Yes)
                     {
                         movedStack[i].UndoMove();
-                        movedStack.Pop(i--);
+                        movedStack.Pop(i);
                     }
-                    
-                }
-                else { i--; }
-                repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+                    else { i++;}
+                    repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);   
+                } 
             }
             
             if (repeatResponse == DialogResult.Yes) { MessageBox.Show("Nothing to undo"); }
@@ -510,6 +510,7 @@ namespace ToDoModel
         {
             try
             {
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePathSave));
                 await Task.Run(()=>attachment.SaveAsFile(filePathSave));
                 return true;
             }

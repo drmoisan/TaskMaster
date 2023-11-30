@@ -16,7 +16,7 @@ namespace UtilitiesCS
         public static void LogMethodCall(params object[] callingMethodParamValues)
         {
             var sf = new StackTrace();
-            var assembliesAndMethods = Enumerable.Range(0, sf.FrameCount).Select(i => (sf.GetFrame(i).GetMethod().DeclaringType.Assembly.GetName().Name, sf.GetFrame(i).GetMethod().Name)).ToArray();
+            //var assembliesAndMethods = Enumerable.Range(0, sf.FrameCount).Select(i => (sf.GetFrame(i).GetMethod().DeclaringType.Assembly.GetName().Name, sf.GetFrame(i).GetMethod().Name)).ToArray();
             
             int frameLevel = 0;
             MethodBase method, methodCalledBy;
@@ -39,7 +39,7 @@ namespace UtilitiesCS
             string methodName = "";
             if (method is not null) 
             {
-                methodName = $"{method.DeclaringType.Name}.{method.Name}";
+                methodName = $"{GetClassName(method)}.{method.Name}";
             }
 
             try
@@ -56,27 +56,66 @@ namespace UtilitiesCS
                 frameLevel = 2;
                 methodCalledBy = null;
             }
+            
+            var methodCaller = $"{GetClassName(methodCalledBy)}.{methodCalledBy.Name}()" ?? "";
 
-            //var methodCaller = $"{methodCalledBy.DeclaringType.Name}.{methodCalledBy.Name}()" ?? "";
-            var methodCaller = $"{methodCalledBy.DeclaringType.Name}.{methodCalledBy.Name}()" ?? "";
-
-            if (methodParameters.Length == callingMethodParamValues.Length)
+            // Exclude out parameters
+            var methodParamsExcludingOut = methodParameters?.Where(p => !p.IsOut).ToArray();
+            if (methodParamsExcludingOut.Length == callingMethodParamValues.Length)
             {
                 List<string> parameterList = new List<string>();
-                foreach (var parameter in methodParameters)
+                foreach (var parameter in methodParamsExcludingOut)
                 {
                     parameterList.Add($"{parameter.Name}={callingMethodParamValues[parameter.Position]}");
                 }
 
                 logger.Info($"TRACE\t{methodCaller} -> {methodName}({string.Join(", ", parameterList)})");
-
             }
             else
             {
                 logger.Info($"TRACE\t{methodCaller} -> {method.Name}(/* Please update to pass in all parameters */)");
             }
+        }
 
+        public static string[] GetMyStackSummary(StackTrace sf)
+        {
+            var stack = GetMyStack(sf);
+            var stackSummary = stack.Select(m => $"{GetClassName(m)}.{m.Name}").ToArray();
+            return stackSummary;
+        }
 
+        private static string GetClassName(MethodBase m)
+        {
+            if (m.IsStatic) { return m.Module.Name; }
+            else { return m.DeclaringType.Name; }
+        }
+        
+        public static List<MethodBase> GetMyStack(StackTrace sf)
+        {
+            List<MethodBase> stack = new List<MethodBase>();
+            
+            for (int i = 0; i < sf.FrameCount; i++)
+            {
+                var method = sf.GetFrame(i).GetMethod();
+                string assemblyName;
+                if (method.IsStatic)
+                {
+                    assemblyName = method.Module.Assembly.GetName().Name;
+                }
+                else
+                {
+                    assemblyName = method.DeclaringType.Assembly.GetName().Name;
+                }
+                if (ProjectNames.Contains(assemblyName))
+                {
+                    if (method.Name != "MoveNext")
+                    {
+                        stack.Add(method);
+                    }
+                }
+            }
+            
+            return stack;
         }
 
         private static MethodBase GetFirstMethodOfMine(StackTrace sf, ref int i)
@@ -94,18 +133,17 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        var assemblyName = sf.GetFrame(i).GetMethod().DeclaringType.Assembly.GetName().Name;
+                        var m = sf.GetFrame(i).GetMethod();
+                        string assemblyName;
+                        
+                        if (m.IsStatic) { assemblyName = m.Module.Assembly.GetName().Name; }
+                        else { assemblyName = m.DeclaringType.Assembly.GetName().Name; }
+                        
                         if (ProjectNames.Contains(assemblyName))
                         {
                             methodCalledBy = sf.GetFrame(i).GetMethod();
-                            if (methodCalledBy.Name == "MoveNext")
-                            {
-                                methodCalledBy = null;
-                            }
-                            else
-                            {
-                                repeat = false;
-                            }
+                            if (methodCalledBy.Name == "MoveNext") { methodCalledBy = null; }
+                            else { repeat = false; }
                         }
                     }
                     
@@ -141,47 +179,6 @@ namespace UtilitiesCS
             }
         }
         
-        //internal static List<string> ProjectPaths 
-        //{
-        //    get 
-        //    { 
-        //        if (_projectPaths is null)
-        //        {
-        //            var solutionPath = GetSolutionPath();
-        //            var content = File.ReadAllText(solutionPath);
-        //            Regex projReg = new Regex(
-        //                "Project\\(\"\\{[\\w-]*\\}\"\\) = \"([\\w _]*.*)\", \"(.*\\.(cs|vcx|vb)proj)\"", 
-        //                RegexOptions.Compiled);
-        //            var matches = projReg.Matches(content).Cast<Match>();
-        //            var projects = matches.Select(x => x.Groups[2].Value).ToList();
-        //            for (int i = 0; i < projects.Count; ++i)
-        //            {
-        //                if (!Path.IsPathRooted(projects[i]))
-        //                    projects[i] = Path.Combine(Path.GetDirectoryName(solutionPath),
-        //                        projects[i]);
-        //                projects[i] = Path.GetFullPath(projects[i]);
-        //            }
-        //            _projectPaths = projects;
-        //        }
-        //        return _projectPaths;
-        //    }
-        //}
-
-        //Doesn't work
-        //internal static string GetSolutionPath()
-        //{
-        //    var currentDirPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        //    while (currentDirPath != null)
-        //    {
-        //        var fileInCurrentDir = Directory.GetFiles(currentDirPath).Select(f => f.Split(@"\").Last()).ToArray();
-        //        var solutionFileName = fileInCurrentDir.SingleOrDefault(f => f.EndsWith(".sln", StringComparison.InvariantCultureIgnoreCase));
-        //        if (solutionFileName != null)
-        //            return Path.Combine(currentDirPath, solutionFileName);
-
-        //        currentDirPath = Directory.GetParent(currentDirPath)?.FullName;
-        //    }
-
-        //    throw new FileNotFoundException("Cannot find solution file path");
-        //}
+        
     }
 }

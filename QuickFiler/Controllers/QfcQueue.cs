@@ -76,7 +76,7 @@ namespace QuickFiler.Controllers
 
         public async Task<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> TryDequeueAsync(CancellationToken token, int timeout)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(token, timeout);
 
             token.ThrowIfCancellationRequested();
 
@@ -122,7 +122,7 @@ namespace QuickFiler.Controllers
         public async Task EnqueueAsync(IList<MailItem> items,
                                        IQfcCollectionController qfcCollectionController)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(items, qfcCollectionController);
 
             if (items is null) { throw new ArgumentNullException(nameof(items)); }
             if (items.Count == 0) { throw new ArgumentException("items is empty"); }
@@ -185,7 +185,7 @@ namespace QuickFiler.Controllers
 
         internal async Task<QfcItemGroup> AddAsync(TableLayoutPanel tlp, MailItem mailItem, int indexNumber)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(tlp, mailItem, indexNumber);
 
             var grp = new QfcItemGroup(mailItem);
             var viewer = ItemViewerQueue.Dequeue(_token);
@@ -196,7 +196,7 @@ namespace QuickFiler.Controllers
 
         internal void AddViewerToTlp(TableLayoutPanel tlp, ItemViewer viewer, int indexNumber)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(tlp, viewer, indexNumber);
 
             viewer.Parent = tlp;
             tlp.SetCellPosition(viewer, new TableLayoutPanelCellPosition(0, indexNumber));
@@ -240,7 +240,7 @@ namespace QuickFiler.Controllers
             TableLayoutPanel tlp,
             int start)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(items, appGlobals, homeController, qfcCollectionController, tlp, start);
 
             var digits = start + items.Count >= 10 ? 2:1;
             var itemTasks = Enumerable.Range(start, items.Count)

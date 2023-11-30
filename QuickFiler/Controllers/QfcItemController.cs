@@ -352,7 +352,7 @@ namespace QuickFiler.Controllers
         
         internal async Task PopulateControlsAsync(MailItem mailItem, int viewerPosition, bool loadAll)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(mailItem, viewerPosition, loadAll);
 
             _token.ThrowIfCancellationRequested();
 
@@ -364,7 +364,7 @@ namespace QuickFiler.Controllers
 
         internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(itemInfo, viewerPosition);
 
             _itemViewer.LblSender.Text = itemInfo.SenderName;
             _itemViewer.LblSubject.Text = itemInfo.Subject;
@@ -491,7 +491,7 @@ namespace QuickFiler.Controllers
         
         public void PopulateFolderComboBox(object varList = null)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(varList);
 
             LoadFolderHandler(varList);
 
@@ -903,7 +903,7 @@ namespace QuickFiler.Controllers
 
         internal void CbxConversation_CheckedChanged(object sender, EventArgs e)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(sender, e);
 
             _optionConversationChecked = _itemViewer.ConversationMenuItem.Checked;
             if (!SuppressEvents)
@@ -1352,7 +1352,7 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleTipsAsync(Enums.ToggleState desiredState)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(desiredState);
 
             _token.ThrowIfCancellationRequested();
 

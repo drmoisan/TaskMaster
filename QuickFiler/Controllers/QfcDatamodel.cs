@@ -187,9 +187,9 @@ namespace QuickFiler.Controllers
             //// Cast list to concurrent queue
             _masterQueue = new ConcurrentQueue<MailItem>(emailList);
 
+            // Continuous Process -> Would need to use blocking collection and producer/consumer pattern
             //_masterQueue = new ConcurrentQueue<MailItem>();
-
-            rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ForEach(item => _masterQueue.Enqueue(item));
+            //rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ForEach(item => _masterQueue.Enqueue(item));
 
             return true;
             

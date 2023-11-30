@@ -32,19 +32,18 @@ namespace TaskTree
 
         public void InitializeTreeListView()
         {
-
             {
                 _viewer.TreeLv.CanExpandGetter = x => ((TreeNode<ToDoItem>)x).ChildCount > 0;
                 _viewer.TreeLv.ChildrenGetter = x => ((TreeNode<ToDoItem>)x).Children;
                 _viewer.TreeLv.ParentGetter = x => ((TreeNode<ToDoItem>)x).Parent;
                 _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
                 _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
-
-                _viewer.TreeLv.CheckedObjects = _dataModel.ListOfToDoTree
-                    .SelectMany(node => node.Descendents(true).Where(x => x.Value.Complete))
-                    .ToList();
-
                 _viewer.TreeLv.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
+
+                //_viewer.TreeLv.CheckedObjects = _dataModel.ListOfToDoTree
+                //    .SelectMany(node => node.Descendents(true).Where(x => x.Value.Complete))
+                //    .ToList();
+
             }
 
             SimpleDropSink sink1 = (SimpleDropSink)_viewer.TreeLv.DropSink;
@@ -55,7 +54,8 @@ namespace TaskTree
             _rs.FindAllControls(_viewer);
             _rs.SetResizeDimensions(_viewer.SplitContainer1, Resizer.ResizeDimensions.None, true);
             _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position | Resizer.ResizeDimensions.Size, true);
-            _rs.PrintDict();
+            _rs.ResizeAllControls(_viewer);
+            //_rs.PrintDict();
         }
 
         #endregion Constructors and Initializers

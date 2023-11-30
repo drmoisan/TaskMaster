@@ -33,7 +33,8 @@ namespace UtilitiesCS.OutlookExtensions
         private const string _olTaskDueDate = "TaskDueDate";
         private const string _olDueDate = "DueDate";
         private const string _olTaskStartDate = "TaskStartDate";
-        private const string _olStartDate = "CreationTime";
+        private const string _olStartDate = "StartDate";
+        private const string _olCreationTime = "CreationTime";
         private const string _olComplete = "Complete";
         private const string _olTaskSubject = "TaskSubject";
         private const string _olSubject = "Subject";
@@ -51,8 +52,10 @@ namespace UtilitiesCS.OutlookExtensions
             {
                 try
                 {
-                    var complete = this.TryGetPropertyValue(_olComplete) ?? (OlFlagStatus)this.GetPropertyValue(_olFlagStatus) == OlFlagStatus.olFlagComplete;
-                    return (bool)complete;
+                    bool complete;
+                    if (_olType == OlItemType.olTaskItem) { complete = (bool)(this.TryGetPropertyValue(_olComplete) ?? false); }
+                    else { complete = (OlFlagStatus)this.GetPropertyValue(_olFlagStatus) == OlFlagStatus.olFlagComplete; }
+                    return complete;
                 }
                 // if neither property exists, catch the exception and throw a custom one
                 catch (System.Exception)
@@ -62,15 +65,11 @@ namespace UtilitiesCS.OutlookExtensions
             }
             set
             {
-                
                 if (Complete != value)
                 {
-                    var success = this.TrySetPropertyValue(_olComplete, value);
-                    if (!success) 
-                    {
-                        if (value) { success = this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olFlagMarked); }
-                        else { success = this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olFlagComplete); }
-                    }
+                    bool success;
+                    if (_olType == OlItemType.olTaskItem) { success = this.TrySetPropertyValue(_olComplete, value); }
+                    else { success = this.TrySetPropertyValue(_olFlagStatus, value ? OlFlagStatus.olFlagComplete : OlFlagStatus.olFlagMarked); }
                     if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(Complete))); }
                 }
             }
@@ -80,7 +79,12 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get
             {
-                var dueDate = this.TryGetPropertyValue(_olTaskDueDate) ?? this.TryGetPropertyValue(_olDueDate);
+                object dueDate;
+                if (_olType == OlItemType.olTaskItem) { dueDate = this.TryGetPropertyValue(_olDueDate); }
+                else
+                {
+                    dueDate = this.TryGetPropertyValue(_olTaskDueDate, _olDueDate);
+                }
                 if (dueDate is null)
                 {
                     throw new ArgumentException(GetTypeErrorMessage(nameof(DueDate))); 
@@ -92,7 +96,9 @@ namespace UtilitiesCS.OutlookExtensions
                 DateTime current = DueDate;
                 if (current != value)
                 {
-                    var success = this.TrySetPropertyValue(_olTaskDueDate, value);
+                    bool success;
+                    if (_olType == OlItemType.olTaskItem) { success = this.TrySetPropertyValue(_olDueDate, value); }
+                    else { success = this.TrySetPropertyValue(_olTaskDueDate, value); }
                     if (!success) { success = this.TrySetPropertyValue(_olDueDate, value); }
                     if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(DueDate))); }
                 }
@@ -103,13 +109,13 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get
             {
+                if (_olType == OlItemType.olTaskItem) { return true; }
                 var mailFlag = this.TryGetPropertyValue(_olFlagStatus);
                 if (mailFlag != null)
                 {
                     return (OlFlagStatus)mailFlag == OlFlagStatus.olFlagMarked ||
                            (OlFlagStatus)mailFlag == OlFlagStatus.olFlagComplete;
                 }
-                else if (this.InnerObject is TaskItem) { return true; }
                 else { throw new ArgumentException(GetTypeErrorMessage(nameof(FlagAsTask))); }
             }
             set
@@ -131,17 +137,14 @@ namespace UtilitiesCS.OutlookExtensions
                 }
             }
         }
-        
-        public bool PropertyExists(string propertyName)
-        {
-            return (GetPropertyValue(propertyName) != null);
-        }
-        
+                
         public DateTime TaskStartDate
         {
             get
-            {
-                var startDate = this.TryGetPropertyValue(_olTaskStartDate) ?? this.TryGetPropertyValue(_olStartDate);
+            {                
+                object startDate = null;
+                if (_olType == OlItemType.olTaskItem) { startDate = this.TryGetPropertyValue(_olStartDate, _olCreationTime); }
+                else { startDate = this.TryGetPropertyValue(_olTaskStartDate, _olCreationTime); }
                 if (startDate is null)
                 {
                     throw new ArgumentException(GetTypeErrorMessage(nameof(TaskStartDate)));
@@ -164,15 +167,23 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get
             {
-                var taskSubject = this.TryGetPropertyValue(_olTaskSubject, _olSubject) ?? throw new ArgumentException(GetTypeErrorMessage(nameof(TaskSubject)));
-                return (string)taskSubject;
+                if (_olType == OlItemType.olTaskItem) { return Subject; }
+                else
+                {
+                    var taskSubject = this.TryGetPropertyValue(_olTaskSubject, _olSubject) ?? throw new ArgumentException(GetTypeErrorMessage(nameof(TaskSubject)));
+                    return (string)taskSubject;
+                }
             }
             set
             {
                 if (TaskSubject != value)
                 {
-                    var success = this.TrySetPropertyValue(_olTaskSubject, _olSubject, value);
-                    if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(TaskSubject))); }
+                    if (_olType == OlItemType.olTaskItem) { Subject = value; }
+                    else 
+                    { 
+                        var success = this.TrySetPropertyValue(_olTaskSubject, _olSubject, value);
+                        if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(TaskSubject))); }
+                    }
                 }
             }
         }
@@ -181,7 +192,9 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get 
             {
-                var work = this.TryGetPropertyValue(_olTotalWork) ?? this.PropertyAccessor.TryGetProperty(PA_TOTAL_WORK);
+                object work;
+                if (_olType == OlItemType.olTaskItem) { work = this.TryGetPropertyValue(_olTotalWork); }
+                else { work = this.PropertyAccessor.TryGetProperty(PA_TOTAL_WORK); }
                 try { return (int)work; }
                 catch (System.Exception) { return 0; }
             }
@@ -189,8 +202,18 @@ namespace UtilitiesCS.OutlookExtensions
             {
                 if (TotalWork != value)
                 {
-                    var success = this.TrySetPropertyValue(_olTotalWork, value);
-                    if (!success) { this.PropertyAccessor.SetProperty(PA_TOTAL_WORK, value); }
+                    bool success;
+                    try
+                    {
+                        if (_olType == OlItemType.olTaskItem) { success = this.TrySetPropertyValue(_olTotalWork, value); }
+                        else { success = this.PropertyAccessor.TrySetProperty(PA_TOTAL_WORK, value); }
+                        if (!success) { this.PropertyAccessor.SetProperty(PA_TOTAL_WORK, value); }
+                    }
+                    catch (System.Exception)
+                    {
+                        Debug.WriteLine($"Error setting TotalWork to value {value}");
+                    }
+                    
                 }
             }
         }

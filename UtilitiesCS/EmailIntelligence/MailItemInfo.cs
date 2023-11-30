@@ -79,7 +79,7 @@ namespace UtilitiesCS //QuickFiler
 
         public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, string emailPrefixToStrip, CancellationToken token, bool loadAll)
         {
-            TraceUtility.LogMethodCall();
+            TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
 
             token.ThrowIfCancellationRequested();
 

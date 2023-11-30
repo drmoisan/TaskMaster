@@ -169,7 +169,7 @@ namespace TaskTree
             this.TreeLv.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick;
             this.TreeLv.CellEditUseWholeCell = false;
             this.TreeLv.CheckBoxes = true;
-            this.TreeLv.CheckedAspectName = "";
+            this.TreeLv.CheckedAspectName = "Value.Complete";
             this.TreeLv.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.OlvTaskSubject,
             this.OlvToDoID,
@@ -184,7 +184,6 @@ namespace TaskTree
             this.TreeLv.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TreeLv.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TreeLv.HideSelection = false;
-            this.TreeLv.HierarchicalCheckboxes = true;
             this.TreeLv.IsSimpleDragSource = true;
             this.TreeLv.IsSimpleDropSink = true;
             this.TreeLv.Location = new System.Drawing.Point(0, 0);

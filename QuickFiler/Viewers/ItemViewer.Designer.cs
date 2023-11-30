@@ -100,7 +100,7 @@
             this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
             this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 614F));
+            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 617F));
             this.L0vh_Tlp.Controls.Add(this.MoveOptionsStrip, 12, 0);
             this.L0vh_Tlp.Controls.Add(this.LblAcSearch, 11, 2);
             this.L0vh_Tlp.Controls.Add(this.CboFolders, 13, 4);
@@ -138,13 +138,14 @@
             // 
             // MoveOptionsStrip
             // 
+            this.MoveOptionsStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.MoveOptionsStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.MoveOptionsStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MoveOptionsMenu});
             this.MoveOptionsStrip.Location = new System.Drawing.Point(1429, 0);
             this.MoveOptionsStrip.Name = "MoveOptionsStrip";
             this.L0vh_Tlp.SetRowSpan(this.MoveOptionsStrip, 2);
-            this.MoveOptionsStrip.Size = new System.Drawing.Size(200, 42);
+            this.MoveOptionsStrip.Size = new System.Drawing.Size(200, 40);
             this.MoveOptionsStrip.TabIndex = 43;
             this.MoveOptionsStrip.Text = "menuStrip1";
             // 
@@ -156,7 +157,7 @@
             this.SaveEmailMenuItem,
             this.SavePicturesMenuItem});
             this.MoveOptionsMenu.Name = "MoveOptionsMenu";
-            this.MoveOptionsMenu.Size = new System.Drawing.Size(186, 38);
+            this.MoveOptionsMenu.Size = new System.Drawing.Size(186, 36);
             this.MoveOptionsMenu.Text = "&Move Options";
             // 
             // ConversationMenuItem
@@ -545,7 +546,7 @@
             this.L1h1L2v1h3Panel.Controls.Add(this.BtnPopOut);
             this.L1h1L2v1h3Panel.Controls.Add(this.LblAcTask);
             this.L1h1L2v1h3Panel.Controls.Add(this.BtnFlagTask);
-            this.L1h1L2v1h3Panel.Location = new System.Drawing.Point(1779, 0);
+            this.L1h1L2v1h3Panel.Location = new System.Drawing.Point(1778, 0);
             this.L1h1L2v1h3Panel.Margin = new System.Windows.Forms.Padding(0);
             this.L1h1L2v1h3Panel.Name = "L1h1L2v1h3Panel";
             this.L0vh_Tlp.SetRowSpan(this.L1h1L2v1h3Panel, 2);

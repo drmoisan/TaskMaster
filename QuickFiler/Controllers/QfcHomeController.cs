@@ -350,7 +350,7 @@ namespace QuickFiler.Controllers
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
 
             durationMinutesText = (Duration / 60d).ToString("##0.00");
-            WriteMoveToCalendar(OlEndTime, OlStartTime, out OlAppointment, out OlEmailCalendar, emailsLoaded);
+            WriteMoveToCalendar(OlEndTime, OlStartTime, emailsLoaded, out OlAppointment, out OlEmailCalendar);
 
             string[] strOutput = _formController.Groups
                 .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
@@ -360,7 +360,7 @@ namespace QuickFiler.Controllers
             await NonBlockingProducer(strOutput, Token);
         }
 
-        private void WriteMoveToCalendar(DateTime OlEndTime, DateTime OlStartTime, out AppointmentItem OlAppointment, out Folder OlEmailCalendar, int emailsLoaded)
+        private void WriteMoveToCalendar(DateTime OlEndTime, DateTime OlStartTime, int emailsLoaded, out AppointmentItem OlAppointment, out Folder OlEmailCalendar)
         {
             TraceUtility.LogMethodCall(OlEndTime, OlStartTime, emailsLoaded);
             

@@ -259,12 +259,12 @@ namespace UtilitiesCS
                     _item,
                     _args);
             }
-            catch (SystemException ex)
+            catch (SystemException)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: CallMethod for {0} Exception: {1} ",
-                    methodName, ex.Message));
+                //Debug.WriteLine(
+                //    string.Format(
+                //    "OutlookItem: CallMethod for {0} Exception: {1} ",
+                //    methodName, ex.Message));
                 throw;
             }
         }
@@ -281,12 +281,12 @@ namespace UtilitiesCS
                     _item,
                     args);
             }
-            catch (SystemException ex)
+            catch (SystemException)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: CallMethod for {0} Exception: {1} ",
-                    methodName, ex.Message));
+                //Debug.WriteLine(
+                //    string.Format(
+                //    "OutlookItem: CallMethod for {0} Exception: {1} ",
+                //    methodName, ex.Message));
                 throw;
             }
         }
