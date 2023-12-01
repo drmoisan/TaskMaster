@@ -321,6 +321,12 @@
       <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="EmailIntelligence\FilterOlFolders\OlFolderTree.cs" />
+    <Compile Include="EmailIntelligence\FilterOlFolders\OSBrowser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\FilterOlFolders\OSBrowser.Designer.cs">
+      <DependentUpon>OSBrowser.cs</DependentUpon>
+    </Compile>
     <Compile Include="EmailIntelligence\SubjectMap\CommonWords.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidence.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidenceList.cs" />
@@ -517,6 +523,9 @@
     <EmbeddedResource Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersViewer.resx">
       <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\FilterOlFolders\OSBrowser.resx">
+      <DependentUpon>OSBrowser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HelperClasses\DvgForm.resx">
       <DependentUpon>DvgForm.cs</DependentUpon>

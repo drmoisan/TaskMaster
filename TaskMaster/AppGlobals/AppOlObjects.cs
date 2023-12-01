@@ -139,6 +139,13 @@ namespace TaskMaster
             }
         }
 
+        private Folder _archiveRoot;
+        public Folder ArchiveRoot => Initializer.GetOrLoad(ref _archiveRoot, LoadArchiveRoot);
+        internal Folder LoadArchiveRoot() 
+        {
+            return FolderHandler.GetFolder(Root.Folders, "Archive");
+        }
+
         public string EmailPrefixToStrip => Properties.Resources.Email_Prefix_To_Strip;
         
         private StackObjectCS<object> _movedMails_Stack;

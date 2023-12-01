@@ -11,12 +11,29 @@ namespace UtilitiesCS
         public FilterOlFoldersController(IApplicationGlobals appGlobals) 
         { 
             _globals = appGlobals;
-            _olFolderTree = new OlFolderTree(_globals.Ol.EmailRoot,_globals.TD.FilteredFolderScraping);
+            _olFolderTree = new OlFolderTree(_globals.Ol.ArchiveRoot,_globals.TD.FilteredFolderScraping);
+            _viewer = new FilterOlFoldersViewer();
+            _viewer.SetController(this);
+            _viewer.Show();
         }
 
-        private IApplicationGlobals _globals;
-                
+        private IApplicationGlobals _globals;       
+        private FilterOlFoldersViewer _viewer;
+
         private OlFolderTree _olFolderTree;
-        private OlFolderTree _olFilterTree;
+        public OlFolderTree OlFolderTree { get => _olFolderTree; }
+
+        #region Event Handlers
+
+        internal void Discard() => _viewer.Close();
+
+        internal void Save()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        #endregion Event Handlers
+
     }
 }

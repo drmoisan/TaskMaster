@@ -264,8 +264,9 @@ namespace TaskMaster
 
         internal void TryLoadFolderFilter()
         {
-            var filter = new FilterOlFoldersViewer();
-            filter.ShowDialog();
+            var filter = new FilterOlFoldersController(_globals);
+            //var filter = new FilterOlFoldersViewer();
+            //filter.ShowDialog();
         }
 
         #endregion

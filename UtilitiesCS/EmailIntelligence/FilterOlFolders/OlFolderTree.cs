@@ -9,6 +9,7 @@ namespace UtilitiesCS
         public OlFolderTree() { }
 
         private List<TreeNode<OlFolderInfo>> _roots;
+        public List<TreeNode<OlFolderInfo>> Roots { get => _roots; }
 
         public OlFolderTree(MAPIFolder olRoot)
         {
@@ -48,6 +49,7 @@ namespace UtilitiesCS
             {
                 node.Traverse(node => node.Selected = true);
             }
+            
         }
 
         public List<TreeNode<OlFolderInfo>> FilterSelected(bool include)

@@ -40,10 +40,6 @@ namespace TaskTree
                 _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
                 _viewer.TreeLv.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
 
-                //_viewer.TreeLv.CheckedObjects = _dataModel.ListOfToDoTree
-                //    .SelectMany(node => node.Descendents(true).Where(x => x.Value.Complete))
-                //    .ToList();
-
             }
 
             SimpleDropSink sink1 = (SimpleDropSink)_viewer.TreeLv.DropSink;

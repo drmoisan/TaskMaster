@@ -9,6 +9,7 @@ namespace UtilitiesCS
         Application App { get; }
         string EmailRootPath { get; }
         string ArchiveRootPath { get; }
+        Folder ArchiveRoot { get; }
         string UserEmailAddress { get; }
         string EmailPrefixToStrip { get; }
         Folder Inbox { get; }
