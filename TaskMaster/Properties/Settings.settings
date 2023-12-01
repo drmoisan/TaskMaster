@@ -137,5 +137,8 @@
     <Setting Name="SaveEmailCopy" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="FileName_FilteredFolderScraping" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999FilteredFolderScraping.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

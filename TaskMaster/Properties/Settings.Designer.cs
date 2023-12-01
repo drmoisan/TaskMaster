@@ -550,5 +550,17 @@ namespace TaskMaster.Properties {
                 this["SaveEmailCopy"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999FilteredFolderScraping.json")]
+        public string FileName_FilteredFolderScraping {
+            get {
+                return ((string)(this["FileName_FilteredFolderScraping"]));
+            }
+            set {
+                this["FileName_FilteredFolderScraping"] = value;
+            }
+        }
     }
 }

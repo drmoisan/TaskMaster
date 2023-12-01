@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -62,6 +61,12 @@ namespace UtilitiesCS
             return idx;
         }
 
+        // TODO: Implement RebuildMap method
+        public void RebuildMap(IApplicationGlobals appGlobals) 
+        { 
+            NotImplementedDialog.StopAtNotImplemented("RebuildMap");
+        }
+
         #region Backup Loader
 
         public static IList<CtfMapEntry> ReadTextFile(string filePath)
@@ -107,7 +112,7 @@ namespace UtilitiesCS
             }
             catch (System.OverflowException e)
             {
-                string message = $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueEntry)} of the backup loader";
+                string message = $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
@@ -115,7 +120,7 @@ namespace UtilitiesCS
             }
             catch (System.InvalidOperationException e)
             {
-                string message = $"Error dequeuing at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueEntry)} of the backup loader";
+                string message = $"Error dequeuing at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);

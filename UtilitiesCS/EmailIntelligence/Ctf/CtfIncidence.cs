@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace UtilitiesCS
 {
+    [Obsolete("Use CtfMapEntry Instead")]
     public class CtfIncidence 
     {
         public CtfIncidence()

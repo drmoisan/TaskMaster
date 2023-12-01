@@ -177,7 +177,8 @@ namespace TaskMaster
         public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.TryRecipientGetInfo();
         public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.TrySubstituteIdRoot();
         public void GetImage_Click(Office.IRibbonControl control) => _controller.TryGetImage();
-        
+        public void LoadFolderFilter_Click(Office.IRibbonControl control) => _controller.TryLoadFolderFilter();
+
         #endregion
 
         #region Helpers

@@ -6,11 +6,13 @@ using Microsoft.VisualBasic;
 using UtilitiesCS;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System;
 
 
 namespace UtilitiesCS
 {
     //TODO: Deprecate this CtfIncidence class
+    [Obsolete("This class is deprecated, use CtfMap instead")]
     public class CtfIncidenceList : SerializableList<CtfIncidence>
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

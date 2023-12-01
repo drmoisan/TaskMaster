@@ -151,6 +151,7 @@ namespace ToDoModel
             }
         }
 
+        [Obsolete]
         internal void ScoreAndAddConv(CtfIncidence ctfIncidence, int convCtPwr, int convWeight)
         {
             // For each Folder that already contains at least one email with the conversationID ...

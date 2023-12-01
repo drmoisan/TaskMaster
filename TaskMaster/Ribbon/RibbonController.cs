@@ -19,6 +19,7 @@ using System.Drawing.Imaging;
 using stdole;
 using System;
 
+
 namespace TaskMaster
 {
 
@@ -261,6 +262,12 @@ namespace TaskMaster
             ToDoModel.SortEmail.Run2(items, false, "_ Active Projects\\Countertop Beta", false, false, false, _globals, null, null);
         }
 
+        internal void TryLoadFolderFilter()
+        {
+            var filter = new FilterOlFoldersViewer();
+            filter.ShowDialog();
+        }
+
         #endregion
 
         internal void SortEmail()
@@ -269,5 +276,6 @@ namespace TaskMaster
             sorter.Run();
         }
 
+        
     }
 }

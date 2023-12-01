@@ -18,6 +18,7 @@ namespace UtilitiesCS
         IProjectInfo ProjInfo { get; }
         ScoCollection<IPrefix> PrefixList { get; }
         ScoCollection<IPrefix> LoadPrefixList();
+        ScoCollection<string> FilteredFolderScraping { get; }
         string ProjInfo_Filename { get; }
         string FnameDictRemap { get; }
         string FnameIDList { get; }

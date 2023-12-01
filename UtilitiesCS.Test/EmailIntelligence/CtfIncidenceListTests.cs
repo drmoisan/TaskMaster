@@ -8,6 +8,7 @@ using UtilitiesCS;
 namespace UtilitiesCS.Test.EmailIntelligence
 {
     [TestClass]
+    [Obsolete]
     public class CtfIncidenceListTests
     {
         private MockRepository mockRepository;
