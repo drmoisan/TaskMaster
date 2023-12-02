@@ -41,10 +41,22 @@ namespace UtilitiesCS
 
         private static SynchronizationContext _uiContext;
         
+        public static System.Drawing.SizeF AutoScaleFactor 
+        {
+            get 
+            { 
+                if (_autoScaleFactor is null) { InitUiContext();  }
+                return (System.Drawing.SizeF)_autoScaleFactor; 
+            }
+        }
+        private static System.Drawing.SizeF? _autoScaleFactor = null;
+
+
         public static void InitUiContext(bool monitorUiThread = true)
         {
             _syncContextForm = new SyncContextForm();
             _uiContext = _syncContextForm.UiSyncContext;
+            _autoScaleFactor = _syncContextForm.FormAutoScaleFactor;
             //Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
             _uiDispatcher = Dispatcher.CurrentDispatcher;
             if (monitorUiThread)

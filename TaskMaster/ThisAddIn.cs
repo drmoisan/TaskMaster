@@ -33,6 +33,13 @@ namespace TaskMaster
             // Grab the sync context for the UI thread
             UIThreadExtensions.InitUiContext(monitorUiThread: false);
 
+            // Set the indent for TreeListView Renderer which does not autoscale.
+            // Default pixels per level was 16 + 1 but designed for 100% scaling.
+            // This add-in is designed for 200% scaling.
+            var tlvIndent = 34; 
+            tlvIndent = (int)(tlvIndent * UIThreadExtensions.AutoScaleFactor.Width);
+            BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
+
             // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();
 

@@ -1,20 +1,22 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using System.Linq;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using UtilitiesCS.HelperClasses;
+using System;
 
 namespace UtilitiesCS
 {
-    public class OlFolderTree
+    public class OlFolderTree: INotifyPropertyChanged
     {
         public OlFolderTree() { }
-
-        private List<TreeNode<OlFolderInfo>> _roots;
-        public List<TreeNode<OlFolderInfo>> Roots { get => _roots; }
 
         public OlFolderTree(MAPIFolder olRoot)
         {
             var root = RootFromFolder(olRoot);
             _roots = new List<TreeNode<OlFolderInfo>>() { root };
+            WireNotifications();
         }
 
         public OlFolderTree(MAPIFolder olRoot, IList<string> selections)
@@ -22,6 +24,7 @@ namespace UtilitiesCS
             var root = RootFromFolder(olRoot);
             root.Traverse(node => node.Selected = selections.Contains(node.RelativePath));
             _roots = new List<TreeNode<OlFolderInfo>>() { root };
+            WireNotifications();
         }
 
         private TreeNode<OlFolderInfo> RootFromFolder(MAPIFolder olRoot)
@@ -31,6 +34,9 @@ namespace UtilitiesCS
             this.InitializeChildren(root, olRoot);
             return root;
         }
+
+        private List<TreeNode<OlFolderInfo>> _roots;
+        public List<TreeNode<OlFolderInfo>> Roots { get => _roots; }
 
         private void InitializeChildren(TreeNode<OlFolderInfo> node, MAPIFolder olRoot)
         {
@@ -79,10 +85,32 @@ namespace UtilitiesCS
             }
         }
 
+        #region INotifyPropertyChanged
+
+        internal void WireNotifications()
+        {
+            _roots.ForEach(root => root.Traverse(node => node.Value.PropertyChanged += Child_PropertyChanged));
+        }
+        
+        private TimedBatchAction _batchNotifier = new(TimeSpan.FromMilliseconds(50));
+
+        private void Child_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            _batchNotifier.RequestAction(() => PropertyChanged?.Invoke(sender, e));   
+        }
+
+        public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
     }
 
 
-    public class OlFolderInfo
+    public class OlFolderInfo:INotifyPropertyChanged
     {
         public OlFolderInfo() { }
 
@@ -91,19 +119,48 @@ namespace UtilitiesCS
             _olFolder = olFolder;
             _olRoot = olRoot;
             _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath, "");
+            _name = olFolder.Name;
         }
 
         private MAPIFolder _olRoot;
         public MAPIFolder OlRoot { get => _olRoot; set => _olRoot = value; }
 
         private MAPIFolder _olFolder;
-        public MAPIFolder OlFolder { get => _olFolder; set => _olFolder = value; }
+        public MAPIFolder OlFolder 
+        { 
+            get => _olFolder;
+            set 
+            { 
+                _olFolder = value; 
+                RelativePath = _olFolder.FolderPath.Replace(_olRoot.FolderPath, "");
+                Name = _olFolder.Name;
+            }
+        }
+
+        private string _name;
+        public string Name { get => _name; private set => _name = value; }
 
         private string _relativePath;
-        public string RelativePath { get => _relativePath; }
+        public string RelativePath { get => _relativePath; private set => _relativePath = value; }
 
         private bool _selected;
-        public bool Selected { get => _selected; set => _selected = value; }
+        public bool Selected 
+        { 
+            get => _selected;
+            set 
+            { 
+                _selected = value; 
+                NotifyPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
 
     }
 }

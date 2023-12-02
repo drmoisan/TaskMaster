@@ -357,6 +357,7 @@
     <Compile Include="HelperClasses\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="HelperClasses\ShellUtilities.cs" />
+    <Compile Include="HelperClasses\TimedBatchAction.cs" />
     <Compile Include="HelperClasses\VerboseLogger.cs" />
     <Compile Include="Interfaces\IGlobals\IAppQuickFilerSettings.cs" />
     <Compile Include="Interfaces\ITimerWrapper.cs" />

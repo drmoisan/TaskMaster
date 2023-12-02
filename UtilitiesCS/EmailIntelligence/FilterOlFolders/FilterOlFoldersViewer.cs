@@ -16,7 +16,6 @@ namespace UtilitiesCS
         public FilterOlFoldersViewer()
         {
             InitializeComponent();
-
         }
 
         private FilterOlFoldersController _controller;
@@ -25,11 +24,8 @@ namespace UtilitiesCS
             _controller = controller;
             //SetupDragAndDrop();
             SetupTree();
-
-            // You can change the way the connection lines are drawn by changing the pen
-            //TreeListView.TreeRenderer renderer = this.TlvNotFiltered.TreeColumnRenderer;
-            //renderer.LinePen = new Pen(Color.Firebrick, 0.5f);
-            //renderer.LinePen.DashStyle = DashStyle.Dot;
+            SetupRenderer(this.TlvNotFiltered.TreeColumnRenderer);
+            SetupRenderer(this.TlvFiltered.TreeColumnRenderer);
         }
         
         private void SetupDragAndDrop()
@@ -60,19 +56,31 @@ namespace UtilitiesCS
             };
         }
 
+        private void SetupRenderer(TreeListView.TreeRenderer renderer)
+        {
+            var penSize = 2.0f * UIThreadExtensions.AutoScaleFactor.Width;
+            renderer.LinePen = new Pen(Color.Firebrick, penSize);
+            renderer.LinePen.DashStyle = DashStyle.Dot;
+            renderer.UseTriangles = true;
+            renderer.IsShowGlyphs = true;
+        }
+        
         private void SetupTree()
         {
             this.TlvNotFiltered.CanExpandGetter = x => ((TreeNode<OlFolderInfo>)x).ChildCount>0;
             this.TlvNotFiltered.ChildrenGetter = x => ((TreeNode<OlFolderInfo>)x).Children;
             this.TlvNotFiltered.ParentGetter = x => ((TreeNode<OlFolderInfo>)x).Parent;
-            //this.treeListView.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
+            this.OlvNameNotFiltered.ImageGetter = x => 0;
             this.TlvNotFiltered.Roots = _controller.OlFolderTree.Roots;
+            this.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
+
 
             this.TlvFiltered.CanExpandGetter = x => ((TreeNode<OlFolderInfo>)x).ChildCount > 0;
             this.TlvFiltered.ChildrenGetter = x => ((TreeNode<OlFolderInfo>)x).Children;
             this.TlvFiltered.ParentGetter = x => ((TreeNode<OlFolderInfo>)x).Parent;
-            //this.treeListView.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
+            this.OlvNameFiltered.ImageGetter = x => 0;
             this.TlvFiltered.Roots = _controller.OlFolderTree.Roots;
+            this.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
         }
 
         

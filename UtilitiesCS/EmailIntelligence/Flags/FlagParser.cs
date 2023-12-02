@@ -195,7 +195,6 @@ namespace UtilitiesCS
         public ObservableCollection<string> GetKbList(bool IncludePrefix = false) => IncludePrefix ? _kb.ListWithPrefix : _kb.List;
         public void SetKbList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _kb.List = value;
 
-
         private bool _today = false;
         public bool Today { get => _today; set => _today = value; }
 
@@ -207,7 +206,7 @@ namespace UtilitiesCS
 
         #endregion
 
-        #region Events
+        #region INotifyCollectionChanged Implementation
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
         

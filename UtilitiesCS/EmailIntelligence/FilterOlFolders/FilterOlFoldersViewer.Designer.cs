@@ -33,14 +33,14 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.label1 = new System.Windows.Forms.Label();
             this.TlvNotFiltered = new BrightIdeasSoftware.TreeListView();
-            this.olvColumnName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.imageListSmall = new System.Windows.Forms.ImageList(this.components);
+            this.OlvNameNotFiltered = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.label2 = new System.Windows.Forms.Label();
             this.TlvFiltered = new BrightIdeasSoftware.TreeListView();
+            this.OlvNameFiltered = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.BtnSave = new System.Windows.Forms.Button();
             this.BtnDiscard = new System.Windows.Forms.Button();
-            this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -68,7 +68,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.label2);
             this.splitContainer1.Panel2.Controls.Add(this.TlvFiltered);
             this.splitContainer1.Size = new System.Drawing.Size(1830, 894);
-            this.splitContainer1.SplitterDistance = 911;
+            this.splitContainer1.SplitterDistance = 910;
             this.splitContainer1.TabIndex = 1;
             // 
             // label1
@@ -83,30 +83,34 @@
             // 
             // TlvNotFiltered
             // 
-            this.TlvNotFiltered.AllColumns.Add(this.olvColumnName);
+            this.TlvNotFiltered.AllColumns.Add(this.OlvNameNotFiltered);
             this.TlvNotFiltered.AllowColumnReorder = true;
             this.TlvNotFiltered.AllowDrop = true;
             this.TlvNotFiltered.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TlvNotFiltered.CellEditUseWholeCell = false;
+            this.TlvNotFiltered.CheckBoxes = true;
+            this.TlvNotFiltered.CheckedAspectName = "Value.Selected";
             this.TlvNotFiltered.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.olvColumnName});
+            this.OlvNameNotFiltered});
             this.TlvNotFiltered.Cursor = System.Windows.Forms.Cursors.Default;
             this.TlvNotFiltered.EmptyListMsg = "This folder is completely empty!";
             this.TlvNotFiltered.EmptyListMsgFont = new System.Drawing.Font("Comic Sans MS", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TlvNotFiltered.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TlvNotFiltered.HideSelection = false;
             this.TlvNotFiltered.IsSimpleDragSource = true;
             this.TlvNotFiltered.IsSimpleDropSink = true;
             this.TlvNotFiltered.Location = new System.Drawing.Point(3, 73);
             this.TlvNotFiltered.Name = "TlvNotFiltered";
+            this.TlvNotFiltered.OwnerDraw = false;
             this.TlvNotFiltered.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.Submenu;
             this.TlvNotFiltered.ShowCommandMenuOnRightClick = true;
             this.TlvNotFiltered.ShowGroups = false;
             this.TlvNotFiltered.ShowImagesOnSubItems = true;
             this.TlvNotFiltered.ShowItemToolTips = true;
-            this.TlvNotFiltered.Size = new System.Drawing.Size(905, 818);
-            this.TlvNotFiltered.SmallImageList = this.imageListSmall;
+            this.TlvNotFiltered.Size = new System.Drawing.Size(904, 818);
+            this.TlvNotFiltered.SmallImageList = this.imageList1;
             this.TlvNotFiltered.TabIndex = 0;
             this.TlvNotFiltered.UseCompatibleStateImageBehavior = false;
             this.TlvNotFiltered.UseFilterIndicator = true;
@@ -115,45 +119,28 @@
             this.TlvNotFiltered.View = System.Windows.Forms.View.Details;
             this.TlvNotFiltered.VirtualMode = true;
             // 
-            // olvColumnName
+            // OlvNameNotFiltered
             // 
-            this.olvColumnName.AspectName = "Value.OlFolder.Name";
-            this.olvColumnName.IsEditable = false;
-            this.olvColumnName.IsTileViewColumn = true;
-            this.olvColumnName.Text = "Name";
-            this.olvColumnName.UseInitialLetterForGroup = true;
-            this.olvColumnName.Width = 863;
-            this.olvColumnName.WordWrap = true;
+            this.OlvNameNotFiltered.AspectName = "Value.Name";
+            this.OlvNameNotFiltered.IsEditable = false;
+            this.OlvNameNotFiltered.IsTileViewColumn = true;
+            this.OlvNameNotFiltered.Text = "Name";
+            this.OlvNameNotFiltered.UseInitialLetterForGroup = true;
+            this.OlvNameNotFiltered.Width = 863;
+            this.OlvNameNotFiltered.WordWrap = true;
             // 
-            // imageListSmall
+            // imageList1
             // 
-            this.imageListSmall.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListSmall.ImageStream")));
-            this.imageListSmall.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageListSmall.Images.SetKeyName(0, "compass");
-            this.imageListSmall.Images.SetKeyName(1, "down");
-            this.imageListSmall.Images.SetKeyName(2, "user");
-            this.imageListSmall.Images.SetKeyName(3, "find");
-            this.imageListSmall.Images.SetKeyName(4, "folder");
-            this.imageListSmall.Images.SetKeyName(5, "movie");
-            this.imageListSmall.Images.SetKeyName(6, "music");
-            this.imageListSmall.Images.SetKeyName(7, "no");
-            this.imageListSmall.Images.SetKeyName(8, "readonly");
-            this.imageListSmall.Images.SetKeyName(9, "public");
-            this.imageListSmall.Images.SetKeyName(10, "recycle");
-            this.imageListSmall.Images.SetKeyName(11, "spanner");
-            this.imageListSmall.Images.SetKeyName(12, "star");
-            this.imageListSmall.Images.SetKeyName(13, "tick");
-            this.imageListSmall.Images.SetKeyName(14, "archive");
-            this.imageListSmall.Images.SetKeyName(15, "system");
-            this.imageListSmall.Images.SetKeyName(16, "hidden");
-            this.imageListSmall.Images.SetKeyName(17, "temporary");
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "FolderClosed.png");
             // 
             // label2
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(370, 12);
+            this.label2.Location = new System.Drawing.Point(371, 12);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(174, 51);
             this.label2.TabIndex = 2;
@@ -162,23 +149,36 @@
             // 
             // TlvFiltered
             // 
-            this.TlvFiltered.AllColumns.Add(this.olvColumn1);
+            this.TlvFiltered.AllColumns.Add(this.OlvNameFiltered);
             this.TlvFiltered.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TlvFiltered.CellEditUseWholeCell = false;
+            this.TlvFiltered.CheckBoxes = true;
+            this.TlvFiltered.CheckedAspectName = "Value.Selected";
             this.TlvFiltered.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.olvColumn1});
+            this.OlvNameFiltered});
             this.TlvFiltered.Cursor = System.Windows.Forms.Cursors.Default;
+            this.TlvFiltered.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TlvFiltered.HideSelection = false;
             this.TlvFiltered.Location = new System.Drawing.Point(3, 73);
             this.TlvFiltered.Name = "TlvFiltered";
             this.TlvFiltered.ShowGroups = false;
-            this.TlvFiltered.Size = new System.Drawing.Size(908, 818);
+            this.TlvFiltered.ShowImagesOnSubItems = true;
+            this.TlvFiltered.Size = new System.Drawing.Size(909, 818);
+            this.TlvFiltered.SmallImageList = this.imageList1;
             this.TlvFiltered.TabIndex = 1;
             this.TlvFiltered.UseCompatibleStateImageBehavior = false;
+            this.TlvFiltered.UseFiltering = true;
             this.TlvFiltered.View = System.Windows.Forms.View.Details;
             this.TlvFiltered.VirtualMode = true;
+            // 
+            // OlvNameFiltered
+            // 
+            this.OlvNameFiltered.AspectName = "Value.Name";
+            this.OlvNameFiltered.FillsFreeSpace = true;
+            this.OlvNameFiltered.Text = "Name";
+            this.OlvNameFiltered.Width = 849;
             // 
             // flowLayoutPanel1
             // 
@@ -214,12 +214,6 @@
             this.BtnDiscard.UseVisualStyleBackColor = true;
             this.BtnDiscard.Click += new System.EventHandler(this.BtnDiscard_Click);
             // 
-            // olvColumn1
-            // 
-            this.olvColumn1.AspectName = "Value.OlFolder.Name";
-            this.olvColumn1.Text = "Name";
-            this.olvColumn1.Width = 849;
-            // 
             // FilterOlFoldersViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -245,15 +239,15 @@
 
         #endregion
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private BrightIdeasSoftware.TreeListView TlvNotFiltered;
-        private BrightIdeasSoftware.OLVColumn olvColumnName;
-        private BrightIdeasSoftware.TreeListView TlvFiltered;
-        private System.Windows.Forms.ImageList imageListSmall;
+        private BrightIdeasSoftware.OLVColumn OlvNameNotFiltered;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button BtnSave;
         private System.Windows.Forms.Button BtnDiscard;
-        private BrightIdeasSoftware.OLVColumn olvColumn1;
+        private BrightIdeasSoftware.OLVColumn OlvNameFiltered;
+        private System.Windows.Forms.ImageList imageList1;
+        internal BrightIdeasSoftware.TreeListView TlvNotFiltered;
+        internal BrightIdeasSoftware.TreeListView TlvFiltered;
     }
 }

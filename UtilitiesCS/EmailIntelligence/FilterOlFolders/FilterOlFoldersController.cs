@@ -1,5 +1,7 @@
-﻿using System;
+﻿using BrightIdeasSoftware;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,7 @@ namespace UtilitiesCS
         { 
             _globals = appGlobals;
             _olFolderTree = new OlFolderTree(_globals.Ol.ArchiveRoot,_globals.TD.FilteredFolderScraping);
+            _olFolderTree.PropertyChanged += OlFolderTree_PropertyChanged;
             _viewer = new FilterOlFoldersViewer();
             _viewer.SetController(this);
             _viewer.Show();
@@ -32,6 +35,14 @@ namespace UtilitiesCS
             throw new NotImplementedException();
         }
 
+        public void OlFolderTree_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            {
+                _viewer.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
+                _viewer.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
+            });
+        }
 
         #endregion Event Handlers
 
