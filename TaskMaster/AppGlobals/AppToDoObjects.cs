@@ -184,12 +184,12 @@ namespace TaskMaster
                               //PriorityScheduler.BelowNormal);
         }
 
-        private ScoCollection<string> _filteredFolderScraping;
-        public ScoCollection<string> FilteredFolderScraping => Initialized(_filteredFolderScraping, () => LoadFilteredFolderScraping());
-        public ScoCollection<string> LoadFilteredFolderScraping()
+        private ScoDictionary<string, int> _filteredFolderScraping;
+        public ScoDictionary<string, int> FilteredFolderScraping => Initialized(_filteredFolderScraping, () => LoadFilteredFolderScraping());
+        public ScoDictionary<string, int> LoadFilteredFolderScraping()
         {
-            var filteredFolderScraping = new ScoCollection<string>(fileName: _defaults.FileName_FilteredFolderScraping,
-                                                                             folderPath: Parent.FS.FldrPythonStaging);
+            var filteredFolderScraping = new ScoDictionary<string, int>(_defaults.FileName_FilteredFolderScraping,
+                                                                        Parent.FS.FldrPythonStaging);
             return filteredFolderScraping;
         }
         async private Task LoadFilteredFolderScrapingAsync()

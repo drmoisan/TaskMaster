@@ -119,7 +119,10 @@ namespace UtilitiesCS
 
         public IEnumerable<TreeNode<T>> FindAll(Func<TreeNode<T>, bool> comparator) 
         {
-            return new List<TreeNode<T>>();
+            if (comparator(this))
+                return new TreeNode<T>[] { this }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
+            else
+                return new TreeNode<T>[] { }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
         }
         
         public IEnumerable<T> Flatten()

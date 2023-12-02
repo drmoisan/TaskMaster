@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
+using Microsoft.Office.Interop.Outlook;
 using ObjectListViewDemo;
 
 namespace UtilitiesCS
@@ -71,16 +72,18 @@ namespace UtilitiesCS
             this.TlvNotFiltered.ChildrenGetter = x => ((TreeNode<OlFolderInfo>)x).Children;
             this.TlvNotFiltered.ParentGetter = x => ((TreeNode<OlFolderInfo>)x).Parent;
             this.OlvNameNotFiltered.ImageGetter = x => 0;
-            this.TlvNotFiltered.Roots = _controller.OlFolderTree.Roots;
-            this.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
+            this.TlvNotFiltered.Roots = _controller.OlFolderTree.FilterSelected(false);
+            //this.TlvNotFiltered.Roots = _controller.OlFolderTree.Roots;
+            //this.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
 
 
             this.TlvFiltered.CanExpandGetter = x => ((TreeNode<OlFolderInfo>)x).ChildCount > 0;
             this.TlvFiltered.ChildrenGetter = x => ((TreeNode<OlFolderInfo>)x).Children;
             this.TlvFiltered.ParentGetter = x => ((TreeNode<OlFolderInfo>)x).Parent;
             this.OlvNameFiltered.ImageGetter = x => 0;
-            this.TlvFiltered.Roots = _controller.OlFolderTree.Roots;
-            this.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
+            this.TlvFiltered.Roots = _controller.OlFolderTree.FilterSelected(true);
+            //this.TlvFiltered.Roots = _controller.OlFolderTree.Roots;
+            //this.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
         }
 
         
