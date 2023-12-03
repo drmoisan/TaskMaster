@@ -35,14 +35,30 @@ namespace UtilitiesCS
             var selected = OlFolderTree.Roots
                 .SelectMany(x => x.FlattenIf(info => info.Selected))
                 .Select(info => info.RelativePath);
-                //.Select(x => _globals.TD.FilteredFolderScraping.TryAdd(x, 1));
+
+            // remove any keys that are no longer selected
             _globals.TD.FilteredFolderScraping.Keys.Where(x => !selected.Contains(x))
                 .ForEach(x => _globals.TD.FilteredFolderScraping.Remove(x));
 
+            // add any new keys that are selected
             selected.ForEach(x => _globals.TD.FilteredFolderScraping.TryAdd(x, 1));
+            
+            // save the settings
             _globals.TD.FilteredFolderScraping.Serialize();
         }
 
+        //internal bool CheckedStateGetter(object rowObject)
+        //{
+            
+        //    //OLVColumn column = (OLVColumn)rowObject;
+        //    return 
+        //}
+
+        //internal void CheckedStatePutter(object rowObject, bool newValue)
+        //{
+            
+        //}
+        
         public void OlFolderTree_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             UIThreadExtensions.UiDispatcher.Invoke(() =>

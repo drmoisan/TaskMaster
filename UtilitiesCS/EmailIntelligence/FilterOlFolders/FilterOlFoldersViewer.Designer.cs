@@ -91,7 +91,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TlvNotFiltered.CellEditUseWholeCell = false;
             this.TlvNotFiltered.CheckBoxes = true;
-            this.TlvNotFiltered.CheckedAspectName = "Value.Selected";
+            this.TlvNotFiltered.CheckedAspectName = "";
             this.TlvNotFiltered.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.OlvNameNotFiltered});
             this.TlvNotFiltered.Cursor = System.Windows.Forms.Cursors.Default;
