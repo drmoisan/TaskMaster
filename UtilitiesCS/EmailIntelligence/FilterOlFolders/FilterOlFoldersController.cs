@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using static System.Windows.Forms.AxHost;
 
 namespace UtilitiesCS
 {
@@ -17,6 +19,29 @@ namespace UtilitiesCS
             _olFolderTree.PropertyChanged += OlFolderTree_PropertyChanged;
             _viewer = new FilterOlFoldersViewer();
             _viewer.SetController(this);
+            _viewer.TlvNotFiltered.CheckStateGetter = delegate(object rowObject)
+            {
+                var node = (TreeNode<OlFolderInfo>)rowObject;
+                if (node.Value.Selected)
+                    return CheckState.Checked;
+                else
+                    return CheckState.Unchecked;
+
+            };
+            _viewer.TlvNotFiltered.CheckStatePutter = delegate(object rowObject, CheckState newValue)
+            {
+                var node = (TreeNode<OlFolderInfo>)rowObject;
+                if (newValue == CheckState.Checked)
+                {
+                    node.Value.Selected = true;
+                    return CheckState.Checked;
+                }
+                else
+                {
+                    node.Value.Selected = false;
+                    return CheckState.Unchecked;
+                }
+            };
             _viewer.Show();
         }
 
@@ -47,18 +72,6 @@ namespace UtilitiesCS
             _globals.TD.FilteredFolderScraping.Serialize();
         }
 
-        //internal bool CheckedStateGetter(object rowObject)
-        //{
-            
-        //    //OLVColumn column = (OLVColumn)rowObject;
-        //    return 
-        //}
-
-        //internal void CheckedStatePutter(object rowObject, bool newValue)
-        //{
-            
-        //}
-        
         public void OlFolderTree_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             UIThreadExtensions.UiDispatcher.Invoke(() =>
