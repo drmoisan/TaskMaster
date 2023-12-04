@@ -19,29 +19,11 @@ namespace UtilitiesCS
             _olFolderTree.PropertyChanged += OlFolderTree_PropertyChanged;
             _viewer = new FilterOlFoldersViewer();
             _viewer.SetController(this);
-            _viewer.TlvNotFiltered.CheckStateGetter = delegate(object rowObject)
-            {
-                var node = (TreeNode<OlFolderInfo>)rowObject;
-                if (node.Value.Selected)
-                    return CheckState.Checked;
-                else
-                    return CheckState.Unchecked;
+            _viewer.TlvNotFiltered.CheckStateGetter = GetCheckedState;
+            _viewer.TlvNotFiltered.CheckStatePutter = PutCheckedState;
+            _viewer.TlvFiltered.CheckStateGetter = GetCheckedState;
+            _viewer.TlvFiltered.CheckStatePutter = PutCheckedState;
 
-            };
-            _viewer.TlvNotFiltered.CheckStatePutter = delegate(object rowObject, CheckState newValue)
-            {
-                var node = (TreeNode<OlFolderInfo>)rowObject;
-                if (newValue == CheckState.Checked)
-                {
-                    node.Value.Selected = true;
-                    return CheckState.Checked;
-                }
-                else
-                {
-                    node.Value.Selected = false;
-                    return CheckState.Unchecked;
-                }
-            };
             _viewer.Show();
         }
 
@@ -57,6 +39,8 @@ namespace UtilitiesCS
 
         internal void Save()
         {
+            _viewer.Close();
+
             var selected = OlFolderTree.Roots
                 .SelectMany(x => x.FlattenIf(info => info.Selected))
                 .Select(info => info.RelativePath);
@@ -99,6 +83,36 @@ namespace UtilitiesCS
                 _viewer.TlvFiltered.Refresh();
             });
         }
+
+        internal CheckStateGetterDelegate GetCheckedState = delegate (object rowObject)
+        {
+            var node = (TreeNode<OlFolderInfo>)rowObject;
+            if (node.Value.Selected)
+                return CheckState.Checked;
+            else
+                if (node.Flatten().Any(x => x.Selected))
+                return CheckState.Indeterminate;
+            else
+                return CheckState.Unchecked;
+
+        };
+
+        internal CheckStatePutterDelegate PutCheckedState = delegate (object rowObject, CheckState newValue)
+        {
+            var node = (TreeNode<OlFolderInfo>)rowObject;
+            if (newValue == CheckState.Checked)
+            {
+                node.Traverse(x => x.Value.Selected = true);
+                //node.Value.Selected = true;
+                return CheckState.Checked;
+            }
+            else
+            {
+                node.Traverse(x => x.Value.Selected = false);
+                //node.Value.Selected = false;
+                return CheckState.Unchecked;
+            }
+        };
 
         #endregion Event Handlers
 
