@@ -199,6 +199,22 @@ namespace TaskMaster
                                       default(CancellationToken));
         }
 
+        private ScoDictionary<string, string> _folderRemap;
+        public ScoDictionary<string, string> FolderRemap => Initializer.GetOrLoad(ref _folderRemap, () => LoadFolderRemap());
+        public ScoDictionary<string, string> LoadFolderRemap()
+        {
+            var folderRemap = new ScoDictionary<string, string>(_defaults.FileName_FolderRemap,
+                                                                Parent.FS.FldrPythonStaging);
+            return folderRemap;
+        }
+        async private Task LoadFolderRemapAsync()
+        {
+            _folderRemap = await Task.Factory.StartNew(
+                                 () => LoadFolderRemap(),
+                                 default(CancellationToken));
+        }
+
+
         //private Dictionary<string, string> LoadDictCSV(string fpath, string filename)
         //{
         //    var dict = CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv");

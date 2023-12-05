@@ -47,6 +47,7 @@
                     <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />
                     <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
                     <button id="LoadFolderFilter" imageMso="Filter" onAction="LoadFolderFilter_Click" label="Load Folder Filter" />
+                    <button id="LoadFolderRemap" imageMso="Filter" onAction="LoadFolderRemap_Click" label="Load Folder Remap" />
                   </menu> 
                 </menu>  
               </group>

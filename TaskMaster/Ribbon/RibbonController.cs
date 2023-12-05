@@ -18,6 +18,7 @@ using System.Threading;
 using System.Drawing.Imaging;
 using stdole;
 using System;
+using UtilitiesCS.EmailIntelligence.FolderRemap;
 
 
 namespace TaskMaster
@@ -267,6 +268,11 @@ namespace TaskMaster
             var filter = new FilterOlFoldersController(_globals);
             //var filter = new FilterOlFoldersViewer();
             //filter.ShowDialog();
+        }
+
+        internal void TryLoadFolderRemap()
+        {
+            var remap = new FolderRemapController(_globals);
         }
 
         #endregion

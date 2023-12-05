@@ -19,6 +19,7 @@ namespace UtilitiesCS
         ScoCollection<IPrefix> PrefixList { get; }
         ScoCollection<IPrefix> LoadPrefixList();
         ScoDictionary<string, int> FilteredFolderScraping { get; }
+        ScoDictionary<string, string> FolderRemap { get; }
         string ProjInfo_Filename { get; }
         string FnameDictRemap { get; }
         string FnameIDList { get; }

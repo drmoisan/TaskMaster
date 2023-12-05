@@ -140,5 +140,8 @@
     <Setting Name="FileName_FilteredFolderScraping" Type="System.String" Scope="User">
       <Value Profile="(Default)">999999FilteredFolderScraping.json</Value>
     </Setting>
+    <Setting Name="FileName_FolderRemap" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999FolderRemap.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
