@@ -60,12 +60,14 @@
             this.TlvOriginal.ShowGroups = false;
             this.TlvOriginal.ShowImagesOnSubItems = true;
             this.TlvOriginal.ShowItemToolTips = true;
-            this.TlvOriginal.Size = new System.Drawing.Size(800, 831);
+            this.TlvOriginal.Size = new System.Drawing.Size(1035, 1206);
+            this.TlvOriginal.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.TlvOriginal.TabIndex = 1;
             this.TlvOriginal.UseCompatibleStateImageBehavior = false;
             this.TlvOriginal.UseFilterIndicator = true;
             this.TlvOriginal.UseFiltering = true;
             this.TlvOriginal.UseHotItem = true;
+            this.TlvOriginal.UseOverlays = false;
             this.TlvOriginal.View = System.Windows.Forms.View.Details;
             this.TlvOriginal.VirtualMode = true;
             // 
@@ -73,6 +75,7 @@
             // 
             this.OlvNameNotFiltered.AspectName = "Value.Name";
             this.OlvNameNotFiltered.FillsFreeSpace = true;
+            this.OlvNameNotFiltered.HeaderCheckBoxUpdatesRowCheckBoxes = false;
             this.OlvNameNotFiltered.IsEditable = false;
             this.OlvNameNotFiltered.IsTileViewColumn = true;
             this.OlvNameNotFiltered.Text = "Name";
@@ -84,7 +87,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 831);
+            this.ClientSize = new System.Drawing.Size(1035, 1206);
             this.Controls.Add(this.TlvOriginal);
             this.Name = "FolderSelector";
             this.Text = "FolderSelector";

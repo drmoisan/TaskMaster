@@ -86,7 +86,10 @@ namespace UtilitiesCS
             _parent.Progress.Report((parentProgress, _jobName));
             if(_isRoot && parentProgress == 100)
             {
-                _progressViewer.Close();
+                if (_progressViewer.InvokeRequired)
+                    _progressViewer.Invoke(()=> { if (!_progressViewer.IsDisposed) { _progressViewer.Close(); } });
+                else
+                    if (!_progressViewer.IsDisposed) { _progressViewer.Close(); }
             }
         }
 

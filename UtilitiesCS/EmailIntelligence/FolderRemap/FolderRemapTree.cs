@@ -148,7 +148,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         {
             _olFolder = olFolder;
             _olRoot = olRoot;
-            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath, "");
+            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath+"\\", "");
             _name = olFolder.Name;
         }
 

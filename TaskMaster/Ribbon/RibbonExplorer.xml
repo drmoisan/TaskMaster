@@ -48,6 +48,7 @@
                     <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
                     <button id="LoadFolderFilter" imageMso="Filter" onAction="LoadFolderFilter_Click" label="Load Folder Filter" />
                     <button id="LoadFolderRemap" imageMso="Filter" onAction="LoadFolderRemap_Click" label="Load Folder Remap" />
+                    <button id="RebuildSubjectMap" imageMso="Filter" onAction="RebuildSubjectMap_Click" label="Rebuild Subject Map" />
                   </menu> 
                 </menu>  
               </group>

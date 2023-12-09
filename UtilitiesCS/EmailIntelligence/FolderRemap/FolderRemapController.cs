@@ -16,7 +16,6 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         public FolderRemapController(IApplicationGlobals appGlobals) 
         {
             _globals = appGlobals;
-            InitMappings();            
             _folderRemapTree = new FolderRemapTree(_globals.Ol.ArchiveRoot, _globals.TD.FolderRemap);
             Mappings2 = _folderRemapTree.GetRemapList();
             _folderRemapTree.PropertyChanged += OlFolderTree_PropertyChanged;
@@ -26,8 +25,10 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             _viewer.TlvOriginal.CheckStatePutter = MakeCheckedStatePutter();
             _viewer.OlvMap.CheckStateGetter = GetMappedCheckedState;
             _viewer.OlvMap.CheckStatePutter = PutMappedCheckedState;
-
             _viewer.Show();
+            ExpandTo(1, true);
+            _viewer.TlvOriginal.Refresh();
+            _viewer.Refresh();
         }
 
         private IApplicationGlobals _globals;
@@ -39,16 +40,9 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         private List<OlFolderRemap> _mappings2;
         public List<OlFolderRemap> Mappings2 { get => _mappings2; private set => _mappings2 = value; }
         
-        private ConcurrentObservableDictionary<string, string> _mappings;
-        internal ConcurrentObservableDictionary<string, string> Mappings { get => _mappings; }
+        private bool _update;
 
         #region Internal Helper Methods
-
-        internal void InitMappings()
-        {            
-            var mappings = _globals.TD.FolderRemap.ToArray();
-            _mappings = new ConcurrentObservableDictionary<string, string>(mappings.ToDictionary());
-        }
 
         internal void SyncTreeToMappings()
         {
@@ -57,36 +51,42 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                 .FlattenIf(mapping => mapping.MappedTo is not null));
 
             Mappings2 = treeMappings.ToList();
-            // remove any keys that are no longer remapped
-            Mappings.Keys
-                .Where(key => !treeMappings
-                .Any(mapping => mapping.RelativePath == key))
-                .ForEach(x => Mappings.Remove(x));
-
-            // add or update remapped keys
-            treeMappings.ForEach(mapping =>
-            {
-                if (!Mappings.TryAdd(mapping.RelativePath, mapping.MappedTo.RelativePath))
-                    Mappings[mapping.RelativePath] = mapping.MappedTo.RelativePath;
-            });
         }
 
         internal void SyncGlobalMap()
         {
             // remove any keys that are no longer remapped
             _globals.TD.FolderRemap.Keys
-                .Where(key => !Mappings.ContainsKey(key))
+                .Where(key => !Mappings2.Any(x => x.RelativePath == key))
                 .ForEach(x => _globals.TD.FolderRemap.Remove(x));
 
             // add or update remapped keys
-            Mappings.ForEach(mapping =>
+            Mappings2.ForEach(mapping =>
             {
-                if (!_globals.TD.FolderRemap.TryAdd(mapping.Key, mapping.Value))
-                    _globals.TD.FolderRemap[mapping.Key] = mapping.Value;
+                if (!_globals.TD.FolderRemap.TryAdd(mapping.RelativePath, mapping.MappedTo.RelativePath))
+                    _globals.TD.FolderRemap[mapping.RelativePath] = mapping.MappedTo.RelativePath;
             });
 
             // Save the result
             _globals.TD.FolderRemap.Serialize();
+        }
+
+        internal void ExpandTo(int level, bool addChecked=false) 
+        {
+            RemapTree.Roots
+                     .SelectMany(root => root
+                     .FindAll(node => node.Depth < level))
+                     .ForEach(x => _viewer.TlvOriginal.Expand(x));
+
+            if (addChecked)
+            {
+                RemapTree.Roots
+                         .SelectMany(root => root
+                         .FindAll(node => node
+                            .FindAll(node => node.Value.MappedTo != null)
+                            .Any()))
+                         .ForEach(x => _viewer.TlvOriginal.Expand(x));
+            }
         }
 
         #endregion Internal Helper Methods
@@ -103,6 +103,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 
         public void OlFolderTree_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (_update) return;
             SyncTreeToMappings();
             _viewer.OlvMap.SetObjects(Mappings2);
         }
@@ -134,18 +135,21 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                 case DropTargetLocation.Background:
                     
                     break;
-                case DropTargetLocation.Item:
+                case DropTargetLocation.Item: 
+                    _update = true;
                     MoveObjectsToChildren(
                         e.ListView as TreeListView,
                         e.SourceListView as TreeListView,
                         (TreeNode<OlFolderRemap>)e.TargetModel,
                         e.SourceModels);
+                    _update = false;
                     break;
                 default:
                     return;
             }
 
-            e.RefreshObjects();
+            //e.RefreshObjects();
+            //_viewer.TlvOriginal.Sort(0);
         }
 
         private void MoveObjectsToChildren(TreeListView targetTree, TreeListView sourceTree, TreeNode<OlFolderRemap> target, IList toMove)
@@ -157,7 +161,9 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             {
                 x.Traverse(node => node.Value.MappedTo = targetObj);
             }
-            
+
+            SyncTreeToMappings();
+            _viewer.OlvMap.SetObjects(Mappings2);
         }
 
         internal CheckStateGetterDelegate GetMappedCheckedState = delegate (object rowObject)
@@ -178,8 +184,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             {
                 node.MappedTo = null;
                 return CheckState.Unchecked;
-            }
-            
+            }            
         };
 
 
@@ -217,10 +222,10 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                     
                     return CheckState.Checked;
                 }
+                
                 else
                 {
-                    node.Traverse(x => x.Value.MappedTo = null);
-                    //node.Value.Selected = false;
+                    node.Value.MappedTo = null;
                     return CheckState.Unchecked;
                 }
             };

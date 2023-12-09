@@ -37,6 +37,7 @@
             this.CboFolders = new System.Windows.Forms.ComboBox();
             this.LblSearch = new System.Windows.Forms.Label();
             this.TxtboxSearch = new System.Windows.Forms.TextBox();
+            this.L0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.LblConvCt = new System.Windows.Forms.Label();
             this.LblItemNumber = new System.Windows.Forms.Label();
             this.LblSender = new System.Windows.Forms.Label();
@@ -60,27 +61,26 @@
             this.LblAcReply = new System.Windows.Forms.Label();
             this.LblAcReplyAll = new System.Windows.Forms.Label();
             this.LblAcFwd = new System.Windows.Forms.Label();
-            this.LblAcDelete = new System.Windows.Forms.Label();
-            this.LblAcPopOut = new System.Windows.Forms.Label();
-            this.LblAcTask = new System.Windows.Forms.Label();
-            this.LblAcMoveOptions = new System.Windows.Forms.Label();
-            this.L0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.BtnReply = new System.Windows.Forms.Button();
             this.BtnReplyAll = new System.Windows.Forms.Button();
             this.BtnForward = new System.Windows.Forms.Button();
+            this.LblAcDelete = new System.Windows.Forms.Label();
             this.BtnDelItem = new System.Windows.Forms.Button();
+            this.LblAcPopOut = new System.Windows.Forms.Label();
             this.BtnPopOut = new System.Windows.Forms.Button();
+            this.LblAcTask = new System.Windows.Forms.Label();
             this.BtnFlagTask = new System.Windows.Forms.Button();
+            this.LblAcMoveOptions = new System.Windows.Forms.Label();
             this.ConversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.SaveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.SaveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.SavePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.L0vh_Tlp.SuspendLayout();
             this.MoveOptionsStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).BeginInit();
             this.L1h0L2hv3h_TlpBodyToggle.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).BeginInit();
             this.L1h1L2v1h3Panel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).BeginInit();
             this.SuspendLayout();
             // 
             // L0vh_Tlp
@@ -215,6 +215,27 @@
             this.TxtboxSearch.Name = "TxtboxSearch";
             this.TxtboxSearch.Size = new System.Drawing.Size(765, 41);
             this.TxtboxSearch.TabIndex = 41;
+            // 
+            // L0v2h2_WebView2
+            // 
+            this.L0v2h2_WebView2.AllowExternalDrop = true;
+            this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
+            this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
+            this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+            this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 216);
+            this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
+            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2290, 688);
+            this.L0v2h2_WebView2.TabIndex = 40;
+            this.L0v2h2_WebView2.ZoomFactor = 1D;
+            this.L0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
             // 
             // LblConvCt
             // 
@@ -545,88 +566,6 @@
             this.LblAcFwd.TabIndex = 12;
             this.LblAcFwd.Text = "W";
             // 
-            // LblAcDelete
-            // 
-            this.LblAcDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcDelete.AutoSize = true;
-            this.LblAcDelete.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcDelete.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
-            this.LblAcDelete.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcDelete.Location = new System.Drawing.Point(507, 0);
-            this.LblAcDelete.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcDelete.Name = "LblAcDelete";
-            this.LblAcDelete.Size = new System.Drawing.Size(29, 27);
-            this.LblAcDelete.TabIndex = 8;
-            this.LblAcDelete.Text = "X";
-            // 
-            // LblAcPopOut
-            // 
-            this.LblAcPopOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcPopOut.AutoSize = true;
-            this.LblAcPopOut.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcPopOut.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcPopOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
-            this.LblAcPopOut.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcPopOut.Location = new System.Drawing.Point(407, 0);
-            this.LblAcPopOut.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcPopOut.Name = "LblAcPopOut";
-            this.LblAcPopOut.Size = new System.Drawing.Size(29, 27);
-            this.LblAcPopOut.TabIndex = 6;
-            this.LblAcPopOut.Text = "P";
-            // 
-            // LblAcTask
-            // 
-            this.LblAcTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcTask.AutoSize = true;
-            this.LblAcTask.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcTask.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcTask.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcTask.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcTask.Location = new System.Drawing.Point(307, 0);
-            this.LblAcTask.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcTask.Name = "LblAcTask";
-            this.LblAcTask.Size = new System.Drawing.Size(28, 27);
-            this.LblAcTask.TabIndex = 4;
-            this.LblAcTask.Text = "T";
-            // 
-            // LblAcMoveOptions
-            // 
-            this.LblAcMoveOptions.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblAcMoveOptions.AutoSize = true;
-            this.LblAcMoveOptions.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcMoveOptions.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcMoveOptions.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcMoveOptions.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcMoveOptions.Location = new System.Drawing.Point(1385, 12);
-            this.LblAcMoveOptions.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcMoveOptions.Name = "LblAcMoveOptions";
-            this.L0vh_Tlp.SetRowSpan(this.LblAcMoveOptions, 2);
-            this.LblAcMoveOptions.Size = new System.Drawing.Size(39, 33);
-            this.LblAcMoveOptions.TabIndex = 10;
-            this.LblAcMoveOptions.Text = "M";
-            // 
-            // L0v2h2_WebView2
-            // 
-            this.L0v2h2_WebView2.AllowExternalDrop = true;
-            this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
-            this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
-            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties1.Language = null;
-            coreWebView2CreationProperties1.ProfileName = null;
-            coreWebView2CreationProperties1.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
-            this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
-            this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_WebView2.Location = new System.Drawing.Point(103, 216);
-            this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
-            this.L0v2h2_WebView2.Size = new System.Drawing.Size(2290, 688);
-            this.L0v2h2_WebView2.TabIndex = 40;
-            this.L0v2h2_WebView2.ZoomFactor = 1D;
-            this.L0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
-            // 
             // BtnReply
             // 
             this.BtnReply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -666,6 +605,21 @@
             this.BtnForward.TabStop = false;
             this.BtnForward.UseVisualStyleBackColor = true;
             // 
+            // LblAcDelete
+            // 
+            this.LblAcDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LblAcDelete.AutoSize = true;
+            this.LblAcDelete.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcDelete.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
+            this.LblAcDelete.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcDelete.Location = new System.Drawing.Point(507, 0);
+            this.LblAcDelete.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcDelete.Name = "LblAcDelete";
+            this.LblAcDelete.Size = new System.Drawing.Size(29, 27);
+            this.LblAcDelete.TabIndex = 8;
+            this.LblAcDelete.Text = "X";
+            // 
             // BtnDelItem
             // 
             this.BtnDelItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -684,6 +638,21 @@
             this.BtnDelItem.TabStop = false;
             this.BtnDelItem.UseVisualStyleBackColor = true;
             // 
+            // LblAcPopOut
+            // 
+            this.LblAcPopOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LblAcPopOut.AutoSize = true;
+            this.LblAcPopOut.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcPopOut.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcPopOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
+            this.LblAcPopOut.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcPopOut.Location = new System.Drawing.Point(407, 0);
+            this.LblAcPopOut.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcPopOut.Name = "LblAcPopOut";
+            this.LblAcPopOut.Size = new System.Drawing.Size(29, 27);
+            this.LblAcPopOut.TabIndex = 6;
+            this.LblAcPopOut.Text = "P";
+            // 
             // BtnPopOut
             // 
             this.BtnPopOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -697,6 +666,21 @@
             this.BtnPopOut.TabStop = false;
             this.BtnPopOut.UseVisualStyleBackColor = true;
             // 
+            // LblAcTask
+            // 
+            this.LblAcTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LblAcTask.AutoSize = true;
+            this.LblAcTask.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcTask.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcTask.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblAcTask.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcTask.Location = new System.Drawing.Point(307, 0);
+            this.LblAcTask.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcTask.Name = "LblAcTask";
+            this.LblAcTask.Size = new System.Drawing.Size(28, 27);
+            this.LblAcTask.TabIndex = 4;
+            this.LblAcTask.Text = "T";
+            // 
             // BtnFlagTask
             // 
             this.BtnFlagTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -709,6 +693,22 @@
             this.BtnFlagTask.TabIndex = 3;
             this.BtnFlagTask.TabStop = false;
             this.BtnFlagTask.UseVisualStyleBackColor = true;
+            // 
+            // LblAcMoveOptions
+            // 
+            this.LblAcMoveOptions.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LblAcMoveOptions.AutoSize = true;
+            this.LblAcMoveOptions.BackColor = System.Drawing.SystemColors.ControlText;
+            this.LblAcMoveOptions.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.LblAcMoveOptions.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this.LblAcMoveOptions.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.LblAcMoveOptions.Location = new System.Drawing.Point(1385, 12);
+            this.LblAcMoveOptions.Margin = new System.Windows.Forms.Padding(0);
+            this.LblAcMoveOptions.Name = "LblAcMoveOptions";
+            this.L0vh_Tlp.SetRowSpan(this.LblAcMoveOptions, 2);
+            this.LblAcMoveOptions.Size = new System.Drawing.Size(39, 33);
+            this.LblAcMoveOptions.TabIndex = 10;
+            this.LblAcMoveOptions.Text = "M";
             // 
             // ConversationMenuItem
             // 
@@ -758,12 +758,12 @@
             this.L0vh_Tlp.PerformLayout();
             this.MoveOptionsStrip.ResumeLayout(false);
             this.MoveOptionsStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).EndInit();
             this.L1h0L2hv3h_TlpBodyToggle.ResumeLayout(false);
             this.L1h0L2hv3h_TlpBodyToggle.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).EndInit();
             this.L1h1L2v1h3Panel.ResumeLayout(false);
             this.L1h1L2v1h3Panel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).EndInit();
             this.ResumeLayout(false);
 
         }

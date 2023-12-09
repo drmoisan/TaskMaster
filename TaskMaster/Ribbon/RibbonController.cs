@@ -275,6 +275,13 @@ namespace TaskMaster
             var remap = new FolderRemapController(_globals);
         }
 
+        internal async Task RebuildSubjectMapAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            await _globals.AF.SubjectMap.RebuildAsync(_globals);
+        }
         #endregion
 
         internal void SortEmail()
@@ -282,7 +289,6 @@ namespace TaskMaster
             var sorter = new EfcHomeController(_globals, () => { });
             sorter.Run();
         }
-
-        
+                
     }
 }

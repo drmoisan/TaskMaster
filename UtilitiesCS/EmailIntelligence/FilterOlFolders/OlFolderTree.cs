@@ -118,7 +118,7 @@ namespace UtilitiesCS
         {
             _olFolder = olFolder;
             _olRoot = olRoot;
-            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath, "");
+            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath+"\\", "");
             _name = olFolder.Name;
         }
 
@@ -132,7 +132,7 @@ namespace UtilitiesCS
             set 
             { 
                 _olFolder = value; 
-                RelativePath = _olFolder.FolderPath.Replace(_olRoot.FolderPath, "");
+                RelativePath = _olFolder.FolderPath.Replace(_olRoot.FolderPath+"\\", "");
                 Name = _olFolder.Name;
             }
         }

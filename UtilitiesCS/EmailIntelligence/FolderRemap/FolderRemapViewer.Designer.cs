@@ -129,6 +129,7 @@
             this.TlvOriginal.ShowItemToolTips = true;
             this.TlvOriginal.Size = new System.Drawing.Size(741, 808);
             this.TlvOriginal.SmallImageList = this.imageList1;
+            this.TlvOriginal.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.TlvOriginal.TabIndex = 0;
             this.TlvOriginal.UseCompatibleStateImageBehavior = false;
             this.TlvOriginal.UseFilterIndicator = true;
@@ -142,11 +143,12 @@
             // OlvNameNotFiltered
             // 
             this.OlvNameNotFiltered.AspectName = "Value.Name";
+            this.OlvNameNotFiltered.FillsFreeSpace = true;
             this.OlvNameNotFiltered.IsEditable = false;
             this.OlvNameNotFiltered.IsTileViewColumn = true;
             this.OlvNameNotFiltered.Text = "Name";
             this.OlvNameNotFiltered.UseInitialLetterForGroup = true;
-            this.OlvNameNotFiltered.Width = 494;
+            this.OlvNameNotFiltered.Width = 669;
             this.OlvNameNotFiltered.WordWrap = true;
             // 
             // imageList1
@@ -233,6 +235,7 @@
             // BtnSave
             // 
             this.BtnSave.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.BtnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnSave.Location = new System.Drawing.Point(3, 3);
             this.BtnSave.Name = "BtnSave";
             this.BtnSave.Size = new System.Drawing.Size(292, 84);
@@ -244,6 +247,7 @@
             // BtnDiscard
             // 
             this.BtnDiscard.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.BtnDiscard.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnDiscard.Location = new System.Drawing.Point(301, 3);
             this.BtnDiscard.Name = "BtnDiscard";
             this.BtnDiscard.Size = new System.Drawing.Size(292, 84);
