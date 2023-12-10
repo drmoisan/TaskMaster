@@ -49,6 +49,7 @@
                     <button id="LoadFolderFilter" imageMso="Filter" onAction="LoadFolderFilter_Click" label="Load Folder Filter" />
                     <button id="LoadFolderRemap" imageMso="Filter" onAction="LoadFolderRemap_Click" label="Load Folder Remap" />
                     <button id="RebuildSubjectMap" imageMso="Filter" onAction="RebuildSubjectMap_Click" label="Rebuild Subject Map" />
+                    <button id="ShowSubjectMapMetrics" imageMso="Filter" onAction="ShowSubjectMapMetrics_Click" label="Show Subject Map Metrics" />
                   </menu> 
                 </menu>  
               </group>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -11,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.SubjectMap;
 using UtilitiesCS.HelperClasses;
 using static Deedle.FrameBuilder;
 
@@ -193,6 +195,22 @@ namespace UtilitiesCS
             return list;
         }
 
+        public void ShowSummaryMetrics()
+        {
+            summaryMetrics = this
+                .GroupBy(x => x.Folderpath)
+                .Select(grp => new SummaryMetric 
+                { 
+                    FolderName = grp.First().Foldername,
+                    FolderPath = grp.First().Folderpath,
+                    SubjectCount = grp.Count(),
+                    EmailCount = grp.Sum(x=>x.EmailSubjectCount)
+                })
+                .ToList();
+            var smm = new SubjectMapMetrics(summaryMetrics);
+            smm.Show();
+        }
+        
         internal void RepopulateSubjectMapEntries(
             IApplicationGlobals appGlobals, 
             ProgressTracker progress,
@@ -277,6 +295,15 @@ namespace UtilitiesCS
             progress.Report(100);
 
                               
+        }
+
+        internal List<SummaryMetric> summaryMetrics;
+        internal class SummaryMetric
+        {
+            public string FolderName;
+            public string FolderPath;
+            public int SubjectCount;
+            public int EmailCount;
         }
     }
 }

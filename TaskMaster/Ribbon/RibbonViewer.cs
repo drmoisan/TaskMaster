@@ -180,6 +180,7 @@ namespace TaskMaster
         public void LoadFolderFilter_Click(Office.IRibbonControl control) => _controller.TryLoadFolderFilter();
         public void LoadFolderRemap_Click(Office.IRibbonControl control) => _controller.TryLoadFolderRemap();
         public async void RebuildSubjectMap_Click(Office.IRibbonControl control) => await _controller.RebuildSubjectMapAsync();
+        public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.ShowSubjectMapMetrics();
 
         #endregion
 
