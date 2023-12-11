@@ -345,20 +345,37 @@ namespace QuickFiler.Controllers
 
         }
 
+        private async Task LoadUiFromQueue() 
+        {
+            TraceUtility.LogMethodCall();
+            
+            (var tlp, var itemGroups) = await _qfcQueue.TryDequeueAsync(Token, 4000);
+            LoadItems(tlp, itemGroups);
+            _parent.SwapStopWatch();
+        }
+        
         private async Task MoveAndIterate()
         {
             TraceUtility.LogMethodCall();
 
             if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
             {
-                (var tlp, var itemGroups) = await _qfcQueue.TryDequeueAsync(Token, 4000);
-                //await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
-                LoadItems(tlp, itemGroups);
-                _parent.SwapStopWatch();
-                var move = BackGroundMove();
+                _groups.CacheMoveObjects();
+                var moveTask = BackGroundMoveAsync();
+
+                try
+                {
+                    await LoadUiFromQueue();
+                }
+                catch (System.Exception e)
+                {
+                    await moveTask;
+                    throw e;
+                }
+                
                 var iterate = _parent.IterateQueueAsync();
                 
-                await move;
+                await moveTask;
                 await iterate;
             }
             else if (_formViewer.Worker.IsBusy)
@@ -369,7 +386,7 @@ namespace QuickFiler.Controllers
             {
                 _groups.CacheMoveObjects();
                 _parent.SwapStopWatch();
-                var moveTask = BackGroundMove();
+                var moveTask = BackGroundMoveAsync();
                 MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 await moveTask;
                 await ActionCancelAsync();
@@ -378,7 +395,7 @@ namespace QuickFiler.Controllers
 
         }
 
-        internal async Task BackGroundMove()
+        internal async Task BackGroundMoveAsync()
         {
             TraceUtility.LogMethodCall();
 

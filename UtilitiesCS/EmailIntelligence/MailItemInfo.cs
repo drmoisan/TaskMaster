@@ -77,7 +77,11 @@ namespace UtilitiesCS //QuickFiler
             return info;
         }
 
-        public static async Task<MailItemInfo> FromMailItemAsync(MailItem item, string emailPrefixToStrip, CancellationToken token, bool loadAll)
+        public static async Task<MailItemInfo> FromMailItemAsync(
+            MailItem item, 
+            string emailPrefixToStrip, 
+            CancellationToken token, 
+            bool loadAll)
         {
             TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
 
@@ -178,8 +182,7 @@ namespace UtilitiesCS //QuickFiler
             _senderName = sender.Name;
             _senderHtml = sender.Html;
         }
-
-        
+                
         #endregion
 
         #region Private variables and enums

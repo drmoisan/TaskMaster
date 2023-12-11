@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UtilitiesCS
@@ -54,6 +55,22 @@ namespace UtilitiesCS
             }
         }
 
+        internal static List<T> ToList<T>(this IEnumerable<T> enumerable, int count, ProgressTracker progress)
+        {
+            int completed = 0;
+            List<T> list = null;
+            progress.Report(0, $"Consuming {0:N0} of {count:N0}");
+
+            using (new System.Threading.Timer(_ => progress.Report(
+                    completed,
+                    $"Consuming {(int)((double)completed * (double)count / 100):N0} of {count:N0}"),
+                    null, 0, 500))
+            {
+                list = enumerable.WithProgressReporting(count, (x) => completed = x).ToList();
+            }
+            return list;
+        }
+
         public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<int> progress)
         {
             if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
@@ -62,8 +79,8 @@ namespace UtilitiesCS
             foreach (var item in enumerable)
             {
                 yield return item;
-
-                completed++;
+                
+                Interlocked.Increment(ref completed);
                 progress((int)(((double)completed / count) * 100));
             }
         }

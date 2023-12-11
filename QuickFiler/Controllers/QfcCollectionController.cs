@@ -184,8 +184,8 @@ namespace QuickFiler.Controllers
         public void LoadControlsAndHandlers_01(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
         {
             _formViewer.SuspendLayout();
-            SwapTlp(tlp);
-            SwapItemGroups(itemGroups);
+            ActivateQueuedTlp(tlp);
+            ActivateQueuedItemGroups(itemGroups);
             _formViewer.ResumeLayout();
             ActiveIndex = -1;
         }
@@ -409,30 +409,42 @@ namespace QuickFiler.Controllers
                                  });
         }
         
-        internal void SwapTlp(TableLayoutPanel tlp)
+        internal void ActivateQueuedTlp(TableLayoutPanel tlp)
         {
-            // Cache parent of current tlp and cache the original tlp to a variable for background processing
             var tlpParent = _formViewer.L1v0L2L3v_TableLayout.Parent;
-            _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
-
-            // Remove current tlp from parent and replace with new tlp
-            _formViewer.L1v0L2L3v_TableLayout.Parent = null;
             _formViewer.L1v0L2L3v_TableLayout = tlp;
             _formViewer.L1v0L2L3v_TableLayout.Parent = tlpParent;
             _formViewer.L1v0L2L3v_TableLayout.Visible = true;
-            // Cache handle of new tlp
             _itemTlp = _formViewer.L1v0L2L3v_TableLayout;
+        }
+        
+        internal void CacheTlpForMove()
+        {
+            _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
+        }
+
+        internal void SwapTlp(TableLayoutPanel tlp)
+        {
+            CacheTlpForMove();
+            ActivateQueuedTlp(tlp);
+        }
+
+        internal void CacheItemGroupsForMove()
+        {
+            _itemGroupsToMove = _itemGroups;
+        }
+        
+        internal void ActivateQueuedItemGroups(List<QfcItemGroup> itemGroups)
+        {
+            _itemGroups = itemGroups;
         }
 
         internal void SwapItemGroups(List<QfcItemGroup> itemGroups)
         {
             UnregisterNavigation();
-            
-            // Cache current item groups to process in background
-            _itemGroupsToMove = _itemGroups;
 
-            // Replace current item groups with new item groups to process
-            _itemGroups = itemGroups;
+            CacheItemGroupsForMove();
+            ActivateQueuedItemGroups(itemGroups);
 
             RegisterNavigation();
         }

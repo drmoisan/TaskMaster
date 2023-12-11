@@ -341,6 +341,7 @@
     <Compile Include="EmailIntelligence\FolderRemap\FolderSelector.Designer.cs">
       <DependentUpon>FolderSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="EmailIntelligence\RebuildIntelligence\EmailDataMiner.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\CommonWords.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidence.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidenceList.cs" />
@@ -376,6 +377,7 @@
     </Compile>
     <Compile Include="HelperClasses\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
+    <Compile Include="HelperClasses\SegmentStopWatch.cs" />
     <Compile Include="HelperClasses\ShellUtilities.cs" />
     <Compile Include="HelperClasses\TimedBatchAction.cs" />
     <Compile Include="HelperClasses\VerboseLogger.cs" />
