@@ -62,7 +62,6 @@ namespace UtilitiesCS
             base.Insert(0, item);
             base.Serialize();
         }
-
         private BlockingCollection<T> _bc = [];
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private CancellationToken _ct;

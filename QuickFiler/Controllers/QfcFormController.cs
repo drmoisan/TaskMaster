@@ -391,8 +391,6 @@ namespace QuickFiler.Controllers
                 await moveTask;
                 await ActionCancelAsync();
             }
-
-
         }
 
         internal async Task BackGroundMoveAsync()

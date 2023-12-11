@@ -166,6 +166,8 @@ namespace QuickFiler.Controllers
             _formViewer.Show();
             _formViewer.Refresh();
             logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(RunAsync)} is complete");
+
+            _ = IterateQueueAsync();
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -190,7 +192,7 @@ namespace QuickFiler.Controllers
                     _formViewer.L1v1L2h5_SpnEmailPerLoad.Enabled = true;
                     _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
                 });
-                _ = IterateQueueAsync();
+                //_ = IterateQueueAsync();
                 WorkerComplete = true;
             }
         }
@@ -438,6 +440,7 @@ namespace QuickFiler.Controllers
 
         public void Cleanup()
         {
+            _datamodel.Cleanup();
             _globals = null;
             _formViewer = null;
             _explorerController = null;

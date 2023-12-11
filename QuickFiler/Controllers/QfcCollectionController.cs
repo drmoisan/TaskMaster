@@ -227,16 +227,9 @@ namespace QuickFiler.Controllers
             _template = template;
             _templateExpanded = templateExpanded;
             
-            // Repeat calls. Was first called by QfcFormController
-            // Prep the TLP
-            //TableLayoutHelper.InsertSpecificRow(_itemTlp, 0, template, listMailItems.Count);
-            //CaptureTlpTemplate();
-
             // Load the Item Viewers, Item Controllers, and Initialize
             await LoadGroups_02b(listMailItems, template, _tlpStates);
-            //LoadItemGroupsAndViewers_02(listMailItems, template);
             WireUpAsyncKeyboardHandler();
-            //await LoadConversationsAndFoldersAsync();
             
             // Restore state of window
             _formViewer.WindowState = FormWindowState.Maximized;
@@ -657,7 +650,11 @@ namespace QuickFiler.Controllers
             });
             RegisterNavigation();
         }
-        
+
+        #endregion
+
+        #region Event Wiring
+
         public void WireUpKeyboardHandler()
         {
             // Treatment as char limits to 9 numbered items and 26 character items
@@ -780,8 +777,7 @@ namespace QuickFiler.Controllers
             return stringAsyncAction;
         }
 
-
-        #endregion
+        #endregion Event Wiring
 
         #region UI Select QfcItems
 
