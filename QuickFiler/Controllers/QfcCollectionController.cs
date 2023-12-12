@@ -69,6 +69,7 @@ namespace QuickFiler.Controllers
         private IQfcKeyboardHandler _kbdHandler;
         private delegate int ActionDelegate(int intNewSelection, bool blExpanded);
         private TlpCellStates _tlpStates;
+        private EmailMoveMonitor _moveMonitor = new();
 
         #endregion
 
@@ -183,6 +184,7 @@ namespace QuickFiler.Controllers
 
         public void LoadControlsAndHandlers_01(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
         {
+            itemGroups.ForEach(grp => _moveMonitor.HookItem(grp.MailItem,(x) => RemoveSpecificControlGroup(x.EntryID)));
             _formViewer.SuspendLayout();
             ActivateQueuedTlp(tlp);
             ActivateQueuedItemGroups(itemGroups);
@@ -200,8 +202,8 @@ namespace QuickFiler.Controllers
             _template = template;
             _templateExpanded = templateExpanded;
 
-            // Save the TLP template
-            //CaptureTlpTemplate();
+            // Hook the move monitor to the mail items
+            listMailItems.ForEach(mailItem => _moveMonitor.HookItem(mailItem, (x) => RemoveSpecificControlGroup(x.EntryID)));
 
             LoadItemGroupsAndViewers_02(listMailItems, template);
 
@@ -226,7 +228,10 @@ namespace QuickFiler.Controllers
             // Save the QfcItem template styles
             _template = template;
             _templateExpanded = templateExpanded;
-            
+
+            // Hook the move monitor to the mail items
+            listMailItems.ForEach(mailItem => _moveMonitor.HookItem(mailItem, (x) => RemoveSpecificControlGroup(x.EntryID)));
+
             // Load the Item Viewers, Item Controllers, and Initialize
             await LoadGroups_02b(listMailItems, template, _tlpStates);
             WireUpAsyncKeyboardHandler();
@@ -516,6 +521,8 @@ namespace QuickFiler.Controllers
 
                 _itemGroups.Clear();
 
+                _moveMonitor.UnhookAll();
+
                 TlpLayout = tlpState;
             }
         }
@@ -553,6 +560,13 @@ namespace QuickFiler.Controllers
             }
         }
 
+        internal void RemoveSpecificControlGroup(string entryID)
+        {
+            var group = _itemGroups.Where(x => x.MailItem.EntryID == entryID).FirstOrDefault();
+            if (group is not null)
+                RemoveSpecificControlGroup(group.ItemController.ItemNumber);
+        }
+
         /// <summary>
         /// Remove a specific control group from the form, 
         /// remove the group from the list of groups,
@@ -573,6 +587,9 @@ namespace QuickFiler.Controllers
 
             // Remove the controls from the form
             TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
+
+            // Unhook the email from the move monitor
+            _moveMonitor.UnhookItem(_itemGroups[selection - 1].MailItem);
 
             // Remove the group from the list of groups
             _itemGroups.RemoveAt(selection - 1);
@@ -621,7 +638,10 @@ namespace QuickFiler.Controllers
                 // Remove the controls from the form
                 TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
             });
-            
+
+            // Unhook the email from the move monitor
+            _moveMonitor.UnhookItem(_itemGroups[selection - 1].MailItem);
+
             // Remove the group from the list of groups
             _itemGroups.RemoveAt(selection - 1);
 

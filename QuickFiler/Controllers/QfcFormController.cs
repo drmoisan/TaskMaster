@@ -509,7 +509,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        #endregion
+        #endregion Event Handlers
 
         #region Major Actions
 

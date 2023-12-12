@@ -18,6 +18,8 @@ using System.Windows.Forms;
 using System.Threading;
 using static Deedle.FrameBuilder;
 using log4net.Repository.Hierarchy;
+using Swordfish.NET.Collections;
+using QuickFiler.Helper_Classes;
 
 namespace QuickFiler.Controllers
 {
@@ -63,14 +65,16 @@ namespace QuickFiler.Controllers
         public void Cleanup() 
         { 
             _globals.Ol.App.NewMailEx -= Application_NewMailEx;
+            _moveMonitor.UnhookAll();
+            _moveMonitor = null;
             _activeExplorer = null;
             _olApp = null;
             _globals = null;
             _frame = null;
             _masterQueue = null;
-            _blockingQueue = null;
-            _priorityQueue = null;
-            _queues = null;
+            //_blockingQueue = null;
+            //_priorityQueue = null;
+            //_queues = null;
             _worker = null;
         }
 
@@ -81,10 +85,8 @@ namespace QuickFiler.Controllers
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
-        private ConcurrentQueue<MailItem> _masterQueue;
-        private BlockingCollection<MailItem> _blockingQueue = [];
-        private BlockingCollection<MailItem> _priorityQueue = [];
-        private BlockingCollection<MailItem>[] _queues; 
+        private LockingLinkedList<MailItem> _masterQueue = [];
+        private EmailMoveMonitor _moveMonitor = new();
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
         private BackgroundWorker _worker;
@@ -200,35 +202,32 @@ namespace QuickFiler.Controllers
 
             var emailList = await Task.Factory.StartNew(() => InitEmailQueue(batchSize, worker), 
                                                         token,
-                                                        TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                                                        TaskCreationOptions.LongRunning, 
+                                                        TaskScheduler.Default);
 
             return emailList;
         }
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw)
         {
-            _queues = [_priorityQueue, _blockingQueue];
-
             if ((_frame is null) || (_frame.RowCount == 0))
             {
                 MessageBox.Show("Email Frame is empty");
-                //_masterQueue = new ConcurrentQueue<MailItem>();
                 return false;
             }
             
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
-
-            // Batch Process
-            // Convert array of IEmailInfo to List<MailItem>
-            //var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
-
-            //// Cast list to concurrent queue
-            //_masterQueue = new ConcurrentQueue<MailItem>(emailList);
-
-            // Continuous Process -> Would need to use blocking collection and producer/consumer pattern
-            rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ForEach(item => _blockingQueue.TryAdd(item));
-            _blockingQueue.CompleteAdding();
+           
+            rows.Select(row => 
+                (MailItem)_olApp.GetNamespace("MAPI")
+                .GetItemFromID(row.EntryId, row.StoreId))
+                .ForEach(item => 
+                { 
+                    _masterQueue.AddLast(item);
+                    _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
+                });
+            
             return true;
             
         }
@@ -375,47 +374,40 @@ namespace QuickFiler.Controllers
 
         public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
         {
-            IList<MailItem> listObjects = new List<MailItem>();
-
             _token.ThrowIfCancellationRequested();
 
-            int dequeued = 0;
-            bool repeat = true;
-            while (repeat && dequeued < quantity)
-            {
-                if (BlockingCollection<MailItem>.TryTakeFromAny(_queues, out MailItem item, 100, _token) != -1)
-                {
-                    listObjects.Add(item);
-                    Interlocked.Increment(ref dequeued);
-                }
-                else
-                {
-                    _token.ThrowIfCancellationRequested();
-                    if (_blockingQueue.IsCompleted) { repeat = false; }
-                    else { await Task.Delay(200); }
-                }
-            }
+            if (_masterQueue.Count < quantity)
+                await WaitForQueue(quantity, _token);
 
-            return listObjects;
+            var nodes = _masterQueue.TryTakeFirst(quantity).ToList();
+            nodes.ForEach(node => _moveMonitor.UnhookItem(node));
+            
+            return nodes;
         }
 
-        internal async Task WaitForQueue(int quantity, CancellationToken toToken)
+        internal async Task WaitForQueue(int quantity, CancellationToken token)
         {
-            while (_worker.IsBusy && (_blockingQueue is null || _blockingQueue.Count < quantity))
+            while (_worker.IsBusy && (_masterQueue?.Count < quantity))
             {
-                toToken.ThrowIfCancellationRequested();
+                token.ThrowIfCancellationRequested();
                 await Task.Delay(200);
             }
         }
 
         #endregion Email Queue Processing
 
+        #region Linked List Locking
+
+
+
+        #endregion Linked List Locking
+
         #region Event Handlers
 
         void Application_NewMailEx(string EntryIDCollection)
         {
             MailItem newMail = (MailItem)_globals.Ol.App.Session.GetItemFromID(EntryIDCollection, System.Reflection.Missing.Value);
-            _priorityQueue.TryAdd(newMail);
+            _masterQueue.AddFirst(newMail);
         }
 
         #endregion Event Handlers

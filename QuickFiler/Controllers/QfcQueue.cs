@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -37,9 +38,8 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
 
         private int _jobsRunning = 0;
-        private BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue = 
-            new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(
-                new ConcurrentQueue<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>());
+        private BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue = [];
+        private EmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
 
         #endregion Constructors and Private Members
 
@@ -70,6 +70,7 @@ namespace QuickFiler.Controllers
         public (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) Dequeue()
         {
             (TableLayoutPanel tlp, List<QfcItemGroup> itemGroups) = _queue.Take();
+            itemGroups.ForEach(group => _moveMonitor.UnhookItem(group.MailItem));
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
             return (tlp, itemGroups);
         }
@@ -104,7 +105,10 @@ namespace QuickFiler.Controllers
                     }
                 }
                 if (result != default)
+                {
+                    result.ItemGroups.ForEach(group => _moveMonitor.UnhookItem(group.MailItem));
                     CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
+                }
                 
             }
             catch (OperationCanceledException)
@@ -119,6 +123,40 @@ namespace QuickFiler.Controllers
 
         }                
 
+        public async Task RemoveItem(MailItem mailItem)
+        {
+            TraceUtility.LogMethodCall(mailItem);
+
+            BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> bc;
+
+            // Wait for all jobs to finish to prevent conflicts
+            await JobsToFinish(100, _token);
+
+            bc = Interlocked.Exchange(ref _queue, []);
+            
+            Interlocked.Increment(ref _jobsRunning);
+
+            var list = bc.ToList();
+
+            foreach (var entry in list)
+            {
+                
+                if (entry.ItemGroups.Any(group => group.MailItem.EntryID == mailItem.EntryID))
+                {
+                    await UiIdleCallAsync(() => 
+                    { 
+                        var idx = entry.ItemGroups.FindIndex(group => group.MailItem.EntryID == mailItem.EntryID);
+                        entry.Tlp.RemoveSpecificRow(idx);
+                        entry.ItemGroups.RemoveAt(idx);
+                        RenumberGroups(entry.ItemGroups);
+                    });
+                }
+                _queue.Add(entry);
+            }
+
+            Interlocked.Decrement(ref _jobsRunning);
+        }
+
         public async Task EnqueueAsync(IList<MailItem> items,
                                        IQfcCollectionController qfcCollectionController)
         {
@@ -126,6 +164,9 @@ namespace QuickFiler.Controllers
 
             if (items is null) { throw new ArgumentNullException(nameof(items)); }
             if (items.Count == 0) { throw new ArgumentException("items is empty"); }
+            
+            items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x)));
+            
             _qfcCollectionController = qfcCollectionController;
 
             Interlocked.Increment(ref _jobsRunning);
@@ -280,14 +321,12 @@ namespace QuickFiler.Controllers
             var oldQueue = _queue;
             
             // Externally visible queue is now empty, but job is marked as running
-            _queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(
-                new ConcurrentQueue<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>()); 
+            _queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(); 
             
             logger.Debug($"{nameof(ChangeIterationSize)} called and jobsRunning increased to {_jobsRunning}");
             Interlocked.Increment(ref _jobsRunning);
 
-            var queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>(
-                new ConcurrentQueue<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>());
+            var queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>();
 
 
             while (oldQueue.Count > 0)
