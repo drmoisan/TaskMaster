@@ -14,6 +14,7 @@ using ToDoModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace QuickFiler.Controllers
 {    
@@ -49,6 +50,7 @@ namespace QuickFiler.Controllers
             RemoveTemplatesAndSetupTlp();
             SetupLightDark();
             RegisterFormEventHandlers();
+            _undoConsumerTask = Task.Run(UndoConsumer);
         }
 
         #endregion
@@ -76,6 +78,8 @@ namespace QuickFiler.Controllers
         private QfcQueue _qfcQueue;
         private TlpCellStates _states;
         private Dictionary<string, Theme> _themes;
+        private BlockingCollection<IMovedMailInfo> _undoQueue = [];
+        private Task _undoConsumerTask;
 
         #endregion
 
@@ -197,6 +201,8 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void Cleanup()
         {
+            _undoConsumerTask.Dispose();
+            _undoQueue.Dispose();
             _globals = null;
             _formViewer = null;
             _groups = null;
@@ -409,11 +415,15 @@ namespace QuickFiler.Controllers
 
         }
 
-        public void ButtonUndo_Click(object sender, EventArgs e) => ButtonUndo_Click();
+        public void ButtonUndo_Click(object sender, EventArgs e) 
+        {
+            UndoDialog();
+        }
 
         public void ButtonUndo_Click()
         {
-            SortEmail.Undo(_movedItems, _globals.Ol.App);
+            UndoDialog();
+            //SortEmail.Undo(_movedItems, _globals.Ol.App);
         }
 
         public async void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
@@ -560,6 +570,85 @@ namespace QuickFiler.Controllers
         public void MinimizeFormViewer()
         {
             _formViewer.Invoke(new System.Action(() => _formViewer.WindowState = FormWindowState.Minimized));
+        }
+
+        internal void UndoItem(int i)
+        {
+            _undoQueue.Add(_movedItems.Pop(i));
+        }
+
+        internal void ContinueUndo(int i) 
+        {
+            var repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+        }
+        
+        internal void UndoDialog2(int i)
+        {
+            var olApp = _globals.Ol.App;
+            
+            var message = _movedItems[i].UndoMoveMessage(olApp);
+            if (message is null) { UndoDialog2(i++); }
+            else
+            {
+                var actions = new Dictionary<string, System.Action>()
+                {
+                    { "Yes", () => UndoItem(i) },
+                    { "No", () => ContinueUndo(i++) },
+                    { "Cancel", () => { } },
+                };
+                var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
+                if (undoResponse == DialogResult.Yes)
+                {
+                    _undoQueue.Add(_movedItems.Pop(i));
+                }
+                else { i++; }
+                //repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+            }
+            
+
+        }
+
+        internal void UndoDialog()
+        {
+            var olApp = _globals.Ol.App;
+            DialogResult repeatResponse = DialogResult.Yes;
+            var i = 0;
+
+            
+            while (i < _movedItems.Count && repeatResponse == DialogResult.Yes)
+            {
+                var message = _movedItems[i].UndoMoveMessage(olApp);
+                if (message is null) { i++; }
+                else
+                {
+                    var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
+                    if (undoResponse == DialogResult.Yes)
+                    {
+                        _undoQueue.Add(_movedItems.Pop(i));
+                    }
+                    else { i++; }
+                    repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+                }
+            }
+            
+
+            if (repeatResponse == DialogResult.Yes) { MessageBox.Show("Nothing to undo"); }
+            _movedItems.Serialize();
+        }
+
+        internal async Task UndoConsumer()
+        {
+            while (!_undoQueue.IsCompleted)
+            {
+                if (_undoQueue.TryTake(out var item)) 
+                { 
+                    var mail = item.UndoMove();
+                    await UIThreadExtensions.UiDispatcher.InvokeAsync(
+                        () => _groups.AddItemGroup(mail), 
+                        System.Windows.Threading.DispatcherPriority.ContextIdle);
+                }
+                else { await Task.Delay(200); }
+            }
         }
 
         // TODO: Implement Viewer_Activate

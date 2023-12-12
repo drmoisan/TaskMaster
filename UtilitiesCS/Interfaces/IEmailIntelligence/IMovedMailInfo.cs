@@ -24,7 +24,7 @@ namespace UtilitiesCS
         string OlRootPath { get; set; }
         string StoreId { get; set; }
 
-        bool UndoMove();
+        MailItem UndoMove();
         string UndoMoveMessage(Outlook.Application olApp);
     }
 }

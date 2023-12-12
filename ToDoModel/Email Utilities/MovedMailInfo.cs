@@ -62,7 +62,14 @@ namespace ToDoModel
             {
                 if (_mailItem is null && this.OlApp is not null)
                 {
-                    _mailItem = (MailItem)this.OlApp.Session.GetItemFromID(this.EntryId, this.StoreId);
+                    try
+                    {
+                        _mailItem = (MailItem)this.OlApp.Session.GetItemFromID(this.EntryId, this.StoreId);
+                    }
+                    catch (System.Exception)
+                    {
+                        return null;
+                    }
                 }
                 return _mailItem;
             }
@@ -88,14 +95,14 @@ namespace ToDoModel
 
         public bool IsReadyToUndoMove { get => NotNull(MailItem, FolderOld);}
 
-        public bool UndoMove()
+        public MailItem UndoMove()
         {
             if (NotNull(MailItem, FolderOld))
             {
-                MailItem.Move(FolderOld);
-                return true;
+                var mail = (MailItem)MailItem.Move(FolderOld);
+                return mail;
             }
-            return false;
+            return null;
         }
 
         public string UndoMoveMessage(Outlook.Application olApp)

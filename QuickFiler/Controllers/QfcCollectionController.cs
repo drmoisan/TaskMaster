@@ -107,7 +107,11 @@ namespace QuickFiler.Controllers
             if (EmailsLoaded > 0)
             {
                 var format = string.Join("",Enumerable.Range(0, digits).Select(x=>"0").ToArray());
-                _itemGroups.ForEach(grp => grp.ItemViewer.LblItemNumber.Text = grp.ItemController.ItemNumber.ToString(format));
+                _itemGroups.ForEach(grp => 
+                { 
+                    grp.ItemController.ItemNumberDigits = digits;
+                    grp.ItemViewer.LblItemNumber.Text = grp.ItemController?.ItemNumber.ToString(format) ?? 0.ToString(format); 
+                });
             }
         }
         
@@ -648,7 +652,11 @@ namespace QuickFiler.Controllers
             if (_itemGroups.Count > 0)
             {
                 // Renumber the remaining groups
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => RenumberGroups());
+                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+                {
+                    var digits = Digits;
+                    RenumberGroups(); 
+                });
 
                 // Restore UI to previous state with newly selected item
                 if (activeUI)
@@ -1144,10 +1152,11 @@ namespace QuickFiler.Controllers
             UnregisterNavigation();
             
             int removalIndex = indexOriginal + 1;
-
-            var qfOriginal = _itemGroups[indexOriginal].ItemController;
-            TableLayoutHelper.RemoveSpecificRow(_itemTlp, removalIndex, childCount);
             
+            var qfOriginal = _itemGroups[indexOriginal].ItemController;
+            //TableLayoutHelper.RemoveSpecificRow(_itemTlp, removalIndex, childCount);
+            EliminateSpaceForItems(removalIndex, childCount);
+
             for (int i = 0; i < childCount; i++)
             {
                 _itemGroups[removalIndex].ItemController.Cleanup();
@@ -1156,10 +1165,12 @@ namespace QuickFiler.Controllers
 
             RenumberGroups();
 
-            _itemTlp.MinimumSize = new System.Drawing.Size(
-                _itemTlp.MinimumSize.Width,
-                _itemTlp.MinimumSize.Height -
-                (int)Math.Round(_template.Height * childCount, 0));
+            //_itemTlp.MinimumSize = new System.Drawing.Size(
+            //    _itemTlp.MinimumSize.Width,
+            //    _itemTlp.MinimumSize.Height -
+            //    (int)Math.Round(_template.Height * childCount, 0));
+
+            //_itemTlp.Size = _itemTlp.MinimumSize;
 
             RegisterNavigation();
             TlpLayout = tlpState;
@@ -1188,9 +1199,12 @@ namespace QuickFiler.Controllers
 
             if (insertCount > 0)
             {
-                MakeSpaceToEnumerateConversation(insertionIndex,
+                MakeSpaceForItems(insertionIndex,
                                                  insertCount);
                 
+                InsertItemGroups(insertionIndex, insertCount);
+                RenumberGroups(insertionIndex + insertCount);
+
                 EnumerateConversationMembers(entryID,
                                              resolver,
                                              insertionIndex,
@@ -1202,6 +1216,22 @@ namespace QuickFiler.Controllers
             TlpLayout = tlpState;
         }
 
+        internal void InitializeGroup(QfcItemGroup grp, int index, MailItem mailItem, bool child)
+        {
+            grp.ItemViewer = LoadItemViewer_03(index, _template, false, child ? 1:0);
+            grp.MailItem = mailItem;
+            grp.ItemController = new QfcItemController(
+                AppGlobals: _globals,
+                homeController: _homeController,
+                parent: this,
+                itemViewer: grp.ItemViewer,
+                viewerPosition: index + 1,
+                itemNumberDigits: Digits,
+                grp.MailItem,
+                tlpStates: _tlpStates);
+            grp.ItemController.IsChild = child;
+        }
+        
         /// <summary>
         /// Parallel function to expand each member of a conversation into individual ItemViewers/Controllers.
         /// Expanded members are inserted into the base collection and conversation count and folder suggestions
@@ -1218,33 +1248,24 @@ namespace QuickFiler.Controllers
                                      .OrderByDescending(mailItem => mailItem.SentOn)
                                      .ToList();
 
-            _itemTlp.MinimumSize = new System.Drawing.Size(
-                _itemTlp.MinimumSize.Width,
-                _itemTlp.MinimumSize.Height +
-                (int)Math.Round(_template.Height * insertions.Count, 0));
-
-            //Enumerable.Range(0, insertions.Count).AsParallel().ForEach(i =>
             Enumerable.Range(0, insertions.Count).ForEach(i =>
             {
+                // Initialize Group
                 var grp = _itemGroups[i + insertionIndex];
-                grp.ItemViewer = LoadItemViewer_03(i + insertionIndex, _template, false, 1);
-                grp.MailItem = insertions[i];
-                grp.ItemController = new QfcItemController(AppGlobals: _globals,
-                                                           homeController: _homeController,
-                                                           parent: this,
-                                                           itemViewer: grp.ItemViewer,
-                                                           viewerPosition: i + insertionIndex + 1,
-                                                           itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
-                                                           grp.MailItem,
-                                                           tlpStates: _tlpStates);
-
+                InitializeGroup(grp, i + insertionIndex, insertions[i], child: true);
+                
+                // Initialize Item Controller
                 grp.ItemController.Initialize(false);
                 grp.ItemController.PopulateConversation(resolver);
                 grp.ItemController.PopulateFolderComboBox(folderList);
-                grp.ItemController.IsChild = true;
                 grp.ItemController.ConvOriginID = _itemGroups[insertionIndex-1].MailItem.EntryID;
-                if (_kbdHandler.KbdActive) { grp.ItemController.ToggleNavigation(async: true, desiredState: Enums.ToggleState.On); }
-
+                
+                // Set Current UI State and Theme
+                if (_kbdHandler.KbdActive) 
+                { 
+                    grp.ItemController.ToggleNavigation(
+                        async: true, desiredState: Enums.ToggleState.On); 
+                }
                 if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
                 else { grp.ItemController.SetThemeLight(async: true); }
                 ChangeConversationSilently(grp, false);
@@ -1252,6 +1273,36 @@ namespace QuickFiler.Controllers
             });
         }
 
+        public void AddItemGroup(MailItem mailItem)
+        {
+            UnregisterNavigation();
+            var tlpState = SafeSetTlpLayout(false);
+
+            var index = _itemGroups.Count;
+            MakeSpaceForItems(index, 1);
+            InsertItemGroups(index, 1);
+            RenumberGroups(index + 1);
+
+            var grp = _itemGroups[index];
+            InitializeGroup(grp, index, mailItem, child: false);
+            
+            // Hook the email to the move monitor
+            _moveMonitor.HookItem(mailItem, (x) => RemoveSpecificControlGroup(x.EntryID));
+            
+            // Initialize Item Controller
+            grp.ItemController.Initialize(false);
+            grp.ItemController.PopulateConversation();
+            grp.ItemController.PopulateFolderComboBox();
+
+            // Set Current UI State and Theme
+            if (_kbdHandler.KbdActive) { grp.ItemController.ToggleNavigation(async: true, desiredState: Enums.ToggleState.On); }
+            if (_darkMode) { grp.ItemController.SetThemeDark(async: true); }
+            else { grp.ItemController.SetThemeLight(async: true); }
+
+            RegisterNavigation();
+            TlpLayout = tlpState;
+        }
+        
         public int PromoteFirstChild(string originalId, ref int childCount)
         {
             int indexOriginal = _itemGroups.FindIndex(itemGroup => itemGroup.ItemController.ConvOriginID == originalId);
@@ -1290,14 +1341,31 @@ namespace QuickFiler.Controllers
             }
         }
         
-        public void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount)
+        public void EliminateSpaceForItems(int removalInex, int removalCount)
         {
+            TableLayoutHelper.RemoveSpecificRow(_itemTlp, removalInex, removalCount);
+
+            var heightChange = -(int)Math.Round(_template.Height * removalCount, 0);
+            _itemTlp.MinimumSize = new System.Drawing.Size(
+                _itemTlp.MinimumSize.Width,
+                _itemTlp.MinimumSize.Height - heightChange);
+                
+            _itemTlp.Size = new System.Drawing.Size(
+                _itemTlp.Size.Width,
+                _itemTlp.Size.Height - heightChange);
+        }
+        
+        public void MakeSpaceForItems(int insertionIndex, int insertCount)
+        {
+            _itemTlp.MinimumSize = new System.Drawing.Size(
+                _itemTlp.MinimumSize.Width,
+                _itemTlp.MinimumSize.Height +
+                (int)Math.Round(_template.Height * insertCount, 0));
+
             TableLayoutHelper.InsertSpecificRow(panel: _itemTlp,
                                                 rowIndex: insertionIndex,
                                                 templateStyle: _template,
                                                 insertCount: insertCount);
-            InsertItemGroups(insertionIndex, insertCount);
-            RenumberGroups(insertionIndex+insertCount);
         }
 
         public void UpdateSelectionForRemoval(int selection)
@@ -1319,13 +1387,7 @@ namespace QuickFiler.Controllers
                 ActiveIndex--;
             }
         }
-
-        public void RemoveSpaceToCollapseConversation()
-        {
-            // Perhaps can eliminate
-            throw new NotImplementedException();
-        }
-        
+                
         public void RenumberGroups()
         {
             for (int i = 0; i < _itemGroups.Count; i++)
