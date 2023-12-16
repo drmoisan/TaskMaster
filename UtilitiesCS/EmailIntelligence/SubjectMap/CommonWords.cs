@@ -36,14 +36,21 @@ namespace UtilitiesCS.EmailIntelligence
             return string.Join(" ", tokens.StripCommonWords(commonWords));
         }
 
-        public static string StripAccents(this string s)
+        public static string StripAccents(this string s, char dflt = default)
         {
             StringBuilder sb = new StringBuilder(s.Normalize(NormalizationForm.FormKD));
             for (int i = sb.Length -1; i >= 0; i--)
             {
                 if (sb[i] > 127)
                 {
-                    sb.Remove(i, 1);
+                    if (dflt != default)
+                    {
+                        sb[i] = dflt;
+                    }
+                    else
+                    { 
+                        sb.Remove(i, 1);
+                    }
                 } 
             }
             

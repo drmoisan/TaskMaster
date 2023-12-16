@@ -15,12 +15,14 @@ using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    internal class EmailTokenizer
+    public class EmailTokenizer
     {
         #region Constructors and Initializers
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public EmailTokenizer() { }
 
         public EmailTokenizer(IApplicationGlobals appGlobals) { _globals = appGlobals; }
 
@@ -28,7 +30,7 @@ namespace UtilitiesCS.EmailIntelligence
         /// Get the tokenizer ready to use; this should be 
         /// called after all options have been set.
         /// </summary>
-        private void setup()
+        public void setup()
         {
             // We put this here, rather than in __init__, so that this can be
             // done after we set options at runtime (since the tokenizer
@@ -60,6 +62,13 @@ namespace UtilitiesCS.EmailIntelligence
         private Regex date_hms_re = new Regex(@"(?'hour'[0-9][0-9]):(?'minute'[0-9][0-9])(?::[0-9][0-9])? ");
         private Regex subject_word_re = new Regex(@"[\w\x80-\xff$.%]+");
         private Regex punctuation_run_re = new Regex(@"\W+");
+        private Regex numeric_entity_re = new Regex(@"&#(\d+);");
+        private Regex virus_re = new Regex(@"""
+    < /? \s* (?: script | iframe) \b
+|   \b src= ['""]? cid:
+|   \b (?: height | width) = ['""]? 0
+""", RegexOptions.Compiled);
+        private Regex whitespace_split_re = new Regex(@"\s+");
 
         private string[] date_formats = new string[]
         {
@@ -80,7 +89,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public IEnumerable<string> tokenize(MailItemInfo msg)
         {
-            var headers = msg.GetHeaders();
+            //var headers = msg.GetHeaders();
             foreach (var tok in this.tokenize_headers(msg))
                 yield return tok;
             foreach (var tok in this.tokenize_body(msg))
@@ -122,9 +131,109 @@ namespace UtilitiesCS.EmailIntelligence
             //               # not significant), so leaving it out
             // To:, Cc:      # These can help, if your ham and spam are sourced
             //               # from the same location. If not, they'll be horrible.
-            yield return $"from:name:{msg.SenderName.ToLower()}";
 
-            throw new NotImplementedException("tokenize_headers");
+            List<(string field, RecipientInfo value)> addrlist = [];
+            addrlist.Add(("from", msg.Sender));
+            msg.ToRecipients.ForEach(x => addrlist.Add(("to", x)));
+            msg.CcRecipients.ForEach(x => addrlist.Add(("cc", x)));
+
+            foreach (var (field, value) in addrlist)
+            {
+                yield return $"{field}:name:{value.Name.ToLower()}";
+                
+                foreach (var w in value.Address.ToLower().Split('@'))
+                    yield return $"{field}:addr:{w}";
+            }
+
+            // Spammers sometimes send out mail alphabetically to fairly large
+            // numbers of addresses.  This results in headers like:
+            // To: <itinerart@videotron.ca>
+            // Cc: <itinerant@skyful.com>, <itinerant@netillusions.net>,
+            //       <itineraries@musi-cal.com>, <itinerario@rullet.leidenuniv.nl>,
+            //       <itinerance@sorengo.com>
+            //
+            // This token attempts to exploit that property.  The above would
+            // give a common prefix of "itinera" for 6 addresses, yielding a
+            // gross score of 42.  We group scores into buckets by dividing by 10
+            // to yield a final token value of "pfxlen:04".  The length test
+            // eliminates the bad case where the message was sent to a single
+            // individual.
+
+            IEnumerable<string> all_addrs = null;
+            
+            if (SpamBayesOptions.summarize_email_prefixes) 
+            {
+                if (all_addrs is null) { all_addrs = addrlist.Select(x => x.value.Address.ToLower()); }
+
+                if (all_addrs.Count() > 1)
+                {
+                    var pfx = commonprefix(all_addrs);
+                    if (pfx != "") 
+                    { 
+                        var score = pfx.Length * all_addrs.Count() / 10;
+                        // After staring at pfxlen:* values generated from a large
+                        // number of ham & spam I saw that any scores greater
+                        // than 3 were always associated with spam.  Collapsing
+                        // all such scores into a single token avoids a bunch of
+                        // hapaxes like "pfxlen:28".
+
+                        if (score > 3)
+                        {
+                            yield return "pfxlen:big";
+                        }
+                        else 
+                        {
+                            yield return $"pfxlen:{score / 10 * 10:00}";
+                        }
+                    }
+                }
+            }
+
+            //# same idea as above, but works for addresses in the same domain
+            //# like
+            //# To: "skip" <bugs@mojam.com>, <chris@mojam.com>,
+            //#       <concertmaster@mojam.com>, <concerts@mojam.com>,
+            //#       <design@mojam.com>, <rob@mojam.com>, <skip@mojam.com>
+            if (SpamBayesOptions.summarize_email_suffixes)
+            {
+                if (all_addrs is null) { all_addrs = addrlist.Select(x => x.value.Address.ToLower()); }
+
+                if (all_addrs.Count() > 1)
+                {
+                    var sfx = commonsuffix(all_addrs);
+                    if (sfx != "")
+                    {
+                        var score = sfx.Length * all_addrs.Count() / 10;
+                        // Similar analysis as above regarding suffix length
+                        // I suspect the best cutoff is probably dependent on
+                        // how long the recipient domain is (e.g. "mojam.com" vs.
+                        // "montanaro.dyndns.org")
+
+                        if (score > 7)
+                        {
+                            yield return "sfxlen:big";
+                        }
+                        else
+                        {
+                            yield return $"sfxlen:{score / 10 * 10:00}";
+                        }
+                    }
+                }
+            }
+
+            //# To:
+            //# Cc:
+            //# Count the number of addresses in each of the recipient headers.
+
+            var tocount = msg.ToRecipients.Count();
+            if (tocount > 0)
+                yield return $"to:2**{Math.Round(Math.Log(tocount,2))}";
+
+            var cccount = msg.ToRecipients.Count();
+            if (cccount > 0)
+                yield return $"to:2**{Math.Round(Math.Log(cccount, 2))}";
+
+            
         }
                 
         /// <summary>
@@ -189,21 +298,39 @@ namespace UtilitiesCS.EmailIntelligence
                 foreach (var t in this.tokenize_text(texts))
                     yield return t;
             }
-            
-            throw new NotImplementedException("tokenize_body");
 
             // Find, decode (base64, qp), and tokenize textual parts of the body.
-            foreach (var part in textparts(msg))
+            foreach (string part in textparts(msg))
             {
                 // Decode, or take it as-is if decoding fails.
-                var text = "";// part.Text;
+                string text = part;
                 if (text is null)
                 {
                     yield return "control: text payload is None";
                     continue;
                 }
+
+                //# Replace numeric character entities (like &#97; for the letter
+                //# 'a').
+                text = numeric_entity_re.Replace(text, NumericEntityReplacer);
+
+                //# Normalize case.
+                text = text.ToLower();
+
+                if (SpamBayesOptions.replace_nonascii_chars)
+                {
+                    //# Translate accented characters to non-accented and Replace non-ascii characters .
+                    text = text.StripAccents('?');
+                }
+
+                foreach (var t in find_html_virus_clues(msg.Item.HTMLBody))
+                    yield return $"virus:{t}";
+
                 foreach (var t in this.tokenize_text(text))
                     yield return t;
+
+
+
             }
 
         }
@@ -214,16 +341,74 @@ namespace UtilitiesCS.EmailIntelligence
 
         private IEnumerable<string> textparts(MailItemInfo msg)
         {
-            throw new NotImplementedException();
+            yield return msg.Body;
         }
 
+        /// <summary>
+        /// Tokenize everything in the chunk of text we were handed.
+        /// </summary>
+        /// <param name="texts"></param>
+        /// <returns></returns>
         private IEnumerable<string> tokenize_text(string texts)
         {
-            throw new NotImplementedException();
+
+            var short_runs = new HashSet<int>();
+            var short_count = 0;
+            var words = whitespace_split_re.Split(texts);
+            foreach (var w in words)
+            {
+                var n = w.Length;
+                if (n < 3)
+                {
+                    //# count how many short words we see in a row - meant to
+                    //# latch onto crap like this:
+                    //# X j A m N j A d X h
+                    //# M k E z R d I p D u I m A c
+                    //# C o I d A t L j I v S j
+                    short_count += 1;
+                }
+                else
+                {
+                    if (short_count > 0)
+                    {
+                        short_runs.Add(short_count);
+                        short_count = 0;
+                    }
+                    //# Make sure this range matches in tokenize_word().
+                    if (3 <= n && n <= SpamBayesOptions.skip_max_word_size)
+                        yield return w;
+                    else if (n >= 3)
+                    {
+                        foreach (var t in tokenize_word(w))
+                            yield return t;
+                    }
+                }
+            }
+
+            if (short_runs.Count > 0 && SpamBayesOptions.x_short_runs)
+                yield return $"short:{Math.Round(Math.Log(short_runs.Max(),2),0):N2}";
+            
         }
 
+        public string commonprefix(IEnumerable<string> strings) 
+        { 
+            var pfx = string.Join("", strings
+                .Transpose()
+                .TakeWhile(s => s.All(d => d == s.First()))
+                .Select(s => s.First()));
+            return pfx;
+        }
 
-
+        public string commonsuffix(IEnumerable<string> strings)
+        {
+            var commonLength = strings.Select(s => s.Length).Min();
+            var sfx = string.Join("", strings
+                .Select(x => x.Substring(x.Length - commonLength))
+                .Transpose()
+                .TakeWhile(s => s.All(d => d == s.Last()))
+                .Select(s => s.Last()));
+            return sfx;
+        }
 
         // Port of the tokenizer from the Python version of SpamBayes
         internal IEnumerable<string> crack_filename(string fname)
@@ -398,7 +583,26 @@ namespace UtilitiesCS.EmailIntelligence
             
         }
 
-        
+        string NumericEntityReplacer(Match m)
+        {
+            try
+            {
+                return ((char)int.Parse(m.Groups[1].Value)).ToString();
+            }
+            catch
+            {
+                return "?";
+            }
+        }
+
+        IEnumerable<string> find_html_virus_clues(string text)
+        {
+            var matches = virus_re.Matches(text);
+            foreach (Match match in matches)
+            {
+                yield return match.Value;
+            }
+        }
 
         #endregion Helper Methods
     }
@@ -412,6 +616,10 @@ namespace UtilitiesCS.EmailIntelligence
         public const bool image_size = true;
         public const bool crack_images = true;
         public const int max_image_size = 1000000;
+        public const bool summarize_email_prefixes = true;
+        public const bool summarize_email_suffixes = true;
+        public const bool replace_nonascii_chars = true;
+        public const bool x_short_runs = true;
     }
 
     public class CharsetCodebase 

@@ -19,6 +19,7 @@ using System.Drawing.Imaging;
 using stdole;
 using System;
 using UtilitiesCS.EmailIntelligence.FolderRemap;
+using UtilitiesCS.EmailIntelligence;
 
 
 namespace TaskMaster
@@ -282,6 +283,26 @@ namespace TaskMaster
         {
             _globals.AF.SubjectMap.ShowSummaryMetrics();
         }
+        
+        internal async Task TryTokenizeEmail()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+
+            CancellationTokenSource cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var ae = _globals.Ol.App.ActiveExplorer();
+            var mail = (Outlook.MailItem)ae.Selection[1];
+            var mailInfo = await MailItemInfo.FromMailItemAsync(mail, _globals.Ol.EmailPrefixToStrip, token, true);
+            var tokenizer = new EmailTokenizer(_globals);
+            tokenizer.setup();
+            var tokens = tokenizer.tokenize(mailInfo);
+            var tokenString = tokens.SentenceJoin();
+            MessageBox.Show(tokenString);
+        }
+        
         #endregion
 
         internal void SortEmail()
@@ -290,6 +311,5 @@ namespace TaskMaster
             sorter.Run();
         }
 
-        
     }
 }

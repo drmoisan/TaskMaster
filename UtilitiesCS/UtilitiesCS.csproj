@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -322,6 +323,8 @@
     </Compile>
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianFilter.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\ConvertedSpamBayesTokenizer.cs" />
     <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
@@ -473,6 +476,7 @@
     <Compile Include="OutlookExtensions\FolderConverter.cs" />
     <Compile Include="OutlookExtensions\IOutlookItem.cs" />
     <Compile Include="OutlookExtensions\MailItemExtensions.cs" />
+    <Compile Include="OutlookExtensions\MsgToMime\MAPIMethods.cs" />
     <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
     <Compile Include="OutlookExtensions\OlItemPseudoInterface.cs" />
     <Compile Include="OutlookExtensions\OlTableExtensions.cs" />

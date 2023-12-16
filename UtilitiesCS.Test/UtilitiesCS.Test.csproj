@@ -52,6 +52,7 @@
     <Compile Include="EmailIntelligence\CtfIncidenceListTests.cs" />
     <Compile Include="EmailIntelligence\CtfMapTests.cs" />
     <Compile Include="EmailIntelligence\UnitTest1.cs" />
+    <Compile Include="EmailIntelligence\EmailTokenizerTests.cs" />
     <Compile Include="HelperClasses\PropertyInitializerTest.cs" />
     <Compile Include="HelperClasses\TimedDiskWriterTests.cs" />
     <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />

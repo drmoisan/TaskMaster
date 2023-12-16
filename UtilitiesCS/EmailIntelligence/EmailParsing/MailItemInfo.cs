@@ -200,7 +200,6 @@ namespace UtilitiesCS //QuickFiler
         #region Private variables and enums
         
         private string _storeId;
-        private RecipientInfo _sender;
         private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
         private ThreadSafeSingleShotGuard _recipientsStarted = new();
         private CancellationToken _token;
@@ -276,6 +275,30 @@ namespace UtilitiesCS //QuickFiler
         //    private set => _recipientsTask = value;  
         //}
 
+        private string _sentOn;
+        public string SentOn { get => Initialized(ref _sentOn); set => _sentOn = value; }
+
+        private string _subject;
+        public string Subject { get => Initialized(ref _subject); set => _subject = value; }
+        
+        private string _senderHtml;
+        public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
+
+        private string _senderName;
+        public string SenderName { get => Initialized(ref _senderName); set => _senderName = value; }
+        
+        private RecipientInfo _sender;
+        public RecipientInfo Sender
+        {
+            get
+            {
+                if (_sender is null)
+                    LoadPriority(_emailPrefixToStrip);
+                return _sender;
+            }
+            set => _sender = value;
+        }
+
         private Enums.LoadState _recipientsLoaded = Enums.LoadState.NotLoaded;
         public Enums.LoadState RecipientsLoaded 
         {
@@ -284,18 +307,6 @@ namespace UtilitiesCS //QuickFiler
             [MethodImpl(MethodImplOptions.Synchronized)]
             private set => _recipientsLoaded = value; 
         }
-        
-        private string _senderHtml;
-        public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
-
-        private string _senderName;
-        public string SenderName { get => Initialized(ref _senderName); set => _senderName = value; }
-
-        private string _sentOn;
-        public string SentOn { get => Initialized(ref _sentOn); set => _sentOn = value; }
-
-        private string _subject;
-        public string Subject { get => Initialized(ref _subject); set => _subject = value; }
 
         private string _ccRecipientsHtml;
         public string CcRecipientsHtml
