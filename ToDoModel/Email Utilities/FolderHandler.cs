@@ -19,6 +19,11 @@ namespace ToDoModel
     {
         #region Constructors and Initialization
 
+        public FolderHandler(Outlook.Application olApp)
+        {
+            _olApp = olApp;
+        }
+        
         public FolderHandler(IApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
@@ -195,7 +200,7 @@ namespace ToDoModel
         /// <param name="olApp">Handle on the <seealso cref="Outlook.Application"/></param>
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
         /// or <c>null</c> if not found</returns>
-        public static Folder GetFolder(string folderpath, Outlook.Application olApp)
+        public Folder GetFolder(string folderpath, Outlook.Application olApp)
         {
             if (folderpath.Substring(0, 2) == @"\\")
             {
@@ -278,7 +283,7 @@ namespace ToDoModel
         /// <param name="children"><seealso cref="Folders"/> collection to search</param>
         /// <param name="childName">Name of the <seealso cref="Folder"/> to match</param>
         /// <returns>The <seealso cref="Folder"/> if found or <c>null</c></returns>
-        public static Folder GetFolder(Folders children, string childName)
+        public Folder GetFolder(Folders children, string childName)
         {
             var folderLevelNames = children.Cast<MAPIFolder>().Select(x => x.Name).ToList();
             if (folderLevelNames.Contains(childName))

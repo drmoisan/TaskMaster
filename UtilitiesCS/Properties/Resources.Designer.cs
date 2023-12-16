@@ -91,6 +91,16 @@ namespace UtilitiesCS.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] charset_lookup {
+            get {
+                object obj = ResourceManager.GetObject("charset_lookup", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap ExceptionPublic {

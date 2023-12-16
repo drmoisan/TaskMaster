@@ -143,7 +143,8 @@ namespace TaskMaster
         public Folder ArchiveRoot => Initializer.GetOrLoad(ref _archiveRoot, LoadArchiveRoot);
         internal Folder LoadArchiveRoot() 
         {
-            return FolderHandler.GetFolder(Root.Folders, "Archive");
+            var folderHandler = new FolderHandler(_globals);
+            return folderHandler.GetFolder(Root.Folders, "Archive");
         }
 
         public string EmailPrefixToStrip => Properties.Resources.Email_Prefix_To_Strip;

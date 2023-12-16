@@ -9,13 +9,18 @@ using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 //using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 
-namespace ToDoModel
+namespace UtilitiesCS.EmailIntelligence
 {
     public class AttachmentInfo
     {
         #region Constructors and Initializers
 
         public AttachmentInfo() { }
+
+        public AttachmentInfo(Attachment attachment) 
+        { 
+            _attachment = attachment;
+        }
 
         public AttachmentInfo(Attachment attachment, DateTime sentOn, string saveFolderPath)
         {
@@ -29,9 +34,9 @@ namespace ToDoModel
 
         async public static Task<AttachmentInfo> LoadAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
-            var _att = new AttachmentInfo();
-            await _att.InitAsync(attachment,sentOn, saveFolderPath, deleteFolderPath);
-            return _att;
+            var att = new AttachmentInfo();
+            await att.InitAsync(attachment,sentOn, saveFolderPath, deleteFolderPath);
+            return att;
         }
 
         public void Init(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)

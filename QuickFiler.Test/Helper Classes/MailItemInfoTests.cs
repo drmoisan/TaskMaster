@@ -147,11 +147,10 @@ namespace QuickFiler.Test
             };
 
             // Act
-            var result = mailItemInfo.LoadPriority(emailPrefixToStrip);
+            mailItemInfo.LoadPriority(emailPrefixToStrip);
             var actual = mailItemInfo;
 
             // Assert
-            Assert.IsTrue(result);
             actual.Should().BeEquivalentTo(expected);
         }
                 

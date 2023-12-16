@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,15 +8,10 @@ using Microsoft.Office.Interop.Outlook;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.EmailIntelligence;
 using System.Collections.Generic;
-//using Microsoft.TeamFoundation.Common;
-using Microsoft.VisualBasic;
 using Deedle;
-using Microsoft.Office.Core;
-//using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 using System.Threading.Tasks;
-using System.Web.Profile;
-//using Microsoft.VisualStudio.Services.WebApi;
 
 namespace ToDoModel
 {
@@ -144,7 +138,8 @@ namespace ToDoModel
                 Folder olDestination = null;
                 try
                 {
-                    olDestination = FolderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
+                    var folderHandler = new FolderHandler(appGlobals);
+                    olDestination = folderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
                 }
                 catch (System.Exception e)
                 {
@@ -256,7 +251,8 @@ namespace ToDoModel
                 appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
-                var olDestination = FolderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
+                var folderHandler = new FolderHandler(appGlobals);
+                var olDestination = folderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
                 var mailItemTemp = (MailItem)mailItem.Move(olDestination);
 
                 // Add the email to the Undo Stack
@@ -294,6 +290,7 @@ namespace ToDoModel
             _removeReadOnly = YesNoToAllResponse.Empty;
         }
 
+        // Duplicative with QuickFiler but it is still mapped to main menu so I need to take it out
         public static void Undo(ScoStack<IMovedMailInfo> movedStack, Outlook.Application olApp) 
         {
             DialogResult repeatResponse = DialogResult.Yes;
@@ -845,154 +842,8 @@ namespace ToDoModel
 
         #endregion
 
-        #region old methods
+       
         
-        public static void Run2(
-            IList<MailItem> mailItems,
-            bool savePictures,
-            string destinationFolderpath,
-            bool saveMsg,
-            bool saveAttachments,
-            bool removeFlowFile,
-            IApplicationGlobals appGlobals,
-            string olRoot,
-            string fsRoot)
-        {
-            #region Private variables
-            string loc;
-            string FileSystem_LOC;
-
-            string FileSystem_DelLOC;
-
-            MailItem mailItem;
-
-            Folder sortFolder;
-            Folder folderCurrent;
-            string strFolderPath = "";
-            int i;
-            MailItem mailItemTemp;
-
-            var strOutput = new string[2];
-
-            #endregion
-
-            // ******************
-            // ***INITIALIZE*****
-            // ******************
-            var _globals = appGlobals;
-            if (olRoot.IsNullOrEmpty()) { olRoot = _globals.Ol.ArchiveRootPath; }
-
-            folderCurrent = GetCurrentExplorerFolder(_globals.Ol.App.ActiveExplorer(), mailItems);
-
-            if (folderCurrent.FolderPath.Contains(_globals.Ol.Inbox.FolderPath))
-            {
-                strFolderPath = _globals.FS.FldrFlow;
-            }
-            else if (folderCurrent.FolderPath.Contains(olRoot) & (folderCurrent.FolderPath != olRoot))
-            {
-                strFolderPath = folderCurrent.ToFsFolderpath(olAncestor: _globals.Ol.ArchiveRootPath, fsAncestorEquivalent: _globals.FS.FldrRoot);
-            }
-            // strFolderPath = _globals.FS.FldrRoot & Right(folderCurrent.FolderPath, Len(folderCurrent.FolderPath) - Len(_globals.Ol.ArchiveRootPath) - 1)
-
-
-
-
-            // *************************************************************************
-            // ************** SAVE ATTACHMENTS IF ENABLED*******************************
-            // *************************************************************************
-            string strTemp2 = "";
-            // QUESTION: Original code allowed path to be an optional variable and then did something if a value was supplied that didn't match the archive root. Need to determine why and if new treatment loses functionality
-            if ((olRoot ?? "") != (_globals.Ol.ArchiveRootPath ?? ""))
-            {
-                strTemp2 = _globals.Ol.ArchiveRootPath.Substring(_globals.Ol.EmailRootPath.Length);
-                FileSystem_LOC = _globals.FS.FldrRoot + strTemp2 + @"\" + destinationFolderpath;  // Parent Directory
-            }
-            else
-            {
-                FileSystem_LOC = Path.Combine(_globals.FS.FldrRoot, destinationFolderpath);
-            }
-
-            FileSystem_DelLOC = _globals.FS.FldrRoot;
-
-            // If Save_PDF = True Then
-            // Call SaveAsPDF.SaveMessageAsPDF(FileSystem_LOC, selItems)
-            // End If
-
-            if (saveMsg == true)
-            {
-                SaveMessageAsMSG(FileSystem_LOC, mailItems);
-            }
-            // 
-
-
-
-            // ****Save Attachment to OneDrive directory****
-
-            if (saveAttachments == true)
-            {
-                // Email_SortSaveAttachment.SaveAttachmentsFromSelection(SavePath:=FileSystem_LOC, Verify_Action:=Pictures_Checkbox, selItems:=selItems, save_images:=Pictures_Checkbox, SaveMSG:=Save_MSG)
-                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: appGlobals, SavePath: FileSystem_LOC, Verify_Action: savePictures, selItems: mailItems, save_images: savePictures, SaveMSG: saveMsg);
-            }
-
-
-
-            if (removeFlowFile == true)
-            {
-                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: appGlobals, SavePath: strFolderPath, DELFILE: true, selItems: mailItems);
-            }
-
-
-
-            // *************************************************************************
-            // *********** LABEL EMAIL AS AUTOSORTED AND MOVE TO EMAIL FOLDER***********
-            // *************************************************************************
-
-            // If strTemp2 = "" Then Add_Recent(SortFolderpath)
-            if (string.IsNullOrEmpty(strTemp2))
-                _globals.AF.RecentsList.Add(destinationFolderpath);
-            loc = Path.Combine(olRoot, destinationFolderpath);
-            sortFolder = new FolderHandler(_globals).GetFolder(loc); // Call Function to turn text to Folder
-
-            // Call Flag_Fields_Categories.SetCategory("Autosort")
-            // Call Flag_Fields_Categories.SetUdf("Autosort", "True")
-            if (sortFolder is null)
-            {
-                MessageBox.Show(loc + " does not exist, skipping email move.");
-            }
-            else
-            {
-
-                for (i = mailItems.Count - 1; i >= 0; i -= 1)
-                {
-                    if (mailItems[i] is MailItem)
-                    {
-                        if (!(mailItems[i] is MeetingItem))
-                        {
-                            mailItem = (MailItem)mailItems[i];
-                            if (string.IsNullOrEmpty(strTemp2))
-                            {
-                                // Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
-                                UpdateForMove(mailItem, destinationFolderpath, appGlobals.AF.CtfMap, appGlobals.AF.SubjectMap);
-                            };
-                            try
-                            {
-                                mailItem.SetUdf("Autosort", "True");
-                                mailItem.UnRead = false;
-                                mailItem.Save();
-
-                                mailItemTemp = (MailItem)mailItem.Move(sortFolder);
-                                CaptureMoveDetails(mailItem, mailItemTemp, _globals);
-                            }
-                            catch (System.Exception e)
-                            {
-                                Debug.WriteLine(e.Message);
-                                Debug.WriteLine(e.StackTrace);
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         private static void PushToUndoStack(
             MailItem beforeMove,
@@ -1011,38 +862,11 @@ namespace ToDoModel
         {
             TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
-            // TODO: Change this into a JSON file
-            //WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
-            //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath).Skip(1).ToArray();
-            //strOutput[1] = SanitizeArrayLineTSV(ref strAry);
             var output = SanitizeArrayLineTSV(ref strAry);
 
             _globals.Ol.EmailMoveWriter.Enqueue(output);
-            //FileIO2.WriteTextFile(_globals.FS.Filenames.MovedMails, strOutput, _globals.FS.FldrMyD);
         }
-
-        //private static string SanitizeArrayLineTSV(ref string[] strOutput)
-        //{
-        //    string strBuild = "";
-        //    if (strOutput.IsInitialized())
-        //    {
-        //        int max = strOutput.Length;
-        //        for (int i = 1, loopTo = max; i <= loopTo; i++)
-        //        {
-        //            string strTemp = StripTabsCrLf(strOutput[i]);
-        //            strBuild = strBuild + "\t" + strTemp;
-
-        //        }
-        //        if (strBuild.Length > 0)
-        //            strBuild = strBuild.Substring(1);
-        //        return strBuild;
-        //    }
-        //    else
-        //    {
-        //        return "";
-        //    }
-        //}
 
         private static string SanitizeArrayLineTSV(ref string[] strOutput)
         {
@@ -1119,75 +943,7 @@ namespace ToDoModel
             }
         }
         
-        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, SubjectMapSco subMap)
-        {
-            ctfMap.Add(mailItem.ConversationID, fldr, 1);
-            subMap.Add(mailItem.Subject, fldr);
-        }
         
-        private static void SaveMessageAsMSG(string fileSystem_LOC, IList<MailItem> selItems)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static Folder GetCurrentExplorerFolder(Explorer activeExplorer)
-        {
-            var objItem = activeExplorer.Selection[0];
-
-            if (objItem is MailItem)
-            {
-                MailItem olMail = (MailItem)objItem;
-                return (Folder)olMail.Parent;
-            }
-
-            else if (objItem is AppointmentItem)
-            {
-                AppointmentItem olAppointment = (AppointmentItem)objItem;
-                return (Folder)olAppointment.Parent;
-            }
-
-            else if (objItem is MeetingItem)
-            {
-                MeetingItem olMeeting = (MeetingItem)objItem;
-                return (Folder)olMeeting.Parent;
-            }
-
-            else if (objItem is TaskItem)
-            {
-                TaskItem olTask = (TaskItem)objItem;
-                return (Folder)olTask.Parent;
-            }
-
-            else
-            {
-                return null;
-            }
-        }
-
-        private static Folder GetCurrentExplorerFolder(Explorer activeExplorer, IList<MailItem> mailItems)
-        {
-            if (mailItems is not null)
-            {
-                return GetCurrentExplorerFolder(activeExplorer, mailItems[0]);
-            }
-            else
-            {
-                return GetCurrentExplorerFolder(activeExplorer);
-            }
-        }
-
-        private static Folder GetCurrentExplorerFolder(Explorer ActiveExplorer, MailItem mailItem)
-        {
-            if (mailItem is not null) { return (Folder)mailItem.Parent; }
-            else { return GetCurrentExplorerFolder(ActiveExplorer); }
-        }
-
-        
-
-        // Public Function DialogueThrowNotImplemented() As Boolean
-        // Return MsgBox("")
-        // End Function
-        #endregion
     }
 
 }

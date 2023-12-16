@@ -17,6 +17,8 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        #region Constructors and private fields
+
         public EmailDataMiner(IApplicationGlobals appGlobals) 
         { 
             _globals = appGlobals;
@@ -24,6 +26,10 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
 
         private IApplicationGlobals _globals;
         private SegmentStopWatch _sw;
+
+        #endregion Constructors and private fields
+
+        #region Scrape Emails
 
         internal OlFolderTree GetOlFolderTree()
         {
@@ -59,7 +65,7 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
             return mailItems;
         }
 
-        internal List<MailItem> LoadMailWithProgress(
+        internal List<MailItem> LinqToSimpleEmailList(
             IEnumerable<MAPIFolder> folders, 
             IEnumerable<MailItem> mailItems, 
             ProgressTracker progress)
@@ -73,11 +79,8 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
             return mailList;
         }
                 
-        internal async Task<List<MailItem>> GetEmailsInScopeAsync()
+        public async Task<List<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
         {
-
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
             var progress = new ProgressTracker(tokenSource);
             List<MailItem> mailItems = null;
 
@@ -97,29 +100,32 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
                 _sw.LogDuration(nameof(QueryMailItems));
 
                 // Load to memory
-                mailItems = LoadMailWithProgress(folders, mailItemsQuery, progress);
-                _sw.LogDuration(nameof(LoadMailWithProgress));
+                mailItems = LinqToSimpleEmailList(folders, mailItemsQuery, progress);
+                _sw.LogDuration(nameof(LinqToSimpleEmailList));
 
-            }, token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             progress.Report(100);
 
             return mailItems;
         }
                 
-        public async Task ScrapeEmails() 
+
+        #endregion Aquire Emails
+
+        public async Task MineEmails() 
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
+            
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-            var progress = new ProgressTracker(tokenSource);
-
+            
             _sw = new SegmentStopWatch();
             _sw.Start();
 
-            var mailItems = await GetEmailsInScopeAsync();
+            var mailItems = await ScrapeEmails(tokenSource);
 
             // Convert to MailItemInfo
             var mailInfoTasks = mailItems.Select(x => MailItemInfo.FromMailItemAsync(x, _globals.Ol.EmailPrefixToStrip, token, true));
@@ -127,9 +133,6 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
             
                         
         }
-    
-    
-        
 
     }
 }

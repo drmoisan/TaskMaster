@@ -104,25 +104,13 @@
     <Compile Include="Data Model\ToDo\ToDoEvents.cs" />
     <Compile Include="Data Model\ToDo\ToDoItem.cs" />
     <Compile Include="Data Model\Tree\TreeOfToDoItems.cs" />
-    <Compile Include="Email Utilities\AttachmentInfo.cs" />
     <Compile Include="Email Utilities\AutoFile.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
-    <Compile Include="Email Utilities\cConversation.cs" />
-    <Compile Include="Email Utilities\CommonWordsModule.cs" />
-    <Compile Include="Email Utilities\Conversation_To_Folder.cs" />
     <Compile Include="Email Utilities\FolderHandler.cs" />
-    <Compile Include="Email Utilities\FolderSuggestions.cs" />
-    <Compile Include="Email Utilities\FolderSuggestionsModule.cs" />
-    <Compile Include="Email Utilities\Load_CTF_AND_Subjects_AND_Recents.cs" />
-    <Compile Include="Email Utilities\ModuleMailItemsSort.cs" />
     <Compile Include="Email Utilities\MovedMailInfo.cs" />
-    <Compile Include="Email Utilities\SaveAttachmentsModule.cs" />
     <Compile Include="Email Utilities\SmithWaterman.cs" />
     <Compile Include="Email Utilities\SortEmail.cs" />
-    <Compile Include="Email Utilities\SubjectMapModule.cs" />
     <Compile Include="Email Utilities\Suggestions.cs" />
-    <Compile Include="Email Utilities\SuggestionsLeg2.cs" />
-    <Compile Include="Email Utilities\SuggestionsLegacy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

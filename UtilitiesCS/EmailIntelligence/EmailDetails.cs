@@ -202,13 +202,17 @@ namespace UtilitiesCS
             return (recipientsTo, recipientsCC);
         }
 
-        public static RecipientInfo GetInfo(this IEnumerable<Recipient> recipients)
+        public static IEnumerable<RecipientInfo> GetInfo(this IEnumerable<Recipient> recipients)
         {
-            var recipientTuples = recipients.Select(GetRecipientInfo);
-            return new RecipientInfo(
-                string.Join("; ", recipientTuples.Select(t => t.Name)),
-                string.Join("; ", recipientTuples.Select(t => t.Address)),
-                string.Join("; ", recipientTuples.Select(t => t.Html)));
+            return recipients.Select(GetInfo);
+        }
+
+        public static RecipientInfo GetInfo(this Recipient recipient)
+        {
+            string name = GetRecipientName(recipient);
+            string address = GetRecipientAddress(recipient);
+            string html = ConvertRecipientToHtml(name, address);
+            return new RecipientInfo(name, address, html);
         }
 
         public static string GetToRecipientsInHtml(MailItem olMail)
@@ -315,14 +319,7 @@ namespace UtilitiesCS
                 GetRecipientName(olRecipient), 
                 GetRecipientAddress(olRecipient));
         }
-
-        private static RecipientInfo GetRecipientInfo(Recipient olRecipient)
-        {
-            string name = GetRecipientName(olRecipient);
-            string address = GetRecipientAddress(olRecipient);
-            string html = ConvertRecipientToHtml(name, address);
-            return new RecipientInfo(name, address, html);
-        }
+                
 
         #endregion
     }

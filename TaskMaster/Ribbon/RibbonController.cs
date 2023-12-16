@@ -256,12 +256,7 @@ namespace TaskMaster
         {
             return System.Drawing.Image.FromHbitmap((IntPtr)disp.Handle, (IntPtr)disp.hPal);
         }
-        internal void TryLegacySortMailToExistingRun2()
-        {
-            var mail = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
-            var items = new List<Outlook.MailItem> { mail };
-            ToDoModel.SortEmail.Run2(items, false, "_ Active Projects\\Countertop Beta", false, false, false, _globals, null, null);
-        }
+        
 
         internal void TryLoadFolderFilter()
         {

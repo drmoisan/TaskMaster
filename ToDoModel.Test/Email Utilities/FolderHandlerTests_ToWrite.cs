@@ -67,7 +67,8 @@ namespace ToDoModel.Test
             Application olApp = null;
 
             // Act
-            var result = FolderHandler.GetFolder(
+            var folderHandler = new FolderHandler(olApp);
+            var result = folderHandler.GetFolder(
                 folderpath,
                 olApp);
 

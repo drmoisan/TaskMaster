@@ -172,7 +172,6 @@ namespace TaskMaster
         public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();
         public void GetQfcDataModel_Click(Office.IRibbonControl control) => _controller.TryGetQfcDataModel();
         public void GetTableInView_Click(Office.IRibbonControl control) => _controller.TryGetTableInView();
-        public void LegacySortMailToExistingRun2_Click(Office.IRibbonControl control) => _controller.TryLegacySortMailToExistingRun2();
         public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.TryRebuildProjInfo();
         public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.TryRecipientGetInfo();
         public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.TrySubstituteIdRoot();

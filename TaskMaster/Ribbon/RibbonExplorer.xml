@@ -41,7 +41,6 @@
                     <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
                     <button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
                     <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
-                    <button id="LegacySortMailToExistingRun2" imageMso="TraceDependentCells" onAction="LegacySortMailToExistingRun2_Click" label="LegacySortMailToExistingRun2" />
                     <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
                     <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
                     <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />

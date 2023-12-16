@@ -572,42 +572,6 @@ namespace QuickFiler.Controllers
             _formViewer.Invoke(new System.Action(() => _formViewer.WindowState = FormWindowState.Minimized));
         }
 
-        internal void UndoItem(int i)
-        {
-            _undoQueue.Add(_movedItems.Pop(i));
-        }
-
-        internal void ContinueUndo(int i) 
-        {
-            var repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
-        }
-        
-        internal void UndoDialog2(int i)
-        {
-            var olApp = _globals.Ol.App;
-            
-            var message = _movedItems[i].UndoMoveMessage(olApp);
-            if (message is null) { UndoDialog2(i++); }
-            else
-            {
-                var actions = new Dictionary<string, System.Action>()
-                {
-                    { "Yes", () => UndoItem(i) },
-                    { "No", () => ContinueUndo(i++) },
-                    { "Cancel", () => { } },
-                };
-                var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
-                if (undoResponse == DialogResult.Yes)
-                {
-                    _undoQueue.Add(_movedItems.Pop(i));
-                }
-                else { i++; }
-                //repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
-            }
-            
-
-        }
-
         internal void UndoDialog()
         {
             var olApp = _globals.Ol.App;

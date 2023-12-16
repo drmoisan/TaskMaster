@@ -288,6 +288,9 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Tesseract, Version=5.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tesseract.5.2.0\lib\net48\Tesseract.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -319,9 +322,12 @@
     </Compile>
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
+    <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\EmailTokenizer.cs" />
     <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
     <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersController.cs" />
     <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersViewer.cs">
       <SubType>Form</SubType>
@@ -363,13 +369,16 @@
     <Compile Include="EmailIntelligence\Flags\FlagParser.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
-    <Compile Include="EmailIntelligence\MailItemInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsing\MailItemInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.Designer.cs">
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\ImageExtensions.cs" />
+    <Compile Include="Extensions\JsonExtensions.cs" />
+    <Compile Include="HelperClasses\AsyncLazy.cs" />
     <Compile Include="HelperClasses\DebugTextWriter.cs" />
     <Compile Include="HelperClasses\DvgForm.cs">
       <SubType>Form</SubType>
@@ -396,7 +405,7 @@
     <Compile Include="HelperClasses\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IMailItemInfo.cs" />
     <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
-    <Compile Include="EmailIntelligence\RecipientInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsing\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
@@ -463,6 +472,7 @@
     <Compile Include="OutlookExtensions\ExplorerActions.cs" />
     <Compile Include="OutlookExtensions\FolderConverter.cs" />
     <Compile Include="OutlookExtensions\IOutlookItem.cs" />
+    <Compile Include="OutlookExtensions\MailItemExtensions.cs" />
     <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
     <Compile Include="OutlookExtensions\OlItemPseudoInterface.cs" />
     <Compile Include="OutlookExtensions\OlTableExtensions.cs" />
@@ -590,6 +600,7 @@
     <Content Include="Resources\CalculationWarning.svg" />
     <Content Include="Resources\Cancel.png" />
     <Content Include="Resources\Cancel.svg" />
+    <None Include="Resources\charset_lookup.json" />
     <Content Include="Resources\Cloud.svg" />
     <Content Include="Resources\CSEventReceiver.svg" />
     <Content Include="Resources\CSWorkflowAssociationForm.svg" />
@@ -649,8 +660,10 @@
     <Error Condition="!Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets'))" />
     <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Tesseract.5.2.0\build\Tesseract.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets" Condition="Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets')" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets')" />
+  <Import Project="..\packages\Tesseract.5.2.0\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" />
 </Project>
