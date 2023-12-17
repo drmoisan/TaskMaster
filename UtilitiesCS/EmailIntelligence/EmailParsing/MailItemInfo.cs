@@ -14,6 +14,7 @@ using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Threading;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
 
 namespace UtilitiesCS //QuickFiler
 {
@@ -381,6 +382,12 @@ namespace UtilitiesCS //QuickFiler
             return (string)Item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001F/");
         }
 
+        public IEnumerable<string> Tokens { get => _tokens ?? Tokenizer.tokenize(this); private set => _tokens = value; }
+        private IEnumerable<string> _tokens;
+
+        [JsonIgnore]
+        public EmailTokenizer Tokenizer { get => _tokenizer ??= new EmailTokenizer(); }
+        private EmailTokenizer _tokenizer;
         #endregion
 
         #region INotifyPropertyChanged

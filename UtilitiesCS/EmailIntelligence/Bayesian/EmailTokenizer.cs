@@ -22,9 +22,12 @@ namespace UtilitiesCS.EmailIntelligence
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public EmailTokenizer() { }
+        public EmailTokenizer() 
+        {
+            setup();
+        }
 
-        public EmailTokenizer(IApplicationGlobals appGlobals) { _globals = appGlobals; }
+        //public EmailTokenizer(IApplicationGlobals appGlobals) { _globals = appGlobals; }
 
         /// <summary>
         /// Get the tokenizer ready to use; this should be 
@@ -49,9 +52,9 @@ namespace UtilitiesCS.EmailIntelligence
                 // discriminators.  (Not just Date, but Received and X - From_
             }
 
-            crack_images = new ImageStripper(_globals).analyze;
+            crack_images = new ImageStripper().analyze;
         }
-        private IApplicationGlobals _globals;
+        //private IApplicationGlobals _globals;
 
         #endregion Constructors and Initializers
 

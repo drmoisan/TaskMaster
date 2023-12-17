@@ -20,18 +20,18 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Constructors and private fields
 
-        public ImageStripper(IApplicationGlobals appGlobals) 
+        public ImageStripper() 
         { 
-            _globals = appGlobals; 
+            //_globals = appGlobals; 
         }
 
-        public ImageStripper(IApplicationGlobals appGlobals, string cachefile)
+        public ImageStripper(string cachefile)
         {
-            _globals = appGlobals;
+            //_globals = appGlobals;
             _cachefile = cachefile;
         }
 
-        private IApplicationGlobals _globals;
+        //private IApplicationGlobals _globals;
         private string _cachefile;
 
         #endregion Constructors and private fields
@@ -325,8 +325,9 @@ namespace UtilitiesCS.EmailIntelligence
         {
             // Get byte array of image
             byte[] data = bitmap.ToByte();
-
-            string tessdataPath = $"{_globals.FS.FldrAppData}{Path.DirectorySeparatorChar}tessdata";
+            
+            string tessdataPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
+            //string tessdataPath = $"{_globals.FS.FldrAppData}{Path.DirectorySeparatorChar}tessdata";
             using (TesseractEngine engine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default))
             {
                 using (Pix pix = Pix.LoadFromMemory(data))
