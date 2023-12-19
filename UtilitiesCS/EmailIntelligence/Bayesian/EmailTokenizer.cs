@@ -283,8 +283,8 @@ namespace UtilitiesCS.EmailIntelligence
                 var total_len = 0;
                 foreach (var part in parts)
                 {
-                    var len = part.Size;
-                    total_len += len;
+                    if (part is Attachment attachment)
+                        total_len += attachment.Size;
                 }
                 if (total_len > 0)
                 {
@@ -443,15 +443,15 @@ namespace UtilitiesCS.EmailIntelligence
             return rx.IsMatch(word);
         }
 
-        internal List<Attachment> imageparts(MailItemInfo msg)
+        internal List<object> imageparts(MailItemInfo msg)
         {
-            var parts = msg.Attachments.Where(x => x.IsImage).Select(x => x.Attachment);
-            return parts.ToList();
+            var attachments = msg.Attachments;
+            var parts = msg.Attachments.Where(x => x.IsImage).Select(x => x.Attachment).Cast<object>().ToList();
+            return parts;
             // Original Python code below
             // # Return a list of all msg parts with type 'image/*'.
             // return [part for part in msg.walk() if part.get_content_type().startswith('image/')]
         }
-        
         
         internal IEnumerable<string> tokenize_word(
             string word, 
@@ -509,7 +509,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        internal Func<string, List<Attachment>, (string texts, HashSet<string> tokens)> crack_images;
+        internal Func<string, List<object>, (string texts, HashSet<string> tokens)> crack_images;
 
         internal static List<CharsetCodebase> charsetCodebases = 
             JsonExtensions.Deserialize<List<CharsetCodebase>>(

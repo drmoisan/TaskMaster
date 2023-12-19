@@ -323,11 +323,15 @@
     </Compile>
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianFilter.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\ClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ConvertedSpamBayesTokenizer.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\CorpusInherit.cs" />
     <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\CorpusExample.cs" />
     <Compile Include="EmailIntelligence\Bayesian\EmailTokenizer.cs" />
     <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
@@ -505,8 +509,10 @@
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ObserverHelper.cs" />
+    <Compile Include="ReusableTypeClasses\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
     <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
+    <Compile Include="ReusableTypeClasses\ScoSortedDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack.cs" />
     <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\SerializableList.cs" />

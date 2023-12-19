@@ -5,7 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-using UtilitiesCS.EmailIntelligence.Bayesian;
+
 
 namespace Expat.Bayesian
 {
@@ -48,8 +48,8 @@ namespace Expat.Bayesian
 
         #endregion
 
-        private Corpus _good;
-        private Corpus _bad;
+        private CorpusExample _good;
+        private CorpusExample _bad;
         private SortedDictionary<string, double> _prob;
         private int _ngood;
         private int _nbad;
@@ -58,7 +58,7 @@ namespace Expat.Bayesian
         /// <summary>
         /// A list of words that show tend to show up in Spam text
         /// </summary>
-        public Corpus Bad
+        public CorpusExample Bad
         {
             get { return _bad; }
             set { _bad = value; }
@@ -67,7 +67,7 @@ namespace Expat.Bayesian
         /// <summary>
         /// A list of words that tend to show up in non-spam text
         /// </summary>
-        public Corpus Good
+        public CorpusExample Good
         {
             get { return _good; }
             set { _good = value; }
@@ -92,8 +92,8 @@ namespace Expat.Bayesian
         /// <param name="badReader"></param>
         public void Load(TextReader goodReader, TextReader badReader)
         {
-            _good = new Corpus(goodReader);
-            _bad = new Corpus(badReader);
+            _good = new CorpusExample(goodReader);
+            _bad = new CorpusExample(badReader);
 
             CalculateProbabilities();
         }
@@ -103,7 +103,7 @@ namespace Expat.Bayesian
         /// </summary>
         /// <param name="good"></param>
         /// <param name="bad"></param>
-        public void Load(Corpus good, Corpus bad)
+        public void Load(CorpusExample good, CorpusExample bad)
         {
             _good = good;
             _bad = bad;
@@ -118,8 +118,8 @@ namespace Expat.Bayesian
         /// <param name="table"></param>
         public void Load(DataTable table)
         {
-            _good = new Corpus();
-            _bad = new Corpus();
+            _good = new CorpusExample();
+            _bad = new CorpusExample();
 
             foreach (DataRow row in table.Rows)
             {
@@ -281,7 +281,7 @@ namespace Expat.Bayesian
 
             // Spin through every word in the body and look up its individual spam probability.
             // Keep the list in decending order of "Interestingness"
-            Regex re = new Regex(Corpus.TokenPattern, RegexOptions.Compiled);
+            Regex re = new Regex(CorpusExample.TokenPattern, RegexOptions.Compiled);
             Match m = re.Match(body);
             int index = 0;
             while (m.Success)

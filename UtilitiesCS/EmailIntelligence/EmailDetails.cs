@@ -4,11 +4,18 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.ReusableTypeClasses;
+using System.Data;
+using System.Reflection;
+using System;
 
 namespace UtilitiesCS
 {
+    
     public static class EmailDetails
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private const int _numberOfFields = 13;
         
         private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
@@ -101,58 +108,101 @@ namespace UtilitiesCS
 
         public static string GetSenderName(this MailItem olMail)
         {
-            if (olMail.Sent == false)
+            AddressEntry sender = olMail.Sender;
+            string senderName = "";
+
+            if (sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
             {
-                return "";
-            }
-            else if (olMail.Sender.Type == "EX")
-            {
-                try
+                ExchangeUser exchUser = sender.GetExchangeUser();
+                if (exchUser != null)
                 {
-                    var OlPA = olMail.Sender.PropertyAccessor;
-                    string senderAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
-                    return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(senderAddress.Split('@')[0].Replace(".", " "));
+                    senderName = $"{exchUser.FirstName} {exchUser.LastName}";
                 }
-                catch
+                else
                 {
-                    return "";
+                    senderName = olMail.SenderName;
                 }
             }
             else
             {
-                return olMail.Sender.Name;
+                senderName = olMail.SenderName;
             }
+            return senderName;
+            //if (olMail.Sent == false)
+            //{
+            //    return "";
+            //}
+            //else if (olMail.Sender.Type == "EX")
+            //{
+            //    try
+            //    {
+            //        var OlPA = olMail.Sender.PropertyAccessor;
+            //        string senderAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
+            //        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(senderAddress.Split('@')[0].Replace(".", " "));
+            //    }
+            //    catch
+            //    {
+            //        logger.Error($"Error getting sender name for {olMail.Subject} in Folder {((Folder)olMail.Parent).FolderPath} on date {olMail.SentOn}");
+            //        return "";
+            //    }
+            //}
+            //else
+            //{
+            //    return olMail.Sender.Name;
+            //}
 
         }
 
         public static string GetSenderAddress(this MailItem olMail)
         {
-            string senderAddress;
+            AddressEntry sender = olMail.Sender;
+            string senderAddress = "";
 
-            if (olMail.Sender.Type == "EX")
+            if (sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
             {
-                var OlPA = olMail.Sender.PropertyAccessor;
-                try
+                ExchangeUser exchUser = sender.GetExchangeUser();
+                if (exchUser != null)
                 {
-                    senderAddress =(string)OlPA.GetProperty(PR_SMTP_ADDRESS);
+                    senderAddress = exchUser.PrimarySmtpAddress;
                 }
-                catch
+                else
                 {
-                    try
-                    {
-                        senderAddress = olMail.Sender.Name;
-                    }
-                    catch
-                    {
-                        senderAddress = "";
-                    }
+                    senderAddress = olMail.SenderEmailAddress;
                 }
             }
             else
             {
                 senderAddress = olMail.SenderEmailAddress;
             }
+
             return senderAddress;
+
+            //string senderAddress;
+
+            //if (olMail.Sender.Type == "EX")
+            //{
+            //    var OlPA = olMail.Sender.PropertyAccessor;
+            //    try
+            //    {
+            //        senderAddress =(string)OlPA.GetProperty(PR_SMTP_ADDRESS);
+            //    }
+            //    catch
+            //    {
+            //        try
+            //        {
+            //            senderAddress = olMail.Sender.Name;
+            //        }
+            //        catch
+            //        {
+            //            senderAddress = "";
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    senderAddress = olMail.SenderEmailAddress;
+            //}
+            //return senderAddress;
         }
 
         public static RecipientInfo GetSenderInfo(this MailItem olMail)

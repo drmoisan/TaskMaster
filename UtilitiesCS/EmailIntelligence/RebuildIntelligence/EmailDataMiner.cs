@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.HelperClasses;
+using System.Windows;
 
 namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
 {
@@ -109,27 +110,47 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
 
             return mailItems;
         }
-                
+
 
         #endregion Aquire Emails
 
-        public async Task MineEmails() 
+        public async Task MineEmails()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            
+
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-            
+
             _sw = new SegmentStopWatch();
             _sw.Start();
 
             var mailItems = await ScrapeEmails(tokenSource);
 
-            // Convert to MailItemInfo
-            var mailInfoTasks = mailItems.Select(x => MailItemInfo.FromMailItemAsync(x, _globals.Ol.EmailPrefixToStrip, token, true));
-            var mailInfoItems = (await Task.WhenAll(mailInfoTasks)).ToList();
+            var progress = new ProgressTracker(tokenSource);
+            progress.Report(0, "Creating MailItemInfo");
+            var count = mailItems.Count();
+            //var mailInfo = await mailItems.ToAsyncEnumerable().SelectAwait(async x => await MailItemInfo
+            //                        .FromMailItemAsync(x, _globals.Ol.EmailPrefixToStrip, token, true))
+            //                        .WithProgressReporting(count, (x) => progress.Report(x)).ToListAsync();
+            int i = 0;
+            var mailInfo = mailItems.Select(mailItem => 
+            {
+                var info = new MailItemInfo(mailItem);
+                info.LoadAll(_globals.Ol.EmailPrefixToStrip);
+                return info;
+            }).WithProgressReporting(count,(x)=>progress.Report(x)).ToList();
+
+            progress.Report(100);
+            //var mailInfoTasks = mailItems.Select(x => MailItemInfo
+            //    .FromMailItemAsync(x, _globals.Ol.EmailPrefixToStrip, token, true));
+                
+            //var tokenizeTasks = mailInfoTasks.Select(task => task.ContinueWith(x => x.Result.TokenizeAsync()));
+                //.ContinueWith(info => info.Result.TokenizeAsync()));
+
+            //var mailInfoItems = (await Task.WhenAll(mailInfoTasks)).ToList();
+            //var l = await Task.WhenAll(await Task.WhenAll(tokenizeTasks));
             
                         
         }

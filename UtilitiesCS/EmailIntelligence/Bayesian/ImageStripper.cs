@@ -39,7 +39,7 @@ namespace UtilitiesCS.EmailIntelligence
         int misses, hits = 0;
                 
         internal (string text, HashSet<string> tokens) analyze(
-            string engine_name, List<Attachment> parts)
+            string engine_name, List<object> parts)
         {
             if (engine_name != "Tesseract")
             {
@@ -68,13 +68,15 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        internal (List<Bitmap> image, HashSet<string> tokens) PIL_decode_parts(List<Attachment> parts)
+        internal (List<Bitmap> image, HashSet<string> tokens) PIL_decode_parts(List<object> parts)
         {
             var tokens = new HashSet<string>();
             var rows = new LinkedList<Bitmap>();
             var max_image_size = SpamBayesOptions.max_image_size;
 
-            foreach (var part in parts)
+            var attachmentParts = parts.Where(x => x is Attachment).Cast<Attachment>().ToList();
+            var htmlParts = parts.Where(x => x is string).Cast<string>().ToList();
+            foreach (var part in attachmentParts)
             {
                 // See 'image_large_size_attribute' above - the provider may have seen
                 // an image, but optimized the fact we don't bother processing large

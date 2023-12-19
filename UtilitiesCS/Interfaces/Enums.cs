@@ -24,6 +24,11 @@
             Folder = 2
         }
 
+        public enum Corpus
+        {
+            Negative = 0,
+            Positive = 1
+        }
         
         public enum WorkerState
         {

@@ -181,7 +181,7 @@ namespace TaskMaster
         public async void RebuildSubjectMap_Click(Office.IRibbonControl control) => await _controller.RebuildSubjectMapAsync();
         public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.ShowSubjectMapMetrics();
         public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.TryTokenizeEmail();
-
+        public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.TryMineEmails();
         #endregion
 
         #region Helpers

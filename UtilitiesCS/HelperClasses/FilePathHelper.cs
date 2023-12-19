@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,16 +11,18 @@ namespace UtilitiesCS
 {
     public class FilePathHelper: INotifyPropertyChanged
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public FilePathHelper() { PropertyChanged += FilePathHelper_PropertyChanged; }
 
         public FilePathHelper(string fileName, string folderPath)
         {
             FileName = fileName;
             FolderPath = folderPath;
+            FilePath = Path.Combine(_folderPath, _fileName);
             PropertyChanged += FilePathHelper_PropertyChanged;
         }
-
-        
 
         private string _filePath = "";
         public string FilePath { get => _filePath; set { _filePath = value; NotifyPropertyChanged(); } }
@@ -50,7 +53,18 @@ namespace UtilitiesCS
                         _filePath = Path.Combine(_folderPath, _fileName);
                     break;
                 case "FilePath":
-                    _folderPath = Path.GetDirectoryName(_filePath);
+                    try
+                    {
+                        _folderPath = Path.GetDirectoryName(_filePath);    
+                    }
+                    catch (System.Exception ex)
+                    {
+                        var st = string.Join("\n",TraceUtility.GetMyStackSummary(new StackTrace()));
+                        string msg = $"FilePath: {_filePath} is invalid.\n{st}";
+                        logger.Error(msg);
+                        throw;
+                    }
+                    
                     _fileName = Path.GetFileName(_filePath);
                     if (_fileName == "") 
                         throw new ArgumentException($"FilePath {_filePath} must include a FileName");

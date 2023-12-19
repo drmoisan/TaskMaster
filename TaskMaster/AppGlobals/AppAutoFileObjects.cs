@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
@@ -46,6 +47,7 @@ namespace TaskMaster
                 LoadSubjectMapAndEncoderAsync(),
                 LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
+                LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
             //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
@@ -371,6 +373,20 @@ namespace TaskMaster
             }
         }
 
-        
+        private ScDictionary<string, ClassifierGroup> _manager;
+        public ScDictionary<string, ClassifierGroup> Manager => Initialized(_manager, LoadManager);
+        private ScDictionary<string, ClassifierGroup> LoadManager()
+        {
+            var manager = ScDictionary<string, ClassifierGroup>.Deserialize(
+                fileName: _defaults.File_ClassifierManager,
+                folderPath: _parent.FS.FldrPythonStaging);
+            return manager;
+        }
+        private async Task LoadManagerAsync()
+        {
+            await Task.Factory.StartNew(
+                () => _manager = LoadManager(),
+                default(CancellationToken));
+        }
     }
 }

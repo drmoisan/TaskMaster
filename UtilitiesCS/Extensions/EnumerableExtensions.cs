@@ -71,6 +71,19 @@ namespace UtilitiesCS
             return list;
         }
 
+        public static IAsyncEnumerable<T> WithProgressReporting<T>(this IAsyncEnumerable<T> enumerable, long count, Action<int> progress)
+        {
+            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+
+            int completed = 0;
+            return enumerable.Select(x =>
+            {
+                Interlocked.Increment(ref completed);
+                progress((int)(((double)completed / count) * 100));
+                return x;
+            });
+        }
+        
         public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<int> progress)
         {
             if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }

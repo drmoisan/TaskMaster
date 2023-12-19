@@ -143,5 +143,8 @@
     <Setting Name="FileName_FolderRemap" Type="System.String" Scope="User">
       <Value Profile="(Default)">999999FolderRemap.json</Value>
     </Setting>
+    <Setting Name="File_ClassifierManager" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999ClassifierManager.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

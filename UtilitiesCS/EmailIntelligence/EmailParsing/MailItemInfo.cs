@@ -173,7 +173,29 @@ namespace UtilitiesCS //QuickFiler
                 _ = Task.Factory.StartNew(() => LoadRecipients(), token);
                 _completedLoadingPriority = true;
             }
-            else { Task.Delay(100).Wait(); }
+            else 
+            { 
+                Task.Delay(100).Wait(); 
+            }
+        }
+
+        public void LoadAll(string emailPrefixToStrip)
+        {
+            if (_item is null) { throw new ArgumentNullException(); }
+            _entryId = _item.EntryID;
+            _sender = _item.GetSenderInfo();
+            _senderName = _sender.Name;
+            _senderHtml = _sender.Html;
+            _subject = _item.Subject;
+            _body = CompressPlainText(_item.Body, emailPrefixToStrip);
+            _triage = _item.GetTriage();
+            _sentOn = _item.SentOn.ToString("g");
+            _actionable = _item.GetActionTaken();
+            _folder = ((Folder)_item.Parent).Name;
+            _conversationIndex = _item.ConversationIndex;
+            _unread = _item.UnRead;
+            _isTaskFlagSet = (_item.FlagStatus == OlFlagStatus.olFlagMarked);
+            LoadRecipients();
         }
 
         public void LoadRecipients()
@@ -384,6 +406,11 @@ namespace UtilitiesCS //QuickFiler
 
         public IEnumerable<string> Tokens { get => _tokens ?? Tokenizer.tokenize(this); private set => _tokens = value; }
         private IEnumerable<string> _tokens;
+        public async Task<IEnumerable<string>> TokenizeAsync()
+        {
+            _tokens = await Task.Run(() => Tokenizer.tokenize(this));
+            return _tokens;
+        }
 
         [JsonIgnore]
         public EmailTokenizer Tokenizer { get => _tokenizer ??= new EmailTokenizer(); }

@@ -296,8 +296,8 @@ namespace TaskMaster
             var ae = _globals.Ol.App.ActiveExplorer();
             var mail = (Outlook.MailItem)ae.Selection[1];
             var mailInfo = await MailItemInfo.FromMailItemAsync(mail, _globals.Ol.EmailPrefixToStrip, token, true);
-            var tokenizer = new EmailTokenizer(_globals);
-            tokenizer.setup();
+            var tokenizer = new EmailTokenizer();
+            //tokenizer.setup();
             var tokens = tokenizer.tokenize(mailInfo);
             var tokenString = tokens.SentenceJoin();
             MessageBox.Show(tokenString);
@@ -311,5 +311,13 @@ namespace TaskMaster
             sorter.Run();
         }
 
+        internal async Task TryMineEmails()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.RebuildIntelligence.EmailDataMiner(_globals);
+            await miner.MineEmails();
+        }
     }
 }

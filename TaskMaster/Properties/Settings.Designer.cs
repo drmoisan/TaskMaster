@@ -574,5 +574,17 @@ namespace TaskMaster.Properties {
                 this["FileName_FolderRemap"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999ClassifierManager.json")]
+        public string File_ClassifierManager {
+            get {
+                return ((string)(this["File_ClassifierManager"]));
+            }
+            set {
+                this["File_ClassifierManager"] = value;
+            }
+        }
     }
 }
