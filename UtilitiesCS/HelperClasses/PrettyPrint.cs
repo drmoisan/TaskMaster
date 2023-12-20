@@ -11,6 +11,7 @@ namespace UtilitiesCS
     using System.Data;
     using System.Diagnostics;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Windows.Forms;
     using System.Windows.Input;
 
@@ -96,7 +97,6 @@ namespace UtilitiesCS
             return dt;
         }
 
-
         internal static int[] GetMaxLengthsByColumn(this string[,] strings)
         {
             int[] maxLengthsByColumn = new int[strings.GetLength(1)];
@@ -143,6 +143,90 @@ namespace UtilitiesCS
             return text;
         }
 
+        public static string ToFormattedText(this string[][] jagged, string[] headers = null, string title = null) 
+        {
+            // Get the max number of columns
+            var columnCount = jagged.GroupBy(row => row.Length).Select(x => x.Key).Max();
+            
+            // Get the max length of each data column
+            var columnLengths = new int[columnCount];
+            jagged.ForEach(row => 
+            {
+                for (int i = 0; i < row.Length; i++)
+                {
+                    if (row[i] is null) { row[i] = ""; }
+                    columnLengths[i] = Math.Max(columnLengths[i], row[i].Length);
+                }
+            });
+            StringBuilder sb = new();
+
+            // Adjust Column widths for headers
+            if (headers != null)
+            {
+                Enumerable.Range(0, columnCount).ForEach(i => columnLengths[i] = Math.Max(columnLengths[i], headers[i].Length));
+            }
+            
+            // Calculate Table Width
+            int width = columnLengths.Sum() + columnLengths.Length * 2 + 3;
+
+            if (!title.IsNullOrEmpty()) 
+            {
+                sb.AppendLine(new string('=', width));
+                if (title.Length + 3 <= width)
+                {                    
+                    sb.AppendLine($"| {title.PadToCenter(width - 3)}|");   
+                }
+                else
+                {
+                    var rx = new Regex(@"([^ ]+)");
+                    var matches = rx.Matches(title).Cast<Match>().Select(m => m.Groups[1].Value);
+                    List<string> lines = new();
+                    StringBuilder line = new();
+                    foreach (var match in matches)
+                    {
+                        if (line.Length + match.Length + 4 <= width)
+                        {
+                            line.Append(" ");
+                            line.Append(match);
+                        }
+                        else 
+                        {
+                            lines.Add($"| {line.ToString().PadToCenter(width - 3)}|");
+                            line.Clear();
+                        }
+                        
+                    }
+                    if (line.Length > 0)
+                        lines.Add($"| {line.ToString().PadToCenter(width - 3)}|");
+                    lines.ForEach(line => sb.AppendLine(line));
+                }
+            }
+
+            if (headers != null) 
+            { 
+                if (title.IsNullOrEmpty())
+                    sb.AppendLine(new string('=', width));
+                sb.Append("| ");
+                headers.ForEach(header => sb.Append(header.PadRight(columnLengths[0] + 2)));
+                sb.AppendLine("|");
+            }
+                                    
+            sb.AppendLine(new string('=', width));
+
+            for (int i = 0; i < jagged.Length; i++)
+            {
+                sb.Append("| ");
+                for (int j = 0; j < jagged[i].Length; j++)
+                {
+                    sb.Append(jagged[i][j].PadRight(columnLengths[j] + 2));
+                }
+                sb.AppendLine("|");
+            }
+            sb.AppendLine(new string('=', width));
+
+            return sb.ToString();
+
+        }
 
         public static string ToFormattedText(this string[,] strings)
         {

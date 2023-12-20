@@ -7,6 +7,7 @@ using UtilitiesCS.ReusableTypeClasses;
 using System.Data;
 using System.Reflection;
 using System;
+using System.Text.RegularExpressions;
 
 namespace UtilitiesCS
 {
@@ -259,8 +260,9 @@ namespace UtilitiesCS
 
         public static RecipientInfo GetInfo(this Recipient recipient)
         {
-            string name = GetRecipientName(recipient);
-            string address = GetRecipientAddress(recipient);
+            (var name, var address) = GetRecipientInfo(recipient);
+            //string name = GetRecipientName(recipient);
+            //string address = GetRecipientAddress(recipient);
             string html = ConvertRecipientToHtml(name, address);
             return new RecipientInfo(name, address, html);
         }
@@ -329,38 +331,123 @@ namespace UtilitiesCS
             return folderPath;
         }
 
-        private static string GetRecipientAddress(Recipient OlRecipient)
+        private static string GetRecipientAddress(Recipient olRecipient)
         {
-            var OlPA = OlRecipient.PropertyAccessor;
-            string StrSMTPAddress;
-            try
+            string smtpAddress;
+
+            if (olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
             {
-                StrSMTPAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
-            }
-            catch
-            {
-                try
+                ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
+                if (exchUser != null)
                 {
-                    StrSMTPAddress = OlRecipient.Address;
+                    smtpAddress = exchUser.PrimarySmtpAddress;
                 }
-                catch
+                else
                 {
-                    try
-                    {
-                        StrSMTPAddress = OlRecipient.Name;
-                    }
-                    catch
-                    {
-                        StrSMTPAddress = "";
-                    }
+                    smtpAddress = olRecipient.Address;
                 }
             }
-            return StrSMTPAddress;
+            else
+            {
+                smtpAddress = olRecipient.Address;
+            }
+            return smtpAddress;
+            //var OlPA = OlRecipient.PropertyAccessor;
+            //string StrSMTPAddress;
+            //try
+            //{
+            //    StrSMTPAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
+            //}
+            //catch
+            //{
+            //    try
+            //    {
+            //        StrSMTPAddress = OlRecipient.Address;
+            //    }
+            //    catch
+            //    {
+            //        try
+            //        {
+            //            StrSMTPAddress = OlRecipient.Name;
+            //        }
+            //        catch
+            //        {
+            //            StrSMTPAddress = "";
+            //        }
+            //    }
+            //}
+            //return StrSMTPAddress;
+        }
+        
+        internal static (string FirstName, string LastName, string DomainName) ExtractNameFromAddress(string address) 
+        {
+            var rx = new Regex(@"^(.+)@([^@]+)$");
+            var match = rx.Match(address);
+            if (!(match.Success && match.Groups.Count == 3))            
+                return (null,null,null);
+            string domain = match.Groups[2].Value;
+            string mailbox = match.Groups[1].Value;
+            rx = new Regex(@"(?:^|\.)(?=[^""]|""?|)""?((?(1)[^""]*|[^\.""]*))""?(?=\.|$|@)");
+            var nameParts = rx.Matches(mailbox).Cast<Match>().Select(m => m.Groups[1].Value).ToArray();
+            //var nameParts = mailbox.Split('.');
+            switch (nameParts.Length)
+            {
+                case 1:
+                    return (nameParts[0], null, domain);
+                case 2:
+                    return (nameParts[0], nameParts[1], domain);
+                default:
+                    if (nameParts.Length - nameParts.Count(p => p.Length == 1) >= 2)
+                        nameParts = nameParts.Where(p => p.Length > 1).ToArray();
+                    return (nameParts[0], nameParts[1], domain);
+            }
+        }
+        
+        private static (string Name, string Address) GetRecipientInfo(Recipient recipient)
+        {
+            string name, address;
+            if (recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            {
+                ExchangeUser exchUser = recipient.AddressEntry.GetExchangeUser();
+                if (exchUser != null)
+                {
+                    var firstNameExch = exchUser.FirstName;
+                    address = exchUser.PrimarySmtpAddress;
+                    var rx = new Regex(@"^(.+)@([^@]+)$");
+                    name = $"{exchUser.FirstName} {exchUser.LastName}";
+                }
+                else
+                {
+                    name = recipient.Name;
+                    address = recipient.Address;
+                }
+            }
+            else
+            {
+                name = recipient.Name;
+                address = recipient.Address;
+            }
+            
+            return (name, address);
         }
         
         private static string GetRecipientName(Recipient olRecipient)
         {
-            return olRecipient.Name;
+            string recipientName;
+            if (olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            {
+                ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
+                if (exchUser != null)
+                {
+                    recipientName = $"{exchUser.FirstName} {exchUser.LastName}";
+                }
+                else
+                {
+                    recipientName = olRecipient.Name;
+                }
+            }
+            else { recipientName = olRecipient.Name;}
+            return recipientName;
         }
         
         private static string GetRecipientHtml(Recipient olRecipient)

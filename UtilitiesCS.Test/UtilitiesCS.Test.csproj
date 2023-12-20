@@ -11,7 +11,7 @@
     <RootNamespace>UtilitiesCS.Test</RootNamespace>
     <AssemblyName>UtilitiesCS.Test</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>Latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
@@ -53,6 +53,7 @@
     <Compile Include="EmailIntelligence\CtfMapTests.cs" />
     <Compile Include="EmailIntelligence\UnitTest1.cs" />
     <Compile Include="EmailIntelligence\EmailTokenizerTests.cs" />
+    <Compile Include="EmailIntelligence\EmailDetailsTest.cs" />
     <Compile Include="HelperClasses\PropertyInitializerTest.cs" />
     <Compile Include="HelperClasses\TimedDiskWriterTests.cs" />
     <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />
