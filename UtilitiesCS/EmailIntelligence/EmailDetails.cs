@@ -112,7 +112,7 @@ namespace UtilitiesCS
             AddressEntry sender = olMail.Sender;
             string senderName = "";
 
-            if (sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
             {
                 ExchangeUser exchUser = sender.GetExchangeUser();
                 if (exchUser != null)
@@ -159,7 +159,7 @@ namespace UtilitiesCS
             AddressEntry sender = olMail.Sender;
             string senderAddress = "";
 
-            if (sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
             {
                 ExchangeUser exchUser = sender.GetExchangeUser();
                 if (exchUser != null)

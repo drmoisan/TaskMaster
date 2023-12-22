@@ -65,31 +65,46 @@ namespace UtilitiesCS
 
         public void Report(double value, string jobName)
         {
-            if (value < 0 || value > 100)
+            if (value < 0)
             {
                 var caller = new StackFrame(1, false).GetMethod().Name;
-                throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
+                throw new ArgumentOutOfRangeException($"Progress reported " +
+                    $"by {caller} must be an integer between 0 and 100");
             }
-            _jobName = jobName;
-            Report(value);
+            if (value > 100)
+            {
+                Report(100);
+            }
+            else 
+            { 
+                _jobName = jobName;
+                Report(value);
+            }
         }
 
         public void Report(double value)
         {
-            if (value < 0 || value > 100)
+            if (value < 0)
             {
                 var caller = new StackFrame(1, false).GetMethod().Name;
                 throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
             }
-            _progress = value;
-            var parentProgress = (int)Math.Round(_parent.Allocation * value / 100,0) + _parent.StartingAt;
-            _parent.Progress.Report((parentProgress, _jobName));
-            if(_isRoot && parentProgress == 100)
+            else if (value > 100)
             {
-                if (_progressViewer.InvokeRequired)
-                    _progressViewer.Invoke(()=> { if (!_progressViewer.IsDisposed) { _progressViewer.Close(); } });
-                else
-                    if (!_progressViewer.IsDisposed) { _progressViewer.Close(); }
+                Report(100);
+            }
+            else
+            {
+                _progress = value;
+                var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
+                _parent.Progress.Report((parentProgress, _jobName));
+                if (_isRoot && parentProgress == 100)
+                {
+                    if (_progressViewer.InvokeRequired)
+                        _progressViewer.Invoke(() => { if (!_progressViewer.IsDisposed) { _progressViewer.Close(); } });
+                    else
+                        if (!_progressViewer.IsDisposed) { _progressViewer.Close(); }
+                }
             }
         }
 

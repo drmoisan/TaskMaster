@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.HelperClasses;
 using System.Windows;
+using Newtonsoft.Json;
 
 namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
 {
@@ -44,6 +45,7 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
                               .SelectMany(root => root
                               .FlattenIf(node => !node.Selected))
                               .Select(x => x.OlFolder);
+            var ary = folders.Select(x=>x.FolderPath).ToArray();
             return folders;
         }
 
@@ -129,31 +131,139 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
             var mailItems = await ScrapeEmails(tokenSource);
 
             var progress = new ProgressTracker(tokenSource);
-            progress.Report(0, "Creating MailItemInfo");
             var count = mailItems.Count();
+
             //var mailInfo = await mailItems.ToAsyncEnumerable().SelectAwait(async x => await MailItemInfo
             //                        .FromMailItemAsync(x, _globals.Ol.EmailPrefixToStrip, token, true))
             //                        .WithProgressReporting(count, (x) => progress.Report(x)).ToListAsync();
-            int i = 0;
-            var mailInfo = mailItems.Select(mailItem => 
+
+            int complete = 0;
+            progress.Report(0, $"Creating MailItem Info {complete:N0} of {count:N0}");
+
+            var psw = new Stopwatch();
+            psw.Start();
+
+            //var mailTasks = mailItems.Select(x => Task.Factory.StartNew(() =>
+            //{
+            //    var mailInfo = new MailItemInfo(x);
+            //    mailInfo.LoadAll(_globals.Ol.EmailPrefixToStrip);
+            //    mailInfo.LoadTokens();
+            //    Interlocked.Increment(ref complete);
+            //    return mailInfo;
+            //},token,TaskCreationOptions.LongRunning, TaskScheduler.Default));
+            
+            ScoCollection<MinedMailInfo> mailInfoCollection = [];
+            mailInfoCollection.FilePath = "C:\\Temp\\emailInfo.json";
+
+            int chunkNum = 100;
+            int chunkSize = mailItems.Count() / chunkNum;
+            int lastChunk = mailItems.Count() - (chunkSize * (chunkNum -1));
+            List<Task> tasks = [];
+            
+            for (int i = 0; i < chunkSize; i++)
             {
-                var info = new MailItemInfo(mailItem);
-                info.LoadAll(_globals.Ol.EmailPrefixToStrip);
-                return info;
-            }).WithProgressReporting(count,(x)=>progress.Report(x)).ToList();
+                tasks.Add(Task.Factory.StartNew(() => 
+                {
+                    var chunk = (i == chunkSize) ? lastChunk : chunkSize;
+                    var chunkEnd = (i == chunkSize) ? mailItems.Count() : chunkSize * (i + 1);
+                    
+                    for (int j = chunkSize * i; j < chunkEnd; j++)
+                    {
+                        try
+                        {
+                            var mailInfo = new MailItemInfo(mailItems[j]);
+                            mailInfo.LoadAll(_globals.Ol.EmailPrefixToStrip);
+                            mailInfo.LoadTokens();
+                            var minedInfo = new MinedMailInfo(mailInfo);
+                            var obj = JsonConvert.SerializeObject(minedInfo);
+                            mailInfoCollection.Add(minedInfo);
+                            Interlocked.Increment(ref complete);
+                        }
+                        catch (System.Exception)
+                        {
+                            logger.Debug($"Skipping MailItem from {mailItems[j].SentOn} in folder {((Folder)mailItems[j].Parent).FolderPath}");                            
+                        }                        
+                    }
+                }, 
+                token, TaskCreationOptions.LongRunning, TaskScheduler.Default));
+            }
+            
+            //var chunkTasks = Enumerable.Range(0, 100).Select(i => Task.Factory.StartNew(() =>
+            //{
+            //    var chunk = (i == 99) ? lastChunk : chunkSize;
+            //    var mailInfoEnum = mailItems.Skip(i * chunkSize)
+            //                            .Take(chunk)
+            //                            .Select(x => 
+            //                            { 
+            //                                var mailInfo = new MailItemInfo(x);
+            //                                mailInfo.LoadAll(_globals.Ol.EmailPrefixToStrip);
+            //                                mailInfo.LoadTokens();
+            //                                Interlocked.Increment(ref complete);
+            //                                return mailInfo; 
+            //                            }).ToArray();
+            //    return mailInfoEnum;
+            //}, token, TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray();
+
+            //$"Creating MailItem Info {complete.ToString("N0")} of {count:N0} ({(complete > 0 ? psw.Elapsed.TotalSeconds / complete : 0).ToString("N0")} seconds per mail)"),
+
+            
+            //MailItemInfo[][] jagged;
+            
+            using (new System.Threading.Timer(_ => progress.Report(
+                (int)(((double)complete / count) * 100), 
+                $"Creating MailItem Info {complete} of {count}"), 
+                null, 0, 500))
+            {
+                //jagged = await Task.WhenAll(chunkTasks);
+                await Task.WhenAll(tasks);
+            }
+
+            //MailItemInfo[] result = [];
+            //jagged.ForEach(x => result = result.Concat(x).ToArray());
+            //var minedInfo = result.Select(x => new MinedMailInfo(x)).ToList();
+            //ScoCollection<MinedMailInfo> mailInfoCollection = new ScoCollection<MinedMailInfo>(minedInfo);
+            
+            mailInfoCollection.Serialize();
 
             progress.Report(100);
-            //var mailInfoTasks = mailItems.Select(x => MailItemInfo
-            //    .FromMailItemAsync(x, _globals.Ol.EmailPrefixToStrip, token, true));
-                
-            //var tokenizeTasks = mailInfoTasks.Select(task => task.ContinueWith(x => x.Result.TokenizeAsync()));
-                //.ContinueWith(info => info.Result.TokenizeAsync()));
-
-            //var mailInfoItems = (await Task.WhenAll(mailInfoTasks)).ToList();
-            //var l = await Task.WhenAll(await Task.WhenAll(tokenizeTasks));
             
-                        
+                                    
         }
 
+    }
+
+    public class MinedMailInfo 
+    {
+        public MinedMailInfo(MailItemInfo info) 
+        {
+            Categories = info.Item.Categories;
+            Tokens = info.Tokens.ToArray();
+            FolderPath = info.Folder;
+            ToRecipients = info.ToRecipients.ToArray();
+            CcRecipients = info.CcRecipients.ToArray();
+            Sender = info.Sender;
+            ConversationId = info.Item.ConversationID;
+        }
+
+        private string _categories;
+        public string Categories { get => _categories; set => _categories = value; }
+        
+        private string[] _tokens;
+        public string[] Tokens { get => _tokens; set => _tokens = value; }
+        
+        public string _folderPath;
+        public string FolderPath { get => _folderPath; set => _folderPath = value; }
+        
+        private RecipientInfo[] _toRecipients;
+        public RecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }
+        
+        private RecipientInfo[] _ccRecipients;
+        public RecipientInfo[] CcRecipients { get => _ccRecipients; set => _ccRecipients = value; }
+        
+        private RecipientInfo _sender;
+        public RecipientInfo Sender { get => _sender; set => _sender = value; }
+        
+        private string _conversationId;
+        public string ConversationId { get => _conversationId; set => _conversationId = value; }
     }
 }

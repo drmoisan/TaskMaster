@@ -142,9 +142,10 @@ namespace UtilitiesCS.EmailIntelligence
 
             foreach (var (field, value) in addrlist)
             {
-                yield return $"{field}:name:{value.Name.ToLower()}";
+                yield return $"{field}:name:{value?.Name?.ToLower() ?? "empty"}";
                 
-                foreach (var w in value.Address.ToLower().Split('@'))
+                var address = value?.Address?.ToLower() ?? "";
+                foreach (var w in address.Split('@'))
                     yield return $"{field}:addr:{w}";
             }
 
@@ -166,7 +167,7 @@ namespace UtilitiesCS.EmailIntelligence
             
             if (SpamBayesOptions.summarize_email_prefixes) 
             {
-                if (all_addrs is null) { all_addrs = addrlist.Select(x => x.value.Address.ToLower()); }
+                if (all_addrs is null) { all_addrs = addrlist.Select(x => x.value?.Address?.ToLower() ?? ""); }
 
                 if (all_addrs.Count() > 1)
                 {

@@ -68,22 +68,9 @@ namespace UtilitiesCS
         private Task _addTask; 
         private void NonBlockingConsumer_Add(CancellationToken ct) 
         {
-            while (!_bc.IsCompleted)
+            foreach (T item in _bc.GetConsumingEnumerable(ct))
             {
-                try
-                {
-                    if (_bc.TryTake(out T nextItem, 0, ct))
-                    {
-                        AddThreadsafe(nextItem);
-                    }
-                }
-
-                catch (OperationCanceledException)
-                {
-                    Console.WriteLine("Taking canceled.");
-                    break;
-                }
-                
+                AddThreadsafe(item);
             }
         }
     }

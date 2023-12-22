@@ -88,7 +88,7 @@ namespace UtilitiesCS //QuickFiler
             CancellationToken token, 
             bool loadAll)
         {
-            TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
+            //TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
 
             token.ThrowIfCancellationRequested();
 
@@ -404,8 +404,17 @@ namespace UtilitiesCS //QuickFiler
             return (string)Item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001F/");
         }
 
-        public IEnumerable<string> Tokens { get => _tokens ?? Tokenizer.tokenize(this); private set => _tokens = value; }
+        public IEnumerable<string> Tokens 
+        { 
+            get => Initializer.GetOrLoad(ref _tokens, LoadTokens); 
+            private set => _tokens = value; 
+        }
         private IEnumerable<string> _tokens;
+        public IEnumerable<string> LoadTokens() 
+        {
+            _tokens = Tokenizer.tokenize(this);
+            return _tokens;
+        }
         public async Task<IEnumerable<string>> TokenizeAsync()
         {
             _tokens = await Task.Run(() => Tokenizer.tokenize(this));
@@ -432,7 +441,7 @@ namespace UtilitiesCS //QuickFiler
 
         internal static string CompressPlainText(string text, string emailPrefixToStrip)
         {
-            return CompressPlainText(text, IMailItemInfo.PlainTextOptionsEnum.StripAll, emailPrefixToStrip);
+            return CompressPlainText(text ?? "", IMailItemInfo.PlainTextOptionsEnum.StripAll, emailPrefixToStrip ?? "");
         }
 
         internal static string CompressPlainText(string text, IMailItemInfo.PlainTextOptionsEnum options, string emailPrefixToStrip)

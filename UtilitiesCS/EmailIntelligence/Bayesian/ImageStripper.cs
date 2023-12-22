@@ -51,7 +51,7 @@ namespace UtilitiesCS.EmailIntelligence
 
             if (parts.Count == 0)
             {
-                logger.Debug("No images to analyze");
+                //logger.Debug("No images to analyze");
                 return ("", new HashSet<string>());
             }
 

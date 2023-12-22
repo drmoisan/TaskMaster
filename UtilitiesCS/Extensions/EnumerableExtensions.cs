@@ -149,5 +149,19 @@ namespace UtilitiesCS
             }
         }
 
+
+        public static Tuple<IEnumerable<T>, IEnumerable<U>> Unzip<T, U>(this IEnumerable<(T, U)> source)
+        {
+            var first = new List<T>();
+            var second = new List<U>();
+
+            foreach (var item in source)
+            {
+                first.Add(item.Item1);
+                second.Add(item.Item2);
+            }
+
+            return new Tuple<IEnumerable<T>, IEnumerable<U>>(first, second);
+        }
     }
 }
