@@ -243,6 +243,16 @@ namespace UtilitiesCS.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] StatusInProgress {
+            get {
+                object obj = ResourceManager.GetObject("StatusInProgress", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] wb {
             get {
                 object obj = ResourceManager.GetObject("wb", resourceCulture);

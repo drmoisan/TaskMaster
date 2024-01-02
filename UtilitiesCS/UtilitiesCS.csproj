@@ -395,10 +395,16 @@
       <DependentUpon>DvgForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HelperClasses\MyFileSystemInfo.cs" />
-    <Compile Include="HelperClasses\ProgressViewer.cs">
+    <Compile Include="Threading\ProgressMultiStepViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="HelperClasses\ProgressViewer.Designer.cs">
+    <Compile Include="Threading\ProgressMultiStepViewer.Designer.cs">
+      <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Threading\ProgressViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Threading\ProgressViewer.Designer.cs">
       <DependentUpon>ProgressViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="HelperClasses\QfcTipsDetails.cs" />
@@ -437,7 +443,7 @@
     <Compile Include="HelperClasses\MergeSortImplementations.cs" />
     <Compile Include="HelperClasses\OlItemSummary.cs" />
     <Compile Include="HelperClasses\PrettyPrint.cs" />
-    <Compile Include="HelperClasses\ProgressTracker.cs" />
+    <Compile Include="Threading\ProgressTracker.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
     <Compile Include="HelperClasses\TableLayoutHelper.cs" />
     <Compile Include="HelperClasses\Theme.cs" />
@@ -594,7 +600,10 @@
       <DependentUpon>DvgForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="HelperClasses\ProgressViewer.resx">
+    <EmbeddedResource Include="Threading\ProgressMultiStepViewer.resx">
+      <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Threading\ProgressViewer.resx">
       <DependentUpon>ProgressViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -651,6 +660,7 @@
     <Content Include="Resources\SortByType.svg" />
     <Content Include="Resources\StatusExcluded.10.10.svg" />
     <Content Include="Resources\StatusHelp.13.13.svg" />
+    <None Include="Resources\StatusInProgress.svg" />
     <Content Include="Resources\StatusWarning.12.12.svg" />
     <Content Include="Resources\TeamProjectRepositoryFolder.svg" />
     <Content Include="Resources\TestCoveredPassing.svg" />

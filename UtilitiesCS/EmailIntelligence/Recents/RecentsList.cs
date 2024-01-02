@@ -13,28 +13,28 @@ namespace UtilitiesCS
         public RecentsList() : base() 
         {
             _ct = _cts.Token;
-            _addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
+            //_addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
         }
         
         public RecentsList(List<T> listOfT, int max) : base(listOfT) 
         { 
             Max = max;
             _ct = _cts.Token;
-            _addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
+            //_addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
         }
         
         public RecentsList(IEnumerable<T> IEnumerableOfT, int max) : base(IEnumerableOfT) 
         { 
             Max = max;
             _ct = _cts.Token;
-            _addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
+            //_addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
         }
         
         public RecentsList(string filename, string folderpath, int max) : base(filename, folderpath) 
         { 
             Max = max;
             _ct = _cts.Token;
-            _addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
+            //_addTask = Task.Run(() => NonBlockingConsumer_Add(_ct), _ct);
         }
 
         private int _max = 5;

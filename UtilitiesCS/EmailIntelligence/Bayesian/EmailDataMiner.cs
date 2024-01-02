@@ -86,7 +86,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
         {
             //var progress = new ProgressTracker(tokenSource);
-            List<MailItem> mailItems = null;
+            //List<MailItem> mailItems = null;
             IEnumerable<MailItem> mailItemsQuery = null;
 
             await Task.Factory.StartNew(() =>
@@ -128,8 +128,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
 
-            _sw = new SegmentStopWatch();
-            _sw.Start();
+            //_sw = new SegmentStopWatch();
+            //_sw.Start();
 
             var mailItems = await ScrapeEmails(tokenSource);
 
