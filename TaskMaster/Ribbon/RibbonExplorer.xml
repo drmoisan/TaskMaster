@@ -51,6 +51,7 @@
                     <button id="ShowSubjectMapMetrics" imageMso="Filter" onAction="ShowSubjectMapMetrics_Click" label="Show Subject Map Metrics" />
                     <button id="TokenizeEmail" imageMso="Filter" onAction="TokenizeEmail_Click" label="Tokenize Email" />
                     <button id="MineEmails" imageMso="Filter" onAction="MineEmails_Click" label="Mine Emails" />
+                    <button id="BuildClassifier" imageMso="Filter" onAction="BuildClassifier_Click" label="Build Classifier" />
                   </menu> 
                 </menu>  
               </group>

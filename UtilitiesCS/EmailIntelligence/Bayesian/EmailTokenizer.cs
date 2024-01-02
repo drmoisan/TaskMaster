@@ -64,14 +64,16 @@ namespace UtilitiesCS.EmailIntelligence
         private Regex urlsep_re = new Regex(@"[;?:@&=+,$.]");
         private Regex date_hms_re = new Regex(@"(?'hour'[0-9][0-9]):(?'minute'[0-9][0-9])(?::[0-9][0-9])? ");
         private Regex subject_word_re = new Regex(@"[\w\x80-\xff$.%]+");
-        private Regex punctuation_run_re = new Regex(@"\W+");
+        //private Regex punctuation_run_re = new Regex(@"\W+"); // original eliminated because it captures white spaces and needs to start with 2 consecutive to be a run
+        private Regex punctuation_run_re = new Regex(@"\p{P}{2,}");
         private Regex numeric_entity_re = new Regex(@"&#(\d+);");
         private Regex virus_re = new Regex(@"""
     < /? \s* (?: script | iframe) \b
 |   \b src= ['""]? cid:
 |   \b (?: height | width) = ['""]? 0
 """, RegexOptions.Compiled);
-        private Regex whitespace_split_re = new Regex(@"\s+");
+        //private Regex whitespace_split_re = new Regex(@"\s+"); // original. Doesn't eliminate punctuation from tokens
+        private Regex whitespace_split_re = new Regex(@"\p{P}*\s+");
 
         private string[] date_formats = new string[]
         {
@@ -112,14 +114,16 @@ namespace UtilitiesCS.EmailIntelligence
             // Don't ignore case in Subject lines; e.g., 'free' versus 'FREE' is
             // especially significant in this context.  Experiment showed a small
             // but real benefit to keeping case intact in this specific context.
-            
-            foreach (var w in subject_word_re.Matches(msg.Subject))
+
+            var matches = subject_word_re.Matches(msg.Subject);
+            foreach (var w in matches)
             {
                 foreach (var t in tokenize_word(w.ToString()))
                     yield return "subject:" + t;
             }
 
-            foreach (var w in punctuation_run_re.Matches(msg.Subject))
+            matches = punctuation_run_re.Matches(msg.Subject);
+            foreach (var w in matches)
             {
                 yield return "subject:"+ w;
             }
@@ -144,7 +148,7 @@ namespace UtilitiesCS.EmailIntelligence
             {
                 yield return $"{field}:name:{value?.Name?.ToLower() ?? "empty"}";
                 
-                var address = value?.Address?.ToLower() ?? "";
+                var address = value?.Address?.ToLower() ?? "empty";
                 foreach (var w in address.Split('@'))
                     yield return $"{field}:addr:{w}";
             }

@@ -146,5 +146,8 @@
     <Setting Name="File_ClassifierManager" Type="System.String" Scope="User">
       <Value Profile="(Default)">999999ClassifierManager.json</Value>
     </Setting>
+    <Setting Name="FileName_EmailInfoStaging" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999emailInfo.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

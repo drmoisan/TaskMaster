@@ -73,9 +73,8 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError)
         {
-            var disk = new FilePathHelper(fileName, folderPath);
-            Deserialize(disk, askUserOnError);
-            return new ScDictionary<TKey, TValue>();
+            var disk = new FilePathHelper(fileName, folderPath);            
+            return Deserialize(disk, askUserOnError);
         }
 
         internal static ScDictionary<TKey, TValue> Deserialize(FilePathHelper disk, bool askUserOnError)
@@ -91,6 +90,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     throw new InvalidOperationException($"{disk.FilePath} deserialized to null.");
                 }
+                
             }
             catch (FileNotFoundException e)
             {
@@ -111,6 +111,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 writeDictionary = true;
             }
 
+            dictionary.FilePath = disk.FilePath;
             if (writeDictionary)
             {
                 dictionary.Serialize();

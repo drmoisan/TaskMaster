@@ -48,16 +48,19 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// A list of words that show tend to show up in Spam text
         /// </summary>
         private Corpus _negative;
+        public Corpus Negative => _negative;
 
         /// <summary>
         /// A list of words that tend to show up in non-spam text
         /// </summary>
         private Corpus _positive;
+        public Corpus Positive => _positive;
 
         /// <summary>
         /// A list of probabilities that the given word might appear in a Spam text
         /// </summary>
         private ConcurrentDictionary<string, double> _prob;
+        public ConcurrentDictionary<string, double> Prob => _prob;
 
         #endregion private fields
 
@@ -85,7 +88,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public void AddTokens(IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
         {
             _positive.AddOrIncrementTokens(positiveTokens);
+            _nPositive = _positive.TokenCounts.Values.Sum();
             _negative.AddOrIncrementTokens(negativeTokens);
+            _nNegative = _negative.TokenCounts.Values.Sum();
 
             positiveTokens.Concat(negativeTokens).Distinct().ForEach(UpdateTokenProbability);
         }
@@ -145,6 +150,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 double prob = Math.Max(Knobs.MinScore,
                               Math.Min(Knobs.MaxScore, badfactor / (goodfactor + badfactor)));
 
+                
                 // special case for Spam-only tokens.
                 // .9998 for tokens only found in spam, or .9999 if found more than 10 times
                 if (g == 0)

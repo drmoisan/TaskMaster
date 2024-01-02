@@ -586,5 +586,17 @@ namespace TaskMaster.Properties {
                 this["File_ClassifierManager"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9999999emailInfo.json")]
+        public string FileName_EmailInfoStaging {
+            get {
+                return ((string)(this["FileName_EmailInfoStaging"]));
+            }
+            set {
+                this["FileName_EmailInfoStaging"] = value;
+            }
+        }
     }
 }

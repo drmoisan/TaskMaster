@@ -329,6 +329,7 @@
     <Compile Include="EmailIntelligence\Bayesian\ConvertedSpamBayesTokenizer.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusInherit.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\MinedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusExample.cs" />
@@ -363,7 +364,7 @@
     <Compile Include="EmailIntelligence\FolderRemap\FolderSelector.Designer.cs">
       <DependentUpon>FolderSelector.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmailIntelligence\RebuildIntelligence\EmailDataMiner.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\EmailDataMiner.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\CommonWords.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidence.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidenceList.cs" />

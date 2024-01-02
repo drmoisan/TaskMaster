@@ -182,6 +182,7 @@ namespace TaskMaster
         public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.ShowSubjectMapMetrics();
         public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.TryTokenizeEmail();
         public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.TryMineEmails();
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.TryBuildClassifier();
         #endregion
 
         #region Helpers

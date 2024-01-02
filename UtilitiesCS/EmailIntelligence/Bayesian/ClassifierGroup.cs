@@ -42,7 +42,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return results;
         }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         public Func<object, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
         private Func<object, IEnumerable<string>> _tokenizer;
 

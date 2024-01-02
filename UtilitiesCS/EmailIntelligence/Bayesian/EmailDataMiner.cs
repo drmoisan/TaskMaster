@@ -12,7 +12,7 @@ using UtilitiesCS.HelperClasses;
 using System.Windows;
 using Newtonsoft.Json;
 
-namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
+namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
     public class EmailDataMiner
     {
@@ -81,36 +81,39 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
 
             return mailList;
         }
-                
-        public async Task<List<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
+
+        //public async Task<List<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
+        public async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
         {
-            var progress = new ProgressTracker(tokenSource);
+            //var progress = new ProgressTracker(tokenSource);
             List<MailItem> mailItems = null;
+            IEnumerable<MailItem> mailItemsQuery = null;
 
             await Task.Factory.StartNew(() =>
             {
                 // Query List of Outlook Folders if they are not on the skip list
-                progress.Report(0, "Building Outlook Folder Tree");
+                //progress.Report(0, "Building Outlook Folder Tree");
                 var tree = GetOlFolderTree();
                 _sw.LogDuration(nameof(GetOlFolderTree));
-                progress.Increment(2);
+                //progress.Increment(2);
 
                 var folders = QueryOlFolders(tree);
                 _sw.LogDuration(nameof(QueryOlFolders));
 
                 // Query MailItems from these folders
-                var mailItemsQuery = QueryMailItems(folders);
+                mailItemsQuery = QueryMailItems(folders);
                 _sw.LogDuration(nameof(QueryMailItems));
 
-                // Load to memory
-                mailItems = LinqToSimpleEmailList(folders, mailItemsQuery, progress);
-                _sw.LogDuration(nameof(LinqToSimpleEmailList));
+                //// Load to memory
+                //mailItems = LinqToSimpleEmailList(folders, mailItemsQuery, progress);
+                //_sw.LogDuration(nameof(LinqToSimpleEmailList));
 
             }, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-            progress.Report(100);
+            //progress.Report(100);
 
-            return mailItems;
+            //return mailItems;
+            return mailItemsQuery;
         }
 
 
@@ -155,23 +158,27 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
             ScoCollection<MinedMailInfo> mailInfoCollection = [];
             mailInfoCollection.FilePath = "C:\\Temp\\emailInfo.json";
 
-            int chunkNum = 100;
+            int chunkNum = 15;
             int chunkSize = mailItems.Count() / chunkNum;
             int lastChunk = mailItems.Count() - (chunkSize * (chunkNum -1));
             List<Task> tasks = [];
             
-            for (int i = 0; i < chunkSize; i++)
+            //var chunks = mailItems.Chunk(chunkSize);
+
+            //foreach (var c in chunks)
+            for (int i = 0; i < chunkNum; i++)
             {
+                //await Task.Factory.StartNew(() =>
                 tasks.Add(Task.Factory.StartNew(() => 
                 {
-                    var chunk = (i == chunkSize) ? lastChunk : chunkSize;
-                    var chunkEnd = (i == chunkSize) ? mailItems.Count() : chunkSize * (i + 1);
-                    
-                    for (int j = chunkSize * i; j < chunkEnd; j++)
+                    //foreach (var mailItem in c)
+                    var endIter = i == (chunkNum - 1) ? mailItems.Count() : chunkSize * (chunkNum + 1);
+                    for (int j = chunkNum*chunkSize; j < endIter; j++)
                     {
+                        var mailItem = mailItems.ElementAt(j);
                         try
                         {
-                            var mailInfo = new MailItemInfo(mailItems[j]);
+                            var mailInfo = new MailItemInfo(mailItem);
                             mailInfo.LoadAll(_globals.Ol.EmailPrefixToStrip);
                             mailInfo.LoadTokens();
                             var minedInfo = new MinedMailInfo(mailInfo);
@@ -181,12 +188,40 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
                         }
                         catch (System.Exception)
                         {
-                            logger.Debug($"Skipping MailItem from {mailItems[j].SentOn} in folder {((Folder)mailItems[j].Parent).FolderPath}");                            
-                        }                        
+                            logger.Debug($"Skipping MailItem from {mailItem.SentOn} in folder {((Folder)mailItem.Parent).FolderPath}");
+                        }
                     }
-                }, 
+                },
                 token, TaskCreationOptions.LongRunning, TaskScheduler.Default));
             }
+
+            //for (int i = 0; i < chunkSize; i++)
+            //{
+            //    tasks.Add(Task.Factory.StartNew(() => 
+            //    {
+            //        var chunk = (i == chunkSize) ? lastChunk : chunkSize;
+            //        var chunkEnd = (i == chunkSize) ? mailItems.Count() : chunkSize * (i + 1);
+                    
+            //        for (int j = chunkSize * i; j < chunkEnd; j++)
+            //        {
+            //            try
+            //            {
+            //                var mailInfo = new MailItemInfo(mailItems[j]);
+            //                mailInfo.LoadAll(_globals.Ol.EmailPrefixToStrip);
+            //                mailInfo.LoadTokens();
+            //                var minedInfo = new MinedMailInfo(mailInfo);
+            //                var obj = JsonConvert.SerializeObject(minedInfo);
+            //                mailInfoCollection.Add(minedInfo);
+            //                Interlocked.Increment(ref complete);
+            //            }
+            //            catch (System.Exception)
+            //            {
+            //                logger.Debug($"Skipping MailItem from {mailItems[j].SentOn} in folder {((Folder)mailItems[j].Parent).FolderPath}");                            
+            //            }                        
+            //        }
+            //    }, 
+            //    token, TaskCreationOptions.LongRunning, TaskScheduler.Default));
+            //}
             
             //var chunkTasks = Enumerable.Range(0, 100).Select(i => Task.Factory.StartNew(() =>
             //{
@@ -230,40 +265,57 @@ namespace UtilitiesCS.EmailIntelligence.RebuildIntelligence
                                     
         }
 
-    }
-
-    public class MinedMailInfo 
-    {
-        public MinedMailInfo(MailItemInfo info) 
+        public async Task<ScoCollection<MinedMailInfo>> LoadStaging() 
         {
-            Categories = info.Item.Categories;
-            Tokens = info.Tokens.ToArray();
-            FolderPath = info.Folder;
-            ToRecipients = info.ToRecipients.ToArray();
-            CcRecipients = info.CcRecipients.ToArray();
-            Sender = info.Sender;
-            ConversationId = info.Item.ConversationID;
+            _mailInfoCollection = await Task.Run(
+                () => new ScoCollection<MinedMailInfo>(
+                    _globals.FS.Filenames.EmailInfoStagingFile,
+                    _globals.FS.FldrPythonStaging));
+            
+            return _mailInfoCollection;
         }
 
-        private string _categories;
-        public string Categories { get => _categories; set => _categories = value; }
-        
-        private string[] _tokens;
-        public string[] Tokens { get => _tokens; set => _tokens = value; }
-        
-        public string _folderPath;
-        public string FolderPath { get => _folderPath; set => _folderPath = value; }
-        
-        private RecipientInfo[] _toRecipients;
-        public RecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }
-        
-        private RecipientInfo[] _ccRecipients;
-        public RecipientInfo[] CcRecipients { get => _ccRecipients; set => _ccRecipients = value; }
-        
-        private RecipientInfo _sender;
-        public RecipientInfo Sender { get => _sender; set => _sender = value; }
-        
-        private string _conversationId;
-        public string ConversationId { get => _conversationId; set => _conversationId = value; }
+        private ScoCollection<MinedMailInfo> _mailInfoCollection;
+
+        public async Task BuildClassifierAsync() 
+        {
+            var collection = await LoadStaging();
+            
+            var tree = GetOlFolderTree();
+            var folders = QueryOlFolders(tree).ToList();
+            var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
+
+            var group = new ClassifierGroup();
+
+            //foreach (var folderPath in folderPaths)
+            //{
+            //    var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+            //    var negativeTokens = collection.Where(x => x.FolderPath != folderPath).SelectMany(x => x.Tokens).ToList();
+            //    if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
+            //        group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
+            //}
+
+            var tasks = folderPaths.Select(folderPath => 
+            {
+                return Task.Run(() =>
+                {
+                    var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+                    var negativeTokens = collection.Where(x => x.FolderPath != folderPath).SelectMany(x => x.Tokens).ToList();
+                    if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
+                        group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
+                });
+            });
+
+            await Task.WhenAll(tasks); 
+
+            var success = _globals.AF.Manager.TryAdd("Folder", group);
+            if (!success) { throw new System.InvalidOperationException("Failed to add ClassifierGroup"); }
+
+            _globals.AF.Manager.Serialize();
+            //var classifier = new BayesianClassifier();
+            
+        }
+
     }
+
 }

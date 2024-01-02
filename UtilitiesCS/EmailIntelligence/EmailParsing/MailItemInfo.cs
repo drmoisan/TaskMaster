@@ -201,10 +201,10 @@ namespace UtilitiesCS //QuickFiler
         public void LoadRecipients()
         {
             RecipientsLoaded = Enums.LoadState.Loading;
-            _toRecipients = _item.GetToRecipients().GetInfo();
+            _toRecipients = _item.GetToRecipients().GetInfo().ToArray();
             _toRecipientsName = string.Join("; ",_toRecipients.Select(t => t.Name));
             _toRecipientsHtml = string.Join("; ", _toRecipients.Select(t => t.Html));
-            _ccRecipients = _item.GetCcRecipients().GetInfo();
+            _ccRecipients = _item.GetCcRecipients().GetInfo().ToArray();
             _ccRecipientsName = string.Join("; ", _ccRecipients.Select(t => t.Name));
             _ccRecipientsHtml = string.Join("; ", _ccRecipients.Select(t => t.Html));
             RecipientsLoaded = Enums.LoadState.Loaded;
@@ -345,8 +345,8 @@ namespace UtilitiesCS //QuickFiler
             set { _ccRecipientsName = value; NotifyPropertyChanged(); }
         }
 
-        private IEnumerable<RecipientInfo> _ccRecipients;
-        public IEnumerable<RecipientInfo> CcRecipients => RecipientsInitialized(ref _ccRecipients, default);
+        private RecipientInfo[] _ccRecipients;
+        public RecipientInfo[] CcRecipients => RecipientsInitialized(ref _ccRecipients, default);
 
         private string _toRecipientsHtml;
         public string ToRecipientsHtml 
@@ -362,8 +362,8 @@ namespace UtilitiesCS //QuickFiler
             set { _toRecipientsName = value; NotifyPropertyChanged(); }
         }
 
-        private IEnumerable<RecipientInfo> _toRecipients;
-        public IEnumerable<RecipientInfo> ToRecipients => RecipientsInitialized(ref _toRecipients, default); 
+        private RecipientInfo[] _toRecipients;
+        public RecipientInfo[] ToRecipients => RecipientsInitialized(ref _toRecipients, default); 
         
         private string _triage;
         public string Triage { get => Initialized(ref _triage); set => _triage = value; }
@@ -404,20 +404,20 @@ namespace UtilitiesCS //QuickFiler
             return (string)Item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001F/");
         }
 
-        public IEnumerable<string> Tokens 
+        public string[] Tokens 
         { 
             get => Initializer.GetOrLoad(ref _tokens, LoadTokens); 
             private set => _tokens = value; 
         }
-        private IEnumerable<string> _tokens;
-        public IEnumerable<string> LoadTokens() 
+        private string[] _tokens;
+        public string[] LoadTokens() 
         {
-            _tokens = Tokenizer.tokenize(this);
+            _tokens = Tokenizer.tokenize(this).ToArray();
             return _tokens;
         }
         public async Task<IEnumerable<string>> TokenizeAsync()
         {
-            _tokens = await Task.Run(() => Tokenizer.tokenize(this));
+            _tokens = await Task.Run(() => Tokenizer.tokenize(this).ToArray());
             return _tokens;
         }
 

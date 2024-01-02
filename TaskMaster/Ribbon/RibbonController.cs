@@ -316,8 +316,17 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var miner = new UtilitiesCS.EmailIntelligence.RebuildIntelligence.EmailDataMiner(_globals);
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
             await miner.MineEmails();
+        }
+
+        internal async Task TryBuildClassifier()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
+            await miner.BuildClassifierAsync();
         }
     }
 }

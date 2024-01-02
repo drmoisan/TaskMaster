@@ -145,7 +145,7 @@ namespace Expat.Bayesian
         {
             _prob = new SortedDictionary<string, double>();
 
-            _ngood = _good.Tokens.Count;
+            _ngood = _good.Tokens.Count; // this is inconsistent with Paul Graham who uses email count vs token couny
             _nbad = _bad.Tokens.Count;
             foreach (string token in _good.Tokens.Keys)
             {

@@ -36,7 +36,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public Enums.Corpus Indicator { get => _indicator; set => _indicator = value; }
         private Enums.Corpus _indicator;
 
-        public void AddOrIncrementToken(string token) => TokenCounts.AddOrUpdate(token, 1, (key, count) => count++);
+        public void AddOrIncrementToken(string token) => TokenCounts.AddOrUpdate(token, 1, (key, count) => ++count);
 
         public void AddOrIncrementTokens(IEnumerable<string> tokens) => tokens.ForEach(AddOrIncrementToken);
 

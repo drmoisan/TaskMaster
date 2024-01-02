@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
@@ -25,5 +26,6 @@ namespace UtilitiesCS
         System.Action MaximizeQuickFileWindow { get; set; }
         ScoStack<IMovedMailInfo> MovedMails { get; }
         ScoCollection<FilterEntry> Filters { get; }
+        ScDictionary<string, ClassifierGroup> Manager { get; }
     }
 }
