@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
@@ -27,5 +28,8 @@ namespace UtilitiesCS
         ScoStack<IMovedMailInfo> MovedMails { get; }
         ScoCollection<FilterEntry> Filters { get; }
         ScDictionary<string, ClassifierGroup> Manager { get; }
+        ProgressTrackerPane ProgressTracker { get; }
+        Microsoft.Office.Tools.CustomTaskPane ProgressPane { get; }
+        CancellationToken CancelLoad { get; }
     }
 }

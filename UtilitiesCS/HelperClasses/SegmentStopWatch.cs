@@ -16,30 +16,75 @@ namespace UtilitiesCS.HelperClasses
         public SegmentStopWatch() { }
 
         private Stopwatch _stopwatch = new Stopwatch();
-        private long _latestElapsed = 0L;
-        private Stack<(string ActionName, long Duration)> _durations = new();
+        private TimeSpan _latestElapsed = default;
+        
+        private Stack<(string ActionName, TimeSpan Duration)> _durations = new();
+        public Stack<(string ActionName, TimeSpan Duration)> Durations => _durations;
 
-        public void Start() => _stopwatch.Start();
+        public SegmentStopWatch Start() 
+        { 
+            _stopwatch.Start(); 
+            return this;
+        }
+        
+        public SegmentStopWatch Stop()
+        {
+            _stopwatch.Stop();
+            return this;
+        }
+
+        public TimeSpan Elapsed => _stopwatch.Elapsed;
 
         public void LogDuration(string actionName)
         {
-            long duration = _stopwatch.ElapsedMilliseconds - _latestElapsed;
+            TimeSpan duration = _stopwatch.Elapsed - _latestElapsed;
+            _latestElapsed = _stopwatch.Elapsed;
             _durations.Push((actionName, duration));
         }
 
-        public void WriteDurationsToLog()
+        public Stack<(string ActionName, TimeSpan Duration)> GroupByActionName(bool inplace = false) 
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("\nDurations");
-            sb.AppendLine("---------");
-            while (_durations.Count > 0)
+            var grouped = _durations
+                .Reverse()
+                .GroupBy(x => x.ActionName)
+                .Select(group => 
+                { 
+                    var actionName = group.Key;
+                    var duration = TimeSpan.FromTicks(group.Sum(x => x.Duration.Ticks));
+                    return (ActionName: actionName, Duration: duration);
+                })
+                .ToStack();
+            if (inplace)
             {
-                var (actionName, duration) = _durations.Pop();
-                sb.AppendLine($"{actionName}: {duration}");
+                _durations = grouped;
+                return null;
             }
-            logger.Debug(sb.ToString());
-            _latestElapsed = 0;
+            else
+            {
+                return grouped;
+            }
         }
 
+        public string GetDurations([CallerMemberName] string methodName = "")
+        {
+            _durations.Push(("TOTAL", _stopwatch.Elapsed));
+            var durs = _durations
+                .Reverse()
+                .Select(x => new[] 
+                //{ x.Duration.ToString("c"), x.ActionName })
+                { x.Duration.ToString("%m\\:ss\\.ff"), x.ActionName })
+                .ToArray();
+
+            var text = durs.ToFormattedText(["Duration", "Action"], $"SEGMENT DURATIONS {methodName.ToUpper()}");
+            return text;
+        }
+
+        public void WriteToLog([CallerMemberName] string methodName = "", bool clear = true)
+        {
+            var text = GetDurations(methodName);
+            if (clear) 
+            { _durations.Clear(); }
+            logger.Info($"\n{text}");
+        }
     }
 }

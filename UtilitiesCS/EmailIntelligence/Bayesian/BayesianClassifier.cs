@@ -9,6 +9,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using Newtonsoft.Json;
+using System.Runtime.Serialization;
+using System.Threading;
+using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -18,6 +22,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     /// </summary>
     public class BayesianClassifier
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Constructors
 
         public BayesianClassifier() { }
@@ -37,6 +44,57 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             Load(positiveTokens, negativeTokens);
         }
 
+        private BayesianClassifier(string tag, Corpus positive, Corpus negative, Corpus tokenBase)
+        {
+            _tag = tag;
+            _positive = positive;
+            _nPositive = positive.TokenCounts.Values.Sum();
+            _negative = negative;
+            _nNegative = negative.TokenCounts.Values.Sum();
+            TokenBase = tokenBase;
+            _prob = new ConcurrentDictionary<string, double>();
+            TokenBase.TokenCounts.Keys.ForEach(UpdateTokenProbability);
+        }
+
+        public static BayesianClassifier FromTokenBase(
+            Corpus tokenBase,
+            string tag, 
+            IEnumerable<string> positiveTokens)
+        {
+            
+            var positive = new Corpus(positiveTokens);
+            var negative = tokenBase - positive;
+            var classifier = new BayesianClassifier(tag, positive, negative, tokenBase);
+
+            return classifier;
+        }
+
+        public static async Task<BayesianClassifier> FromTokenBaseAsync(
+            Corpus tokenBase,
+            string tag,
+            IEnumerable<string> positiveTokens,
+            CancellationToken token)
+        {
+            var classifier = new BayesianClassifier();
+            await Task.Factory.StartNew(
+                () => 
+                {
+                    var positive = new Corpus(positiveTokens);
+                    var negative = tokenBase - positive;
+                    classifier.Tag = tag;
+                    classifier.Positive = positive;
+                    classifier._nPositive = positive.TokenCounts.Values.Sum();
+                    classifier.Negative = negative;
+                    classifier._nNegative = negative.TokenCounts.Values.Sum();
+                    classifier.TokenBase = tokenBase;
+                    classifier._prob = new ConcurrentDictionary<string, double>();
+                    tokenBase.TokenCounts.Keys.ForEach(classifier.UpdateTokenProbability);
+                }, 
+                token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            
+            return classifier;
+        }
+
         #endregion Constructors
 
         #region private fields
@@ -44,32 +102,40 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private int _nPositive;
         private int _nNegative;
 
+        #endregion private fields
+
+        #region public properties
+
+        [JsonIgnore]
+        public bool Loaded { get => _loaded; private set => _loaded = value; }
+        private bool _loaded = false;
+
         /// <summary>
         /// A list of words that show tend to show up in Spam text
         /// </summary>
+        [JsonIgnore]
+        public Corpus Negative { get => _negative; private set => _negative = value; }
         private Corpus _negative;
-        public Corpus Negative => _negative;
 
         /// <summary>
         /// A list of words that tend to show up in non-spam text
         /// </summary>
+        public Corpus Positive { get => _positive; set => _positive = value; }
         private Corpus _positive;
-        public Corpus Positive => _positive;
 
         /// <summary>
         /// A list of probabilities that the given word might appear in a Spam text
         /// </summary>
+        [JsonProperty]
+        public ConcurrentDictionary<string, double> Prob { get => _prob; private set => _prob = value; }
         private ConcurrentDictionary<string, double> _prob;
-        public ConcurrentDictionary<string, double> Prob => _prob;
 
-        #endregion private fields
+        public Corpus TokenBase = null;
 
-        #region properties
-
-        private string _tag;
         public string Tag { get => _tag; set => _tag = value; }
+        private string _tag;
 
-        #endregion properties
+        #endregion public properties
 
         #region population
 
@@ -164,6 +230,57 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion population
 
+        #region Serialization Helpers
+
+        public async Task InferNegativeTokensAsync(CancellationToken token, SegmentStopWatch sw = null)
+        {
+            token.ThrowIfCancellationRequested();
+
+            Negative ??= await Corpus.SubtractAsync(TokenBase, Positive, token, sw);
+            sw?.LogDuration("Infer Negative Tokens");
+
+            token.ThrowIfCancellationRequested();
+
+            _nPositive = Positive.TokenCounts.Values.Sum();
+            sw?.LogDuration("Calculate _nPositive");
+
+            _nNegative = Negative.TokenCounts.Values.Sum();
+            sw?.LogDuration("Calculate _nNegative");
+        }
+
+        public async Task RecalcProbsAsync(CancellationToken token, SegmentStopWatch sw = null)
+        { 
+            Prob = new ConcurrentDictionary<string, double>();
+            sw?.LogDuration("Create new Prob Dict");
+
+            var processors = Math.Max(Environment.ProcessorCount - 2, 1);
+            var chunkSize = (int)Math.Round((double)TokenBase.TokenCounts.Keys.Count() / (double)processors, 0);
+            sw?.LogDuration("Calculate Chunk Size");
+
+            var chunks = TokenBase.TokenCounts.Keys.Chunk(chunkSize);
+            sw?.LogDuration("Divide Keys in to Chunks");
+
+            var tasks = chunks.Select(chunk => Task.Run(() => chunk.ForEach(UpdateTokenProbability)));
+            sw?.LogDuration("Start tasks to Calculate Token Probabilities");
+
+            await Task.WhenAll(tasks);
+            sw?.LogDuration("Complete Tasks To Calculate Token Probabilities");
+        }
+        
+        public async Task AfterDeserialize(CancellationToken token, SegmentStopWatch sw = null)
+        {                       
+            await Task.Run(async() => await InferNegativeTokensAsync(token, sw), token).ConfigureAwait(false);
+            
+            if (Prob is null)
+            {
+                await RecalcProbsAsync(token, sw).ConfigureAwait(false);
+            }
+            Loaded = true;
+            sw.LogDuration("Set Loaded to True");
+        }
+
+        #endregion Serialization Helpers
+
         #region classifier testing
         /// <summary>
         /// Returns the probability that the supplied tokens are a _positive match with the Classifier
@@ -172,7 +289,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// <returns></returns>
         public double CalculateProbability(IEnumerable<string> tokens)
         {
-            SortedList probs = new SortedList();
+            SortedList probs = [];
 
             // Spin through every word in the body and look up its individual spam probability.
             // Keep the list in decending order of "Interestingness"
@@ -206,8 +323,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             foreach (string key in probs.Keys)
             {
                 double prob = (double)probs[key];
-                mult = mult * prob;
-                comb = comb * (1 - prob);
+                mult *= prob;
+                comb *= (1 - prob);
 
                 Debug.WriteLine(index + " " + probs[key] + " " + key);
 
@@ -249,7 +366,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             get { return _knobs; }
             set { _knobs = value; }
         }
-        private KnobList _knobs = new KnobList();
+        private KnobList _knobs = new();
 
         #endregion knobs for dialing in performance
     }

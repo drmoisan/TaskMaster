@@ -72,6 +72,11 @@ namespace UtilitiesCS
             return list;
         }
 
+        public static Stack<T> ToStack<T>(this IEnumerable<T> enumerable)
+        {
+            return new Stack<T>(enumerable);
+        } 
+
         public static IAsyncEnumerable<T> WithProgressReporting<T>(this IAsyncEnumerable<T> enumerable, long count, Action<int> progress)
         {
             if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
@@ -133,6 +138,21 @@ namespace UtilitiesCS
             }
         }
 
+
+        public static Tuple<IEnumerable<T>, IEnumerable<U>> Unzip<T, U>(this IEnumerable<(T, U)> source)
+        {
+            var first = new List<T>();
+            var second = new List<U>();
+
+            foreach (var item in source)
+            {
+                first.Add(item.Item1);
+                second.Add(item.Item2);
+            }
+
+            return new Tuple<IEnumerable<T>, IEnumerable<U>>(first, second);
+        }
+
         public static IEnumerable<IEnumerable<T>> Transpose<T>(
             this IEnumerable<IEnumerable<T>> source)
         {
@@ -149,22 +169,6 @@ namespace UtilitiesCS
                 Array.ForEach(enumerators, e => e.Dispose());
             }
         }
-
-
-        public static Tuple<IEnumerable<T>, IEnumerable<U>> Unzip<T, U>(this IEnumerable<(T, U)> source)
-        {
-            var first = new List<T>();
-            var second = new List<U>();
-
-            foreach (var item in source)
-            {
-                first.Add(item.Item1);
-                second.Add(item.Item2);
-            }
-
-            return new Tuple<IEnumerable<T>, IEnumerable<U>>(first, second);
-        }
-
 
         public static IEnumerable<TSource[]> Chunk<TSource>(this IEnumerable<TSource> source, int size)
         {

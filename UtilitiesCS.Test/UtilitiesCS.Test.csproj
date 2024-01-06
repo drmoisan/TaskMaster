@@ -54,6 +54,7 @@
     <Compile Include="EmailIntelligence\UnitTest1.cs" />
     <Compile Include="EmailIntelligence\EmailTokenizerTests.cs" />
     <Compile Include="EmailIntelligence\EmailDetailsTest.cs" />
+    <Compile Include="EmailIntelligence\IClonableBehaviorTest.cs" />
     <Compile Include="HelperClasses\PropertyInitializerTest.cs" />
     <Compile Include="HelperClasses\TimedDiskWriterTests.cs" />
     <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="HelperClasses\SimpleRegex_Test.cs" />
     <Compile Include="Dialogs\YesNoToAll_Test.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
+    <Compile Include="Threading\AppGlobalsConverterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -114,6 +116,9 @@
     </Reference>
     <Reference Include="Moq, Version=4.20.69.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.20.69\lib\net462\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />

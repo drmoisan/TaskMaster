@@ -8,13 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Threading;
 
-namespace UtilitiesCS
+namespace UtilitiesCS.EmailIntelligence.TaskPane
 {
-    public partial class ProgressViewer : Form//, IProgressViewer
+    public partial class ProgressPane : UserControl
     {
-        public ProgressViewer()
+        public ProgressPane()
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
@@ -30,7 +29,7 @@ namespace UtilitiesCS
 
         private TaskScheduler _uiScheduler;
         public TaskScheduler UiScheduler { get => _uiScheduler; }
-      
+
 
         private CancellationTokenSource _tokenSource;
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
@@ -42,20 +41,7 @@ namespace UtilitiesCS
         private void CancelButton_Click(object sender, EventArgs e)
         {
             _tokenSource.Cancel();
-            this.Close();
+            this.Dispose();
         }
-
-        #region IProgressViewer
-        
-        //void IProgressViewer.SetCancellationTokenSource(CancellationTokenSource tokenSource)
-        //{
-        //    this.SetCancellationTokenSource(tokenSource);
-        //}
-        //ProgressBar IProgressViewer.Bar => this.Bar;
-        //Label IProgressViewer.JobName => this.JobName;
-        //Button IProgressViewer.ButtonCancel => this.ButtonCancel;
-        //Dispatcher IProgressViewer.UiDispatcher { get => this.UiDispatcher; set => this.UiDispatcher = value; }
-        
-        #endregion IProgressViewer
     }
 }

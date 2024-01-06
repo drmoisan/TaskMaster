@@ -47,6 +47,22 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
+        protected static ScDictionary<TKey, TValue> CreateEmpty(DialogResult response, FilePathHelper disk, JsonSerializerSettings settings)
+        {
+            if (response == DialogResult.Yes)
+            {
+                var dictionary = new ScDictionary<TKey, TValue>();
+                dictionary.JsonSettings = settings;
+                dictionary.Serialize(disk.FilePath);
+                return dictionary;
+            }
+            else
+            {
+                throw new ArgumentNullException(
+                "Must have a dictionary or create one to continue executing");
+            }
+        }
+
         protected static DialogResult AskUser(bool askUserOnError, string messageText)
         {
             DialogResult response;
@@ -74,23 +90,30 @@ namespace UtilitiesCS.ReusableTypeClasses
         public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError)
         {
             var disk = new FilePathHelper(fileName, folderPath);            
-            return Deserialize(disk, askUserOnError);
+            var settings = GetDefaultSettings();
+            return Deserialize(disk, askUserOnError, settings);
         }
 
-        internal static ScDictionary<TKey, TValue> Deserialize(FilePathHelper disk, bool askUserOnError)
+        public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) 
         {
-            ScDictionary<TKey, TValue> dictionary = null;
-            bool writeDictionary = false;
-            DialogResult response = DialogResult.Ignore;
+            var disk = new FilePathHelper(fileName, folderPath);
+            return Deserialize(disk, askUserOnError, settings);
+        }
 
+        internal static ScDictionary<TKey, TValue> Deserialize(FilePathHelper disk, bool askUserOnError, JsonSerializerSettings settings)
+        {
+            bool writeDictionary = false;
+            ScDictionary<TKey, TValue> dictionary;
+            DialogResult response;
+            
             try
             {
-                dictionary = DeserializeJson(disk);
+                dictionary = DeserializeJson(disk, settings);
                 if (dictionary is null)
                 {
                     throw new InvalidOperationException($"{disk.FilePath} deserialized to null.");
                 }
-                
+
             }
             catch (FileNotFoundException e)
             {
@@ -98,7 +121,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 response = AskUser(askUserOnError,
                     $"{disk.FilePath} not found. Need a dictionary to " +
                     $"continue. Create a new dictionary or abort execution?");
-                dictionary = CreateEmpty(response, disk);
+                dictionary = CreateEmpty(response, disk, settings);
                 writeDictionary = true;
             }
             catch (System.Exception e)
@@ -107,7 +130,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 response = AskUser(askUserOnError,
                     $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
                     $"Need a dictionary to continue. Create a new dictionary or abort execution?");
-                dictionary = CreateEmpty(response, disk);
+                dictionary = CreateEmpty(response, disk, settings);
                 writeDictionary = true;
             }
 
@@ -119,15 +142,18 @@ namespace UtilitiesCS.ReusableTypeClasses
             return dictionary;
         }
 
+        protected static ScDictionary<TKey, TValue> DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings) 
+        {
+            var collection = JsonConvert.DeserializeObject<ScDictionary<TKey, TValue>>(
+                File.ReadAllText(disk.FilePath), settings);
+            collection.JsonSettings = settings;
+            return collection;
+        }
+
         protected static ScDictionary<TKey, TValue> DeserializeJson(FilePathHelper disk)
         {
-            ScDictionary<TKey, TValue> collection;
-            var settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.Auto;
-            settings.Formatting = Formatting.Indented;
-            collection = JsonConvert.DeserializeObject<ScDictionary<TKey, TValue>>(
-                File.ReadAllText(disk.FilePath), settings);
-            return collection;
+            var settings = GetDefaultSettings();
+            return DeserializeJson(disk, settings);
         }
 
         #endregion Static Deserialization
@@ -141,6 +167,24 @@ namespace UtilitiesCS.ReusableTypeClasses
         public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
 
         public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
+
+        public FilePathHelper LocalDisk { get => _localDisk; set => _localDisk = value; }
+        private FilePathHelper _localDisk = new FilePathHelper();
+
+        public FilePathHelper NetDisk { get => _netDisk; set => _netDisk = value; }
+        private FilePathHelper _netDisk = new FilePathHelper();
+
+        public void ActivateLocalDisk()
+        {
+            _disk = _localDisk;
+            _jsonSettings = _localJsonSettings;
+        }
+
+        public void ActivateNetDisk()
+        {
+            _disk = _netDisk;
+            _jsonSettings = _netJsonSettings;
+        }
 
         public void Serialize()
         {
@@ -158,6 +202,27 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         protected static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
+        [JsonIgnore]
+        public JsonSerializerSettings JsonSettings { get => _jsonSettings; set => _jsonSettings = value; }
+        private JsonSerializerSettings _jsonSettings = GetDefaultSettings();
+
+        [JsonIgnore]
+        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings; set => _netJsonSettings = value; }
+        private JsonSerializerSettings _netJsonSettings;
+
+        [JsonIgnore]
+        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings; set => _localJsonSettings = value; }
+        private JsonSerializerSettings _localJsonSettings;
+
+        public static JsonSerializerSettings GetDefaultSettings() 
+        {
+            return new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented
+            };
+        }
+
         public void SerializeThreadSafe(string filePath)
         {
             // Set Status to Locked
@@ -167,11 +232,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     using (StreamWriter sw = File.CreateText(filePath))
                     {
-                        var settings = new JsonSerializerSettings();
-                        settings.TypeNameHandling = TypeNameHandling.Auto;
-                        settings.Formatting = Formatting.Indented;
-
-                        var serializer = JsonSerializer.Create(settings);
+                        var serializer = JsonSerializer.Create(JsonSettings);
                         serializer.Serialize(sw, this);
                         sw.Close();
                         _serializationRequested = new ThreadSafeSingleShotGuard();

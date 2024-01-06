@@ -118,6 +118,10 @@ namespace UtilitiesCS
             return columnLengths;
         }
 
+        private static readonly string[] _aggregators = ["total", "subtotal","average",
+            "mean","median","min","max","stddev", "variance", "count", 
+            "sum", "mode", "range","skewness", "kurtosis", "percentile", "quartile"];
+
         public static string ToFormattedText(this IDictionary<string, float> dict, float decimalPlaces)
         {
             var keyConverter = new Func<string, string>(key => key);
@@ -207,7 +211,10 @@ namespace UtilitiesCS
                 if (title.IsNullOrEmpty())
                     sb.AppendLine(new string('=', width));
                 sb.Append("| ");
-                headers.ForEach(header => sb.Append(header.PadRight(columnLengths[0] + 2)));
+                for (int i = 0; i < headers.Length; i++) 
+                {
+                    sb.Append(headers[i].PadRight(columnLengths[i] + 2));
+                }
                 sb.AppendLine("|");
             }
                                     
@@ -215,12 +222,17 @@ namespace UtilitiesCS
 
             for (int i = 0; i < jagged.Length; i++)
             {
+                var isAggregator = _aggregators.Contains(jagged[i][0].ToLower());
+                if (isAggregator) { sb.AppendLine(new string('_', width));}
+
                 sb.Append("| ");
                 for (int j = 0; j < jagged[i].Length; j++)
                 {
                     sb.Append(jagged[i][j].PadRight(columnLengths[j] + 2));
                 }
                 sb.AppendLine("|");
+
+                if (isAggregator) { sb.AppendLine(new string('_', width)); }
             }
             sb.AppendLine(new string('=', width));
 

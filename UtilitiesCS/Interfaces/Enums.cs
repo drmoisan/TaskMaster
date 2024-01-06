@@ -45,5 +45,11 @@
             Loading = 1, 
             Loaded = 2 
         }
+
+        public enum SerializationOptions
+        {
+            AskUserOnError = 1,
+            WriteNew = 2,
+        }
     }
 }

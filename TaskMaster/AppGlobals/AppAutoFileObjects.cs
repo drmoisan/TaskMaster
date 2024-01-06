@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualBasic;
+﻿using Microsoft.Office.Core;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
 using QuickFiler;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,8 @@ namespace TaskMaster
 
     public class AppAutoFileObjects : IAppAutoFileObjects
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public AppAutoFileObjects(ApplicationGlobals parent)
         {
@@ -136,7 +139,7 @@ namespace TaskMaster
         {   
             await Task.Factory.StartNew(
                 () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
-                default,
+                CancelLoad,
                 TaskCreationOptions.None, 
                 TaskScheduler.Current);
         }   
@@ -181,7 +184,7 @@ namespace TaskMaster
         {
             await Task.Factory.StartNew(
                 () => _ctfMap = LoadCtfMap(),
-                default(CancellationToken));
+                CancelLoad);
                 //default,
                 //TaskCreationOptions.None,
                 //PriorityScheduler.BelowNormal);
@@ -263,7 +266,7 @@ namespace TaskMaster
         {
             await Task.Factory.StartNew(
                 () => _filters = LoadFilters(),
-                default(CancellationToken));
+                CancelLoad);
         }
         private void ScoFilterEntry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -289,7 +292,7 @@ namespace TaskMaster
         {
             await Task.Factory.StartNew(
                  () => _subjectMap = LoadSubjectMap(),
-                 default(CancellationToken),
+                 CancelLoad,
                  TaskCreationOptions.LongRunning,
                  TaskScheduler.Current);
             //default,
@@ -377,16 +380,90 @@ namespace TaskMaster
         public ScDictionary<string, ClassifierGroup> Manager => Initialized(_manager, LoadManager);
         private ScDictionary<string, ClassifierGroup> LoadManager()
         {
-            var manager = ScDictionary<string, ClassifierGroup>.Deserialize(
-                fileName: _defaults.File_ClassifierManager,
-                folderPath: _parent.FS.FldrPythonStaging);
+            var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
+            var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
+            
+            var local = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrAppData);
+            var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
+           
+            var localSettings = GetSettings(false);
+            var networkSettings = GetSettings(true);
+            
+            var manager = GetManager(local, localSettings);
+            manager.NetDisk = network;
+            manager.NetJsonSettings = networkSettings;
+            manager.LocalDisk = local;
+            manager.LocalJsonSettings = localSettings;
+
+            if (networkDt != default && (localDt == default || networkDt > localDt))
+            {
+                IdleActionQueue.AddEntry(async () =>
+                    await Task.Run(() =>
+                    {
+                        _manager = GetManager(network, networkSettings);
+                        _manager.NetDisk = network;
+                        _manager.NetJsonSettings = networkSettings;
+                        _manager.LocalDisk = local;
+                        _manager.LocalJsonSettings = localSettings;
+                        _manager.ActivateLocalDisk();
+                        IdleActionQueue.AddEntry(() => _manager.Serialize());
+                    }
+                    ));
+            }
+
             return manager;
         }
+
+        private JsonSerializerSettings GetSettings(bool compress)
+        {
+            var settings = ScDictionary<string, ClassifierGroup>.GetDefaultSettings();
+            settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            settings.Converters.Add(new AppGlobalsConverter(_parent));
+            if (compress)
+                settings.ContractResolver = new DoNotSerializeContractResolver("Prob","Negative");
+            return settings;
+        }
+        
+        private ScDictionary<string, ClassifierGroup> GetManager(
+            FilePathHelper disk, 
+            JsonSerializerSettings settings)
+        {
+            return ScDictionary<string, ClassifierGroup>.Deserialize(
+                fileName: disk.FileName,
+                folderPath: disk.FolderPath,
+                askUserOnError: false,
+                settings: settings);
+        }
+
         private async Task LoadManagerAsync()
         {
-            await Task.Factory.StartNew(
+            LoadProgressPane(_tokenSource);
+            await Task.Run(
                 () => _manager = LoadManager(),
-                default(CancellationToken));
+                CancelLoad);
+        }
+
+        private ProgressTrackerPane _progressTracker;
+        public ProgressTrackerPane ProgressTracker => _progressTracker;
+        private Microsoft.Office.Tools.CustomTaskPane _progressPane;
+        public Microsoft.Office.Tools.CustomTaskPane ProgressPane => _progressPane;
+        private void LoadProgressPane(CancellationTokenSource tokenSource)
+        {
+            if (_progressTracker is null)
+            {
+                _progressTracker = new ProgressTrackerPane(tokenSource);
+                _progressPane = Globals.ThisAddIn.CustomTaskPanes.Add(
+                    _progressTracker.ProgressViewer, "Progress Tracker");
+                _progressPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionBottom;
+            }
+        }
+
+        private CancellationTokenSource _tokenSource = new();
+        public CancellationToken CancelLoad => Initialized(_token, LoadToken);
+        private CancellationToken _token;
+        private CancellationToken LoadToken()
+        {
+            return _tokenSource.Token;
         }
     }
 }

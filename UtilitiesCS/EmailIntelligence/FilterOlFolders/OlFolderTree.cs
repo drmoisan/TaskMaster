@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using UtilitiesCS.HelperClasses;
 using System;
+using System.Threading;
+using log4net.Repository.Hierarchy;
 
 namespace UtilitiesCS
 {
@@ -27,11 +29,52 @@ namespace UtilitiesCS
             WireNotifications();
         }
 
+        public OlFolderTree(MAPIFolder olRoot, IList<string> selections, ProgressTracker progress)
+        {
+            int folderCount = 0;
+            var root = RootFromFolder(olRoot, progress.SpawnChild(95), ref folderCount);
+
+            if (folderCount > 0)
+            { 
+                var traverseProgress = progress.SpawnChild(5);
+                double increment = 100 / (double)folderCount;
+                double rt = 0;
+
+                root.Traverse(node => 
+                { 
+                    node.Selected = selections.Contains(node.RelativePath);
+                    rt += increment;
+                    traverseProgress.Report(rt);
+                });
+            }
+            _roots = new List<TreeNode<OlFolderInfo>>() { root };
+            WireNotifications();
+
+            progress.Report(100);
+        }
+
         private TreeNode<OlFolderInfo> RootFromFolder(MAPIFolder olRoot)
         {
             var info = new OlFolderInfo(olRoot, olRoot);
             var root = new TreeNode<OlFolderInfo>(info);
             this.InitializeChildren(root, olRoot);
+            return root;
+        }
+
+        private TreeNode<OlFolderInfo> RootFromFolder(MAPIFolder olRoot, ProgressTracker progress, ref int runningCount)
+        {
+            var info = new OlFolderInfo(olRoot, olRoot);
+            var root = new TreeNode<OlFolderInfo>(info);
+            Interlocked.Increment(ref runningCount);
+
+            if (olRoot.Folders.Count > 0)
+            {
+                this.InitializeChildren(root, olRoot, progress, ref runningCount);
+            }
+            else
+            {
+                progress.Report(100);
+            }
             return root;
         }
 
@@ -47,6 +90,37 @@ namespace UtilitiesCS
                     if (child.Folders.Count > 0)
                         InitializeChildren(childNode, olRoot);
                 });
+        }
+
+        private void InitializeChildren(TreeNode<OlFolderInfo> node, MAPIFolder olRoot, ProgressTracker progress, ref int runningTotal)
+        {
+            var children = node.Value.OlFolder.Folders.Cast<MAPIFolder>().ToArray();
+            var count = children.Count();
+            
+            if (count > 0)
+            {
+                double increment = 100 / (double)count;
+                double rt = 0;
+                foreach (var child in children) 
+                {
+                    var childNode = node.AddChild(new OlFolderInfo(child, olRoot));
+                    Interlocked.Increment(ref runningTotal);
+                    
+                    rt += increment;
+                    if (child.Folders.Count > 0)
+                    {
+                        var childProgress = progress.SpawnChild(increment);
+                        InitializeChildren(childNode, olRoot, childProgress, ref runningTotal);
+                    }
+                    else
+                    {
+                        progress.Report(rt, $"Building Outlook Folder Tree ({runningTotal} completed)");
+                        //progress.Increment(increment);
+                    }
+                }
+                
+                progress.Report(100);
+            }                
         }
 
         public void Select(TreeNode<OlFolderInfo> node, bool includeDescendents)

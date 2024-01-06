@@ -5,16 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UtilitiesCS.EmailIntelligence.TaskPane;
 
 namespace UtilitiesCS
 {
-    public class ProgressTracker: IProgress<(int Value, string JobName)>
+    public class ProgressTrackerPane : IProgress<(int Value, string JobName)>
     {
-        public ProgressTracker(CancellationTokenSource tokenSource) 
-        {   
-            UIThreadExtensions.UiDispatcher.Invoke(() => 
-            { 
-                _progressViewer = new ProgressViewer();
+        public ProgressTrackerPane(CancellationTokenSource tokenSource)
+        {
+            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            {
+                _progressViewer = new ProgressPane();
                 _progressViewer.UiDispatcher = UIThreadExtensions.UiDispatcher;
                 _progressViewer.SetCancellationTokenSource(tokenSource);
             });
@@ -26,18 +27,18 @@ namespace UtilitiesCS
                 _progressViewer.Refresh();
             });
             _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
-            
+
             this.Report(0, "Initializing");
             _isRoot = true;
-            
+
             if (_progressViewer.InvokeRequired)
                 _progressViewer.Invoke(() => _progressViewer.Show());
             else
                 _progressViewer.Show();
         }
-        
-        public ProgressTracker(ProgressTracker parent, int allocation, int startingAt) 
-        { 
+
+        public ProgressTrackerPane(ProgressTrackerPane parent, int allocation, int startingAt)
+        {
             _parent = new ParentProgress<(int Value, string JobName)>(parent, allocation, startingAt);
             _jobName = parent._jobName;
             _progressViewer = parent.ProgressViewer;
@@ -50,23 +51,24 @@ namespace UtilitiesCS
 
         protected string _jobName;
         private bool _isRoot = false;
+        private bool _root100 = false;
         private ParentProgress<(int Value, string JobName)> _parent;
-        
-        private ProgressViewer _progressViewer;
-        public ProgressViewer ProgressViewer { get => _progressViewer; protected set => _progressViewer = value; }
+
+        private ProgressPane _progressViewer;
+        public ProgressPane ProgressViewer { get => _progressViewer; protected set => _progressViewer = value; }
 
         private double _progress;
         public double Progress { get => _progress; }
 
-        public ProgressTracker Increment(double value, string jobName)
+        public ProgressTrackerPane Increment(double value, string jobName)
         {
             _jobName = jobName;
             return Increment(value);
         }
 
-        public ProgressTracker Increment(double value)
+        public ProgressTrackerPane Increment(double value)
         {
-            var newProgress = Math.Max(Math.Min(_progress + value,100),0);
+            var newProgress = Math.Max(Math.Min(_progress + value, 100), 0);
             Report(newProgress);
             return this;
         }
@@ -93,11 +95,25 @@ namespace UtilitiesCS
             {
                 Report(100);
             }
-            else 
-            { 
+            else
+            {
                 _jobName = jobName;
                 Report(value);
             }
+        }
+
+        internal void ChangeBarColor(System.Drawing.Color color)
+        {
+            SafeAction(() => _progressViewer.Bar.BackColor = color);
+        }
+
+        internal void SafeAction(Action action)
+        {
+            if (_progressViewer.IsDisposed) { return; }
+            if (_progressViewer.InvokeRequired)
+                _progressViewer.Invoke(action);
+            else
+                action();
         }
 
         public void Report(double value)
@@ -116,75 +132,60 @@ namespace UtilitiesCS
                 _progress = value;
                 var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
                 _parent.Progress.Report((parentProgress, _jobName));
-                if (_isRoot && parentProgress == 100)
-                {
-                    if (_progressViewer.InvokeRequired)
-                        _progressViewer.Invoke(() => { if (!_progressViewer.IsDisposed) { _progressViewer.Close(); } });
-                    else
-                        if (!_progressViewer.IsDisposed) { _progressViewer.Close(); }
-                }
+                if (_isRoot) 
+                { 
+                    if (parentProgress == 100 || _root100) 
+                    {
+                        ChangeBarColor(_root100 ? System.Drawing.Color.Blue : System.Drawing.Color.Green);
+                        _root100 = !_root100;
+                    }
+                } 
             }
         }
 
-        public async Task ReportAsync(double value) 
+        //public async Task ReportAsync(double value)
+        //{
+        //    if (value < 0)
+        //    {
+        //        var caller = new StackFrame(1, false).GetMethod().Name;
+        //        throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
+        //    }
+        //    else if (value > 100)
+        //    {
+        //        Report(100);
+        //    }
+        //    else
+        //    {
+        //        _progress = value;
+        //        var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
+        //        _parent.Progress.Report((parentProgress, _jobName));
+        //        if (_isRoot && parentProgress == 100)
+        //        {
+        //            //if (_progressViewer.InvokeRequired)
+        //            //    await _progressViewer.UiDispatcher.InvokeAsync(() => { if (!_progressViewer.IsDisposed) { _progressViewer.Dispose(); } });
+        //            //else
+        //            //    if (!_progressViewer.IsDisposed) { _progressViewer.Dispose(); }
+        //        }
+        //    }
+        //}
+
+        public ProgressTrackerPane SpawnChild(int allocation)
         {
-            if (value < 0)
-            {
-                var caller = new StackFrame(1, false).GetMethod().Name;
-                throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
-            }
-            else if (value > 100)
-            {
-                Report(100);
-            }
-            else
-            {
-                _progress = value;
-                var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
-                _parent.Progress.Report((parentProgress, _jobName));
-                if (_isRoot && parentProgress == 100)
-                {
-                    if (_progressViewer.InvokeRequired)
-                        await _progressViewer.UiDispatcher.InvokeAsync(() => { if (!_progressViewer.IsDisposed) { _progressViewer.Close(); } });
-                    else
-                        if (!_progressViewer.IsDisposed) { _progressViewer.Close(); }
-                }
-            }
+            return new ProgressTrackerPane(this, allocation, (int)_progress);
         }
 
-        public ProgressTracker SpawnChild(int allocation)
+        public ProgressTrackerPane SpawnChild(double allocation)
         {
-            return new ProgressTracker(this, allocation, (int)_progress);
+            return this.SpawnChild((int)Math.Round(allocation, 0));
         }
 
-        public ProgressTracker SpawnChild(double allocation)
-        {
-            return this.SpawnChild((int)Math.Round(allocation, 0));            
-        }
-
-        public ProgressTracker SpawnChild()
+        public ProgressTrackerPane SpawnChild()
         {
             var progress = (int)_progress;
             var remaining = 100 - progress;
-            return new ProgressTracker(this, remaining, progress);
+            return new ProgressTrackerPane(this, remaining, progress);
         }
     }
 
-    internal struct ParentProgress<T>
-    {
-        public ParentProgress(IProgress<T> progress, int allocation, int startingAt)
-        {
-            _progress = progress;
-            _allocation = allocation;
-            _startingAt = startingAt;
-        }
-        private IProgress<T> _progress;
-        public IProgress<T> Progress { get => _progress; set => _progress = value; }
-
-        private int _allocation;
-        public int Allocation { get => _allocation; set => _allocation = value; }
-
-        private int _startingAt;
-        public int StartingAt { get => _startingAt; set => _startingAt = value; }
-    }
 }
+

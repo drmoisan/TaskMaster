@@ -20,6 +20,7 @@ using stdole;
 using System;
 using UtilitiesCS.EmailIntelligence.FolderRemap;
 using UtilitiesCS.EmailIntelligence;
+using log4net.Repository.Hierarchy;
 
 
 namespace TaskMaster
@@ -34,6 +35,9 @@ namespace TaskMaster
         private bool _quickFilerLoaded = false;
 
         public RibbonController() { }
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         internal void SetGlobals(ApplicationGlobals AppGlobals)
         {
@@ -327,6 +331,25 @@ namespace TaskMaster
                     new WindowsFormsSynchronizationContext());
             var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
             await miner.BuildClassifierAsync();
+        }
+
+        internal void TryPrintManagerState()
+        {
+            _globals.AF.Manager["Folder"].LogState();
+            //logger.Debug($"\n{
+            //    _globals.AF.Manager["Folder"]
+            //    .Classifiers
+            //    .Select(x => new[]
+            //        {
+            //            x.Value.Tag,
+            //            (x.Value.TokenBase is not null).ToString(),
+            //            (x.Value.Positive is not null).ToString(),
+            //            (x.Value.Negative is not null).ToString()
+            //        })
+            //    .ToArray()
+            //    .ToFormattedText(
+            //        ["Classifier", "TokenBase", "Positive", "Negative"], 
+            //        "Classifier Manager State".ToUpper())}");
         }
     }
 }

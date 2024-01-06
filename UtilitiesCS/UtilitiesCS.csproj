@@ -61,6 +61,9 @@
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ConcurrencyVisualizer.Markers">
+      <HintPath>..\..\..\..\..\..\..\program files\microsoft visual studio\2022\preview\common7\ide\extensions\rf2nfg00.o0t\SDK\Managed\4.0\Microsoft.ConcurrencyVisualizer.Markers.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Analysis.0.20.1\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
@@ -93,6 +96,29 @@
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common.v4.0.Utilities, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.v4.0.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Outlook, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Outlook.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Outlook.v4.0.Utilities, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Outlook.v4.0.Utilities.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2151.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2151.40\lib\net45\Microsoft.Web.WebView2.Core.dll</HintPath>
@@ -324,7 +350,9 @@
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifier.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianFilter.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\DoNotSerializeContractResolver.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ConvertedSpamBayesTokenizer.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
@@ -384,9 +412,18 @@
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.Designer.cs">
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </Compile>
+    <Compile Include="HelperClasses\ObjectCopier.cs" />
+    <Compile Include="Threading\IProgressViewer.cs" />
+    <Compile Include="Threading\ProgressPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Threading\ProgressPane.Designer.cs">
+      <DependentUpon>ProgressPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="HelperClasses\AsyncLazy.cs" />
+    <Compile Include="HelperClasses\DebugTextLogger.cs" />
     <Compile Include="HelperClasses\DebugTextWriter.cs" />
     <Compile Include="HelperClasses\DvgForm.cs">
       <SubType>Form</SubType>
@@ -395,12 +432,15 @@
       <DependentUpon>DvgForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HelperClasses\MyFileSystemInfo.cs" />
+    <Compile Include="ReusableTypeClasses\AbstractCloneable.cs" />
     <Compile Include="Threading\ProgressMultiStepViewer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Threading\ProgressMultiStepViewer.Designer.cs">
       <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Threading\AppGlobalsConverter.cs" />
+    <Compile Include="Threading\ProgressTrackerPane.cs" />
     <Compile Include="Threading\ProgressViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -596,6 +636,9 @@
     <EmbeddedResource Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.resx">
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Threading\ProgressPane.resx">
+      <DependentUpon>ProgressPane.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HelperClasses\DvgForm.resx">
       <DependentUpon>DvgForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -669,6 +712,7 @@
     <Content Include="Resources\wb.svg" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="EmailIntelligence\TaskPane\" />
     <Folder Include="Properties\DataSources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
