@@ -96,7 +96,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //List<MailItem> mailItems = null;
             IEnumerable<MailItem> mailItemsQuery = null;
 
-            await Task.Factory.StartNew(() =>
+            await Task.Run(() =>
             {
                 // Query List of Outlook Folders if they are not on the skip list
                 progress.Report(0, "Building Outlook Folder Tree");
@@ -114,7 +114,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 //mailItems = LinqToSimpleEmailList(folders, mailItemsQuery, progress);
                 //_sw.LogDuration(nameof(LinqToSimpleEmailList));
                 _sw.WriteToLog(clear: false);
-            }, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }, tokenSource.Token);
 
             //progress.Report(100);
 
@@ -177,7 +177,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //for (int i = 0; i < chunkNum; i++)
             {
                 //await Task.Factory.StartNew(() =>
-                tasks.Add(Task.Factory.StartNew(() => 
+                tasks.Add(Task.Run(() => 
                 {
                     foreach (var mailItem in c)
                     //var endIter = i == (chunkNum - 1) ? count : chunkSize * (chunkNum + 1);
@@ -209,7 +209,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         }
                     }
                 },
-                token, TaskCreationOptions.None, TaskScheduler.Default));
+                token));
             }
 
             //await Task.WhenAll(tasks);
@@ -249,7 +249,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var remaining = count - complete;
             var remainingSeconds = remaining * seconds;
             var ts = TimeSpan.FromSeconds(remainingSeconds);
-            string msg = $"Creating Info {complete} of {count} ({seconds:N2} spm) ({ts:c} remaining)";
+            string msg = $"Completed {complete} of {count} ({seconds:N2} spm) " +
+                $"({psw.Elapsed:%m\\ss} elapsed {ts:%m\\ss} remaining)";
             return msg;
         }
 
@@ -270,7 +271,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
             var progress = new ProgressTracker(tokenSource);
-            
+
+            _globals.AF.Manager.Clear();
+
             var sw = new SegmentStopWatch();
             sw.Start();
 

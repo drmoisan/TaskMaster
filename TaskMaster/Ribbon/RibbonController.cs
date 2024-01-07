@@ -351,5 +351,17 @@ namespace TaskMaster
             //        ["Classifier", "TokenBase", "Positive", "Negative"], 
             //        "Classifier Manager State".ToUpper())}");
         }
+
+        internal void TrySaveManagerLocally()
+        {
+            _globals.AF.Manager.ActivateLocalDisk();
+            _globals.AF.Manager.Serialize();
+        }
+
+        internal void TrySaveManagerNetwork()
+        {
+            _globals.AF.Manager.ActivateNetDisk();
+            _globals.AF.Manager.Serialize();
+        }
     }
 }

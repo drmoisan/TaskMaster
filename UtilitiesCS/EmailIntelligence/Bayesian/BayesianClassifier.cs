@@ -33,8 +33,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             _tag = tag;
             _prob = new ConcurrentDictionary<string, double>();
-            _positive = new Corpus();
-            _negative = new Corpus();
+            _notMatch = new Corpus();
+            _match = new Corpus();
         }
 
         public BayesianClassifier(string tag, IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
@@ -47,10 +47,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private BayesianClassifier(string tag, Corpus positive, Corpus negative, Corpus tokenBase)
         {
             _tag = tag;
-            _positive = positive;
-            _nPositive = positive.TokenCounts.Values.Sum();
-            _negative = negative;
-            _nNegative = negative.TokenCounts.Values.Sum();
+            _notMatch = positive;
+            _nNotMatch = positive.TokenCounts.Values.Sum();
+            _match = negative;
+            _nMatch = negative.TokenCounts.Values.Sum();
             TokenBase = tokenBase;
             _prob = new ConcurrentDictionary<string, double>();
             TokenBase.TokenCounts.Keys.ForEach(UpdateTokenProbability);
@@ -82,10 +82,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     var positive = new Corpus(positiveTokens);
                     var negative = tokenBase - positive;
                     classifier.Tag = tag;
-                    classifier.Positive = positive;
-                    classifier._nPositive = positive.TokenCounts.Values.Sum();
-                    classifier.Negative = negative;
-                    classifier._nNegative = negative.TokenCounts.Values.Sum();
+                    classifier.NotMatch = positive;
+                    classifier._nNotMatch = positive.TokenCounts.Values.Sum();
+                    classifier.Match = negative;
+                    classifier._nMatch = negative.TokenCounts.Values.Sum();
                     classifier.TokenBase = tokenBase;
                     classifier._prob = new ConcurrentDictionary<string, double>();
                     tokenBase.TokenCounts.Keys.ForEach(classifier.UpdateTokenProbability);
@@ -99,8 +99,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region private fields
 
-        private int _nPositive;
-        private int _nNegative;
+        private int _nNotMatch;
+        private int _nMatch;
 
         #endregion private fields
 
@@ -113,15 +113,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// <summary>
         /// A list of words that show tend to show up in Spam text
         /// </summary>
-        [JsonIgnore]
-        public Corpus Negative { get => _negative; private set => _negative = value; }
-        private Corpus _negative;
+        public Corpus Match { get => _match; private set => _match = value; }
+        private Corpus _match;
 
         /// <summary>
         /// A list of words that tend to show up in non-spam text
         /// </summary>
-        public Corpus Positive { get => _positive; set => _positive = value; }
-        private Corpus _positive;
+        [JsonIgnore]
+        public Corpus NotMatch { get => _notMatch; set => _notMatch = value; }
+        private Corpus _notMatch;
 
         /// <summary>
         /// A list of probabilities that the given word might appear in a Spam text
@@ -141,22 +141,22 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public void AddPositive(IEnumerable<string> tokens) 
         {
-            _positive.AddOrIncrementTokens(tokens);
+            _notMatch.AddOrIncrementTokens(tokens);
             tokens.Distinct().ForEach(UpdateTokenProbability);
         }
 
         public void AddNegative(IEnumerable<string> tokens)
         {
-            _negative.AddOrIncrementTokens(tokens);
+            _match.AddOrIncrementTokens(tokens);
             tokens.Distinct().ForEach(UpdateTokenProbability);
         }
 
         public void AddTokens(IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
         {
-            _positive.AddOrIncrementTokens(positiveTokens);
-            _nPositive = _positive.TokenCounts.Values.Sum();
-            _negative.AddOrIncrementTokens(negativeTokens);
-            _nNegative = _negative.TokenCounts.Values.Sum();
+            _notMatch.AddOrIncrementTokens(positiveTokens);
+            _nNotMatch = _notMatch.TokenCounts.Values.Sum();
+            _match.AddOrIncrementTokens(negativeTokens);
+            _nMatch = _match.TokenCounts.Values.Sum();
 
             positiveTokens.Concat(negativeTokens).Distinct().ForEach(UpdateTokenProbability);
         }
@@ -165,7 +165,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             foreach (var token in tokens)
             {
-                _positive.DecrementOrRemoveToken(token);
+                _notMatch.DecrementOrRemoveToken(token);
                 UpdateTokenProbability(token);
             }
         }
@@ -174,15 +174,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             foreach (var token in tokens)
             {
-                _negative.DecrementOrRemoveToken(token);
+                _match.DecrementOrRemoveToken(token);
                 UpdateTokenProbability(token);
             }
         }
 
         public void Load(IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
         {
-            _positive = new Corpus();
-            _negative = new Corpus();
+            _notMatch = new Corpus();
+            _match = new Corpus();
             AddTokens(positiveTokens, negativeTokens);
         }
 
@@ -205,23 +205,23 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 			 *								 (+ (min 1 (/ g ngood))   
 			 *									(min 1 (/ b nbad)))))))))
 			 */
-            int g = _positive.TokenCounts.TryGetValue(token, out int gCount) ? gCount * Knobs.GoodTokenWeight : 0 ;
-            int b = _negative.TokenCounts.TryGetValue(token, out int bCount) ? bCount : 0;
+            int g = _notMatch.TokenCounts.TryGetValue(token, out int gCount) ? gCount * Knobs.NotMatchTokenWeight : 0 ;
+            int b = _match.TokenCounts.TryGetValue(token, out int bCount) ? bCount : 0;
 
             if (g + b >= Knobs.MinCountForInclusion)
             {
-                double goodfactor = Math.Min(1, (double)g / (double)_nPositive);
-                double badfactor = Math.Min(1, (double)b / (double)_nNegative);
+                double notMatchfactor = Math.Min(1, (double)g / (double)_nNotMatch);
+                double matchFactor = Math.Min(1, (double)b / (double)_nMatch);
 
                 double prob = Math.Max(Knobs.MinScore,
-                              Math.Min(Knobs.MaxScore, badfactor / (goodfactor + badfactor)));
+                              Math.Min(Knobs.MaxScore, matchFactor / (notMatchfactor + matchFactor)));
 
                 
                 // special case for Spam-only tokens.
                 // .9998 for tokens only found in spam, or .9999 if found more than 10 times
                 if (g == 0)
                 {
-                    prob = (b > Knobs.CertainSpamCount) ? Knobs.CertainSpamScore : Knobs.LikelySpamScore;
+                    prob = (b > Knobs.CertainMatchCount) ? Knobs.CertainMatchScore : Knobs.LikelyMatchScore;
                 }
 
                 _prob[token] = prob;
@@ -236,15 +236,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             token.ThrowIfCancellationRequested();
 
-            Negative ??= await Corpus.SubtractAsync(TokenBase, Positive, token, sw);
+            Match ??= await Corpus.SubtractAsync(TokenBase, NotMatch, token, sw);
             sw?.LogDuration("Infer Negative Tokens");
 
             token.ThrowIfCancellationRequested();
 
-            _nPositive = Positive.TokenCounts.Values.Sum();
+            _nNotMatch = NotMatch.TokenCounts.Values.Sum();
             sw?.LogDuration("Calculate _nPositive");
 
-            _nNegative = Negative.TokenCounts.Values.Sum();
+            _nMatch = Match.TokenCounts.Values.Sum();
             sw?.LogDuration("Calculate _nNegative");
         }
 
@@ -269,7 +269,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         
         public async Task AfterDeserialize(CancellationToken token, SegmentStopWatch sw = null)
         {                       
-            await Task.Run(async() => await InferNegativeTokensAsync(token, sw), token).ConfigureAwait(false);
+            //await Task.Run(async() => await InferNegativeTokensAsync(token, sw), token).ConfigureAwait(false);
             
             if (Prob is null)
             {
@@ -345,14 +345,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public class KnobList
         {
             // Values in PG's original article:
-            public int GoodTokenWeight = 2;             // 2
+            public int NotMatchTokenWeight = 2;             // 2
             public int MinTokenCount = 0;               // 0
             public int MinCountForInclusion = 5;        // 5
             public double MinScore = 0.011;             // 0.01
             public double MaxScore = 0.99;              // 0.99
-            public double LikelySpamScore = 0.9998;     // 0.9998
-            public double CertainSpamScore = 0.9999;    // 0.9999
-            public int CertainSpamCount = 10;           // 10
+            public double LikelyMatchScore = 0.9998;     // 0.9998
+            public double CertainMatchScore = 0.9999;    // 0.9999
+            public int CertainMatchCount = 10;           // 10
             public int InterestingWordCount = 15;       // 15 (later changed to 20)
         }
 

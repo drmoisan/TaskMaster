@@ -184,6 +184,8 @@ namespace TaskMaster
         public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.TryMineEmails();
         public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.TryBuildClassifier();
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.TryPrintManagerState();
+        public void SaveManagerLocally_Click(Office.IRibbonControl control) => _controller.TrySaveManagerLocally();
+        public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
         #endregion
 
         #region Helpers

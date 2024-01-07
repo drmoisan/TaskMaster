@@ -44,12 +44,12 @@ namespace TaskMaster
         {
             var tasks = new List<Task> 
             {
-                LoadRecentsListAsync(),
-                LoadCtfMapAsync(),
-                LoadCommonWordsAsync(),
-                LoadSubjectMapAndEncoderAsync(),
-                LoadMovedMailsAsync(),
-                LoadFiltersAsync(),
+                //LoadRecentsListAsync(),
+                //LoadCtfMapAsync(),
+                //LoadCommonWordsAsync(),
+                //LoadSubjectMapAndEncoderAsync(),
+                //LoadMovedMailsAsync(),
+                //LoadFiltersAsync(),
                 LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
@@ -420,7 +420,7 @@ namespace TaskMaster
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(_parent));
             if (compress)
-                settings.ContractResolver = new DoNotSerializeContractResolver("Prob","Negative");
+                settings.ContractResolver = new DoNotSerializeContractResolver("Prob","NotMatch");
             return settings;
         }
         
@@ -434,13 +434,22 @@ namespace TaskMaster
                 askUserOnError: false,
                 settings: settings);
         }
-
         private async Task LoadManagerAsync()
         {
             LoadProgressPane(_tokenSource);
             await Task.Run(
                 () => _manager = LoadManager(),
                 CancelLoad);
+        }
+        public void SaveManagerLocal()
+        {
+            _manager.ActivateLocalDisk();
+            _manager.Serialize();
+        }
+        public void SaveManagerNetwork()
+        {
+            _manager.ActivateNetDisk();
+            _manager.Serialize();
         }
 
         private ProgressTrackerPane _progressTracker;
@@ -465,5 +474,6 @@ namespace TaskMaster
         {
             return _tokenSource.Token;
         }
+            
     }
 }

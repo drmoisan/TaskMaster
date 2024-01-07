@@ -42,8 +42,8 @@ namespace TaskMaster
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
 
             // Initialize long loading elements on a low priority thread
-            EfcViewerQueue.BuildQueue(2);
-            ItemViewerQueue.BuildQueueBackground(30);
+            //EfcViewerQueue.BuildQueue(2);
+            //ItemViewerQueue.BuildQueueBackground(30);
 
             // Initialize the global variables on a low priority thread
             _ = _globals.LoadAsync();

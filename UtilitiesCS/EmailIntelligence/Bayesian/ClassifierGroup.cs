@@ -67,8 +67,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     {
                         x.Value.Tag,
                         (x.Value.TokenBase is not null).ToString(),
-                        (x.Value.Positive is not null).ToString(),
-                        (x.Value.Negative is not null).ToString()
+                        (x.Value.NotMatch is not null).ToString(),
+                        (x.Value.Match is not null).ToString()
                     })
                 .ToArray()
                 .ToFormattedText(
