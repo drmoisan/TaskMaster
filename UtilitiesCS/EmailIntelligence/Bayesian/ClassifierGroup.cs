@@ -30,6 +30,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public Corpus TokenBase { get => _tokenBase; set => _tokenBase = value; }
         private Corpus _tokenBase = new ();
         
+        public IEnumerable<(string Token, string FolderPath, int Count)> DedicatedTokens { get => _dedicatedTokens; set => _dedicatedTokens = value; }
+        private IEnumerable<(string Token, string FolderPath, int Count)> _dedicatedTokens;
+
         public IApplicationGlobals AppGlobals { get; set; }
 
         public void ForceClassifierUpdate(string tag, IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)

@@ -153,6 +153,22 @@ namespace UtilitiesCS
             return new Tuple<IEnumerable<T>, IEnumerable<U>>(first, second);
         }
 
+        public static Tuple<IEnumerable<T>, IEnumerable<U>, IEnumerable<V>> Unzip<T, U, V>(this IEnumerable<(T, U, V)> source)
+        {
+            var first = new List<T>();
+            var second = new List<U>();
+            var third = new List<V>();
+
+            foreach (var item in source)
+            {
+                first.Add(item.Item1);
+                second.Add(item.Item2);
+                third.Add(item.Item3);
+            }
+
+            return new Tuple<IEnumerable<T>, IEnumerable<U>, IEnumerable<V>>(first, second, third);
+        }
+
         public static IEnumerable<IEnumerable<T>> Transpose<T>(
             this IEnumerable<IEnumerable<T>> source)
         {
