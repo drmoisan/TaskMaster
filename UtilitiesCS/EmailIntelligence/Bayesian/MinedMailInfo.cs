@@ -14,6 +14,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             Sender = info.Sender;
             ConversationId = info.Item.ConversationID;
         }
+        public MinedMailInfo(string folderPath, string[] tokens)
+        {
+            Tokens = tokens;
+            FolderPath = folderPath;
+        }
 
         private string _categories;
         public string Categories { get => _categories; set => _categories = value; }

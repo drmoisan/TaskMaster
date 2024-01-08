@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
@@ -51,7 +52,8 @@ namespace UtilitiesCS
         protected string _jobName;
         private bool _isRoot = false;
         private ParentProgress<(int Value, string JobName)> _parent;
-        
+        private ThreadSafeSingleShotGuard _pvIsDisposed = new ThreadSafeSingleShotGuard();
+
         private ProgressViewer _progressViewer;
         public ProgressViewer ProgressViewer { get => _progressViewer; protected set => _progressViewer = value; }
 
@@ -118,10 +120,17 @@ namespace UtilitiesCS
                 _parent.Progress.Report((parentProgress, _jobName));
                 if (_isRoot && parentProgress == 100)
                 {
-                    if (_progressViewer.InvokeRequired)
-                        _progressViewer.Invoke(() => { if (!_progressViewer.IsDisposed) { _progressViewer.Close(); } });
-                    else
-                        if (!_progressViewer.IsDisposed) { _progressViewer.Close(); }
+                    if (_pvIsDisposed.CheckAndSetFirstCall)
+                    {
+                        if (_progressViewer.InvokeRequired)
+                            _progressViewer.Invoke(() => 
+                            {
+                                if (!_progressViewer.IsDisposed)
+                                    _progressViewer.Close();    
+                            });
+                        else
+                            _progressViewer.Close();                                       
+                    }
                 }
             }
         }

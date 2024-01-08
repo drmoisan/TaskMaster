@@ -23,22 +23,33 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _classifiers = [];
         }
 
+        #region Public Properties
+
         public ConcurrentDictionary<string, BayesianClassifier> Classifiers { get => _classifiers; protected set => _classifiers = value; }
         private ConcurrentDictionary<string, BayesianClassifier> _classifiers;
+
+        [JsonProperty(Order = -3)]
+        public IEnumerable<DedicatedToken> DedicatedTokens { get => _dedicatedTokens; set => _dedicatedTokens = value; }
+        private IEnumerable<DedicatedToken> _dedicatedTokens;
 
         [JsonProperty(Order = -2)]
         public Corpus TokenBase { get => _tokenBase; set => _tokenBase = value; }
         private Corpus _tokenBase = new ();
-        
-        public IEnumerable<(string Token, string FolderPath, int Count)> DedicatedTokens { get => _dedicatedTokens; set => _dedicatedTokens = value; }
-        private IEnumerable<(string Token, string FolderPath, int Count)> _dedicatedTokens;
 
         public IApplicationGlobals AppGlobals { get; set; }
+
+        //[JsonIgnore]
+        public Func<object, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
+        private Func<object, IEnumerable<string>> _tokenizer;
+
+        #endregion Public Properties
+
+        #region Public Methods
 
         public void ForceClassifierUpdate(string tag, IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
         {
             _classifiers[tag] = new BayesianClassifier(tag, positiveTokens, negativeTokens);
-            Interlocked.CompareExchange(ref _classifiers[tag].TokenBase, _tokenBase, null);   
+            _classifiers[tag].Parent ??= this;
         }
 
         public void AddOrUpdateClassifier(string tag, IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
@@ -69,21 +80,22 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .Select(x => new[]
                     {
                         x.Value.Tag,
-                        (x.Value.TokenBase is not null).ToString(),
+                        (x.Value.Parent is not null).ToString(),
+                        (x.Value.Parent.TokenBase is not null).ToString(),
                         (x.Value.NotMatch is not null).ToString(),
                         (x.Value.Match is not null).ToString()
                     })
                 .ToArray()
                 .ToFormattedText(
-                    ["Classifier", "TokenBase", "Positive", "Negative"],
+                    ["Classifier", "Parent", "TokenBase", "Positive", "Negative"],
                     "Classifier Manager State".ToUpper())}");
         }
 
-        //[JsonIgnore]
-        public Func<object, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
-        private Func<object, IEnumerable<string>> _tokenizer;
+        #endregion Public Methods
 
-        [OnDeserialized]
+        #region Serialization
+
+        //[OnDeserialized]
         internal void OnDeserializedMethod(StreamingContext context)
         {
             IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
@@ -208,9 +220,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 logger.Debug("Loading Canceled by User");
             }
         }
-
         
-
         internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed") 
         {
             string message;
@@ -227,5 +237,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             
             return message;
         }
+
+        #endregion Serialization
     }
 }

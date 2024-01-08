@@ -49,6 +49,7 @@
     <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="EmailIntelligence\Bayesian\EmailDataMinerTests.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceListTests.cs" />
     <Compile Include="EmailIntelligence\CtfMapTests.cs" />
     <Compile Include="EmailIntelligence\UnitTest1.cs" />

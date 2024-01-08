@@ -267,69 +267,38 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         private ScoCollection<MinedMailInfo> _mailInfoCollection;
         
-        public IEnumerable<(string Token, string FolderPath, int Count)> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
+        public IEnumerable<DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
         {
-            //var tokenSource = new CancellationTokenSource();
-            //var token = tokenSource.Token;
-            //var progress = new ProgressTracker(tokenSource);
+            //var dedicated = collection.SelectMany(x => 
+            //    x.Tokens.Select(y => 
+            //    (Token: y, FolderPath: x.FolderPath))
+            //    .GroupBy(x => x.Token).Select(grp => new DedicatedToken(
+            //        grp.Key,
+            //        grp.ToList().First().FolderPath,
+            //        grp.Count()))).ToArray();
 
-            //var sw = new SegmentStopWatch();
-            //sw.Start();
-
-            //var tmp = await LoadStaging();
-            //var collection = new ConcurrentBag<MinedMailInfo>(tmp);
-            //tmp = null;
-            //sw.LogDuration("Load Staging");
-
-            var dedicated = collection.SelectMany(x => 
-                x.Tokens.Select(y => 
+            var dedicated = collection.Select(x =>
+                x.Tokens.Select(y =>
                 (Token: y, FolderPath: x.FolderPath))
-                .GroupBy(x => x.Token).Select(grp => (
-                    Token: grp.Key,
-                    FolderPath: grp.ToList().First().FolderPath,
-                    Count: grp.Count()))).ToArray();
+                .GroupBy(x => x.Token)
+                .Select(grp => new DedicatedToken(
+                    grp.Key,
+                    grp.ToList().First().FolderPath,
+                    grp.Count())))
+                .SelectMany(x=>x)
+                .GroupBy(x => x.Token)
+                .Where(grp => grp.Count() == 1)
+                .SelectMany(x => x)
+                .ToArray();
 
             return dedicated;
         }
         
-        //public async Task<Dictionary<string, string[]>> ReverseTokenLookup()
-        //{
-        //    var tokenSource = new CancellationTokenSource();
-        //    var token = tokenSource.Token;
-        //    var progress = new ProgressTracker(tokenSource);
-
-        //    var sw = new SegmentStopWatch();
-        //    sw.Start();
-
-        //    var tmp = await LoadStaging();
-        //    var collection = new ConcurrentBag<MinedMailInfo>(tmp);
-        //    tmp = null;
-        //    sw.LogDuration("Load Staging");
-
-        //    var dict = collection.SelectMany(x => 
-        //    {
-        //        List<KeyValuePair<string, string>> kvps = new();
-        //        foreach(var token in x.Tokens)
-        //        {
-        //            kvps.Add(new KeyValuePair<string, string>(token, x.FolderPath));
-        //        }
-        //        var kvps2 = kvps.GroupBy(x => x.Key)
-        //            .Select(grp => new KeyValuePair<string, KeyValuePair<string, int>>(
-        //            grp.Key, new KeyValuePair<string, int>(
-        //            grp.ToList().First().Value, grp.Count())));
-
-        //        return kvps2;
-        //    });
-
-        //    var dict2 = dict.GroupBy(x => x.Key).Where(grp => grp.Count() == 1).SelectMany(grp => grp);
-
-        //}
-
         public async Task BuildClassifierAsync()
         {
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-            var progress = new ProgressTracker(tokenSource);
+            //var progress = new ProgressTracker(tokenSource);
 
             _globals.AF.Manager.Clear();
 
@@ -350,7 +319,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var dedicatedTokens = dedicated.Select(x => x.Token).ToArray();
 
             var allTokens = collection.SelectMany(x => x.Tokens).ToList();
-            //    .Where(x=>!dedicatedTokens.Contains(x)).ToList();
 
             Corpus tokenBase = new();
             tokenBase.AddOrIncrementTokens(allTokens);
@@ -363,8 +331,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             group.DedicatedTokens = dedicated;
 
             int completed = 0;
-            //folderPaths = folderPaths.Take(3).ToList();
             int count = folderPaths.Count();
+
+            var processors = Math.Max(Environment.ProcessorCount - 2, 1);
+            var chunkSize = (int)Math.Round((double)count / (double)processors, 0);
+            var chunks = folderPaths.Chunk(chunkSize);
 
             Stopwatch psw = new Stopwatch();
             psw.Start();
@@ -373,18 +344,34 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
             //var classifier = tokenBase.ToClassifier(folderPath, positiveTokens);
 
-            var tasks = folderPaths.Select(folderPath =>
-            {
-                return Task.Run(async () =>
+            var progress = new ProgressTracker(tokenSource);
+
+            var tasks = chunks.Select(
+                chunk => Task.Run(async () => await
+                chunk.ToAsyncEnumerable()
+                .ForEachAsync(async (folderPath) =>
                 {
                     var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-                    group.Classifiers[folderPath] = await tokenBase.ToClassifierAsync(folderPath, positiveTokens, token);
+                    group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
                     Interlocked.Increment(ref completed);
                     progress.Report(
                         (int)(((double)completed / count) * 100),
                         GetReportMessage(completed, count, psw));
-                }, token);
-            });
+                }), 
+                token));
+            
+            //var tasks = folderPaths.Select(folderPath =>
+            //{
+            //    return Task.Run(async () =>
+            //    {
+            //        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+            //        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+            //        Interlocked.Increment(ref completed);
+            //        progress.Report(
+            //            (int)(((double)completed / count) * 100),
+            //            GetReportMessage(completed, count, psw));
+            //    }, token);
+            //});
 
             bool success = false;
             Task entireTask = Task.WhenAll(tasks);
@@ -404,6 +391,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             if (success)
             {
                 _globals.AF.Manager["Folder"] = group;
+                _globals.AF.Manager.ActivateLocalDisk();
                 _globals.AF.Manager.Serialize();
             }
         }

@@ -352,6 +352,7 @@
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianFilter.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\DedicatedToken.cs" />
     <Compile Include="EmailIntelligence\Bayesian\DoNotSerializeContractResolver.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ConvertedSpamBayesTokenizer.cs" />

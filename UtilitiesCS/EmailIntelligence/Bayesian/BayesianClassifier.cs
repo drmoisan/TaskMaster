@@ -44,33 +44,33 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             Load(positiveTokens, negativeTokens);
         }
 
-        private BayesianClassifier(string tag, Corpus positive, Corpus negative, Corpus tokenBase)
+        private BayesianClassifier(string tag, Corpus positive, Corpus negative, ClassifierGroup parent)
         {
             _tag = tag;
             _notMatch = positive;
             _nNotMatch = positive.TokenCounts.Values.Sum();
             _match = negative;
             _nMatch = negative.TokenCounts.Values.Sum();
-            TokenBase = tokenBase;
+            Parent = parent;
             _prob = new ConcurrentDictionary<string, double>();
-            TokenBase.TokenCounts.Keys.ForEach(UpdateTokenProbability);
+            Parent.TokenBase.TokenCounts.Keys.ForEach(UpdateTokenProbability);
         }
 
         public static BayesianClassifier FromTokenBase(
-            Corpus tokenBase,
+            ClassifierGroup parent,
             string tag, 
             IEnumerable<string> positiveTokens)
         {
             
             var positive = new Corpus(positiveTokens);
-            var negative = tokenBase - positive;
-            var classifier = new BayesianClassifier(tag, positive, negative, tokenBase);
+            var negative = parent.TokenBase - positive;
+            var classifier = new BayesianClassifier(tag, positive, negative, parent);
 
             return classifier;
         }
 
         public static async Task<BayesianClassifier> FromTokenBaseAsync(
-            Corpus tokenBase,
+            ClassifierGroup parent,
             string tag,
             IEnumerable<string> positiveTokens,
             CancellationToken token)
@@ -80,15 +80,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 () => 
                 {
                     var positive = new Corpus(positiveTokens);
-                    var negative = tokenBase - positive;
+                    var negative = parent.TokenBase - positive;
                     classifier.Tag = tag;
                     classifier.NotMatch = positive;
                     classifier._nNotMatch = positive.TokenCounts.Values.Sum();
                     classifier.Match = negative;
                     classifier._nMatch = negative.TokenCounts.Values.Sum();
-                    classifier.TokenBase = tokenBase;
+                    classifier.Parent = parent;
                     classifier._prob = new ConcurrentDictionary<string, double>();
-                    tokenBase.TokenCounts.Keys.ForEach(classifier.UpdateTokenProbability);
+                    parent.TokenBase.TokenCounts.Keys.ForEach(classifier.UpdateTokenProbability);
                 }, 
                 token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             
@@ -130,7 +130,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public ConcurrentDictionary<string, double> Prob { get => _prob; private set => _prob = value; }
         private ConcurrentDictionary<string, double> _prob;
 
-        public Corpus TokenBase = null;
+        //public Corpus TokenBase = null;
+
+        [JsonProperty]
+        public ClassifierGroup Parent { get => _parent; internal set => _parent = value; }
+        private ClassifierGroup _parent;
 
         public string Tag { get => _tag; set => _tag = value; }
         private string _tag;
@@ -236,7 +240,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             token.ThrowIfCancellationRequested();
 
-            Match ??= await Corpus.SubtractAsync(TokenBase, NotMatch, token, sw);
+            Match ??= await Corpus.SubtractAsync(Parent.TokenBase, NotMatch, token, sw);
             sw?.LogDuration("Infer Negative Tokens");
 
             token.ThrowIfCancellationRequested();
@@ -254,10 +258,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             sw?.LogDuration("Create new Prob Dict");
 
             var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)Math.Round((double)TokenBase.TokenCounts.Keys.Count() / (double)processors, 0);
+            var chunkSize = (int)Math.Round((double)Parent.TokenBase.TokenCounts.Keys.Count() / (double)processors, 0);
             sw?.LogDuration("Calculate Chunk Size");
 
-            var chunks = TokenBase.TokenCounts.Keys.Chunk(chunkSize);
+            var chunks = Parent.TokenBase.TokenCounts.Keys.Chunk(chunkSize);
             sw?.LogDuration("Divide Keys in to Chunks");
 
             var tasks = chunks.Select(chunk => Task.Run(() => chunk.ForEach(UpdateTokenProbability)));
