@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS.HelperClasses;
@@ -18,29 +19,37 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        #region Constructors
+
         public ClassifierGroup()
         {
             _classifiers = [];
         }
 
+        #endregion Constructors
+
         #region Public Properties
 
         public ConcurrentDictionary<string, BayesianClassifier> Classifiers { get => _classifiers; protected set => _classifiers = value; }
-        private ConcurrentDictionary<string, BayesianClassifier> _classifiers;
+        protected ConcurrentDictionary<string, BayesianClassifier> _classifiers;
 
         [JsonProperty(Order = -3)]
-        public IEnumerable<DedicatedToken> DedicatedTokens { get => _dedicatedTokens; set => _dedicatedTokens = value; }
-        private IEnumerable<DedicatedToken> _dedicatedTokens;
+        public ConcurrentDictionary<string, DedicatedToken> DedicatedTokens { get => _dedicatedTokens; set => _dedicatedTokens = value; }
+        protected ConcurrentDictionary<string, DedicatedToken> _dedicatedTokens = new();
 
         [JsonProperty(Order = -2)]
-        public Corpus TokenBase { get => _tokenBase; set => _tokenBase = value; }
-        private Corpus _tokenBase = new ();
+        public Corpus SharedTokenBase { get => _sharedTokenBase; set => _sharedTokenBase = value; }
+        protected Corpus _sharedTokenBase = new();
+
+        [JsonProperty(Order = -1)]
+        public int TotalTokenCount { get => _totalTokenCount; set => _totalTokenCount = value; }
+        protected int _totalTokenCount;
 
         public IApplicationGlobals AppGlobals { get; set; }
 
         //[JsonIgnore]
         public Func<object, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
-        private Func<object, IEnumerable<string>> _tokenizer;
+        private Func<object, IEnumerable<string>> _tokenizer = new EmailTokenizer().tokenize;
 
         #endregion Public Properties
 
@@ -56,21 +65,72 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifier(tag));
             classifier.AddTokens(positiveTokens, negativeTokens);
-            
+
         }
 
-        public IOrderedEnumerable<KeyValuePair<string, double>> Classify(object source)
+        public IOrderedEnumerable<Prediction<string>> Classify(object source)
         {
             return this.Classify(_tokenizer(source));
         }
 
-        public IOrderedEnumerable<KeyValuePair<string, double>> Classify(IEnumerable<string> tokens)
+        public IOrderedEnumerable<Prediction<string>> Classify(IEnumerable<string> tokens)
         {
             var results = Classifiers.Select(
-                classifier => new KeyValuePair<string, double>(
-                    classifier.Key, classifier.Value.CalculateProbability(tokens)))
-                .OrderByDescending(x => x.Value);
+                classifier => new Prediction<string>(
+                    classifier.Key, classifier.Value.GetMatchProbability(tokens))).OrderBy(x=>x);
             return results;
+        }
+
+        #endregion Public Methods
+
+        #region Debug Methods
+
+        public void LogMetrics() 
+        {
+            var metrics = Classifiers.Select(x => new
+            {
+                Descriptor = x.Value?.Tag ?? "",
+                Match = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0,
+                NotMatch = x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0,
+                Probability = x.Value?.Prob?.Keys?.Count() ?? 0,
+                Total = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0 + 
+                        x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0 + 
+                        x.Value?.Prob?.Keys?.Count() ?? 0
+            }).ToList();
+            metrics.Insert(0, new
+            {
+                Descriptor = "Dedicated",
+                Match = this.DedicatedTokens.Count(),
+                NotMatch = 0,
+                Probability = 0,
+                Total = (int)((double)this.DedicatedTokens.Count() * 6)
+            });
+            metrics.Insert(1, new
+            {
+                Descriptor = "TokenBase",
+                Match = this.SharedTokenBase.TokenFrequency.Keys.Count(),
+                NotMatch = 0,
+                Probability = 0,
+                Total = this.SharedTokenBase.TokenFrequency.Keys.Count()
+            });
+            metrics.Add(new
+            {
+                Descriptor = "Total",
+                Match = metrics.Select(x=>x.Match).Sum(),
+                NotMatch = metrics.Select(x => x.NotMatch).Sum(),
+                Probability = metrics.Select(x => x.Probability).Sum(),
+                Total = metrics.Select(x => x.Total).Sum()
+            });
+
+            var jagged = metrics.Select(x => new[] { x.Descriptor, x.Match.ToString("N0"), x.NotMatch.ToString("N0"), x.Probability.ToString("N0"), x.Total.ToString("N0") }).ToArray();
+            //var jagged = metrics.Select(x => new object[] { x.Descriptor, x.Match, x.NotMatch, x.Probability, x.Total }).ToArray();
+
+            logger.Debug($"\n{jagged.ToFormattedText(
+                    ["Descriptor", "Matches", "Not Match", "Probability", "Total Lines"],
+                    [Enums.Justification.Left, Enums.Justification.Right, 
+                        Enums.Justification.Right, Enums.Justification.Right, 
+                        Enums.Justification.Right],
+                    "Classifier Manager Metrics".ToUpper())}");
         }
 
         public void LogState() 
@@ -81,24 +141,28 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     {
                         x.Value.Tag,
                         (x.Value.Parent is not null).ToString(),
-                        (x.Value.Parent.TokenBase is not null).ToString(),
+                        (x.Value.Parent.SharedTokenBase is not null).ToString(),
                         (x.Value.NotMatch is not null).ToString(),
                         (x.Value.Match is not null).ToString()
                     })
                 .ToArray()
                 .ToFormattedText(
                     ["Classifier", "Parent", "TokenBase", "Positive", "Negative"],
+                    [Enums.Justification.Center, Enums.Justification.Center,
+                        Enums.Justification.Center, Enums.Justification.Center, 
+                        Enums.Justification.Center],
                     "Classifier Manager State".ToUpper())}");
         }
 
-        #endregion Public Methods
-
+        #endregion Debug Methods
+        
         #region Serialization
 
-        //[OnDeserialized]
+        [OnDeserialized]
         internal void OnDeserializedMethod(StreamingContext context)
         {
-            IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
+            //IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
+            LogMetrics();
         }
 
         public async Task AfterDeserialize(CancellationToken token) 

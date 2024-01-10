@@ -22,8 +22,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             actual = addresses.Select(address => EmailDetails.ExtractNameFromAddress(address)).Select(x => new string[] { x.FirstName, x.LastName, x.DomainName }).ToArray();
 
             Console.WriteLine($"Addresses:\n{string.Join("\n", addresses)}\n");
-            Console.WriteLine($"\n{expected.ToFormattedText(["First Name", "Last Name", "Domain"],"EXPECTED")}");
-            Console.WriteLine($"\n{actual.ToFormattedText(["First Name", "Last Name", "Domain"], "ACTUAL")}");
+            Console.WriteLine($"\n{expected.ToFormattedText(["First Name", "Last Name", "Domain"],title:"EXPECTED")}");
+            Console.WriteLine($"\n{actual.ToFormattedText(["First Name", "Last Name", "Domain"], title: "ACTUAL")}");
 
             // Assert
 

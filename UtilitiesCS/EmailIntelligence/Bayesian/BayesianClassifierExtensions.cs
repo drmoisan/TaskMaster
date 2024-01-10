@@ -20,10 +20,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public static async Task<BayesianClassifier> ToClassifierAsync(
             this ClassifierGroup parent,
             string tag,
-            IEnumerable<string> positiveTokens,
+            IEnumerable<string> matchTokens,
             CancellationToken token)
         {
-            return await BayesianClassifier.FromTokenBaseAsync(parent, tag, positiveTokens, token);
+            return await BayesianClassifier.FromTokenBaseAsync(parent, tag, matchTokens, token);
         }
     }
 }

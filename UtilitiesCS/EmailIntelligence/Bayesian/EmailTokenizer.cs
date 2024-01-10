@@ -92,6 +92,20 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Main Methods
 
+        public IEnumerable<string> tokenize(object obj) 
+        {
+            if (obj is null) { throw new ArgumentNullException("obj"); }
+            else if (obj is string[]) { return (string[])obj; }
+            else if (obj is MailItemInfo) { return tokenize((MailItemInfo)obj);}
+            else if (obj is MailItem) { return tokenize(new MailItemInfo((MailItem)obj)); }
+            else
+            {
+                throw new ArgumentException($"obj type must be {typeof(string[])}, " +
+                    $"{typeof(MailItem)}, or {typeof(MailItemInfo)}. {obj.GetType()} " +
+                    $"is not supported");
+            }
+        }
+
         public IEnumerable<string> tokenize(MailItemInfo msg)
         {
             //var headers = msg.GetHeaders();

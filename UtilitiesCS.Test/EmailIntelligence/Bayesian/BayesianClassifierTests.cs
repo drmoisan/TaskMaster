@@ -1,0 +1,395 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System;
+using System.Threading.Tasks;
+using System.Threading;
+using UtilitiesCS.EmailIntelligence.Bayesian;
+using System.Collections.Generic;
+using UtilitiesCS.HelperClasses;
+using System.Collections.Concurrent;
+using System.Linq;
+using FluentAssertions;
+
+namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
+{
+    [TestClass]
+    public class BayesianClassifierTests
+    {
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            Console.SetOut(new DebugTextWriter());
+            this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true};
+            this.dedicated = CreateDedicatedTokens();
+            
+            this.sharedTokens = CreateSharedTokens();
+            var tokenBase = new CorpusSub();
+            tokenBase.SetTokenBase(sharedTokens);
+            this.sharedTokenBase2 = tokenBase.GetBase();
+            
+            this.classifierGroup = new ClassifierGroupSub();
+            this.classifierGroup.DedicatedTokens = this.dedicated;
+            this.classifierGroup.SharedTokenBase = this.sharedTokenBase2;
+        }
+
+        #region Helper Functions and Classes
+
+        private MockRepository mockRepository;
+        private Mock<ClassifierGroupSub> mockClassifierGroup;
+        private ClassifierGroupSub classifierGroup;
+        private ConcurrentDictionary<string, DedicatedToken> dedicated;
+        private Mock<Corpus> sharedTokenBase;
+        private Corpus sharedTokenBase2;
+        private ConcurrentDictionary<string, int> sharedTokens;
+        private Mock<BayesianClassifier> mockBayesianClassifier;
+
+        private class BayesianClassifierSub: BayesianClassifier
+        {
+            public BayesianClassifierSub() { }
+            public BayesianClassifierSub(ConcurrentDictionary<string, double> prob) 
+            { 
+                base._prob = prob;
+            }
+
+            public new ConcurrentDictionary<string, double> Prob { get => base._prob; set => base._prob = value; }
+
+            public new ClassifierGroupSub Parent 
+            { 
+                get => base._parent as ClassifierGroupSub;
+                set => base._parent = value; 
+            }
+        }
+        
+        public class ClassifierGroupSub: ClassifierGroup
+        {
+            public ClassifierGroupSub() { }
+
+            public new virtual ConcurrentDictionary<string, DedicatedToken> DedicatedTokens { get => base._dedicatedTokens; set => base._dedicatedTokens = value; }
+
+            public new virtual Corpus SharedTokenBase { get => base._sharedTokenBase; set => base._sharedTokenBase = value; }
+        }
+
+        public class CorpusSub: Corpus
+        {
+            public CorpusSub() { }
+            public void SetTokenBase(ConcurrentDictionary<string, int> tb)
+            {
+                this.TokenFrequency = tb;
+            }
+            public Corpus GetBase() => this;
+        }
+
+        private void AddKvp(ConcurrentDictionary<string, DedicatedToken> cd, string token, int count, string folderPath)
+        {
+            cd.TryAdd(token, new DedicatedToken() 
+            { Token = token, Count = count, FolderPath = folderPath });
+        }
+
+        private ConcurrentDictionary<string, DedicatedToken> CreateDedicatedTokens()
+        {
+            var cd = new ConcurrentDictionary<string, DedicatedToken>();
+            AddKvp(cd, "dedicated1", 6, "folderA");
+            AddKvp(cd, "dedicated2", 4, "folderA");
+            AddKvp(cd, "dedicated3", 1, "folderA");
+            AddKvp(cd, "dedicated4", 6, "folderB");
+            AddKvp(cd, "dedicated5", 4, "folderB");
+            AddKvp(cd, "dedicated6", 1, "folderB");
+            return cd;
+        }
+
+        private ConcurrentDictionary<string, int> CreateSharedTokens()
+        {
+            var cd = new ConcurrentDictionary<string, int>();
+            cd.TryAdd("shared1", 6);
+            cd.TryAdd("shared2", 4);
+            cd.TryAdd("shared3", 1);
+            cd.TryAdd("shared4", 6);
+            cd.TryAdd("shared5", 4);
+            cd.TryAdd("shared6", 1);
+            return cd;
+        }
+
+        private const string alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+        private BayesianClassifierSub CreateBayesianClassifier()
+        {
+            return new BayesianClassifierSub();
+        }
+
+        private BayesianClassifierSub SetupClassifierScenario1()
+        {
+            var classifier = CreateBayesianClassifier();
+            classifier.Tag = "folderA";
+            classifier.Parent = classifierGroup;
+            classifier.Prob = new ConcurrentDictionary<string, double>(
+                Enumerable.Range(0, 26)
+                .Select(i => new KeyValuePair<string, double>(
+                alphabet[i].ToString(), i / (double)100 + 0.6)));
+
+            LogTokens(classifier.Prob.OrderBy(x => x.Key).ToDictionary(), "Source probability tokens");
+            LogTokens(classifier.Parent.SharedTokenBase.TokenFrequency.OrderBy(x => x.Key).ToDictionary(), "Shared tokens");
+            LogDedicatedTokens();
+            return classifier;
+        }
+
+        private void LogProbabilities(IDictionary<string, double> probabilities, string title)
+        {
+            var text = probabilities.ToFormattedText(
+                (key) => key,
+                (value) => value.ToString("N2"),
+                headers: ["Class", "Probability"],
+                justifications: [Enums.Justification.Left, Enums.Justification.Right],
+                title: title);
+            Console.WriteLine(text);
+        }
+
+        private void LogDedicatedTokens() 
+        {
+            Console.WriteLine($"\nDEDICATED TOKENS:\n[{string.Join(",",this.dedicated.Select(x => x.Value.Token))}]");
+        }
+
+        private void LogTokens(IDictionary<string, double> probabilities, string title) 
+        {
+            Console.WriteLine($"\n{title.ToUpper()}:\n[{string.Join(",", probabilities.Select(x=>x.Key))}]");
+        }
+
+        private void LogTokens(IDictionary<string, int> probabilities, string title)
+        {
+            Console.WriteLine($"\n{title.ToUpper()}:\n[{string.Join(",", probabilities.Select(x => x.Key))}]");
+        }
+
+        #endregion Helper Functions and Classes
+
+        [TestMethod]
+        public void GetProbabilityList_MultiCase_ExpectedBehavior()
+        {
+            // Test description
+            Console.WriteLine($"Tests several conditions:\n1) A subset of tokens are found in the probability list." +
+                $"\n2) A subset of tokens are not found in the probability list but are found in either the shared " +
+                $"token list or the dedicated token list, and\n3) Some of the tokens found in those lists do not meet " +
+                $"the minimum threshhold for inclusion and are excluded from the list. \n   " +
+                $"When included, they should carry the minimum probability of " +
+                $"a match to the current classifier because they are important to other classifiers\n" +
+                $"4) There is one new token, which should be excluded\n" +
+                $"5) There are two duplicated tokens which should have two entries");
+
+            // ===============
+            // Arrange
+            // ===============
+
+            // Set up classifier
+            var classifier = SetupClassifierScenario1();
+
+            // Set up tokens in the Prob list
+            var input = Enumerable.Range(8, 4).Select(i => alphabet[i].ToString()).ToList();
+            
+            // Add two duplicate tokens in the Prob list
+            input.AddRange(Enumerable.Range(9, 2).Select(i => alphabet[i].ToString()));
+            
+            // Add Shared and Dedicated tokens that are NOT in the Prob list
+            input.AddRange(["dedicated2", "dedicated3", "shared1", "shared2", "shared3", "new1"]);
+            Console.WriteLine($"\nInput Tokens: \n[{string.Join(", ", input)}]\n");
+
+            // Set up the expected output
+            var expected = new SortedList<string, double>();
+            int j = 0;
+            Enumerable.Range(8, 4)
+                .ForEach(i => expected.Add(
+                    $".{40 - i:00}000{alphabet[i]}{j++}",
+                    i / (double)100 + 0.6));
+            Enumerable.Range(9, 2)
+                .ForEach(i => expected.Add(
+                    $".{40 - i:00}000{alphabet[i]}{j++}",
+                    i / (double)100 + 0.6));
+            expected.Add($".01100dedicated2{j++}", 0.011);
+            expected.Add($".01100shared1{j++}", 0.011);
+            expected.Add($".01100shared2{j++}", 0.011);
+
+            Console.WriteLine("Expected list should exclude:\n" +
+                "dedicated3: does not meet minimum token count\n" +
+                "shared3:    does not meet minimum token count\n" +
+                "new1:       does not exist in any list\n");
+
+            LogProbabilities(expected, "Expected Probability List");
+
+
+            // ===============
+            // Act
+            // ===============
+            var actual = classifier.GetProbabilityList(input);
+            LogProbabilities(actual, "Actual Probability List");
+
+            // ===============
+            // Assert
+            // ===============
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void GetProbabilityList_NullCase_ExpectedBehavior()
+        {
+            // Test description
+            Console.WriteLine($"Tests null input");
+
+            // ===============
+            // Arrange
+            // ===============
+
+            // Set up classifier
+            var classifier = SetupClassifierScenario1();
+
+            // Set up null token parameter
+            string[] input = null;
+
+            // Set up the expected output
+            var expected = new SortedList<string, double>();
+            LogProbabilities(expected, "Expected Output");
+            
+            // ===============
+            // Act
+            // ===============
+            var actual = classifier.GetProbabilityList(input);
+            LogProbabilities(actual, "Actual Output");
+
+            // ===============
+            // Assert
+            // ===============
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void GetProbabilityList_EmptyCase_ExpectedBehavior()
+        {
+            // Test description
+            Console.WriteLine($"Tests empty input");
+
+            // ===============
+            // Arrange
+            // ===============
+
+            // Set up classifier
+            var classifier = SetupClassifierScenario1();
+
+            // Set up null token parameter
+            string[] input = [];
+
+            // Set up the expected output
+            var expected = new SortedList<string, double>();
+            LogProbabilities(expected, "Expected Output");
+
+            // ===============
+            // Act
+            // ===============
+            var actual = classifier.GetProbabilityList(input);
+            LogProbabilities(actual, "Actual Output");
+
+            // ===============
+            // Assert
+            // ===============
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void GetProbabilityList_AllNew_ExpectedBehavior()
+        {
+            // Test description
+            Console.WriteLine($"Tests all new tokens");
+
+            // ===============
+            // Arrange
+            // ===============
+
+            // Set up classifier
+            var classifier = SetupClassifierScenario1();
+
+            // Set up null token parameter
+            string[] input = ["new1","new2","new3"];
+
+            // Set up the expected output
+            var expected = new SortedList<string, double>();
+            LogProbabilities(expected, "Expected Output");
+
+            // ===============
+            // Act
+            // ===============
+            var actual = classifier.GetProbabilityList(input);
+            LogProbabilities(actual, "Actual Output");
+
+            // ===============
+            // Assert
+            // ===============
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void CombineProbabilities_01ExcludeEntriesAfterInterestingWordCount_ExpectedBehavior()
+        {
+            Console.WriteLine("Tests whether the cutoff for Knobs.InterestingWordCount is working\n");
+            
+            // Arrange
+            var classifier = this.CreateBayesianClassifier();
+            var cutoff = classifier.Knobs.InterestingWordCount;
+            SortedList<string, double> input = [];
+            Enumerable.Range(0, cutoff).ForEach(i => input.Add($".00001highprobtoken{i}", 1));
+            Enumerable.Range(0, 5).ForEach(i => input.Add($".40000averagetoken{i}", 0.5));
+            Console.WriteLine($"Interesting Word Count: {cutoff}\n");
+            LogProbabilities(input, "Source List of Probabilities");
+            double expected = 1;
+            Console.WriteLine($"Expected: {expected:N2} since all entries at 0.50 probability are cut off");
+
+            // Act
+            double actual = classifier.CombineProbabilities(input);
+            Console.WriteLine($"Actual: {actual:N2}");
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void CombineProbabilities_02FewEntries_ExpectedBehavior()
+        {
+            Console.WriteLine("Tests whether properly handles few entries\n");
+
+            // Arrange
+            var classifier = this.CreateBayesianClassifier();
+            var cutoff = classifier.Knobs.InterestingWordCount;
+            SortedList<string, double> input = [];
+            Enumerable.Range(0, Math.Max(1,cutoff-2)).ForEach(i => input.Add($".00001highprobtoken{i}", 1));
+            Console.WriteLine($"Interesting Word Count: {cutoff}\n");
+            LogProbabilities(input, "Source List of Probabilities");
+            double expected = 1;
+            Console.WriteLine($"Expected: {expected:N2}");
+
+            // Act
+            double actual = classifier.CombineProbabilities(input);
+            Console.WriteLine($"Actual: {actual:N2}");
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void CombineProbabilities_03NoEntries_ExpectedBehavior()
+        {
+            Console.WriteLine("Tests whether properly handles no entries\n");
+
+            // Arrange
+            var classifier = this.CreateBayesianClassifier();
+            var cutoff = classifier.Knobs.InterestingWordCount;
+            SortedList<string, double> input = [];
+            
+            LogProbabilities(input, "Source List of Probabilities");
+            double expected = 0;
+            Console.WriteLine($"Expected: {expected:N2}");
+
+            // Act
+            double actual = classifier.CombineProbabilities(input);
+            Console.WriteLine($"Actual: {actual:N2}");
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+
+    }
+}

@@ -24,7 +24,7 @@ namespace UtilitiesCS
             {
                 _progressViewer.Bar.Value = tup.value;
                 _progressViewer.JobName.Text = tup.jobName;
-                _progressViewer.Refresh();
+                //_progressViewer.Refresh();
             });
             _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
             

@@ -56,6 +56,10 @@ namespace UtilitiesCS
             }
         }
 
+        public static string StringJoin(this IEnumerable<string> strings, string seperator=",") => string.Join(seperator, strings);
+
+        public static string StringJoin(this IEnumerable<char> chars, string seperator = "") => string.Join(seperator, chars);
+
         internal static List<T> ToList<T>(this IEnumerable<T> enumerable, int count, ProgressTracker progress)
         {
             int completed = 0;
@@ -137,7 +141,6 @@ namespace UtilitiesCS
                 yield return (e1.Current, e2.Current);
             }
         }
-
 
         public static Tuple<IEnumerable<T>, IEnumerable<U>> Unzip<T, U>(this IEnumerable<(T, U)> source)
         {

@@ -251,7 +251,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var remainingSeconds = remaining * seconds;
             var ts = TimeSpan.FromSeconds(remainingSeconds);
             string msg = $"Completed {complete} of {count} ({seconds:N2} spm) " +
-                $"({psw.Elapsed:%m\\ss} elapsed {ts:%m\\ss} remaining)";
+                $"({psw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
         }
 
@@ -267,16 +267,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         private ScoCollection<MinedMailInfo> _mailInfoCollection;
         
-        public IEnumerable<DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
+        public ConcurrentDictionary<string, DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
         {
-            //var dedicated = collection.SelectMany(x => 
-            //    x.Tokens.Select(y => 
-            //    (Token: y, FolderPath: x.FolderPath))
-            //    .GroupBy(x => x.Token).Select(grp => new DedicatedToken(
-            //        grp.Key,
-            //        grp.ToList().First().FolderPath,
-            //        grp.Count()))).ToArray();
-
             var dedicated = collection.Select(x =>
                 x.Tokens.Select(y =>
                 (Token: y, FolderPath: x.FolderPath))
@@ -285,13 +277,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     grp.Key,
                     grp.ToList().First().FolderPath,
                     grp.Count())))
-                .SelectMany(x=>x)
+                .SelectMany(x => x)
                 .GroupBy(x => x.Token)
                 .Where(grp => grp.Count() == 1)
                 .SelectMany(x => x)
-                .ToArray();
+                .Select(x => new KeyValuePair<string, DedicatedToken>(x.Token, x));
+                //.ToArray();
+            var dict = new ConcurrentDictionary<string, DedicatedToken>(dedicated);
 
-            return dedicated;
+            return dict;
         }
         
         public async Task BuildClassifierAsync()
@@ -315,20 +309,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
             sw.LogDuration("Get Folder Paths");
 
-            var dedicated = GetDedicated(collection);
-            var dedicatedTokens = dedicated.Select(x => x.Token).ToArray();
-
+            var group = new ClassifierGroup();
+            
             var allTokens = collection.SelectMany(x => x.Tokens).ToList();
+            group.TotalTokenCount = allTokens.Count();
+            sw.LogDuration("Capture all tokens and count");
 
-            Corpus tokenBase = new();
-            tokenBase.AddOrIncrementTokens(allTokens);
-            dedicatedTokens.ForEach(x => tokenBase.TokenCounts.TryRemove(x, out _));
-            sw.LogDuration("Create Token Base");
+            var dedicated = GetDedicated(collection);
+            var dedicatedTokens = dedicated.Select(x => x.Key).ToArray();
+            group.DedicatedTokens = dedicated;
+            sw.LogDuration("Identify Dedicated Tokens");
+
+            Corpus sharedTokenBase = new();
+            sharedTokenBase.AddOrIncrementTokens(allTokens);
+            dedicatedTokens.ForEach(x => sharedTokenBase.TokenFrequency.TryRemove(x, out _));
+            group.SharedTokenBase = sharedTokenBase;
+            sw.LogDuration("Create Shared Token Base");
             sw.WriteToLog(clear: false);
 
-            var group = new ClassifierGroup();
-            group.TokenBase = tokenBase;
-            group.DedicatedTokens = dedicated;
 
             int completed = 0;
             int count = folderPaths.Count();
@@ -347,18 +345,32 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var progress = new ProgressTracker(tokenSource);
 
             var tasks = chunks.Select(
-                chunk => Task.Run(async () => await
-                chunk.ToAsyncEnumerable()
-                .ForEachAsync(async (folderPath) =>
+                chunk => Task.Run(async () =>
                 {
-                    var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-                    group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
-                    Interlocked.Increment(ref completed);
-                    progress.Report(
-                        (int)(((double)completed / count) * 100),
-                        GetReportMessage(completed, count, psw));
-                }), 
-                token));
+                    foreach (var folderPath in chunk)
+                    {
+                        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+                        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+                        Interlocked.Increment(ref completed);
+                        progress.Report(
+                            (int)(((double)completed / count) * 100),
+                            GetReportMessage(completed, count, psw));
+                    }
+                },token));
+
+            //var tasks = chunks.Select(
+            //    chunk => Task.Run(async () => await
+            //        chunk.ToAsyncEnumerable()
+            //        .ForEachAsync(async (folderPath) => 
+            //        {
+            //            var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+            //            group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+            //            Interlocked.Increment(ref completed);
+            //            progress.Report(
+            //                (int)(((double)completed / count) * 100),
+            //                GetReportMessage(completed, count, psw));
+            //        }), 
+            //        token));
             
             //var tasks = folderPaths.Select(folderPath =>
             //{
@@ -374,11 +386,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //});
 
             bool success = false;
-            Task entireTask = Task.WhenAll(tasks);
 
             try
             {
-                await entireTask;
+                await Task.WhenAll(tasks);
                 success = true;
             }
             catch (OperationCanceledException)
@@ -409,7 +420,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             tokenBase.AddOrIncrementTokens(allTokens);
 
             var group = new ClassifierGroup();
-            group.TokenBase = tokenBase;
+            group.SharedTokenBase = tokenBase;
 
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
@@ -481,7 +492,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             tokenBase.AddOrIncrementTokens(allTokens);
 
             var group = new ClassifierGroup();
-            group.TokenBase = tokenBase;
+            group.SharedTokenBase = tokenBase;
 
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;

@@ -359,6 +359,7 @@
     <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusInherit.cs" />
     <Compile Include="EmailIntelligence\Bayesian\MinedMailInfo.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
     <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusExample.cs" />

@@ -75,7 +75,10 @@ namespace UtilitiesCS.HelperClasses
                 { x.Duration.ToString("%m\\:ss\\.ff"), x.ActionName })
                 .ToArray();
 
-            var text = durs.ToFormattedText(["Duration", "Action"], $"SEGMENT DURATIONS {methodName.ToUpper()}");
+            var text = durs.ToFormattedText(
+                ["Duration", "Action"],
+                [Enums.Justification.Right, Enums.Justification.Left],
+                $"SEGMENT DURATIONS {methodName.ToUpper()}");
             return text;
         }
 

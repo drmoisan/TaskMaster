@@ -335,21 +335,7 @@ namespace TaskMaster
 
         internal void TryPrintManagerState()
         {
-            _globals.AF.Manager["Folder"].LogState();
-            //logger.Debug($"\n{
-            //    _globals.AF.Manager["Folder"]
-            //    .Classifiers
-            //    .Select(x => new[]
-            //        {
-            //            x.Value.Tag,
-            //            (x.Value.TokenBase is not null).ToString(),
-            //            (x.Value.Positive is not null).ToString(),
-            //            (x.Value.Negative is not null).ToString()
-            //        })
-            //    .ToArray()
-            //    .ToFormattedText(
-            //        ["Classifier", "TokenBase", "Positive", "Negative"], 
-            //        "Classifier Manager State".ToUpper())}");
+            _globals.AF.Manager["Folder"].LogMetrics();
         }
 
         internal void TrySaveManagerLocally()

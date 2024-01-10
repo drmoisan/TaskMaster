@@ -4,6 +4,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
     public class DedicatedToken: IEquatable<DedicatedToken>
     {
+        public DedicatedToken() { }
+
         public DedicatedToken(string token, string folderPath, int count)
         {
             Token = token;

@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using System.Threading;
 using UtilitiesCS.HelperClasses;
+using Fizzler;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -48,12 +49,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             _tag = tag;
             _notMatch = positive;
-            _nNotMatch = positive.TokenCounts.Values.Sum();
+            _notMatchCount = positive.TokenFrequency.Values.Sum();
             _match = negative;
-            _nMatch = negative.TokenCounts.Values.Sum();
+            _matchCount = negative.TokenFrequency.Values.Sum();
             Parent = parent;
             _prob = new ConcurrentDictionary<string, double>();
-            Parent.TokenBase.TokenCounts.Keys.ForEach(UpdateTokenProbability);
+            Parent.SharedTokenBase.TokenFrequency.Keys.ForEach(UpdateProbabilityShared);
         }
 
         public static BayesianClassifier FromTokenBase(
@@ -63,7 +64,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             
             var positive = new Corpus(positiveTokens);
-            var negative = parent.TokenBase - positive;
+            var negative = parent.SharedTokenBase - positive;
             var classifier = new BayesianClassifier(tag, positive, negative, parent);
 
             return classifier;
@@ -72,26 +73,27 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public static async Task<BayesianClassifier> FromTokenBaseAsync(
             ClassifierGroup parent,
             string tag,
-            IEnumerable<string> positiveTokens,
+            IEnumerable<string> matchTokens,
             CancellationToken token)
         {
             var classifier = new BayesianClassifier();
-            await Task.Factory.StartNew(
-                () => 
+            //await Task.Factory.StartNew(
+            await Task.Run(
+                () =>
                 {
-                    var positive = new Corpus(positiveTokens);
-                    var negative = parent.TokenBase - positive;
+                    var match = new Corpus(matchTokens);
+                    var notMatch = parent.SharedTokenBase - match;
                     classifier.Tag = tag;
-                    classifier.NotMatch = positive;
-                    classifier._nNotMatch = positive.TokenCounts.Values.Sum();
-                    classifier.Match = negative;
-                    classifier._nMatch = negative.TokenCounts.Values.Sum();
+                    classifier.NotMatch = notMatch;
+                    classifier._notMatchCount = notMatch.TokenFrequency.Values.Sum();
+                    classifier.Match = match;
+                    classifier._matchCount = match.TokenFrequency.Values.Sum();
                     classifier.Parent = parent;
                     classifier._prob = new ConcurrentDictionary<string, double>();
-                    parent.TokenBase.TokenCounts.Keys.ForEach(classifier.UpdateTokenProbability);
-                }, 
-                token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            
+                    parent.SharedTokenBase.TokenFrequency.Keys.ForEach(classifier.UpdateProbabilityShared);
+                },
+                token);
+                            
             return classifier;
         }
 
@@ -99,8 +101,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region private fields
 
-        private int _nNotMatch;
-        private int _nMatch;
 
         #endregion private fields
 
@@ -113,8 +113,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// <summary>
         /// A list of words that show tend to show up in Spam text
         /// </summary>
+        [JsonProperty]
         public Corpus Match { get => _match; private set => _match = value; }
         private Corpus _match;
+
+        [JsonProperty]
+        public int MatchCount { get => _matchCount; private set => _matchCount = value; }
+        private int _matchCount;
 
         /// <summary>
         /// A list of words that tend to show up in non-spam text
@@ -123,18 +128,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public Corpus NotMatch { get => _notMatch; set => _notMatch = value; }
         private Corpus _notMatch;
 
+        [JsonProperty]
+        public int NotMatchCount { get => _notMatchCount; private set => _notMatchCount = value; }
+        private int _notMatchCount;
+
         /// <summary>
         /// A list of probabilities that the given word might appear in a Spam text
         /// </summary>
         [JsonProperty]
         public ConcurrentDictionary<string, double> Prob { get => _prob; private set => _prob = value; }
-        private ConcurrentDictionary<string, double> _prob;
-
-        //public Corpus TokenBase = null;
+        protected ConcurrentDictionary<string, double> _prob;
 
         [JsonProperty]
         public ClassifierGroup Parent { get => _parent; internal set => _parent = value; }
-        private ClassifierGroup _parent;
+        protected ClassifierGroup _parent;
 
         public string Tag { get => _tag; set => _tag = value; }
         private string _tag;
@@ -146,23 +153,23 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public void AddPositive(IEnumerable<string> tokens) 
         {
             _notMatch.AddOrIncrementTokens(tokens);
-            tokens.Distinct().ForEach(UpdateTokenProbability);
+            tokens.Distinct().ForEach(UpdateProbabilityShared);
         }
 
         public void AddNegative(IEnumerable<string> tokens)
         {
             _match.AddOrIncrementTokens(tokens);
-            tokens.Distinct().ForEach(UpdateTokenProbability);
+            tokens.Distinct().ForEach(UpdateProbabilityShared);
         }
 
         public void AddTokens(IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
         {
             _notMatch.AddOrIncrementTokens(positiveTokens);
-            _nNotMatch = _notMatch.TokenCounts.Values.Sum();
+            _notMatchCount = _notMatch.TokenFrequency.Values.Sum();
             _match.AddOrIncrementTokens(negativeTokens);
-            _nMatch = _match.TokenCounts.Values.Sum();
+            _matchCount = _match.TokenFrequency.Values.Sum();
 
-            positiveTokens.Concat(negativeTokens).Distinct().ForEach(UpdateTokenProbability);
+            positiveTokens.Concat(negativeTokens).Distinct().ForEach(UpdateProbabilityShared);
         }
 
         public void RemovePositive(IEnumerable<string> tokens)
@@ -170,7 +177,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             foreach (var token in tokens)
             {
                 _notMatch.DecrementOrRemoveToken(token);
-                UpdateTokenProbability(token);
+                UpdateProbabilityShared(token);
             }
         }
 
@@ -179,7 +186,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             foreach (var token in tokens)
             {
                 _match.DecrementOrRemoveToken(token);
-                UpdateTokenProbability(token);
+                UpdateProbabilityShared(token);
             }
         }
 
@@ -195,7 +202,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// by comparing the number of good and bad texts it appears in already.
         /// </summary>
         /// <param name="token"></param>
-        private void UpdateTokenProbability(string token)
+        private void UpdateProbabilityStandalone(string token)
         {
             /*
 			 * This is a direct implementation of Paul Graham's algorithm from
@@ -209,18 +216,57 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 			 *								 (+ (min 1 (/ g ngood))   
 			 *									(min 1 (/ b nbad)))))))))
 			 */
-            int g = _notMatch.TokenCounts.TryGetValue(token, out int gCount) ? gCount * Knobs.NotMatchTokenWeight : 0 ;
-            int b = _match.TokenCounts.TryGetValue(token, out int bCount) ? bCount : 0;
+            int b = _match.TokenFrequency.TryGetValue(token, out int bCount) ? bCount : 0;
+            int g = _notMatch.TokenFrequency.TryGetValue(token, out int gCount) ? gCount * Knobs.NotMatchTokenWeight : 0 ;
 
             if (g + b >= Knobs.MinCountForInclusion)
             {
-                double notMatchfactor = Math.Min(1, (double)g / (double)_nNotMatch);
-                double matchFactor = Math.Min(1, (double)b / (double)_nMatch);
+                double matchFactor = Math.Min(1, (double)b / (double)_matchCount);
+                var notMatchCount = Parent.TotalTokenCount - _matchCount;
+                double notMatchfactor = Math.Min(1, (double)g / (double)notMatchCount);
 
                 double prob = Math.Max(Knobs.MinScore,
                               Math.Min(Knobs.MaxScore, matchFactor / (notMatchfactor + matchFactor)));
 
-                
+                // special case for Spam-only tokens.
+                // .9998 for tokens only found in spam, or .9999 if found more than 10 times
+                if (g == 0)
+                {
+                    prob = (b > Knobs.CertainMatchCount) ? Knobs.CertainMatchScore : Knobs.LikelyMatchScore;
+                }
+
+                _prob[token] = prob;
+            }
+        }
+
+        private void UpdateProbabilityShared(string token) 
+        {
+            /*
+			 * This is a direct implementation of Paul Graham's algorithm from
+			 * http://www.paulgraham.com/spam.html
+			 * 
+			 *	(let ((g (* 2 (or (gethash word good) 0)))
+			 *		  (b (or (gethash word bad) 0)))
+			 *	   (unless (< (+ g b) 5)
+			 *		 (max .01
+			 *			  (min .99 (float (/ (min 1 (/ b nbad))
+			 *								 (+ (min 1 (/ g ngood))   
+			 *									(min 1 (/ b nbad)))))))))
+			 */
+            int b = _match.TokenFrequency.TryGetValue(token, out int bCount) ? bCount : 0;
+            int g = Parent.SharedTokenBase.TokenFrequency
+                .TryGetValue(token, out int gCount) ? Math.Max(gCount - b, 0) : 0;
+
+            if (g + b >= Knobs.MinCountForInclusion)
+            {
+                double matchFactor = Math.Min(1, (double)b / (double)_matchCount);
+                var notMatchCount = Parent.TotalTokenCount - _matchCount;
+                double notMatchfactor = Math.Min(1, (double)g / (double)notMatchCount);
+
+                double prob = Math.Max(Knobs.MinScore,
+                              Math.Min(Knobs.MaxScore, matchFactor / (notMatchfactor + matchFactor)));
+
+
                 // special case for Spam-only tokens.
                 // .9998 for tokens only found in spam, or .9999 if found more than 10 times
                 if (g == 0)
@@ -240,15 +286,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             token.ThrowIfCancellationRequested();
 
-            Match ??= await Corpus.SubtractAsync(Parent.TokenBase, NotMatch, token, sw);
+            Match ??= await Corpus.SubtractAsync(Parent.SharedTokenBase, NotMatch, token, sw);
             sw?.LogDuration("Infer Negative Tokens");
 
             token.ThrowIfCancellationRequested();
 
-            _nNotMatch = NotMatch.TokenCounts.Values.Sum();
+            _notMatchCount = NotMatch.TokenFrequency.Values.Sum();
             sw?.LogDuration("Calculate _nPositive");
 
-            _nMatch = Match.TokenCounts.Values.Sum();
+            _matchCount = Match.TokenFrequency.Values.Sum();
             sw?.LogDuration("Calculate _nNegative");
         }
 
@@ -258,13 +304,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             sw?.LogDuration("Create new Prob Dict");
 
             var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)Math.Round((double)Parent.TokenBase.TokenCounts.Keys.Count() / (double)processors, 0);
+            var chunkSize = (int)Math.Round((double)Parent.SharedTokenBase.TokenFrequency.Keys.Count() / (double)processors, 0);
             sw?.LogDuration("Calculate Chunk Size");
 
-            var chunks = Parent.TokenBase.TokenCounts.Keys.Chunk(chunkSize);
+            var chunks = Parent.SharedTokenBase.TokenFrequency.Keys.Chunk(chunkSize);
             sw?.LogDuration("Divide Keys in to Chunks");
 
-            var tasks = chunks.Select(chunk => Task.Run(() => chunk.ForEach(UpdateTokenProbability)));
+            var tasks = chunks.Select(chunk => Task.Run(() => chunk.ForEach(UpdateProbabilityShared)));
             sw?.LogDuration("Start tasks to Calculate Token Probabilities");
 
             await Task.WhenAll(tasks);
@@ -291,54 +337,99 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// </summary>
         /// <param name="tokens"></param>
         /// <returns></returns>
-        public double CalculateProbability(IEnumerable<string> tokens)
+        public double GetMatchProbability(IEnumerable<string> tokens)
+        {            
+            var probabilities = GetProbabilityList(tokens);
+            var combined = CombineProbabilities(probabilities);
+
+            return combined;
+        }
+
+        public SortedList<string, double> GetProbabilityList(IEnumerable<string> tokens)
         {
-            SortedList probs = [];
+            SortedList<string, double> probabilities = [];
+
+            if (tokens is null)
+            {
+                logger.Debug($"Parameter {nameof(tokens)} is null. Returning empty list");
+                return probabilities;
+            }
 
             // Spin through every word in the body and look up its individual spam probability.
             // Keep the list in decending order of "Interestingness"
             int index = 0;
             foreach (var token in tokens)
             {
-                if (_prob.ContainsKey(token))
+                if (_prob.TryGetValue(token, out double prob))
                 {
                     // "interestingness" == how far our score is from 50%.  
                     // The crazy math below is building a string that lets us sort alphabetically by interestingness.
-                    double prob = _prob[token];
                     string key = (0.5 - Math.Abs(0.5 - prob)).ToString(".00000") + token + index++;
-                    probs.Add(key, prob);
+                    probabilities.Add(key, prob);
+                }
 
+                else if (Parent?.DedicatedTokens?.TryGetValue(token, out var dedicated) ?? false)
+                {
+                    if (dedicated.Count * Knobs.NotMatchTokenWeight >= Knobs.MinCountForInclusion)
+                    {
+                        prob = Knobs.MinScore;
+                        string key = (0.5 - Math.Abs(0.5 - prob))
+                            .ToString(".00000") + token + index++;
+                        probabilities.Add(key, prob);
+                    }
+                }
+
+                else if (Parent?.SharedTokenBase?.TokenFrequency.TryGetValue(token, out var count) ?? false)
+                {
+                    if (count * Knobs.NotMatchTokenWeight >= Knobs.MinCountForInclusion)
+                    {
+                        prob = Knobs.MinScore;
+                        string key = (0.5 - Math.Abs(0.5 - prob))
+                            .ToString(".00000") + token + index++;
+                        probabilities.Add(key, prob);
+                    }
                 }
             }
 
-            /* Combine the 15 most interesting probabilities together into one.  
-			 * The algorithm to do this is shown below and described here:
-			 * http://www.paulgraham.com/naivebayes.html
-			 * 
-			 *				abc           
-			 *	---------------------------
-			 *	abc + (1 - a)(1 - b)(1 - c)
-			 *
-			 */
+            return probabilities;
+        }
 
-            double mult = 1;  // for holding abc..n
-            double comb = 1;  // for holding (1 - a)(1 - b)(1 - c)..(1-n)
-            index = 0;
-            foreach (string key in probs.Keys)
+        public double CombineProbabilities(SortedList<string, double> probabilities)
+        {
+            /* Combine the 20 most interesting probabilities together into one.  
+                         * The algorithm to do this is shown below and described here:
+                         * http://www.paulgraham.com/naivebayes.html
+                         * 
+                         *				abc           
+                         *	---------------------------
+                         *	abc + (1 - a)(1 - b)(1 - c)
+                         *
+                         */
+
+            double mult = 1;
+            double comb = 1;
+            //int index = 0;
+
+            if (probabilities is null) { throw new ArgumentNullException(nameof(probabilities));}
+
+            if(probabilities.Count == 0)
             {
-                double prob = (double)probs[key];
-                mult *= prob;
-                comb *= (1 - prob);
-
-                Debug.WriteLine(index + " " + probs[key] + " " + key);
-
-                if (++index > Knobs.InterestingWordCount)
-                    break;
+                return 0;
             }
+            
+            probabilities
+                .Take(Knobs.InterestingWordCount)
+                .ForEach(kvp => 
+                {
+                    mult *= kvp.Value;
+                    comb *= (1 - kvp.Value);
+                });
 
-            return mult / (mult + comb);
+            var combined = mult / (mult + comb);
+            return combined;
 
         }
+        
         #endregion classifier testing
 
         #region knobs for dialing in performance
@@ -357,7 +448,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             public double LikelyMatchScore = 0.9998;     // 0.9998
             public double CertainMatchScore = 0.9999;    // 0.9999
             public int CertainMatchCount = 10;           // 10
-            public int InterestingWordCount = 15;       // 15 (later changed to 20)
+            public int InterestingWordCount = 20;       // 15 (later changed to 20)
         }
 
         /// <summary>

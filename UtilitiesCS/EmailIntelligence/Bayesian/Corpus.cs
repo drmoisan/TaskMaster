@@ -18,12 +18,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Constructors
 
-        public Corpus() { _tokenCounts = [];  }
-        public Corpus(IEnumerable<string> tokens) { _tokenCounts = new(); AddOrIncrementTokens(tokens); }
-        public Corpus(IEnumerable<KeyValuePair<string, int>> collection) { _tokenCounts = new(collection); }
-        public Corpus(IEqualityComparer<string> comparer) { _tokenCounts = new ConcurrentDictionary<string, int>(comparer); }
-        public Corpus(IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) { _tokenCounts = new ConcurrentDictionary<string, int>(collection, comparer); }
-        public Corpus(int concurrencyLevel, int capacity) { _tokenCounts = new ConcurrentDictionary<string, int>(concurrencyLevel, capacity); }
+        public Corpus() { _tokenFrequency = [];  }
+        public Corpus(IEnumerable<string> tokens) { _tokenFrequency = new(); AddOrIncrementTokens(tokens); }
+        public Corpus(IEnumerable<KeyValuePair<string, int>> collection) { _tokenFrequency = new(collection); }
+        public Corpus(IEqualityComparer<string> comparer) { _tokenFrequency = new ConcurrentDictionary<string, int>(comparer); }
+        public Corpus(IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) { _tokenFrequency = new ConcurrentDictionary<string, int>(collection, comparer); }
+        public Corpus(int concurrencyLevel, int capacity) { _tokenFrequency = new ConcurrentDictionary<string, int>(concurrencyLevel, capacity); }
         public Corpus(int concurrencyLevel, IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) { new ConcurrentDictionary<string, int>(concurrencyLevel, collection, comparer); }
         public Corpus(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) { new ConcurrentDictionary<string, int>(concurrencyLevel, capacity, comparer); }
 
@@ -31,38 +31,46 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Public Properties and Methods
 
-        public ConcurrentDictionary<string, int> TokenCounts { get => _tokenCounts; protected set => _tokenCounts = value; }
-        private ConcurrentDictionary<string, int> _tokenCounts;
-        
+        public ConcurrentDictionary<string, int> TokenFrequency { get => _tokenFrequency; protected set => _tokenFrequency = value; }
+        private ConcurrentDictionary<string, int> _tokenFrequency;
+
+        public int TokenCount { get => _tokenCount; protected set => _tokenCount = value; }
+        private int _tokenCount;
+
         public Enums.Corpus Indicator { get => _indicator; set => _indicator = value; }
         private Enums.Corpus _indicator;
 
-        public void AddOrIncrementToken(string token) => TokenCounts.AddOrUpdate(token, 1, (key, count) => ++count);
+        public void AddOrIncrementToken(string token) 
+        { 
+            TokenFrequency.AddOrUpdate(token, 1, (key, count) => ++count); 
+            Interlocked.Increment(ref _tokenCount);
+        }
 
         public void AddOrIncrementTokens(IEnumerable<string> tokens) => tokens.ForEach(AddOrIncrementToken);
 
-        public void DecrementOrRemoveToken(string token)
+        public bool DecrementOrRemoveToken(string token)
         {
-            lock (_tokenCounts)
+            if (_tokenFrequency.TryGetValue(token, out int count))
             {
-                if (_tokenCounts.TryGetValue(token, out int count))
+                Interlocked.Decrement(ref _tokenCount);
+                if (Interlocked.Decrement(ref count) == 0)
                 {
-                    if (--count == 0)
-                    {
-                        _tokenCounts.TryRemove(token, out _);
-                    }
-                    else
-                    {
-                        _tokenCounts[token] = count;
-                    }
+                    _tokenFrequency.TryRemove(token, out _);
+                    return false;
+                }
+                else
+                {
+                    _tokenFrequency[token] = count;
+                    return true;
                 }
             }
+            else { return false; }            
         }
 
         public object Clone()
         {
             var result = this.MemberwiseClone() as Corpus;
-            result.TokenCounts = new ConcurrentDictionary<string, int>(this.TokenCounts);
+            result.TokenFrequency = new ConcurrentDictionary<string, int>(this.TokenFrequency);
             return result;
         }
 
@@ -74,9 +82,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var result = c1.Clone() as Corpus;
             
-            foreach (var kvp in c2.TokenCounts)
+            foreach (var kvp in c2.TokenFrequency)
             {
-                result.TokenCounts.AddOrUpdate(kvp.Key, kvp.Value, (key, count) => count + kvp.Value);
+                result.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value, (key, count) => count + kvp.Value);
             }
             return result;
         }
@@ -94,24 +102,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             sw.LogDuration("clone universe");
 
             var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)Math.Round((double)c2.TokenCounts.Count() / (double)processors, 0);
+            var chunkSize = (int)Math.Round((double)c2.TokenFrequency.Count() / (double)processors, 0);
             if (chunkSize == 0)
                 return result;
-            chunkSize = Math.Min(Math.Max(chunkSize, 50),c2.TokenCounts.Count());
-            var chunks = c2.TokenCounts.Chunk(chunkSize);
+            chunkSize = Math.Min(Math.Max(chunkSize, 50),c2.TokenFrequency.Count());
+            var chunks = c2.TokenFrequency.Chunk(chunkSize);
             sw.LogDuration("chunk positive tokens");
 
             var tasks = chunks.Select(chunk => Task.Run(() => chunk.ForEach(x => 
             { 
-                if (result.TokenCounts.TryGetValue(x.Key, out int count))
+                if (result.TokenFrequency.TryGetValue(x.Key, out int count))
                 {
                     if (count > x.Value)
                     {
-                        result.TokenCounts.TryUpdate(x.Key, count - x.Value, count);
+                        result.TokenFrequency.TryUpdate(x.Key, count - x.Value, count);
                     }
                     else
                     {
-                        result.TokenCounts.TryRemove(x.Key, out _);
+                        result.TokenFrequency.TryRemove(x.Key, out _);
                     }
                 }
             }), 
@@ -126,17 +134,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public static Corpus operator -(Corpus c1, Corpus c2)
         {
             var result = c1.Clone() as Corpus;
-            foreach (var kvp in c2.TokenCounts)
+            foreach (var kvp in c2.TokenFrequency)
             {
-                if (result.TokenCounts.TryGetValue(kvp.Key, out int count))
+                if (result.TokenFrequency.TryGetValue(kvp.Key, out int count))
                 {
                     if (count > kvp.Value)
                     {
-                        result.TokenCounts.TryUpdate(kvp.Key, count - kvp.Value, count);
+                        result.TokenFrequency.TryUpdate(kvp.Key, count - kvp.Value, count);
                     }
                     else
                     {
-                        result.TokenCounts.TryRemove(kvp.Key, out _);
+                        result.TokenFrequency.TryRemove(kvp.Key, out _);
                     }
                 }
             }
