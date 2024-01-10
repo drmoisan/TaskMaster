@@ -158,7 +158,53 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             Console.WriteLine($"\n{title.ToUpper()}:\n[{string.Join(",", probabilities.Select(x => x.Key))}]");
         }
 
+        private void LogTokenFrequency(IDictionary<string, int> probabilities, string title)
+        {
+            var text = probabilities.ToFormattedText(
+                (key) => key,
+                (value) => value.ToString("N0"),
+                headers: ["Token", "Count"],
+                justifications: [Enums.Justification.Left, Enums.Justification.Right],
+                title: title);
+            Console.WriteLine(text);
+        }
+
         #endregion Helper Functions and Classes
+
+        [TestMethod]
+        public void GetMatchProbability_StateUnderTest_ExpectedBehavior()
+        {
+            Console.WriteLine("Integration test of GetMatchProbability method which \n" +
+                "calls GetProbabilityList and CombineProbabilities");
+
+            // ===============
+            // Arrange
+            // ===============
+
+            // Set up classifier
+            var classifier = SetupClassifierScenario1();
+
+            // Set up tokens in the Prob list
+            var input = Enumerable.Range(8, 4).Select(i => alphabet[i].ToString()).ToList();
+
+            // Add two duplicate tokens in the Prob list
+            input.AddRange(Enumerable.Range(9, 2).Select(i => alphabet[i].ToString()));
+
+            // Add Shared and Dedicated tokens that are NOT in the Prob list
+            input.AddRange(["dedicated2", "dedicated3", "shared1", "shared2", "shared3", "new1"]);
+            Console.WriteLine($"\nInput Tokens: \n[{string.Join(", ", input)}]\n");
+            double expected = 0.72;
+
+            // Act
+            double actual = classifier.GetMatchProbability(input);
+
+            // Assert
+            Console.WriteLine($"Expected: {expected:N2}");
+            Console.WriteLine($"Actual:   {actual:N2}");
+            Assert.AreEqual(expected, actual);
+
+        }
+
 
         [TestMethod]
         public void GetProbabilityList_MultiCase_ExpectedBehavior()
