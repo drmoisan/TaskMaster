@@ -359,7 +359,8 @@ namespace UtilitiesCS
                     if (line.Length > 0)
                         lines.Add($"| {line.ToString().PadToCenter(tableWidth - 3)}|");
                     
-                    foreach (var l in lines) { sb.Append(l); }
+                    foreach (var l in lines) { sb.AppendLine(l); }
+                    
                 }
             }
         }

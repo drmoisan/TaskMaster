@@ -90,7 +90,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     classifier._matchCount = match.TokenFrequency.Values.Sum();
                     classifier.Parent = parent;
                     classifier._prob = new ConcurrentDictionary<string, double>();
-                    parent.SharedTokenBase.TokenFrequency.Keys.ForEach(classifier.UpdateProbabilityShared);
+                    classifier.Match.TokenFrequency.Keys.ForEach(classifier.UpdateProbabilityShared);
+                    //parent.SharedTokenBase.TokenFrequency.Keys.ForEach(classifier.UpdateProbabilityShared);
                 },
                 token);
                             
