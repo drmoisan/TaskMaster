@@ -353,6 +353,7 @@ namespace UtilitiesCS
                         {
                             lines.Add($"| {line.ToString().PadToCenter(tableWidth - 3)}|");
                             line.Clear();
+                            line.Append(match);
                         }
 
                     }

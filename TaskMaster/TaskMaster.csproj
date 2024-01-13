@@ -434,7 +434,7 @@
     <ManifestKeyFile>TaskMaster_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>EE03745CFCB7C7E902AA128FD1E43E7FAAE85D18</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>8ACC20B89291F2337DFFA85C1E7070F42CF96F96</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup />
   <!-- Include the build rules for a C# project. -->

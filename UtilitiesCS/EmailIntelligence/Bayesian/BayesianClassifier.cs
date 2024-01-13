@@ -82,10 +82,27 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 () =>
                 {
                     var match = new Corpus(matchTokens);
+                    PrintTokenFrequency(match.TokenFrequency, "Match Token Frequency");
+
                     var notMatch = parent.SharedTokenBase - match;
+                    notMatch.TokenFrequency
+                            .Where(x => x.Value * classifier.Knobs.NotMatchTokenWeight < 
+                                classifier.Knobs.MinCountForInclusion)
+                            .ForEach(x => notMatch.TokenFrequency.TryRemove(x.Key, out _));
+                    
+                    PrintTokenFrequency(notMatch.TokenFrequency, "Not Match Token Frequency");
+
                     classifier.Tag = tag;
                     classifier.NotMatch = notMatch;
                     classifier._notMatchCount = notMatch.TokenFrequency.Values.Sum();
+                    var dedicatedNotMatchCount = parent.DedicatedTokens
+                                                       .Where(x => 
+                                                       (!match.TokenFrequency.ContainsKey(x.Value.Token)) && 
+                                                       (x.Value.Count * classifier.Knobs.NotMatchTokenWeight > 
+                                                       classifier.Knobs.MinCountForInclusion))
+                                                       .Sum(x => x.Value.Count);
+                    classifier._notMatchCount += dedicatedNotMatchCount;
+
                     classifier.Match = match;
                     classifier._matchCount = match.TokenFrequency.Values.Sum();
                     classifier.Parent = parent;
@@ -102,6 +119,27 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region private fields
 
+        private static void PrintTokenFrequency(IDictionary<string, int> dict, string title) 
+        {
+            string text = dict.ToFormattedText(
+                (key) => key, 
+                (value) => value.ToString("N0"), 
+                headers: ["Token", "Count"], 
+                justifications: [Enums.Justification.Left, Enums.Justification.Right], 
+                title: title);
+            Console.WriteLine(text);
+        }
+
+        private static void PrintProbability(IDictionary<string, double> dict, string title)
+        {
+            string text = dict.ToFormattedText(
+                (key) => key, 
+                (value) => value.ToString("N5"),
+                headers: ["Token", "Prob"],
+                justifications: [Enums.Justification.Left, Enums.Justification.Right],
+                title: title);
+            Console.WriteLine(text);
+        }
 
         #endregion private fields
 
@@ -341,6 +379,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public double GetMatchProbability(IEnumerable<string> tokens)
         {            
             var probabilities = GetProbabilityList(tokens);
+            
+            var text = probabilities.ToFormattedText(
+                (key) => key,
+                (value) => value.ToString("N4"),
+                headers: ["Class", "Probability"],
+                justifications: [Enums.Justification.Left, Enums.Justification.Right],
+                title: "Probability List");
+            Console.WriteLine(text);
+
             var combined = CombineProbabilities(probabilities);
 
             return combined;
