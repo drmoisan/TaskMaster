@@ -84,27 +84,33 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     var match = new Corpus(matchTokens);
                     PrintTokenFrequency(match.TokenFrequency, "Match Token Frequency");
 
-                    var notMatch = parent.SharedTokenBase - match;
-                    notMatch.TokenFrequency
-                            .Where(x => x.Value * classifier.Knobs.NotMatchTokenWeight < 
-                                classifier.Knobs.MinCountForInclusion)
-                            .ForEach(x => notMatch.TokenFrequency.TryRemove(x.Key, out _));
-                    
-                    PrintTokenFrequency(notMatch.TokenFrequency, "Not Match Token Frequency");
+                    var (notMatchFiltered, matchFiltered) = Corpus.SubtractFilter(
+                        parent.SharedTokenBase, 
+                        match,
+                        classifier.Knobs.NotMatchTokenWeight,
+                        classifier.Knobs.MinCountForInclusion);
+
+                    PrintTokenFrequency(matchFiltered.TokenFrequency, "Filtered Match Token Frequency");
+                    PrintTokenFrequency(notMatchFiltered.TokenFrequency, "Filtered Not Match Token Frequency");
+
+                    var sharedNotMatchCount = notMatchFiltered.TokenFrequency.Values.Sum();
+                    var matchCount = matchFiltered.TokenFrequency.Values.Sum();
 
                     classifier.Tag = tag;
-                    classifier.NotMatch = notMatch;
-                    classifier._notMatchCount = notMatch.TokenFrequency.Values.Sum();
                     var dedicatedNotMatchCount = parent.DedicatedTokens
                                                        .Where(x => 
                                                        (!match.TokenFrequency.ContainsKey(x.Value.Token)) && 
                                                        (x.Value.Count * classifier.Knobs.NotMatchTokenWeight > 
                                                        classifier.Knobs.MinCountForInclusion))
                                                        .Sum(x => x.Value.Count);
-                    classifier._notMatchCount += dedicatedNotMatchCount;
 
+                    classifier._matchCount = matchCount;
+                    classifier._notMatchCount = sharedNotMatchCount + dedicatedNotMatchCount;
+
+                    Console.WriteLine($"Filtered Shared Match Count: {classifier._matchCount}");
+                    Console.WriteLine($"Filtered Shared NotMatch Count: {classifier._notMatchCount}");
+                    
                     classifier.Match = match;
-                    classifier._matchCount = match.TokenFrequency.Values.Sum();
                     classifier.Parent = parent;
                     classifier._prob = new ConcurrentDictionary<string, double>();
                     classifier.Match.TokenFrequency.Keys.ForEach(classifier.UpdateProbabilityShared);
@@ -292,15 +298,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 			 *								 (+ (min 1 (/ g ngood))   
 			 *									(min 1 (/ b nbad)))))))))
 			 */
-            int b = _match.TokenFrequency.TryGetValue(token, out int bCount) ? bCount : 0;
-            int g = Parent.SharedTokenBase.TokenFrequency
-                .TryGetValue(token, out int gCount) ? Math.Max(gCount - b, 0) : 0;
+            int m = _match.TokenFrequency.TryGetValue(token, out int bCount) ? bCount : 0;
+            int nm = Parent.SharedTokenBase.TokenFrequency
+                .TryGetValue(token, out int gCount) ? Math.Max(gCount - m, 0) : 0;
 
-            if (g + b >= Knobs.MinCountForInclusion)
+            if (nm * Knobs.NotMatchTokenWeight + m >= Knobs.MinCountForInclusion)
             {
-                double matchFactor = Math.Min(1, (double)b / (double)_matchCount);
-                var notMatchCount = Parent.TotalTokenCount - _matchCount;
-                double notMatchfactor = Math.Min(1, (double)g / (double)notMatchCount);
+                double matchFactor = Math.Min(1, (double)m / (double)_matchCount);
+                
+                double notMatchfactor = Math.Min(1, (double)nm * Knobs.NotMatchTokenWeight / (double)_notMatchCount);
 
                 double prob = Math.Max(Knobs.MinScore,
                               Math.Min(Knobs.MaxScore, matchFactor / (notMatchfactor + matchFactor)));
@@ -308,9 +314,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
                 // special case for Spam-only tokens.
                 // .9998 for tokens only found in spam, or .9999 if found more than 10 times
-                if (g == 0)
+                if (nm == 0)
                 {
-                    prob = (b > Knobs.CertainMatchCount) ? Knobs.CertainMatchScore : Knobs.LikelyMatchScore;
+                    prob = (m > Knobs.CertainMatchCount) ? Knobs.CertainMatchScore : Knobs.LikelyMatchScore;
                 }
 
                 _prob[token] = prob;

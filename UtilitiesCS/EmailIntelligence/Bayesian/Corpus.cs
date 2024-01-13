@@ -151,6 +151,38 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return result;
         }
 
+        public static (Corpus NotMatchFiltered, Corpus MatchFiltered) SubtractFilter(Corpus all, Corpus match, int negTokenWt, int minCt)
+        {
+            var result = all.Clone() as Corpus;
+            var matchClone = match.Clone() as Corpus;
+
+            result.TokenFrequency = new ConcurrentDictionary<string, int>(result.TokenFrequency.Where(x => x.Value * negTokenWt >= minCt));
+            foreach (var kvp in matchClone.TokenFrequency)
+            {
+                if (result.TokenFrequency.TryGetValue(kvp.Key, out int count))
+                {
+                    if (count > kvp.Value)
+                    {
+                        result.TokenFrequency.TryUpdate(kvp.Key, count - kvp.Value, count);
+                        if (result.TokenFrequency[kvp.Key] * negTokenWt + kvp.Value < minCt)
+                        {
+                            result.TokenFrequency.TryRemove(kvp.Key, out _);        
+                            matchClone.TokenFrequency[kvp.Key] = 0;
+                        }
+                    }
+                    else
+                    {
+                        result.TokenFrequency.TryRemove(kvp.Key, out _);
+                    }
+                }
+            }
+            matchClone.TokenFrequency = new ConcurrentDictionary<string, int>(matchClone.TokenFrequency.Where(x => x.Value > 0));
+            return (result, matchClone);
+            
+        }
+
+
+
         #endregion Operator Overloads
 
     }

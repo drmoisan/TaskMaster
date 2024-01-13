@@ -534,7 +534,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             Enumerable.Range(0, 20).ForEach(i => matchTokens.Add("shared8"));
             CancellationToken token = default;
 
-            var expected = new ConcurrentDictionary<string, double>
+            var expected = new Dictionary<string, double>
             {
                 ["dedicated7"] = 0.9998,
                 ["dedicated8"] = 0.9999,
@@ -544,18 +544,27 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
                 ["shared8"] = 0.333333333333333,
 
             };
-            
 
+            expected = expected.Select(kvp => new KeyValuePair<string, double>(
+                kvp.Key, Math.Round(kvp.Value, 5)))
+                .OrderBy(x => x.Key)
+                .ToDictionary();
+            
             // Act
-            var actual = await BayesianClassifier.FromTokenBaseAsync(
+            var result = await BayesianClassifier.FromTokenBaseAsync(
                 parent,
                 tag,
                 matchTokens,
                 token);
+            
+            var actual = result.Prob.Select(kvp => new KeyValuePair<string, double>(
+                kvp.Key, Math.Round(kvp.Value, 5)))
+                .OrderBy(x => x.Key)
+                .ToDictionary();
 
-            LogTokenFrequency(actual.Match.TokenFrequency.OrderBy(x => x.Key).ToDictionary(), "Match token frequency");
-            LogProbabilities(expected.OrderBy(x => x.Key).ToDictionary(), "Expected probability tokens");
-            LogProbabilities(actual.Prob.OrderBy(x => x.Key).ToDictionary(), "Resulting probability tokens");
+            //LogTokenFrequency(result.Match.TokenFrequency.OrderBy(x => x.Key).ToDictionary(), "Match token frequency");
+            LogProbabilities(expected, "Expected probability tokens");
+            LogProbabilities(actual, "Resulting probability tokens");
             
             // Assert
             actual.Should().BeEquivalentTo(expected);
