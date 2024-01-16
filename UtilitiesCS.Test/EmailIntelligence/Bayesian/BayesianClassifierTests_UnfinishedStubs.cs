@@ -214,24 +214,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
-        public void AddTokens_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var bayesianClassifier = this.CreateBayesianClassifier();
-            IEnumerable<string> positiveTokens = null;
-            IEnumerable<string> negativeTokens = null;
-
-            // Act
-            bayesianClassifier.AddTokens(
-                positiveTokens,
-                negativeTokens);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
         public void RemovePositive_StateUnderTest_ExpectedBehavior()
         {
             // Arrange

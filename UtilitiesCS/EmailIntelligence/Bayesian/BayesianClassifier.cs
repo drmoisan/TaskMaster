@@ -160,7 +160,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// </summary>
         [JsonProperty]
         public Corpus Match { get => _match; private set => _match = value; }
-        private Corpus _match;
+        protected Corpus _match;
 
         [JsonProperty]
         public int MatchCount { get => _matchCount; private set => _matchCount = value; }
@@ -171,7 +171,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// </summary>
         [JsonIgnore]
         public Corpus NotMatch { get => _notMatch; set => _notMatch = value; }
-        private Corpus _notMatch;
+        protected Corpus _notMatch;
 
         [JsonProperty]
         public int NotMatchCount { get => _notMatchCount; private set => _notMatchCount = value; }
@@ -214,7 +214,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _match.AddOrIncrementTokens(negativeTokens);
             _matchCount = _match.TokenFrequency.Values.Sum();
 
-            positiveTokens.Concat(negativeTokens).Distinct().ForEach(UpdateProbabilityShared);
+            positiveTokens.Concat(negativeTokens).Distinct().ForEach(UpdateProbabilityStandalone);
         }
 
         public void RemovePositive(IEnumerable<string> tokens)
@@ -247,7 +247,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// by comparing the number of good and bad texts it appears in already.
         /// </summary>
         /// <param name="token"></param>
-        private void UpdateProbabilityStandalone(string token)
+        internal protected virtual void UpdateProbabilityStandalone(string token)
         {
             /*
 			 * This is a direct implementation of Paul Graham's algorithm from
@@ -284,7 +284,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        private void UpdateProbabilityShared(string token) 
+        internal protected virtual void UpdateProbabilityShared(string token) 
         {
             /*
 			 * This is a direct implementation of Paul Graham's algorithm from
