@@ -2,16 +2,16 @@
 using System;
 using UtilitiesCS;
 
-namespace UtilitiesCS
+namespace Z.Disabled.UtilitiesCS.Test
 {
     [TestClass]
     public class UnitTest1
     {
         [TestMethod]
-        public void TestMethod1()
+        public void Disabled_TestMethod1()
         {
-            var viewer = new FilterOlFoldersViewer();
-            viewer.ShowDialog();
+            //var viewer = new FilterOlFoldersViewer();
+            //viewer.ShowDialog();
         }
     }
 }

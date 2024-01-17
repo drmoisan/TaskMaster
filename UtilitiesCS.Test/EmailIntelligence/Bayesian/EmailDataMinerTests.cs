@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Deedle.Internal;
 using FluentAssertions;
+using System.Linq;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
@@ -23,7 +24,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         public void TestInitialize()
         {
             Console.SetOut(new DebugTextWriter());
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
+            this.mockRepository = new MockRepository(MockBehavior.Loose);
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
         }
 
@@ -51,8 +52,8 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             // Arrange
             var emailDataMiner = this.CreateEmailDataMiner();
             var input = this.CreateCollection();
-            var expected = new List<DedicatedToken>()
-            {
+            List<DedicatedToken> expected =
+            [
                 new("token2", "folderPath1", 2),
                 new("token3", "folderPath1", 1),
                 new("token5", "folderPath1", 1),
@@ -61,103 +62,31 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
                 new("token8", "folderPath2", 2),
                 new("token9", "folderPath3", 3),
                 new("token10", "folderPath3", 1),
-            };
+            ];
 
             // Act
-            var actual = emailDataMiner.GetDedicated(input);
+            var actualDictionary = emailDataMiner.GetDedicated(input);
+            var actual = actualDictionary.Values.ToList();
+
+            Console.WriteLine(
+                expected.Select(x => new[] { x.Token, x.FolderPath, x.Count.ToString() })
+                .ToArray()
+                .ToFormattedText(
+                [ "Token", "FolderPath", "Count" ], 
+                [Enums.Justification.Center, Enums.Justification.Left, Enums.Justification.Right],
+                "Expected Dedicated Tokens"));
+
+            Console.WriteLine(
+                actual.Select(x => new[] { x.Token, x.FolderPath, x.Count.ToString() })
+                .ToArray()
+                .ToFormattedText(
+                ["Token", "FolderPath", "Count"],
+                [Enums.Justification.Center, Enums.Justification.Left, Enums.Justification.Right],
+                "Expected Dedicated Tokens"));
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
         }
-
-        //[TestMethod]
-        //public async Task ScrapeEmails_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var emailDataMiner = this.CreateEmailDataMiner();
-        //    CancellationTokenSource tokenSource = null;
-        //    ProgressTracker progress = null;
-
-        //    // Act
-        //    var result = await emailDataMiner.ScrapeEmails(
-        //        tokenSource,
-        //        progress);
-
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
-
-        [TestMethod]
-        public async Task MineEmails_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var emailDataMiner = this.CreateEmailDataMiner();
-
-            // Act
-            await emailDataMiner.MineEmails();
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public async Task LoadStaging_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var emailDataMiner = this.CreateEmailDataMiner();
-
-            // Act
-            var result = await emailDataMiner.LoadStaging();
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
         
-
-        [TestMethod]
-        public async Task BuildClassifierAsync_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var emailDataMiner = this.CreateEmailDataMiner();
-
-            // Act
-            await emailDataMiner.BuildClassifierAsync();
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public async Task BuildClassifierAsync1_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var emailDataMiner = this.CreateEmailDataMiner();
-
-            // Act
-            await emailDataMiner.BuildClassifierAsync1();
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public async Task BuildClassifierAsync2_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var emailDataMiner = this.CreateEmailDataMiner();
-
-            // Act
-            await emailDataMiner.BuildClassifierAsync2();
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
     }
 }

@@ -91,8 +91,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailList;
         }
 
-        //public async Task<List<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
-        public async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource, ProgressTracker progress)
+        
+        internal async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource, ProgressTracker progress)
         {
             //List<MailItem> mailItems = null;
             IEnumerable<MailItem> mailItemsQuery = null;

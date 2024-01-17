@@ -27,7 +27,7 @@ namespace UtilitiesCS
 
         public override void WriteJson(JsonWriter writer, IApplicationGlobals value, JsonSerializer serializer)
         {
-            var message = "default";
+            object message = "default";
             serializer.Serialize(writer, message);
         }
     }

@@ -154,7 +154,9 @@ namespace UtilitiesCS
             StringBuilder sb = new();
             
             AppendJaggedTitle(ref sb, title, tableWidth);
-            
+
+            justifications ??= InferDefaultJustifications(jagged, columnCount);
+
             AppendJaggedHeaders(ref sb, headers, title, columnWidths, tableWidth);
             
             sb.AppendLine(new string('=', tableWidth));
@@ -169,13 +171,28 @@ namespace UtilitiesCS
 
         }
 
+        private static Enums.Justification[] InferDefaultJustifications(string[][] jagged, int columnCount)
+        {
+            if (jagged.Length == 0) { return Enumerable.Repeat(Enums.Justification.Left, columnCount).ToArray(); }
+            return Enumerable
+                .Range(0, columnCount)
+                .Select(i => 
+                {
+                    if (double.TryParse(jagged[0][i], out _))
+                        return Enums.Justification.Right;
+                    else
+                        return Enums.Justification.Left;
+                })
+                .ToArray();
+        }
+
         private static void AppendJaggedRows(
             ref StringBuilder sb,
             string[][] jagged, 
             Enums.Justification[] justifications, 
             int[] columnWidths, 
             int tableWidth)
-        {
+        {   
             for (int i = 0; i < jagged.Length; i++)
             {
                 // Add divider if the row is an aggregator

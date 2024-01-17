@@ -195,26 +195,44 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region population
 
-        public void AddPositive(IEnumerable<string> tokens) 
+        public void AddNotMatch(IEnumerable<string> tokens) 
         {
             _notMatch.AddOrIncrementTokens(tokens);
             tokens.Distinct().ForEach(UpdateProbabilityShared);
         }
 
-        public void AddNegative(IEnumerable<string> tokens)
+        public void AddMatch(IEnumerable<string> tokens)
         {
             _match.AddOrIncrementTokens(tokens);
             tokens.Distinct().ForEach(UpdateProbabilityShared);
         }
 
-        public void AddTokens(IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
+        public void AddTokens(IEnumerable<string> matchTokens, IEnumerable<string> notMatchTokens)
         {
-            _notMatch.AddOrIncrementTokens(positiveTokens);
-            _notMatchCount = _notMatch.TokenFrequency.Values.Sum();
-            _match.AddOrIncrementTokens(negativeTokens);
-            _matchCount = _match.TokenFrequency.Values.Sum();
+            _match ??= new Corpus();
+            _notMatch ??= new Corpus();
+            _match.AddOrIncrementTokens(matchTokens);
+            _notMatch.AddOrIncrementTokens(notMatchTokens);
+            
+            _matchCount = _match.TokenFrequency
+                .Where(kvp => _notMatch.TokenFrequency.TryGetValue(kvp.Key, out int nm) ? 
+                nm * Knobs.NotMatchTokenWeight + kvp.Value >= Knobs.MinCountForInclusion : 
+                kvp.Value >= Knobs.MinCountForInclusion)
+                .Sum(kvp => kvp.Value);
+            
+            var tokenBase = matchTokens.Concat(notMatchTokens).Distinct().ToArray();
+            Console.WriteLine($"\nToken count calculation");
+            (_matchCount, _notMatchCount) = tokenBase.Select(token => 
+            {
+                _match.TokenFrequency.TryGetValue(token, out int m);
+                _notMatch.TokenFrequency.TryGetValue(token, out int nm);
+                if (nm * Knobs.NotMatchTokenWeight + m >= Knobs.MinCountForInclusion)
+                    return (m, nm);
+                else    
+                    return (m: 0, nm: 0);                
+            }).Aggregate((rollingTotal, next) => (rollingTotal.m + next.m, rollingTotal.nm + next.nm));
 
-            positiveTokens.Concat(negativeTokens).Distinct().ForEach(UpdateProbabilityStandalone);
+            tokenBase.ForEach(UpdateProbabilityStandalone);
         }
 
         public void RemovePositive(IEnumerable<string> tokens)
@@ -261,23 +279,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 			 *								 (+ (min 1 (/ g ngood))   
 			 *									(min 1 (/ b nbad)))))))))
 			 */
-            int b = _match.TokenFrequency.TryGetValue(token, out int bCount) ? bCount : 0;
-            int g = _notMatch.TokenFrequency.TryGetValue(token, out int gCount) ? gCount * Knobs.NotMatchTokenWeight : 0 ;
+            _prob ??= new ConcurrentDictionary<string, double>();
+            
+            int m = _match.TokenFrequency.TryGetValue(token, out int mCount) ? mCount : 0;
+            int nm = _notMatch.TokenFrequency.TryGetValue(token, out int nmCount) ? nmCount * Knobs.NotMatchTokenWeight : 0 ;
 
-            if (g + b >= Knobs.MinCountForInclusion)
+            if (nm + m >= Knobs.MinCountForInclusion)
             {
-                double matchFactor = Math.Min(1, (double)b / (double)_matchCount);
-                var notMatchCount = Parent.TotalTokenCount - _matchCount;
-                double notMatchfactor = Math.Min(1, (double)g / (double)notMatchCount);
+                double matchFactor = Math.Min(1, m / (double)_matchCount);
+                double notMatchfactor = Math.Min(1, nm / (double)_notMatchCount);
 
                 double prob = Math.Max(Knobs.MinScore,
                               Math.Min(Knobs.MaxScore, matchFactor / (notMatchfactor + matchFactor)));
 
                 // special case for Spam-only tokens.
                 // .9998 for tokens only found in spam, or .9999 if found more than 10 times
-                if (g == 0)
+                if (nm == 0)
                 {
-                    prob = (b > Knobs.CertainMatchCount) ? Knobs.CertainMatchScore : Knobs.LikelyMatchScore;
+                    prob = (m > Knobs.CertainMatchCount) ? Knobs.CertainMatchScore : Knobs.LikelyMatchScore;
                 }
 
                 _prob[token] = prob;

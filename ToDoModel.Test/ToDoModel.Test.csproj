@@ -51,7 +51,7 @@
     <Compile Include="AssertAll.cs" />
     <Compile Include="Data Model\ID\BaseChangerTests.cs" />
     <Compile Include="Data Model\Tree\TreeNodeTests.cs" />
-    <Compile Include="Email Utilities\FolderHandlerTests_ToWrite.cs" />
+    <Compile Include="Email Utilities\FolderHandlerTests_UnfinishedStubs.cs" />
     <Compile Include="Email Utilities\FolderHandlerTests_Written.cs" />
     <Compile Include="Email Utilities\SortItemsToExistingFolderTests.cs" />
     <Compile Include="FolderPathsTest.cs" />

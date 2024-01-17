@@ -52,6 +52,7 @@
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\EmailDataMinerTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests_UnfinishedStubs.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\EmailDataMinerTests_UnfinishedStubs.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceListTests.cs" />
     <Compile Include="EmailIntelligence\CtfMapTests.cs" />
     <Compile Include="EmailIntelligence\UnitTest1.cs" />
@@ -79,7 +80,9 @@
     <Compile Include="HelperClasses\SimpleRegex_Test.cs" />
     <Compile Include="Dialogs\YesNoToAll_Test.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
+    <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
+    <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

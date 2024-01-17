@@ -3,6 +3,7 @@ using Moq;
 using System;
 using UtilitiesCS;
 using Newtonsoft.Json;
+using FluentAssertions;
 
 namespace UtilitiesCS.Test.Threading
 {
@@ -13,6 +14,10 @@ namespace UtilitiesCS.Test.Threading
         private Mock<IApplicationGlobals> mockApplicationGlobals;
         private Mock<IAppStagingFilenames> mockStagingFilenames;
         private Mock<IFileSystemFolderPaths> mockFileSystemsFolderPaths;
+        private Mock<JsonReader> mockJsonReader;
+        private Mock<Type> mockType;
+        private Mock<JsonWriter> mockJsonWriter;
+        //private Mock<JsonSerializerSub> mockJsonSerializer;
 
         [TestInitialize]
         public void TestInitialize()
@@ -24,8 +29,22 @@ namespace UtilitiesCS.Test.Threading
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
             this.mockApplicationGlobals.SetupAllProperties();
             this.mockApplicationGlobals.SetupGet(x => x.FS).Returns(this.mockFileSystemsFolderPaths.Object);
-            
+            this.mockJsonReader = this.mockRepository.Create<JsonReader>();
+            this.mockJsonReader.SetupAllProperties();
+            this.mockType = this.mockRepository.Create<Type>();
+            this.mockType.SetupAllProperties();
+            this.mockJsonWriter = this.mockRepository.Create<JsonWriter>();
+            this.mockJsonWriter.SetupAllProperties();
+            //this.mockJsonSerializer = this.mockRepository.Create<JsonSerializerSub>();
+            //this.mockJsonSerializer.SetupAllProperties();
+            //this.mockJsonSerializer.Setup(x => x.Serialize(It.IsAny<JsonWriter>(), It.IsAny<object>()))
+            //    .Callback<JsonWriter, object>((writer, obj) =>
+            //{
+            //    Console.WriteLine($"JsonSerializer.Serialize called with {writer} and {obj}");
+            //});
         }
+
+        #region Helper Methods and Classes
 
         private JsonSerializerSettings CreateJsonSerializerSettings()
         {
@@ -53,25 +72,26 @@ namespace UtilitiesCS.Test.Threading
             public IApplicationGlobals AppGlobals { get; set; }
         }
 
+        
+
+        #endregion Helper Methods and Classes
+
         [TestMethod]
         public void SimpleConversionTest() 
         { 
             // Arrange
             var settings = this.CreateJsonSerializerSettings();
             var appGlobals = this.mockApplicationGlobals.Object;
-            var input = new SampleClass() { Name = "Test", Age = 47, AppGlobals = appGlobals };
-            var expected = appGlobals.FS.FldrPythonStaging;
-
+            var expected = new SampleClass() { Name = "Test", Age = 47, AppGlobals = appGlobals };
             
             // Act
-            var json = JsonConvert.SerializeObject(input, settings);
+            var json = JsonConvert.SerializeObject(expected, settings);
             Console.WriteLine("JSON Object");
             Console.WriteLine(json);
-            var actualObj = JsonConvert.DeserializeObject<SampleClass>(json, settings);
-            var actual = actualObj.AppGlobals.FS.FldrPythonStaging;
+            var actual = JsonConvert.DeserializeObject<SampleClass>(json, settings);
             
             // Assert
-            Assert.AreEqual(expected, actual);
+            actual.Should().BeEquivalentTo(expected);
         }
         
         [TestMethod]
@@ -79,8 +99,8 @@ namespace UtilitiesCS.Test.Threading
         {
             // Arrange
             var appGlobalsConverter = this.CreateAppGlobalsConverter();
-            JsonReader reader = null;
-            Type objectType = null;
+            JsonReader reader = this.mockJsonReader.Object;
+            Type objectType = this.mockType.Object;
             IApplicationGlobals existingValue = null;
             bool hasExistingValue = false;
             JsonSerializer serializer = null;
@@ -94,28 +114,9 @@ namespace UtilitiesCS.Test.Threading
                 serializer);
 
             // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
+            result.Should().BeEquivalentTo(this.mockApplicationGlobals.Object);
         }
 
-        [TestMethod]
-        public void WriteJson_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var appGlobalsConverter = this.CreateAppGlobalsConverter();
-            JsonWriter writer = null;
-            IApplicationGlobals value = null;
-            JsonSerializer serializer = null;
-
-            // Act
-            appGlobalsConverter.WriteJson(
-                writer,
-                value,
-                serializer);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        
     }
 }

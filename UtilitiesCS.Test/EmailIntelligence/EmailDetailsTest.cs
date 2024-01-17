@@ -10,7 +10,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
     [TestClass]
     public class EmailDetailsTest
     {
-        [TestMethod]
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            Console.SetOut(new DebugTextWriter());
+        }
+
+            [TestMethod]
         public void ExtractNameFromAddress_Test()
         {
             // Arrange
@@ -19,7 +25,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             string[][] actual;
 
             // Act
-            actual = addresses.Select(address => EmailDetails.ExtractNameFromAddress(address)).Select(x => new string[] { x.FirstName, x.LastName, x.DomainName }).ToArray();
+            actual = addresses.Select(EmailDetails.ExtractNameFromAddress).Select(x => new string[] { x.FirstName, x.LastName, x.DomainName }).ToArray();
 
             Console.WriteLine($"Addresses:\n{string.Join("\n", addresses)}\n");
             Console.WriteLine($"\n{expected.ToFormattedText(["First Name", "Last Name", "Domain"],title:"EXPECTED")}");

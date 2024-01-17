@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace UtilitiesCS
 {
     public static class EnumerableExtensions
@@ -171,6 +172,16 @@ namespace UtilitiesCS
 
             return new Tuple<IEnumerable<T>, IEnumerable<U>, IEnumerable<V>>(first, second, third);
         }
+                
+        //public static Tuple<T, U> Sum<T, U>(this IEnumerable<(T, U)> source) 
+        //{
+        //    var tup = source.Unzip();
+                                
+        //    T sumT = (T)((dynamic)tup.Item1).Sum();
+        //    U sumU = (U)((dynamic)tup.Item1).Sum();
+        //    return new Tuple<T, U>(sumT, sumU);
+        //}
+
 
         public static IEnumerable<IEnumerable<T>> Transpose<T>(
             this IEnumerable<IEnumerable<T>> source)

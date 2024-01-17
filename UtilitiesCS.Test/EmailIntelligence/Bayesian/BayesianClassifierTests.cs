@@ -262,6 +262,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             Console.WriteLine(text);
         }
 
+
         #endregion Helper Functions and Classes
 
         [TestMethod]
@@ -581,84 +582,93 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             var bayesianClassifier = new BayesianClassifierSub();
             
 
-            List<string> matchTokens = Enumerable.Range(0,5).Select(i => $"token{i:00}").ToList();
-            matchTokens.AddRange(Enumerable.Range(2, 2).Select(i => $"token{i:00}"));
-            matchTokens.AddRange(Enumerable.Range(2, 2).Select(i => $"token{i:00}"));
+            List<string> matchTokens = [];
+            List<string> notMatchTokens = [];
+
+            for (int i = 0; i < 4; i++)
+            {
+                matchTokens.AddRange(Enumerable.Range(0, 5).Select(i => $"token{i:00}"));
+                matchTokens.AddRange(Enumerable.Range(2, 2).Select(i => $"token{i:00}"));
+                matchTokens.AddRange(Enumerable.Range(2, 2).Select(i => $"token{i:00}"));
+
+                notMatchTokens.AddRange(Enumerable.Range(3, 5).Select(i => $"token{i:00}"));
+                notMatchTokens.AddRange(Enumerable.Range(5, 2).Select(i => $"token{i:00}"));
+                notMatchTokens.AddRange(Enumerable.Range(5, 2).Select(i => $"token{i:00}"));
+            }
             
-            List<string> notMatchTokens = Enumerable.Range(3, 5).Select(i => $"token{i:00}").ToList();
-            notMatchTokens.AddRange(Enumerable.Range(5, 2).Select(i => $"token{i:00}"));
-            notMatchTokens.AddRange(Enumerable.Range(5, 2).Select(i => $"token{i:00}"));
+            Console.WriteLine($"Match tokens: [{string.Join(",", matchTokens)}]");
+            Console.WriteLine($"Not Match tokens: [{string.Join(",", notMatchTokens)}]");
+                        
+            var expectedMatchFrequency = new Dictionary<string, int>()
+            {
+                ["token00"] = 4,
+                ["token01"] = 4,
+                ["token02"] = 12,
+                ["token03"] = 12,
+                ["token04"] = 4,
+            };
 
-            var expectedMatchFrequency = matchTokens
-                .GroupBy(x => x)
-                .Select(x => new KeyValuePair<string, int>(x.Key, x.Count()))
-                .OrderBy(x => x.Key)
-                .ToDictionary();
+            var expectedNotMatchFrequency = new Dictionary<string, int>()
+            {
+                ["token03"] = 4,
+                ["token04"] = 4,
+                ["token05"] = 12,
+                ["token06"] = 12,
+                ["token07"] = 4,
+            };
 
-            var expectedMatchCount = expectedMatchFrequency.Sum(x => x.Value);
+            var expectedMatchCount = 28;
+
+            var expectedNotMatchCount = 36;
             
-            var expectedNotMatchFrequency = notMatchTokens
-                .GroupBy(x => x)
-                .Select(x => new KeyValuePair<string, int>(x.Key, x.Count()))
-                .OrderBy(x => x.Key)
-                .ToDictionary();
-
-            var expectedNotMatchCount = expectedNotMatchFrequency.Sum(x => x.Value);
-
-            var expectedAllTokens = matchTokens.Concat(notMatchTokens).ToList();
-            var expectedAllFrequency = expectedAllTokens
-                .GroupBy(x => x)
-                .Select(x => new KeyValuePair<string, int>(x.Key, x.Count()))
-                .OrderBy(x => x.Key)
-                .ToDictionary();
-
-            var expectedAllCount = expectedAllFrequency.Sum(x => x.Value);
-
-            List<object> expected = [
-                expectedMatchFrequency,
-                expectedMatchCount,
-                expectedNotMatchFrequency,
-                expectedNotMatchCount,
-                
-            ];
-
+            Dictionary<string, double> expectedProb = new()
+            {
+                ["token02"] = 0.99990,
+                ["token03"] = 0.65854,
+                ["token04"] = 0.39130,
+                ["token05"] = 0.01100,
+                ["token06"] = 0.01100,
+                ["token07"] = 0.01100
+            };
+            
             // Act
             bayesianClassifier.AddTokens(
                 matchTokens,
                 notMatchTokens);
 
-            List<object> actual = [
-                bayesianClassifier.Match.TokenFrequency.OrderBy(x=>x.Key).ToDictionary(),
-                bayesianClassifier.MatchCount,
-                bayesianClassifier.NotMatch.TokenFrequency.OrderBy(x => x.Key).ToDictionary(),
-                bayesianClassifier.NotMatchCount,
-            ];
-            
-            LogTokenFrequency(expectedAllFrequency, "Expected all token frequency");
-            Console.WriteLine($"Expected all token count: {expectedAllCount}");
-            
+            var actualMatchFrequency = bayesianClassifier.Match.TokenFrequency.OrderBy(x => x.Key).ToDictionary();
+            var actualMatchCount = bayesianClassifier.MatchCount;
+            var actualNotMatchFrequency = bayesianClassifier.NotMatch.TokenFrequency.OrderBy(x => x.Key).ToDictionary();
+            var actualNotMatchCount = bayesianClassifier.NotMatchCount;
+            var actualProb = bayesianClassifier.Prob.Select(kvp => 
+                new KeyValuePair<string,double>(kvp.Key, Math.Round(kvp.Value,5)))
+                .OrderBy(kvp => kvp.Key).ToDictionary();
+                        
             LogTokenFrequency(expectedMatchFrequency, "Expected Match token frequency");
             Console.WriteLine($"Expected Match token count: {expectedMatchCount}");
             Console.WriteLine("");
 
-            LogTokenFrequency((Dictionary<string, int>)actual[0], "Actual Match token frequency");
-            Console.WriteLine($"Actual Match token count: {actual[1]}");
+            LogTokenFrequency(actualMatchFrequency, "Actual Match token frequency");
+            Console.WriteLine($"Actual Match token count: {actualMatchCount}");
             Console.WriteLine("");
 
             LogTokenFrequency(expectedNotMatchFrequency, "Expected Not Match token frequency");
             Console.WriteLine($"Expected Not Match token count: {expectedNotMatchCount}");
             Console.WriteLine("");
 
-            LogTokenFrequency((Dictionary<string, int>)actual[2], "Actual Not Match token frequency");
-            Console.WriteLine($"Actual Not Match token count: {actual[3]}");
+            LogTokenFrequency(actualNotMatchFrequency, "Actual Not Match token frequency");
+            Console.WriteLine($"Actual Not Match token count: {actualNotMatchCount}");
             Console.WriteLine("");
 
+            LogProbabilities(expectedProb, "Expected Probabilities");
             LogProbabilities(bayesianClassifier.Prob, "Actual Probabilities");
 
-
             // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
+            actualMatchFrequency.Should().Equal(expectedMatchFrequency);
+            actualMatchCount.Should().Be(expectedMatchCount);
+            actualNotMatchFrequency.Should().Equal(expectedNotMatchFrequency);
+            actualNotMatchCount.Should().Be(expectedNotMatchCount);
+            actualProb.Should().Equal(expectedProb);
         }
     }
 }

@@ -47,6 +47,7 @@ namespace UtilitiesCS
                     { Details.Subject, item.MessageClass.ToString() } 
                 };
             }
+
             return new Dictionary<Details, string>()
             {
                 { Details.Type, typeof(MailItem).ToString() },
