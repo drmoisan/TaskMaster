@@ -32,7 +32,7 @@ namespace UtilitiesCS.EmailIntelligence
             Init(attachment, sentOn, saveFolderPath, deleteFolderPath);
         }
 
-        async public static Task<AttachmentInfo> LoadAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
+        async public static Task<AttachmentInfo> CreateAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             var att = new AttachmentInfo();
             await att.InitAsync(attachment,sentOn, saveFolderPath, deleteFolderPath);
@@ -59,7 +59,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        async public Task InitAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
+        async protected internal Task InitAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             _attachment = attachment;
 
@@ -138,7 +138,7 @@ namespace UtilitiesCS.EmailIntelligence
             return filepath;
         }
         
-        public bool CheckParameters(Attachment attachment, DateTime sentOn, string saveFolderPath)
+        internal bool CheckParameters(Attachment attachment, DateTime sentOn, string saveFolderPath)
         {
             _errorMessages = new List<string>();
 
@@ -153,7 +153,7 @@ namespace UtilitiesCS.EmailIntelligence
             else { return true; }
         }
 
-        public bool CheckParameters(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
+        internal bool CheckParameters(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             _errorMessages = new List<string>();
 
@@ -173,7 +173,7 @@ namespace UtilitiesCS.EmailIntelligence
             else { return true; }
         }
         
-        public (string Filename, string Extension) GetAttachmentFilename(Attachment attachment)
+        internal virtual (string Filename, string Extension) GetAttachmentFilename(Attachment attachment)
         {
             var filename = Path.GetFileNameWithoutExtension(attachment.FileName);
             var extension = Path.GetExtension(attachment.FileName);
@@ -187,7 +187,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string GetNameSuffix() 
         { 
-            return $"_{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+            return $"_{DateTime.Now:yyyyMMddHHmmss}";
         }
         
         public string PrependDatePrefix(string seed, DateTime date)
@@ -195,7 +195,6 @@ namespace UtilitiesCS.EmailIntelligence
             var prefix = date.ToString("yyyyMMdd");
             return $"{prefix}_{seed}";
         }
-
 
         #endregion
     }

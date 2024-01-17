@@ -370,7 +370,7 @@ namespace ToDoModel
                                       .Cast<Attachment>()
                                       .Where(x => x.Type != OlAttachmentType.olOLE)
                                       .ToAsyncEnumerable()
-                                      .SelectAwait(async x => await AttachmentInfo.LoadAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath));
+                                      .SelectAwait(async x => await AttachmentInfo.CreateAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath));
             if (!saveAttachments)
             {
                 attachments = attachments.Where(x => x.IsImage);
