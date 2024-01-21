@@ -1,4 +1,6 @@
-﻿namespace UtilitiesCS
+﻿using System;
+
+namespace UtilitiesCS
 {
     public static class Enums
     {
@@ -29,7 +31,7 @@
             Negative = 0,
             Positive = 1
         }
-        
+
         public enum WorkerState
         {
             Idle = 0,
@@ -59,5 +61,17 @@
             Right = 2,
             Justified = 3
         }
+
+        [Flags]
+        public enum DictionaryResult
+        { 
+            KeyExists = 1,          // 001
+            KeysChanged = 2,        // 010
+            ValueChanged = 4,       // 100
+            // Key removed would be    X10
+            // Key added would be      011
+            // Value updated would be  101
+        }
+        
     }
 }

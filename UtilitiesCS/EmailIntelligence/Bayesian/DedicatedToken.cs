@@ -1,8 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class DedicatedToken: IEquatable<DedicatedToken>
+    public class DedicatedToken: IEquatable<DedicatedToken>, INotifyPropertyChanged
     {
         public DedicatedToken() { }
 
@@ -19,8 +20,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private string _folderPath;
         public string FolderPath { get => _folderPath; set => _folderPath = value; }
 
-        private int _count;
-        public int Count { get => _count; set => _count = value; }
+        //private int _count;
+        //public int Count { get => _count; set => _count = value; }
+        public int Count;
+
+        #region IEquatable
 
         public bool Equals(DedicatedToken other)
         {
@@ -28,5 +32,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 return false;
             return this.Token == other.Token && this.FolderPath == other.FolderPath;
         }
+
+        #endregion IEquatable
+
+        #region INotifyPropertyChanged
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+        
+        #endregion INotifyPropertyChanged
+
+        
     }
 }

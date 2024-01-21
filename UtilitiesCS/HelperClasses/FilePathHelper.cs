@@ -163,12 +163,7 @@ namespace UtilitiesCS
                 return false;
             }
         }
-
-        internal void TruncateSeed()
-        {
-            var maxSeedLength = MAX_PATH - FolderPath.Length - FileExtension.Length - FileStemSuffix.Length;
-        }
-        
+                
         public bool AdjustForMaxPath()
         {
             if (!StemInitialized())

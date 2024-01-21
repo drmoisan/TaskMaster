@@ -53,6 +53,7 @@
     <Compile Include="EmailIntelligence\Bayesian\EmailDataMinerTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests_UnfinishedStubs.cs" />
     <Compile Include="EmailIntelligence\Bayesian\EmailDataMinerTests_UnfinishedStubs.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierSharedTests.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceListTests.cs" />
     <Compile Include="EmailIntelligence\CtfMapTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfoTests.cs" />

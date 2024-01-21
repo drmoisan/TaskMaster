@@ -31,6 +31,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Public Properties and Methods
 
+        public enum ActionEnum 
+        { 
+            Failed = 0, 
+            ValueUpdated = 1, 
+            ItemAdded = 2, 
+            ItemRemoved = 3 
+        }
+        
         public ConcurrentDictionary<string, int> TokenFrequency { get => _tokenFrequency; protected set => _tokenFrequency = value; }
         private ConcurrentDictionary<string, int> _tokenFrequency;
 
@@ -40,10 +48,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public Enums.Corpus Indicator { get => _indicator; set => _indicator = value; }
         private Enums.Corpus _indicator;
 
+        public int AddTokenCount(int increment)
+        {
+            return Interlocked.Add(ref _tokenCount, increment);
+        }
+
         public void AddOrIncrementToken(string token) 
         { 
             TokenFrequency.AddOrUpdate(token, 1, (key, count) => ++count); 
-            Interlocked.Increment(ref _tokenCount);
         }
 
         public void AddOrIncrementTokens(IEnumerable<string> tokens) => tokens.ForEach(AddOrIncrementToken);
@@ -65,6 +77,36 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 }
             }
             else { return false; }            
+        }
+
+        public void AddTokenOrSumValues(IEnumerable<KeyValuePair<string, int>> tokenFrequency)
+        {
+            foreach (var kvp in tokenFrequency)
+            {
+                this.AddOrSumTokenValue(kvp.Key, kvp.Value);
+            }
+        }
+
+        public int AddOrSumTokenValue(string token, int value)
+        {
+            return TokenFrequency.AddOrUpdate(token, value, (key, count) => count + value);
+        }
+
+        public void SubtractOrRemoveValues(IEnumerable<KeyValuePair<string, int>> tokenFrequency)
+        {
+            foreach (var kvp in tokenFrequency)
+            {
+                SubtractOrRemoveValue(kvp.Key, kvp.Value);
+            }
+        }
+
+        public void SubtractOrRemoveValue(string token, int value)
+        {
+            _tokenFrequency.UpdateOrRemove(
+                token,
+                (key, oldValue) => oldValue - value <= 0,
+                (key, oldValue) => oldValue - value,
+                out _);
         }
 
         public object Clone()

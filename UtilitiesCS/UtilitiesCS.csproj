@@ -52,6 +52,9 @@
     <Reference Include="FSharp.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\FSharp.Core.7.0.400\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Generic.Math, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Generic.Math.1.0.2\lib\net46\Generic.Math.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
     </Reference>
@@ -351,7 +354,9 @@
     <Compile Include="Dialogs\YesNoToAll.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianFilter.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Drafts\CorpusVectorized_badidea.cs" />
     <Compile Include="EmailIntelligence\Bayesian\DedicatedToken.cs" />
     <Compile Include="EmailIntelligence\Bayesian\DoNotSerializeContractResolver.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ClassifierGroup.cs" />
@@ -360,6 +365,7 @@
     <Compile Include="EmailIntelligence\Bayesian\CorpusInherit.cs" />
     <Compile Include="EmailIntelligence\Bayesian\MinedMailInfo.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />
     <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusExample.cs" />
