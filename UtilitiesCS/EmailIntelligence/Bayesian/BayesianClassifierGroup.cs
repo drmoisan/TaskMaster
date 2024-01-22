@@ -46,7 +46,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         protected Corpus _sharedTokenBase = new();
 
         [JsonProperty(Order = -1)]
-        public int TotalTokenCount { get => _totalTokenCount; set => _totalTokenCount = value; }
+        public int TotalEmailCount { get => _totalTokenCount; set => _totalTokenCount = value; }
         protected int _totalTokenCount;
 
         public IApplicationGlobals AppGlobals { get; set; }
@@ -64,115 +64,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             _classifiers[tag] = BayesianClassifierShared.FromTokenBase(this, tag, matchTokens);
         }
-
-        public void AddOrUpdateClassifier_2(string tag, IEnumerable<string> matchTokens)
-        {
-            // Saved logic from when DedicatedTokens was a ConcurrentDictionary<string, DedicatedToken>
-
-            //var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag));
-
-            //var matchFrequency = GroupAndCount(matchTokens);
-
-            //foreach (var kvp in matchFrequency)
-            //{
-            //    DedicatedTokens.AddOrUpdate(kvp.Key, new DedicatedToken { FolderPath = tag, Count = kvp.Value }, (key, existingVal) =>
-            //    {
-            //        if (existingVal.FolderPath == tag)
-            //        {
-            //            existingVal.Count += kvp.Value;
-            //        }
-            //        return existingVal;
-            //    });
-
-            //    SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value, (key, existingVal) =>
-            //    {
-            //        return existingVal + kvp.Value;
-            //    });
-            //}
-
-            //// Update other match probabilities for new total counts
-            //throw new NotImplementedException();
-        }
-
-        public void UpdateSharedDictionaries2(string key, int count, string tag)
-        {
-            //// Check whether the KeyValuePair<string, int> named kvp has a matching key
-            //// in DedicatedTokens and get its value in a variable named dedicatedToken
-            //DedicatedToken dedicatedToken = null;
-            //bool moveDedicatedToShared = false;
-
-            //lock (_dedicatedTokens3)
-            //{
-            //    // Does The Token Exist in DedicatedTokens?
-            //    if (_dedicatedTokens3.TryGetValue(key, out dedicatedToken))
-            //    {
-            //        // Does the FolderPath match the tag?
-            //        if (dedicatedToken.FolderPath == tag)
-            //        {
-            //            // If So, Add the count to the dedicated token and return
-            //            Interlocked.Add(ref dedicatedToken.Count, count);
-            //            return;
-            //        }
-            //        else
-            //        {
-            //            // If Not, it means it has become a shared token. 
-            //            // Remove the token and mark it for migration to shared tokens
-            //            moveDedicatedToShared = _dedicatedTokens3.Remove(key);
-            //        }
-            //    }
-            //    // If the token is not in DedicatedTokens, try to add to a shared token
-            //    else if (this.SharedTokenBase.TokenFrequency.TryAddValues(key, count))
-            //    {
-            //        // If successful return and release lock
-            //        return;
-            //    }
-            //    else
-            //    {
-            //        // Token is new. Add to dedicated tokens 
-            //        _dedicatedTokens3.Add(key, new DedicatedToken 
-            //            { Token = key, FolderPath = tag, Count = count });
-            //        return;
-            //    }
-            //}
-            
-            //if (this.SharedTokenBase.TokenFrequency.TryGetValue(kvp.Key, out var st))
-            //{
-            //    // Threadsafe update the value in the shared token base
-            //}
-            //else
-            //{
-            //    // Add to dedicated tokens
-            //}
-            //    // Add to the bayesian clasifier and update the probability
-            
-        }
-
-        public void UpdateSharedDictionaries(string key, int value, string tag)
-        {
-            Enums.DictionaryResult result = UpdateOrRemoveDedicated(
-                key, value, tag, out var dedicatedToken);
-
-            // Exit if dedicated token value updated successfully
-            if (result.HasFlag(Enums.DictionaryResult.ValueChanged))
-                return;
-
-            // Else if the dedicated token should be migrated, add or update shared tokens
-            else if (result.HasFlag(Enums.DictionaryResult.KeysChanged) &&
-                !result.HasFlag(Enums.DictionaryResult.KeyExists))
-            {
-                int migratedValue = dedicatedToken.Count + value;
-                SharedTokenBase.TokenFrequency.AddOrUpdate(key, migratedValue, 
-                    (sharedKey, existingValue) => existingValue + migratedValue);
-                return;    
-            }
-            // Else it add to dedicated tokens
-            else
-            {
-                _dedicatedTokens.TryAdd(key, new DedicatedToken
-                    { Token = key, FolderPath = tag, Count = value });
-            }
-        }
-
+                
         private Enums.DictionaryResult UpdateOrRemoveDedicated(
             string key, int value, string tag, out DedicatedToken dedicatedToken)
         {
@@ -194,30 +86,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 value: out dedicatedToken);
         }
 
-        public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens)
+        public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens, int emailCount)
         {
-            // This whole method is not threadsafe if I am filing multiple emails at once
             var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag));
             var matchFrequency = GroupAndCount(matchTokens);
-            foreach (var kvp in matchFrequency)
-            {
-                UpdateSharedDictionaries(kvp.Key, kvp.Value, tag);
-            }
-            classifier.AddToMatches(matchFrequency);
-
-            //// Make threadsafe
-            //var (notMatchFiltered, matchFiltered) = Corpus.SubtractFilter(
-            //            SharedTokenBase,
-            //            classifier.Match,
-            //            classifier.Knobs.NotMatchTokenWeight,
-            //            classifier.Knobs.MinCountForInclusion);
-            
-            //classifier.NotMatchCount = notMatchFiltered.TokenFrequency.Values.Sum();
-            //classifier.MatchCount = matchFiltered.TokenFrequency.Values.Sum();
-
-
-            // Update other match probabilities for new total counts
-            
+            classifier.Train(matchFrequency, emailCount);
         }
         
         public static Dictionary<string, int> GroupAndCount(IEnumerable<string> items)
@@ -320,126 +193,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //LogMetrics();
         }
 
-        public async Task AfterDeserialize(CancellationToken token)
-        {
-            var sw = new SegmentStopWatch().Start();
-
-            AppGlobals.AF.ProgressPane.Visible = true;
-            logger.Debug("Starting Classifier Probability Calculation");
-            AppGlobals.AF.ProgressTracker.Report(0, "Starting Classifier Probability Calculation");
-            sw.LogDuration("Initialized AfterDeserialize");
-
-            //await Classifiers.First().Value.AfterDeserialize(AppGlobals.AF.CancelLoad);
-            //Interlocked.Increment(ref completed);
-            //AppGlobals.AF.ProgressTracker.Report((int)(completed / count * 100), GetReportMessage(completed, count, sw));
-
-            //await AfterDeserialized_HeavyParallelizationAsync(token, sw);
-            await OptimizeUpdate(sw);
-
-            sw.Stop().GroupByActionName(inplace: true);
-            sw.WriteToLog();
-
-            AppGlobals.AF.ProgressTracker.Report(100, $"Completed in {sw.Elapsed:mm\\:ss}");
-
-        }
-
-        //internal async Task AfterDeserialized_HeavyParallelizationAsync(
-        //    CancellationToken token, SegmentStopWatch sw)
-        //{
-        //    await Task.Run(async () =>
-        //    {
-        //        // Memory issue with infer negative. 
-        //        await InferNegative(token);
-        //        sw.LogDuration("InferNegative Tokens");
-
-        //        await RecalcNullProbs(token);
-        //        sw.LogDuration("Update Probabilities");
-        //    }, token);
-        //}
-
-        internal async Task RecalcNullProbs(CancellationToken token)
-        {
-            if (Classifiers.Values.Any(x => x.Prob is null))
-            {
-                AppGlobals.AF.ProgressTracker.Report(
-                    0, "Starting to Recalculate Probabilities");
-                var count = Classifiers.Count;
-                int completed = 0;
-                var sw = new SegmentStopWatch().Start();
-
-                await Classifiers.Values.ToAsyncEnumerable()
-                        .ForEachAsync(async (classifier) =>
-                        {
-                            await classifier.RecalcProbsAsync(token);
-                            Interlocked.Increment(ref completed);
-                            AppGlobals.AF.ProgressTracker.Report((int)((double)completed / (double)count * 100),
-                                GetReportMessage(completed, count, sw, "Recalc Probabilities: Completed"));
-                        });
-
-            }
-
-        }
-
-        //// Parallelization made this slower because memory usage was too high
-        //internal async Task InferNegative(CancellationToken token)
-        //{
-        //    AppGlobals.AF.ProgressTracker.Report(
-        //        0, "Starting Negative Token Inference");
-        //    var count = Classifiers.Count;
-        //    int completed = 0;
-
-        //    var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-        //    var chunkSize = (int)Math.Round((double)count / (double)processors, 0);
-        //    var chunks = Classifiers.Values.Chunk(chunkSize);
-
-        //    var sw = new SegmentStopWatch();
-        //    // Start the chunked tasks to multiprocess async
-        //    var tasks = chunks.Select(
-        //        chunk => Task.Run(async () => await
-        //        chunk.ToAsyncEnumerable()
-        //        .ForEachAsync(async (classifier) =>
-        //        {
-        //            await classifier.InferNegativeTokensAsync(token);
-        //            Interlocked.Increment(ref completed);
-        //            AppGlobals.AF.ProgressTracker.Report(
-        //                (int)((double)completed / (double)count * 100),
-        //                GetReportMessage(completed, count, sw, "Infer Negative Tokens: Completed"));
-        //        })));
-
-        //    sw.Start();
-
-        //    try
-        //    {
-        //        await Task.WhenAll(tasks);
-        //    }
-        //    catch (OperationCanceledException)
-        //    {
-        //        logger.Debug("Loading Canceled by User");
-        //    }
-        //}
-
-        internal async Task OptimizeUpdate(SegmentStopWatch sw)
-        {
-            var count = Classifiers.Count;
-            int completed = 0;
-
-            try
-            {
-                foreach (var classifier in Classifiers)
-                {
-                    AppGlobals.AF.CancelLoad.ThrowIfCancellationRequested();
-                    await classifier.Value.AfterDeserialize(AppGlobals.AF.CancelLoad, sw);
-                    Interlocked.Increment(ref completed);
-                    AppGlobals.AF.ProgressTracker.Report((int)((double)completed / (double)count * 100),
-                        GetReportMessage(completed, count, sw));
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                logger.Debug("Loading Canceled by User");
-            }
-        }
-
         internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed")
         {
             string message;
@@ -458,5 +211,118 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         #endregion Serialization
+
+        #region obsolete
+
+        public void AddOrUpdateClassifier_2(string tag, IEnumerable<string> matchTokens)
+        {
+            // Saved logic from when DedicatedTokens was a ConcurrentDictionary<string, DedicatedToken>
+
+            //var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag));
+
+            //var matchFrequency = GroupAndCount(matchTokens);
+
+            //foreach (var kvp in matchFrequency)
+            //{
+            //    DedicatedTokens.AddOrUpdate(kvp.Key, new DedicatedToken { FolderPath = tag, Count = kvp.Value }, (key, existingVal) =>
+            //    {
+            //        if (existingVal.FolderPath == tag)
+            //        {
+            //            existingVal.Count += kvp.Value;
+            //        }
+            //        return existingVal;
+            //    });
+
+            //    SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value, (key, existingVal) =>
+            //    {
+            //        return existingVal + kvp.Value;
+            //    });
+            //}
+
+            //// Update other match probabilities for new total counts
+            //throw new NotImplementedException();
+        }
+
+        public void UpdateSharedDictionaries2(string key, int count, string tag)
+        {
+            //// Check whether the KeyValuePair<string, int> named kvp has a matching key
+            //// in DedicatedTokens and get its value in a variable named dedicatedToken
+            //DedicatedToken dedicatedToken = null;
+            //bool moveDedicatedToShared = false;
+
+            //lock (_dedicatedTokens3)
+            //{
+            //    // Does The Token Exist in DedicatedTokens?
+            //    if (_dedicatedTokens3.TryGetValue(key, out dedicatedToken))
+            //    {
+            //        // Does the FolderPath match the tag?
+            //        if (dedicatedToken.FolderPath == tag)
+            //        {
+            //            // If So, Add the count to the dedicated token and return
+            //            Interlocked.Add(ref dedicatedToken.Count, count);
+            //            return;
+            //        }
+            //        else
+            //        {
+            //            // If Not, it means it has become a shared token. 
+            //            // Remove the token and mark it for migration to shared tokens
+            //            moveDedicatedToShared = _dedicatedTokens3.Remove(key);
+            //        }
+            //    }
+            //    // If the token is not in DedicatedTokens, try to add to a shared token
+            //    else if (this.SharedTokenBase.TokenFrequency.TryAddValues(key, count))
+            //    {
+            //        // If successful return and release lock
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        // Token is new. Add to dedicated tokens 
+            //        _dedicatedTokens3.Add(key, new DedicatedToken 
+            //            { Token = key, FolderPath = tag, Count = count });
+            //        return;
+            //    }
+            //}
+
+            //if (this.SharedTokenBase.TokenFrequency.TryGetValue(kvp.Key, out var st))
+            //{
+            //    // Threadsafe update the value in the shared token base
+            //}
+            //else
+            //{
+            //    // Add to dedicated tokens
+            //}
+            //    // Add to the bayesian clasifier and update the probability
+
+        }
+
+        public void UpdateSharedDictionaries(string key, int value, string tag)
+        {
+            Enums.DictionaryResult result = UpdateOrRemoveDedicated(
+                key, value, tag, out var dedicatedToken);
+
+            // Exit if dedicated token value updated successfully
+            if (result.HasFlag(Enums.DictionaryResult.ValueChanged))
+                return;
+
+            // Else if the dedicated token should be migrated, add or update shared tokens
+            else if (result.HasFlag(Enums.DictionaryResult.KeysChanged) &&
+                !result.HasFlag(Enums.DictionaryResult.KeyExists))
+            {
+                int migratedValue = dedicatedToken.Count + value;
+                SharedTokenBase.TokenFrequency.AddOrUpdate(key, migratedValue,
+                    (sharedKey, existingValue) => existingValue + migratedValue);
+                return;
+            }
+            // Else it add to dedicated tokens
+            else
+            {
+                _dedicatedTokens.TryAdd(key, new DedicatedToken
+                { Token = key, FolderPath = tag, Count = value });
+            }
+        }
+
+
+        #endregion obsolete
     }
 }

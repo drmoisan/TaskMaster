@@ -22,4 +22,6 @@ namespace UtilitiesCS.Threading
         public bool CheckAndSetFirstCall
         { get { return Interlocked.Exchange(ref _state, CALLED) == NOTCALLED; } }
     }
+
+    
 }

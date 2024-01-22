@@ -15,33 +15,33 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
+            Console.SetOut(new DebugTextWriter());            
             this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true };
+            
             this.dedicated = CreateDedicatedTokens();
-            this.dedicated2 = CreateDedicatedTokens2();
-
             this.sharedTokens = CreateSharedTokens();
-            this.sharedTokens2 = CreateSharedTokens2();
             var tokenBase = new CorpusSub();
-            var tokenBase2 = new CorpusSub();
             tokenBase.SetTokenBase(sharedTokens);
-            tokenBase2.SetTokenBase(sharedTokens2);
             this.sharedTokenBase = tokenBase.GetBase();
-            this.sharedTokenBase2 = tokenBase2.GetBase();
-
             this.classifierGroup = new ClassifierGroupSub
             {
                 DedicatedTokens = this.dedicated,
                 SharedTokenBase = this.sharedTokenBase,
-                TotalTokenCount = this.sharedTokenBase.TokenCount + this.dedicated.Sum(x => x.Value.Count)
+                TotalEmailCount = this.sharedTokenBase.TokenCount + this.dedicated.Sum(x => x.Value.Count)
             };
 
+            this.dedicated2 = CreateDedicatedTokens2();
+            this.sharedTokens2 = CreateSharedTokens2();
+            var tokenBase2 = new CorpusSub();
+            tokenBase2.SetTokenBase(sharedTokens2);
+            this.sharedTokenBase2 = tokenBase2.GetBase();
             this.classifierGroup2 = new ClassifierGroupSub
             {
                 DedicatedTokens = this.dedicated2,
                 SharedTokenBase = this.sharedTokenBase2,
-                TotalTokenCount = this.sharedTokenBase2.TokenCount + this.dedicated2.Sum(x => x.Value.Count)
+                TotalEmailCount = this.sharedTokenBase2.TokenCount + this.dedicated2.Sum(x => x.Value.Count)
             };
+            
         }
 
         #region Helper Functions and Classes
@@ -106,7 +106,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             public void SetTokenBase(ConcurrentDictionary<string, int> tb)
             {
                 this.TokenFrequency = tb;
-                this.TokenCount = tb.Sum(x => x.Value);
+
             }
             public Corpus GetBase() => this;
         }
@@ -186,11 +186,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
                 Enumerable.Range(0, 26)
                 .Select(i => new KeyValuePair<string, double>(
                 alphabet[i].ToString(), i / (double)100 + 0.6)));
-
-            //LogTokens(classifier.Prob.OrderBy(x => x.Key).ToDictionary(), "Source probability tokens");
-            //LogTokens(classifier.Parent.SharedTokenBase.TokenFrequency.OrderBy(x => x.Key).ToDictionary(), "Shared tokens");
-            //LogDedicatedTokens();
-
+                        
             LogProbabilities(classifier.Prob, "Source token probability");
             LogTokenFrequency(classifier.Parent.SharedTokenBase.TokenFrequency, "Shared tokens");
             LogDedicatedTokenFrequency();
@@ -288,8 +284,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             Console.WriteLine(text);
         }
-
-
 
         #endregion Helper Functions and Classes
 
@@ -572,6 +566,32 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void AddToMatches_01BuildFromEmpty_ExpectedBehavior(IEnumerable<KeyValuePair<string, int>> tokenFrequency)
+        {
+            var classifier = CreateBayesianClassifier();
+
+            var sharedTokenFrequency = new ConcurrentDictionary<string,int>(
+                new Dictionary<string, int>
+                {
+                    ["token03"] = 4,
+                    ["token04"] = 4,
+                    ["token05"] = 12,
+                    ["token06"] = 12,
+                    ["token07"] = 4
+                });
+
+            var tokenBase = new CorpusSub();
+            tokenBase.SetTokenBase(sharedTokenFrequency);
+            this.classifierGroup = new ClassifierGroupSub
+            {
+                SharedTokenBase = tokenBase,
+                TotalEmailCount = this.sharedTokenBase.TokenCount 
+            };
+
+            classifier.Parent = classifierGroup;
         }
 
         [TestMethod]

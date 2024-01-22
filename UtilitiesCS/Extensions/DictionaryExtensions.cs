@@ -122,29 +122,6 @@ namespace UtilitiesCS
             return await Task.Run(() => dictionary.TryAddValues(key, value), linkedTS.Token);
         }
 
-        //public static (bool ValueUpdated, TKey Key,TValue Value) UpdateOrRemove<TKey, TValue>(
-        //    this ConcurrentDictionary<TKey, TValue> dictionary, 
-        //    TKey key,
-        //    Func<TKey, TValue, bool> removeCondition,
-        //    Func<TKey, TValue, TValue> updateValueFactory) 
-        //{
-        //    while (dictionary.TryGetValue(key, out TValue oldValue)) 
-        //    {                
-        //        if (removeCondition(key, oldValue))
-        //        {
-        //            if(dictionary.TryRemove(key, out oldValue))
-        //                return (false, key, oldValue);
-        //        }
-        //        else
-        //        {
-        //            TValue newValue = updateValueFactory(key, oldValue);
-        //            if (dictionary.TryUpdate(key, newValue, oldValue))
-        //                return (true, key, newValue);
-        //        }
-        //    }
-        //    return (false, default(TKey), default(TValue));
-        //}
-
         public static Enums.DictionaryResult UpdateOrRemove<TKey, TValue>(
             this ConcurrentDictionary<TKey, TValue> dictionary,
             TKey key,
