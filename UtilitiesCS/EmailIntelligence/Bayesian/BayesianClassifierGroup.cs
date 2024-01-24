@@ -46,8 +46,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         protected Corpus _sharedTokenBase = new();
 
         [JsonProperty(Order = -1)]
-        public int TotalEmailCount { get => _totalTokenCount; set => _totalTokenCount = value; }
-        protected int _totalTokenCount;
+        public int TotalEmailCount { get => _totalEmailCount; set => _totalEmailCount = value; }
+        protected int _totalEmailCount;
 
         public IApplicationGlobals AppGlobals { get; set; }
 
@@ -59,7 +59,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Public Methods
 
-        
+        public void AddToEmailCount(int count)
+        {
+            Interlocked.Add(ref _totalEmailCount, count);
+        }
+
         public void ForceClassifierUpdate(string tag, IEnumerable<string> matchTokens)
         {
             _classifiers[tag] = BayesianClassifierShared.FromTokenBase(this, tag, matchTokens);

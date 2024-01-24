@@ -148,7 +148,7 @@
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.11259F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59F));
+            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 61F));
             this.L0v1L2g_TlpTop.Controls.Add(this.LblDuration, 2, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.XlWorktime, 1, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.LblKbf, 2, 5);
@@ -271,7 +271,7 @@
             this.TaskName.Location = new System.Drawing.Point(76, 73);
             this.TaskName.Margin = new System.Windows.Forms.Padding(6);
             this.TaskName.Name = "TaskName";
-            this.TaskName.Size = new System.Drawing.Size(1465, 37);
+            this.TaskName.Size = new System.Drawing.Size(1462, 37);
             this.TaskName.TabIndex = 15;
             // 
             // XlImportance
@@ -301,7 +301,7 @@
             this.PriorityBox.Location = new System.Drawing.Point(276, 140);
             this.PriorityBox.Margin = new System.Windows.Forms.Padding(6);
             this.PriorityBox.Name = "PriorityBox";
-            this.PriorityBox.Size = new System.Drawing.Size(415, 33);
+            this.PriorityBox.Size = new System.Drawing.Size(414, 33);
             this.PriorityBox.TabIndex = 23;
             this.PriorityBox.SelectedIndexChanged += new System.EventHandler(this.PriorityBox_SelectedIndexChanged);
             // 
@@ -319,7 +319,7 @@
             this.KbSelector.Location = new System.Drawing.Point(276, 190);
             this.KbSelector.Margin = new System.Windows.Forms.Padding(6);
             this.KbSelector.Name = "KbSelector";
-            this.KbSelector.Size = new System.Drawing.Size(415, 33);
+            this.KbSelector.Size = new System.Drawing.Size(414, 33);
             this.KbSelector.TabIndex = 7;
             this.KbSelector.SelectedIndexChanged += new System.EventHandler(this.KbSelector_SelectedIndexChanged);
             // 
@@ -332,7 +332,7 @@
             this.Duration.Location = new System.Drawing.Point(276, 240);
             this.Duration.Margin = new System.Windows.Forms.Padding(6);
             this.Duration.Name = "Duration";
-            this.Duration.Size = new System.Drawing.Size(415, 37);
+            this.Duration.Size = new System.Drawing.Size(414, 37);
             this.Duration.TabIndex = 9;
             // 
             // LblReminder
@@ -340,7 +340,7 @@
             this.LblReminder.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblReminder.AutoSize = true;
             this.LblReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblReminder.Location = new System.Drawing.Point(826, 144);
+            this.LblReminder.Location = new System.Drawing.Point(824, 144);
             this.LblReminder.Margin = new System.Windows.Forms.Padding(0);
             this.LblReminder.Name = "LblReminder";
             this.LblReminder.Size = new System.Drawing.Size(132, 30);
@@ -352,7 +352,7 @@
             this.LblDuedate.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblDuedate.AutoSize = true;
             this.LblDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblDuedate.Location = new System.Drawing.Point(832, 194);
+            this.LblDuedate.Location = new System.Drawing.Point(830, 194);
             this.LblDuedate.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.LblDuedate.Name = "LblDuedate";
             this.LblDuedate.Size = new System.Drawing.Size(128, 30);
@@ -365,7 +365,7 @@
             this.XlReminder.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlReminder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlReminder.Location = new System.Drawing.Point(1086, 141);
+            this.XlReminder.Location = new System.Drawing.Point(1083, 141);
             this.XlReminder.Margin = new System.Windows.Forms.Padding(0);
             this.XlReminder.Name = "XlReminder";
             this.XlReminder.Size = new System.Drawing.Size(35, 35);
@@ -378,7 +378,7 @@
             this.XlDuedate.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlDuedate.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlDuedate.Location = new System.Drawing.Point(1086, 191);
+            this.XlDuedate.Location = new System.Drawing.Point(1083, 191);
             this.XlDuedate.Margin = new System.Windows.Forms.Padding(0);
             this.XlDuedate.Name = "XlDuedate";
             this.XlDuedate.Size = new System.Drawing.Size(35, 35);
@@ -392,7 +392,7 @@
             this.DtReminder.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtReminder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtReminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtReminder.Location = new System.Drawing.Point(1130, 140);
+            this.DtReminder.Location = new System.Drawing.Point(1127, 140);
             this.DtReminder.Margin = new System.Windows.Forms.Padding(6);
             this.DtReminder.Name = "DtReminder";
             this.DtReminder.ShowCheckBox = true;
@@ -406,7 +406,7 @@
             this.DtDuedate.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtDuedate.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtDuedate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtDuedate.Location = new System.Drawing.Point(1130, 190);
+            this.DtDuedate.Location = new System.Drawing.Point(1127, 190);
             this.DtDuedate.Margin = new System.Windows.Forms.Padding(6);
             this.DtDuedate.Name = "DtDuedate";
             this.DtDuedate.ShowCheckBox = true;
@@ -416,7 +416,7 @@
             // C3S1
             // 
             this.C3S1.AutoSize = true;
-            this.C3S1.Location = new System.Drawing.Point(1087, 0);
+            this.C3S1.Location = new System.Drawing.Point(1084, 0);
             this.C3S1.Name = "C3S1";
             this.C3S1.Size = new System.Drawing.Size(24, 17);
             this.C3S1.TabIndex = 32;
@@ -426,7 +426,7 @@
             // C4S1
             // 
             this.C4S1.AutoSize = true;
-            this.C4S1.Location = new System.Drawing.Point(1510, 0);
+            this.C4S1.Location = new System.Drawing.Point(1507, 0);
             this.C4S1.Name = "C4S1";
             this.C4S1.Size = new System.Drawing.Size(24, 17);
             this.C4S1.TabIndex = 32;
@@ -464,7 +464,7 @@
             // C1S1
             // 
             this.C1S1.AutoSize = true;
-            this.C1S1.Location = new System.Drawing.Point(660, 0);
+            this.C1S1.Location = new System.Drawing.Point(659, 0);
             this.C1S1.Name = "C1S1";
             this.C1S1.Size = new System.Drawing.Size(24, 17);
             this.C1S1.TabIndex = 32;
@@ -598,7 +598,7 @@
             this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 66F));
+            this.L0v2L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 69F));
             this.L0v2L1g_Tlp.Controls.Add(this.LblTopic, 2, 4);
             this.L0v2L1g_Tlp.Controls.Add(this.LblProject, 2, 3);
             this.L0v2L1g_Tlp.Controls.Add(this.LblPeople, 2, 2);
@@ -858,7 +858,7 @@
             this.L0v3L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.L0v3L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v3L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.L0v3L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 66F));
+            this.L0v3L1g_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 69F));
             this.L0v3L1g_Tlp.Controls.Add(this.ShortcutInternet, 4, 2);
             this.L0v3L1g_Tlp.Controls.Add(this.ShortcutPreRead, 8, 1);
             this.L0v3L1g_Tlp.Controls.Add(this.ShortcutPersonal, 4, 1);

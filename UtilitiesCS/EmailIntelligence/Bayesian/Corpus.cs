@@ -26,6 +26,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public Corpus(int concurrencyLevel, int capacity) { _tokenFrequency = new ConcurrentDictionary<string, int>(concurrencyLevel, capacity); }
         public Corpus(int concurrencyLevel, IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) { new ConcurrentDictionary<string, int>(concurrencyLevel, collection, comparer); }
         public Corpus(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) { new ConcurrentDictionary<string, int>(concurrencyLevel, capacity, comparer); }
+        protected Corpus(Corpus corpus) 
+        {
+            _tokenFrequency = corpus.TokenFrequency;
+            _tokenCount = corpus.TokenCount;
+            _indicator = corpus.Indicator;
+        }
 
         #endregion Constructors
 
@@ -40,7 +46,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
         
         public ConcurrentDictionary<string, int> TokenFrequency { get => _tokenFrequency; protected set => _tokenFrequency = value; }
-        private ConcurrentDictionary<string, int> _tokenFrequency;
+        protected ConcurrentDictionary<string, int> _tokenFrequency;
 
         public int TokenCount { get => _tokenCount; protected set => _tokenCount = value; }
         private int _tokenCount;
@@ -112,7 +118,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public object Clone()
         {
             var result = this.MemberwiseClone() as Corpus;
-            result.TokenFrequency = new ConcurrentDictionary<string, int>(this.TokenFrequency);
+            var tokenFrequency = this.TokenFrequency ?? new ConcurrentDictionary<string, int>();
+            result.TokenFrequency = new ConcurrentDictionary<string, int>(tokenFrequency);
             return result;
         }
 

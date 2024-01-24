@@ -313,6 +313,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Set up classifier
             var classifier = SetupClassifierScenario1();
+            Console.WriteLine($"Total Token Count: {classifier.Parent.TotalTokenCount}");
 
             // Set up tokens in the Prob list
             var input = Enumerable.Range(8, 4).Select(i => alphabet[i].ToString()).ToList();
