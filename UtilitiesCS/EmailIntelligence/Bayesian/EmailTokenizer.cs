@@ -8,6 +8,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Schema;
 using Tesseract;
 using UtilitiesCS.Extensions;
@@ -91,6 +93,11 @@ namespace UtilitiesCS.EmailIntelligence
         #endregion Constants
 
         #region Main Methods
+
+        public async Task<string[]> tokenizeAsync(object obj, CancellationToken cancel)
+        {
+            return await Task.Run(() => tokenize(obj).ToArray(), cancel);
+        }
 
         public IEnumerable<string> tokenize(object obj) 
         {

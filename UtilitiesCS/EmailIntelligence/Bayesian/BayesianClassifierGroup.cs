@@ -1,16 +1,12 @@
-﻿using ExCSS;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using System.Security.Policy;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
@@ -34,13 +30,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public ConcurrentDictionary<string, BayesianClassifierShared> Classifiers { get => _classifiers; protected set => _classifiers = value; }
         protected ConcurrentDictionary<string, BayesianClassifierShared> _classifiers;
 
-        [JsonProperty(Order = -3)]
-        public ConcurrentDictionary<string, DedicatedToken> DedicatedTokens { get => _dedicatedTokens; set => _dedicatedTokens = value; }
-        protected ConcurrentDictionary<string, DedicatedToken> _dedicatedTokens = new();
-
-        protected Dictionary<string, DedicatedToken> _dedicatedTokens3 = new();
-        
-
         [JsonProperty(Order = -2)]
         public Corpus SharedTokenBase { get => _sharedTokenBase; set => _sharedTokenBase = value; }
         protected Corpus _sharedTokenBase = new();
@@ -51,70 +40,78 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public IApplicationGlobals AppGlobals { get; set; }
 
-        //[JsonIgnore]
-        public Func<object, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
-        private Func<object, IEnumerable<string>> _tokenizer = new EmailTokenizer().tokenize;
+        public Func<object, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
+        private Func<object, IEnumerable<string>> _tokenize = new EmailTokenizer().tokenize;
+
+        public Func<object, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
+        private Func<object, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().tokenizeAsync;
 
         #endregion Public Properties
 
-        #region Public Methods
+        #region Public Training Methods
+
+        public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens, int emailCount)
+        {
+            var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag));
+            var matchFrequency = matchTokens.GroupAndCount();
+            classifier.Train(matchFrequency, emailCount);
+        }
 
         public void AddToEmailCount(int count)
         {
             Interlocked.Add(ref _totalEmailCount, count);
         }
 
-        public void ForceClassifierUpdate(string tag, IEnumerable<string> matchTokens)
+        public async Task ForceClassifierUpdate(string tag, IDictionary<string, int> matchTokens, int emailCount)
         {
-            _classifiers[tag] = BayesianClassifierShared.FromTokenBase(this, tag, matchTokens);
-        }
-                
-        private Enums.DictionaryResult UpdateOrRemoveDedicated(
-            string key, int value, string tag, out DedicatedToken dedicatedToken)
-        {
-            return _dedicatedTokens.UpdateOrRemove(
-                key: key,
-                removeCondition: (key, oldValue) => oldValue.FolderPath == tag,
-                updateValueFactory: (key, existingValue) =>
-                {
-                    if (existingValue.FolderPath != tag)
-                    {
-                        throw new ArgumentException($"New Tag [{tag}] does not match " +
-                            $"existing [{existingValue.FolderPath}]. Should have been removed" +
-                            $"already by removal condition");
-                    }
-
-                    existingValue.Count += value;
-                    return existingValue;
-                },
-                value: out dedicatedToken);
+            _classifiers[tag] = await BayesianClassifierShared.FromTokenBaseAsync(
+                this, tag, matchTokens, emailCount, false, default);
         }
 
-        public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens, int emailCount)
+        #endregion Public Training Methods
+
+        #region Public Classification Methods
+
+        public OrderedParallelQuery<Prediction<string>> Classify(object source)
         {
-            var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag));
-            var matchFrequency = GroupAndCount(matchTokens);
-            classifier.Train(matchFrequency, emailCount);
+            var tokens = _tokenize(source);
+            var tokenIncidence = tokens.GroupAndCount();
+            var result = this.Classify(tokenIncidence).OrderByDescending(x => x.Probability);
+            var sl = new SortedList<int, Prediction<string>>();
+            return result;
         }
-        
-        public static Dictionary<string, int> GroupAndCount(IEnumerable<string> items)
+
+        public OrderedParallelQuery<Prediction<string>> Classify(
+            IDictionary<string, int> tokenIncidence)
         {
-            return items.GroupBy(item => item)
-            .ToDictionary(group => group.Key, group => group.Count());
-        }
-        public IOrderedEnumerable<Prediction<string>> Classify(object source)
-        {
-            return this.Classify(_tokenizer(source));
-        }
-        public IOrderedEnumerable<Prediction<string>> Classify(IEnumerable<string> tokens)
-        {
-            var results = Classifiers.Select(
-            classifier => new Prediction<string>(
-            classifier.Key, classifier.Value.GetMatchProbability(tokens))).OrderBy(x => x);
+            var results = Classifiers.AsParallel()
+                .Select(classifier => new Prediction<string>(
+                    classifier.Key,
+                    classifier.Value.GetMatchProbability(tokenIncidence)))
+                .OrderByDescending(x => x.Probability);
             return results;
         }
 
-        #endregion Public Methods
+        public async ValueTask<Prediction<string>[]> ClassifyAsync(object source, CancellationToken cancel)
+        {
+            var tokens = await TokenizeAsync(source, cancel);
+            var tokenIncidence = await tokens.GroupAndCountAsync();
+            var result = await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
+            return result;
+        }
+        
+        public IOrderedAsyncEnumerable<Prediction<string>> ClassifyAsync(
+            IDictionary<string, int> tokenIncidence, CancellationToken cancel)
+        {
+            var results = Classifiers.ToAsyncEnumerable()
+                .SelectAwait(async(classifier) => new Prediction<string>(
+                    classifier.Key, 
+                    await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
+                .OrderByDescending(prediction => prediction.Probability);
+            return results;
+        }
+
+        #endregion Public Classification Methods
 
         #region Debug Methods
 
@@ -218,6 +215,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region obsolete
 
+        [Obsolete]
         public void AddOrUpdateClassifier_2(string tag, IEnumerable<string> matchTokens)
         {
             // Saved logic from when DedicatedTokens was a ConcurrentDictionary<string, DedicatedToken>
@@ -247,6 +245,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //throw new NotImplementedException();
         }
 
+        [Obsolete]
         public void UpdateSharedDictionaries2(string key, int count, string tag)
         {
             //// Check whether the KeyValuePair<string, int> named kvp has a matching key
@@ -300,30 +299,31 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         }
 
+        [Obsolete]
         public void UpdateSharedDictionaries(string key, int value, string tag)
         {
-            Enums.DictionaryResult result = UpdateOrRemoveDedicated(
-                key, value, tag, out var dedicatedToken);
+            //Enums.DictionaryResult result = UpdateOrRemoveDedicated(
+            //    key, value, tag, out var dedicatedToken);
 
-            // Exit if dedicated token value updated successfully
-            if (result.HasFlag(Enums.DictionaryResult.ValueChanged))
-                return;
+            //// Exit if dedicated token value updated successfully
+            //if (result.HasFlag(Enums.DictionaryResult.ValueChanged))
+            //    return;
 
-            // Else if the dedicated token should be migrated, add or update shared tokens
-            else if (result.HasFlag(Enums.DictionaryResult.KeysChanged) &&
-                !result.HasFlag(Enums.DictionaryResult.KeyExists))
-            {
-                int migratedValue = dedicatedToken.Count + value;
-                SharedTokenBase.TokenFrequency.AddOrUpdate(key, migratedValue,
-                    (sharedKey, existingValue) => existingValue + migratedValue);
-                return;
-            }
-            // Else it add to dedicated tokens
-            else
-            {
-                _dedicatedTokens.TryAdd(key, new DedicatedToken
-                { Token = key, FolderPath = tag, Count = value });
-            }
+            //// Else if the dedicated token should be migrated, add or update shared tokens
+            //else if (result.HasFlag(Enums.DictionaryResult.KeysChanged) &&
+            //    !result.HasFlag(Enums.DictionaryResult.KeyExists))
+            //{
+            //    int migratedValue = dedicatedToken.Count + value;
+            //    SharedTokenBase.TokenFrequency.AddOrUpdate(key, migratedValue,
+            //        (sharedKey, existingValue) => existingValue + migratedValue);
+            //    return;
+            //}
+            //// Else it add to dedicated tokens
+            //else
+            //{
+            //    _dedicatedTokens.TryAdd(key, new DedicatedToken
+            //    { Token = key, FolderPath = tag, Count = value });
+            //}
         }
 
 

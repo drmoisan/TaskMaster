@@ -420,6 +420,9 @@
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.Designer.cs">
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\IAsyncEnumerableExtensions.cs" />
+    <Compile Include="Extensions\NullExtensions.cs" />
+    <Compile Include="Extensions\TraceExtensions.cs" />
     <Compile Include="HelperClasses\ObjectCopier.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPane.cs">
@@ -476,7 +479,7 @@
     <Compile Include="Extensions\DfMLNet.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\DrawingExtensions.cs" />
-    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />

@@ -12,7 +12,7 @@ namespace UtilitiesCS.Test.Threading
     {
         private MockRepository mockRepository;
         private Mock<IApplicationGlobals> mockApplicationGlobals;
-        private Mock<IAppStagingFilenames> mockStagingFilenames;
+        //private Mock<IAppStagingFilenames> mockStagingFilenames;
         private Mock<IFileSystemFolderPaths> mockFileSystemsFolderPaths;
         private Mock<JsonReader> mockJsonReader;
         private Mock<Type> mockType;

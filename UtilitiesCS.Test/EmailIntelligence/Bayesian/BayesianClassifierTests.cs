@@ -57,7 +57,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         private ConcurrentDictionary<string, DedicatedToken> dedicated, dedicated2;
         private Corpus sharedTokenBase, sharedTokenBase2;
         private ConcurrentDictionary<string, int> sharedTokens, sharedTokens2;
-        private Mock<BayesianClassifier> mockBayesianClassifier;
+        //private Mock<BayesianClassifier> mockBayesianClassifier;
 
         private class BayesianClassifierSub: BayesianClassifier
         {

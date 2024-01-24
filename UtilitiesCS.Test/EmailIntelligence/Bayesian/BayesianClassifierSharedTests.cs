@@ -62,12 +62,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
                 ConcurrentDictionary<string, DedicatedToken> dedicated,
                 Corpus sharedTokenBase)
             {
-                base._dedicatedTokens = dedicated;
                 base._sharedTokenBase = sharedTokenBase;
                 base._totalEmailCount = sharedTokenBase.TokenCount + dedicated.Sum(x => x.Value.Count);
             }
-
-            public new virtual ConcurrentDictionary<string, DedicatedToken> DedicatedTokens { get => base._dedicatedTokens; set => base._dedicatedTokens = value; }
 
             public new virtual CorpusSub SharedTokenBase { get => (CorpusSub)base._sharedTokenBase; set => base._sharedTokenBase = value; }
 
@@ -135,9 +132,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
                     ["dedicated5"] = 4,
                     ["dedicated8"] = 20,
                 }),
-                TotalEmailCount = 163,
-                DedicatedTokens = new ConcurrentDictionary<string, DedicatedToken>(),
-                
+                TotalEmailCount = 163,                
             };
             classifier.Prob = new ConcurrentDictionary<string, double>(
                 Enumerable.Range(0, 26)
@@ -177,8 +172,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
                     ["dedicated8"] = 20,
                 }),
                 TotalEmailCount = 163,
-                DedicatedTokens = new ConcurrentDictionary<string, DedicatedToken>(),
-
+                
             };
             classifier.Prob = new ConcurrentDictionary<string, double>
             {
@@ -360,7 +354,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
-        public void GetProbabilityList_MultiCase_ExpectedBehavior()
+        public void GetInterestingList_MultiCase_ExpectedBehavior()
         {
             // Test description
             Console.WriteLine($"Tests several conditions:\n1) A subset of tokens are found in the probability list." +
@@ -397,7 +391,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Set up the expected output
             var expected = new SortedList<string, double>();
-            int j = 0;
+            
             Enumerable.Range(8, 4)
                 .ForEach(i => expected.Add(
                     $".{40 - i:00}000{alphabet[i]}0",
@@ -430,7 +424,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
-        public void GetProbabilityList_NullCase_ExpectedBehavior()
+        public void GetInterestingList_NullCase_ExpectedBehavior()
         {
             // Test description
             Console.WriteLine($"Tests null input");
@@ -463,7 +457,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
-        public void GetProbabilityList_EmptyCase_ExpectedBehavior()
+        public void GetInterestingList_EmptyCase_ExpectedBehavior()
         {
             // Test description
             Console.WriteLine($"Tests empty input");
@@ -496,7 +490,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
-        public void GetProbabilityList_AllNew_ExpectedBehavior()
+        public void GetInterestingList_AllNew_ExpectedBehavior()
         {
             // Test description
             Console.WriteLine($"Tests all new tokens");
@@ -627,9 +621,39 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             actual.Should().BeEquivalentTo(expected,
-                options => options.Excluding(x => x.Parent.Tokenizer));
+                options => options.Excluding(x => x.Parent.Tokenize));
 
         }
+
+        [TestMethod]
+        public async Task Train_01BuildFromEmptyAsync_ExpectedBehavior()
+        {
+            // Arrange
+            var classifier = GetClassifier3a().Standardize();
+
+            var input = new Dictionary<string, int>
+            {
+                ["token00"] = 4,
+                ["token01"] = 4,
+                ["token02"] = 12,
+                ["token03"] = 12,
+                ["token04"] = 4
+            };
+
+            var expected = GetClassifier3b().Standardize();
+
+            // Act
+
+            await classifier.TrainAsync(input, 7, default);
+            var actual = ((BayesianClassifierSub)classifier.Clone()).Standardize();
+            actual.LogActualVsExpected(expected);
+
+            // Assert
+            actual.Should().BeEquivalentTo(expected,
+                options => options.Excluding(x => x.Parent.Tokenize));
+
+        }
+
 
         [TestMethod]
         public void Train_02AddIncremental_ExpectedBehavior()
@@ -655,7 +679,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             actual.Should().BeEquivalentTo(expected, 
-                options => options.Excluding(x => x.Parent.Tokenizer));
+                options => options.Excluding(x => x.Parent.Tokenize));
 
         }
 

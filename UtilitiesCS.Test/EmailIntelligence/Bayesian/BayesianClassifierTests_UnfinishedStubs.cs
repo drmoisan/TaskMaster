@@ -23,7 +23,7 @@ namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.Bayesian
         private Mock<Corpus> sharedTokenBase;
         private Corpus sharedTokenBase2;
         private ConcurrentDictionary<string, int> sharedTokens;
-        private Mock<BayesianClassifier> mockBayesianClassifier;
+        //private Mock<BayesianClassifier> mockBayesianClassifier;
 
         [TestInitialize]
         public void TestInitialize()
@@ -160,159 +160,159 @@ namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.Bayesian
             //this.mockRepository.VerifyAll();
         }
 
-        [TestMethod]
-        public void Unfinished_AddPositive_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //IEnumerable<string> tokens = null;
+        //[TestMethod]
+        //public void Unfinished_AddPositive_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //IEnumerable<string> tokens = null;
 
-            //// Act
-            //bayesianClassifier.AddNotMatch(
-            //    tokens);
+        //    //// Act
+        //    //bayesianClassifier.AddNotMatch(
+        //    //    tokens);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Unfinished_AddNegative_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //IEnumerable<string> tokens = null;
+        //[TestMethod]
+        //public void Unfinished_AddNegative_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //IEnumerable<string> tokens = null;
 
-            //// Act
-            //bayesianClassifier.AddMatch(
-            //    tokens);
+        //    //// Act
+        //    //bayesianClassifier.AddMatch(
+        //    //    tokens);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Unfinished_AddTokens_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //IEnumerable<string> positiveTokens = null;
-            //IEnumerable<string> negativeTokens = null;
+        //[TestMethod]
+        //public void Unfinished_AddTokens_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //IEnumerable<string> positiveTokens = null;
+        //    //IEnumerable<string> negativeTokens = null;
 
-            //// Act
-            //bayesianClassifier.AddTokens(
-            //    positiveTokens,
-            //    negativeTokens);
+        //    //// Act
+        //    //bayesianClassifier.AddTokens(
+        //    //    positiveTokens,
+        //    //    negativeTokens);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Unfinished_RemovePositive_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //IEnumerable<string> tokens = null;
+        //[TestMethod]
+        //public void Unfinished_RemovePositive_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //IEnumerable<string> tokens = null;
 
-            //// Act
-            //bayesianClassifier.RemovePositive(
-            //    tokens);
+        //    //// Act
+        //    //bayesianClassifier.RemovePositive(
+        //    //    tokens);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Unfinished_RemoveNegative_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //IEnumerable<string> tokens = null;
+        //[TestMethod]
+        //public void Unfinished_RemoveNegative_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //IEnumerable<string> tokens = null;
 
-            //// Act
-            //bayesianClassifier.RemoveNegative(
-            //    tokens);
+        //    //// Act
+        //    //bayesianClassifier.RemoveNegative(
+        //    //    tokens);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Unfinished_Load_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //IEnumerable<string> positiveTokens = null;
-            //IEnumerable<string> negativeTokens = null;
+        //[TestMethod]
+        //public void Unfinished_Load_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //IEnumerable<string> positiveTokens = null;
+        //    //IEnumerable<string> negativeTokens = null;
 
-            //// Act
-            //bayesianClassifier.Load(
-            //    positiveTokens,
-            //    negativeTokens);
+        //    //// Act
+        //    //bayesianClassifier.Load(
+        //    //    positiveTokens,
+        //    //    negativeTokens);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public async Task Unfinished_InferNegativeTokensAsync_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //CancellationToken token = default(global::System.Threading.CancellationToken);
-            //SegmentStopWatch sw = null;
+        //[TestMethod]
+        //public async Task Unfinished_InferNegativeTokensAsync_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //CancellationToken token = default(global::System.Threading.CancellationToken);
+        //    //SegmentStopWatch sw = null;
 
-            //// Act
-            //await bayesianClassifier.InferNegativeTokensAsync(
-            //    token,
-            //    sw);
+        //    //// Act
+        //    //await bayesianClassifier.InferNegativeTokensAsync(
+        //    //    token,
+        //    //    sw);
 
-            //// Assert
-            ////Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    ////Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public async Task Unfinished_RecalcProbsAsync_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //CancellationToken token = default(global::System.Threading.CancellationToken);
-            //SegmentStopWatch sw = null;
+        //[TestMethod]
+        //public async Task Unfinished_RecalcProbsAsync_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //CancellationToken token = default(global::System.Threading.CancellationToken);
+        //    //SegmentStopWatch sw = null;
 
-            //// Act
-            //await bayesianClassifier.RecalcProbsAsync(
-            //    token,
-            //    sw);
+        //    //// Act
+        //    //await bayesianClassifier.RecalcProbsAsync(
+        //    //    token,
+        //    //    sw);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public async Task Unfinished_AfterDeserialize_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var bayesianClassifier = this.CreateBayesianClassifier();
-            //CancellationToken token = default(global::System.Threading.CancellationToken);
-            //SegmentStopWatch sw = null;
+        //[TestMethod]
+        //public async Task Unfinished_AfterDeserialize_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var bayesianClassifier = this.CreateBayesianClassifier();
+        //    //CancellationToken token = default(global::System.Threading.CancellationToken);
+        //    //SegmentStopWatch sw = null;
 
-            //// Act
-            //await bayesianClassifier.AfterDeserialize(
-            //    token,
-            //    sw);
+        //    //// Act
+        //    //await bayesianClassifier.AfterDeserialize(
+        //    //    token,
+        //    //    sw);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
 
         

@@ -50,19 +50,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _parent = classifierShared.Parent;
         }
 
-        public static BayesianClassifierShared FromTokenBase(
-            BayesianClassifierGroup parent,
-            string tag,
-            IEnumerable<string> matchTokens)
-        {
-
-            var match = new Corpus(matchTokens);
-            var notMatch = parent.SharedTokenBase - match;
-            var classifier = new BayesianClassifierShared(tag, match, parent);
-
-            return classifier;
-        }
-
         public static async Task<BayesianClassifierShared> FromTokenBaseAsync(
             BayesianClassifierGroup parent,
             string tag,
@@ -121,26 +108,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region private fields and methods
 
-        private static void PrintTokenFrequency(IDictionary<string, int> dict, string title)
-        {
-            string text = dict.ToFormattedText(
-                (key) => key,
-                (value) => value.ToString("N0"),
-                headers: ["Token", "Count"],
-                justifications: [Enums.Justification.Left, Enums.Justification.Right],
-                title: title);
-            Console.WriteLine(text);
-        }
-        private static void PrintProbability(IDictionary<string, double> dict, string title)
-        {
-            string text = dict.ToFormattedText(
-                (key) => key,
-                (value) => value.ToString("N5"),
-                headers: ["Token", "Prob"],
-                justifications: [Enums.Justification.Left, Enums.Justification.Right],
-                title: title);
-            Console.WriteLine(text);
-        }
         private ThreadSafeSingleShotGuard probRefresh = new ThreadSafeSingleShotGuard();
 
         #endregion private fields and methods
@@ -289,69 +256,44 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion population
 
-        #region Serialization Helpers
-
-        #endregion Serialization Helpers
-
         #region classifier testing
-        public double GetMatchProbability(IDictionary<string, int> tokenIncidence)
+
+        public double CombineProbabilities(SortedList<string, double> probabilities)
         {
-            var interestingList = GetInterestingList(tokenIncidence);
+            /* Combine the 20 most interesting probabilities together into one.  
+                         * The algorithm to do this is shown below and described here:
+                         * http://www.paulgraham.com/naivebayes.html
+                         * 
+                         *				abc           
+                         *	---------------------------
+                         *	abc + (1 - a)(1 - b)(1 - c)
+                         *
+                         */
 
-            var combined = CombineProbabilities(interestingList);
+            double mult = 1;
+            double comb = 1;
+            //int index = 0;
 
+            if (probabilities is null) { throw new ArgumentNullException(nameof(probabilities)); }
+
+            if (probabilities.Count == 0)
+            {
+                return 0;
+            }
+
+            probabilities
+                .Take(Knobs.InterestingWordCount)
+                .ForEach(kvp =>
+                {
+                    mult *= kvp.Value;
+                    comb *= (1 - kvp.Value);
+                });
+
+            var combined = mult / (mult + comb);
             return combined;
+
         }
-
-        private Dictionary<string, int> GetNotMatchIncidence(IDictionary<string, int> tokenIncidence, string[] matchKeys)
-        {
-            return tokenIncidence
-                            .Where(kvp => !matchKeys.Contains(kvp.Key))
-                            .Where(kvp => Parent.SharedTokenBase.TokenFrequency.TryGetValue(kvp.Key, out var value)
-                                && value * Knobs.NotMatchTokenWeight >= Knobs.MinCountForInclusion)
-                            .ToDictionary();
-        }
-
-        private (string Token, double Prob, int Incidence)[]
-            MergeProb(IDictionary<string, int> tokenIncidence)
-        {
-            return Prob.Select(x => (Token: x.Key, Prob: x.Value,
-                Incidence: tokenIncidence.TryGetValue(x.Key, out int count) ? count : 0))
-                .Where(x => x.Incidence != 0)
-                .ToArray();
-        }
-
-        //private async Task<(string Token, double Prob, int Incidence)[]> 
-        //    MergeProbAsync(IDictionary<string, int> tokenIncidence)
-        //{
-        //    return (await Prob).Select(x => (Token: x.Key, Prob: x.Value,
-        //        Incidence: tokenIncidence.TryGetValue(x.Key, out int count) ? count : 0))
-        //        .Where(x => x.Incidence != 0)
-        //        .ToArray();
-        //}
-
-        /// <summary>
-        /// Returns the probability that the supplied tokens are a _positive match with the Classifier
-        /// </summary>
-        /// <param name="tokens"></param>
-        /// <returns></returns>
-        public double GetMatchProbability(IEnumerable<string> tokens)
-        {
-            var probabilities = GetInterestingList(tokens);
-
-            var text = probabilities.ToFormattedText(
-                (key) => key,
-                (value) => value.ToString("N4"),
-                headers: ["Class", "Probability"],
-                justifications: [Enums.Justification.Left, Enums.Justification.Right],
-                title: "Probability List");
-            Console.WriteLine(text);
-
-            var combined = CombineProbabilities(probabilities);
-
-            return combined;
-        }
-
+        
         public SortedList<string, double> GetInterestingList(IDictionary<string, int> tokenIncidence)
         {
             SortedList<string, double> interestingList = [];
@@ -392,89 +334,58 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return interestingList;
         }
 
-        public SortedList<string, double> GetInterestingList(IEnumerable<string> tokens)
+        public double GetMatchProbability(IDictionary<string, int> tokenIncidence)
         {
-            SortedList<string, double> probabilities = [];
+            var interestingList = GetInterestingList(tokenIncidence);
 
-            if (tokens is null)
-            {
-                logger.Debug($"Parameter {nameof(tokens)} is null. Returning empty list");
-                return probabilities;
-            }
+            var combined = CombineProbabilities(interestingList);
 
-            // Spin through every word in the body and look up its individual spam probability.
-            // Keep the list in decending order of "Interestingness"
-            int index = 0;
-            foreach (var token in tokens)
-            {
-                if (_prob.TryGetValue(token, out double prob))
-                {
-                    // "interestingness" == how far our score is from 50%.  
-                    // The crazy math below is building a string that lets us sort alphabetically by interestingness.
-                    string key = (0.5 - Math.Abs(0.5 - prob)).ToString(".00000") + token + index++;
-                    probabilities.Add(key, prob);
-                }
-
-                else if (Parent?.DedicatedTokens?.TryGetValue(token, out var dedicated) ?? false)
-                {
-                    if (dedicated.Count * Knobs.NotMatchTokenWeight >= Knobs.MinCountForInclusion)
-                    {
-                        prob = Knobs.MinScore;
-                        string key = (0.5 - Math.Abs(0.5 - prob))
-                            .ToString(".00000") + token + index++;
-                        probabilities.Add(key, prob);
-                    }
-                }
-
-                else if (Parent?.SharedTokenBase?.TokenFrequency.TryGetValue(token, out var count) ?? false)
-                {
-                    if (count * Knobs.NotMatchTokenWeight >= Knobs.MinCountForInclusion)
-                    {
-                        prob = Knobs.MinScore;
-                        string key = (0.5 - Math.Abs(0.5 - prob))
-                            .ToString(".00000") + token + index++;
-                        probabilities.Add(key, prob);
-                    }
-                }
-            }
-
-            return probabilities;
+            return combined;
         }
 
-        public double CombineProbabilities(SortedList<string, double> probabilities)
+        public Task<double> GetMatchProbabilityAsync(
+            IDictionary<string, int> tokenIncidence, CancellationToken token)
         {
-            /* Combine the 20 most interesting probabilities together into one.  
-                         * The algorithm to do this is shown below and described here:
-                         * http://www.paulgraham.com/naivebayes.html
-                         * 
-                         *				abc           
-                         *	---------------------------
-                         *	abc + (1 - a)(1 - b)(1 - c)
-                         *
-                         */
+            return Task.Run(() => GetMatchProbability(tokenIncidence), token);
+        }
 
-            double mult = 1;
-            double comb = 1;
-            //int index = 0;
+        /// <summary>
+        /// Returns the probability that the supplied tokens are a _positive match with the Classifier
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public double GetMatchProbability(IEnumerable<string> tokens)
+        {
+            var probabilities = GetInterestingList(tokens.GroupAndCount());
 
-            if (probabilities is null) { throw new ArgumentNullException(nameof(probabilities)); }
+            var text = probabilities.ToFormattedText(
+                (key) => key,
+                (value) => value.ToString("N4"),
+                headers: ["Class", "Probability"],
+                justifications: [Enums.Justification.Left, Enums.Justification.Right],
+                title: "Probability List");
+            Console.WriteLine(text);
 
-            if (probabilities.Count == 0)
-            {
-                return 0;
-            }
+            var combined = CombineProbabilities(probabilities);
 
-            probabilities
-                .Take(Knobs.InterestingWordCount)
-                .ForEach(kvp =>
-                {
-                    mult *= kvp.Value;
-                    comb *= (1 - kvp.Value);
-                });
-
-            var combined = mult / (mult + comb);
             return combined;
+        }
+        
+        private Dictionary<string, int> GetNotMatchIncidence(IDictionary<string, int> tokenIncidence, string[] matchKeys)
+        {
+            return tokenIncidence
+                            .Where(kvp => !matchKeys.Contains(kvp.Key))
+                            .Where(kvp => Parent.SharedTokenBase.TokenFrequency.TryGetValue(kvp.Key, out var value)
+                                && value * Knobs.NotMatchTokenWeight >= Knobs.MinCountForInclusion)
+                            .ToDictionary();
+        }
 
+        private (string Token, double Prob, int Incidence)[] MergeProb(IDictionary<string, int> tokenIncidence)
+        {
+            return Prob.Select(x => (Token: x.Key, Prob: x.Value,
+                Incidence: tokenIncidence.TryGetValue(x.Key, out int count) ? count : 0))
+                .Where(x => x.Incidence != 0)
+                .ToArray();
         }
 
         #endregion classifier testing

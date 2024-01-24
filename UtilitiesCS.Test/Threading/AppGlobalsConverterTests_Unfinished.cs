@@ -11,7 +11,6 @@ namespace Z.Disabled.UtilitiesCS.Test.Threading
     {
         private MockRepository mockRepository;
         private Mock<IApplicationGlobals> mockApplicationGlobals;
-        private Mock<IAppStagingFilenames> mockStagingFilenames;
         private Mock<IFileSystemFolderPaths> mockFileSystemsFolderPaths;
 
         [TestInitialize]
@@ -59,7 +58,7 @@ namespace Z.Disabled.UtilitiesCS.Test.Threading
             // Arrange
             var appGlobalsConverter = this.CreateAppGlobalsConverter();
             //JsonWriter writer = this.mockJsonWriter.Object;
-            JsonWriter writer = null;
+            //JsonWriter writer = null;
             IApplicationGlobals value = this.mockApplicationGlobals.Object;
             //var serializer = this.mockJsonSerializer.Object;
             var serializer = new JsonSerializer();

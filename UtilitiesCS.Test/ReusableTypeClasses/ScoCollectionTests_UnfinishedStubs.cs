@@ -11,30 +11,30 @@ namespace Z.Unfinished.UtilitiesCS.Test.ReusableTypeClasses
     [TestClass]
     public class ScoCollectionTests_UnfinishedStubs
     {
-        private MockRepository mockRepository;
+        //private MockRepository mockRepository;
 
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-        }
+        //[TestInitialize]
+        //public void TestInitialize()
+        //{
+        //    this.mockRepository = new MockRepository(MockBehavior.Strict);
+        //}
 
         #region Helper Methods and Classes
 
-        private ScoCollection<string> CreateScoCollection()
-        {
-            return new ScoCollection<string>();
-        }
-        private List<string[]> _receivedEvents;
+        //private ScoCollection<string> CreateScoCollection()
+        //{
+        //    return new ScoCollection<string>();
+        //}
+        //private List<string[]> _receivedEvents;
 
 
-        public void CollectionChangedHandler(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            var newItems = e.NewItems.Cast<object>().Select(obj => obj.ToString()).StringJoin(",");
+        //public void CollectionChangedHandler(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        //{
+        //    var newItems = e.NewItems.Cast<object>().Select(obj => obj.ToString()).StringJoin(",");
 
-            _receivedEvents.Add([e.Action.ToString(), newItems]);
+        //    _receivedEvents.Add([e.Action.ToString(), newItems]);
 
-        }
+        //}
 
         #endregion Helper Methods and Classes
 
@@ -52,173 +52,173 @@ namespace Z.Unfinished.UtilitiesCS.Test.ReusableTypeClasses
             //this.mockRepository.VerifyAll();
         }
 
-        [TestMethod]
-        public void FromList_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
-            //IList<string> value = null;
+        //[TestMethod]
+        //public void FromList_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
+        //    //IList<string> value = null;
 
-            //// Act
-            //scoCollection.FromList(
-            //    value);
+        //    //// Act
+        //    //scoCollection.FromList(
+        //    //    value);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Serialize_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
+        //[TestMethod]
+        //public void Serialize_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
 
-            //// Act
-            //scoCollection.Serialize();
+        //    //// Act
+        //    //scoCollection.Serialize();
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Serialize_StateUnderTest_ExpectedBehavior1()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
-            //string filePath = null;
+        //[TestMethod]
+        //public void Serialize_StateUnderTest_ExpectedBehavior1()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
+        //    //string filePath = null;
 
-            //// Act
-            //scoCollection.Serialize(
-            //    filePath);
+        //    //// Act
+        //    //scoCollection.Serialize(
+        //    //    filePath);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public async Task SerializeAsync_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
+        //[TestMethod]
+        //public async Task SerializeAsync_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
 
-            //// Act
-            //await scoCollection.SerializeAsync();
+        //    //// Act
+        //    //await scoCollection.SerializeAsync();
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-            await Task.CompletedTask;
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //    await Task.CompletedTask;
+        //}
 
-        [TestMethod]
-        public async Task SerializeAsync_StateUnderTest_ExpectedBehavior1()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
-            //string filePath = null;
+        //[TestMethod]
+        //public async Task SerializeAsync_StateUnderTest_ExpectedBehavior1()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
+        //    //string filePath = null;
 
-            //// Act
-            //await scoCollection.SerializeAsync(
-            //    filePath);
+        //    //// Act
+        //    //await scoCollection.SerializeAsync(
+        //    //    filePath);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-            await Task.CompletedTask;
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //    await Task.CompletedTask;
+        //}
 
-        [TestMethod]
-        public void SerializeThreadSafe_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
-            //string filePath = null;
+        //[TestMethod]
+        //public void SerializeThreadSafe_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
+        //    //string filePath = null;
 
-            //// Act
-            //scoCollection.SerializeThreadSafe(
-            //    filePath);
+        //    //// Act
+        //    //scoCollection.SerializeThreadSafe(
+        //    //    filePath);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Deserialize_StateUnderTest_ExpectedBehavior()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
+        //[TestMethod]
+        //public void Deserialize_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
 
-            //// Act
-            //scoCollection.Deserialize();
+        //    //// Act
+        //    //scoCollection.Deserialize();
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Deserialize_StateUnderTest_ExpectedBehavior1()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
-            //bool askUserOnError = false;
+        //[TestMethod]
+        //public void Deserialize_StateUnderTest_ExpectedBehavior1()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
+        //    //bool askUserOnError = false;
 
-            //// Act
-            //scoCollection.Deserialize(
-            //    askUserOnError);
+        //    //// Act
+        //    //scoCollection.Deserialize(
+        //    //    askUserOnError);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Deserialize_StateUnderTest_ExpectedBehavior2()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
-            //string fileName = null;
-            //string folderPath = null;
-            //bool askUserOnError = false;
+        //[TestMethod]
+        //public void Deserialize_StateUnderTest_ExpectedBehavior2()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
+        //    //string fileName = null;
+        //    //string folderPath = null;
+        //    //bool askUserOnError = false;
 
-            //// Act
-            //scoCollection.Deserialize(
-            //    fileName,
-            //    folderPath,
-            //    askUserOnError);
+        //    //// Act
+        //    //scoCollection.Deserialize(
+        //    //    fileName,
+        //    //    folderPath,
+        //    //    askUserOnError);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void Deserialize_StateUnderTest_ExpectedBehavior3()
-        {
-            //// Arrange
-            //var scoCollection = this.CreateScoCollection();
-            //string fileName = null;
-            //string folderPath = null;
-            //ScoCollection<string>.AltListLoader backupLoader = null;
-            //string backupFilepath = null;
-            //bool askUserOnError = false;
+        //[TestMethod]
+        //public void Deserialize_StateUnderTest_ExpectedBehavior3()
+        //{
+        //    //// Arrange
+        //    //var scoCollection = this.CreateScoCollection();
+        //    //string fileName = null;
+        //    //string folderPath = null;
+        //    //ScoCollection<string>.AltListLoader backupLoader = null;
+        //    //string backupFilepath = null;
+        //    //bool askUserOnError = false;
 
-            //// Act
-            //scoCollection.Deserialize(
-            //    fileName,
-            //    folderPath,
-            //    backupLoader,
-            //    backupFilepath,
-            //    askUserOnError);
+        //    //// Act
+        //    //scoCollection.Deserialize(
+        //    //    fileName,
+        //    //    folderPath,
+        //    //    backupLoader,
+        //    //    backupFilepath,
+        //    //    askUserOnError);
 
-            //// Assert
-            //Assert.Fail();
-            //this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
     }
 }
 

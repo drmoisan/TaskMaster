@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public static class EnumerableExtensions
+    public static class IEnumerableExtensions
     {
         /// <summary>
         /// Casts the elements of an System.Collections.IEnumerable to the specified type.
