@@ -140,8 +140,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _sw.Start();
 
             var mailItems = await ScrapeEmails(tokenSource, progress);
-
-            
+                        
             progress = new ProgressTracker(tokenSource);
             var count = mailItems.Count();
 

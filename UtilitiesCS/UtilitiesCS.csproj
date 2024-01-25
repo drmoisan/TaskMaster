@@ -424,6 +424,7 @@
     <Compile Include="Extensions\NullExtensions.cs" />
     <Compile Include="Extensions\TraceExtensions.cs" />
     <Compile Include="HelperClasses\ObjectCopier.cs" />
+    <Compile Include="ReusableTypeClasses\ScBag.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPane.cs">
       <SubType>UserControl</SubType>
