@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
+    [Serializable]
     public class RecipientInfo
     {
         public RecipientInfo() { }

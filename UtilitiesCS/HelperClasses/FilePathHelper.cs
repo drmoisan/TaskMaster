@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic;
 
 namespace UtilitiesCS
 {
@@ -209,12 +210,16 @@ namespace UtilitiesCS
             switch (e.PropertyName)
             {
                 case "FileName":
-                    if (_folderPath != "")
+                    if (!_folderPath.IsNullOrEmpty() && !_fileName.IsNullOrEmpty())
                         _filePath = Path.Combine(_folderPath, _fileName);
+                    else
+                        _filePath = null;
                     break;
                 case "FolderPath":
-                    if (!_fileName.IsNullOrEmpty())
+                    if (!_folderPath.IsNullOrEmpty() && !_fileName.IsNullOrEmpty())
                         _filePath = Path.Combine(_folderPath, _fileName);
+                    else
+                        _filePath = null;
                     break;
                 case "FilePath":
                     try

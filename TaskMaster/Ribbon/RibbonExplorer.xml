@@ -55,6 +55,7 @@
                     <button id="PrintManagerState" imageMso="PrintAttach" onAction="PrintManagerState_Click" label="Print Manager State" />
                     <button id="SaveManagerLocally" imageMso="SaveAll" onAction="SaveManagerLocally_Click" label="Save Manager Locally" />
                     <button id="SaveManagerNetwork" imageMso="SaveAll" onAction="SaveManagerNetwork_Click" label="Save Manager On Network" />
+                    <button id="SerializeMailInfo" imageMso="SaveAll" onAction="SerializeMailInfo_Click" label="Serialize Mail Info"/>
                   </menu> 
                 </menu>  
               </group>

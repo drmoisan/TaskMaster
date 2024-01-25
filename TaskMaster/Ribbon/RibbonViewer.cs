@@ -186,6 +186,7 @@ namespace TaskMaster
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.TryPrintManagerState();
         public void SaveManagerLocally_Click(Office.IRibbonControl control) => _controller.TrySaveManagerLocally();
         public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
+        public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
         #endregion
 
         #region Helpers

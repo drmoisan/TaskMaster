@@ -1,6 +1,9 @@
 ﻿
+using System;
+
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
+    [Serializable]
     public class MinedMailInfo
     {
         public MinedMailInfo() { }

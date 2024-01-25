@@ -13,7 +13,12 @@ using System.Windows;
 using Newtonsoft.Json;
 using System.Numerics;
 using System.Collections.Concurrent;
-using UtilitiesCS.OutlookExtensions;
+using VBFunctions;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Drawing;
+
+
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -126,6 +131,115 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion Aquire Emails
 
+        private void SerializeFsSave<T>(T obj, string objName, JsonSerializer serializer, FilePathHelper disk)
+        {
+            disk.FileName = $"{objName}_Example.json";
+            using (StreamWriter sw = File.CreateText(disk.FilePath))
+            {
+                serializer.Serialize(sw, obj);
+                sw.Close();
+                disk.FileName = null;
+            }
+        }
+        
+        private void LogSizeComparison(string m1, long s1, string m2, long s2, string objectName)
+        {
+            var jagged = new string[][]
+            {
+                [m1, $"{s1:N0}"],
+                [m2, $"{s2:N0}"],
+            };
+            
+            var text = jagged.ToFormattedText(
+                ["Method", "Size"], 
+                [Enums.Justification.Left, Enums.Justification.Right], 
+                $"{objectName} Size");
+            
+            logger.Debug($"Object size calculations:\n{text}");
+        }
+        
+        public void SerializeActiveItem()
+        {
+            var (mailItem, s1) = TryLoadObjectAndGetMemorySize(() => _globals.Ol.App.ActiveExplorer().Selection[1]);
+            var s2 = ObjectSize(mailItem);
+
+            LogSizeComparison("GC Allocation", s1, "Serialization", s2, "MailItem");
+            
+            if (mailItem is not null) { SerializeMailInfo(mailItem); }
+            
+        }
+
+        public void SerializeMailInfo(MailItem mailItem)
+        {
+            var jsonSettings = new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented
+            };
+            var serializer = JsonSerializer.Create(jsonSettings);
+            
+            var disk = new FilePathHelper();
+            disk.FolderPath = _globals.FS.FldrAppData;
+
+            SerializeFsSave(mailItem, "MailItem", serializer, disk);
+
+
+            var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
+                new MailItemInfo(mailItem).LoadAll(_globals.Ol.EmailPrefixToStrip, true));
+            var sizeMailInfo2 = ObjectSize(mailInfo);
+            LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
+            SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
+
+            
+            
+            var (minedInfo, sizeMinedInfo1) = TryLoadObjectAndGetMemorySize(() => 
+                new MinedMailInfo(mailInfo));
+            var sizeMinedInfo2 = ObjectSize(minedInfo);
+            LogSizeComparison("GC Allocation", sizeMinedInfo1, "Serialization", sizeMinedInfo2, "MinedMailInfo");
+            SerializeFsSave(minedInfo, "MinedMailInfo", serializer, disk);
+            
+        }
+
+        private (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(Func<T> loader)
+        {
+            var start = GC.GetTotalMemory(true);
+            T obj;
+            try
+            {
+                obj = loader();
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error loading object of type {typeof(T).Name}\n{e.Message}", e);
+                return (default, 0);
+            }
+            
+            var end = GC.GetTotalMemory(true);
+            var size = end - start;
+
+            return (obj, size);
+        }
+
+        private long ObjectSize<T>(T item) where T : class 
+        {
+            long size = 0;
+            try
+            {
+                using (Stream s = new MemoryStream())
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    formatter.Serialize(s, item);
+                    size = s.Length;
+                }
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error serializing object of type {typeof(T).Name}\n{e.Message}", e);
+            }
+            
+            return size;
+        }
+
         public async Task MineEmails()
         {
             if (SynchronizationContext.Current is null)
@@ -143,31 +257,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         
             progress = new ProgressTracker(tokenSource);
             var count = mailItems.Count();
-
-            //var mailInfo = await mailItems.ToAsyncEnumerable().SelectAwait(async x => await MailItemInfo
-            //                        .FromMailItemAsync(x, _globals.Ol.EmailPrefixToStrip, token, true))
-            //                        .WithProgressReporting(count, (x) => progress.Report(x)).ToListAsync();
-
+                        
             int complete = 0;
             progress.Report(0, $"Creating MailItem Info {complete:N0} of {count:N0}");
 
             var psw = new Stopwatch();
             psw.Start();
-
-            //var mailTasks = mailItems.Select(x => Task.Factory.StartNew(() =>
-            //{
-            //    var mailInfo = new MailItemInfo(x);
-            //    mailInfo.LoadAll(_globals.Ol.EmailPrefixToStrip);
-            //    mailInfo.LoadTokens();
-            //    Interlocked.Increment(ref complete);
-            //    return mailInfo;
-            //},token,TaskCreationOptions.LongRunning, TaskScheduler.Default));
-            
+                        
             ScoCollection<MinedMailInfo> mailInfoCollection = [];
             mailInfoCollection.FilePath = "C:\\Temp\\emailInfo.json";
-
+            var temp = new MinedMailInfo(new MailItemInfo(mailItems.First()).LoadAll(_globals.Ol.EmailPrefixToStrip));
             
-            int chunkNum = 7;
+            
+            ulong availableRAM = ComputerInfo.AvailablePhysicalMemory;
+            int chunkNum = Environment.ProcessorCount - 1;
             int chunkSize = count / chunkNum;
             List<Task> tasks = [];
             
@@ -176,7 +279,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             foreach (var c in chunks)
             //for (int i = 0; i < chunkNum; i++)
             {
-                //await Task.Factory.StartNew(() =>
                 tasks.Add(Task.Run(() => 
                 {
                     foreach (var mailItem in c)

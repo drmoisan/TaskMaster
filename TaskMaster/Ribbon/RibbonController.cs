@@ -21,6 +21,7 @@ using System;
 using UtilitiesCS.EmailIntelligence.FolderRemap;
 using UtilitiesCS.EmailIntelligence;
 using log4net.Repository.Hierarchy;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 
 
 namespace TaskMaster
@@ -348,6 +349,15 @@ namespace TaskMaster
         {
             _globals.AF.Manager.ActivateNetDisk();
             _globals.AF.Manager.Serialize();
+        }
+
+        internal void TrySerializeMailInfo() 
+        {
+            new EmailDataMiner(_globals).SerializeActiveItem();
+            //var ae = _globals.Ol.App.ActiveExplorer();
+            //var mail = (Outlook.MailItem)ae.Selection[1];
+            //new EmailDataMiner(_globals).SerializeMailInfo(mail);
+
         }
     }
 }

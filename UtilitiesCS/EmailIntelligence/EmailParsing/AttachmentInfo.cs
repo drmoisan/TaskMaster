@@ -11,6 +11,7 @@ using UtilitiesCS;
 
 namespace UtilitiesCS.EmailIntelligence
 {
+    [Serializable]
     public class AttachmentInfo
     {
         #region Constructors and Initializers

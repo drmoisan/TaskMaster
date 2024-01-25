@@ -434,9 +434,12 @@
     <ManifestKeyFile>TaskMaster_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>8ACC20B89291F2337DFFA85C1E7070F42CF96F96</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>5A9E40BA85A1492F0C3FC6E5FED81933720F45EB</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- Include additional build rules for an Office application add-in. -->

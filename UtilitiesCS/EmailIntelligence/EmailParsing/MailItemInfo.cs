@@ -21,6 +21,7 @@ namespace UtilitiesCS //QuickFiler
     /// <summary>
     /// Class to cache information about a mail item.
     /// </summary>
+    [Serializable]
     public class MailItemInfo: INotifyPropertyChanged 
     {
         #region Constructors, Initializers, and Destructors
@@ -150,7 +151,7 @@ namespace UtilitiesCS //QuickFiler
             return true;
         }
 
-        public void LoadPriority(string emailPrefixToStrip, CancellationToken token = default)
+        public MailItemInfo LoadPriority(string emailPrefixToStrip, CancellationToken token = default)
         {
             if (!_completedLoadingPriority && _loadNotStarted.CheckAndSetFirstCall)
             {
@@ -172,14 +173,16 @@ namespace UtilitiesCS //QuickFiler
                 // RecipientsTask = Task.Factory.StartNew(() => LoadRecipients(), token);
                 _ = Task.Factory.StartNew(() => LoadRecipients(), token);
                 _completedLoadingPriority = true;
+                return this;
             }
             else 
             { 
                 Task.Delay(100).Wait(); 
+                return this;
             }
         }
 
-        public void LoadAll(string emailPrefixToStrip)
+        public MailItemInfo LoadAll(string emailPrefixToStrip, bool loadTokens = false)
         {
             if (_item is null) { throw new ArgumentNullException(); }
             _entryId = _item.EntryID;
@@ -196,6 +199,8 @@ namespace UtilitiesCS //QuickFiler
             _unread = _item.UnRead;
             _isTaskFlagSet = (_item.FlagStatus == OlFlagStatus.olFlagMarked);
             LoadRecipients();
+            if (loadTokens) { LoadTokens(); }
+            return this;
         }
 
         public void LoadRecipients()

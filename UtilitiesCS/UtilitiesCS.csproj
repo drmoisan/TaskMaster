@@ -423,6 +423,7 @@
     <Compile Include="Extensions\IAsyncEnumerableExtensions.cs" />
     <Compile Include="Extensions\NullExtensions.cs" />
     <Compile Include="Extensions\TraceExtensions.cs" />
+    <Compile Include="HelperClasses\ObjectSize.cs" />
     <Compile Include="HelperClasses\ObjectCopier.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
@@ -610,6 +611,10 @@
     <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
       <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
       <Name>UtilitiesSwordfish.NET.General</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VBFunctions\VBFunctions.csproj">
+      <Project>{c10dbd94-a7f6-43bc-8630-43002722d130}</Project>
+      <Name>VBFunctions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
