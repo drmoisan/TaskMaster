@@ -184,7 +184,7 @@ namespace UtilitiesCS
     }
 
 
-    public class OlFolderInfo:INotifyPropertyChanged
+    public class OlFolderInfo : INotifyPropertyChanged
     {
         public OlFolderInfo() { }
 
@@ -192,21 +192,23 @@ namespace UtilitiesCS
         {
             _olFolder = olFolder;
             _olRoot = olRoot;
-            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath+"\\", "");
+            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath + "\\", "");
             _name = olFolder.Name;
+            _lazyItemSize = new Lazy<long>(() => OlFolder.Items.Cast<object>().Select(x=>new OutlookItem(x)).Sum(item => item.Size));
+            _lazyItemCount = new Lazy<int>(() => OlFolder.Items.Count);
         }
 
         private MAPIFolder _olRoot;
         public MAPIFolder OlRoot { get => _olRoot; set => _olRoot = value; }
 
         private MAPIFolder _olFolder;
-        public MAPIFolder OlFolder 
-        { 
+        public MAPIFolder OlFolder
+        {
             get => _olFolder;
-            set 
-            { 
-                _olFolder = value; 
-                RelativePath = _olFolder.FolderPath.Replace(_olRoot.FolderPath+"\\", "");
+            set
+            {
+                _olFolder = value;
+                RelativePath = _olFolder.FolderPath.Replace(_olRoot.FolderPath + "\\", "");
                 Name = _olFolder.Name;
             }
         }
@@ -218,14 +220,26 @@ namespace UtilitiesCS
         public string RelativePath { get => _relativePath; private set => _relativePath = value; }
 
         private bool _selected;
-        public bool Selected 
-        { 
+        public bool Selected
+        {
             get => _selected;
-            set 
-            { 
-                _selected = value; 
+            set
+            {
+                _selected = value;
                 NotifyPropertyChanged();
             }
+        }
+
+        public int ItemCount => _lazyItemCount.Value;
+        private Lazy<int> _lazyItemCount;
+
+        public long ItemSize => _lazyItemSize.Value;
+        private Lazy<long> _lazyItemSize;
+
+        public void RecalcLazy()
+        {
+            _lazyItemSize = new Lazy<long>(() => OlFolder.Items.Cast<OutlookItem>().Sum(item => item.Size));
+            _lazyItemCount = new Lazy<int>(() => OlFolder.Items.Count);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

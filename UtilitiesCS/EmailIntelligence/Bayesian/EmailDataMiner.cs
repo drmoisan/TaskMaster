@@ -15,8 +15,12 @@ using System.Numerics;
 using System.Collections.Concurrent;
 using VBFunctions;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Drawing;
+using System.Reactive;
+using System.Reactive.Linq;
+using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.ReusableTypeClasses;
+using Fizzler;
+
 
 
 
@@ -53,13 +57,63 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return tree;
         }
 
+        internal OlFolderInfo[][] GetOlFolderChunks() 
+        {
+            var availableRAM = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
+
+            var tree = GetOlFolderTree();
+            var folderRecords = QueryOlFolderInfo(tree)
+                .Scan(new
+                {
+                    FolderInfo = default(OlFolderInfo),
+                    CumulativeSize = 0L,
+                    ChunkNumber = 0L,
+                    CumulativeCount = 0
+                },
+
+                (current, next) => new
+                {
+                    FolderInfo = next,
+                    CumulativeSize = current.CumulativeSize + next.ItemSize,
+                    ChunkNumber = (current.CumulativeSize + next.ItemSize + availableRAM - 1L) / availableRAM,
+                    CumulativeCount = current.CumulativeCount + next.ItemCount
+                })
+                .ToArray();
+                            
+            var folderChunks = folderRecords
+                .GroupBy(x => x.ChunkNumber)
+                .Select(group => group
+                .Select(x => x.FolderInfo)
+                .ToArray())
+                .ToArray();
+
+            var last = folderRecords.Last();
+            var (totalSize, totalCount) = (last.CumulativeSize, last.CumulativeCount);
+            
+            logger.Debug($"Available RAM: {availableRAM:N0}");            
+            logger.Debug($"Total Size: {totalSize:N0}");
+            logger.Debug($"Total Item Count: {totalCount:N0}");
+            logger.Debug($"Average Item Size: {(totalSize/(double)totalCount)/1000:N0}K");
+            logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
+
+            //return (folderChunks, totalSize, totalCount);
+            return folderChunks;
+        }
+
         internal IEnumerable<MAPIFolder> QueryOlFolders(OlFolderTree tree)
         {
             var folders = tree.Roots
                               .SelectMany(root => root
                               .FlattenIf(node => !node.Selected))
                               .Select(x => x.OlFolder);
-            //var ary = folders.Select(x=>x.FolderPath).ToArray();
+            return folders;
+        }
+
+        internal IEnumerable<OlFolderInfo> QueryOlFolderInfo(OlFolderTree tree)
+        {
+            var folders = tree.Roots
+                              .SelectMany(root => root
+                              .FlattenIf(node => !node.Selected));
             return folders;
         }
 
@@ -96,7 +150,34 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailList;
         }
 
-        
+
+        internal async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
+        {
+            //List<MailItem> mailItems = null;
+            IEnumerable<MailItem> mailItemsQuery = null;
+
+            await Task.Run(() =>
+            {
+                // Query List of Outlook Folders if they are not on the skip list
+                var tree = GetOlFolderTree();
+                _sw.LogDuration(nameof(GetOlFolderTree));
+
+                var folders = QueryOlFolders(tree);
+                _sw.LogDuration(nameof(QueryOlFolders));
+
+                // Query MailItems from these folders
+                mailItemsQuery = QueryMailItems(folders);
+                _sw.LogDuration(nameof(QueryMailItems));
+
+                //// Load to memory
+                //mailItems = LinqToSimpleEmailList(folders, mailItemsQuery, progress);
+                //_sw.LogDuration(nameof(LinqToSimpleEmailList));
+                _sw.WriteToLog(clear: false);
+            }, tokenSource.Token);
+                        
+            return mailItemsQuery;
+        }
+
         internal async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource, ProgressTracker progress)
         {
             //List<MailItem> mailItems = null;
@@ -131,6 +212,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion Aquire Emails
 
+        #region Testing Sizing and Serialization Methods
+
         private void SerializeFsSave<T>(T obj, string objName, JsonSerializer serializer, FilePathHelper disk)
         {
             disk.FileName = $"{objName}_Example.json";
@@ -161,7 +244,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public void SerializeActiveItem()
         {
             var (mailItem, s1) = TryLoadObjectAndGetMemorySize(() => _globals.Ol.App.ActiveExplorer().Selection[1]);
-            var s2 = ObjectSize(mailItem);
+            var s2 = 0; //ObjectSize(mailItem);
 
             LogSizeComparison("GC Allocation", s1, "Serialization", s2, "MailItem");
             
@@ -186,7 +269,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
                 new MailItemInfo(mailItem).LoadAll(_globals.Ol.EmailPrefixToStrip, true));
-            var sizeMailInfo2 = ObjectSize(mailInfo);
+            var sizeMailInfo2 = 0; // ObjectSize(mailInfo);
             LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
 
@@ -194,7 +277,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             
             var (minedInfo, sizeMinedInfo1) = TryLoadObjectAndGetMemorySize(() => 
                 new MinedMailInfo(mailInfo));
-            var sizeMinedInfo2 = ObjectSize(minedInfo);
+            var sizeMinedInfo2 = 0; // ObjectSize(minedInfo);
             LogSizeComparison("GC Allocation", sizeMinedInfo1, "Serialization", sizeMinedInfo2, "MinedMailInfo");
             SerializeFsSave(minedInfo, "MinedMailInfo", serializer, disk);
             
@@ -220,66 +303,106 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return (obj, size);
         }
 
-        private long ObjectSize<T>(T item) where T : class 
-        {
-            long size = 0;
-            try
-            {
-                using (Stream s = new MemoryStream())
-                {
-                    BinaryFormatter formatter = new BinaryFormatter();
-                    formatter.Serialize(s, item);
-                    size = s.Length;
-                }
-            }
-            catch (System.Exception e)
-            {
-                logger.Error($"Error serializing object of type {typeof(T).Name}\n{e.Message}", e);
-            }
+        //private long ObjectSize<T>(T item) where T : class 
+        //{
+        //    long size = 0;
+        //    try
+        //    {
+        //        MemoryStream ms = new MemoryStream();
+        //        using (BsonWriter writer = new BsonWriter(ms))
+        //        {
+        //            JsonSerializer serializer = new JsonSerializer();
+        //            serializer.Serialize(writer, item);
+        //            size = ms.Length;
+        //        }
+
+        //    }
+        //    catch (System.Exception e)
+        //    {
+        //        logger.Error($"Error serializing object of type {typeof(T).Name}\n{e.Message}", e);
+        //    }
             
-            return size;
+        //    return size;
+        //}
+
+        #endregion Testing Sizing and Serialization Methods
+
+        public async Task MineEmailsV2()
+        {
+            InitProgress(out var tokenSource, out var token, out var progress, out var sw);
+            
+            var folderChunks = GetOlFolderChunks();
+            sw.LogDuration("Get Outlook Folder Chunks", true);
+
+            //var serializer = GetSerializer();
+            //var disk = new FilePathHelper();
+            //disk.FolderPath = _globals.FS.FldrAppData;
+
+            var chunkCount = folderChunks.Count();
+            var chunkProgress = 100 / (double)chunkCount;
+
+            for (int i = 0; i < chunkCount; i++)
+            {
+                await MineFolderGroup(
+                    folderChunks[i], i, progress.SpawnChild(chunkProgress), token);
+            }
+
+            progress.Report(100);
         }
 
-        public async Task MineEmails()
+        internal JsonSerializer GetSerializer()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+            var jsonSettings = new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented
+            };
+            var serializer = JsonSerializer.Create(jsonSettings);
+            return serializer;
+        }
 
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
-            var progress = new ProgressTracker(tokenSource);
+        public void SerializeChunk(MinedMailInfo[] chunk, JsonSerializer serializer, FilePathHelper disk, int i) 
+        { 
+            disk.FileName = $"MinedMailInfo_{i:000}.json";
+            using (StreamWriter sw = File.CreateText(disk.FilePath))
+            {
+                serializer.Serialize(sw, chunk);
+                sw.Close();
+                disk.FileName = null;
+            }
+            disk.FileName = null;
+        }
 
-            _sw = new SegmentStopWatch();
-            _sw.Start();
+        public async Task MineFolderGroup(
+            OlFolderInfo[] olFolderInfos, 
+            int batch, 
+            ProgressTracker progress,
+            CancellationToken token)
+        {
+            var mailItems = QueryMailItems(olFolderInfos.Select(x => x.OlFolder)).ToArray();
 
-            var mailItems = await ScrapeEmails(tokenSource, progress);
-                        
-            progress = new ProgressTracker(tokenSource);
-            var count = mailItems.Count();
-                        
             int complete = 0;
-            progress.Report(0, $"Creating MailItem Info {complete:N0} of {count:N0}");
+            var count = mailItems.Count();
+
+            progress.Report(0, $"Creating MailItem Info {complete:N0} of {count:N0} in batch {batch}");
 
             var psw = new Stopwatch();
             psw.Start();
-                        
-            ScoCollection<MinedMailInfo> mailInfoCollection = [];
-            mailInfoCollection.FilePath = "C:\\Temp\\emailInfo.json";
-            var temp = new MinedMailInfo(new MailItemInfo(mailItems.First()).LoadAll(_globals.Ol.EmailPrefixToStrip));
-            
-            
-            ulong availableRAM = ComputerInfo.AvailablePhysicalMemory;
+
+            ScBag<MinedMailInfo> minedBag = [];
+            minedBag.FolderPath = _globals.FS.FldrAppData;
+            minedBag.FileName = $"MinedMailInfo_{batch:000}.json";
+
             int chunkNum = Environment.ProcessorCount - 1;
             int chunkSize = count / chunkNum;
             List<Task> tasks = [];
-            
+
             var chunks = mailItems.Chunk(chunkSize);
 
             foreach (var c in chunks)
             //for (int i = 0; i < chunkNum; i++)
             {
-                tasks.Add(Task.Run(() => 
+                tasks.Add(Task.Run(() =>
                 {
                     foreach (var mailItem in c)
                     //var endIter = i == (chunkNum - 1) ? count : chunkSize * (chunkNum + 1);
@@ -296,7 +419,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                             mailInfo.LoadTokens();
                             var minedInfo = new MinedMailInfo(mailInfo);
                             var obj = JsonConvert.SerializeObject(minedInfo);
-                            mailInfoCollection.Add(minedInfo);
+                            minedBag.Add(minedInfo);
                             Interlocked.Increment(ref complete);
                             //progress.Report((int)(((double)complete / (double)count) * 100), $"Creating MailItem Info {complete} of {count}");
                         }
@@ -324,23 +447,130 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 try
                 {
                     await Task.WhenAll(tasks);
-                    mailInfoCollection.Serialize();
+                    minedBag.Serialize();
                 }
                 catch (TaskCanceledException)
                 {
                     logger.Debug("Request to cancel task was received");
                 }
-                
-            }
 
-            //MailItemInfo[] result = [];
-            //jagged.ForEach(x => result = result.Concat(x).ToArray());
-            //var minedInfo = result.Select(x => new MinedMailInfo(x)).ToList();
-            //ScoCollection<MinedMailInfo> mailInfoCollection = new ScoCollection<MinedMailInfo>(minedInfo);
+            }
+        }
+
+        private void InitProgress(out CancellationTokenSource tokenSource, out CancellationToken token, out ProgressTracker progress, out SegmentStopWatch sw)
+        {
+            tokenSource = new CancellationTokenSource();
+            token = tokenSource.Token;
+            progress = new ProgressTracker(tokenSource);
+            sw = new SegmentStopWatch();
+            sw.Start();
+        }
+        
+        public async Task MineEmails()
+        {
+            if (SynchronizationContext.Current is null) { SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext()); }
+
+            await MineEmailsV2();
+
+            //var tokenSource = new CancellationTokenSource();
+            //var token = tokenSource.Token;
+            ////var progress = new ProgressTracker(tokenSource);
+            //ProgressTracker progress = null;
+
+            //_sw = new SegmentStopWatch();
+            //_sw.Start();
+
+            //var mailItems = await ScrapeEmails(tokenSource);
+            ////var mailItems = await ScrapeEmails(tokenSource, progress);
+
+            ////progress = new ProgressTracker(tokenSource);
+            ////var count = mailItems.Count();
+            //var (count, size) = mailItems.Aggregate((Count: 0, Size: 0L), (acc, x) => (acc.Count + 1, acc.Size + x.Size));
+            //var itemSize = (long)(size / (double)count);
+            
+            //int complete = 0;
+            //progress.Report(0, $"Creating MailItem Info {complete:N0} of {count:N0}");
+
+            //var psw = new Stopwatch();
+            //psw.Start();
+                        
+            //ScoCollection<MinedMailInfo> mailInfoCollection = [];
+            //mailInfoCollection.FilePath = "C:\\Temp\\emailInfo.json";
+            //var temp = new MinedMailInfo(new MailItemInfo(mailItems.First()).LoadAll(_globals.Ol.EmailPrefixToStrip));
+            
+            
+            //ulong availableRAM = ComputerInfo.AvailablePhysicalMemory;
+            //int chunkNum = Environment.ProcessorCount - 1;
+            //int chunkSize = count / chunkNum;
+            //List<Task> tasks = [];
+            
+            //var chunks = mailItems.Chunk(chunkSize);
+
+            //foreach (var c in chunks)
+            ////for (int i = 0; i < chunkNum; i++)
+            //{
+            //    tasks.Add(Task.Run(() => 
+            //    {
+            //        foreach (var mailItem in c)
+            //        //var endIter = i == (chunkNum - 1) ? count : chunkSize * (chunkNum + 1);
+            //        //for (int j = chunkNum*chunkSize; j < endIter; j++)
+            //        {
+            //            //var mailItem = mailItems.ElementAt(j);
+            //            try
+            //            {
+            //                token.ThrowIfCancellationRequested();
+            //                var mailInfo = new MailItemInfo(mailItem);
+            //                token.ThrowIfCancellationRequested();
+            //                mailInfo.LoadAll(_globals.Ol.EmailPrefixToStrip);
+            //                token.ThrowIfCancellationRequested();
+            //                mailInfo.LoadTokens();
+            //                var minedInfo = new MinedMailInfo(mailInfo);
+            //                var obj = JsonConvert.SerializeObject(minedInfo);
+            //                mailInfoCollection.Add(minedInfo);
+            //                Interlocked.Increment(ref complete);
+            //                //progress.Report((int)(((double)complete / (double)count) * 100), $"Creating MailItem Info {complete} of {count}");
+            //            }
+            //            catch (OperationCanceledException)
+            //            {
+            //                logger.Debug("Request to cancel task was received");
+            //                break;
+            //            }
+            //            catch (System.Exception)
+            //            {
+            //                logger.Debug($"Skipping MailItem from {mailItem.SentOn} in folder {((Folder)mailItem.Parent).FolderPath}");
+            //            }
+            //        }
+            //    },
+            //    token));
+            //}
+
+            ////await Task.WhenAll(tasks);
+            //using (new System.Threading.Timer(_ => progress.Report(
+            //    (int)(((double)complete / count) * 100),
+            //    GetReportMessage(complete, count, psw)),
+            //    //$"Creating MailItem Info {complete} of {count} ({complete > 0 ? psw.Elapsed.TotalSeconds/complete}"),
+            //    null, 0, 1000))
+            //{
+            //    try
+            //    {
+            //        await Task.WhenAll(tasks);
+            //        mailInfoCollection.Serialize();
+            //    }
+            //    catch (TaskCanceledException)
+            //    {
+            //        logger.Debug("Request to cancel task was received");
+            //    }
+                
+            //}
+
+            ////MailItemInfo[] result = [];
+            ////jagged.ForEach(x => result = result.Concat(x).ToArray());
+            ////var minedInfo = result.Select(x => new MinedMailInfo(x)).ToList();
+            ////ScoCollection<MinedMailInfo> mailInfoCollection = new ScoCollection<MinedMailInfo>(minedInfo);
 
             
 
-            progress.Report(100);
+            //progress.Report(100);
             
                                     
         }

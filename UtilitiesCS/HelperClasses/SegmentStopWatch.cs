@@ -42,6 +42,17 @@ namespace UtilitiesCS.HelperClasses
             _durations.Push((actionName, duration));
         }
 
+        public void LogDuration(string actionName, bool logImmediately)
+        {
+            TimeSpan duration = _stopwatch.Elapsed - _latestElapsed;
+            _latestElapsed = _stopwatch.Elapsed;
+            _durations.Push((actionName, duration));
+            if (logImmediately)
+            {
+                logger.Debug($"{actionName} duration was {duration:%m\\:ss\\.ff}");
+            }
+        }
+
         public Stack<(string ActionName, TimeSpan Duration)> GroupByActionName(bool inplace = false) 
         {
             var grouped = _durations

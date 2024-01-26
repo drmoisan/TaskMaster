@@ -10,6 +10,38 @@ namespace UtilitiesCS.Extensions
     
     public static class IAsyncEnumerableExtensions
     {
+        public static async IAsyncEnumerable<(TFirst, TSecond)> Zip<TFirst, TSecond>(this IAsyncEnumerable<TFirst> first, IAsyncEnumerable<TSecond> second)
+        {
+            await using var e1 = first.GetAsyncEnumerator();
+            await using var e2 = second.GetAsyncEnumerator();
+
+            while (true)
+            {
+                var t1 = e1.MoveNextAsync().AsTask();
+                var t2 = e2.MoveNextAsync().AsTask();
+                await Task.WhenAll(t1, t2);
+
+                if (!t1.Result || !t2.Result)
+                    yield break;
+
+                yield return (e1.Current, e2.Current);
+            }
+        }
+
+        public static IAsyncEnumerable<T> WithProgressReporting<T>(this IAsyncEnumerable<T> enumerable, long count, Action<int> progress)
+        {
+            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+
+            int completed = 0;
+            return enumerable.Select(x =>
+            {
+                Interlocked.Increment(ref completed);
+                progress((int)(((double)completed / count) * 100));
+                return x;
+            });
+        }
+
+
         /// <summary>
         /// Creates a <seealso cref="SortedList{TKey, TValue}"/> from an async-enumerable sequence according to a specified key selector function, a comparer, and an element selector function.
         /// </summary>

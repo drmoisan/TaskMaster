@@ -82,19 +82,6 @@ namespace UtilitiesCS
             return new Stack<T>(enumerable);
         } 
 
-        public static IAsyncEnumerable<T> WithProgressReporting<T>(this IAsyncEnumerable<T> enumerable, long count, Action<int> progress)
-        {
-            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
-
-            int completed = 0;
-            return enumerable.Select(x =>
-            {
-                Interlocked.Increment(ref completed);
-                progress((int)(((double)completed / count) * 100));
-                return x;
-            });
-        }
-        
         public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<int> progress)
         {
             if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
@@ -123,24 +110,6 @@ namespace UtilitiesCS
             );
 
             return dt;
-        }
-
-        public static async IAsyncEnumerable<(TFirst, TSecond)> Zip<TFirst, TSecond>(this IAsyncEnumerable<TFirst> first, IAsyncEnumerable<TSecond> second)
-        {
-            await using var e1 = first.GetAsyncEnumerator();
-            await using var e2 = second.GetAsyncEnumerator();
-
-            while (true)
-            {
-                var t1 = e1.MoveNextAsync().AsTask();
-                var t2 = e2.MoveNextAsync().AsTask();
-                await Task.WhenAll(t1, t2);
-
-                if (!t1.Result || !t2.Result)
-                    yield break;
-
-                yield return (e1.Current, e2.Current);
-            }
         }
 
         public static Tuple<IEnumerable<T>, IEnumerable<U>> Unzip<T, U>(this IEnumerable<(T, U)> source)
@@ -172,17 +141,7 @@ namespace UtilitiesCS
 
             return new Tuple<IEnumerable<T>, IEnumerable<U>, IEnumerable<V>>(first, second, third);
         }
-                
-        //public static Tuple<T, U> Sum<T, U>(this IEnumerable<(T, U)> source) 
-        //{
-        //    var tup = source.Unzip();
-                                
-        //    T sumT = (T)((dynamic)tup.Item1).Sum();
-        //    U sumU = (U)((dynamic)tup.Item1).Sum();
-        //    return new Tuple<T, U>(sumT, sumU);
-        //}
-
-
+                        
         public static IEnumerable<IEnumerable<T>> Transpose<T>(
             this IEnumerable<IEnumerable<T>> source)
         {
