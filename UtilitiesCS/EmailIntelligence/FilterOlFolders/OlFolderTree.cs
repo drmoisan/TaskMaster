@@ -7,6 +7,7 @@ using UtilitiesCS.HelperClasses;
 using System;
 using System.Threading;
 using log4net.Repository.Hierarchy;
+using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
@@ -186,16 +187,20 @@ namespace UtilitiesCS
 
     public class OlFolderInfo : INotifyPropertyChanged
     {
-        public OlFolderInfo() { }
-
         public OlFolderInfo(MAPIFolder olFolder, MAPIFolder olRoot)
         {
             _olFolder = olFolder;
             _olRoot = olRoot;
             _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath + "\\", "");
             _name = olFolder.Name;
-            _lazyItemSize = new Lazy<long>(() => OlFolder.Items.Cast<object>().Select(x=>new OutlookItem(x)).Sum(item => item.Size));
-            _lazyItemCount = new Lazy<int>(() => OlFolder.Items.Count);
+            _lazyItemSize = new AsyncLazy<long>(async () => await Task.Run(
+                () => OlFolder.Items.OfType<dynamic>().Sum(item => 
+                {
+                    try { return item?.Size ?? 0; }
+                    catch (System.Exception) { return 0; }     
+                })));
+            //_lazyItemSize = new AsyncLazy<long>(async () => await Task.Run(() => OlFolder.Items.Cast<object>().Where(x=>x is MailItem).Cast<MailItem>().Sum(item => item.Size)));
+            _lazyItemCount = new AsyncLazy<int>(async () => await Task.Run(() => OlFolder.Items.Count));
         }
 
         private MAPIFolder _olRoot;
@@ -230,16 +235,52 @@ namespace UtilitiesCS
             }
         }
 
-        public int ItemCount => _lazyItemCount.Value;
-        private Lazy<int> _lazyItemCount;
+        public AsyncLazy<int> ItemCount 
+        { 
+            get => _lazyItemCount; 
+            protected set
+            {
+                _lazyItemCount = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private AsyncLazy<int> _lazyItemCount;
 
-        public long ItemSize => _lazyItemSize.Value;
-        private Lazy<long> _lazyItemSize;
+        public AsyncLazy<long> ItemSize 
+        { 
+            get => _lazyItemSize;
+            protected set 
+            {                 
+                _lazyItemSize = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private AsyncLazy<long> _lazyItemSize;
 
-        public void RecalcLazy()
+        public async Task CompleteInitialization()
         {
-            _lazyItemSize = new Lazy<long>(() => OlFolder.Items.Cast<OutlookItem>().Sum(item => item.Size));
-            _lazyItemCount = new Lazy<int>(() => OlFolder.Items.Count);
+            _ = await ItemSize;
+            _ = await ItemCount;
+        }
+
+        public async Task<(long ItemSize, int ItemCount)> GetLazyValues()
+        {
+            var itemSize = await ItemSize;
+            var itemCount = await ItemCount;
+            return (itemSize, itemCount);
+        }
+
+        public void ResetLazy()
+        {
+            // ItemSize = new AsyncLazy<long>(async () => await Task.Run(() => OlFolder.Items.Cast<OutlookItem>().Sum(item => item.Size)));
+            ItemSize = new AsyncLazy<long>(async () => await Task.Run(
+                () => OlFolder.Items.OfType<dynamic>().Sum(item =>
+                {
+                    try { return item?.Size ?? 0; }
+                    catch (System.Exception) { return 0; }
+                })));
+
+            ItemCount = new AsyncLazy<int>(async () => await Task.Run(() => OlFolder.Items.Count));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

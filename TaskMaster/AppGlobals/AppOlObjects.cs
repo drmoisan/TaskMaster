@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
 using ToDoModel;
 using UtilitiesCS;
 
@@ -149,16 +149,16 @@ namespace TaskMaster
 
         public string EmailPrefixToStrip => Properties.Resources.Email_Prefix_To_Strip;
         
-        private StackObjectCS<object> _movedMails_Stack;
-        public StackObjectCS<object> MovedMails_Stack
+        private StackObjectCS<object> _movedMailsStack;
+        public StackObjectCS<object> MovedMailsStack
         {
             get
             {
-                return _movedMails_Stack;
+                return _movedMailsStack;
             }
             set
             {
-                _movedMails_Stack = value;
+                _movedMailsStack = value;
             }
         }
 
@@ -204,6 +204,20 @@ namespace TaskMaster
             }
         }
 
+        public int GetExplorerScreenNumber()
+        {
+            var explorer = App.ActiveExplorer();
+            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
+            return System.Windows.Forms.Screen.AllScreens.FindIndex(s => s.Bounds.IntersectsWith(bounds));
+        }
+
+        public System.Windows.Forms.Screen GetExplorerScreen()
+        {
+            var explorer = App.ActiveExplorer();
+            Point location = new(explorer.Left, explorer.Top);
+            return System.Windows.Forms.Screen.FromPoint(location);
+        }
+        
         private void NotifyPropertyChanged([CallerMemberName] string propertyName="")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -8,44 +8,42 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.HelperClasses
 {
-    public class SegmentStopWatch
+    public class SegmentStopWatch: Stopwatch
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SegmentStopWatch() { }
+        public SegmentStopWatch(): base() { }
 
-        private Stopwatch _stopwatch = new Stopwatch();
+        //private Stopwatch _stopwatch = new Stopwatch();
         private TimeSpan _latestElapsed = default;
         
         private Stack<(string ActionName, TimeSpan Duration)> _durations = new();
         public Stack<(string ActionName, TimeSpan Duration)> Durations => _durations;
 
-        public SegmentStopWatch Start() 
+        public new SegmentStopWatch Start() 
         { 
-            _stopwatch.Start(); 
+            base.Start();
             return this;
         }
         
-        public SegmentStopWatch Stop()
+        public new SegmentStopWatch Stop()
         {
-            _stopwatch.Stop();
+            base.Stop();
             return this;
         }
-
-        public TimeSpan Elapsed => _stopwatch.Elapsed;
-
+                
         public void LogDuration(string actionName)
         {
-            TimeSpan duration = _stopwatch.Elapsed - _latestElapsed;
-            _latestElapsed = _stopwatch.Elapsed;
+            TimeSpan duration = this.Elapsed - _latestElapsed;
+            _latestElapsed = this.Elapsed;
             _durations.Push((actionName, duration));
         }
 
         public void LogDuration(string actionName, bool logImmediately)
         {
-            TimeSpan duration = _stopwatch.Elapsed - _latestElapsed;
-            _latestElapsed = _stopwatch.Elapsed;
+            TimeSpan duration = this.Elapsed - _latestElapsed;
+            _latestElapsed = this.Elapsed;
             _durations.Push((actionName, duration));
             if (logImmediately)
             {
@@ -78,7 +76,7 @@ namespace UtilitiesCS.HelperClasses
 
         public string GetDurations([CallerMemberName] string methodName = "")
         {
-            _durations.Push(("TOTAL", _stopwatch.Elapsed));
+            _durations.Push(("TOTAL", this.Elapsed));
             var durs = _durations
                 .Reverse()
                 .Select(x => new[] 

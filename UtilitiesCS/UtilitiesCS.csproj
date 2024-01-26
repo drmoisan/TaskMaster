@@ -255,6 +255,9 @@
     <Reference Include="System.Reactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.6.0.0\lib\net472\System.Reactive.dll</HintPath>
     </Reference>
+    <Reference Include="System.Reactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Async.6.0.0-alpha.18\lib\netstandard2.0\System.Reactive.Async.dll</HintPath>
+    </Reference>
     <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
       <Private>True</Private>
@@ -615,6 +618,7 @@
     <Compile Include="Windows Forms\MouseDownFilter.cs" />
     <Compile Include="Windows Forms\OlvExtension.cs" />
     <Compile Include="Windows Forms\Resizer.cs" />
+    <Compile Include="Windows Forms\ScreenHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">

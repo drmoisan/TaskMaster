@@ -434,7 +434,7 @@
     <ManifestKeyFile>TaskMaster_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>BB48B98F35FA1FBA1A48EC787EF6764C6457E71D</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>202EE8D88CA6479B48D7F5C4BE849233CBA8DE0D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>

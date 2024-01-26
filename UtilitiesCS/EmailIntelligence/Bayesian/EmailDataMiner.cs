@@ -19,10 +19,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
-using Fizzler;
-
-
-
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -57,49 +53,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return tree;
         }
 
-        internal OlFolderInfo[][] GetOlFolderChunks() 
-        {
-            var availableRAM = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
-
-            var tree = GetOlFolderTree();
-            var folderRecords = QueryOlFolderInfo(tree)
-                .Scan(new
-                {
-                    FolderInfo = default(OlFolderInfo),
-                    CumulativeSize = 0L,
-                    ChunkNumber = 0L,
-                    CumulativeCount = 0
-                },
-
-                (current, next) => new
-                {
-                    FolderInfo = next,
-                    CumulativeSize = current.CumulativeSize + next.ItemSize,
-                    ChunkNumber = (current.CumulativeSize + next.ItemSize + availableRAM - 1L) / availableRAM,
-                    CumulativeCount = current.CumulativeCount + next.ItemCount
-                })
-                .ToArray();
-                            
-            var folderChunks = folderRecords
-                .GroupBy(x => x.ChunkNumber)
-                .Select(group => group
-                .Select(x => x.FolderInfo)
-                .ToArray())
-                .ToArray();
-
-            var last = folderRecords.Last();
-            var (totalSize, totalCount) = (last.CumulativeSize, last.CumulativeCount);
-            
-            logger.Debug($"Available RAM: {availableRAM:N0}");            
-            logger.Debug($"Total Size: {totalSize:N0}");
-            logger.Debug($"Total Item Count: {totalCount:N0}");
-            logger.Debug($"Average Item Size: {(totalSize/(double)totalCount)/1000:N0}K");
-            logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
-
-            //return (folderChunks, totalSize, totalCount);
-            return folderChunks;
-        }
-
         internal IEnumerable<MAPIFolder> QueryOlFolders(OlFolderTree tree)
         {
             var folders = tree.Roots
@@ -115,6 +68,66 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                               .SelectMany(root => root
                               .FlattenIf(node => !node.Selected));
             return folders;
+        }
+
+        internal async Task<OlFolderInfo[]> GetInitializedFolderInfo()
+        {
+            InitProgress(out var tokenSource, out var token, out var progress, out var sw);
+
+            var tree = GetOlFolderTree();
+            var folders = QueryOlFolderInfo(tree).ToArray();
+            var count = folders.Count();
+            if (count == 0) { return folders; }
+            
+            progress.Report(0, "Getting Counts/Sizes");
+            int completed = 0;
+
+            var folderTasks = folders.Select(x => Task.Run(async () => 
+            {
+                _ = await x.ItemCount;
+                _ = await x.ItemSize;
+                Interlocked.Increment(ref completed);
+                progress.Report(100 * completed / (double)count, $"Getting Counts/Sizes {GetReportMessage(completed,count, sw)}");
+                await Task.Delay(50);
+            }));
+            await Task.WhenAll(folderTasks);
+
+            progress.Report(100);
+
+            return folders;
+        }
+
+        internal struct FolderStruct(OlFolderInfo folderInfo, long cumulativeSize, long chunkNumber, int cumulativeCount)
+        {
+            public OlFolderInfo FolderInfo { get; set; } = folderInfo;
+            public long CumulativeSize { get; set; } = cumulativeSize;
+            public long ChunkNumber { get; set; } = chunkNumber;
+            public int CumulativeCount { get; set; } = cumulativeCount;
+        }
+
+        internal async Task<FolderStruct[]> AddRollingMeasures(long availableRAM, OlFolderInfo[] folders)
+        {
+            var folderRecords = await folders
+                .ToAsyncEnumerable()
+                .Scan(new FolderStruct(default(OlFolderInfo), 0L, 0L, 0),
+                async (current, next) => new FolderStruct
+                {
+                    FolderInfo = next,
+                    CumulativeSize = current.CumulativeSize + (await next.ItemSize),
+                    ChunkNumber = (current.CumulativeSize + (await next.ItemSize) + availableRAM - 1L) / availableRAM,
+                    CumulativeCount = current.CumulativeCount + (await next.ItemCount)
+                })
+                .ToArrayAsync();
+            return folderRecords;
+        }
+
+        private static void LogFolderChunkMetrics(long availableRAM, OlFolderInfo[][] folderChunks, long totalSize, int totalCount)
+        {
+            logger.Debug($"Available RAM {availableRAM / (double)1000000:N0} MG");
+            logger.Debug($"Total Size: {totalSize / (double)1000000:N0} MG");
+            logger.Debug($"Total Item Count: {totalCount:N0}");
+            logger.Debug($"Average Item Size: {(totalSize / (double)totalCount) / 1000:N0} K");
+            logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
         }
 
         //internal IEnumerable<MAPIFolder> QueryOlFoldersAsync(OlFolderTree tree)
@@ -136,10 +149,32 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailItems;
         }
 
-        internal List<MailItem> LinqToSimpleEmailList(
-            IEnumerable<MAPIFolder> folders, 
-            IEnumerable<MailItem> mailItems, 
-            ProgressTracker progress)
+        internal async Task<OlFolderInfo[][]> GetOlFolderChunks()
+        {
+            var availableRAM = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
+            logger.Debug($"Available RAM {availableRAM / (double)1000000:N1} MG");
+
+            // Grab selected OlFolderInfo objects from a OlFolderTree, flatten to an array, and initialize
+            var folders = await GetInitializedFolderInfo();
+
+            var folderRecords = await AddRollingMeasures(availableRAM, folders);
+
+            var folderChunks = folderRecords
+                .GroupBy(x => x.ChunkNumber)
+                .Select(group => group
+                .Select(x => x.FolderInfo)
+                .ToArray())
+                .ToArray();
+
+            var last = folderRecords.Last();
+            var (totalSize, totalCount) = (last.CumulativeSize, last.CumulativeCount);
+            
+            LogFolderChunkMetrics(availableRAM, folderChunks, totalSize, totalCount);
+
+            return folderChunks;
+        }
+
+        internal List<MailItem> ConsumeLinq(IEnumerable<MAPIFolder> folders, IEnumerable<MailItem> mailItems, ProgressTracker progress)
         {
             var prelimCount = folders.Select(folder => folder.Items.Count).Sum();
             _sw.LogDuration("Get Preliminary Count");
@@ -149,7 +184,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return mailList;
         }
-
 
         internal async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
         {
@@ -170,7 +204,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 _sw.LogDuration(nameof(QueryMailItems));
 
                 //// Load to memory
-                //mailItems = LinqToSimpleEmailList(folders, mailItemsQuery, progress);
+                //mailItems = ConsumeLinq(folders, mailItemsQuery, progress);
                 //_sw.LogDuration(nameof(LinqToSimpleEmailList));
                 _sw.WriteToLog(clear: false);
             }, tokenSource.Token);
@@ -198,7 +232,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 _sw.LogDuration(nameof(QueryMailItems));
 
                 //// Load to memory
-                //mailItems = LinqToSimpleEmailList(folders, mailItemsQuery, progress);
+                //mailItems = ConsumeLinq(folders, mailItemsQuery, progress);
                 //_sw.LogDuration(nameof(LinqToSimpleEmailList));
                 _sw.WriteToLog(clear: false);
             }, tokenSource.Token);
@@ -329,14 +363,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task MineEmailsV2()
         {
-            InitProgress(out var tokenSource, out var token, out var progress, out var sw);
-            
-            var folderChunks = GetOlFolderChunks();
+            var sw = new SegmentStopWatch().Start();
+
+            var folderChunks = await GetOlFolderChunks();
             sw.LogDuration("Get Outlook Folder Chunks", true);
 
-            //var serializer = GetSerializer();
-            //var disk = new FilePathHelper();
-            //disk.FolderPath = _globals.FS.FldrAppData;
+            InitProgress(out var tokenSource, out var token, out var progress, out var psw);
 
             var chunkCount = folderChunks.Count();
             var chunkProgress = 100 / (double)chunkCount;
@@ -458,10 +490,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         private void InitProgress(out CancellationTokenSource tokenSource, out CancellationToken token, out ProgressTracker progress, out SegmentStopWatch sw)
-        {
+        {            
             tokenSource = new CancellationTokenSource();
             token = tokenSource.Token;
-            progress = new ProgressTracker(tokenSource);
+            progress = new ProgressTracker(tokenSource, _globals.Ol.GetExplorerScreen());
             sw = new SegmentStopWatch();
             sw.Start();
         }
@@ -575,14 +607,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                                     
         }
 
-        private string GetReportMessage(int complete, int count, Stopwatch psw)
+        private string GetReportMessage(int complete, int count, Stopwatch sw)
         {
-            double seconds = complete > 0 ? psw.Elapsed.TotalSeconds / complete : 0;
+            double seconds = complete > 0 ? sw.Elapsed.TotalSeconds / complete : 0;
             var remaining = count - complete;
             var remainingSeconds = remaining * seconds;
             var ts = TimeSpan.FromSeconds(remainingSeconds);
             string msg = $"Completed {complete} of {count} ({seconds:N2} spm) " +
-                $"({psw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
+                $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
         }
 

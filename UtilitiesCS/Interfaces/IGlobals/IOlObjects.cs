@@ -18,10 +18,12 @@ namespace UtilitiesCS
         Folder EmailRoot { get; }
         Reminders OlReminders { get; }
         Folder ToDoFolder { get; }
-        StackObjectCS<object> MovedMails_Stack { get; set; }
+        StackObjectCS<object> MovedMailsStack { get; set; }
         string ViewWide { get; }
         string ViewCompact { get; }
         bool DarkMode { get; set; }
         TimedDiskWriter<string> EmailMoveWriter { get; }
+        int GetExplorerScreenNumber();
+        System.Windows.Forms.Screen GetExplorerScreen();
     }
 }

@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using UtilitiesCS.Threading;
+using UtilitiesCS.Windows_Forms;
 
 namespace UtilitiesCS
 {
@@ -14,9 +16,11 @@ namespace UtilitiesCS
         public ProgressTracker(CancellationTokenSource tokenSource) 
         {   
             UIThreadExtensions.UiDispatcher.Invoke(() => 
-            { 
-                _progressViewer = new ProgressViewer();
-                _progressViewer.UiDispatcher = UIThreadExtensions.UiDispatcher;
+            {
+                _progressViewer = new ProgressViewer
+                {
+                    UiDispatcher = UIThreadExtensions.UiDispatcher
+                };
                 _progressViewer.SetCancellationTokenSource(tokenSource);
             });
 
@@ -24,6 +28,7 @@ namespace UtilitiesCS
             {
                 _progressViewer.Bar.Value = tup.value;
                 _progressViewer.JobName.Text = tup.jobName;
+                _progressViewer.JobName.Invalidate();
                 //_progressViewer.Refresh();
             });
             _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
@@ -36,7 +41,38 @@ namespace UtilitiesCS
             else
                 _progressViewer.Show();
         }
-        
+
+        public ProgressTracker(CancellationTokenSource tokenSource, Screen screen)
+        {
+            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            {
+                _progressViewer = new ProgressViewer
+                {
+                    UiDispatcher = UIThreadExtensions.UiDispatcher
+                };
+                _progressViewer.SetCancellationTokenSource(tokenSource);
+                _progressViewer.StartPosition = FormStartPosition.Manual;
+                _progressViewer.TrySwitchScreens(screen, true);
+            });
+
+            var rootProgress = new Progress<(int value, string jobName)>(tup =>
+            {
+                _progressViewer.Bar.Value = tup.value;
+                _progressViewer.JobName.Text = tup.jobName;
+                _progressViewer.JobName.Invalidate();
+                //_progressViewer.Refresh();
+            });
+            _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
+
+            this.Report(0, "Initializing");
+            _isRoot = true;
+
+            if (_progressViewer.InvokeRequired)
+                _progressViewer.Invoke(() => _progressViewer.Show());
+            else
+                _progressViewer.Show();
+        }
+
         public ProgressTracker(ProgressTracker parent, int allocation, int startingAt) 
         { 
             _parent = new ParentProgress<(int Value, string JobName)>(parent, allocation, startingAt);
