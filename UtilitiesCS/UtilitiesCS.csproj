@@ -388,6 +388,7 @@
     <Compile Include="EmailIntelligence\Bayesian\EmailTokenizer.cs" />
     <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
+    <Compile Include="EmailIntelligence\FilterOlFolders\OlFolderInfo .cs" />
     <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersController.cs" />
     <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersViewer.cs">
       <SubType>Form</SubType>
@@ -442,6 +443,7 @@
     <Compile Include="HelperClasses\ObjectSize.cs" />
     <Compile Include="HelperClasses\ObjectCopier.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
+    <Compile Include="Threading\AsyncMultiTasker.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPane.cs">
       <SubType>UserControl</SubType>

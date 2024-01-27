@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.Windows_Forms;
 
 namespace TaskMaster
 {
@@ -206,16 +207,20 @@ namespace TaskMaster
 
         public int GetExplorerScreenNumber()
         {
-            var explorer = App.ActiveExplorer();
-            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
-            return System.Windows.Forms.Screen.AllScreens.FindIndex(s => s.Bounds.IntersectsWith(bounds));
+            System.Windows.Forms.Screen screen = GetExplorerScreen();
+            return System.Windows.Forms.Screen.AllScreens.ToList().IndexOf(screen);
         }
 
         public System.Windows.Forms.Screen GetExplorerScreen()
         {
             var explorer = App.ActiveExplorer();
-            Point location = new(explorer.Left, explorer.Top);
-            return System.Windows.Forms.Screen.FromPoint(location);
+            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
+            return System.Windows.Forms.Screen.AllScreens.FindMax((s1, s2) =>
+            {
+                var a1 = Rectangle.Intersect(s1.Bounds, bounds).Area();
+                var a2 = Rectangle.Intersect(s2.Bounds, bounds).Area();
+                return a2 > a1 ? s2 : s1;
+            });
         }
         
         private void NotifyPropertyChanged([CallerMemberName] string propertyName="")

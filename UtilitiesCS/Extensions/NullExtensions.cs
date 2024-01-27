@@ -29,11 +29,24 @@ namespace UtilitiesCS.Extensions
             }
         }
 
-        public static T ThrowIfNullOrEmpty<T,U>(
-            this T? argument,
+        public static bool IsNullOrEmpty<T>(
+            this IEnumerable<T> argument)
+        {
+            if (argument is null || argument.Count() == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static IEnumerable<T> ThrowIfNullOrEmpty<T>(
+            this IEnumerable<T> argument,
             string? message = default,
             [CallerMemberName] string callerName = ""
-        ) where T : IEnumerable<U>
+        ) 
         {
             if (argument is null || argument.Count() == 0)
             {

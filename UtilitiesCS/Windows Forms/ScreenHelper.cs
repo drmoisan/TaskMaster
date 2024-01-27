@@ -11,6 +11,16 @@ namespace UtilitiesCS.Windows_Forms
 {
     public static class ScreenHelper
     {
+        public static int Area(this Rectangle rectangle)
+        {
+            return rectangle.Width * rectangle.Height;
+        }
+
+        public static float Area(this RectangleF rectangle)
+        {
+            return rectangle.Width * rectangle.Height;
+        }
+        
         public static void ToggleScreens(this ContainerControl container, bool withScaling)
         {
             if (Screen.AllScreens.Count() < 2) { throw new ArgumentOutOfRangeException(nameof(container), $"There is only one screen"); }
@@ -43,8 +53,7 @@ namespace UtilitiesCS.Windows_Forms
         {
             screen = default;
             screenNumber = -1;
-            if (point == default) { return false; }
-
+            
             screenNumber = Screen.AllScreens.FindIndex(screen => screen.Bounds.Contains(point));
             if (screenNumber == -1) { return false; }
 
@@ -55,7 +64,6 @@ namespace UtilitiesCS.Windows_Forms
         
         internal static (Screen Screen, int ScreenNumber) GetScreen(this Point point)
         {
-            if (point == default) { throw new ArgumentNullException(nameof(point)); }
             var screenNumber = Screen.AllScreens.FindIndex(screen => screen.Bounds.Contains(point));
             if (screenNumber == -1) { throw new ArgumentOutOfRangeException($"point {point} not on any screen"); }
 

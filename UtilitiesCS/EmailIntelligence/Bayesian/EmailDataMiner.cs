@@ -19,6 +19,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -72,27 +73,32 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal async Task<OlFolderInfo[]> GetInitializedFolderInfo()
         {
-            InitProgress(out var tokenSource, out var token, out var progress, out var sw);
+            InitProgress(out var tokenSource, out var cancel, out var progress, out var sw);
+            OlFolderInfo[] folders = null;
 
-            var tree = GetOlFolderTree();
-            var folders = QueryOlFolderInfo(tree).ToArray();
-            var count = folders.Count();
-            if (count == 0) { return folders; }
+            await Task.Run(
+                async () => 
+                {
+                    var tree = GetOlFolderTree();
+                    folders = QueryOlFolderInfo(tree).ToArray();
+                    var count = folders.Count();
+                    if (count == 0) { return; }
+
+                    progress.Report(0, "Getting Counts/Sizes");
+                    //int completed = 0;
+
+                    await AsyncMultiTasker.AsyncMultiTaskChunker(folders, async (folder) =>
+                    {
+                        _ = await folder.ItemCount;
+                        _ = await folder.FolderSize;
+                    }, progress, "Getting Counts/Sizes", cancel);
+
+                    progress.Report(100);
+
+                }, 
+                cancel);
+
             
-            progress.Report(0, "Getting Counts/Sizes");
-            int completed = 0;
-
-            var folderTasks = folders.Select(x => Task.Run(async () => 
-            {
-                _ = await x.ItemCount;
-                _ = await x.ItemSize;
-                Interlocked.Increment(ref completed);
-                progress.Report(100 * completed / (double)count, $"Getting Counts/Sizes {GetReportMessage(completed,count, sw)}");
-                await Task.Delay(50);
-            }));
-            await Task.WhenAll(folderTasks);
-
-            progress.Report(100);
 
             return folders;
         }
@@ -113,8 +119,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 async (current, next) => new FolderStruct
                 {
                     FolderInfo = next,
-                    CumulativeSize = current.CumulativeSize + (await next.ItemSize),
-                    ChunkNumber = (current.CumulativeSize + (await next.ItemSize) + availableRAM - 1L) / availableRAM,
+                    CumulativeSize = current.CumulativeSize + (await next.FolderSize),
+                    ChunkNumber = (current.CumulativeSize + (await next.FolderSize) + availableRAM - 1L) / availableRAM,
                     CumulativeCount = current.CumulativeCount + (await next.ItemCount)
                 })
                 .ToArrayAsync();
@@ -173,7 +179,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return folderChunks;
         }
-
+                
         internal List<MailItem> ConsumeLinq(IEnumerable<MAPIFolder> folders, IEnumerable<MailItem> mailItems, ProgressTracker progress)
         {
             var prelimCount = folders.Select(folder => folder.Items.Count).Sum();
@@ -243,6 +249,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailItemsQuery;
         }
 
+        
 
         #endregion Aquire Emails
 
@@ -485,7 +492,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     logger.Debug("Request to cancel task was received");
                 }
-
             }
         }
 

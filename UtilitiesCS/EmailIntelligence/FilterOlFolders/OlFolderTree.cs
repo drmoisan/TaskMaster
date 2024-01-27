@@ -6,13 +6,15 @@ using System.Runtime.CompilerServices;
 using UtilitiesCS.HelperClasses;
 using System;
 using System.Threading;
-using log4net.Repository.Hierarchy;
 using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
     public class OlFolderTree: INotifyPropertyChanged
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public OlFolderTree() { }
 
         public OlFolderTree(MAPIFolder olRoot)
@@ -185,111 +187,5 @@ namespace UtilitiesCS
     }
 
 
-    public class OlFolderInfo : INotifyPropertyChanged
-    {
-        public OlFolderInfo(MAPIFolder olFolder, MAPIFolder olRoot)
-        {
-            _olFolder = olFolder;
-            _olRoot = olRoot;
-            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath + "\\", "");
-            _name = olFolder.Name;
-            _lazyItemSize = new AsyncLazy<long>(async () => await Task.Run(
-                () => OlFolder.Items.OfType<dynamic>().Sum(item => 
-                {
-                    try { return item?.Size ?? 0; }
-                    catch (System.Exception) { return 0; }     
-                })));
-            //_lazyItemSize = new AsyncLazy<long>(async () => await Task.Run(() => OlFolder.Items.Cast<object>().Where(x=>x is MailItem).Cast<MailItem>().Sum(item => item.Size)));
-            _lazyItemCount = new AsyncLazy<int>(async () => await Task.Run(() => OlFolder.Items.Count));
-        }
-
-        private MAPIFolder _olRoot;
-        public MAPIFolder OlRoot { get => _olRoot; set => _olRoot = value; }
-
-        private MAPIFolder _olFolder;
-        public MAPIFolder OlFolder
-        {
-            get => _olFolder;
-            set
-            {
-                _olFolder = value;
-                RelativePath = _olFolder.FolderPath.Replace(_olRoot.FolderPath + "\\", "");
-                Name = _olFolder.Name;
-            }
-        }
-
-        private string _name;
-        public string Name { get => _name; private set => _name = value; }
-
-        private string _relativePath;
-        public string RelativePath { get => _relativePath; private set => _relativePath = value; }
-
-        private bool _selected;
-        public bool Selected
-        {
-            get => _selected;
-            set
-            {
-                _selected = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public AsyncLazy<int> ItemCount 
-        { 
-            get => _lazyItemCount; 
-            protected set
-            {
-                _lazyItemCount = value;
-                NotifyPropertyChanged();
-            }
-        }
-        private AsyncLazy<int> _lazyItemCount;
-
-        public AsyncLazy<long> ItemSize 
-        { 
-            get => _lazyItemSize;
-            protected set 
-            {                 
-                _lazyItemSize = value;
-                NotifyPropertyChanged();
-            }
-        }
-        private AsyncLazy<long> _lazyItemSize;
-
-        public async Task CompleteInitialization()
-        {
-            _ = await ItemSize;
-            _ = await ItemCount;
-        }
-
-        public async Task<(long ItemSize, int ItemCount)> GetLazyValues()
-        {
-            var itemSize = await ItemSize;
-            var itemCount = await ItemCount;
-            return (itemSize, itemCount);
-        }
-
-        public void ResetLazy()
-        {
-            // ItemSize = new AsyncLazy<long>(async () => await Task.Run(() => OlFolder.Items.Cast<OutlookItem>().Sum(item => item.Size)));
-            ItemSize = new AsyncLazy<long>(async () => await Task.Run(
-                () => OlFolder.Items.OfType<dynamic>().Sum(item =>
-                {
-                    try { return item?.Size ?? 0; }
-                    catch (System.Exception) { return 0; }
-                })));
-
-            ItemCount = new AsyncLazy<int>(async () => await Task.Run(() => OlFolder.Items.Count));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-
-    }
+    
 }
