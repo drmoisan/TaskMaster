@@ -27,9 +27,9 @@ namespace Z.Unfinished.ToDoModel.Test
             this.mockApplicationGlobals.SetupGet(x => x.Ol).Returns(this.mockOlObjects.Object);
         }
 
-        private FolderHandler CreateFolderHandler()
+        private OlFolderHelper CreateFolderHandler()
         {
-            return new FolderHandler(
+            return new OlFolderHelper(
                 this.mockApplicationGlobals.Object);
         }
 

@@ -15,23 +15,23 @@ using System.Threading;
 namespace ToDoModel
 {
 
-    public class FolderHandler
+    public class OlFolderHelper
     {
         #region Constructors and Initialization
 
-        public FolderHandler(Outlook.Application olApp)
+        public OlFolderHelper(Outlook.Application olApp)
         {
             _olApp = olApp;
         }
         
-        public FolderHandler(IApplicationGlobals AppGlobals)
+        public OlFolderHelper(IApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
             _olApp = AppGlobals.Ol.App;
             Suggestions = new Suggestions();
         }
 
-        public FolderHandler(IApplicationGlobals appGlobals, object objItem, InitOptions options)
+        public OlFolderHelper(IApplicationGlobals appGlobals, object objItem, InitOptions options)
         {
             _globals = appGlobals;
             _olApp = appGlobals.Ol.App;
@@ -223,7 +223,7 @@ namespace ToDoModel
 
         /// <summary>
         /// Function grabs a handle on the <seealso cref="Folder"/> based on a rooted <seealso cref="Folder"/>.FolderPath.
-        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="FolderHandler"/> instance.
+        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="OlFolderHelper"/> instance.
         /// </summary>
         /// <param name="folderpath"> Rooted <seealso cref="MAPIFolder.FolderPath"/></param>
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
@@ -243,7 +243,7 @@ namespace ToDoModel
 
         /// <summary>
         /// Function grabs a handle on the <seealso cref="Folder"/> represented by the rooted <seealso cref="Folder"/>.FolderPath.
-        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="FolderHandler"/> instance. If the
+        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="OlFolderHelper"/> instance. If the
         /// targeted folder is not found, an exception is thrown or a message is delivered to the user based on the 
         /// value of the <paramref name="throwEx"/> parameter.
         /// </summary>

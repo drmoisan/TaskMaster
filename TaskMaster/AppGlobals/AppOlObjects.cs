@@ -144,7 +144,7 @@ namespace TaskMaster
         public Folder ArchiveRoot => Initializer.GetOrLoad(ref _archiveRoot, LoadArchiveRoot);
         internal Folder LoadArchiveRoot() 
         {
-            var folderHandler = new FolderHandler(_globals);
+            var folderHandler = new OlFolderHelper(_globals);
             return folderHandler.GetFolder(Root.Folders, "Archive");
         }
 

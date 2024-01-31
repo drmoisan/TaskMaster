@@ -106,7 +106,7 @@
     <Compile Include="Data Model\Tree\TreeOfToDoItems.cs" />
     <Compile Include="Email Utilities\AutoFile.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
-    <Compile Include="Email Utilities\FolderHandler.cs" />
+    <Compile Include="Email Utilities\OlFolderHelper.cs" />
     <Compile Include="Email Utilities\MovedMailInfo.cs" />
     <Compile Include="Email Utilities\SmithWaterman.cs" />
     <Compile Include="Email Utilities\SortEmail.cs" />

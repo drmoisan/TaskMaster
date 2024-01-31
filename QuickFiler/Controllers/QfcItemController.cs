@@ -474,13 +474,13 @@ namespace QuickFiler.Controllers
         {
             if (varList is null)
             {
-                _folderHandler = new FolderHandler(
-                    _globals, _mailItem, FolderHandler.InitOptions.FromField);
+                _folderHandler = new OlFolderHelper(
+                    _globals, _mailItem, OlFolderHelper.InitOptions.FromField);
             }
             else
             {
-                _folderHandler = new FolderHandler(
-                    _globals, varList, FolderHandler.InitOptions.FromArrayOrString);
+                _folderHandler = new OlFolderHelper(
+                    _globals, varList, OlFolderHelper.InitOptions.FromArrayOrString);
             }
         }
 
@@ -551,7 +551,7 @@ namespace QuickFiler.Controllers
         private bool _suppressEvents = false;
         private CoreWebView2Environment _webViewEnvironment;
         private Dictionary<string, Theme> _themes;
-        private FolderHandler _folderHandler;
+        private OlFolderHelper _folderHandler;
         private IApplicationGlobals _globals;
         private IList<TableLayoutPanel> _tableLayoutPanels;
         private IQfcCollectionController _parent;

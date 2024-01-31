@@ -31,19 +31,19 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private CancellationToken _token;
         
-        private FolderHandler _folderHandler;
-        public FolderHandler FolderHandler { get => _folderHandler; }
+        private OlFolderHelper _folderHandler;
+        public OlFolderHelper FolderHandler { get => _folderHandler; }
         async public Task InitFolderHandlerAsync(object folderList = null)
         {
             if (folderList is null)
             {
-                _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, _mail, FolderHandler.InitOptions.FromField), _token);
+                _folderHandler = await Task.Run(() => new OlFolderHelper(
+                    _globals, _mail, OlFolderHelper.InitOptions.FromField), _token);
             }
             else
             {
-                _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, folderList, FolderHandler.InitOptions.FromArrayOrString), _token);
+                _folderHandler = await Task.Run(() => new OlFolderHelper(
+                    _globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString), _token);
             }
         }
 

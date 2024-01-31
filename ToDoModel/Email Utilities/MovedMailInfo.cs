@@ -80,7 +80,7 @@ namespace ToDoModel
             {
                 if (_folderOld is null && NotNull(folderPathOld, olRootPath, olApp))
                 {
-                    var folderHandler = new FolderHandler(olApp);
+                    var folderHandler = new OlFolderHelper(olApp);
                     _folderOld = folderHandler.GetFolder($"{olRootPath}\\{folderPathOld}", olApp);
                 }
                 return _folderOld;

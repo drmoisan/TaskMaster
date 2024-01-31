@@ -138,7 +138,7 @@ namespace ToDoModel
                 Folder olDestination = null;
                 try
                 {
-                    var folderHandler = new FolderHandler(appGlobals);
+                    var folderHandler = new OlFolderHelper(appGlobals);
                     olDestination = folderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
                 }
                 catch (System.Exception e)
@@ -251,7 +251,7 @@ namespace ToDoModel
                 appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
-                var folderHandler = new FolderHandler(appGlobals);
+                var folderHandler = new OlFolderHelper(appGlobals);
                 var olDestination = folderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
                 var mailItemTemp = (MailItem)mailItem.Move(olDestination);
 
