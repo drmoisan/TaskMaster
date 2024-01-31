@@ -180,7 +180,7 @@ namespace UtilitiesCS
         public async Task ToggleAsync(Enums.ToggleState desiredState)
         {
             _token.ThrowIfCancellationRequested();
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => Toggle(desiredState));
+            await UiThread.Dispatcher.InvokeAsync(() => Toggle(desiredState));
             //if (desiredState.HasFlag(Enums.ToggleState.On))
             //{
             //    await _uiContext;
@@ -203,7 +203,7 @@ namespace UtilitiesCS
         public async Task ToggleAsync(Enums.ToggleState desiredState, bool sharedColumn)
         {
             _token.ThrowIfCancellationRequested();
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>Toggle(desiredState, sharedColumn));
+            await UiThread.Dispatcher.InvokeAsync(()=>Toggle(desiredState, sharedColumn));
         }
     }
 }

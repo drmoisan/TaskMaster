@@ -15,72 +15,43 @@ namespace UtilitiesCS
     public class ProgressTracker: IProgress<(int Value, string JobName)>
     {
         public ProgressTracker(CancellationTokenSource tokenSource) 
-        {   
-            UIThreadExtensions.UiDispatcher.Invoke(() => 
-            {
-                _progressViewer = new ProgressViewer
-                {
-                    UiDispatcher = UIThreadExtensions.UiDispatcher
-                };
-                _progressViewer.SetCancellationTokenSource(tokenSource);
-            });
-
-            var rootProgress = new Progress<(int value, string jobName)>(async tup =>
-            {
-                await _progressViewer.UiDispatcher.InvokeAsync(() =>
-                {
-                    _progressViewer.Bar.Value = tup.value;
-                    _progressViewer.JobName.Text = tup.jobName;
-                    
-                    //_progressViewer.Refresh();
-                });
-                _progressViewer.Bar.Value = tup.value;
-                _progressViewer.JobName.Text = tup.jobName;
-                //_progressViewer.Invalidate();
-                //_progressViewer.Refresh();
-            });
-            _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
-            
-            this.Report(0, "Initializing");
-            _isRoot = true;
-            
-            if (_progressViewer.InvokeRequired)
-                _progressViewer.Invoke(() => _progressViewer.Show());
-            else
-                _progressViewer.Show();
+        {
+            _cancelSource = tokenSource;
         }
 
         public ProgressTracker(CancellationTokenSource tokenSource, Screen screen)
         {
-            _uiDispatcher = UIThreadExtensions.UiDispatcher;
+            _cancelSource = tokenSource;
+            _screen = screen;
+        }
 
-            _uiDispatcher.Invoke(() =>
+        public ProgressTracker Initialize() 
+        {
+            UiDispatcher = UiThread.Dispatcher;
+
+            UiDispatcher.Invoke(() =>
             {
                 _progressViewer = new ProgressViewer
                 {
-                    UiDispatcher = UIThreadExtensions.UiDispatcher
+                    UiDispatcher = UiThread.Dispatcher,
+                    CancelSource = _cancelSource
                 };
-                _progressViewer.SetCancellationTokenSource(tokenSource);
-                _progressViewer.StartPosition = FormStartPosition.Manual;
-                _progressViewer.TrySwitchScreens(screen, true);
-            });
-
-            var rootProgress = new Progress<(int value, string jobName)>(async tup => 
-            await _uiDispatcher.InvokeAsync(() =>
-            {
-                _progressViewer.Bar.Value = tup.value;
-                _progressViewer.JobName.Text = tup.jobName;
-            }));
-            
-            _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
-
-            this.Report(0, "Initializing");
-            _isRoot = true;
-
-            if (_progressViewer.InvokeRequired)
-                _progressViewer.Invoke(() => _progressViewer.Show());
-            else
+                if (_screen != null)
+                {
+                    _progressViewer.StartPosition = FormStartPosition.Manual;
+                    _progressViewer.TrySwitchScreens(_screen, true);
+                }
+                var rootProgress = new Progress<(int value, string jobName)>(tup =>
+                {
+                    _progressViewer.JobName.Text = tup.jobName;
+                    _progressViewer.Bar.Value = tup.value;
+                    _progressViewer.Refresh();
+                });
+                _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
+                _isRoot = true;
                 _progressViewer.Show();
+            });
+            return this;
         }
 
         public ProgressTracker(ProgressTracker parent, int allocation, int startingAt) 
@@ -99,8 +70,12 @@ namespace UtilitiesCS
         private bool _isRoot = false;
         private ParentProgress<(int Value, string JobName)> _parent;
         private ThreadSafeSingleShotGuard _pvIsDisposed = new ThreadSafeSingleShotGuard();
+        private CancellationTokenSource _cancelSource;
+        private Screen _screen;
 
+        internal Dispatcher UiDispatcher { get => _uiDispatcher; set => _uiDispatcher = value; }
         private Dispatcher _uiDispatcher;
+        
         private ProgressViewer _progressViewer;
         public ProgressViewer ProgressViewer { get => _progressViewer; protected set => _progressViewer = value; }
 
@@ -164,7 +139,10 @@ namespace UtilitiesCS
             {
                 _progress = value;
                 var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
+                
+                // Updates UI
                 _parent.Progress.Report((parentProgress, _jobName));
+                
                 if (_isRoot && parentProgress == 100)
                 {
                     if (_pvIsDisposed.CheckAndSetFirstCall)

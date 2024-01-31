@@ -40,7 +40,7 @@ namespace QuickFiler.Helper_Classes
                                     MailItem mailItem,
                                     CancellationTokenSource tokenSource,
                                     CancellationToken token,
-                                    System.Action<List<MailItemInfo>> updateUI = null)
+                                    System.Action<List<MailItemHelper>> updateUI = null)
         {
             _globals = appGlobals;
             _tokenSource = tokenSource;
@@ -55,7 +55,7 @@ namespace QuickFiler.Helper_Classes
                                       CancellationTokenSource tokenSource,
                                       CancellationToken token,
                                       bool loadAll,
-                                      System.Action<List<MailItemInfo>> updateUI = null)
+                                      System.Action<List<MailItemHelper>> updateUI = null)
         {
             var resolver = new ConversationResolver(appGlobals, mailItem);
             resolver.Token = token;
@@ -102,8 +102,8 @@ namespace QuickFiler.Helper_Classes
         private bool _fullyLoaded = false;
         public bool FullyLoaded { get => _fullyLoaded; private set => _fullyLoaded = value; }
 
-        private System.Action<List<MailItemInfo>> _updateUI;
-        public System.Action<List<MailItemInfo>> UpdateUI 
+        private System.Action<List<MailItemHelper>> _updateUI;
+        public System.Action<List<MailItemHelper>> UpdateUI 
         { 
             get => _updateUI; 
             set => Initializer.SetAndSave(ref _updateUI, value, (x) => NotifyPropertyChanged(nameof(UpdateUI))); 
@@ -111,13 +111,13 @@ namespace QuickFiler.Helper_Classes
 
         #region ConversationInfo
 
-        private Pair<List<MailItemInfo>> _convInfoFields;
-        public Pair<List<MailItemInfo>> ConversationInfo
+        private Pair<List<MailItemHelper>> _convInfoFields;
+        public Pair<List<MailItemHelper>> ConversationInfo
         {
             get => Initializer.GetOrLoad(ref _convInfoFields, LoadConversationInfo, (x) => NotifyPropertyChanged(nameof(ConversationInfo)), false, _mailItem);
             set { _convInfoFields = value; NotifyPropertyChanged(); }
         }
-        internal Pair<List<MailItemInfo>> LoadConversationInfo()
+        internal Pair<List<MailItemHelper>> LoadConversationInfo()
         {
             if (Count.Expanded <= 0) 
             { 
@@ -128,18 +128,18 @@ namespace QuickFiler.Helper_Classes
             var df = Df.Expanded;
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
             var convInfoExpanded = Enumerable.Range(0, Count.Expanded)
-                                             .Select(indexRow => MailItemInfo.FromDf(
+                                             .Select(indexRow => MailItemHelper.FromDf(
                                                  df, indexRow, olNs, _globals.Ol.EmailPrefixToStrip, Token))
                                              .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
                                              .ToList();
 
             var convInfoSameFolder = convInfoExpanded.Where(
-                itemInfo => itemInfo.Folder == ((Folder)_mailItem.Parent).Name).ToList();
+                itemInfo => itemInfo.FolderName == ((Folder)_mailItem.Parent).Name).ToList();
 
-            return new Pair<List<MailItemInfo>>(sameFolder: convInfoSameFolder, expanded: convInfoExpanded);
+            return new Pair<List<MailItemHelper>>(sameFolder: convInfoSameFolder, expanded: convInfoExpanded);
             
         }
-        public async Task<Pair<List<MailItemInfo>>> LoadConversationInfoAsync(CancellationToken token, bool backgroundLoad)
+        public async Task<Pair<List<MailItemHelper>>> LoadConversationInfoAsync(CancellationToken token, bool backgroundLoad)
         {
             token.ThrowIfCancellationRequested();
 
@@ -149,7 +149,7 @@ namespace QuickFiler.Helper_Classes
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
 
             var tasksConvInfoExp = Enumerable.Range(0, Count.Expanded)
-                                             .Select(indexRow => MailItemInfo
+                                             .Select(indexRow => MailItemHelper
                                              .FromDfAsync(Df.Expanded, indexRow, olNs, 
                                              _globals.Ol.EmailPrefixToStrip, token, backgroundLoad));
 
@@ -160,13 +160,13 @@ namespace QuickFiler.Helper_Classes
             if (UpdateUI is not null)
             {
                 token.ThrowIfCancellationRequested();
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
+                await UiThread.Dispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
             }
 
             var convInfoSameFolder = convInfoExpanded.Where(
-                itemInfo => itemInfo.Folder == ((Folder)_mailItem.Parent).Name).ToList();
+                itemInfo => itemInfo.FolderName == ((Folder)_mailItem.Parent).Name).ToList();
 
-            var pair = new Pair<List<MailItemInfo>>(sameFolder: convInfoSameFolder, expanded: convInfoExpanded);
+            var pair = new Pair<List<MailItemHelper>>(sameFolder: convInfoSameFolder, expanded: convInfoExpanded);
             ConversationInfo = pair;
             return pair;
         }
@@ -288,7 +288,7 @@ namespace QuickFiler.Helper_Classes
             {
                 if (FullyLoaded)
                 {
-                    await UIThreadExtensions.UiDispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
+                    await UiThread.Dispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
                 }
             }
         }

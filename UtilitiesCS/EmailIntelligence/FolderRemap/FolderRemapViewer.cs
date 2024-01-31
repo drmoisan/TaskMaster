@@ -30,7 +30,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                 
         private void SetupRenderer(TreeListView.TreeRenderer renderer)
         {
-            var penSize = 2.0f * UIThreadExtensions.AutoScaleFactor.Width;
+            var penSize = 2.0f * UiThread.AutoScaleFactor.Width;
             renderer.LinePen = new Pen(Color.Firebrick, penSize);
             renderer.LinePen.DashStyle = DashStyle.Dot;
             renderer.UseTriangles = true;

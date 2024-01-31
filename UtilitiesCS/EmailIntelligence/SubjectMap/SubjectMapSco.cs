@@ -268,7 +268,7 @@ namespace UtilitiesCS
                     new WindowsFormsSynchronizationContext());
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-            var progress = new ProgressTracker(tokenSource);
+            var progress = new ProgressTracker(tokenSource).Initialize();
 
             await Task.Factory.StartNew(() =>
             {

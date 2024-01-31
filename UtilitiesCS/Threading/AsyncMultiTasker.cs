@@ -109,10 +109,10 @@ namespace UtilitiesCS.Threading
             int count = obj.Count();
             int complete = 0;
 
-            int chunkNum = Environment.ProcessorCount - 1;
+            int chunkNum = Environment.ProcessorCount - 2;
             int chunkSize = count / chunkNum;
 
-            var chunks = obj.Chunk(chunkSize);
+            var chunks = obj.Chunk(chunkSize).ToArray();
 
             List<Task> tasks = [];
             var sw = Stopwatch.StartNew();
@@ -153,7 +153,9 @@ namespace UtilitiesCS.Threading
                 }
             };
             timer.AutoReset = true;
-            
+
+            var tasksComplete = Task.WhenAll(tasks);
+
             try
             {
                 timer.StartTimer();
@@ -349,5 +351,41 @@ namespace UtilitiesCS.Threading
             return msg;
         }
 
+        #region Alt Timer Code
+
+        //var reportTask = Task.Run(() =>
+        //{
+        //    new Thread(() => 
+        //    {
+        //        Thread.CurrentThread.IsBackground = true;
+        //        while (!tasksComplete.IsCompleted)
+        //        {
+        //            if (count > 0)
+        //            {
+        //                progress.Report(
+        //                    ((int)(((double)complete / count) * 100),
+        //                    GetReportMessage(messagePrefix, complete, count, sw)));
+        //            }
+        //            Thread.Sleep(1000);
+        //        }
+        //    }).Start();
+        //}, cancel);
+
+        //var reportTask = Task.Run(async () =>
+        //{ 
+        //    while (!tasksComplete.IsCompleted)
+        //    {
+        //        if (count > 0)
+        //        {
+        //            progress.Report(
+        //                ((int)(((double)complete / count) * 100),
+        //                GetReportMessage(messagePrefix, complete, count, sw)));
+        //        }
+        //        await Task.Delay(1000);
+        //    }
+        //}, cancel);
+        //var tasks2 = new List<Task> { tasksComplete, reportTask };
+
+        #endregion Alt Timer Code
     }
 }

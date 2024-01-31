@@ -62,14 +62,14 @@ namespace QuickFiler.Controllers
             set => _mail = value;
         }
 
-        private MailItemInfo _mailInfo;
-        public MailItemInfo MailInfo
+        private MailItemHelper _mailInfo;
+        public MailItemHelper MailInfo
         {
             get
             {
                 if (_mailInfo is null && Mail is not null)
                 {
-                    _mailInfo = new MailItemInfo(Mail);
+                    _mailInfo = new MailItemHelper(Mail);
                     _mailInfo.LoadPriority(_globals.Ol.EmailPrefixToStrip, _token);
                 }
                 return _mailInfo;

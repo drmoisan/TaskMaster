@@ -302,7 +302,7 @@ namespace QuickFiler.Controllers
 
         public async void CboFolders_KeyDownAsyncOld(object sender, KeyEventArgs e)
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 ItemViewer viewer = null;
                 if (_cboKeys.Contains(e.KeyCode)) { viewer = GetItemViewer(sender as Control); }
@@ -447,7 +447,7 @@ namespace QuickFiler.Controllers
                 case Keys k when (k == Keys.Left || k == Keys.Return || k == Keys.Escape):
                     { 
                         // Close the drop down box
-                        UIThreadExtensions.UiDispatcher.Invoke(() => cbo.DroppedDown = false);
+                        UiThread.Dispatcher.Invoke(() => cbo.DroppedDown = false);
                         e.SuppressKeyPress = true;
                         e.Handled = true;
                         break;
@@ -474,7 +474,7 @@ namespace QuickFiler.Controllers
             {
                 case Keys.Right:
                     {
-                        await UIThreadExtensions.UiDispatcher.InvokeAsync(() => cbo.DroppedDown = true);
+                        await UiThread.Dispatcher.InvokeAsync(() => cbo.DroppedDown = true);
                         e.SuppressKeyPress = true;
                         e.Handled = true;
                         break;

@@ -239,7 +239,7 @@ namespace QuickFiler.Controllers
             _mailCtrls = new List<Control> { _itemViewer.LblSender, _itemViewer.LblSubject, };
         }
 
-        public void SetTopicThread(List<MailItemInfo> conversationInfo)
+        public void SetTopicThread(List<MailItemHelper> conversationInfo)
         {
             // Set the TopicThread to the ConversationInfo list
             _itemViewer.TopicThread.SetObjects(conversationInfo);
@@ -261,7 +261,7 @@ namespace QuickFiler.Controllers
         private IFilerHomeController _homeController;
         private IQfcKeyboardHandler _keyboardHandler;
         private IQfcTipsDetails _itemPositionTips;
-        private MailItemInfo _itemInfo;
+        private MailItemHelper _itemInfo;
         private ItemViewer _itemViewer;
         private System.Threading.Timer _timer;
         private List<Control> _navCtrls;
@@ -519,7 +519,7 @@ namespace QuickFiler.Controllers
             var objects = _itemViewer.TopicThread.SelectedObjects;
             if ((objects is not null) && (objects.Count != 0))
             {
-                var info = objects[0] as MailItemInfo;
+                var info = objects[0] as MailItemHelper;
                 _itemViewer.L0v2h2_WebView2.NavigateToString(info.Html);
             }
 
@@ -757,14 +757,14 @@ namespace QuickFiler.Controllers
 
         public void ToggleSaveAttachments()
         {
-            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            UiThread.Dispatcher.Invoke(() =>
                 _itemViewer.SaveAttachmentsMenuItem.Checked =
                 !_itemViewer.SaveAttachmentsMenuItem.Checked);
         }
 
         public void ToggleSaveCopyOfMail()
         {   
-            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            UiThread.Dispatcher.Invoke(() =>
                 _itemViewer.SaveEmailMenuItem.Checked =
                 !_itemViewer.SaveEmailMenuItem.Checked);
         }

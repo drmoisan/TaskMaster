@@ -344,7 +344,7 @@ namespace QuickFiler.Controllers
 
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
-            _itemInfo = new MailItemInfo(mailItem);
+            _itemInfo = new MailItemHelper(mailItem);
             _itemInfo.LoadPriority(_globals.Ol.EmailPrefixToStrip, _token);
             AssignControls(_itemInfo, viewerPosition);
 
@@ -356,13 +356,13 @@ namespace QuickFiler.Controllers
 
             _token.ThrowIfCancellationRequested();
 
-            _itemInfo = await MailItemInfo.FromMailItemAsync(mailItem, _globals.Ol.EmailPrefixToStrip, _token, loadAll);
+            _itemInfo = await MailItemHelper.FromMailItemAsync(mailItem, _globals.Ol.EmailPrefixToStrip, _token, loadAll);
             
             AssignControls(_itemInfo, viewerPosition);
 
         }
 
-        internal void AssignControls(MailItemInfo itemInfo, int viewerPosition)
+        internal void AssignControls(MailItemHelper itemInfo, int viewerPosition)
         {
             TraceUtility.LogMethodCall(itemInfo, viewerPosition);
 
@@ -447,7 +447,7 @@ namespace QuickFiler.Controllers
         public void PopulateConversation(int count)
         {
             //_itemViewer.LblConvCt.BeginInvoke(new System.Action(() =>
-            UIThreadExtensions.UiDispatcher.BeginInvoke(() =>
+            UiThread.Dispatcher.BeginInvoke(() =>
             {
                 _itemViewer.LblConvCt.Text = count.ToString();
                 if (count == 0) { _itemViewer.LblConvCt.BackColor = Color.Red; }
@@ -460,7 +460,7 @@ namespace QuickFiler.Controllers
 
             DispatcherPriority priority = backgroundLoad ? DispatcherPriority.Background : DispatcherPriority.Normal;
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(
+            await UiThread.Dispatcher.InvokeAsync(
                 () =>
                 {
                     _itemViewer.LblConvCt.Text = count.ToString();
@@ -495,7 +495,7 @@ namespace QuickFiler.Controllers
 
             LoadFolderHandler(varList);
 
-            UIThreadExtensions.UiDispatcher.BeginInvoke(()=>
+            UiThread.Dispatcher.BeginInvoke(()=>
             //_itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
             {
                 if (_folderHandler.FolderArray.Length > 0)
@@ -560,7 +560,7 @@ namespace QuickFiler.Controllers
         private IFilerHomeController _homeController;
         private IQfcKeyboardHandler _kbdHandler;
         private IQfcTipsDetails _itemPositionTips;
-        private MailItemInfo _itemInfo;
+        private MailItemHelper _itemInfo;
         private ItemViewer _itemViewer;
         private string _activeTheme;
         private System.Threading.Timer _emailIsReadTimer;
@@ -723,7 +723,7 @@ namespace QuickFiler.Controllers
         //                            .ToList();
         //}
 
-        public void SetTopicThread(List<MailItemInfo> conversationInfo)
+        public void SetTopicThread(List<MailItemHelper> conversationInfo)
         {
             // Set the TopicThread to the ConversationInfo list
             _itemViewer.TopicThread.SetObjects(conversationInfo);
@@ -989,7 +989,7 @@ namespace QuickFiler.Controllers
             var objects = _itemViewer.TopicThread.SelectedObjects;
             if ((objects is not null)&&(objects.Count !=0))
             {
-                var info = objects[0] as MailItemInfo;
+                var info = objects[0] as MailItemHelper;
                 _itemViewer.L0v2h2_WebView2.NavigateToString(info.Html);
             }
            
@@ -1028,7 +1028,7 @@ namespace QuickFiler.Controllers
         public async Task JumpToFolderDropDownAsync()
         {
             await _kbdHandler.ToggleKeyboardDialogAsync();
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 _itemViewer.CboFolders.Focus();
                 _itemViewer.CboFolders.DroppedDown = true;
@@ -1044,7 +1044,7 @@ namespace QuickFiler.Controllers
 
         async internal Task JumpToAsync(Control control)
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => control.Focus());
+            await UiThread.Dispatcher.InvokeAsync(() => control.Focus());
             await _kbdHandler.ToggleKeyboardDialogAsync();
         }
 
@@ -1062,41 +1062,41 @@ namespace QuickFiler.Controllers
 
         async public Task MenuDropDown()
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(
+            await UiThread.Dispatcher.InvokeAsync(
                 ()=>_itemViewer.MoveOptionsMenu.ShowDropDown());
         }
 
         async public Task Reply()
         {
-            var reply = await UIThreadExtensions.UiDispatcher.InvokeAsync(
+            var reply = await UiThread.Dispatcher.InvokeAsync(
                 ()=> this.Mail.Reply());
             reply.Display();
         }
 
         async public Task ReplyAll()
         {
-            var reply = await UIThreadExtensions.UiDispatcher.InvokeAsync(
+            var reply = await UiThread.Dispatcher.InvokeAsync(
                 () => this.Mail.ReplyAll());
             reply.Display();
         }
 
         async public Task Forward()
         {
-            var forward = await UIThreadExtensions.UiDispatcher.InvokeAsync(
+            var forward = await UiThread.Dispatcher.InvokeAsync(
                 () => this.Mail.Forward());
             forward.Display();
         }
 
         async public Task ToggleCbMenuItemAsync(ToolStripMenuItemCb menuItem)
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => menuItem.Checked = !menuItem.Checked);
+            await UiThread.Dispatcher.InvokeAsync(() => menuItem.Checked = !menuItem.Checked);
         }
 
         async public Task ToggleCbMenuItemAsync(ToolStripMenuItemCb menuItem, Enums.ToggleState desiredState)
         {
             var booleanState = desiredState.HasFlag(Enums.ToggleState.On);
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 if (menuItem.Checked != booleanState) { menuItem.Checked = booleanState; }
             });
@@ -1104,14 +1104,14 @@ namespace QuickFiler.Controllers
 
         async public Task ToggleCheckboxAsync(CheckBox checkBox)
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => checkBox.Checked = !checkBox.Checked);
+            await UiThread.Dispatcher.InvokeAsync(() => checkBox.Checked = !checkBox.Checked);
         }
 
         async public Task ToggleCheckboxAsync(CheckBox checkBox, Enums.ToggleState desiredState)
         {
             var booleanState = desiredState.HasFlag(Enums.ToggleState.On);
             
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 if (checkBox.Checked != booleanState) { checkBox.Checked = booleanState; }
             });
@@ -1123,7 +1123,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void ToggleConversationCheckbox()
         {
-            UIThreadExtensions.UiDispatcher.Invoke(() => 
+            UiThread.Dispatcher.Invoke(() => 
                 _itemViewer.ConversationMenuItem.Checked = 
                 !_itemViewer.ConversationMenuItem.Checked);
         }
@@ -1135,7 +1135,7 @@ namespace QuickFiler.Controllers
         /// <param name="desiredState">State of checkbox desired</param>
         public void ToggleConversationCheckbox(Enums.ToggleState desiredState)
         {
-            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            UiThread.Dispatcher.Invoke(() =>
             {
                 switch (desiredState)
                 {
@@ -1188,12 +1188,12 @@ namespace QuickFiler.Controllers
             await _parent.ToggleExpansionStyleAsync(ItemIndex, desiredState);
             if (desiredState == Enums.ToggleState.On)
             {
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => ToggleExpansionOn());
+                await UiThread.Dispatcher.InvokeAsync(() => ToggleExpansionOn());
                 RegisterExpandedAsyncActions();
             }
             else
             {
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => ToggleExpansionOff());
+                await UiThread.Dispatcher.InvokeAsync(() => ToggleExpansionOff());
                 UnregisterExpandedAsyncActions();
             }
         }
@@ -1396,7 +1396,7 @@ namespace QuickFiler.Controllers
 
         public void ToggleSaveCopyOfMail()
         {
-            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            UiThread.Dispatcher.Invoke(() =>
                 _itemViewer.SaveEmailMenuItem.Checked = 
                 !_itemViewer.SaveEmailMenuItem.Checked);            
         }
@@ -1480,7 +1480,7 @@ namespace QuickFiler.Controllers
 
         internal async Task EnumerateConversationAsync()
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(EnumerateConversation);
+            await UiThread.Dispatcher.InvokeAsync(EnumerateConversation);
         }
 
         public Dictionary<string, System.Action> RightKeyActions { get => new() 
@@ -1554,7 +1554,7 @@ namespace QuickFiler.Controllers
         public async Task FlagAsTaskAsync()
         {
             List<MailItem> itemList = [Mail];
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+            await UiThread.Dispatcher.InvokeAsync(() => 
             {
                 var flagTask = new FlagTasks(AppGlobals: _globals,
                                          ItemList: itemList,
@@ -1580,7 +1580,7 @@ namespace QuickFiler.Controllers
         public async Task MarkItemForDeletionAsync()
         {
             _token.ThrowIfCancellationRequested();
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 if (!_itemViewer.CboFolders.Items.Contains("Trash to Delete"))
                 {

@@ -433,12 +433,12 @@ namespace QuickFiler.Controllers
 
         internal async Task UiIdleCallAsync(System.Action action)
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(action, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            await UiThread.Dispatcher.InvokeAsync(action, System.Windows.Threading.DispatcherPriority.ContextIdle);
         }
 
         internal async Task<T> UiIdleCallAsync<T>(Func<T> func)
         {
-            return await UIThreadExtensions.UiDispatcher.InvokeAsync(func, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            return await UiThread.Dispatcher.InvokeAsync(func, System.Windows.Threading.DispatcherPriority.ContextIdle);
         }
 
 

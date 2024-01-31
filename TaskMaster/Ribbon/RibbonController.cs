@@ -214,7 +214,7 @@ namespace TaskMaster
             var conversation = (Outlook.Conversation)Mail.GetConversation();
             var df = conversation.GetDataFrame();
             df.PrettyPrint();
-            var mInfo = new MailItemInfo(df, 0, _globals.Ol.EmailPrefixToStrip);
+            var mInfo = new MailItemHelper(df, 0, _globals.Ol.EmailPrefixToStrip);
         }
         internal void TryGetQfcDataModel()
         {
@@ -300,7 +300,7 @@ namespace TaskMaster
 
             var ae = _globals.Ol.App.ActiveExplorer();
             var mail = (Outlook.MailItem)ae.Selection[1];
-            var mailInfo = await MailItemInfo.FromMailItemAsync(mail, _globals.Ol.EmailPrefixToStrip, token, true);
+            var mailInfo = await MailItemHelper.FromMailItemAsync(mail, _globals.Ol.EmailPrefixToStrip, token, true);
             var tokenizer = new EmailTokenizer();
             //tokenizer.setup();
             var tokens = tokenizer.tokenize(mailInfo);

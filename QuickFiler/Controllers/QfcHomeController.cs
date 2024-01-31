@@ -65,7 +65,7 @@ namespace QuickFiler.Controllers
             // Create cancellation token and progress tracker
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-            var progress = new ProgressTracker(tokenSource);
+            var progress = new ProgressTracker(tokenSource).Initialize();
             
             try
             {
@@ -187,7 +187,7 @@ namespace QuickFiler.Controllers
             else
             {
                 logger.Debug("Background load of email database complete.");
-                UIThreadExtensions.UiDispatcher.Invoke(() =>
+                UiThread.Dispatcher.Invoke(() =>
                 {
                     _formViewer.L1v1L2h5_SpnEmailPerLoad.Enabled = true;
                     _formViewer.L1v1L2h5_BtnSkip.Enabled = true;

@@ -277,15 +277,15 @@ namespace UtilitiesCS
 
         public void SetQfcTheme(bool async)
         {
-            if (async) { UIThreadExtensions.UiDispatcher.InvokeAsync(() => SetQfcTheme()); }
-            else { UIThreadExtensions.UiDispatcher.Invoke(() => SetQfcTheme()); }
+            if (async) { UiThread.Dispatcher.InvokeAsync(() => SetQfcTheme()); }
+            else { UiThread.Dispatcher.Invoke(() => SetQfcTheme()); }
             //if (async) { _lblSender.BeginInvoke(new System.Action(() => SetQfcTheme())); }
             //else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
         }
         
         public async Task SetQfcThemeAsync()
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=> SetQfcTheme());
+            await UiThread.Dispatcher.InvokeAsync(()=> SetQfcTheme());
         }
 
         private void SetQfcTheme()

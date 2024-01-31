@@ -42,9 +42,9 @@ namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.EmailParsing
 
         #endregion How To Test Static Methods
 
-        private AttachmentInfo CreateAttachmentInfo()
+        private AttachmentHelper CreateAttachmentInfo()
         {
-            return new AttachmentInfo();
+            return new AttachmentHelper();
         }
 
         [TestMethod]

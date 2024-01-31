@@ -13,10 +13,10 @@ namespace UtilitiesCS
     {
         public ProgressTrackerPane(CancellationTokenSource tokenSource)
         {
-            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            UiThread.Dispatcher.Invoke(() =>
             {
                 _progressViewer = new ProgressPane();
-                _progressViewer.UiDispatcher = UIThreadExtensions.UiDispatcher;
+                _progressViewer.UiDispatcher = UiThread.Dispatcher;
                 _progressViewer.SetCancellationTokenSource(tokenSource);
             });
 

@@ -350,7 +350,7 @@ namespace ToDoModel
             string name = "";
             while (name is not null && name == "")
             {
-                await UIThreadExtensions.GetUiContext();
+                await UiThread.UiSyncContext;
                 name = InputBox.ShowDialog(
                     $"Please enter a new subfolder name for {parent.Name}",
                     "New folder dialog");

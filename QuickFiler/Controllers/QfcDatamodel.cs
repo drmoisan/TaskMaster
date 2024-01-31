@@ -11,14 +11,9 @@ using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
 using Deedle;
-using UtilitiesCS.ReusableTypeClasses;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Threading;
-using static Deedle.FrameBuilder;
-using log4net.Repository.Hierarchy;
-using Swordfish.NET.Collections;
 using QuickFiler.Helper_Classes;
 
 namespace QuickFiler.Controllers

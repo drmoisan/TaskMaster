@@ -407,11 +407,11 @@ namespace QuickFiler.Controllers
             await _groups.MoveEmailsAsync(_movedItems);
 
             // Write Move Metrics
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(
+            await UiThread.Dispatcher.InvokeAsync(
                 async () => await WriteMetrics(_globals.FS.Filenames.EmailSession),
                 System.Windows.Threading.DispatcherPriority.ContextIdle);
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => _groups.CleanupBackground());
+            await UiThread.Dispatcher.InvokeAsync(() => _groups.CleanupBackground());
 
         }
 
@@ -607,7 +607,7 @@ namespace QuickFiler.Controllers
                 if (_undoQueue.TryTake(out var item)) 
                 { 
                     var mail = item.UndoMove();
-                    await UIThreadExtensions.UiDispatcher.InvokeAsync(
+                    await UiThread.Dispatcher.InvokeAsync(
                         () => _groups.AddItemGroup(mail), 
                         System.Windows.Threading.DispatcherPriority.ContextIdle);
                 }

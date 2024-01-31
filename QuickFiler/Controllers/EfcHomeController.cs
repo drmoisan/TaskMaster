@@ -58,7 +58,7 @@ namespace QuickFiler
         {
             if (_dataModel.Mail is not null)
             {
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_formViewer.Show());
+                await UiThread.Dispatcher.InvokeAsync(()=>_formViewer.Show());
             }
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
@@ -131,7 +131,7 @@ namespace QuickFiler
             QuickFileMetrics_WRITE(_globals.FS.Filenames.EmailSession, selectedFolder, convInfo);
         }
                 
-        public void QuickFileMetrics_WRITE(string filename, string selectedFolder, List<MailItemInfo> moved)
+        public void QuickFileMetrics_WRITE(string filename, string selectedFolder, List<MailItemHelper> moved)
         {
             if (moved is not null && moved.Count == 0) 
             { 

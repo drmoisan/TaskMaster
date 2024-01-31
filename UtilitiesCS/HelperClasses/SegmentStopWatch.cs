@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace UtilitiesCS.HelperClasses
 {
@@ -13,9 +14,16 @@ namespace UtilitiesCS.HelperClasses
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SegmentStopWatch(): base() { }
+        public SegmentStopWatch(): base() 
+        { 
+            if (UiThread.UiThreadId == Thread.CurrentThread.ManagedThreadId)
+            {
+                
+                logger.Warn($"SegmentStopWatch created on UI thread {Thread.CurrentThread.ManagedThreadId}" +
+                    $"\nStackTrace: {string.Join(" => ",TraceUtility.GetMyStackSummary(new StackTrace()))}");
+            }
+        }
 
-        //private Stopwatch _stopwatch = new Stopwatch();
         private TimeSpan _latestElapsed = default;
         
         private Stack<(string ActionName, TimeSpan Duration)> _durations = new();

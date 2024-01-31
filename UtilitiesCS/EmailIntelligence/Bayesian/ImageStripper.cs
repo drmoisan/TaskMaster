@@ -328,7 +328,7 @@ namespace UtilitiesCS.EmailIntelligence
             // Get byte array of image
             byte[] data = bitmap.ToByte();
             
-            string tessdataPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
+            string tessdataPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
             //string tessdataPath = $"{_globals.FS.FldrAppData}{Path.DirectorySeparatorChar}tessdata";
             using (TesseractEngine engine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default))
             {

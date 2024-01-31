@@ -1,19 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using Office = Microsoft.Office.Core;
 using Microsoft.Office.Interop.Outlook;
-using System.Runtime.CompilerServices;
-using System.Diagnostics;
-using ToDoModel;
 using Microsoft.Office.Core;
-using QuickFiler;
 using UtilitiesCS;
-using UtilitiesCS.Threading;
-using UtilitiesCS.HelperClasses;
+
 
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
@@ -28,17 +17,25 @@ namespace TaskMaster
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
+            // Grab the sync context for the UI thread
+            UiThread.Init(monitorUiThread: false);
+
+            Application.Startup += Application_Startup;
+
+            logger.Debug("ThisAddIn_Startup() complete");
+        }
+
+        private async void Application_Startup()
+        {
+            logger.Debug("Application_Startup() fired");
             // Create the global variables
             _globals = new ApplicationGlobals(Application);
-
-            // Grab the sync context for the UI thread
-            UIThreadExtensions.InitUiContext(monitorUiThread: false);
 
             // Set the indent for TreeListView Renderer which does not autoscale.
             // Default pixels per level was 16 + 1 but designed for 100% scaling.
             // This add-in is designed for 200% scaling.
-            var tlvIndent = 34; 
-            tlvIndent = (int)(tlvIndent * UIThreadExtensions.AutoScaleFactor.Width);
+            var tlvIndent = 34;
+            tlvIndent = (int)(tlvIndent * UiThread.AutoScaleFactor.Width);
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
 
             // Initialize long loading elements on a low priority thread
@@ -46,10 +43,10 @@ namespace TaskMaster
             //ItemViewerQueue.BuildQueueBackground(30);
 
             // Initialize the global variables on a low priority thread
-            _ = _globals.LoadAsync();
-            
+            var loadGlobals = _globals.LoadAsync();
+
             // Initialize IdleAction Queue so that breakpoint is hit after UI
-            IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
+            //IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
             //IdleActionQueue.AddEntry(() => _globals.TD.LoadPrefixList());
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
@@ -58,15 +55,17 @@ namespace TaskMaster
             //Console.SetOut(new DebugTextWriter());
             //Console.SetOut(new DebugTextLogger());
             //Console.WriteLine("Test of console output redirect to logger");
-            
+
             // Send a reference to the ribbon controller and external utilities for future use
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
             // Hook the Inbox and ToDo events
             //_globals.Events.Hook();
-            logger.Debug("ThisAddIn_Startup() complete");
+            
+            await loadGlobals;
 
+            logger.Debug("Application_Startup() complete");
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

@@ -61,7 +61,7 @@ namespace ToDoModel
             await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
         }
 
-        async public static Task SortAsync(IList<MailItemInfo> mailInfoList,
+        async public static Task SortAsync(IList<MailItemHelper> mailInfoList,
                                            bool savePictures,
                                            string destinationOlStem,
                                            bool saveMsg,
@@ -334,7 +334,7 @@ namespace ToDoModel
 
         #region Helper Methods
 
-        internal static IEnumerable<AttachmentInfo> GetAttachmentsInfo(
+        internal static IEnumerable<AttachmentHelper> GetAttachmentsInfo(
             MailItem mailItem,
             string saveFsPath,
             string deleteFsPath,
@@ -344,21 +344,21 @@ namespace ToDoModel
             var attachments = mailItem.Attachments
                                       .Cast<Attachment>()
                                       .Where(x => x.Type != OlAttachmentType.olOLE)
-                                      .Select(x => new AttachmentInfo(x, mailItem.SentOn, saveFsPath, deleteFsPath));
+                                      .Select(x => new AttachmentHelper(x, mailItem.SentOn, saveFsPath, deleteFsPath));
             if (!saveAttachments)
             {
-                attachments = attachments.Where(x => x.IsImage);
+                attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
             }
             
             if (!savePictures)
             {
-                attachments = attachments.Where(x => !x.IsImage);
+                attachments = attachments.Where(x => !x.AttachmentInfo.IsImage);
             }
             return attachments;
                            
         }
 
-        internal static IAsyncEnumerable<AttachmentInfo> GetAttachmentsInfoAsync(
+        internal static IAsyncEnumerable<AttachmentHelper> GetAttachmentsInfoAsync(
             MailItem mailItem,
             string saveFsPath,
             string deleteFsPath,
@@ -370,31 +370,31 @@ namespace ToDoModel
                                       .Cast<Attachment>()
                                       .Where(x => x.Type != OlAttachmentType.olOLE)
                                       .ToAsyncEnumerable()
-                                      .SelectAwait(async x => await AttachmentInfo.CreateAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath));
+                                      .SelectAwait(async x => await AttachmentHelper.CreateAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath));
             if (!saveAttachments)
             {
-                attachments = attachments.Where(x => x.IsImage);
+                attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
             }
 
             if (!savePictures)
             {
-                attachments = attachments.Where(x => !x.IsImage);
+                attachments = attachments.Where(x => !x.AttachmentInfo.IsImage);
             }
             return attachments;
 
         }
 
-        public static void SaveAttachment(this AttachmentInfo attachmentInfo)
+        public static void SaveAttachment(this AttachmentHelper attachmentHelper)
         {
-            if (File.Exists(attachmentInfo.FilePathSave))
+            if (File.Exists(attachmentHelper.FilePathSave))
             {
-                if (attachmentInfo.IsImage)
+                if (attachmentHelper.AttachmentInfo.IsImage)
                 {
                     if (_picturesOverwrite == YesNoToAllResponse.Empty)
                     {
-                        _picturesOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
+                        _picturesOverwrite = YesNoToAll.ShowDialog($"The file {attachmentHelper.FilePathSave} already exists. Overwrite?");
                     }
-                    SaveCase(_picturesOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+                    SaveCase(_picturesOverwrite, attachmentHelper.Attachment, attachmentHelper.FilePathSave, attachmentHelper.FilePathSaveAlt);
 
                     if (_picturesOverwrite == YesNoToAllResponse.Yes || _picturesOverwrite == YesNoToAllResponse.No)
                     {
@@ -405,9 +405,9 @@ namespace ToDoModel
                 {
                     if (_attachmentsOverwrite == YesNoToAllResponse.Empty)
                     {
-                        _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
+                        _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentHelper.FilePathSave} already exists. Overwrite?");
                     }
-                    SaveCase(_attachmentsOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+                    SaveCase(_attachmentsOverwrite, attachmentHelper.Attachment, attachmentHelper.FilePathSave, attachmentHelper.FilePathSaveAlt);
                     
                     // Reset response about overwriting attachments when it is not "ToAll"
                     if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
@@ -419,24 +419,24 @@ namespace ToDoModel
             else
             {
                 //attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FolderPathSave);
-                attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FilePathSave);
+                attachmentHelper.Attachment.SaveAsFile(attachmentHelper.FilePathSave);
                 //await Task.Run(() => attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FilePathSave));
             }
         }
 
-        async public static Task SaveAttachmentAsync(this AttachmentInfo attachmentInfo)
+        async public static Task SaveAttachmentAsync(this AttachmentHelper attachmentHelper)
         {
-            TraceUtility.LogMethodCall(attachmentInfo);
+            TraceUtility.LogMethodCall(attachmentHelper);
 
-            if (File.Exists(attachmentInfo.FilePathSave))
+            if (File.Exists(attachmentHelper.FilePathSave))
             {
-                if (attachmentInfo.IsImage)
+                if (attachmentHelper.AttachmentInfo.IsImage)
                 {
                     if (_picturesOverwrite == YesNoToAllResponse.Empty)
                     {
-                        _picturesOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
+                        _picturesOverwrite = YesNoToAll.ShowDialog($"The file {attachmentHelper.FilePathSave} already exists. Overwrite?");
                     }
-                    await SaveCaseAsync(_picturesOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+                    await SaveCaseAsync(_picturesOverwrite, attachmentHelper.Attachment, attachmentHelper.FilePathSave, attachmentHelper.FilePathSaveAlt);
 
                     if (_picturesOverwrite == YesNoToAllResponse.Yes || _picturesOverwrite == YesNoToAllResponse.No)
                     {
@@ -447,10 +447,10 @@ namespace ToDoModel
                 {
                     if (_attachmentsOverwrite == YesNoToAllResponse.Empty)
                     {
-                        _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentInfo.FilePathSave} already exists. Overwrite?");
+                        _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentHelper.FilePathSave} already exists. Overwrite?");
                     }
                     
-                    await SaveCaseAsync(_attachmentsOverwrite, attachmentInfo.Attachment, attachmentInfo.FilePathSave, attachmentInfo.FilePathSaveAlt);
+                    await SaveCaseAsync(_attachmentsOverwrite, attachmentHelper.Attachment, attachmentHelper.FilePathSave, attachmentHelper.FilePathSaveAlt);
                     if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
                     {
                         _attachmentsOverwrite = YesNoToAllResponse.Empty;
@@ -460,7 +460,7 @@ namespace ToDoModel
             else 
             { 
                 //await Task.Run(() => attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FolderPathSave));
-                await attachmentInfo.Attachment.TrySaveAttachmentAsync(attachmentInfo.FilePathSave);
+                await attachmentHelper.Attachment.TrySaveAttachmentAsync(attachmentHelper.FilePathSave);
             }
         }
 
@@ -634,7 +634,7 @@ namespace ToDoModel
 
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
             
-            var strPath = AttachmentInfo.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
+            var strPath = AttachmentHelper.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
             await Task.Run(()=>mailItem.SaveAs(strPath, OlSaveAsType.olMSG));
         }
 
@@ -644,7 +644,7 @@ namespace ToDoModel
         {
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
 
-            var strPath = AttachmentInfo.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
+            var strPath = AttachmentHelper.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
             mailItem.SaveAs(strPath, OlSaveAsType.olMSG);
         }
 

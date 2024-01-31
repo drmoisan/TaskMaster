@@ -104,9 +104,9 @@ namespace Z.Unfinished.QuickFiler.Test
             
         }
 
-        private MailItemInfo CreateMailItemInfo()
+        private MailItemHelper CreateMailItemInfo()
         {
-            return new MailItemInfo(this.mockMailItem.Object);
+            return new MailItemHelper(this.mockMailItem.Object);
         }
 
         [TestMethod]

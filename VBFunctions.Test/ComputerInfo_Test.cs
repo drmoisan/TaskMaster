@@ -34,10 +34,10 @@ namespace VBFunctions.Test
             
             var jagged = new List<string[]> 
             { 
-                new string[] { "AvailablePhysicalMemory", $"{availablePhysicalMemory / (double)1000000:N0} MB" },
-                new string[] { "TotalPhysicalMemory", $"{totalPhysicalMemory / (double)1000000:N0} MB" },
-                new string[] { "AvailableVirtualMemory", $"{availableVirtualMemory / (double)1000000:N0} MB" },
-                new string[] { "TotalVirtualMemory", $"{totalVirtualMemory / (double)1000000:N0} MB" }
+                new string[] { "AvailablePhysicalMemory", $"{availablePhysicalMemory / (double)Math.Pow(10,9):N2} GB" },
+                new string[] { "TotalPhysicalMemory", $"{totalPhysicalMemory / (double)Math.Pow(10, 9):N2} GB" },
+                new string[] { "AvailableVirtualMemory", $"{availableVirtualMemory / (double)Math.Pow(10, 9):N2} GB" },
+                new string[] { "TotalVirtualMemory", $"{totalVirtualMemory / (double)Math.Pow(10, 9):N2} GB" }
             };
 
             Console.WriteLine(jagged.ToArray().ToFormattedText(

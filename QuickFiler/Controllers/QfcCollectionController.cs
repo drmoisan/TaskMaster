@@ -630,7 +630,7 @@ namespace QuickFiler.Controllers
 
             bool tlpState = TlpLayout;
             
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() =>
+            await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 tlpState = TlpLayout;
                 TlpLayout = false;
@@ -648,7 +648,7 @@ namespace QuickFiler.Controllers
             if (_itemGroups.Count > 0)
             {
                 // Renumber the remaining groups
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+                await UiThread.Dispatcher.InvokeAsync(() => 
                 {
                     var digits = Digits;
                     RenumberGroups(); 
@@ -666,7 +666,7 @@ namespace QuickFiler.Controllers
                 await _kbdHandler.ToggleKeyboardDialogAsync();
             }
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+            await UiThread.Dispatcher.InvokeAsync(() => 
             { 
                 TlpLayout = tlpState;
                 ResetPanelHeight();
@@ -881,7 +881,7 @@ namespace QuickFiler.Controllers
             if ((ActiveIndex != idx) && (idx < _itemGroups.Count))
             {
                 bool tlpState = true;
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => 
+                await UiThread.Dispatcher.InvokeAsync(() => 
                 { 
                     tlpState = TlpLayout;
                     TlpLayout = false;
@@ -891,7 +891,7 @@ namespace QuickFiler.Controllers
                     expanded = await ToggleOffActiveItemAsync(false);
                 await ActivateBySelectionAsync(idx + 1, expanded);
 
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(() => TlpLayout = tlpState);
+                await UiThread.Dispatcher.InvokeAsync(() => TlpLayout = tlpState);
             }
         }
 
@@ -909,7 +909,7 @@ namespace QuickFiler.Controllers
 
         public async Task SelectNextItemAsync()
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => SelectNextItem());
+            await UiThread.Dispatcher.InvokeAsync(() => SelectNextItem());
         }
 
         public void SelectPreviousItem()
@@ -927,7 +927,7 @@ namespace QuickFiler.Controllers
 
         public async Task SelectPreviousItemAsync()
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => SelectPreviousItem());
+            await UiThread.Dispatcher.InvokeAsync(() => SelectPreviousItem());
         }
 
         internal void ScrollIntoView(ItemViewer item)
@@ -993,7 +993,7 @@ namespace QuickFiler.Controllers
         {
             Token.ThrowIfCancellationRequested();
 
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>ToggleExpansionStyle(itemIndex, desiredState));
+            await UiThread.Dispatcher.InvokeAsync(()=>ToggleExpansionStyle(itemIndex, desiredState));
         }
 
         public void ToggleOffNavigation(bool async)

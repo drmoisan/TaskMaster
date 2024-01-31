@@ -7,11 +7,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     public class MinedMailInfo
     {
         public MinedMailInfo() { }
-        public MinedMailInfo(MailItemInfo info)
+        public MinedMailInfo(MailItemHelper info)
         {
             Categories = info.Item.Categories;
             Tokens = info.Tokens;
-            FolderPath = info.Folder;
+            FolderPath = info.FolderName;
             ToRecipients = info.ToRecipients;
             CcRecipients = info.CcRecipients;
             Sender = info.Sender;

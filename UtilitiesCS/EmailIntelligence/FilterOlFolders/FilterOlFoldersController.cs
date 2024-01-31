@@ -58,7 +58,7 @@ namespace UtilitiesCS
 
         public void OlFolderTree_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            UIThreadExtensions.UiDispatcher.Invoke(() =>
+            UiThread.Dispatcher.Invoke(() =>
             {
                 //_viewer.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
                 //_viewer.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);

@@ -382,12 +382,15 @@
     <Compile Include="EmailIntelligence\Bayesian\MinedMailInfo.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />
-    <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsing\AttachmentHelper.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusExample.cs" />
     <Compile Include="EmailIntelligence\Bayesian\EmailTokenizer.cs" />
     <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IAttachmentInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsing\ItemInfo.cs" />
     <Compile Include="EmailIntelligence\FilterOlFolders\OlFolderInfo .cs" />
     <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersController.cs" />
     <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersViewer.cs">
@@ -430,7 +433,7 @@
     <Compile Include="EmailIntelligence\Flags\FlagParser.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
-    <Compile Include="EmailIntelligence\EmailParsing\MailItemInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsing\MailItemHelper.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -438,13 +441,16 @@
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </Compile>
     <Compile Include="Extensions\IAsyncEnumerableExtensions.cs" />
+    <Compile Include="Extensions\LazyExtension.cs" />
     <Compile Include="Extensions\NullExtensions.cs" />
     <Compile Include="Extensions\TraceExtensions.cs" />
+    <Compile Include="HelperClasses\ComStreamWrapper.cs" />
     <Compile Include="HelperClasses\ObjectSize.cs" />
     <Compile Include="HelperClasses\ObjectCopier.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
+    <Compile Include="Threading\ProgressPackage.cs" />
     <Compile Include="Threading\ProgressPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -471,6 +477,7 @@
       <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Threading\AppGlobalsConverter.cs" />
+    <Compile Include="Threading\ProgressTrackerAsync.cs" />
     <Compile Include="Threading\ProgressTrackerPane.cs" />
     <Compile Include="Threading\ProgressViewer.cs">
       <SubType>Form</SubType>
@@ -488,7 +495,7 @@
     <Compile Include="Interfaces\ITimerWrapper.cs" />
     <Compile Include="HelperClasses\TimedDiskWriter.cs" />
     <Compile Include="HelperClasses\TimerWrapper.cs" />
-    <Compile Include="Interfaces\IEmailIntelligence\IMailItemInfo.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
     <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
     <Compile Include="EmailIntelligence\EmailParsing\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
@@ -609,7 +616,7 @@
     <Compile Include="Threading\ThreadMonitor.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
     <Compile Include="Threading\TimeOutTask.cs" />
-    <Compile Include="Threading\UIThreadExtensions.cs" />
+    <Compile Include="Threading\UiThread.cs" />
     <Compile Include="To Depricate\CSVDictUtilities.cs" />
     <Compile Include="To Depricate\FileIO2.cs" />
     <Compile Include="To Depricate\FlattenArray.cs" />
@@ -739,6 +746,7 @@
     <Content Include="Resources\SortByType.svg" />
     <Content Include="Resources\StatusExcluded.10.10.svg" />
     <Content Include="Resources\StatusHelp.13.13.svg" />
+    <None Include="Resources\eng.traineddata" />
     <None Include="Resources\StatusInProgress.svg" />
     <Content Include="Resources\StatusWarning.12.12.svg" />
     <Content Include="Resources\TeamProjectRepositoryFolder.svg" />

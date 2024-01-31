@@ -180,8 +180,8 @@ namespace UtilitiesCS
         {
             if (_controls is not null) 
             { 
-                if (async) { UIThreadExtensions.UiDispatcher.InvokeAsync(new Action(() => ApplyTheme())); }
-                else { UIThreadExtensions.UiDispatcher.Invoke(new Action(() => ApplyTheme())); }
+                if (async) { UiThread.Dispatcher.InvokeAsync(new Action(() => ApplyTheme())); }
+                else { UiThread.Dispatcher.Invoke(new Action(() => ApplyTheme())); }
             }
             else { ApplyTheme(); }
         }

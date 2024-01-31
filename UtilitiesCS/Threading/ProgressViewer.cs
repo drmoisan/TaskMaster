@@ -17,6 +17,7 @@ namespace UtilitiesCS
         public ProgressViewer()
         {
             InitializeComponent();
+            _uiThreadNumber = Thread.CurrentThread.ManagedThreadId;
             _context = SynchronizationContext.Current;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             this.ButtonCancel.Enabled = false;
@@ -30,18 +31,21 @@ namespace UtilitiesCS
 
         private TaskScheduler _uiScheduler;
         public TaskScheduler UiScheduler { get => _uiScheduler; }
-      
 
-        private CancellationTokenSource _tokenSource;
+        private int _uiThreadNumber;
+        public int UiThreadNumber { get => _uiThreadNumber; set => _uiThreadNumber = value; }
+
+        private CancellationTokenSource _cancelSource;
+        public CancellationTokenSource CancelSource { get => _cancelSource; set => _cancelSource = value; }
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
         {
-            _tokenSource = tokenSource;
+            _cancelSource = tokenSource;
             this.ButtonCancel.Enabled = true;
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            _tokenSource.Cancel();
+            _cancelSource.Cancel();
             this.Close();
         }
 

@@ -103,17 +103,17 @@ namespace UtilitiesCS.EmailIntelligence
         {
             if (obj is null) { throw new ArgumentNullException("obj"); }
             else if (obj is string[]) { return (string[])obj; }
-            else if (obj is MailItemInfo) { return tokenize((MailItemInfo)obj);}
-            else if (obj is MailItem) { return tokenize(new MailItemInfo((MailItem)obj)); }
+            else if (obj is MailItemHelper) { return tokenize((MailItemHelper)obj);}
+            else if (obj is MailItem) { return tokenize(new MailItemHelper((MailItem)obj)); }
             else
             {
                 throw new ArgumentException($"obj type must be {typeof(string[])}, " +
-                    $"{typeof(MailItem)}, or {typeof(MailItemInfo)}. {obj.GetType()} " +
+                    $"{typeof(MailItem)}, or {typeof(MailItemHelper)}. {obj.GetType()} " +
                     $"is not supported");
             }
         }
 
-        public IEnumerable<string> tokenize(MailItemInfo msg)
+        public IEnumerable<string> tokenize(MailItemHelper msg)
         {
             //var headers = msg.GetHeaders();
             foreach (var tok in this.tokenize_headers(msg))
@@ -122,7 +122,7 @@ namespace UtilitiesCS.EmailIntelligence
                 yield return tok;
         }
 
-        internal IEnumerable<string> tokenize_headers(MailItemInfo msg)
+        internal IEnumerable<string> tokenize_headers(MailItemHelper msg)
         {
             // Special tagging of header lines and MIME metadata.
 
@@ -136,14 +136,31 @@ namespace UtilitiesCS.EmailIntelligence
             // especially significant in this context.  Experiment showed a small
             // but real benefit to keeping case intact in this specific context.
 
-            var matches = subject_word_re.Matches(msg.Subject);
+            MatchCollection matches = default;
+            try
+            {
+                matches = subject_word_re.Matches(msg.Subject);  
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error tokenizing message subject: {e.Message}", e);
+            }
+            
             foreach (var w in matches)
             {
                 foreach (var t in tokenize_word(w.ToString()))
                     yield return "subject:" + t;
             }
 
-            matches = punctuation_run_re.Matches(msg.Subject);
+            try
+            {
+                matches = punctuation_run_re.Matches(msg.Subject);
+            }
+            catch (System.Exception e) 
+            {
+                logger.Error($"Error tokenizing message subject: {e.Message}", e);
+            }
+
             foreach (var w in matches)
             {
                 yield return "subject:"+ w;
@@ -274,7 +291,7 @@ namespace UtilitiesCS.EmailIntelligence
         /// <param name="msg">MailItemInfo wrapper with email and metadata</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        internal IEnumerable<string> tokenize_body(MailItemInfo msg)
+        internal IEnumerable<string> tokenize_body(MailItemHelper msg)
         {
             if (SpamBayesOptions.check_octets)
             {
@@ -368,7 +385,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Helper Methods
 
-        private IEnumerable<string> textparts(MailItemInfo msg)
+        private IEnumerable<string> textparts(MailItemHelper msg)
         {
             yield return msg.Body;
         }
@@ -469,10 +486,10 @@ namespace UtilitiesCS.EmailIntelligence
             return rx.IsMatch(word);
         }
 
-        internal List<object> imageparts(MailItemInfo msg)
+        internal List<object> imageparts(MailItemHelper msg)
         {
             var attachments = msg.Attachments;
-            var parts = msg.Attachments.Where(x => x.IsImage).Select(x => x.Attachment).Cast<object>().ToList();
+            var parts = msg.Attachments.Where(x => x.AttachmentInfo.IsImage).Select(x => x.Attachment).Cast<object>().ToList();
             return parts;
             // Original Python code below
             // # Return a list of all msg parts with type 'image/*'.
@@ -549,7 +566,7 @@ namespace UtilitiesCS.EmailIntelligence
         /// <param name="msg"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        internal IEnumerable<string> crack_content_xyz(MailItemInfo itemInfo)
+        internal IEnumerable<string> crack_content_xyz(MailItemHelper itemInfo)
         {
             // content-type not clearly defined in Outlook object model
             // need to convert to System.Net.Mail.MailMessage to get this info
