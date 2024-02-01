@@ -10,6 +10,57 @@ namespace UtilitiesCS
 {
     public static class IListExtensions
     {
+        public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
+        {
+            list.ThrowIfNull();
+            items.ThrowIfNull();
+            if (list is List<T> asList)
+            {
+                asList.AddRange(items);
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    list.Add(item);
+                }
+            }
+        }
+        
+        public static bool TryAddRange<T>(this IList<T> list, IEnumerable<T> items)
+        {
+            if (list is null || items is null)
+            {
+                return false;
+            }
+            if (list is List<T> asList)
+            {
+                try
+                {
+                    asList.AddRange(items);
+                }
+                catch (System.Exception)
+                {
+                    return false;
+                } 
+            }
+            else
+            {
+                try
+                {
+                    foreach (var item in items)
+                    {
+                        list.Add(item);
+                    }
+                }
+                catch (System.Exception)
+                {
+                    return false;
+                }                
+            }
+            return true;
+        }
+
         public static bool Contains(this IList<string> list, string value, StringComparison comparison)
         {
             return list.FindIndex(value, comparison) != -1;

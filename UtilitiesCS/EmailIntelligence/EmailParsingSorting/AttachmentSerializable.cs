@@ -39,9 +39,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             Session = a.Session;
 
             // Custom Properties
-            _data = new Lazy<byte[]>(() => GetBytes(a));
+            _a = a;
+            _data = new Lazy<byte[]>(() => GetBytes(_a));
             _isImage = new Lazy<bool>(IsAnImage);
         }
+        private Attachment _a;
 
         #endregion Constructors
 
@@ -68,7 +70,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         }
 
         private Lazy<byte[]> _data;
-        public byte[] AttachmentData { get => _data.Value; set => _data = value.ToLazy(); }
+        public byte[] AttachmentData { get => _data?.Value; set => _data = value?.ToLazy(); }
 
         #endregion Serialized Custom Properties
 
