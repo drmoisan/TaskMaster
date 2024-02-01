@@ -5,7 +5,7 @@ using UtilitiesCS;
 using System;
 using System.Linq;
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
     public class MovedMailInfo : IMovedMailInfo
     {

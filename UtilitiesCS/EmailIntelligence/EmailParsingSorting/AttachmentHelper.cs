@@ -15,6 +15,9 @@ namespace UtilitiesCS.EmailIntelligence
 {
     public class AttachmentHelper 
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         #region Constructors and Initializers
 
         public AttachmentHelper() { }
@@ -59,7 +62,7 @@ namespace UtilitiesCS.EmailIntelligence
                     _filePathDelete = AdjustForMaxPath(deleteFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension);
                 }
                 AttachmentInfo.Size = attachment.Size;
-                AttachmentInfo.OlAttachmentType = attachment.Type;
+                AttachmentInfo.Type = attachment.Type;
             }
         }
 
@@ -93,8 +96,8 @@ namespace UtilitiesCS.EmailIntelligence
         public const int MAX_PATH = 256;
         public const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
 
-        private AttachmentInfo _attachmentInfo = new();
-        public IAttachmentInfo AttachmentInfo { get => _attachmentInfo; set => _attachmentInfo = value as AttachmentInfo; }
+        private AttachmentSerializable _attachmentInfo = new();
+        public IAttachment AttachmentInfo { get => _attachmentInfo; set => _attachmentInfo = value as AttachmentSerializable; }
 
         private Attachment _attachment;
         public Attachment Attachment { get => _attachment; set => _attachment = value; }

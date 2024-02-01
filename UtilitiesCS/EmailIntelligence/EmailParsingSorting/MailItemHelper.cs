@@ -75,7 +75,7 @@ namespace UtilitiesCS //QuickFiler
             _tokens = itemInfo.Tokens;
             _triage = itemInfo.Triage;
             _unread = itemInfo.UnRead;
-            _attachmentsInfo = itemInfo.AttachmentsInfo.AsLazyValue();
+            _attachmentsInfo = itemInfo.AttachmentsInfo.ToLazy();
         }
 
         public static MailItemHelper FromDf(DataFrame df, long indexRow, Outlook.NameSpace olNs, string emailPrefixToStrip, CancellationToken token = default)
@@ -303,6 +303,11 @@ namespace UtilitiesCS //QuickFiler
             if (variable is null) { LoadPriority(_emailPrefixToStrip); }
             return (bool)variable;
         }
+        internal int Initialized(ref int? variable, Func<int> loader)
+        {
+            variable ??= loader();
+            return (int)variable;
+        }
 
         private string _actionable;
         public string Actionable { get => Initialized(ref _actionable); set => _actionable = value; }
@@ -415,6 +420,9 @@ namespace UtilitiesCS //QuickFiler
         private string _html = null;
         public string Html { get => _html ?? GetHtml(); private set => _html = value; }
 
+        private string _htmlBody = null;
+        public string HTMLBody { get => _htmlBody ??= _item?.HTMLBody; protected set => _htmlBody = value; }
+
         private DateTime _sentDate;
         public DateTime SentDate
         {
@@ -443,8 +451,8 @@ namespace UtilitiesCS //QuickFiler
                        .ToArray();
         }
 
-        private Lazy<IAttachmentInfo[]> _attachmentsInfo; 
-        public IAttachmentInfo[] AttachmentsInfo { get => _attachmentsInfo.Value; protected set => _attachmentsInfo = value.AsLazyValue(); }
+        private Lazy<IAttachment[]> _attachmentsInfo; 
+        public IAttachment[] AttachmentsInfo { get => _attachmentsInfo.Value; protected set => _attachmentsInfo = value.ToLazy(); }
         
         public string GetHeadersExtendedMapi()
         {
@@ -589,8 +597,18 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
             set => Initializer.SetAndSave(ref _unread, value, (x) => _item.UnRead = x ?? false, () => _item.Save(), null, false);
         }
 
-        private bool? _isTaskFlagSet;
+        public int InternetCodepage 
+        { 
+            get => Initialized(ref _internetCodepage, LoadInternetCodepage); 
+            set => _internetCodepage = value; 
+        }
+        private int? _internetCodepage;
+        private int LoadInternetCodepage()
+        {
+            return _item.ThrowIfNull().InternetCodepage;
+        }
 
+        private bool? _isTaskFlagSet;
         public bool IsTaskFlagSet { get => Initialized(ref _isTaskFlagSet); set => _isTaskFlagSet = value; }
 
         internal string DarkModeHeader

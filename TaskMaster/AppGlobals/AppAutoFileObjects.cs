@@ -468,7 +468,7 @@ namespace TaskMaster
         }
 
         private CancellationTokenSource _tokenSource = new();
-        public CancellationToken CancelLoad => Initialized(_token, LoadToken);
+        public CancellationToken CancelLoad => Initializer.GetOrLoad(ref _token, LoadToken);
         private CancellationToken _token;
         private CancellationToken LoadToken()
         {

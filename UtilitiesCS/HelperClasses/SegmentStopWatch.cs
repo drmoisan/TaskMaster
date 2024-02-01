@@ -20,7 +20,7 @@ namespace UtilitiesCS.HelperClasses
             {
                 
                 logger.Warn($"SegmentStopWatch created on UI thread {Thread.CurrentThread.ManagedThreadId}" +
-                    $"\nStackTrace: {string.Join(" => ",TraceUtility.GetMyStackSummary(new StackTrace()))}");
+                    $"\nStackTrace: {string.Join(" => ",TraceUtility.GetMyMethodNames(new StackTrace()))}");
             }
         }
 

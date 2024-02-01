@@ -168,7 +168,7 @@ namespace TaskMaster
 
         internal void UndoSort()
         {
-            ToDoModel.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
+            UtilitiesCS.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
         }
 
         #region SettingsMenu
@@ -303,7 +303,7 @@ namespace TaskMaster
             var mailInfo = await MailItemHelper.FromMailItemAsync(mail, _globals.Ol.EmailPrefixToStrip, token, true);
             var tokenizer = new EmailTokenizer();
             //tokenizer.setup();
-            var tokens = tokenizer.tokenize(mailInfo);
+            var tokens = tokenizer.tokenize(mailInfo).ToArray();
             var tokenString = tokens.SentenceJoin();
             MessageBox.Show(tokenString);
         }

@@ -297,18 +297,22 @@ namespace QuickFiler.Controllers
             }
             else 
             {
-                var folder = await _dataModel.FolderHandler.CreateFolderAsync(SelectedFolder,
-                                                                                _globals.Ol.ArchiveRootPath,
-                                                                                _globals.FS.FldrRoot,
-                                                                                Token);
+                var folder = (await _dataModel.FolderHelper.CreateFolderAsync(
+                    SelectedFolder, 
+                    _globals.Ol.ArchiveRootPath, 
+                    _globals.FS.FldrRoot, 
+                    Token)) as MAPIFolder;
+
                 if (folder is not null)
                 {
-                    await _dataModel.MoveToFolder(folder,
-                                                    _globals.Ol.ArchiveRootPath,
-                                                    SaveAttachments,
-                                                    SaveEmail,
-                                                    SavePictures,
-                                                    MoveConversation);
+                    await _dataModel.MoveToFolder(
+                        folder,
+                        _globals.Ol.ArchiveRootPath,
+                        SaveAttachments,
+                        SaveEmail,
+                        SavePictures,
+                        MoveConversation);
+
                     _formViewer.Close();
                     Cleanup();
                 }
@@ -471,7 +475,7 @@ namespace QuickFiler.Controllers
                 await _formViewer.UiSyncContext;
                 _formViewer.Hide();
                 var folder = await Task.FromResult(_dataModel
-                                                   .FolderHandler
+                                                   .FolderHelper
                                                    .CreateFolder(SelectedFolder,
                                                                  _globals.Ol.ArchiveRootPath,
                                                                  _globals.FS.FldrRoot)).ConfigureAwait(false);
@@ -625,7 +629,7 @@ namespace QuickFiler.Controllers
 
             await _formViewer.UiSyncContext;
 
-            _formViewer.FolderListBox.DataSource = _dataModel.FolderHandler.FolderArray;
+            _formViewer.FolderListBox.DataSource = _dataModel.FolderHelper.FolderArray;
             if (_formViewer.FolderListBox.Items.Count > 0)
             {
                 _formViewer.FolderListBox.SelectedIndex = 1;

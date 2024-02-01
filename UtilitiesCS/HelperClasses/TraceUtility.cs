@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Deedle;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,7 +12,7 @@ using System.Web.UI.WebControls;
 
 namespace UtilitiesCS
 {
-    public class TraceUtility
+    public static class TraceUtility
     {
         [Conditional("TRACE")]
         public static void LogMethodCall(params object[] callingMethodParamValues)
@@ -77,48 +79,58 @@ namespace UtilitiesCS
             }
         }
 
-        public static string[] GetMyStackSummary(StackTrace sf)
+        public static string[] GetMyMethodNames(this StackTrace trace)
         {
-            var stack = GetMyStack(sf);
-            var stackSummary = stack.Select(m => $"{GetClassName(m)}.{m.Name}").ToArray();
-            return stackSummary;
+            return trace.GetMyMethods().Select(m => $"{GetClassName(m)}.{m.Name}").ToArray();
         }
 
-        private static string GetClassName(MethodBase m)
+        public static string GetTraceString(StackTrace trace)
+        {
+            return string.Join(" -> ", trace.GetMyMethodNames());
+        }
+
+        private static string GetClassName(this MethodBase m)
         {
             if (m.IsStatic) { return m.Module.Name; }
             else { return m.DeclaringType.Name; }
         }
-        
-        public static List<MethodBase> GetMyStack(StackTrace sf)
+
+        public static Assembly GetAssembly(this MethodBase m)
         {
-            List<MethodBase> stack = new List<MethodBase>();
-            
-            for (int i = 0; i < sf.FrameCount; i++)
+            if (m.IsStatic) { return m.Module.Assembly; }
+            else { return m.DeclaringType.Assembly; }
+        }
+        
+        public static List<(StackFrame Frame, MethodBase Method)> GetMyFrames(this StackTrace trace) 
+        {
+            List<(StackFrame Frame, MethodBase Method)> result = [];
+
+            for (int i = 0; i < trace.FrameCount; i++)
             {
-                var method = sf.GetFrame(i).GetMethod();
-                string assemblyName;
-                if (method.IsStatic)
-                {
-                    assemblyName = method.Module.Assembly.GetName().Name;
-                }
-                else
-                {
-                    assemblyName = method.DeclaringType.Assembly.GetName().Name;
-                }
-                if (ProjectNames.Contains(assemblyName))
-                {
-                    if (method.Name != "MoveNext")
-                    {
-                        stack.Add(method);
-                    }
+                var frame = trace.GetFrame(i);
+                var method = frame.GetMethod();
+                
+                if (method is not null && 
+                    method.Name != "MoveNext" && 
+                    method.GetAssembly().IsMine())
+                {                    
+                    result.Add((frame, method));
                 }
             }
-            
-            return stack;
+            return result;
+        }
+        
+        internal static bool IsMine(this Assembly assembly)
+        {
+            return ProjectNames.Contains(assembly.GetName().Name);
         }
 
-        private static MethodBase GetFirstMethodOfMine(StackTrace sf, ref int i)
+        public static List<MethodBase> GetMyMethods(this StackTrace trace)
+        {
+            return trace.GetMyFrames().Select(f => f.Method).ToList();
+        }
+
+        private static MethodBase GetFirstMethodOfMine(StackTrace trace, ref int i)
         {
             MethodBase methodCalledBy = null;
             bool repeat = true;
@@ -126,14 +138,14 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    if(++i >= sf.FrameCount) 
+                    if(++i >= trace.FrameCount) 
                     {
                         methodCalledBy = null;
                         repeat = false;
                     }
                     else
                     {
-                        var m = sf.GetFrame(i).GetMethod();
+                        var m = trace.GetFrame(i).GetMethod();
                         string assemblyName;
                         
                         if (m.IsStatic) { assemblyName = m.Module.Assembly.GetName().Name; }
@@ -141,7 +153,7 @@ namespace UtilitiesCS
                         
                         if (ProjectNames.Contains(assemblyName))
                         {
-                            methodCalledBy = sf.GetFrame(i).GetMethod();
+                            methodCalledBy = trace.GetFrame(i).GetMethod();
                             if (methodCalledBy.Name == "MoveNext") { methodCalledBy = null; }
                             else { repeat = false; }
                         }
@@ -181,4 +193,5 @@ namespace UtilitiesCS
         
         
     }
+    
 }

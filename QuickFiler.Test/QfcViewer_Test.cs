@@ -15,9 +15,9 @@ namespace Z.Disabled.QuickFiler.Test
     [TestClass]
     public class QfcViewer_Test
     {
-        private QfcFormViewer qf;
-        private ItemViewer iv;
-        private Mock<IFilerFormController> formController;
+        //private QfcFormViewer qf;
+        //private ItemViewer iv;
+        //private Mock<IFilerFormController> formController;
 
         
 

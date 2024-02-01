@@ -8,17 +8,22 @@ namespace UtilitiesCS.Extensions.Lazy
 {
     public static class LazyExtension
     {
-        public static Lazy<T> AsLazyValue<T>(this T value) where T: class
+        public static Lazy<T> ToLazy<T>(this T value) where T: class
         {
             return new Lazy<T>(value.Return);
         }
-        
+
+        public static Lazy<T> ToLazyValue<T>(this T value) where T : struct
+        {
+            return new Lazy<T>(() => value);
+        }
+
         public static Func<T> AsFunc<T>(this T value) where T: class
         {
             return new Func<T>(value.Return);
         }        
 
-        internal static T Return<T>(this T value)
+        internal static T Return<T>(this T value) where T : class
         {
             return value;
         }

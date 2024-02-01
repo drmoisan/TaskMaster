@@ -64,14 +64,14 @@ namespace UtilitiesCS
         }
         private BlockingCollection<T> _bc = [];
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private CancellationToken _ct;
-        private Task _addTask; 
-        private void NonBlockingConsumer_Add(CancellationToken ct) 
-        {
-            foreach (T item in _bc.GetConsumingEnumerable(ct))
-            {
-                AddThreadsafe(item);
-            }
-        }
+        private CancellationToken _ct = default;
+        //private Task _addTask; 
+        //private void NonBlockingConsumer_Add(CancellationToken ct) 
+        //{
+        //    foreach (T item in _bc.GetConsumingEnumerable(ct))
+        //    {
+        //        AddThreadsafe(item);
+        //    }
+        //}
     }
 }

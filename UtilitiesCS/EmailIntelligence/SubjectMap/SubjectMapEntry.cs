@@ -259,7 +259,7 @@ namespace UtilitiesCS
             {
                 if (value is null)
                 {
-                    var stack = TraceUtility.GetMyStack(new StackTrace());
+                    var stack = TraceUtility.GetMyMethods(new StackTrace());
                     logger.Debug($"SubjectEncoded set to null. See stack:\n" +
                         $"{string.Join(" -> ",stack.Select(x => x.Name).ToArray())}");
                 }

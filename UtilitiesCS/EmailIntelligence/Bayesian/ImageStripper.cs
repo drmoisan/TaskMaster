@@ -5,9 +5,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI;
 using Tesseract;
 using UtilitiesCS.Extensions;
 
@@ -36,7 +33,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #endregion Constructors and private fields
 
-        int misses, hits = 0;
+        //int misses, hits = 0;
                 
         internal (string text, HashSet<string> tokens) analyze(
             string engine_name, List<object> parts)
@@ -74,7 +71,7 @@ namespace UtilitiesCS.EmailIntelligence
             var rows = new LinkedList<Bitmap>();
             var max_image_size = SpamBayesOptions.max_image_size;
 
-            var attachmentParts = parts.Where(x => x is Attachment).Cast<Attachment>().ToList();
+            var attachmentParts = parts.Where(x => x is IAttachment).Cast<IAttachment>().ToList();
             var htmlParts = parts.Where(x => x is string).Cast<string>().ToList();
             foreach (var part in attachmentParts)
             {
@@ -87,7 +84,12 @@ namespace UtilitiesCS.EmailIntelligence
                 {
                     try
                     {
-                        bytes = GetBytes(part);
+                        bytes = part.AttachmentData;
+                        if (bytes.IsNullOrEmpty()) 
+                        {
+                            tokens.Add($"invalid-image:{part.Type}");
+                        }
+                        //bytes = GetBytes(part);
                     }
                     catch (System.Exception)
                     {
@@ -109,7 +111,8 @@ namespace UtilitiesCS.EmailIntelligence
                 
                 try
                 {
-                    image = GetImage(part);
+                    image = GetImage(GetStream(bytes));
+                    //image = GetImage(part);
                 }
                 catch (System.Exception)
                 {
@@ -220,7 +223,7 @@ namespace UtilitiesCS.EmailIntelligence
         internal Bitmap imconcattb(Bitmap top, Bitmap bottom)
         {
             var w1 = top.Width;
-            var h1 = bottom.Height;
+            var h1 = top.Height;
             var w2 = bottom.Width;
             var h2 = bottom.Height;
 
@@ -332,13 +335,21 @@ namespace UtilitiesCS.EmailIntelligence
             //string tessdataPath = $"{_globals.FS.FldrAppData}{Path.DirectorySeparatorChar}tessdata";
             using (TesseractEngine engine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default))
             {
-                using (Pix pix = Pix.LoadFromMemory(data))
-                {
-                    using (Tesseract.Page page = engine.Process(pix))
-                    {
-                        return page.GetText();
-                    }
-                }
+                //var pix = new BitmapToPixConverter().Convert(bitmap);
+                //var page = engine.Process(pix);
+                var page = engine.Process(bitmap);
+                
+                var text = page.GetText();
+                return text;
+                
+                
+                //using (Pix pix = Pix.LoadFromMemory(data))
+                //{
+                //    using (Tesseract.Page page = engine.Process(pix))
+                //    {
+                //        return page.GetText();
+                //    }
+                //}
             }
         }
 

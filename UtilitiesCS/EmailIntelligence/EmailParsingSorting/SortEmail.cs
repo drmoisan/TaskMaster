@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using Deedle;
 using System.Threading.Tasks;
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
 
     public static class SortEmail

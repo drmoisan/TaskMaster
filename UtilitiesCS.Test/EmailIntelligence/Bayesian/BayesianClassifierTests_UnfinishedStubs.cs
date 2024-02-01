@@ -16,126 +16,126 @@ namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.Bayesian
     [TestClass]
     public class BayesianClassifierTests_UnfinishedStubs
     {
-        private MockRepository mockRepository;
-        private Mock<ClassifierGroupSub> mockClassifierGroup;
-        private ClassifierGroupSub classifierGroup;
-        private ConcurrentDictionary<string, DedicatedToken> dedicated;
-        private Mock<Corpus> sharedTokenBase;
-        private Corpus sharedTokenBase2;
-        private ConcurrentDictionary<string, int> sharedTokens;
+        //private MockRepository mockRepository;
+        //private Mock<ClassifierGroupSub> mockClassifierGroup;
+        //private ClassifierGroupSub classifierGroup;
+        //private ConcurrentDictionary<string, DedicatedToken> dedicated;
+        //private Mock<Corpus> sharedTokenBase;
+        //private Corpus sharedTokenBase2;
+        //private ConcurrentDictionary<string, int> sharedTokens;
         //private Mock<BayesianClassifier> mockBayesianClassifier;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
-            this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true };
-            this.dedicated = CreateDedicatedTokens();
+            //Console.SetOut(new DebugTextWriter());
+            //this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true };
+            //this.dedicated = CreateDedicatedTokens();
 
-            this.sharedTokens = CreateSharedTokens();
-            var tokenBase = new CorpusSub();
-            tokenBase.SetTokenBase(sharedTokens);
-            this.sharedTokenBase2 = tokenBase.GetBase();
+            //this.sharedTokens = CreateSharedTokens();
+            //var tokenBase = new CorpusSub();
+            //tokenBase.SetTokenBase(sharedTokens);
+            //this.sharedTokenBase2 = tokenBase.GetBase();
 
-            this.classifierGroup = new ClassifierGroupSub();
-            this.classifierGroup.DedicatedTokens = this.dedicated;
-            this.classifierGroup.SharedTokenBase = this.sharedTokenBase2;
+            //this.classifierGroup = new ClassifierGroupSub();
+            //this.classifierGroup.DedicatedTokens = this.dedicated;
+            //this.classifierGroup.SharedTokenBase = this.sharedTokenBase2;
         }
 
         #region Helper Functions and Classes
 
-        private class BayesianClassifierSub : BayesianClassifier
-        {
-            public BayesianClassifierSub() { }
-            public BayesianClassifierSub(ConcurrentDictionary<string, double> prob)
-            {
-                base._prob = prob;
-            }
+        //private class BayesianClassifierSub : BayesianClassifier
+        //{
+        //    public BayesianClassifierSub() { }
+        //    public BayesianClassifierSub(ConcurrentDictionary<string, double> prob)
+        //    {
+        //        base._prob = prob;
+        //    }
 
-            public new ConcurrentDictionary<string, double> Prob { get => base._prob; set => base._prob = value; }
+        //    public new ConcurrentDictionary<string, double> Prob { get => base._prob; set => base._prob = value; }
 
-            public new ClassifierGroupSub Parent
-            {
-                set => base._parent = value;
-            }
-        }
+        //    public new ClassifierGroupSub Parent
+        //    {
+        //        set => base._parent = value;
+        //    }
+        //}
 
-        public class ClassifierGroupSub : ClassifierGroup
-        {
-            public ClassifierGroupSub() { }
+        //public class ClassifierGroupSub : ClassifierGroup
+        //{
+        //    public ClassifierGroupSub() { }
 
-            public new virtual ConcurrentDictionary<string, DedicatedToken> DedicatedTokens { get => base._dedicatedTokens; set => base._dedicatedTokens = value; }
+        //    public new virtual ConcurrentDictionary<string, DedicatedToken> DedicatedTokens { get => base._dedicatedTokens; set => base._dedicatedTokens = value; }
 
-            public new virtual Corpus SharedTokenBase { get => base._sharedTokenBase; set => base._sharedTokenBase = value; }
-        }
+        //    public new virtual Corpus SharedTokenBase { get => base._sharedTokenBase; set => base._sharedTokenBase = value; }
+        //}
 
-        public class CorpusSub : Corpus
-        {
-            public CorpusSub() { }
-            public void SetTokenBase(ConcurrentDictionary<string, int> tb)
-            {
-                this.TokenFrequency = tb;
-            }
-            public Corpus GetBase() => this;
-        }
+        //public class CorpusSub : Corpus
+        //{
+        //    public CorpusSub() { }
+        //    public void SetTokenBase(ConcurrentDictionary<string, int> tb)
+        //    {
+        //        this.TokenFrequency = tb;
+        //    }
+        //    public Corpus GetBase() => this;
+        //}
 
-        private void AddKvp(ConcurrentDictionary<string, DedicatedToken> cd, string token, int count, string folderPath)
-        {
-            cd.TryAdd(token, new DedicatedToken()
-            { Token = token, Count = count, FolderPath = folderPath });
-        }
+        //private void AddKvp(ConcurrentDictionary<string, DedicatedToken> cd, string token, int count, string folderPath)
+        //{
+        //    cd.TryAdd(token, new DedicatedToken()
+        //    { Token = token, Count = count, FolderPath = folderPath });
+        //}
 
-        private ConcurrentDictionary<string, DedicatedToken> CreateDedicatedTokens()
-        {
-            var cd = new ConcurrentDictionary<string, DedicatedToken>();
-            AddKvp(cd, "dedicated1", 6, "folderA");
-            AddKvp(cd, "dedicated2", 4, "folderA");
-            AddKvp(cd, "dedicated3", 1, "folderA");
-            AddKvp(cd, "dedicated4", 6, "folderB");
-            AddKvp(cd, "dedicated5", 4, "folderB");
-            AddKvp(cd, "dedicated6", 1, "folderB");
-            return cd;
-        }
+        //private ConcurrentDictionary<string, DedicatedToken> CreateDedicatedTokens()
+        //{
+        //    var cd = new ConcurrentDictionary<string, DedicatedToken>();
+        //    AddKvp(cd, "dedicated1", 6, "folderA");
+        //    AddKvp(cd, "dedicated2", 4, "folderA");
+        //    AddKvp(cd, "dedicated3", 1, "folderA");
+        //    AddKvp(cd, "dedicated4", 6, "folderB");
+        //    AddKvp(cd, "dedicated5", 4, "folderB");
+        //    AddKvp(cd, "dedicated6", 1, "folderB");
+        //    return cd;
+        //}
 
-        private ConcurrentDictionary<string, int> CreateSharedTokens()
-        {
-            var cd = new ConcurrentDictionary<string, int>();
-            cd.TryAdd("shared1", 6);
-            cd.TryAdd("shared2", 4);
-            cd.TryAdd("shared3", 1);
-            cd.TryAdd("shared4", 6);
-            cd.TryAdd("shared5", 4);
-            cd.TryAdd("shared6", 1);
-            return cd;
-        }
+        //private ConcurrentDictionary<string, int> CreateSharedTokens()
+        //{
+        //    var cd = new ConcurrentDictionary<string, int>();
+        //    cd.TryAdd("shared1", 6);
+        //    cd.TryAdd("shared2", 4);
+        //    cd.TryAdd("shared3", 1);
+        //    cd.TryAdd("shared4", 6);
+        //    cd.TryAdd("shared5", 4);
+        //    cd.TryAdd("shared6", 1);
+        //    return cd;
+        //}
 
-        private const string alphabet = "abcdefghijklmnopqrstuvwxyz";
+        //private const string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
-        private BayesianClassifierSub CreateBayesianClassifier()
-        {
-            return new BayesianClassifierSub();
-        }
+        //private BayesianClassifierSub CreateBayesianClassifier()
+        //{
+        //    return new BayesianClassifierSub();
+        //}
 
-        private void LogProbabilities(IDictionary<string, double> probabilities, string title)
-        {
-            var text = probabilities.ToFormattedText(
-                (key) => key,
-                (value) => value.ToString("N2"),
-                headers: ["Class", "Probability"],
-                justifications: [Enums.Justification.Left, Enums.Justification.Right],
-                title: title);
-            Console.WriteLine(text);
-        }
+        //private void LogProbabilities(IDictionary<string, double> probabilities, string title)
+        //{
+        //    var text = probabilities.ToFormattedText(
+        //        (key) => key,
+        //        (value) => value.ToString("N2"),
+        //        headers: ["Class", "Probability"],
+        //        justifications: [Enums.Justification.Left, Enums.Justification.Right],
+        //        title: title);
+        //    Console.WriteLine(text);
+        //}
 
-        private void LogDedicatedTokens()
-        {
-            Console.WriteLine($"\nDEDICATED TOKENS:\n[{string.Join(",", this.dedicated.Select(x => x.Value.Token))}]");
-        }
+        //private void LogDedicatedTokens()
+        //{
+        //    Console.WriteLine($"\nDEDICATED TOKENS:\n[{string.Join(",", this.dedicated.Select(x => x.Value.Token))}]");
+        //}
 
-        private void LogTokens(IDictionary<string, double> probabilities, string title)
-        {
-            Console.WriteLine($"\n{title.ToUpper()}:\n[{string.Join(",", probabilities.Select(x => x.Key))}]");
-        }
+        //private void LogTokens(IDictionary<string, double> probabilities, string title)
+        //{
+        //    Console.WriteLine($"\n{title.ToUpper()}:\n[{string.Join(",", probabilities.Select(x => x.Key))}]");
+        //}
 
         #endregion Helper Functions and Classes
 

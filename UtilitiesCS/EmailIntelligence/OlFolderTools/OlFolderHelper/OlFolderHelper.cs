@@ -12,7 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
 
     public class OlFolderHelper
@@ -470,8 +470,8 @@ namespace ToDoModel
         /// <param name="olAncestor"><inheritdoc cref="CreateFolder(string, string, string)"/></param>
         /// <param name="fsAncestor"><inheritdoc cref="CreateFolder(string, string, string)"/></param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>A Task of the created Outlook.<seealso cref="MAPIFolder"/></returns>
-        public async Task<MAPIFolder> CreateFolderAsync(string parentBranchPath, string olAncestor, string fsAncestor, CancellationToken token)
+        /// <returns>A Task of the created Outlook.<seealso cref="MAPIFolder"/> returned as object</returns>
+        public async Task<object> CreateFolderAsync(string parentBranchPath, string olAncestor, string fsAncestor, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 

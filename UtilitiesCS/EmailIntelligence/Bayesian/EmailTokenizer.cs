@@ -113,7 +113,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        public IEnumerable<string> tokenize(MailItemHelper msg)
+        public IEnumerable<string> tokenize(IItemInfo msg)
         {
             //var headers = msg.GetHeaders();
             foreach (var tok in this.tokenize_headers(msg))
@@ -122,7 +122,7 @@ namespace UtilitiesCS.EmailIntelligence
                 yield return tok;
         }
 
-        internal IEnumerable<string> tokenize_headers(MailItemHelper msg)
+        internal IEnumerable<string> tokenize_headers(IItemInfo msg)
         {
             // Special tagging of header lines and MIME metadata.
 
@@ -146,10 +146,13 @@ namespace UtilitiesCS.EmailIntelligence
                 logger.Error($"Error tokenizing message subject: {e.Message}", e);
             }
             
-            foreach (var w in matches)
+            if (matches is not null)
             {
-                foreach (var t in tokenize_word(w.ToString()))
-                    yield return "subject:" + t;
+                foreach (var w in matches)
+                {
+                    foreach (var t in tokenize_word(w.ToString()))
+                        yield return "subject:" + t;
+                }
             }
 
             try
@@ -161,9 +164,12 @@ namespace UtilitiesCS.EmailIntelligence
                 logger.Error($"Error tokenizing message subject: {e.Message}", e);
             }
 
-            foreach (var w in matches)
+            if (matches is not null)
             {
-                yield return "subject:"+ w;
+                foreach (var w in matches)
+                {
+                    yield return "subject:" + w;
+                }
             }
 
             // Dang -- I can't use Sender:.  If I do,
@@ -179,16 +185,19 @@ namespace UtilitiesCS.EmailIntelligence
 
             List<(string field, RecipientInfo value)> addrlist = [];
             addrlist.Add(("from", msg.Sender));
-            msg.ToRecipients.ForEach(x => addrlist.Add(("to", x)));
-            msg.CcRecipients.ForEach(x => addrlist.Add(("cc", x)));
+            msg.ToRecipients?.ForEach(x => addrlist.Add(("to", x)));
+            msg.CcRecipients?.ForEach(x => addrlist.Add(("cc", x)));
 
-            foreach (var (field, value) in addrlist)
+            if (addrlist.Count > 0) 
             {
-                yield return $"{field}:name:{value?.Name?.ToLower() ?? "empty"}";
-                
-                var address = value?.Address?.ToLower() ?? "empty";
-                foreach (var w in address.Split('@'))
-                    yield return $"{field}:addr:{w}";
+                foreach (var (field, value) in addrlist)
+                {
+                    yield return $"{field}:name:{value?.Name?.ToLower() ?? "empty"}";
+
+                    var address = value?.Address?.ToLower() ?? "empty";
+                    foreach (var w in address.Split('@'))
+                        yield return $"{field}:addr:{w}";
+                }
             }
 
             // Spammers sometimes send out mail alphabetically to fairly large
@@ -271,11 +280,11 @@ namespace UtilitiesCS.EmailIntelligence
             //# Cc:
             //# Count the number of addresses in each of the recipient headers.
 
-            var tocount = msg.ToRecipients.Count();
+            var tocount = msg.ToRecipients?.Count() ?? 0;
             if (tocount > 0)
                 yield return $"to:2**{Math.Round(Math.Log(tocount,2))}";
 
-            var cccount = msg.ToRecipients.Count();
+            var cccount = msg.ToRecipients?.Count() ?? 0;
             if (cccount > 0)
                 yield return $"to:2**{Math.Round(Math.Log(cccount, 2))}";
 
@@ -291,7 +300,7 @@ namespace UtilitiesCS.EmailIntelligence
         /// <param name="msg">MailItemInfo wrapper with email and metadata</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        internal IEnumerable<string> tokenize_body(MailItemHelper msg)
+        internal IEnumerable<string> tokenize_body(IItemInfo msg)
         {
             if (SpamBayesOptions.check_octets)
             {
@@ -326,7 +335,7 @@ namespace UtilitiesCS.EmailIntelligence
                 var total_len = 0;
                 foreach (var part in parts)
                 {
-                    if (part is Attachment attachment)
+                    if (part is IAttachment attachment)
                         total_len += attachment.Size;
                 }
                 if (total_len > 0)
@@ -369,7 +378,7 @@ namespace UtilitiesCS.EmailIntelligence
                     text = text.StripAccents('?');
                 }
 
-                foreach (var t in find_html_virus_clues(msg.Item.HTMLBody))
+                foreach (var t in find_html_virus_clues(msg.HTMLBody))
                     yield return $"virus:{t}";
 
                 foreach (var t in this.tokenize_text(text))
@@ -385,7 +394,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Helper Methods
 
-        private IEnumerable<string> textparts(MailItemHelper msg)
+        private IEnumerable<string> textparts(IItemInfo msg)
         {
             yield return msg.Body;
         }
@@ -486,11 +495,13 @@ namespace UtilitiesCS.EmailIntelligence
             return rx.IsMatch(word);
         }
 
-        internal List<object> imageparts(MailItemHelper msg)
+        internal List<object> imageparts(IItemInfo msg)
         {
-            var attachments = msg.Attachments;
-            var parts = msg.Attachments.Where(x => x.AttachmentInfo.IsImage).Select(x => x.Attachment).Cast<object>().ToList();
-            return parts;
+            return msg.AttachmentsInfo.Where(x => x.IsImage).Cast<object>().ToList();
+            //var attachments = msg.Attachments;
+            //var parts = msg.Attachments.Where(x => x.AttachmentInfo.IsImage).Select(x => x.Attachment).Cast<object>().ToList();
+            //return parts;
+
             // Original Python code below
             // # Return a list of all msg parts with type 'image/*'.
             // return [part for part in msg.walk() if part.get_content_type().startswith('image/')]
@@ -566,17 +577,17 @@ namespace UtilitiesCS.EmailIntelligence
         /// <param name="msg"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        internal IEnumerable<string> crack_content_xyz(MailItemHelper itemInfo)
+        internal IEnumerable<string> crack_content_xyz(IItemInfo itemInfo)
         {
             // content-type not clearly defined in Outlook object model
             // need to convert to System.Net.Mail.MailMessage to get this info
             // MimeKit seems like a promising library to explore later
             
-            var codePage = itemInfo.Item.InternetCodepage;
+            var codePage = itemInfo.InternetCodepage;
             var charset = charsetCodebases.FirstOrDefault(x => x.Codepage == codePage).Charset;
             yield return $"charset:{charset}";
                         
-            var attachments = itemInfo.Item.Attachments.Cast<Attachment>();
+            var attachments = itemInfo.AttachmentsInfo;
             foreach (var attachment in attachments)
             {
                 var fname = attachment.FileName;

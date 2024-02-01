@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 //using Microsoft.VisualStudio.Services.Common;
-using UtilitiesCS;
+//using UtilitiesCS;
 
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
 
     public static class SmithWaterman

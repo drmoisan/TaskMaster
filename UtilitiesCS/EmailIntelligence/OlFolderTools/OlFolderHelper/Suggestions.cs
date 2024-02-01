@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 
-namespace ToDoModel
+namespace UtilitiesCS
 {
     public class Suggestions
     {
@@ -148,21 +148,6 @@ namespace ToDoModel
                     score = (long)Math.Round(Math.Pow(score, _globals.AF.LngConvCtPwr) * _globals.AF.Conversation_Weight);
                     AddSuggestion(match.EmailFolder, score);
                 }
-            }
-        }
-
-        [Obsolete]
-        internal void ScoreAndAddConv(CtfIncidence ctfIncidence, int convCtPwr, int convWeight)
-        {
-            // For each Folder that already contains at least one email with the conversationID ...
-            for (int i = 1; i <= ctfIncidence.FolderCount; i++)
-            {
-                // Calculate the weight of the suggestion based on how much of the conversation is already in the folder
-                long score = ctfIncidence.EmailCounts[i];
-                score = (long)Math.Round(Math.Pow(score, convCtPwr) * convWeight);
-
-                // Add or increment the score for the folder
-                AddSuggestion(ctfIncidence.EmailFolders[i], score);
             }
         }
 
@@ -437,8 +422,5 @@ namespace ToDoModel
             public int[] FolderWordLengths;
             public int Score;
         }
-
-        
-
     }
 }

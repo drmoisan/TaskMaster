@@ -184,6 +184,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.6.0.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Globalization.Calendars, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Globalization.Calendars.4.3.0\lib\net46\System.Globalization.Calendars.dll</HintPath>
@@ -382,42 +385,47 @@
     <Compile Include="EmailIntelligence\Bayesian\MinedMailInfo.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />
-    <Compile Include="EmailIntelligence\EmailParsing\AttachmentHelper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentHelper.cs" />
     <Compile Include="EmailIntelligence\AutoFile2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusExample.cs" />
     <Compile Include="EmailIntelligence\Bayesian\EmailTokenizer.cs" />
     <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
-    <Compile Include="EmailIntelligence\EmailParsing\AttachmentInfo.cs" />
-    <Compile Include="Interfaces\IEmailIntelligence\IAttachmentInfo.cs" />
-    <Compile Include="EmailIntelligence\EmailParsing\ItemInfo.cs" />
-    <Compile Include="EmailIntelligence\FilterOlFolders\OlFolderInfo .cs" />
-    <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersController.cs" />
-    <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersViewer.cs">
+    <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentSerializable.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\OlFolderHelper.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\Suggestions.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\ItemInfo.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OlFolderInfo .cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersViewer.Designer.cs">
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.Designer.cs">
       <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmailIntelligence\FilterOlFolders\OlFolderTree.cs" />
-    <Compile Include="EmailIntelligence\FilterOlFolders\OSBrowser.cs">
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OlFolderTree.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EmailIntelligence\FilterOlFolders\OSBrowser.Designer.cs">
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.Designer.cs">
       <DependentUpon>OSBrowser.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmailIntelligence\FolderRemap\FolderRemapController.cs" />
-    <Compile Include="EmailIntelligence\FolderRemap\FolderRemapTree.cs" />
-    <Compile Include="EmailIntelligence\FolderRemap\FolderRemapViewer.cs">
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapController.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapTree.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EmailIntelligence\FolderRemap\FolderRemapViewer.Designer.cs">
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapViewer.Designer.cs">
       <DependentUpon>FolderRemapViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmailIntelligence\FolderRemap\FolderSelector.cs">
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EmailIntelligence\FolderRemap\FolderSelector.Designer.cs">
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.Designer.cs">
       <DependentUpon>FolderSelector.cs</DependentUpon>
     </Compile>
     <Compile Include="EmailIntelligence\Bayesian\EmailDataMiner.cs" />
@@ -433,7 +441,7 @@
     <Compile Include="EmailIntelligence\Flags\FlagParser.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
-    <Compile Include="EmailIntelligence\EmailParsing\MailItemHelper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelper.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -497,7 +505,7 @@
     <Compile Include="HelperClasses\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
     <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
-    <Compile Include="EmailIntelligence\EmailParsing\RecipientInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
@@ -662,18 +670,18 @@
     <EmbeddedResource Include="Dialogs\MyBoxViewer.resx">
       <DependentUpon>MyBoxViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EmailIntelligence\FilterOlFolders\FilterOlFoldersViewer.resx">
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.resx">
       <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="EmailIntelligence\FilterOlFolders\OSBrowser.resx">
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.resx">
       <DependentUpon>OSBrowser.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EmailIntelligence\FolderRemap\FolderRemapViewer.resx">
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapViewer.resx">
       <DependentUpon>FolderRemapViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="EmailIntelligence\FolderRemap\FolderSelector.resx">
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.resx">
       <DependentUpon>FolderSelector.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.resx">

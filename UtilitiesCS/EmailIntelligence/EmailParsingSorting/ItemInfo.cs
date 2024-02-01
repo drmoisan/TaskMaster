@@ -5,7 +5,11 @@ namespace UtilitiesCS.EmailIntelligence
     [Serializable]
     public class ItemInfo : IItemInfo
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         public ItemInfo() { }
+
         public ItemInfo(IItemInfo itemInfo)
         {
             Actionable = itemInfo.Actionable;
@@ -17,6 +21,8 @@ namespace UtilitiesCS.EmailIntelligence
             StoreId = itemInfo.StoreId;
             FolderName = itemInfo.FolderName;
             Html = itemInfo.Html;
+            HTMLBody = itemInfo.HTMLBody;
+            InternetCodepage = itemInfo.InternetCodepage;
             IsTaskFlagSet = itemInfo.IsTaskFlagSet;
             PlainTextOptions = itemInfo.PlainTextOptions;
             Sender = itemInfo.Sender;
@@ -29,8 +35,9 @@ namespace UtilitiesCS.EmailIntelligence
             Triage = itemInfo.Triage;
             UnRead = itemInfo.UnRead;
         }
+
         public string Actionable { get; set; }
-        public IAttachmentInfo[] AttachmentsInfo { get; set; }
+        public IAttachment[] AttachmentsInfo { get; set; }
         public string Body { get; set; }
         public string ConversationIndex { get; set; }
         public string EmailPrefixToStrip { get; set; }
@@ -38,6 +45,8 @@ namespace UtilitiesCS.EmailIntelligence
         public string StoreId { get; set; }
         public string FolderName { get; set; }
         public string Html { get; set; }
+        public string HTMLBody { get; set; }
+        public int InternetCodepage { get; set; }
         public bool IsTaskFlagSet { get; set; }
         
         public IItemInfo.PlainTextOptionsEnum PlainTextOptions { get; set; }

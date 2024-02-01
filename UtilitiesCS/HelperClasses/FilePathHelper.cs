@@ -228,7 +228,7 @@ namespace UtilitiesCS
                     }
                     catch (System.Exception)
                     {
-                        var st = string.Join("\n",TraceUtility.GetMyStackSummary(new StackTrace()));
+                        var st = string.Join("\n",TraceUtility.GetMyMethodNames(new StackTrace()));
                         string msg = $"FilePath: {_filePath} is invalid.\n{st}";
                         logger.Error(msg);
                         throw;

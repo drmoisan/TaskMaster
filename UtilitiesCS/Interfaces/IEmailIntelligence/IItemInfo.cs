@@ -24,7 +24,7 @@ public interface IItemInfo
     }
 
     string Actionable { get; set; }
-    IAttachmentInfo[] AttachmentsInfo { get; }
+    IAttachment[] AttachmentsInfo { get; }
     string Body { get; set; }
     string ConversationIndex { get; set; }
     string EmailPrefixToStrip { get; }
@@ -32,6 +32,8 @@ public interface IItemInfo
     string StoreId { get; set; }
     string FolderName { get; set; }
     string Html { get; }
+    string HTMLBody { get; }
+    int InternetCodepage { get; }
     bool IsTaskFlagSet { get; set; }
     PlainTextOptionsEnum PlainTextOptions { get; set; }
     RecipientInfo Sender { get; set; }

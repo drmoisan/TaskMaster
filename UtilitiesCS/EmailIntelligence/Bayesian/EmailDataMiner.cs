@@ -36,7 +36,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         private IApplicationGlobals _globals;
-        private SegmentStopWatch _sw;
+        private SegmentStopWatch _sw = default;
+        internal const int MaxObjectSize = 2000000000;
 
         #endregion Constructors and private fields
 
@@ -97,7 +98,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             progress.Report(100);
 
-            return folders;
+            return await folders.ToAsyncEnumerable().WhereAwait(async (x) => await x.ItemCount > 0).ToArrayAsync();
         }
 
         internal struct FolderStruct(OlFolderInfo folderInfo, long cumulativeSize, long chunkNumber, int cumulativeCount)
@@ -127,6 +128,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private static void LogFolderChunkMetrics(long availableRAM, OlFolderInfo[][] folderChunks, long totalSize, int totalCount)
         {
             logger.Debug($"Available RAM {availableRAM / (double)1000000:N0} MG");
+            logger.Debug($"Max Object Size in VSTO {MaxObjectSize/(double)1000000000:N1} GB");
             logger.Debug($"Total Size: {totalSize / (double)1000000:N0} MG");
             logger.Debug($"Total Item Count: {totalCount:N0}");
             logger.Debug($"Average Item Size: {(totalSize / (double)totalCount) / 1000:N0} K");
@@ -154,13 +156,16 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal async Task<OlFolderInfo[][]> GetOlFolderChunks()
         {
-            var availableRAM = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
-            logger.Debug($"Available RAM {availableRAM / (double)1000000000:N2} Gig");
+            var availableRam = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
+            var maxChunkSize = Math.Min(availableRam, MaxObjectSize);
+            logger.Debug($"Available RAM {availableRam / (double)1000000000:N2} GB");
+            logger.Debug($"Max Obj Size  {MaxObjectSize / (double)1000000000:N2} GB");
+            logger.Debug($"Min(RAM, Max) {maxChunkSize / (double)1000000000:N2} GB");
 
             // Grab selected OlFolderInfo objects from a OlFolderTree, flatten to an array, and initialize
             var folders = await GetInitializedFolderInfo();
 
-            var folderRecords = await AddRollingMeasures(availableRAM, folders);
+            var folderRecords = await AddRollingMeasures(maxChunkSize, folders);
 
             var folderChunks = folderRecords
                 .GroupBy(x => x.ChunkNumber)
@@ -172,7 +177,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var last = folderRecords.Last();
             var (totalSize, totalCount) = (last.CumulativeSize, last.CumulativeCount);
             
-            LogFolderChunkMetrics(availableRAM, folderChunks, totalSize, totalCount);
+            LogFolderChunkMetrics(maxChunkSize, folderChunks, totalSize, totalCount);
 
             return folderChunks;
         }
@@ -245,8 +250,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //return mailItems;
             return mailItemsQuery;
         }
-
-        
 
         #endregion Aquire Emails
 
@@ -380,7 +383,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             for (int i = 0; i < chunkCount; i++)
             {
                 await MineFolderGroup(
-                    folderChunks[i], i, progress.SpawnChild(chunkProgress), token);
+                    folderChunks[i], i, chunkCount, progress.SpawnChild(chunkProgress), token);
             }
 
             progress.Report(100);
@@ -423,6 +426,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public async Task MineFolderGroup(
             OlFolderInfo[] olFolderInfos,
             int batch,
+            int totalBatches,
             ProgressTracker progress,
             CancellationToken token)
         {
@@ -439,7 +443,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 mailItems,
                 async (mailItem) => await ProcessMailItem(mailItem, token),
                 progress,
-                $"Mining Mail Batch {batch} ",
+                $"Mining Mail Batch {batch} of {totalBatches} ",
                 token);
 
             progress.Report(100);

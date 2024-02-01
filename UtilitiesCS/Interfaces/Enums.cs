@@ -72,6 +72,13 @@ namespace UtilitiesCS
             // Key added would be      011
             // Value updated would be  101
         }
-        
+
+        public enum TriState
+        {
+            Undetermined = -1,
+            False = 0,
+            True = 1
+        }
+
     }
 }
