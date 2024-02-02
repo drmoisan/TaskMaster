@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Outlook;
+using System;
 
 namespace UtilitiesCS.EmailIntelligence
 {
@@ -15,7 +16,8 @@ namespace UtilitiesCS.EmailIntelligence
             Actionable = itemInfo.Actionable;
             AttachmentsInfo = itemInfo.AttachmentsInfo;
             Body = itemInfo.Body;
-            ConversationIndex = itemInfo.ConversationIndex;
+            Categories = itemInfo.Categories;
+            ConversationID = itemInfo.ConversationID;
             EmailPrefixToStrip = itemInfo.EmailPrefixToStrip;
             EntryId = itemInfo.EntryId;
             StoreId = itemInfo.StoreId;
@@ -39,7 +41,8 @@ namespace UtilitiesCS.EmailIntelligence
         public string Actionable { get; set; }
         public IAttachment[] AttachmentsInfo { get; set; }
         public string Body { get; set; }
-        public string ConversationIndex { get; set; }
+        public string Categories { get; set; }
+        public string ConversationID { get; set; }
         public string EmailPrefixToStrip { get; set; }
         public string EntryId { get; set; }
         public string StoreId { get; set; }

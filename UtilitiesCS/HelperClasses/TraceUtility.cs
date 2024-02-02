@@ -84,7 +84,7 @@ namespace UtilitiesCS
             return trace.GetMyMethods().Select(m => $"{GetClassName(m)}.{m.Name}").ToArray();
         }
 
-        public static string GetTraceString(StackTrace trace)
+        public static string GetMyTraceString(this StackTrace trace)
         {
             return string.Join(" -> ", trace.GetMyMethodNames());
         }

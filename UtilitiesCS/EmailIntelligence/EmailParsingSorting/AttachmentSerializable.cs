@@ -92,15 +92,60 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
 
         internal byte[] GetBytes(Attachment attachment)
         {
-            const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
             byte[] bytes = null;
+            
+            if (Type == OlAttachmentType.olByValue)
+            {
+                try
+                {
+                    bytes = File.ReadAllBytes(attachment.GetTemporaryFilePath());
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error reading {attachment.FileName} as bytes. {e.Message}", e);
+                }
+            }
+            if (bytes is null && !TryFromAccessor(attachment, out bytes))
+            {
+                TryFromSaveAsLoad(attachment, out bytes);
+            }
+            
+            return bytes;
+        }
+
+        internal bool TryFromSaveAsLoad(Attachment attachment, out byte[] bytes)
+        {
+            bytes = null;
+            var tempFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var fileName = $"temp_{DateTime.Now:yyyyMMddHHmmssf}"; 
+            var tempFilePath = Path.Combine(tempFolderPath, fileName);
+            try
+            {
+                attachment.SaveAsFile(tempFilePath);
+                bytes = File.ReadAllBytes(tempFilePath);
+                File.Delete(tempFilePath);
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            return bytes is not null;
+        }
+        
+        internal bool TryFromAccessor(Attachment attachment, out byte[] bytes)
+        {
+            const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
+            bytes = null;
             try
             {
                 bytes = attachment.PropertyAccessor.GetProperty(PR_ATTACH_DATA_BIN);
             }
-            catch (System.Exception) { }
-            
-            return bytes;
+            catch (System.Exception) 
+            { 
+                return false;
+            }
+
+            return true;
         }
 
         internal MemoryStream GetStream(byte[] bytes)

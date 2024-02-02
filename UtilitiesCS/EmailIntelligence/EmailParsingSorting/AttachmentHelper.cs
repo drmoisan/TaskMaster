@@ -25,6 +25,7 @@ namespace UtilitiesCS.EmailIntelligence
         public AttachmentHelper(Attachment attachment)
         {
             _attachment = attachment;
+            _attachmentInfo = new AttachmentSerializable(attachment);
         }
 
         public AttachmentHelper(Attachment attachment, DateTime sentOn, string saveFolderPath)
@@ -96,7 +97,7 @@ namespace UtilitiesCS.EmailIntelligence
         public const int MAX_PATH = 256;
         public const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
 
-        private AttachmentSerializable _attachmentInfo = new();
+        private AttachmentSerializable _attachmentInfo;
         public IAttachment AttachmentInfo { get => _attachmentInfo; set => _attachmentInfo = value as AttachmentSerializable; }
 
         private Attachment _attachment;

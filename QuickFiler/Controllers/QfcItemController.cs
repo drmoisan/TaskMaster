@@ -356,7 +356,7 @@ namespace QuickFiler.Controllers
 
             _token.ThrowIfCancellationRequested();
 
-            _itemInfo = await MailItemHelper.FromMailItemAsync(mailItem, _globals.Ol.EmailPrefixToStrip, _token, loadAll);
+            _itemInfo = await MailItemHelper.FromMailItemAsync(mailItem, _globals, _token, loadAll);
             
             AssignControls(_itemInfo, viewerPosition);
 

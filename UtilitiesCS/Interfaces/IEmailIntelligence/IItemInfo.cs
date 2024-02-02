@@ -26,7 +26,8 @@ public interface IItemInfo
     string Actionable { get; set; }
     IAttachment[] AttachmentsInfo { get; }
     string Body { get; set; }
-    string ConversationIndex { get; set; }
+    string Categories { get; set; }
+    string ConversationID { get; set; }
     string EmailPrefixToStrip { get; }
     string EntryId { get; set; }
     string StoreId { get; set; }

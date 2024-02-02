@@ -54,7 +54,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             BayesianClassifierGroup parent,
             string tag,
             IDictionary<string, int> matches,
-            int emailCount,
+            int matchEmailCount,
             bool addToParent,
             CancellationToken token)
         {
@@ -67,8 +67,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 if ((nullPositions & 4) == 4) { paramNames.Add(nameof(matches)); }
                 throw new ArgumentNullException($"Null parameters received: {paramNames.StringJoin(", ")}");
             }
-            if (emailCount < 1) { throw new ArgumentOutOfRangeException(nameof(emailCount), 
-                $"Parameter {nameof(emailCount)} was {emailCount} must be greater than 0");}
+            if (matchEmailCount < 1) { throw new ArgumentOutOfRangeException(nameof(matchEmailCount), 
+                $"Parameter {nameof(matchEmailCount)} was {matchEmailCount} must be greater than 0");}
             
             BayesianClassifierShared classifier = null;
             
@@ -78,7 +78,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     // Call constructor
                     classifier = new BayesianClassifierShared(tag, new Corpus(matches), parent)
                     {
-                        MatchEmailCount = emailCount,
+                        MatchEmailCount = matchEmailCount,
                     };
                     
                     // Update and cache probabilities

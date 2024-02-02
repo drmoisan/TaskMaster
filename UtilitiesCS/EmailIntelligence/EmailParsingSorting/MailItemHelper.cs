@@ -17,6 +17,7 @@ using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.Extensions;
+using Fizzler;
 
 namespace UtilitiesCS //QuickFiler
 {
@@ -43,22 +44,22 @@ namespace UtilitiesCS //QuickFiler
 
         public MailItemHelper(DataFrame df, long indexRow, string emailPrefixToStrip)
         {
-            _entryId = (string)df["EntryID"][indexRow];
-            _storeId = (string)df["Store"][indexRow];
-            _senderName = (string)df["SenderName"][indexRow];
-            _sender = new RecipientInfo() { Name = _senderName, Address = (string)df["SenderSmtpAddress"][indexRow] };
-            FolderName = (string)df["Folder Name"][indexRow];
-            _emailPrefixToStrip = emailPrefixToStrip;
-            DateTime.TryParse((string)df["SentOn"][indexRow], out _sentDate);
-            _conversationIndex = (string)df["ConversationIndex"][indexRow];
-            _attachmentsInfo = new(() => Attachments.Select(x => x.AttachmentInfo).ToArray());
+            EntryId = (string)df["EntryID"][indexRow];
+            StoreId = (string)df["Store"][indexRow];
+            //_senderName = (string)df["SenderName"][indexRow];
+            //_sender = new RecipientInfo() { Name = _senderName, Address = (string)df["SenderSmtpAddress"][indexRow] };
+            //FolderName = (string)df["Folder Name"][indexRow];
+            //_emailPrefixToStrip = emailPrefixToStrip;
+            //DateTime.TryParse((string)df["SentOn"][indexRow], out _sentDate);
+            //_conversationIndex = (string)df["ConversationIndex"][indexRow];
+            //_attachmentsInfo = new(() => Attachments.Select(x => x.AttachmentInfo).ToArray());
         }
 
         protected MailItemHelper(IItemInfo itemInfo)
         {
             _actionable = itemInfo.Actionable;
             _body = itemInfo.Body;
-            _conversationIndex = itemInfo.ConversationIndex;                
+            _conversationID = itemInfo.ConversationID;                
             _emailPrefixToStrip = itemInfo.EmailPrefixToStrip;
             _entryId = itemInfo.EntryId;
             _storeId = itemInfo.StoreId;
@@ -78,75 +79,64 @@ namespace UtilitiesCS //QuickFiler
             _attachmentsInfo = itemInfo.AttachmentsInfo.ToLazy();
         }
 
-        public static MailItemHelper FromDf(DataFrame df, long indexRow, Outlook.NameSpace olNs, string emailPrefixToStrip, CancellationToken token = default)
+        public static MailItemHelper FromDf(DataFrame df, long indexRow, IApplicationGlobals appGlobals, CancellationToken token = default)
         {
-            var info = new MailItemHelper(df, indexRow, emailPrefixToStrip);
-            info.ResolveMail(olNs, strict: true);
-            info.LoadPriority(emailPrefixToStrip, token);
+            var info = new MailItemHelper(df, indexRow, appGlobals.Ol.EmailPrefixToStrip);
+            info.ResolveMail(appGlobals.Ol.NamespaceMAPI, strict: true);
+            info.LoadPriority(appGlobals.Ol.EmailPrefixToStrip, token);
+            info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
             return info;
         }
 
-        public static async Task<MailItemHelper> FromDfAsync(DataFrame df, long indexRow, Outlook.NameSpace olNs, string emailPrefixToStrip, CancellationToken token, bool background)
+        public static async Task<MailItemHelper> FromDfAsync(DataFrame df, long indexRow, IApplicationGlobals appGlobals, CancellationToken token, bool background)
         {
             token.ThrowIfCancellationRequested();
 
-            //TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
-
-            var info = new MailItemHelper(df, indexRow, emailPrefixToStrip);
-            await info.ResolveMailAsync(olNs, token, background);
+            var info = new MailItemHelper(df, indexRow, appGlobals.Ol.EmailPrefixToStrip);
+            await info.ResolveMailAsync(appGlobals.Ol.NamespaceMAPI, token, background);
 
             token.ThrowIfCancellationRequested();
-            await Task.Factory.StartNew(
-                () =>
-                {
-                    info.Subject = info.Item.Subject;
-                    info.Body = CompressPlainText(info.Item.Body, emailPrefixToStrip);
-                    info.Triage = info.Item.GetTriage();
-                    info.SentOn = info.Item.SentOn.ToString("g");
-                    info.Actionable = info.Item.GetActionTaken();
-                    info.ConversationIndex = info.Item.ConversationIndex;
-                    info.UnRead = info.Item.UnRead;
-                    info.IsTaskFlagSet = (info.Item.FlagStatus == OlFlagStatus.olFlagMarked || info.Item.FlagStatus == OlFlagStatus.olFlagComplete);
-                    info.LoadRecipients();
-                },
-                token);//,
-                       //TaskCreationOptions.None,
-                       //priority);
+            await Task.Run(() => info.LoadPriorityItems(appGlobals.Ol.EmailPrefixToStrip, token), token);
+
+            info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
+
+            token.ThrowIfCancellationRequested();
+            await Task.Run(info.LoadRecipients, token);
 
             return info;
+        }
+
+        internal static Folder ResolveFolderRoot(IApplicationGlobals appGlobals, string folderPath)
+        {
+            if (folderPath.Contains(appGlobals.Ol.ArchiveRootPath))
+            {
+                return appGlobals.Ol.ArchiveRoot;
+            }
+            else
+            {
+                return appGlobals.Ol.EmailRoot;
+            }
         }
 
         public static async Task<MailItemHelper> FromMailItemAsync(
             MailItem item,
-            string emailPrefixToStrip,
+            IApplicationGlobals appGlobals,
             CancellationToken token,
             bool loadAll)
         {
             //TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
 
             token.ThrowIfCancellationRequested();
+            item.ThrowIfNull();
 
             var info = new MailItemHelper(item);
-            if (item is null) { throw new ArgumentNullException(); }
-            info.EntryId = item.EntryID;
-            info.SetSender(item.GetSenderInfo());
-            info.Subject = item.Subject;
-            info.Body = CompressPlainText(item.Body, emailPrefixToStrip);
-            info.Triage = item.GetTriage();
-            info.SentOn = item.SentOn.ToString("g");
-            info.Actionable = item.GetActionTaken();
-            info.FolderName = ((Folder)item.Parent).Name;
-            info.ConversationIndex = item.ConversationIndex;
-            info.UnRead = item.UnRead;
-            info.IsTaskFlagSet = (item.FlagStatus == OlFlagStatus.olFlagMarked || item.FlagStatus == OlFlagStatus.olFlagComplete);
-            var recipientTask = Task.Factory.StartNew(() => info.LoadRecipients(),
-                                                      token,
-                                                      TaskCreationOptions.LongRunning,
-                                                      TaskScheduler.Default);
-            if (loadAll)
-            {
-                await recipientTask;
-            }
+            
+            await Task.Run(() => info.LoadPriorityItems(appGlobals.Ol.EmailPrefixToStrip, token), token);
+            
+            info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
+
+            var recipientTask = Task.Run(info.LoadRecipients, token);
+            if (loadAll) { await recipientTask; }
 
             return info;
         }
@@ -165,49 +155,41 @@ namespace UtilitiesCS //QuickFiler
         {
             //TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
 
-            return await Task.Factory.StartNew(
+            return await Task.Run(
                 () => ResolveMail(olNs, strict: true),
                 token);//,
                        //TaskCreationOptions.None,
                        //priority);
         }
 
-        async public Task<bool> LoadAsync(Outlook.NameSpace olNs, bool darkMode = false)
+        internal void LoadPriorityItems(string emailPrefixToStrip, CancellationToken token = default) 
         {
-            _item = await Task.FromResult((MailItem)olNs.GetItemFromID(_entryId, _storeId));
-            _sender.Html = EmailDetails.ConvertRecipientToHtml(_sender.Address, _sender.Name);
-            _senderHtml = _sender.Html;
-            LoadRecipients();
-            _html = GetHtml();
-            if (darkMode) { _html = ToggleDark(Enums.ToggleState.On); }
-            _triage = _item.GetTriage();
-            _sentOn = _sentDate.ToString("g");
-            _actionable = _item.GetActionTaken();
-
-            return true;
+            if (Item is null) { throw new ArgumentNullException(); }
+            EntryId = Item.EntryID;
+            Sender = Item.GetSenderInfo();
+            SenderName = Sender.Name;
+            SenderHtml = Sender.Html;
+            Subject = Item.Subject;
+            Body = CompressPlainText(Item.Body, emailPrefixToStrip);
+            Categories = Item.Categories;
+            Triage = Item.GetTriage();
+            SentOn = Item.SentOn.ToString("g");
+            Actionable = Item.GetActionTaken();
+            FolderInfo = new OlFolderInfo();
+            FolderInfo.OlFolder = (Outlook.Folder)Item.Parent;
+            FolderName = ((Folder)Item.Parent).Name;
+            ConversationID = Item.ConversationID;
+            UnRead = Item.UnRead;
+            IsTaskFlagSet = (Item.FlagStatus == OlFlagStatus.olFlagMarked);
+            _token = token;
         }
 
         public MailItemHelper LoadPriority(string emailPrefixToStrip, CancellationToken token = default)
         {
             if (!_completedLoadingPriority && _loadNotStarted.CheckAndSetFirstCall)
             {
-                if (_item is null) { throw new ArgumentNullException(); }
-                _entryId = _item.EntryID;
-                _sender = _item.GetSenderInfo();
-                _senderName = _sender.Name;
-                _senderHtml = _sender.Html;
-                _subject = _item.Subject;
-                _body = CompressPlainText(_item.Body, emailPrefixToStrip);
-                _triage = _item.GetTriage();
-                _sentOn = _item.SentOn.ToString("g");
-                _actionable = _item.GetActionTaken();
-                FolderName = ((Folder)_item.Parent).Name;
-                _conversationIndex = _item.ConversationIndex;
-                _unread = _item.UnRead;
-                _isTaskFlagSet = (_item.FlagStatus == OlFlagStatus.olFlagMarked);
-                _token = token;
-                // RecipientsTask = Task.Factory.StartNew(() => LoadRecipients(), token);
-                _ = Task.Factory.StartNew(() => LoadRecipients(), token);
+                LoadPriorityItems(emailPrefixToStrip, token);
+                _ = Task.Run(LoadRecipients, token);
                 _completedLoadingPriority = true;
                 return this;
             }
@@ -218,22 +200,11 @@ namespace UtilitiesCS //QuickFiler
             }
         }
 
-        public MailItemHelper LoadAll(string emailPrefixToStrip, bool loadTokens = false)
+        public MailItemHelper LoadAll(string emailPrefixToStrip, Folder olRoot, bool loadTokens = false)
         {
             if (Item is null) { throw new ArgumentNullException(); }
-            _entryId = _item.EntryID;
-            _sender = _item.GetSenderInfo();
-            _senderName = _sender.Name;
-            _senderHtml = _sender.Html;
-            _subject = _item.Subject;
-            _body = CompressPlainText(_item.Body, emailPrefixToStrip);
-            _triage = _item.GetTriage();
-            _sentOn = _item.SentOn.ToString("g");
-            _actionable = _item.GetActionTaken();
-            FolderName = ((Folder)_item.Parent).Name;
-            _conversationIndex = _item.ConversationIndex;
-            _unread = _item.UnRead;
-            _isTaskFlagSet = (_item.FlagStatus == OlFlagStatus.olFlagMarked);
+            LoadPriorityItems(emailPrefixToStrip, default);
+            FolderInfo.OlRoot = olRoot;
             LoadRecipients();
             if (loadTokens) { LoadTokens(); }
             return this;
@@ -263,7 +234,6 @@ namespace UtilitiesCS //QuickFiler
 
         #region Private variables and enums
 
-
         private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
         private ThreadSafeSingleShotGuard _recipientsStarted = new();
         private CancellationToken _token;
@@ -274,90 +244,52 @@ namespace UtilitiesCS //QuickFiler
 
         #region Public Properties
 
-        internal T RecipientsInitialized<T>(ref T variable, T defaultValue)
-        {
-            switch (RecipientsLoaded)
-            {
-                case Enums.LoadState.NotLoaded:
-                    LoadRecipients();
-                    variable = defaultValue;
-                    break;
-                case Enums.LoadState.Loading:
-                    variable = defaultValue;
-                    break;
-                case Enums.LoadState.Loaded:
-                    break;
-            }
-
-            return variable;
-        }
-        internal string Initialized(ref string variable)
-        {
-            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
-            return variable;
-        }
-        internal bool Initialized(ref bool? variable)
-        {
-            // check if one of the nullable variables is null which would indicate
-            // the need to initialize
-            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
-            return (bool)variable;
-        }
-        internal int Initialized(ref int? variable, Func<int> loader)
-        {
-            variable ??= loader();
-            return (int)variable;
-        }
-
         private string _actionable;
-        public string Actionable { get => Initialized(ref _actionable); set => _actionable = value; }
+        public string Actionable { get => PriorityInitialized(ref _actionable); set => _actionable = value; }
 
         private string _body;
-        public string Body { get => Initialized(ref _body); set => _body = value; }
+        public string Body { get => PriorityInitialized(ref _body); set => _body = value; }
 
-        private string _conversationIndex;
-        public string ConversationIndex { get => Initialized(ref _conversationIndex); set => _conversationIndex = value; }
+        private string _categories;
+        public string Categories { get => PriorityInitialized(ref _categories); set => _categories = value; }
+
+        private string _conversationID;
+        public string ConversationID { get => PriorityInitialized(ref _conversationID); set => _conversationID = value; }
 
         private string _emailPrefixToStrip = "";
         public string EmailPrefixToStrip { get => _emailPrefixToStrip; internal set => _emailPrefixToStrip = value; }
 
         private string _entryId;
-        public string EntryId { get => Initialized(ref _entryId); set => _entryId = value; }
+        public string EntryId { get => PriorityInitialized(ref _entryId); set => _entryId = value; }
 
         private string _storeId;
-        public string StoreId { get => Initialized(ref _storeId); set => _storeId = value; }
+        public string StoreId { get => PriorityInitialized(ref _storeId); set => _storeId = value; }
+
+        private OlFolderInfo _folderInfo;
+        public OlFolderInfo FolderInfo { get => PriorityInitialized(ref _folderInfo); set => _folderInfo = value; }
 
         private string _folderName;
-        public string FolderName { get => Initialized(ref _folderName); set => _folderName = value; }
+        public string FolderName { get => PriorityInitialized(ref _folderName); set => _folderName = value; }
         
+        //private OlFolderInfo _folderInfo;
+
         private MailItem _item;
         public MailItem Item { get => _item; set => _item = value; }
 
         private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo.PlainTextOptionsEnum.StripAll;
         public IItemInfo.PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
 
-        //private Task _recipientsTask;
-        //internal Task RecipientsTask 
-        //{ 
-        //    get
-        //    {
-        //        if (_recipientsTask is null) { LoadPriority(_emailPrefixToStrip); }
-        //        return _recipientsTask;
-        //    }
-        //    private set => _recipientsTask = value;  
-        //}
-
         private string _sentOn;
-        public string SentOn { get => Initialized(ref _sentOn); set => _sentOn = value; }
+        public string SentOn { get => PriorityInitialized(ref _sentOn); set => _sentOn = value; }
 
         private string _subject;
-        public string Subject { get => Initialized(ref _subject); set => _subject = value; }
+        public string Subject { get => PriorityInitialized(ref _subject); set => _subject = value; }
 
         private string _senderHtml;
-        public string SenderHtml { get => Initialized(ref _senderHtml); set => _senderHtml = value; }
+        public string SenderHtml { get => PriorityInitialized(ref _senderHtml); set => _senderHtml = value; }
 
         private string _senderName;
-        public string SenderName { get => Initialized(ref _senderName); set => _senderName = value; }
+        public string SenderName { get => PriorityInitialized(ref _senderName); set => _senderName = value; }
 
         private RecipientInfo _sender;
         public RecipientInfo Sender
@@ -415,7 +347,7 @@ namespace UtilitiesCS //QuickFiler
         public RecipientInfo[] ToRecipients => RecipientsInitialized(ref _toRecipients, default);
 
         private string _triage;
-        public string Triage { get => Initialized(ref _triage); set => _triage = value; }
+        public string Triage { get => PriorityInitialized(ref _triage); set => _triage = value; }
 
         private string _html = null;
         public string Html { get => _html ?? GetHtml(); private set => _html = value; }
@@ -479,7 +411,68 @@ namespace UtilitiesCS //QuickFiler
         [JsonIgnore]
         public EmailTokenizer Tokenizer { get => _tokenizer ??= new EmailTokenizer(); }
         private EmailTokenizer _tokenizer;
+
+        private bool? _unread;
+        public bool UnRead
+        {
+            get => (bool)Initializer.GetOrLoad(ref _unread, loader: () => _item.UnRead, strict: false, dependencies: _item)!;
+            set => Initializer.SetAndSave(ref _unread, value, (x) => _item.UnRead = x ?? false, () => _item.Save(), null, false);
+        }
+
+        public int InternetCodepage
+        {
+            get => Initialized(ref _internetCodepage, LoadInternetCodepage);
+            set => _internetCodepage = value;
+        }
+        private int? _internetCodepage;
+        private int LoadInternetCodepage()
+        {
+            return _item.ThrowIfNull().InternetCodepage;
+        }
+
+        private bool? _isTaskFlagSet;
+        public bool IsTaskFlagSet { get => Initialized(ref _isTaskFlagSet); set => _isTaskFlagSet = value; }
+
         #endregion
+
+        #region Helper Methods
+
+        internal T RecipientsInitialized<T>(ref T variable, T defaultValue)
+        {
+            switch (RecipientsLoaded)
+            {
+                case Enums.LoadState.NotLoaded:
+                    LoadRecipients();
+                    variable = defaultValue;
+                    break;
+                case Enums.LoadState.Loading:
+                    variable = defaultValue;
+                    break;
+                case Enums.LoadState.Loaded:
+                    break;
+            }
+
+            return variable;
+        }
+        internal T PriorityInitialized<T>(ref T variable)
+        {
+            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
+            return variable;
+        }
+        internal bool Initialized(ref bool? variable)
+        {
+            // check if one of the nullable variables is null which would indicate
+            // the need to initialize
+            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
+            return (bool)variable;
+        }
+        internal int Initialized(ref int? variable, Func<int> loader)
+        {
+            variable ??= loader();
+            return (int)variable;
+        }
+        
+        #endregion Helper Methods
 
         #region INotifyPropertyChanged
 
@@ -588,28 +581,9 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 }
                 return _emailHeader;
             }
-        }
+        }       
 
-        private bool? _unread;
-        public bool UnRead
-        {
-            get => (bool)Initializer.GetOrLoad(ref _unread, loader: () => _item.UnRead, strict: false, dependencies: _item)!;
-            set => Initializer.SetAndSave(ref _unread, value, (x) => _item.UnRead = x ?? false, () => _item.Save(), null, false);
-        }
-
-        public int InternetCodepage 
-        { 
-            get => Initialized(ref _internetCodepage, LoadInternetCodepage); 
-            set => _internetCodepage = value; 
-        }
-        private int? _internetCodepage;
-        private int LoadInternetCodepage()
-        {
-            return _item.ThrowIfNull().InternetCodepage;
-        }
-
-        private bool? _isTaskFlagSet;
-        public bool IsTaskFlagSet { get => Initialized(ref _isTaskFlagSet); set => _isTaskFlagSet = value; }
+#nullable disable
 
         internal string DarkModeHeader
         {

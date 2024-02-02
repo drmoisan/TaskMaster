@@ -62,10 +62,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             Interlocked.Add(ref _totalEmailCount, count);
         }
 
-        public async Task ForceClassifierUpdate(string tag, IDictionary<string, int> matchTokens, int emailCount)
+        public async Task RebuildClassifier(string tag, IDictionary<string, int> matchTokens, int matchEmailCount, CancellationToken cancel)
         {
             _classifiers[tag] = await BayesianClassifierShared.FromTokenBaseAsync(
-                this, tag, matchTokens, emailCount, false, default);
+                this, tag, matchTokens, matchEmailCount, false, cancel);
         }
 
         #endregion Public Training Methods

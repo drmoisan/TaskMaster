@@ -23,6 +23,8 @@ using UtilitiesCS.Threading;
 using UtilitiesCS.Properties;
 using UtilitiesCS.Extensions;
 using System.Runtime.InteropServices;
+using System.Windows.Forms.VisualStyles;
+using static Microsoft.FSharp.Core.ByRefKinds;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -209,6 +211,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folderChunks;
         }
 
+        internal IEnumerable<(MailItem Mail,OlFolderInfo FolderInfo)> QueryMailTuples(IEnumerable<OlFolderInfo> folders)
+        {
+            var mailTuples = folders
+                .Select(folderInfo => (folderInfo.OlFolder, folderInfo))
+                .SelectMany(tup => tup.OlFolder
+                                      .Items
+                                      .Cast<object>()
+                                      .Where(obj => obj is MailItem)
+                                      .Cast<MailItem>()
+                                      .Select(mail => (mail, tup.folderInfo)));
+                
+            return mailTuples;
+        }
+
         internal IEnumerable<MailItem> QueryMailItems(IEnumerable<MAPIFolder> folders)
         {
             var mailItems = folders
@@ -288,43 +304,85 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailItemsQuery;
         }
 
-        public async Task<ScBag<MinedMailInfo>> LoadAndConsolidateMinedMail()
+        public async Task<T> Load<T>(string fileName = "")
         {
-            var chunks = Deserialize<int>("FolderChunkCompleted", "");
-            ScBag<MinedMailInfo> minedBag = [];
-
-            for (int i = 0; i < chunks; i++)
-            {
-                var bag = await Task.Run(() => Deserialize<ScBag<MinedMailInfo>>($"MinedMailInfo_{i:000}", ""));
-                ((IList<MinedMailInfo>)minedBag).AddRange(bag);
-            }
-            return minedBag;
+            var tName = FolderConverter.SanitizeFilename(typeof(T).Name);
+            if (fileName.IsNullOrEmpty()) { fileName = tName; }
+            T result = await Task.Run(() => Deserialize<T>(fileName));
+            
+            return result;
         }
 
-        public async Task TransformToMinedMail(OlFolderInfo[][] folderChunks)
+        public delegate Task FolderGroupTransformer(OlFolderInfo[] folders, int batch, int totalBatches, ProgressTracker progress, CancellationToken token);
+        
+        public async Task Transform(OlFolderInfo[][] folderChunks, FolderGroupTransformer transformer)
         {
             var (tokenSource, token, progress, psw) = await ProgressPackage.CreateAsTupleAsync(screen: _globals.Ol.GetExplorerScreen());
             var chunkCount = folderChunks.Count();
             var progressPerChunk = 100 / (double)chunkCount;
 
-            var latestChunk = Deserialize<int>("FolderChunkCompleted", "");
-            progress.Report(latestChunk * progressPerChunk);
+            var latestGroup = Deserialize<int>("FolderGroupCompleted");
+            progress.Report(latestGroup * progressPerChunk);
 
-            for (int i = latestChunk; i < chunkCount; i++)
+            for (int i = latestGroup; i < chunkCount; i++)
             {
-                await MineFolderGroup(
+                await transformer(
                     folderChunks[i], i, chunkCount, progress.SpawnChild(progressPerChunk), token);
 
-                SerializeAndSave(i + 1, "FolderChunkCompleted", "");
+                SerializeAndSave(i + 1, "FolderGroupCompleted");
             }
 
             progress.Report(100);
         }
 
+        public async Task Transform<Tin, Tout>(Func<Tin, Task<Tout>> transformer)
+        {
+            var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
+            var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
+            var count = Deserialize<int>("FolderGroupCompleted");
+            var completed = Deserialize<int>($"{tOutName}Completed");
+            for (int i = completed; i < count; i++)
+            {
+                Tin obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
+                Tout result = await transformer(obj);
+                if(count == 1)                
+                    SerializeAndSave(result, tOutName);                
+                else                
+                    SerializeAndSave(result, $"{tOutName}_{i:0000}");
+                SerializeAndSave(i + 1, $"{tOutName}Completed");
+            }
+        }
+        
+        public async Task Transform<Tin, Tout>(Func<Tin[], Task<Tout>> transformer)
+        {
+            var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
+            var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
+            var count = Deserialize<int>("FolderGroupCompleted");
+            List<Tin>list = [];
+            for (int i = 0; i < count; i++)
+            {
+                Tin obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
+                list.Add(obj);
+            }
+            Tout result = await transformer([.. list]);
+            SerializeAndSave(result, tOutName);
+        }
+
+        public async Task<IItemInfo> ProcessMailTuple((MailItem Mail, OlFolderInfo FolderInfo) mailTuple, CancellationToken cancel)
+        {
+            var mailInfo = await Task.Run(async () => await MailItemHelper.FromMailItemAsync(
+                mailTuple.Mail, _globals, cancel, true));
+
+            mailInfo.FolderInfo = mailTuple.FolderInfo;
+            await mailInfo.TokenizeAsync();
+            var serializable = mailInfo.ToSerializableObject();
+            return serializable;
+        }
+
         public async Task<MinedMailInfo> ProcessMailItem(MailItem mailItem, CancellationToken cancel)
         {
             var mailInfo = await Task.Run(async () => await MailItemHelper.FromMailItemAsync(
-                mailItem, _globals.Ol.EmailPrefixToStrip, cancel, true));
+                mailItem, _globals, cancel, true));
 
             await mailInfo.TokenizeAsync();
 
@@ -332,14 +390,25 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return minedInfo;
         }
 
-        public async Task MineFolderGroup(
-            OlFolderInfo[] olFolderInfos,
+        public async Task<MinedMailInfo[]> ToMinedMail(IItemInfo[] items)
+        {
+            return await Task.Run(() => items.Select(item => new MinedMailInfo(item)).ToArray());
+        }
+
+        public async Task<MinedMailInfo[]> Consolidate(MinedMailInfo[][] jagged)
+        {
+            return await Task.Run(() => jagged.SelectMany(x => x).ToArray());
+        }
+
+        public async Task ToMinedMail(
+            OlFolderInfo[] folders,
             int batch,
             int totalBatches,
             ProgressTracker progress,
             CancellationToken token)
         {
-            var mailItems = QueryMailItems(olFolderInfos.Select(x => x.OlFolder)).ToArray();
+
+            var mailItems = QueryMailItems(folders.Select(x=>x.OlFolder)).ToArray();
 
             var count = mailItems.Count();
             if (count == 0)
@@ -366,20 +435,58 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             minedBag.Serialize();
         }
 
+        public async Task ToIItemInfo(
+            OlFolderInfo[] folders,
+            int batch,
+            int totalBatches,
+            ProgressTracker progress,
+            CancellationToken token)
+        {
+            
+            var mailTuples = QueryMailTuples(folders).ToArray();
+
+            var count = mailTuples.Count();
+            if (count == 0)
+            {
+                progress.Report(100);
+                return;
+            }
+
+            var cBag = await AsyncMultiTasker.AsyncMultiTaskChunker(
+                mailTuples,
+                async (mailTuple) => await ProcessMailTuple(mailTuple, token),
+                progress,
+                $"Mining Mail Batch {batch} of {totalBatches} ",
+                token);
+
+            progress.Report(100);
+
+            var minedBag = new ScBag<IItemInfo>(cBag)
+            {
+                FolderPath = _globals.FS.FldrAppData,
+                FileName = $"IItemInfo_{batch:000}.json"
+            };
+
+            minedBag.Serialize();
+        }
+
         public async Task<ScBag<MinedMailInfo>> MineEmails()
         {
             if (SynchronizationContext.Current is null) { SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext()); }
 
-            var folderChunks = await Task.Run(async () => await ExtractOlFolderChunks());
-            await TransformToMinedMail(folderChunks);
-            return await LoadAndConsolidateMinedMail();
+            var folderGroups = await Task.Run(async () => await ExtractOlFolderChunks());
+            //await Transform(folderGroups, ToMinedMail);
+            await Transform(folderGroups, ToIItemInfo);
+            await Transform<IItemInfo[], MinedMailInfo[]>(ToMinedMail);
+            await Transform<MinedMailInfo[], MinedMailInfo[]>(Consolidate);
+            return new ScBag<MinedMailInfo>(await Load<MinedMailInfo[]>());
         }
 
         #endregion ETL Mined Emails
 
         #region Testing Sizing and Serialization Methods
 
-        private T Deserialize<T>(string fileNameSeed, string fileNameSuffix)
+        private T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -388,7 +495,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             };
             var disk = new FilePathHelper();
             disk.FolderPath = _globals.FS.FldrAppData;
-            disk.FileName = $"{fileNameSeed}_{fileNameSuffix}.json";
+            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+            disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
             {
                 var item = JsonConvert.DeserializeObject<T>(
@@ -398,7 +506,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             else { return default(T); }
         }
 
-        private void SerializeAndSave<T>(T obj, string fileNameSeed, string fileNameSuffix)
+        private void SerializeAndSave<T>(T obj, string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -408,7 +516,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var serializer = JsonSerializer.Create(jsonSettings);
             var disk = new FilePathHelper();
             disk.FolderPath = _globals.FS.FldrAppData;
-            disk.FileName = $"{fileNameSeed}_{fileNameSuffix}.json";
+            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+            disk.FileName = fileName;
             SerializeAndSave(obj, serializer, disk);
         }
 
@@ -475,7 +584,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
 
             var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MailItemHelper(mailItem).LoadAll(_globals.Ol.EmailPrefixToStrip, true));
+                new MailItemHelper(mailItem).LoadAll(_globals.Ol.EmailPrefixToStrip, _globals.Ol.ArchiveRoot,true));
             var sizeMailInfo2 = 0; // ObjectSize(mailInfo);
             LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
@@ -553,9 +662,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
             disk.FileName = null;
         }
-                
+
         #endregion Testing Sizing and Serialization Methods
-                
+
+        #region helper methods
+
         private string GetReportMessage(int complete, int count, Stopwatch sw)
         {
             double seconds = complete > 0 ? sw.Elapsed.TotalSeconds / complete : 0;
@@ -566,6 +677,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
         }
+
+        #endregion helper methods
+
+        #region Build Classifiers
 
         public async Task<ScoCollection<MinedMailInfo>> LoadStaging() 
         {
@@ -599,124 +714,95 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return dict;
         }
-        
-        public async Task BuildClassifierAsync()
+
+        public async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(ScBag<MinedMailInfo> collection)
         {
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
-            //var progress = new ProgressTracker(tokenSource);
+            collection.ThrowIfNull();
 
+            var group = await Task.Run(() => Deserialize<BayesianClassifierGroup>("StagingClassifierGroup"));
+            if (group is null)
+            {
+                group = await CreateClassifierGroupAsync(collection);
+                SerializeAndSave(group, "StagingClassifierGroup");
+            }
+            return group;
+        }
+
+        public async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(ScBag<MinedMailInfo> collection) 
+        {
+            return await Task.Run(() => 
+            {
+                var group = new BayesianClassifierGroup
+                {
+                    TotalEmailCount = collection.Count(),
+                    SharedTokenBase = new Corpus(collection.SelectMany(x => x.Tokens).GroupAndCount())
+                };
+                return group;
+            });
+        }
+        
+        public async Task BuildClassifierAsync(IGrouping<string, MinedMailInfo> group, BayesianClassifierGroup classifierGroup, CancellationToken cancel)
+        {
+            var matchFrequency = group.Select(minedMail => minedMail.Tokens).SelectMany(x => x).GroupAndCount();
+            var matchCorpus = new Corpus(matchFrequency);
+            var matchEmailCount = group.Count();
+            await classifierGroup.RebuildClassifier(group.Key, matchFrequency, matchEmailCount, cancel);        
+        }
+        
+        public async Task BuildClassifierGroupAsync()
+        {
             _globals.AF.Manager.Clear();
+            
+            var ppkg = await ProgressPackage.CreateAsTupleAsync(screen: _globals.Ol.GetExplorerScreen());
+            var sw = ppkg.StopWatch;
 
-            var sw = new SegmentStopWatch();
-            sw.Start();
-
-            var tmp = await LoadStaging();
-            var collection = new ConcurrentBag<MinedMailInfo>(tmp);
-            tmp = null;
+            var collection = new ScBag<MinedMailInfo>(await Task.Run(() => Load<MinedMailInfo[]>()));
+            collection.ThrowIfNullOrEmpty();
             sw.LogDuration("Load Staging");
 
-            var tree = GetOlFolderTree();
-            var folders = QueryOlFolders(tree).ToList();
-            var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
+            var folderPaths = QueryOlFolderInfo(GetOlFolderTree()).Select(x => x.RelativePath).ToList();
             sw.LogDuration("Get Folder Paths");
 
-            var group = new ClassifierGroup();
-            
-            var allTokens = collection.SelectMany(x => x.Tokens).ToList();
-            group.TotalTokenCount = allTokens.Count();
-            sw.LogDuration("Capture all tokens and count");
-
-            var dedicated = GetDedicated(collection);
-            var dedicatedTokens = dedicated.Select(x => x.Key).ToArray();
-            group.DedicatedTokens = dedicated;
-            sw.LogDuration("Identify Dedicated Tokens");
-
-            Corpus sharedTokenBase = new();
-            sharedTokenBase.AddOrIncrementTokens(allTokens);
-            dedicatedTokens.ForEach(x => sharedTokenBase.TokenFrequency.TryRemove(x, out _));
-            group.SharedTokenBase = sharedTokenBase;
-            sw.LogDuration("Create Shared Token Base");
+            var classifierGroup = await GetOrCreateClassifierGroupAsync(collection);
+            sw.LogDuration("Get or Create Classifier Group and shared token base");
             sw.WriteToLog(clear: false);
 
+            var groups = collection.GroupBy(x => x.FolderPath);
 
-            int completed = 0;
-            int count = folderPaths.Count();
-
-            var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)Math.Round((double)count / (double)processors, 0);
-            var chunks = folderPaths.Chunk(chunkSize);
-
-            Stopwatch psw = new Stopwatch();
-            psw.Start();
-
-            //var folderPath = folderPaths[0];
-            //var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-            //var classifier = tokenBase.ToClassifier(folderPath, positiveTokens);
-
-            var progress = new ProgressTracker(tokenSource).Initialize();
-
-            var tasks = chunks.Select(
-                chunk => Task.Run(async () =>
-                {
-                    foreach (var folderPath in chunk)
-                    {
-                        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-                        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
-                        Interlocked.Increment(ref completed);
-                        progress.Report(
-                            (int)(((double)completed / count) * 100),
-                            GetReportMessage(completed, count, psw));
-                    }
-                },token));
-
-            //var tasks = chunks.Select(
-            //    chunk => Task.Run(async () => await
-            //        chunk.ToAsyncEnumerable()
-            //        .ForEachAsync(async (folderPath) => 
-            //        {
-            //            var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-            //            group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
-            //            Interlocked.Increment(ref completed);
-            //            progress.Report(
-            //                (int)(((double)completed / count) * 100),
-            //                GetReportMessage(completed, count, psw));
-            //        }), 
-            //        token));
+            await AsyncMultiTasker.AsyncMultiTaskChunker(groups, async (group) =>
+            {
+                await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
+            }, ppkg.ProgressTracker, "Building Classifiers", ppkg.Cancel);
             
-            //var tasks = folderPaths.Select(folderPath =>
-            //{
-            //    return Task.Run(async () =>
-            //    {
-            //        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-            //        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
-            //        Interlocked.Increment(ref completed);
-            //        progress.Report(
-            //            (int)(((double)completed / count) * 100),
-            //            GetReportMessage(completed, count, psw));
-            //    }, token);
-            //});
+            sw.LogDuration("Build Classifiers");
+            sw.WriteToLog(clear: false);
+            //Task AsyncMultiTaskChunker<T>(
+            //IEnumerable<T> obj,
+            //Func<T, Task> func,
+            //IProgress<(int Value, string JobName)> progress,
+            //string messagePrefix,
+            //CancellationToken cancel)
 
             bool success = false;
 
-            try
-            {
-                await Task.WhenAll(tasks);
-                success = true;
-            }
-            catch (OperationCanceledException)
-            {
-                logger.Debug("Classifier calculation canceled");
-            }
+            //try
+            //{
+            //    await Task.WhenAll(tasks);
+            //    success = true;
+            //}
+            //catch (OperationCanceledException)
+            //{
+            //    logger.Debug("Classifier calculation canceled");
+            //}
 
-            progress.Report(100);
+            //progress.Report(100);
 
-            if (success)
-            {
-                _globals.AF.Manager["Folder"] = group;
-                _globals.AF.Manager.ActivateLocalDisk();
-                _globals.AF.Manager.Serialize();
-            }
+            //if (success)
+            //{
+            //    _globals.AF.Manager["Folder"] = group;
+            //    _globals.AF.Manager.ActivateLocalDisk();
+            //    _globals.AF.Manager.Serialize();
+            //}
         }
 
         public async Task BuildClassifierAsync1()
@@ -898,6 +984,127 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             
             
         }
+
+        public async Task BuildClassifierAsync3()
+        {
+            var tokenSource = new CancellationTokenSource();
+            var token = tokenSource.Token;
+            //var progress = new ProgressTracker(tokenSource);
+
+            _globals.AF.Manager.Clear();
+
+            var sw = new SegmentStopWatch();
+            sw.Start();
+
+            var tmp = await LoadStaging();
+            var collection = new ConcurrentBag<MinedMailInfo>(tmp);
+            tmp = null;
+            sw.LogDuration("Load Staging");
+
+            var tree = GetOlFolderTree();
+            var folders = QueryOlFolders(tree).ToList();
+            var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
+            sw.LogDuration("Get Folder Paths");
+
+            var group = new ClassifierGroup();
+
+            var allTokens = collection.SelectMany(x => x.Tokens).ToList();
+            group.TotalTokenCount = allTokens.Count();
+            sw.LogDuration("Capture all tokens and count");
+
+            var dedicated = GetDedicated(collection);
+            var dedicatedTokens = dedicated.Select(x => x.Key).ToArray();
+            group.DedicatedTokens = dedicated;
+            sw.LogDuration("Identify Dedicated Tokens");
+
+            Corpus sharedTokenBase = new();
+            sharedTokenBase.AddOrIncrementTokens(allTokens);
+            dedicatedTokens.ForEach(x => sharedTokenBase.TokenFrequency.TryRemove(x, out _));
+            group.SharedTokenBase = sharedTokenBase;
+            sw.LogDuration("Create Shared Token Base");
+            sw.WriteToLog(clear: false);
+
+
+            int completed = 0;
+            int count = folderPaths.Count();
+
+            var processors = Math.Max(Environment.ProcessorCount - 2, 1);
+            var chunkSize = (int)Math.Round((double)count / (double)processors, 0);
+            var chunks = folderPaths.Chunk(chunkSize);
+
+            Stopwatch psw = new Stopwatch();
+            psw.Start();
+
+            //var folderPath = folderPaths[0];
+            //var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+            //var classifier = tokenBase.ToClassifier(folderPath, positiveTokens);
+
+            var progress = new ProgressTracker(tokenSource).Initialize();
+
+            var tasks = chunks.Select(
+                chunk => Task.Run(async () =>
+                {
+                    foreach (var folderPath in chunk)
+                    {
+                        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+                        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+                        Interlocked.Increment(ref completed);
+                        progress.Report(
+                            (int)(((double)completed / count) * 100),
+                            GetReportMessage(completed, count, psw));
+                    }
+                }, token));
+
+            //var tasks = chunks.Select(
+            //    chunk => Task.Run(async () => await
+            //        chunk.ToAsyncEnumerable()
+            //        .ForEachAsync(async (folderPath) => 
+            //        {
+            //            var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+            //            group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+            //            Interlocked.Increment(ref completed);
+            //            progress.Report(
+            //                (int)(((double)completed / count) * 100),
+            //                GetReportMessage(completed, count, psw));
+            //        }), 
+            //        token));
+
+            //var tasks = folderPaths.Select(folderPath =>
+            //{
+            //    return Task.Run(async () =>
+            //    {
+            //        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+            //        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+            //        Interlocked.Increment(ref completed);
+            //        progress.Report(
+            //            (int)(((double)completed / count) * 100),
+            //            GetReportMessage(completed, count, psw));
+            //    }, token);
+            //});
+
+            bool success = false;
+
+            try
+            {
+                await Task.WhenAll(tasks);
+                success = true;
+            }
+            catch (OperationCanceledException)
+            {
+                logger.Debug("Classifier calculation canceled");
+            }
+
+            progress.Report(100);
+
+            if (success)
+            {
+                _globals.AF.Manager["Folder"] = group;
+                _globals.AF.Manager.ActivateLocalDisk();
+                _globals.AF.Manager.Serialize();
+            }
+        }
+
+        #endregion Build Classifiers
 
     }
 

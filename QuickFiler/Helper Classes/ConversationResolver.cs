@@ -127,11 +127,11 @@ namespace QuickFiler.Helper_Classes
             
             var df = Df.Expanded;
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
-            var convInfoExpanded = Enumerable.Range(0, Count.Expanded)
-                                             .Select(indexRow => MailItemHelper.FromDf(
-                                                 df, indexRow, olNs, _globals.Ol.EmailPrefixToStrip, Token))
-                                             .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
-                                             .ToList();
+            var convInfoExpanded = Enumerable
+                .Range(0, Count.Expanded)
+                .Select(indexRow => MailItemHelper.FromDf(df, indexRow, _globals, Token))
+                .OrderByDescending(itemInfo => itemInfo.ConversationID)
+                .ToList();
 
             var convInfoSameFolder = convInfoExpanded.Where(
                 itemInfo => itemInfo.FolderName == ((Folder)_mailItem.Parent).Name).ToList();
@@ -148,13 +148,13 @@ namespace QuickFiler.Helper_Classes
 
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
 
-            var tasksConvInfoExp = Enumerable.Range(0, Count.Expanded)
-                                             .Select(indexRow => MailItemHelper
-                                             .FromDfAsync(Df.Expanded, indexRow, olNs, 
-                                             _globals.Ol.EmailPrefixToStrip, token, backgroundLoad));
+            var tasksConvInfoExp = Enumerable
+                .Range(0, Count.Expanded)
+                .Select(indexRow => MailItemHelper
+                .FromDfAsync(Df.Expanded, indexRow, _globals, token, backgroundLoad));
 
             var convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp))
-                                   .OrderByDescending(itemInfo => itemInfo.ConversationIndex)
+                                   .OrderByDescending(itemInfo => itemInfo.ConversationID)
                                    .ToList();
 
             if (UpdateUI is not null)

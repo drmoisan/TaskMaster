@@ -300,7 +300,7 @@ namespace TaskMaster
 
             var ae = _globals.Ol.App.ActiveExplorer();
             var mail = (Outlook.MailItem)ae.Selection[1];
-            var mailInfo = await MailItemHelper.FromMailItemAsync(mail, _globals.Ol.EmailPrefixToStrip, token, true);
+            var mailInfo = await MailItemHelper.FromMailItemAsync(mail, _globals, token, true);
             var tokenizer = new EmailTokenizer();
             //tokenizer.setup();
             var tokens = tokenizer.tokenize(mailInfo).ToArray();
@@ -331,7 +331,7 @@ namespace TaskMaster
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
             var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
-            await miner.BuildClassifierAsync();
+            await miner.BuildClassifierGroupAsync();
         }
 
         internal void TryPrintManagerState()
