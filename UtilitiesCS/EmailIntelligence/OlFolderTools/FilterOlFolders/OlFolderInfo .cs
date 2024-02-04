@@ -15,15 +15,28 @@ namespace UtilitiesCS
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public OlFolderInfo() { ResetLazy(); }
+        public OlFolderInfo() { }
+
+        [JsonConstructor]
+        public OlFolderInfo(bool selected, int itemCount, long folderSize, string name, string relativePath) 
+        { 
+            Selected = selected;
+            ItemCount = itemCount;
+            FolderSize = folderSize;
+            Name = name;
+            RelativePath = relativePath;
+            SubscribeToPropertyChanged(PropertyEnum.All);
+        }
 
         public OlFolderInfo(MAPIFolder olFolder, MAPIFolder olRoot)
         {
             _olFolder = olFolder;
             _olRoot = olRoot;
             ResetLazy();
+            SubscribeToPropertyChanged(PropertyEnum.All);
         }
 
+        private MAPIFolder _olRoot;
         [JsonIgnore]
         public MAPIFolder OlRoot 
         { 
@@ -31,11 +44,10 @@ namespace UtilitiesCS
             set 
             { 
                 _olRoot = value;
-                _lazyRelativePath = new Lazy<string>(LoadRelativePath);
+                NotifyPropertyChanged();
             } 
         }
-        private MAPIFolder _olRoot;
-
+        
         private MAPIFolder _olFolder;
         [JsonIgnore]
         public MAPIFolder OlFolder
@@ -44,7 +56,7 @@ namespace UtilitiesCS
             set
             {
                 _olFolder = value;
-                ResetLazy();
+                NotifyPropertyChanged();
             }
         }
 
@@ -128,16 +140,17 @@ namespace UtilitiesCS
         
         public async Task LoadLazyAsync()
         {
-            Name = await Task.Run(LoadName);
-            RelativePath = await Task.Run(LoadRelativePath);
-            FolderSize = await Task.Run(LoadFolderSize);
-            ItemCount = await Task.Run(() => OlFolder.Items.Count);
+            await Task.Run(() => 
+            {
+                _ = Name;
+                _ = RelativePath;
+                _ = FolderSize;
+                _ = ItemCount;
+            });
         }
 
         public void ResetLazy()
         {
-            //_lazyFolderSize = new AsyncLazy<long>(async () => await Task.Run(() => LoadFolderSize()));
-            //_lazyItemCount = new AsyncLazy<int>(async () => await Task.Run(() => OlFolder.Items.Count));
             _lazyFolderSize = new Lazy<long>(LoadFolderSize);
             _lazyItemCount = new Lazy<int>(() => OlFolder.Items.Count);
             _lazyName = new Lazy<string>(LoadName);
@@ -146,78 +159,132 @@ namespace UtilitiesCS
 
         #endregion Lazy Properties
 
-        #region AsyncLazy Properties
-
-        //public AsyncLazy<int> ItemCount
-        //{
-        //    get => _lazyItemCount;
-        //    protected set
-        //    {
-        //        _lazyItemCount = value;
-        //        NotifyPropertyChanged();
-        //    }
-        //}
-        //private AsyncLazy<int> _lazyItemCount;
-
-        //public AsyncLazy<long> FolderSize
-        //{
-        //    get => _lazyFolderSize;
-        //    protected set
-        //    {
-        //        _lazyFolderSize = value;
-        //        NotifyPropertyChanged();
-        //    }
-        //}
-        //private AsyncLazy<long> _lazyFolderSize;
-        //private long LoadFolderSize()
-        //{
-        //    return OlFolder.Items.Cast<dynamic>().Aggregate(0L, (acc, item) =>
-        //    {
-        //        try { return acc + (item?.Size ?? 0); }
-        //        catch (OverflowException e)
-        //        {
-        //            string message = $"OverflowException encountered while aggregating " +
-        //            $"item sizes in {OlFolder.FolderPath}.\n{e.Message}\n";
-
-        //            message += $"Accumulator prior to overflow: {acc:N0}\n";
-
-        //            try
-        //            {
-        //                message += $"Current Value to add: {item.Size}";
-        //            }
-        //            catch (System.Exception ie)
-        //            {
-        //                message += $"Unable to get size of item to add (see inner exception): \n{ie.Message}\n";
-        //            }
-
-        //            logger.Error(message, e);
-        //            return acc;
-        //        }
-        //    });
-        //}
-
-        //public async Task ForceLazyToComplete()
-        //{
-        //    _ = await FolderSize;
-        //    _ = await ItemCount;
-        //}
-
-        //public async Task<(long ItemSize, int ItemCount)> GetLazyValues()
-        //{
-        //    var itemSize = await FolderSize;
-        //    var itemCount = await ItemCount;
-        //    return (itemSize, itemCount);
-        //}
-
-        //public void ResetLazy()
-        //{
-        //    FolderSize = new AsyncLazy<long>(async () => await Task.Run(() => LoadFolderSize()));
-        //    ItemCount = new AsyncLazy<int>(async () => await Task.Run(() => OlFolder.Items.Count));
-        //}
-
-        #endregion AsyncLazy Properties
-
         #region INotifyPropertyChanged
+
+        [Flags]
+        public enum PropertyEnum
+        {
+            OlRoot = 1,
+            OlFolder = 2,
+            ItemCount = 4,
+            FolderSize = 8,
+            Name = 16,
+            RelativePath = 32,
+            All = OlRoot | OlFolder | ItemCount | FolderSize | Name | RelativePath
+        }
+
+        [JsonIgnore]
+        public PropertyEnum SubscriptionStatus { get; private set; }
+
+        public void SubscribeToPropertyChanged(PropertyEnum properties)
+        {
+            if (properties.HasFlag(PropertyEnum.OlRoot))
+            {
+                PropertyChanged -= PropertyChanged_OlRoot;
+                PropertyChanged += PropertyChanged_OlRoot;
+                SubscriptionStatus |= PropertyEnum.OlRoot;
+            }
+            if (properties.HasFlag(PropertyEnum.OlFolder))
+            {
+                PropertyChanged -= PropertyChanged_OlFolder;
+                PropertyChanged += PropertyChanged_OlFolder;
+                SubscriptionStatus |= PropertyEnum.OlFolder;
+            }
+            if (properties.HasFlag(PropertyEnum.ItemCount))
+            {
+                PropertyChanged -= PropertyChanged_ItemCount;
+                PropertyChanged += PropertyChanged_ItemCount;
+                SubscriptionStatus |= PropertyEnum.ItemCount;
+            }
+            if (properties.HasFlag(PropertyEnum.FolderSize))
+            {
+                PropertyChanged -= PropertyChanged_FolderSize;
+                PropertyChanged += PropertyChanged_FolderSize; 
+                SubscriptionStatus |= PropertyEnum.FolderSize;
+            }
+            if (properties.HasFlag(PropertyEnum.Name))
+            {
+                PropertyChanged -= PropertyChanged_Name;
+                PropertyChanged += PropertyChanged_Name;
+                SubscriptionStatus |= PropertyEnum.Name;
+            }
+            if (properties.HasFlag(PropertyEnum.RelativePath))
+            {
+                PropertyChanged -= PropertyChanged_RelativePath;
+                PropertyChanged += PropertyChanged_RelativePath;
+                SubscriptionStatus |= PropertyEnum.RelativePath;
+            }
+        }
+
+        public void UnSubscribeToPropertyChanged(PropertyEnum properties)
+        {
+            if (properties.HasFlag(PropertyEnum.OlRoot))
+            {
+                PropertyChanged -= PropertyChanged_OlRoot;
+                SubscriptionStatus &= ~PropertyEnum.OlRoot;
+            }
+            if (properties.HasFlag(PropertyEnum.OlFolder))
+            {
+                PropertyChanged -= PropertyChanged_OlFolder;
+                SubscriptionStatus &= ~PropertyEnum.OlFolder;
+            }
+            if (properties.HasFlag(PropertyEnum.ItemCount))
+            {
+                PropertyChanged -= PropertyChanged_ItemCount;
+                SubscriptionStatus &= ~PropertyEnum.ItemCount;
+            }
+            if (properties.HasFlag(PropertyEnum.FolderSize))
+            {
+                PropertyChanged -= PropertyChanged_FolderSize;
+                SubscriptionStatus &= ~PropertyEnum.FolderSize;
+            }
+            if (properties.HasFlag(PropertyEnum.Name))
+            {
+                PropertyChanged -= PropertyChanged_Name;
+                SubscriptionStatus &= ~PropertyEnum.Name;
+            }
+            if (properties.HasFlag(PropertyEnum.RelativePath))
+            {
+                PropertyChanged -= PropertyChanged_RelativePath;
+                SubscriptionStatus &= ~PropertyEnum.RelativePath;
+            }
+        }
+
+        private void PropertyChanged_OlFolder(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(OlFolder))
+            {
+                ResetLazy();
+            }
+        }
+
+        private void PropertyChanged_OlRoot(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(OlRoot))
+            {
+                _lazyRelativePath = new Lazy<string>(LoadRelativePath);
+            }
+        }
+
+        private void PropertyChanged_ItemCount(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ItemCount)) { }
+        }
+
+        private void PropertyChanged_FolderSize(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(FolderSize)) { }
+        }
+
+        private void PropertyChanged_Name(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Name)) { }
+        }
+
+        private void PropertyChanged_RelativePath(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(RelativePath)) { }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

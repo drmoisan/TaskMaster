@@ -19,18 +19,38 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
 
         public AttachmentSerializable() { }
         
-        public AttachmentSerializable(Attachment a) 
+        public AttachmentSerializable(Attachment a, bool imageBytesOnly = true) 
         {             
             // Serialized Properties
+            Type = a.Type;
             BlockLevel = a.BlockLevel;
             Class = a.Class;
             DisplayName = a.DisplayName;
-            FileName = a.FileName;
+            try
+            {
+                FileName = a.FileName;
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}", e);
+                FileName = "";
+            }
+            
             Index = a.Index;
-            PathName = a.PathName;
+            if (Type != OlAttachmentType.olEmbeddeditem)
+            {
+                try
+                {
+                    PathName = a.PathName;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}", e);                
+                }
+            }
+                        
             Position = a.Position;
             Size = a.Size;
-            Type = a.Type;
 
             // Non-Serialized Properties
             Application = a.Application;
@@ -39,6 +59,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             Session = a.Session;
 
             // Custom Properties
+            ImageBytesOnly = imageBytesOnly;
             _a = a;
             _data = new Lazy<byte[]>(() => GetBytes(_a));
             _isImage = new Lazy<bool>(IsAnImage);
@@ -94,7 +115,9 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         {
             byte[] bytes = null;
             
-            if (Type == OlAttachmentType.olByValue)
+            if (!IsImage & ImageBytesOnly) { return bytes;}
+
+            if (Type != OlAttachmentType.olByValue)
             {
                 try
                 {
@@ -188,6 +211,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         [JsonIgnore]
         [field: NonSerialized]
         public NameSpace Session { get; set; }
+
+        [JsonIgnore]
+        [field: NonSerialized]
+        public bool ImageBytesOnly { get; set; }
 
         #endregion Non-Serialized Attachment Properties
     }

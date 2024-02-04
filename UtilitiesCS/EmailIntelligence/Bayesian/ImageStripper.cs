@@ -227,12 +227,28 @@ namespace UtilitiesCS.EmailIntelligence
             var w2 = bottom.Width;
             var h2 = bottom.Height;
 
+            if (w1 * w2 * h1 * h2 == 0)
+            {
+                logger.Debug($"Invalid image dimensions: w1: {w1}, h1: {h1}, w2: {w2}, h2: {h2}");
+                return top;
+            }
+
             Bitmap bitmap = new(Math.Max(w1,w2), h1 + h2, PixelFormat.Format24bppRgb);
             using (Graphics g = Graphics.FromImage(bitmap))
             {
                 g.Clear(Color.Black);
-                g.DrawImage(top, 0, 0);
-                g.DrawImage(bottom, 0, top.Height);
+                try
+                {
+                    g.DrawImage(top, 0, 0);
+                    g.DrawImage(bottom, 0, top.Height);
+                }
+                catch (System.OutOfMemoryException e)
+                {
+                    logger.Debug($"Variables before exception: w1: {w1}, h1: {h1}, w2: {w2}, h2: {h2}");
+                    logger.Error(e.Message,e);
+                    bitmap = top;
+                }
+                
             }
             return bitmap;
         }

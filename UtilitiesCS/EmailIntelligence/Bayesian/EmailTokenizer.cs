@@ -137,38 +137,42 @@ namespace UtilitiesCS.EmailIntelligence
             // but real benefit to keeping case intact in this specific context.
 
             MatchCollection matches = default;
-            try
+            if (msg.Subject is not null)
             {
-                matches = subject_word_re.Matches(msg.Subject);  
-            }
-            catch (System.Exception e)
-            {
-                logger.Error($"Error tokenizing message subject: {e.Message}", e);
-            }
-            
-            if (matches is not null)
-            {
-                foreach (var w in matches)
+                try
                 {
-                    foreach (var t in tokenize_word(w.ToString()))
-                        yield return "subject:" + t;
+                    matches = subject_word_re.Matches(msg.Subject);
                 }
-            }
-
-            try
-            {
-                matches = punctuation_run_re.Matches(msg.Subject);
-            }
-            catch (System.Exception e) 
-            {
-                logger.Error($"Error tokenizing message subject: {e.Message}", e);
-            }
-
-            if (matches is not null)
-            {
-                foreach (var w in matches)
+                catch (System.Exception e)
                 {
-                    yield return "subject:" + w;
+                    logger.Error($"Error tokenizing message subject: {e.Message}", e);
+                }
+
+
+                if (matches is not null)
+                {
+                    foreach (var w in matches)
+                    {
+                        foreach (var t in tokenize_word(w.ToString()))
+                            yield return "subject:" + t;
+                    }
+                }
+
+                try
+                {
+                    matches = punctuation_run_re.Matches(msg.Subject);
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error tokenizing message subject: {e.Message}", e);
+                }
+
+                if (matches is not null)
+                {
+                    foreach (var w in matches)
+                    {
+                        yield return "subject:" + w;
+                    }
                 }
             }
 

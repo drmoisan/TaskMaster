@@ -5,7 +5,7 @@ namespace UtilitiesCS
     public interface IAttachment
     {
         Application Application { get; set; }
-        byte[] AttachmentData { get; }
+        byte[] AttachmentData { get; set; }
         OlAttachmentBlockLevel BlockLevel { get; set; }
         OlObjectClass Class { get; set; }
         string DisplayName { get; set; }

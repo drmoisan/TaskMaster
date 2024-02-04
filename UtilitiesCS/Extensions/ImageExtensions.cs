@@ -34,7 +34,9 @@ namespace UtilitiesCS.Extensions
         {
             var width = image.Width;
             var height = image.Height;
-            
+            if (width == 0 || height == 0)
+                throw new System.Exception($"Image has invalid dimensions: width = {width} | height = {height}");
+
             Bitmap rgbImage = new(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             using (Graphics graphics = Graphics.FromImage(rgbImage))
             {

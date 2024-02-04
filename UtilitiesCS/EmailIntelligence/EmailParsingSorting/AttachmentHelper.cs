@@ -48,7 +48,8 @@ namespace UtilitiesCS.EmailIntelligence
         public void Init(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             _attachment = attachment;
-            
+            _attachmentInfo = new AttachmentSerializable(attachment);
+
             if (CheckParameters(attachment, sentOn, saveFolderPath, deleteFolderPath))
             {
                 (AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension) = GetAttachmentFilename(Attachment);

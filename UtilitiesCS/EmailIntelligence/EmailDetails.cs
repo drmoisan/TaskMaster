@@ -129,29 +129,7 @@ namespace UtilitiesCS
                 senderName = olMail.SenderName;
             }
             return senderName;
-            //if (olMail.Sent == false)
-            //{
-            //    return "";
-            //}
-            //else if (olMail.Sender.Type == "EX")
-            //{
-            //    try
-            //    {
-            //        var OlPA = olMail.Sender.PropertyAccessor;
-            //        string senderAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
-            //        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(senderAddress.Split('@')[0].Replace(".", " "));
-            //    }
-            //    catch
-            //    {
-            //        logger.Error($"Error getting sender name for {olMail.Subject} in Folder {((Folder)olMail.Parent).FolderPath} on date {olMail.SentOn}");
-            //        return "";
-            //    }
-            //}
-            //else
-            //{
-            //    return olMail.Sender.Name;
-            //}
-
+            
         }
 
         public static string GetSenderAddress(this MailItem olMail)
