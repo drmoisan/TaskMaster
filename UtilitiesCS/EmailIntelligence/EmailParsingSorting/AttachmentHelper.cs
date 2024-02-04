@@ -190,7 +190,7 @@ namespace UtilitiesCS.EmailIntelligence
                 logger.Error($"Error getting filename for item. Attachment type {attachment.Type}\n{e.Message}",e);
             }
             
-            var extension = Path.GetExtension(attachment.FileName);
+            var extension = Path.GetExtension(FileName);
             if (filename.Length == 0)
             {
                 filename = extension;
