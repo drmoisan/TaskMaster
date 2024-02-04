@@ -181,21 +181,23 @@ namespace UtilitiesCS.EmailIntelligence
         internal virtual (string Filename, string Extension) GetAttachmentFilename(Attachment attachment)
         {
             string filename = "";
+            string extension = "";
             try
             {
                 filename = Path.GetFileNameWithoutExtension(attachment.FileName);
+                extension = Path.GetExtension(attachment.FileName);
+                if (filename.Length == 0)
+                {
+                    filename = extension;
+                    extension = "";
+                }
             }
             catch (System.Exception e)
             {
                 logger.Error($"Error getting filename for item. Attachment type {attachment.Type}\n{e.Message}",e);
             }
             
-            var extension = Path.GetExtension(FileName);
-            if (filename.Length == 0)
-            {
-                filename = extension;
-                extension = "";
-            }
+            
             return (filename, extension);
         }
 
