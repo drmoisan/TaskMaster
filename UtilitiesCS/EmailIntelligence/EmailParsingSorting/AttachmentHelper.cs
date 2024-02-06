@@ -71,7 +71,7 @@ namespace UtilitiesCS.EmailIntelligence
         async protected internal Task InitAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             _attachment = attachment;
-            
+            _attachmentInfo = new AttachmentSerializable(attachment);
 
             if (CheckParameters(attachment, sentOn, saveFolderPath, deleteFolderPath))
             {

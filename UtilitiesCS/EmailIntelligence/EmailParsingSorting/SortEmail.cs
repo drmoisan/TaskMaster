@@ -98,7 +98,7 @@ namespace UtilitiesCS
             if (mailItems is null || mailItems.Count == 0) 
             { throw new ArgumentNullException($"{mailItems} is null or empty"); }
 
-            var conversationID = mailItems[0].ConversationID;
+            var conversationID = mailItems.FirstOrDefault().ConversationID;
 
             ResolvePaths(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent,
                 out string destinationOlPath, out string saveFsPath, out string deleteFsPath);

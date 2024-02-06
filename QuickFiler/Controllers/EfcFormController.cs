@@ -25,17 +25,25 @@ namespace QuickFiler.Controllers
     {
         #region Constructors
 
-        public EfcFormController(IApplicationGlobals AppGlobals,
-                                 EfcDataModel dataModel,
-                                 EfcViewer formViewer,
-                                 EfcHomeController homeController,
-                                 System.Action ParentCleanup,
-                                 QfEnums.InitTypeEnum initType,
-                                 CancellationToken token)
+        public EfcFormController(
+            IApplicationGlobals AppGlobals,
+            EfcDataModel dataModel,
+            EfcViewer formViewer,
+            EfcHomeController homeController,
+            System.Action ParentCleanup,
+            QfEnums.InitTypeEnum initType,
+            CancellationToken token)
         {
-            SaveParameters(AppGlobals, dataModel, formViewer, 
-                homeController, ParentCleanup, initType, token);
-            
+            _token = token;
+            _globals = AppGlobals;
+            _parentCleanup = ParentCleanup;
+            _formViewer = formViewer;
+            _homeController = homeController;
+            _dataModel = dataModel;
+            _initType = initType;
+            _itemViewer = _formViewer.ItemViewer;
+            _itemTlp = _formViewer.L0vh_TLP;
+
             Initialize();
         }
 
@@ -123,19 +131,6 @@ namespace QuickFiler.Controllers
                                               !_listHighlighted.Contains(x) &&
                                               !_listCheckBox.Contains(x)) 
                                   .ToList();
-        }
-
-        private void SaveParameters(IApplicationGlobals AppGlobals, EfcDataModel dataModel, EfcViewer formViewer, EfcHomeController homeController, System.Action ParentCleanup, QfEnums.InitTypeEnum initType, CancellationToken token)
-        {
-            _token = token;
-            _globals = AppGlobals;
-            _parentCleanup = ParentCleanup;
-            _formViewer = formViewer;
-            _homeController = homeController;
-            _dataModel = dataModel;
-            _initType = initType;
-            _itemViewer = _formViewer.ItemViewer;
-            _itemTlp = _formViewer.L0vh_TLP;
         }
 
         internal void SetupThemes()

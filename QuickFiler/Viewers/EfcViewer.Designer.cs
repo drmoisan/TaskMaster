@@ -81,14 +81,14 @@ namespace QuickFiler
             this.L0vh_TLP.Controls.Add(this.ItemViewer, 1, 1);
             this.L0vh_TLP.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0vh_TLP.Location = new System.Drawing.Point(0, 0);
-            this.L0vh_TLP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.L0vh_TLP.Margin = new System.Windows.Forms.Padding(4);
             this.L0vh_TLP.Name = "L0vh_TLP";
             this.L0vh_TLP.RowCount = 4;
             this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
             this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1031F));
             this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.L0vh_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
-            this.L0vh_TLP.Size = new System.Drawing.Size(2384, 996);
+            this.L0vh_TLP.Size = new System.Drawing.Size(2384, 1756);
             this.L0vh_TLP.TabIndex = 0;
             // 
             // Tlp
@@ -108,7 +108,7 @@ namespace QuickFiler
             this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.99937F));
             this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 178F));
+            this.Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 180F));
             this.Tlp.Controls.Add(this.LblAcTrash, 13, 1);
             this.Tlp.Controls.Add(this.LblAcFolderList, 0, 4);
             this.Tlp.Controls.Add(this.LblAcSearch, 0, 1);
@@ -146,7 +146,7 @@ namespace QuickFiler
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 44F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 19F));
             this.Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 19F));
-            this.Tlp.Size = new System.Drawing.Size(2316, 1);
+            this.Tlp.Size = new System.Drawing.Size(2316, 651);
             this.Tlp.TabIndex = 1;
             // 
             // LblAcTrash
@@ -157,7 +157,7 @@ namespace QuickFiler
             this.LblAcTrash.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcTrash.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcTrash.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcTrash.Location = new System.Drawing.Point(2100, 82);
+            this.LblAcTrash.Location = new System.Drawing.Point(2098, 82);
             this.LblAcTrash.Margin = new System.Windows.Forms.Padding(0);
             this.LblAcTrash.Name = "LblAcTrash";
             this.LblAcTrash.Size = new System.Drawing.Size(34, 33);
@@ -175,7 +175,7 @@ namespace QuickFiler
             this.LblAcFolderList.Location = new System.Drawing.Point(3, 235);
             this.LblAcFolderList.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
             this.LblAcFolderList.Name = "LblAcFolderList";
-            this.LblAcFolderList.Size = new System.Drawing.Size(34, 1);
+            this.LblAcFolderList.Size = new System.Drawing.Size(34, 33);
             this.LblAcFolderList.TabIndex = 18;
             this.LblAcFolderList.Text = "F";
             // 
@@ -202,7 +202,7 @@ namespace QuickFiler
             this.SearchText.Location = new System.Drawing.Point(44, 75);
             this.SearchText.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.SearchText.Name = "SearchText";
-            this.SearchText.Size = new System.Drawing.Size(2013, 49);
+            this.SearchText.Size = new System.Drawing.Size(2011, 49);
             this.SearchText.TabIndex = 0;
             // 
             // label1
@@ -259,7 +259,7 @@ namespace QuickFiler
             this.FolderListBox.Location = new System.Drawing.Point(44, 235);
             this.FolderListBox.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.FolderListBox.Name = "FolderListBox";
-            this.FolderListBox.Size = new System.Drawing.Size(2268, 1);
+            this.FolderListBox.Size = new System.Drawing.Size(2268, 203);
             this.FolderListBox.TabIndex = 11;
             // 
             // Ok
@@ -267,7 +267,7 @@ namespace QuickFiler
             this.Ok.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.Ok.Image = global::QuickFiler.Properties.Resources.Run;
             this.Ok.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Ok.Location = new System.Drawing.Point(498, -139);
+            this.Ok.Location = new System.Drawing.Point(497, 511);
             this.Ok.Margin = new System.Windows.Forms.Padding(16, 13, 16, 13);
             this.Ok.Name = "Ok";
             this.Tlp.SetRowSpan(this.Ok, 4);
@@ -284,7 +284,7 @@ namespace QuickFiler
             this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.Cancel.Image = global::QuickFiler.Properties.Resources.Cancel;
             this.Cancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Cancel.Location = new System.Drawing.Point(866, -139);
+            this.Cancel.Location = new System.Drawing.Point(865, 511);
             this.Cancel.Margin = new System.Windows.Forms.Padding(16, 13, 16, 13);
             this.Cancel.Name = "Cancel";
             this.Tlp.SetRowSpan(this.Cancel, 4);
@@ -300,7 +300,7 @@ namespace QuickFiler
             this.RefreshPredicted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.RefreshPredicted.Image = global::QuickFiler.Properties.Resources.QuickRefresh1;
             this.RefreshPredicted.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.RefreshPredicted.Location = new System.Drawing.Point(1234, -139);
+            this.RefreshPredicted.Location = new System.Drawing.Point(1233, 511);
             this.RefreshPredicted.Margin = new System.Windows.Forms.Padding(16, 13, 16, 13);
             this.RefreshPredicted.Name = "RefreshPredicted";
             this.Tlp.SetRowSpan(this.RefreshPredicted, 4);
@@ -316,7 +316,7 @@ namespace QuickFiler
             this.NewFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.NewFolder.Image = global::QuickFiler.Properties.Resources.NewFolder1;
             this.NewFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.NewFolder.Location = new System.Drawing.Point(1602, -139);
+            this.NewFolder.Location = new System.Drawing.Point(1601, 511);
             this.NewFolder.Margin = new System.Windows.Forms.Padding(16, 13, 16, 13);
             this.NewFolder.Name = "NewFolder";
             this.Tlp.SetRowSpan(this.NewFolder, 4);
@@ -335,7 +335,7 @@ namespace QuickFiler
             this.LblAcEmail.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcEmail.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcEmail.Location = new System.Drawing.Point(0, -125);
+            this.LblAcEmail.Location = new System.Drawing.Point(0, 525);
             this.LblAcEmail.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
             this.LblAcEmail.Name = "LblAcEmail";
             this.LblAcEmail.Size = new System.Drawing.Size(39, 33);
@@ -350,7 +350,7 @@ namespace QuickFiler
             this.LblAcFilters.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcFilters.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcFilters.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcFilters.Location = new System.Drawing.Point(3, -81);
+            this.LblAcFilters.Location = new System.Drawing.Point(3, 569);
             this.LblAcFilters.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
             this.LblAcFilters.Name = "LblAcFilters";
             this.LblAcFilters.Size = new System.Drawing.Size(34, 33);
@@ -365,7 +365,7 @@ namespace QuickFiler
             this.LblAcOk.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcOk.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcOk.Location = new System.Drawing.Point(444, -125);
+            this.LblAcOk.Location = new System.Drawing.Point(443, 525);
             this.LblAcOk.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
             this.LblAcOk.Name = "LblAcOk";
             this.LblAcOk.Size = new System.Drawing.Size(35, 33);
@@ -380,7 +380,7 @@ namespace QuickFiler
             this.LblAcCancel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcCancel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcCancel.Location = new System.Drawing.Point(812, -125);
+            this.LblAcCancel.Location = new System.Drawing.Point(811, 525);
             this.LblAcCancel.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
             this.LblAcCancel.Name = "LblAcCancel";
             this.LblAcCancel.Size = new System.Drawing.Size(35, 33);
@@ -395,7 +395,7 @@ namespace QuickFiler
             this.LblAcRefresh.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcRefresh.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcRefresh.Location = new System.Drawing.Point(1179, -125);
+            this.LblAcRefresh.Location = new System.Drawing.Point(1178, 525);
             this.LblAcRefresh.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
             this.LblAcRefresh.Name = "LblAcRefresh";
             this.LblAcRefresh.Size = new System.Drawing.Size(37, 33);
@@ -410,7 +410,7 @@ namespace QuickFiler
             this.LblAcNewFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.LblAcNewFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
             this.LblAcNewFolder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcNewFolder.Location = new System.Drawing.Point(1547, -125);
+            this.LblAcNewFolder.Location = new System.Drawing.Point(1546, 525);
             this.LblAcNewFolder.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
             this.LblAcNewFolder.Name = "LblAcNewFolder";
             this.LblAcNewFolder.Size = new System.Drawing.Size(37, 33);
@@ -423,9 +423,8 @@ namespace QuickFiler
             this.FilterMenuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.FilterMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FiltersMenu});
-            this.FilterMenuStrip.Location = new System.Drawing.Point(40, -87);
+            this.FilterMenuStrip.Location = new System.Drawing.Point(40, 563);
             this.FilterMenuStrip.Name = "FilterMenuStrip";
-            this.FilterMenuStrip.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
             this.FilterMenuStrip.Size = new System.Drawing.Size(254, 40);
             this.FilterMenuStrip.TabIndex = 26;
             this.FilterMenuStrip.Text = "menuStrip1";
@@ -481,9 +480,8 @@ namespace QuickFiler
             this.MoveOptionsStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.MoveOptionsStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MoveOptionsMenu});
-            this.MoveOptionsStrip.Location = new System.Drawing.Point(40, -131);
+            this.MoveOptionsStrip.Location = new System.Drawing.Point(40, 519);
             this.MoveOptionsStrip.Name = "MoveOptionsStrip";
-            this.MoveOptionsStrip.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
             this.MoveOptionsStrip.Size = new System.Drawing.Size(254, 40);
             this.MoveOptionsStrip.TabIndex = 25;
             this.MoveOptionsStrip.Text = "menuStrip1";
@@ -547,7 +545,7 @@ namespace QuickFiler
             this.ItemViewer.Controller = null;
             this.ItemViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ItemViewer.Location = new System.Drawing.Point(42, 43);
-            this.ItemViewer.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.ItemViewer.Margin = new System.Windows.Forms.Padding(12);
             this.ItemViewer.MinimumSize = new System.Drawing.Size(1516, 196);
             this.ItemViewer.Name = "ItemViewer";
             this.ItemViewer.Size = new System.Drawing.Size(2300, 1007);
@@ -557,11 +555,11 @@ namespace QuickFiler
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2384, 996);
+            this.ClientSize = new System.Drawing.Size(2384, 1756);
             this.Controls.Add(this.L0vh_TLP);
             this.MainMenuStrip = this.MoveOptionsStrip;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.MinimumSize = new System.Drawing.Size(1356, 840);
+            this.Margin = new System.Windows.Forms.Padding(4);
+            this.MinimumSize = new System.Drawing.Size(1356, 1742);
             this.Name = "EfcViewer";
             this.Text = "EfcViewer";
             this.L0vh_TLP.ResumeLayout(false);
