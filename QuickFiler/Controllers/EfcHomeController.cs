@@ -44,7 +44,7 @@ namespace QuickFiler
         private QfEnums.InitTypeEnum _initType;
         private System.Action _parentCleanup;
 
-        [STAThread]
+        //[STAThread]
         public void Run() 
         { 
             if (_dataModel.Mail is not null)

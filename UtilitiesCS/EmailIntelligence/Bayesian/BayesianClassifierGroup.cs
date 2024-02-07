@@ -40,15 +40,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public IApplicationGlobals AppGlobals { get; set; }
 
+        [JsonIgnore]
         public Func<object, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
         private Func<object, IEnumerable<string>> _tokenize = new EmailTokenizer().tokenize;
 
+        [JsonIgnore]
         public Func<object, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
         private Func<object, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().tokenizeAsync;
 
         #endregion Public Properties
 
-        #region Public Training Methods
+        #region Public Model Training Methods
 
         public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens, int emailCount)
         {
@@ -68,9 +70,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 this, tag, matchTokens, matchEmailCount, false, cancel);
         }
 
-        #endregion Public Training Methods
+        #endregion Public Model Training Methods
 
-        #region Public Classification Methods
+        #region Public Classification Prediction Methods
 
         public OrderedParallelQuery<Prediction<string>> Classify(object source)
         {
@@ -111,7 +113,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return results;
         }
 
-        #endregion Public Classification Methods
+        #endregion Public Classification Prediction Methods
 
         #region Debug Methods
 

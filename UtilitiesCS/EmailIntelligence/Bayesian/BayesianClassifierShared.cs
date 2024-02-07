@@ -141,7 +141,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion public properties
 
-        #region population
+        #region Public Model Training Methods
 
         public void Train(IDictionary<string, int> tokenFrequency, int emailCount)
         {
@@ -254,9 +254,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        #endregion population
+        #endregion Public Model Training Methods
 
-        #region classifier testing
+        #region Public Classification Prediction Methods
 
         public double CombineProbabilities(SortedList<string, double> probabilities)
         {
@@ -388,7 +388,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ToArray();
         }
 
-        #endregion classifier testing
+        #endregion Public Classification Prediction Methods
 
         #region knobs for dialing in performance
 

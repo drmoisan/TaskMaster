@@ -26,6 +26,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms.VisualStyles;
 using static Microsoft.FSharp.Core.ByRefKinds;
 using static Deedle.StatsInternal;
+using System.Web.Management;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -153,7 +154,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
         }
 
-        internal async Task<bool> ResolveMapiFolderHandles(OlFolderInfo[] folders)
+        internal async Task<bool> TryResolveMapiHandles(OlFolderInfo[] folders)
         {
             return await Task.Run(() =>
             {
@@ -202,13 +203,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             if (!reload)
             {
                 folders = Deserialize<OlFolderInfo[]>("StagingFolderRecords");
-                reload = !await ResolveMapiFolderHandles(folders);
+            }
+            
+            if (!reload && folders is not null && await TryResolveMapiHandles(folders))
+            {
                 await folders.ToAsyncEnumerable().ForEachAwaitAsync(x => x.LoadLazyAsync()); //.Select(x => x.LoadLazyAsync());
             }
-            if (reload || folders is null)
+
+            else
             {
                 folders = await GetInitializedFolderInfo();
-                SerializeAndSave(folders, "StagingFolderRecords", "");
+                SerializeAndSave(folders, "StagingFolderRecords");
             }
 
             var availableRam = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
@@ -216,7 +221,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             logger.Debug($"Available RAM {availableRam / (double)1000000000:N2} GB");
             logger.Debug($"Max Obj Size  {MaxObjectSize / (double)1000000000:N2} GB");
             logger.Debug($"Min(RAM, Max) {maxChunkSize / (double)1000000000:N2} GB");
-
 
             var folderRecords = AddRollingMeasures(maxChunkSize, folders);
             SerializeAndSave(folderRecords, "StagingFolderRecordsWithTotals");
@@ -258,7 +262,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             logger.Debug($"Summary data on folder chunking\n{summaryText}");
 
-            
             SerializeAndSave(folderChunks, "StagingFolderChunks");
 
             var totalSize = groupSummary.Sum(x => x.Size);
@@ -530,7 +533,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             minedBag.Serialize();
         }
 
-
         #endregion ETL - TRANSFORM For Data Mining
 
         #region ETL - LOAD To Data Mining
@@ -550,7 +552,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Build Classifiers
 
-        public async Task<ScoCollection<MinedMailInfo>> LoadStaging() 
+        public virtual async Task<ScoCollection<MinedMailInfo>> LoadStaging() 
         {
             _mailInfoCollection = await Task.Run(
                 () => new ScoCollection<MinedMailInfo>(
@@ -560,9 +562,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return _mailInfoCollection;
         }
 
-        private ScoCollection<MinedMailInfo> _mailInfoCollection;
+        protected ScoCollection<MinedMailInfo> _mailInfoCollection;
         
-        public ConcurrentDictionary<string, DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
+        public virtual ConcurrentDictionary<string, DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
         {
             var dedicated = collection.Select(x =>
                 x.Tokens.Select(y =>
@@ -583,7 +585,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return dict;
         }
 
-        public async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(ScBag<MinedMailInfo> collection)
+        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(ScBag<MinedMailInfo> collection)
         {
             collection.ThrowIfNull();
 
@@ -596,34 +598,43 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return group;
         }
 
-        public async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(ScBag<MinedMailInfo> collection) 
+        public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
+            ScBag<MinedMailInfo> collection) 
         {
             return await Task.Run(() => 
             {
                 var group = new BayesianClassifierGroup
                 {
                     TotalEmailCount = collection.Count(),
-                    SharedTokenBase = new Corpus(collection.SelectMany(x => x.Tokens).GroupAndCount())
+                    SharedTokenBase = new Corpus(
+                        collection.SelectMany(x => x.Tokens).GroupAndCount())
                 };
                 return group;
             });
         }
         
-        public async Task BuildClassifierAsync(IGrouping<string, MinedMailInfo> group, BayesianClassifierGroup classifierGroup, CancellationToken cancel)
+        public virtual async Task BuildClassifierAsync(
+            IGrouping<string, MinedMailInfo> group, 
+            BayesianClassifierGroup classifierGroup, 
+            CancellationToken cancel)
         {
-            var matchFrequency = group.Select(minedMail => minedMail.Tokens).SelectMany(x => x).GroupAndCount();
+            var matchFrequency = group.Select(minedMail => minedMail.Tokens)
+                                      .SelectMany(x => x)
+                                      .GroupAndCount();
+            
             var matchCorpus = new Corpus(matchFrequency);
             var matchEmailCount = group.Count();
-            await classifierGroup.RebuildClassifier(group.Key, matchFrequency, matchEmailCount, cancel);        
+            await classifierGroup.RebuildClassifier(
+                group.Key, matchFrequency, matchEmailCount, cancel);        
         }
         
-        public async Task BuildClassifierGroupAsync()
+        public async Task BuildFolderClassifiersAsync()
         {
             _globals.AF.Manager.Clear();
             
             var ppkg = await ProgressPackage.CreateAsTupleAsync(screen: _globals.Ol.GetExplorerScreen());
             var sw = ppkg.StopWatch;
-
+            
             var collection = new ScBag<MinedMailInfo>(await Task.Run(() => Load<MinedMailInfo[]>()));
             collection.ThrowIfNullOrEmpty();
             sw.LogDuration("Load Staging");
@@ -637,42 +648,30 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var groups = collection.GroupBy(x => x.FolderPath);
 
-            await AsyncMultiTasker.AsyncMultiTaskChunker(groups, async (group) =>
-            {
-                await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
-            }, ppkg.ProgressTracker, "Building Classifiers", ppkg.Cancel);
-            
-            sw.LogDuration("Build Classifiers");
-            sw.WriteToLog(clear: false);
-            //Task AsyncMultiTaskChunker<T>(
-            //IEnumerable<T> obj,
-            //Func<T, Task> func,
-            //IProgress<(int Value, string JobName)> progress,
-            //string messagePrefix,
-            //CancellationToken cancel)
-
             bool success = false;
-
-            //try
-            //{
-            //    await Task.WhenAll(tasks);
-            //    success = true;
-            //}
-            //catch (OperationCanceledException)
-            //{
-            //    logger.Debug("Classifier calculation canceled");
-            //}
-
-            //progress.Report(100);
-
-            //if (success)
-            //{
-            //    _globals.AF.Manager["Folder"] = group;
-            //    _globals.AF.Manager.ActivateLocalDisk();
-            //    _globals.AF.Manager.Serialize();
-            //}
+            try
+            {
+                await AsyncMultiTasker.AsyncMultiTaskChunker(groups, async (group) =>
+                {
+                    await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
+                }, ppkg.ProgressTracker, "Building Classifiers", ppkg.Cancel);
+                sw.LogDuration("Build Classifiers");
+                sw.WriteToLog(clear: false);
+                success = true;
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            
+            if (success)
+            {
+                _globals.AF.Manager["Folder"] = classifierGroup;
+                _globals.AF.Manager.Serialize();
+            }
         }
 
+        [Obsolete]
         public async Task BuildClassifierAsync1()
         {
             var collection = await LoadStaging();
@@ -736,15 +735,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (success)
             {
-                _globals.AF.Manager["Folder"] = group;
+                //Disabled to prevent compiler error
+                _globals.AF.Manager["Folder"] = null; // group;
                 _globals.AF.Manager.Serialize();
             }
-
-
-
-
         }
 
+        [Obsolete]
         public async Task BuildClassifierAsync2() 
         {
             var collection = await LoadStaging();
@@ -844,15 +841,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (success)
             {
-                _globals.AF.Manager["Folder"] = group;
+                _globals.AF.Manager["Folder"] = null; // group;
                 _globals.AF.Manager.Serialize();
             }
-
-            
-            
-            
         }
 
+        [Obsolete]
         public async Task BuildClassifierAsync3()
         {
             var tokenSource = new CancellationTokenSource();
@@ -966,7 +960,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (success)
             {
-                _globals.AF.Manager["Folder"] = group;
+                // Set to null to prevent compiler error with type change
+                _globals.AF.Manager["Folder"] = null; //group;
                 _globals.AF.Manager.ActivateLocalDisk();
                 _globals.AF.Manager.Serialize();
             }
@@ -976,7 +971,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Testing Sizing and Serialization Methods
 
-        private T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
+        internal virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -996,7 +991,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             else { return default(T); }
         }
 
-        private void SerializeAndSave<T>(T obj, string fileNameSeed, string fileNameSuffix = "")
+        internal virtual void SerializeAndSave<T>(T obj, string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -1011,7 +1006,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             SerializeAndSave(obj, serializer, disk);
         }
 
-        private void SerializeAndSave<T>(T obj, JsonSerializer serializer, FilePathHelper disk)
+        internal virtual void SerializeAndSave<T>(T obj, JsonSerializer serializer, FilePathHelper disk)
         {
             using (StreamWriter sw = File.CreateText(disk.FilePath))
             {
@@ -1020,7 +1015,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        private void SerializeFsSave<T>(T obj, string objName, JsonSerializer serializer, FilePathHelper disk)
+        internal virtual void SerializeFsSave<T>(T obj, string objName, JsonSerializer serializer, FilePathHelper disk)
         {
             disk.FileName = $"{objName}_Example.json";
             using (StreamWriter sw = File.CreateText(disk.FilePath))
@@ -1031,7 +1026,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        private void LogSizeComparison(string m1, long s1, string m2, long s2, string objectName)
+        internal virtual void LogSizeComparison(string m1, long s1, string m2, long s2, string objectName)
         {
             var jagged = new string[][]
             {
@@ -1047,7 +1042,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             logger.Debug($"Object size calculations:\n{text}");
         }
 
-        public void SerializeActiveItem()
+        public virtual void SerializeActiveItem()
         {
             var (mailItem, s1) = TryLoadObjectAndGetMemorySize(() => _globals.Ol.App.ActiveExplorer().Selection[1]);
             var s2 = 0; //ObjectSize(mailItem);
@@ -1058,7 +1053,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         }
 
-        public void SerializeMailInfo(MailItem mailItem)
+        internal virtual void SerializeMailInfo(MailItem mailItem)
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -1089,7 +1084,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         }
 
-        private (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(Func<T> loader, int copiesToLoad = 1)
+        internal virtual (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(Func<T> loader, int copiesToLoad = 1)
         {
             loader.ThrowIfNull();
             if (copiesToLoad < 1) { throw new ArgumentOutOfRangeException(nameof(copiesToLoad), $"{nameof(copiesToLoad)} must be greater than 0"); }
@@ -1130,7 +1125,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return (obj, size);
         }
 
-        internal JsonSerializer GetSerializer()
+        internal virtual JsonSerializer GetSerializer()
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -1141,7 +1136,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return serializer;
         }
 
-        public void SerializeChunk(MinedMailInfo[] chunk, JsonSerializer serializer, FilePathHelper disk, int i) 
+        public virtual void SerializeChunk(MinedMailInfo[] chunk, JsonSerializer serializer, FilePathHelper disk, int i) 
         { 
             disk.FileName = $"MinedMailInfo_{i:000}.json";
             using (StreamWriter sw = File.CreateText(disk.FilePath))

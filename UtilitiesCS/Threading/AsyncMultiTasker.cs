@@ -113,9 +113,11 @@ namespace UtilitiesCS.Threading
             int chunkSize = count / chunkNum;
 
             var chunks = obj.Chunk(chunkSize).ToArray();
+            // temp override to test
+            //chunks = [obj.ToArray()];
 
             List<Task> tasks = [];
-            var sw = Stopwatch.StartNew();
+            var sw = await Task.Run(Stopwatch.StartNew);
 
             foreach (var chunk in chunks)
             {
@@ -142,23 +144,25 @@ namespace UtilitiesCS.Threading
                 cancel));
             }
 
-            var timer = new TimerWrapper(TimeSpan.FromSeconds(1));
-            timer.Elapsed += (sender, e) =>
+            TimerWrapper timer = null;
+            await Task.Run(() =>
             {
-                if (count > 0)
+                timer = new TimerWrapper(TimeSpan.FromSeconds(1));
+                timer.Elapsed += (sender, e) =>
                 {
-                    progress.Report(
-                        ((int)(((double)complete / count) * 100),
-                        GetReportMessage(messagePrefix, complete, count, sw)));
-                }
-            };
-            timer.AutoReset = true;
-
-            var tasksComplete = Task.WhenAll(tasks);
-
+                    if (count > 0)
+                    {
+                        progress.Report(
+                            ((int)(((double)complete / count) * 100),
+                            GetReportMessage(messagePrefix, complete, count, sw)));
+                    }
+                };
+                timer.AutoReset = true;
+                timer.StartTimer();
+            });
+            
             try
             {
-                timer.StartTimer();
                 await Task.WhenAll(tasks);
             }
             catch (TaskCanceledException)
@@ -174,6 +178,7 @@ namespace UtilitiesCS.Threading
             }
             finally
             {
+                progress.Report((100, "Operation Complete"));
                 timer.StopTimer();
                 timer.Dispose();
             }
@@ -257,6 +262,7 @@ namespace UtilitiesCS.Threading
             }
             finally
             {
+                progress.Report((100, "Operation Complete"));
                 timer.StopTimer();
                 timer.Dispose();
             }
@@ -335,6 +341,7 @@ namespace UtilitiesCS.Threading
             }
             finally
             {
+                progress.Report((100, "Operation Complete"));
                 timer.StopTimer();
                 timer.Dispose();
             }

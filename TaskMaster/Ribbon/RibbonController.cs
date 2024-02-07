@@ -331,12 +331,12 @@ namespace TaskMaster
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
             var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
-            await miner.BuildClassifierGroupAsync();
+            await miner.BuildFolderClassifiersAsync();
         }
 
         internal void TryPrintManagerState()
         {
-            _globals.AF.Manager["Folder"].LogMetrics();
+            //_globals.AF.Manager["Folder"].LogMetrics();
         }
 
         internal void TrySaveManagerLocally()

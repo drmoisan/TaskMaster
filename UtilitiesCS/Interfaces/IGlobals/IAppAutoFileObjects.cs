@@ -27,7 +27,7 @@ namespace UtilitiesCS
         System.Action MaximizeQuickFileWindow { get; set; }
         ScoStack<IMovedMailInfo> MovedMails { get; }
         ScoCollection<FilterEntry> Filters { get; }
-        ScDictionary<string, ClassifierGroup> Manager { get; }
+        ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         ProgressTrackerPane ProgressTracker { get; }
         Microsoft.Office.Tools.CustomTaskPane ProgressPane { get; }
         CancellationToken CancelLoad { get; }
