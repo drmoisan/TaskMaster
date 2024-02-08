@@ -33,7 +33,8 @@ namespace UtilitiesCS.Threading
             var chunks = obj.Chunk(chunkSize);
             var result = new ConcurrentBag<TOut>();
             List<Task> tasks = [];
-            var sw = Stopwatch.StartNew();
+            //var sw = Stopwatch.StartNew();
+            var sw = new SegmentStopWatch().Start();
 
             foreach (var chunk in chunks)
             {
@@ -44,7 +45,7 @@ namespace UtilitiesCS.Threading
                         try
                         {
                             result.Add(await func(item));
-                            Interlocked.Increment(ref complete);
+                            Interlocked.Increment(ref complete);                            
                         }
                         catch (OperationCanceledException)
                         {
@@ -68,6 +69,12 @@ namespace UtilitiesCS.Threading
                     progress.Report(
                         ((int)(((double)complete / count) * 100),
                         GetReportMessage(messagePrefix, complete, count, sw)));
+                    //if (complete > 100)
+                    //{
+                    //    timer.StopTimer();
+                    //    result.ForEach(x => sw.MergeDurations(((IItemInfo)x).Sw.Durations));
+                    //    sw.WriteToLog();
+                    //}
                 }
             };
             timer.AutoReset = true;
@@ -76,6 +83,11 @@ namespace UtilitiesCS.Threading
             {
                 timer.StartTimer();
                 await Task.WhenAll(tasks);
+
+                timer.StopTimer();
+                result.ForEach(x => sw.MergeDurations(((IItemInfo)x).Sw.Durations));
+                sw.WriteToLog();
+                
                 return result;
             }
             catch (TaskCanceledException)

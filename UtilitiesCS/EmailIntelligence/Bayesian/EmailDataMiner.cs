@@ -54,11 +54,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             if (SynchronizationContext.Current is null) { SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext()); }
 
+            var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
+
             var folderGroups = await Task.Run(async () => await ExtractOlFolderChunks());
             //await Transform(folderGroups, ToMinedMail);
-            await Transform(folderGroups, ToIItemInfo);
+            await Transform(folderGroups, ToIItemInfoArray);
             await Transform<IItemInfo[], MinedMailInfo[]>(ToMinedMail);
             await Transform<MinedMailInfo[], MinedMailInfo[]>(Consolidate);
+            
+            await ToggleOfflineMode(offline);
             return new ScBag<MinedMailInfo>(await Load<MinedMailInfo[]>());
         }
 
@@ -103,8 +107,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal async Task<OlFolderInfo[]> GetInitializedFolderInfo()
         {
-            var (tokenSource, cancel, progress, sw) = await ProgressPackage.CreateAsTupleAsync(
-                screen: _globals.Ol.GetExplorerScreen());
+            var (tokenSource, cancel, progress, sw) = await ProgressPackage.CreateAsTupleAsync();
+                //screen: _globals.Ol.GetExplorerScreen());
             OlFolderInfo[] folders = null;
 
             await Task.Run(
@@ -369,11 +373,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region ETL - TRANSFORM For Data Mining
 
-        public delegate Task FolderGroupTransformer(OlFolderInfo[] folders, int batch, int totalBatches, ProgressTracker progress, CancellationToken token);
+        public delegate Task FolderGroupTransformer(OlFolderInfo[] folders, int batch, int totalBatches, ProgressTrackerPane progress, CancellationToken token);
 
         public async Task Transform(OlFolderInfo[][] folderChunks, FolderGroupTransformer transformer)
         {
-            var (tokenSource, token, progress, psw) = await ProgressPackage.CreateAsTupleAsync(screen: _globals.Ol.GetExplorerScreen());
+            var (_, token, progress, _) = await ProgressPackage
+                .CreateAsTuplePaneAsync(progressTrackerPane: _globals.AF.ProgressTracker).ConfigureAwait(false);
+            _globals.AF.ProgressPane.Visible = true;
+
             var chunkCount = folderChunks.Count();
             var progressPerChunk = 100 / (double)chunkCount;
 
@@ -389,6 +396,75 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
 
             progress.Report(100);
+        }
+
+        public async Task ToIItemInfoArray(
+            OlFolderInfo[] folders,
+            int batch,
+            int totalBatches,
+            ProgressTrackerPane progress,
+            CancellationToken token)
+        {
+            var sw = await Task.Run(() => new SegmentStopWatch().Start());
+            var mailTuples = QueryMailTuples(folders).ToArray();
+            sw.LogDuration("QueryMailTuples");
+
+            var count = mailTuples.Count();
+            if (count == 0)
+            {
+                progress.Report(100);
+                return;
+            }
+
+            var cBag = await AsyncMultiTasker.AsyncMultiTaskChunker(
+                mailTuples,
+                async (mailTuple) => await ToIItemInfo(mailTuple, token),
+                progress,
+                $"Mining Mail Batch {batch} of {totalBatches} ",
+                token);
+
+            cBag.ForEach(x => 
+            { 
+                sw.MergeDurations(x.Sw.Durations);
+                x.Sw.Stop();
+                x.Sw = null;
+            });
+            sw.WriteToLog(clear: true);
+
+            progress.Report(100);
+
+            var ary = cBag.ToArray();
+            SerializeAndSave(ary, ary.GetType().Name, batch.ToString("0000"));
+
+            //var minedBag = new ScBag<IItemInfo>(cBag)
+            //{
+            //    FolderPath = _globals.FS.FldrAppData,
+            //    FileName = $"IItemInfo_{batch:000}.json"
+            //};
+
+            //minedBag.Serialize();
+        }
+
+        public async Task<IItemInfo> ToIItemInfo((MailItem Mail, OlFolderInfo FolderInfo) mailTuple, CancellationToken cancel)
+        {
+            var mailInfo = await Task.Run(async () => await MailItemHelper.FromMailItemAsync(
+                mailTuple.Mail, _globals, cancel, true));
+
+            mailInfo.FolderInfo = mailTuple.FolderInfo;
+            
+            await mailInfo.TokenizeAsync();
+            var serializable = mailInfo.ToSerializableObject();
+            serializable.Sw = mailInfo.Sw;
+            serializable.Sw.LogDuration("ToSerializableObject");
+
+            foreach (var attachment in serializable.AttachmentsInfo)
+            {
+                if (!attachment.IsImage) 
+                { 
+                    attachment.AttachmentData = null;
+                }
+            }
+            return serializable;
         }
 
         public async Task Transform<Tin, Tout>(Func<Tin, Task<Tout>> transformer)
@@ -409,39 +485,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        public async Task Transform<Tin, Tout>(Func<Tin[], Task<Tout>> transformer)
-        {
-            var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
-            var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
-            var count = Deserialize<int>("FolderGroupCompleted");
-            List<Tin> list = [];
-            for (int i = 0; i < count; i++)
-            {
-                Tin obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
-                list.Add(obj);
-            }
-            Tout result = await transformer([.. list]);
-            SerializeAndSave(result, tOutName);
-        }
-
-        public async Task<IItemInfo> ToIItemInfo((MailItem Mail, OlFolderInfo FolderInfo) mailTuple, CancellationToken cancel)
-        {
-            var mailInfo = await Task.Run(async () => await MailItemHelper.FromMailItemAsync(
-                mailTuple.Mail, _globals, cancel, true));
-
-            mailInfo.FolderInfo = mailTuple.FolderInfo;
-            await mailInfo.TokenizeAsync();
-            var serializable = mailInfo.ToSerializableObject();
-            foreach (var attachment in serializable.AttachmentsInfo)
-            {
-                if (!attachment.IsImage) 
-                { 
-                    attachment.AttachmentData = null;
-                }
-            }
-            return serializable;
-        }
-
         public async Task<MinedMailInfo[]> ToMinedMail(IItemInfo[] items)
         {
             return await Task.Run(() => items.Select(item => new MinedMailInfo(item)).ToArray());
@@ -456,6 +499,21 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var minedInfo = new MinedMailInfo(mailInfo);
             return minedInfo;
+        }
+
+        public async Task Transform<Tin, Tout>(Func<Tin[], Task<Tout>> transformer)
+        {
+            var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
+            var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
+            var count = Deserialize<int>("FolderGroupCompleted");
+            List<Tin> list = [];
+            for (int i = 0; i < count; i++)
+            {
+                Tin obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
+                list.Add(obj);
+            }
+            Tout result = await transformer([.. list]);
+            SerializeAndSave(result, tOutName);
         }
 
         public async Task<MinedMailInfo[]> Consolidate(MinedMailInfo[][] jagged)
@@ -498,42 +556,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             minedBag.Serialize();
         }
 
-        public async Task ToIItemInfo(
-            OlFolderInfo[] folders,
-            int batch,
-            int totalBatches,
-            ProgressTracker progress,
-            CancellationToken token)
-        {
-
-            var mailTuples = QueryMailTuples(folders).ToArray();
-
-            var count = mailTuples.Count();
-            if (count == 0)
-            {
-                progress.Report(100);
-                return;
-            }
-
-            var cBag = await AsyncMultiTasker.AsyncMultiTaskChunker(
-                mailTuples,
-                async (mailTuple) => await ToIItemInfo(mailTuple, token),
-                progress,
-                $"Mining Mail Batch {batch} of {totalBatches} ",
-                token);
-
-            progress.Report(100);
-
-            var minedBag = new ScBag<IItemInfo>(cBag)
-            {
-                FolderPath = _globals.FS.FldrAppData,
-                FileName = $"IItemInfo_{batch:000}.json"
-            };
-
-            minedBag.Serialize();
-        }
-
-        #endregion ETL - TRANSFORM For Data Mining
+#endregion ETL - TRANSFORM For Data Mining
 
         #region ETL - LOAD To Data Mining
 
@@ -1161,6 +1184,22 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             string msg = $"Completed {complete} of {count} ({seconds:N2} spm) " +
                 $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
+        }
+
+        /// <summary>
+        /// If Outlook is not in offline mode, save the state and toggle it to offline mode
+        /// </summary>
+        /// <param name="offline"></param>
+        /// <returns></returns>
+        private async Task<bool> ToggleOfflineMode(bool offline)
+        {
+            if (!offline)
+            {
+                var commandBars = _globals.Ol.App.ActiveExplorer().CommandBars;
+                if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+                await Task.Delay(5);
+            }
+            return offline;
         }
 
         #endregion Helper Methods

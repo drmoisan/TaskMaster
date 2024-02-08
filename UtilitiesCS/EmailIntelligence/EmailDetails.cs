@@ -8,6 +8,7 @@ using System.Data;
 using System.Reflection;
 using System;
 using System.Text.RegularExpressions;
+using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS
 {
@@ -233,16 +234,20 @@ namespace UtilitiesCS
 
         public static IEnumerable<RecipientInfo> GetInfo(this IEnumerable<Recipient> recipients)
         {
-            return recipients.Select(GetInfo);
+            return recipients.Select(x => x.GetInfo());
         }
 
-        public static RecipientInfo GetInfo(this Recipient recipient)
+        public static RecipientInfo GetInfo(this Recipient recipient, SegmentStopWatch sw = null)
         {
             (var name, var address) = GetRecipientInfo(recipient);
+            sw?.LogDuration("GetRecipientInfo");
             //string name = GetRecipientName(recipient);
             //string address = GetRecipientAddress(recipient);
             string html = ConvertRecipientToHtml(name, address);
-            return new RecipientInfo(name, address, html);
+            sw?.LogDuration("ConvertRecipientToHtml");
+            var ri = new RecipientInfo(name, address, html);
+            sw?.LogDuration("New RecipientInfo");
+            return ri;
         }
 
         public static string GetToRecipientsInHtml(MailItem olMail)

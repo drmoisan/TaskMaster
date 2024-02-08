@@ -1,9 +1,11 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS;
 
@@ -46,4 +48,7 @@ public interface IItemInfo
     string[] Tokens { get; }
     string Triage { get; set; }
     bool UnRead { get; set; }
+    
+    [JsonIgnore]
+    SegmentStopWatch Sw { get; set; }
 }

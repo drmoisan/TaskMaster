@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.Extensions;
 using Fizzler;
+using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS //QuickFiler
 {
@@ -101,7 +102,11 @@ namespace UtilitiesCS //QuickFiler
             info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
 
             token.ThrowIfCancellationRequested();
-            await Task.Run(info.LoadRecipients, token);
+            await Task.Run(() => 
+            { 
+                info.LoadRecipients();
+                if (info._html is not null) { info._html = info.GetHtml(); }
+            }, token);
 
             return info;
         }
@@ -117,7 +122,7 @@ namespace UtilitiesCS //QuickFiler
                 return appGlobals.Ol.EmailRoot;
             }
         }
-
+        
         public static async Task<MailItemHelper> FromMailItemAsync(
             MailItem item,
             IApplicationGlobals appGlobals,
@@ -125,19 +130,24 @@ namespace UtilitiesCS //QuickFiler
             bool loadAll)
         {
             //TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
-
+            
             token.ThrowIfCancellationRequested();
             item.ThrowIfNull();
 
             var info = new MailItemHelper(item);
-            
+            info.Sw = new SegmentStopWatch().Start();
+
             await Task.Run(() => info.LoadPriorityItems(appGlobals.Ol.EmailPrefixToStrip, token), token);
             
             info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
 
-            var recipientTask = Task.Run(info.LoadRecipients, token);
+            var recipientTask = Task.Run(() => 
+            { 
+                info.LoadRecipients();
+                if (info._html is not null) { info._html = info.GetHtml(); }
+            }, token);
             if (loadAll) { await recipientTask; }
-
+            
             return info;
         }
 
@@ -182,6 +192,7 @@ namespace UtilitiesCS //QuickFiler
             UnRead = Item.UnRead;
             IsTaskFlagSet = (Item.FlagStatus == OlFlagStatus.olFlagMarked);
             _token = token;
+            Sw.LogDuration("LoadPriorityItems");
         }
 
         public MailItemHelper LoadPriority(string emailPrefixToStrip, CancellationToken token = default)
@@ -189,13 +200,17 @@ namespace UtilitiesCS //QuickFiler
             if (!_completedLoadingPriority && _loadNotStarted.CheckAndSetFirstCall)
             {
                 LoadPriorityItems(emailPrefixToStrip, token);
-                _ = Task.Run(LoadRecipients, token);
+                _ = Task.Run(() => 
+                { 
+                    LoadRecipients();
+                    if (_html is not null) { _html = GetHtml(); }
+                }, token);
                 _completedLoadingPriority = true;
                 return this;
             }
             else
             {
-                Task.Delay(100).Wait();
+                //Task.Delay(100).Wait();
                 return this;
             }
         }
@@ -206,6 +221,7 @@ namespace UtilitiesCS //QuickFiler
             LoadPriorityItems(emailPrefixToStrip, default);
             FolderInfo.OlRoot = olRoot;
             LoadRecipients();
+            if (_html is not null) { _html = GetHtml(); }
             if (loadTokens) { LoadTokens(); }
             return this;
         }
@@ -213,14 +229,21 @@ namespace UtilitiesCS //QuickFiler
         public void LoadRecipients()
         {
             RecipientsLoaded = Enums.LoadState.Loading;
-            _toRecipients = _item.GetToRecipients().GetInfo().ToArray();
+            var recipients = Item.Recipients.Cast<Recipient>().ToArray();
+            Sw.LogDuration("Recipients -> Cast to array");
+            ToRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray();
+
+            //_toRecipients = _item.GetToRecipients().GetInfo().ToArray();
             _toRecipientsName = string.Join("; ", _toRecipients.Select(t => t.Name));
             _toRecipientsHtml = string.Join("; ", _toRecipients.Select(t => t.Html));
-            _ccRecipients = _item.GetCcRecipients().GetInfo().ToArray();
+            CcRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray();
+            //_ccRecipients = _item.GetCcRecipients().GetInfo().ToArray();
             _ccRecipientsName = string.Join("; ", _ccRecipients.Select(t => t.Name));
             _ccRecipientsHtml = string.Join("; ", _ccRecipients.Select(t => t.Html));
             RecipientsLoaded = Enums.LoadState.Loaded;
-            if (_html is not null) { _html = GetHtml(); }
+            //if (_html is not null) { _html = GetHtml(); }
+            
+            Sw.LogDuration("LoadRecipients");
         }
 
         internal void SetSender(RecipientInfo sender)
@@ -239,6 +262,7 @@ namespace UtilitiesCS //QuickFiler
         private CancellationToken _token;
         private readonly ThreadSafeSingleShotGuard _loadNotStarted = new();
         private bool _completedLoadingPriority;
+        public SegmentStopWatch Sw { get; set; }
 
         #endregion
 
@@ -327,8 +351,12 @@ namespace UtilitiesCS //QuickFiler
         }
 
         private RecipientInfo[] _ccRecipients;
-        public RecipientInfo[] CcRecipients => RecipientsInitialized(ref _ccRecipients, default);
-
+        public RecipientInfo[] CcRecipients
+        {
+            get => RecipientsInitialized(ref _ccRecipients, default);
+            protected set => _ccRecipients = value;
+        }
+        
         private string _toRecipientsHtml;
         public string ToRecipientsHtml
         {
@@ -344,7 +372,11 @@ namespace UtilitiesCS //QuickFiler
         }
 
         private RecipientInfo[] _toRecipients;
-        public RecipientInfo[] ToRecipients => RecipientsInitialized(ref _toRecipients, default);
+        public RecipientInfo[] ToRecipients 
+        { 
+            get => RecipientsInitialized(ref _toRecipients, default); 
+            protected set => _toRecipients = value; 
+        }
 
         private string _triage;
         public string Triage { get => PriorityInitialized(ref _triage); set => _triage = value; }
@@ -405,6 +437,7 @@ namespace UtilitiesCS //QuickFiler
         public async Task<IEnumerable<string>> TokenizeAsync()
         {
             _tokens = await Task.Run(() => Tokenizer.tokenize(this).ToArray());
+            Sw.LogDuration("TokenizeAsync");
             return _tokens;
         }
 
@@ -631,6 +664,7 @@ img {
             var regex = new Regex(@"(<body[\S\s]*?>)", RegexOptions.Multiline);
             string revisedBody = regex.Replace(body, "$1" + EmailHeader);
             //string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
+            Sw.LogDuration("GetHtml");
             return revisedBody;
         }
 

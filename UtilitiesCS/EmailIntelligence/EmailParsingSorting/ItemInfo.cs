@@ -1,5 +1,6 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using System;
+using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.EmailIntelligence
 {
@@ -51,6 +52,7 @@ namespace UtilitiesCS.EmailIntelligence
         public string HTMLBody { get; set; }
         public int InternetCodepage { get; set; }
         public bool IsTaskFlagSet { get; set; }
+        public SegmentStopWatch Sw { get; set;}
         
         public IItemInfo.PlainTextOptionsEnum PlainTextOptions { get; set; }
         public RecipientInfo Sender { get; set; }

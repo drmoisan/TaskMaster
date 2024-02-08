@@ -106,5 +106,36 @@ namespace UtilitiesCS.HelperClasses
             { _durations.Clear(); }
             logger.Info($"\n{text}");
         }
+
+        public void MergeDurations(Stack<(string ActionName, TimeSpan Duration)> durations)
+        {
+            _durations = _durations
+                .Reverse()
+                .Concat(durations)
+                .GroupBy(x => x.ActionName)
+                .Select(group =>
+                {
+                    var actionName = group.Key;
+                    var duration = TimeSpan.FromTicks(group.Sum(x => x.Duration.Ticks));
+                    return (ActionName: actionName, Duration: duration);
+                })
+                .ToStack();
+        }
+        
+        public static Stack<(string ActionName, TimeSpan Duration)> GroupDurations(
+                       Stack<(string ActionName, TimeSpan Duration)> d1,
+                       Stack<(string ActionName, TimeSpan Duration)> d2)
+        {
+            return d1
+                .Concat(d2)
+                .GroupBy(x => x.ActionName)
+                .Select(group =>
+                {
+                    var actionName = group.Key;
+                    var duration = TimeSpan.FromTicks(group.Sum(x => x.Duration.Ticks));
+                    return (ActionName: actionName, Duration: duration);
+                })
+                .ToStack(); 
+        }
     }
 }
