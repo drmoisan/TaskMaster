@@ -49,7 +49,7 @@ namespace UtilitiesCS.EmailIntelligence
         public string EntryId { get; set; }
         public string StoreId { get; set; }
         public string FolderName { get; set; }
-        public OlFolderInfo FolderInfo { get; set; }
+        public IFolderInfo FolderInfo { get; set; }
         public string Html { get; set; }
         public string HTMLBody { get; set; }
         public int InternetCodepage { get; set; }

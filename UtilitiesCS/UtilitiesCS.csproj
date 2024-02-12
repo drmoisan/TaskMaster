@@ -394,6 +394,7 @@
     <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentSerializable.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />

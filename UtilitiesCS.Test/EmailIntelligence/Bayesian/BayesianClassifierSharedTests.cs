@@ -621,7 +621,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             actual.Should().BeEquivalentTo(expected,
-                options => options.Excluding(x => x.Parent.Tokenize));
+                options => options
+                    .Excluding(x => x.Parent.Tokenize)
+                    .Excluding(x => x.Parent.TokenizeAsync));
 
         }
 
@@ -650,7 +652,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             actual.Should().BeEquivalentTo(expected,
-                options => options.Excluding(x => x.Parent.Tokenize));
+                options => options
+                    .Excluding(x => x.Parent.Tokenize)
+                    .Excluding(x => x.Parent.TokenizeAsync));
 
         }
 
@@ -678,8 +682,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             actual.LogActualVsExpected(expected);
 
             // Assert
-            actual.Should().BeEquivalentTo(expected, 
-                options => options.Excluding(x => x.Parent.Tokenize));
+            actual.Should().BeEquivalentTo(expected,
+                options => options
+                    .Excluding(x => x.Parent.Tokenize)
+                    .Excluding(x => x.Parent.TokenizeAsync));
 
         }
 

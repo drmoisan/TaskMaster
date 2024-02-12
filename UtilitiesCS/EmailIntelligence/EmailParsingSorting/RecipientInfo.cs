@@ -22,8 +22,8 @@ namespace UtilitiesCS
         private string _address;
         private string _html;
 
-        public string Name { get => _name; set => _name = value; }
-        public string Address { get => _address; set => _address = value; }
-        public string Html { get => _html; set => _html = value; }
+        public virtual string Name { get => _name; set => _name = value; }
+        public virtual string Address { get => _address; set => _address = value; }
+        public virtual string Html { get => _html; set => _html = value; }
     }
 }

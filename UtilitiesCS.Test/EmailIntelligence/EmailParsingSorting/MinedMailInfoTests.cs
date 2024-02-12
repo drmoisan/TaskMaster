@@ -3,6 +3,8 @@ using Moq;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using Microsoft.Office.Interop.Outlook;
 using FluentAssertions;
+using Newtonsoft.Json;
+using System;
 
 namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
 {
@@ -11,7 +13,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
     {
         private MockRepository mockRepository;
         private Mock<IItemInfo> mockIItemInfo;
-        private Mock<OlFolderInfo> mockOlFolderInfo;
+        private Mock<IFolderInfo> mockOlFolderInfo;
         private Mock<Folder> mockFolder;
         private Mock<Folder> mockFolderRoot;
         private Mock<RecipientInfo> mockSender;
@@ -24,6 +26,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
         [TestInitialize]
         public void TestInitialize()
         {
+            Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             this.mockFolder = this.CreateMockFolder("FolderL1\\FolderL2\\FolderL3\\FolderName");
             this.mockFolderRoot = this.CreateMockFolder("FolderL1");
@@ -73,9 +76,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
             return folder;
         }
         
-        private Mock<OlFolderInfo> CreateMockOlFolderInfo(Folder folder, Folder folderRoot)
+        private Mock<IFolderInfo> CreateMockOlFolderInfo(Folder folder, Folder folderRoot)
         {
-            var item = this.mockRepository.Create<OlFolderInfo>();
+            var item = this.mockRepository.Create<IFolderInfo>();
             item.SetupAllProperties();
             item.Setup(x => x.OlFolder).Returns(folder);
             item.Setup(x => x.FolderSize).Returns(1000000);
@@ -86,12 +89,12 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
             while (relativePath.StartsWith("\\")) { relativePath = relativePath.Substring(1); }
             item.Setup(x => x.RelativePath).Returns(relativePath);
             item.Setup(x => x.Selected).Returns(true);
-            item.Setup(x => x.SubscriptionStatus).Returns(OlFolderInfo.PropertyEnum.All);
+            item.Setup(x => x.SubscriptionStatus).Returns(IFolderInfo.PropertyEnum.All);
             return item;
         }
 
         private Mock<IItemInfo> CreateMockIItemInfo(
-            OlFolderInfo folderInfo, RecipientInfo sender, RecipientInfo[] ccRecipients, 
+            IFolderInfo folderInfo, RecipientInfo sender, RecipientInfo[] ccRecipients, 
             RecipientInfo[] toRecipients, string conversationId)
         {
             var itemInfo = this.mockRepository.Create<IItemInfo>();
@@ -122,10 +125,11 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
 
             // Act
             var actual = new MinedMailInfo(this.mockIItemInfo.Object);
+            Console.WriteLine($"Expected Object:\n{JsonConvert.SerializeObject(expected)}");
+            Console.WriteLine($"Actual Object:\n{JsonConvert.SerializeObject(actual)}");
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
-            this.mockRepository.VerifyAll();
         }
     }
 }

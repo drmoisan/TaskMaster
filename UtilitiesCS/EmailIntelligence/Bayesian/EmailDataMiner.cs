@@ -185,8 +185,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     var subscriptions = folder.SubscriptionStatus;
 
                     folder.UnSubscribeToPropertyChanged(
-                        OlFolderInfo.PropertyEnum.OlRoot |
-                        OlFolderInfo.PropertyEnum.OlFolder);
+                        IFolderInfo.PropertyEnum.OlRoot |
+                        IFolderInfo.PropertyEnum.OlFolder);
 
                     folder.OlRoot = handle.OlRoot;
                     folder.OlFolder = handle.OlFolder;

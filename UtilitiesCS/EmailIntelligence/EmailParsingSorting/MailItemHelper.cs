@@ -294,8 +294,8 @@ namespace UtilitiesCS //QuickFiler
         private string _storeId;
         public string StoreId { get => PriorityInitialized(ref _storeId); set => _storeId = value; }
 
-        private OlFolderInfo _folderInfo;
-        public OlFolderInfo FolderInfo { get => PriorityInitialized(ref _folderInfo); set => _folderInfo = value; }
+        private IFolderInfo _folderInfo;
+        public IFolderInfo FolderInfo { get => PriorityInitialized(ref _folderInfo); set => _folderInfo = value; }
 
         private string _folderName;
         public string FolderName { get => PriorityInitialized(ref _folderName); set => _folderName = value; }

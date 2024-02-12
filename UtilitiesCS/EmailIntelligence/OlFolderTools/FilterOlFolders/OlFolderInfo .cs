@@ -10,22 +10,20 @@ using System.Diagnostics;
 
 namespace UtilitiesCS
 {
-    public class OlFolderInfo : INotifyPropertyChanged
+    public class OlFolderInfo : INotifyPropertyChanged, IFolderInfo
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public OlFolderInfo() { }
-
         [JsonConstructor]
-        public OlFolderInfo(bool selected, int itemCount, long folderSize, string name, string relativePath) 
-        { 
+        public OlFolderInfo(bool selected, int itemCount, long folderSize, string name, string relativePath)
+        {
             Selected = selected;
             ItemCount = itemCount;
             FolderSize = folderSize;
             Name = name;
             RelativePath = relativePath;
-            SubscribeToPropertyChanged(PropertyEnum.All);
+            SubscribeToPropertyChanged(IFolderInfo.PropertyEnum.All);
         }
 
         public OlFolderInfo(MAPIFolder olFolder, MAPIFolder olRoot)
@@ -33,21 +31,21 @@ namespace UtilitiesCS
             _olFolder = olFolder;
             _olRoot = olRoot;
             ResetLazy();
-            SubscribeToPropertyChanged(PropertyEnum.All);
+            SubscribeToPropertyChanged(IFolderInfo.PropertyEnum.All);
         }
 
         private MAPIFolder _olRoot;
         [JsonIgnore]
-        public MAPIFolder OlRoot 
-        { 
+        public MAPIFolder OlRoot
+        {
             get => _olRoot;
-            set 
-            { 
+            set
+            {
                 _olRoot = value;
                 NotifyPropertyChanged();
-            } 
+            }
         }
-        
+
         private MAPIFolder _olFolder;
         [JsonIgnore]
         public MAPIFolder OlFolder
@@ -104,7 +102,7 @@ namespace UtilitiesCS
                 }
             });
         }
-        
+
         private Lazy<string> _lazyName;
         public string Name { get => _lazyName.Value; private set => _lazyName = value.ToLazy(); }
         internal virtual string LoadName() => OlFolder?.Name;
@@ -137,10 +135,10 @@ namespace UtilitiesCS
                 return OlFolder.FolderPath.Replace(OlRoot.FolderPath + "\\", "");
             }
         }
-        
+
         public async Task LoadLazyAsync()
         {
-            await Task.Run(() => 
+            await Task.Run(() =>
             {
                 _ = Name;
                 _ = RelativePath;
@@ -161,92 +159,81 @@ namespace UtilitiesCS
 
         #region INotifyPropertyChanged
 
-        [Flags]
-        public enum PropertyEnum
-        {
-            OlRoot = 1,
-            OlFolder = 2,
-            ItemCount = 4,
-            FolderSize = 8,
-            Name = 16,
-            RelativePath = 32,
-            All = OlRoot | OlFolder | ItemCount | FolderSize | Name | RelativePath
-        }
-
+        
         [JsonIgnore]
-        public PropertyEnum SubscriptionStatus { get; private set; }
+        public IFolderInfo.PropertyEnum SubscriptionStatus { get; private set; }
 
-        public void SubscribeToPropertyChanged(PropertyEnum properties)
+        public void SubscribeToPropertyChanged(IFolderInfo.PropertyEnum properties)
         {
-            if (properties.HasFlag(PropertyEnum.OlRoot))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlRoot))
             {
                 PropertyChanged -= PropertyChanged_OlRoot;
                 PropertyChanged += PropertyChanged_OlRoot;
-                SubscriptionStatus |= PropertyEnum.OlRoot;
+                SubscriptionStatus |= IFolderInfo.PropertyEnum.OlRoot;
             }
-            if (properties.HasFlag(PropertyEnum.OlFolder))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlFolder))
             {
                 PropertyChanged -= PropertyChanged_OlFolder;
                 PropertyChanged += PropertyChanged_OlFolder;
-                SubscriptionStatus |= PropertyEnum.OlFolder;
+                SubscriptionStatus |= IFolderInfo.PropertyEnum.OlFolder;
             }
-            if (properties.HasFlag(PropertyEnum.ItemCount))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.ItemCount))
             {
                 PropertyChanged -= PropertyChanged_ItemCount;
                 PropertyChanged += PropertyChanged_ItemCount;
-                SubscriptionStatus |= PropertyEnum.ItemCount;
+                SubscriptionStatus |= IFolderInfo.PropertyEnum.ItemCount;
             }
-            if (properties.HasFlag(PropertyEnum.FolderSize))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.FolderSize))
             {
                 PropertyChanged -= PropertyChanged_FolderSize;
-                PropertyChanged += PropertyChanged_FolderSize; 
-                SubscriptionStatus |= PropertyEnum.FolderSize;
+                PropertyChanged += PropertyChanged_FolderSize;
+                SubscriptionStatus |= IFolderInfo.PropertyEnum.FolderSize;
             }
-            if (properties.HasFlag(PropertyEnum.Name))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.Name))
             {
                 PropertyChanged -= PropertyChanged_Name;
                 PropertyChanged += PropertyChanged_Name;
-                SubscriptionStatus |= PropertyEnum.Name;
+                SubscriptionStatus |= IFolderInfo.PropertyEnum.Name;
             }
-            if (properties.HasFlag(PropertyEnum.RelativePath))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.RelativePath))
             {
                 PropertyChanged -= PropertyChanged_RelativePath;
                 PropertyChanged += PropertyChanged_RelativePath;
-                SubscriptionStatus |= PropertyEnum.RelativePath;
+                SubscriptionStatus |= IFolderInfo.PropertyEnum.RelativePath;
             }
         }
 
-        public void UnSubscribeToPropertyChanged(PropertyEnum properties)
+        public void UnSubscribeToPropertyChanged(IFolderInfo.PropertyEnum properties)
         {
-            if (properties.HasFlag(PropertyEnum.OlRoot))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlRoot))
             {
                 PropertyChanged -= PropertyChanged_OlRoot;
-                SubscriptionStatus &= ~PropertyEnum.OlRoot;
+                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.OlRoot;
             }
-            if (properties.HasFlag(PropertyEnum.OlFolder))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlFolder))
             {
                 PropertyChanged -= PropertyChanged_OlFolder;
-                SubscriptionStatus &= ~PropertyEnum.OlFolder;
+                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.OlFolder;
             }
-            if (properties.HasFlag(PropertyEnum.ItemCount))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.ItemCount))
             {
                 PropertyChanged -= PropertyChanged_ItemCount;
-                SubscriptionStatus &= ~PropertyEnum.ItemCount;
+                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.ItemCount;
             }
-            if (properties.HasFlag(PropertyEnum.FolderSize))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.FolderSize))
             {
                 PropertyChanged -= PropertyChanged_FolderSize;
-                SubscriptionStatus &= ~PropertyEnum.FolderSize;
+                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.FolderSize;
             }
-            if (properties.HasFlag(PropertyEnum.Name))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.Name))
             {
                 PropertyChanged -= PropertyChanged_Name;
-                SubscriptionStatus &= ~PropertyEnum.Name;
+                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.Name;
             }
-            if (properties.HasFlag(PropertyEnum.RelativePath))
+            if (properties.HasFlag(IFolderInfo.PropertyEnum.RelativePath))
             {
                 PropertyChanged -= PropertyChanged_RelativePath;
-                SubscriptionStatus &= ~PropertyEnum.RelativePath;
+                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.RelativePath;
             }
         }
 
