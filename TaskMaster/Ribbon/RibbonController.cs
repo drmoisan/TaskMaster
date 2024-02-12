@@ -22,6 +22,8 @@ using UtilitiesCS.EmailIntelligence.FolderRemap;
 using UtilitiesCS.EmailIntelligence;
 using log4net.Repository.Hierarchy;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using static UtilitiesCS.EmailIntelligence.Bayesian.BayesianHypertuning;
+using System.Diagnostics.Metrics;
 
 
 namespace TaskMaster
@@ -358,6 +360,17 @@ namespace TaskMaster
             //var mail = (Outlook.MailItem)ae.Selection[1];
             //new EmailDataMiner(_globals).SerializeMailInfo(mail);
 
+        }
+
+        internal async Task TryTestClassifier()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianHypertuning(_globals);
+            //await tuner.TestFolderClassifierAsync();
+            await tuner.SaveConfusionMatrixAsync(null, null);
+            
         }
     }
 }

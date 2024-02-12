@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.Extensions;
 
 
 namespace UtilitiesCS
@@ -57,6 +59,11 @@ namespace UtilitiesCS
             }
         }
 
+        public static IEnumerable<TValue> SelectGroup<TKey, TValue>(this IEnumerable<IGrouping<TKey, TValue>> groups, TKey key) 
+        {
+            return groups.Where(x => x.Key.Equals(key)).SelectMany(x => x);
+        }
+
         public static string StringJoin(this IEnumerable<string> strings, string seperator=",") => string.Join(seperator, strings);
 
         public static string StringJoin(this IEnumerable<char> chars, string seperator = "") => string.Join(seperator, chars);
@@ -93,6 +100,17 @@ namespace UtilitiesCS
                 
                 Interlocked.Increment(ref completed);
                 progress((int)(((double)completed / count) * 100));
+            }
+        }
+
+        public static IEnumerable<T> WithAction<T>(this IEnumerable<T> enumerable, System.Action action)
+        {
+            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+
+            foreach (var item in enumerable)
+            {
+                action();
+                yield return item;
             }
         }
 
@@ -230,6 +248,90 @@ namespace UtilitiesCS
                 while (i >= size && e.MoveNext());
             }
         }
-    
+
+        private static IEnumerable<T[]> SplitIterator<T>(IEnumerable<T> source, int size)
+        {
+            using IEnumerator<T> e = source.GetEnumerator();
+
+            // Before allocating anything, make sure there's at least one element.
+            if (e.MoveNext())
+            {
+                // Now that we know we have at least one item, allocate an initial storage array. This is not
+                // the array we'll yield.  It starts out small in order to avoid significantly overallocating
+                // when the source has many fewer elements than the chunk size.
+                int arraySize = Math.Min(size, 4);
+                int i;
+                do
+                {
+                    var array = new T[arraySize];
+
+                    // Store the first item.
+                    array[0] = e.Current;
+                    i = 1;
+
+                    if (size != array.Length)
+                    {
+                        // This is the first chunk. As we fill the array, grow it as needed.
+                        for (; i < size && e.MoveNext(); i++)
+                        {
+                            if (i >= array.Length)
+                            {
+                                arraySize = (int)Math.Min((uint)size, 2 * (uint)array.Length);
+                                Array.Resize(ref array, arraySize);
+                            }
+
+                            array[i] = e.Current;
+                        }
+                    }
+                    else
+                    {
+                        // For all but the first chunk, the array will already be correctly sized.
+                        // We can just store into it until either it's full or MoveNext returns false.
+                        T[] local = array; // avoid bounds checks by using cached local (`array` is lifted to iterator object as a field)
+                        Debug.Assert(local.Length == size);
+                        for (; (uint)i < (uint)local.Length && e.MoveNext(); i++)
+                        {
+                            local[i] = e.Current;
+                        }
+                    }
+
+                    if (i != array.Length)
+                    {
+                        Array.Resize(ref array, i);
+                    }
+
+                    yield return array;
+                }
+                while (i >= size && e.MoveNext());
+            }
+        }
+
+        public static (T[] Train, T[] Test) SplitTestTrain<T>(this IEnumerable<T> collection, double trainPercent)
+        {
+            collection.ThrowIfNullOrEmpty();
+            if (trainPercent < 0 || trainPercent > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(trainPercent), "Train percentage must be between 0 and 1");
+            }
+
+            var array = collection.ToArray();
+            var count = array.Count();
+
+            var rnd = new Random();
+            
+            // Must consume IEnumerable to avoid generating a different random numbers on each iteration
+            var assignments = Enumerable.Range(0, count).Select(x => rnd.NextDouble() > trainPercent ? "Test" : "Train").ToArray();
+            var zipped = array.Zip(assignments, (tElement, grouping) => (grouping, tElement)).ToArray();
+            var train = zipped.Where(x => x.grouping == "Train").Select(x => x.tElement).ToArray();
+            var test = zipped.Where(x => x.grouping == "Test").Select(x => x.tElement).ToArray();
+
+            // Flawed approach, as it will generate the random numbers each iteration, 
+            // which could cause lists neither to be mutually exclusive nor collectively exhaustive
+            //var groups = collection.GroupBy(x => rnd.NextDouble() > trainPercent ? "Test" : "Train");
+            //var train = groups.SelectGroup("Train");
+            //var test = groups.SelectGroup("Test");
+            return (train, test);
+        }
+
     }
 }

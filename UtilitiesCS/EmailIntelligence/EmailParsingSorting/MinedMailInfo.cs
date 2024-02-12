@@ -11,16 +11,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             Categories = info.Categories;
             Tokens = info.Tokens;
-            FolderPath = info.FolderName;
+            FolderInfo = info.FolderInfo;
             ToRecipients = info.ToRecipients;
             CcRecipients = info.CcRecipients;
             Sender = info.Sender;
             ConversationId = info.ConversationID;
-        }
-        public MinedMailInfo(string folderPath, string[] tokens)
-        {
-            Tokens = tokens;
-            FolderPath = folderPath;
         }
 
         private string _categories;
@@ -29,8 +24,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private string[] _tokens;
         public string[] Tokens { get => _tokens; set => _tokens = value; }
 
-        public string _folderPath;
-        public string FolderPath { get => _folderPath; set => _folderPath = value; }
+        private OlFolderInfo _folderInfo;
+        public OlFolderInfo FolderInfo { get => _folderInfo; set => _folderInfo = value; }
 
         private RecipientInfo[] _toRecipients;
         public RecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }

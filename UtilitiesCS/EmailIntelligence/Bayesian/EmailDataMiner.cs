@@ -17,17 +17,13 @@ using VBFunctions;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
-using UtilitiesCS.Properties;
 using UtilitiesCS.Extensions;
 using System.Runtime.InteropServices;
-using System.Windows.Forms.VisualStyles;
-using static Microsoft.FSharp.Core.ByRefKinds;
-using static Deedle.StatsInternal;
-using System.Web.Management;
-using static Deedle.Vectors.VectorListTransform;
+using System.Runtime.CompilerServices;
+
+
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -385,18 +381,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             progress.Report(0, message);
 
             var (completed, chunkCount) = await DeserializeAsync<(int, int)>("FolderGroupCompleted");
-            var progressPerChunk = 100 / (double)chunkCount;
-
             if (folderChunks.Count() != chunkCount)
             {
                 logger.Debug($"FolderChunks count {folderChunks.Count()} does not match chunkCount {chunkCount}. Restarting transformation with new data");
                 chunkCount = folderChunks.Count();
                 completed = 0;
             }
+            var progressPerChunk = 100 / (double)chunkCount;
 
             for (int i = 0; i < chunkCount; i++)
             {
-                if (i <= completed)
+                if (i < completed)
                 {
                     if (withValidation)
                     {
@@ -536,6 +531,31 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return await Task.Run(() => items.Select(item => new MinedMailInfo(item)).ToArray());
         }
 
+        public async Task<MinedMailInfo[]> FilterExcluded(MinedMailInfo[] items)
+        {
+            return await Task.Run(() => items
+                .Where(x => 
+                    !_globals.TD.FilteredFolderScraping.ContainsKey(x.FolderInfo.RelativePath))
+                .ToArray());
+        }
+
+        public async Task<MinedMailInfo[]> RemapFolderPaths(MinedMailInfo[] items)
+        {
+            await Task.Run(() =>
+            {
+                foreach (var item in items)
+                {
+                    if (_globals.TD.DictRemap.ContainsKey(item.FolderInfo.RelativePath))
+                    {
+                        item.FolderInfo.RelativePath = _globals.TD.DictRemap[item.FolderInfo.RelativePath];
+                    }
+                }
+                //items.ForEach(x => x.FolderPath = _globals.TD.DictRemap.ContainsKey(x.FolderPath) ?
+                //           _globals.TD.DictRemap[x.FolderPath] : x.FolderPath);
+            });
+            return items;
+        }
+
         public async Task<MinedMailInfo> ToMinedMail(MailItem mailItem, CancellationToken cancel)
         {
             var mailInfo = await Task.Run(async () => await MailItemHelper.FromMailItemAsync(
@@ -573,7 +593,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task<MinedMailInfo[]> Consolidate(MinedMailInfo[][] jagged)
         {
-            return await Task.Run(() => jagged.SelectMany(x => x).ToArray());
+            var combined = await Task.Run(() => jagged.SelectMany(x => x).ToArray());
+            combined = await Task.Run(() => FilterExcluded(combined));
+            combined = await Task.Run(() => RemapFolderPaths(combined));
+            return combined;
         }
 
         public async Task ToMinedMail(
@@ -619,7 +642,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var tName = FolderConverter.SanitizeFilename(typeof(T).Name);
             if (fileName.IsNullOrEmpty()) { fileName = tName; }
-            T result = await Task.Run(() => Deserialize<T>(fileName));
+            T result = await DeserializeAsync<T>(fileName);
 
             return result;
         }
@@ -646,7 +669,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var dedicated = collection.Select(x =>
                 x.Tokens.Select(y =>
-                (Token: y, FolderPath: x.FolderPath))
+                (Token: y, FolderPath: x.FolderInfo.RelativePath))
                 .GroupBy(x => x.Token)
                 .Select(grp => new DedicatedToken(
                     grp.Key,
@@ -663,7 +686,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return dict;
         }
 
-        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(ScBag<MinedMailInfo> collection)
+        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection)
         {
             collection.ThrowIfNull();
 
@@ -677,7 +700,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
-            ScBag<MinedMailInfo> collection)
+            MinedMailInfo[] collection)
         {
             return await Task.Run(() =>
             {
@@ -706,14 +729,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 group.Key, matchFrequency, matchEmailCount, cancel);
         }
 
-        public async Task TestFolderClassifierAsync() 
-        {
-            await Task.CompletedTask;
-        }
         
-        public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, ScBag<MinedMailInfo> collection, ProgressPackage ppkg)
+    public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg)
         {
-            var groups = collection.GroupBy(x => x.FolderPath);
+            var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
             var sw = ppkg.StopWatch;
 
             bool success = false;
@@ -744,7 +763,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = true;
             ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier -> Load Mined Mail Info");
                         
-            var collection = new ScBag<MinedMailInfo>(await Task.Run(() => Load<MinedMailInfo[]>()));
+            var collection = await Load<MinedMailInfo[]>();
             collection.ThrowIfNullOrEmpty();
             sw.LogDuration("Load Staging");
             
@@ -802,8 +821,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 return Task.Run(() =>
                 {
-                    var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-                    var negativeTokens = collection.Where(x => x.FolderPath != folderPath).SelectMany(x => x.Tokens).ToList();
+                    var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
+                    var negativeTokens = collection.Where(x => x.FolderInfo.RelativePath != folderPath).SelectMany(x => x.Tokens).ToList();
                     if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
                     {
                         group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
@@ -821,7 +840,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     progress.Report(
                         (int)(((double)completed / count) * 100),
-                        GetReportMessage(completed, count, psw));
+                        GetProgressMessage(completed, count, psw));
                 }
                 success = true;
             }
@@ -884,8 +903,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 return Task.Run(() =>
                 {
-                    var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-                    var negativeTokens = collection.Where(x => x.FolderPath != folderPath).SelectMany(x => x.Tokens).ToList();
+                    var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
+                    var negativeTokens = collection.Where(x => x.FolderInfo.RelativePath != folderPath).SelectMany(x => x.Tokens).ToList();
                     if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
                         group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
                     Interlocked.Increment(ref completed);
@@ -901,7 +920,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     progress.Report(
                         (int)(((double)completed / count) * 100),
-                        GetReportMessage(completed, count, psw));
+                        GetProgressMessage(completed, count, psw));
                 }
                 success = true;
             }
@@ -1007,12 +1026,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     foreach (var folderPath in chunk)
                     {
-                        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+                        var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
                         group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
                         Interlocked.Increment(ref completed);
                         progress.Report(
                             (int)(((double)completed / count) * 100),
-                            GetReportMessage(completed, count, psw));
+                            GetProgressMessage(completed, count, psw));
                     }
                 }, token));
 
@@ -1067,6 +1086,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         #endregion Build Classifiers
+
+        #region Test Classifiers
+                
+        #endregion Test Classifiers
 
         #region Testing Sizing and Serialization Methods
 
@@ -1193,7 +1216,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
 
             var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MailItemHelper(mailItem).LoadAll(_globals.Ol.EmailPrefixToStrip, _globals.Ol.ArchiveRoot,true));
+                new MailItemHelper(mailItem).LoadAll(_globals, _globals.Ol.ArchiveRoot,true));
             var sizeMailInfo2 = 0; // ObjectSize(mailInfo);
             LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
@@ -1297,7 +1320,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Helper Methods
 
-        private string GetReportMessage(int complete, int count, Stopwatch sw)
+        private string GetProgressMessage(int complete, int count, Stopwatch sw)
         {
             double seconds = complete > 0 ? sw.Elapsed.TotalSeconds / complete : 0;
             var remaining = count - complete;

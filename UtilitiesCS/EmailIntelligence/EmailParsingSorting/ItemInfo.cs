@@ -23,6 +23,7 @@ namespace UtilitiesCS.EmailIntelligence
             EntryId = itemInfo.EntryId;
             StoreId = itemInfo.StoreId;
             FolderName = itemInfo.FolderName;
+            FolderInfo = itemInfo.FolderInfo;
             Html = itemInfo.Html;
             HTMLBody = itemInfo.HTMLBody;
             InternetCodepage = itemInfo.InternetCodepage;
@@ -48,6 +49,7 @@ namespace UtilitiesCS.EmailIntelligence
         public string EntryId { get; set; }
         public string StoreId { get; set; }
         public string FolderName { get; set; }
+        public OlFolderInfo FolderInfo { get; set; }
         public string Html { get; set; }
         public string HTMLBody { get; set; }
         public int InternetCodepage { get; set; }

@@ -75,11 +75,6 @@ namespace UtilitiesCS
 
         public void Report((int Value, string JobName) report)
         {
-            if (report.Value < 0 || report.Value > 100)
-            {
-                var caller = new StackFrame(1, false).GetMethod().Name;
-                throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
-            }
             Report((double)report.Value, report.JobName);
         }
 
@@ -87,7 +82,7 @@ namespace UtilitiesCS
         {
             if (value < 0)
             {
-                var caller = new StackFrame(1, false).GetMethod().Name;
+                var caller = new StackTrace().GetMyTraceString();
                 throw new ArgumentOutOfRangeException($"Progress reported " +
                     $"by {caller} must be an integer between 0 and 100");
             }

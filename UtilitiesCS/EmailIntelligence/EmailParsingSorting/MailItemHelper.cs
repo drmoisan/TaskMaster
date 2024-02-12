@@ -46,14 +46,7 @@ namespace UtilitiesCS //QuickFiler
         public MailItemHelper(DataFrame df, long indexRow, string emailPrefixToStrip)
         {
             EntryId = (string)df["EntryID"][indexRow];
-            StoreId = (string)df["Store"][indexRow];
-            //_senderName = (string)df["SenderName"][indexRow];
-            //_sender = new RecipientInfo() { Name = _senderName, Address = (string)df["SenderSmtpAddress"][indexRow] };
-            //FolderName = (string)df["Folder Name"][indexRow];
-            //_emailPrefixToStrip = emailPrefixToStrip;
-            //DateTime.TryParse((string)df["SentOn"][indexRow], out _sentDate);
-            //_conversationIndex = (string)df["ConversationIndex"][indexRow];
-            //_attachmentsInfo = new(() => Attachments.Select(x => x.AttachmentInfo).ToArray());
+            StoreId = (string)df["Store"][indexRow];           
         }
 
         protected MailItemHelper(IItemInfo itemInfo)
@@ -65,6 +58,7 @@ namespace UtilitiesCS //QuickFiler
             _entryId = itemInfo.EntryId;
             _storeId = itemInfo.StoreId;
             FolderName = itemInfo.FolderName;
+            FolderInfo = itemInfo.FolderInfo;
             _html = itemInfo.Html;
             _isTaskFlagSet = itemInfo.IsTaskFlagSet;
             _plainTextOptions = itemInfo.PlainTextOptions;
@@ -84,7 +78,7 @@ namespace UtilitiesCS //QuickFiler
         {
             var info = new MailItemHelper(df, indexRow, appGlobals.Ol.EmailPrefixToStrip);
             info.ResolveMail(appGlobals.Ol.NamespaceMAPI, strict: true);
-            info.LoadPriority(appGlobals.Ol.EmailPrefixToStrip, token);
+            info.LoadPriority(appGlobals, token);
             info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
             return info;
         }
@@ -97,7 +91,7 @@ namespace UtilitiesCS //QuickFiler
             await info.ResolveMailAsync(appGlobals.Ol.NamespaceMAPI, token, background);
 
             token.ThrowIfCancellationRequested();
-            await Task.Run(() => info.LoadPriorityItems(appGlobals.Ol.EmailPrefixToStrip, token), token);
+            await Task.Run(() => info.LoadPriorityItems(appGlobals, token), token);
 
             info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
 
@@ -136,8 +130,9 @@ namespace UtilitiesCS //QuickFiler
 
             var info = new MailItemHelper(item);
             info.Sw = new SegmentStopWatch().Start();
+            
 
-            await Task.Run(() => info.LoadPriorityItems(appGlobals.Ol.EmailPrefixToStrip, token), token);
+            await Task.Run(() => info.LoadPriorityItems(appGlobals, token), token);
             
             info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
 
@@ -172,7 +167,7 @@ namespace UtilitiesCS //QuickFiler
                        //priority);
         }
 
-        internal void LoadPriorityItems(string emailPrefixToStrip, CancellationToken token = default) 
+        internal void LoadPriorityItems(IApplicationGlobals globals, CancellationToken token = default) 
         {
             if (Item is null) { throw new ArgumentNullException(); }
             EntryId = Item.EntryID;
@@ -180,14 +175,16 @@ namespace UtilitiesCS //QuickFiler
             SenderName = Sender.Name;
             SenderHtml = Sender.Html;
             Subject = Item.Subject;
-            Body = CompressPlainText(Item.Body, emailPrefixToStrip);
+            Body = CompressPlainText(Item.Body, globals.Ol.EmailPrefixToStrip);
             Categories = Item.Categories;
             Triage = Item.GetTriage();
             SentOn = Item.SentOn.ToString("g");
             Actionable = Item.GetActionTaken();
-            FolderInfo = new OlFolderInfo();
-            FolderInfo.OlFolder = (Outlook.Folder)Item.Parent;
+            FolderInfo = new OlFolderInfo(
+                (Outlook.Folder)Item.Parent, ResolveFolderRoot(globals, 
+                ((Outlook.Folder)Item.Parent).FolderPath));
             FolderName = ((Folder)Item.Parent).Name;
+            Globals = globals;
             ConversationID = Item.ConversationID;
             UnRead = Item.UnRead;
             IsTaskFlagSet = (Item.FlagStatus == OlFlagStatus.olFlagMarked);
@@ -195,11 +192,11 @@ namespace UtilitiesCS //QuickFiler
             Sw.LogDuration("LoadPriorityItems");
         }
 
-        public MailItemHelper LoadPriority(string emailPrefixToStrip, CancellationToken token = default)
+        public MailItemHelper LoadPriority(IApplicationGlobals globals, CancellationToken token = default)
         {
             if (!_completedLoadingPriority && _loadNotStarted.CheckAndSetFirstCall)
             {
-                LoadPriorityItems(emailPrefixToStrip, token);
+                LoadPriorityItems(globals, token);
                 _ = Task.Run(() => 
                 { 
                     LoadRecipients();
@@ -215,10 +212,10 @@ namespace UtilitiesCS //QuickFiler
             }
         }
 
-        public MailItemHelper LoadAll(string emailPrefixToStrip, Folder olRoot, bool loadTokens = false)
+        public MailItemHelper LoadAll(IApplicationGlobals globals, Folder olRoot, bool loadTokens = false)
         {
             if (Item is null) { throw new ArgumentNullException(); }
-            LoadPriorityItems(emailPrefixToStrip, default);
+            LoadPriorityItems(globals, default);
             FolderInfo.OlRoot = olRoot;
             LoadRecipients();
             if (_html is not null) { _html = GetHtml(); }
@@ -286,6 +283,14 @@ namespace UtilitiesCS //QuickFiler
         private string _entryId;
         public string EntryId { get => PriorityInitialized(ref _entryId); set => _entryId = value; }
 
+        private IApplicationGlobals _globals;
+        [JsonIgnore]
+        internal IApplicationGlobals Globals 
+        { 
+            get => PriorityInitialized(ref _globals); 
+            private set => _globals = value; 
+        }
+
         private string _storeId;
         public string StoreId { get => PriorityInitialized(ref _storeId); set => _storeId = value; }
 
@@ -321,7 +326,7 @@ namespace UtilitiesCS //QuickFiler
             get
             {
                 if (_sender is null)
-                    LoadPriority(_emailPrefixToStrip);
+                    LoadPriority(Globals);
                 return _sender;
             }
             set => _sender = value;
@@ -489,14 +494,14 @@ namespace UtilitiesCS //QuickFiler
         }
         internal T PriorityInitialized<T>(ref T variable)
         {
-            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
+            if (variable is null) { LoadPriority(Globals); }
             return variable;
         }
         internal bool Initialized(ref bool? variable)
         {
             // check if one of the nullable variables is null which would indicate
             // the need to initialize
-            if (variable is null) { LoadPriority(_emailPrefixToStrip); }
+            if (variable is null) { LoadPriority(Globals); }
             return (bool)variable;
         }
         internal int Initialized(ref int? variable, Func<int> loader)
