@@ -625,6 +625,7 @@
     <Compile Include="Threading\SyncContextForm.Designer.cs" />
     <Compile Include="Threading\TaskPriority.cs" />
     <Compile Include="Threading\ThreadMonitor.cs" />
+    <Compile Include="Threading\ThreadSafeFunctions.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
     <Compile Include="Threading\TimeOutTask.cs" />
     <Compile Include="Threading\UiThread.cs" />

@@ -545,9 +545,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 foreach (var item in items)
                 {
-                    if (_globals.TD.DictRemap.ContainsKey(item.FolderInfo.RelativePath))
+                    if (_globals.TD.FolderRemap.ContainsKey(item.FolderInfo.RelativePath))
                     {
-                        item.FolderInfo.RelativePath = _globals.TD.DictRemap[item.FolderInfo.RelativePath];
+                        item.FolderInfo.RelativePath = _globals.TD.FolderRemap[item.FolderInfo.RelativePath];
                     }
                 }
                 //items.ForEach(x => x.FolderPath = _globals.TD.DictRemap.ContainsKey(x.FolderPath) ?
@@ -627,7 +627,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var minedBag = new ScBag<MinedMailInfo>(cBag)
             {
-                FolderPath = _globals.FS.FldrAppData,
+                FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian"),
                 FileName = $"MinedMailInfo_{batch:000}.json"
             };
 
@@ -730,7 +730,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         
-    public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg)
+        public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg)
         {
             var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
             var sw = ppkg.StopWatch;
@@ -1087,10 +1087,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion Build Classifiers
 
-        #region Test Classifiers
-                
-        #endregion Test Classifiers
-
         #region Testing Sizing and Serialization Methods
 
         internal virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
@@ -1101,7 +1097,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Formatting = Formatting.Indented
             };
             var disk = new FilePathHelper();
-            disk.FolderPath = _globals.FS.FldrAppData;
+            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");;
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
@@ -1121,7 +1117,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Formatting = Formatting.Indented
             };
             var disk = new FilePathHelper();
-            disk.FolderPath = _globals.FS.FldrAppData;
+            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");;
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
@@ -1147,7 +1143,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             };
             var serializer = JsonSerializer.Create(jsonSettings);
             var disk = new FilePathHelper();
-            disk.FolderPath = _globals.FS.FldrAppData;
+            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             SerializeAndSave(obj, serializer, disk);
@@ -1210,7 +1206,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var serializer = JsonSerializer.Create(jsonSettings);
 
             var disk = new FilePathHelper();
-            disk.FolderPath = _globals.FS.FldrAppData;
+            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");;
 
             SerializeFsSave(mailItem, "MailItem", serializer, disk);
 

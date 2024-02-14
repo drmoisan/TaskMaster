@@ -34,7 +34,8 @@ namespace TaskMaster
                 LoadIdListAsync(),
                 LoadCategoryFiltersAsync(),
                 LoadPrefixListAsync(),
-                LoadFilteredFolderScrapingAsync()
+                LoadFilteredFolderScrapingAsync(),
+                LoadFolderRemapAsync()
             };
             await Task.WhenAll(tasks);
             //logger.Debug($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
@@ -92,8 +93,7 @@ namespace TaskMaster
             
             return dictPPL;
         }
-        async private Task LoadDictPPLAsync() => _dictPPL = await Task.Factory.StartNew(
-            () => LoadDictPPL(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        async private Task LoadDictPPLAsync() => _dictPPL = await Task.Run(LoadDictPPL);
         async private Task LoadPrefixAndDictPeopleAsync()
         {
             await LoadPrefixListAsync();
@@ -127,9 +127,7 @@ namespace TaskMaster
                                                               folderpath: Parent.FS.FldrPythonStaging);
             return dictRemap;
         }
-        async private Task LoadDictRemapAsync() => _dictRemap = await Task.Factory.StartNew(
-            () => LoadDictRemap(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-
+        async private Task LoadDictRemapAsync() => _dictRemap = await Task.Run(LoadDictRemap, default);
 
         //TODO: Convert CategoryFilters to ScoCollection
         private ISerializableList<string> _catFilters;
@@ -209,9 +207,7 @@ namespace TaskMaster
         }
         async private Task LoadFolderRemapAsync()
         {
-            _folderRemap = await Task.Factory.StartNew(
-                                 () => LoadFolderRemap(),
-                                 default(CancellationToken));
+            _folderRemap = await Task.Run(LoadFolderRemap);
         }
 
 

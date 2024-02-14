@@ -49,7 +49,7 @@ namespace TaskMaster
                 //LoadCommonWordsAsync(),
                 //LoadSubjectMapAndEncoderAsync(),
                 //LoadMovedMailsAsync(),
-                //LoadFiltersAsync(),
+                LoadFiltersAsync(),
                 LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);

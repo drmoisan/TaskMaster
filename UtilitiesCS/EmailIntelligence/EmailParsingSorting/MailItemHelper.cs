@@ -189,7 +189,7 @@ namespace UtilitiesCS //QuickFiler
             UnRead = Item.UnRead;
             IsTaskFlagSet = (Item.FlagStatus == OlFlagStatus.olFlagMarked);
             _token = token;
-            Sw.LogDuration("LoadPriorityItems");
+            Sw?.LogDuration("LoadPriorityItems");
         }
 
         public MailItemHelper LoadPriority(IApplicationGlobals globals, CancellationToken token = default)
@@ -227,7 +227,7 @@ namespace UtilitiesCS //QuickFiler
         {
             RecipientsLoaded = Enums.LoadState.Loading;
             var recipients = Item.Recipients.Cast<Recipient>().ToArray();
-            Sw.LogDuration("Recipients -> Cast to array");
+            Sw?.LogDuration("Recipients -> Cast to array");
             ToRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray();
 
             //_toRecipients = _item.GetToRecipients().GetInfo().ToArray();
@@ -240,7 +240,7 @@ namespace UtilitiesCS //QuickFiler
             RecipientsLoaded = Enums.LoadState.Loaded;
             //if (_html is not null) { _html = GetHtml(); }
             
-            Sw.LogDuration("LoadRecipients");
+            Sw?.LogDuration("LoadRecipients");
         }
 
         internal void SetSender(RecipientInfo sender)
@@ -442,7 +442,7 @@ namespace UtilitiesCS //QuickFiler
         public async Task<IEnumerable<string>> TokenizeAsync()
         {
             _tokens = await Task.Run(() => Tokenizer.tokenize(this).ToArray());
-            Sw.LogDuration("TokenizeAsync");
+            Sw?.LogDuration("TokenizeAsync");
             return _tokens;
         }
 
@@ -669,7 +669,7 @@ img {
             var regex = new Regex(@"(<body[\S\s]*?>)", RegexOptions.Multiline);
             string revisedBody = regex.Replace(body, "$1" + EmailHeader);
             //string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);
-            Sw.LogDuration("GetHtml");
+            Sw?.LogDuration("GetHtml");
             return revisedBody;
         }
 

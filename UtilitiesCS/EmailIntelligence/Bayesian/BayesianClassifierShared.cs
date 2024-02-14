@@ -343,6 +343,26 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return combined;
         }
 
+        public (double Probability, (string Token, double TokenProbability)[]) GetProbabilityDrivers(
+            IDictionary<string, int> tokenIncidence)
+        {
+            var probabilities = GetInterestingList(tokenIncidence);
+
+            var combined = CombineProbabilities(probabilities);
+            
+            var drivers = probabilities.Select(x => 
+                { 
+                    var key = x.Key.Substring(6);
+                    var value = x.Value;
+                    return (key, value);
+                })
+                .OrderByDescending(x => x.value)
+                .Take(Knobs.InterestingWordCount)
+                .ToArray();
+            
+            return (combined, drivers);
+        }
+
         public Task<double> GetMatchProbabilityAsync(
             IDictionary<string, int> tokenIncidence, CancellationToken token)
         {

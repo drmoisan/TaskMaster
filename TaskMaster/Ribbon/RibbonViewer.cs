@@ -188,6 +188,8 @@ namespace TaskMaster
         public void SaveManagerLocally_Click(Office.IRibbonControl control) => _controller.TrySaveManagerLocally();
         public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
+        public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDrivers();
+        
         #endregion
 
         #region Helpers

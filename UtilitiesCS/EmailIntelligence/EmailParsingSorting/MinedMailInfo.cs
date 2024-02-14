@@ -16,6 +16,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             CcRecipients = info.CcRecipients;
             Sender = info.Sender;
             ConversationId = info.ConversationID;
+            EntryId = info.EntryId;
+            StoreId = info.StoreId;
         }
 
         private string _categories;
@@ -38,6 +40,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         private string _conversationId;
         public string ConversationId { get => _conversationId; set => _conversationId = value; }
+
+        private string _entryID;
+        public string EntryId { get => _entryID; set => _entryID = value; }
+
+        private string _storeID;
+        public string StoreId { get => _storeID; set => _storeID = value; }
     }
 
 }

@@ -368,9 +368,20 @@ namespace TaskMaster
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
             var tuner = new BayesianHypertuning(_globals);
-            //await tuner.TestFolderClassifierAsync();
-            await tuner.SaveConfusionMatrixAsync(null, null);
+            await tuner.TestFolderClassifierAsync();
             
+            //ConfusionMatrixCounts[] counts = await tuner.DeserializeAsync<ConfusionMatrixCounts[]>("ConfusionMatrixCounts");
+            //IEnumerable<TestScores> scores = await tuner.CalculateTestScoresAsync(counts);
+            //await tuner.SaveScoresAsync(scores);
+            
+        }
+        internal async Task GetConfusionDrivers() 
+        { 
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianHypertuning(_globals);
+            await tuner.GetConfusionDriversAsync();
         }
     }
 }

@@ -87,20 +87,26 @@ namespace UtilitiesCS.Threading
         public SegmentStopWatch StopWatch { get => _stopWatch; set => _stopWatch = value; }
         private SegmentStopWatch _stopWatch;
         
-        public (
-            CancellationTokenSource CancelSource,
-            CancellationToken Cancel,
-            ProgressTracker ProgressTracker,
-            SegmentStopWatch StopWatch) ToTuple()
+        public ProgressPackage SpawnChild(int allocation)
+        {
+            return new ProgressPackage
+            {
+                CancelSource = this.CancelSource,
+                Cancel = this.Cancel,
+                StopWatch = this.StopWatch,
+                ProgressTracker = this.ProgressTracker?.SpawnChild(allocation),
+                ProgressTrackerPane = this.ProgressTrackerPane?.SpawnChild(allocation)
+            };
+        }
+        
+        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTracker ProgressTracker, SegmentStopWatch StopWatch) 
+            ToTuple()
         {
             return (CancelSource, Cancel, ProgressTracker, StopWatch);
         }
 
-        public (
-            CancellationTokenSource CancelSource,
-            CancellationToken Cancel,
-            ProgressTrackerPane ProgressTrackerPane,
-            SegmentStopWatch StopWatch) ToTuplePane()
+        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTrackerPane ProgressTrackerPane, SegmentStopWatch StopWatch) 
+            ToTuplePane()
         {
             return (CancelSource, Cancel, ProgressTrackerPane, StopWatch);
         }
