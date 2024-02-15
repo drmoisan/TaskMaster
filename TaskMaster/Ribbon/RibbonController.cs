@@ -22,7 +22,7 @@ using UtilitiesCS.EmailIntelligence.FolderRemap;
 using UtilitiesCS.EmailIntelligence;
 using log4net.Repository.Hierarchy;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using static UtilitiesCS.EmailIntelligence.Bayesian.BayesianHypertuning;
+using static UtilitiesCS.EmailIntelligence.Bayesian.BayesianPerformance;
 using System.Diagnostics.Metrics;
 
 
@@ -367,7 +367,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianHypertuning(_globals);
+            var tuner = new BayesianPerformance(_globals);
             await tuner.TestFolderClassifierAsync();            
         }
 
@@ -376,7 +376,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianHypertuning(_globals);
+            var tuner = new BayesianPerformance(_globals);
             await tuner.TestFolderClassifierAsync(verbose: true);
         }
 
@@ -385,7 +385,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianHypertuning(_globals);
+            var tuner = new BayesianPerformance(_globals);
             await tuner.GetConfusionDriversAsync();
         }
         internal async Task TryChartMetrics()
@@ -393,7 +393,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                                        new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianHypertuning(_globals);
+            var tuner = new BayesianPerformance(_globals);
             await tuner.ShowSensitivityChartAsync(null);
         }
     }

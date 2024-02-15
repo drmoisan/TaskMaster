@@ -375,7 +375,7 @@
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianHypertuning.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianPerformance.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianFilter.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Drafts\CorpusVectorized_badidea.cs" />
     <Compile Include="EmailIntelligence\Bayesian\DedicatedToken.cs" />

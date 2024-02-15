@@ -131,5 +131,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
         #endregion Serialization
 
+
     }
 }

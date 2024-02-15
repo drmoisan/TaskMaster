@@ -14,14 +14,14 @@ using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class BayesianHypertuning
+    public class BayesianPerformance
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constructors and Settings
 
-        public BayesianHypertuning(IApplicationGlobals globals)
+        public BayesianPerformance(IApplicationGlobals globals)
         {
             _globals = globals;
         }
@@ -31,10 +31,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal BayesianSerializationHelper Serialization { get; set; }
 
-        protected bool _saveWip;
+        protected bool _saveWip = true;
         public bool SaveWip { get => _saveWip; set => _saveWip = value; }
 
         #endregion Constructors and Settings
+
+        #region Classifier Performance Testing
 
         #region Main Testing Methods
 
@@ -49,9 +51,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var progressState = _globals.AF.ProgressPane.Visible;
             _globals.AF.ProgressPane.Visible = true;
 
-            var (dataMiner, collection, folderPaths, ppkg) = await ReloadIfNullAsync(null, null, null);
+            var (dataMiner, collection, folderPaths, ppkg) = await LoadIfNullAsync(null, null, null);
             
-            var (train, test) = SplitTestTrain(collection, 0.75, ppkg);
+            var (train, test) = SplitAndSave(collection, 0.75, ppkg);
 
             var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg, train);
 
@@ -80,9 +82,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var progressState = _globals.AF.ProgressPane.Visible;
             _globals.AF.ProgressPane.Visible = true;
 
-            (dataMiner, collection, var folderPaths, var ppkg) = await ReloadIfNullAsync(dataMiner, collection, null);
+            (dataMiner, collection, var folderPaths, var ppkg) = await LoadIfNullAsync(dataMiner, collection, null);
 
-            var (train, test) = SplitTestTrain(collection, 0.75, ppkg);
+            var (train, test) = SplitAndSave(collection, 0.75, ppkg);
 
             var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg, train);
                         
@@ -114,7 +116,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var progressState = _globals.AF.ProgressPane.Visible;
             _globals.AF.ProgressPane.Visible = true;
 
-            (testOutcomes, testSource, classifierGroup, ppkg) = await ReloadIfNullAsync(
+            (testOutcomes, testSource, classifierGroup, ppkg) = await LoadIfNullAsync(
                 testOutcomes, testSource, classifierGroup, ppkg);
 
             var testScores = await Serialization.DeserializeAsync<TestScores[]>("TestScores");
@@ -130,10 +132,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = progressState;
             
         }
-        
+
         #endregion Main Testing Methods
 
-        #region Classifier Performance Testing
+        #region Step 1: Build Classifier
 
         public async Task<BayesianClassifierGroup> BuildClassifierAsync(EmailDataMiner dataMiner, ProgressPackage ppkg, MinedMailInfo[] train)
         {
@@ -150,6 +152,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return classifierGroup;
         }
+
+        #endregion Step 1: Build Classifier
+
+        #region Step 2: Run The Test -> TestOutcome[]
 
         public async Task<TestOutcome[]> RunClassifierTestAsync(
             MinedMailInfo[] test, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg)
@@ -334,6 +340,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return verboseTestOutcomes;
         }
 
+        #endregion Step 2: Run The Test -> TestOutcome[]
+
+        #region Step 3: Group Outcomes -> TestResult[]
+
         public TestResult[] GroupOutcomes(TestOutcome[] outcomes)
         {
             TestResult[] testResults =
@@ -379,7 +389,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return verboseTestResults;
         }
-                
+
+        #endregion Step 3: Group Outcomes -> TestResult[]
+
+        #region Step 4: Count Hits and Misses -> ClassCounts[]
+
         public ClassCounts[] CountHitsMisses(List<string> folderPaths, TestResult[] testResults)
         {
             ClassCounts[] counts = folderPaths.Select(x => new ClassCounts
@@ -422,6 +436,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return verboseCounts;
         }
+
+        #endregion Step 4: Count Hits and Misses -> ClassCounts[]
+
+        #region Step 5: Calculate Test Scores -> IEnumerable<TestScores>
 
         public IEnumerable<TestScores> CalculateTestScores(ClassCounts[] counts)
         {
@@ -551,6 +569,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return scores;
         }
 
+        #endregion Step 5: Calculate Test Scores -> IEnumerable<TestScores>
+
+        #region Step 6: Build Confusion Matrix -> serialized CSV and Text
+
         public async Task BuildConfusionMatrixAsync(List<string> folderPaths, TestResult[] testResults)
         {
             testResults ??= await Serialization.DeserializeAsync<TestResult[]>(typeof(TestResult[]).Name);
@@ -591,6 +613,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }).ToArray();
             await BuildConfusionMatrixAsync(folderPaths, testResults);
         }
+
+        #endregion Step 6: Build Confusion Matrix -> serialized CSV and Text
+
+        #region Step 7: Diagnose Poor Performers -> ClassificationErrors[]
 
         public async Task<VerboseTestResult[]> GetConfusionDetails(MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg, TestOutcome[] confusedOutcomes, TestResult[] confusedCounts)
         {
@@ -757,6 +783,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return classificationErrors;  
         }
 
+        #endregion Step 7: Diagnose Poor Performers -> ClassificationErrors[]
+
+        #region Step 8: Run Sensitivity Analysis -> ThresholdMetric[]
+
         public async Task<ThresholdMetric[]> RunSensitivityAsync(VerboseTestOutcome[] verboseTestOutcomes) 
         {
             verboseTestOutcomes ??= await Serialization.DeserializeAsync<VerboseTestOutcome[]>(typeof(VerboseTestOutcome[]).Name);
@@ -808,9 +838,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             viewer.Show();
         }
 
+        #endregion Step 8: Run Sensitivity Analysis -> ThresholdMetric[]
+
         #endregion Classifier Performance Testing
 
-        #region Data Progress, Loading, Saving, and Logging Methods
+        #region Progress Helpers
 
         private string GetProgressMessage(int complete, int count, Stopwatch sw)
         {
@@ -855,6 +887,44 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             string msg = $"Completed {complete} of {count} ({secondsPerItem:N2} spm) " +
                 $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
+        }
+
+        #endregion Progress Helpers
+
+        #region Data Loading and Saving
+
+        public virtual async Task LoadForDiagnosisAsync() 
+        {
+            var (testOutcomes, testSource, classifierGroup, ppkg) = await LoadIfNullAsync(null, null, null, null);
+
+        }
+        
+        public virtual async Task<(TestOutcome[], MinedMailInfo[], BayesianClassifierGroup, ProgressPackage)> LoadIfNullAsync(
+            TestOutcome[] testOutcomes, MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg)
+        {
+            ppkg ??= await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
+            _globals.AF.ProgressPane.Visible = true;
+            ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
+
+            testOutcomes ??= await Serialization.DeserializeAsync<TestOutcome[]>("TestOutcomes");
+            testSource ??= await Serialization.DeserializeAsync<MinedMailInfo[]>("Test");
+            classifierGroup ??= await Serialization.DeserializeAsync<BayesianClassifierGroup>("TestClassifierGroup");
+
+            if (testOutcomes.Length != testSource.Length) { throw new ArgumentException("Test Outcomes and Test Source Lengths Do Not Match"); }
+            return (testOutcomes, testSource, classifierGroup, ppkg);
+        }
+
+        public virtual async Task<(EmailDataMiner, MinedMailInfo[], List<string>, ProgressPackage)> LoadIfNullAsync(
+            EmailDataMiner dataMiner, MinedMailInfo[] collection, ProgressPackage ppkg)
+        {
+            ppkg ??= await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
+            ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
+
+            dataMiner ??= new EmailDataMiner(Globals);
+            collection ??= await dataMiner.Load<MinedMailInfo[]>();
+            var folderPaths = collection.Select(x => x.FolderInfo.RelativePath).OrderBy(x => x).Distinct().ToList();
+
+            return (dataMiner, collection, folderPaths, ppkg);
         }
 
         public async Task SaveScoresAsync(IEnumerable<TestScores> scores)
@@ -903,7 +973,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             logger.Debug($"\n{scoresText}");
         }
 
-        public virtual (MinedMailInfo[] Train, MinedMailInfo[] Test) SplitTestTrain(MinedMailInfo[] collection, double trainPercent, ProgressPackage ppkg)
+        public virtual (MinedMailInfo[] Train, MinedMailInfo[] Test) SplitAndSave(MinedMailInfo[] collection, double trainPercent, ProgressPackage ppkg)
         {
             ppkg.ProgressTrackerPane.Increment(10, "Building Folder Classifier -> Split Into Train / Test");
             var (train, test) = collection.SplitTestTrain(0.75);
@@ -912,41 +982,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return (train, test);
         }
 
-        public virtual async Task LoadForDiagnosisAsync() 
-        {
-            var (testOutcomes, testSource, classifierGroup, ppkg) = await ReloadIfNullAsync(null, null, null, null);
-
-        }
-        
-        public virtual async Task<(TestOutcome[], MinedMailInfo[], BayesianClassifierGroup, ProgressPackage)> ReloadIfNullAsync(
-            TestOutcome[] testOutcomes, MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg)
-        {
-            ppkg ??= await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
-            _globals.AF.ProgressPane.Visible = true;
-            ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
-
-            testOutcomes ??= await Serialization.DeserializeAsync<TestOutcome[]>("TestOutcomes");
-            testSource ??= await Serialization.DeserializeAsync<MinedMailInfo[]>("Test");
-            classifierGroup ??= await Serialization.DeserializeAsync<BayesianClassifierGroup>("TestClassifierGroup");
-
-            if (testOutcomes.Length != testSource.Length) { throw new ArgumentException("Test Outcomes and Test Source Lengths Do Not Match"); }
-            return (testOutcomes, testSource, classifierGroup, ppkg);
-        }
-
-        public virtual async Task<(EmailDataMiner, MinedMailInfo[], List<string>, ProgressPackage)> ReloadIfNullAsync(
-            EmailDataMiner dataMiner, MinedMailInfo[] collection, ProgressPackage ppkg)
-        {
-            ppkg ??= await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
-            ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
-
-            dataMiner ??= new EmailDataMiner(Globals);
-            collection ??= await dataMiner.Load<MinedMailInfo[]>();
-            var folderPaths = collection.Select(x => x.FolderInfo.RelativePath).OrderBy(x => x).Distinct().ToList();
-
-            return (dataMiner, collection, folderPaths, ppkg);
-        }
-
-        #endregion Data Progress, Loading, Saving, and Logging Methods
+        #endregion Data Loading and Saving
 
     }
 
