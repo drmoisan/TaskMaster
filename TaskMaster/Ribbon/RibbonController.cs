@@ -368,13 +368,18 @@ namespace TaskMaster
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
             var tuner = new BayesianHypertuning(_globals);
-            await tuner.TestFolderClassifierAsync();
-            
-            //ConfusionMatrixCounts[] counts = await tuner.DeserializeAsync<ConfusionMatrixCounts[]>("ConfusionMatrixCounts");
-            //IEnumerable<TestScores> scores = await tuner.CalculateTestScoresAsync(counts);
-            //await tuner.SaveScoresAsync(scores);
-            
+            await tuner.TestFolderClassifierAsync();            
         }
+
+        internal async Task TryTestClassifierVerbose()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianHypertuning(_globals);
+            await tuner.TestFolderClassifierAsync(verbose: true);
+        }
+
         internal async Task GetConfusionDrivers() 
         { 
             if (SynchronizationContext.Current is null)
@@ -382,6 +387,14 @@ namespace TaskMaster
                     new WindowsFormsSynchronizationContext());
             var tuner = new BayesianHypertuning(_globals);
             await tuner.GetConfusionDriversAsync();
+        }
+        internal async Task TryChartMetrics()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                                       new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianHypertuning(_globals);
+            await tuner.ShowSensitivityChartAsync(null);
         }
     }
 }
