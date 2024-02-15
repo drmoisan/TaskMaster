@@ -1,10 +1,7 @@
-﻿using log4net.Repository.Hierarchy;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,7 +10,6 @@ using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
-using System.Windows.Forms.DataVisualization.Charting;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
@@ -33,121 +29,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private IApplicationGlobals _globals;
         public IApplicationGlobals Globals { get => _globals; }
 
+        internal BayesianSerializationHelper Serialization { get; set; }
+
         protected bool _saveWip;
         public bool SaveWip { get => _saveWip; set => _saveWip = value; }
 
         #endregion Constructors and Settings
-
-        #region Performance Record Types
-
-        public record ClassCounts()
-        {
-            public string Class { get; set; }
-            public int TP { get; set; }
-            public int FP { get; set; }
-            public int FN { get; set; }
-            public int TN { get; set; }
-        }
-
-        public record VerboseClassCounts() 
-        {
-            public string Class { get; set; }
-            public int TPCount { get; set; }
-            public int FPCount { get; set; }
-            public int FNCount { get; set; }
-            public int TNCount { get; set; }
-            public VerboseTestOutcome[] TPDetails { get; set; }
-            public VerboseTestOutcome[] FPDetails { get; set; }
-            public VerboseTestOutcome[] FNDetails { get; set; }
-            public VerboseTestOutcome[] TNDetails { get; set; }
-        }
-
-        public record TestScores()
-        {
-            public string Class { get; set; }
-            public int TP { get; set; }
-            public int FP { get; set; }
-            public int FN { get; set; }
-            public int TN { get; set; }
-            public double Precision { get; set; }
-            public double Recall { get; set; }
-            public double F1 { get; set; }
-        }
-
-        public record VerboseTestScores()
-        {
-            public string Class { get; set; }
-            public int TPCount { get; set; }
-            public int FPCount { get; set; }
-            public int FNCount { get; set; }
-            public int TNCount { get; set; }
-            public VerboseTestOutcome[] TPDetails { get; set; }
-            public VerboseTestOutcome[] FPDetails { get; set; }
-            public VerboseTestOutcome[] FNDetails { get; set; }
-            public VerboseTestOutcome[] TNDetails { get; set; }
-            public double Precision { get; set; }
-            public double Recall { get; set; }
-            public double F1 { get; set; }
-        }
-
-        public record VerboseTestResult()
-        {
-            public string Actual { get; set; }
-            public string Predicted { get; set; }
-            public int Count { get; set; }
-            public VerboseTestOutcome[] Details { get; set; }
-        }
-
-        public record ClassificationErrors()
-        {
-            public string Class { get; set; }
-            public VerboseTestOutcome[] FalsePositives { get; set; }
-            public VerboseTestOutcome[] FalseNegatives { get; set; }
-        }
-
-        public record VerboseTestOutcome() 
-        { 
-            public string Actual { get; set; }
-            public string Predicted { get; set; }
-            public MinedMailInfo Source { get; set; }
-            public int SourceIndex { get; set; }
-            public (string Token, double TokenProbability)[] Drivers { get; set; }
-            public double Probability { get; set; }
-        }
-        
-        public record TestResult()
-        {
-            public string Actual { get; set; }
-            public string Predicted { get; set; }
-            public int Count { get; set; }
-        }
-
-        public record TestOutcome()
-        {
-            public string Actual { get; set; }
-            public string Predicted { get; set; }
-            public int SourceIndex { get; set; }
-        }
-
-        public record ThresholdMetric()
-        {
-            public double Threshold { get; set; }
-            public double Precision { get; set; }
-            public int PrecisionCount { get; set; }
-            public double Recall { get; set; }
-            public int RecallCount { get; set; }
-            public double F1 { get; set; }
-            public int F1Count { get; set; }
-        }
-
-        public record ThresholdMetrics()
-        {
-            public Series Precision { get; set; }
-            public Series Recall { get; set; }
-            public Series F1 { get; set; }
-        }
-
-        #endregion Performance Record Types
 
         #region Main Testing Methods
 
@@ -230,7 +117,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             (testOutcomes, testSource, classifierGroup, ppkg) = await ReloadIfNullAsync(
                 testOutcomes, testSource, classifierGroup, ppkg);
 
-            var testScores = await DeserializeAsync<TestScores[]>("TestScores");
+            var testScores = await Serialization.DeserializeAsync<TestScores[]>("TestScores");
                         
             ppkg.ProgressTrackerPane.Increment(10, "Getting Confusion Outcomes and Counts");
             TestOutcome[] confusedOutcomes = testOutcomes.Where(x => x.Actual != x.Predicted).ToArray();
@@ -259,7 +146,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             await dataMiner.BuildFolderClassifiersAsync(classifierGroup, train, await new ProgressPackage().InitializeAsync(
                 ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(20), ppkg.StopWatch));
 
-            SerializeAndSave(classifierGroup, "TestClassifierGroup");
+            Serialization.SerializeAndSave(classifierGroup, "TestClassifierGroup");
 
             return classifierGroup;
         }
@@ -325,7 +212,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 await timerTask;
                 await testTask;
-                SerializeAndSave(testOutcomes, testOutcomes.GetType().Name);
+                Serialization.SerializeAndSave(testOutcomes, testOutcomes.GetType().Name);
             }
             catch (Exception e)
             {
@@ -420,7 +307,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 await timerTask;
                 await testTask;
 
-                SerializeAndSave(verboseTestOutcomes, verboseTestOutcomes.GetType().Name);
+                Serialization.SerializeAndSave(verboseTestOutcomes, verboseTestOutcomes.GetType().Name);
                 
                 var testOutcomes = verboseTestOutcomes.Select(x => new TestOutcome
                 {
@@ -428,7 +315,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     Predicted = x.Predicted,
                     SourceIndex = x.SourceIndex
                 }).ToArray();
-                SerializeAndSave(testOutcomes, testOutcomes.GetType().Name);
+                Serialization.SerializeAndSave(testOutcomes, testOutcomes.GetType().Name);
 
             }
             catch (Exception e)
@@ -461,7 +348,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     })
                     .OrderByDescending(x => x.Count)
             ];
-            SerializeAndSave(testResults, testResults.GetType().Name);
+            Serialization.SerializeAndSave(testResults, testResults.GetType().Name);
             return testResults;
         }
 
@@ -480,7 +367,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     })
                     .OrderByDescending(x => x.Count)
             ];
-            SerializeAndSave(verboseTestResults, verboseTestResults.GetType().Name);
+            Serialization.SerializeAndSave(verboseTestResults, verboseTestResults.GetType().Name);
 
             var testResults = verboseTestResults.Select(x => new TestResult
             {
@@ -488,7 +375,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Predicted = x.Predicted,
                 Count = x.Count
             }).ToArray();
-            SerializeAndSave(testResults, testResults.GetType().Name);
+            Serialization.SerializeAndSave(testResults, testResults.GetType().Name);
 
             return verboseTestResults;
         }
@@ -503,7 +390,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 FN = testResults.Count(y => y.Actual == x && y.Predicted != x),
                 TN = testResults.Count(y => y.Actual != x && y.Predicted != x)
             }).ToArray();
-            SerializeAndSave(counts, counts.GetType().Name);
+            Serialization.SerializeAndSave(counts, counts.GetType().Name);
             return counts;
         }
 
@@ -521,7 +408,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 FNDetails = testResults.Where(y => y.Actual == x && y.Predicted != x).SelectMany(y => y.Details).ToArray(),
                 //TNDetails = testResults.Where(y => y.Actual != x && y.Predicted != x).SelectMany(y => y.Details).ToArray()
             }).ToArray();
-            SerializeAndSave(verboseCounts, verboseCounts.GetType().Name);
+            Serialization.SerializeAndSave(verboseCounts, verboseCounts.GetType().Name);
 
             var counts = verboseCounts.Select(x => new ClassCounts
             {
@@ -531,7 +418,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 FN = x.FNCount,
                 TN = x.TNCount
             }).ToArray();
-            SerializeAndSave(counts, counts.GetType().Name);
+            Serialization.SerializeAndSave(counts, counts.GetType().Name);
 
             return verboseCounts;
         }
@@ -539,7 +426,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public IEnumerable<TestScores> CalculateTestScores(ClassCounts[] counts)
         {
             if (counts.IsNullOrEmpty())
-            { counts = Deserialize<ClassCounts[]>(typeof(ClassCounts[]).Name); }
+            { counts = Serialization.Deserialize<ClassCounts[]>(typeof(ClassCounts[]).Name); }
             var scores = counts.Select(x => new
             {
                 x.Class,
@@ -579,7 +466,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public async Task<IEnumerable<TestScores>> CalculateTestScoresAsync(ClassCounts[] counts)
         {
             if (counts.IsNullOrEmpty())
-            { counts = await DeserializeAsync<ClassCounts[]>(typeof(ClassCounts[]).Name); }
+            { counts = await Serialization.DeserializeAsync<ClassCounts[]>(typeof(ClassCounts[]).Name); }
             var scores = counts.Select(x => new
             {
                 x.Class,
@@ -619,7 +506,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public async Task<IEnumerable<VerboseTestScores>> CalculateTestScoresAsync(VerboseClassCounts[] details)
         {
             if (details.IsNullOrEmpty())
-            { details = await DeserializeAsync<VerboseClassCounts[]>(typeof(VerboseClassCounts[]).Name); }
+            { details = await Serialization.DeserializeAsync<VerboseClassCounts[]>(typeof(VerboseClassCounts[]).Name); }
             var scores = details.Select(x => new
             {
                 x.Class,
@@ -666,7 +553,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task BuildConfusionMatrixAsync(List<string> folderPaths, TestResult[] testResults)
         {
-            testResults ??= await DeserializeAsync<TestResult[]>(typeof(TestResult[]).Name);
+            testResults ??= await Serialization.DeserializeAsync<TestResult[]>(typeof(TestResult[]).Name);
             folderPaths ??= [.. testResults.Select(x => x.Actual).Concat(testResults.Select(x=>x.Predicted)).Distinct().OrderBy(x => x)];
 
             string[][] jagged = new string[folderPaths.Count()+1][];
@@ -681,7 +568,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 jagged[i][j] = result.Count.ToString();
             }
 
-            await SaveCsvAsync(jagged, "ConfusionMatrix");
+            await Serialization.SaveCsvAsync(jagged, "ConfusionMatrix");
 
             var headers = new List<string> { "Actual" };
             headers.AddRange(Enumerable.Range(0, folderPaths.Count()).Select(x => x.ToString().PadToCenter(3)));
@@ -689,13 +576,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var confusionText = jagged.ToFormattedText(headers.ToArray(), justifications, "Confusion Matrix\nPredicted");
             var confusionArray = confusionText.Split("\n").ToArray();
-            await SaveTextsAsync(confusionArray, "ConfusionMatrixText");
+            await Serialization.SaveTextsAsync(confusionArray, "ConfusionMatrixText");
             
         }
 
         public async Task BuildConfusionMatrixAsync(List<string> folderPaths, VerboseTestResult[] verboseTestResults)
         {
-            verboseTestResults ??= await DeserializeAsync<VerboseTestResult[]>(typeof(VerboseTestResult[]).Name);
+            verboseTestResults ??= await Serialization.DeserializeAsync<VerboseTestResult[]>(typeof(VerboseTestResult[]).Name);
             TestResult[] testResults = verboseTestResults.Select(x => new TestResult
             {
                 Actual = x.Actual,
@@ -733,10 +620,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         catch (Exception e)
                         {
                             logger.Error(e.Message, e);
-                            SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
+                            Serialization.SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
                             logger.Debug($"original prediction: {prediction}");
                             var predictions = classifierGroup.Classify(tokens).ToArray();
-                            SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
+                            Serialization.SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
 
                             throw;
                         }
@@ -792,10 +679,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 catch (Exception e)
                 {
                     logger.Error(e.Message, e);
-                    SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
+                    Serialization.SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
                     logger.Debug($"original prediction: {prediction}");
                     var predictions = classifierGroup.Classify(tokens).ToArray();
-                    SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
+                    Serialization.SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
 
                     throw;
                 }
@@ -848,7 +735,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             })
             .ToArray();
 
-            if (SaveWip) { SerializeAndSave(classificationErrors, "ClassificationErrors"); }
+            if (SaveWip) { Serialization.SerializeAndSave(classificationErrors, "ClassificationErrors"); }
             ppkg.ProgressTrackerPane.Report(100);
             
             return classificationErrors;
@@ -865,14 +752,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 }).OrderByDescending(x => x.FalsePositives.Count() + x.FalseNegatives.Count())
                 .ToArray();
 
-            if (SaveWip) { SerializeAndSave(classificationErrors, "ClassificationErrors"); }
+            if (SaveWip) { Serialization.SerializeAndSave(classificationErrors, "ClassificationErrors"); }
             
             return classificationErrors;  
         }
 
         public async Task<ThresholdMetric[]> RunSensitivityAsync(VerboseTestOutcome[] verboseTestOutcomes) 
         {
-            verboseTestOutcomes ??= await DeserializeAsync<VerboseTestOutcome[]>(typeof(VerboseTestOutcome[]).Name);
+            verboseTestOutcomes ??= await Serialization.DeserializeAsync<VerboseTestOutcome[]>(typeof(VerboseTestOutcome[]).Name);
             var folderPaths = verboseTestOutcomes.SelectMany(x => new string[] { x.Actual, x.Predicted }).Distinct().OrderBy(x => x).ToList();
 
             var thresholdMetrics = Enumerable.Range(0, 100).Select(i =>
@@ -902,13 +789,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 };
             }).ToArray();
 
-            SerializeAndSave(thresholdMetrics, typeof(ThresholdMetric[]).Name);
+            Serialization.SerializeAndSave(thresholdMetrics, typeof(ThresholdMetric[]).Name);
             return thresholdMetrics;
         }
 
         public async Task ShowSensitivityChartAsync(ThresholdMetric[] thresholdMetrics) 
         { 
-            thresholdMetrics ??= await DeserializeAsync<ThresholdMetric[]>(typeof(ThresholdMetric[]).Name);
+            thresholdMetrics ??= await Serialization.DeserializeAsync<ThresholdMetric[]>(typeof(ThresholdMetric[]).Name);
             thresholdMetrics ??= await RunSensitivityAsync(null);
 
             var viewer = new MetricChartViewer();
@@ -972,7 +859,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task SaveScoresAsync(IEnumerable<TestScores> scores)
         {
-            SerializeAndSave(scores, "TestScores");
+            Serialization.SerializeAndSave(scores, "TestScores");
             var scores2 = scores.Select(x => new string[]
                         {
                 x.Class, x.TP.ToString(), x.FP.ToString(), x.FN.ToString(), x.TN.ToString(),x.Precision.ToString("0.00"), x.Recall.ToString("0.00"), x.F1.ToString("0.00")
@@ -981,13 +868,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var scoresText = scores2.ToFormattedText(
                 ["Class", "TP", "FP", "FN", "TN", "Precision", "Recall", "F1"],
                 Enumerable.Repeat(Enums.Justification.Center, 8).ToArray(), "Classifier Performance By Class");
-            await SaveTextsAsync([scoresText], "TestScores");
+            await Serialization.SaveTextsAsync([scoresText], "TestScores");
             logger.Debug($"\n{scoresText}");
         }
 
         public async Task SaveScoresAsync(IEnumerable<VerboseTestScores> verboseScores)
         {
-            SerializeAndSave(verboseScores, "VerboseTestScores[]");
+            Serialization.SerializeAndSave(verboseScores, "VerboseTestScores[]");
             
             var scores = verboseScores.Select(x => new TestScores
             {
@@ -1000,8 +887,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Recall = x.Recall,
                 F1 = x.F1
             }).ToList();
-            
-            SerializeAndSave(scores, "TestScores");
+
+            Serialization.SerializeAndSave(scores, "TestScores");
 
             var scores2 = scores.Select(x => new string[]
             {
@@ -1012,7 +899,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var scoresText = scores2.ToFormattedText(
                 ["Class", "TP", "FP", "FN", "TN", "Precision", "Recall", "F1"],
                 Enumerable.Repeat(Enums.Justification.Center, 8).ToArray(), "Classifier Performance By Class");
-            await SaveTextsAsync([scoresText], "TestScores");
+            await Serialization.SaveTextsAsync([scoresText], "TestScores");
             logger.Debug($"\n{scoresText}");
         }
 
@@ -1020,8 +907,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             ppkg.ProgressTrackerPane.Increment(10, "Building Folder Classifier -> Split Into Train / Test");
             var (train, test) = collection.SplitTestTrain(0.75);
-            SerializeAndSave(train, "Train");
-            SerializeAndSave(test, "Test");
+            Serialization.SerializeAndSave(train, "Train");
+            Serialization.SerializeAndSave(test, "Test");
             return (train, test);
         }
 
@@ -1038,9 +925,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = true;
             ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
 
-            testOutcomes ??= await DeserializeAsync<TestOutcome[]>("TestOutcomes");
-            testSource ??= await DeserializeAsync<MinedMailInfo[]>("Test");
-            classifierGroup ??= await DeserializeAsync<BayesianClassifierGroup>("TestClassifierGroup");
+            testOutcomes ??= await Serialization.DeserializeAsync<TestOutcome[]>("TestOutcomes");
+            testSource ??= await Serialization.DeserializeAsync<MinedMailInfo[]>("Test");
+            classifierGroup ??= await Serialization.DeserializeAsync<BayesianClassifierGroup>("TestClassifierGroup");
 
             if (testOutcomes.Length != testSource.Length) { throw new ArgumentException("Test Outcomes and Test Source Lengths Do Not Match"); }
             return (testOutcomes, testSource, classifierGroup, ppkg);
@@ -1060,122 +947,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         #endregion Data Progress, Loading, Saving, and Logging Methods
-
-        #region Serialization
-
-        internal virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
-        {
-            var jsonSettings = new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-            };
-            jsonSettings.Converters.Add(new AppGlobalsConverter(Globals));
-
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
-            {
-                var item = JsonConvert.DeserializeObject<T>(
-                    File.ReadAllText(disk.FilePath), jsonSettings);
-                return item;
-            }
-            else { return default(T); }
-        }
-
-        internal async virtual Task<T> DeserializeAsync<T>(string fileNameSeed, string fileNameSuffix = "")
-        {
-            var jsonSettings = new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-            };
-            jsonSettings.Converters.Add(new AppGlobalsConverter(Globals));
-
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
-            {
-                string fileText = null;
-                using (var reader = File.OpenText(disk.FilePath))
-                {
-                    fileText = await reader.ReadToEndAsync();
-                }
-
-                var item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
-                return item;
-            }
-            else { return default(T); }
-        }
-
-        internal virtual async Task SaveTextsAsync(IEnumerable<string> texts, string fileNameSeed, string fileNameSuffix = "", string fileExtension = ".txt")
-        {
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? 
-                $"{fileNameSeed}{fileExtension}" : 
-                $"{fileNameSeed}_{fileNameSuffix}{fileExtension}";
-
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath)) { File.Delete(disk.FilePath); }
-            await WriteTextsAsync(disk.FilePath, texts);
-        }
-
-        internal virtual async Task SaveCsvAsync(string[][] jagged, string fileNameSeed, string fileNameSuffix = "")
-        {
-            var texts = jagged.Select(x => x.StringJoin(",")).ToArray();
-            await SaveTextsAsync(texts, fileNameSeed, fileNameSuffix, ".csv");
-        }
-        
-        internal virtual void SerializeAndSave<T>(T obj, string fileNameSeed, string fileNameSuffix = "")
-        {
-            var jsonSettings = new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,                
-            };
-            jsonSettings.Converters.Add(new AppGlobalsConverter(Globals));
-
-            var serializer = JsonSerializer.Create(jsonSettings);
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            SerializeAndSave(obj, serializer, disk);
-        }
-
-        static async Task WriteTextsAsync(string filePath, IEnumerable<string> texts)
-        {
-
-            using (FileStream sourceStream = new FileStream(filePath,
-                FileMode.Append, FileAccess.Write, FileShare.None,
-                bufferSize: 4096, useAsync: true))
-            {
-                await texts.ToAsyncEnumerable().ForEachAwaitAsync(async text =>
-                {
-                    byte[] encodedText = Encoding.Unicode.GetBytes(text + Environment.NewLine);
-                    await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
-                });
-            };
-        }
-
-        internal virtual void SerializeAndSave<T>(T obj, JsonSerializer serializer, FilePathHelper disk)
-        {
-            using (StreamWriter sw = File.CreateText(disk.FilePath))
-            {
-                serializer.Serialize(sw, obj);
-                disk.FileName = null;
-            }
-        }
-
-        #endregion Serialization
 
     }
 

@@ -384,7 +384,8 @@
     <Compile Include="EmailIntelligence\Bayesian\ConvertedSpamBayesTokenizer.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusInherit.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\Performance\ClassifierMetrics.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianSerializationHelper.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianMetricTypes.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs">
       <SubType>Form</SubType>
     </Compile>
