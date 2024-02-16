@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 {
-    internal class BayesianSerializationHelper(IApplicationGlobals globals)
+    public class BayesianSerializationHelper(IApplicationGlobals globals)
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -130,7 +130,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         }
 
         #endregion Serialization
-
 
     }
 }

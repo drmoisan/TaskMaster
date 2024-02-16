@@ -11,17 +11,18 @@ using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
+using static UtilitiesCS.OlItemSummary;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class BayesianPerformance
+    public class BayesianPerformanceMeasurement
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constructors and Settings
 
-        public BayesianPerformance(IApplicationGlobals globals)
+        public BayesianPerformanceMeasurement(IApplicationGlobals globals)
         {
             _globals = globals;
         }
@@ -755,7 +756,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 { 
                     Class = x.Key, 
                     FalsePositives = fpDetails, 
-                    FalseNegatives = fnDetails 
+                    FalseNegatives = fnDetails,
+                    FalsePositivesCount = fpDetails.Count(),
+                    FalseNegativesCount = fnDetails.Count(),
                 };
                 return errors;
             })
@@ -774,7 +777,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     Class = x.Class,
                     FalsePositives = x.FPDetails,
-                    FalseNegatives = x.FNDetails
+                    FalseNegatives = x.FNDetails,
+                    FalsePositivesCount = x.FPDetails.Count(),
+                    FalseNegativesCount = x.FNDetails.Count(),
                 }).OrderByDescending(x => x.FalsePositives.Count() + x.FalseNegatives.Count())
                 .ToArray();
 
@@ -893,12 +898,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Data Loading and Saving
 
-        public virtual async Task LoadForDiagnosisAsync() 
-        {
-            var (testOutcomes, testSource, classifierGroup, ppkg) = await LoadIfNullAsync(null, null, null, null);
-
-        }
-        
         public virtual async Task<(TestOutcome[], MinedMailInfo[], BayesianClassifierGroup, ProgressPackage)> LoadIfNullAsync(
             TestOutcome[] testOutcomes, MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg)
         {
@@ -927,7 +926,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return (dataMiner, collection, folderPaths, ppkg);
         }
 
-        public async Task SaveScoresAsync(IEnumerable<TestScores> scores)
+        public virtual async Task SaveScoresAsync(IEnumerable<TestScores> scores)
         {
             Serialization.SerializeAndSave(scores, "TestScores");
             var scores2 = scores.Select(x => new string[]
@@ -942,7 +941,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             logger.Debug($"\n{scoresText}");
         }
 
-        public async Task SaveScoresAsync(IEnumerable<VerboseTestScores> verboseScores)
+        public virtual async Task SaveScoresAsync(IEnumerable<VerboseTestScores> verboseScores)
         {
             Serialization.SerializeAndSave(verboseScores, "VerboseTestScores[]");
             

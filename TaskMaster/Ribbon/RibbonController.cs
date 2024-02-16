@@ -22,8 +22,9 @@ using UtilitiesCS.EmailIntelligence.FolderRemap;
 using UtilitiesCS.EmailIntelligence;
 using log4net.Repository.Hierarchy;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using static UtilitiesCS.EmailIntelligence.Bayesian.BayesianPerformance;
+using static UtilitiesCS.EmailIntelligence.Bayesian.BayesianPerformanceMeasurement;
 using System.Diagnostics.Metrics;
+using QuickFiler.Controllers;
 
 
 namespace TaskMaster
@@ -362,12 +363,14 @@ namespace TaskMaster
 
         }
 
+        #region BayesianPerformance
+
         internal async Task TryTestClassifier()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianPerformance(_globals);
+            var tuner = new BayesianPerformanceMeasurement(_globals);
             await tuner.TestFolderClassifierAsync();            
         }
 
@@ -376,7 +379,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianPerformance(_globals);
+            var tuner = new BayesianPerformanceMeasurement(_globals);
             await tuner.TestFolderClassifierAsync(verbose: true);
         }
 
@@ -385,16 +388,28 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianPerformance(_globals);
+            var tuner = new BayesianPerformanceMeasurement(_globals);
             await tuner.GetConfusionDriversAsync();
         }
         internal async Task TryChartMetrics()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                                       new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianPerformance(_globals);
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianPerformanceMeasurement(_globals);
             await tuner.ShowSensitivityChartAsync(null);
         }
+
+        internal async Task InvestigateErrorsAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            
+            var performance = new BayesianPerformanceController(_globals);
+            await performance.InvestigatePerformance();
+        }
+
+        #endregion BayesianPerformance
     }
 }

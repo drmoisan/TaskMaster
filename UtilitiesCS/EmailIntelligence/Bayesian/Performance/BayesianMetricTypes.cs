@@ -1,7 +1,27 @@
 ﻿using System.Windows.Forms.DataVisualization.Charting;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 {
+    public record TestOutcome()
+    {
+        public string Actual { get; set; }
+        public string Predicted { get; set; }
+        public int SourceIndex { get; set; }
+    }
+
+    public record VerboseTestOutcome()
+    {
+        public string Actual { get; set; }
+        public string Predicted { get; set; }
+        public MinedMailInfo Source { get; set; }
+        public int SourceIndex { get; set; }
+        public (string Token, double TokenProbability)[] Drivers { get; set; }
+        public double Probability { get; set; }
+    }
+
     public record ClassCounts()
     {
         public string Class { get; set; }
@@ -52,6 +72,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public double F1 { get; set; }
     }
 
+    public record TestResult()
+    {
+        public string Actual { get; set; }
+        public string Predicted { get; set; }
+        public int Count { get; set; }
+    }
+
     public record VerboseTestResult()
     {
         public string Actual { get; set; }
@@ -64,31 +91,42 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
     {
         public string Class { get; set; }
         public VerboseTestOutcome[] FalsePositives { get; set; }
+        public int FalsePositivesCount { get; set; }
         public VerboseTestOutcome[] FalseNegatives { get; set; }
+        public int FalseNegativesCount { get; set; }
     }
 
-    public record VerboseTestOutcome()
+    public class ClassificationErrors2
     {
-        public string Actual { get; set; }
-        public string Predicted { get; set; }
-        public MinedMailInfo Source { get; set; }
-        public int SourceIndex { get; set; }
-        public (string Token, double TokenProbability)[] Drivers { get; set; }
-        public double Probability { get; set; }
-    }
+        public ClassificationErrors2() { }
 
-    public record TestResult()
-    {
-        public string Actual { get; set; }
-        public string Predicted { get; set; }
-        public int Count { get; set; }
-    }
+        [JsonConstructor]
+        public ClassificationErrors2(
+            string @class, 
+            IEnumerable<KeyValuePair<VerboseTestOutcome, string>> verboseOutcomes, 
+            int falsePositives, 
+            int falseNegatives)
+        {
+            Class = @class;
+            VerboseOutcomesJson = verboseOutcomes;
+            FalsePositives = falsePositives;
+            FalseNegatives = falseNegatives;
+        }
 
-    public record TestOutcome()
-    {
-        public string Actual { get; set; }
-        public string Predicted { get; set; }
-        public int SourceIndex { get; set; }
+        public string Class { get; set; }
+        
+        [JsonIgnore]
+        public Dictionary<VerboseTestOutcome, string> VerboseOutcomes { get; set; }
+
+        [JsonProperty]
+        private IEnumerable<KeyValuePair<VerboseTestOutcome, string>> VerboseOutcomesJson
+        {
+            get => VerboseOutcomes?.ToArray() ?? [];
+            set => VerboseOutcomes = value?.ToDictionary();
+        }
+
+        public int FalsePositives { get; set; }
+        public int FalseNegatives { get; set; }
     }
 
     public record ThresholdMetric()

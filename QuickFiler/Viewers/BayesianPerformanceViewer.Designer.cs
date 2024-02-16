@@ -1,6 +1,6 @@
 ﻿namespace QuickFiler.Viewers
 {
-    partial class BayesianClassViewer
+    partial class BayesianPerformanceViewer
     {
         /// <summary>
         /// Required designer variable.

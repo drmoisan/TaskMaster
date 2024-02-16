@@ -166,6 +166,16 @@ namespace TaskMaster
 
         #endregion SettingsMenu
 
+        #region BayesianPerformance
+
+        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.TryTestClassifier();
+        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierVerbose();
+        public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDrivers();
+        public async void ChartMetrics_Click(Office.IRibbonControl control) => await _controller.TryChartMetrics();
+        public async void InvestigateErrors_Click(Office.IRibbonControl control) => await _controller.InvestigateErrorsAsync();
+
+        #endregion BayesianPerformance
+
         #region TryMethods  
         public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
         public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();
@@ -182,15 +192,12 @@ namespace TaskMaster
         public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.ShowSubjectMapMetrics();
         public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.TryTokenizeEmail();
         public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.TryMineEmails();
-        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.TryBuildClassifier();
-        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.TryTestClassifier();
-        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierVerbose();
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.TryBuildClassifier();        
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.TryPrintManagerState();
         public void SaveManagerLocally_Click(Office.IRibbonControl control) => _controller.TrySaveManagerLocally();
         public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
-        public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDrivers();
-        public async void ChartMetrics_Click(Office.IRibbonControl control) => await _controller.TryChartMetrics();
+        
 
         #endregion
 

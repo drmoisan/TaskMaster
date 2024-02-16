@@ -33,7 +33,14 @@
                       <checkBox id="SaveEmailCopyDefault" label="Save Email Copy" getPressed="SaveEmailCopy_GetPressed" onAction="SaveEmailCopy_Clicked"/>
                       <checkBox id="SavePicturesDefault" label="Save Pictures" getPressed="SavePictures_GetPressed" onAction="SavePictures_Clicked"/>
                     </menu>
-                  </menu>  
+                  </menu>
+                  <menu id="BayesianPerformance" imageMso="TaskEarnedValueForm" label="Bayesian Performance" itemSize="large">
+                    <button id="TestClassifier" imageMso="AutoSummarize" onAction="TestClassifier_Click" label="Test Classifier" />
+                    <button id="TestClassifierVerbose" imageMso="AutoSummarize" onAction="TestClassifierVerbose_Click" label="Test Classifier Verbose" />
+                    <button id ="GetConfusionDetails" imageMso="CalendarMonthDetailsSplitButton" onAction="GetConfusionDrivers_Click" label="Get Confusion Drivers"/>
+                    <button id ="ChartMetrics" imageMso="ChartChangeType" onAction="ChartMetrics_Click" label="Chart Metrics"/>
+                    <button id ="InvestigateErrors" imageMso="ChartQuickExplore" onAction="InvestigateErrors_Click" label="Investigate Errors"/>
+                  </menu>                    
                   <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" itemSize="large">
                     <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
                     <button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
@@ -52,10 +59,6 @@
                     <button id="TokenizeEmail" imageMso="Filter" onAction="TokenizeEmail_Click" label="Tokenize Email" />
                     <button id="MineEmails" imageMso="Filter" onAction="MineEmails_Click" label="Mine Emails" />
                     <button id="BuildClassifier" imageMso="Filter" onAction="BuildClassifier_Click" label="Build Classifier" />
-                    <button id="TestClassifier" imageMso="Filter" onAction="TestClassifier_Click" label="Test Classifier" />
-                    <button id="TestClassifierVerbose" imageMso="Filter" onAction="TestClassifierVerbose_Click" label="Test Classifier Verbose" />
-                    <button id ="GetConfusionDetails" imageMso="Filter" onAction="GetConfusionDrivers_Click" label="Get Confusion Drivers"/>
-                    <button id ="ChartMetrics" imageMso="Filter" onAction="ChartMetrics_Click" label="Chart Metrics"/>
                     <button id="PrintManagerState" imageMso="PrintAttach" onAction="PrintManagerState_Click" label="Print Manager State" />
                     <button id="SaveManagerLocally" imageMso="SaveAll" onAction="SaveManagerLocally_Click" label="Save Manager Locally" />
                     <button id="SaveManagerNetwork" imageMso="SaveAll" onAction="SaveManagerNetwork_Click" label="Save Manager On Network" />

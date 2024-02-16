@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace QuickFiler.Viewers
 {
-    public partial class BayesianClassViewer : Form
+    public partial class BayesianPerformanceViewer : Form
     {
-        public BayesianClassViewer()
+        public BayesianPerformanceViewer()
         {
             InitializeComponent();
         }
