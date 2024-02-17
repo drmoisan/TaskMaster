@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.Threading;
 
 
 namespace UtilitiesCS
@@ -102,6 +103,51 @@ namespace UtilitiesCS
                 progress((int)(((double)completed / count) * 100));
             }
         }
+
+        public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<long, long> progress)
+        {
+            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+
+            long completed = 0;
+            foreach (var item in enumerable)
+            {
+                yield return item;
+
+                Interlocked.Increment(ref completed);
+                progress(completed, count);
+            }
+        }
+
+        public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, int count, ProgressTrackerPane progress, Stopwatch sw)
+        {            
+            enumerable.ThrowIfNullOrEmpty();
+            progress.ThrowIfNull();
+            sw ??= Stopwatch.StartNew();
+
+            int completed = 0;
+            foreach (var item in enumerable)
+            {
+                yield return item;
+
+                Interlocked.Increment(ref completed);
+
+                progress.Report(
+                    (double)completed / count * 100,
+                    $"Testing Classifiers -> { GetProgressMessage(completed, count, sw) }");
+            }
+        }
+
+        private static string GetProgressMessage(int complete, int count, Stopwatch sw)
+        {
+            double seconds = complete > 0 ? sw.Elapsed.TotalSeconds / complete : 0;
+            var remaining = count - complete;
+            var remainingSeconds = remaining * seconds;
+            var ts = TimeSpan.FromSeconds(remainingSeconds);
+            string msg = $"Completed {complete} of {count} ({seconds:N2} spm) " +
+                $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
+            return msg;
+        }
+
 
         public static IEnumerable<T> WithAction<T>(this IEnumerable<T> enumerable, System.Action action)
         {
@@ -325,11 +371,6 @@ namespace UtilitiesCS
             var train = zipped.Where(x => x.grouping == "Train").Select(x => x.tElement).ToArray();
             var test = zipped.Where(x => x.grouping == "Test").Select(x => x.tElement).ToArray();
 
-            // Flawed approach, as it will generate the random numbers each iteration, 
-            // which could cause lists neither to be mutually exclusive nor collectively exhaustive
-            //var groups = collection.GroupBy(x => rnd.NextDouble() > trainPercent ? "Test" : "Train");
-            //var train = groups.SelectGroup("Train");
-            //var test = groups.SelectGroup("Test");
             return (train, test);
         }
 

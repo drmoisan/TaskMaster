@@ -172,7 +172,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         private FilePathHelper _localDisk = new FilePathHelper();
 
         public FilePathHelper NetDisk { get => _netDisk; set => _netDisk = value; }
-        private FilePathHelper _netDisk = new FilePathHelper();
+        private FilePathHelper _netDisk = new();
 
         public void ActivateLocalDisk()
         {

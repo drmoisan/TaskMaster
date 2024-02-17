@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using UtilitiesCS.EmailIntelligence.TaskPane;
 
 namespace UtilitiesCS
@@ -44,10 +40,6 @@ namespace UtilitiesCS
             _progressViewer = parent.ProgressViewer;
         }
 
-        //public ProgressTracker(IProgress<(int Value, string JobName)> parent, int allocation, int startingAt)
-        //{
-        //    _parent = new ParentProgress<(int Value, string JobName)>(parent, allocation, startingAt);
-        //}
 
         protected string _jobName;
         private bool _isRoot = false;
@@ -137,32 +129,6 @@ namespace UtilitiesCS
                 } 
             }
         }
-
-        //public async Task ReportAsync(double value)
-        //{
-        //    if (value < 0)
-        //    {
-        //        var caller = new StackFrame(1, false).GetMethod().Name;
-        //        throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
-        //    }
-        //    else if (value > 100)
-        //    {
-        //        Report(100);
-        //    }
-        //    else
-        //    {
-        //        _progress = value;
-        //        var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
-        //        _parent.Progress.Report((parentProgress, _jobName));
-        //        if (_isRoot && parentProgress == 100)
-        //        {
-        //            //if (_progressViewer.InvokeRequired)
-        //            //    await _progressViewer.UiDispatcher.InvokeAsync(() => { if (!_progressViewer.IsDisposed) { _progressViewer.Dispose(); } });
-        //            //else
-        //            //    if (!_progressViewer.IsDisposed) { _progressViewer.Dispose(); }
-        //        }
-        //    }
-        //}
 
         public ProgressTrackerPane SpawnChild(int allocation)
         {

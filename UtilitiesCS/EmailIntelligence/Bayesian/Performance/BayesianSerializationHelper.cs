@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
@@ -68,6 +69,51 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             else { return default(T); }
         }
 
+        public async virtual Task<T> DeserializeAsync<T>(ProgressTrackerPane progress, string fileNameSeed, string fileNameSuffix = "", string fileExtension = ".json")
+        {
+            JsonSerializerSettings jsonSettings = GetJsonSettings();
+            FilePathHelper disk = GetDisk(fileNameSeed, fileNameSuffix, fileExtension);
+
+            T item = default;
+
+            if (File.Exists(disk.FilePath))
+            {
+                var fileText = await disk.ReadTextWithProgressAsync(progress, $"Reading {disk.FileName} Async: ");
+                                
+                try
+                {
+                    item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Error deserializing {disk.FileName}\n{e.Message}\nStack Trace:\n{e.StackTrace}", e);
+                }
+                
+            }
+            return item;
+        }
+
+        protected FilePathHelper GetDisk(string fileNameSeed, string fileNameSuffix, string extension)
+        {
+            var disk = new FilePathHelper();
+            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}{extension}" : $"{fileNameSeed}_{fileNameSuffix}{extension}";
+            disk.FileName = fileName;
+            return disk;
+        }
+
+        protected JsonSerializerSettings GetJsonSettings()
+        {
+            var jsonSettings = new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+            };
+            jsonSettings.Converters.Add(new AppGlobalsConverter(Globals));
+            return jsonSettings;
+        }
+
         public virtual async Task SaveTextsAsync(IEnumerable<string> texts, string fileNameSeed, string fileNameSuffix = "", string fileExtension = ".txt")
         {
             var disk = new FilePathHelper();
@@ -103,6 +149,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             SerializeAndSave(obj, serializer, disk);
+        }
+
+        public virtual async Task SerializeAndSaveAsync<T>(T obj, ProgressTrackerPane progress, string fileNameSeed, string fileNameSuffix = "", string fileExtension = ".json", string progressPrefix = "", CancellationToken cancel = default)
+        {
+            var jsonSettings = GetJsonSettings();
+            var serializer = JsonSerializer.Create(jsonSettings);
+            var disk = GetDisk(fileNameSeed, fileNameSuffix, fileExtension);
+
+            await serializer.SerializeWithProgressAsync(obj, disk, progress, cancel, progressPrefix);            
         }
 
         public virtual async Task WriteTextsAsync(string filePath, IEnumerable<string> texts)

@@ -31,18 +31,39 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public int TN { get; set; }
     }
 
-    public record VerboseClassCounts()
+    public class VerboseClassCounts() 
     {
         public string Class { get; set; }
-        public int TPCount { get; set; }
-        public int FPCount { get; set; }
-        public int FNCount { get; set; }
-        public int TNCount { get; set; }
-        public VerboseTestOutcome[] TPDetails { get; set; }
-        public VerboseTestOutcome[] FPDetails { get; set; }
-        public VerboseTestOutcome[] FNDetails { get; set; }
-        public VerboseTestOutcome[] TNDetails { get; set; }
+        public int TP { get; set; }
+        public int FP { get; set; }
+        public int FN { get; set; }
+        public int TN { get; set; }
+        public int Errors { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<VerboseTestOutcome, string> VerboseOutcomes { get; set; }
+
+        [JsonProperty]
+        private IEnumerable<KeyValuePair<VerboseTestOutcome, string>> VerboseOutcomesJson
+        {
+            get => VerboseOutcomes?.ToArray() ?? [];
+            set => VerboseOutcomes = value?.ToDictionary();
+        }
+    
     }
+
+    //public record VerboseClassCounts()
+    //{
+    //    public string Class { get; set; }
+    //    public int TPCount { get; set; }
+    //    public int FPCount { get; set; }
+    //    public int FNCount { get; set; }
+    //    public int TNCount { get; set; }
+    //    public VerboseTestOutcome[] TPDetails { get; set; }
+    //    public VerboseTestOutcome[] FPDetails { get; set; }
+    //    public VerboseTestOutcome[] FNDetails { get; set; }
+    //    public VerboseTestOutcome[] TNDetails { get; set; }
+    //}
 
     public record TestScores()
     {
@@ -56,30 +77,54 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public double F1 { get; set; }
     }
 
-    public record VerboseTestScores()
+    //public record VerboseTestScores()
+    //{
+    //    public string Class { get; set; }
+    //    public int TP { get; set; }
+    //    public int FP { get; set; }
+    //    public int FN { get; set; }
+    //    public int TN { get; set; }
+    //    public double Precision { get; set; }
+    //    public double Recall { get; set; }
+    //    public double F1 { get; set; }
+    //    public VerboseTestOutcome[] TPDetails { get; set; }
+    //    public VerboseTestOutcome[] FPDetails { get; set; }
+    //    public VerboseTestOutcome[] FNDetails { get; set; }
+    //    public VerboseTestOutcome[] TNDetails { get; set; }
+    //}
+
+    public class VerboseTestScores
     {
         public string Class { get; set; }
-        public int TPCount { get; set; }
-        public int FPCount { get; set; }
-        public int FNCount { get; set; }
-        public int TNCount { get; set; }
-        public VerboseTestOutcome[] TPDetails { get; set; }
-        public VerboseTestOutcome[] FPDetails { get; set; }
-        public VerboseTestOutcome[] FNDetails { get; set; }
-        public VerboseTestOutcome[] TNDetails { get; set; }
+        public int TP { get; set; }
+        public int FP { get; set; }
+        public int FN { get; set; }
+        public int TN { get; set; }
+        public int Errors { get; set; }
         public double Precision { get; set; }
         public double Recall { get; set; }
         public double F1 { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<VerboseTestOutcome, string> VerboseOutcomes { get; set; }
+
+        [JsonProperty]
+        private IEnumerable<KeyValuePair<VerboseTestOutcome, string>> VerboseOutcomesJson
+        {
+            get => VerboseOutcomes?.ToArray() ?? [];
+            set => VerboseOutcomes = value?.ToDictionary();
+        }
+
     }
 
-    public record TestResult()
+    public record GroupedTestOutcome()
     {
         public string Actual { get; set; }
         public string Predicted { get; set; }
         public int Count { get; set; }
     }
 
-    public record VerboseTestResult()
+    public record VerboseGroupedTestOutcome()
     {
         public string Actual { get; set; }
         public string Predicted { get; set; }
@@ -87,21 +132,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public VerboseTestOutcome[] Details { get; set; }
     }
 
-    public record ClassificationErrors()
+    public class ClassificationErrors
     {
-        public string Class { get; set; }
-        public VerboseTestOutcome[] FalsePositives { get; set; }
-        public int FalsePositivesCount { get; set; }
-        public VerboseTestOutcome[] FalseNegatives { get; set; }
-        public int FalseNegativesCount { get; set; }
-    }
-
-    public class ClassificationErrors2
-    {
-        public ClassificationErrors2() { }
+        public ClassificationErrors() { }
 
         [JsonConstructor]
-        public ClassificationErrors2(
+        public ClassificationErrors(
             string @class, 
             IEnumerable<KeyValuePair<VerboseTestOutcome, string>> verboseOutcomes, 
             int falsePositives, 
@@ -109,8 +145,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         {
             Class = @class;
             VerboseOutcomesJson = verboseOutcomes;
-            FalsePositives = falsePositives;
-            FalseNegatives = falseNegatives;
+            FP = falsePositives;
+            FN = falseNegatives;
         }
 
         public string Class { get; set; }
@@ -125,8 +161,16 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             set => VerboseOutcomes = value?.ToDictionary();
         }
 
-        public int FalsePositives { get; set; }
-        public int FalseNegatives { get; set; }
+        public int FP { get; set; }
+        public int FN { get; set; }
+        public int TP { get; set; }
+        public int TN { get; set; }
+        public int Errors { get; set; }
+    }
+
+    public class VerboseOutcomeClass 
+    { 
+
     }
 
     public record ThresholdMetric()

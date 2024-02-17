@@ -12,6 +12,7 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 using static UtilitiesCS.OlItemSummary;
+using System.Windows.Interop;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -25,6 +26,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public BayesianPerformanceMeasurement(IApplicationGlobals globals)
         {
             _globals = globals;
+            Serialization = new BayesianSerializationHelper(globals);
         }
 
         private IApplicationGlobals _globals;
@@ -54,13 +56,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var (dataMiner, collection, folderPaths, ppkg) = await LoadIfNullAsync(null, null, null);
             
-            var (train, test) = SplitAndSave(collection, 0.75, ppkg);
+            ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier");
+            var (train, test) = await SplitAndSave(collection, 0.75, ppkg.SpawnChild(10));
 
-            var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg, train);
+            var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg.SpawnChild(20), train);
 
-            VerboseTestOutcome[] verboseDetails = await RunVerboseClassifierTestAsync(test, classifierGroup, ppkg);
+            VerboseTestOutcome[] verboseDetails = await RunVerboseClassifierTestAsync(test, classifierGroup, ppkg.SpawnChild(50));
 
-            VerboseTestResult[] verboseResults = GroupOutcomes(verboseDetails);
+            VerboseGroupedTestOutcome[] verboseResults = GroupOutcomes(verboseDetails);
 
             ppkg.ProgressTrackerPane.Increment(0, "Building Folder Classifier -> Building Confusion Matrix and Calculating Scores");
 
@@ -68,11 +71,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var scores = await CalculateTestScoresAsync(counts);
 
-            await SaveScoresAsync(scores);
+            await SaveScoresAsync(scores, ppkg.ProgressTrackerPane.SpawnChild(5));
 
             await BuildConfusionMatrixAsync(folderPaths, verboseResults);
 
-            DiagnosePoorPerformance(counts);
+            await DiagnosePoorPerformanceAsync(scores.ToArray(), ppkg.ProgressTrackerPane.SpawnChild(25));
 
             ppkg.ProgressTrackerPane.Report(100, "Operation Complete");
             _globals.AF.ProgressPane.Visible = progressState;
@@ -85,21 +88,22 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             (dataMiner, collection, var folderPaths, var ppkg) = await LoadIfNullAsync(dataMiner, collection, null);
 
-            var (train, test) = SplitAndSave(collection, 0.75, ppkg);
+            ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier");
+            var (train, test) = await SplitAndSave(collection, 0.75, ppkg.SpawnChild(10));
 
-            var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg, train);
+            var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg.SpawnChild(20), train);
                         
-            TestOutcome[] testOutcomes = await RunClassifierTestAsync(test, classifierGroup, ppkg.SpawnChild(40));
-            TestResult[] testResults = GroupOutcomes(testOutcomes);
+            TestOutcome[] testOutcomes = await RunClassifierTestAsync(test, classifierGroup, ppkg.SpawnChild(50));
+            GroupedTestOutcome[] testResults = GroupOutcomes(testOutcomes);
 
             ppkg.ProgressTrackerPane.Increment(0, "Building Folder Classifier -> Building Confusion Matrix and Calculating Scores");
             
             ClassCounts[] counts = CountHitsMisses(folderPaths, testResults);
             
             IEnumerable<TestScores> scores = await CalculateTestScoresAsync(counts);
-            
-            await SaveScoresAsync(scores);
-            
+
+            await SaveScoresAsync(scores, ppkg.ProgressTrackerPane.SpawnChild(5));
+
             await BuildConfusionMatrixAsync(folderPaths, testResults);
 
             ppkg.ProgressTrackerPane.Report(100, "Operation Complete");
@@ -120,14 +124,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             (testOutcomes, testSource, classifierGroup, ppkg) = await LoadIfNullAsync(
                 testOutcomes, testSource, classifierGroup, ppkg);
 
-            var testScores = await Serialization.DeserializeAsync<TestScores[]>("TestScores");
+            var testScores = await Serialization.DeserializeAsync<TestScores[]>(ppkg.ProgressTrackerPane, "TestScores");
                         
-            ppkg.ProgressTrackerPane.Increment(10, "Getting Confusion Outcomes and Counts");
+            ppkg.ProgressTrackerPane.Report(0, "Getting Confusion Outcomes and Counts");
             TestOutcome[] confusedOutcomes = testOutcomes.Where(x => x.Actual != x.Predicted).ToArray();
-            TestResult[] confusedCounts = GroupOutcomes(confusedOutcomes);
+            GroupedTestOutcome[] confusedCounts = GroupOutcomes(confusedOutcomes);
 
             ppkg.ProgressTrackerPane.Increment(10, "Extracting Confusion Drivers");
-            ClassificationErrors[] errors = await DiagnosePoorPerformance(testSource, classifierGroup, 
+            ClassificationErrors[] errors = await DiagnosePoorPerformanceAsync(testSource, classifierGroup, 
                 ppkg.SpawnChild(100 - (int)ppkg.ProgressTrackerPane.Progress), confusedOutcomes, testScores);
                         
             _globals.AF.ProgressPane.Visible = progressState;
@@ -140,14 +144,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task<BayesianClassifierGroup> BuildClassifierAsync(EmailDataMiner dataMiner, ProgressPackage ppkg, MinedMailInfo[] train)
         {
-            ppkg.ProgressTrackerPane.Increment(10, "Building Folder Classifier -> Create Classifier Group");
+            ppkg.ProgressTrackerPane.Increment(0, "Building Folder Classifier -> Create Classifier Group");
 
             var classifierGroup = await dataMiner.CreateClassifierGroupAsync(train);
 
-            ppkg.ProgressTrackerPane.Increment(10, "Building Folder Classifier -> Building Classifiers");
+            ppkg.ProgressTrackerPane.Increment(30, "Building Folder Classifier -> Building Classifiers");
 
             await dataMiner.BuildFolderClassifiersAsync(classifierGroup, train, await new ProgressPackage().InitializeAsync(
-                ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(20), ppkg.StopWatch));
+                ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(70), ppkg.StopWatch));
 
             Serialization.SerializeAndSave(classifierGroup, "TestClassifierGroup");
 
@@ -164,7 +168,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var paneState = _globals.AF.ProgressPane.Visible;
             _globals.AF.ProgressPane.Visible = true;
 
-            ppkg?.ProgressTrackerPane.Report(0, "Testing Classifiers");
+            var ppkg2 = ppkg?.SpawnChild(70);
+            ppkg2?.ProgressTrackerPane.Report(0, "Testing Classifiers");
             TestOutcome[] testOutcomes = null;
             int completed = 0;
             int count = test.Count();
@@ -172,30 +177,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             double secondsPerItem = 0;
             double elapsedSeconds = 0;
             var sw = await Task.Run(() => new SegmentStopWatch().Start());
+            var cores = Environment.ProcessorCount;
             
             var testTask = Task.Run(() => testOutcomes =
                 [
                     .. test
                     .Select((MinedMail, Index) => (MinedMail, Index))
                     .AsParallel()
+                    .WithMergeOptions(ParallelMergeOptions.NotBuffered)
+                    .WithDegreeOfParallelism(cores-2)
                     .Select(x => new TestOutcome
                     {
                         SourceIndex = x.Index,
                         Actual = x.MinedMail.FolderInfo.RelativePath,
                         Predicted = classifierGroup.Classify(x.MinedMail.Tokens.GroupAndCount()).First().Class
                     })
-                    .WithAction(() =>
-                    {
-                        Interlocked.Increment(ref completed);
-                        
-                        var msg = GetProgressMessage(completed, count, sw, ref secondsPerItem, ref remainingSeconds);
-                        ppkg.ProgressTrackerPane.Report(
-                            ((int)(((double)completed / count) * 100),
-                            $"Testing Classifiers -> {msg}"));
-                        elapsedSeconds = sw.Elapsed.TotalSeconds;
-                    }),
+                    .WithAction(() => ReportAndCapture(ppkg2, ref completed, count, ref remainingSeconds, ref secondsPerItem, ref elapsedSeconds, sw)),
                 ],
-                ppkg.Cancel);
+                ppkg2.Cancel);
 
             TimerWrapper timer = null;
             var timerTask = Task.Run(() =>
@@ -206,7 +205,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     if (count > 0)
                     {
                         var msg = AdjustProgressTimer(completed, count, sw, ref secondsPerItem, ref remainingSeconds, ref elapsedSeconds);
-                        ppkg.ProgressTrackerPane.Report(
+                        ppkg2.ProgressTrackerPane.Report(
                             ((int)(((double)completed / count) * 100),
                             $"Testing Classifiers -> {msg}"));
                     }
@@ -217,9 +216,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             try
             {
-                await timerTask;
-                await testTask;
-                Serialization.SerializeAndSave(testOutcomes, testOutcomes.GetType().Name);
+                await Task.WhenAll(timerTask, testTask);
+                
+                await Serialization.SerializeAndSaveAsync(testOutcomes, ppkg.ProgressTrackerPane.SpawnChild(30), testOutcomes.GetType().Name);
             }
             catch (Exception e)
             {
@@ -243,26 +242,31 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var paneState = _globals.AF.ProgressPane.Visible;
             _globals.AF.ProgressPane.Visible = true;
 
-            ppkg?.ProgressTrackerPane.Report(0, "Testing Classifiers");
+            var ppkg2 = ppkg?.SpawnChild(70);
+            ppkg2?.ProgressTrackerPane.Report(0, "Testing Classifiers");
             VerboseTestOutcome[] verboseTestOutcomes = null;
-            int completed = 0;
-            int count = test.Count();
-            double remainingSeconds = 0;
-            double secondsPerItem = 0;
-            double elapsedSeconds = 0;
+            var cores = Environment.ProcessorCount;
+
+            var (completed, count, remainingSeconds, secondsPerItem, elapsedSeconds) = (0, test.Count(), 0D, 0D, 0D);
+            
             var sw = await Task.Run(() => new SegmentStopWatch().Start());
 
             var testTask = Task.Run(() => verboseTestOutcomes =
                 [
                     .. test
                     .Select((MinedMail, Index) => (MinedMail, Index))
-                    .AsParallel()
+                    //.AsParallel()
+                    //.WithDegreeOfParallelism(cores-2)
+                    //.WithMergeOptions(ParallelMergeOptions.NotBuffered)
                     .Select(x => (Source: x.MinedMail, Outcome: new TestOutcome
                     {
                         SourceIndex = x.Index,
                         Actual = x.MinedMail.FolderInfo.RelativePath,
                         Predicted = classifierGroup.Classify(x.MinedMail.Tokens.GroupAndCount()).First().Class
-                    })).Select(x =>
+                    })).WithProgressReporting(count, pgrs => Interlocked.Increment(ref completed))
+                    //.WithAction(() => ReportAndCapture(ppkg2, ref completed, count, ref remainingSeconds, ref secondsPerItem, ref elapsedSeconds, sw))
+                    .ToArray().AsParallel()
+                    .Select(x =>
                     {
                         var classifier = classifierGroup.Classifiers[x.Outcome.Predicted];
                         var tokens = x.Source.Tokens.GroupAndCount();
@@ -277,19 +281,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                             SourceIndex = x.Outcome.SourceIndex
                         };
                         return detail;
-                    })
-                    .WithAction(() =>
-                    {
-                        Interlocked.Increment(ref completed);
-
-                        var msg = GetProgressMessage(completed, count, sw, ref secondsPerItem, ref remainingSeconds);
-                        ppkg.ProgressTrackerPane.Report(
-                            ((int)(((double)completed / count) * 100),
-                            $"Testing Classifiers -> {msg}"));
-                        elapsedSeconds = sw.Elapsed.TotalSeconds;
                     }),
+                    //.WithProgressReporting(count, ppkg.ProgressTrackerPane, sw)
+                    //.WithAction(() => ReportAndCapture(ppkg2, ref completed, count, ref remainingSeconds, ref secondsPerItem, ref elapsedSeconds, sw)),                    
                 ],
-                ppkg.Cancel);
+                ppkg2.Cancel);
 
             TimerWrapper timer = null;
             var timerTask = Task.Run(() =>
@@ -299,10 +295,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     if (count > 0)
                     {
-                        var msg = AdjustProgressTimer(completed, count, sw, ref secondsPerItem, ref remainingSeconds, ref elapsedSeconds);
-                        ppkg.ProgressTrackerPane.Report(
-                            ((int)(((double)completed / count) * 100),
-                            $"Testing Classifiers -> {msg}"));
+                        var msg = GetProgressMessage(completed, count, sw);
+                        //var msg = AdjustProgressTimer(completed, count, sw, ref secondsPerItem, ref remainingSeconds, ref elapsedSeconds);
+                        ppkg2.ProgressTrackerPane.Report(
+                            (double)completed / count * 100,
+                            $"Testing Classifiers -> {msg}");
                     }
                 };
                 timer.AutoReset = true;
@@ -311,10 +308,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             try
             {
-                await timerTask;
-                await testTask;
-
-                Serialization.SerializeAndSave(verboseTestOutcomes, verboseTestOutcomes.GetType().Name);
+                await Task.WhenAll(timerTask, testTask);
+                
+                await Serialization.SerializeAndSaveAsync(verboseTestOutcomes, ppkg.ProgressTrackerPane.SpawnChild(15), verboseTestOutcomes.GetType().Name);
                 
                 var testOutcomes = verboseTestOutcomes.Select(x => new TestOutcome
                 {
@@ -322,7 +318,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     Predicted = x.Predicted,
                     SourceIndex = x.SourceIndex
                 }).ToArray();
-                Serialization.SerializeAndSave(testOutcomes, testOutcomes.GetType().Name);
+                await Serialization.SerializeAndSaveAsync(testOutcomes, ppkg.ProgressTrackerPane.SpawnChild(15), testOutcomes.GetType().Name);
 
             }
             catch (Exception e)
@@ -341,17 +337,30 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return verboseTestOutcomes;
         }
 
+        private void ReportAndCapture(ProgressPackage ppkg, ref int completed, int count, ref double remainingSeconds, ref double secondsPerItem, ref double elapsedSeconds, SegmentStopWatch sw)
+        {
+            //double elapsedSeconds;
+            Interlocked.Increment(ref completed);
+
+            var msg = GetProgressMessage(completed, count, sw, ref secondsPerItem, ref remainingSeconds);
+            ppkg.ProgressTrackerPane.Report(
+                ((int)(((double)completed / count) * 100),
+                $"Testing Classifiers -> {msg}"));
+            elapsedSeconds = sw.Elapsed.TotalSeconds;
+            //return elapsedSeconds;
+        }
+
         #endregion Step 2: Run The Test -> TestOutcome[]
 
         #region Step 3: Group Outcomes -> TestResult[]
 
-        public TestResult[] GroupOutcomes(TestOutcome[] outcomes)
+        public GroupedTestOutcome[] GroupOutcomes(TestOutcome[] outcomes)
         {
-            TestResult[] testResults =
+            GroupedTestOutcome[] testResults =
             [
                 .. outcomes
                     .GroupBy(x => (x.Actual, x.Predicted))
-                    .Select(x => new TestResult
+                    .Select(x => new GroupedTestOutcome
                     {
                         Actual = x.Key.Actual,
                         Predicted = x.Key.Predicted,
@@ -363,13 +372,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return testResults;
         }
 
-        public VerboseTestResult[] GroupOutcomes(VerboseTestOutcome[] outcomes)
+        public VerboseGroupedTestOutcome[] GroupOutcomes(VerboseTestOutcome[] outcomes)
         {
-            VerboseTestResult[] verboseTestResults =
+            VerboseGroupedTestOutcome[] verboseTestResults =
             [
                 .. outcomes
                     .GroupBy(x => (x.Actual, x.Predicted))
-                    .Select(x => new VerboseTestResult
+                    .Select(x => new VerboseGroupedTestOutcome
                     {
                         Actual = x.Key.Actual,
                         Predicted = x.Key.Predicted,
@@ -380,7 +389,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             ];
             Serialization.SerializeAndSave(verboseTestResults, verboseTestResults.GetType().Name);
 
-            var testResults = verboseTestResults.Select(x => new TestResult
+            var testResults = verboseTestResults.Select(x => new GroupedTestOutcome
             {
                 Actual = x.Actual,
                 Predicted = x.Predicted,
@@ -395,7 +404,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Step 4: Count Hits and Misses -> ClassCounts[]
 
-        public ClassCounts[] CountHitsMisses(List<string> folderPaths, TestResult[] testResults)
+        public ClassCounts[] CountHitsMisses(List<string> folderPaths, GroupedTestOutcome[] testResults)
         {
             ClassCounts[] counts = folderPaths.Select(x => new ClassCounts
             {
@@ -409,33 +418,63 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return counts;
         }
 
-        public VerboseClassCounts[] CountHitsMisses(List<string> folderPaths, VerboseTestResult[] testResults)
+        public VerboseClassCounts[] CountHitsMisses(List<string> folderPaths, VerboseGroupedTestOutcome[] testResults)
         {
-            VerboseClassCounts[] verboseCounts = folderPaths.Select(x => new VerboseClassCounts
-            {
-                Class = x,
-                TPCount = testResults.Count(y => y.Actual == x && y.Predicted == x),
-                FPCount = testResults.Count(y => y.Actual != x && y.Predicted == x),
-                FNCount = testResults.Count(y => y.Actual == x && y.Predicted != x),
-                TNCount = testResults.Count(y => y.Actual != x && y.Predicted != x),
-                TPDetails = testResults.Where(y => y.Actual == x && y.Predicted == x).SelectMany(y => y.Details).ToArray(),
-                FPDetails = testResults.Where(y => y.Actual != x && y.Predicted == x).SelectMany(y => y.Details).ToArray(),
-                FNDetails = testResults.Where(y => y.Actual == x && y.Predicted != x).SelectMany(y => y.Details).ToArray(),
-                //TNDetails = testResults.Where(y => y.Actual != x && y.Predicted != x).SelectMany(y => y.Details).ToArray()
-            }).ToArray();
+            VerboseClassCounts[] verboseCounts = folderPaths
+                .Select(x => new 
+                {
+                    Class = x,
+                    TP = testResults.Count(y => y.Actual == x && y.Predicted == x),
+                    FP = testResults.Count(y => y.Actual != x && y.Predicted == x),
+                    FN = testResults.Count(y => y.Actual == x && y.Predicted != x),
+                    TN = testResults.Count(y => y.Actual != x && y.Predicted != x),
+                })
+                .Where(x => x.TP + x.FP + x.FN > 0)
+                .Select(x => new VerboseClassCounts
+                {
+                    Class = x.Class, 
+                    TP = x.TP,
+                    FP = x.FP,
+                    FN = x.FN,
+                    TN = x.TN,
+                    Errors = x.FP + x.FN,
+                
+                    VerboseOutcomes = testResults
+                        .Where(y => y.Actual == x.Class || y.Predicted == x.Class)
+                        .SelectMany(y =>
+                        {
+                            var resultType = GetResultType(x.Class, y.Actual, y.Predicted);
+                            return y.Details.Select(z => new KeyValuePair<VerboseTestOutcome, string>(z, resultType));
+                        }).ToDictionary()
+
+                }).ToArray();
             Serialization.SerializeAndSave(verboseCounts, verboseCounts.GetType().Name);
 
             var counts = verboseCounts.Select(x => new ClassCounts
             {
                 Class = x.Class,
-                TP = x.TPCount,
-                FP = x.FPCount,
-                FN = x.FNCount,
-                TN = x.TNCount
+                TP = x.TP,
+                FP = x.FP,
+                FN = x.FN,
+                TN = x.TN,
             }).ToArray();
             Serialization.SerializeAndSave(counts, counts.GetType().Name);
 
             return verboseCounts;
+        }
+
+        internal virtual string GetResultType(string @class, string actual, string predicted) 
+        {
+            var t = (@class, actual, predicted);
+            return t switch
+            {
+                { } when (t.actual == t.@class) && (predicted == @class) => "TruePositive",
+                { } when actual != @class && predicted == @class => "FalsePositive",
+                { } when actual == @class && predicted != @class => "FalseNegative",
+                { } when actual != @class && predicted != @class => "TrueNegative",
+                _ => "Unknown"
+            };
+
         }
 
         #endregion Step 4: Count Hits and Misses -> ClassCounts[]
@@ -529,27 +568,23 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var scores = details.Select(x => new
             {
                 x.Class,
-                x.TPCount,
-                x.FPCount,
-                x.FNCount,
-                x.TNCount,
-                x.TPDetails,
-                x.FPDetails,
-                x.FNDetails,
-                x.TNDetails,
-                Precision = (x.TPCount + x.FPCount) != 0 ? x.TPCount / (double)(x.TPCount + x.FPCount) : 0,
-                Recall = (x.TPCount + x.FNCount) != 0 ? x.TPCount / (double)(x.TPCount + x.FNCount) : 0,
+                x.TP,
+                x.FP,
+                x.FN,
+                x.TN,
+                x.Errors,
+                x.VerboseOutcomes,
+                Precision = (x.TP + x.FP) != 0 ? x.TP / (double)(x.TP + x.FP) : 0,
+                Recall = (x.TP + x.FN) != 0 ? x.TP / (double)(x.TP + x.FN) : 0,
             }).Select(x => new VerboseTestScores
             {
                 Class = x.Class,
-                TPCount = x.TPCount,
-                FPCount = x.FPCount,
-                FNCount = x.FNCount,
-                TNCount = x.TNCount,
-                TPDetails = x.TPDetails,
-                FPDetails = x.FPDetails,
-                FNDetails = x.FNDetails,
-                TNDetails = x.TNDetails,
+                TP = x.TP,
+                FP = x.FP,
+                FN = x.FN,
+                TN = x.TN,
+                Errors = x.Errors,
+                VerboseOutcomes = x.VerboseOutcomes,
                 Precision = x.Precision,
                 Recall = x.Recall,
                 F1 = (x.Precision + x.Recall) != 0 ? 2 * (x.Precision * x.Recall) / (x.Precision + x.Recall) : 0
@@ -558,10 +593,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             scores.Add(new VerboseTestScores
             {
                 Class = "TOTAL",
-                TPCount = scores.Sum(x => x.TPCount),
-                FPCount = scores.Sum(x => x.FPCount),
-                FNCount = scores.Sum(x => x.FNCount),
-                TNCount = scores.Sum(x => x.TNCount),
+                TP = scores.Sum(x => x.TP),
+                FP = scores.Sum(x => x.FP),
+                FN = scores.Sum(x => x.FN),
+                TN = scores.Sum(x => x.TN),
+                Errors = scores.Sum(x => x.Errors),
                 Precision = scores.Select(x => x.Precision).Average(),
                 Recall = scores.Select(x => x.Recall).Average(),
                 F1 = scores.Select(x => x.F1).Average()
@@ -574,9 +610,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Step 6: Build Confusion Matrix -> serialized CSV and Text
 
-        public async Task BuildConfusionMatrixAsync(List<string> folderPaths, TestResult[] testResults)
+        public async Task BuildConfusionMatrixAsync(List<string> folderPaths, GroupedTestOutcome[] testResults)
         {
-            testResults ??= await Serialization.DeserializeAsync<TestResult[]>(typeof(TestResult[]).Name);
+            testResults ??= await Serialization.DeserializeAsync<GroupedTestOutcome[]>(typeof(GroupedTestOutcome[]).Name);
             folderPaths ??= [.. testResults.Select(x => x.Actual).Concat(testResults.Select(x=>x.Predicted)).Distinct().OrderBy(x => x)];
 
             string[][] jagged = new string[folderPaths.Count()+1][];
@@ -603,10 +639,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             
         }
 
-        public async Task BuildConfusionMatrixAsync(List<string> folderPaths, VerboseTestResult[] verboseTestResults)
+        public async Task BuildConfusionMatrixAsync(List<string> folderPaths, VerboseGroupedTestOutcome[] verboseTestResults)
         {
-            verboseTestResults ??= await Serialization.DeserializeAsync<VerboseTestResult[]>(typeof(VerboseTestResult[]).Name);
-            TestResult[] testResults = verboseTestResults.Select(x => new TestResult
+            verboseTestResults ??= await Serialization.DeserializeAsync<VerboseGroupedTestOutcome[]>(typeof(VerboseGroupedTestOutcome[]).Name);
+            GroupedTestOutcome[] testResults = verboseTestResults.Select(x => new GroupedTestOutcome
             {
                 Actual = x.Actual,
                 Predicted = x.Predicted,
@@ -619,7 +655,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Step 7: Diagnose Poor Performers -> ClassificationErrors[]
 
-        public async Task<VerboseTestResult[]> GetConfusionDetails(MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg, TestOutcome[] confusedOutcomes, TestResult[] confusedCounts)
+        public async Task<VerboseGroupedTestOutcome[]> GetConfusionDetails(MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg, TestOutcome[] confusedOutcomes, GroupedTestOutcome[] confusedCounts)
         {
             var numberConfused = confusedOutcomes.Count();
             int complete = 0;
@@ -677,7 +713,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         return detail;
                     }).ToArray();
 
-                var results = new VerboseTestResult()
+                var results = new VerboseGroupedTestOutcome()
                 {
                     Actual = x.Actual,
                     Predicted = x.Predicted,
@@ -727,63 +763,87 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }).ToArray();
         }
 
-        public async Task<ClassificationErrors[]> DiagnosePoorPerformance(MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg, TestOutcome[] confusedOutcomes, TestScores[] testScores)
+        public async Task<ClassificationErrors[]> DiagnosePoorPerformanceAsync(MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg, TestOutcome[] confusedOutcomes, TestScores[] testScores)
         {
             int complete = 0;
             var sw = await Task.Run(Stopwatch.StartNew);
             var misclassified = testScores
-                .Select(x => new KeyValuePair<string, int>(x.Class, x.FN + x.FP))
-                .Where(x => x.Key != "TOTAL" && x.Value > 0)
-                .OrderByDescending(x => x.Value)
+                .Select(x => new { x.Class, x.TP, x.FP, x.FN, x.TN, Errors = x.FP + x.FN })
+                //new KeyValuePair<string, int>(x.Class, x.FN + x.FP))
+                .Where(x => x.Class != "TOTAL" && x.Errors > 0)
+                .OrderByDescending(x => x.Errors)
                 .ToArray();
 
             var numberConfused = misclassified.Count();
+            
+            var ppkg2 = ppkg.SpawnChild(70);
             var classificationErrors = misclassified.Select(x =>
             {
                 var fpDetails = GetVerboseTestDetails(confusedOutcomes.Where(
-                    outcome => outcome.Predicted == x.Key), testSource, classifierGroup);
+                    outcome => outcome.Predicted == x.Class), testSource, classifierGroup);
 
                 var fnDetails = GetVerboseTestDetails(confusedOutcomes.Where(
-                    outcome => outcome.Actual == x.Key), testSource, classifierGroup);
-
-                Interlocked.Increment(ref complete);
-
-                ppkg.ProgressTrackerPane.Report(
-                    (int)(100 * complete / (double)numberConfused),
-                    $"Extracting Confusion Drivers: {GetProgressMessage(complete, numberConfused, sw)}");
+                    outcome => outcome.Actual == x.Class), testSource, classifierGroup);
 
                 var errors = new ClassificationErrors() 
                 { 
-                    Class = x.Key, 
-                    FalsePositives = fpDetails, 
-                    FalseNegatives = fnDetails,
-                    FalsePositivesCount = fpDetails.Count(),
-                    FalseNegativesCount = fnDetails.Count(),
+                    Class = x.Class, 
+                    TP = x.TP,
+                    FP = x.FP, 
+                    FN = x.FN,
+                    TN = x.TN,
+                    Errors = x.Errors,
+                    VerboseOutcomes = fpDetails
+                        .Select(x => new KeyValuePair<VerboseTestOutcome, string>(x, "False Positive"))
+                        .Concat(fnDetails.Select(x => new KeyValuePair<VerboseTestOutcome, string>(x, "False Negative")))
+                        .ToDictionary()
                 };
+                
+                Interlocked.Increment(ref complete);
+
+                ppkg2.ProgressTrackerPane.Report(
+                    (int)(100 * complete / (double)numberConfused),
+                    $"Extracting Confusion Drivers: {GetProgressMessage(complete, numberConfused, sw)}");
+
                 return errors;
             })
             .ToArray();
 
-            if (SaveWip) { Serialization.SerializeAndSave(classificationErrors, "ClassificationErrors"); }
+            if (SaveWip) 
+            { 
+                await Serialization.SerializeAndSaveAsync(
+                    classificationErrors, ppkg.ProgressTrackerPane.SpawnChild(30), "ClassificationErrors[]"); 
+            }
             ppkg.ProgressTrackerPane.Report(100);
             
             return classificationErrors;
         }
 
-        public ClassificationErrors[] DiagnosePoorPerformance(VerboseClassCounts[] classCounts)
+        public async Task<ClassificationErrors[]> DiagnosePoorPerformanceAsync(VerboseTestScores[] verboseTestResults, ProgressTrackerPane progress)
         {
-            var classificationErrors = classCounts
+            var sw = await Task.Run(Stopwatch.StartNew);
+
+            var classificationErrors = verboseTestResults
+                .Where(x => x.Errors > 0)
                 .Select(x => new ClassificationErrors()
                 {
                     Class = x.Class,
-                    FalsePositives = x.FPDetails,
-                    FalseNegatives = x.FNDetails,
-                    FalsePositivesCount = x.FPDetails.Count(),
-                    FalseNegativesCount = x.FNDetails.Count(),
-                }).OrderByDescending(x => x.FalsePositives.Count() + x.FalseNegatives.Count())
+                    TP = x.TP,
+                    FP = x.FP,
+                    FN = x.FN,
+                    TN = x.TN,
+                    Errors = x.FP + x.FN,
+
+                    VerboseOutcomes = x.VerboseOutcomes
+                        .Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value))
+                        .ToDictionary(),
+
+                })
+                .OrderByDescending(x => x.Errors)
+                .WithProgressReporting(verboseTestResults.Length, progress.SpawnChild(50), sw)
                 .ToArray();
 
-            if (SaveWip) { Serialization.SerializeAndSave(classificationErrors, "ClassificationErrors"); }
+            if (SaveWip) { await Serialization.SerializeAndSaveAsync(classificationErrors, progress.SpawnChild(50), "ClassificationErrors[]"); }
             
             return classificationErrors;  
         }
@@ -808,7 +868,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     Predicted = x.Predicted,
                     SourceIndex = x.SourceIndex,
                 }).ToArray();
-                TestResult[] testResults = GroupOutcomes(testOutcomes);
+                GroupedTestOutcome[] testResults = GroupOutcomes(testOutcomes);
                 ClassCounts[] counts = CountHitsMisses(folderPaths, testResults);
                 var metrics = CalculateTestScores(counts).Last();
                 var observations = metrics.TP + metrics.FN + metrics.FP + metrics.TN; 
@@ -871,7 +931,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return msg;
         }
 
-        private string AdjustProgressTimer(int complete, int count, Stopwatch sw, ref double secondsPerItem, ref double remainingSeconds, ref double elapsedSeconds)
+        private string AdjustProgressTimer(int complete, int count, Stopwatch sw, ref double secondsPerItem, 
+            ref double remainingSeconds, ref double elapsedSeconds)
         {
             int attempts = 0;
             double exchangeValue = 0;
@@ -902,12 +963,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             TestOutcome[] testOutcomes, MinedMailInfo[] testSource, BayesianClassifierGroup classifierGroup, ProgressPackage ppkg)
         {
             ppkg ??= await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
-            _globals.AF.ProgressPane.Visible = true;
             ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
 
-            testOutcomes ??= await Serialization.DeserializeAsync<TestOutcome[]>("TestOutcomes");
-            testSource ??= await Serialization.DeserializeAsync<MinedMailInfo[]>("Test");
-            classifierGroup ??= await Serialization.DeserializeAsync<BayesianClassifierGroup>("TestClassifierGroup");
+            testOutcomes ??= await Serialization.DeserializeAsync<TestOutcome[]>(ppkg.ProgressTrackerPane, typeof(TestOutcome[]).Name);
+            testSource ??= await Serialization.DeserializeAsync<MinedMailInfo[]>(ppkg.ProgressTrackerPane, "Test");
+            classifierGroup ??= await Serialization.DeserializeAsync<BayesianClassifierGroup>(ppkg.ProgressTrackerPane, "TestClassifierGroup");
 
             if (testOutcomes.Length != testSource.Length) { throw new ArgumentException("Test Outcomes and Test Source Lengths Do Not Match"); }
             return (testOutcomes, testSource, classifierGroup, ppkg);
@@ -920,44 +980,48 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
 
             dataMiner ??= new EmailDataMiner(Globals);
-            collection ??= await dataMiner.Load<MinedMailInfo[]>();
+            
+            collection ??= await Serialization.DeserializeAsync<MinedMailInfo[]>(ppkg.ProgressTrackerPane, typeof(MinedMailInfo[]).Name);
             var folderPaths = collection.Select(x => x.FolderInfo.RelativePath).OrderBy(x => x).Distinct().ToList();
 
             return (dataMiner, collection, folderPaths, ppkg);
         }
 
-        public virtual async Task SaveScoresAsync(IEnumerable<TestScores> scores)
+        public virtual async Task SaveScoresAsync(IEnumerable<TestScores> scores, ProgressTrackerPane progress)
         {
-            Serialization.SerializeAndSave(scores, "TestScores");
+            await Serialization.SerializeAndSaveAsync(scores, progress.SpawnChild(50), "TestScores");
             var scores2 = scores.Select(x => new string[]
                         {
                 x.Class, x.TP.ToString(), x.FP.ToString(), x.FN.ToString(), x.TN.ToString(),x.Precision.ToString("0.00"), x.Recall.ToString("0.00"), x.F1.ToString("0.00")
                         }).ToArray();
 
+            progress.Increment(0, "Scores as Text");
             var scoresText = scores2.ToFormattedText(
                 ["Class", "TP", "FP", "FN", "TN", "Precision", "Recall", "F1"],
                 Enumerable.Repeat(Enums.Justification.Center, 8).ToArray(), "Classifier Performance By Class");
             await Serialization.SaveTextsAsync([scoresText], "TestScores");
+            
+            progress.Report(100);
             logger.Debug($"\n{scoresText}");
         }
 
-        public virtual async Task SaveScoresAsync(IEnumerable<VerboseTestScores> verboseScores)
+        public virtual async Task SaveScoresAsync(IEnumerable<VerboseTestScores> verboseScores, ProgressTrackerPane progress)
         {
-            Serialization.SerializeAndSave(verboseScores, "VerboseTestScores[]");
+            await Serialization.SerializeAndSaveAsync(verboseScores, progress.SpawnChild(30), "VerboseTestScores[]");
             
             var scores = verboseScores.Select(x => new TestScores
             {
                 Class = x.Class,
-                TP = x.TPCount,
-                FP = x.FPCount,
-                FN = x.FNCount,
-                TN = x.TNCount,
+                TP = x.TP,
+                FP = x.FP,
+                FN = x.FN,
+                TN = x.TN,
                 Precision = x.Precision,
                 Recall = x.Recall,
                 F1 = x.F1
             }).ToList();
 
-            Serialization.SerializeAndSave(scores, "TestScores");
+            await Serialization.SerializeAndSaveAsync(scores, progress.SpawnChild(30), "TestScores");
 
             var scores2 = scores.Select(x => new string[]
             {
@@ -970,14 +1034,16 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Enumerable.Repeat(Enums.Justification.Center, 8).ToArray(), "Classifier Performance By Class");
             await Serialization.SaveTextsAsync([scoresText], "TestScores");
             logger.Debug($"\n{scoresText}");
+            progress.Report(100);
         }
 
-        public virtual (MinedMailInfo[] Train, MinedMailInfo[] Test) SplitAndSave(MinedMailInfo[] collection, double trainPercent, ProgressPackage ppkg)
+        public virtual async Task<(MinedMailInfo[] Train, MinedMailInfo[] Test)> SplitAndSave(MinedMailInfo[] collection, double trainPercent, ProgressPackage ppkg)
         {
-            ppkg.ProgressTrackerPane.Increment(10, "Building Folder Classifier -> Split Into Train / Test");
+            ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier -> Split Into Train / Test");
             var (train, test) = collection.SplitTestTrain(0.75);
-            Serialization.SerializeAndSave(train, "Train");
-            Serialization.SerializeAndSave(test, "Test");
+            ppkg.ProgressTrackerPane.Increment(20);
+            await Serialization.SerializeAndSaveAsync(train, ppkg.ProgressTrackerPane.SpawnChild(40), "Train", cancel: ppkg.Cancel);
+            await Serialization.SerializeAndSaveAsync(test, ppkg.ProgressTrackerPane.SpawnChild(40), "Test", cancel: ppkg.Cancel);
             return (train, test);
         }
 

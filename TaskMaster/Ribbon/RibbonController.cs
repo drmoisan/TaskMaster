@@ -25,6 +25,8 @@ using UtilitiesCS.EmailIntelligence.Bayesian;
 using static UtilitiesCS.EmailIntelligence.Bayesian.BayesianPerformanceMeasurement;
 using System.Diagnostics.Metrics;
 using QuickFiler.Controllers;
+using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
+using UtilitiesCS.Threading;
 
 
 namespace TaskMaster
@@ -390,6 +392,11 @@ namespace TaskMaster
                     new WindowsFormsSynchronizationContext());
             var tuner = new BayesianPerformanceMeasurement(_globals);
             await tuner.GetConfusionDriversAsync();
+            //var serializer = new BayesianSerializationHelper(_globals);
+            //var testScores = await serializer.DeserializeAsync<VerboseTestScores[]>("VerboseTestScores[]");
+            //var ppkg = await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
+            //_globals.AF.ProgressPane.Visible = true;
+            //var errors = await tuner.DiagnosePoorPerformanceAsync(testScores, ppkg.ProgressTrackerPane);
         }
         internal async Task TryChartMetrics()
         {
