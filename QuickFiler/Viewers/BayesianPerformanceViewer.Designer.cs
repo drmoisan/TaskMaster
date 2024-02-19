@@ -28,12 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.ErrCount = new System.Windows.Forms.Label();
+            this.TotalCount = new System.Windows.Forms.Label();
             this.FnCount = new System.Windows.Forms.Label();
             this.FpCount = new System.Windows.Forms.Label();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -44,51 +42,41 @@
             this.ClassSelector = new System.Windows.Forms.ListBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.objectListView1 = new BrightIdeasSoftware.ObjectListView();
+            this.CbFalsePositive = new System.Windows.Forms.CheckBox();
+            this.CbFalseNegative = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.objectListView1)).BeginInit();
             this.SuspendLayout();
             // 
-            // radioButton1
-            // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioButton1.Location = new System.Drawing.Point(30, 53);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(215, 35);
-            this.radioButton1.TabIndex = 1;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "False Positive";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            // 
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.ErrCount);
+            this.groupBox1.Controls.Add(this.CbFalseNegative);
+            this.groupBox1.Controls.Add(this.CbFalsePositive);
+            this.groupBox1.Controls.Add(this.TotalCount);
             this.groupBox1.Controls.Add(this.FnCount);
             this.groupBox1.Controls.Add(this.FpCount);
-            this.groupBox1.Controls.Add(this.radioButton2);
-            this.groupBox1.Controls.Add(this.radioButton1);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(1873, 30);
+            this.groupBox1.Location = new System.Drawing.Point(1823, 30);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(489, 223);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Class Errors";
+            this.groupBox1.Text = "Class Counts";
             // 
-            // ErrCount
+            // TotalCount
             // 
-            this.ErrCount.AutoSize = true;
-            this.ErrCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ErrCount.Location = new System.Drawing.Point(325, 135);
-            this.ErrCount.Name = "ErrCount";
-            this.ErrCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
-            this.ErrCount.Size = new System.Drawing.Size(87, 35);
-            this.ErrCount.TabIndex = 5;
-            this.ErrCount.Text = "#,###";
-            this.ErrCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.TotalCount.AutoSize = true;
+            this.TotalCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TotalCount.Location = new System.Drawing.Point(325, 135);
+            this.TotalCount.Name = "TotalCount";
+            this.TotalCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
+            this.TotalCount.Size = new System.Drawing.Size(87, 35);
+            this.TotalCount.TabIndex = 5;
+            this.TotalCount.Text = "#,###";
+            this.TotalCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // FnCount
             // 
@@ -114,18 +102,6 @@
             this.FpCount.Text = "#,###";
             this.FpCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.radioButton2.Location = new System.Drawing.Point(30, 94);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(227, 35);
-            this.radioButton2.TabIndex = 1;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "False Negative";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -136,7 +112,7 @@
             this.groupBox2.Controls.Add(this.RecallScore);
             this.groupBox2.Controls.Add(this.PrecisionScore);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox2.Location = new System.Drawing.Point(2388, 30);
+            this.groupBox2.Location = new System.Drawing.Point(2338, 30);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(377, 223);
             this.groupBox2.TabIndex = 4;
@@ -224,7 +200,7 @@
             this.ClassSelector.ItemHeight = 31;
             this.ClassSelector.Location = new System.Drawing.Point(17, 43);
             this.ClassSelector.Name = "ClassSelector";
-            this.ClassSelector.Size = new System.Drawing.Size(1800, 155);
+            this.ClassSelector.Size = new System.Drawing.Size(1750, 155);
             this.ClassSelector.TabIndex = 5;
             // 
             // groupBox3
@@ -235,7 +211,7 @@
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(24, 30);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1823, 223);
+            this.groupBox3.Size = new System.Drawing.Size(1773, 223);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Class Selector";
@@ -243,6 +219,7 @@
             // objectListView1
             // 
             this.objectListView1.CellEditUseWholeCell = false;
+            this.objectListView1.Cursor = System.Windows.Forms.Cursors.Default;
             this.objectListView1.HideSelection = false;
             this.objectListView1.Location = new System.Drawing.Point(24, 273);
             this.objectListView1.Name = "objectListView1";
@@ -251,17 +228,37 @@
             this.objectListView1.UseCompatibleStateImageBehavior = false;
             this.objectListView1.View = System.Windows.Forms.View.Details;
             // 
-            // BayesianClassViewer
+            // CbFalsePositive
+            // 
+            this.CbFalsePositive.AutoSize = true;
+            this.CbFalsePositive.Location = new System.Drawing.Point(30, 53);
+            this.CbFalsePositive.Name = "CbFalsePositive";
+            this.CbFalsePositive.Size = new System.Drawing.Size(216, 35);
+            this.CbFalsePositive.TabIndex = 6;
+            this.CbFalsePositive.Text = "False Positive";
+            this.CbFalsePositive.UseVisualStyleBackColor = true;
+            // 
+            // CbFalseNegative
+            // 
+            this.CbFalseNegative.AutoSize = true;
+            this.CbFalseNegative.Location = new System.Drawing.Point(30, 94);
+            this.CbFalseNegative.Name = "CbFalseNegative";
+            this.CbFalseNegative.Size = new System.Drawing.Size(228, 35);
+            this.CbFalseNegative.TabIndex = 7;
+            this.CbFalseNegative.Text = "False Negative";
+            this.CbFalseNegative.UseVisualStyleBackColor = true;
+            // 
+            // BayesianPerformanceViewer
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2790, 1283);
+            this.ClientSize = new System.Drawing.Size(2740, 1283);
             this.Controls.Add(this.objectListView1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Name = "BayesianClassViewer";
+            this.Name = "BayesianPerformanceViewer";
             this.Text = "BayesianClassViewer";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -274,15 +271,13 @@
         }
 
         #endregion
-        private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         public System.Windows.Forms.Label FpCount;
-        public System.Windows.Forms.Label ErrCount;
+        public System.Windows.Forms.Label TotalCount;
         public System.Windows.Forms.Label FnCount;
         public System.Windows.Forms.Label PrecisionScore;
         public System.Windows.Forms.Label RecallScore;
@@ -290,5 +285,7 @@
         private System.Windows.Forms.ListBox ClassSelector;
         private System.Windows.Forms.GroupBox groupBox3;
         private BrightIdeasSoftware.ObjectListView objectListView1;
+        protected internal System.Windows.Forms.CheckBox CbFalseNegative;
+        protected internal System.Windows.Forms.CheckBox CbFalsePositive;
     }
 }

@@ -11,8 +11,6 @@ using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
-using static UtilitiesCS.OlItemSummary;
-using System.Windows.Interop;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -823,6 +821,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var sw = await Task.Run(Stopwatch.StartNew);
 
+            verboseTestResults.ForEach(x => 
+            { 
+                var verboseOutcomes = x.VerboseOutcomes?.Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value)) ?? [];
+                x.VerboseOutcomes = verboseOutcomes.Count() > 0 ? verboseOutcomes.ToDictionary() : [];
+            }); //.VerboseOutcomes.Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value))
             var classificationErrors = verboseTestResults
                 .Where(x => x.Errors > 0)
                 .Select(x => new ClassificationErrors()
@@ -833,10 +836,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     FN = x.FN,
                     TN = x.TN,
                     Errors = x.FP + x.FN,
-
-                    VerboseOutcomes = x.VerboseOutcomes
-                        .Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value))
-                        .ToDictionary(),
+                    VerboseOutcomes = x.VerboseOutcomes,
+                        //.Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value))
+                        //?.ToDictionary(),
 
                 })
                 .OrderByDescending(x => x.Errors)

@@ -272,8 +272,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 foreach (var classifier in Classifiers)
                 {
-                    AppGlobals.AF.CancelLoad.ThrowIfCancellationRequested();
-                    await classifier.Value.AfterDeserialize(AppGlobals.AF.CancelLoad, sw);
+                    AppGlobals.AF.CancelToken.ThrowIfCancellationRequested();
+                    await classifier.Value.AfterDeserialize(AppGlobals.AF.CancelToken, sw);
                     Interlocked.Increment(ref completed);
                     AppGlobals.AF.ProgressTracker.Report((int)((double)completed / (double)count * 100),
                         GetReportMessage(completed, count, sw));

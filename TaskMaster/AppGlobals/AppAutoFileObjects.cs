@@ -139,7 +139,7 @@ namespace TaskMaster
         {   
             await Task.Factory.StartNew(
                 () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
-                CancelLoad,
+                CancelToken,
                 TaskCreationOptions.None, 
                 TaskScheduler.Current);
         }   
@@ -184,7 +184,7 @@ namespace TaskMaster
         {
             await Task.Factory.StartNew(
                 () => _ctfMap = LoadCtfMap(),
-                CancelLoad);
+                CancelToken);
                 //default,
                 //TaskCreationOptions.None,
                 //PriorityScheduler.BelowNormal);
@@ -266,7 +266,7 @@ namespace TaskMaster
         {
             await Task.Factory.StartNew(
                 () => _filters = LoadFilters(),
-                CancelLoad);
+                CancelToken);
         }
         private void ScoFilterEntry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -292,7 +292,7 @@ namespace TaskMaster
         {
             await Task.Factory.StartNew(
                  () => _subjectMap = LoadSubjectMap(),
-                 CancelLoad,
+                 CancelToken,
                  TaskCreationOptions.LongRunning,
                  TaskScheduler.Current);
             //default,
@@ -439,7 +439,7 @@ namespace TaskMaster
             LoadProgressPane(_tokenSource);
             await Task.Run(
                 () => _manager = LoadManager(),
-                CancelLoad);
+                CancelToken);
         }
         public void SaveManagerLocal()
         {
@@ -467,8 +467,9 @@ namespace TaskMaster
             }
         }
 
+        public CancellationTokenSource CancelSource => _tokenSource;
         private CancellationTokenSource _tokenSource = new();
-        public CancellationToken CancelLoad => Initializer.GetOrLoad(ref _token, LoadToken);
+        public CancellationToken CancelToken => Initializer.GetOrLoad(ref _token, LoadToken);
         private CancellationToken _token;
         private CancellationToken LoadToken()
         {

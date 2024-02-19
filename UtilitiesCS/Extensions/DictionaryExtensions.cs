@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Generic.Math;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
@@ -48,6 +49,7 @@ namespace UtilitiesCS
         /// <returns>A Sorted Dictionary</returns>
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source)
         {
+            if (source.IsNullOrEmpty()) { return []; }
             IEnumerable<IGrouping<TKey, KeyValuePair<TKey, TValue>>> duplicateKVPsByKey = source.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1);
             if (duplicateKVPsByKey.Any())
                 throw new InvalidOperationException($"Cannot convert to dictionary with duplicate keys: {string.Join(",", duplicateKVPsByKey)}");

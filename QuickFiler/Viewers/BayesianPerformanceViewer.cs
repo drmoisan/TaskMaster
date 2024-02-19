@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using QuickFiler.Controllers;
 using System.Windows.Forms;
 
 namespace QuickFiler.Viewers
@@ -16,5 +9,14 @@ namespace QuickFiler.Viewers
         {
             InitializeComponent();
         }
+
+        public BayesianPerformanceViewer(BayesianPerformanceController controller)
+        {
+            InitializeComponent();
+            Controller = controller;
+        }
+
+        private BayesianPerformanceController _controller;
+        public virtual BayesianPerformanceController Controller { get => _controller; internal set => _controller = value; }
     }
 }

@@ -30,6 +30,7 @@ namespace UtilitiesCS
         ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         ProgressTrackerPane ProgressTracker { get; }
         Microsoft.Office.Tools.CustomTaskPane ProgressPane { get; }
-        CancellationToken CancelLoad { get; }
+        CancellationToken CancelToken { get; }
+        CancellationTokenSource CancelSource { get; }
     }
 }
