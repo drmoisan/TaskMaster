@@ -28,10 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.TotalCount = new System.Windows.Forms.Label();
-            this.FnCount = new System.Windows.Forms.Label();
-            this.FpCount = new System.Windows.Forms.Label();
+            this.TlpMain = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -39,68 +36,61 @@
             this.label7 = new System.Windows.Forms.Label();
             this.RecallScore = new System.Windows.Forms.Label();
             this.PrecisionScore = new System.Windows.Forms.Label();
-            this.ClassSelector = new System.Windows.Forms.ListBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.objectListView1 = new BrightIdeasSoftware.ObjectListView();
-            this.CbFalsePositive = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.CbFalseNegative = new System.Windows.Forms.CheckBox();
-            this.groupBox1.SuspendLayout();
+            this.CbFalsePositive = new System.Windows.Forms.CheckBox();
+            this.TotalCount = new System.Windows.Forms.Label();
+            this.FnCount = new System.Windows.Forms.Label();
+            this.FpCount = new System.Windows.Forms.Label();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.ClassSelector = new System.Windows.Forms.ListBox();
+            this.OlvVerboseDetails = new BrightIdeasSoftware.ObjectListView();
+            this.PredictedClass = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.Type = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.Probability = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.From = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvDrivers = new BrightIdeasSoftware.ObjectListView();
+            this.OlvToken = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvTokenProbability = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvDriverPresence = new BrightIdeasSoftware.ObjectListView();
+            this.OlvSubject2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvProbability2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.FlpActions = new System.Windows.Forms.FlowLayoutPanel();
+            this.button1 = new System.Windows.Forms.Button();
+            this.TlpMain.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.objectListView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OlvVerboseDetails)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OlvDrivers)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OlvDriverPresence)).BeginInit();
+            this.FlpActions.SuspendLayout();
             this.SuspendLayout();
             // 
-            // groupBox1
+            // TlpMain
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.CbFalseNegative);
-            this.groupBox1.Controls.Add(this.CbFalsePositive);
-            this.groupBox1.Controls.Add(this.TotalCount);
-            this.groupBox1.Controls.Add(this.FnCount);
-            this.groupBox1.Controls.Add(this.FpCount);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(1823, 30);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(489, 223);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Class Counts";
-            // 
-            // TotalCount
-            // 
-            this.TotalCount.AutoSize = true;
-            this.TotalCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TotalCount.Location = new System.Drawing.Point(325, 135);
-            this.TotalCount.Name = "TotalCount";
-            this.TotalCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
-            this.TotalCount.Size = new System.Drawing.Size(87, 35);
-            this.TotalCount.TabIndex = 5;
-            this.TotalCount.Text = "#,###";
-            this.TotalCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // FnCount
-            // 
-            this.FnCount.AutoSize = true;
-            this.FnCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FnCount.Location = new System.Drawing.Point(325, 94);
-            this.FnCount.Name = "FnCount";
-            this.FnCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
-            this.FnCount.Size = new System.Drawing.Size(87, 35);
-            this.FnCount.TabIndex = 3;
-            this.FnCount.Text = "#,###";
-            this.FnCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // FpCount
-            // 
-            this.FpCount.AutoSize = true;
-            this.FpCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FpCount.Location = new System.Drawing.Point(325, 53);
-            this.FpCount.Name = "FpCount";
-            this.FpCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
-            this.FpCount.Size = new System.Drawing.Size(87, 35);
-            this.FpCount.TabIndex = 2;
-            this.FpCount.Text = "#,###";
-            this.FpCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.TlpMain.ColumnCount = 3;
+            this.TlpMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TlpMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 515F));
+            this.TlpMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 390F));
+            this.TlpMain.Controls.Add(this.groupBox2, 3, 0);
+            this.TlpMain.Controls.Add(this.groupBox1, 1, 0);
+            this.TlpMain.Controls.Add(this.groupBox3, 0, 0);
+            this.TlpMain.Controls.Add(this.OlvVerboseDetails, 0, 1);
+            this.TlpMain.Controls.Add(this.OlvDrivers, 1, 1);
+            this.TlpMain.Controls.Add(this.OlvDriverPresence, 1, 2);
+            this.TlpMain.Controls.Add(this.FlpActions, 0, 3);
+            this.TlpMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TlpMain.Location = new System.Drawing.Point(0, 0);
+            this.TlpMain.Name = "TlpMain";
+            this.TlpMain.RowCount = 4;
+            this.TlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 230F));
+            this.TlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            this.TlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40F));
+            this.TlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 120F));
+            this.TlpMain.Size = new System.Drawing.Size(2740, 1283);
+            this.TlpMain.TabIndex = 10;
             // 
             // groupBox2
             // 
@@ -112,10 +102,11 @@
             this.groupBox2.Controls.Add(this.RecallScore);
             this.groupBox2.Controls.Add(this.PrecisionScore);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox2.Location = new System.Drawing.Point(2338, 30);
+            this.groupBox2.Location = new System.Drawing.Point(2367, 10);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(10);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(377, 223);
-            this.groupBox2.TabIndex = 4;
+            this.groupBox2.Size = new System.Drawing.Size(363, 210);
+            this.groupBox2.TabIndex = 15;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Class Scores";
             // 
@@ -188,6 +179,93 @@
             this.PrecisionScore.Text = "#,###";
             this.PrecisionScore.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.CbFalseNegative);
+            this.groupBox1.Controls.Add(this.CbFalsePositive);
+            this.groupBox1.Controls.Add(this.TotalCount);
+            this.groupBox1.Controls.Add(this.FnCount);
+            this.groupBox1.Controls.Add(this.FpCount);
+            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Location = new System.Drawing.Point(1851, 10);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(10);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(489, 210);
+            this.groupBox1.TabIndex = 14;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Class Counts";
+            // 
+            // CbFalseNegative
+            // 
+            this.CbFalseNegative.AutoSize = true;
+            this.CbFalseNegative.Location = new System.Drawing.Point(30, 94);
+            this.CbFalseNegative.Name = "CbFalseNegative";
+            this.CbFalseNegative.Size = new System.Drawing.Size(228, 35);
+            this.CbFalseNegative.TabIndex = 7;
+            this.CbFalseNegative.Text = "False Negative";
+            this.CbFalseNegative.UseVisualStyleBackColor = true;
+            // 
+            // CbFalsePositive
+            // 
+            this.CbFalsePositive.AutoSize = true;
+            this.CbFalsePositive.Location = new System.Drawing.Point(30, 53);
+            this.CbFalsePositive.Name = "CbFalsePositive";
+            this.CbFalsePositive.Size = new System.Drawing.Size(216, 35);
+            this.CbFalsePositive.TabIndex = 6;
+            this.CbFalsePositive.Text = "False Positive";
+            this.CbFalsePositive.UseVisualStyleBackColor = true;
+            // 
+            // TotalCount
+            // 
+            this.TotalCount.AutoSize = true;
+            this.TotalCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TotalCount.Location = new System.Drawing.Point(325, 135);
+            this.TotalCount.Name = "TotalCount";
+            this.TotalCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
+            this.TotalCount.Size = new System.Drawing.Size(87, 35);
+            this.TotalCount.TabIndex = 5;
+            this.TotalCount.Text = "#,###";
+            this.TotalCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // FnCount
+            // 
+            this.FnCount.AutoSize = true;
+            this.FnCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FnCount.Location = new System.Drawing.Point(325, 94);
+            this.FnCount.Name = "FnCount";
+            this.FnCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
+            this.FnCount.Size = new System.Drawing.Size(87, 35);
+            this.FnCount.TabIndex = 3;
+            this.FnCount.Text = "#,###";
+            this.FnCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // FpCount
+            // 
+            this.FpCount.AutoSize = true;
+            this.FpCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FpCount.Location = new System.Drawing.Point(325, 53);
+            this.FpCount.Name = "FpCount";
+            this.FpCount.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
+            this.FpCount.Size = new System.Drawing.Size(87, 35);
+            this.FpCount.TabIndex = 2;
+            this.FpCount.Text = "#,###";
+            this.FpCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this.ClassSelector);
+            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox3.Location = new System.Drawing.Point(10, 10);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(10);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(1815, 210);
+            this.groupBox3.TabIndex = 13;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Class Selector";
+            // 
             // ClassSelector
             // 
             this.ClassSelector.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -200,53 +278,167 @@
             this.ClassSelector.ItemHeight = 31;
             this.ClassSelector.Location = new System.Drawing.Point(17, 43);
             this.ClassSelector.Name = "ClassSelector";
-            this.ClassSelector.Size = new System.Drawing.Size(1750, 155);
+            this.ClassSelector.Size = new System.Drawing.Size(1792, 124);
             this.ClassSelector.TabIndex = 5;
+            this.ClassSelector.SelectedIndexChanged += new System.EventHandler(this.ClassSelector_SelectedIndexChanged);
             // 
-            // groupBox3
+            // OlvVerboseDetails
             // 
-            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.OlvVerboseDetails.AllColumns.Add(this.PredictedClass);
+            this.OlvVerboseDetails.AllColumns.Add(this.Type);
+            this.OlvVerboseDetails.AllColumns.Add(this.Probability);
+            this.OlvVerboseDetails.AllColumns.Add(this.From);
+            this.OlvVerboseDetails.AllColumns.Add(this.olvColumn1);
+            this.OlvVerboseDetails.CellEditUseWholeCell = false;
+            this.OlvVerboseDetails.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.PredictedClass,
+            this.Type,
+            this.Probability,
+            this.From,
+            this.olvColumn1});
+            this.OlvVerboseDetails.Cursor = System.Windows.Forms.Cursors.Default;
+            this.OlvVerboseDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.OlvVerboseDetails.FullRowSelect = true;
+            this.OlvVerboseDetails.HideSelection = false;
+            this.OlvVerboseDetails.Location = new System.Drawing.Point(10, 240);
+            this.OlvVerboseDetails.Margin = new System.Windows.Forms.Padding(10);
+            this.OlvVerboseDetails.Name = "OlvVerboseDetails";
+            this.TlpMain.SetRowSpan(this.OlvVerboseDetails, 2);
+            this.OlvVerboseDetails.Size = new System.Drawing.Size(1815, 912);
+            this.OlvVerboseDetails.TabIndex = 12;
+            this.OlvVerboseDetails.UseCompatibleStateImageBehavior = false;
+            this.OlvVerboseDetails.View = System.Windows.Forms.View.Details;
+            this.OlvVerboseDetails.SelectionChanged += new System.EventHandler(this.OlvVerboseDetails_SelectionChanged);
+            // 
+            // PredictedClass
+            // 
+            this.PredictedClass.AspectName = "Key.Source.FolderInfo.Name";
+            this.PredictedClass.Text = "Predicted Class";
+            this.PredictedClass.Width = 342;
+            // 
+            // Type
+            // 
+            this.Type.AspectName = "Value";
+            this.Type.IsEditable = false;
+            this.Type.Text = "Type";
+            this.Type.Width = 329;
+            // 
+            // Probability
+            // 
+            this.Probability.AspectName = "Key.Probability";
+            this.Probability.AspectToStringFormat = "{0:P2}";
+            this.Probability.Text = "Probability";
+            this.Probability.Width = 212;
+            // 
+            // From
+            // 
+            this.From.AspectName = "Key.Source.Sender.Name";
+            this.From.Text = "From";
+            this.From.Width = 314;
+            // 
+            // olvColumn1
+            // 
+            this.olvColumn1.AspectName = "Key.Source.Subject";
+            this.olvColumn1.Text = "Subject";
+            this.olvColumn1.Width = 545;
+            // 
+            // OlvDrivers
+            // 
+            this.OlvDrivers.AllColumns.Add(this.OlvToken);
+            this.OlvDrivers.AllColumns.Add(this.OlvTokenProbability);
+            this.OlvDrivers.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox3.Controls.Add(this.ClassSelector);
-            this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox3.Location = new System.Drawing.Point(24, 30);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1773, 223);
-            this.groupBox3.TabIndex = 6;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Class Selector";
+            this.OlvDrivers.CellEditUseWholeCell = false;
+            this.OlvDrivers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.OlvToken,
+            this.OlvTokenProbability});
+            this.TlpMain.SetColumnSpan(this.OlvDrivers, 2);
+            this.OlvDrivers.Cursor = System.Windows.Forms.Cursors.Default;
+            this.OlvDrivers.HasCollapsibleGroups = false;
+            this.OlvDrivers.HideSelection = false;
+            this.OlvDrivers.Location = new System.Drawing.Point(1845, 240);
+            this.OlvDrivers.Margin = new System.Windows.Forms.Padding(10);
+            this.OlvDrivers.Name = "OlvDrivers";
+            this.OlvDrivers.Size = new System.Drawing.Size(885, 539);
+            this.OlvDrivers.TabIndex = 11;
+            this.OlvDrivers.UseCompatibleStateImageBehavior = false;
+            this.OlvDrivers.View = System.Windows.Forms.View.Details;
+            this.OlvDrivers.SelectionChanged += new System.EventHandler(this.OlvDrivers_SelectionChanged);
             // 
-            // objectListView1
+            // OlvToken
             // 
-            this.objectListView1.CellEditUseWholeCell = false;
-            this.objectListView1.Cursor = System.Windows.Forms.Cursors.Default;
-            this.objectListView1.HideSelection = false;
-            this.objectListView1.Location = new System.Drawing.Point(24, 273);
-            this.objectListView1.Name = "objectListView1";
-            this.objectListView1.Size = new System.Drawing.Size(2741, 856);
-            this.objectListView1.TabIndex = 7;
-            this.objectListView1.UseCompatibleStateImageBehavior = false;
-            this.objectListView1.View = System.Windows.Forms.View.Details;
+            this.OlvToken.AspectName = "Item1";
+            this.OlvToken.Groupable = false;
+            this.OlvToken.Text = "Driver";
+            this.OlvToken.Width = 498;
             // 
-            // CbFalsePositive
+            // OlvTokenProbability
             // 
-            this.CbFalsePositive.AutoSize = true;
-            this.CbFalsePositive.Location = new System.Drawing.Point(30, 53);
-            this.CbFalsePositive.Name = "CbFalsePositive";
-            this.CbFalsePositive.Size = new System.Drawing.Size(216, 35);
-            this.CbFalsePositive.TabIndex = 6;
-            this.CbFalsePositive.Text = "False Positive";
-            this.CbFalsePositive.UseVisualStyleBackColor = true;
+            this.OlvTokenProbability.AspectName = "Item2";
+            this.OlvTokenProbability.AspectToStringFormat = "{0:P2}";
+            this.OlvTokenProbability.Groupable = false;
+            this.OlvTokenProbability.Text = "Probability";
+            this.OlvTokenProbability.Width = 229;
             // 
-            // CbFalseNegative
+            // OlvDriverPresence
             // 
-            this.CbFalseNegative.AutoSize = true;
-            this.CbFalseNegative.Location = new System.Drawing.Point(30, 94);
-            this.CbFalseNegative.Name = "CbFalseNegative";
-            this.CbFalseNegative.Size = new System.Drawing.Size(228, 35);
-            this.CbFalseNegative.TabIndex = 7;
-            this.CbFalseNegative.Text = "False Negative";
-            this.CbFalseNegative.UseVisualStyleBackColor = true;
+            this.OlvDriverPresence.AllColumns.Add(this.OlvSubject2);
+            this.OlvDriverPresence.AllColumns.Add(this.OlvProbability2);
+            this.OlvDriverPresence.CellEditUseWholeCell = false;
+            this.OlvDriverPresence.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.OlvSubject2,
+            this.OlvProbability2});
+            this.TlpMain.SetColumnSpan(this.OlvDriverPresence, 2);
+            this.OlvDriverPresence.Cursor = System.Windows.Forms.Cursors.Default;
+            this.OlvDriverPresence.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.OlvDriverPresence.HideSelection = false;
+            this.OlvDriverPresence.Location = new System.Drawing.Point(1845, 799);
+            this.OlvDriverPresence.Margin = new System.Windows.Forms.Padding(10);
+            this.OlvDriverPresence.Name = "OlvDriverPresence";
+            this.OlvDriverPresence.Size = new System.Drawing.Size(885, 353);
+            this.OlvDriverPresence.TabIndex = 10;
+            this.OlvDriverPresence.UseCompatibleStateImageBehavior = false;
+            this.OlvDriverPresence.View = System.Windows.Forms.View.Details;
+            // 
+            // OlvSubject2
+            // 
+            this.OlvSubject2.AspectName = "Item1";
+            this.OlvSubject2.Text = "Subject";
+            this.OlvSubject2.Width = 630;
+            // 
+            // OlvProbability2
+            // 
+            this.OlvProbability2.AspectName = "Item2";
+            this.OlvProbability2.AspectToStringFormat = "{0:P2}";
+            this.OlvProbability2.Text = "Probability";
+            this.OlvProbability2.Width = 179;
+            // 
+            // FlpActions
+            // 
+            this.FlpActions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.FlpActions.AutoSize = true;
+            this.TlpMain.SetColumnSpan(this.FlpActions, 3);
+            this.FlpActions.Controls.Add(this.button1);
+            this.FlpActions.Location = new System.Drawing.Point(1212, 1165);
+            this.FlpActions.Name = "FlpActions";
+            this.FlpActions.Size = new System.Drawing.Size(316, 115);
+            this.FlpActions.TabIndex = 16;
+            // 
+            // button1
+            // 
+            this.button1.Image = global::QuickFiler.Properties.Resources.SolutionFolderSwitch1;
+            this.button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button1.Location = new System.Drawing.Point(10, 10);
+            this.button1.Margin = new System.Windows.Forms.Padding(10);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(296, 104);
+            this.button1.TabIndex = 15;
+            this.button1.Text = "ReSort Item";
+            this.button1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.button1.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // BayesianPerformanceViewer
             // 
@@ -254,38 +446,54 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2740, 1283);
-            this.Controls.Add(this.objectListView1);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.TlpMain);
             this.Name = "BayesianPerformanceViewer";
             this.Text = "BayesianClassViewer";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.TlpMain.ResumeLayout(false);
+            this.TlpMain.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.objectListView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OlvVerboseDetails)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OlvDrivers)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.OlvDriverPresence)).EndInit();
+            this.FlpActions.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+        internal BrightIdeasSoftware.ObjectListView OlvDrivers;
+        internal BrightIdeasSoftware.OLVColumn OlvToken;
+        internal BrightIdeasSoftware.OLVColumn OlvTokenProbability;
+        internal BrightIdeasSoftware.ObjectListView OlvDriverPresence;
+        private BrightIdeasSoftware.OLVColumn OlvSubject2;
+        private BrightIdeasSoftware.OLVColumn OlvProbability2;
         private System.Windows.Forms.GroupBox groupBox1;
+        protected internal System.Windows.Forms.CheckBox CbFalseNegative;
+        protected internal System.Windows.Forms.CheckBox CbFalsePositive;
+        public System.Windows.Forms.Label TotalCount;
+        public System.Windows.Forms.Label FnCount;
+        public System.Windows.Forms.Label FpCount;
+        private System.Windows.Forms.GroupBox groupBox3;
+        protected internal System.Windows.Forms.ListBox ClassSelector;
+        protected internal BrightIdeasSoftware.ObjectListView OlvVerboseDetails;
+        internal BrightIdeasSoftware.OLVColumn PredictedClass;
+        internal BrightIdeasSoftware.OLVColumn Type;
+        internal BrightIdeasSoftware.OLVColumn Probability;
+        internal BrightIdeasSoftware.OLVColumn From;
+        private BrightIdeasSoftware.OLVColumn olvColumn1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label7;
-        public System.Windows.Forms.Label FpCount;
-        public System.Windows.Forms.Label TotalCount;
-        public System.Windows.Forms.Label FnCount;
-        public System.Windows.Forms.Label PrecisionScore;
-        public System.Windows.Forms.Label RecallScore;
         public System.Windows.Forms.Label F1Score;
-        private System.Windows.Forms.ListBox ClassSelector;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private BrightIdeasSoftware.ObjectListView objectListView1;
-        protected internal System.Windows.Forms.CheckBox CbFalseNegative;
-        protected internal System.Windows.Forms.CheckBox CbFalsePositive;
+        private System.Windows.Forms.Label label7;
+        public System.Windows.Forms.Label RecallScore;
+        public System.Windows.Forms.Label PrecisionScore;
+        internal System.Windows.Forms.TableLayoutPanel TlpMain;
+        private System.Windows.Forms.FlowLayoutPanel FlpActions;
+        private System.Windows.Forms.Button button1;
     }
 }

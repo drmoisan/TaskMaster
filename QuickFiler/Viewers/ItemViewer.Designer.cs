@@ -125,7 +125,7 @@
             this.L0vh_Tlp.Controls.Add(this.LblAcMoveOptions, 11, 0);
             this.L0vh_Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0vh_Tlp.Location = new System.Drawing.Point(0, 0);
-            this.L0vh_Tlp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.L0vh_Tlp.Margin = new System.Windows.Forms.Padding(4);
             this.L0vh_Tlp.Name = "L0vh_Tlp";
             this.L0vh_Tlp.RowCount = 6;
             this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
@@ -146,7 +146,6 @@
             this.MoveOptionsMenu});
             this.MoveOptionsStrip.Location = new System.Drawing.Point(1414, 0);
             this.MoveOptionsStrip.Name = "MoveOptionsStrip";
-            this.MoveOptionsStrip.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
             this.L0vh_Tlp.SetRowSpan(this.MoveOptionsStrip, 2);
             this.MoveOptionsStrip.Size = new System.Drawing.Size(200, 40);
             this.MoveOptionsStrip.TabIndex = 43;
@@ -266,7 +265,7 @@
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_WebView2.Location = new System.Drawing.Point(104, 216);
-            this.L0v2h2_WebView2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.L0v2h2_WebView2.Margin = new System.Windows.Forms.Padding(4);
             this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
             this.L0v2h2_WebView2.Size = new System.Drawing.Size(2288, 688);
             this.L0v2h2_WebView2.TabIndex = 40;
@@ -281,7 +280,7 @@
             this.LblConvCt.Location = new System.Drawing.Point(1290, 35);
             this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
             this.LblConvCt.Name = "LblConvCt";
-            this.LblConvCt.Padding = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.LblConvCt.Padding = new System.Windows.Forms.Padding(6);
             this.L0vh_Tlp.SetRowSpan(this.LblConvCt, 2);
             this.LblConvCt.Size = new System.Drawing.Size(84, 58);
             this.LblConvCt.TabIndex = 14;
@@ -417,7 +416,7 @@
             this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TxtboxBody, 0, 0);
             this.L1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L1h0L2hv3h_TlpBodyToggle.Location = new System.Drawing.Point(104, 97);
-            this.L1h0L2hv3h_TlpBodyToggle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.L1h0L2hv3h_TlpBodyToggle.Margin = new System.Windows.Forms.Padding(4);
             this.L1h0L2hv3h_TlpBodyToggle.Name = "L1h0L2hv3h_TlpBodyToggle";
             this.L1h0L2hv3h_TlpBodyToggle.RowCount = 1;
             this.L0vh_Tlp.SetRowSpan(this.L1h0L2hv3h_TlpBodyToggle, 2);
@@ -444,7 +443,7 @@
             this.TopicThread.FullRowSelect = true;
             this.TopicThread.HideSelection = false;
             this.TopicThread.Location = new System.Drawing.Point(1270, 4);
-            this.TopicThread.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TopicThread.Margin = new System.Windows.Forms.Padding(4);
             this.TopicThread.MultiSelect = false;
             this.TopicThread.Name = "TopicThread";
             this.TopicThread.ShowGroups = false;
@@ -755,7 +754,7 @@
             this.AutoSize = true;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.L0vh_Tlp);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.MinimumSize = new System.Drawing.Size(1516, 196);
             this.Name = "ItemViewer";
             this.Size = new System.Drawing.Size(2396, 908);

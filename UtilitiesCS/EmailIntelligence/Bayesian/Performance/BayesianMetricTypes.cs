@@ -141,12 +141,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             string @class, 
             IEnumerable<KeyValuePair<VerboseTestOutcome, string>> verboseOutcomes, 
             int falsePositives, 
-            int falseNegatives)
+            int falseNegatives,
+            double precision,
+            double recall,
+            double f1)
         {
             Class = @class;
             VerboseOutcomesJson = verboseOutcomes;
             FP = falsePositives;
             FN = falseNegatives;
+            Precision = precision;
+            Recall = recall;
+            F1 = f1;
         }
 
         public string Class { get; set; }
@@ -166,6 +172,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public int TP { get; set; }
         public int TN { get; set; }
         public int Errors { get; set; }
+        public double Precision { get; set; }
+        public double Recall { get; set; }
+        public double F1 { get; set; }
     }
 
     public class VerboseOutcomeClass 

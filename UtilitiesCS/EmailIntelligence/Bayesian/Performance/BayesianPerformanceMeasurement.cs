@@ -766,7 +766,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             int complete = 0;
             var sw = await Task.Run(Stopwatch.StartNew);
             var misclassified = testScores
-                .Select(x => new { x.Class, x.TP, x.FP, x.FN, x.TN, Errors = x.FP + x.FN })
+                .Select(x => new { x.Class, x.TP, x.FP, x.FN, x.TN, Errors = x.FP + x.FN, x.Precision, x.Recall, x.F1 })
                 //new KeyValuePair<string, int>(x.Class, x.FN + x.FP))
                 .Where(x => x.Class != "TOTAL" && x.Errors > 0)
                 .OrderByDescending(x => x.Errors)
@@ -791,6 +791,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     FN = x.FN,
                     TN = x.TN,
                     Errors = x.Errors,
+                    Precision = x.Precision,
+                    Recall = x.Recall,
+                    F1 = x.F1,
                     VerboseOutcomes = fpDetails
                         .Select(x => new KeyValuePair<VerboseTestOutcome, string>(x, "False Positive"))
                         .Concat(fnDetails.Select(x => new KeyValuePair<VerboseTestOutcome, string>(x, "False Negative")))
@@ -823,11 +826,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             verboseTestResults.ForEach(x => 
             { 
-                var verboseOutcomes = x.VerboseOutcomes?.Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value)) ?? [];
+                var verboseOutcomes = x.VerboseOutcomes?.Where(y => (new string[] { "FalsePositive", "FalseNegative" }).Contains(y.Value)) ?? [];
                 x.VerboseOutcomes = verboseOutcomes.Count() > 0 ? verboseOutcomes.ToDictionary() : [];
             }); //.VerboseOutcomes.Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value))
             var classificationErrors = verboseTestResults
-                .Where(x => x.Errors > 0)
+                .Where(x => x.Errors > 0 && x.Class != "TOTAL")
                 .Select(x => new ClassificationErrors()
                 {
                     Class = x.Class,
@@ -836,6 +839,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     FN = x.FN,
                     TN = x.TN,
                     Errors = x.FP + x.FN,
+                    Precision = x.Precision,
+                    Recall = x.Recall,
+                    F1 = x.F1,
                     VerboseOutcomes = x.VerboseOutcomes,
                         //.Where(y => (new string[] { "False Positive", "False Negative" }).Contains(y.Value))
                         //?.ToDictionary(),

@@ -353,6 +353,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var drivers = probabilities.Select(x => 
                 { 
                     var key = x.Key.Substring(6);
+                    key = key.Substring(0, key.Length - 1);
                     var value = x.Value;
                     return (key, value);
                 })

@@ -22,6 +22,7 @@ using UtilitiesCS.Threading;
 using UtilitiesCS.Extensions;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 
 
 
@@ -495,6 +496,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             (_, var count) = await DeserializeAsync<(int, int)>("FolderGroupCompleted").ConfigureAwait(false);
             var completed = await DeserializeAsync<int>($"{tOutName}Completed").ConfigureAwait(false);
             var completedPerChunk = 100 / (double)count;
+            var serializer = new BayesianSerializationHelper(_globals);
 
             for (int i = 0; i < count; i++)
             {
@@ -512,14 +514,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     }
                 }
 
-                Tin obj = await DeserializeAsync<Tin>($"{tInName}_{i:0000}").ConfigureAwait(false);
+                Tin obj = await serializer.DeserializeAsync<Tin>(progress.SpawnChild(completedPerChunk), $"{tInName}_{i:0000}").ConfigureAwait(false);
                 Tout result = await transformer(obj);
                 if (count == 1)
                     SerializeAndSave(result, tOutName);
                 else
                     SerializeAndSave(result, $"{tOutName}_{i:0000}");
                 SerializeAndSave(i + 1, $"{tOutName}Completed");
-                progress.Report((int)((i + 1) * completedPerChunk), $"{message}. Transformed {i + 1} of {count}");
+                //progress.Report((int)((i + 1) * completedPerChunk), $"{message}. Transformed {i + 1} of {count}");
             }
 
             progress.Report(100);
