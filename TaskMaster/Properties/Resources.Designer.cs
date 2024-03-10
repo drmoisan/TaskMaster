@@ -68,5 +68,15 @@ namespace TaskMaster.Properties {
                 return ResourceManager.GetString("Email Prefix To Strip", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] PrefixList {
+            get {
+                object obj = ResourceManager.GetObject("PrefixList", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

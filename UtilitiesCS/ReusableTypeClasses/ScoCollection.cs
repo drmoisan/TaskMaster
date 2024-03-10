@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,11 @@ namespace UtilitiesCS
 
         public ScoCollection(IEnumerable<T> enumerable) : base(enumerable) { }
 
+        public ScoCollection(byte[] file) : base() 
+        {
+            DeserializeJson(file);
+        }
+        
         public ScoCollection(
             string fileName,
             string folderPath) : base()
@@ -75,6 +81,17 @@ namespace UtilitiesCS
             settings.Formatting = Formatting.Indented;
             collection = JsonConvert.DeserializeObject<ScoCollection<T>>(
                 File.ReadAllText(disk.FilePath), settings);
+            return collection;
+        }
+
+        private ScoCollection<T> DeserializeJson(byte[] file)
+        {
+            ScoCollection<T> collection;
+            var settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.Auto;
+            settings.Formatting = Formatting.Indented;
+            var fileString = Encoding.UTF8.GetString(file);
+            collection = JsonConvert.DeserializeObject<ScoCollection<T>>(fileString);
             return collection;
         }
 

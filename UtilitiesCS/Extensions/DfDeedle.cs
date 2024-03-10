@@ -225,6 +225,8 @@ namespace UtilitiesCS
                                        removeColumns: removeColumns,
                                        addColumns: addColumns);
 
+            if (table is null) { return null; }
+
             (var data, var columnInfo) = table.ETL();
 
             Frame<int, string> df = FromArray2D(data: data, columnInfo);
@@ -245,7 +247,10 @@ namespace UtilitiesCS
                                                         removeColumns: removeColumns,
                                                         addColumns: addColumns);
                 if (df is null) { df = dfTemp; }
-                else if (dfTemp is not null) { df.Merge(dfTemp); }
+                else if (dfTemp is not null) 
+                { 
+                    df.Merge(dfTemp); 
+                }
             }
             return df;
         }

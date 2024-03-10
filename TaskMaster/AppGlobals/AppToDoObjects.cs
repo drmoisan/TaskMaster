@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -26,18 +27,29 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
-            var tasks = new List<Task> 
-            {
-                LoadDictPPLAsync(),
-                LoadDictRemapAsync(),
-                LoadProjInfoAsync(),
-                LoadIdListAsync(),
-                LoadCategoryFiltersAsync(),
-                LoadPrefixListAsync(),
-                LoadFilteredFolderScrapingAsync(),
-                LoadFolderRemapAsync()
-            };
-            await Task.WhenAll(tasks);
+            //var tasks = new List<Task> 
+            //{
+            //    LoadDictPPLAsync(),
+            //    LoadDictRemapAsync(),
+            //    LoadProjInfoAsync(),
+            //    LoadIdListAsync(),
+            //    LoadCategoryFiltersAsync(),
+            //    LoadPrefixListAsync(),
+            //    LoadFilteredFolderScrapingAsync(),
+            //    LoadFolderRemapAsync()
+            //};
+            //await Task.WhenAll(tasks);
+
+            //await LoadDictPPLAsync();
+            await LoadPrefixAndDictPeopleAsync();
+            await LoadDictRemapAsync();
+            await LoadProjInfoAsync();
+            await LoadIdListAsync();
+            await LoadCategoryFiltersAsync();
+            //await LoadPrefixListAsync();
+            await LoadFilteredFolderScrapingAsync();
+            await LoadFolderRemapAsync();
+
             //logger.Debug($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
         }
 
@@ -162,8 +174,11 @@ namespace TaskMaster
         public ScoCollection<IPrefix> PrefixList => Initialized(_prefixList, () => LoadPrefixList());
         public ScoCollection<IPrefix> LoadPrefixList()
         {
+            //var prefixList = new ScoCollection<IPrefix>(Properties.Resources.PrefixList);
             var prefixList = new ScoCollection<IPrefix>(fileName: _defaults.FileName_PrefixList,
                                                         folderPath: Parent.FS.FldrPythonStaging);
+
+
             if (prefixList.Count == 0) 
             { 
                 var tdDefaults = new ToDoDefaults();
@@ -174,9 +189,7 @@ namespace TaskMaster
         }
         async private Task LoadPrefixListAsync()
         {
-            _prefixList = await Task.Factory.StartNew(
-                              () => LoadPrefixList(),
-                              default(CancellationToken));
+            _prefixList = await Task.Run(LoadPrefixList);
                               //default,
                               //TaskCreationOptions.None,
                               //PriorityScheduler.BelowNormal);

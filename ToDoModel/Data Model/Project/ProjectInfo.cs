@@ -59,12 +59,15 @@ namespace ToDoModel
         {
             var table = store.GetToDoTable();
             
+            if (table is null) { return null; }
+
             (var data, var columnInfo) = table.ETL();
             
             Frame<int, string> df = DfDeedle.FromArray2D(data: data, columnInfo);
                         
             df = df.FillMissing("");
-            
+
+            df = Frame.FromRows(df.Rows.Where(x => (string)x.Value["ToDoID"] != ""));           
             return df;
         }
 
@@ -132,7 +135,13 @@ namespace ToDoModel
             {
                 var dfTemp = GetDfToDo(store);
                 if (df is null) { df = dfTemp; }
-                else if (dfTemp is not null) { df.Merge(dfTemp); }
+                else if (dfTemp is not null) 
+                {
+                    //df.Print();
+                    //dfTemp.Print();
+                    df = df.Merge(dfTemp);
+                    df.Print();
+                }
             }
 
             df = FilterToProjectIDs(df);

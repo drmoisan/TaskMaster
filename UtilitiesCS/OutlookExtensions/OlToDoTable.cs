@@ -12,7 +12,15 @@ namespace UtilitiesCS.OutlookExtensions
     {  
         public static Outlook.Table GetToDoTable(this Outlook.Store store) 
         {
-            var folder = store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+            MAPIFolder folder = null;
+            try
+            {
+                folder = store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
             Outlook.Table table = folder.GetTable();
             table.Columns.RemoveAll();
             table.Columns.Add(OlTableExtensions.SchemaToDoID);
