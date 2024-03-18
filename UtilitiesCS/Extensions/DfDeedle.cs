@@ -239,20 +239,29 @@ namespace UtilitiesCS
                                                            string[] removeColumns,
                                                            string[] addColumns)
         {
-            Frame<int, string> df = null;
+            Frame<string, string> df = null;
             foreach (Outlook.Store store in stores)
             {
                 var dfTemp = DfDeedle.FromDefaultFolder(store: store,
                                                         folderEnum: folderEnum,
                                                         removeColumns: removeColumns,
                                                         addColumns: addColumns);
-                if (df is null) { df = dfTemp; }
+                
+                // Set the index to the EntryID to avoid duplicate integer index
+                var dfEid = dfTemp?.IndexRowsWith<int, string, string>(dfTemp.GetColumn<string>("EntryID").Values);
+                if (df is null) { df = dfEid; }
                 else if (dfTemp is not null) 
-                { 
-                    df.Merge(dfTemp); 
+                {
+                    //df.Print();
+                    //dfEid.Print();
+                    df = df.Merge(dfEid);
+                    //df.Print();
+
                 }
             }
-            return df;
+            // Set the index to the integer index as originally designed to maintain forward compatibility
+            var df2 = df.IndexRowsWith(Enumerable.Range(0, df.RowCount));
+            return df2;
         }
 
         public static void Display(this Frame<int, string> df, IEnumerable<string> rowKeyNames)
