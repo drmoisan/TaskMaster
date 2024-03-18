@@ -31,6 +31,7 @@ namespace TaskTree
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             ImageList1 = new System.Windows.Forms.ImageList(components);
             ContextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(components);
             ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();

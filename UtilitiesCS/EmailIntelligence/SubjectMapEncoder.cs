@@ -116,18 +116,22 @@ namespace UtilitiesCS
             if (tokens is null) { throw new ArgumentNullException(nameof(tokens));}
             foreach (var token in tokens)
             {
-                if (!Encoder.ContainsKey(token))
+                lock (Encoder)
                 {
-                    bool tryAgain = true;
-                    int code = -1;
-                    while (tryAgain)
+                    if (!Encoder.ContainsKey(token))
                     {
-                        code = Encoder.Values.Max() + 1;
-                        if (Decoder.TryAdd(code, token)) { tryAgain = false; }
+                        bool tryAgain = true;
+                        int code = -1;
+                        while (tryAgain)
+                        {
+                            code = Encoder.Values.Max() + 1;
+                            if (Decoder.TryAdd(code, token)) { tryAgain = false; }
+                        }
+                        Encoder.Add(token, code);
+                        changed = true;
                     }
-                    Encoder.Add(token, code);
-                    changed = true;
                 }
+                
             }
             if (changed) { _encoder.Serialize(); }
         }

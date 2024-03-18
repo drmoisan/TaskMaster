@@ -9,9 +9,9 @@ using System.Security;
 [assembly: AssemblyTitle("TaskMaster")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PepsiCo Inc")]
+[assembly: AssemblyCompany("Dan Moisan")]
 [assembly: AssemblyProduct("TaskMaster")]
-[assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")]
+[assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

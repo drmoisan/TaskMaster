@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS;
 
 namespace TaskVisualization
 {
-    public static class Enums
-    {
-        public enum ToggleState { Off = 0, On = 1 }
-    }
-
     public class TipsController
     {
         public TipsController(Label label)

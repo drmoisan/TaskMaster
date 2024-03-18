@@ -58,7 +58,7 @@ namespace TaskVisualization
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
+       {
             if (keyData.HasFlag(Keys.Alt))
             {
                 // If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then

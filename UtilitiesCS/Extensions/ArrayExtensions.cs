@@ -321,6 +321,15 @@ namespace UtilitiesCS
             return false;
         }
 
+        public static string SentenceJoin(this IEnumerable<string> array, string separator = ", ", string lastSeparator = " and ")
+        {
+            var count = array.Count();
+            if (count == 0) { return ""; }
+            if (count == 1) { return array.ElementAt(0); }
+            if (count == 2) { return array.ElementAt(0) + lastSeparator + array.ElementAt(1); }
+            return string.Join(separator, array.Take(count - 1)) + lastSeparator + array.ElementAt(count - 1);
+        }
+
         public static string SentenceJoin(this string[] array, string separator = ", ", string lastSeparator = " and ")
         {
             if (array.Length == 0) { return ""; }

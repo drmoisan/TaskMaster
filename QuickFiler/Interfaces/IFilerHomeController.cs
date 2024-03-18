@@ -1,6 +1,9 @@
 using System;
 using ToDoModel;
 using System.Threading.Tasks;
+using System.Threading;
+using UtilitiesCS;
+using System.Diagnostics;
 
 namespace QuickFiler.Interfaces
 {
@@ -9,14 +12,18 @@ namespace QuickFiler.Interfaces
         #region Constructors, Initializers, and Destructors
         
         void Run();
+        Task RunAsync(ProgressTracker progress);
         void Cleanup();
         
         #endregion
 
         #region Public Properties
 
+        SynchronizationContext UiSyncContext { get; }
+        CancellationTokenSource TokenSource { get; }
+        CancellationToken Token { get; }
         bool Loaded { get; }
-		cStopWatch StopWatch { get; }
+		Stopwatch StopWatch { get; }
         //IQfcDatamodel DataModel { get; }
         IQfcExplorerController ExplorerCtlr { get; set; }
 		IFilerFormController FormCtrlr { get; }

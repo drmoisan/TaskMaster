@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Deedle.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,56 +7,95 @@ namespace UtilitiesCS
 {
     public static class MergeSortImplementations
     {
-        private static IList<T> MergeSort<T>(IList<T> coll, Comparison<T> comparison)
+
+        /// <summary>
+        /// 2 Overloads
+        /// <para>Generic implementation of merge sort algorithm. </para>
+        /// <para> Parameter <c><paramref name="inplace"/></c>
+        /// determines whether the method returns a new <seealso cref="IList{T}"/> or copies the results 
+        /// back into the original parameter named <c><paramref name="list"/></c>.</para>
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter</typeparam>
+        /// <param name="list">the <seealso cref="IList{T}"/> to be sorted </param>
+        /// <param name="comparison">Represents the method that compares two objects of the same type.</param>
+        /// <param name="inplace"><seealso cref="bool"/> to determine whether to copy back into the original variable</param>
+        /// <returns><code>null | <seealso cref="IList{T}"/></code> 
+        /// <br/>
+        /// <c>null</c> - when <c>InPlace</c> is <c>true</c>. Values are copied to <paramref name="list"/>
+        /// <br/>
+        /// <seealso cref="IList{T}"/> - when <c>InPlace</c> is <c>false</c>
+        /// </returns>
+        public static IList<T> MergeSort<T>(this IList<T> list, Comparison<T> comparison, bool inplace)
         {
-            // DONE: 2023-03-06 Move To UtilitiesCS. A generic merge sort(of T) doesn't belong in a form controller
-            var Result = new List<T>();
-            var Left = new Queue<T>();
-            var Right = new Queue<T>();
-            if (coll.Count <= 1)
-                return coll;
-            int midpoint = (int)Math.Round(coll.Count / 2d);
+            var count = list.Count;
+            var result = list.MergeSort(comparison);
+
+            if (inplace)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    list[i] = result[i];
+                }
+
+                return null;
+            }
+            
+            return result; 
+        }
+
+        /// <summary>
+        /// Generic implementation of merge sort algorithm
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter</typeparam>
+        /// <param name="list">the <seealso cref="IList{T}"/> to be sorted </param>
+        /// <param name="comparison">Represents the method that compares two objects of the same type.</param>
+        /// <returns>The sorted <seealso cref="IList{T}"/></returns>
+        public static IList<T> MergeSort<T>(this IList<T> list, Comparison<T> comparison)
+        {
+            var left = new Queue<T>();
+            var right = new Queue<T>();
+            var count = list.Count;
+            if (count <= 1)
+                return list;
+            int midpoint = (int)Math.Round(count / 2d);
 
             for (int i = 0, loopTo = midpoint - 1; i <= loopTo; i++)
-                Left.Enqueue(coll[i]);
+                left.Enqueue(list[i]);
 
-            for (int i = midpoint, loopTo1 = coll.Count - 1; i <= loopTo1; i++)
-                Right.Enqueue(coll[i]);
+            for (int i = midpoint, loopTo = count - 1; i <= loopTo; i++)
+                right.Enqueue(list[i]);
 
+            left = new Queue<T>(MergeSort(left.ToList(), comparison));
+            right = new Queue<T>(MergeSort(right.ToList(), comparison));
+            var result = left.Merge(right, comparison);
 
-            Left = new Queue<T>(MergeSort(Left.ToList(), comparison));
-            Right = new Queue<T>(MergeSort(Right.ToList(), comparison));
-            Result = Merge(Left, Right, comparison);
-            return Result;
-        }
-
-
-        private static List<T> Merge<T>(Queue<T> Left, Queue<T> Right, Comparison<T> comparison)
-        {
-            // DONE: 2023-03-06 Move To UtilitiesCS. A generic merge sort(of T) doesn't belong in a form controller
-
-            var Result = new List<T>();
-
-            while (Left.Count > 0 && Right.Count > 0)
+            for (int i = 0; i< count; i++)
             {
-                int cmp = comparison(Left.Peek(), Right.Peek());
-                if (cmp < 0)
-                {
-                    Result.Add(Left.Dequeue());
-                }
-                else
-                {
-                    Result.Add(Right.Dequeue());
-                }
+                list[i] = result[i];
             }
 
-            while (Left.Count > 0)
-                Result.Add(Left.Dequeue());
-
-            while (Right.Count > 0)
-                Result.Add(Right.Dequeue());
-
-            return Result;
+            return list;
         }
+
+        private static List<T> Merge<T>(this Queue<T> left, Queue<T> right, Comparison<T> comparison)
+        {
+            var result = new List<T>();
+
+            while (left.Count > 0 && right.Count > 0)
+            {
+                int comp = comparison(left.Peek(), right.Peek());
+                if (comp < 0) { result.Add(left.Dequeue()); }
+                else { result.Add(right.Dequeue()); }
+            }
+
+            while (left.Count > 0)
+                result.Add(left.Dequeue());
+
+            while (right.Count > 0)
+                result.Add(right.Dequeue());
+
+            return result;
+        }
+
     }
 }

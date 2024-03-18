@@ -63,6 +63,16 @@ namespace SVGControl.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] AbstractCube {
+            get {
+                object obj = ResourceManager.GetObject("AbstractCube", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Image {
             get {
                 object obj = ResourceManager.GetObject("Image", resourceCulture);

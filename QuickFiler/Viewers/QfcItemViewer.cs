@@ -20,20 +20,30 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
-            InitTipsLabelsList();
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            InitTips();
         }
 
-        private IList<Label> _tipsLabels;
-        private IQfcItemController _controller;
-        
 
+        private IList<Label> _tipsLabels;
         public IList<Label> TipsLabels { get => _tipsLabels; }
-        public IQfcItemController Controller { get => _controller; set => _controller = value; }
+
+        private IList<Label> _leftTipsLabels;
+        public IList<Label> LeftTipsLabels { get => _leftTipsLabels; }
+
+        private IList<Label> _expandedTipsLabels;
+        public IList<Label> ExpandedTipsLabels { get => _expandedTipsLabels; }
+
+        private IItemControler _controller;
+        public IItemControler Controller { get => _controller; set => _controller = value; }
         
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
 
-        private void InitTipsLabelsList()
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
+
+        private void InitTips()
         {
             _tipsLabels = new List<Label>
             {
@@ -45,11 +55,18 @@ namespace QuickFiler
                 LblAcConversation,
                 LblAcEmail,
                 LblAcFolder,
-                LblAcSearch
+                LblAcSearch,
             };
 
-        }
+            _leftTipsLabels = new List<Label>
+            {
+                LblAcOpen,
+            };
 
-        
+            _expandedTipsLabels = new List<Label>
+            {
+                LblAcBody,
+            };
+        }
     }
 }

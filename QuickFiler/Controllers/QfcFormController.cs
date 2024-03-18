@@ -13,6 +13,7 @@ using System.IO;
 using ToDoModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace QuickFiler.Controllers
 {    
@@ -22,10 +23,15 @@ namespace QuickFiler.Controllers
 
         public QfcFormController(IApplicationGlobals appGlobals,
                                  QfcFormViewer formViewer,
-                                 Enums.InitTypeEnum initType,
+                                 QfcQueue qfcQueue,
+                                 QfEnums.InitTypeEnum initType,
                                  System.Action parentCleanup,
-                                 QfcHomeController parent)
-        { 
+                                 QfcHomeController parent,
+                                 CancellationTokenSource tokenSource,
+                                 CancellationToken token)
+        {
+            _token = token;
+            _tokenSource = tokenSource;
             _globals = appGlobals;
             _initType = initType;
             _formViewer = formViewer;
@@ -35,10 +41,11 @@ namespace QuickFiler.Controllers
             _parent = parent;
             WriteMetrics = parent.QuickFileMetrics_WRITE;
             Iterate = parent.Iterate;
-            _movedItems = parent.DataModel.MovedItems;
+            _movedItems = _globals.AF.MovedMails;
+            _qfcQueue = qfcQueue;
             
             CaptureItemSettings();
-            RemoveItemTemplate();
+            RemoveTemplatesAndSetupTlp();
             SetupLightDark();
             RegisterFormEventHandlers();
         }
@@ -56,16 +63,16 @@ namespace QuickFiler.Controllers
         private RowStyle _rowStyleExpanded;
         
         private Padding _itemMarginTemplate;
-        private Enums.InitTypeEnum _initType;
+        private QfEnums.InitTypeEnum _initType;
         private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
-        private IFilerHomeController _parent;
-        private int _itemsPerIteration = -1;
+        private QfcHomeController _parent;
         private delegate void WriteMetricsDelegate(string filename);
         private WriteMetricsDelegate WriteMetrics;
         private delegate void IterateDelegate();
         private IterateDelegate Iterate;
         private ScoStack<IMovedMailInfo> _movedItems;
+        private QfcQueue _qfcQueue;
 
         #endregion
 
@@ -79,19 +86,29 @@ namespace QuickFiler.Controllers
             //_formViewer.L1v0L2_PanelMain.Height
         }
 
-        public void RemoveItemTemplate()
+        public void RemoveTemplatesAndSetupTlp()
         {
-            TableLayoutHelper.RemoveSpecificRow(_formViewer.L1v0L2L3v_TableLayout, 0, 2);
+            ref TableLayoutPanel tlp = ref _formViewer.L1v0L2L3v_TableLayout;
+            TableLayoutHelper.RemoveSpecificRow(tlp, 0, 2);
+
+            var count = ItemsPerIteration;
+            //_itemsPerIteration = 1;
+            //count = 1;
+            tlp.InsertSpecificRow(0, _rowStyleTemplate, count);
+            tlp.MinimumSize = new System.Drawing.Size(
+                tlp.MinimumSize.Width,
+                tlp.MinimumSize.Height +
+                (int)Math.Round(_rowStyleTemplate.Height * count, 0));
+            _qfcQueue.TlpTemplate = tlp;
         }
 
         public void SetupLightDark()
         {
-            if (Properties.Settings.Default.DarkMode == true)
+            if (_globals.Ol.DarkMode == true)
             {
                 SetDarkMode();
             }
-            _formViewer.DarkMode.Checked = Properties.Settings.Default.DarkMode;
-            _formViewer.DarkMode.CheckedChanged += new System.EventHandler(DarkMode_CheckedChanged);
+            _globals.Ol.PropertyChanged += DarkMode_CheckedChanged;
         }
 
         public int SpaceForEmail
@@ -108,29 +125,26 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public int ItemsPerIteration
+        private int _itemsPerIteration = -1;
+        public int ItemsPerIteration 
         {
-            get
-            {
-                if (_itemsPerIteration == -1)
-                {
-                    _itemsPerIteration = (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0);
-                    _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = _itemsPerIteration));
-                }
-                return _itemsPerIteration;
-            }
-            set => _itemsPerIteration = value;
+            get => Initializer.GetOrLoad(ref _itemsPerIteration, (x) => x != -1, LoadItemsPerIteration);
+            set => Initializer.SetAndSave(ref _itemsPerIteration, value, (x) => _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = x)));
+        }
+        public int LoadItemsPerIteration()
+        {
+            var result = (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0);
+            _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = result));
+            return result;
         }
 
         public void RegisterFormEventHandlers()
         {
             _formViewer.ForAllControls(x =>
             {
-                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHndlr.KeyboardHandler_PreviewKeyDown);
-                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
-                //x.KeyUp += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyUp);
-                //x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyPress);
-                // Debug.WriteLine($"Registered handler for {x.Name}");
+                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHndlr.KeyboardHandler_PreviewKeyDownAsync);
+                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
+                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> { _formViewer.QfcItemViewerTemplate });
 
@@ -161,17 +175,24 @@ namespace QuickFiler.Controllers
 
         #region Public Properties
         
-        private IQfcCollectionController _groups;
+        private QfcCollectionController _groups;
         public IQfcCollectionController Groups { get => _groups; }
         
         public IntPtr FormHandle { get => _formViewer.Handle; }
         
         private QfcFormViewer _formViewer;
         public QfcFormViewer FormViewer { get => _formViewer; }
-        
+
         public void ToggleOffNavigation(bool async) => _groups.ToggleOffNavigation(async);
-        
+        public async Task ToggleOffNavigationAsync() => await _groups.ToggleOffNavigationAsync();
         public void ToggleOnNavigation(bool async) => _groups.ToggleOnNavigation(async);
+        public async Task ToggleOnNavigationAsync() => await _groups.ToggleOnNavigationAsync();
+
+        private CancellationToken _token;
+        public CancellationToken Token { get => _token; }
+
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; }
 
         #endregion
 
@@ -179,7 +200,9 @@ namespace QuickFiler.Controllers
 
         private void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
-            if (_formViewer.DarkMode.Checked == true)
+            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            //if (_formViewer.DarkMode.Checked == true)
+            if (_globals.Ol.DarkMode == true)
             {
                 SetDarkMode();
             }
@@ -221,10 +244,15 @@ namespace QuickFiler.Controllers
             _formViewer.BackColor = System.Drawing.SystemColors.ControlLightLight;
         }
 
-        async public void ButtonCancel_Click(object sender, EventArgs e) => await ActionCancelAsync();
+        async public void ButtonCancel_Click(object sender, EventArgs e) 
+        {
+            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            await ActionCancelAsync(); 
+        }
 
         async public Task ActionCancelAsync()
         {
+            _parent.TokenSource.Cancel();
             await _formViewer.UiSyncContext;
             _formViewer.Hide();
             _groups.Cleanup();
@@ -234,49 +262,81 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
-        async public void ButtonOK_Click(object sender, EventArgs e) => await ActionOkAsync();
+        async public void ButtonOK_Click(object sender, EventArgs e) 
+        {
+            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            await ActionOkAsync(); 
+        }
 
         async public Task ActionOkAsync()
         {
-            if (_initType.HasFlag(Enums.InitTypeEnum.Sort))
+            if (!_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
-                if (_blRunningModalCode == false)
-                {
-                    if (_groups.ReadyForMove)
-                    {
-                        _blRunningModalCode = true;
-                        //_blSuppressEvents = true;
+                throw new NotImplementedException(
+                    $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been " +
+                    $"implemented for {nameof(_initType)} {_initType}");
+            }
+            
+            else if (_blRunningModalCode)
+            {
+                MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (_groups.ReadyForMove)
+            {
+                _blRunningModalCode = true;
+                
+                if (_parent.KeyboardHndlr.KbdActive) { _parent.KeyboardHndlr.ToggleKeyboardDialog(); }
+                await MoveAndIterate();
+                
+                _blRunningModalCode = false;
+            }
 
-                        // Move emails
-                        await _groups.MoveEmails(_movedItems);
-                        
-                        // Write move metrics
-                        await Task.Run(()=>WriteMetrics(_globals.FS.Filenames.EmailSession)).ConfigureAwait(false);
-                        
-                        // Switch to UI thread
-                        await _formViewer.UiSyncContext;
-                        
-                        // Cleanup the viewers and controllers for moved items
-                        _groups.RemoveControls();
-                        
-                        // Launch viewers and controllers for the next items in queue
-                        Iterate();
+        }
 
-                        //_blSuppressEvents = false;
-                        _blRunningModalCode = false;
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+        private async Task MoveAndIterate()
+        {
+
+            if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
+            {
+                (var tlp, var itemGroups) = await _qfcQueue.TryDequeueAsync(Token, 4000);
+                //await UIThreadExtensions.UiDispatcher.InvokeAsync(() => LoadItems(tlp, itemGroups));
+                LoadItems(tlp, itemGroups);
+                _parent.SwapStopWatch();
+                var move = BackGroundMove();
+                var iterate = _parent.IterateQueueAsync();
+                
+                await move;
+                await iterate;
+            }
+            else if (_formViewer.Worker.IsBusy)
+            {
+                MessageBox.Show("Still loading emails. Please try again in a few seconds.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                throw new NotImplementedException(
-                    $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been "+
-                    $"implemented for {nameof(_initType)} {_initType}");
+                _groups.CacheMoveObjects();
+                _parent.SwapStopWatch();
+                var moveTask = BackGroundMove();
+                MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await moveTask;
+                await ActionCancelAsync();
             }
+
+
+        }
+
+        internal async Task BackGroundMove()
+        {
+            // Move emails
+            await _groups.MoveEmailsAsync(_movedItems);
+
+            // Write Move Metrics
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(
+                () => WriteMetrics(_globals.FS.Filenames.EmailSession),
+                System.Windows.Threading.DispatcherPriority.ContextIdle);
+
+            await UIThreadExtensions.UiDispatcher.InvokeAsync(() => _groups.CleanupBackground());
+
         }
 
         public void ButtonUndo_Click(object sender, EventArgs e) => ButtonUndo_Click();
@@ -288,22 +348,76 @@ namespace QuickFiler.Controllers
 
         public void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
         {
-            ItemsPerIteration = (int)_formViewer.L1v1L2h5_SpnEmailPerLoad.Value;
+            var count = (int)_formViewer.L1v1L2h5_SpnEmailPerLoad.Value;
+            if (count != _itemsPerIteration && count > 0)
+            {
+                ref TableLayoutPanel tlp = ref _formViewer.L1v0L2L3v_TableLayout;
+                AdjustTlp(_formViewer.L1v0L2L3v_TableLayout, count);
+                AdjustTlp(_qfcQueue.TlpTemplate, count);
+                _itemsPerIteration = count;
+            }
+        }
+
+        internal void AdjustTlp(TableLayoutPanel tlp, int newCount)
+        {
+            var oldCount = tlp.RowCount - 1;
+            if (oldCount != newCount) 
+            { 
+                var diff = newCount - Math.Max(0, oldCount);
+                if (diff > 0)
+                {
+                    tlp.InsertSpecificRow(oldCount, _rowStyleTemplate, diff);
+                    tlp.MinimumSize = new System.Drawing.Size(
+                        tlp.MinimumSize.Width,
+                        tlp.MinimumSize.Height +
+                        (int)Math.Round(_rowStyleTemplate.Height * diff, 0));
+                }
+                else
+                {
+                    tlp.RemoveSpecificRow(newCount, diff);
+                    tlp.MinimumSize = new System.Drawing.Size(
+                        tlp.MinimumSize.Width,
+                        tlp.MinimumSize.Height -
+                        (int)Math.Round(_rowStyleTemplate.Height * diff, 0));
+                }
+            }
         }
 
         #endregion
 
         #region Major Actions
 
+        public void LoadItems(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups)
+        {
+            _groups.LoadControlsAndHandlers_01(tlp, itemGroups);
+        }
+
+        
+
         public void LoadItems(IList<MailItem> listObjects)
         {            
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
-                                                  darkMode: Properties.Settings.Default.DarkMode,
-                                                  InitType: Enums.InitTypeEnum.Sort,
+                                                  InitType: QfEnums.InitTypeEnum.Sort,
                                                   homeController: _parent,
-                                                  parent: this);
-            _groups.LoadControlsAndHandlers(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+                                                  parent: this,
+                                                  tokenSource: TokenSource,
+                                                  token: Token);
+            _groups.LoadControlsAndHandlers_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+        }
+
+        public async Task LoadItemsAsync(IList<MailItem> listObjects)
+        {
+            Token.ThrowIfCancellationRequested();
+
+            _groups = new QfcCollectionController(AppGlobals: _globals,
+                                                  viewerInstance: _formViewer,
+                                                  InitType: QfEnums.InitTypeEnum.Sort,
+                                                  homeController: _parent,
+                                                  parent: this,
+                                                  tokenSource: TokenSource,
+                                                  token: Token);
+            await _groups.LoadControlsAndHandlersAsync_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
         /// <summary>

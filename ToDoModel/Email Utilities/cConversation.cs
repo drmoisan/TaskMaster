@@ -46,8 +46,8 @@ namespace ToDoModel
             {
                 oRow = _table.GetNextRow();
                 // Use EntryID and StoreID to open the item.
-                Debug.WriteLine(oRow["Subject"]);
-                Debug.WriteLine(oRow["http://schemas.microsoft.com/mapi/proptag/0x0e05001f"]);
+                Debug.WriteLine((object)oRow["Subject"]);
+                Debug.WriteLine((object)oRow["http://schemas.microsoft.com/mapi/proptag/0x0e05001f"]);
             }
         }
 
