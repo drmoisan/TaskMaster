@@ -19,7 +19,19 @@ namespace UtilitiesCS.OutlookExtensions
 
         public static string GetUdfString(this MailItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
         public static string GetUdfString(this OutlookItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
-        public static string GetUdfString(this UserProperty property) => (string)property.GetUdfValue(OlUserPropertyType.olText, true);
+
+        public static string GetUdfString(this UserProperty property) 
+        { 
+            object value = property.GetUdfValue(OlUserPropertyType.olText, true);
+            if (value.IsArray<string>())
+            {
+                return string.Join(", ", (string[])value);
+            }
+            else
+            {
+                return value as string;
+            }
+        }
 
         public static T GetUdfValue<T>(this UserProperty property, bool flatten = true)
         {
@@ -40,9 +52,9 @@ namespace UtilitiesCS.OutlookExtensions
         {
             if ((property != null) && (property.Value != null))
             {
-                var result = property.Value;
+                object result = property.Value;
                 if (result.IsArray()) { result = (object)result.FlattenArrayTree<string>(); }
-                return (object)result;
+                return result;
             }
             else
             {

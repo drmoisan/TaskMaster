@@ -15,7 +15,6 @@ using UtilitiesCS;
 namespace TaskVisualization
 {
 
-
     public class TaskController
     {
         #region Constructors and Initializers
@@ -531,12 +530,18 @@ namespace TaskVisualization
                         (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, '\0', _altLevel);
                     }
                     _altActive = false;
-                    _activeNavGroup = -1;
+                    //_activeNavGroup = -1;
                     return true;               
                 }
                 else
                 {
                     ToggleXlGroupNav(Enums.ToggleState.On);
+                    if (_activeNavGroup != -1) 
+                    { 
+                        var groupNumber = _activeNavGroup;
+                        _activeNavGroup = -1;
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(groupNumber.ToString()[0]);
+                    }
                     _altActive = true;
                     return true;
                 }
@@ -719,13 +724,13 @@ namespace TaskVisualization
                 c.IsReadOnly = true;
 
                 if (_options.HasFlag(FlagsToSet.context))
-                    c.Context = _active.Context;
+                    c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
                 if (_options.HasFlag(FlagsToSet.people))
-                    c.People = _active.People;
+                    c.People.AsListNoPrefix = _active.People.AsListNoPrefix;
                 if (_options.HasFlag(FlagsToSet.projects))
-                    c.Projects = _active.Projects;
+                    c.Projects.AsListNoPrefix = _active.Projects.AsListNoPrefix;
                 if (_options.HasFlag(FlagsToSet.topics))
-                    c.Topics = _active.Topics;
+                    c.Topics.AsListNoPrefix = _active.Topics.AsListNoPrefix;
                 if (_options.HasFlag(FlagsToSet.today))
                     c.Today = _active.Today;
                 if (_options.HasFlag(FlagsToSet.bullpin))
@@ -828,11 +833,11 @@ namespace TaskVisualization
             else if (ctrl is Label)
             {
 
-                if (lbl.Equals(_viewer.XlPeople))
+                if (lbl.Equals(_viewer.XlProject))
                 {
                     AssignPeople();
                 }
-                else if (lbl.Equals(_viewer.XlProject))
+                else if (lbl.Equals(_viewer.XlPeople))
                 {
                     AssignProject();
                 }
@@ -869,7 +874,7 @@ namespace TaskVisualization
                 var tips = NavTips.Where(x => x.GroupNumber == _activeNavGroup);
                 tips.ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.Off));
                 tips.ElementAt(0).TLP.BackColor = SystemColors.Control;
-                _activeNavGroup = -1;
+                //_activeNavGroup = -1;
             }
             return (null, true, 0);
         }

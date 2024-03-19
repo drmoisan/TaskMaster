@@ -14,6 +14,8 @@ namespace UtilitiesCS
 {
     public class ThemeControlGroup
     {
+        #region Constructors
+
         private ThemeControlGroup() { }
 
         public ThemeControlGroup(IList<Control> controls, Color back)
@@ -105,6 +107,9 @@ namespace UtilitiesCS
             _groupType = GroupTypeEnum.WebView2;
         }
 
+        #endregion Constructors
+
+        #region Private Variables
 
         private enum GroupTypeEnum 
         { 
@@ -135,9 +140,15 @@ namespace UtilitiesCS
         private Func<bool> IsAlt;
         private Func<object, bool> IsAltHover;
 
+        #endregion Private Variables
+
+        
+
         private string _groupName;
         public string GroupName { get => _groupName; set => _groupName = value; }
-        
+
+        #region Apply Theme
+
         public void ApplyTheme()
         {
             switch (_groupType)
@@ -169,8 +180,8 @@ namespace UtilitiesCS
         {
             if (_controls is not null) 
             { 
-                if (async) { _controls[0].BeginInvoke(new Action(() => ApplyTheme())); }
-                else { _controls[0].Invoke(new Action(() => ApplyTheme())); }
+                if (async) { UiThread.Dispatcher.InvokeAsync(new Action(() => ApplyTheme())); }
+                else { UiThread.Dispatcher.Invoke(new Action(() => ApplyTheme())); }
             }
             else { ApplyTheme(); }
         }
@@ -241,6 +252,10 @@ namespace UtilitiesCS
             }
         }
 
+        #endregion Apply Theme
+
+        #region Event Wiring and Handlers
+
         private void Control_MouseEnter(object sender, EventArgs e) => ((Control)sender).BackColor = _hoverColor;
 
         private void Control_MouseLeave(object sender, EventArgs e)
@@ -248,22 +263,6 @@ namespace UtilitiesCS
             if (IsAltHover(sender)) { ((Control)sender).BackColor = _backColorAlt; } 
             else { ((Control)sender).BackColor = _backColorMain; }
         }
-                
-        //private void Button_MouseEnter(object sender, EventArgs e) => ((Button)sender).BackColor = _hoverColor;
-        
-        //private void Button_MouseLeave(object sender, EventArgs e) 
-        //{
-        //    if (((Button)sender).DialogResult == DialogResult.OK) { ((Button)sender).BackColor = _clickedColor; }
-        //    else { ((Button)sender).BackColor = _backColor; }
-        //}
-
-        //private void Checkbox_MouseEnter(object sender, EventArgs e) => ((CheckBox)sender).BackColor = _hoverColor;
-        
-        //private void Checkbox_MouseLeave(object sender, EventArgs e) 
-        //{ 
-        //    if (((CheckBox)sender).Checked) { ((CheckBox)sender).BackColor = _clickedColor; }
-        //    else { ((CheckBox)sender).BackColor = _backColor; }
-        //}
 
         public void DeactivateEvents()
         {
@@ -285,6 +284,10 @@ namespace UtilitiesCS
                 control.RemoveEventHandlers("MouseLeave");
             });
         }
+        
+        #endregion Event Wiring and Handlers
+
+
 
     }
 }

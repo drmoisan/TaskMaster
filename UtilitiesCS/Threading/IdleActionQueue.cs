@@ -53,8 +53,9 @@ namespace UtilitiesCS.Threading
                 {
                     try
                     {
-                        await UIThreadExtensions.GetUiContext();
-                        action();
+                        await UiThread.Dispatcher.InvokeAsync(() => action());
+                        //await UIThreadExtensions.UiSyncContext;
+                        //action();
                     }
                     catch (Exception ex)
                     {

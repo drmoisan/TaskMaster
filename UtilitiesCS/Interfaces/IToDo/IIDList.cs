@@ -5,7 +5,7 @@ namespace UtilitiesCS
     public interface IIDList: ISerializableList<string>
     {
         int MaxLengthOfID { get; }
-        void CompressToDoIDs(Application OlApp);
+        void CompressToDoIDs(IApplicationGlobals appGlobals);
         string GetNextToDoID();
         string GetNextToDoID(string strSeed);
         void RefreshIDList();

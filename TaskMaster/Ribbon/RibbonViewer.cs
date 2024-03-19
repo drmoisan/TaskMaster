@@ -146,8 +146,35 @@ namespace TaskMaster
 
         public bool ToggleDarkMode_GetPressed(Office.IRibbonControl control) => _controller.IsDarkModeActive();
         public void ToggleDarkMode_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleDarkMode();
-        
+
         #endregion
+
+        #region SettingsMenu
+
+        public bool MoveEntireConversation_GetPressed(Office.IRibbonControl control) => _controller.IsMoveEntireConversationActive();
+        public void MoveEntireConversation_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleMoveEntireConversation();
+        
+        public bool SaveAttachments_GetPressed(Office.IRibbonControl control) => _controller.IsSaveAttachmentsActive();
+        public void SaveAttachments_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveAttachments();
+        
+        public bool SaveEmailCopy_GetPressed(Office.IRibbonControl control) => _controller.IsSaveEmailCopyActive();
+        public void SaveEmailCopy_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveEmailCopy();
+        
+        public bool SavePictures_GetPressed(Office.IRibbonControl control) => _controller.IsSavePicturesActive();
+        public void SavePictures_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSavePictures();
+
+
+        #endregion SettingsMenu
+
+        #region BayesianPerformance
+
+        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.TryTestClassifier();
+        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierVerbose();
+        public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDrivers();
+        public async void ChartMetrics_Click(Office.IRibbonControl control) => await _controller.TryChartMetrics();
+        public async void InvestigateErrors_Click(Office.IRibbonControl control) => await _controller.InvestigateErrorsAsync();
+
+        #endregion BayesianPerformance
 
         #region TryMethods  
         public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
@@ -155,10 +182,22 @@ namespace TaskMaster
         public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();
         public void GetQfcDataModel_Click(Office.IRibbonControl control) => _controller.TryGetQfcDataModel();
         public void GetTableInView_Click(Office.IRibbonControl control) => _controller.TryGetTableInView();
-        public void LegacySortMailToExistingRun2_Click(Office.IRibbonControl control) => _controller.TryLegacySortMailToExistingRun2();
         public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.TryRebuildProjInfo();
         public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.TryRecipientGetInfo();
         public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.TrySubstituteIdRoot();
+        public void GetImage_Click(Office.IRibbonControl control) => _controller.TryGetImage();
+        public void LoadFolderFilter_Click(Office.IRibbonControl control) => _controller.TryLoadFolderFilter();
+        public void LoadFolderRemap_Click(Office.IRibbonControl control) => _controller.TryLoadFolderRemap();
+        public async void RebuildSubjectMap_Click(Office.IRibbonControl control) => await _controller.RebuildSubjectMapAsync();
+        public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.ShowSubjectMapMetrics();
+        public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.TryTokenizeEmail();
+        public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.TryMineEmails();
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.TryBuildClassifier();        
+        public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.TryPrintManagerState();
+        public void SaveManagerLocally_Click(Office.IRibbonControl control) => _controller.TrySaveManagerLocally();
+        public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
+        public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
+        
 
         #endregion
 

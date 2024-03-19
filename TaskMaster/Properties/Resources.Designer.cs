@@ -59,5 +59,24 @@ namespace TaskMaster.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WARNING: Email originated outside of PepsiCo..
+        /// </summary>
+        internal static string Email_Prefix_To_Strip {
+            get {
+                return ResourceManager.GetString("Email Prefix To Strip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] PrefixList {
+            get {
+                object obj = ResourceManager.GetObject("PrefixList", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

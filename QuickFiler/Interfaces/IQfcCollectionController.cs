@@ -22,10 +22,11 @@ namespace QuickFiler.Interfaces
         Task PopOutControlGroupAsync(int selection);
         void RemoveControls();
         Task RemoveControlsAsync();
-        void RemoveSpaceToCollapseConversation();
+        void EliminateSpaceForItems(int removalInex, int removalCount);
         void RemoveSpecificControlGroup(int intPosition);
         Task RemoveSpecificControlGroupAsync(int selection);
         Task MoveEmailsAsync(ScoStack<IMovedMailInfo> StackMovedItems);
+        void AddItemGroup(MailItem mailItem);
 
         // UI Select QfcItems
         int ActivateBySelection(int intNewSelection, bool blExpanded);
@@ -41,7 +42,7 @@ namespace QuickFiler.Interfaces
         void ToggleGroupConv(int childCount, int indexOriginal);
         void ToggleGroupConv(string originalId);
         void ToggleUnGroupConv(ConversationResolver resolver, string entryID, int conversationCount, object folderList);
-        void MakeSpaceToEnumerateConversation(int insertionIndex, int insertCount);                        
+        void MakeSpaceForItems(int insertionIndex, int insertCount);                        
 
         // UI Light Dark
         void SetDarkMode(bool async);

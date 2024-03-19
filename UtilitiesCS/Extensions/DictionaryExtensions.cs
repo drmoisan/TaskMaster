@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using Generic.Math;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
@@ -40,19 +45,28 @@ namespace UtilitiesCS
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
-        /// <param name="l">IEnumerable of a KeyValuePair from a dictionary</param>
+        /// <param name="source">IEnumerable of a KeyValuePair from a dictionary</param>
         /// <returns>A Sorted Dictionary</returns>
-        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> l)
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source)
         {
-            IEnumerable<IGrouping<TKey, KeyValuePair<TKey, TValue>>> duplicateKVPsByKey = l.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1);
+            if (source.IsNullOrEmpty()) { return []; }
+            IEnumerable<IGrouping<TKey, KeyValuePair<TKey, TValue>>> duplicateKVPsByKey = source.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1);
             if (duplicateKVPsByKey.Any())
                 throw new InvalidOperationException($"Cannot convert to dictionary with duplicate keys: {string.Join(",", duplicateKVPsByKey)}");
 
             var result = new Dictionary<TKey, TValue>();
-            foreach (var e in l)
+            foreach (var e in source)
                 result[e.Key] = e.Value;
 
             return result;
+        }
+
+        public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source)
+        {
+            var duplicateKVPsByKey = source.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1);
+            if (duplicateKVPsByKey.Any())
+                throw new InvalidOperationException($"Cannot convert to dictionary with duplicate keys: {string.Join(",", duplicateKVPsByKey)}");
+            return new ConcurrentDictionary<TKey, TValue>(source);
         }
 
         public static SortedDictionary<K, V> ToSortedDictionary<K, V>(this Dictionary<K, V> existing)
@@ -69,9 +83,79 @@ namespace UtilitiesCS
             return new SortedDictionary<string, bool>(filtered_cats);
         }
 
+        public static bool TryAddValues<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {            
+            while (dictionary.TryGetValue(key, out var existingValue))
+            {
+                TValue newValue = GenericMath<TValue>.Add(existingValue, value);
+                if (dictionary.TryUpdate(key, newValue, existingValue))
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool TrySubtractValues<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            while (dictionary.TryGetValue(key, out var existingValue))
+            {
+                TValue newValue = GenericMath<TValue>.Subtract(existingValue, value);
+                if (dictionary.TryUpdate(key, newValue, existingValue))
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool TryOperateValues<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary, TKey key, TValue value, Func<TValue, TValue, TValue> operation)
+        {
+            while (dictionary.TryGetValue(key, out var existingValue))
+            {
+                TValue newValue = operation(existingValue, value);
+                if (dictionary.TryUpdate(key, newValue, existingValue))
+                    return true;
+            }
+            return false;
+        }
+
+        public static async Task<bool> TryAddValuesAsync<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary, TKey key, TValue value, CancellationToken token)
+        {
+            var linkedTS = CancellationTokenSource.CreateLinkedTokenSource(token);
+            linkedTS.CancelAfter(500);
+            
+            return await Task.Run(() => dictionary.TryAddValues(key, value), linkedTS.Token);
+        }
+
+        public static Enums.DictionaryResult UpdateOrRemove<TKey, TValue>(
+            this ConcurrentDictionary<TKey, TValue> dictionary,
+            TKey key,
+            Func<TKey, TValue, bool> removeCondition,
+            Func<TKey, TValue, TValue> updateValueFactory,
+            out TValue value)
+        {
+            while (dictionary.TryGetValue(key, out value))
+            {
+                if (removeCondition(key, value))
+                {
+                    // removes if KVP is exact match. If another thread has
+                    // updated the value, it will fail and try the loop again
+                    if (((ICollection<KeyValuePair<TKey,TValue>>)dictionary)
+                        .Remove(new KeyValuePair<TKey, TValue>(key, value)))
+                    {
+                        return Enums.DictionaryResult.KeysChanged;
+                    }
+                }
+                else
+                {
+                    TValue newValue = updateValueFactory(key, value);
+                    if (dictionary.TryUpdate(key, newValue, value))
+                        return Enums.DictionaryResult.ValueChanged | Enums.DictionaryResult.KeyExists;
+                }
+            }
+            return default;
+        }
+
     }
-    
-    
+
+
     //public class DictionaryComparer<TKey, TValue> :
     //IEqualityComparer<Dictionary<TKey, TValue>>
     //{

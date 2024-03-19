@@ -70,6 +70,13 @@ namespace UtilitiesCS
 
             return (index == min && s1.Length == s2.Length) ? -1 : index;
         }
-    
+        
+        public static string PadToCenter(this string str, int totalWidth, char paddingChar = ' ')
+        {
+            if (str.Length >= totalWidth) { return str; }
+            int padLength = totalWidth - str.Length;
+            int padLeft = padLength / 2 + str.Length;
+            return str.PadLeft(padLeft, paddingChar).PadRight(totalWidth, paddingChar);
+        }
     }
 }

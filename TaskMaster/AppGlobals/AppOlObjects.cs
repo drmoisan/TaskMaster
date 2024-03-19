@@ -1,19 +1,25 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
+using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.Windows_Forms;
 
 namespace TaskMaster
 {
     public class AppOlObjects : IOlObjects
     {
-        public AppOlObjects(Application olApplication)
+        public AppOlObjects(Application olApplication, IApplicationGlobals appGlobals)
         {
+            _globals = appGlobals;
             _olApplication = olApplication;
         }
+
+        private IApplicationGlobals _globals;
 
         private Application _olApplication;
         public Application App { get => _olApplication; }
@@ -134,17 +140,39 @@ namespace TaskMaster
             }
         }
 
-        private StackObjectCS<object> _movedMails_Stack;
-        public StackObjectCS<object> MovedMails_Stack
+        private Folder _archiveRoot;
+        public Folder ArchiveRoot => Initializer.GetOrLoad(ref _archiveRoot, LoadArchiveRoot);
+        internal Folder LoadArchiveRoot() 
+        {
+            var folderHandler = new OlFolderHelper(_globals);
+            return folderHandler.GetFolder(Root.Folders, "Archive");
+        }
+
+        public string EmailPrefixToStrip => Properties.Resources.Email_Prefix_To_Strip;
+        
+        private StackObjectCS<object> _movedMailsStack;
+        public StackObjectCS<object> MovedMailsStack
         {
             get
             {
-                return _movedMails_Stack;
+                return _movedMailsStack;
             }
             set
             {
-                _movedMails_Stack = value;
+                _movedMailsStack = value;
             }
+        }
+
+        private TimedDiskWriter<string> _emailMoveWriter;
+        public TimedDiskWriter<string> EmailMoveWriter => Initializer.GetOrLoad(ref _emailMoveWriter, LoadEmailMoveWriter);
+        public TimedDiskWriter<string> LoadEmailMoveWriter()
+        {
+            var writer = new TimedDiskWriter<string>();
+            writer.Config.WriteInterval = TimeSpan.FromSeconds(5);
+            writer.Config.TryAddTimeout = 20;
+            SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
+            writer.DiskWriter = async (items) => await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.MovedMails, items.ToArray(), _globals.FS.FldrMyD, default);
+            return writer;
         }
 
         private string _userEmailAddress;
@@ -177,6 +205,24 @@ namespace TaskMaster
             }
         }
 
+        public int GetExplorerScreenNumber()
+        {
+            System.Windows.Forms.Screen screen = GetExplorerScreen();
+            return System.Windows.Forms.Screen.AllScreens.ToList().IndexOf(screen);
+        }
+
+        public System.Windows.Forms.Screen GetExplorerScreen()
+        {
+            var explorer = App.ActiveExplorer();
+            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
+            return System.Windows.Forms.Screen.AllScreens.FindMax((s1, s2) =>
+            {
+                var a1 = Rectangle.Intersect(s1.Bounds, bounds).Area();
+                var a2 = Rectangle.Intersect(s2.Bounds, bounds).Area();
+                return a2 > a1 ? s2 : s1;
+            });
+        }
+        
         private void NotifyPropertyChanged([CallerMemberName] string propertyName="")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

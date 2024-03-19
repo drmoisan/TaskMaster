@@ -25,7 +25,7 @@ namespace QuickFiler
 
         private IList<Label> _tipsLabels;
         private IQfcItemController _controller;
-        
+
         private SynchronizationContext _context;
 
         public IList<Label> TipsLabels { get => _tipsLabels; }

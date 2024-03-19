@@ -25,9 +25,9 @@ namespace QuickFiler.Interfaces
         bool Loaded { get; }
 		Stopwatch StopWatch { get; }
         //IQfcDatamodel DataModel { get; }
-        IQfcExplorerController ExplorerCtlr { get; set; }
-		IFilerFormController FormCtrlr { get; }
-		IQfcKeyboardHandler KeyboardHndlr { get; set; }
+        IQfcExplorerController ExplorerController { get; set; }
+		IFilerFormController FormController { get; }
+		IQfcKeyboardHandler KeyboardHandler { get; set; }
         //QfcFormViewer FormViewer { get; }
 
         #endregion

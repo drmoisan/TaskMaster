@@ -20,20 +20,12 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(
+                _ = UiThread.Dispatcher.InvokeAsync(
                     () =>
                     {
                         _queue.Enqueue(new ItemViewer());
-                        //logger.Debug($"Enqueued {_queue.Count}");
                     },
                     System.Windows.Threading.DispatcherPriority.ContextIdle);
-                
-                // IdleActionQueue implementation
-                //IdleActionQueue.AddEntry(() =>
-                //{
-                //    _queue.Enqueue(new ItemViewer());
-                //    //logger.Debug($"Enqueued {_queue.Count}");
-                //});
             }
         }
 
@@ -41,7 +33,7 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(
+                _ = UiThread.Dispatcher.InvokeAsync(
                     () =>
                     {
                         _queue.Enqueue(new ItemViewer());
@@ -72,7 +64,7 @@ namespace QuickFiler
             }
             else
             {
-                viewer = UIThreadExtensions.UiDispatcher.Invoke(() => new ItemViewer(), DispatcherPriority.Render);
+                viewer = UiThread.Dispatcher.Invoke(() => new ItemViewer(), DispatcherPriority.Render);
                 BuildQueueWhenIdle(1);
             }
             return viewer;
@@ -83,7 +75,7 @@ namespace QuickFiler
             var countOriginal = _queue.Count;
             if (countOriginal < count)
             {
-                UIThreadExtensions.UiDispatcher.Invoke(() => BuildQueue(count - countOriginal), DispatcherPriority.Render);
+                UiThread.Dispatcher.Invoke(() => BuildQueue(count - countOriginal), DispatcherPriority.Render);
             }
             BuildQueueWhenIdle(countOriginal);
             return _queue.DequeueChunk(count);

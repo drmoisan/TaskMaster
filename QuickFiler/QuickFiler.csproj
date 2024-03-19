@@ -10,7 +10,7 @@
     <RootNamespace>QuickFiler</RootNamespace>
     <AssemblyName>QuickFiler</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
@@ -46,6 +46,9 @@
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="log4net.Ext.Json, Version=2.0.10.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.Ext.Json.2.0.10.1\lib\net452\log4net.Ext.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -58,14 +61,17 @@
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.Core.dll</HintPath>
+    <Reference Include="Microsoft.Office.Tools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2151.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2151.40\lib\net45\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.2151.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2151.40\lib\net45\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.2151.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2151.40\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
@@ -76,7 +82,11 @@
       <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
     </Reference>
     <Reference Include="office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Svg.3.4.5\lib\net462\Svg.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -98,6 +108,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=7.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.7.0.2\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
@@ -226,6 +237,7 @@
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -240,10 +252,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\BayesianPerformanceController.cs" />
     <Compile Include="Controllers\EfcDataModel.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcItemController.cs" />
+    <Compile Include="Controllers\KaChar.cs" />
+    <Compile Include="Controllers\KaKey.cs" />
+    <Compile Include="Controllers\KaStringAsync.cs" />
+    <Compile Include="Controllers\KbdActions.cs" />
     <Compile Include="Controllers\QfcCollectionController.cs" />
     <Compile Include="Controllers\QfcDatamodel.cs" />
     <Compile Include="Controllers\QfcExplorerController.cs" />
@@ -251,23 +268,23 @@
     <Compile Include="Controllers\QfcHomeController.cs" />
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Controllers\QfcItemGroup.cs" />
-    <Compile Include="Controllers\QfcKeyboardHandler.cs" />
+    <Compile Include="Controllers\KeyboardHandler.cs" />
     <Compile Include="Controllers\QfcQueue.cs" />
-    <Compile Include="Controllers\QfcTipsDetails.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
-    <Compile Include="Helper Classes\DebugTextWriter.cs" />
     <Compile Include="Helper Classes\EfcThemeHelper.cs" />
     <Compile Include="Helper Classes\EfcViewerQueue.cs" />
+    <Compile Include="Helper Classes\EmailMoveMonitor.cs" />
     <Compile Include="Helper Classes\IConversationResolver.cs" />
-    <Compile Include="Helper Classes\IMailItemInfo.cs" />
     <Compile Include="Helper Classes\ItemViewerQueue.cs" />
-    <Compile Include="Helper Classes\MailItemInfo.cs" />
+    <Compile Include="Helper Classes\LockingLinkedList.cs" />
     <Compile Include="Helper Classes\QfcThemeHelper.cs" />
     <Compile Include="Helper Classes\QfEnums.cs" />
+    <Compile Include="Helper Classes\TlpCellSnapShot.cs" />
     <Compile Include="Interfaces\IFilerFormController.cs" />
     <Compile Include="Interfaces\IFilerHomeController.cs" />
     <Compile Include="Interfaces\IItemControler.cs" />
+    <Compile Include="Interfaces\IKbdAction.cs" />
     <Compile Include="Interfaces\IQfcCollectionController.cs" />
     <Compile Include="Interfaces\IQfcDatamodel.cs" />
     <Compile Include="Interfaces\IQfcExplorerController.cs" />
@@ -286,26 +303,52 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Viewers\BayesianPerformanceViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewers\BayesianPerformanceViewer.Designer.cs">
+      <DependentUpon>BayesianPerformanceViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\EfcViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewers\EfcViewer.Designer.cs" />
+    <Compile Include="Viewers\EfcViewer.Designer.cs">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\ItemViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Viewers\ItemViewer.Designer.cs" />
+    <Compile Include="Viewers\ItemViewer.Designer.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\ItemViewerExpanded.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\ItemViewerExpanded.Designer.cs">
+      <DependentUpon>ItemViewerExpanded.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcFormViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewers\QfcFormViewer.Designer.cs" />
+    <Compile Include="Viewers\QfcFormViewer.Designer.cs">
+      <DependentUpon>QfcFormViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewers\QfcItemViewerExpanded.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Viewers\QfcItemViewerExpanded.Designer.cs" />
+    <Compile Include="Viewers\QfcItemViewerExpanded.Designer.cs">
+      <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\ToolStripMenuItemCb.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Viewers\ToolStripMenuItemCb.Designer.cs">
+      <DependentUpon>ToolStripMenuItemCb.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
-      <Project>{481e1cb9-3bd9-470f-92df-f8f1fe957b06}</Project>
+      <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
       <Name>SVGControl</Name>
     </ProjectReference>
     <ProjectReference Include="..\TaskVisualization\TaskVisualization.csproj">
@@ -330,10 +373,29 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewers\EfcViewer.resx" />
-    <EmbeddedResource Include="Viewers\ItemViewer.resx" />
-    <EmbeddedResource Include="Viewers\QfcFormViewer.resx" />
-    <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx" />
+    <EmbeddedResource Include="Viewers\BayesianPerformanceViewer.resx">
+      <DependentUpon>BayesianPerformanceViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\EfcViewer.resx">
+      <DependentUpon>EfcViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\ItemViewer.resx">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\ItemViewerExpanded.resx">
+      <DependentUpon>ItemViewerExpanded.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcFormViewer.resx">
+      <DependentUpon>QfcFormViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewers\QfcItemViewerExpanded.resx">
+      <DependentUpon>QfcItemViewerExpanded.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\ApplicationFlyout.png" />
@@ -341,6 +403,7 @@
     <Content Include="Resources\AppStartPageBackground.png" />
     <Content Include="Resources\Cancel.png" />
     <Content Include="Resources\Cancel.svg" />
+    <None Include="Resources\CheckBoxChecked.png" />
     <Content Include="Resources\Close.png" />
     <Content Include="Resources\Close.svg" />
     <Content Include="Resources\DatabaseModelRefresh.svg" />
@@ -350,18 +413,32 @@
     <Content Include="Resources\EmailHeader.html" />
     <Content Include="Resources\FlagDarkRed.png" />
     <Content Include="Resources\FlagDarkRed.svg" />
+    <None Include="Resources\Forward1.png" />
     <Content Include="Resources\NewFolder.png" />
     <Content Include="Resources\NewFolder.svg" />
     <Content Include="Resources\QuickFind.png" />
     <Content Include="Resources\QuickFind.svg" />
     <Content Include="Resources\QuickRefresh.png" />
     <Content Include="Resources\QuickRefresh.svg" />
+    <None Include="Resources\Forward4.afdesign" />
+    <None Include="Resources\Reply.afdesign" />
+    <None Include="Resources\Reply.svg" />
+    <None Include="Resources\Reply2.afdesign" />
+    <None Include="Resources\Reply3.afdesign" />
+    <None Include="Resources\Reply4.afdesign" />
+    <None Include="Resources\ReplyAll.afdesign" />
+    <None Include="Resources\ReplyAll.png" />
+    <None Include="Resources\Reply.png" />
     <Content Include="Resources\Run.png" />
     <Content Include="Resources\Run.svg" />
+    <None Include="Resources\SolutionFolderSwitch.svg" />
+    <None Include="Resources\SolutionFolderSwitch.png" />
     <Content Include="Resources\TextBlock.png" />
     <Content Include="Resources\TextBlock.svg" />
     <Content Include="Resources\Web.png" />
     <Content Include="Resources\Web.svg" />
+    <None Include="Resources\ReplyAll3.afdesign" />
+    <None Include="Resources\ReplyAll4.afdesign" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -372,13 +449,13 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets'))" />
     <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets'))" />
   </Target>
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.2151.40\build\Microsoft.Web.WebView2.targets')" />
 </Project>

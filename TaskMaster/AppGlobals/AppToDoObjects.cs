@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -26,16 +27,29 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
-            var tasks = new List<Task> 
-            {
-                LoadDictPPLAsync(),
-                LoadDictRemapAsync(),
-                LoadProjInfoAsync(),
-                LoadIdListAsync(),
-                LoadCategoryFiltersAsync(),
-                LoadPrefixListAsync()
-            };
-            await Task.WhenAll(tasks);
+            //var tasks = new List<Task> 
+            //{
+            //    LoadDictPPLAsync(),
+            //    LoadDictRemapAsync(),
+            //    LoadProjInfoAsync(),
+            //    LoadIdListAsync(),
+            //    LoadCategoryFiltersAsync(),
+            //    LoadPrefixListAsync(),
+            //    LoadFilteredFolderScrapingAsync(),
+            //    LoadFolderRemapAsync()
+            //};
+            //await Task.WhenAll(tasks);
+
+            //await LoadDictPPLAsync();
+            await LoadPrefixAndDictPeopleAsync();
+            await LoadDictRemapAsync();
+            await LoadProjInfoAsync();
+            await LoadIdListAsync();
+            await LoadCategoryFiltersAsync();
+            //await LoadPrefixListAsync();
+            await LoadFilteredFolderScrapingAsync();
+            await LoadFolderRemapAsync();
+
             //logger.Debug($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
         }
 
@@ -66,20 +80,10 @@ namespace TaskMaster
         async private Task LoadProjInfoAsync()
         {
             _projInfo = await Task.Run(() => new ProjectInfo(filename: _defaults.FileName_ProjInfo, folderpath: Parent.FS.FldrAppData));
-            //_projInfo = await Task.Factory.StartNew(
-            //                  () => new ProjectInfo(filename: _defaults.FileName_ProjInfo,
-            //                                        folderpath: Parent.FS.FldrAppData), 
-            //                  default,
-            //                  TaskCreationOptions.None,
-            //                  PriorityScheduler.BelowNormal);
+            
             if (_projInfo.Count == 0) 
             {
                 await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
-                //await Task.Factory.StartNew(
-                //      () => _projInfo.Rebuild(Parent.Ol.App),
-                //      default,
-                //      TaskCreationOptions.None,
-                //      PriorityScheduler.BelowNormal);
             }
         }
         private IProjectInfo LoadProjInfo()
@@ -89,37 +93,6 @@ namespace TaskMaster
             if (projectInfo.Count == 0) { projectInfo.Rebuild(Parent.Ol.App); }
             return projectInfo;
         }
-
-        //private string _dictPPL_Filename;
-        //public string DictPPL_Filename { get => Initialized(_dictPPL_Filename, () => _defaults.FilenameDictPpl);}
-        ////{
-        ////    get
-        ////    {
-        ////        if (_dictPPL_Filename is null)
-        ////            _dictPPL_Filename = _defaults.FilenameDictPpl;
-        ////        return _dictPPL_Filename;
-        ////    }
-        ////}
-        
-
-        ////TODO: Convert DictPPL to SCODictionary
-        //private Dictionary<string, string> _dictPPL;
-        //public Dictionary<string, string> DictPPL => Initialized(_dictPPL, () => LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename));
-        ////{
-        ////    get
-        ////    {
-        ////        if (_dictPPL is null)
-        ////            _dictPPL = LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename);
-        ////        return _dictPPL;
-        ////    }
-        ////}
-        //async private Task LoadDictPPLAsync() 
-        //{ _dictPPL = await LoadDictJSONAsync(Parent.FS.FldrStaging, DictPPL_Filename); }
-        //public void DictPPL_Save()
-        //{
-        //    File.WriteAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename), 
-        //                      JsonConvert.SerializeObject(_dictPPL, Formatting.Indented));
-        //}
 
         private PeopleScoDictionary _dictPPL;
         public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
@@ -132,8 +105,7 @@ namespace TaskMaster
             
             return dictPPL;
         }
-        async private Task LoadDictPPLAsync() => _dictPPL = await Task.Factory.StartNew(
-            () => LoadDictPPL(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        async private Task LoadDictPPLAsync() => _dictPPL = await Task.Run(LoadDictPPL);
         async private Task LoadPrefixAndDictPeopleAsync()
         {
             await LoadPrefixListAsync();
@@ -167,12 +139,7 @@ namespace TaskMaster
                                                               folderpath: Parent.FS.FldrPythonStaging);
             return dictRemap;
         }
-        async private Task LoadDictRemapAsync() => _dictRemap = await Task.Factory.StartNew(
-            () => LoadDictRemap(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-
-        //private Dictionary<string, string> _dictRemap;
-        //public Dictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictJSON(Parent.FS.FldrStaging, FnameDictRemap));
-        //async private Task LoadDictRemapAsync() => _dictRemap = await LoadDictJSONAsync(Parent.FS.FldrStaging, FnameDictRemap);
+        async private Task LoadDictRemapAsync() => _dictRemap = await Task.Run(LoadDictRemap, default);
 
         //TODO: Convert CategoryFilters to ScoCollection
         private ISerializableList<string> _catFilters;
@@ -205,10 +172,13 @@ namespace TaskMaster
         // Prefix List
         private ScoCollection<IPrefix> _prefixList;
         public ScoCollection<IPrefix> PrefixList => Initialized(_prefixList, () => LoadPrefixList());
-        private ScoCollection<IPrefix> LoadPrefixList()
+        public ScoCollection<IPrefix> LoadPrefixList()
         {
-            var prefixList = new ScoCollection<IPrefix>(filename: _defaults.FileName_PrefixList,
-                                                        folderpath: Parent.FS.FldrPythonStaging);
+            //var prefixList = new ScoCollection<IPrefix>(Properties.Resources.PrefixList);
+            var prefixList = new ScoCollection<IPrefix>(fileName: _defaults.FileName_PrefixList,
+                                                        folderPath: Parent.FS.FldrPythonStaging);
+
+
             if (prefixList.Count == 0) 
             { 
                 var tdDefaults = new ToDoDefaults();
@@ -219,12 +189,38 @@ namespace TaskMaster
         }
         async private Task LoadPrefixListAsync()
         {
-            _prefixList = await Task.Factory.StartNew(
-                              () => LoadPrefixList(),
-                              default(CancellationToken));
+            _prefixList = await Task.Run(LoadPrefixList);
                               //default,
                               //TaskCreationOptions.None,
                               //PriorityScheduler.BelowNormal);
+        }
+
+        private ScoDictionary<string, int> _filteredFolderScraping;
+        public ScoDictionary<string, int> FilteredFolderScraping => Initialized(_filteredFolderScraping, () => LoadFilteredFolderScraping());
+        public ScoDictionary<string, int> LoadFilteredFolderScraping()
+        {
+            var filteredFolderScraping = new ScoDictionary<string, int>(_defaults.FileName_FilteredFolderScraping,
+                                                                        Parent.FS.FldrPythonStaging);
+            return filteredFolderScraping;
+        }
+        async private Task LoadFilteredFolderScrapingAsync()
+        {
+            _filteredFolderScraping = await Task.Factory.StartNew(
+                                      () => LoadFilteredFolderScraping(),
+                                      default(CancellationToken));
+        }
+
+        private ScoDictionary<string, string> _folderRemap;
+        public ScoDictionary<string, string> FolderRemap => Initializer.GetOrLoad(ref _folderRemap, () => LoadFolderRemap());
+        public ScoDictionary<string, string> LoadFolderRemap()
+        {
+            var folderRemap = new ScoDictionary<string, string>(_defaults.FileName_FolderRemap,
+                                                                Parent.FS.FldrPythonStaging);
+            return folderRemap;
+        }
+        async private Task LoadFolderRemapAsync()
+        {
+            _folderRemap = await Task.Run(LoadFolderRemap);
         }
 
 
@@ -316,7 +312,7 @@ namespace TaskMaster
         //    }
         //    catch (FileNotFoundException)
         //    {
-                
+
         //        response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
         //    }
         //    catch (Exception ex)

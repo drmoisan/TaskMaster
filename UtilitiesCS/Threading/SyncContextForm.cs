@@ -17,7 +17,11 @@ namespace QuickFiler.Viewers
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
+            _autoScaleFactor = this.AutoScaleFactor;
         }
+
+        private System.Drawing.SizeF _autoScaleFactor;
+        public System.Drawing.SizeF FormAutoScaleFactor { get => _autoScaleFactor; }
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
