@@ -12,19 +12,19 @@ namespace UtilitiesCS
         Folder FolderOld { get; set; }
         
         string FolderPathNew { get; set; }
-        string FolderPathOld { get; set; }
+        string folderPathOld { get; set; }
         
         [JsonIgnore]
         MailItem MailItem { get; set; }
         
         [JsonIgnore]
-        Application OlApp { get; set; }
+        Application olApp { get; set; }
 
         [JsonIgnore]
-        string OlRootPath { get; set; }
+        string olRootPath { get; set; }
         string StoreId { get; set; }
 
-        bool UndoMove();
+        MailItem UndoMove();
         string UndoMoveMessage(Outlook.Application olApp);
     }
 }

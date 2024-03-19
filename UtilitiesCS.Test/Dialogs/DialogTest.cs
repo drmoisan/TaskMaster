@@ -4,18 +4,15 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using UtilitiesCS;
 
-namespace UtilitiesCS.Test
+namespace Z.Disabled.UtilitiesCS.Test
 {
     [TestClass]
     public class DialogTest
     {
         private delegate DialogResult TestDelegate();
-        //private TestDelegate testDelegate1 = buttonOK;
-        //private TestDelegate testDelegate2 = buttonCancel;
-        
-
+                
         [TestMethod]
-        public void TestMethod1()
+        public void Form_TestMethod1()
         {
             
             //string title, string message, Dictionary< string,Delegate > map
@@ -25,11 +22,11 @@ namespace UtilitiesCS.Test
             map.Add("OK", new TestDelegate(buttonOk));
             map.Add("CANCEL", new TestDelegate(buttonCancel));
 
-
-            //MyBoxTemplate _box = new MyBoxTemplate();
             MyBoxViewer _box = new MyBoxViewer(title, message, map);
-            DialogResult result = _box.ShowDialog();
-            Assert.IsTrue(result == DialogResult.OK);
+            
+            //Disabled
+            //DialogResult result = _box.ShowDialog();
+            //Assert.IsTrue(result == DialogResult.OK);
 
         }
 

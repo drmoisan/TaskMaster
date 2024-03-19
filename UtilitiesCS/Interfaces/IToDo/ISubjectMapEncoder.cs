@@ -54,7 +54,7 @@ namespace UtilitiesCS
         /// the map passed as a variable
         /// </summary>
         /// <param name="map">Serializable list of <see cref="ISubjectMapEntry"/></param>
-        void RebuildEncoding(ISubjectMapSL map);
+        void RebuildEncoding(SubjectMapSco map);
 
         /// <summary>
         /// Rebuilds encoding dictionary based and re-encodes elements within 

@@ -103,7 +103,6 @@ namespace UtilitiesCS.OutlookExtensions
         {
             try
             {
-                // An invalid property name exception is propagated to client
                 return item.ItemType.InvokeMember(
                     propertyName,
                     BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
@@ -111,7 +110,7 @@ namespace UtilitiesCS.OutlookExtensions
                     item.InnerObject,
                     item.Args);
             }
-            catch (SystemException ex)
+            catch (COMException ex)
             {
                 Debug.WriteLine(
                     string.Format(
@@ -151,12 +150,12 @@ namespace UtilitiesCS.OutlookExtensions
                     new object[] { propertyValue });
                 return true;
             }
-            catch (SystemException ex)
+            catch (COMException)
             {
-                Debug.WriteLine(
-                   string.Format(
-                   "OutlookItem: SetPropertyValue for {0} Exception: {1} ",
-                   propertyName, ex.Message));
+                //Debug.WriteLine(
+                //   string.Format(
+                //   "OutlookItem: SetPropertyValue for {0} Exception: {1} ",
+                //   propertyName, ex.Message));
                 return false;
             }
         }

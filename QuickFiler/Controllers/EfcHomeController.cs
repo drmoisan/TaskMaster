@@ -33,7 +33,7 @@ namespace QuickFiler
                 //_formViewer = new EfcViewer();
                 _formViewer = EfcViewerQueue.Dequeue();
                 _uiSyncContext = _formViewer.UiSyncContext;
-                _keyboardHandler = new QfcKeyboardHandler(_formViewer, this);
+                _keyboardHandler = new KeyboardHandler(_formViewer, this);
                 _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, appGlobals, this);
                 _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType, Token);
             }
@@ -44,7 +44,7 @@ namespace QuickFiler
         private QfEnums.InitTypeEnum _initType;
         private System.Action _parentCleanup;
 
-        [STAThread]
+        //[STAThread]
         public void Run() 
         { 
             if (_dataModel.Mail is not null)
@@ -58,7 +58,7 @@ namespace QuickFiler
         {
             if (_dataModel.Mail is not null)
             {
-                await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_formViewer.Show());
+                await UiThread.Dispatcher.InvokeAsync(()=>_formViewer.Show());
             }
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
@@ -78,13 +78,13 @@ namespace QuickFiler
         #region Public Properties
 
         private IQfcExplorerController _explorerController;
-        public IQfcExplorerController ExplorerCtlr { get => _explorerController; set => _explorerController = value; }
+        public IQfcExplorerController ExplorerController { get => _explorerController; set => _explorerController = value; }
 
         private EfcFormController _formController;
-        public IFilerFormController FormCtrlr { get => _formController; }
+        public IFilerFormController FormController { get => _formController; }
 
         private IQfcKeyboardHandler _keyboardHandler;
-        public IQfcKeyboardHandler KeyboardHndlr { get => _keyboardHandler; set => _keyboardHandler = value; }
+        public IQfcKeyboardHandler KeyboardHandler { get => _keyboardHandler; set => _keyboardHandler = value; }
 
         private EfcDataModel _dataModel;
         internal EfcDataModel DataModel { get => _dataModel; set => _dataModel = value; }
@@ -131,7 +131,7 @@ namespace QuickFiler
             QuickFileMetrics_WRITE(_globals.FS.Filenames.EmailSession, selectedFolder, convInfo);
         }
                 
-        public void QuickFileMetrics_WRITE(string filename, string selectedFolder, List<MailItemInfo> moved)
+        public void QuickFileMetrics_WRITE(string filename, string selectedFolder, List<MailItemHelper> moved)
         {
             if (moved is not null && moved.Count == 0) 
             { 

@@ -58,7 +58,7 @@ namespace TaskVisualization
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-       {
+        {
             if (keyData.HasFlag(Keys.Alt))
             {
                 // If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
@@ -72,10 +72,10 @@ namespace TaskVisualization
         }
 
         private List<Label> _navColumns;
-        internal List<Label> NavColumns 
+        internal List<Label> NavColumns
         {
-            get 
-            { 
+            get
+            {
                 if (_navColumns is null)
                     _navColumns = new() { C1S1, C2S2, C2S4, C3S1, C3S2, C3S4, C4S1, C4S2 };
                 return _navColumns;
@@ -236,5 +236,12 @@ namespace TaskVisualization
 
         #endregion
 
+        private void TaskViewer_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down || e.KeyCode == Keys.Up)
+            {
+                e.IsInputKey = true;
+            }
+        }
     }
 }

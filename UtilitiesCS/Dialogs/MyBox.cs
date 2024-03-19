@@ -92,17 +92,13 @@ namespace UtilitiesCS
 
                 if (actionPair.Key.Contains("Cancel"))
                 {
-                    actionButton = new ActionButton($"button{i}",
-                                                        actionPair.Key,
-                                                        DialogResult.Cancel,
-                                                        actionPair.Value);
+                    actionButton = new ActionButton(
+                        $"button{i}", actionPair.Key, DialogResult.Cancel, actionPair.Value);
                 }
                 else
                 {
-                    actionButton = new ActionButton($"button{i}",
-                                                        actionPair.Key,
-                                                        DialogResult.OK,
-                                                        actionPair.Value);
+                    actionButton = new ActionButton(
+                        $"button{i}", actionPair.Key, DialogResult.OK, actionPair.Value);
                 }
 
                 actionButtons.Add(actionButton);

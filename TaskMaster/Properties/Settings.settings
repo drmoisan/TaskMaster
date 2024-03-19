@@ -122,5 +122,32 @@
     <Setting Name="DarkMode" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="FileName_Filters" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999Filters.json</Value>
+    </Setting>
+    <Setting Name="SaveAttachments" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="MoveEntireConversations" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SavePictures" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SaveEmailCopy" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="FileName_FilteredFolderScraping" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999FilteredFolderScraping.json</Value>
+    </Setting>
+    <Setting Name="FileName_FolderRemap" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999FolderRemap.json</Value>
+    </Setting>
+    <Setting Name="File_ClassifierManager" Type="System.String" Scope="User">
+      <Value Profile="(Default)">999999ClassifierManager.json</Value>
+    </Setting>
+    <Setting Name="FileName_EmailInfoStaging" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9999999emailInfo.json</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

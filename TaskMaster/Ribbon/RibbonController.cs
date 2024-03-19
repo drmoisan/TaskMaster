@@ -15,6 +15,19 @@ using Microsoft.Office.Interop.Outlook;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Drawing.Imaging;
+using stdole;
+using System;
+using UtilitiesCS.EmailIntelligence.FolderRemap;
+using UtilitiesCS.EmailIntelligence;
+using log4net.Repository.Hierarchy;
+using UtilitiesCS.EmailIntelligence.Bayesian;
+using static UtilitiesCS.EmailIntelligence.Bayesian.BayesianPerformanceMeasurement;
+using System.Diagnostics.Metrics;
+using QuickFiler.Controllers;
+using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
+using UtilitiesCS.Threading;
+
 
 namespace TaskMaster
 {
@@ -22,15 +35,17 @@ namespace TaskMaster
     public class RibbonController
     {
         private RibbonViewer _viewer;
-        private IApplicationGlobals _globals;
+        private ApplicationGlobals _globals;
         private bool blHook = true;
-        //private QuickFiler.Legacy.QfcLauncher _quickfileLegacy;
         private IFilerHomeController _quickFiler;
         private bool _quickFilerLoaded = false;
 
         public RibbonController() { }
 
-        internal void SetGlobals(IApplicationGlobals AppGlobals)
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        internal void SetGlobals(ApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
         }
@@ -55,23 +70,11 @@ namespace TaskMaster
         internal void LoadTaskTree()
         {
             var taskTreeViewer = new TaskTreeForm();
-            var dataModel = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
-            dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals.Ol.App);
+            var dataModel = new TreeOfToDoItems([]);
+            dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals);
             var taskTreeController = new TaskTreeController(_globals, taskTreeViewer, dataModel);
             taskTreeViewer.Show();
         }
-
-        //internal void LoadQuickFilerOld()
-        //{
-        //    bool loaded = false;
-        //    if (_quickfileLegacy is not null)
-        //        loaded = _quickfileLegacy.Loaded;
-        //    if (loaded == false)
-        //    {
-        //        _quickfileLegacy = new QuickFiler.Legacy.QfcLauncher(_globals, ReleaseQuickFilerLegacy);
-        //        _quickfileLegacy.Run();
-        //    }
-        //}
 
         internal void LoadQuickFiler()
         {
@@ -96,11 +99,7 @@ namespace TaskMaster
             }
         }
 
-        //private void ReleaseQuickFilerLegacy()
-        //{
-        //    _quickfileLegacy = null;
-        //}
-
+        
         private void ReleaseQuickFiler()
         {
             _quickFiler = null;
@@ -116,7 +115,7 @@ namespace TaskMaster
 
         internal void CompressIDs()
         {
-            _globals.TD.IDList.CompressToDoIDs(_globals.Ol.App);
+            _globals.TD.IDList.CompressToDoIDs(_globals);
             MessageBox.Show("ID Compression Complete");
         }
 
@@ -126,7 +125,7 @@ namespace TaskMaster
             ToDoEvents.MigrateToDoIDs(_globals.Ol.App);
         }
 
-        internal string GetHookButtonText(Office.IRibbonControl control)
+        internal string GetHookButtonText(Office.IRibbonControl _)
         {
             if (blHook)
             {
@@ -161,8 +160,8 @@ namespace TaskMaster
 
         internal void HideHeadersNoChildren()
         {
-            var dataTree = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
-            dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, Globals.ThisAddIn.Application);
+            var dataTree = new TreeOfToDoItems([]);
+            dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, _globals);
             dataTree.HideEmptyHeadersInView();
         }
 
@@ -174,8 +173,24 @@ namespace TaskMaster
 
         internal void UndoSort()
         {
-            ToDoModel.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
+            UtilitiesCS.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
         }
+
+        #region SettingsMenu
+        
+        internal bool IsMoveEntireConversationActive() => _globals.QfSettings.MoveEntireConversation;
+        internal void ToggleMoveEntireConversation() => _globals.InternalQfSettings.MoveEntireConversation = !_globals.InternalQfSettings.MoveEntireConversation;
+        
+        internal bool IsSaveAttachmentsActive() => _globals.QfSettings.SaveAttachments;
+        internal void ToggleSaveAttachments() => _globals.InternalQfSettings.SaveAttachments = !_globals.InternalQfSettings.SaveAttachments;
+        
+        internal bool IsSavePicturesActive() => _globals.QfSettings.SavePictures;
+        internal void ToggleSavePictures() => _globals.InternalQfSettings.SavePictures = !_globals.InternalQfSettings.SavePictures;
+        
+        internal bool IsSaveEmailCopyActive() => _globals.QfSettings.SaveEmailCopy;
+        internal void ToggleSaveEmailCopy() => _globals.InternalQfSettings.SaveEmailCopy = !_globals.InternalQfSettings.SaveEmailCopy;
+
+        #endregion SettingsMenu
 
         #region Try specific methods
         internal void RunTry()
@@ -204,7 +219,7 @@ namespace TaskMaster
             var conversation = (Outlook.Conversation)Mail.GetConversation();
             var df = conversation.GetDataFrame();
             df.PrettyPrint();
-            var mInfo = new MailItemInfo(df, 0);
+            var mInfo = new MailItemHelper(df, 0, _globals.Ol.EmailPrefixToStrip);
         }
         internal void TryGetQfcDataModel()
         {
@@ -223,20 +238,81 @@ namespace TaskMaster
         internal void TryRecipientGetInfo()
         {
             var Mail = (Outlook.MailItem)_globals.Ol.App.ActiveExplorer().Selection[1];
-            var recips = Mail.Recipients.Cast<Recipient>();
-            var info = recips.GetInfo();
+            var recipients = Mail.Recipients.Cast<Recipient>();
+            var info = recipients.GetInfo();
         }
         internal void TrySubstituteIdRoot()
         {
             _globals.TD.IDList.SubstituteIdRoot("9710", "2501");
         }
-        internal void TryLegacySortMailToExistingRun2()
+        internal void TryGetImage()
         {
-            var mail = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
-            var items = new List<Outlook.MailItem> { mail };
-            ToDoModel.SortEmail.Run2(items, false, "_ Active Projects\\Countertop Beta", false, false, false, _globals, null, null);
+            var ae = _globals.Ol.App.ActiveExplorer();
+            //var image = ae.CommandBars.GetImageMso("ReplyAll", 38, 38);
+            var image3 = ae.CommandBars.GetImageMso("Forward", 38, 38);
+            //var image5 = ae.CommandBars.GetImageMso("Reply", 100, 100);
+
+            //System.Drawing.Image image2 = GetImage(image);
+            //image2.Save(@"C:\Temp\ReplyAll.png", ImageFormat.Png);
+
+            System.Drawing.Image image4 = GetImage(image3);
+            image4.Save(@"C:\Temp\Forward.png", ImageFormat.Png);
+
+            //System.Drawing.Image image6 = GetImage(image5);
+            //image6.Save(@"C:\Temp\Reply.png", ImageFormat.Png);
+
+
+        }
+        internal System.Drawing.Image GetImage(IPictureDisp disp)
+        {
+            return System.Drawing.Image.FromHbitmap((IntPtr)disp.Handle, (IntPtr)disp.hPal);
+        }
+        
+
+        internal void TryLoadFolderFilter()
+        {
+            var filter = new FilterOlFoldersController(_globals);
+            //var filter = new FilterOlFoldersViewer();
+            //filter.ShowDialog();
         }
 
+        internal void TryLoadFolderRemap()
+        {
+            var remap = new FolderRemapController(_globals);
+        }
+
+        internal async Task RebuildSubjectMapAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            await _globals.AF.SubjectMap.RebuildAsync(_globals);
+        }
+
+        internal void ShowSubjectMapMetrics()
+        {
+            _globals.AF.SubjectMap.ShowSummaryMetrics();
+        }
+        
+        internal async Task TryTokenizeEmail()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+
+            CancellationTokenSource cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var ae = _globals.Ol.App.ActiveExplorer();
+            var mail = (Outlook.MailItem)ae.Selection[1];
+            var mailInfo = await MailItemHelper.FromMailItemAsync(mail, _globals, token, true);
+            var tokenizer = new EmailTokenizer();
+            //tokenizer.setup();
+            var tokens = tokenizer.tokenize(mailInfo).ToArray();
+            var tokenString = tokens.SentenceJoin();
+            MessageBox.Show(tokenString);
+        }
+        
         #endregion
 
         internal void SortEmail()
@@ -245,5 +321,102 @@ namespace TaskMaster
             sorter.Run();
         }
 
+        internal async Task TryMineEmails()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
+            await miner.MineEmails();
+        }
+
+        internal async Task TryBuildClassifier()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
+            await miner.BuildFolderClassifiersAsync();
+        }
+
+        internal void TryPrintManagerState()
+        {
+            //_globals.AF.Manager["Folder"].LogMetrics();
+        }
+
+        internal void TrySaveManagerLocally()
+        {
+            _globals.AF.Manager.ActivateLocalDisk();
+            _globals.AF.Manager.Serialize();
+        }
+
+        internal void TrySaveManagerNetwork()
+        {
+            _globals.AF.Manager.ActivateNetDisk();
+            _globals.AF.Manager.Serialize();
+        }
+
+        internal void TrySerializeMailInfo() 
+        {
+            new EmailDataMiner(_globals).SerializeActiveItem();
+            //var ae = _globals.Ol.App.ActiveExplorer();
+            //var mail = (Outlook.MailItem)ae.Selection[1];
+            //new EmailDataMiner(_globals).SerializeMailInfo(mail);
+
+        }
+
+        #region BayesianPerformance
+
+        internal async Task TryTestClassifier()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianPerformanceMeasurement(_globals);
+            await tuner.TestFolderClassifierAsync();            
+        }
+
+        internal async Task TryTestClassifierVerbose()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianPerformanceMeasurement(_globals);
+            await tuner.TestFolderClassifierAsync(verbose: true);
+        }
+
+        internal async Task GetConfusionDrivers() 
+        { 
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianPerformanceMeasurement(_globals);
+            await tuner.GetConfusionDriversAsync();
+            //var serializer = new BayesianSerializationHelper(_globals);
+            //var testScores = await serializer.DeserializeAsync<VerboseTestScores[]>("VerboseTestScores[]");
+            //var ppkg = await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
+            //_globals.AF.ProgressPane.Visible = true;
+            //var errors = await tuner.DiagnosePoorPerformanceAsync(testScores, ppkg.ProgressTrackerPane);
+        }
+        internal async Task TryChartMetrics()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var tuner = new BayesianPerformanceMeasurement(_globals);
+            await tuner.ShowSensitivityChartAsync(null);
+        }
+
+        internal async Task InvestigateErrorsAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            
+            var performance = new BayesianPerformanceController(_globals);
+            await performance.InvestigatePerformance();
+        }
+
+        #endregion BayesianPerformance
     }
 }

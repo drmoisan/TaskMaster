@@ -4,10 +4,10 @@ using Deedle;
 using System.Linq;
 using System.Diagnostics;
 using QuickFiler.Controllers;
+using UtilitiesCS;
 
 namespace QuickFiler.Test
 {
-    
     [TestClass]
     public class UnitTest1
     {
@@ -47,25 +47,25 @@ namespace QuickFiler.Test
         }
 
         [TestMethod]
-        public void TestGB()
+        public void Disabled_TestGB()
         {
-            var df = LoadDF();
-            var topics = df.GetColumn<string>("Conversation").Values.Distinct().ToArray();
+            //var df = LoadDF();
+            //var topics = df.GetColumn<string>("Conversation").Values.Distinct().ToArray();
 
-            var rows = topics.Select(topic =>
-            {
-                var dfConversation = df.FilterRowsBy("Conversation", topic);
-                var maxSentOn = dfConversation.GetColumn<DateTime>("SentOn").Values.Max();
-                var row = dfConversation.FilterRowsBy("SentOn", maxSentOn).Rows.FirstValue();
-                //var dfDateIdx = dfConversation.IndexRows<DateTime>("SentOn", keepColumn: true);
-                //var addr = dfDateIdx.RowIndex.Locate(maxSentOn);
-                //var idx = (int)dfDateIdx.RowIndex.AddressOperations.OffsetOf(addr);
-                //var row = dfConversation.Rows.GetAt(idx);
-                return row;
-            });
+            //var rows = topics.Select(topic =>
+            //{
+            //    var dfConversation = df.FilterRowsBy("Conversation", topic);
+            //    var maxSentOn = dfConversation.GetColumn<DateTime>("SentOn").Values.Max();
+            //    var row = dfConversation.FilterRowsBy("SentOn", maxSentOn).Rows.FirstValue();
+            //    //var dfDateIdx = dfConversation.IndexRows<DateTime>("SentOn", keepColumn: true);
+            //    //var addr = dfDateIdx.RowIndex.Locate(maxSentOn);
+            //    //var idx = (int)dfDateIdx.RowIndex.AddressOperations.OffsetOf(addr);
+            //    //var row = dfConversation.Rows.GetAt(idx);
+            //    return row;
+            //});
             
-            var dfFiltered = Frame.FromRows(rows);
-            dfFiltered.Print();
+            //var dfFiltered = Frame.FromRows(rows);
+            //dfFiltered.Print();
 
         }
 

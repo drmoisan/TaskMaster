@@ -22,7 +22,7 @@ namespace QuickFiler
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitControlGroups();
         }
-        
+
         //private IList<Control> _rightControls;
 
         private IList<Label> _tipsLabels;
@@ -39,13 +39,13 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
         public SynchronizationContext UiSyncContext { get => _context; }
-        
+
         private TaskScheduler _uiScheduler;
         public TaskScheduler UiScheduler { get => _uiScheduler; }
 
         public void RemoveControlsColsRightOf(Control furthestRight)
         {
-            if (furthestRight.Parent is TableLayoutPanel) 
+            if (furthestRight.Parent is TableLayoutPanel)
             {
                 var tlp = (TableLayoutPanel)furthestRight.Parent;
                 var columnNumber = tlp.GetColumn(furthestRight);
@@ -58,8 +58,8 @@ namespace QuickFiler
 
                 }
             }
-            else 
-            { 
+            else
+            {
                 RemoveControlsRightOf(furthestRight);
             }
         }
@@ -80,15 +80,21 @@ namespace QuickFiler
         {
             _tipsLabels = new List<Label>
             {
+                // TODO: Add new labels for reply, reply all, forward
                 LblAcOpen,
                 LblAcPopOut,
                 LblAcTask,
                 LblAcDelete,
-                LblAcAttachments,
-                LblAcConversation,
-                LblAcEmail,
+                LblAcMoveOptions,
+                //LblAcAttachments,
+                //LblAcConversation,
+                //LblAcEmail,
                 LblAcFolder,
                 LblAcSearch,
+                LblAcReply,
+                LblAcReplyAll,
+                LblAcFwd,
+                LblAcBody,
             };
 
             _leftTipsLabels = new List<Label>
@@ -131,6 +137,44 @@ namespace QuickFiler
         private void L0v2h2_WebView2_ParentChanged(object sender, EventArgs e)
         {
             Console.WriteLine("Parent Changed");
+        }
+
+        private void MenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            var menuItem = (ToolStripMenuItem)sender;
+            MenuItem_CheckedChanged(menuItem);
+        }
+
+        private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
+        {
+            if (menuItem.Checked)
+            {
+                menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            }
+            else
+            {
+                menuItem.Image = null;
+            }
+        }
+
+        public List<Component> MenuItems => Initializer.GetOrLoad(ref _menuItems, LoadMenuItems);
+        private List<Component> _menuItems;
+        private List<Component> LoadMenuItems()
+        {
+            var menuItems = new List<Component>
+            {
+                this.MoveOptionsMenu,
+                this.ConversationMenuItem,
+                this.SaveAttachmentsMenuItem,
+                this.SaveEmailMenuItem,
+                this.SavePicturesMenuItem,
+            };
+            return menuItems;
+        }
+
+        private void MoveOptionsMenu_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

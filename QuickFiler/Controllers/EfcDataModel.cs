@@ -31,19 +31,19 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private CancellationToken _token;
         
-        private FolderHandler _folderHandler;
-        public FolderHandler FolderHandler { get => _folderHandler; }
+        private OlFolderHelper _folderHelper;
+        public OlFolderHelper FolderHelper { get => _folderHelper; }
         async public Task InitFolderHandlerAsync(object folderList = null)
         {
             if (folderList is null)
             {
-                _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, _mail, FolderHandler.InitOptions.FromField), _token);
+                _folderHelper = await Task.Run(() => new OlFolderHelper(
+                    _globals, _mail, OlFolderHelper.InitOptions.FromField), _token);
             }
             else
             {
-                _folderHandler = await Task.Run(() => new FolderHandler(
-                    _globals, folderList, FolderHandler.InitOptions.FromArrayOrString), _token);
+                _folderHelper = await Task.Run(() => new OlFolderHelper(
+                    _globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString), _token);
             }
         }
 
@@ -62,15 +62,15 @@ namespace QuickFiler.Controllers
             set => _mail = value;
         }
 
-        private MailItemInfo _mailInfo;
-        public MailItemInfo MailInfo
+        private MailItemHelper _mailInfo;
+        public MailItemHelper MailInfo
         {
             get
             {
                 if (_mailInfo is null && Mail is not null)
                 {
-                    _mailInfo = new MailItemInfo(Mail);
-                    _mailInfo.LoadPriority(_token);
+                    _mailInfo = new MailItemHelper(Mail);
+                    _mailInfo.LoadPriority(_globals, _token);
                 }
                 return _mailInfo;
             }
@@ -88,7 +88,7 @@ namespace QuickFiler.Controllers
                 bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
 
                 //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                await SortEmail.RunAsync(mailItems: items,
+                await SortEmail.SortAsync(mailItems: items,
                                          savePictures: savePictures,
                                          destinationOlStem: folderpath,
                                          saveMsg: saveEmail,
@@ -131,7 +131,7 @@ namespace QuickFiler.Controllers
                 searchText = "*" + searchText + "*";
             }
 
-            return _folderHandler.FindFolder(
+            return _folderHelper.FindFolder(
                         searchString: searchText,
                         reloadCTFStagingFiles: false,
                         recalcSuggestions: false,
@@ -140,7 +140,8 @@ namespace QuickFiler.Controllers
 
         public void RefreshSuggestions()
         {
-            _folderHandler.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
+            _folderHelper.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
+            _folderHelper.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
         }
 
     }

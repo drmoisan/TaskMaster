@@ -29,14 +29,14 @@ namespace UtilitiesCS.Threading
 
         public void Run()
         {
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 while (true)
                 {
                     Thread.Sleep(pollingFrequency);
                     var dispatcher = Dispatcher.FromThread(thread);
                     if (dispatcher is null)
-                        UIThreadExtensions.GetUiContext().Send((x) => dispatcher = Dispatcher.CurrentDispatcher, null);        
+                        UiThread.UiSyncContext.Send((x) => dispatcher = Dispatcher.CurrentDispatcher, null);        
                 
                     var task = dispatcher.InvokeAsync(() => { });
 
@@ -45,7 +45,6 @@ namespace UtilitiesCS.Threading
                         Thread.Sleep(delayThreshold);
                         if (task.Status != DispatcherOperationStatus.Completed)
                         {
-                            Log.Debug($"{(i + 1) * 100}ms Delay on thread {thread.Name} ({task.Status})");
                             Debug.WriteLine($"{(i + 1) * 100}ms Delay on thread {thread.Name} ({task.Status})");
                         }
                         else

@@ -21,6 +21,8 @@ namespace UtilitiesCS
                      Label lblSubject,
                      IList<TableLayoutPanel> tableLayoutPanels,
                      IList<Button> buttons,
+                     IList<System.ComponentModel.Component> menuItems,
+                     MenuStrip menuStrip,
                      IList<IQfcTipsDetails> tipsDetailsLabels,
                      IList<IQfcTipsDetails> tipsExpanded,
                      TextBox textboxSearch,
@@ -62,6 +64,8 @@ namespace UtilitiesCS
             _lblSubject = lblSubject;
             _tableLayoutPanels = tableLayoutPanels;
             _buttons = buttons;
+            _menuItems = menuItems;
+            _menuStrip = menuStrip;
             _tipsDetailsLabels = tipsDetailsLabels;
             _tipsExpanded = tipsExpanded;
             _textboxSearch = textboxSearch;
@@ -103,6 +107,8 @@ namespace UtilitiesCS
         private Label _lblSubject;
         private IList<TableLayoutPanel> _tableLayoutPanels;
         private IList<Button> _buttons;
+        private IList<System.ComponentModel.Component> _menuItems;
+        private MenuStrip _menuStrip;
         private IList<IQfcTipsDetails> _tipsDetailsLabels;
         IList<IQfcTipsDetails> _tipsExpanded;
         private TextBox _textboxSearch;
@@ -271,15 +277,15 @@ namespace UtilitiesCS
 
         public void SetQfcTheme(bool async)
         {
-            if (async) { UIThreadExtensions.UiDispatcher.InvokeAsync(() => SetQfcTheme()); }
-            else { UIThreadExtensions.UiDispatcher.Invoke(() => SetQfcTheme()); }
+            if (async) { UiThread.Dispatcher.InvokeAsync(() => SetQfcTheme()); }
+            else { UiThread.Dispatcher.Invoke(() => SetQfcTheme()); }
             //if (async) { _lblSender.BeginInvoke(new System.Action(() => SetQfcTheme())); }
             //else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
         }
         
         public async Task SetQfcThemeAsync()
         {
-            await UIThreadExtensions.UiDispatcher.InvokeAsync(()=> SetQfcTheme());
+            await UiThread.Dispatcher.InvokeAsync(()=> SetQfcTheme());
         }
 
         private void SetQfcTheme()
@@ -318,6 +324,19 @@ namespace UtilitiesCS
                 else { btn.BackColor = ButtonBackColor; }
             }
 
+            foreach (System.ComponentModel.Component menuItem in _menuItems)
+            {
+                if (menuItem is ToolStripMenuItem)
+                {
+                    var item = menuItem as ToolStripMenuItem;
+                    item.BackColor = ButtonBackColor;
+                    //item.ForeColor = ButtonForeColor;
+                }
+            }
+
+            _menuStrip.BackColor = DefaultBackColor;
+            
+            _menuStrip.ForeColor = DefaultForeColor;
             // Colors for the folder search
             // TODO: Override the draw function because these colors do not work as expected
             _textboxSearch.BackColor = TxtboxSearchBackColor;

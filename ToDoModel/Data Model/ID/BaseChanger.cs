@@ -10,7 +10,8 @@ namespace ToDoModel
 {
     public static class BaseChanger
     {
-        public const string ConverterString = "0123456789abcdefghijklmnopqrstuvwxyz";
+        //public const string ConverterString = "0123456789abcdefghijklmnopqrstuvwxyz";
+        public const string ConverterString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private static int _maxBase = ConverterString.Length;
         public static int MaxBase { get => _maxBase; }   
 
@@ -50,11 +51,11 @@ namespace ToDoModel
             while (num >= nbase)
             {
                 r = num % nbase;
-                baseBuilder.Append(ConverterString[(int)r]);
+                baseBuilder.Insert(0, ConverterString[(int)r]);
                 num /= nbase;
             }
 
-            baseBuilder.Append(ConverterString[(int)num]);
+            baseBuilder.Insert(0,ConverterString[(int)num]);
 
             var prependCount = baseBuilder.Length % intMinDigits;
             switch (prependCount)

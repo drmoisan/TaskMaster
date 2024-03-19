@@ -12,10 +12,10 @@ namespace UtilitiesCS
     /// </summary>
     public class OutlookItem
     {
-        private object _item;  // the wrapped Outlook item
-        private Type _type;  // type for the Outlook item 
-        private object[] _args;  // dummy argument array
-        private System.Type _typeOlObjectClass;
+        protected object _item;  // the wrapped Outlook item
+        protected Type _type;  // type for the Outlook item 
+        protected object[] _args;  // dummy argument array
+        protected System.Type _typeOlObjectClass;
 
         #region OutlookItem Constants
 
@@ -66,6 +66,8 @@ namespace UtilitiesCS
         #endregion
 
         #region Constructor
+        protected OutlookItem() { }
+
         public OutlookItem(object item)
         {
             _item = item;
@@ -257,12 +259,12 @@ namespace UtilitiesCS
                     _item,
                     _args);
             }
-            catch (SystemException ex)
+            catch (SystemException)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: CallMethod for {0} Exception: {1} ",
-                    methodName, ex.Message));
+                //Debug.WriteLine(
+                //    string.Format(
+                //    "OutlookItem: CallMethod for {0} Exception: {1} ",
+                //    methodName, ex.Message));
                 throw;
             }
         }
@@ -279,12 +281,12 @@ namespace UtilitiesCS
                     _item,
                     args);
             }
-            catch (SystemException ex)
+            catch (SystemException)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: CallMethod for {0} Exception: {1} ",
-                    methodName, ex.Message));
+                //Debug.WriteLine(
+                //    string.Format(
+                //    "OutlookItem: CallMethod for {0} Exception: {1} ",
+                //    methodName, ex.Message));
                 throw;
             }
         }

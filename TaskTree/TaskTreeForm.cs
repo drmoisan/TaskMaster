@@ -1,29 +1,43 @@
 ﻿using System;
 using System.Collections;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ToDoModel;
 
 namespace TaskTree
 {
-    public partial class TaskTreeForm: Form
+    public partial class TaskTreeForm : Form
     {
-        private TaskTreeController _controller;
+        #region Constructors 
 
         public TaskTreeForm()
         {
-
-            // This call is required by the designer.
             InitializeComponent();
-
-            // Add any initialization after the InitializeComponent() call.
-
+            _context = SynchronizationContext.Current;
+            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
+        
+        #endregion Constructors 
 
+        #region Public Methods and Properties
+
+        private TaskTreeController _controller;
         public void SetController(TaskTreeController Controller)
         {
             _controller = Controller;
         }
+
+        private SynchronizationContext _context;
+        public SynchronizationContext UiSyncContext { get => _context; }
+
+        private TaskScheduler _uiScheduler;
+        public TaskScheduler UiScheduler { get => _uiScheduler; }
+
+        #endregion Public Methods and Properties
+
+        #region Event Handlers
 
         private void TaskTreeForm_Load(object sender, EventArgs e)
         {
@@ -42,35 +56,12 @@ namespace TaskTree
             if (_controller is not null)
                 _controller.HandleModelDropped(sender, e);
         }
-
-        private void MoveObjectsToRoots(TreeListView targetTree, TreeListView sourceTree, IList toMove)
-        {
-            if (_controller is not null)
-                _controller.MoveObjectsToRoots(targetTree, sourceTree, toMove);
-        }
-
-        private void MoveObjectsToSibling(TreeListView targetTree, TreeListView sourceTree, TreeNode<ToDoItem> target, IList toMove, int siblingOffset)
-        {
-
-            if (_controller is not null)
-                _controller.MoveObjectsToSibling(targetTree, sourceTree, target, toMove, siblingOffset);
-        }
-
-        private void MoveObjectsToChildren(TreeListView targetTree, TreeListView sourceTree, TreeNode<ToDoItem> target, IList toMove)
-        {
-
-            if (_controller is not null)
-                _controller.MoveObjectsToChildren(targetTree, sourceTree, target, toMove);
-        }
-
-
-
+                
         private void TLV_ItemActivate(object sender, EventArgs e)
         {
             if (_controller is not null)
-                _controller.TlvActivateItem();
+                _controller.TreeLvActivateItem();
         }
-
 
         private void FormatRow(object sender, FormatRowEventArgs e)
         {
@@ -101,5 +92,8 @@ namespace TaskTree
             if (_controller is not null)
                 _controller.RebuildTreeVisual();
         }
+
+        #endregion Event Handlers
+
     }
 }

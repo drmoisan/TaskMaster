@@ -18,7 +18,7 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(
+                _ = UiThread.Dispatcher.InvokeAsync(
                     () =>
                     {
                         _queue.Enqueue(new EfcViewer());

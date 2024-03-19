@@ -1,7 +1,10 @@
-﻿using Microsoft.VisualBasic;
+﻿using Microsoft.Office.Core;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
 using QuickFiler;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +14,7 @@ using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
@@ -19,7 +23,8 @@ namespace TaskMaster
 
     public class AppAutoFileObjects : IAppAutoFileObjects
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public AppAutoFileObjects(ApplicationGlobals parent)
         {
@@ -39,20 +44,20 @@ namespace TaskMaster
         {
             var tasks = new List<Task> 
             {
-                LoadRecentsListAsync(),
-                LoadCtfMapAsync(),
-                LoadCommonWordsAsync(),
-                LoadSubjectMapAndEncoderAsync(),
-                LoadMovedMailsAsync()
+                //LoadRecentsListAsync(),
+                //LoadCtfMapAsync(),
+                //LoadCommonWordsAsync(),
+                //LoadSubjectMapAndEncoderAsync(),
+                //LoadMovedMailsAsync(),
+                LoadFiltersAsync(),
+                LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
             //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
         }
         
         private bool _sugFilesLoaded = false;
-        private IRecentsList<string> _recentsList;
         private IApplicationGlobals _parent;
-        private CtfMap _ctfMap;
         private ISerializableList<string> _commonWords;
         private Properties.Settings _defaults = Properties.Settings.Default;
 
@@ -110,7 +115,8 @@ namespace TaskMaster
             await Task.Run(() => _movedMails = LoadMovedMails());
         }
 
-        public IRecentsList<string> RecentsList
+        private RecentsList<string> _recentsList;
+        public RecentsList<string> RecentsList
         {
             get
             {
@@ -121,10 +127,10 @@ namespace TaskMaster
             set
             {
                 _recentsList = value;
-                if (_recentsList.Folderpath == "")
+                if (_recentsList.FolderPath == "")
                 {
-                    _recentsList.Folderpath = _parent.FS.FldrPythonStaging;
-                    _recentsList.Filename = Properties.Settings.Default.FileName_Recents;
+                    _recentsList.FolderPath = _parent.FS.FldrPythonStaging;
+                    _recentsList.FileName = Properties.Settings.Default.FileName_Recents;
                 }
                 _recentsList.Serialize();
             }
@@ -133,11 +139,12 @@ namespace TaskMaster
         {   
             await Task.Factory.StartNew(
                 () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
-                default,
+                CancelToken,
                 TaskCreationOptions.None, 
                 TaskScheduler.Current);
         }   
-
+        
+        private CtfMap _ctfMap;
         public CtfMap CtfMap
         {
             get
@@ -154,24 +161,30 @@ namespace TaskMaster
             set
             {
                 _ctfMap = value;
-                if (_ctfMap.Filepath == "")
+                if (_ctfMap.FilePath == "")
                 {
-                    _ctfMap.Folderpath = _parent.FS.FldrPythonStaging;
-                    _ctfMap.Filename = _defaults.File_CTF_Inc;
+                    _ctfMap.FolderPath = _parent.FS.FldrPythonStaging;
+                    _ctfMap.FileName = _defaults.File_CTF_Inc;
                 }
                 _ctfMap.Serialize();
             }
         }
+        public CtfMap LoadCtfMap()
+        {
+            var map = new CtfMap(
+                filename: _defaults.File_CTF_Inc,
+                folderpath: _parent.FS.FldrPythonStaging,
+                backupFilepath: Path.Combine(
+                    _parent.FS.FldrPythonStaging,
+                    _defaults.BackupFile_CTF_Inc),
+                askUserOnError: true);
+            return map;
+        }
         async private Task LoadCtfMapAsync()
         {
             await Task.Factory.StartNew(
-                () => _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc,
-                                           folderpath: _parent.FS.FldrPythonStaging,
-                                           backupFilepath: Path.Combine(
-                                               _parent.FS.FldrPythonStaging,
-                                               _defaults.BackupFile_CTF_Inc),
-                                           askUserOnError: true),
-                default(CancellationToken));
+                () => _ctfMap = LoadCtfMap(),
+                CancelToken);
                 //default,
                 //TaskCreationOptions.None,
                 //PriorityScheduler.BelowNormal);
@@ -215,7 +228,6 @@ namespace TaskMaster
                 //TaskCreationOptions.None,
                 //PriorityScheduler.BelowNormal);
         }
-
         private IList<string> CommonWordsBackupLoader(string filepath)
         {
             string[] cw = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: false);
@@ -224,20 +236,6 @@ namespace TaskMaster
 
         private ISubjectMapEncoder _encoder;
         public ISubjectMapEncoder Encoder => Initialized(_encoder, LoadEncoder);
-        //{ 
-        //    get 
-        //    {
-        //        if (_encoder is null) 
-        //        {
-        //            _encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
-        //                                             folderpath: _parent.FS.FldrPythonStaging,
-        //                                             subjectMap: SubjectMap);
-        //            if (_encoder.Encoder.Count == 0) { _encoder.RebuildEncoding(SubjectMap); }
-        //        }
-                
-        //        return _encoder; 
-        //    }
-        //}
         private ISubjectMapEncoder LoadEncoder()
         {
             var encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
@@ -247,30 +245,38 @@ namespace TaskMaster
             return encoder;
         }
 
-        private ISubjectMapSL _subjectMap;
-        public ISubjectMapSL SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
-        //{
-        //    get
-        //    {
-        //        if (_subjectMap is null)
-        //        {
-        //            _subjectMap = new SubjectMapSL(filename: _defaults.File_Subject_Map,
-        //                                           folderpath: _parent.FS.FldrPythonStaging,
-        //                                           backupLoader: SubjectMapBackupLoader,
-        //                                           backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
-        //                                                                        _defaults.BackupFile_SubjectMap),
-        //                                           askUserOnError: false,
-        //                                           commonWords: CommonWords);
+        
+        private SubjectMapSco _subjectMap;
+        public SubjectMapSco SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
 
-        //            _subjectMap.PropertyChanged += SubjectMap_PropertyChanged;
-        //        }
-        //        return _subjectMap;
-        //    }
-
-        //}
-        private SubjectMapSL LoadSubjectMap()
+        private ObserverHelper<NotifyCollectionChangedEventArgs> _filterObserver;
+        private ScoCollection<FilterEntry> _filters;
+        public ScoCollection<FilterEntry> Filters => Initializer.GetOrLoad(ref _filters, LoadFilters); 
+        private ScoCollection<FilterEntry> LoadFilters()
         {
-            var subMap = new SubjectMapSL(filename: _defaults.File_Subject_Map,
+            var filters = new ScoCollection<FilterEntry>(
+                fileName: _defaults.FileName_Filters,
+                folderPath: _parent.FS.FldrPythonStaging);
+            _filterObserver = new ObserverHelper<NotifyCollectionChangedEventArgs>("FilterObserver", (x)=>Filters.Serialize());
+            filters.Subscribe(_filterObserver);
+            //filters.CollectionChanged += ScoFilterEntry_CollectionChanged;
+            return filters;
+        }
+        async private Task LoadFiltersAsync()
+        {
+            await Task.Factory.StartNew(
+                () => _filters = LoadFilters(),
+                CancelToken);
+        }
+        private void ScoFilterEntry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var collection= (ScoCollection<FilterEntry>)sender;
+            collection.Serialize();
+        }
+
+        private SubjectMapSco LoadSubjectMap()
+        {
+            var subMap = new SubjectMapSco(filename: _defaults.File_Subject_Map,
                                           folderpath: _parent.FS.FldrPythonStaging,
                                           backupLoader: SubjectMapBackupLoader,
                                           backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
@@ -278,14 +284,15 @@ namespace TaskMaster
                                           askUserOnError: false,
                                           commonWords: CommonWords);
 
-            subMap.PropertyChanged += SubjectMap_PropertyChanged;
+            subMap.CollectionChanged += SubjectMap_CollectionChanged;
             return subMap;
         }
+
         async private Task LoadSubjectMapAndEncoderAsync()
         {
             await Task.Factory.StartNew(
                  () => _subjectMap = LoadSubjectMap(),
-                 default(CancellationToken),
+                 CancelToken,
                  TaskCreationOptions.LongRunning,
                  TaskScheduler.Current);
             //default,
@@ -325,28 +332,149 @@ namespace TaskMaster
 
             while (rowQueue.Count > 0)
             {
-                subjectMapEntries.Add(
-                    new SubjectMapEntry(emailFolder: rowQueue.Dequeue(),
-                                        emailSubject: rowQueue.Dequeue(),
-                                        emailSubjectCount: int.Parse(rowQueue.Dequeue()),
-                                        commonWords: CommonWords));
+                string emailFolderPath = "not set"; 
+                string emailSubject = "not set";
+                int emailSubjectCount = -1;
+                try
+                {
+                    emailFolderPath = rowQueue.Dequeue();
+                    emailSubject = rowQueue.Dequeue();
+                    emailSubjectCount = int.Parse(rowQueue.Dequeue());
+                    
+                    subjectMapEntries.Add(
+                        new SubjectMapEntry(
+                            emailFolder: emailFolderPath,
+                            emailSubject: emailSubject,
+                            emailSubjectCount: emailSubjectCount,
+                            commonWords: CommonWords));
+                    
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Error loading subject map from backup file on item \n " +
+                        $"Email Folder: {emailFolderPath} \n" +
+                        $"Email Subject: {emailSubject} \n" +
+                        $"Email Count {emailSubjectCount} \n" +
+                        $"{e.Message}", e);
+                }
             }
             return subjectMapEntries;
         }
         
-        internal void SubjectMap_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        internal void SubjectMap_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            ISubjectMapSL map = (ISubjectMapSL)sender;
-            if (e.PropertyName == "Add")
+            SubjectMapSco map = (SubjectMapSco)sender;
+            
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                var entry = map[map.Count - 1];
+                var entry = map.Last();
                 entry.Encode(Encoder);
             }
-            else if (e.PropertyName == "BackupLoader") 
+            else if (e.Action == NotifyCollectionChangedAction.Reset) 
             {
                 Encoder.RebuildEncoding(map);
             }
         }
 
+        private ScDictionary<string, BayesianClassifierGroup> _manager;
+        public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
+        private ScDictionary<string, BayesianClassifierGroup> LoadManager()
+        {
+            var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
+            var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
+            
+            var local = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrAppData);
+            var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
+           
+            var localSettings = GetSettings(false);
+            var networkSettings = GetSettings(true);
+            
+            var manager = GetManager(local, localSettings);
+            manager.NetDisk = network;
+            manager.NetJsonSettings = networkSettings;
+            manager.LocalDisk = local;
+            manager.LocalJsonSettings = localSettings;
+
+            if (networkDt != default && (localDt == default || networkDt > localDt))
+            {
+                IdleActionQueue.AddEntry(async () =>
+                    await Task.Run(() =>
+                    {
+                        _manager = GetManager(network, networkSettings);
+                        _manager.NetDisk = network;
+                        _manager.NetJsonSettings = networkSettings;
+                        _manager.LocalDisk = local;
+                        _manager.LocalJsonSettings = localSettings;
+                        _manager.ActivateLocalDisk();
+                        IdleActionQueue.AddEntry(() => _manager.Serialize());
+                    }
+                    ));
+            }
+
+            return manager;
+        }
+
+        private JsonSerializerSettings GetSettings(bool compress)
+        {
+            var settings = ScDictionary<string, ClassifierGroup>.GetDefaultSettings();
+            settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            settings.Converters.Add(new AppGlobalsConverter(_parent));
+            if (compress)
+                settings.ContractResolver = new DoNotSerializeContractResolver("Prob","NotMatch");
+            return settings;
+        }
+        
+        private ScDictionary<string, BayesianClassifierGroup> GetManager(
+            FilePathHelper disk, 
+            JsonSerializerSettings settings)
+        {
+            return ScDictionary<string, BayesianClassifierGroup>.Deserialize(
+                fileName: disk.FileName,
+                folderPath: disk.FolderPath,
+                askUserOnError: false,
+                settings: settings);
+        }
+        private async Task LoadManagerAsync()
+        {
+            LoadProgressPane(_tokenSource);
+            await Task.Run(
+                () => _manager = LoadManager(),
+                CancelToken);
+        }
+        public void SaveManagerLocal()
+        {
+            _manager.ActivateLocalDisk();
+            _manager.Serialize();
+        }
+        public void SaveManagerNetwork()
+        {
+            _manager.ActivateNetDisk();
+            _manager.Serialize();
+        }
+
+        private ProgressTrackerPane _progressTracker;
+        public ProgressTrackerPane ProgressTracker => _progressTracker;
+        private Microsoft.Office.Tools.CustomTaskPane _progressPane;
+        public Microsoft.Office.Tools.CustomTaskPane ProgressPane => _progressPane;
+        private void LoadProgressPane(CancellationTokenSource tokenSource)
+        {
+            if (_progressTracker is null)
+            {
+                _progressTracker = new ProgressTrackerPane(tokenSource);
+                _progressPane = Globals.ThisAddIn.CustomTaskPanes.Add(
+                    _progressTracker.ProgressViewer, "Progress Tracker");
+                _progressPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionBottom;
+            }
+        }
+
+        public CancellationTokenSource CancelSource => _tokenSource;
+        private CancellationTokenSource _tokenSource = new();
+        public CancellationToken CancelToken => Initializer.GetOrLoad(ref _token, LoadToken);
+        private CancellationToken _token;
+        private CancellationToken LoadToken()
+        {
+            return _tokenSource.Token;
+        }
+            
     }
 }

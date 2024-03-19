@@ -12,5 +12,6 @@ namespace UtilitiesCS
         string EmailSessionTemp { get; set; }
         string RecentsFile { get; set; }
         string SubjectMap { get; set; }
+        string EmailInfoStagingFile { get; set; }
     }
 }

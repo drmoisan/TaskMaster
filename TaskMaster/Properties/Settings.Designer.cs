@@ -490,5 +490,113 @@ namespace TaskMaster.Properties {
                 this["DarkMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999Filters.json")]
+        public string FileName_Filters {
+            get {
+                return ((string)(this["FileName_Filters"]));
+            }
+            set {
+                this["FileName_Filters"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveAttachments {
+            get {
+                return ((bool)(this["SaveAttachments"]));
+            }
+            set {
+                this["SaveAttachments"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MoveEntireConversations {
+            get {
+                return ((bool)(this["MoveEntireConversations"]));
+            }
+            set {
+                this["MoveEntireConversations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SavePictures {
+            get {
+                return ((bool)(this["SavePictures"]));
+            }
+            set {
+                this["SavePictures"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveEmailCopy {
+            get {
+                return ((bool)(this["SaveEmailCopy"]));
+            }
+            set {
+                this["SaveEmailCopy"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999FilteredFolderScraping.json")]
+        public string FileName_FilteredFolderScraping {
+            get {
+                return ((string)(this["FileName_FilteredFolderScraping"]));
+            }
+            set {
+                this["FileName_FilteredFolderScraping"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999FolderRemap.json")]
+        public string FileName_FolderRemap {
+            get {
+                return ((string)(this["FileName_FolderRemap"]));
+            }
+            set {
+                this["FileName_FolderRemap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("999999ClassifierManager.json")]
+        public string File_ClassifierManager {
+            get {
+                return ((string)(this["File_ClassifierManager"]));
+            }
+            set {
+                this["File_ClassifierManager"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9999999emailInfo.json")]
+        public string FileName_EmailInfoStaging {
+            get {
+                return ((string)(this["FileName_EmailInfoStaging"]));
+            }
+            set {
+                this["FileName_EmailInfoStaging"] = value;
+            }
+        }
     }
 }

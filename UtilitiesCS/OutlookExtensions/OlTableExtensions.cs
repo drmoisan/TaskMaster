@@ -698,7 +698,15 @@ namespace UtilitiesCS
         public static Outlook.Table GetTable(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns)
         {
             if (store is null) { throw new ArgumentNullException(nameof(store)); }
-            var folder = store.GetDefaultFolder(folderEnum);
+            MAPIFolder folder = null;
+            try
+            {
+                folder = store.GetDefaultFolder(folderEnum);
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
             return folder.GetTable(removeColumns: removeColumns, addColumns: addColumns);
         }
 
