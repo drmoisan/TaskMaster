@@ -381,8 +381,8 @@
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
+    <None Include="Resources\9999999CommonWords.json" />
     <None Include="Resources\999999PrefixList.json" />
-    <None Include="TaskMaster_1_TemporaryKey.pfx" />
     <None Include="TaskMaster_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
@@ -433,10 +433,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>726E6B30D8F2BF2B6F031DFF6DEF15C4A8EC0C8D</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>14B8C297F45E127A59AE255CC6747D381479607C</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
