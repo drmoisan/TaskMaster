@@ -47,7 +47,7 @@ namespace TaskMaster
                 //LoadRecentsListAsync(),
                 //LoadCtfMapAsync(),
                 //LoadCommonWordsAsync(),
-                //LoadSubjectMapAndEncoderAsync(),
+                LoadSubjectMapAndEncoderAsync(),
                 //LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
                 LoadManagerAsync(),
@@ -290,24 +290,14 @@ namespace TaskMaster
 
         async private Task LoadSubjectMapAndEncoderAsync()
         {
-            await Task.Factory.StartNew(
+            await Task.Run(
                  () => _subjectMap = LoadSubjectMap(),
-                 CancelToken,
-                 TaskCreationOptions.LongRunning,
-                 TaskScheduler.Current);
-            //default,
-            //TaskCreationOptions.None,
-            //PriorityScheduler.BelowNormal);
-
-            await Task.Factory.StartNew(
+                 CancelToken);
+            
+            await Task.Run(
                  () => _encoder = LoadEncoder(),
-                 default(CancellationToken));
-            //default,
-            //TaskCreationOptions.None,
-            //PriorityScheduler.BelowNormal);
+                 CancelToken);
 
-            //await TaskPriority.Run(
-            //    PriorityScheduler.BelowNormal,
             await Task.Run(
                 () =>
                 {
@@ -328,7 +318,8 @@ namespace TaskMaster
             var subjectMapEntries = new List<SubjectMapEntry>();
 
             string[] fileContents = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: true);
-            var rowQueue = new Queue<string>(fileContents);
+            
+            var rowQueue = fileContents.IsNullOrEmpty() ? new Queue<string>(): new Queue<string>(fileContents);
 
             while (rowQueue.Count > 0)
             {
