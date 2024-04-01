@@ -11,6 +11,9 @@ using System.Diagnostics;
 using Svg;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+using System.Resources;
+using System.Xml.Linq;
+using System.Globalization;
 
 namespace SVGControl
 {
@@ -25,16 +28,10 @@ namespace SVGControl
     public class SvgImageSelector : INotifyPropertyChanged
     {
 
-        public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize, Assembly caller)
-        {
-            
-            _renderer = new SvgRenderer(outer, margin, autoSize);
-            _renderer.PropertyChanged += Renderer_PropertyChanged;
-            Debug.WriteLine("SvgImageSelector Initialized");
-        }
-
+        
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize)
         {
+            ResourceNames = new List<ISvgResource>();
             _renderer = new SvgRenderer(outer, margin, autoSize);
             _renderer.PropertyChanged += Renderer_PropertyChanged;
             Debug.WriteLine("SvgImageSelector Initialized");
@@ -42,6 +39,7 @@ namespace SVGControl
 
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize, bool useDefaultImage)
         {
+            ResourceNames = new List<ISvgResource>();
             _useDefaultImage = useDefaultImage;
             if (useDefaultImage)
             {
@@ -88,26 +86,65 @@ namespace SVGControl
             }
             set
             {
-                if (_relativeImagePath != value)
+                //if (_relativeImagePath != value)
+                //{
+                //    if ((value == "")|(value == "(none)"))
+                //    {
+                //        _relativeImagePath = value;
+                //        if (_useDefaultImage) { SetDefaultImage(); }
+                //        else { _renderer.Document = null; }
+                //    }
+                //    else
+                //    {
+                //        string valueAbs = value.AbsoluteFromURI(GetAnchorPath());
+                //        _renderer.Document = SvgDocument.Open(valueAbs);
+                //        _absoluteImagePath = valueAbs;
+                //        _relativeImagePath = valueAbs.GetRelativeURI(GetAnchorPath());
+                //    }
+                //    NotifyPropertyChanged("ImagePath");
+                //}
+            }
+        }
+
+        private ISvgResource _svgResource = null;
+
+        [Editor(typeof(DropDownEditor), typeof(UITypeEditor))]
+        public ISvgResource ResourceName
+        {
+            get => _svgResource ;
+            
+            set
+            {
+                if (_svgResource != value)
                 {
-                    if ((value == "")|(value == "(none)"))
+                    if (value is null || value.Name == "")
                     {
-                        _relativeImagePath = value;
+                        _svgResource = value;
                         if (_useDefaultImage) { SetDefaultImage(); }
                         else { _renderer.Document = null; }
                     }
                     else
                     {
-                        string valueAbs = value.AbsoluteFromURI(GetAnchorPath());
-                        _renderer.Document = SvgDocument.Open(valueAbs);
-                        _absoluteImagePath = valueAbs;
-                        _relativeImagePath = valueAbs.GetRelativeURI(GetAnchorPath());
+                        _svgResource = value;
+                        _renderer.Document = SvgRenderer.GetSvgDocument(value.Data);
                     }
-                    NotifyPropertyChanged("ImagePath");
+                    NotifyPropertyChanged("ResourceName");
                 }
+                //_svgResource = value;
             }
         }
-        
+
+        //private List<string> _resourceNames;
+
+        [Browsable(false)]
+        public List<ISvgResource> ResourceNames { get; private set; }
+
+        public void AddResource(ISvgResource resource)
+        {
+            if (!ResourceNames.Contains(resource))
+            ResourceNames.Add(resource);
+        }
+
         [DefaultValue(AutoSize.MaintainAspectRatio)]
         public AutoSize AutoSize { get => _renderer.AutoSize; set => _renderer.AutoSize = value; }
         

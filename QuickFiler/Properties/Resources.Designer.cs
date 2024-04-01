@@ -392,6 +392,16 @@ namespace QuickFiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Run1 {
+            get {
+                object obj = ResourceManager.GetObject("Run1", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] SolutionFolderSwitch {
             get {
                 object obj = ResourceManager.GetObject("SolutionFolderSwitch", resourceCulture);
