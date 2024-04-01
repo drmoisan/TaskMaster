@@ -372,6 +372,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\BayesianPerformanceViewer.resx">
       <DependentUpon>BayesianPerformanceViewer.cs</DependentUpon>
@@ -418,7 +419,6 @@
     <Content Include="Resources\NewFolder.svg" />
     <Content Include="Resources\QuickFind.png" />
     <Content Include="Resources\QuickFind.svg" />
-    <Content Include="Resources\QuickRefresh.png" />
     <Content Include="Resources\QuickRefresh.svg" />
     <None Include="Resources\Forward4.afdesign" />
     <None Include="Resources\Reply.afdesign" />

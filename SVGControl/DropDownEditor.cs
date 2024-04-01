@@ -45,9 +45,16 @@ namespace SVGControl
             var assemblyName = asm.GetName().Name;
             var rm = new ResourceManager($"{assemblyName}.Properties.Resources", asm);
             var rset = rm.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
-            
+
+
+            var entries2 = rset.Cast<System.Collections.DictionaryEntry>()
+                              .OrderBy(x => x.Key)
+                              .Select(x => new KeyValuePair<string,object>((string)x.Key, x.Value))
+                              .ToList();
+
             var entries = rset.Cast<System.Collections.DictionaryEntry>()
                               .Where(x => x.Value is byte[])
+                              .OrderBy(x => x.Key)
                               .Select(x => new SvgResource((string)x.Key, (byte[])x.Value))
                               .ToList();
 
@@ -55,10 +62,10 @@ namespace SVGControl
             // this is how we get the list of possible benchmarks
             SvgImageSelector imageSelector = (SvgImageSelector)context.Instance;
 
-            foreach (var entry in entries)
-            {
-                imageSelector.AddResource(entry);
-            }
+            //foreach (var entry in entries)
+            //{
+            //    imageSelector.AddResource(entry);
+            //}
             
             //var names = rset.Cast<System.Collections.DictionaryEntry>()
             //                .Where(x => x.Value is byte[])
@@ -75,10 +82,12 @@ namespace SVGControl
             // use the IBenchmark.Name property for list box display
             lb.DisplayMember = "Name";
 
-            
+
             //foreach (string resourceName in names)
             //foreach (string resourceName in imageSelector.ResourceNames)
-            foreach (ISvgResource resourceName in imageSelector.ResourceNames)
+            lb.Items.Clear();
+            //foreach (ISvgResource resourceName in imageSelector.ResourceNames)
+            foreach (ISvgResource resourceName in entries)
             {
                 // we store benchmarks objects directly in the listbox
                 int index = lb.Items.Add(resourceName);

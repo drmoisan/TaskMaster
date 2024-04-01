@@ -27,8 +27,8 @@ namespace SVGControl
                     return "(none)";
                 else
                 {
-                    System.Collections.DictionaryEntry benchmark = (System.Collections.DictionaryEntry)value;
-                    return benchmark.Key;
+                    ISvgResource resource = (ISvgResource)value;
+                    return resource.Name;
                 }
             }
             return "(none)";
