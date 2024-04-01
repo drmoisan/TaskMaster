@@ -13,10 +13,12 @@ namespace SVGControl
 
         public ButtonSVG()
         {
+            var caller = System.Reflection.Assembly.GetCallingAssembly();
             InitializeComponent();
             _imageSVG = new SvgImageSelector(base.Size,
                                              new Padding(3),
-                                             SVGControl.AutoSize.MaintainAspectRatio);
+                                             SVGControl.AutoSize.MaintainAspectRatio,
+                                             caller);
             _imageSVG.PropertyChanged += ImageSVG_PropertyChanged;
             this.Resize += ButtonSVG_Resize;
         }

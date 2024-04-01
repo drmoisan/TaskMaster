@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Diagnostics;
 using Svg;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace SVGControl
 {
@@ -23,6 +24,15 @@ namespace SVGControl
     [TypeConverter(typeof(SvgOptionsConverter))]
     public class SvgImageSelector : INotifyPropertyChanged
     {
+
+        public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize, Assembly caller)
+        {
+            
+            _renderer = new SvgRenderer(outer, margin, autoSize);
+            _renderer.PropertyChanged += Renderer_PropertyChanged;
+            Debug.WriteLine("SvgImageSelector Initialized");
+        }
+
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize)
         {
             _renderer = new SvgRenderer(outer, margin, autoSize);
@@ -48,9 +58,11 @@ namespace SVGControl
         //private SvgDocument _doc;
         private string _relativeImagePath;
         private string _absoluteImagePath;
+        private string _anchorPath;
         private bool _saveRendering = false;
         private bool _useDefaultImage = false;
         private SvgRenderer _renderer;
+        private Control _parent;
         internal String AboluteImagePath
         {
             get { return _absoluteImagePath; }
@@ -193,7 +205,12 @@ namespace SVGControl
         {
             //string workingDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
             //Debug.WriteLine("System.AppDomain.CurrentDomain.BaseDirectory is " + workingDirectory);
-            //var resrcs = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            //var assmbly = System.Reflection.Assembly.GetExecutingAssembly();
+            //var location = assmbly.Location;
+            
+            //var resrcs = assmbly.GetManifestResourceNames();
+            
+            
             string workingDirectory = Environment.CurrentDirectory;
             List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
             if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))

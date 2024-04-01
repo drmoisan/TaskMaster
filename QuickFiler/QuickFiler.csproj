@@ -405,7 +405,9 @@
     <Content Include="Resources\Cancel.svg" />
     <None Include="Resources\CheckBoxChecked.png" />
     <Content Include="Resources\Close.png" />
-    <Content Include="Resources\Close.svg" />
+    <Resource Include="Resources\Close.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\DatabaseModelRefresh.svg" />
     <Content Include="Resources\DatabaseRunning.svg" />
     <Content Include="Resources\Delete.png" />
@@ -415,11 +417,15 @@
     <Content Include="Resources\FlagDarkRed.svg" />
     <None Include="Resources\Forward1.png" />
     <Content Include="Resources\NewFolder.png" />
-    <Content Include="Resources\NewFolder.svg" />
+    <Resource Include="Resources\NewFolder.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\QuickFind.png" />
     <Content Include="Resources\QuickFind.svg" />
     <Content Include="Resources\QuickRefresh.png" />
-    <Content Include="Resources\QuickRefresh.svg" />
+    <Resource Include="Resources\QuickRefresh.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <None Include="Resources\Forward4.afdesign" />
     <None Include="Resources\Reply.afdesign" />
     <None Include="Resources\Reply.svg" />
