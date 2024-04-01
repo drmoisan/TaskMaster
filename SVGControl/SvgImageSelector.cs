@@ -5,17 +5,10 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms.Design;
 using System.Windows.Forms;
 using System.Drawing;
-using System.Windows.Forms.VisualStyles;
-using System.Drawing.Printing;
 using System.Diagnostics;
 using Svg;
-using Fizzler;
-using System.Globalization;
-using System.Diagnostics.Eventing.Reader;
 using System.Runtime.CompilerServices;
 
 namespace SVGControl

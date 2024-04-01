@@ -83,7 +83,7 @@ namespace SVGControl
 
         public static string AbsoluteFromURI(this string uriToMakeAbsolute, string anchorPath)
         {
-            if (uriToMakeAbsolute.StartsWith("./"))
+            if (uriToMakeAbsolute.StartsWith("./") || uriToMakeAbsolute.StartsWith("../"))
             {
                 anchorPath = NormalizeFolderpath(anchorPath);
                 string relativePath = uriToMakeAbsolute;

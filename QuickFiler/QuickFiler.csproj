@@ -430,7 +430,9 @@
     <None Include="Resources\ReplyAll.png" />
     <None Include="Resources\Reply.png" />
     <Content Include="Resources\Run.png" />
-    <Content Include="Resources\Run.svg" />
+    <Resource Include="Resources\Run.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <None Include="Resources\SolutionFolderSwitch.svg" />
     <None Include="Resources\SolutionFolderSwitch.png" />
     <Content Include="Resources\TextBlock.png" />
