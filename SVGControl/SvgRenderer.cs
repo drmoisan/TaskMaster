@@ -183,8 +183,14 @@ namespace SVGControl
         public static SvgDocument GetSvgDocument(byte[] file)
         {
             Stream stream = new MemoryStream(file);
-            SvgDocument document = SvgDocument.Open<SvgDocument>(stream);
-            return document;
+            try
+            {
+                return SvgDocument.Open<SvgDocument>(stream);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         #region EventHandlers

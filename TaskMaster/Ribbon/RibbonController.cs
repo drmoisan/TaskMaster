@@ -268,7 +268,6 @@ namespace TaskMaster
             return System.Drawing.Image.FromHbitmap((IntPtr)disp.Handle, (IntPtr)disp.hPal);
         }
         
-
         internal void TryLoadFolderFilter()
         {
             var filter = new FilterOlFoldersController(_globals);
