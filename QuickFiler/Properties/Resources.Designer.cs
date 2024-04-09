@@ -91,12 +91,12 @@ namespace QuickFiler.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static System.Drawing.Bitmap Cancel {
+        internal static byte[] Cancel1 {
             get {
-                object obj = ResourceManager.GetObject("Cancel", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("Cancel1", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
@@ -240,6 +240,16 @@ namespace QuickFiler.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] NewFolder2 {
+            get {
+                object obj = ResourceManager.GetObject("NewFolder2", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap QuickFind {
@@ -260,22 +270,12 @@ namespace QuickFiler.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static System.Drawing.Bitmap QuickRefresh {
+        internal static byte[] QuickRefresh {
             get {
                 object obj = ResourceManager.GetObject("QuickRefresh", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap QuickRefresh1 {
-            get {
-                object obj = ResourceManager.GetObject("QuickRefresh1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((byte[])(obj));
             }
         }
         
@@ -386,6 +386,16 @@ namespace QuickFiler.Properties {
             get {
                 object obj = ResourceManager.GetObject("Run", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Run1 {
+            get {
+                object obj = ResourceManager.GetObject("Run1", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

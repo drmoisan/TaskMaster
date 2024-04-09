@@ -32,8 +32,8 @@
             // 
             // ButtonSVG
             // 
-            this.Name = "ButtonSVG";
             this.Size = new System.Drawing.Size(150, 69);
+            this.ParentChanged += new System.EventHandler(this.ButtonSVG_ParentChanged);
             this.ResumeLayout(false);
 
         }
