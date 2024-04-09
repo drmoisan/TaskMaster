@@ -56,11 +56,10 @@ namespace SVGControl
         //private SvgDocument _doc;
         private string _relativeImagePath;
         private string _absoluteImagePath;
-        private string _anchorPath;
         private bool _saveRendering = false;
         private bool _useDefaultImage = false;
         private SvgRenderer _renderer;
-        private Control _parent;
+        
         internal String AboluteImagePath
         {
             get { return _absoluteImagePath; }
