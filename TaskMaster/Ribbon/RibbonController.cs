@@ -416,6 +416,11 @@ namespace TaskMaster
             await performance.InvestigatePerformance();
         }
 
+        internal void PopulateUdf()
+        {
+            FlagTasks.PopulateUdf(null, _globals.Ol.App.ActiveExplorer());
+        }
+
         #endregion BayesianPerformance
     }
 }

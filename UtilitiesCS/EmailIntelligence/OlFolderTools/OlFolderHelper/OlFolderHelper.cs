@@ -67,10 +67,20 @@ namespace UtilitiesCS
         
         public void InitializeFromEmail(object objItem) //internal
         {
-            var OlMail = MailResolution.TryResolveMailItem(objItem);
-            if (OlMail is null) { throw new ArgumentException("Constructor Requires the Email Object to be passed as MailItem to use this flag"); }
-            
-            FromFolderKey(OlMail);
+            if (objItem is null) { throw new ArgumentException("Cannot initialize suggestions from email because reference is null"); }
+            else if (objItem is MailItemHelper) 
+            {                 
+                var mailInfo = (MailItemHelper)objItem;
+                FromFolderKey(mailInfo);
+            }
+            else if (objItem is MailItem && MailResolution.TryResolveMailItem(objItem) is not null)
+            {
+                FromFolderKey((MailItem)objItem);
+            }
+            else
+            {
+                throw new ArgumentException($"Obj is of type {objItem.GetType().Name}, but selected option requires a MailItem or MailItemHelper");
+            }
         }
 
         public void FromArrayOrString(object obj)
@@ -103,7 +113,15 @@ namespace UtilitiesCS
                 Suggestions.RefreshSuggestions(olMail: olMail, appGlobals: _globals);
             }
         }
-        
+
+        public void FromFolderKey(MailItemHelper mailInfo)//internal
+        {
+            if (!Suggestions.LoadFromField(mailInfo, _globals))
+            {
+                Suggestions.RefreshSuggestions(mailInfo: mailInfo, appGlobals: _globals);
+            }
+        }
+
         #endregion
 
         #region Private Fields

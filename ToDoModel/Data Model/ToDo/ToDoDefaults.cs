@@ -23,6 +23,8 @@ namespace ToDoModel
             DefaultTaskLength = Properties.Settings.Default.Default_Task_Length;
         }
 
+        public static ToDoDefaults Instance { get; } = new ToDoDefaults();
+
         public int DefaultTaskLength { get; private set; }
 
         public List<IPrefix> PrefixList { get; private set; }

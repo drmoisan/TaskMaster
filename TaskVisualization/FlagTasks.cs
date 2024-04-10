@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic.CompilerServices;
@@ -25,7 +26,7 @@ namespace TaskVisualization
         private readonly TaskController _controller;
         private readonly ToDoDefaults _defaultsToDo = new ToDoDefaults();
         private readonly AutoAssign _autoAssign;
-        private readonly TaskController.FlagsToSet _flagsToSet;
+        private readonly Enums.FlagsToSet _flagsToSet;
         private readonly IApplicationGlobals _globals;
         private string _userEmailAddress;
 
@@ -34,7 +35,7 @@ namespace TaskVisualization
         {
             _globals = AppGlobals;
             _olExplorer = AppGlobals.Ol.App.ActiveExplorer();
-            _todoSelection = InitializeToDoList(ItemList);
+            _todoSelection = InitializeToDoList(ItemList, _olExplorer);
             _flagsToSet = GetFlagsToSet(_todoSelection.Count);
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
@@ -59,52 +60,58 @@ namespace TaskVisualization
                 return DialogResult.None;
         }
 
-        private List<ToDoItem> InitializeToDoList(IList ItemList)
+        public static List<ToDoItem> InitializeToDoList(IList itemList, Explorer olExplorer)
         {
-            if (ItemList is null)
-                ItemList = GetSelection();
+            itemList ??= GetSelection(olExplorer);
             var ToDoSelection = new List<ToDoItem>();
-            foreach (var ObjItem in ItemList)
+            foreach (var objItem in itemList)
             {
                 ToDoItem tmpToDo;
-                if (ObjItem is MailItem)
+                if (objItem is MailItem)
                 {
-                    MailItem OlMail = (MailItem)ObjItem;
-                    tmpToDo = new ToDoItem(OlMail);
+                    MailItem olMail = (MailItem)objItem;
+                    tmpToDo = new ToDoItem(olMail);
                 }
-                else if (ObjItem is TaskItem)
+                else if (objItem is TaskItem)
                 {
-                    TaskItem OlTask = (TaskItem)ObjItem;
-                    tmpToDo = new ToDoItem(OlTask);
+                    TaskItem olTask = (TaskItem)objItem;
+                    tmpToDo = new ToDoItem(olTask);
                 }
                 else
                 {
-                    tmpToDo = new ToDoItem(ObjItem, OnDemand: true);
+                    tmpToDo = new ToDoItem(objItem, OnDemand: true);
                 }
                 ToDoSelection.Add(tmpToDo);
             }
             return ToDoSelection;
         }
 
-        /// <summary>
-    /// Adds the Selection from the ActiveExplorer to a new Collection
-    /// </summary>
-    /// <returns>Collection of Outlook Items</returns>
-        private IList GetSelection()
-        {
-            var ItemList = new List<object>();
-            foreach (var obj in _olExplorer.Selection)
-                ItemList.Add(obj);
-            return ItemList;
+        public static void PopulateUdf(IList itemList, Explorer olExplorer) 
+        { 
+            var toDoSelection = InitializeToDoList(itemList, olExplorer);
+            var flagsToSet = GetFlagsToSet(toDoSelection.Count);
+            toDoSelection.ForEach(x => x.WriteFlagsBatch(flagsToSet));
         }
 
-        private TaskController.FlagsToSet GetFlagsToSet(int selectionCount)
+        /// <summary>
+        /// Adds the Selection from the ActiveExplorer to a new Collection
+        /// </summary>
+        /// <returns>Collection of Outlook Items</returns>
+        private static IList GetSelection(Explorer olExplorer)
+        {
+            var itemList = new List<object>();
+            foreach (var obj in olExplorer.Selection)
+                itemList.Add(obj);
+            return itemList;
+        }
+
+        private static Enums.FlagsToSet GetFlagsToSet(int selectionCount)
         {
             if (selectionCount > 1)
             {
 
-                TaskController.FlagsToSet[] excludedMembers = new[] { TaskController.FlagsToSet.all, TaskController.FlagsToSet.none };
-                var symbolsDict = Enum.GetValues(typeof(TaskController.FlagsToSet)).Cast<TaskController.FlagsToSet>().ToList().AsEnumerable().Where(x => excludedMembers.Contains(x) == false).Select(x => x).ToDictionary(x => Enum.GetName(typeof(TaskController.FlagsToSet), x), x => x);
+                Enums.FlagsToSet[] excludedMembers = new[] { Enums.FlagsToSet.all, Enums.FlagsToSet.none };
+                var symbolsDict = Enum.GetValues(typeof(Enums.FlagsToSet)).Cast<Enums.FlagsToSet>().ToList().AsEnumerable().Where(x => excludedMembers.Contains(x) == false).Select(x => x).ToDictionary(x => Enum.GetName(typeof(Enums.FlagsToSet), x), x => x);
 
 
 
@@ -118,7 +125,13 @@ namespace TaskVisualization
 
                 using (var optionsViewer = new TagViewer())
                 {
-                    var flagController = new TagController(viewerInstance: optionsViewer, dictOptions: symbolSelectionDict, autoAssigner: null, prefixes: _defaultsToDo.PrefixList, userEmailAddress: _userEmailAddress);
+                    var flagController = new TagController(
+                        viewerInstance: optionsViewer, 
+                        dictOptions: symbolSelectionDict, 
+                        autoAssigner: null, 
+                        prefixes: ToDoDefaults.Instance.PrefixList,
+                        userEmailAddress: "UnusedFieldDiscardText");
+
                     optionsViewer.ShowDialog();
                     if (flagController.ExitType != "Cancel")
                     {
@@ -127,24 +140,24 @@ namespace TaskVisualization
                 }
                 if (listSelections.Count == 0)
                 {
-                    return TaskController.FlagsToSet.all;
+                    return Enums.FlagsToSet.all;
                 }
                 else
                 {
-                    TaskController.FlagsToSet flag;
+                    Enums.FlagsToSet flag;
                     var flagsList = (from x in listSelections
                                      where Enum.TryParse(x, out flag)
-                                     select Enum.Parse(typeof(TaskController.FlagsToSet), x)).ToList().OfType<TaskController.FlagsToSet>();
-                    // Dim flagsList2 = flagsList.OfType(Of TaskController.FlagsToSet)()
+                                     select Enum.Parse(typeof(Enums.FlagsToSet), x)).ToList().OfType<Enums.FlagsToSet>();
+                    // Dim flagsList2 = flagsList.OfType(Of Enums.FlagsToSet)()
                     // Dim flagsList = (From x In symbolsDict Where listSelections.Contains(x.Key) Select x.Value).ToList()
-                    // Dim selectedFlags As TaskController.FlagsToSet = GenericBitwise(Of TaskController.FlagsToSet).And(flagsList)
-                    TaskController.FlagsToSet selectedFlags = (TaskController.FlagsToSet)Conversions.ToInteger(GenericBitwiseStatic<TaskController.FlagsToSet>.Or(flagsList));
+                    // Dim selectedFlags As Enums.FlagsToSet = GenericBitwise(Of Enums.FlagsToSet).And(flagsList)
+                    Enums.FlagsToSet selectedFlags = (Enums.FlagsToSet)Conversions.ToInteger(GenericBitwiseStatic<Enums.FlagsToSet>.Or(flagsList));
                     return selectedFlags;
                 }
             }
             else
             {
-                return TaskController.FlagsToSet.all;
+                return Enums.FlagsToSet.all;
             }
         }
 

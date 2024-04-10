@@ -602,7 +602,6 @@ namespace QuickFiler.Controllers
             //}
         }
 
-
         internal void LoadUserSettings()
         {
             _saveAttachments = Settings.Default.SaveAttachments;
@@ -622,7 +621,7 @@ namespace QuickFiler.Controllers
         {
             await _dataModel.InitFolderHandlerAsync(folderList);
 
-            await _formViewer.UiSyncContext;
+            //await _formViewer.UiSyncContext;
 
             _formViewer.FolderListBox.DataSource = _dataModel.FolderHelper.FolderArray;
             if (_formViewer.FolderListBox.Items.Count > 0)

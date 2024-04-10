@@ -146,11 +146,19 @@ namespace ToDoModel
             strFilter = "@SQL=" + objView.Filter;
 
             var stores = Application.Session.Stores.Cast<Store>();
-            var result = stores.Select(store =>
+            var result = stores.Where(store => store.ExchangeStoreType != OlExchangeStoreType.olExchangePublicFolder).Select(store =>
             {
-                var folder = (Folder)store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
-                var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
-                return olObjects.Cast<object>().Select(x => new OutlookItem(x)).ToList();
+                try
+                {
+                    var folder = (Folder)store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+                    var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
+                    return olObjects.Cast<object>().Select(x => new OutlookItem(x)).ToList();
+                }
+                catch (System.Exception)
+                {
+                    return new List<OutlookItem>();
+                }
+                
             }).SelectMany(x=>x).ToList();
             
             return result;

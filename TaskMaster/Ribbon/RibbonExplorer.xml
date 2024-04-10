@@ -16,6 +16,7 @@
                         <button id="BtnCompressIDs" imageMso="ReviewCombineRevisions" onAction="BtnCompressIDs_Click" label="Compress IDs" />
                         <button id="BtnHookToggle" imageMso="PositionAbsoluteMarks" onAction="BtnHookToggle_Click" getLabel="GetHookButtonText" />
                         <button id="BtnMigrateIDs" onAction="BtnMigrateIDs_Click" label="MigrateToDoIDs" />
+                        <button id ="BtnPopulateUdf" onAction="BtnPopulateUdf_Click" label ="Populate User Defined Fields"/>
                     </menu>
                 </group>
             </tab>

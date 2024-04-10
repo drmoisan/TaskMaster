@@ -61,7 +61,7 @@ namespace TaskMaster
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
             // Hook the Inbox and ToDo events
-            //_globals.Events.Hook();
+            _globals.Events.Hook();
             
             await loadGlobals;
 

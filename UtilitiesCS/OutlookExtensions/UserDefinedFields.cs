@@ -177,7 +177,7 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="value">Value to assign to the user defined field</param>
         /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
         /// <returns>true if successful. false if unsuccessful</returns>
-        public static bool SetUdf(this OutlookItem item,
+        public static bool TrySetUdf(this OutlookItem item,
                                   string udfName,
                                   object value,
                                   OlUserPropertyType olUdfType = OlUserPropertyType.olText)
@@ -188,6 +188,13 @@ namespace UtilitiesCS.OutlookExtensions
                 UserProperty property = item.UserProperties.Find(udfName);
                 if (property is null)
                     property = item.UserProperties.Add(udfName, olUdfType);
+                else if (property.Type != olUdfType)
+                {
+                    var index = item.UserProperties.Cast<UserProperty>().ToList().IndexOf(property);
+                    item.UserProperties.Remove(index + 1);
+                    property = item.UserProperties.Add(udfName, olUdfType);
+                }
+                
                 property.Value = value;
                 item.Save();
                 return true;
@@ -200,6 +207,38 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
+        /// <summary>
+        /// Extension function to set a user defined property on an Outlook item of unknown type. 
+        /// </summary>
+        /// <param name="item">Outlook item. Supported types include MailItem, TaskItem, 
+        /// AppointmentItem, and MeetingItem.</param>
+        /// <param name="udfName">Name of the user defined field</param>
+        /// <param name="value">Value to assign to the user defined field</param>
+        /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
+        /// <returns>true if successful. false if unsuccessful</returns>
+        public static void SetUdf(this OutlookItem item,
+                                  string udfName,
+                                  object value,
+                                  OlUserPropertyType olUdfType = OlUserPropertyType.olText)
+        {
+            if (!ValidPropertyArgs(value, olUdfType)) 
+            {
+                throw new ArgumentException($"Argument {nameof(value)}={value} " +
+                    $"is of type {value.GetType()} which is not assignable to type {olUdfType}.");
+            }
+            UserProperty property = item.UserProperties.Find(udfName);
+            if (property is null)
+                property = item.UserProperties.Add(udfName, olUdfType);
+            else if (property.Type != olUdfType)
+            {
+                var index = item.UserProperties.Cast<UserProperty>().ToList().IndexOf(property);
+                item.UserProperties.Remove(index + 1);
+                property = item.UserProperties.Add(udfName, olUdfType);
+            }
+
+            property.Value = value;
+            item.Save();
+        }
         private static Dictionary<OlUserPropertyType, Type> udfTypeLookup = new Dictionary<OlUserPropertyType, Type> 
         {
             {OlUserPropertyType.olText, typeof(string)},
@@ -207,7 +246,7 @@ namespace UtilitiesCS.OutlookExtensions
             {OlUserPropertyType.olDateTime, typeof(DateTime) },
             {OlUserPropertyType.olYesNo, typeof(bool) },
             {OlUserPropertyType.olDuration, typeof(double) },
-            {OlUserPropertyType.olKeywords, typeof(string) },
+            {OlUserPropertyType.olKeywords, typeof(string[]) },
             {OlUserPropertyType.olPercent, typeof(double) },
             {OlUserPropertyType.olCurrency, typeof(decimal) },
             {OlUserPropertyType.olFormula, typeof(string) },
@@ -246,9 +285,10 @@ namespace UtilitiesCS.OutlookExtensions
             Type valueType = value.GetType();
             if (destinationType.IsAssignableFrom(valueType)) { return true; }
             else 
-            {
-                string msg = $"Argument {nameof(value)} is of type {valueType} " +
-                        $"which is not assignable to {olUdfType} which is of type {destinationType.ToString()}";
+            {                
+                string msg = $"Argument {nameof(value)}={value} is of type {valueType} " +
+                        $"which is not assignable to {olUdfType} which is of type {destinationType}." +
+                        $"Stack Trace: {TraceUtility.GetMyTraceString(new StackTrace())}";
                 Debug.WriteLine(msg);
                 return false;
             }
@@ -411,7 +451,7 @@ namespace UtilitiesCS.OutlookExtensions
                                   OlUserPropertyType olUdfType = OlUserPropertyType.olText)
         {
             var olItem = new OutlookItem(item);
-            return olItem.SetUdf(udfName, value, olUdfType);
+            return olItem.TrySetUdf(udfName, value, olUdfType);
         }
 
         /// <summary>

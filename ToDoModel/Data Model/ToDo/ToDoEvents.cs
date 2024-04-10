@@ -497,7 +497,7 @@ namespace ToDoModel
                     {
                         string strToDoIDnew = SubstituteCharsInID(strToDoID);
                         item.ToDoID = strToDoIDnew;
-                        item.OlItem.SetUdf("NewID", value: "20230606");
+                        item.OlItem.TrySetUdf("NewID", value: "20230606");
                     }
                 }
                 i++;

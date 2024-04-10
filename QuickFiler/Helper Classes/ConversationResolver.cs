@@ -194,7 +194,7 @@ namespace QuickFiler.Helper_Classes
             //TaskScheduler priority = backgroundLoad ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
             TaskCreationOptions options = backgroundLoad ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
 
-            await Task.Factory.StartNew(() => ConversationItems = LoadConversationItems(),
+            await Task.Run(() => ConversationItems = LoadConversationItems(),
                                         token);//,
                                         //options,
                                         //priority);

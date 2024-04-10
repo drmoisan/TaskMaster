@@ -30,7 +30,6 @@ namespace QuickFiler
             {
                 _initType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
                 _stopWatch = new Stopwatch();
-                //_formViewer = new EfcViewer();
                 _formViewer = EfcViewerQueue.Dequeue();
                 _uiSyncContext = _formViewer.UiSyncContext;
                 _keyboardHandler = new KeyboardHandler(_formViewer, this);

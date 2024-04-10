@@ -158,7 +158,7 @@ namespace ToDoModel
                     string todoOld = row["ToDoID"].ToString();
                     string todoNew = todoOld.Replace(oldPrefix, newPrefix);
                     var item = new OutlookItem(_olApp.Session.GetItemFromID(entryID, storeID));
-                    item.SetUdf("ToDoID", todoNew);
+                    item.TrySetUdf("ToDoID", todoNew);
                     this.Remove(todoOld);
                     this.Add(todoNew);
                 }

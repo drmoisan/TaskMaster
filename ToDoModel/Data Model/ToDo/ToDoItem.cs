@@ -218,13 +218,33 @@ namespace ToDoModel
         {
             _olItem.Categories = _flags.Combine();
             
-            _olItem.SetUdf("TagContext", Context.AsStringNoPrefix, OlUserPropertyType.olKeywords);
-            _olItem.SetUdf("TagPeople", People.AsStringNoPrefix,OlUserPropertyType.olKeywords);
+            _olItem.TrySetUdf("TagContext", Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            _olItem.TrySetUdf("TagPeople", People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
             // TODO: Assign ToDoID if project assignment changes
             // TODO: If ID exists and project reassigned, move any _children
-            _olItem.SetUdf("TagProject", Projects.AsStringNoPrefix, OlUserPropertyType.olKeywords);
-            _olItem.SetUdf("TagTopic", Topics.AsStringNoPrefix, OlUserPropertyType.olKeywords);
-            _olItem.SetUdf("KB", _flags.GetKb(false));
+            _olItem.TrySetUdf("TagProject", Projects.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            _olItem.TrySetUdf("TagTopic", Topics.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            _olItem.TrySetUdf("KB", _flags.GetKb(false));
+        }
+
+        public void WriteFlagsBatch(Enums.FlagsToSet flagsToSet)
+        {            
+            //_olItem.Categories = _flags.Combine();
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.context))
+                _olItem.SetUdf("TagContext", Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.people))
+                _olItem.SetUdf("TagPeople", People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            // TODO: Assign ToDoID if project assignment changes
+            // TODO: If ID exists and project reassigned, move any _children
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.projects))
+            {
+                _olItem.SetUdf("TagProject", Projects.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+                _olItem.SetUdf("TagProgram", TagProgram, OlUserPropertyType.olText);
+            }
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.topics))
+                _olItem.SetUdf("TagTopic", Topics.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.kbf))
+                _olItem.SetUdf("KB", _flags.GetKb(false));
         }
 
         #region Public Properties
@@ -426,7 +446,7 @@ namespace ToDoModel
                 {
                     if (_olItem is not null)
                     {
-                        _olItem.SetUdf("TagProgram", value, OlUserPropertyType.olKeywords);
+                        _olItem.TrySetUdf("TagProgram", value, OlUserPropertyType.olText);
                     }
                 }
             }
@@ -508,7 +528,7 @@ namespace ToDoModel
         public string ToDoID
         {
             get => GetOrLoad(ref _toDoID, () => _olItem.GetUdfString("ToDoID"), _olItem);
-            set => SetAndSave(ref _toDoID, value, (x) => { _olItem.SetUdf("ToDoID", x); SplitID(); });
+            set => SetAndSave(ref _toDoID, value, (x) => { _olItem.TrySetUdf("ToDoID", x); SplitID(); });
         }
         
         // _VisibleTreeState
@@ -537,7 +557,7 @@ namespace ToDoModel
         }
         private void VisibleTreeSetAndSaver(int value)
         {
-            SetAndSave(ref _visibleTreeState, value, (x) => { _olItem.SetUdf("VTS", x, OlUserPropertyType.olInteger); SplitID(); });
+            SetAndSave(ref _visibleTreeState, value, (x) => { _olItem.TrySetUdf("VTS", x, OlUserPropertyType.olInteger); SplitID(); });
         }
 
         public bool ActiveBranch
@@ -554,7 +574,7 @@ namespace ToDoModel
                     }
                     else
                     {
-                        _olItem.SetUdf("AB", true, OlUserPropertyType.olYesNo);
+                        _olItem.TrySetUdf("AB", true, OlUserPropertyType.olYesNo);
                         _activeBranch = true;
                     }
 
@@ -566,7 +586,7 @@ namespace ToDoModel
                 _activeBranch = value;
                 if (!_readonly)
                 {
-                    _olItem?.SetUdf("AB", value, OlUserPropertyType.olYesNo);
+                    _olItem?.TrySetUdf("AB", value, OlUserPropertyType.olYesNo);
                 }
             }
         }
@@ -597,7 +617,7 @@ namespace ToDoModel
             {
                 _EC2 = value;
                 if (!_readonly)
-                    _olItem.SetUdf("EC2", value, OlUserPropertyType.olYesNo);
+                    _olItem.TrySetUdf("EC2", value, OlUserPropertyType.olYesNo);
                 _expandChildren = "";
                 _expandChildrenState = "";
             }
@@ -648,7 +668,7 @@ namespace ToDoModel
                 {
                     if (_olItem is not null)
                     {
-                        _olItem.SetUdf("EC", value);
+                        _olItem.TrySetUdf("EC", value);
                     }
                 }
             }
@@ -679,7 +699,7 @@ namespace ToDoModel
                 {
                     if (_olItem is not null)
                     {
-                        _olItem.SetUdf("EcState", value);
+                        _olItem.TrySetUdf("EcState", value);
                     }
                 }
             }
@@ -706,7 +726,7 @@ namespace ToDoModel
                             strFieldValue = strToDoID.Substring(i - 2, 2);
                         }
                         if (!_readonly)
-                            _olItem.SetUdf(strField, strFieldValue);
+                            _olItem.TrySetUdf(strField, strFieldValue);
                     }
                 }
             }
@@ -746,7 +766,7 @@ namespace ToDoModel
                 {
                     if (_olItem is not null)
                     {
-                        _olItem.SetUdf("Meta Task Level", value);
+                        _olItem.TrySetUdf("Meta Task Level", value);
                     }
                 }
             }
@@ -777,7 +797,7 @@ namespace ToDoModel
                 {
                     if (_olItem is not null)
                     {
-                        _olItem.SetUdf("Meta Task Subject", value);
+                        _olItem.TrySetUdf("Meta Task Subject", value);
                     }
                 }
             }
@@ -841,7 +861,7 @@ namespace ToDoModel
         {
             if (_olItem is not null)
             {
-                _olItem.SetUdf(udfName, udfValue, OlUserPropertyType.olKeywords);
+                _olItem.TrySetUdf(udfName, udfValue, OlUserPropertyType.olKeywords);
                 _olItem.Categories = _flags.Combine();
                 _olItem.Save();
             }

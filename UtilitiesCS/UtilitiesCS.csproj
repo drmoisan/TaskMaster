@@ -543,7 +543,7 @@
     <Compile Include="Extensions\QueueExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\WinFormsExtensions.cs" />
-    <Compile Include="HelperClasses\ConversationHelper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\ConversationHelper.cs" />
     <Compile Include="HelperClasses\GenericBitwise.cs" />
     <Compile Include="HelperClasses\Initializer.cs" />
     <Compile Include="HelperClasses\MailResolution.cs" />

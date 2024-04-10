@@ -83,6 +83,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return result;
         }
 
+        public OrderedParallelQuery<Prediction<string>> Classify(string[] tokens)
+        {
+            var tokenIncidence = tokens.GroupAndCount();
+            return this.Classify(tokenIncidence);
+        }
+
         public OrderedParallelQuery<Prediction<string>> Classify(
             IDictionary<string, int> tokenIncidence)
         {
@@ -101,7 +107,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var result = await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
             return result;
         }
-        
+
+        public async ValueTask<Prediction<string>[]> ClassifyAsync(string[] tokens, CancellationToken cancel)
+        {
+            var tokenIncidence = tokens.GroupAndCount();
+            return await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
+        }
+
+
         public IOrderedAsyncEnumerable<Prediction<string>> ClassifyAsync(
             IDictionary<string, int> tokenIncidence, CancellationToken cancel)
         {

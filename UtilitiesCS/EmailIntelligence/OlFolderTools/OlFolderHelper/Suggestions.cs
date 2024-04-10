@@ -58,6 +58,15 @@ namespace UtilitiesCS
             else { return false; }
         }
 
+        public bool LoadFromField(MailItemHelper mailInfo,
+                                  IApplicationGlobals appGlobals)
+        {
+            _folderNameScores.Clear();
+            AddConversationBasedSuggestions(mailInfo.Item, appGlobals);
+            if (AddOlFolderKeys(mailInfo.Item, appGlobals)) { return true; }
+            else { return false; }
+        }
+
         public bool AddOlFolderKeys(MailItem olMail,
                                     IApplicationGlobals appGlobals,
                                     int topN = -1)
@@ -89,6 +98,38 @@ namespace UtilitiesCS
 
             Vlog.LogObject(_folderNameScores, nameof(_folderNameScores));
             
+        }
+
+        public void RefreshSuggestions(MailItemHelper mailInfo,
+                                       IApplicationGlobals appGlobals,
+                                       int topNfolderKeys = -1,
+                                       bool parallel = false)
+        {
+            var _globals = appGlobals;
+            _folderNameScores.Clear();
+
+            AddBayesianSuggestions(mailInfo, appGlobals, topNfolderKeys);
+
+            AddConversationBasedSuggestions(mailInfo.Item, _globals);
+            if (topNfolderKeys > 0)
+            {
+                AddOlFolderKeys(mailInfo.Item, _globals, topNfolderKeys);
+            }
+
+            AddWordSequenceSuggestions(mailInfo.Item, appGlobals, parallel);
+
+            Vlog.LogObject(_folderNameScores, nameof(_folderNameScores));
+
+        }
+
+        private void AddBayesianSuggestions(MailItemHelper mailInfo, IApplicationGlobals globals, int topNfolderKeys)
+        {
+            var predictions = globals.AF.Manager["Folders"].Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
+            foreach (var prediction in predictions)
+            {
+                long score = (long)Math.Round(prediction.Probability * 1000, 0);
+                AddSuggestion(prediction.Class, score);
+            }
         }
 
         public bool AddSuggestion(object folderObject, long score)
