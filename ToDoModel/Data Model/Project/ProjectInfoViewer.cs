@@ -7,13 +7,13 @@ using UtilitiesCS;
 namespace ToDoModel
 {
 
-    public partial class ProjectInfoWindow
+    public partial class ProjectInfoViewer
     {
         public IProjectInfo _projectInfo;
         private readonly Resizer rs = new Resizer();
         private bool blEditingCell = false;
 
-        public ProjectInfoWindow(IProjectInfo ProjInfo)
+        public ProjectInfoViewer(IProjectInfo ProjInfo)
         {
             // This call is required by the designer.
             InitializeComponent();
@@ -23,7 +23,7 @@ namespace ToDoModel
 
         }
 
-        public ProjectInfoWindow(IProjectInfo ProjInfo, Action<string, string> action)
+        public ProjectInfoViewer(IProjectInfo ProjInfo, Action<string, string> action)
         {
             // This call is required by the designer.
             InitializeComponent();

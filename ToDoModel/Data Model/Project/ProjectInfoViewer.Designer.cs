@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace ToDoModel
 {
     [Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
-    public partial class ProjectInfoWindow : System.Windows.Forms.Form
+    public partial class ProjectInfoViewer : System.Windows.Forms.Form
     {
 
         // Form overrides dispose to clean up the component list.

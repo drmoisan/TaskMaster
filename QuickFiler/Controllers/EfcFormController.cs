@@ -431,7 +431,9 @@ namespace QuickFiler.Controllers
 
         async public Task ActionOkAsync()
         {
-            await _formViewer.UiSyncContext;
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+
             _formViewer.Hide();
             await _homeController.ExecuteMoves().ConfigureAwait(false);
             await _formViewer.UiSyncContext;
@@ -621,7 +623,7 @@ namespace QuickFiler.Controllers
         {
             await _dataModel.InitFolderHandlerAsync(folderList);
 
-            //await _formViewer.UiSyncContext;
+            await _formViewer.UiSyncContext;
 
             _formViewer.FolderListBox.DataSource = _dataModel.FolderHelper.FolderArray;
             if (_formViewer.FolderListBox.Items.Count > 0)

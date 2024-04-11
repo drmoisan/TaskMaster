@@ -92,10 +92,12 @@
     <Compile Include="Data Model\ID\IDListUtilities.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionary.cs" />
     <Compile Include="Data Model\Project\ProjectInfo.cs" />
-    <Compile Include="Data Model\Project\ProjectInfoWindow.cs">
+    <Compile Include="Data Model\Project\ProjectInfoViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Data Model\Project\ProjectInfoWindow.Designer.cs" />
+    <Compile Include="Data Model\Project\ProjectInfoViewer.Designer.cs">
+      <DependentUpon>ProjectInfoViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Data Model\Project\ProjectList.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoEntry.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoLegacy.cs" />
@@ -112,9 +114,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Data Model\Project\ProjectInfoWindow.resx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tags\Tags.csproj">
@@ -137,6 +136,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data Model\Project\ProjectInfoViewer.resx">
+      <DependentUpon>ProjectInfoViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

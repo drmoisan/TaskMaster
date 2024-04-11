@@ -108,8 +108,8 @@ namespace TaskMaster
 
         internal void ReviseProjectInfo()
         {
-            _globals.TD.ProjInfo.SetIdUpdateAction(_globals.TD.IDList.SubstituteIdRoot);
-            var _projInfoView = new ProjectInfoWindow(_globals.TD.ProjInfo);
+            //_globals.TD.ProjInfo.SetIdUpdateAction(_globals.TD.IDList.SubstituteIdRoot);
+            var _projInfoView = new ProjectInfoViewer(_globals.TD.ProjInfo);
             _projInfoView.Show();
         }
 
