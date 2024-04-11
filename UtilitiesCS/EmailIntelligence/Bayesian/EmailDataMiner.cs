@@ -516,10 +516,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
                 Tin obj = await serializer.DeserializeAsync<Tin>(progress.SpawnChild(completedPerChunk), $"{tInName}_{i:0000}").ConfigureAwait(false);
                 Tout result = await transformer(obj);
-                if (count == 1)
-                    SerializeAndSave(result, tOutName);
-                else
-                    SerializeAndSave(result, $"{tOutName}_{i:0000}");
+                //if (count == 1)
+                //    SerializeAndSave(result, tOutName);
+                //else
+                SerializeAndSave(result, $"{tOutName}_{i:0000}");
                 SerializeAndSave(i + 1, $"{tOutName}Completed");
                 //progress.Report((int)((i + 1) * completedPerChunk), $"{message}. Transformed {i + 1} of {count}");
             }
@@ -786,8 +786,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             
             if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
             {
+                _globals.AF.ProgressPane.Visible = false;
                 _globals.AF.Manager["Folder"] = classifierGroup;
                 _globals.AF.Manager.Serialize();
+                MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -1153,6 +1155,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal virtual void SerializeAndSave<T>(T obj, JsonSerializer serializer, FilePathHelper disk)
         {
+            Directory.CreateDirectory(disk.FolderPath);
             using (StreamWriter sw = File.CreateText(disk.FilePath))
             {
                 serializer.Serialize(sw, obj);
@@ -1163,6 +1166,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         internal virtual void SerializeFsSave<T>(T obj, string objName, JsonSerializer serializer, FilePathHelper disk)
         {
             disk.FileName = $"{objName}_Example.json";
+            Directory.CreateDirectory(disk.FolderPath);
             using (StreamWriter sw = File.CreateText(disk.FilePath))
             {
                 serializer.Serialize(sw, obj);

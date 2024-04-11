@@ -124,7 +124,17 @@ namespace UtilitiesCS
 
         private void AddBayesianSuggestions(MailItemHelper mailInfo, IApplicationGlobals globals, int topNfolderKeys)
         {
-            var predictions = globals.AF.Manager["Folders"].Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
+            EmailIntelligence.Bayesian.Prediction<string>[] predictions = null;
+            
+            if (topNfolderKeys > 0)
+            {
+                predictions = globals.AF.Manager["Folder"].Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
+            }
+            else
+            {
+                predictions = globals.AF.Manager["Folder"].Classify(mailInfo.Tokens).ToArray();
+            }
+            
             foreach (var prediction in predictions)
             {
                 long score = (long)Math.Round(prediction.Probability * 1000, 0);

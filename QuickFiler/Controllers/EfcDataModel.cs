@@ -69,7 +69,7 @@ namespace QuickFiler.Controllers
             if (folderList is null)
             {
                 FolderHelper = await Task.Run(() => new OlFolderHelper(
-                    Globals, Mail, OlFolderHelper.InitOptions.FromField), Token);
+                    Globals, MailInfo, OlFolderHelper.InitOptions.FromField), Token);
             }
             else
             {

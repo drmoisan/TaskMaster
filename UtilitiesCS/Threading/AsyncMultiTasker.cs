@@ -122,7 +122,7 @@ namespace UtilitiesCS.Threading
             int complete = 0;
 
             int chunkNum = Environment.ProcessorCount - 2;
-            int chunkSize = count / chunkNum;
+            int chunkSize = Math.Max(1,count / chunkNum);
 
             var chunks = obj.Chunk(chunkSize).ToArray();
             // temp override to test
