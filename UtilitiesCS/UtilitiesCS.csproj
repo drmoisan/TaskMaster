@@ -579,7 +579,7 @@
     <Compile Include="Interfaces\IToDo\ISubjectMapEncoder.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEntry.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapSco.cs" />
-    <Compile Include="Interfaces\IToDo\IToDoProjectInfoEntry.cs" />
+    <Compile Include="Interfaces\IToDo\IProjectEntry.cs" />
     <Compile Include="Interfaces\ITypes\IObservableDictionary.cs" />
     <Compile Include="Interfaces\ITypes\IScoCollection.cs" />
     <Compile Include="Interfaces\ITypes\IScoCollection2.cs" />

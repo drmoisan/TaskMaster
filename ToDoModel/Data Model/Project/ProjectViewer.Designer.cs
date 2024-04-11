@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace ToDoModel
 {
     [Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
-    public partial class ProjectInfoViewer : System.Windows.Forms.Form
+    public partial class ProjectViewer : System.Windows.Forms.Form
     {
 
         // Form overrides dispose to clean up the component list.
@@ -139,7 +139,7 @@ namespace ToDoModel
             // 
             // ProjectInfoBindingSource
             // 
-            ProjectInfoBindingSource.DataSource = typeof(ProjectInfo);
+            ProjectInfoBindingSource.DataSource = typeof(ProjectData);
             // 
             // ProjectInfoWindow
             // 

@@ -14,15 +14,15 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace ToDoModel
 {
     [Serializable()]
-    public class ProjectInfo : SerializableList<IToDoProjectInfoEntry>, IProjectInfo
+    public class ProjectData : SerializableList<IProjectEntry>, IProjectInfo
     {
-        public ProjectInfo() : base() { }
-        public ProjectInfo(IList<IToDoProjectInfoEntry> projInfoEntries) : base(projInfoEntries) { }
-        public ProjectInfo(IEnumerable<IToDoProjectInfoEntry> projInfoEntries) : base(projInfoEntries) { }
-        public ProjectInfo(string filename, string folderpath) : base(filename, folderpath) { }
-        public ProjectInfo(string filename,
+        public ProjectData() : base() { }
+        public ProjectData(IList<IProjectEntry> projInfoEntries) : base(projInfoEntries) { }
+        public ProjectData(IEnumerable<IProjectEntry> projInfoEntries) : base(projInfoEntries) { }
+        public ProjectData(string filename, string folderpath) : base(filename, folderpath) { }
+        public ProjectData(string filename,
                            string folderpath,
-                           CSVLoader<IToDoProjectInfoEntry> backupLoader,
+                           CSVLoader<IProjectEntry> backupLoader,
                            string backupFilepath,
                            bool askUserOnError) : base(filename,
                                                        folderpath,
@@ -101,8 +101,8 @@ namespace ToDoModel
         /// delimiter is present, project name is the same as program name
         /// </summary>
         /// <param name="df">Deedle dataframe with ToDoID and Categories</param>
-        /// <returns>A new <seealso cref="List{T}"/> where T is <seealso cref="IToDoProjectInfoEntry"/></returns>
-        internal List<IToDoProjectInfoEntry> DfToListEntries(Frame<int, string> df)
+        /// <returns>A new <seealso cref="List{T}"/> where T is <seealso cref="IProjectEntry"/></returns>
+        internal List<IProjectEntry> DfToListEntries(Frame<int, string> df)
         {
             return df.Rows
                      .Select(row => new
@@ -117,7 +117,7 @@ namespace ToDoModel
                         FlagParser parser = new(ref categories);
                         var projectName = parser.GetProjects();
                         var programName = projectName.Split('-')[0];
-                        IToDoProjectInfoEntry entry = new ToDoProjectInfoEntry(projectName, x.ID, programName);
+                        IProjectEntry entry = new ProjectEntry(projectName, x.ID, programName);
                         return entry;
                      })
                      .ToList();
@@ -178,7 +178,7 @@ namespace ToDoModel
 
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProjectName(string projectName)
+        public List<IProjectEntry> Find_ByProjectName(string projectName)
         {
             return this.Where(x => x.ProjectName.ToLower() == projectName.ToLower()).ToList();
         }
@@ -188,7 +188,7 @@ namespace ToDoModel
             return base.FindIndex(x => x.ProjectID == projectID) != -1;
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProjectID(string projectID)
+        public List<IProjectEntry> Find_ByProjectID(string projectID)
         {
             return this.Where(x => x.ProjectID == projectID).ToList();
         }
@@ -198,7 +198,7 @@ namespace ToDoModel
             return base.FindIndex(x => x.ProgramName.ToLower() == programName.ToLower()) != -1;
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProgramName(string programName)
+        public List<IProjectEntry> Find_ByProgramName(string programName)
         {
             return this.Where(x => x.ProgramName.ToLower() == programName.ToLower()).ToList();
         }

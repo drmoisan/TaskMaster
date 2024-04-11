@@ -7,13 +7,13 @@ using UtilitiesCS;
 namespace ToDoModel
 {
 
-    public partial class ProjectInfoViewer
+    public partial class ProjectViewer
     {
         public IProjectInfo _projectInfo;
         private readonly Resizer rs = new Resizer();
         private bool blEditingCell = false;
 
-        public ProjectInfoViewer(IProjectInfo ProjInfo)
+        public ProjectViewer(IProjectInfo ProjInfo)
         {
             // This call is required by the designer.
             InitializeComponent();
@@ -23,7 +23,7 @@ namespace ToDoModel
 
         }
 
-        public ProjectInfoViewer(IProjectInfo ProjInfo, Action<string, string> action)
+        public ProjectViewer(IProjectInfo ProjInfo, Action<string, string> action)
         {
             // This call is required by the designer.
             InitializeComponent();
@@ -72,7 +72,7 @@ namespace ToDoModel
                     ArrayList selection = (ArrayList)olvProjInfo.SelectedObjects;
                     if (selection is not null)
                     {
-                        foreach (ToDoProjectInfoEntry entry in selection)
+                        foreach (ProjectEntry entry in selection)
                             _projectInfo.Remove(entry);
                         _projectInfo.Save();
                         olvProjInfo.RemoveObjects(olvProjInfo.SelectedObjects);

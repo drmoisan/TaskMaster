@@ -6,7 +6,7 @@ using System.Windows.Forms;
 namespace ToDoModel
 {
     [Serializable()]
-    public class ToDoProjectInfoEntry : IEquatable<IToDoProjectInfoEntry>, IComparable, IComparable<IToDoProjectInfoEntry>, IToDoProjectInfoEntry, IEquatable<ToDoProjectInfoEntry>
+    public class ProjectEntry : IEquatable<IProjectEntry>, IComparable, IComparable<IProjectEntry>, IProjectEntry, IEquatable<ProjectEntry>
     {
         private string _projectName;
         private string _projectID;
@@ -51,7 +51,7 @@ namespace ToDoModel
             }
         }
 
-        public ToDoProjectInfoEntry(string ProjName, string ProjID, string ProgName)
+        public ProjectEntry(string ProjName, string ProjID, string ProgName)
         {
             ProjectName = ProjName;
             ProjectID = ProjID;
@@ -63,7 +63,7 @@ namespace ToDoModel
             _idUpdate = action;
         }
 
-        public int CompareTo(IToDoProjectInfoEntry other)
+        public int CompareTo(IProjectEntry other)
         {
             if (other is null) { return 1; }
             else if (ProjectID is null) { return -1; }
@@ -90,7 +90,7 @@ namespace ToDoModel
         {
             if (obj is null)
                 return 1;
-            IToDoProjectInfoEntry other = obj as IToDoProjectInfoEntry;
+            IProjectEntry other = obj as IProjectEntry;
 
             if (other is not null)
             {
@@ -109,10 +109,10 @@ namespace ToDoModel
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as IToDoProjectInfoEntry);
+            return Equals(obj as IProjectEntry);
         }
 
-        public bool Equals(ToDoProjectInfoEntry other)
+        public bool Equals(ProjectEntry other)
         {
             return other is not null &&
                    ProjectName == other.ProjectName &&
@@ -120,7 +120,7 @@ namespace ToDoModel
                    ProgramName == other.ProgramName;
         }
 
-        public bool Equals(IToDoProjectInfoEntry other)
+        public bool Equals(IProjectEntry other)
         {
             return other is not null &&
                    ProjectName == other.ProjectName &&

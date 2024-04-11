@@ -205,7 +205,7 @@ namespace ToDoModel
                                             // ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                             // SaveDict()
                                             string strProgram = InputBox.ShowDialog($"What is the program name for {strProject}?", DefaultResponse: "");
-                                            _globals.TD.ProjInfo.Add(new ToDoProjectInfoEntry(strProject, strToDoID, strProgram));
+                                            _globals.TD.ProjInfo.Add(new ProjectEntry(strProject, strToDoID, strProgram));
                                             _globals.TD.ProjInfo.Save();
                                         }
                                     }

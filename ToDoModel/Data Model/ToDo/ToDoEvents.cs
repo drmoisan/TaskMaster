@@ -309,7 +309,7 @@ namespace ToDoModel
                                     if (response == DialogResult.Yes)
                                     {
                                         string strProgram = InputBox.ShowDialog("What is the program name for " + strProject + "?", DefaultResponse: "");
-                                        ProjInfo.Add(new ToDoProjectInfoEntry(strProject, strToDoID, strProgram));
+                                        ProjInfo.Add(new ProjectEntry(strProject, strToDoID, strProgram));
                                         ProjInfo.Save();
                                     }
                                 }

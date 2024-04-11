@@ -91,15 +91,16 @@
     <Compile Include="Data Model\ID\IDList.cs" />
     <Compile Include="Data Model\ID\IDListUtilities.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionary.cs" />
-    <Compile Include="Data Model\Project\ProjectInfo.cs" />
-    <Compile Include="Data Model\Project\ProjectInfoViewer.cs">
+    <Compile Include="Data Model\Project\ProjectData.cs" />
+    <Compile Include="Data Model\Project\ProjectController.cs" />
+    <Compile Include="Data Model\Project\ProjectViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Data Model\Project\ProjectInfoViewer.Designer.cs">
-      <DependentUpon>ProjectInfoViewer.cs</DependentUpon>
+    <Compile Include="Data Model\Project\ProjectViewer.Designer.cs">
+      <DependentUpon>ProjectViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Data Model\Project\ProjectList.cs" />
-    <Compile Include="Data Model\Project\ToDoProjectInfoEntry.cs" />
+    <Compile Include="Data Model\Project\ProjectEntry.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoLegacy.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoUtilities.cs" />
     <Compile Include="Data Model\ToDo\ToDoDefaults.cs" />
@@ -138,8 +139,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data Model\Project\ProjectInfoViewer.resx">
-      <DependentUpon>ProjectInfoViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Data Model\Project\ProjectViewer.resx">
+      <DependentUpon>ProjectViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

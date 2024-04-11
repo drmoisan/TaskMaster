@@ -109,7 +109,7 @@ namespace TaskMaster
         internal void ReviseProjectInfo()
         {
             //_globals.TD.ProjInfo.SetIdUpdateAction(_globals.TD.IDList.SubstituteIdRoot);
-            var _projInfoView = new ProjectInfoViewer(_globals.TD.ProjInfo);
+            var _projInfoView = new ProjectViewer(_globals.TD.ProjInfo);
             _projInfoView.Show();
         }
 

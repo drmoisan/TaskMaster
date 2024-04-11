@@ -75,11 +75,11 @@ namespace TaskMaster
 
         private string _projInfo_Filename;
         public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _projInfo_Filename = _defaults.FileName_ProjInfo);
-        private ProjectInfo _projInfo;
+        private ProjectData _projInfo;
         public IProjectInfo ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
         async private Task LoadProjInfoAsync()
         {
-            _projInfo = await Task.Run(() => new ProjectInfo(filename: _defaults.FileName_ProjInfo, folderpath: Parent.FS.FldrAppData));
+            _projInfo = await Task.Run(() => new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: Parent.FS.FldrAppData));
             
             if (_projInfo.Count == 0) 
             {
@@ -88,7 +88,7 @@ namespace TaskMaster
         }
         private IProjectInfo LoadProjInfo()
         {
-            var projectInfo = new ProjectInfo(filename: _defaults.FileName_ProjInfo,
+            var projectInfo = new ProjectData(filename: _defaults.FileName_ProjInfo,
                                               folderpath: Parent.FS.FldrAppData);
             if (projectInfo.Count == 0) { projectInfo.Rebuild(Parent.Ol.App); }
             return projectInfo;
