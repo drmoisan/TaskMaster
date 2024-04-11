@@ -14,7 +14,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace ToDoModel
 {
     [Serializable()]
-    public class ProjectData : SerializableList<IProjectEntry>, IProjectInfo
+    public class ProjectData : SerializableList<IProjectEntry>, IProjectData
     {
         public ProjectData() : base() { }
         public ProjectData(IList<IProjectEntry> projInfoEntries) : base(projInfoEntries) { }

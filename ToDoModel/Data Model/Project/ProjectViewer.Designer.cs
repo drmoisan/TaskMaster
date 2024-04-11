@@ -42,10 +42,10 @@ namespace ToDoModel
             OlvProjectID = new BrightIdeasSoftware.OLVColumn();
             OlvProjectName = new BrightIdeasSoftware.OLVColumn();
             OlvProgramName = new BrightIdeasSoftware.OLVColumn();
-            BTN_CANCEL = new System.Windows.Forms.Button();
-            BTN_CANCEL.Click += new EventHandler(BTN_CANCEL_Click);
-            BTN_OK = new System.Windows.Forms.Button();
-            BTN_OK.Click += new EventHandler(BTN_OK_Click);
+            ButtonCancel = new System.Windows.Forms.Button();
+            ButtonCancel.Click += new EventHandler(ButtonCancel_Click);
+            ButtonOk = new System.Windows.Forms.Button();
+            ButtonOk.Click += new EventHandler(ButtonOk_Click);
             ProjectInfoBindingSource = new System.Windows.Forms.BindingSource(components);
             ((System.ComponentModel.ISupportInitialize)SplitContainer1).BeginInit();
             SplitContainer1.Panel1.SuspendLayout();
@@ -68,8 +68,8 @@ namespace ToDoModel
             // 
             // SplitContainer1.Panel2
             // 
-            SplitContainer1.Panel2.Controls.Add(BTN_CANCEL);
-            SplitContainer1.Panel2.Controls.Add(BTN_OK);
+            SplitContainer1.Panel2.Controls.Add(ButtonCancel);
+            SplitContainer1.Panel2.Controls.Add(ButtonOk);
             SplitContainer1.Size = new System.Drawing.Size(800, 450);
             SplitContainer1.SplitterDistance = 399;
             SplitContainer1.TabIndex = 0;
@@ -119,23 +119,23 @@ namespace ToDoModel
             // 
             // BTN_CANCEL
             // 
-            BTN_CANCEL.Anchor = System.Windows.Forms.AnchorStyles.None;
-            BTN_CANCEL.Location = new System.Drawing.Point(440, 12);
-            BTN_CANCEL.Name = "BTN_CANCEL";
-            BTN_CANCEL.Size = new System.Drawing.Size(94, 23);
-            BTN_CANCEL.TabIndex = 1;
-            BTN_CANCEL.Text = "CANCEL";
-            BTN_CANCEL.UseVisualStyleBackColor = true;
+            ButtonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            ButtonCancel.Location = new System.Drawing.Point(440, 12);
+            ButtonCancel.Name = "BTN_CANCEL";
+            ButtonCancel.Size = new System.Drawing.Size(94, 23);
+            ButtonCancel.TabIndex = 1;
+            ButtonCancel.Text = "CANCEL";
+            ButtonCancel.UseVisualStyleBackColor = true;
             // 
             // BTN_OK
             // 
-            BTN_OK.Anchor = System.Windows.Forms.AnchorStyles.None;
-            BTN_OK.Location = new System.Drawing.Point(312, 12);
-            BTN_OK.Name = "BTN_OK";
-            BTN_OK.Size = new System.Drawing.Size(94, 23);
-            BTN_OK.TabIndex = 0;
-            BTN_OK.Text = "OK";
-            BTN_OK.UseVisualStyleBackColor = true;
+            ButtonOk.Anchor = System.Windows.Forms.AnchorStyles.None;
+            ButtonOk.Location = new System.Drawing.Point(312, 12);
+            ButtonOk.Name = "BTN_OK";
+            ButtonOk.Size = new System.Drawing.Size(94, 23);
+            ButtonOk.TabIndex = 0;
+            ButtonOk.Text = "OK";
+            ButtonOk.UseVisualStyleBackColor = true;
             // 
             // ProjectInfoBindingSource
             // 
@@ -163,8 +163,8 @@ namespace ToDoModel
 
         internal System.Windows.Forms.SplitContainer SplitContainer1;
         internal System.Windows.Forms.BindingSource ProjectInfoBindingSource;
-        internal System.Windows.Forms.Button BTN_CANCEL;
-        internal System.Windows.Forms.Button BTN_OK;
+        internal System.Windows.Forms.Button ButtonCancel;
+        internal System.Windows.Forms.Button ButtonOk;
         internal BrightIdeasSoftware.ObjectListView olvProjInfo;
         internal BrightIdeasSoftware.OLVColumn OlvProjectID;
         internal BrightIdeasSoftware.OLVColumn OlvProjectName;

@@ -15,7 +15,7 @@ namespace UtilitiesCS
         ISerializableList<string> CategoryFilters { get; }
         IIDList IDList { get; }
         IApplicationGlobals Parent { get; }
-        IProjectInfo ProjInfo { get; }
+        IProjectData ProjInfo { get; }
         ScoCollection<IPrefix> PrefixList { get; }
         ScoCollection<IPrefix> LoadPrefixList();
         ScoDictionary<string, int> FilteredFolderScraping { get; }

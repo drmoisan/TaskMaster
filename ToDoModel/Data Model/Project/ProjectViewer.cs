@@ -9,33 +9,40 @@ namespace ToDoModel
 
     public partial class ProjectViewer
     {
-        public IProjectInfo _projectInfo;
+        public IProjectData _projectData;
         private readonly Resizer rs = new Resizer();
         private bool blEditingCell = false;
 
-        public ProjectViewer(IProjectInfo ProjInfo)
+        public ProjectViewer()
+        {
+            // This call is required by the designer.
+            InitializeComponent();
+        }
+
+
+        public ProjectViewer(IProjectData projData)
         {
             // This call is required by the designer.
             InitializeComponent();
 
             // Add any initialization after the InitializeComponent() call.
-            _projectInfo = ProjInfo;
+            _projectData = projData;
 
         }
 
-        public ProjectViewer(IProjectInfo ProjInfo, Action<string, string> action)
+        public ProjectViewer(IProjectData ProjInfo, Action<string, string> action)
         {
             // This call is required by the designer.
             InitializeComponent();
 
             // Add any initialization after the InitializeComponent() call.
-            _projectInfo = ProjInfo;
+            _projectData = ProjInfo;
 
         }
 
         private void ProjectInfoWindow_Load(object sender, EventArgs e)
         {
-            olvProjInfo.SetObjects(_projectInfo);
+            olvProjInfo.SetObjects(_projectData);
 
             rs.FindAllControls(this);
             rs.SetResizeDimensions(SplitContainer1.Panel2, Resizer.ResizeDimensions.Position, true);
@@ -44,13 +51,13 @@ namespace ToDoModel
             rs.PrintDict();
         }
 
-        private void BTN_OK_Click(object sender, EventArgs e)
+        private void ButtonOk_Click(object sender, EventArgs e)
         {
-            _projectInfo.Save();
+            _projectData.Save();
             Close();
         }
 
-        private void BTN_CANCEL_Click(object sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             Close();
         }
@@ -73,8 +80,8 @@ namespace ToDoModel
                     if (selection is not null)
                     {
                         foreach (ProjectEntry entry in selection)
-                            _projectInfo.Remove(entry);
-                        _projectInfo.Save();
+                            _projectData.Remove(entry);
+                        _projectData.Save();
                         olvProjInfo.RemoveObjects(olvProjInfo.SelectedObjects);
                     }
                 }

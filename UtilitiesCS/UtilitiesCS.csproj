@@ -574,7 +574,7 @@
     <Compile Include="Interfaces\IToDo\IIDList.cs" />
     <Compile Include="Interfaces\IToDo\IPeopleScoDictionary.cs" />
     <Compile Include="Interfaces\IToDo\IPrefix.cs" />
-    <Compile Include="Interfaces\IToDo\IProjectInfo.cs" />
+    <Compile Include="Interfaces\IToDo\IProjectData.cs" />
     <Compile Include="Interfaces\IToDo\IProjectInfoLegacy.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEncoder.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEntry.cs" />

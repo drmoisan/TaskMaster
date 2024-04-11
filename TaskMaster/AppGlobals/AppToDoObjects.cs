@@ -76,7 +76,7 @@ namespace TaskMaster
         private string _projInfo_Filename;
         public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _projInfo_Filename = _defaults.FileName_ProjInfo);
         private ProjectData _projInfo;
-        public IProjectInfo ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
+        public IProjectData ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
         async private Task LoadProjInfoAsync()
         {
             _projInfo = await Task.Run(() => new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: Parent.FS.FldrAppData));
@@ -86,7 +86,7 @@ namespace TaskMaster
                 await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
             }
         }
-        private IProjectInfo LoadProjInfo()
+        private IProjectData LoadProjInfo()
         {
             var projectInfo = new ProjectData(filename: _defaults.FileName_ProjInfo,
                                               folderpath: Parent.FS.FldrAppData);
