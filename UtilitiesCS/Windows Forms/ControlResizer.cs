@@ -26,7 +26,7 @@ using System.Windows.Forms;
 namespace UtilitiesCS
 {
 
-    public class Resizer
+    public class ControlResizer
     {
 
         // ----------------------------------------------------------

@@ -33,131 +33,145 @@ namespace ToDoModel
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            SplitContainer1 = new System.Windows.Forms.SplitContainer();
-            olvProjInfo = new BrightIdeasSoftware.ObjectListView();
-            olvProjInfo.KeyUp += new System.Windows.Forms.KeyEventHandler(olvProjInfo_KeyUp);
-            olvProjInfo.CellEditStarting += new BrightIdeasSoftware.CellEditEventHandler(olvProjInfo_CellEditStarting);
-            olvProjInfo.CellEditFinishing += new BrightIdeasSoftware.CellEditEventHandler(olvProjInfo_CellEditFinishing);
-            OlvProjectID = new BrightIdeasSoftware.OLVColumn();
-            OlvProjectName = new BrightIdeasSoftware.OLVColumn();
-            OlvProgramName = new BrightIdeasSoftware.OLVColumn();
-            ButtonCancel = new System.Windows.Forms.Button();
-            ButtonCancel.Click += new EventHandler(ButtonCancel_Click);
-            ButtonOk = new System.Windows.Forms.Button();
-            ButtonOk.Click += new EventHandler(ButtonOk_Click);
-            ProjectInfoBindingSource = new System.Windows.Forms.BindingSource(components);
-            ((System.ComponentModel.ISupportInitialize)SplitContainer1).BeginInit();
-            SplitContainer1.Panel1.SuspendLayout();
-            SplitContainer1.Panel2.SuspendLayout();
-            SplitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)olvProjInfo).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)ProjectInfoBindingSource).BeginInit();
-            SuspendLayout();
+            this.components = new System.ComponentModel.Container();
+            this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.OlvProjectData = new BrightIdeasSoftware.ObjectListView();
+            this.OlvProjectID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvProjectName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvProgramName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.ButtonCancel = new System.Windows.Forms.Button();
+            this.ButtonOk = new System.Windows.Forms.Button();
+            this.ProjectInfoBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.button1 = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
+            this.SplitContainer1.Panel1.SuspendLayout();
+            this.SplitContainer1.Panel2.SuspendLayout();
+            this.SplitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.OlvProjectData)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ProjectInfoBindingSource)).BeginInit();
+            this.SuspendLayout();
             // 
             // SplitContainer1
             // 
-            SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            SplitContainer1.Location = new System.Drawing.Point(0, 0);
-            SplitContainer1.Name = "SplitContainer1";
-            SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.SplitContainer1.Name = "SplitContainer1";
+            this.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // SplitContainer1.Panel1
             // 
-            SplitContainer1.Panel1.Controls.Add(olvProjInfo);
+            this.SplitContainer1.Panel1.Controls.Add(this.OlvProjectData);
             // 
             // SplitContainer1.Panel2
             // 
-            SplitContainer1.Panel2.Controls.Add(ButtonCancel);
-            SplitContainer1.Panel2.Controls.Add(ButtonOk);
-            SplitContainer1.Size = new System.Drawing.Size(800, 450);
-            SplitContainer1.SplitterDistance = 399;
-            SplitContainer1.TabIndex = 0;
+            this.SplitContainer1.Panel2.Controls.Add(this.button1);
+            this.SplitContainer1.Panel2.Controls.Add(this.ButtonCancel);
+            this.SplitContainer1.Panel2.Controls.Add(this.ButtonOk);
+            this.SplitContainer1.Size = new System.Drawing.Size(800, 450);
+            this.SplitContainer1.SplitterDistance = 399;
+            this.SplitContainer1.TabIndex = 0;
             // 
-            // olvProjInfo
+            // OlvProjectData
             // 
-            olvProjInfo.AllColumns.Add(OlvProjectID);
-            olvProjInfo.AllColumns.Add(OlvProjectName);
-            olvProjInfo.AllColumns.Add(OlvProgramName);
-            olvProjInfo.AllowColumnReorder = true;
-            olvProjInfo.AllowDrop = true;
-            olvProjInfo.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick;
-            olvProjInfo.CellEditUseWholeCell = false;
-            olvProjInfo.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { OlvProjectID, OlvProjectName, OlvProgramName });
-            olvProjInfo.Cursor = System.Windows.Forms.Cursors.Default;
-            olvProjInfo.Dock = System.Windows.Forms.DockStyle.Fill;
-            olvProjInfo.HasCollapsibleGroups = false;
-            olvProjInfo.HideSelection = false;
-            olvProjInfo.Location = new System.Drawing.Point(0, 0);
-            olvProjInfo.Name = "olvProjInfo";
-            olvProjInfo.ShowGroups = false;
-            olvProjInfo.Size = new System.Drawing.Size(800, 399);
-            olvProjInfo.TabIndex = 0;
-            olvProjInfo.UseCompatibleStateImageBehavior = false;
-            olvProjInfo.View = System.Windows.Forms.View.Details;
+            this.OlvProjectData.AllColumns.Add(this.OlvProjectID);
+            this.OlvProjectData.AllColumns.Add(this.OlvProjectName);
+            this.OlvProjectData.AllColumns.Add(this.OlvProgramName);
+            this.OlvProjectData.AllowColumnReorder = true;
+            this.OlvProjectData.AllowDrop = true;
+            this.OlvProjectData.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick;
+            this.OlvProjectData.CellEditUseWholeCell = false;
+            this.OlvProjectData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.OlvProjectID,
+            this.OlvProjectName,
+            this.OlvProgramName});
+            this.OlvProjectData.Cursor = System.Windows.Forms.Cursors.Default;
+            this.OlvProjectData.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.OlvProjectData.HasCollapsibleGroups = false;
+            this.OlvProjectData.HideSelection = false;
+            this.OlvProjectData.Location = new System.Drawing.Point(0, 0);
+            this.OlvProjectData.Name = "OlvProjectData";
+            this.OlvProjectData.ShowGroups = false;
+            this.OlvProjectData.Size = new System.Drawing.Size(800, 399);
+            this.OlvProjectData.TabIndex = 0;
+            this.OlvProjectData.UseCompatibleStateImageBehavior = false;
+            this.OlvProjectData.View = System.Windows.Forms.View.Details;
+            this.OlvProjectData.CellEditFinishing += new BrightIdeasSoftware.CellEditEventHandler(this.OlvProjInfo_CellEditFinishing);
+            this.OlvProjectData.CellEditStarting += new BrightIdeasSoftware.CellEditEventHandler(this.OlvProjInfo_CellEditStarting);
+            this.OlvProjectData.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OlvProjInfo_KeyUp);
             // 
             // OlvProjectID
             // 
-            OlvProjectID.AspectName = "ProjectID";
-            OlvProjectID.Groupable = false;
-            OlvProjectID.Text = "Project ID";
-            OlvProjectID.Width = 166;
+            this.OlvProjectID.AspectName = "ProjectID";
+            this.OlvProjectID.Groupable = false;
+            this.OlvProjectID.Text = "Project ID";
+            this.OlvProjectID.Width = 166;
             // 
             // OlvProjectName
             // 
-            OlvProjectName.AspectName = "ProjectName";
-            OlvProjectName.Groupable = false;
-            OlvProjectName.Text = "Project Name";
-            OlvProjectName.Width = 318;
+            this.OlvProjectName.AspectName = "ProjectName";
+            this.OlvProjectName.Groupable = false;
+            this.OlvProjectName.Text = "Project Name";
+            this.OlvProjectName.Width = 318;
             // 
             // OlvProgramName
             // 
-            OlvProgramName.AspectName = "ProgramName";
-            OlvProgramName.Groupable = false;
-            OlvProgramName.Text = "Program Name";
-            OlvProgramName.Width = 283;
+            this.OlvProgramName.AspectName = "ProgramName";
+            this.OlvProgramName.Groupable = false;
+            this.OlvProgramName.Text = "Program Name";
+            this.OlvProgramName.Width = 283;
             // 
-            // BTN_CANCEL
+            // ButtonCancel
             // 
-            ButtonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            ButtonCancel.Location = new System.Drawing.Point(440, 12);
-            ButtonCancel.Name = "BTN_CANCEL";
-            ButtonCancel.Size = new System.Drawing.Size(94, 23);
-            ButtonCancel.TabIndex = 1;
-            ButtonCancel.Text = "CANCEL";
-            ButtonCancel.UseVisualStyleBackColor = true;
+            this.ButtonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.ButtonCancel.Location = new System.Drawing.Point(371, 12);
+            this.ButtonCancel.Name = "ButtonCancel";
+            this.ButtonCancel.Size = new System.Drawing.Size(94, 23);
+            this.ButtonCancel.TabIndex = 1;
+            this.ButtonCancel.Text = "CANCEL";
+            this.ButtonCancel.UseVisualStyleBackColor = true;
+            this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
             // 
-            // BTN_OK
+            // ButtonOk
             // 
-            ButtonOk.Anchor = System.Windows.Forms.AnchorStyles.None;
-            ButtonOk.Location = new System.Drawing.Point(312, 12);
-            ButtonOk.Name = "BTN_OK";
-            ButtonOk.Size = new System.Drawing.Size(94, 23);
-            ButtonOk.TabIndex = 0;
-            ButtonOk.Text = "OK";
-            ButtonOk.UseVisualStyleBackColor = true;
+            this.ButtonOk.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.ButtonOk.Location = new System.Drawing.Point(243, 12);
+            this.ButtonOk.Name = "ButtonOk";
+            this.ButtonOk.Size = new System.Drawing.Size(94, 23);
+            this.ButtonOk.TabIndex = 0;
+            this.ButtonOk.Text = "OK";
+            this.ButtonOk.UseVisualStyleBackColor = true;
+            this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
             // 
             // ProjectInfoBindingSource
             // 
-            ProjectInfoBindingSource.DataSource = typeof(ProjectData);
+            this.ProjectInfoBindingSource.DataSource = typeof(ToDoModel.ProjectData);
             // 
-            // ProjectInfoWindow
+            // button1
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(6.0f, 13.0f);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(800, 450);
-            Controls.Add(SplitContainer1);
-            Name = "ProjectInfoWindow";
-            Text = "ProjectInfoWindow";
-            SplitContainer1.Panel1.ResumeLayout(false);
-            SplitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)SplitContainer1).EndInit();
-            SplitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)olvProjInfo).EndInit();
-            ((System.ComponentModel.ISupportInitialize)ProjectInfoBindingSource).EndInit();
-            Load += new EventHandler(ProjectInfoWindow_Load);
-            Resize += new EventHandler(ProjectInfoWindow_Resize);
-            ResumeLayout(false);
+            this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.button1.Location = new System.Drawing.Point(511, 12);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(94, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "NEW";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // ProjectViewer
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.SplitContainer1);
+            this.Name = "ProjectViewer";
+            this.Text = "ProjectInfoWindow";
+            this.Resize += new System.EventHandler(this.ProjectInfoWindow_Resize);
+            this.SplitContainer1.Panel1.ResumeLayout(false);
+            this.SplitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).EndInit();
+            this.SplitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.OlvProjectData)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ProjectInfoBindingSource)).EndInit();
+            this.ResumeLayout(false);
 
         }
 
@@ -165,9 +179,10 @@ namespace ToDoModel
         internal System.Windows.Forms.BindingSource ProjectInfoBindingSource;
         internal System.Windows.Forms.Button ButtonCancel;
         internal System.Windows.Forms.Button ButtonOk;
-        internal BrightIdeasSoftware.ObjectListView olvProjInfo;
+        internal BrightIdeasSoftware.ObjectListView OlvProjectData;
         internal BrightIdeasSoftware.OLVColumn OlvProjectID;
         internal BrightIdeasSoftware.OLVColumn OlvProjectName;
         internal BrightIdeasSoftware.OLVColumn OlvProgramName;
+        internal System.Windows.Forms.Button button1;
     }
 }

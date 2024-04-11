@@ -124,12 +124,17 @@ namespace UtilitiesCS.OutlookExtensions
                 if (current != value)
                 {
                     //If it was false and now is true, set the flag status to olFlagMarked. Irrelevant for TaskItems
-                    if (value) { this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olFlagMarked); }
+                    if (value) 
+                    { 
+                        this.TryCallMethod("MarkAsTask", new object[] { OlMarkInterval.olMarkNoDate });
+                        //this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olFlagMarked); 
+                    }
                     else
                     {
                         // If it was true and now is false, set the flag status to olNoFlag
-                        if (!this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olNoFlag)) 
-                        {
+                        //if (!this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olNoFlag))
+                        if (this.TryCallMethod("ClearTaskFlag") is null)
+                            {
                             // TaskItems cannot be set to false
                             throw new ArgumentOutOfRangeException($"{nameof(TaskItem)} items cannot be set to False");
                         }

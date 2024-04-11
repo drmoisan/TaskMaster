@@ -27,6 +27,7 @@ using System.Diagnostics.Metrics;
 using QuickFiler.Controllers;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 using UtilitiesCS.Threading;
+using UtilitiesCS.HelperClasses;
 
 
 namespace TaskMaster
@@ -106,11 +107,10 @@ namespace TaskMaster
             _quickFilerLoaded = false;
         }
 
-        internal void ReviseProjectInfo()
+        internal void ReviseProjectData()
         {
-            //_globals.TD.ProjInfo.SetIdUpdateAction(_globals.TD.IDList.SubstituteIdRoot);
-            var _projInfoView = new ProjectViewer(_globals.TD.ProjInfo);
-            _projInfoView.Show();
+            var controller = new ToDoModel.Data_Model.Project.ProjectController(_globals.TD.ProjInfo);
+            controller.Run();
         }
 
         internal void CompressIDs()
@@ -419,6 +419,13 @@ namespace TaskMaster
         internal void PopulateUdf()
         {
             FlagTasks.PopulateUdf(null, _globals.Ol.App.ActiveExplorer());
+        }
+
+        internal void TryDeepCompareEmails()
+        {
+            var email1 = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
+            var email2 = _globals.Ol.App.ActiveExplorer().Selection[2] as Outlook.MailItem;
+            Deep.DeepDifferences<MailItem>(email1, email2);
         }
 
         #endregion BayesianPerformance

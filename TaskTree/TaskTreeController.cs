@@ -48,8 +48,8 @@ namespace TaskTree
             sink1.CanDropOnBackground = true;
 
             _rs.FindAllControls(_viewer);
-            _rs.SetResizeDimensions(_viewer.SplitContainer1, Resizer.ResizeDimensions.None, true);
-            _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position | Resizer.ResizeDimensions.Size, true);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1, ControlResizer.ResizeDimensions.None, true);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, ControlResizer.ResizeDimensions.Position | ControlResizer.ResizeDimensions.Size, true);
             _rs.ResizeAllControls(_viewer);
             //_rs.PrintDict();
         }
@@ -59,8 +59,8 @@ namespace TaskTree
         #region Private Fields
 
         public List<TreeNode<ToDoItem>> ToDoTree = new List<TreeNode<ToDoItem>>();
-        private readonly Resizer _rs = new Resizer();
-        private readonly Resizer _rscol = new Resizer();
+        private readonly ControlResizer _rs = new ControlResizer();
+        private readonly ControlResizer _rscol = new ControlResizer();
         private bool _expanded = false;
         private bool _filterCompleted = true;
         private TaskTreeForm _viewer;

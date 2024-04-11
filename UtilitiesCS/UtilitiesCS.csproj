@@ -40,6 +40,7 @@
     <Reference Include="Apache.Arrow, Version=13.0.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
       <HintPath>..\packages\Apache.Arrow.13.0.0\lib\netstandard2.0\Apache.Arrow.dll</HintPath>
     </Reference>
+    <Reference Include="CustomMarshalers" />
     <Reference Include="Deedle, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
     </Reference>
@@ -412,6 +413,8 @@
     <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentSerializable.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
+    <Compile Include="HelperClasses\DeepCompare.cs" />
+    <Compile Include="HelperClasses\DispatchUtility.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
@@ -656,7 +659,7 @@
     <Compile Include="Windows Forms\ImageHelper.cs" />
     <Compile Include="Windows Forms\MouseDownFilter.cs" />
     <Compile Include="Windows Forms\OlvExtension.cs" />
-    <Compile Include="Windows Forms\Resizer.cs" />
+    <Compile Include="Windows Forms\ControlResizer.cs" />
     <Compile Include="Windows Forms\ScreenHelper.cs" />
   </ItemGroup>
   <ItemGroup>

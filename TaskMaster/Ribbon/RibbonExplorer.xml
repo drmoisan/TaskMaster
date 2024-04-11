@@ -44,6 +44,7 @@
                   </menu>                    
                   <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" itemSize="large">
                     <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
+                    <button id="DeepEmailCompare" imageMso ="TraceDependentCells" onAction="DeepCompareEmails_Click" label="Deep Compare Emails"/>
                     <button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
                     <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />
                     <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />

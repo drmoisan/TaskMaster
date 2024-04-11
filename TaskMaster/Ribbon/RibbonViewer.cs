@@ -90,7 +90,7 @@ namespace TaskMaster
 
         public void BtnReviseProjectInfo_Click(Office.IRibbonControl control)
         {
-            _controller.ReviseProjectInfo();
+            _controller.ReviseProjectData();
         }
 
         public void BtnCompressIDs_Click(Office.IRibbonControl control)
@@ -179,6 +179,7 @@ namespace TaskMaster
         #endregion BayesianPerformance
 
         #region TryMethods  
+        public void DeepCompareEmails_Click(Office.IRibbonControl control) => _controller.TryDeepCompareEmails();
         public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
         public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();
         public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();
