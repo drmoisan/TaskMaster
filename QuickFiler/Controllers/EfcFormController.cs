@@ -43,11 +43,30 @@ namespace QuickFiler.Controllers
             _initType = initType;
             _itemViewer = _formViewer.ItemViewer;
             _itemTlp = _formViewer.L0vh_TLP;
-
-            Initialize();
         }
 
-        internal void Initialize()
+        public EfcFormController(
+            IApplicationGlobals globals,
+            EfcViewer formViewer,
+            EfcHomeController homeController,
+            System.Action parentCleanup,
+            QfEnums.InitTypeEnum initType,
+            CancellationToken token)
+        {
+            _token = token;
+            _globals = globals;
+            _parentCleanup = parentCleanup;
+            _formViewer = formViewer;
+            _homeController = homeController;
+            _initType = initType;
+            _itemViewer = _formViewer.ItemViewer;
+            _itemController = new EfcItemController(globals, homeController, this, _itemViewer, token);
+            _itemTlp = _formViewer.L0vh_TLP;
+        }
+
+        private EfcFormController() { }
+
+        internal EfcFormController Initialize()
         {
             LoadUserSettings();
             CaptureConfigureItemViewer();
@@ -56,8 +75,29 @@ namespace QuickFiler.Controllers
             SetupThemes();
             WireEventHandlers();
             _ = PopulateFolderCombobox();
-
+            return this;
         }
+
+        internal EfcFormController InitializeWithoutData()
+        {
+            LoadUserSettings();
+            CaptureConfigureItemViewer();
+            ResolveControlGroups();
+            _itemController.InitializeWithoutData();
+            SetupThemes();
+            WireEventHandlers();
+            return this;
+        }
+
+        internal EfcFormController InitializeDataFields(EfcDataModel dataModel)
+        {
+            _dataModel = dataModel;
+            _itemController.InitializeDataFields(dataModel);
+            _ = PopulateFolderCombobox();
+            return this;
+        }
+
+        
 
         #endregion Constructors
 

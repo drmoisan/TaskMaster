@@ -136,10 +136,7 @@ namespace TaskMaster
             _controller.RunTry();
         }
 
-        public void SortEmail_Click(Office.IRibbonControl control)
-        {
-            _controller.SortEmail();
-        }
+        public async void SortEmail_Click(Office.IRibbonControl control) => await _controller.SortEmailAsync();
 
         public void UndoSort_Click(Office.IRibbonControl control)
         {

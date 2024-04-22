@@ -4,11 +4,9 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms.VisualStyles;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Threading;
@@ -17,7 +15,6 @@ using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.Extensions;
-using Fizzler;
 using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS //QuickFiler
@@ -40,7 +37,7 @@ namespace UtilitiesCS //QuickFiler
         public MailItemHelper(MailItem item)
         {
             _item = item;
-            _attachmentsInfo = new(() => Attachments.Select(x => x.AttachmentInfo).ToArray());
+            _attachmentsInfo = new(() => Attachments?.Select(x => x.AttachmentInfo)?.ToArray());
         }
 
         public MailItemHelper(DataFrame df, long indexRow, string emailPrefixToStrip)
@@ -414,14 +411,16 @@ namespace UtilitiesCS //QuickFiler
         }
         internal AttachmentHelper[] LoadAttachmentsInfo()
         {
-            return Item.Attachments
-                       .Cast<Attachment>()
-                       .Select(x => new AttachmentHelper(x, _sentDate, FolderName, _emailPrefixToStrip))
-                       .ToArray();
+            var attachments = Item.Attachments
+                                  .Cast<Attachment>()
+                                  .Select(x => new AttachmentHelper(x, _sentDate, FolderName, _emailPrefixToStrip))
+                                  .ToArray();
+            AttachmentsInfo = attachments.Select(x => x.AttachmentInfo).ToArray();
+            return attachments;
         }
 
         private Lazy<IAttachment[]> _attachmentsInfo; 
-        public IAttachment[] AttachmentsInfo { get => _attachmentsInfo.Value; protected set => _attachmentsInfo = value.ToLazy(); }
+        public IAttachment[] AttachmentsInfo { get => _attachmentsInfo?.Value; protected set => _attachmentsInfo = value.ToLazy(); }
         
         public string GetHeadersExtendedMapi()
         {

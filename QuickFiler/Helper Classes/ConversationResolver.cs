@@ -30,6 +30,8 @@ namespace QuickFiler.Helper_Classes
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        #region Constructors and Initializers
+
         public ConversationResolver(IApplicationGlobals appGlobals, MailItem mailItem) 
         { 
             _globals = appGlobals;
@@ -46,6 +48,7 @@ namespace QuickFiler.Helper_Classes
             _tokenSource = tokenSource;
             _token = token;
             _mailItem = mailItem;
+            MailInfo = new MailItemHelper(mailItem).LoadPriority(appGlobals, token);
             _updateUI = updateUI;
             PropertyChanged += Handler_PropertyChanged;
         }
@@ -64,6 +67,8 @@ namespace QuickFiler.Helper_Classes
             if (updateUI is not null)
                 resolver.UpdateUI = updateUI;
 
+            resolver.MailInfo = await MailItemHelper.FromMailItemAsync(mailItem, appGlobals, token, loadAll);
+
             if (loadAll)
             {
                 await resolver.LoadDfAsync(token, loadAll);
@@ -74,8 +79,6 @@ namespace QuickFiler.Helper_Classes
             else
             {
                 resolver.PropertyChanged += resolver.Handler_PropertyChanged;
-                // Not sure why this was here. Going to comment it out for now
-                //_ = resolver.LoadConversationItemsAsync(token, backgroundLoad);
                 await resolver.LoadDfAsync(token, loadAll);
             }
 
@@ -90,24 +93,33 @@ namespace QuickFiler.Helper_Classes
             await LoadConversationItemsAsync(token, true);
         }
 
+        #endregion Constructors and Initializers
+
+        #region Properties
+
         private CancellationToken _token;
         internal CancellationToken Token { get => _token; set => _token = value; }
 
         private CancellationTokenSource _tokenSource;
         internal CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
 
-        private IApplicationGlobals _globals;
-        private MailItem _mailItem;
+        protected IApplicationGlobals _globals;
+        
+        protected MailItem _mailItem;
+        public MailItem Mail { get => _mailItem; protected set => _mailItem = value; }
 
         private bool _fullyLoaded = false;
-        public bool FullyLoaded { get => _fullyLoaded; private set => _fullyLoaded = value; }
+        public bool FullyLoaded { get => _fullyLoaded; protected set => _fullyLoaded = value; }
 
-        private System.Action<List<MailItemHelper>> _updateUI;
+        protected System.Action<List<MailItemHelper>> _updateUI;
         public System.Action<List<MailItemHelper>> UpdateUI 
         { 
             get => _updateUI; 
             set => Initializer.SetAndSave(ref _updateUI, value, (x) => NotifyPropertyChanged(nameof(UpdateUI))); 
         }
+
+        protected MailItemHelper _mailInfo;
+        public MailItemHelper MailInfo { get => _mailInfo; set => _mailInfo = value; }
 
         #region ConversationInfo
 
@@ -150,8 +162,18 @@ namespace QuickFiler.Helper_Classes
 
             var tasksConvInfoExp = Enumerable
                 .Range(0, Count.Expanded)
-                .Select(indexRow => MailItemHelper
-                .FromDfAsync(Df.Expanded, indexRow, _globals, token, backgroundLoad));
+                .Select(indexRow =>
+                {
+                    var entryId = (string)Df.Expanded["EntryID"][indexRow];
+                    if (entryId == MailInfo.EntryId)
+                    {
+                        return Task.FromResult(this.MailInfo);
+                    }
+                    else
+                    {
+                        return MailItemHelper.FromDfAsync(Df.Expanded, indexRow, _globals, token, backgroundLoad);
+                    }
+                });
 
             var convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp))
                                    .OrderByDescending(itemInfo => itemInfo.ConversationID)
@@ -212,8 +234,7 @@ namespace QuickFiler.Helper_Classes
         }
 
         internal Pair<DataFrame> LoadDf() 
-        { 
-                       
+        {                        
             var dfExpanded = _mailItem.GetConversation()
                                       .GetConversationDf()
                                       .FilterConversation(
@@ -222,7 +243,8 @@ namespace QuickFiler.Helper_Classes
                                             true);
 
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
-            
+            logger.Debug($"Source mail: {_mailItem.EntryID}");
+            logger.Debug(dfExpanded.PrettyText());
             return new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded); 
             
         }
@@ -256,6 +278,8 @@ namespace QuickFiler.Helper_Classes
         }
 
         #endregion
+
+        #endregion Properties
 
         #region INotifyPropertyChanged implementation
 

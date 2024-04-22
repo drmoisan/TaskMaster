@@ -10,6 +10,7 @@ using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Helper_Classes;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.Extensions;
 
 namespace QuickFiler.Controllers
 {
@@ -32,12 +33,26 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public async Task InitAsync()
+        private EfcDataModel(IApplicationGlobals globals, MailItem mail)
         {
-            if (Mail is not null)
-            {
-                ConversationResolver = await ConversationResolver.LoadAsync(Globals, Mail, TokenSource, Token, false);
-            }
+            Globals = globals;
+            Mail = mail;
+        }
+
+        public async static Task<EfcDataModel> CreateAsync(
+            IApplicationGlobals globals, 
+            MailItem mail, 
+            CancellationTokenSource tokenSource, 
+            CancellationToken token, 
+            bool loadAll)
+        {
+            globals.ThrowIfNull(nameof(globals));
+            mail.ThrowIfNull(nameof(mail));
+
+            var dataModel = new EfcDataModel(globals, mail);
+            dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mail, tokenSource, token, loadAll);
+            
+            return dataModel;
         }
 
 
@@ -92,20 +107,20 @@ namespace QuickFiler.Controllers
             set => _mail = value;
         }
 
-        private MailItemHelper _mailInfo;
-        public MailItemHelper MailInfo
-        {
-            get
-            {
-                if (_mailInfo is null && Mail is not null)
-                {
-                    _mailInfo = new MailItemHelper(Mail);
-                    _mailInfo.LoadPriority(_globals, _token);
-                }
-                return _mailInfo;
-            }
-            protected set => _mailInfo = value;
-        }
+        //private MailItemHelper _mailInfo;
+        public MailItemHelper MailInfo => ConversationResolver.MailInfo;
+        //{
+        //    get
+        //    {
+        //        if (_mailInfo is null && Mail is not null)
+        //        {
+        //            _mailInfo = new MailItemHelper(Mail);
+        //            _mailInfo.LoadPriority(_globals, _token);
+        //        }
+        //        return _mailInfo;
+        //    }
+        //    protected set => _mailInfo = value;
+        //}
 
         #endregion Public Properties
 
@@ -117,13 +132,12 @@ namespace QuickFiler.Controllers
                                        bool savePictures,
                                        bool moveConversation)
         {
-            if (Mail is not null)
+            if (MailInfo is not null)
             {
-                IList<MailItem> items = PackageItems(moveConversation);
+                
                 bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
-
-                //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                await SortEmail.SortAsync(mailItems: items,
+                var mailHelpers = moveConversation ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper>() { MailInfo };
+                await SortEmail.SortAsync(mailHelpers: mailHelpers,
                                          savePictures: savePictures,
                                          destinationOlStem: folderpath,
                                          saveMsg: saveEmail,
@@ -133,10 +147,34 @@ namespace QuickFiler.Controllers
                                          olAncestor: _globals.Ol.ArchiveRootPath,
                                          fsAncestorEquivalent: _globals.FS.FldrRoot);
                 SortEmail.Cleanup_Files();
-                // blDoMove
             }
-            //stackMovedItems.Push(grp.MailItem);
         }
+
+        //async public Task MoveToFolder(string folderpath,
+        //                               bool saveAttachments,
+        //                               bool saveEmail,
+        //                               bool savePictures,
+        //                               bool moveConversation)
+        //{
+        //    if (Mail is not null)
+        //    {
+        //        IList<MailItem> items = PackageItems(moveConversation);
+        //        bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
+
+        //        //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
+        //        await SortEmail.SortAsync(mailItems: items,
+        //                                 savePictures: savePictures,
+        //                                 destinationOlStem: folderpath,
+        //                                 saveMsg: saveEmail,
+        //                                 saveAttachments: attchments,
+        //                                 removePreviousFsFiles: false,
+        //                                 appGlobals: _globals,
+        //                                 olAncestor: _globals.Ol.ArchiveRootPath,
+        //                                 fsAncestorEquivalent: _globals.FS.FldrRoot);
+        //        SortEmail.Cleanup_Files();
+        //        // blDoMove
+        //    }
+        //}
 
         async public Task MoveToFolder(MAPIFolder folder,
                                        string olAncestor,

@@ -320,6 +320,15 @@ namespace TaskMaster
             sorter.Run();
         }
 
+        internal async Task SortEmailAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var sorter = await EfcHomeController.CreateAsync(_globals, () => { });
+            sorter.Run();
+        }
+
         internal async Task TryMineEmails()
         {
             if (SynchronizationContext.Current is null)

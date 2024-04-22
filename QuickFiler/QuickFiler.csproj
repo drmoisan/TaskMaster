@@ -373,8 +373,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewers\BayesianPerformanceViewer.resx">
       <DependentUpon>BayesianPerformanceViewer.cs</DependentUpon>
@@ -417,6 +417,7 @@
     <Content Include="Resources\FlagDarkRed.png" />
     <Content Include="Resources\FlagDarkRed.svg" />
     <None Include="Resources\Forward1.png" />
+    <None Include="Resources\Forward.svg" />
     <Content Include="Resources\NewFolder.png" />
     <Content Include="Resources\NewFolder.svg" />
     <Content Include="Resources\QuickFind.png" />
@@ -425,12 +426,11 @@
     <None Include="Resources\Forward4.afdesign" />
     <None Include="Resources\Reply.afdesign" />
     <None Include="Resources\Reply.svg" />
-    <None Include="Resources\Reply2.afdesign" />
-    <None Include="Resources\Reply3.afdesign" />
-    <None Include="Resources\Reply4.afdesign" />
-    <None Include="Resources\ReplyAll.afdesign" />
-    <None Include="Resources\ReplyAll.png" />
+    <None Include="Resources\ReplyAf.afdesign" />
+    <None Include="Resources\Reply4Af.afdesign" />
+    <None Include="Resources\ReplyAllAf.afdesign" />
     <None Include="Resources\Reply.png" />
+    <None Include="Resources\ReplyAll.svg" />
     <Content Include="Resources\Run.png" />
     <Resource Include="Resources\Run.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -441,8 +441,8 @@
     <Content Include="Resources\TextBlock.svg" />
     <Content Include="Resources\Web.png" />
     <Content Include="Resources\Web.svg" />
-    <None Include="Resources\ReplyAll3.afdesign" />
-    <None Include="Resources\ReplyAll4.afdesign" />
+    <None Include="Resources\ReplyAll3Af.afdesign" />
+    <None Include="Resources\ReplyAll4Af.afdesign" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

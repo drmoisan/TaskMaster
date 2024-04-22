@@ -54,7 +54,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens, int emailCount)
         {
-            var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag));
+            var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag, this));
             var matchFrequency = matchTokens.GroupAndCount();
             classifier.Train(matchFrequency, emailCount);
         }

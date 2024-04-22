@@ -34,6 +34,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _match = new Corpus();
         }
 
+        public BayesianClassifierShared(string tag, BayesianClassifierGroup parent)
+        {
+            _tag = tag;
+            _prob = new ConcurrentDictionary<string, double>();
+            _match = new Corpus();
+            Parent = parent;
+        }
+
         protected BayesianClassifierShared(string tag, Corpus match, BayesianClassifierGroup parent)
         {
             _tag = tag;

@@ -200,6 +200,16 @@ namespace QuickFiler.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Forward {
+            get {
+                object obj = ResourceManager.GetObject("Forward", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Forward1 {
@@ -312,16 +322,6 @@ namespace QuickFiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] Reply21 {
-            get {
-                object obj = ResourceManager.GetObject("Reply21", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] Reply3 {
             get {
                 object obj = ResourceManager.GetObject("Reply3", resourceCulture);
@@ -332,49 +332,9 @@ namespace QuickFiler.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] Reply4 {
-            get {
-                object obj = ResourceManager.GetObject("Reply4", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap ReplyAll {
+        internal static byte[] ReplyAll {
             get {
                 object obj = ResourceManager.GetObject("ReplyAll", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] ReplyAll1 {
-            get {
-                object obj = ResourceManager.GetObject("ReplyAll1", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] ReplyAll3 {
-            get {
-                object obj = ResourceManager.GetObject("ReplyAll3", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] ReplyAll4 {
-            get {
-                object obj = ResourceManager.GetObject("ReplyAll4", resourceCulture);
                 return ((byte[])(obj));
             }
         }

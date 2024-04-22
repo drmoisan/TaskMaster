@@ -25,51 +25,106 @@ namespace QuickFiler.Controllers
     {
         #region Constructors and Initializers
 
-        public EfcItemController(IApplicationGlobals AppGlobals,
+        public EfcItemController(IApplicationGlobals globals,
                                  IFilerHomeController homeController,
                                  EfcFormController parent,
                                  ItemViewer itemViewer,
                                  EfcDataModel dataModel,
-                                 CancellationToken token)
+                                 CancellationToken token) :
+            this(globals, homeController, parent, itemViewer, token)
         {
-            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async: true, token);
+            Initialize(async: true);
         }
 
-        public EfcItemController(IApplicationGlobals AppGlobals,
+        public EfcItemController(IApplicationGlobals globals,
                                  IFilerHomeController homeController,
                                  EfcFormController parent,
                                  ItemViewer itemViewer,
                                  EfcDataModel dataModel,
                                  bool async,
-                                 CancellationToken token)
+                                 CancellationToken token): 
+            this(globals, homeController, parent, itemViewer, token)
         {
-            Initialize(AppGlobals, homeController, parent, itemViewer, dataModel, async, token);
+            Initialize(async);
         }
 
-        private void Initialize(IApplicationGlobals AppGlobals,
-                                IFilerHomeController homeController,
-                                EfcFormController parent,
-                                ItemViewer itemViewer,
-                                EfcDataModel dataModel,
-                                bool async,
-                                CancellationToken token)
+        public EfcItemController(IApplicationGlobals globals,
+                                 IFilerHomeController homeController,
+                                 EfcFormController parent,
+                                 ItemViewer itemViewer,
+                                 CancellationToken token)
         {
-            _token = token;
-            _globals = AppGlobals;
+            _globals = globals;
             _homeController = homeController;
-
-            // Grab handle on viewer and controllers
-            _itemViewer = itemViewer;
-            _itemViewer.Controller = this;
-            _dataModel = dataModel;
             _keyboardHandler = _homeController.KeyboardHandler;
-            _parent = parent;
             _explorerController = _homeController.ExplorerController;
+            _parent = parent;
+            _itemViewer = itemViewer;
+            _token = token;
+        }
+
+        public EfcItemController InitializeWithoutData()
+        {
+            // Adjust the viewer for Efc purposes
+            AdjustViewerForEfc();
+
+            ResolveControlGroups(_itemViewer);
+
+            
+            // Toggle off Tips and Navigation directly since we are definitely on the UI thread
+            _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off));
+            _itemPositionTips.Toggle(Enums.ToggleState.Off, shareColumn: true);
+
+            return this;
+        }
+
+        public EfcItemController InitializeDataFields(EfcDataModel dataModel)
+        {
+            _dataModel = dataModel;
+            _themes = EfcThemeHelper.SetupThemes(_navCtrls,
+                                                 _tipsCtrls,
+                                                 _dflt2Ctrls,
+                                                 _selectorsCtrls,
+                                                 _mailCtrls,
+                                                 () => !_dataModel.Mail.UnRead,
+                                                 _itemViewer.TopicThread.Columns.Cast<object>().ToList(),
+                                                 (columns, fore, back) => SetOlvTheme(columns, fore, back),
+                                                 _itemViewer.L0v2h2_WebView2,
+                                                 this.HtmlDarkConverter);
+            _activeTheme = LoadTheme();
+
+            PopulateControls(dataModel);
+            PopulateConversation();
+            WireEvents();
+            Task.Run(() => InitializeWebViewAsync());
+            return this;
+        }
+
+        private void Initialize(bool async)
+        //private void Initialize(IApplicationGlobals AppGlobals,
+        //                        IFilerHomeController homeController,
+        //                        EfcFormController parent,
+        //                        ItemViewer itemViewer,
+        //                        EfcDataModel dataModel,
+        //                        bool async,
+        //                        CancellationToken token)
+        {
+            //_token = token;
+            //_globals = AppGlobals;
+            //_homeController = homeController;
+
+            //// Grab handle on viewer and controllers
+            //_itemViewer = itemViewer;
+            //_itemViewer.Controller = this;
+            //_dataModel = dataModel;
+            //_keyboardHandler = _homeController.KeyboardHandler;
+            //_parent = parent;
+            //_explorerController = _homeController.ExplorerController;
 
             // Adjust the viewer for Efc purposes
             AdjustViewerForEfc();
 
-            ResolveControlGroups(itemViewer);
+            ResolveControlGroups(_itemViewer);
 
             _themes = EfcThemeHelper.SetupThemes(_navCtrls,
                                                  _tipsCtrls,
@@ -84,7 +139,7 @@ namespace QuickFiler.Controllers
             _activeTheme = LoadTheme();
 
             // Populate placeholder controls with 
-            PopulateControls(dataModel);
+            PopulateControls(_dataModel);
 
             PopulateConversation();
             
@@ -261,7 +316,6 @@ namespace QuickFiler.Controllers
         private IFilerHomeController _homeController;
         private IQfcKeyboardHandler _keyboardHandler;
         private IQfcTipsDetails _itemPositionTips;
-        private MailItemHelper _itemInfo;
         private ItemViewer _itemViewer;
         private System.Threading.Timer _timer;
         private List<Control> _navCtrls;
@@ -273,6 +327,10 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Exposed properties
+        
+        
+        private MailItemHelper _itemInfo;
+        internal MailItemHelper ItemInfo => _itemInfo;
 
         private string _activeTheme;
         public string ActiveTheme

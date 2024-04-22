@@ -111,12 +111,12 @@ namespace UtilitiesCS
             AddBayesianSuggestions(mailInfo, appGlobals, topNfolderKeys);
 
             AddConversationBasedSuggestions(mailInfo.Item, _globals);
-            if (topNfolderKeys > 0)
-            {
-                AddOlFolderKeys(mailInfo.Item, _globals, topNfolderKeys);
-            }
+            //if (topNfolderKeys > 0)
+            //{
+            //    AddOlFolderKeys(mailInfo.Item, _globals, topNfolderKeys);
+            //}
 
-            AddWordSequenceSuggestions(mailInfo.Item, appGlobals, parallel);
+            //AddWordSequenceSuggestions(mailInfo.Item, appGlobals, parallel);
 
             Vlog.LogObject(_folderNameScores, nameof(_folderNameScores));
 
