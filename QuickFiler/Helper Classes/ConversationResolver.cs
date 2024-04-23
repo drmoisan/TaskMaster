@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace QuickFiler.Helper_Classes
 {
@@ -175,9 +176,33 @@ namespace QuickFiler.Helper_Classes
                     }
                 });
 
-            var convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp))
-                                   .OrderByDescending(itemInfo => itemInfo.ConversationID)
-                                   .ToList();
+            var convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp)).OrderBy(x => x.ConversationID).ToList();
+
+            var idx = convInfoExpanded.FindIndex(x => x.EntryId == MailInfo.EntryId);
+            convInfoExpanded[idx] = MailInfo;
+
+
+            //List<MailItemHelper> convInfoExpanded = null;
+
+            //if (Count.Expanded > 0)
+            //{
+            //    //var tasksConvInfoExp = Enumerable
+            //    convInfoExpanded = await Enumerable.Range(0, Count.Expanded).ToAsyncEnumerable()
+            //        .SelectAwait(async indexRow => await MailItemHelper.FromDfAsync(Df.Expanded, indexRow, _globals, token, backgroundLoad, true))
+            //        .Where(helper => helper.EntryId != MailInfo.EntryId)
+            //        .SelectAwait(async helper => await helper.FromDfAfterResolved()).ToListAsync();
+            //        //.Where(indexRow => (string)Df.Expanded["EntryID"][indexRow] != MailInfo.EntryId)
+            //        //.Select(indexRow => MailItemHelper.FromDfAsync(Df.Expanded, indexRow, _globals, token, backgroundLoad));
+
+            //    //convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp))
+            //    //                       .OrderByDescending(itemInfo => itemInfo.ConversationID)
+            //    //                       .ToList();
+            //    convInfoExpanded.Insert(0, MailInfo);
+            //}
+            //else
+            //{
+            //    convInfoExpanded = new List<MailItemHelper>() { MailInfo };
+            //}
 
             if (UpdateUI is not null)
             {

@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
+using Fizzler;
 
 namespace UtilitiesCS //QuickFiler
 {
@@ -78,6 +79,35 @@ namespace UtilitiesCS //QuickFiler
             info.LoadPriority(appGlobals, token);
             info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
             return info;
+        }
+
+        public static async Task<MailItemHelper> FromDfAsync(DataFrame df, long indexRow, IApplicationGlobals appGlobals, CancellationToken token, bool background, bool resolveOnly)
+        {
+            token.ThrowIfCancellationRequested();
+
+            var info = new MailItemHelper(df, indexRow, appGlobals.Ol.EmailPrefixToStrip);
+            await info.ResolveMailAsync(appGlobals.Ol.NamespaceMAPI, token, background);
+
+            if (!resolveOnly) { await info.FromDfAfterResolved(); }
+
+            return info;
+        }
+
+        public async Task<MailItemHelper> FromDfAfterResolved()
+        {
+            _token.ThrowIfCancellationRequested();
+            await Task.Run(() => LoadPriorityItems(Globals, _token), _token);
+
+            FolderInfo.OlRoot = ResolveFolderRoot(Globals, FolderInfo.OlFolder.FolderPath);
+
+            _token.ThrowIfCancellationRequested();
+            await Task.Run(() =>
+            {
+                LoadRecipients();
+                if (_html is not null) { _html = GetHtml(); }
+            }, _token);
+
+            return this;
         }
 
         public static async Task<MailItemHelper> FromDfAsync(DataFrame df, long indexRow, IApplicationGlobals appGlobals, CancellationToken token, bool background)

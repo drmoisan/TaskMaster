@@ -71,8 +71,8 @@ namespace UtilitiesCS.EmailIntelligence
             var rows = new LinkedList<Bitmap>();
             var max_image_size = SpamBayesOptions.max_image_size;
 
-            var attachmentParts = parts.Where(x => x is IAttachment).Cast<IAttachment>().ToList();
-            var htmlParts = parts.Where(x => x is string).Cast<string>().ToList();
+            var attachmentParts = parts.Where(x => x is IAttachment)?.Cast<IAttachment>()?.ToList() ?? [];
+            var htmlParts = parts.Where(x => x is string)?.Cast<string>()?.ToList() ?? [];
             foreach (var part in attachmentParts)
             {
                 // See 'image_large_size_attribute' above - the provider may have seen

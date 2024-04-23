@@ -101,16 +101,6 @@ namespace UtilitiesCS.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] eng {
-            get {
-                object obj = ResourceManager.GetObject("eng", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap ExceptionPublic {
@@ -256,6 +246,16 @@ namespace UtilitiesCS.Properties {
         internal static byte[] StatusInProgress {
             get {
                 object obj = ResourceManager.GetObject("StatusInProgress", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] TesseractEnglish {
+            get {
+                object obj = ResourceManager.GetObject("TesseractEnglish", resourceCulture);
                 return ((byte[])(obj));
             }
         }

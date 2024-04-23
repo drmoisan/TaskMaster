@@ -31,13 +31,13 @@ namespace QuickFiler
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewer));
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
-            SVGControl.SvgResource svgResource1 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource2 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource3 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource4 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource5 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource6 = new SVGControl.SvgResource();
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties21 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
+            SVGControl.SvgResource svgResource121 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource122 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource123 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource124 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource125 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource126 = new SVGControl.SvgResource();
             this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
             this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -230,7 +230,7 @@ namespace QuickFiler
             this.CboFolders.Location = new System.Drawing.Point(807, 64);
             this.CboFolders.Margin = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.CboFolders.Name = "CboFolders";
-            this.CboFolders.Size = new System.Drawing.Size(391, 25);
+            this.CboFolders.Size = new System.Drawing.Size(196, 25);
             this.CboFolders.TabIndex = 42;
             // 
             // LblSearch
@@ -263,13 +263,13 @@ namespace QuickFiler
             this.L0v2h2_WebView2.AllowExternalDrop = true;
             this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
             this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
-            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties1.Language = null;
-            coreWebView2CreationProperties1.ProfileName = null;
-            coreWebView2CreationProperties1.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties1;
+            coreWebView2CreationProperties21.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties21.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties21.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties21.Language = null;
+            coreWebView2CreationProperties21.ProfileName = null;
+            coreWebView2CreationProperties21.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties21;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_WebView2.Location = new System.Drawing.Point(52, 112);
@@ -618,7 +618,7 @@ namespace QuickFiler
             this.BtnReply.Image = ((System.Drawing.Image)(resources.GetObject("BtnReply.Image")));
             this.BtnReply.ImageSVG.ImagePath = "(none)";
             this.BtnReply.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource1.Data = new byte[] {
+            svgResource121.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
         ((byte)(120)),
@@ -1645,8 +1645,8 @@ namespace QuickFiler
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource1.Name = "Reply";
-            this.BtnReply.ImageSVG.ResourceName = svgResource1;
+            svgResource121.Name = "Reply";
+            this.BtnReply.ImageSVG.ResourceName = svgResource121;
             this.BtnReply.ImageSVG.SaveRendering = false;
             this.BtnReply.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnReply.ImageSVG.UseDefaultImage = false;
@@ -1665,7 +1665,7 @@ namespace QuickFiler
             this.BtnReplyAll.Image = ((System.Drawing.Image)(resources.GetObject("BtnReplyAll.Image")));
             this.BtnReplyAll.ImageSVG.ImagePath = "(none)";
             this.BtnReplyAll.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource2.Data = new byte[] {
+            svgResource122.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
         ((byte)(120)),
@@ -3131,8 +3131,8 @@ namespace QuickFiler
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource2.Name = "ReplyAll";
-            this.BtnReplyAll.ImageSVG.ResourceName = svgResource2;
+            svgResource122.Name = "ReplyAll";
+            this.BtnReplyAll.ImageSVG.ResourceName = svgResource122;
             this.BtnReplyAll.ImageSVG.SaveRendering = false;
             this.BtnReplyAll.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnReplyAll.ImageSVG.UseDefaultImage = false;
@@ -3151,7 +3151,7 @@ namespace QuickFiler
             this.BtnForward.Image = ((System.Drawing.Image)(resources.GetObject("BtnForward.Image")));
             this.BtnForward.ImageSVG.ImagePath = "(none)";
             this.BtnForward.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource3.Data = new byte[] {
+            svgResource123.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
         ((byte)(120)),
@@ -3956,8 +3956,8 @@ namespace QuickFiler
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource3.Name = "Forward";
-            this.BtnForward.ImageSVG.ResourceName = svgResource3;
+            svgResource123.Name = "Forward";
+            this.BtnForward.ImageSVG.ResourceName = svgResource123;
             this.BtnForward.ImageSVG.SaveRendering = false;
             this.BtnForward.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnForward.ImageSVG.UseDefaultImage = false;
@@ -3996,7 +3996,7 @@ namespace QuickFiler
             this.BtnDelItem.Image = ((System.Drawing.Image)(resources.GetObject("BtnDelItem.Image")));
             this.BtnDelItem.ImageSVG.ImagePath = "(none)";
             this.BtnDelItem.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource4.Data = new byte[] {
+            svgResource124.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -4610,8 +4610,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource4.Name = "Delete1";
-            this.BtnDelItem.ImageSVG.ResourceName = svgResource4;
+            svgResource124.Name = "Delete1";
+            this.BtnDelItem.ImageSVG.ResourceName = svgResource124;
             this.BtnDelItem.ImageSVG.SaveRendering = false;
             this.BtnDelItem.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnDelItem.ImageSVG.UseDefaultImage = false;
@@ -4645,7 +4645,7 @@ namespace QuickFiler
             this.BtnPopOut.Image = ((System.Drawing.Image)(resources.GetObject("BtnPopOut.Image")));
             this.BtnPopOut.ImageSVG.ImagePath = "(none)";
             this.BtnPopOut.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource5.Data = new byte[] {
+            svgResource125.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -5370,8 +5370,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource5.Name = "ApplicationFlyout1";
-            this.BtnPopOut.ImageSVG.ResourceName = svgResource5;
+            svgResource125.Name = "ApplicationFlyout1";
+            this.BtnPopOut.ImageSVG.ResourceName = svgResource125;
             this.BtnPopOut.ImageSVG.SaveRendering = false;
             this.BtnPopOut.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnPopOut.ImageSVG.UseDefaultImage = false;
@@ -5405,7 +5405,7 @@ namespace QuickFiler
             this.BtnFlagTask.Image = ((System.Drawing.Image)(resources.GetObject("BtnFlagTask.Image")));
             this.BtnFlagTask.ImageSVG.ImagePath = "(none)";
             this.BtnFlagTask.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource6.Data = new byte[] {
+            svgResource126.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -6112,8 +6112,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource6.Name = "FlagDarkRed1";
-            this.BtnFlagTask.ImageSVG.ResourceName = svgResource6;
+            svgResource126.Name = "FlagDarkRed1";
+            this.BtnFlagTask.ImageSVG.ResourceName = svgResource126;
             this.BtnFlagTask.ImageSVG.SaveRendering = false;
             this.BtnFlagTask.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnFlagTask.ImageSVG.UseDefaultImage = false;

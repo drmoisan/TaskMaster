@@ -501,7 +501,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal List<object> imageparts(IItemInfo msg)
         {
-            return msg.AttachmentsInfo.Where(x => x.IsImage).Cast<object>().ToList();
+            return msg.AttachmentsInfo.Where(x => x.IsImage)?.Cast<object>()?.ToList() ?? [];
             //var attachments = msg.Attachments;
             //var parts = msg.Attachments.Where(x => x.AttachmentInfo.IsImage).Select(x => x.Attachment).Cast<object>().ToList();
             //return parts;
@@ -592,15 +592,18 @@ namespace UtilitiesCS.EmailIntelligence
             yield return $"charset:{charset}";
                         
             var attachments = itemInfo.AttachmentsInfo;
-            foreach (var attachment in attachments)
+            if (attachments is not null)
             {
-                var fname = attachment.FileName;
-                if (fname.IsNullOrEmpty())
-                    yield return "filename:<bogus>";
-                else
+                foreach (var attachment in attachments)
                 {
-                    foreach (var x in crack_filename(fname))
-                        yield return "filename:" + x;
+                    var fname = attachment.FileName;
+                    if (fname.IsNullOrEmpty())
+                        yield return "filename:<bogus>";
+                    else
+                    {
+                        foreach (var x in crack_filename(fname))
+                            yield return "filename:" + x;
+                    }
                 }
             }
 
