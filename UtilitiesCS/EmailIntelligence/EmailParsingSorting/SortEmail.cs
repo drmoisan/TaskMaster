@@ -133,7 +133,11 @@ namespace UtilitiesCS
             {
 
                 var attachments = mailHelper.Attachments.ToAsyncEnumerable();
-                await attachments.ForEachAsync(async x => await x.SaveAttachmentAsync());
+                await attachments.ForEachAsync(async x => 
+                { 
+                    
+                    await x.SaveAttachmentAsync(saveFsPath); 
+                });
 
                 // Delete the original attachments if removePreviousFsFiles is true
                 var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
@@ -557,6 +561,17 @@ namespace UtilitiesCS
                 //await Task.Run(() => attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FolderPathSave));
                 await attachmentHelper.Attachment.TrySaveAttachmentAsync(attachmentHelper.FilePathSave);
             }
+        }
+
+        async public static Task SaveAttachmentAsync(this AttachmentHelper attachmentHelper, string destinationPath)
+        {
+            TraceUtility.LogMethodCall(attachmentHelper);
+            logger.Debug($"Original Destination Path {attachmentHelper.FolderPathSave}");
+            attachmentHelper.FolderPathSave = destinationPath;
+            logger.Debug($"New Destination Path {attachmentHelper.FolderPathSave}");
+
+
+            await SaveAttachmentAsync(attachmentHelper);
         }
 
         async internal static Task SaveCaseAsync(
