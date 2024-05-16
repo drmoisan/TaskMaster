@@ -443,7 +443,7 @@ namespace UtilitiesCS //QuickFiler
         {
             var attachments = Item.Attachments
                                   .Cast<Attachment>()
-                                  .Select(x => new AttachmentHelper(x, _sentDate, FolderName, _emailPrefixToStrip))
+                                  .Select(x => new AttachmentHelper(x, SentDate, FolderName, _emailPrefixToStrip))
                                   .ToArray();
             AttachmentsInfo = attachments.Select(x => x.AttachmentInfo).ToArray();
             return attachments;
