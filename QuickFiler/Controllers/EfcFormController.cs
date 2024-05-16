@@ -140,6 +140,10 @@ namespace QuickFiler.Controllers
             _tlpHeightDiff = _tlpHeightExpanded - _tlpHeightCollapsed;
             _itemViewerTlpRow = _itemTlp.GetPositionFromControl(_itemViewer).Row;
             ToggleExpansionStyle(Enums.ToggleState.Off);
+            var itemTlpRows = _itemViewer.L0vh_Tlp.RowStyles.Cast<RowStyle>().Take(5);
+            var bodyRow = itemTlpRows.ElementAt(4);
+            var bodyRowHeight = _tlpHeightCollapsed - itemTlpRows.Select(x => x.Height).Sum(x => x) + bodyRow.Height;
+            bodyRow.Height = bodyRowHeight;
         }
         
         public void Cleanup()

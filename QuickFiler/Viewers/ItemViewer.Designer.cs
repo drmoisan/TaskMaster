@@ -30,21 +30,17 @@ namespace QuickFiler
         /// </summary>
         private void InitializeComponent()
         {
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewer));
-            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties21 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
-            SVGControl.SvgResource svgResource121 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource122 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource123 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource124 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource125 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource126 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource7 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource8 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource9 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource10 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource11 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource12 = new SVGControl.SvgResource();
             this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
             this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.ConversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SaveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SaveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SavePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.LblAcSearch = new System.Windows.Forms.Label();
             this.CboFolders = new System.Windows.Forms.ComboBox();
             this.LblSearch = new System.Windows.Forms.Label();
@@ -83,6 +79,10 @@ namespace QuickFiler
             this.LblAcTask = new System.Windows.Forms.Label();
             this.BtnFlagTask = new SVGControl.ButtonSVG();
             this.LblAcMoveOptions = new System.Windows.Forms.Label();
+            this.ConversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SaveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SaveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this.SavePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
             this.L0vh_Tlp.SuspendLayout();
             this.MoveOptionsStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).BeginInit();
@@ -170,39 +170,6 @@ namespace QuickFiler
             this.MoveOptionsMenu.Size = new System.Drawing.Size(94, 22);
             this.MoveOptionsMenu.Text = "&Move Options";
             // 
-            // ConversationMenuItem
-            // 
-            this.ConversationMenuItem.CheckOnClick = true;
-            this.ConversationMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("ConversationMenuItem.Image")));
-            this.ConversationMenuItem.Name = "ConversationMenuItem";
-            this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
-            this.ConversationMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.ConversationMenuItem.Text = "Move &Conversation";
-            // 
-            // SaveAttachmentsMenuItem
-            // 
-            this.SaveAttachmentsMenuItem.CheckOnClick = true;
-            this.SaveAttachmentsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SaveAttachmentsMenuItem.Image")));
-            this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
-            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
-            // 
-            // SaveEmailMenuItem
-            // 
-            this.SaveEmailMenuItem.CheckOnClick = true;
-            this.SaveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
-            this.SaveEmailMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.SaveEmailMenuItem.Text = "Save E&mail Copy";
-            // 
-            // SavePicturesMenuItem
-            // 
-            this.SavePicturesMenuItem.CheckOnClick = true;
-            this.SavePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
-            this.SavePicturesMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.SavePicturesMenuItem.Text = "Save &Pictures";
-            // 
             // LblAcSearch
             // 
             this.LblAcSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -230,7 +197,7 @@ namespace QuickFiler
             this.CboFolders.Location = new System.Drawing.Point(807, 64);
             this.CboFolders.Margin = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.CboFolders.Name = "CboFolders";
-            this.CboFolders.Size = new System.Drawing.Size(196, 25);
+            this.CboFolders.Size = new System.Drawing.Size(391, 25);
             this.CboFolders.TabIndex = 42;
             // 
             // LblSearch
@@ -263,13 +230,13 @@ namespace QuickFiler
             this.L0v2h2_WebView2.AllowExternalDrop = true;
             this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
             this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
-            coreWebView2CreationProperties21.AdditionalBrowserArguments = null;
-            coreWebView2CreationProperties21.BrowserExecutableFolder = null;
-            coreWebView2CreationProperties21.IsInPrivateModeEnabled = null;
-            coreWebView2CreationProperties21.Language = null;
-            coreWebView2CreationProperties21.ProfileName = null;
-            coreWebView2CreationProperties21.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties21;
+            coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties2.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties2.Language = null;
+            coreWebView2CreationProperties2.ProfileName = null;
+            coreWebView2CreationProperties2.UserDataFolder = null;
+            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties2;
             this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
             this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2h2_WebView2.Location = new System.Drawing.Point(52, 112);
@@ -482,7 +449,7 @@ namespace QuickFiler
             // 
             // infolder
             // 
-            this.infolder.AspectName = "Folder";
+            this.infolder.AspectName = "FolderName";
             this.infolder.FillsFreeSpace = true;
             this.infolder.MinimumWidth = 200;
             this.infolder.Text = "In Folder";
@@ -618,7 +585,7 @@ namespace QuickFiler
             this.BtnReply.Image = ((System.Drawing.Image)(resources.GetObject("BtnReply.Image")));
             this.BtnReply.ImageSVG.ImagePath = "(none)";
             this.BtnReply.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource121.Data = new byte[] {
+            svgResource7.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
         ((byte)(120)),
@@ -1645,8 +1612,8 @@ namespace QuickFiler
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource121.Name = "Reply";
-            this.BtnReply.ImageSVG.ResourceName = svgResource121;
+            svgResource7.Name = "Reply";
+            this.BtnReply.ImageSVG.ResourceName = svgResource7;
             this.BtnReply.ImageSVG.SaveRendering = false;
             this.BtnReply.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnReply.ImageSVG.UseDefaultImage = false;
@@ -1665,7 +1632,7 @@ namespace QuickFiler
             this.BtnReplyAll.Image = ((System.Drawing.Image)(resources.GetObject("BtnReplyAll.Image")));
             this.BtnReplyAll.ImageSVG.ImagePath = "(none)";
             this.BtnReplyAll.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource122.Data = new byte[] {
+            svgResource8.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
         ((byte)(120)),
@@ -3131,8 +3098,8 @@ namespace QuickFiler
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource122.Name = "ReplyAll";
-            this.BtnReplyAll.ImageSVG.ResourceName = svgResource122;
+            svgResource8.Name = "ReplyAll";
+            this.BtnReplyAll.ImageSVG.ResourceName = svgResource8;
             this.BtnReplyAll.ImageSVG.SaveRendering = false;
             this.BtnReplyAll.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnReplyAll.ImageSVG.UseDefaultImage = false;
@@ -3151,7 +3118,7 @@ namespace QuickFiler
             this.BtnForward.Image = ((System.Drawing.Image)(resources.GetObject("BtnForward.Image")));
             this.BtnForward.ImageSVG.ImagePath = "(none)";
             this.BtnForward.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource123.Data = new byte[] {
+            svgResource9.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
         ((byte)(120)),
@@ -3956,8 +3923,8 @@ namespace QuickFiler
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource123.Name = "Forward";
-            this.BtnForward.ImageSVG.ResourceName = svgResource123;
+            svgResource9.Name = "Forward";
+            this.BtnForward.ImageSVG.ResourceName = svgResource9;
             this.BtnForward.ImageSVG.SaveRendering = false;
             this.BtnForward.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnForward.ImageSVG.UseDefaultImage = false;
@@ -3996,7 +3963,7 @@ namespace QuickFiler
             this.BtnDelItem.Image = ((System.Drawing.Image)(resources.GetObject("BtnDelItem.Image")));
             this.BtnDelItem.ImageSVG.ImagePath = "(none)";
             this.BtnDelItem.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource124.Data = new byte[] {
+            svgResource10.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -4610,8 +4577,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource124.Name = "Delete1";
-            this.BtnDelItem.ImageSVG.ResourceName = svgResource124;
+            svgResource10.Name = "Delete1";
+            this.BtnDelItem.ImageSVG.ResourceName = svgResource10;
             this.BtnDelItem.ImageSVG.SaveRendering = false;
             this.BtnDelItem.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnDelItem.ImageSVG.UseDefaultImage = false;
@@ -4645,7 +4612,7 @@ namespace QuickFiler
             this.BtnPopOut.Image = ((System.Drawing.Image)(resources.GetObject("BtnPopOut.Image")));
             this.BtnPopOut.ImageSVG.ImagePath = "(none)";
             this.BtnPopOut.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource125.Data = new byte[] {
+            svgResource11.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -5370,8 +5337,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource125.Name = "ApplicationFlyout1";
-            this.BtnPopOut.ImageSVG.ResourceName = svgResource125;
+            svgResource11.Name = "ApplicationFlyout1";
+            this.BtnPopOut.ImageSVG.ResourceName = svgResource11;
             this.BtnPopOut.ImageSVG.SaveRendering = false;
             this.BtnPopOut.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnPopOut.ImageSVG.UseDefaultImage = false;
@@ -5405,7 +5372,7 @@ namespace QuickFiler
             this.BtnFlagTask.Image = ((System.Drawing.Image)(resources.GetObject("BtnFlagTask.Image")));
             this.BtnFlagTask.ImageSVG.ImagePath = "(none)";
             this.BtnFlagTask.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource126.Data = new byte[] {
+            svgResource12.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -6112,8 +6079,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource126.Name = "FlagDarkRed1";
-            this.BtnFlagTask.ImageSVG.ResourceName = svgResource126;
+            svgResource12.Name = "FlagDarkRed1";
+            this.BtnFlagTask.ImageSVG.ResourceName = svgResource12;
             this.BtnFlagTask.ImageSVG.SaveRendering = false;
             this.BtnFlagTask.ImageSVG.Size = new System.Drawing.Size(44, 24);
             this.BtnFlagTask.ImageSVG.UseDefaultImage = false;
@@ -6140,6 +6107,39 @@ namespace QuickFiler
             this.LblAcMoveOptions.Size = new System.Drawing.Size(20, 19);
             this.LblAcMoveOptions.TabIndex = 10;
             this.LblAcMoveOptions.Text = "M";
+            // 
+            // ConversationMenuItem
+            // 
+            this.ConversationMenuItem.CheckOnClick = true;
+            this.ConversationMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("ConversationMenuItem.Image")));
+            this.ConversationMenuItem.Name = "ConversationMenuItem";
+            this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
+            this.ConversationMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.ConversationMenuItem.Text = "Move &Conversation";
+            // 
+            // SaveAttachmentsMenuItem
+            // 
+            this.SaveAttachmentsMenuItem.CheckOnClick = true;
+            this.SaveAttachmentsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SaveAttachmentsMenuItem.Image")));
+            this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
+            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
+            // 
+            // SaveEmailMenuItem
+            // 
+            this.SaveEmailMenuItem.CheckOnClick = true;
+            this.SaveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
+            this.SaveEmailMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.SaveEmailMenuItem.Text = "Save E&mail Copy";
+            // 
+            // SavePicturesMenuItem
+            // 
+            this.SavePicturesMenuItem.CheckOnClick = true;
+            this.SavePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
+            this.SavePicturesMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.SavePicturesMenuItem.Text = "Save &Pictures";
             // 
             // ItemViewer
             // 
