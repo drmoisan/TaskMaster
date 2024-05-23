@@ -745,7 +745,7 @@ namespace ToDoModel
         {
             get
             {
-                if (_metaTaskLvl.Length != 0)
+                if (_metaTaskLvl?.Length != 0)
                 {
                     return _metaTaskLvl;
                 }

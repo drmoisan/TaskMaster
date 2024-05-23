@@ -33,11 +33,11 @@ namespace QuickFiler
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EfcViewer));
-            SVGControl.SvgResource svgResource6 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource7 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource8 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource9 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource10 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource36 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource37 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource38 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource39 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource40 = new SVGControl.SvgResource();
             this.L0vh_TLP = new System.Windows.Forms.TableLayoutPanel();
             this.Tlp = new System.Windows.Forms.TableLayoutPanel();
             this.LblAcTrash = new System.Windows.Forms.Label();
@@ -250,7 +250,7 @@ namespace QuickFiler
             this.BtnDelItem.Image = ((System.Drawing.Image)(resources.GetObject("BtnDelItem.Image")));
             this.BtnDelItem.ImageSVG.ImagePath = "(none)";
             this.BtnDelItem.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource6.Data = new byte[] {
+            svgResource36.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -864,8 +864,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource6.Name = "Delete1";
-            this.BtnDelItem.ImageSVG.ResourceName = svgResource6;
+            svgResource36.Name = "Delete1";
+            this.BtnDelItem.ImageSVG.ResourceName = svgResource36;
             this.BtnDelItem.ImageSVG.SaveRendering = false;
             this.BtnDelItem.ImageSVG.Size = new System.Drawing.Size(73, 18);
             this.BtnDelItem.ImageSVG.UseDefaultImage = false;
@@ -897,7 +897,7 @@ namespace QuickFiler
             this.Ok.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.Ok.ImageSVG.ImagePath = "(none)";
             this.Ok.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource7.Data = new byte[] {
+            svgResource37.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -1311,8 +1311,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource7.Name = "Run1";
-            this.Ok.ImageSVG.ResourceName = svgResource7;
+            svgResource37.Name = "Run1";
+            this.Ok.ImageSVG.ResourceName = svgResource37;
             this.Ok.ImageSVG.SaveRendering = false;
             this.Ok.ImageSVG.Size = new System.Drawing.Size(142, 48);
             this.Ok.ImageSVG.UseDefaultImage = false;
@@ -1335,7 +1335,7 @@ namespace QuickFiler
             this.Cancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.Cancel.ImageSVG.ImagePath = "(none)";
             this.Cancel.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
-            svgResource8.Data = new byte[] {
+            svgResource38.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -1819,8 +1819,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource8.Name = "Cancel1";
-            this.Cancel.ImageSVG.ResourceName = svgResource8;
+            svgResource38.Name = "Cancel1";
+            this.Cancel.ImageSVG.ResourceName = svgResource38;
             this.Cancel.ImageSVG.SaveRendering = false;
             this.Cancel.ImageSVG.Size = new System.Drawing.Size(142, 48);
             this.Cancel.ImageSVG.UseDefaultImage = false;
@@ -1842,7 +1842,7 @@ namespace QuickFiler
             this.RefreshPredicted.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.RefreshPredicted.ImageSVG.ImagePath = "(none)";
             this.RefreshPredicted.ImageSVG.Margin = new System.Windows.Forms.Padding(6);
-            svgResource9.Data = new byte[] {
+            svgResource39.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -2881,8 +2881,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource9.Name = "QuickRefresh";
-            this.RefreshPredicted.ImageSVG.ResourceName = svgResource9;
+            svgResource39.Name = "QuickRefresh";
+            this.RefreshPredicted.ImageSVG.ResourceName = svgResource39;
             this.RefreshPredicted.ImageSVG.SaveRendering = false;
             this.RefreshPredicted.ImageSVG.Size = new System.Drawing.Size(136, 42);
             this.RefreshPredicted.ImageSVG.UseDefaultImage = false;
@@ -2904,7 +2904,7 @@ namespace QuickFiler
             this.NewFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.NewFolder.ImageSVG.ImagePath = "(none)";
             this.NewFolder.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 3, 3, 6);
-            svgResource10.Data = new byte[] {
+            svgResource40.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -3973,8 +3973,8 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource10.Name = "NewFolder2";
-            this.NewFolder.ImageSVG.ResourceName = svgResource10;
+            svgResource40.Name = "NewFolder2";
+            this.NewFolder.ImageSVG.ResourceName = svgResource40;
             this.NewFolder.ImageSVG.SaveRendering = false;
             this.NewFolder.ImageSVG.Size = new System.Drawing.Size(142, 45);
             this.NewFolder.ImageSVG.UseDefaultImage = false;
@@ -4167,7 +4167,7 @@ namespace QuickFiler
             this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
             this.ConversationMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.C)));
-            this.ConversationMenuItem.Size = new System.Drawing.Size(251, 22);
+            this.ConversationMenuItem.Size = new System.Drawing.Size(267, 38);
             this.ConversationMenuItem.Text = "Move &Conversation";
             // 
             // SaveAttachmentsMenuItem
@@ -4177,7 +4177,7 @@ namespace QuickFiler
             this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
             this.SaveAttachmentsMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.A)));
-            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(251, 22);
+            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(267, 38);
             this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
             // 
             // SaveEmailMenuItem
@@ -4187,7 +4187,7 @@ namespace QuickFiler
             this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
             this.SaveEmailMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.M)));
-            this.SaveEmailMenuItem.Size = new System.Drawing.Size(251, 22);
+            this.SaveEmailMenuItem.Size = new System.Drawing.Size(267, 38);
             this.SaveEmailMenuItem.Text = "Save E&mail Copy";
             // 
             // SavePicturesMenuItem
@@ -4197,7 +4197,7 @@ namespace QuickFiler
             this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
             this.SavePicturesMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.P)));
-            this.SavePicturesMenuItem.Size = new System.Drawing.Size(251, 22);
+            this.SavePicturesMenuItem.Size = new System.Drawing.Size(267, 38);
             this.SavePicturesMenuItem.Text = "Save &Pictures";
             // 
             // ItemViewer

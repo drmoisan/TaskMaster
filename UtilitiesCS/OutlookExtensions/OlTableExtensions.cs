@@ -668,7 +668,7 @@ namespace UtilitiesCS
                     () => view.GetTable(), 
                     token, 
                     TaskCreationOptions.LongRunning, 
-                    TaskScheduler.Default).TimeoutAfter(1000);
+                    TaskScheduler.Default).TimeoutAfter(2000);
 
                 //table = await Task.Run(() => view.GetTable(), combinedTokenSource.Token);
             }
@@ -690,6 +690,18 @@ namespace UtilitiesCS
                         table = null;
                     }
                 } 
+            }
+            catch (TimeoutException)
+            {
+                Console.WriteLine($"Task timed out on try {counter}");
+                if (counter < 2)
+                {
+                    table = await activeExplorer.GetTableInViewAsync(token, counter + 1);
+                }
+                else
+                {
+                    table = null;
+                }
             }
 
             return table;

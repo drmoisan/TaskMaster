@@ -97,8 +97,6 @@ namespace QuickFiler.Controllers
             return this;
         }
 
-        
-
         #endregion Constructors
 
         #region Private Properties
@@ -272,6 +270,15 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
+        internal void RegisterAlwaysOnAsyncKeyActions()
+        {
+            _formViewer.KeyboardHandler.AlwaysOnKeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
+                new List<KaKeyAsync>
+                {
+                    new KaKeyAsync("Collection", Keys.Return, (k) => ActionOkAsync())
+                });
+        }
+        
         public void WireEventHandlers()
         {
             //_homeController.KeyboardHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
@@ -290,15 +297,30 @@ namespace QuickFiler.Controllers
             _formViewer.SavePicturesMenuItem.CheckedChanged += SavePictures_CheckedChanged;
             _formViewer.ConversationMenuItem.CheckedChanged += MoveConversation_CheckedChanged;
             _formViewer.Ok.Click += ButtonOK_Click;
+            RegisterAlwaysOnAsyncKeyActions();
+            _formViewer.FolderListBox.KeyDown += FolderListBox_KeyDown;
             _formViewer.Cancel.Click += ButtonCancel_Click;
             _formViewer.RefreshPredicted.Click += ButtonRefresh_Click;
             _formViewer.NewFolder.Click += ButtonCreate_Click;
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
+            _formViewer.SearchText.KeyDown += SearchText_DownArrow;
             _formViewer.EditFiltersMenuItem.Click += EditFiltersMenuItem_Click;
             _globals.Ol.PropertyChanged += DarkMode_Changed;
         }
                
+        public void SearchText_DownArrow(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down) { _formViewer.FolderListBox.Select(); }
+        }
+
+        public void FolderListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up && _formViewer.FolderListBox.SelectedIndex == 0) { _formViewer.SearchText.Select(); }
+            else if (e.KeyCode == Keys.Left) { }
+            else if (e.KeyCode == Keys.Right) { }
+        }
+        
         async public void ButtonCancel_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
@@ -478,11 +500,19 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            _formViewer.Hide();
-            await _homeController.ExecuteMoves().ConfigureAwait(false);
-            await _formViewer.UiSyncContext;
-            _formViewer.Dispose();
-            Cleanup();
+            if (_formViewer.FolderListBox.SelectedIndex == 0)
+            {
+                MessageBox.Show("Please select a valid folder.");
+                return;
+            }
+            else
+            {
+                _formViewer.Hide();
+                await _homeController.ExecuteMoves().ConfigureAwait(false);
+                await _formViewer.UiSyncContext;
+                _formViewer.Dispose();
+                Cleanup();
+            }
         }
 
         async public Task ActionCancelAsync()

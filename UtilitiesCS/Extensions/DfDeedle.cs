@@ -173,7 +173,7 @@ namespace UtilitiesCS
                 await Task.Factory.StartNew(() => AddQfcColumns(table),
                 token,
                 TaskCreationOptions.LongRunning,
-                TaskScheduler.Default).TimeoutAfter(1000);
+                TaskScheduler.Default).TimeoutAfter(3000);
             }
             catch (TaskCanceledException)
             {
@@ -182,7 +182,14 @@ namespace UtilitiesCS
                     await AddQfcColumnsAsync(table, token, counter + 1);
                 }
             }
-            
+            catch (TimeoutException)
+            {
+                if (!token.IsCancellationRequested && counter < 2)
+                {
+                    await AddQfcColumnsAsync(table, token, counter + 1);
+                }
+            }
+
         }
 
         internal static Series<int, string> GetColumnEid(object[] slice)
