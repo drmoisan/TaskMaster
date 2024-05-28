@@ -339,12 +339,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     .ForEach(i => interestingList.Add(interestingKey + i, Knobs.MinScore));
             });
 
-            var newIncidence = tokenIncidence.Where(
+            var newWordProbs = tokenIncidence.Where(
                 kvp => !matchTokens.Contains(kvp.Key) && 
                 !notMatchIncidence.ContainsKey(kvp.Key))
                 .ToDictionary();
 
-            newIncidence.ForEach(x =>
+            newWordProbs.ForEach(x =>
             {
 
                 var interestingKey = (0.5 - Math.Abs(0.5 - Knobs.UnknownWordScore)).ToString(".00000") + x.Key;
