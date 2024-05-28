@@ -16,8 +16,7 @@ namespace TaskVisualization
         public IList<string> FilterList => throw new NotImplementedException();
 
         public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
-        {
-            
+        {            
             throw new NotImplementedException();
         }
 

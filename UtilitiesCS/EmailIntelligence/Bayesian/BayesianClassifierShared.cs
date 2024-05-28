@@ -338,7 +338,21 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Enumerable.Range(0, x.Value)
                     .ForEach(i => interestingList.Add(interestingKey + i, Knobs.MinScore));
             });
+
+            var newIncidence = tokenIncidence.Where(
+                kvp => !matchTokens.Contains(kvp.Key) && 
+                !notMatchIncidence.ContainsKey(kvp.Key))
+                .ToDictionary();
+
+            newIncidence.ForEach(x =>
+            {
+
+                var interestingKey = (0.5 - Math.Abs(0.5 - Knobs.UnknownWordScore)).ToString(".00000") + x.Key;
+                Enumerable.Range(0, x.Value)
+                    .ForEach(i => interestingList.Add(interestingKey + i, Knobs.UnknownWordScore));
+            });
             
+
             return interestingList;
         }
 
@@ -436,6 +450,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             public double CertainMatchScore = 0.9999;       // 0.9999
             public int CertainMatchCount = 10;              // 10
             public int InterestingWordCount = 20;           // 15 (later changed to 20)
+            public double UnknownWordScore = 0.5;           // 0.5
         }
 
         /// <summary>
