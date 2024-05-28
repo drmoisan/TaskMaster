@@ -375,7 +375,7 @@ namespace TaskMaster
 
         #region BayesianPerformance
 
-        internal async Task TryTestClassifier()
+        internal async Task TryTestClassifierAsync()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
@@ -384,7 +384,7 @@ namespace TaskMaster
             await tuner.TestFolderClassifierAsync();            
         }
 
-        internal async Task TryTestClassifierVerbose()
+        internal async Task TryTestClassifierVerboseAsync()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
@@ -393,7 +393,7 @@ namespace TaskMaster
             await tuner.TestFolderClassifierAsync(verbose: true);
         }
 
-        internal async Task GetConfusionDrivers() 
+        internal async Task GetConfusionDriversAsync() 
         { 
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
@@ -406,7 +406,7 @@ namespace TaskMaster
             //_globals.AF.ProgressPane.Visible = true;
             //var errors = await tuner.DiagnosePoorPerformanceAsync(testScores, ppkg.ProgressTrackerPane);
         }
-        internal async Task TryChartMetrics()
+        internal async Task TryChartMetricsAsync()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
@@ -436,6 +436,78 @@ namespace TaskMaster
             var email2 = _globals.Ol.App.ActiveExplorer().Selection[2] as Outlook.MailItem;
             Deep.DeepDifferences<MailItem>(email1, email2);
         }
+
+        #region Spam Manager
+
+        internal async Task ClearSpamManagerAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
+            await miner.CreateSpamClassifiersAsync();
+        }
+
+        internal async Task TrainSpam()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
+            if (email is not null)
+            {
+                var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
+                _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Spam", helper.Tokens, 1);
+                _globals.AF.Manager.Serialize();
+            }
+        }
+
+        internal async Task TrainHam()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
+            if (email is not null)
+            {
+                var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
+                _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Ham", helper.Tokens, 1);
+                _globals.AF.Manager.Serialize();
+            }
+        }
+
+        internal async Task TestSpam()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
+            if (email is not null)
+            {
+                var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
+                var tokenFrequency = await helper.Tokens.GroupAndCountAsync();
+                var score = await _globals.AF.Manager["Spam"].Classifiers["Spam"].GetMatchProbabilityAsync(tokenFrequency, default);
+                MessageBox.Show($"Spam Score: {score:P2}");
+
+            }
+        }
+
+        internal void TestSpamVerbose()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SpamMetrics()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SpamInvestigateErrors()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion Spam Manager
 
         #endregion BayesianPerformance
     }

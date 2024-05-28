@@ -23,6 +23,7 @@ using UtilitiesCS.Extensions;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
+using System.Collections.ObjectModel;
 
 
 
@@ -792,6 +793,25 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+        public async Task CreateSpamClassifiersAsync()
+        {
+            var temp = await Task.Run(() =>
+                {
+                    var group = new BayesianClassifierGroup
+                    {
+                        TotalEmailCount = 0,
+                        SharedTokenBase = new Corpus()
+                    };
+                    return group;
+                });
+            _globals.AF.Manager["Spam"] = temp;
+            _globals.AF.Manager.Serialize();
+        }
+            
+        
+
+
 
         [Obsolete]
         public async Task BuildClassifierAsync1()

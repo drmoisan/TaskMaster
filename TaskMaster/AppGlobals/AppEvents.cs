@@ -58,7 +58,15 @@ namespace TaskMaster
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
+                if (_olInboxItems != null)
+                {
+                    _olInboxItems.ItemAdd -= OlInboxItems_ItemAdd;
+                }
                 _olInboxItems = value;
+                if (_olInboxItems != null)
+                {
+                    _olInboxItems.ItemAdd += OlInboxItems_ItemAdd;
+                }
             }
         }
 
@@ -105,6 +113,11 @@ namespace TaskMaster
         private void OlToDoItems_ItemChange(object item)
         {
             ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, _globals);
+        }
+
+        private void OlInboxItems_ItemAdd(object item)
+        {
+            
         }
 
         #endregion

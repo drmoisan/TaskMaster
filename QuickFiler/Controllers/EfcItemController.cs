@@ -33,6 +33,7 @@ namespace QuickFiler.Controllers
                                  CancellationToken token) :
             this(globals, homeController, parent, itemViewer, token)
         {
+            _dataModel = dataModel;
             Initialize(async: true);
         }
 
@@ -45,6 +46,7 @@ namespace QuickFiler.Controllers
                                  CancellationToken token): 
             this(globals, homeController, parent, itemViewer, token)
         {
+            _dataModel = dataModel;
             Initialize(async);
         }
 

@@ -167,13 +167,26 @@ namespace TaskMaster
 
         #region BayesianPerformance
 
-        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.TryTestClassifier();
-        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierVerbose();
-        public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDrivers();
-        public async void ChartMetrics_Click(Office.IRibbonControl control) => await _controller.TryChartMetrics();
+        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierAsync();
+        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierVerboseAsync();
+        public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDriversAsync();
+        public async void ChartMetrics_Click(Office.IRibbonControl control) => await _controller.TryChartMetricsAsync();
         public async void InvestigateErrors_Click(Office.IRibbonControl control) => await _controller.InvestigateErrorsAsync();
 
         #endregion BayesianPerformance
+
+        #region Spam Manager
+        
+        public async void ClearSpam_Click(Office.IRibbonControl control) => await _controller.ClearSpamManagerAsync();
+        public async void TrainSpam_Click(Office.IRibbonControl control) => await _controller.TrainSpam();
+        public async void TrainHam_Click(Office.IRibbonControl control) => await _controller.TrainHam();
+        public async void TestSpam_Click(Office.IRibbonControl control) => await _controller.TestSpam();
+        public void TestSpamVerbose_Click(Office.IRibbonControl control) => _controller.TestSpamVerbose();
+        public void SpamMetrics_Click(Office.IRibbonControl control) => _controller.SpamMetrics();
+        public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => _controller.SpamInvestigateErrors();
+
+        
+        #endregion Spam Manager
 
         #region TryMethods  
         public void DeepCompareEmails_Click(Office.IRibbonControl control) => _controller.TryDeepCompareEmails();

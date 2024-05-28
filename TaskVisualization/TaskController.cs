@@ -835,11 +835,11 @@ namespace TaskVisualization
 
                 if (lbl.Equals(_viewer.XlProject))
                 {
-                    AssignPeople();
+                    AssignProject();
                 }
                 else if (lbl.Equals(_viewer.XlPeople))
                 {
-                    AssignProject();
+                    AssignPeople();
                 }
                 else if (lbl.Equals(_viewer.XlTopic))
                 {

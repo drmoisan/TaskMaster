@@ -25,7 +25,7 @@ namespace TaskVisualization
         
         private readonly TaskController _controller;
         private readonly ToDoDefaults _defaultsToDo = new ToDoDefaults();
-        private readonly AutoAssign _autoAssign;
+        private readonly AutoAssignPeople _autoAssign;
         private readonly Enums.FlagsToSet _flagsToSet;
         private readonly IApplicationGlobals _globals;
         private string _userEmailAddress;
@@ -39,7 +39,7 @@ namespace TaskVisualization
             _flagsToSet = GetFlagsToSet(_todoSelection.Count);
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
-            _autoAssign = new AutoAssign(AppGlobals);
+            _autoAssign = new AutoAssignPeople(AppGlobals);
             _controller = new TaskController(formInstance: _viewer,
                                              olCategories: AppGlobals.Ol.NamespaceMAPI.Categories,
                                              toDoSelection: _todoSelection,
@@ -161,51 +161,6 @@ namespace TaskVisualization
             }
         }
 
-        private class AutoAssign : IAutoAssign
-        {
-
-            private readonly IApplicationGlobals _globals;
-
-            public AutoAssign(IApplicationGlobals globals)
-            {
-                _globals = globals;
-            }
-
-            public IList<string> FilterList
-            {
-                get => _globals.TD.CategoryFilters.ToList();
-            }
-
-            public IList<string> AutoFind(object objItem)
-            {
-                return AutoFile.AutoFindPeople(objItem: objItem,
-                                               ppl_dict: _globals.TD.DictPPL,
-                                               emailRootFolder: _globals.Ol.EmailRootPath,
-                                               dictRemap: _globals.TD.DictRemap,
-                                               userAddress: _globals.Ol.UserEmailAddress,
-                                               blExcludeFlagged: false);
-
-            }
-
-            public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
-            {
-                return _globals.TD.DictPPL.AddMissingEntries(olMail);
-                //return AutoFile.dictPPL_AddMissingEntries(olMail: olMail,
-                //                                          ppl_dict: _globals.TD.DictPPL,
-                //                                          dictRemap: _globals.TD.DictRemap,
-                //                                          prefixes: prefixes,
-                //                                          prefixKey: prefixKey,
-                //                                          emailRootFolder: _globals.Ol.EmailRootPath,
-                //                                          stagingPath: _globals.FS.FldrStaging,
-                //                                          currentUserEmail: currentUserEmail);
-
-            }
-
-            public Category AddColorCategory(IPrefix prefix, string categoryName)
-            {
-                return CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
-            }
-        }
-
+        
     }
 }

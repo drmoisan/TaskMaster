@@ -41,7 +41,16 @@
                     <button id ="GetConfusionDetails" imageMso="CalendarMonthDetailsSplitButton" onAction="GetConfusionDrivers_Click" label="Get Confusion Drivers"/>
                     <button id ="ChartMetrics" imageMso="ChartChangeType" onAction="ChartMetrics_Click" label="Chart Metrics"/>
                     <button id ="InvestigateErrors" imageMso="ChartQuickExplore" onAction="InvestigateErrors_Click" label="Investigate Errors"/>
-                  </menu>                    
+                  </menu>
+                  <menu id="SpamManager" imageMso ="NewComment" label="Spam Manager" itemSize="large">
+                    <button id="NewSpam" imageMso="NewComment" onAction="ClearSpam_Click" label="Clear Spam Manager" />
+                    <button id="TrainSpam" imageMso="AutoSummarize" onAction="TrainSpam_Click" label="Train Spam" />
+                    <button id="TrainHam" imageMso="AutoSummarize" onAction="TrainHam_Click" label="Train Ham" />
+                    <button id="TestSpam" imageMso="AutoSummarize" onAction="TestSpam_Click" label="Test Spam" />
+                    <button id="TestSpamVerbose" imageMso="AutoSummarize" onAction="TestSpamVerbose_Click" label="Test Spam Verbose" />
+                    <button id="SpamMetrics" imageMso="AutoSummarize" onAction="SpamMetrics_Click" label="Spam Metrics" />
+                    <button id="SpamInvestigateErrors" imageMso="AutoSummarize" onAction="SpamInvestigateErrors_Click" label="Spam Investigate Errors" />
+                  </menu>
                   <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" itemSize="large">
                     <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
                     <button id="DeepEmailCompare" imageMso ="TraceDependentCells" onAction="DeepCompareEmails_Click" label="Deep Compare Emails"/>

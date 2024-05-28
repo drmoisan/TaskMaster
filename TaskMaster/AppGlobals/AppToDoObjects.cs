@@ -164,9 +164,6 @@ namespace TaskMaster
                 () => new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
                                                    folderpath: _parent.FS.FldrPythonStaging),
                 default(CancellationToken));
-                //default,
-                //TaskCreationOptions.None,
-                //PriorityScheduler.BelowNormal);
         }
 
         // Prefix List
@@ -174,7 +171,6 @@ namespace TaskMaster
         public ScoCollection<IPrefix> PrefixList => Initialized(_prefixList, () => LoadPrefixList());
         public ScoCollection<IPrefix> LoadPrefixList()
         {
-            //var prefixList = new ScoCollection<IPrefix>(Properties.Resources.PrefixList);
             var prefixList = new ScoCollection<IPrefix>(fileName: _defaults.FileName_PrefixList,
                                                         folderPath: Parent.FS.FldrPythonStaging);
 
@@ -190,9 +186,6 @@ namespace TaskMaster
         async private Task LoadPrefixListAsync()
         {
             _prefixList = await Task.Run(LoadPrefixList);
-                              //default,
-                              //TaskCreationOptions.None,
-                              //PriorityScheduler.BelowNormal);
         }
 
         private ScoDictionary<string, int> _filteredFolderScraping;
@@ -224,128 +217,7 @@ namespace TaskMaster
         }
 
 
-        //private Dictionary<string, string> LoadDictCSV(string fpath, string filename)
-        //{
-        //    var dict = CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv");
-        //    if (dict is not null)
-        //        WriteDictJSON(dict, Path.Combine(fpath, filename));
-        //    return dict;
-        //}
 
-        //async private Task<Dictionary<string, string>> LoadDictCSVAsync(string fpath, string filename)
-        //{
-        //    var dict = await Task<Dictionary<string,string>>.Factory.StartNew(
-        //                     () => CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv"),
-        //                     default,
-        //                     TaskCreationOptions.None,
-        //                     PriorityScheduler.BelowNormal);
-
-        //    if (dict is not null)
-        //        _ = Task.Factory.StartNew(
-        //            () => WriteDictJSON(dict, Path.Combine(fpath, filename)),
-        //            default,
-        //            TaskCreationOptions.None,
-        //            PriorityScheduler.BelowNormal);
-        //    return dict;
-        //}
-
-        ////TODO: Deprecate LoadDictJSON
-        //private Dictionary<string, string> LoadDictJSON(string fpath, string filename)
-        //{
-
-        //    string filepath = Path.Combine(fpath, filename);
-        //    Dictionary<string, string> dict = null;
-        //    var response = DialogResult.Ignore;
-
-        //    try
-        //    {                
-        //        dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename)));
-        //    }
-        //    catch (FileNotFoundException ex)
-        //    {
-        //        response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo,MessageBoxIcon.Error);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //    }
-        //    finally
-        //    {
-        //        if (response == DialogResult.Yes)
-        //        {
-        //            dict = LoadDictCSV(fpath, filename);
-        //        }
-        //        else if (response == DialogResult.No)
-        //        {
-        //            response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //            if (response == DialogResult.Yes)
-        //            {
-        //                dict = new Dictionary<string, string>();
-        //            }
-        //            else
-        //            {
-        //                throw new ArgumentNullException("Cannot proceed without dictionary: " + filename);
-        //            }
-        //        }
-        //    }
-        //    return dict;
-        //}
-
-        //async private Task<Dictionary<string, string>> LoadDictJSONAsync(string fpath, string filename)
-        //{
-
-        //    string filepath = Path.Combine(fpath, filename);
-        //    Dictionary<string, string> dict = null;
-        //    var response = DialogResult.Ignore;
-
-        //    try
-        //    {
-        //        dict = await Task<Dictionary<string, string>>.Factory.StartNew(
-        //                     () => JsonConvert.DeserializeObject<Dictionary<string, string>>(
-        //                         File.ReadAllText(
-        //                            Path.Combine(
-        //                                Parent.FS.FldrStaging, 
-        //                                DictPPL_Filename))),
-        //                     default,
-        //                     TaskCreationOptions.None,
-        //                     PriorityScheduler.BelowNormal);
-        //    }
-        //    catch (FileNotFoundException)
-        //    {
-
-        //        response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //    }
-        //    finally
-        //    {
-        //        if (response == DialogResult.Yes)
-        //        {
-        //            dict = await LoadDictCSVAsync(fpath, filename);
-        //        }
-        //        else if (response == DialogResult.No)
-        //        {
-        //            response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //            if (response == DialogResult.Yes)
-        //            {
-        //                dict = new Dictionary<string, string>();
-        //            }
-        //            else
-        //            {
-        //                throw new ArgumentNullException("Cannot proceed without dictionary: " + filename);
-        //            }
-        //        }
-        //    }
-        //    return dict;
-        //}
-
-        ////TODO: Deprecate WriteDictJSON
-        //public void WriteDictJSON(Dictionary<string, string> dict, string filepath)
-        //{
-        //    File.WriteAllText(filepath, JsonConvert.SerializeObject(dict, Formatting.Indented));
-        //}
 
     }
 }
