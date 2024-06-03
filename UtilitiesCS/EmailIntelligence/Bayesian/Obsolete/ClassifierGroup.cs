@@ -14,6 +14,7 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
+    [Obsolete("Use BayesianClassifierGroup instead")]
     public class ClassifierGroup
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

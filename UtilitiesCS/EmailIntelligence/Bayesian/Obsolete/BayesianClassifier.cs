@@ -21,6 +21,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     /// Naive Baysiam Spam Filter.  Basically, an implementation of this:
     /// http://www.paulgraham.com/spam.html
     /// </summary>
+    [Obsolete("Use BayesianClassifierShared instead")]
     public class BayesianClassifier
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

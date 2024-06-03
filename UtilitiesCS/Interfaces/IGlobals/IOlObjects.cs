@@ -25,5 +25,7 @@ namespace UtilitiesCS
         TimedDiskWriter<string> EmailMoveWriter { get; }
         int GetExplorerScreenNumber();
         System.Windows.Forms.Screen GetExplorerScreen();
+        public Folder JunkCertain { get; }
+        public Folder JunkPossible { get; }
     }
 }

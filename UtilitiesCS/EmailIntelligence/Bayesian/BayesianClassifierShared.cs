@@ -1,16 +1,21 @@
-﻿using Fizzler;
+﻿using C;
+using Fizzler;
+using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
+using static Microsoft.FSharp.Core.ByRefKinds;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -96,7 +101,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                             parent.SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value,
                                 (sharedKey, existingValue) => existingValue + kvp.Value) :
                             parent.SharedTokenBase.TokenFrequency[kvp.Key];
-                        classifier.UpdateProbability(kvp.Key, kvp.Value, tokenCount - kvp.Value);
+                        classifier.UpdateProbabilitySb(kvp.Key, kvp.Value, tokenCount - kvp.Value);
                     });
                 },
                 token);
@@ -162,10 +167,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 var matchCount = Match.AddOrSumTokenValue(kvp.Key, kvp.Value);
                 var tokenCount = Parent.SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value,
                     (sharedKey, existingValue) => existingValue + kvp.Value);
-                UpdateProbability(kvp.Key, matchCount, tokenCount - matchCount);
+                UpdateProbabilitySb(kvp.Key, matchCount, tokenCount - matchCount);
             });
 
-            otherMatches.ForEach(token => UpdateProbability(token));
+            otherMatches.ForEach(token => UpdateProbabilitySb(token));
         }
 
         public async Task TrainAsync(IDictionary<string, int> tokenFrequency, int emailCount, CancellationToken cancel)
@@ -215,6 +220,124 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 Prob.TryRemove(token, out _);
             }
+        }
+
+        internal protected virtual void UpdateProbabilitySb(string token, int matchCount, int notMatchCount)
+        {
+            
+            int m = matchCount;
+            int nm = notMatchCount;
+
+            double prob;
+
+            double nham = Math.Max(1.0, Parent.TotalEmailCount - MatchEmailCount);
+            double nspam = Math.Max(1, MatchEmailCount);
+
+            var hamratio = nm / nham;
+            var spamratio = m / nspam;
+
+            prob = spamratio / (spamratio + hamratio);
+
+            var S = Knobs.UnknownWordStrength;
+            var StimesX = S * Knobs.UnknownWordProb;
+
+            // Now do Robinson's Bayesian adjustment.
+            //
+            // s*x + n*p(w)
+            // f(w) = --------------
+            // s + n
+            //
+            // I find this easier to reason about like so (equivalent when
+            // s != 0):
+            //
+            // x - p
+            // p +  -------
+            //       1 + n/s
+            //
+            // IOW, it moves p a fraction of the distance from p to x, and
+            // less so the larger n is, or the smaller s is.
+
+            var n = m + nm;
+            prob = (StimesX + n * prob) / (S + n);
+
+            Prob[token] = prob;
+        }
+
+        internal protected virtual double UpdateProbabilitySb(WordInfo record) 
+        {
+            int m = record.MatchCount;
+            int nm = record.NotMatchCount;
+
+            double prob;
+
+            double nham = Math.Max(1.0, Parent.TotalEmailCount - MatchEmailCount);
+            double nspam = Math.Max(1, MatchEmailCount);
+
+            var hamratio = nm / nham;
+            var spamratio = m / nspam;
+
+            prob = spamratio / (spamratio + hamratio);
+
+            var S = Knobs.UnknownWordStrength;
+            var StimesX = S * Knobs.UnknownWordProb;
+
+            var n = m + nm;
+            prob = (StimesX + n * prob) / (S + n);
+
+            return prob;
+        }
+
+        /// <summary>
+        /// Compute, store, and return prob(msg is spam | msg contains word).
+        /// This is the Graham calculation, but stripped of biases, and
+        /// stripped of clamping into 0.01 thru 0.99.  The Bayesian
+        /// adjustment following keeps them in a sane range, and one
+        /// that naturally grows the more evidence there is to back up
+        /// a probability.
+        /// </summary>
+        /// <param name="token"></param>
+        internal protected virtual void UpdateProbabilitySb(string token)
+        {
+            int m = _match.TokenFrequency.TryGetValue(token, out int bCount) ? bCount : 0;
+            int nm = Parent.SharedTokenBase.TokenFrequency
+                .TryGetValue(token, out int gCount) ? Math.Max(gCount - m, 0) : 0;
+
+            double prob;
+
+            double nham = Math.Max(1.0, Parent.TotalEmailCount - MatchEmailCount);
+            double nspam = Math.Max(1, MatchEmailCount);
+
+            var hamratio = nm / nham;
+            var spamratio = m / nspam;
+
+            prob = spamratio / (spamratio + hamratio);
+
+            var S = Knobs.UnknownWordStrength;
+            var StimesX = S * Knobs.UnknownWordProb;
+
+
+            // Now do Robinson's Bayesian adjustment.
+            //
+            // s*x + n*p(w)
+            // f(w) = --------------
+            // s + n
+            //
+            // I find this easier to reason about like so (equivalent when
+            // s != 0):
+            //
+            // x - p
+            // p +  -------
+            //       1 + n/s
+            //
+            // IOW, it moves p a fraction of the distance from p to x, and
+            // less so the larger n is, or the smaller s is.
+
+            var n = m + nm;
+            prob = (StimesX + n * prob) / (S + n);
+
+            Prob[token] = prob;
+
+            
         }
 
         internal protected virtual void UpdateProbability(string token)
@@ -341,15 +464,16 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var newWordProbs = tokenIncidence.Where(
                 kvp => !matchTokens.Contains(kvp.Key) && 
-                !notMatchIncidence.ContainsKey(kvp.Key))
+                !Parent.SharedTokenBase.TokenFrequency.ContainsKey(kvp.Key))
+                //!notMatchIncidence.ContainsKey(kvp.Key))
                 .ToDictionary();
 
             newWordProbs.ForEach(x =>
             {
 
-                var interestingKey = (0.5 - Math.Abs(0.5 - Knobs.UnknownWordScore)).ToString(".00000") + x.Key;
+                var interestingKey = (0.5 - Math.Abs(0.5 - Knobs.UnknownWordProb)).ToString(".00000") + x.Key;
                 Enumerable.Range(0, x.Value)
-                    .ForEach(i => interestingList.Add(interestingKey + i, Knobs.UnknownWordScore));
+                    .ForEach(i => interestingList.Add(interestingKey + i, Knobs.UnknownWordProb));
             });
             
 
@@ -433,6 +557,193 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion Public Classification Prediction Methods
 
+        #region SpamBayes Ported Functions
+
+        public class WordInfo(int matchCount, int notMatchCount)
+        {
+            public int MatchCount = matchCount;
+            public int NotMatchCount = notMatchCount;
+        }
+        
+        public struct WordStream(string name, string[] words)
+        {
+            public string Name = name;
+            public string[] Words = words;
+        }
+
+        
+        public (double, List<(string word, double prob)>) chi2_spamprob(WordStream wordStream, bool evidence) => chi2_spamprob(wordStream.Words, evidence);
+        public double chi2_spamprob(WordStream wordStream) => chi2_spamprob(wordStream, false).Item1;
+        public (double, List<(string word, double prob)>) chi2_spamprob(IDictionary<string, int> tokenFrequency, bool evidence) => chi2_spamprob([..tokenFrequency.Keys], evidence);
+        public double chi2_spamprob(IDictionary<string, int> tokenFrequency) => chi2_spamprob(tokenFrequency, false).Item1;
+
+        /// <summary>
+        /// Return best-guess probability that wordstream is spam. 
+        /// wordstream is an iterable object producing words. 
+        /// The return value is a float in [0.0, 1.0]. 
+        /// If optional arg evidence is True, the return value is a pair 
+        /// probability, evidence 
+        /// where evidence is a list of(word, probability) pairs.
+        /// </summary>
+        /// <param name="wordStream"></param>
+        /// <param name="evidence"></param>
+        /// <returns></returns>
+        public (double, List<(string word, double prob)>) chi2_spamprob(string[] tokens, bool evidence)
+        {
+            /*
+             # We compute two chi-squared statistics, one for ham and one for
+             # spam.  The sum-of-the-logs business is more sensitive to probs
+             # near 0 than to probs near 1, so the spam measure uses 1-p (so
+             # that high-spamprob words have greatest effect), and the ham
+             # measure uses p directly (so that lo-spamprob words have greatest
+             # effect).
+             #
+             # For optimization, sum-of-logs == log-of-product, and f.p.
+             # multiplication is a lot cheaper than calling ln().  It's easy
+             # to underflow to 0.0, though, so we simulate unbounded dynamic
+             # range via frexp.  The real product H = this H * 2**Hexp, and
+             # likewise the real product S = this S * 2**Sexp.
+             */
+
+            double H = 1, S = 1;
+            int Hexp = 0, Sexp = 0;
+
+            var clues = GetClues(tokens.ToHashSet());
+            foreach (var (probability, word, record) in clues)
+            {
+                S *= (1.0 - probability);
+                H *= probability;
+                if (S < 1e-200)
+                {
+                    int e = 0;
+                    S = math.frexp(S, ref e);
+                    Sexp += e;
+                }
+                if (H < 1e-200)
+                {
+                    int e = 0;
+                    H = math.frexp(H, ref e);
+                    Hexp += e;
+                }
+            }
+
+            // # Compute the natural log of the product = sum of the logs:
+            // # ln(x * 2**i) = ln(x) + i * ln(2).
+
+            S = Math.Log(S) + Sexp * Math.Log(2);
+            H = Math.Log(H) + Hexp * Math.Log(2);
+
+            var n = clues.Count;
+            double prob = 0;
+            if (n > 0)
+            {
+                S = 1.0 - chi2Q(-2.0 * S, 2 * n);
+                H = 1.0 - chi2Q(-2.0 * H, 2 * n);
+                prob = (S - H + 1.0) / 2.0;
+            }
+            else
+            {
+                prob = 0.5;
+            }
+
+            if (evidence)
+            {
+                var clues2 = clues.Select(clue => (clue.word, clue.prob))
+                    .OrderByDescending(clue => clue.word)
+                    .ToList();
+                clues2.Insert(0, ("*S*", S));
+                clues2.Insert(0, ("*H*", H));
+                return (prob, clues2);
+            }
+            else
+            {
+                return (prob, null);
+            }
+
+
+        }
+        public double chi2_spamprob(string[] tokens) => chi2_spamprob(tokens, false).Item1;
+
+        public async Task<double> Chi2SpamProbAsync(string[] tokens) => await Task.Run(() => chi2_spamprob(tokens));
+
+        public double chi2Q(double x2, int v)
+        {
+            
+            var m = x2 / 2.0;
+            var sum = Math.Exp(-m);
+            var term = sum;
+            for (int i = 1; i < v / 2; i++)
+            {
+                term *= m / i;
+                sum += term;
+            }
+
+            return Math.Min(sum, 1.0);
+        
+        }
+
+        
+        
+        
+
+        //public List<(double prob, string word, WordInfo record)> GetClues(WordStream wordStream) => GetClues([.. wordStream.Words]);
+        //public List<(double prob, string word, WordInfo record)> GetClues(IDictionary<string, int> tokenFrequency) => GetClues([.. tokenFrequency.Keys]);
+
+        public List<(double prob, string word, WordInfo record)> GetClues(HashSet<string> tokenSet)
+        {
+            var mindist = Knobs.MinDist;
+            var clues = new List<(double distance, double prob, string word, WordInfo record)>();
+            var push = clues.Add;
+            foreach (string token in tokenSet)
+            {
+                var tup = GetWordDistance(token);
+                if (tup.distance >= mindist) { push(tup); }
+            }
+            var selectedClues = clues.OrderByDescending(x => x.distance)
+                                     .Take(Knobs.MaxDiscriminators)
+                                     .Select(clue => (clue.prob, clue.word, clue.record))
+                                     .ToList();
+
+            return selectedClues;
+        }
+
+        
+        public (double distance, double prob, string word, WordInfo record) GetWordDistance(string word)
+        {
+            WordInfo record = GetWordInfo(word);
+            double prob;
+            if (record is null)
+            {
+                prob = Knobs.UnknownWordProb;
+            }
+            else
+            {
+                prob = UpdateProbabilitySb(record);
+            }
+            double distance = Math.Abs(prob - 0.5);
+
+            return (distance, prob, word, record);
+        }
+
+        public WordInfo GetWordInfo(string word)
+        {
+            int m = _match.TokenFrequency.TryGetValue(word, out int bCount) ? bCount : 0;
+            int nm = Parent.SharedTokenBase.TokenFrequency
+                .TryGetValue(word, out int gCount) ? Math.Max(gCount - m, 0) : 0;
+            if (m + nm == 0)
+            {
+                return null;
+            }
+            else
+            {
+                var wordInfo = new WordInfo(m, nm);
+                return wordInfo;
+            }
+
+        }
+
+        #endregion SpamBayes Ported Functions
+
         #region knobs for dialing in performance
 
         /// <summary>
@@ -450,7 +761,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             public double CertainMatchScore = 0.9999;       // 0.9999
             public int CertainMatchCount = 10;              // 10
             public int InterestingWordCount = 20;           // 15 (later changed to 20)
-            public double UnknownWordScore = 0.5;           // 0.5
+            public double UnknownWordProb = 0.5;            // 0.5
+            public double UnknownWordStrength = 0.45;       // 0.45
+            public double MinDist = 0;
+            public int MaxDiscriminators = 150;             // 150
         }
 
         /// <summary>

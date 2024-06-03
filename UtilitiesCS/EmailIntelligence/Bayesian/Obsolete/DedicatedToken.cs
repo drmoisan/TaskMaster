@@ -3,6 +3,7 @@ using System.ComponentModel;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
+    [Obsolete("This class is not used in the current implementation of the Bayesian Classifier.")]
     public class DedicatedToken: IEquatable<DedicatedToken>, INotifyPropertyChanged
     {
         public DedicatedToken() { }

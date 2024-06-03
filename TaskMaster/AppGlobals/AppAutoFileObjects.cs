@@ -407,7 +407,7 @@ namespace TaskMaster
 
         private JsonSerializerSettings GetSettings(bool compress)
         {
-            var settings = ScDictionary<string, ClassifierGroup>.GetDefaultSettings();
+            var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(_parent));
             if (compress)

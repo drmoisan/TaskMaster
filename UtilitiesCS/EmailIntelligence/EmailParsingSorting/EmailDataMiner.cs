@@ -668,6 +668,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         protected ScoCollection<MinedMailInfo> _mailInfoCollection;
 
+        [Obsolete ("This method is not used in the current implementation of the Bayesian Classifier.")]
         public virtual ConcurrentDictionary<string, DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
         {
             var dedicated = collection.Select(x =>

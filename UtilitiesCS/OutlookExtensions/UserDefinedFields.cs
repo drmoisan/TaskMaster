@@ -14,6 +14,19 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public static class UserDefinedFields
     {
+        public static void DeleteUdf(this MailItem item, string fieldName)
+        {
+            UserProperty property = item.UserProperties.Find(fieldName);
+            
+            var idx = item.UserProperties.Cast<UserProperty>().ToList().FindIndex(x => x.Name == fieldName);
+
+            if (idx > -1)
+            {
+                item.UserProperties.Remove(idx + 1);
+                item.Save();
+            }
+        }
+
         public static UserProperty GetUdf(this OutlookItem item, string fieldName) => item.UserProperties.Find(fieldName);
         public static UserProperty GetUdf(this MailItem item, string fieldName) => item.UserProperties.Find(fieldName);
 

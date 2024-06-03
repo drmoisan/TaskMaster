@@ -126,7 +126,28 @@ namespace TaskMaster
                 return _emailRootPath;
             }
         }
+                
+        private Folder _junkPossible;
+        public Folder JunkPossible => Initializer.GetOrLoad(ref _archiveRoot, LoadJunkPossible);
+        internal Folder LoadJunkPossible()
+        {
+            var folderHandler = new OlFolderHelper(_globals);
+            return folderHandler.GetFolder(Root.Folders, "Junk - Potential");
+        }
 
+        private Folder _junkCertain;
+        public Folder JunkCertain
+        {
+            get
+            {
+                if (_junkCertain is null)
+                {
+                    _junkCertain = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderJunk);
+                }
+                return _junkCertain;
+            }
+        }
+        
         private string _archiveRootPath;
         public string ArchiveRootPath
         {

@@ -147,6 +147,7 @@ namespace UtilitiesCS
         {
             int columnCount = GetJaggedColumnCount(ref jagged, headers, title);
             if (columnCount == 0) { return "Object is empty and has no headers or title"; }
+            
 
             int[] columnWidths = GetJaggedColumnWidths(jagged, headers, columnCount);
             int tableWidth = columnWidths.Sum() + columnWidths.Length * 2 + 3;

@@ -28,6 +28,7 @@ using QuickFiler.Controllers;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 using UtilitiesCS.Threading;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.OutlookExtensions;
 
 
 namespace TaskMaster
@@ -437,6 +438,8 @@ namespace TaskMaster
             Deep.DeepDifferences<MailItem>(email1, email2);
         }
 
+        #endregion BayesianPerformance
+
         #region Spam Manager
 
         internal async Task ClearSpamManagerAsync()
@@ -453,13 +456,20 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
-            if (email is not null)
-            {
-                var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
-                _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Spam", helper.Tokens, 1);
-                _globals.AF.Manager.Serialize();
-            }
+            var sb = new SpamBayesController(_globals);
+            await sb.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, true);
+            //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection)
+            //{
+            //    //var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
+            //    if (emailObj is MailItem email)
+            //    {
+            //        var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
+            //        _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Spam", helper.Tokens, 1);
+            //        email.SetUdf("Spam", 1.0, OlUserPropertyType.olPercent);
+            //    }
+            //}
+            //_globals.AF.Manager.Serialize();
+
         }
 
         internal async Task TrainHam()
@@ -467,13 +477,20 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
-            if (email is not null)
-            {
-                var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
-                _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Ham", helper.Tokens, 1);
-                _globals.AF.Manager.Serialize();
-            }
+            var sb = new SpamBayesController(_globals);
+            await sb.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, false);
+            //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection)
+            //{
+            //    //var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
+            //    if (emailObj is MailItem email)
+            //    {
+            //        var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
+            //        email.SetUdf("Spam", 0.0, OlUserPropertyType.olPercent);
+            //        _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Ham", helper.Tokens, 1);                    
+            //    }
+            //}
+            //_globals.AF.Manager.Serialize();
+
         }
 
         internal async Task TestSpam()
@@ -481,15 +498,27 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
-            if (email is not null)
-            {
-                var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
-                var tokenFrequency = await helper.Tokens.GroupAndCountAsync();
-                var score = await _globals.AF.Manager["Spam"].Classifiers["Spam"].GetMatchProbabilityAsync(tokenFrequency, default);
-                MessageBox.Show($"Spam Score: {score:P2}");
 
-            }
+            var sb = new SpamBayesController(_globals);
+            await sb.TestAsync(_globals.Ol.App.ActiveExplorer().Selection);
+            //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection )
+            //{
+            //    if (emailObj is MailItem email)
+            //    {
+            //        var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
+            //        var tokens = helper.Tokens;
+            //        var wordStream = new BayesianClassifierShared.WordStream("", tokens);
+            //        var score = _globals.AF.Manager["Spam"].Classifiers["Spam"].chi2_spamprob(wordStream);
+            //        //email.DeleteUdf("Spam");
+            //        email.SetUdf("Spam", score, OlUserPropertyType.olPercent);
+            //        //var score = await _globals.AF.Manager["Spam"].Classifiers["Spam"].GetMatchProbabilityAsync(tokenFrequency, default);
+            //        //MessageBox.Show($"Spam Score: {score:P2}");
+
+            //    }
+
+            //}
+
+
         }
 
         internal void TestSpamVerbose()
@@ -508,7 +537,5 @@ namespace TaskMaster
         }
 
         #endregion Spam Manager
-
-        #endregion BayesianPerformance
     }
 }
