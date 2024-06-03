@@ -94,7 +94,7 @@ namespace QuickFiler
         {
             if (_dataModel.Mail is not null)
             {
-                await UiThread.Dispatcher.InvokeAsync(()=>_formViewer.Show());
+                await UiThread.Dispatcher.InvokeAsync(() => _formViewer.Show());
             }
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }

@@ -213,7 +213,15 @@ namespace UtilitiesCS //QuickFiler
             FolderName = ((Folder)Item.Parent).Name;
             Globals = globals;
             ConversationID = Item.ConversationID;
-            UnRead = Item.UnRead;
+            try
+            {
+                UnRead = Item.UnRead;
+            }
+            catch (System.Exception)
+            {
+
+            }
+            
             IsTaskFlagSet = (Item.FlagStatus == OlFlagStatus.olFlagMarked);
             _token = token;
             Sw?.LogDuration("LoadPriorityItems");
@@ -483,7 +491,10 @@ namespace UtilitiesCS //QuickFiler
         public bool UnRead
         {
             get => (bool)Initializer.GetOrLoad(ref _unread, loader: () => _item.UnRead, strict: false, dependencies: _item)!;
-            set => Initializer.SetAndSave(ref _unread, value, (x) => _item.UnRead = x ?? false, () => _item.Save(), null, false);
+            set => Initializer.SetAndSave(
+                ref _unread, value, 
+                (x) => _item.UnRead = x ?? false, 
+                () => _item.Save(), null, false);
         }
 
         public int InternetCodepage

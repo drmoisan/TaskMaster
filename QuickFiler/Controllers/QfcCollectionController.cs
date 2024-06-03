@@ -502,6 +502,7 @@ namespace QuickFiler.Controllers
             await RemoveSpecificControlGroupAsync(selection);
             
             var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
+            
             await popOutForm.RunAsync();
         }
 
@@ -630,14 +631,15 @@ namespace QuickFiler.Controllers
 
             bool tlpState = TlpLayout;
             
-            await UiThread.Dispatcher.InvokeAsync(() =>
-            {
-                tlpState = TlpLayout;
-                TlpLayout = false;
+            //Removed dispatcher call because synchronization context should be set
+            //await UiThread.Dispatcher.InvokeAsync(() =>
+            //{
+            tlpState = TlpLayout;
+            TlpLayout = false;
 
-                // Remove the controls from the form
-                TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
-            });
+            // Remove the controls from the form
+            TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
+            //});
 
             // Unhook the email from the move monitor
             _moveMonitor.UnhookItem(_itemGroups[selection - 1].MailItem);

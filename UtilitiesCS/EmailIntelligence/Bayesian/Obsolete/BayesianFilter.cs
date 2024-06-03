@@ -13,6 +13,7 @@ namespace Expat.Bayesian
     /// Naive Baysiam Spam Filter.  Basically, an implementation of this:
     /// http://www.paulgraham.com/spam.html
     /// </summary>
+    [Obsolete]
     public class BayesianFilter
     {
         #region knobs for dialing in performance

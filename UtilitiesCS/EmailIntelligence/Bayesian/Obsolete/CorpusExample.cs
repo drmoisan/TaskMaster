@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -9,6 +10,7 @@ namespace Expat.Bayesian
     /// (Corpus is Paul Graham's scary word meaning "bunch of text", and "tokens" are the geeky correct way of saying "words").
     /// From: http://www.paulgraham.com/spam.html
     /// </summary>
+    [Obsolete]
     public class CorpusExample
     {
         /// <summary>

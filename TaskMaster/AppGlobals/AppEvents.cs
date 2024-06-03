@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 
 namespace TaskMaster
 {
@@ -15,10 +16,11 @@ namespace TaskMaster
         public AppEvents(IApplicationGlobals appGlobals)
         {
             _globals = appGlobals;
+            _spamBayes = new SpamBayesController(appGlobals);
         }
 
         private IApplicationGlobals _globals;
-
+        private SpamBayesController _spamBayes;
         private Items _olToDoItems;
         private Items OlToDoItems
         {
@@ -115,9 +117,12 @@ namespace TaskMaster
             ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, _globals);
         }
 
-        private void OlInboxItems_ItemAdd(object item)
+        private async void OlInboxItems_ItemAdd(object item)
         {
-            
+            if (item is MailItem mailItem)
+            {
+                await _spamBayes.TestAsync((object)mailItem);
+            }
         }
 
         #endregion

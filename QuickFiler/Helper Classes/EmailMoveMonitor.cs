@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace QuickFiler.Helper_Classes
 {
+    // TODO: Determine what EmailMoveMonitor was supposed to be used for. It is now malfunctioning. Temprorarily disabling.
     internal class EmailMoveMonitor
     {
-        public EmailMoveMonitor() 
-        { 
+        public EmailMoveMonitor()
+        {
             SetupBeforeItemMove();
         }
 
@@ -28,7 +29,7 @@ namespace QuickFiler.Helper_Classes
                 if (!_hookedItems.Any(x => x.Folder.EntryID == folder.EntryID))
                     folder.BeforeItemMove += BeforeItemMove;
                 _hookedItems.Add(new EmailMoveAction(mail, folder, moveAction));
-            }     
+            }
         }
 
         public void UnhookItem(MailItem mail)
@@ -45,7 +46,7 @@ namespace QuickFiler.Helper_Classes
                 }
             }
         }
-        
+
         public void UnhookAll()
         {
             lock (_hookedItems)
@@ -61,7 +62,7 @@ namespace QuickFiler.Helper_Classes
         private MAPIFolderEvents_12_BeforeItemMoveEventHandler BeforeItemMove;
         private void SetupBeforeItemMove()
         {
-            BeforeItemMove = delegate(object item, MAPIFolder moveTo, ref bool cancel)
+            BeforeItemMove = delegate (object item, MAPIFolder moveTo, ref bool cancel)
             {
                 if (item is MailItem mail)
                 {
@@ -77,27 +78,27 @@ namespace QuickFiler.Helper_Classes
                 }
             };
         }
-        
-        
 
-        
+
+
+
     }
 
     internal class EmailMoveAction
     {
         public EmailMoveAction(
-            MailItem mail, 
-            Folder folder, 
+            MailItem mail,
+            Folder folder,
             Action<MailItem> moveAction)
         {
             _mail = mail;
             _folder = folder;
             _moveAction = moveAction;
         }
-        
+
         private MailItem _mail;
         public MailItem Mail => _mail;
-        
+
         private Folder _folder;
         public Folder Folder => _folder;
 
@@ -105,5 +106,5 @@ namespace QuickFiler.Helper_Classes
         public Action<MailItem> MoveAction => _moveAction;
     }
 
-    
+
 }

@@ -40,6 +40,9 @@
     <Reference Include="Apache.Arrow, Version=13.0.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
       <HintPath>..\packages\Apache.Arrow.13.0.0\lib\netstandard2.0\Apache.Arrow.dll</HintPath>
     </Reference>
+    <Reference Include="C.math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\C.math.NET.1.1\lib\net20\C.math.dll</HintPath>
+    </Reference>
     <Reference Include="CustomMarshalers" />
     <Reference Include="Deedle, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
@@ -376,16 +379,15 @@
     </Compile>
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifier.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\BayesianFilter.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\Drafts\CorpusVectorized_badidea.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\DedicatedToken.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianFilter.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\CorpusVectorized_badidea.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\DedicatedToken.cs" />
     <Compile Include="EmailIntelligence\Bayesian\DoNotSerializeContractResolver.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\ClassifierGroup.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\ConvertedSpamBayesTokenizer.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusInherit.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianSerializationHelper.cs" />
@@ -406,12 +408,15 @@
     <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentHelper.cs" />
-    <Compile Include="EmailIntelligence\AutoFile2.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\CorpusExample.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\EmailTokenizer.cs" />
-    <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\ImageStripper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\AutoFile2.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\CorpusExample.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailTokenizer.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\CaptureEmailAddressesModule2.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\ImageStripper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentSerializable.cs" />
+    <Compile Include="EmailIntelligence\SpamBayes\SpamBayesController.cs" />
+    <Compile Include="EmailIntelligence\SpamBayes\SpamBayesModel.cs" />
+    <Compile Include="EmailIntelligence\SpamBayes\TristateEngine.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="HelperClasses\DeepCompare.cs" />
     <Compile Include="HelperClasses\DispatchUtility.cs" />
@@ -452,13 +457,13 @@
     <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.Designer.cs">
       <DependentUpon>FolderSelector.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmailIntelligence\Bayesian\EmailDataMiner.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\CommonWords.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidence.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfIncidenceList.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfMap.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfMapEntry.cs" />
-    <Compile Include="EmailIntelligence\EmailDetails.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetails.cs" />
     <Compile Include="EmailIntelligence\FilterEntry.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagClassNoItem.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagDetails.cs" />
