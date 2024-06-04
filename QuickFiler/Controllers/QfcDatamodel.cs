@@ -16,6 +16,9 @@ using System.Windows.Forms;
 using System.Threading;
 using QuickFiler.Helper_Classes;
 
+
+
+
 namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
@@ -58,7 +61,9 @@ namespace QuickFiler.Controllers
         }
 
         public void Cleanup() 
-        { 
+        {
+            _tokenSource?.Cancel();
+            _worker?.CancelAsync();
             _globals.Ol.App.NewMailEx -= Application_NewMailEx;
             _moveMonitor.UnhookAll();
             _moveMonitor = null;
@@ -113,7 +118,7 @@ namespace QuickFiler.Controllers
             //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
         }
 
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private async void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             // Do not access the form's BackgroundWorker reference directly.
             // Instead, use the reference provided by the sender parameter.
@@ -123,7 +128,7 @@ namespace QuickFiler.Controllers
             //zxxint arg = (int)e.Argument;
 
             // Start the time-consuming operation.
-            e.Result = LoadRemainingEmailsToQueue(bw);
+            e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
 
             // If the operation was canceled by the user,
             // set the DoWorkEventArgs.Cancel property to true.
@@ -195,10 +200,7 @@ namespace QuickFiler.Controllers
             _tokenSource = tokenSource;
             _worker = worker;
 
-            var emailList = await Task.Factory.StartNew(() => InitEmailQueue(batchSize, worker), 
-                                                        token,
-                                                        TaskCreationOptions.LongRunning, 
-                                                        TaskScheduler.Default);
+            var emailList = await Task.Run(() => InitEmailQueue(batchSize, worker), token);
 
             return emailList;
         }
@@ -226,7 +228,42 @@ namespace QuickFiler.Controllers
             return true;
             
         }
-                
+
+        private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
+        {
+            if ((_frame is null) || (_frame.RowCount == 0))
+            {
+                MessageBox.Show("Email Frame is empty");
+                return false;
+            }
+
+
+            try
+            {
+                await _frame.GetRowsAs<IEmailSortInfo>().Values.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(
+                    async (row, token) => await Task.Run(() =>
+                    {
+                        token.ThrowIfCancellationRequested();    
+                        var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                        _masterQueue.AddLast(item);
+                        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
+                    }, token),
+                    token);
+                return true;
+            }
+            catch (TaskCanceledException)
+            {
+                logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
+                return false;
+            }
+            
+
+            
+
+            
+
+        }
+
         public Frame<int, string> InitDf(Explorer activeExplorer)
         {
             var df = DfDeedle.GetEmailDataInView(activeExplorer);
