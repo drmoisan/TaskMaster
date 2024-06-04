@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.OutlookExtensions;
 
 namespace TaskMaster
 {
@@ -119,9 +120,12 @@ namespace TaskMaster
 
         private async void OlInboxItems_ItemAdd(object item)
         {
-            if (item is MailItem mailItem)
+            if (item is MailItem mailItem && mailItem.MessageClass == "IPM.Note")
             {
-                await _spamBayes.TestAsync((object)mailItem);
+                if (mailItem.UserProperties.Find("Spam") is null)
+                {
+                    await _spamBayes.TestAsync((object)mailItem);
+                }
             }
         }
 
