@@ -242,7 +242,7 @@ namespace UtilitiesCS //QuickFiler
             }
             else
             {
-                //Task.Delay(100).Wait();
+                Task.Delay(100).Wait();
                 return this;
             }
         }

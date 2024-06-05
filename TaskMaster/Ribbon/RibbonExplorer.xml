@@ -78,6 +78,13 @@
                   </menu> 
                 </menu>  
               </group>
+              <group id="TriageGroup" imageMso="Filter" label="Triage">
+                <button id="TriageSelection" imageMso="FilterBySelection" onAction="TriageSelection_Click" label="Triage Selection"/>
+                <button id="TriageSetA" imageMso="HighImportance" onAction="TriageSetA_Click" label="Set A"/>
+                <button id="TriageSetB" imageMso="MediumImportance" onAction="TriageSetB_Click" label="Set B"/>
+                <button id="TriageSetC" imageMso="LowImportance" onAction="TriageSetC_Click" label="Set C"/>
+                <button id="ClearTriage" imageMso="Clear" onAction="ClearTriage_Click" label="Clear Triage"/>
+              </group>
             </tab>
         </tabs>
     </ribbon>

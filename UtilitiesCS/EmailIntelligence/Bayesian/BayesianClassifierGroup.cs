@@ -46,7 +46,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         [JsonIgnore]
         public Func<object, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
-        private Func<object, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().tokenizeAsync;
+        private Func<object, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().TokenizeAsync;
 
         #endregion Public Properties
 

@@ -94,7 +94,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Main Methods
 
-        public async Task<string[]> tokenizeAsync(object obj, CancellationToken cancel)
+        public async Task<string[]> TokenizeAsync(object obj, CancellationToken cancel)
         {
             return await Task.Run(() => tokenize(obj).ToArray(), cancel);
         }
