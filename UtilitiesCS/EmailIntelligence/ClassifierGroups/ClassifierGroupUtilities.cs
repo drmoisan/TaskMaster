@@ -149,7 +149,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
 
             var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MailItemHelper(mailItem).LoadAll(_globals, _globals.Ol.ArchiveRoot, true));
+                new MailItemHelper(mailItem, _globals).LoadAll(_globals, _globals.Ol.ArchiveRoot, true));
             var sizeMailInfo2 = 0; // ObjectSize(mailInfo);
             LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);

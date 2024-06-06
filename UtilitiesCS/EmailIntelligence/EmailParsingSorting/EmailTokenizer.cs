@@ -94,17 +94,17 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Main Methods
 
-        public async Task<string[]> TokenizeAsync(object obj, CancellationToken cancel)
+        public async Task<string[]> TokenizeAsync(object obj, IApplicationGlobals globals, CancellationToken cancel)
         {
-            return await Task.Run(() => tokenize(obj).ToArray(), cancel);
+            return await Task.Run(() => tokenize(obj, globals).ToArray(), cancel);
         }
 
-        public IEnumerable<string> tokenize(object obj) 
+        public IEnumerable<string> tokenize(object obj, IApplicationGlobals globals) 
         {
             if (obj is null) { throw new ArgumentNullException("obj"); }
             else if (obj is string[]) { return (string[])obj; }
             else if (obj is MailItemHelper) { return tokenize((MailItemHelper)obj);}
-            else if (obj is MailItem) { return tokenize(new MailItemHelper((MailItem)obj)); }
+            else if (obj is MailItem) { return tokenize(new MailItemHelper((MailItem)obj, globals)); }
             else
             {
                 throw new ArgumentException($"obj type must be {typeof(string[])}, " +

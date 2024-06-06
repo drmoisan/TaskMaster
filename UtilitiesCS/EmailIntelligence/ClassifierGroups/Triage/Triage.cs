@@ -20,9 +20,10 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
 
         #region Constructors
 
-        public Triage(ScDictionary<string, BayesianClassifierGroup> manager, CancellationToken token = default)
+        public Triage(IApplicationGlobals globals, ScDictionary<string, BayesianClassifierGroup> manager, CancellationToken token = default)
         {
             Manager = manager;
+            Globals = globals;
             Token = token;
             TokenizeAsync = new EmailTokenizer().TokenizeAsync;
             CallbackAsync = (item, value) => Task.Run(() => ((MailItem)item).SetUdf("Triage", value));
@@ -35,11 +36,13 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
         internal ScDictionary<string, BayesianClassifierGroup> Manager { get; }          
         internal CancellationToken Token { get; }
 
+        internal IApplicationGlobals Globals { get; }
+
         /// <summary>
         /// Async Delegate Function that extracts an array of string tokens from an object
         /// </summary>
-        public Func<object, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
-        private Func<object, CancellationToken, Task<string[]>> _tokenizeAsync;
+        public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
+        private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync;
 
         public Func<object, string, Task> CallbackAsync { get => _callbackAsync; set => _callbackAsync = value; }
         private Func<object, string, Task> _callbackAsync;
@@ -91,7 +94,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
         {
             TokenizeAsync.ThrowIfNull($"{nameof(TokenizeAsync)} delegate function cannot be null to Train classifier");
             item.ThrowIfNull($"{nameof(item)} cannot be null to Train classifier");
-            var tokens = await TokenizeAsync(item, Token);
+            var tokens = await TokenizeAsync(item, Globals, Token);
             await TrainAsync(tokens, triageId);
             if (CallbackAsync is not null) { await CallbackAsync(item, triageId); }
         }

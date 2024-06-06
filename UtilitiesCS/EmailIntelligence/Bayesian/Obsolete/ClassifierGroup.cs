@@ -49,8 +49,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public IApplicationGlobals AppGlobals { get; set; }
 
         //[JsonIgnore]
-        public Func<object, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
-        private Func<object, IEnumerable<string>> _tokenizer = new EmailTokenizer().tokenize;
+        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
+        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenizer = new EmailTokenizer().tokenize;
 
         #endregion Public Properties
 

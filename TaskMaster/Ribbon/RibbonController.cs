@@ -549,7 +549,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals.AF.Manager);
+            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
             await triage.ClassifyAsync(_globals.Ol.App.ActiveExplorer().Selection);
         }
 
@@ -558,7 +558,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals.AF.Manager);
+            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
             await triage.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, "A");
         }
 
@@ -567,7 +567,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals.AF.Manager);
+            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
             await triage.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, "B");
         }
 
@@ -576,7 +576,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals.AF.Manager);
+            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
             await triage.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, "C");
         }
 
@@ -585,7 +585,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals.AF.Manager);
+            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
             await triage.CreateNewTriageClassifierGroupAsync(default);
         }
 

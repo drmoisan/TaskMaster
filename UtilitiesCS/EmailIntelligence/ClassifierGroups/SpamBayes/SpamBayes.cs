@@ -98,7 +98,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string[] TokenizeEmail(object email)
         {
-            return email as MailItem is null ? [] : new MailItemHelper(email as MailItem).LoadAll(Globals, Globals.Ol.EmailRoot, true).Tokens;
+            return email as MailItem is null ? [] : new MailItemHelper(email as MailItem, Globals).LoadAll(Globals, Globals.Ol.EmailRoot, true).Tokens;
         }
         
         public async Task<string[]> TokenizeEmailAsync(object email) 
