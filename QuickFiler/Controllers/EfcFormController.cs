@@ -508,8 +508,8 @@ namespace QuickFiler.Controllers
             else
             {
                 _formViewer.Hide();
-                await _homeController.ExecuteMoves().ConfigureAwait(false);
-                await _formViewer.UiSyncContext;
+                await _homeController.ExecuteMovesAsync();
+                //await _formViewer.UiSyncContext;
                 _formViewer.Dispose();
                 Cleanup();
             }

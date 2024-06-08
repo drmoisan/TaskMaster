@@ -309,7 +309,7 @@ namespace TaskMaster
             var mailInfo = await MailItemHelper.FromMailItemAsync(mail, _globals, token, true);
             var tokenizer = new EmailTokenizer();
             //tokenizer.setup();
-            var tokens = tokenizer.tokenize(mailInfo).ToArray();
+            var tokens = tokenizer.Tokenize(mailInfo).ToArray();
             var tokenString = tokens.SentenceJoin();
             MessageBox.Show(tokenString);
         }

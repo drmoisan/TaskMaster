@@ -42,7 +42,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         [JsonIgnore]
         public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
-        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenize = new EmailTokenizer().tokenize;
+        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenize = new EmailTokenizer().Tokenize;
 
         [JsonIgnore]
         public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
@@ -78,7 +78,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public OrderedParallelQuery<Prediction<string>> Classify(object source)
         {
-            var tokens = _tokenize(source);
+            var tokens = _tokenize(source, AppGlobals);
             var tokenIncidence = tokens.GroupAndCount();
             var result = this.Classify(tokenIncidence).OrderByDescending(x => x.Probability);
             var sl = new SortedList<int, Prediction<string>>();
@@ -104,7 +104,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async ValueTask<Prediction<string>[]> ClassifyAsync(object source, CancellationToken cancel)
         {
-            var tokens = await TokenizeAsync(source, cancel);
+            var tokens = await TokenizeAsync(source, AppGlobals, cancel);
             var tokenIncidence = await tokens.GroupAndCountAsync();
             var result = await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
             return result;

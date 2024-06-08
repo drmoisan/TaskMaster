@@ -90,7 +90,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
             Manager.Serialize();
         }
 
-        public async Task TrainAsync(object item, string triageId)
+        public async Task TrainAsync(object item, string triageId, CancellationToken cancel = default)
         {
             TokenizeAsync.ThrowIfNull($"{nameof(TokenizeAsync)} delegate function cannot be null to Train classifier");
             item.ThrowIfNull($"{nameof(item)} cannot be null to Train classifier");
@@ -99,10 +99,11 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
             if (CallbackAsync is not null) { await CallbackAsync(item, triageId); }
         }
 
-        public async Task TrainAsync(string[] tokens, string triageId)
+        public async Task TrainAsync(string[] tokens, string triageId, CancellationToken cancel = default)
         {
             var classifierName = triageId;
-            Manager["Triage"].Classifiers[classifierName].Train(await tokens.GroupAndCountAsync(), 1);
+            //Manager["Triage"].Classifiers[classifierName].Train(await tokens.GroupAndCountAsync(), 1);
+            await Task.Run(() => Manager["Triage"].AddOrUpdateClassifier(classifierName, tokens, 1), cancel);
         }
 
     }

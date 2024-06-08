@@ -403,6 +403,10 @@
     </Compile>
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetailsWrapper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\IEmailDetailsWrapper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\IEmailTokenizer.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\IRecipientInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfo.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />

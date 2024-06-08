@@ -39,9 +39,15 @@ namespace UtilitiesCS //QuickFiler
         {
             _item = item;
             _globals = globals;
+            InitLazyFields(item, globals);
+        }
+
+        private void InitLazyFields(MailItem item, IApplicationGlobals globals)
+        {
             _entryId = new(() => _item.EntryID, true);
             _sender = new(() => _item.GetSenderInfo(), true);
-
+            _senderHtml = new(() => Sender.Html, true);
+            _senderName = new(() => Sender.Name, true);
             _actionable = new(() => _item.GetActionTaken(), true);
             _body = new(() => _item.Body, true);
             _conversationID = new(() => _item.ConversationID, true);
@@ -49,9 +55,10 @@ namespace UtilitiesCS //QuickFiler
             _storeId = new(() => ((Folder)_item.Parent).StoreID, true);
             _folderName = new(() => ((Folder)_item.Parent).Name, true);
             _folderInfo = new(() => new OlFolderInfo((Folder)Item.Parent, ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)));
-            _html = new(() => GetHtml(_item.HTMLBody), true);
+            _htmlBody = new(() => _item.HTMLBody, true);
+            _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);
-            _sender = new(() => _item.GetSenderInfo(), true);
+
             _olRecipients = new(() => _item.Recipients.Cast<Recipient>().ToArray(), true);
             _ccRecipients = new(() => OlRecipients.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray(), true);
             _toRecipients = new(() => OlRecipients.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray(), true);
@@ -60,19 +67,17 @@ namespace UtilitiesCS //QuickFiler
             _ccRecipientsName = new(() => string.Join("; ", CcRecipients.Select(t => t.Name)), true);
             _ccRecipientsHtml = new(() => string.Join("; ", CcRecipients.Select(t => t.Html)), true);
             _sentDate = new(() => _item.SentOn, true);
-            _sentOn = itemInfo.SentOn;
-            _subject = itemInfo.Subject;
-            _tokens = itemInfo.Tokens.ToLazy();
-            _triage = itemInfo.Triage.ToLazy();
-            _unread = itemInfo.UnRead;
-
+            _sentOn = new(() => this.SentDate.ToString("g"), true);
+            _subject = new(() => _item.Subject, true);
+            _tokens = new(() => Tokenizer.Tokenize(this).ToArray(), true);
+            _triage = new(() => _item.GetTriage(), true);
+            _unread = new(() => _item.UnRead, true);
             _attachmentsHelper = new(() => _item.Attachments
                                                 .Cast<Attachment>()
-                                                .Select(x => new AttachmentHelper(x, SentDate, FolderName, EmailPrefixToStrip))
+                                                .Select(x => new AttachmentHelper(x, SentDate, FolderName))
                                                 .ToArray(), true);
             _attachmentsInfo = new(() => AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray());
-            
-
+            _internetCodepage = new(() => _item.InternetCodepage, true);
         }
 
         public MailItemHelper(DataFrame df, long indexRow, string emailPrefixToStrip)
@@ -98,12 +103,11 @@ namespace UtilitiesCS //QuickFiler
             _ccRecipients = itemInfo.CcRecipients.ToLazy();
             _toRecipients = itemInfo.ToRecipients.ToLazy();
             _sentDate = itemInfo.SentDate.ToLazyValue();
-            _sentOn = itemInfo.SentOn;
-            _subject = itemInfo.Subject;
+            _sentOn = itemInfo.SentOn.ToLazy();
+            _subject = itemInfo.Subject.ToLazy();
             _tokens = itemInfo.Tokens.ToLazy();
             _triage = itemInfo.Triage.ToLazy();
-            _unread = itemInfo.UnRead;
-            
+            _unread = itemInfo.UnRead.ToLazyValue();
             _attachmentsInfo = itemInfo.AttachmentsInfo.ToLazy();
         }
 
@@ -190,29 +194,32 @@ namespace UtilitiesCS //QuickFiler
             token.ThrowIfCancellationRequested();
             item.ThrowIfNull();
 
-            var info = new MailItemHelper(item, appGlobals);
-            info.Sw = new SegmentStopWatch().Start();
-            
-
-            await Task.Run(() => info.LoadPriorityItems(appGlobals, token), token);
-            
-            info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
-
-            var recipientTask = Task.Run(() => 
-            { 
-                info.LoadRecipients();
-                if (info._html is not null) { info._html = info.GetHtml().ToLazy(); }
+            return await Task.Run(() =>
+            {
+                var info = new MailItemHelper(item, appGlobals);
+                info.Sw = new SegmentStopWatch().Start();
+                return info;
             }, token);
-            if (loadAll) { await recipientTask; }
+
+            //await Task.Run(() => info.LoadPriorityItems(appGlobals, token), token);
             
-            return info;
+            //info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
+
+            //var recipientTask = Task.Run(() => 
+            //{ 
+            //    info.LoadRecipients();
+            //    if (info._html is not null) { info._html = info.GetHtml().ToLazy(); }
+            //}, token);
+            //if (loadAll) { await recipientTask; }
+            
+            //return info;
         }
 
         public MailItem ResolveMail(Outlook.NameSpace olNs, bool strict = false)
         {
             return Initializer.GetOrLoad(
                 ref _item,
-                () => (MailItem)olNs.GetItemFromID(EntryId, _storeId),
+                () => (MailItem)olNs.GetItemFromID(EntryId, StoreId),
                 strict,
                 _entryId,
                 _storeId);
@@ -310,11 +317,11 @@ namespace UtilitiesCS //QuickFiler
             Sw?.LogDuration("LoadRecipients");
         }
 
-        internal void SetSender(RecipientInfo sender)
+        internal void SetSender(IRecipientInfo sender)
         {
             _sender = sender.ToLazy();
-            _senderName = sender.Name;
-            _senderHtml = sender.Html;
+            _senderName = sender.Name.ToLazy();
+            _senderHtml = sender.Html.ToLazy();
         }
 
         #endregion
@@ -333,19 +340,19 @@ namespace UtilitiesCS //QuickFiler
         #region Public Properties
 
         private Lazy<string> _actionable;
-        public string Actionable { get => _actionable.Value; set => _actionable = value.ToLazy(); }
+        public string Actionable { get => _actionable?.Value; set => _actionable = value.ToLazy(); }
 
         private Lazy<string> _body;
-        public string Body { get => _body.Value; set => _body = value.ToLazy(); }
+        public string Body { get => _body?.Value; set => _body = value.ToLazy(); }
 
         private Lazy<string> _categories;
-        public string Categories { get => _categories.Value; set => _categories = value.ToLazy(); }
+        public string Categories { get => _categories?.Value; set => _categories = value.ToLazy(); }
 
         private Lazy<string> _conversationID;
-        public string ConversationID { get => _conversationID.Value; set => _conversationID = value.ToLazy(); }
+        public string ConversationID { get => _conversationID?.Value; set => _conversationID = value.ToLazy(); }
 
         private Lazy<string> _emailPrefixToStrip;
-        public string EmailPrefixToStrip { get => _emailPrefixToStrip.Value; internal set => _emailPrefixToStrip = value.ToLazy(); }
+        public string EmailPrefixToStrip { get => _emailPrefixToStrip?.Value; internal set => _emailPrefixToStrip = value.ToLazy(); }
 
         //private string _entryId;
         //public string EntryId { get => PriorityInitialized(ref _entryId); set => _entryId = value; }
@@ -366,93 +373,93 @@ namespace UtilitiesCS //QuickFiler
         public string StoreId { get => _storeId.Value; set => _storeId = value.ToLazy(); }
 
         private Lazy<IFolderInfo> _folderInfo;
-        public IFolderInfo FolderInfo { get => _folderInfo.Value; set => _folderInfo = value.ToLazy(); }
+        public IFolderInfo FolderInfo { get => _folderInfo?.Value; set => _folderInfo = value.ToLazy(); }
 
         private Lazy<string> _folderName;
-        public string FolderName { get => _folderName.Value; set => _folderName = value.ToLazy(); }
+        public string FolderName { get => _folderName?.Value; set => _folderName = value.ToLazy(); }
         
         //private OlFolderInfo _folderInfo;
 
         private MailItem _item;
-        public MailItem Item { get => _item; set => _item = value; }
+        public virtual MailItem Item { get => _item; set => _item = value; }
 
         private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo.PlainTextOptionsEnum.StripAll;
-        public IItemInfo.PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
+        public virtual IItemInfo.PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
 
-        private string _sentOn;
-        public string SentOn { get => PriorityInitialized(ref _sentOn); set => _sentOn = value; }
+        private Lazy<string> _sentOn;
+        public virtual string SentOn { get => _sentOn?.Value; set => _sentOn = value.ToLazy(); }
 
-        private string _subject;
-        public string Subject { get => PriorityInitialized(ref _subject); set => _subject = value; }
+        private Lazy<string> _subject;
+        public virtual string Subject { get => _subject?.Value; set => _subject = value.ToLazy(); }
 
-        private string _senderHtml;
-        public string SenderHtml { get => PriorityInitialized(ref _senderHtml); set => _senderHtml = value; }
+        private Lazy<string> _senderHtml;
+        public virtual string SenderHtml { get => _senderHtml?.Value; set => _senderHtml = value.ToLazy(); }
 
-        private string _senderName;
-        public string SenderName { get => PriorityInitialized(ref _senderName); set => _senderName = value; }
+        private Lazy<string> _senderName;
+        public virtual string SenderName { get => _senderName?.Value; set => _senderName = value.ToLazy(); }
 
-        private Lazy<RecipientInfo> _sender;
-        public RecipientInfo Sender { get => _sender.Value; set => _sender = value.ToLazy(); }
+        private Lazy<IRecipientInfo> _sender;
+        public virtual IRecipientInfo Sender { get => _sender.Value; set => _sender = value.ToLazy(); }
 
         private Lazy<Recipient[]> _olRecipients;
-        internal Recipient[] OlRecipients { get => _olRecipients.Value; set => _olRecipients = value.ToLazy(); }
+        internal virtual Recipient[] OlRecipients { get => _olRecipients.Value; set => _olRecipients = value.ToLazy(); }
 
         private Lazy<string> _ccRecipientsHtml;
-        public string CcRecipientsHtml
+        public virtual string CcRecipientsHtml
         {
             get => _ccRecipientsHtml.Value;
             set { _ccRecipientsHtml = value.ToLazy(); NotifyPropertyChanged(); }
         }
 
         private Lazy<string> _ccRecipientsName;
-        public string CcRecipientsName
+        public virtual string CcRecipientsName
         {
             get => _ccRecipientsName.Value;
             set { _ccRecipientsName = value.ToLazy(); NotifyPropertyChanged(); }
         }
 
-        private Lazy<RecipientInfo[]> _ccRecipients;
-        public RecipientInfo[] CcRecipients
+        private Lazy<IRecipientInfo[]> _ccRecipients;
+        public virtual IRecipientInfo[] CcRecipients
         {
             get => _ccRecipients.Value;
             protected set => _ccRecipients = value.ToLazy();
         }
         
         private Lazy<string> _toRecipientsHtml;
-        public string ToRecipientsHtml
+        public virtual string ToRecipientsHtml
         {
             get => _toRecipientsHtml.Value;
             set { _toRecipientsHtml = value.ToLazy(); NotifyPropertyChanged(); }
         }
 
         private Lazy<string> _toRecipientsName;
-        public string ToRecipientsName
+        public virtual string ToRecipientsName
         {
             get => _toRecipientsName.Value;
             set { _toRecipientsName = value.ToLazy(); NotifyPropertyChanged(); }
         }
 
-        private Lazy<RecipientInfo[]> _toRecipients;
-        public RecipientInfo[] ToRecipients 
+        private Lazy<IRecipientInfo[]> _toRecipients;
+        public virtual IRecipientInfo[] ToRecipients 
         { 
             get => _toRecipients.Value; 
             protected set => _toRecipients = value.ToLazy(); 
         }
 
         private Lazy<string> _triage;
-        public string Triage { get => _triage.Value; set => _triage = value.ToLazy(); }
+        public virtual string Triage { get => _triage.Value; set => _triage = value.ToLazy(); }
 
         private Lazy<string> _html = null;
-        public string Html { get => _html.Value; private set => _html = value.ToLazy(); }
+        public virtual string Html { get => _html.Value; private set => _html = value.ToLazy(); }
 
         private Lazy<string> _htmlBody;
-        public string HTMLBody { get => _htmlBody.Value; protected set => _htmlBody = value.ToLazy(); }
+        public virtual string HTMLBody { get => _htmlBody.Value; protected set => _htmlBody = value.ToLazy(); }
 
         private Lazy<DateTime> _sentDate;
-        public DateTime SentDate { get => _sentDate.Value; set => _sentDate = value.ToLazyValue(); }
+        public virtual DateTime SentDate { get => _sentDate.Value; set => _sentDate = value.ToLazyValue(); }
         
         private Lazy<AttachmentHelper[]> _attachmentsHelper;
-        public AttachmentHelper[] AttachmentsHelper { get => _attachmentsHelper.Value; protected set => _attachmentsHelper = value.ToLazy(); }
+        public virtual AttachmentHelper[] AttachmentsHelper { get => _attachmentsHelper.Value; protected set => _attachmentsHelper = value.ToLazy(); }
         //{
         //    get => Initializer.GetOrLoad(ref _attachments, LoadAttachmentsInfo);
         //    private set => _attachments = value;
@@ -462,7 +469,7 @@ namespace UtilitiesCS //QuickFiler
         {
             var attachments = Item.Attachments
                                   .Cast<Attachment>()
-                                  .Select(x => new AttachmentHelper(x, SentDate, FolderName, _emailPrefixToStrip))
+                                  .Select(x => new AttachmentHelper(x, SentDate, FolderName, EmailPrefixToStrip))
                                   .ToArray();
             AttachmentsInfo = attachments.Select(x => x.AttachmentInfo).ToArray();
             return attachments;
@@ -485,29 +492,38 @@ namespace UtilitiesCS //QuickFiler
         
         public string[] LoadTokens()
         {
-            _tokens = Tokenizer.tokenize(this).ToArray().ToLazy();
+            _tokens = Tokenizer.Tokenize(this).ToArray().ToLazy();
             return _tokens.Value;
         }
         public async Task<IEnumerable<string>> TokenizeAsync()
         {
-            _tokens = await Task.Run(() => Tokenizer.tokenize(this).ToArray().ToLazy());
+            _tokens = await Task.Run(() => Tokenizer.Tokenize(this).ToArray().ToLazy());
             Sw?.LogDuration("TokenizeAsync");
             return _tokens.Value;
         }
 
         [JsonIgnore]
-        public EmailTokenizer Tokenizer { get => _tokenizer ??= new EmailTokenizer(); }
-        private EmailTokenizer _tokenizer;
+        public IEmailTokenizer Tokenizer { get => _tokenizer ??= new EmailTokenizer(); }
+        private IEmailTokenizer _tokenizer;
 
-        private bool? _unread;
-        public bool UnRead
-        {
-            get => (bool)Initializer.GetOrLoad(ref _unread, loader: () => _item.UnRead, strict: false, dependencies: _item)!;
-            set => Initializer.SetAndSave(
-                ref _unread, value, 
-                (x) => _item.UnRead = x ?? false, 
-                () => _item.Save(), null, false);
+        private Lazy<bool> _unread;
+        public bool UnRead 
+        { 
+            get => _unread.Value;
+            set 
+            { 
+                _unread = value.ToLazyValue(); 
+                Item.UnRead = value;
+                Item.Save();
+            }
         }
+        //{
+        //    get => (bool)Initializer.GetOrLoad(ref _unread, loader: () => _item.UnRead, strict: false, dependencies: _item)!;
+        //    set => Initializer.SetAndSave(
+        //        ref _unread, value, 
+        //        (x) => _item.UnRead = x ?? false, 
+        //        () => _item.Save(), null, false);
+        //}
 
         public int InternetCodepage
         {
