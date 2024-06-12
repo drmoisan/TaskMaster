@@ -75,7 +75,7 @@ namespace UtilitiesCS.EmailIntelligence
         
         public async Task TrainAsync(object item, bool state)
         {
-            Tokenize.ThrowIfNull($"{nameof(Tokenize)} delegate function cannot be null to Train classifier");
+            TokenizeAsync.ThrowIfNull($"{nameof(Tokenize)} delegate function cannot be null to Train classifier");
             item.ThrowIfNull($"{nameof(item)} cannot be null to Train classifier");
             var tokens = await TokenizeAsync(item);
             await TrainAsync(tokens, state);

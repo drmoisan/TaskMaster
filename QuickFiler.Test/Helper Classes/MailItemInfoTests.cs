@@ -17,6 +17,7 @@ namespace Z.Unfinished.QuickFiler.Test
     public class MailItemInfoTests
     {
         private MockRepository mockRepository;
+        private Mock<IApplicationGlobals> mockApplicationGlobals;
         private Mock<MailItem> mockMailItem;
         private Mock<PropertyAccessor> mockPropertyAccessor;
         private Mock<AddressEntry> mockSender;
@@ -34,6 +35,7 @@ namespace Z.Unfinished.QuickFiler.Test
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Loose);
+            this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
             this.mockMailItem = this.mockRepository.Create<MailItem>();
 
             // Setup sender property assessor
@@ -106,7 +108,7 @@ namespace Z.Unfinished.QuickFiler.Test
 
         private MailItemHelper CreateMailItemInfo()
         {
-            return new MailItemHelper(this.mockMailItem.Object);
+            return new MailItemHelper(this.mockMailItem.Object, this.mockApplicationGlobals.Object);
         }
 
         [TestMethod]

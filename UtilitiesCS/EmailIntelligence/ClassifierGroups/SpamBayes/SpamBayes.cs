@@ -3,16 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class SpamBayesController : TristateEngine
+    public class SpamBayes : TristateEngine
     {
-        public SpamBayesController(IApplicationGlobals globals) : base()
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        #region Constructors and Static Methods
+
+        public SpamBayes(IApplicationGlobals globals) : base()
         {
             Globals = globals;
             Tokenize = TokenizeEmail;
@@ -25,6 +32,28 @@ namespace UtilitiesCS.EmailIntelligence
 
         public IApplicationGlobals Globals { get => _globals; set => _globals = value; }
         private IApplicationGlobals _globals;
+
+        public static async Task CreateNewSpamManagerAsync(ScDictionary<string, BayesianClassifierGroup> manager)
+        {
+            manager["Spam"] = await CreateSpamClassifiersAsync();
+            manager.Serialize();
+        }        
+        
+        internal static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
+        {
+            return await Task.Run(() =>
+            {
+                var group = new BayesianClassifierGroup
+                {
+                    TotalEmailCount = 0,
+                    SharedTokenBase = new Corpus()
+                };
+                return group;
+            }, token);
+            
+        }
+
+        #endregion Constructors and Static Methods
 
         public async Task TestAsync(Selection selection)
         {
@@ -69,7 +98,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string[] TokenizeEmail(object email)
         {
-            return email as MailItem is null ? [] : new MailItemHelper(email as MailItem).LoadAll(Globals, Globals.Ol.EmailRoot, true).Tokens;
+            return email as MailItem is null ? [] : new MailItemHelper(email as MailItem, Globals).LoadAll(Globals, Globals.Ol.EmailRoot, true).Tokens;
         }
         
         public async Task<string[]> TokenizeEmailAsync(object email) 

@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 using System.Collections.ObjectModel;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 
 
 
@@ -33,6 +34,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 
         #region Constructors and private fields
 
@@ -62,7 +64,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             await Transform<MinedMailInfo[], MinedMailInfo[]>(Consolidate);
 
             await ToggleOfflineMode(offline);
-            return new ScBag<MinedMailInfo>(await Load<MinedMailInfo[]>());
+            var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            return new ScBag<MinedMailInfo>(await Load<MinedMailInfo[]>(folderPath));
         }
 
         #region ETL - EXTRACT Folders and Emails
@@ -382,7 +385,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var message = $"Transforming from {typeof(OlFolderInfo[][]).Name} to {typeof(IItemInfo[])}";
             progress.Report(0, message);
 
-            var (completed, chunkCount) = await DeserializeAsync<(int, int)>("FolderGroupCompleted");
+            var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            var (completed, chunkCount) = await EmailDataMiner.DeserializeAsync<(int, int)>(folderPath, "FolderGroupCompleted");
             if (folderChunks.Count() != chunkCount)
             {
                 logger.Debug($"FolderChunks count {folderChunks.Count()} does not match chunkCount {chunkCount}. Restarting transformation with new data");
@@ -494,8 +498,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
             var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
-            (_, var count) = await DeserializeAsync<(int, int)>("FolderGroupCompleted").ConfigureAwait(false);
-            var completed = await DeserializeAsync<int>($"{tOutName}Completed").ConfigureAwait(false);
+            var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            (_, var count) = await EmailDataMiner.DeserializeAsync<(int, int)>(folderPath, "FolderGroupCompleted").ConfigureAwait(false);
+            var completed = await EmailDataMiner.DeserializeAsync<int>(folderPath, $"{tOutName}Completed").ConfigureAwait(false);
             var completedPerChunk = 100 / (double)count;
             var serializer = new BayesianSerializationHelper(_globals);
 
@@ -505,7 +510,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     try
                     {
-                        var objOut = await DeserializeAsync<Tout>($"{tOutName}_{i:0000}").ConfigureAwait(false);
+                        var objOut = await DeserializeAsync<Tout>(folderPath, $"{tOutName}_{i:0000}").ConfigureAwait(false);
                         progress.Report((int)((i + 1) * completedPerChunk), $"{message}. Validated {i + 1} of {count}");
                         continue;
                     }
@@ -641,11 +646,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region ETL - LOAD To Data Mining
 
-        public async Task<T> Load<T>(string fileName = "")
+        public static async Task<T> Load<T>(string folderPath, string fileName = "")
         {
             var tName = FolderConverter.SanitizeFilename(typeof(T).Name);
             if (fileName.IsNullOrEmpty()) { fileName = tName; }
-            T result = await DeserializeAsync<T>(fileName);
+            T result = await EmailDataMiner.DeserializeAsync<T>(folderPath, fileName);
 
             return result;
         }
@@ -654,463 +659,445 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion ETL - Extract, Transform, Load For Data Mining
 
-        #region Build Classifiers
+        //#region Build Classifiers
 
-        public virtual async Task<ScoCollection<MinedMailInfo>> LoadStaging()
-        {
-            _mailInfoCollection = await Task.Run(
-                () => new ScoCollection<MinedMailInfo>(
-                    _globals.FS.Filenames.EmailInfoStagingFile,
-                    _globals.FS.FldrPythonStaging));
+        //public virtual async Task<ScoCollection<MinedMailInfo>> LoadStaging()
+        //{
+        //    _mailInfoCollection = await Task.Run(
+        //        () => new ScoCollection<MinedMailInfo>(
+        //            _globals.FS.Filenames.EmailInfoStagingFile,
+        //            _globals.FS.FldrPythonStaging));
 
-            return _mailInfoCollection;
-        }
+        //    return _mailInfoCollection;
+        //}
 
-        protected ScoCollection<MinedMailInfo> _mailInfoCollection;
+        //protected ScoCollection<MinedMailInfo> _mailInfoCollection;
 
-        [Obsolete ("This method is not used in the current implementation of the Bayesian Classifier.")]
-        public virtual ConcurrentDictionary<string, DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
-        {
-            var dedicated = collection.Select(x =>
-                x.Tokens.Select(y =>
-                (Token: y, FolderPath: x.FolderInfo.RelativePath))
-                .GroupBy(x => x.Token)
-                .Select(grp => new DedicatedToken(
-                    grp.Key,
-                    grp.ToList().First().FolderPath,
-                    grp.Count())))
-                .SelectMany(x => x)
-                .GroupBy(x => x.Token)
-                .Where(grp => grp.Count() == 1)
-                .SelectMany(x => x)
-                .Select(x => new KeyValuePair<string, DedicatedToken>(x.Token, x));
-            //.ToArray();
-            var dict = new ConcurrentDictionary<string, DedicatedToken>(dedicated);
+        //[Obsolete ("This method is not used in the current implementation of the Bayesian Classifier.")]
+        //public virtual ConcurrentDictionary<string, DedicatedToken> GetDedicated(ConcurrentBag<MinedMailInfo> collection)
+        //{
+        //    var dedicated = collection.Select(x =>
+        //        x.Tokens.Select(y =>
+        //        (Token: y, FolderPath: x.FolderInfo.RelativePath))
+        //        .GroupBy(x => x.Token)
+        //        .Select(grp => new DedicatedToken(
+        //            grp.Key,
+        //            grp.ToList().First().FolderPath,
+        //            grp.Count())))
+        //        .SelectMany(x => x)
+        //        .GroupBy(x => x.Token)
+        //        .Where(grp => grp.Count() == 1)
+        //        .SelectMany(x => x)
+        //        .Select(x => new KeyValuePair<string, DedicatedToken>(x.Token, x));
+        //    //.ToArray();
+        //    var dict = new ConcurrentDictionary<string, DedicatedToken>(dedicated);
 
-            return dict;
-        }
+        //    return dict;
+        //}
 
-        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection)
-        {
-            collection.ThrowIfNull();
+        //public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection)
+        //{
+        //    collection.ThrowIfNull();
 
-            var group = await Task.Run(() => Deserialize<BayesianClassifierGroup>("StagingClassifierGroup"));
-            if (group is null)
-            {
-                group = await CreateClassifierGroupAsync(collection);
-                SerializeAndSave(group, "StagingClassifierGroup");
-            }
-            return group;
-        }
+        //    var group = await Task.Run(() => Deserialize<BayesianClassifierGroup>("StagingClassifierGroup"));
+        //    if (group is null)
+        //    {
+        //        group = await CreateClassifierGroupAsync(collection);
+        //        SerializeAndSave(group, "StagingClassifierGroup");
+        //    }
+        //    return group;
+        //}
 
-        public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
-            MinedMailInfo[] collection)
-        {
-            return await Task.Run(() =>
-            {
-                var group = new BayesianClassifierGroup
-                {
-                    TotalEmailCount = collection.Count(),
-                    SharedTokenBase = new Corpus(
-                        collection.SelectMany(x => x.Tokens).GroupAndCount())
-                };
-                return group;
-            });
-        }
+        //public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
+        //    MinedMailInfo[] collection)
+        //{
+        //    return await Task.Run(() =>
+        //    {
+        //        var group = new BayesianClassifierGroup
+        //        {
+        //            TotalEmailCount = collection.Count(),
+        //            SharedTokenBase = new Corpus(
+        //                collection.SelectMany(x => x.Tokens).GroupAndCount())
+        //        };
+        //        return group;
+        //    });
+        //}
 
-        public virtual async Task BuildClassifierAsync(
-            IGrouping<string, MinedMailInfo> group,
-            BayesianClassifierGroup classifierGroup,
-            CancellationToken cancel)
-        {
-            var matchFrequency = group.Select(minedMail => minedMail.Tokens)
-                                      .SelectMany(x => x)
-                                      .GroupAndCount();
+        //public virtual async Task BuildClassifierAsync(
+        //    IGrouping<string, MinedMailInfo> group,
+        //    BayesianClassifierGroup classifierGroup,
+        //    CancellationToken cancel)
+        //{
+        //    var matchFrequency = group.Select(minedMail => minedMail.Tokens)
+        //                              .SelectMany(x => x)
+        //                              .GroupAndCount();
 
-            var matchCorpus = new Corpus(matchFrequency);
-            var matchEmailCount = group.Count();
-            await classifierGroup.RebuildClassifier(
-                group.Key, matchFrequency, matchEmailCount, cancel);
-        }
+        //    var matchCorpus = new Corpus(matchFrequency);
+        //    var matchEmailCount = group.Count();
+        //    await classifierGroup.RebuildClassifier(
+        //        group.Key, matchFrequency, matchEmailCount, cancel);
+        //}
 
         
-        public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg)
-        {
-            var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
-            var sw = ppkg.StopWatch;
+        //public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg)
+        //{
+        //    var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
+        //    var sw = ppkg.StopWatch;
 
-            bool success = false;
-            try
-            {
-                await AsyncMultiTasker.AsyncMultiTaskChunker(groups, async (group) =>
-                {
-                    await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
-                }, ppkg.ProgressTrackerPane, "Building Classifiers", ppkg.Cancel);
-                sw.LogDuration("Build Classifiers");
-                sw.WriteToLog(clear: false);
-                success = true;
-            }
-            catch (System.Exception e)
-            {
-                logger.Error(e.Message, e);
-            }
-            return success;
-        }
+        //    bool success = false;
+        //    try
+        //    {
+        //        await AsyncMultiTasker.AsyncMultiTaskChunker(groups, async (group) =>
+        //        {
+        //            await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
+        //        }, ppkg.ProgressTrackerPane, "Building Classifiers", ppkg.Cancel);
+        //        sw.LogDuration("Build Classifiers");
+        //        sw.WriteToLog(clear: false);
+        //        success = true;
+        //    }
+        //    catch (System.Exception e)
+        //    {
+        //        logger.Error(e.Message, e);
+        //    }
+        //    return success;
+        //}
 
-        public async Task BuildFolderClassifiersAsync()
-        {
-            _globals.AF.Manager.Clear();
+        //public async Task BuildFolderClassifiersAsync()
+        //{
+        //    _globals.AF.Manager.Clear();
 
-            var ppkg = await ProgressPackage //.CreateAsTupleAsync(screen: _globals.Ol.GetExplorerScreen());
-                .CreateAsTuplePaneAsync(progressTrackerPane: _globals.AF.ProgressTracker).ConfigureAwait(false);
-            var sw = ppkg.StopWatch;
-            _globals.AF.ProgressPane.Visible = true;
-            ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier -> Load Mined Mail Info");
+        //    var ppkg = await ProgressPackage //.CreateAsTupleAsync(screen: _globals.Ol.GetExplorerScreen());
+        //        .CreateAsTuplePaneAsync(progressTrackerPane: _globals.AF.ProgressTracker).ConfigureAwait(false);
+        //    var sw = ppkg.StopWatch;
+        //    _globals.AF.ProgressPane.Visible = true;
+        //    ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier -> Load Mined Mail Info");
+
+        //    var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+        //    var collection = await Load<MinedMailInfo[]>(folderPath);
+        //    collection.ThrowIfNullOrEmpty();
+        //    sw.LogDuration("Load Staging");
+            
+        //    ppkg.ProgressTrackerPane.Report(10, "Building Folder Classifier -> Getting Folder Paths");
+
+        //    var folderPaths = QueryOlFolderInfo(GetOlFolderTree()).Select(x => x.RelativePath).ToList();
+        //    sw.LogDuration("Get Folder Paths");
+
+        //    ppkg.ProgressTrackerPane.Report(20, "Building Folder Classifier -> Creating Classifier Group");
+        //    var classifierGroup = await GetOrCreateClassifierGroupAsync(collection);
+        //    sw.LogDuration("Get or Create Classifier Group and shared token base");
+        //    sw.WriteToLog(clear: false);
+        //    ppkg.ProgressTrackerPane.Report(30, "Building Folder Classifier -> Building Classifiers");
+
+        //    var childPpkg = await new ProgressPackage()
+        //        .InitializeAsync(ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(), ppkg.StopWatch)
+        //        .ConfigureAwait(false);
+            
+        //    if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
+        //    {
+        //        _globals.AF.ProgressPane.Visible = false;
+        //        _globals.AF.Manager["Folder"] = classifierGroup;
+        //        _globals.AF.Manager.Serialize();
+        //        MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //    }
+        //}
+                
+        //[Obsolete]
+        //public async Task BuildClassifierAsync1()
+        //{
+        //    var collection = await LoadStaging();
+
+        //    var tree = GetOlFolderTree();
+        //    var folders = QueryOlFolders(tree).ToList();
+        //    var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
+
+        //    var allTokens = collection.SelectMany(x => x.Tokens).ToList();
+        //    Corpus tokenBase = new();
+        //    tokenBase.AddOrIncrementTokens(allTokens);
+
+        //    var group = new ClassifierGroup();
+        //    group.SharedTokenBase = tokenBase;
+
+        //    var tokenSource = new CancellationTokenSource();
+        //    var token = tokenSource.Token;
+        //    var progress = new ProgressTracker(tokenSource).Initialize();
+
+
+        //    int completed = 0;
+        //    folderPaths = folderPaths.Take(3).ToList();
+        //    int count = folderPaths.Count();
+
+        //    Stopwatch psw = new Stopwatch();
+        //    psw.Start();
                         
-            var collection = await Load<MinedMailInfo[]>();
-            collection.ThrowIfNullOrEmpty();
-            sw.LogDuration("Load Staging");
+        //    var tasks = folderPaths.Select(folderPath =>
+        //    {
+        //        return Task.Run(() =>
+        //        {
+        //            var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
+        //            var negativeTokens = collection.Where(x => x.FolderInfo.RelativePath != folderPath).SelectMany(x => x.Tokens).ToList();
+        //            if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
+        //            {
+        //                group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
+        //            }
+        //            Interlocked.Increment(ref completed);
+        //        }, token);
+        //    });
+
+        //    bool success = false;
+        //    Task entireTask = Task.WhenAll(tasks);
+
+        //    try
+        //    {
+        //        while (await Task.WhenAny(entireTask, Task.Delay(1000)) != entireTask)
+        //        {
+        //            progress.Report(
+        //                (int)(((double)completed / count) * 100),
+        //                GetProgressMessage(completed, count, psw));
+        //        }
+        //        success = true;
+        //    }
+        //    catch (OperationCanceledException)
+        //    {
+        //        logger.Debug("Classifier calculation canceled");
+        //    }
+
+        //    progress.Report(100);
+
+        //    if (success)
+        //    {
+        //        //Disabled to prevent compiler error
+        //        _globals.AF.Manager["Folder"] = null; // group;
+        //        _globals.AF.Manager.Serialize();
+        //    }
+        //}
+
+        //[Obsolete]
+        //public async Task BuildClassifierAsync2() 
+        //{
+        //    var collection = await LoadStaging();
             
-            ppkg.ProgressTrackerPane.Report(10, "Building Folder Classifier -> Getting Folder Paths");
+        //    var tree = GetOlFolderTree();
+        //    var folders = QueryOlFolders(tree).ToList();
+        //    var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
 
-            var folderPaths = QueryOlFolderInfo(GetOlFolderTree()).Select(x => x.RelativePath).ToList();
-            sw.LogDuration("Get Folder Paths");
+        //    var allTokens = collection.SelectMany(x => x.Tokens).ToList();
+        //    Corpus tokenBase = new();
+        //    tokenBase.AddOrIncrementTokens(allTokens);
 
-            ppkg.ProgressTrackerPane.Report(20, "Building Folder Classifier -> Creating Classifier Group");
-            var classifierGroup = await GetOrCreateClassifierGroupAsync(collection);
-            sw.LogDuration("Get or Create Classifier Group and shared token base");
-            sw.WriteToLog(clear: false);
-            ppkg.ProgressTrackerPane.Report(30, "Building Folder Classifier -> Building Classifiers");
+        //    var group = new ClassifierGroup();
+        //    group.SharedTokenBase = tokenBase;
 
-            var childPpkg = await new ProgressPackage()
-                .InitializeAsync(ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(), ppkg.StopWatch)
-                .ConfigureAwait(false);
-            
-            if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
-            {
-                _globals.AF.ProgressPane.Visible = false;
-                _globals.AF.Manager["Folder"] = classifierGroup;
-                _globals.AF.Manager.Serialize();
-                MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
+        //    var tokenSource = new CancellationTokenSource();
+        //    var token = tokenSource.Token;
+        //    var progress = new ProgressTracker(tokenSource).Initialize();
 
-        public async Task CreateSpamClassifiersAsync()
-        {
-            var temp = await Task.Run(() =>
-                {
-                    var group = new BayesianClassifierGroup
-                    {
-                        TotalEmailCount = 0,
-                        SharedTokenBase = new Corpus()
-                    };
-                    return group;
-                });
-            _globals.AF.Manager["Spam"] = temp;
-            _globals.AF.Manager.Serialize();
-        }
-            
-        
+        //    //collection.ForEach(x => 
+        //    //{
+        //    //    x.FolderPath = folders.Find(y => y.Name == x.FolderPath).FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "");
+        //    //});
+        //    //collection.Serialize();
 
+        //    //foreach (var folderPath in folderPaths)
+        //    //{
+        //    //    var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+        //    //    var negativeTokens = collection.Where(x => x.FolderPath != folderPath).SelectMany(x => x.Tokens).ToList();
+        //    //    if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
+        //    //        group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
+        //    //}
 
+        //    int completed = 0;
+        //    int count = folderPaths.Count();
 
-        [Obsolete]
-        public async Task BuildClassifierAsync1()
-        {
-            var collection = await LoadStaging();
+        //    Stopwatch psw = new Stopwatch();
+        //    psw.Start();
 
-            var tree = GetOlFolderTree();
-            var folders = QueryOlFolders(tree).ToList();
-            var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
+        //    var tasks = folderPaths.Select(folderPath => 
+        //    {
+        //        return Task.Run(() =>
+        //        {
+        //            var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
+        //            var negativeTokens = collection.Where(x => x.FolderInfo.RelativePath != folderPath).SelectMany(x => x.Tokens).ToList();
+        //            if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
+        //                group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
+        //            Interlocked.Increment(ref completed);
+        //        }, token);
+        //    });
 
-            var allTokens = collection.SelectMany(x => x.Tokens).ToList();
-            Corpus tokenBase = new();
-            tokenBase.AddOrIncrementTokens(allTokens);
+        //    bool success = false;
+        //    Task entireTask = Task.WhenAll(tasks);
 
-            var group = new ClassifierGroup();
-            group.SharedTokenBase = tokenBase;
-
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
-            var progress = new ProgressTracker(tokenSource).Initialize();
-
-
-            int completed = 0;
-            folderPaths = folderPaths.Take(3).ToList();
-            int count = folderPaths.Count();
-
-            Stopwatch psw = new Stopwatch();
-            psw.Start();
-                        
-            var tasks = folderPaths.Select(folderPath =>
-            {
-                return Task.Run(() =>
-                {
-                    var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
-                    var negativeTokens = collection.Where(x => x.FolderInfo.RelativePath != folderPath).SelectMany(x => x.Tokens).ToList();
-                    if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
-                    {
-                        group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
-                    }
-                    Interlocked.Increment(ref completed);
-                }, token);
-            });
-
-            bool success = false;
-            Task entireTask = Task.WhenAll(tasks);
-
-            try
-            {
-                while (await Task.WhenAny(entireTask, Task.Delay(1000)) != entireTask)
-                {
-                    progress.Report(
-                        (int)(((double)completed / count) * 100),
-                        GetProgressMessage(completed, count, psw));
-                }
-                success = true;
-            }
-            catch (OperationCanceledException)
-            {
-                logger.Debug("Classifier calculation canceled");
-            }
-
-            progress.Report(100);
-
-            if (success)
-            {
-                //Disabled to prevent compiler error
-                _globals.AF.Manager["Folder"] = null; // group;
-                _globals.AF.Manager.Serialize();
-            }
-        }
-
-        [Obsolete]
-        public async Task BuildClassifierAsync2() 
-        {
-            var collection = await LoadStaging();
-            
-            var tree = GetOlFolderTree();
-            var folders = QueryOlFolders(tree).ToList();
-            var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
-
-            var allTokens = collection.SelectMany(x => x.Tokens).ToList();
-            Corpus tokenBase = new();
-            tokenBase.AddOrIncrementTokens(allTokens);
-
-            var group = new ClassifierGroup();
-            group.SharedTokenBase = tokenBase;
-
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
-            var progress = new ProgressTracker(tokenSource).Initialize();
-
-            //collection.ForEach(x => 
-            //{
-            //    x.FolderPath = folders.Find(y => y.Name == x.FolderPath).FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "");
-            //});
-            //collection.Serialize();
-
-            //foreach (var folderPath in folderPaths)
-            //{
-            //    var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-            //    var negativeTokens = collection.Where(x => x.FolderPath != folderPath).SelectMany(x => x.Tokens).ToList();
-            //    if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
-            //        group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
-            //}
-
-            int completed = 0;
-            int count = folderPaths.Count();
-
-            Stopwatch psw = new Stopwatch();
-            psw.Start();
-
-            var tasks = folderPaths.Select(folderPath => 
-            {
-                return Task.Run(() =>
-                {
-                    var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
-                    var negativeTokens = collection.Where(x => x.FolderInfo.RelativePath != folderPath).SelectMany(x => x.Tokens).ToList();
-                    if (positiveTokens.Count() > 0 && negativeTokens.Count() > 0)
-                        group.ForceClassifierUpdate(folderPath, positiveTokens, negativeTokens);
-                    Interlocked.Increment(ref completed);
-                }, token);
-            });
-
-            bool success = false;
-            Task entireTask = Task.WhenAll(tasks);
-
-            try
-            {
-                while (await Task.WhenAny(entireTask, Task.Delay(1000)) != entireTask)
-                {
-                    progress.Report(
-                        (int)(((double)completed / count) * 100),
-                        GetProgressMessage(completed, count, psw));
-                }
-                success = true;
-            }
-            catch (OperationCanceledException)
-            {
-                logger.Debug("Classifier calculation canceled");
-            }
+        //    try
+        //    {
+        //        while (await Task.WhenAny(entireTask, Task.Delay(1000)) != entireTask)
+        //        {
+        //            progress.Report(
+        //                (int)(((double)completed / count) * 100),
+        //                GetProgressMessage(completed, count, psw));
+        //        }
+        //        success = true;
+        //    }
+        //    catch (OperationCanceledException)
+        //    {
+        //        logger.Debug("Classifier calculation canceled");
+        //    }
             
 
 
 
-            //System.Timers.Timer progressTimer = new System.Timers.Timer(500);
-            //progressTimer.AutoReset = true;
-            //progressTimer.Elapsed += (sender, e) =>
-            //{
-            //    progress.Report(
-            //        (int)(((double)completed / count) * 100),
-            //        GetReportMessage(completed, count, psw));
-            //};
-            //progressTimer.SynchronizingObject = progress.ProgressViewer;
+        //    //System.Timers.Timer progressTimer = new System.Timers.Timer(500);
+        //    //progressTimer.AutoReset = true;
+        //    //progressTimer.Elapsed += (sender, e) =>
+        //    //{
+        //    //    progress.Report(
+        //    //        (int)(((double)completed / count) * 100),
+        //    //        GetReportMessage(completed, count, psw));
+        //    //};
+        //    //progressTimer.SynchronizingObject = progress.ProgressViewer;
 
-            //try
-            //{
-            //    progressTimer.Start();
-            //    await Task.WhenAll(tasks);
-            //    success = true;
-            //}
-            //catch (OperationCanceledException)
-            //{
-            //    progressTimer.Stop();
-            //    progressTimer.Dispose();
-            //    logger.Debug("Classifier calculation canceled");
-            //}
+        //    //try
+        //    //{
+        //    //    progressTimer.Start();
+        //    //    await Task.WhenAll(tasks);
+        //    //    success = true;
+        //    //}
+        //    //catch (OperationCanceledException)
+        //    //{
+        //    //    progressTimer.Stop();
+        //    //    progressTimer.Dispose();
+        //    //    logger.Debug("Classifier calculation canceled");
+        //    //}
 
-            progress.Report(100);
+        //    progress.Report(100);
 
-            if (success)
-            {
-                _globals.AF.Manager["Folder"] = null; // group;
-                _globals.AF.Manager.Serialize();
-            }
-        }
+        //    if (success)
+        //    {
+        //        _globals.AF.Manager["Folder"] = null; // group;
+        //        _globals.AF.Manager.Serialize();
+        //    }
+        //}
 
-        [Obsolete]
-        public async Task BuildClassifierAsync3()
-        {
-            var tokenSource = new CancellationTokenSource();
-            var token = tokenSource.Token;
-            //var progress = new ProgressTracker(tokenSource);
+        //[Obsolete]
+        //public async Task BuildClassifierAsync3()
+        //{
+        //    var tokenSource = new CancellationTokenSource();
+        //    var token = tokenSource.Token;
+        //    //var progress = new ProgressTracker(tokenSource);
 
-            _globals.AF.Manager.Clear();
+        //    _globals.AF.Manager.Clear();
 
-            var sw = new SegmentStopWatch();
-            sw.Start();
+        //    var sw = new SegmentStopWatch();
+        //    sw.Start();
 
-            var tmp = await LoadStaging();
-            var collection = new ConcurrentBag<MinedMailInfo>(tmp);
-            tmp = null;
-            sw.LogDuration("Load Staging");
+        //    var tmp = await LoadStaging();
+        //    var collection = new ConcurrentBag<MinedMailInfo>(tmp);
+        //    tmp = null;
+        //    sw.LogDuration("Load Staging");
 
-            var tree = GetOlFolderTree();
-            var folders = QueryOlFolders(tree).ToList();
-            var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
-            sw.LogDuration("Get Folder Paths");
+        //    var tree = GetOlFolderTree();
+        //    var folders = QueryOlFolders(tree).ToList();
+        //    var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
+        //    sw.LogDuration("Get Folder Paths");
 
-            var group = new ClassifierGroup();
+        //    var group = new ClassifierGroup();
 
-            var allTokens = collection.SelectMany(x => x.Tokens).ToList();
-            group.TotalTokenCount = allTokens.Count();
-            sw.LogDuration("Capture all tokens and count");
+        //    var allTokens = collection.SelectMany(x => x.Tokens).ToList();
+        //    group.TotalTokenCount = allTokens.Count();
+        //    sw.LogDuration("Capture all tokens and count");
 
-            var dedicated = GetDedicated(collection);
-            var dedicatedTokens = dedicated.Select(x => x.Key).ToArray();
-            group.DedicatedTokens = dedicated;
-            sw.LogDuration("Identify Dedicated Tokens");
+        //    var dedicated = GetDedicated(collection);
+        //    var dedicatedTokens = dedicated.Select(x => x.Key).ToArray();
+        //    group.DedicatedTokens = dedicated;
+        //    sw.LogDuration("Identify Dedicated Tokens");
 
-            Corpus sharedTokenBase = new();
-            sharedTokenBase.AddOrIncrementTokens(allTokens);
-            dedicatedTokens.ForEach(x => sharedTokenBase.TokenFrequency.TryRemove(x, out _));
-            group.SharedTokenBase = sharedTokenBase;
-            sw.LogDuration("Create Shared Token Base");
-            sw.WriteToLog(clear: false);
+        //    Corpus sharedTokenBase = new();
+        //    sharedTokenBase.AddOrIncrementTokens(allTokens);
+        //    dedicatedTokens.ForEach(x => sharedTokenBase.TokenFrequency.TryRemove(x, out _));
+        //    group.SharedTokenBase = sharedTokenBase;
+        //    sw.LogDuration("Create Shared Token Base");
+        //    sw.WriteToLog(clear: false);
 
 
-            int completed = 0;
-            int count = folderPaths.Count();
+        //    int completed = 0;
+        //    int count = folderPaths.Count();
 
-            var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)Math.Round((double)count / (double)processors, 0);
-            var chunks = folderPaths.Chunk(chunkSize);
+        //    var processors = Math.Max(Environment.ProcessorCount - 2, 1);
+        //    var chunkSize = (int)Math.Round((double)count / (double)processors, 0);
+        //    var chunks = folderPaths.Chunk(chunkSize);
 
-            Stopwatch psw = new Stopwatch();
-            psw.Start();
+        //    Stopwatch psw = new Stopwatch();
+        //    psw.Start();
 
-            //var folderPath = folderPaths[0];
-            //var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-            //var classifier = tokenBase.ToClassifier(folderPath, positiveTokens);
+        //    //var folderPath = folderPaths[0];
+        //    //var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+        //    //var classifier = tokenBase.ToClassifier(folderPath, positiveTokens);
 
-            var progress = new ProgressTracker(tokenSource).Initialize();
+        //    var progress = new ProgressTracker(tokenSource).Initialize();
 
-            var tasks = chunks.Select(
-                chunk => Task.Run(async () =>
-                {
-                    foreach (var folderPath in chunk)
-                    {
-                        var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
-                        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
-                        Interlocked.Increment(ref completed);
-                        progress.Report(
-                            (int)(((double)completed / count) * 100),
-                            GetProgressMessage(completed, count, psw));
-                    }
-                }, token));
+        //    var tasks = chunks.Select(
+        //        chunk => Task.Run(async () =>
+        //        {
+        //            foreach (var folderPath in chunk)
+        //            {
+        //                var positiveTokens = collection.Where(x => x.FolderInfo.RelativePath == folderPath).SelectMany(x => x.Tokens).ToList();
+        //                group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+        //                Interlocked.Increment(ref completed);
+        //                progress.Report(
+        //                    (int)(((double)completed / count) * 100),
+        //                    GetProgressMessage(completed, count, psw));
+        //            }
+        //        }, token));
 
-            //var tasks = chunks.Select(
-            //    chunk => Task.Run(async () => await
-            //        chunk.ToAsyncEnumerable()
-            //        .ForEachAsync(async (folderPath) => 
-            //        {
-            //            var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-            //            group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
-            //            Interlocked.Increment(ref completed);
-            //            progress.Report(
-            //                (int)(((double)completed / count) * 100),
-            //                GetReportMessage(completed, count, psw));
-            //        }), 
-            //        token));
+        //    //var tasks = chunks.Select(
+        //    //    chunk => Task.Run(async () => await
+        //    //        chunk.ToAsyncEnumerable()
+        //    //        .ForEachAsync(async (folderPath) => 
+        //    //        {
+        //    //            var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+        //    //            group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+        //    //            Interlocked.Increment(ref completed);
+        //    //            progress.Report(
+        //    //                (int)(((double)completed / count) * 100),
+        //    //                GetReportMessage(completed, count, psw));
+        //    //        }), 
+        //    //        token));
 
-            //var tasks = folderPaths.Select(folderPath =>
-            //{
-            //    return Task.Run(async () =>
-            //    {
-            //        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
-            //        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
-            //        Interlocked.Increment(ref completed);
-            //        progress.Report(
-            //            (int)(((double)completed / count) * 100),
-            //            GetReportMessage(completed, count, psw));
-            //    }, token);
-            //});
+        //    //var tasks = folderPaths.Select(folderPath =>
+        //    //{
+        //    //    return Task.Run(async () =>
+        //    //    {
+        //    //        var positiveTokens = collection.Where(x => x.FolderPath == folderPath).SelectMany(x => x.Tokens).ToList();
+        //    //        group.Classifiers[folderPath] = await group.ToClassifierAsync(folderPath, positiveTokens, token);
+        //    //        Interlocked.Increment(ref completed);
+        //    //        progress.Report(
+        //    //            (int)(((double)completed / count) * 100),
+        //    //            GetReportMessage(completed, count, psw));
+        //    //    }, token);
+        //    //});
 
-            bool success = false;
+        //    bool success = false;
 
-            try
-            {
-                await Task.WhenAll(tasks);
-                success = true;
-            }
-            catch (OperationCanceledException)
-            {
-                logger.Debug("Classifier calculation canceled");
-            }
+        //    try
+        //    {
+        //        await Task.WhenAll(tasks);
+        //        success = true;
+        //    }
+        //    catch (OperationCanceledException)
+        //    {
+        //        logger.Debug("Classifier calculation canceled");
+        //    }
 
-            progress.Report(100);
+        //    progress.Report(100);
 
-            if (success)
-            {
-                // Set to null to prevent compiler error with type change
-                _globals.AF.Manager["Folder"] = null; //group;
-                _globals.AF.Manager.ActivateLocalDisk();
-                _globals.AF.Manager.Serialize();
-            }
-        }
+        //    if (success)
+        //    {
+        //        // Set to null to prevent compiler error with type change
+        //        _globals.AF.Manager["Folder"] = null; //group;
+        //        _globals.AF.Manager.ActivateLocalDisk();
+        //        _globals.AF.Manager.Serialize();
+        //    }
+        //}
 
-        #endregion Build Classifiers
+        //#endregion Build Classifiers
 
         #region Testing Sizing and Serialization Methods
 
@@ -1134,7 +1121,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             else { return default(T); }
         }
 
-        internal async virtual Task<T> DeserializeAsync<T>(string fileNameSeed, string fileNameSuffix = "")
+        internal static async Task<T> DeserializeAsync<T>(string folderPath, string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -1142,7 +1129,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Formatting = Formatting.Indented
             };
             var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");;
+            disk.FolderPath = folderPath;
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
@@ -1239,7 +1226,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
 
             var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MailItemHelper(mailItem).LoadAll(_globals, _globals.Ol.ArchiveRoot,true));
+                new MailItemHelper(mailItem, _globals).LoadAll(_globals, _globals.Ol.ArchiveRoot,true));
             var sizeMailInfo2 = 0; // ObjectSize(mailInfo);
             LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
@@ -1322,7 +1309,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             try
             {
-                T obj = await DeserializeAsync<T>(fileNameSeed, fileNameSuffix);
+                var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+                T obj = await DeserializeAsync<T>(folderPath, fileNameSeed, fileNameSuffix);
                 if (obj != null)
                     return true;
                 else
