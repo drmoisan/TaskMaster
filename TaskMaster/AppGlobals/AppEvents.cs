@@ -17,11 +17,11 @@ namespace TaskMaster
         public AppEvents(IApplicationGlobals appGlobals)
         {
             _globals = appGlobals;
-            _spamBayes = new SpamBayes(appGlobals);
+            _spamBayes = new SpamBayesController(appGlobals);
         }
 
         private IApplicationGlobals _globals;
-        private SpamBayes _spamBayes;
+        private SpamBayesController _spamBayes;
         private Items _olToDoItems;
         private Items OlToDoItems
         {

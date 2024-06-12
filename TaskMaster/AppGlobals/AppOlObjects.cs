@@ -232,13 +232,6 @@ namespace TaskMaster
             return System.Windows.Forms.Screen.AllScreens.ToList().IndexOf(screen);
         }
 
-        public Size GetExplorerScreenSize() 
-        {
-            var explorer = App.ActiveExplorer();
-            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
-            return bounds.Size;
-        }
-        
         public System.Windows.Forms.Screen GetExplorerScreen()
         {
             var explorer = App.ActiveExplorer();

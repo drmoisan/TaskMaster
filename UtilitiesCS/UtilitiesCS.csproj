@@ -68,6 +68,9 @@
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ConcurrencyVisualizer.Markers">
+      <HintPath>..\..\..\..\..\..\..\program files\microsoft visual studio\2022\preview\common7\ide\extensions\rf2nfg00.o0t\SDK\Managed\4.0\Microsoft.ConcurrencyVisualizer.Markers.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Analysis.0.20.1\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
@@ -401,12 +404,6 @@
     <Compile Include="EmailIntelligence\Bayesian\Performance\MetricChartViewer.Designer.cs">
       <DependentUpon>MetricChartViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
-    <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetailsWrapper.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\IEmailDetailsWrapper.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\IEmailTokenizer.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\IRecipientInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfo.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />
@@ -417,9 +414,9 @@
     <Compile Include="EmailIntelligence\EmailParsingSorting\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\ImageStripper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentSerializable.cs" />
-    <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs" />
-    <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
-    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
+    <Compile Include="EmailIntelligence\SpamBayes\SpamBayesController.cs" />
+    <Compile Include="EmailIntelligence\SpamBayes\SpamBayesModel.cs" />
+    <Compile Include="EmailIntelligence\SpamBayes\TristateEngine.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="HelperClasses\DeepCompare.cs" />
     <Compile Include="HelperClasses\DispatchUtility.cs" />

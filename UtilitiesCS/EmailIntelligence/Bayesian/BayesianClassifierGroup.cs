@@ -41,12 +41,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public IApplicationGlobals AppGlobals { get; set; }
 
         [JsonIgnore]
-        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
-        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenize = new EmailTokenizer().Tokenize;
+        public Func<object, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
+        private Func<object, IEnumerable<string>> _tokenize = new EmailTokenizer().tokenize;
 
         [JsonIgnore]
-        public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
-        private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().TokenizeAsync;
+        public Func<object, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
+        private Func<object, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().tokenizeAsync;
 
         #endregion Public Properties
 
@@ -78,7 +78,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public OrderedParallelQuery<Prediction<string>> Classify(object source)
         {
-            var tokens = _tokenize(source, AppGlobals);
+            var tokens = _tokenize(source);
             var tokenIncidence = tokens.GroupAndCount();
             var result = this.Classify(tokenIncidence).OrderByDescending(x => x.Probability);
             var sl = new SortedList<int, Prediction<string>>();
@@ -104,7 +104,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async ValueTask<Prediction<string>[]> ClassifyAsync(object source, CancellationToken cancel)
         {
-            var tokens = await TokenizeAsync(source, AppGlobals, cancel);
+            var tokens = await TokenizeAsync(source, cancel);
             var tokenIncidence = await tokens.GroupAndCountAsync();
             var result = await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
             return result;

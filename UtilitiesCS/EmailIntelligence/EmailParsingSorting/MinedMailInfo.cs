@@ -30,14 +30,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private IFolderInfo _folderInfo;
         public IFolderInfo FolderInfo { get => _folderInfo; set => _folderInfo = value; }
 
-        private IRecipientInfo[] _toRecipients;
-        public IRecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }
+        private RecipientInfo[] _toRecipients;
+        public RecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }
 
-        private IRecipientInfo[] _ccRecipients;
-        public IRecipientInfo[] CcRecipients { get => _ccRecipients; set => _ccRecipients = value; }
+        private RecipientInfo[] _ccRecipients;
+        public RecipientInfo[] CcRecipients { get => _ccRecipients; set => _ccRecipients = value; }
 
-        private IRecipientInfo _sender;
-        public IRecipientInfo Sender { get => _sender; set => _sender = value; }
+        private RecipientInfo _sender;
+        public RecipientInfo Sender { get => _sender; set => _sender = value; }
 
         private string _conversationId;
         public string ConversationId { get => _conversationId; set => _conversationId = value; }

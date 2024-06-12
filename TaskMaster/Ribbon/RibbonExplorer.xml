@@ -22,15 +22,13 @@
             </tab>
             <tab idMso="TabMail">
               <group id="SpamBayesGroup" imageMso="RecycleBin" label="Spam Bayes">
+                <button id="NewSpam" imageMso="NewComment" onAction="ClearSpam_Click" label="Clear Spam Manager" />
                 <button id="TrainSpam" imageMso="CancelAll" onAction="TrainSpam_Click" label="Train Spam" />
                 <button id="TrainHam" imageMso="ClickToRunEnableUpdates" onAction="TrainHam_Click" label="Train Ham" />
-                <menu id="OtherSpamActions" imageMso="AdministrationHome" label="Other" size="normal">
-                  <button id="NewSpam" imageMso="NewComment" onAction="ClearSpam_Click" label="Clear Spam Manager" />
-                  <button id="TestSpam" imageMso="CalculateNow" onAction="TestSpam_Click" label="Test Spam" />
-                  <button id="TestSpamVerbose" imageMso="CalculateSheet" onAction="TestSpamVerbose_Click" label="Test Spam Verbose" />
-                  <button id="SpamMetrics" imageMso="Chart3DColumnChart" onAction="SpamMetrics_Click" label="Spam Metrics" />
-                  <button id="SpamInvestigateErrors" imageMso="AutoSummarize" onAction="SpamInvestigateErrors_Click" label="Spam Investigate Errors" />                 
-                </menu>             
+                <button id="TestSpam" imageMso="CalculateNow" onAction="TestSpam_Click" label="Test Spam" />
+                <button id="TestSpamVerbose" imageMso="CalculateSheet" onAction="TestSpamVerbose_Click" label="Test Spam Verbose" />
+                <button id="SpamMetrics" imageMso="Chart3DColumnChart" onAction="SpamMetrics_Click" label="Spam Metrics" />
+                <button id="SpamInvestigateErrors" imageMso="AutoSummarize" onAction="SpamInvestigateErrors_Click" label="Spam Investigate Errors" />
               </group>
               <group id="Group2" label="Task Master">
                 <button id="FlagAsTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
@@ -79,15 +77,6 @@
                     <button id="SerializeMailInfo" imageMso="SaveAll" onAction="SerializeMailInfo_Click" label="Serialize Mail Info"/>
                   </menu> 
                 </menu>  
-              </group>
-              <group id="TriageGroup" imageMso="Filter" label="Triage">
-                <button id="TriageSetA" onAction="TriageSetA_Click" label="Set A"/>
-                <button id="TriageSetB" onAction="TriageSetB_Click" label="Set B"/>
-                <button id="TriageSetC" onAction="TriageSetC_Click" label="Set C"/>
-                <menu id="OtherTriageActions" label="Other" size="normal">
-                  <button id="ClearTriage" imageMso="Clear" onAction="ClearTriage_Click" label="Clear Triage"/>
-                  <button id="TriageSelection" imageMso="FilterBySelection" onAction="TriageSelection_Click" label="Triage Selection"/>
-                </menu>
               </group>
             </tab>
         </tabs>

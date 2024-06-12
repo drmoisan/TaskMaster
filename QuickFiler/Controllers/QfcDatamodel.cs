@@ -16,9 +16,6 @@ using System.Windows.Forms;
 using System.Threading;
 using QuickFiler.Helper_Classes;
 
-
-
-
 namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
@@ -61,9 +58,7 @@ namespace QuickFiler.Controllers
         }
 
         public void Cleanup() 
-        {
-            _tokenSource?.Cancel();
-            _worker?.CancelAsync();
+        { 
             _globals.Ol.App.NewMailEx -= Application_NewMailEx;
             _moveMonitor.UnhookAll();
             _moveMonitor = null;
@@ -128,8 +123,7 @@ namespace QuickFiler.Controllers
             //zxxint arg = (int)e.Argument;
 
             // Start the time-consuming operation.
-            //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
-            e.Result = LoadRemainingEmailsToQueue(bw, _token);
+            e.Result = LoadRemainingEmailsToQueue(bw);
 
             // If the operation was canceled by the user,
             // set the DoWorkEventArgs.Cancel property to true.
@@ -201,12 +195,15 @@ namespace QuickFiler.Controllers
             _tokenSource = tokenSource;
             _worker = worker;
 
-            var emailList = await Task.Run(() => InitEmailQueue(batchSize, worker), token);
+            var emailList = await Task.Factory.StartNew(() => InitEmailQueue(batchSize, worker), 
+                                                        token,
+                                                        TaskCreationOptions.LongRunning, 
+                                                        TaskScheduler.Default);
 
             return emailList;
         }
 
-        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
+        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw)
         {
             if ((_frame is null) || (_frame.RowCount == 0))
             {
@@ -216,90 +213,20 @@ namespace QuickFiler.Controllers
             
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
-
-            foreach (var row in rows)
-            {
-                try
-                {
-                    token.ThrowIfCancellationRequested();
-                    var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+           
+            rows.Select(row => 
+                (MailItem)_olApp.GetNamespace("MAPI")
+                .GetItemFromID(row.EntryId, row.StoreId))
+                .ForEach(item => 
+                { 
                     _masterQueue.AddLast(item);
                     _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-                }
-                catch (OperationCanceledException)
-                {
-                    logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
-                    return false;
-                }
-                catch (System.Exception e)
-                {
-                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
-                    throw e;
-                }
-            }
+                });
+            
             return true;
             
-            
-            
-
-            //try
-            //{
-            //    rows.Select(row =>
-            //    (MailItem)_olApp.GetNamespace("MAPI")
-            //    .GetItemFromID(row.EntryId, row.StoreId))
-            //    .ForEach(item =>
-            //    {
-            //        token.ThrowIfCancellationRequested();
-            //        _masterQueue.AddLast(item);
-            //        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-            //    });
-
-            //    return true;
-            //}
-            //catch (TaskCanceledException)
-            //{
-            //    logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
-            //    return false;
-            //}
-
-
         }
-
-        private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
-        {
-            if ((_frame is null) || (_frame.RowCount == 0))
-            {
-                MessageBox.Show("Email Frame is empty");
-                return false;
-            }
-
-
-            try
-            {
-                await _frame.GetRowsAs<IEmailSortInfo>().Values.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(
-                    async (row, token) => await Task.Run(() =>
-                    {
-                        token.ThrowIfCancellationRequested();    
-                        var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
-                        _masterQueue.AddLast(item);
-                        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-                    }, token),
-                    token);
-                return true;
-            }
-            catch (TaskCanceledException)
-            {
-                logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
-                return false;
-            }
-            
-
-            
-
-            
-
-        }
-
+                
         public Frame<int, string> InitDf(Explorer activeExplorer)
         {
             var df = DfDeedle.GetEmailDataInView(activeExplorer);

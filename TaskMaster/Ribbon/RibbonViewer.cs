@@ -185,18 +185,8 @@ namespace TaskMaster
         public void SpamMetrics_Click(Office.IRibbonControl control) => _controller.SpamMetrics();
         public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => _controller.SpamInvestigateErrors();
 
-
+        
         #endregion Spam Manager
-
-        #region Triage
-
-        public async void TriageSelection_Click(Office.IRibbonControl control) => await _controller.TriageSelectionAsync();
-        public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
-        public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
-        public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
-        public async void ClearTriage_Click(Office.IRibbonControl control) => await _controller.ClearTriageAync();
-
-        #endregion Triage
 
         #region TryMethods  
         public void DeepCompareEmails_Click(Office.IRibbonControl control) => _controller.TryDeepCompareEmails();

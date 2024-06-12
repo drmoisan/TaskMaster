@@ -122,7 +122,7 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    senderName = sender.Name;
+                    senderName = olMail.SenderName;
                 }
             }
             else
@@ -147,7 +147,7 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    senderAddress = sender.Address;
+                    senderAddress = olMail.SenderEmailAddress;
                 }
             }
             else
@@ -185,7 +185,7 @@ namespace UtilitiesCS
             //return senderAddress;
         }
 
-        public static IRecipientInfo GetSenderInfo(this MailItem olMail)
+        public static RecipientInfo GetSenderInfo(this MailItem olMail)
         {
             var name = olMail.GetSenderName();
             var address = olMail.GetSenderAddress();

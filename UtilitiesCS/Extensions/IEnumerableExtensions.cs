@@ -52,13 +52,13 @@ namespace UtilitiesCS
             }
         }
 
-        //public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
-        //{
-        //    foreach (T item in enumerable)
-        //    {
-        //        action(item);
-        //    }
-        //}
+        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
+        {
+            foreach (T item in enumerable)
+            {
+                action(item);
+            }
+        }
 
         public static IEnumerable<TValue> SelectGroup<TKey, TValue>(this IEnumerable<IGrouping<TKey, TValue>> groups, TKey key) 
         {

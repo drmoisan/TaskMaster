@@ -132,7 +132,7 @@ namespace UtilitiesCS
             if (saveAttachments || savePictures)
             {
 
-                var attachments = mailHelper.AttachmentsHelper.ToAsyncEnumerable();
+                var attachments = mailHelper.Attachments.ToAsyncEnumerable();
                 await attachments.ForEachAsync(async x => 
                 { 
                     

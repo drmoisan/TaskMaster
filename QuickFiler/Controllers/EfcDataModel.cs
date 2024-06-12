@@ -126,7 +126,7 @@ namespace QuickFiler.Controllers
 
         #region Public Methods
 
-        async public Task MoveToFolderAsync(string folderpath, 
+        async public Task MoveToFolder(string folderpath, 
                                        bool saveAttachments,
                                        bool saveEmail,
                                        bool savePictures,
@@ -188,7 +188,7 @@ namespace QuickFiler.Controllers
             {
                 folderpath = folderpath.Substring(1);
             }
-            await MoveToFolderAsync(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
+            await MoveToFolder(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
         }
 
         public IList<MailItem> PackageItems(bool moveConversation)

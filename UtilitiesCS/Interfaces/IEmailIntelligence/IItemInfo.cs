@@ -40,9 +40,9 @@ public interface IItemInfo
     int InternetCodepage { get; }
     bool IsTaskFlagSet { get; set; }
     PlainTextOptionsEnum PlainTextOptions { get; set; }
-    IRecipientInfo Sender { get; set; }
-    IRecipientInfo[] CcRecipients { get; }
-    IRecipientInfo[] ToRecipients { get; }
+    RecipientInfo Sender { get; set; }
+    RecipientInfo[] CcRecipients { get; }
+    RecipientInfo[] ToRecipients { get; }
     DateTime SentDate { get; set; }
     string SentOn { get; set; }
     string Subject { get; set; }

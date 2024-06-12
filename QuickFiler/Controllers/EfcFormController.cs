@@ -132,7 +132,6 @@ namespace QuickFiler.Controllers
 
         internal void CaptureConfigureItemViewer()
         {
-            var explorerSize = _globals.Ol.GetExplorerScreenSize();
             _tlpHeightExpanded = (int)Math.Round(_itemTlp.RowStyles[1].Height, 0);
             var heightDiff = _tlpHeightExpanded - _itemViewer.Height;
             _tlpHeightCollapsed = _itemViewer.MinimumSize.Height + heightDiff;
@@ -143,8 +142,6 @@ namespace QuickFiler.Controllers
             var bodyRow = itemTlpRows.ElementAt(4);
             var bodyRowHeight = _tlpHeightCollapsed - itemTlpRows.Select(x => x.Height).Sum(x => x) + bodyRow.Height;
             bodyRow.Height = bodyRowHeight;
-            _formViewer.MinimumSize = new Size((int)(explorerSize.Width * 0.75), (int)(explorerSize.Height * 0.75));
-            _formViewer.Size = _formViewer.MinimumSize;
         }
         
         public void Cleanup()
@@ -511,8 +508,8 @@ namespace QuickFiler.Controllers
             else
             {
                 _formViewer.Hide();
-                await _homeController.ExecuteMovesAsync();
-                //await _formViewer.UiSyncContext;
+                await _homeController.ExecuteMoves().ConfigureAwait(false);
+                await _formViewer.UiSyncContext;
                 _formViewer.Dispose();
                 Cleanup();
             }

@@ -49,7 +49,7 @@ namespace QuickFiler.Helper_Classes
             _tokenSource = tokenSource;
             _token = token;
             _mailItem = mailItem;
-            MailInfo = new MailItemHelper(mailItem, _globals);//.LoadPriority(appGlobals, token);
+            MailInfo = new MailItemHelper(mailItem).LoadPriority(appGlobals, token);
             _updateUI = updateUI;
             PropertyChanged += Handler_PropertyChanged;
         }

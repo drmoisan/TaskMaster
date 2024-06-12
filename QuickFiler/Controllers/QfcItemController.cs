@@ -344,8 +344,8 @@ namespace QuickFiler.Controllers
 
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
-            _itemInfo = new MailItemHelper(mailItem, _globals);
-            //_itemInfo.LoadPriority(_globals, _token);
+            _itemInfo = new MailItemHelper(mailItem);
+            _itemInfo.LoadPriority(_globals, _token);
             AssignControls(_itemInfo, viewerPosition);
 
         }

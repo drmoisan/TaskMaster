@@ -49,8 +49,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public IApplicationGlobals AppGlobals { get; set; }
 
         //[JsonIgnore]
-        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
-        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenizer = new EmailTokenizer().Tokenize;
+        public Func<object, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
+        private Func<object, IEnumerable<string>> _tokenizer = new EmailTokenizer().tokenize;
 
         #endregion Public Properties
 
@@ -71,7 +71,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public IOrderedEnumerable<Prediction<string>> Classify(object source)
         {
-            return this.Classify(_tokenizer(source, AppGlobals));
+            return this.Classify(_tokenizer(source));
         }
 
         public IOrderedEnumerable<Prediction<string>> Classify(IEnumerable<string> tokens)

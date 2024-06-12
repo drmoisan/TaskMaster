@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace UtilitiesCS
 {
     [Serializable]
-    public class RecipientInfo : IRecipientInfo
+    public class RecipientInfo
     {
         public RecipientInfo() { }
 
