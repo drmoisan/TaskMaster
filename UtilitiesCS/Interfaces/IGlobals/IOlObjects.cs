@@ -1,5 +1,6 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using System.ComponentModel;
+using System.Drawing;
 
 namespace UtilitiesCS
 {
@@ -27,5 +28,6 @@ namespace UtilitiesCS
         System.Windows.Forms.Screen GetExplorerScreen();
         public Folder JunkCertain { get; }
         public Folder JunkPossible { get; }
+        public Size GetExplorerScreenSize();
     }
 }

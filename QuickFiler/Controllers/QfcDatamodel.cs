@@ -118,7 +118,7 @@ namespace QuickFiler.Controllers
             //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
         }
 
-        private async void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             // Do not access the form's BackgroundWorker reference directly.
             // Instead, use the reference provided by the sender parameter.
@@ -128,7 +128,8 @@ namespace QuickFiler.Controllers
             //zxxint arg = (int)e.Argument;
 
             // Start the time-consuming operation.
-            e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
+            //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
+            e.Result = LoadRemainingEmailsToQueue(bw, _token);
 
             // If the operation was canceled by the user,
             // set the DoWorkEventArgs.Cancel property to true.
@@ -205,7 +206,7 @@ namespace QuickFiler.Controllers
             return emailList;
         }
 
-        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw)
+        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
         {
             if ((_frame is null) || (_frame.RowCount == 0))
             {
@@ -215,18 +216,53 @@ namespace QuickFiler.Controllers
             
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
-           
-            rows.Select(row => 
-                (MailItem)_olApp.GetNamespace("MAPI")
-                .GetItemFromID(row.EntryId, row.StoreId))
-                .ForEach(item => 
-                { 
+
+            foreach (var row in rows)
+            {
+                try
+                {
+                    token.ThrowIfCancellationRequested();
+                    var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
                     _masterQueue.AddLast(item);
                     _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-                });
-            
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+                    return false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    throw e;
+                }
+            }
             return true;
             
+            
+            
+
+            //try
+            //{
+            //    rows.Select(row =>
+            //    (MailItem)_olApp.GetNamespace("MAPI")
+            //    .GetItemFromID(row.EntryId, row.StoreId))
+            //    .ForEach(item =>
+            //    {
+            //        token.ThrowIfCancellationRequested();
+            //        _masterQueue.AddLast(item);
+            //        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
+            //    });
+
+            //    return true;
+            //}
+            //catch (TaskCanceledException)
+            //{
+            //    logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+            //    return false;
+            //}
+
+
         }
 
         private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
