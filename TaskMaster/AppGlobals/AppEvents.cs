@@ -17,7 +17,12 @@ namespace TaskMaster
         public AppEvents(IApplicationGlobals appGlobals)
         {
             _globals = appGlobals;
-            _spamBayes = new SpamBayes(appGlobals);
+        }
+
+        internal async Task<AppEvents> LoadAsync()
+        {
+            _spamBayes = await SpamBayes.CreateAsync(_globals);
+            return this;
         }
 
         private IApplicationGlobals _globals;

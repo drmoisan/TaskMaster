@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -22,24 +23,48 @@ namespace UtilitiesCS.EmailIntelligence
         public SpamBayes(IApplicationGlobals globals) : base()
         {
             Globals = globals;
+            Init();
+            //Tokenize = TokenizeEmail;
+            //TokenizeAsync = TokenizeEmailAsync;
+            //CalculateProbability = Globals.AF.Manager["Spam"].Classifiers["Spam"].chi2_spamprob;
+            //CalculateProbabilityAsync = Globals.AF.Manager["Spam"].Classifiers["Spam"].Chi2SpamProbAsync;
+            //CallbackAsync = TrainCallbackAsync;
+            //Threshhold = new TristateThreshhold(0.9, 0.1);
+        }
+
+        private SpamBayes() : base() { }
+
+        public SpamBayes Init() 
+        {
+            Globals.ThrowIfNull();
+            
+            SpamHamGroup = Globals.AF.Manager["Spam"];
             Tokenize = TokenizeEmail;
             TokenizeAsync = TokenizeEmailAsync;
-            CalculateProbability = Globals.AF.Manager["Spam"].Classifiers["Spam"].chi2_spamprob;
+            CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
             CalculateProbabilityAsync = Globals.AF.Manager["Spam"].Classifiers["Spam"].Chi2SpamProbAsync;
             CallbackAsync = TrainCallbackAsync;
             Threshhold = new TristateThreshhold(0.9, 0.1);
+            
+            return this; 
         }
 
-        public IApplicationGlobals Globals { get => _globals; set => _globals = value; }
-        private IApplicationGlobals _globals;
-
-        public static async Task CreateNewSpamManagerAsync(ScDictionary<string, BayesianClassifierGroup> manager)
+        public static async Task<SpamBayes> CreateAsync(IApplicationGlobals globals, CancellationToken token = default)
         {
-            manager["Spam"] = await CreateSpamClassifiersAsync();
-            manager.Serialize();
+            var sb = new SpamBayes();
+            if (globals?.AF?.Manager["Spam"]?.Classifiers["Spam"] is null)
+            {
+                logger.Warn($"{nameof(SpamBayes)}.{nameof(CreateAsync)}: No SpamBayes classifiers found in manager. Skipping load");
+                return null;
+            }
+            else
+        {
+                sb.Globals = globals;
+                return await Task.Run(sb.Init, token);
         }        
+        }
         
-        internal static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
+        public static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
         {
             return await Task.Run(() =>
             {
@@ -48,12 +73,24 @@ namespace UtilitiesCS.EmailIntelligence
                     TotalEmailCount = 0,
                     SharedTokenBase = new Corpus()
                 };
+                group.Classifiers["Spam"] = new BayesianClassifierShared("Spam");
+                group.Classifiers["Spam"] = new BayesianClassifierShared("Ham");
                 return group;
             }, token);
             
         }
 
         #endregion Constructors and Static Methods
+
+        #region public Properties
+
+        public IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+        private IApplicationGlobals _globals;
+        
+        public BayesianClassifierGroup SpamHamGroup { get => _spamHamGroup; set => _spamHamGroup = value; }
+        private BayesianClassifierGroup _spamHamGroup;
+
+        #endregion public Properties
 
         public async Task TestAsync(Selection selection)
         {
@@ -92,8 +129,8 @@ namespace UtilitiesCS.EmailIntelligence
 
         public override async Task TrainAsync(string[] tokens, bool isSpam)
         {
-            var classifierName = isSpam ? "Spam" : "Ham";
-            Globals.AF.Manager["Spam"].Classifiers[classifierName].Train(await tokens.GroupAndCountAsync(), 1);
+            var spamOrHam = isSpam ? "Spam" : "Ham";
+            await SpamHamGroup.Classifiers[spamOrHam].TrainAsync(await tokens.GroupAndCountAsync(), 1, default);
         }
 
         public string[] TokenizeEmail(object email)

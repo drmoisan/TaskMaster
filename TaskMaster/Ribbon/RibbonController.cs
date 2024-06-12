@@ -451,7 +451,8 @@ namespace TaskMaster
             var response = MessageBox.Show("Are you sure you want to clear the Spam Manager? This cannot be undone", "Clear Spam Manager", MessageBoxButtons.YesNo);
             if (response == DialogResult.Yes)
             {
-                await SpamBayes.CreateNewSpamManagerAsync(_globals.AF.Manager);            
+                _globals.AF.Manager["Spam"] = await SpamBayes.CreateSpamClassifiersAsync();
+                _globals.AF.Manager.Serialize();
             }
         }
 
@@ -460,19 +461,11 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var sb = new SpamBayes(_globals);
+            //var sb = new SpamBayes(_globals);
+            var sb = await SpamBayes.CreateAsync(_globals);
+            if (sb == null)
             await sb.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, true);
-            //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection)
-            //{
-            //    //var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
-            //    if (emailObj is MailItem email)
-            //    {
-            //        var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
-            //        _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Spam", helper.Tokens, 1);
-            //        email.SetUdf("Spam", 1.0, OlUserPropertyType.olPercent);
-            //    }
-            //}
-            //_globals.AF.Manager.Serialize();
+            
 
         }
 
@@ -481,7 +474,8 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var sb = new SpamBayes(_globals);
+            //var sb = new SpamBayes(_globals);
+            var sb = await SpamBayes.CreateAsync(_globals);
             await sb.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, false);
             //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection)
             //{
@@ -503,7 +497,8 @@ namespace TaskMaster
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
 
-            var sb = new SpamBayes(_globals);
+            //var sb = new SpamBayes(_globals);
+            var sb = await SpamBayes.CreateAsync(_globals);
             await sb.TestAsync(_globals.Ol.App.ActiveExplorer().Selection);
             //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection )
             //{
