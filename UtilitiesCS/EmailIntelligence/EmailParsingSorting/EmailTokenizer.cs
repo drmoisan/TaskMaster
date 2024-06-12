@@ -17,14 +17,14 @@ using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class EmailTokenizer
+    public class EmailTokenizer : IEmailTokenizer
     {
         #region Constructors and Initializers
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public EmailTokenizer() 
+        public EmailTokenizer()
         {
             setup();
         }
@@ -94,17 +94,17 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Main Methods
 
-        public async Task<string[]> tokenizeAsync(object obj, CancellationToken cancel)
+        public async Task<string[]> TokenizeAsync(object obj, IApplicationGlobals globals, CancellationToken cancel)
         {
-            return await Task.Run(() => tokenize(obj).ToArray(), cancel);
+            return await Task.Run(() => Tokenize(obj, globals).ToArray(), cancel);
         }
 
-        public IEnumerable<string> tokenize(object obj) 
+        public IEnumerable<string> Tokenize(object obj, IApplicationGlobals globals)
         {
             if (obj is null) { throw new ArgumentNullException("obj"); }
             else if (obj is string[]) { return (string[])obj; }
-            else if (obj is MailItemHelper) { return tokenize((MailItemHelper)obj);}
-            else if (obj is MailItem) { return tokenize(new MailItemHelper((MailItem)obj)); }
+            else if (obj is MailItemHelper) { return Tokenize((MailItemHelper)obj); }
+            else if (obj is MailItem) { return Tokenize(new MailItemHelper((MailItem)obj, globals)); }
             else
             {
                 throw new ArgumentException($"obj type must be {typeof(string[])}, " +
@@ -113,7 +113,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        public IEnumerable<string> tokenize(IItemInfo msg)
+        public IEnumerable<string> Tokenize(IItemInfo msg)
         {
             //var headers = msg.GetHeaders();
             foreach (var tok in this.tokenize_headers(msg))
@@ -187,12 +187,12 @@ namespace UtilitiesCS.EmailIntelligence
             // To:, Cc:      # These can help, if your ham and spam are sourced
             //               # from the same location. If not, they'll be horrible.
 
-            List<(string field, RecipientInfo value)> addrlist = [];
+            List<(string field, IRecipientInfo value)> addrlist = [];
             addrlist.Add(("from", msg.Sender));
             msg.ToRecipients?.ForEach(x => addrlist.Add(("to", x)));
             msg.CcRecipients?.ForEach(x => addrlist.Add(("cc", x)));
 
-            if (addrlist.Count > 0) 
+            if (addrlist.Count > 0)
             {
                 foreach (var (field, value) in addrlist)
                 {
@@ -219,16 +219,16 @@ namespace UtilitiesCS.EmailIntelligence
             // individual.
 
             IEnumerable<string> all_addrs = null;
-            
-            if (SpamBayesOptions.summarize_email_prefixes) 
+
+            if (SpamBayesOptions.summarize_email_prefixes)
             {
                 if (all_addrs is null) { all_addrs = addrlist.Select(x => x.value?.Address?.ToLower() ?? ""); }
 
                 if (all_addrs.Count() > 1)
                 {
                     var pfx = commonprefix(all_addrs);
-                    if (pfx != "") 
-                    { 
+                    if (pfx != "")
+                    {
                         var score = pfx.Length * all_addrs.Count() / 10;
                         // After staring at pfxlen:* values generated from a large
                         // number of ham & spam I saw that any scores greater
@@ -240,7 +240,7 @@ namespace UtilitiesCS.EmailIntelligence
                         {
                             yield return "pfxlen:big";
                         }
-                        else 
+                        else
                         {
                             yield return $"pfxlen:{score / 10 * 10:00}";
                         }
@@ -286,15 +286,15 @@ namespace UtilitiesCS.EmailIntelligence
 
             var tocount = msg.ToRecipients?.Count() ?? 0;
             if (tocount > 0)
-                yield return $"to:2**{Math.Round(Math.Log(tocount,2))}";
+                yield return $"to:2**{Math.Round(Math.Log(tocount, 2))}";
 
             var cccount = msg.ToRecipients?.Count() ?? 0;
             if (cccount > 0)
                 yield return $"to:2**{Math.Round(Math.Log(cccount, 2))}";
 
-            
+
         }
-                
+
         /// <summary>
         /// Generate a stream of tokens from an email Message.
         /// If options['Tokenizer', 'check_octets'] is True, the first few 
@@ -445,12 +445,12 @@ namespace UtilitiesCS.EmailIntelligence
             }
 
             if (short_runs.Count > 0 && SpamBayesOptions.x_short_runs)
-                yield return $"short:{Math.Round(Math.Log(short_runs.Max(),2),0):N2}";
-            
+                yield return $"short:{Math.Round(Math.Log(short_runs.Max(), 2), 0):N2}";
+
         }
 
-        public string commonprefix(IEnumerable<string> strings) 
-        { 
+        public string commonprefix(IEnumerable<string> strings)
+        {
             var pfx = string.Join("", strings
                 .Transpose()
                 .TakeWhile(s => s.All(d => d == s.First()))
@@ -510,10 +510,10 @@ namespace UtilitiesCS.EmailIntelligence
             // # Return a list of all msg parts with type 'image/*'.
             // return [part for part in msg.walk() if part.get_content_type().startswith('image/')]
         }
-        
+
         internal IEnumerable<string> tokenize_word(
-            string word, 
-            Func<string,int> _len = null, 
+            string word,
+            Func<string, int> _len = null,
             int maxword = SpamBayesOptions.skip_max_word_size)
         {
             // Workaround for C# not allowing default delegate parameters.
@@ -522,7 +522,7 @@ namespace UtilitiesCS.EmailIntelligence
 
             var n = _len(word);
             // Make sure this range matches in tokenize().
-            if (3 <= n && n <= maxword) 
+            if (3 <= n && n <= maxword)
                 yield return word;
 
             else if (n >= 3)
@@ -540,7 +540,7 @@ namespace UtilitiesCS.EmailIntelligence
                     yield return "email name:" + p1;
                     yield return "email domain:" + p2;
                 }
-                else 
+                else
                 {
                     // There's value in generating a token indicating roughly how
                     // many chars were skipped.  This has real benefit for the f-n
@@ -569,7 +569,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal Func<string, List<object>, (string texts, HashSet<string> tokens)> crack_images;
 
-        internal static List<CharsetCodebase> charsetCodebases = 
+        internal static List<CharsetCodebase> charsetCodebases =
             JsonExtensions.Deserialize<List<CharsetCodebase>>(
                 Properties.Resources.charset_lookup);
 
@@ -586,11 +586,11 @@ namespace UtilitiesCS.EmailIntelligence
             // content-type not clearly defined in Outlook object model
             // need to convert to System.Net.Mail.MailMessage to get this info
             // MimeKit seems like a promising library to explore later
-            
+
             var codePage = itemInfo.InternetCodepage;
             var charset = charsetCodebases.FirstOrDefault(x => x.Codepage == codePage).Charset;
             yield return $"charset:{charset}";
-                        
+
             var attachments = itemInfo.AttachmentsInfo;
             if (attachments is not null)
             {
@@ -644,7 +644,7 @@ namespace UtilitiesCS.EmailIntelligence
             //    x = msg.get('content-transfer-encoding')
             //    if x is not None:
             //        yield 'content-transfer-encoding:' + x.lower()
-            
+
         }
 
         string NumericEntityReplacer(Match m)

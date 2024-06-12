@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
 using System.Diagnostics;
+using UtilitiesCS.Extensions;
 
 namespace QuickFiler
 {
@@ -46,6 +47,9 @@ namespace QuickFiler
 
         public static async Task<EfcHomeController> CreateAsync(IApplicationGlobals globals, System.Action parentCleanup, MailItem mail = null)
         {
+            globals.ThrowIfNull();
+            parentCleanup.ThrowIfNull();
+
             var home = new EfcHomeController(globals, parentCleanup);
             home.CreateCancellationToken();
             mail ??= globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
@@ -148,7 +152,7 @@ namespace QuickFiler
 
         #region Major Actions
 
-        async public Task ExecuteMoves()
+        async public Task ExecuteMovesAsync()
         {
             var selectedFolder = _formController.SelectedFolder;
             var moveConversation = _formController.MoveConversation;
@@ -158,7 +162,7 @@ namespace QuickFiler
                 convInfo = convInfo.Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID).ToList();
             }
 
-            await _dataModel.MoveToFolder(selectedFolder,
+            await _dataModel.MoveToFolderAsync(selectedFolder,
                                           _formController.SaveAttachments,
                                           _formController.SaveEmail,
                                           _formController.SavePictures,
