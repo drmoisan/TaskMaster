@@ -572,10 +572,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         
-        public (double, List<(string word, double prob)>) chi2_spamprob(WordStream wordStream, bool evidence) => chi2_spamprob(wordStream.Words, evidence);
-        public double chi2_spamprob(WordStream wordStream) => chi2_spamprob(wordStream, false).Item1;
-        public (double, List<(string word, double prob)>) chi2_spamprob(IDictionary<string, int> tokenFrequency, bool evidence) => chi2_spamprob([..tokenFrequency.Keys], evidence);
-        public double chi2_spamprob(IDictionary<string, int> tokenFrequency) => chi2_spamprob(tokenFrequency, false).Item1;
+        public (double, List<(string word, double prob)>) Chi2SpamProb(WordStream wordStream, bool evidence) => Chi2SpamProb(wordStream.Words, evidence);
+        public double Chi2SpamProb(WordStream wordStream) => Chi2SpamProb(wordStream, false).Item1;
+        public (double, List<(string word, double prob)>) Chi2SpamProb(IDictionary<string, int> tokenFrequency, bool evidence) => Chi2SpamProb([..tokenFrequency.Keys], evidence);
+        public double Chi2SpamProb(IDictionary<string, int> tokenFrequency) => Chi2SpamProb(tokenFrequency, false).Item1;
 
         /// <summary>
         /// Return best-guess probability that wordstream is spam. 
@@ -588,7 +588,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// <param name="wordStream"></param>
         /// <param name="evidence"></param>
         /// <returns></returns>
-        public (double, List<(string word, double prob)>) chi2_spamprob(string[] tokens, bool evidence)
+        public (double, List<(string word, double prob)>) Chi2SpamProb(string[] tokens, bool evidence)
         {
             /*
              # We compute two chi-squared statistics, one for ham and one for
@@ -662,7 +662,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
 
         }
-        public double chi2_spamprob(string[] tokens) => chi2_spamprob(tokens, false).Item1;
+        public double chi2_spamprob(string[] tokens) => Chi2SpamProb(tokens, false).Item1;
 
         public async Task<double> Chi2SpamProbAsync(string[] tokens) => await Task.Run(() => chi2_spamprob(tokens));
 

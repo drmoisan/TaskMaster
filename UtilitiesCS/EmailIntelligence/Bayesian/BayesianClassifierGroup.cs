@@ -48,6 +48,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
         private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().TokenizeAsync;
 
+        public double MinimumProbability { get => _minimumProbability; set => _minimumProbability = value; }
+        protected double _minimumProbability = 0.0;
+
         #endregion Public Properties
 
         #region Public Model Training Methods
@@ -97,7 +100,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var results = Classifiers.AsParallel()
                 .Select(classifier => new Prediction<string>(
                     classifier.Key,
-                    classifier.Value.GetMatchProbability(tokenIncidence)))
+                    //classifier.Value.GetMatchProbability(tokenIncidence)))
+                    classifier.Value.Chi2SpamProb(tokenIncidence)))
+                .Where(x => x.Probability >= MinimumProbability)
                 .OrderByDescending(x => x.Probability);
             return results;
         }
@@ -123,7 +128,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var results = Classifiers.ToAsyncEnumerable()
                 .SelectAwait(async(classifier) => new Prediction<string>(
                     classifier.Key, 
-                    await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
+                    await classifier.Value.Chi2SpamProbAsync(tokenIncidence.Keys.ToArray())))
+                //await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
+                .Where(x => x.Probability >= MinimumProbability)
                 .OrderByDescending(prediction => prediction.Probability);
             return results;
         }

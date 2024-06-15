@@ -24,7 +24,17 @@ namespace TaskMaster
         async public Task LoadAsync()
         {
             logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
-            await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync(), _events.LoadAsync());
+
+            //var taskEventsAf = Task.Run(async () =>
+            //{
+            //    await _autoFileObjects.LoadAsync();
+            //    await _events.LoadAsync();
+            //});
+
+            await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
+            await _events.LoadAsync();
+            //await Task.WhenAll(_toDoObjects.LoadAsync(), taskEventsAf);
+            //await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync(), _events.LoadAsync());
             logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
         }
 

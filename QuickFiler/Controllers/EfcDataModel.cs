@@ -28,8 +28,7 @@ namespace QuickFiler.Controllers
             {
                 ConversationResolver = new ConversationResolver(Globals, Mail, TokenSource, Token);
                 _conversationResolver.Df = _conversationResolver.LoadDf(); // Load Synchronously
-                // Fire and Forget
-                //_ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItemsAsync(dfConvExp));
+                
             }
         }
 
@@ -41,16 +40,24 @@ namespace QuickFiler.Controllers
 
         public async static Task<EfcDataModel> CreateAsync(
             IApplicationGlobals globals, 
-            MailItem mail, 
+            IList<MailItem> mailItems, 
             CancellationTokenSource tokenSource, 
             CancellationToken token, 
             bool loadAll)
         {
             globals.ThrowIfNull(nameof(globals));
-            mail.ThrowIfNull(nameof(mail));
+            mailItems.ThrowIfNullOrEmpty(nameof(mailItems));
 
-            var dataModel = new EfcDataModel(globals, mail);
-            dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mail, tokenSource, token, loadAll);
+            
+            var dataModel = new EfcDataModel(globals, mailItems[0]);
+            if (mailItems.Count() > 1)
+            {
+                dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mailItems, tokenSource, token);
+            }
+            else
+            {
+                dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mailItems[0], tokenSource, token, loadAll);
+            }
             
             return dataModel;
         }
@@ -106,21 +113,9 @@ namespace QuickFiler.Controllers
             }
             set => _mail = value;
         }
-
-        //private MailItemHelper _mailInfo;
+                
         public MailItemHelper MailInfo => ConversationResolver.MailInfo;
-        //{
-        //    get
-        //    {
-        //        if (_mailInfo is null && Mail is not null)
-        //        {
-        //            _mailInfo = new MailItemHelper(Mail);
-        //            _mailInfo.LoadPriority(_globals, _token);
-        //        }
-        //        return _mailInfo;
-        //    }
-        //    protected set => _mailInfo = value;
-        //}
+        
 
         #endregion Public Properties
 

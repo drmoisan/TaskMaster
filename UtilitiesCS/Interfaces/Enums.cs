@@ -99,5 +99,13 @@ namespace UtilitiesCS
             all = 4095
         }
 
+        public enum NotFoundEnum
+        {
+            Skip = 0,
+            Create = 1,
+            Ask = 2,
+            Throw = 3
+        }
+
     }
 }

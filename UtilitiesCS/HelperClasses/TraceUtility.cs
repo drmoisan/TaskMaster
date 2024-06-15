@@ -79,6 +79,36 @@ namespace UtilitiesCS
             }
         }
 
+        public static ParameterInfo[] GetCallerParameters(this StackTrace st) => st.GetCallerMethod()?.GetParameters();
+
+        public static ParameterInfo[] GetCallerParameters(this StackTrace st, ref int frameLevel) => st.GetCallerMethod(ref frameLevel)?.GetParameters();
+
+        public static MethodBase GetCallerMethod(this StackTrace st)
+        {
+            int frameLevel = 1;
+            return GetCallerMethod(st, ref frameLevel);
+        }
+
+        public static MethodBase GetCallerMethod(this StackTrace st, ref int frameLevel)
+        {
+            MethodBase methodCalledBy = null;
+            try
+            {
+                methodCalledBy = GetFirstMethodOfMine(st, ref frameLevel);
+                //if (methodCalledBy is null)
+                //{
+                //    frameLevel = 2;
+                //    methodCalledBy = new StackFrame(skipFrames: frameLevel).GetMethod();
+                //}
+            }
+            catch (Exception)
+            {
+                frameLevel = 2;
+                methodCalledBy = null;
+            }
+            return methodCalledBy;
+        }
+        
         public static string[] GetMyMethodNames(this StackTrace trace)
         {
             return trace.GetMyMethods().Select(m => $"{GetClassName(m)}.{m.Name}").ToArray();
