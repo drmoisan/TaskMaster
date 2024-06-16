@@ -52,11 +52,18 @@ namespace QuickFiler
 
             var home = new EfcHomeController(globals, parentCleanup);
             home.CreateCancellationToken();
-            mail ??= globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+            List<MailItem> mailItems = [];
 
-            if (mail is not null) 
+            if (mail is not null) { mailItems.Add(mail); }
+            else 
+            { 
+                mailItems = globals.Ol.App.ActiveExplorer().Selection.Cast<MailItem>().ToList(); 
+            }
+            //mail ??= globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+
+            if (mailItems.Count() > 0) 
             {
-                var modelTask = Task.Run(() => EfcDataModel.CreateAsync(globals, mail, home.TokenSource, home.Token, false));
+                var modelTask = Task.Run(() => EfcDataModel.CreateAsync(globals, mailItems, home.TokenSource, home.Token, false));
                 
                 home.InitType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
                 home._stopWatch = new Stopwatch();

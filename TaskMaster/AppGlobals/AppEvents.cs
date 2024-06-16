@@ -9,19 +9,42 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.OutlookExtensions;
+using System.Windows.Forms;
+using System.Threading;
+using UtilitiesCS.Extensions;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage;
+
 
 namespace TaskMaster
 {
     public class AppEvents : IAppEvents
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public AppEvents(IApplicationGlobals appGlobals)
         {
             _globals = appGlobals;
-            _spamBayes = new SpamBayes(appGlobals);
+        }
+
+        private HashSet<ConditionalItemEngine<MailItemHelper>> _mailAddEngines = [];
+        internal HashSet<ConditionalItemEngine<MailItemHelper>> MailAddEngines => _mailAddEngines;
+        
+        //private Dictionary<string, Func<MailItemHelper, Task>> _mailAddFunctions = [];
+        //internal Dictionary<string, Func<MailItemHelper, Task>> MailAddFunctions => _mailAddFunctions;
+
+        internal async Task<AppEvents> LoadAsync()
+        {
+            var spamBayesTask = Task.Run(SetupSpamBayesAsync);
+            var triageTask = Task.Run(SetupTriageAsync);
+            await Task.WhenAll(spamBayesTask, triageTask);
+            
+            return this;
         }
 
         private IApplicationGlobals _globals;
         private SpamBayes _spamBayes;
+        private Triage _triage;
         private Items _olToDoItems;
         private Items OlToDoItems
         {
@@ -108,6 +131,62 @@ namespace TaskMaster
             OlReminders = null;
         }
 
+        //internal async Task SetupSpamBayesAsync()
+        //{
+        //    _spamBayes = await SpamBayes.CreateAsync(_globals);
+
+        //    MailAddFunctions["Spam"] = _spamBayes is not null ? 
+        //        _spamBayes.TestAsync : 
+        //        (item) => LogAsync("SpamBayes is null. Skipping spam check");
+        //}
+        internal async Task SetupSpamBayesAsync()
+        {
+            var ce = new ConditionalItemEngine<MailItemHelper>();
+            
+            ce.AsyncCondition = (item) => Task.Run(() => 
+                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" && 
+                mailItem.UserProperties.Find("Spam") is null);
+
+            ce.EngineInitializer = async () => ce.Engine = await SpamBayes.CreateAsync(_globals);
+            await ce.EngineInitializer();
+            ce.AsyncAction = (item) => ce.Engine is not null ? ((SpamBayes)ce.Engine).TestAsync(item) : null;
+            ce.EngineName = "SpamBayes";
+            ce.Message = $"{ce.EngineName} is null. Skipping actions";
+            MailAddEngines.Add(ce);
+
+            //    (item) => LogAsync("SpamBayes is null. Skipping spam check");
+        }
+
+        internal async Task LogAsync(string message)
+        {
+            await Task.Run(() => logger.Debug(message));
+        }
+
+        internal async Task SetupTriageAsync()
+        {
+            var ce = new ConditionalItemEngine<MailItemHelper>();
+
+            ce.AsyncCondition = (item) => Task.Run(() =>
+                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
+                mailItem.UserProperties.Find("Triage") is null);
+
+            ce.EngineInitializer = async () => ce.Engine = await Triage.CreateAsync(_globals);
+            await ce.EngineInitializer();
+            ce.AsyncAction = (item) => ce.Engine is not null ? ((Triage)ce.Engine).TestAsync(item) : null;
+            ce.EngineName = "Triage";
+            ce.Message = $"{ce.EngineName} is null. Skipping actions";
+            MailAddEngines.Add(ce);
+
+            //internal async Task SetupTriageAsync()
+            //{
+            //    _triage = await Triage.CreateAsync(_globals);
+
+            //    MailAddFunctions["Triage"] = _triage is not null ?
+            //        (item) => _triage.TestAsync(item) :
+            //        (item) => LogAsync("Triage is null. Skipping triage");
+            //}
+        }
+
         private void OlToDoItems_ItemAdd(object item)
         {
             ToDoEvents.OlToDoItems_ItemAdd(item, _globals);
@@ -120,17 +199,74 @@ namespace TaskMaster
 
         private async void OlInboxItems_ItemAdd(object item)
         {
-            if (item is MailItem mailItem && mailItem.MessageClass == "IPM.Note")
+            var engines = await MailAddEngines.ToAsyncEnumerable().WhereAwait(async e => await e.AsyncCondition(item)).Where(e => e.Engine is not null).ToArrayAsync();
+            if (engines.Count() > 0) 
             {
-                if (mailItem.UserProperties.Find("Spam") is null)
-                {
-                    await _spamBayes.TestAsync((object)mailItem);
-                }
-            }
+                var helper = await MailItemHelper.FromMailItemAsync(item as MailItem, _globals, default, false);
+                await Task.Run(() => _ = helper.Tokens);
+                await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
+            }    
+            
+            //if (item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" && mailItem.UserProperties.Find("Spam") is null)
+            //{
+            //    if (_spamBayes is null)
+            //    {
+            //        logger.Debug("SpamBayes is null. Skipping spam check.");
+            //    }
+            //    else 
+            //    { 
+            //        await _spamBayes.TestAsync(item);   
+            //    }
+            //}
         }
+
+        //private async void OlInboxItems_ItemAdd_TriageFilter(object item)
+        //{
+        //    if (item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" && mailItem.UserProperties.Find("Triage") is null)
+        //    {
+        //        if (_triage is null)
+        //        {
+        //            logger.Debug("Triage is null. Skipping triage.");
+        //        }
+        //        else
+        //        {
+        //            await _triage.TestAsync(mailItem);
+        //        }
+        //    }
+        //}
+
 
         #endregion
 
+        internal class ConditionalItemEngine<T> 
+        {
+            public ConditionalItemEngine() { }
+
+            public ConditionalItemEngine(
+                object engine,
+                string engineName,
+                Func<object, Task<bool>> asyncCondition,
+                Func<T, Task> asyncAction,
+                string message)
+            {
+                Engine = engine;
+                EngineName = engineName;
+                AsyncCondition = asyncCondition.ThrowIfNull();
+                AsyncAction = asyncAction.ThrowIfNull();
+                Message = message.ThrowIfNull();   
+            }
+
+            public Func<object, Task<bool>> AsyncCondition { get; set; }
+            public Func<T, Task> AsyncAction { get; set; }            
+            public string Message { get; set; }
+            public object Engine { get; set; }
+            public Func<Task> EngineInitializer { get; set; }
+            public string EngineName { get; set; }
+            public T TypedItem { get; set; }
+
+
+            
+        }
 
     }
 }

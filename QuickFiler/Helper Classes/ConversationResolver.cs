@@ -33,6 +33,8 @@ namespace QuickFiler.Helper_Classes
 
         #region Constructors and Initializers
 
+        private ConversationResolver() { }
+
         public ConversationResolver(IApplicationGlobals appGlobals, MailItem mailItem) 
         { 
             _globals = appGlobals;
@@ -86,6 +88,43 @@ namespace QuickFiler.Helper_Classes
             return resolver;
         }
 
+        // Constructor designed to reuse class for items that might not be in the same conversation
+        // but are in a collection together
+        public async static Task<ConversationResolver> LoadAsync(
+            IApplicationGlobals globals,
+            IEnumerable<MailItem> mailItems,
+            CancellationTokenSource tokenSource,
+            CancellationToken token,
+            System.Action<List<MailItemHelper>> updateUI = null)
+        {
+            var resolver = new ConversationResolver();
+            resolver._globals = globals;
+            resolver.Token = token;
+            resolver.TokenSource = tokenSource;
+
+            if (updateUI is not null)
+                resolver.UpdateUI = updateUI;
+
+            var helpers = await mailItems
+                .ToAsyncEnumerable()
+                .SelectAwaitWithCancellation(
+                    async (mail, token) => await Task.Run(
+                        async() => 
+                        { 
+                            var helper = await MailItemHelper.FromMailItemAsync(mail, globals, token, false);
+                            _ = helper.Tokens;
+                            return helper;
+                        }))
+                .ToListAsync();
+
+            resolver.MailInfo = helpers.First();
+            resolver.Mail = resolver.MailInfo.Item;
+            resolver.ConversationInfo = new Pair<List<MailItemHelper>>(sameFolder: helpers, expanded: helpers);
+            await resolver.LoadConversationItemsAsync(token, true);
+            resolver.PropertyChanged += resolver.Handler_PropertyChanged;
+            return resolver;
+        }
+        
         public async Task BackgroundInitInfoItemsAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();

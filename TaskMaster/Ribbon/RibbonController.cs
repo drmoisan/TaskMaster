@@ -51,12 +51,22 @@ namespace TaskMaster
         internal void SetGlobals(ApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
+            //_sb = new(async () => await SpamBayes.CreateAsync(_globals, true, Enums.NotFoundEnum.Ask));
+            ResetSb();
+            ResetTriage();
+        }
+
+        internal void ResetSb()
+        {
+            _sb = new(async () => await SpamBayes.CreateAsync(_globals, true, Enums.NotFoundEnum.Ask));
         }
 
         internal void SetViewer(RibbonViewer Viewer)
         {
             _viewer = Viewer;
         }
+
+        internal Selection OlSelection => _globals.Ol.App.ActiveExplorer().Selection;
 
         internal void RefreshIDList()
         {
@@ -443,6 +453,18 @@ namespace TaskMaster
 
         #region Spam Manager
 
+        private AsyncLazy<SpamBayes> _sb;
+        internal AsyncLazy<SpamBayes> SB 
+        {
+            get 
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                
+                return _sb; 
+            }
+        }
+
         internal async Task ClearSpamManagerAsync()
         {
             if (SynchronizationContext.Current is null)
@@ -451,78 +473,31 @@ namespace TaskMaster
             var response = MessageBox.Show("Are you sure you want to clear the Spam Manager? This cannot be undone", "Clear Spam Manager", MessageBoxButtons.YesNo);
             if (response == DialogResult.Yes)
             {
-                await SpamBayes.CreateNewSpamManagerAsync(_globals.AF.Manager);            
+                _globals.AF.Manager[SpamBayes.GroupName] = await SpamBayes.CreateSpamClassifiersAsync();
+                _globals.AF.Manager.Serialize();
             }
         }
 
         internal async Task TrainSpam()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
-            var sb = new SpamBayes(_globals);
-            await sb.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, true);
-            //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection)
-            //{
-            //    //var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
-            //    if (emailObj is MailItem email)
-            //    {
-            //        var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
-            //        _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Spam", helper.Tokens, 1);
-            //        email.SetUdf("Spam", 1.0, OlUserPropertyType.olPercent);
-            //    }
-            //}
-            //_globals.AF.Manager.Serialize();
-
+            var sb = await SB;
+            if (sb is null) { ResetSb(); }
+            else { await sb.TrainAsync(OlSelection, true); }
         }
 
         internal async Task TrainHam()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
-            var sb = new SpamBayes(_globals);
-            await sb.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, false);
-            //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection)
-            //{
-            //    //var email = _globals.Ol.App.ActiveExplorer().Selection[1] as Outlook.MailItem;
-            //    if (emailObj is MailItem email)
-            //    {
-            //        var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
-            //        email.SetUdf("Spam", 0.0, OlUserPropertyType.olPercent);
-            //        _globals.AF.Manager["Spam"].AddOrUpdateClassifier("Ham", helper.Tokens, 1);                    
-            //    }
-            //}
-            //_globals.AF.Manager.Serialize();
-
+            var sb = await SB;
+            if (sb is null) { ResetSb(); }
+            else { await sb.TrainAsync(OlSelection, false); }
         }
 
         internal async Task TestSpam()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
-
-            var sb = new SpamBayes(_globals);
-            await sb.TestAsync(_globals.Ol.App.ActiveExplorer().Selection);
-            //foreach (var emailObj in _globals.Ol.App.ActiveExplorer().Selection )
-            //{
-            //    if (emailObj is MailItem email)
-            //    {
-            //        var helper = await MailItemHelper.FromMailItemAsync(email, _globals, default, true);
-            //        var tokens = helper.Tokens;
-            //        var wordStream = new BayesianClassifierShared.WordStream("", tokens);
-            //        var score = _globals.AF.Manager["Spam"].Classifiers["Spam"].chi2_spamprob(wordStream);
-            //        //email.DeleteUdf("Spam");
-            //        email.SetUdf("Spam", score, OlUserPropertyType.olPercent);
-            //        //var score = await _globals.AF.Manager["Spam"].Classifiers["Spam"].GetMatchProbabilityAsync(tokenFrequency, default);
-            //        //MessageBox.Show($"Spam Score: {score:P2}");
-
-            //    }
-
-            //}
-
-
+            var sb = await SB;
+            if (sb is null) { ResetSb(); }
+            else { await sb.TestAsync(OlSelection); }
+            
         }
 
         internal void TestSpamVerbose()
@@ -544,40 +519,76 @@ namespace TaskMaster
 
         #region Triage
 
+        private AsyncLazy<UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage> _triage;
+        internal AsyncLazy<UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage> Triage
+        {
+            get
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+
+                return _triage;
+            }
+        }
+        internal void ResetTriage()
+        {
+            _triage = new(async () => await UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage.CreateAsync(
+                _globals, true, Enums.NotFoundEnum.Ask));
+        }
+
         internal async Task TriageSelectionAsync()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
-            await triage.ClassifyAsync(_globals.Ol.App.ActiveExplorer().Selection);
+            var triage = await Triage;
+            if (triage is null) { ResetTriage(); }
+            else { await triage.TestAsync(OlSelection); }
+
+            //if (SynchronizationContext.Current is null)
+            //    SynchronizationContext.SetSynchronizationContext(
+            //        new WindowsFormsSynchronizationContext());
+            //var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
+            //await triage.ClassifyAsync(_globals.Ol.App.ActiveExplorer().Selection);
         }
 
         internal async Task TriageSetAAsync()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
-            await triage.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, "A");
+            var triage = await Triage;
+            if (triage is null) { ResetTriage(); }
+            else { await triage.TrainAsync(OlSelection, "A"); }
+            //if (SynchronizationContext.Current is null)
+            //    SynchronizationContext.SetSynchronizationContext(
+            //        new WindowsFormsSynchronizationContext());
+            //var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
+            //await triage.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, "A");
         }
 
         internal async Task TriageSetBAsync()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
-            await triage.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, "B");
+            var triage = await Triage;
+            if (triage is null) { ResetTriage(); }
+            else { await triage.TrainAsync(OlSelection, "B"); }
         }
 
         internal async Task TriageSetCAsync()
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
-            await triage.TrainAsync(_globals.Ol.App.ActiveExplorer().Selection, "C");
+            var triage = await Triage;
+            if (triage is null) { ResetTriage(); }
+            else { await triage.TrainAsync(OlSelection, "C"); }
+        }
+
+
+        internal async Task TriageSetPrecision() 
+        {
+            var triage = await Triage;
+            if (triage is null) { ResetTriage(); }
+            else 
+            {
+                var precision = InputBox.ShowDialog("Enter Precision", "Set Precision", $"{triage.ClassifierGroup.MinimumProbability}");
+                if (double.TryParse(precision, out double result))
+                {
+                    triage.ClassifierGroup.MinimumProbability = result;
+                    _globals.AF.Manager.Serialize();
+                }
+            }
         }
 
         internal async Task ClearTriageAync()
@@ -587,6 +598,18 @@ namespace TaskMaster
                     new WindowsFormsSynchronizationContext());
             var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
             await triage.CreateNewTriageClassifierGroupAsync(default);
+        }
+
+        internal void TryDeleteTriageSpamFields()
+        {
+            foreach (var item in OlSelection)
+            {
+                if (item is MailItem mailItem)
+                {
+                    mailItem.DeleteUdf("Triage");
+                    mailItem.DeleteUdf("Spam");                    
+                }
+            }
         }
 
         #endregion Triage

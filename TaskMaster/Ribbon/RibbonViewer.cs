@@ -32,6 +32,7 @@ namespace TaskMaster
         
         private Office.IRibbonUI _ribbon;
         private RibbonController _controller;
+        internal RibbonController Controller => _controller;
 
         public void SetController(RibbonController Controller)
         {
@@ -177,13 +178,13 @@ namespace TaskMaster
 
         #region Spam Manager
         
-        public async void ClearSpam_Click(Office.IRibbonControl control) => await _controller.ClearSpamManagerAsync();
-        public async void TrainSpam_Click(Office.IRibbonControl control) => await _controller.TrainSpam();
-        public async void TrainHam_Click(Office.IRibbonControl control) => await _controller.TrainHam();
-        public async void TestSpam_Click(Office.IRibbonControl control) => await _controller.TestSpam();
-        public void TestSpamVerbose_Click(Office.IRibbonControl control) => _controller.TestSpamVerbose();
-        public void SpamMetrics_Click(Office.IRibbonControl control) => _controller.SpamMetrics();
-        public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => _controller.SpamInvestigateErrors();
+        public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
+        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.TrainSpam();
+        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.TrainHam();
+        public async void TestSpam_Click(Office.IRibbonControl control) => await Controller.TestSpam();
+        public void TestSpamVerbose_Click(Office.IRibbonControl control) => Controller.TestSpamVerbose();
+        public void SpamMetrics_Click(Office.IRibbonControl control) => Controller.SpamMetrics();
+        public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => Controller.SpamInvestigateErrors();
 
 
         #endregion Spam Manager
@@ -195,6 +196,7 @@ namespace TaskMaster
         public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
         public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
         public async void ClearTriage_Click(Office.IRibbonControl control) => await _controller.ClearTriageAync();
+        public async void SetPrecision_Click(Office.IRibbonControl control) => await _controller.TriageSetPrecision();
 
         #endregion Triage
 
@@ -220,7 +222,8 @@ namespace TaskMaster
         public void SaveManagerLocally_Click(Office.IRibbonControl control) => _controller.TrySaveManagerLocally();
         public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
-        
+        public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
+
 
         #endregion
 

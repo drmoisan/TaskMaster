@@ -52,9 +52,26 @@ namespace UtilitiesCS.EmailIntelligence
 
             if (CheckParameters(attachment, sentOn, saveFolderPath, deleteFolderPath))
             {
-                (AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension) = GetAttachmentFilename(Attachment);
-                AttachmentInfo.FilenameSeed = FolderConverter.SanitizeFilename(AttachmentInfo.FilenameSeed);
-                AttachmentInfo.FilenameSeed = PrependDatePrefix(AttachmentInfo.FilenameSeed, sentOn);
+                AttachmentInfo.Type = attachment.Type;
+                if (AttachmentInfo.Type != OlAttachmentType.olOLE)
+                {
+                    (AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension) = GetAttachmentFilename(Attachment);
+                }
+
+                if (!AttachmentInfo.FilenameSeed.IsNullOrEmpty())
+                {
+                    AttachmentInfo.FilenameSeed = FolderConverter.SanitizeFilename(AttachmentInfo.FilenameSeed);
+                }
+                else if (!attachment.DisplayName.IsNullOrEmpty())
+                {
+                    AttachmentInfo.FilenameSeed = FolderConverter.SanitizeFilename(attachment.DisplayName);
+                }
+                else 
+                {
+                    AttachmentInfo.FilenameSeed = "unknown";
+                }
+
+                AttachmentInfo.FilenameSeed = PrependDatePrefix(AttachmentInfo.FilenameSeed, sentOn);                    
                 FilePathSave = AdjustForMaxPath(saveFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension);
                 FilePathSaveAlt = AdjustForMaxPath(saveFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension, GetNameSuffix());
 
@@ -64,31 +81,12 @@ namespace UtilitiesCS.EmailIntelligence
                     _filePathDelete = AdjustForMaxPath(deleteFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension);
                 }
                 AttachmentInfo.Size = attachment.Size;
-                AttachmentInfo.Type = attachment.Type;
             }
         }
 
         async protected internal Task InitAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
-            _attachment = attachment;
-            _attachmentInfo = new AttachmentSerializable(attachment);
-
-            if (CheckParameters(attachment, sentOn, saveFolderPath, deleteFolderPath))
-            {
-                (AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension) = GetAttachmentFilename(Attachment);
-                AttachmentInfo.FilenameSeed = FolderConverter.SanitizeFilename(AttachmentInfo.FilenameSeed);
-                AttachmentInfo.FilenameSeed = PrependDatePrefix(AttachmentInfo.FilenameSeed, sentOn);
-                FilePathSave = AdjustForMaxPath(saveFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension);
-                FilePathSaveAlt = AdjustForMaxPath(saveFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension, GetNameSuffix());
-
-                if (deleteFolderPath is not null)
-                {
-                    _folderPathDelete = deleteFolderPath;
-                    _filePathDelete = AdjustForMaxPath(deleteFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension);
-                }
-            }
-            await Task.CompletedTask;
-
+            await Task.Run(() => Init(attachment, sentOn, saveFolderPath, deleteFolderPath));
         }
 
         #endregion
