@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Threading;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage;
+using System.Collections.Concurrent;
 
 
 namespace TaskMaster
@@ -27,8 +28,8 @@ namespace TaskMaster
             _globals = appGlobals;
         }
 
-        private HashSet<ConditionalItemEngine<MailItemHelper>> _mailAddEngines = [];
-        internal HashSet<ConditionalItemEngine<MailItemHelper>> MailAddEngines => _mailAddEngines;
+        private ConcurrentBag<ConditionalItemEngine<MailItemHelper>> _mailAddEngines = [];
+        internal ConcurrentBag<ConditionalItemEngine<MailItemHelper>> MailAddEngines => _mailAddEngines;
         
         //private Dictionary<string, Func<MailItemHelper, Task>> _mailAddFunctions = [];
         //internal Dictionary<string, Func<MailItemHelper, Task>> MailAddFunctions => _mailAddFunctions;

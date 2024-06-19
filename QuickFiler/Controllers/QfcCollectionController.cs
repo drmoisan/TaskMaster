@@ -1420,19 +1420,19 @@ namespace QuickFiler.Controllers
         public void ResetPanelHeight()
         {
             var ht = 0;
-            _itemTlp.Invoke(new System.Action(() =>
+            //_itemTlp.Invoke(new System.Action(() =>
+            //{
+            for (int i = 0; i < _itemTlp.RowStyles.Count - 1; i++)
             {
-                for (int i = 0; i < _itemTlp.RowStyles.Count - 1; i++)
-                {
-                    ht += (int)Math.Round(_itemTlp.RowStyles[i].Height, 0);
-                }
+                ht += (int)Math.Round(_itemTlp.RowStyles[i].Height, 0);
+            }
 
-                _itemTlp.MinimumSize = new System.Drawing.Size(
-                    _itemTlp.MinimumSize.Width, ht);
-                _itemTlp.Height = ht;
-            }));
+            _itemTlp.MinimumSize = new System.Drawing.Size(
+                _itemTlp.MinimumSize.Width, ht);
+            _itemTlp.Height = ht;
+            //}));
             var panel = _itemTlp.Parent;
-            panel.Invoke(new System.Action(() => panel.Height = ht));
+            panel?.Invoke(new System.Action(() => panel.Height = ht));
         }
 
         #endregion

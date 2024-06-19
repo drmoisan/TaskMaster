@@ -64,6 +64,25 @@ namespace UtilitiesCS.Threading
             }
         }
 
+        internal static void SubtractThreadSafe(this ref int source, int amount, int limit, int maxAttempts)
+        {
+            if (maxAttempts < 1)
+                throw new ArgumentException("maxAttempts must be greater than 0");
+            int attempts = 0;
+            int exchangeValue = 0;
+            int startingValue = -1;
+            while (startingValue != exchangeValue)
+            {
+                if (++attempts > maxAttempts)
+                    throw new InvalidOperationException($"Attempted to add {attempts - 1} times without success");
+                startingValue = source;
+                var temp = startingValue - amount;
+                if (temp < limit) { exchangeValue = Interlocked.CompareExchange(ref source, limit, startingValue); }
+                else { exchangeValue = Interlocked.CompareExchange(ref source, temp, startingValue); }
+            }
+        }
+
+
         public static void IncrementThreadSafe(this ref double source)
         {
             source.AddThreadSafe(1);

@@ -110,8 +110,8 @@ namespace QuickFiler.Controllers
                 PopulateControlsAsync(Mail, ItemNumber, true),
                 ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force),
                 ToggleNavigationAsync(desiredState: Enums.ToggleState.Off),
-                Task.Run(()=>PopulateConversation()),
-                Task.Run(()=>PopulateFolderComboBox()),
+                PopulateConversationAsync(_tokenSource, _token, false),
+                PopulateFolderComboBoxAsync(default, null)
             };
 
             await Task.WhenAll(tasks);
@@ -165,7 +165,8 @@ namespace QuickFiler.Controllers
             _mailItem = mailItem;
             _tlpStates = tlpStates;
             _itemNumberDigits = itemNumberDigits;
-            ItemNumber = viewerPosition;
+            //ItemNumber = viewerPosition;
+            _itemNumber = viewerPosition;
 
             // Set references to other controllers
             _itemViewer.Controller = this;
@@ -358,9 +359,24 @@ namespace QuickFiler.Controllers
 
             _itemInfo = await MailItemHelper.FromMailItemAsync(mailItem, _globals, _token, loadAll);
 
-            AssignControls(_itemInfo, viewerPosition);
+            await AssignControlsAsync(_itemInfo, viewerPosition);
+            //AssignControls(_itemInfo, viewerPosition);
 
         }
+
+        internal async Task AssignControlsAsync(MailItemHelper itemInfo, int viewerPosition)
+        {
+            if (_itemViewer.InvokeRequired)
+            {
+                //await Task.Factory.StartNew(() => AssignControls(itemInfo, viewerPosition), _token, TaskCreationOptions.None, _itemViewer.UiScheduler);
+                await _itemViewer.UiDispatcher.InvokeAsync(() => AssignControls(itemInfo, viewerPosition));
+            }
+            else
+            {
+                AssignControls(itemInfo, viewerPosition);
+            }
+        }
+        
 
         internal void AssignControls(MailItemHelper itemInfo, int viewerPosition)
         {
@@ -475,7 +491,7 @@ namespace QuickFiler.Controllers
             if (varList is null)
             {
                 _folderHandler = new OlFolderHelper(
-                    _globals, _mailItem, OlFolderHelper.InitOptions.FromField);
+                    _globals, _itemInfo, OlFolderHelper.InitOptions.FromField);
             }
             else
             {
@@ -486,7 +502,8 @@ namespace QuickFiler.Controllers
 
         internal async Task LoadFolderHandlerAsync(object varList = null)
         {
-            await Task.Factory.StartNew(() => LoadFolderHandler(varList), _token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            //await Task.Factory.StartNew(() => LoadFolderHandler(varList), _token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            await Task.Run(() => LoadFolderHandler(varList), _token);
         }
 
         public void PopulateFolderComboBox(object varList = null)
@@ -495,16 +512,14 @@ namespace QuickFiler.Controllers
 
             LoadFolderHandler(varList);
 
-            UiThread.Dispatcher.BeginInvoke(() =>
-            //_itemViewer.CboFolders.BeginInvoke(new System.Action(() =>
+            if (_itemViewer.InvokeRequired) 
+            { 
+                _itemViewer.Invoke(() => AssignFolderComboBox());
+            }
+            else
             {
-                if (_folderHandler.FolderArray.Length > 0)
-                {
-                    _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
-                    _itemViewer.CboFolders.SelectedIndex = 1;
-                    _selectedFolder = _itemViewer.CboFolders.SelectedItem as string;
-                }
-            });
+                AssignFolderComboBox();
+            }
 
         }
 
@@ -513,11 +528,26 @@ namespace QuickFiler.Controllers
             token.ThrowIfCancellationRequested();
 
             await LoadFolderHandlerAsync(varList);
-
-            _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
-            _itemViewer.CboFolders.SelectedIndex = 1;
-            _selectedFolder = _itemViewer.CboFolders.SelectedItem as string;
+            if (_itemViewer.InvokeRequired)
+            {
+                await _itemViewer.UiDispatcher.InvokeAsync(AssignFolderComboBox);
+            }
+            else
+            {
+                AssignFolderComboBox();
+            }
         }
+
+        private void AssignFolderComboBox()
+        {
+            if (_folderHandler?.FolderArray?.Length > 0)
+            {
+                _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
+                _itemViewer.CboFolders.SelectedIndex = 1;
+                _selectedFolder = _itemViewer.CboFolders.SelectedItem as string;
+            }
+        }
+
 
         public void Cleanup()
         {

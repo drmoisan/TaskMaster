@@ -68,6 +68,26 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return new ScBag<MinedMailInfo>(await Load<MinedMailInfo[]>(folderPath));
         }
 
+        public async Task DeleteStagingFilesAsync() 
+        {
+            await Task.Run(() => 
+            { 
+                var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+                var files = Directory.GetFiles(folderPath);
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (System.Exception e)
+                    {
+                        logger.Debug($"Error deleting file {file}. \n{e.Message}\n{e.StackTrace}");
+                    }
+                }
+            });
+        }
+
         #region ETL - EXTRACT Folders and Emails
 
         internal struct FolderStruct(OlFolderInfo folderInfo, long cumulativeSize, long chunkNumber, int cumulativeCount)
@@ -536,7 +556,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task<MinedMailInfo[]> ToMinedMail(IItemInfo[] items)
         {
-            return await Task.Run(() => items.Select(item => new MinedMailInfo(item)).ToArray());
+            return await Task.Run(() => items?.Select(item => new MinedMailInfo(item))?.ToArray() ?? null);
         }
 
         public async Task<MinedMailInfo[]> FilterExcluded(MinedMailInfo[] items)

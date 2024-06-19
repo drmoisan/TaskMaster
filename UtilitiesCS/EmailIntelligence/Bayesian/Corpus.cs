@@ -106,13 +106,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        public void SubtractOrRemoveValue(string token, int value)
+        public int SubtractOrRemoveValue(string token, int value)
         {
             _tokenFrequency.UpdateOrRemove(
                 token,
                 (key, oldValue) => oldValue - value <= 0,
                 (key, oldValue) => oldValue - value,
-                out _);
+                out int result);
+            return result;
         }
 
         public object Clone()

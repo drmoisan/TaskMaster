@@ -30,6 +30,7 @@ using UtilitiesCS.Threading;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
+using BrightIdeasSoftware;
 
 
 namespace TaskMaster
@@ -112,7 +113,7 @@ namespace TaskMaster
             }
         }
 
-        
+
         private void ReleaseQuickFiler()
         {
             _quickFiler = null;
@@ -185,20 +186,20 @@ namespace TaskMaster
 
         internal void UndoSort()
         {
-            UtilitiesCS.SortEmail.Undo(_globals.AF.MovedMails,_globals.Ol.App);
+            UtilitiesCS.SortEmail.Undo(_globals.AF.MovedMails, _globals.Ol.App);
         }
 
         #region SettingsMenu
-        
+
         internal bool IsMoveEntireConversationActive() => _globals.QfSettings.MoveEntireConversation;
         internal void ToggleMoveEntireConversation() => _globals.InternalQfSettings.MoveEntireConversation = !_globals.InternalQfSettings.MoveEntireConversation;
-        
+
         internal bool IsSaveAttachmentsActive() => _globals.QfSettings.SaveAttachments;
         internal void ToggleSaveAttachments() => _globals.InternalQfSettings.SaveAttachments = !_globals.InternalQfSettings.SaveAttachments;
-        
+
         internal bool IsSavePicturesActive() => _globals.QfSettings.SavePictures;
         internal void ToggleSavePictures() => _globals.InternalQfSettings.SavePictures = !_globals.InternalQfSettings.SavePictures;
-        
+
         internal bool IsSaveEmailCopyActive() => _globals.QfSettings.SaveEmailCopy;
         internal void ToggleSaveEmailCopy() => _globals.InternalQfSettings.SaveEmailCopy = !_globals.InternalQfSettings.SaveEmailCopy;
 
@@ -207,7 +208,7 @@ namespace TaskMaster
         #region Try specific methods
         internal void RunTry()
         {
-            
+
         }
 
         internal void TryGetConversationDataframe()
@@ -279,7 +280,7 @@ namespace TaskMaster
         {
             return System.Drawing.Image.FromHbitmap((IntPtr)disp.Handle, (IntPtr)disp.hPal);
         }
-        
+
         internal void TryLoadFolderFilter()
         {
             var filter = new FilterOlFoldersController(_globals);
@@ -304,7 +305,7 @@ namespace TaskMaster
         {
             _globals.AF.SubjectMap.ShowSummaryMetrics();
         }
-        
+
         internal async Task TryTokenizeEmail()
         {
             if (SynchronizationContext.Current is null)
@@ -323,7 +324,7 @@ namespace TaskMaster
             var tokenString = tokens.SentenceJoin();
             MessageBox.Show(tokenString);
         }
-        
+
         #endregion
 
         internal void SortEmail()
@@ -376,7 +377,7 @@ namespace TaskMaster
             _globals.AF.Manager.Serialize();
         }
 
-        internal void TrySerializeMailInfo() 
+        internal void TrySerializeMailInfo()
         {
             new EmailDataMiner(_globals).SerializeActiveItem();
             //var ae = _globals.Ol.App.ActiveExplorer();
@@ -384,6 +385,20 @@ namespace TaskMaster
             //new EmailDataMiner(_globals).SerializeMailInfo(mail);
 
         }
+
+        #region Folder Classifier
+
+        internal async Task ScrapeAndMineAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(_globals);
+            await miner.DeleteStagingFilesAsync();
+            await miner.MineEmails();
+        }
+
+        #endregion Folder Classifier
 
         #region BayesianPerformance
 
@@ -393,7 +408,7 @@ namespace TaskMaster
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
             var tuner = new BayesianPerformanceMeasurement(_globals);
-            await tuner.TestFolderClassifierAsync();            
+            await tuner.TestFolderClassifierAsync();
         }
 
         internal async Task TryTestClassifierVerboseAsync()
@@ -405,8 +420,8 @@ namespace TaskMaster
             await tuner.TestFolderClassifierAsync(verbose: true);
         }
 
-        internal async Task GetConfusionDriversAsync() 
-        { 
+        internal async Task GetConfusionDriversAsync()
+        {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
@@ -432,7 +447,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            
+
             var performance = new BayesianPerformanceController(_globals);
             await performance.InvestigatePerformance();
         }
@@ -477,7 +492,7 @@ namespace TaskMaster
                 _globals.AF.Manager.Serialize();
             }
         }
-
+                
         internal async Task TrainSpam()
         {
             var sb = await SB;

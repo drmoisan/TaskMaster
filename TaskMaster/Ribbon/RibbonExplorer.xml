@@ -46,6 +46,10 @@
                       <checkBox id="SavePicturesDefault" label="Save Pictures" getPressed="SavePictures_GetPressed" onAction="SavePictures_Clicked"/>
                     </menu>
                   </menu>
+
+                  <menu id="FolderClassifier" imageMso="Move" label ="Folder Classifier" itemSize="large">
+                    <button id="ScrapeAndMine" imageMso="ProtectedActualsSynchronize" onAction="ScrapeAndMine_Click" label="Scrape/Mine" />
+                  </menu>
                   <menu id="BayesianPerformance" imageMso="TaskEarnedValueForm" label="Bayesian Performance" itemSize="large">
                     <button id="TestClassifier" imageMso="AutoSummarize" onAction="TestClassifier_Click" label="Test Classifier" />
                     <button id="TestClassifierVerbose" imageMso="AutoSummarize" onAction="TestClassifierVerbose_Click" label="Test Classifier Verbose" />

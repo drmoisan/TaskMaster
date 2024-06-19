@@ -219,7 +219,7 @@ namespace QuickFiler.Controllers
             {
                 logger.Debug($"{nameof(IterateQueueAsync)} cancelled");
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 if (this.Token.IsCancellationRequested)
                 {
@@ -227,7 +227,7 @@ namespace QuickFiler.Controllers
                 }
                 else
                 {
-                    throw ex;
+                    throw;
                 }     
             }
             

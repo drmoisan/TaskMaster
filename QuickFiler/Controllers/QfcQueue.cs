@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -182,13 +183,13 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception e)
             {
-                logger.Error($"{nameof(EnqueueAsync)} failed to load controllers and viewers. \n {e.Message}");
+                logger.Error($"{nameof(EnqueueAsync)} failed to load controllers and viewers. \n {e.Message}\n{e.StackTrace}");
             }
             finally
             {
                 Interlocked.Decrement(ref _jobsRunning);
                 logger.Debug($"{nameof(EnqueueAsync)} completed and jobsRunning decreased to {_jobsRunning}");
-            
+
                 CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue));
             }
         }
@@ -284,10 +285,10 @@ namespace QuickFiler.Controllers
             TraceUtility.LogMethodCall(items, appGlobals, homeController, qfcCollectionController, tlp, start);
 
             var digits = start + items.Count >= 10 ? 2:1;
+
             var itemTasks = Enumerable.Range(start, items.Count)
                     .ToAsyncEnumerable()
-                    .SelectAwait(async i => (i: i, grp: await AddAsync(tlp, items[i-start], i)))
-                    //.ToListAsync();
+                    .SelectAwait(async i => (i: i, grp: await AddAsync(tlp, items[i - start], i)))
                     .SelectAwait(async x =>
                     {
                         x.grp.ItemController = new QfcItemController(

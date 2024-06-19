@@ -176,6 +176,12 @@ namespace TaskMaster
 
         #endregion BayesianPerformance
 
+        #region Folder Classifier
+
+        public async void ScrapeAndMine_Click(Office.IRibbonControl control) => await _controller.ScrapeAndMineAsync();
+
+        #endregion Folder Classifier
+
         #region Spam Manager
         
         public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();

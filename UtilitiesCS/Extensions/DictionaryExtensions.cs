@@ -140,6 +140,7 @@ namespace UtilitiesCS
                     if (((ICollection<KeyValuePair<TKey,TValue>>)dictionary)
                         .Remove(new KeyValuePair<TKey, TValue>(key, value)))
                     {
+                        value = default;
                         return Enums.DictionaryResult.KeysChanged;
                     }
                 }

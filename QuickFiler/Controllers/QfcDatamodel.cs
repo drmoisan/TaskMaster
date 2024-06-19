@@ -222,9 +222,13 @@ namespace QuickFiler.Controllers
                 try
                 {
                     token.ThrowIfCancellationRequested();
-                    var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
-                    _masterQueue.AddLast(item);
-                    _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
+                    //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    var item = _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    if (item is not null && item is MailItem mailItem)
+                    {
+                        _masterQueue.AddLast(mailItem);
+                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -474,8 +478,12 @@ namespace QuickFiler.Controllers
 
         void Application_NewMailEx(string EntryIDCollection)
         {
-            MailItem newMail = (MailItem)_globals.Ol.App.Session.GetItemFromID(EntryIDCollection, System.Reflection.Missing.Value);
-            _masterQueue.AddFirst(newMail);
+            var item = _globals.Ol.App.Session.GetItemFromID(EntryIDCollection, System.Reflection.Missing.Value);
+            if (item is MailItem newMail)
+            {
+                _masterQueue.AddFirst(newMail);
+            }
+            //MailItem newMail = (MailItem)_globals.Ol.App.Session.GetItemFromID(EntryIDCollection, System.Reflection.Missing.Value);
         }
 
         #endregion Event Handlers

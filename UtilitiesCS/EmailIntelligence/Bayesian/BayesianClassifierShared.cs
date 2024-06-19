@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -173,6 +174,30 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             otherMatches.ForEach(token => UpdateProbabilitySb(token));
         }
 
+        public void UnTrain(IDictionary<string, int> tokenFrequency, int emailCount)
+        {
+            var otherMatches = Match.TokenFrequency.Keys.Except(tokenFrequency.Keys);
+
+
+            _matchEmailCount.SubtractThreadSafe(1, 0, 4);
+            //Interlocked.Add(ref _matchEmailCount, -emailCount);
+            Parent.AddToEmailCount(-emailCount);
+            tokenFrequency.ForEach(kvp =>
+            {
+                var matchCount = Match.SubtractOrRemoveValue(kvp.Key, kvp.Value);
+                
+                Parent.SharedTokenBase.TokenFrequency.UpdateOrRemove(
+                    kvp.Key,
+                    (key, oldValue) => oldValue - kvp.Value <= 0,
+                    (key, oldValue) => oldValue - kvp.Value,
+                    out int tokenCount);
+                                                    
+                UpdateProbabilitySb(kvp.Key, matchCount, tokenCount - matchCount);
+            });
+
+            otherMatches.ForEach(token => UpdateProbabilitySb(token));
+        }
+
         public async Task TrainAsync(IDictionary<string, int> tokenFrequency, int emailCount, CancellationToken cancel)
         {
             await Task.Run(() => Train(tokenFrequency, emailCount), cancel);
@@ -230,37 +255,29 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             double prob;
 
-            double nham = Math.Max(1.0, Parent.TotalEmailCount - MatchEmailCount);
-            double nspam = Math.Max(1, MatchEmailCount);
+            if (matchCount == 0)
+            {
+                Prob.TryRemove(token, out _);
+            }
+            else
+            {
+                double nham = Math.Max(1.0, Parent.TotalEmailCount - MatchEmailCount);
+                double nspam = Math.Max(1, MatchEmailCount);
 
-            var hamratio = nm / nham;
-            var spamratio = m / nspam;
+                var hamratio = nm / nham;
+                var spamratio = m / nspam;
 
-            prob = spamratio / (spamratio + hamratio);
+                prob = spamratio / (spamratio + hamratio);
 
-            var S = Knobs.UnknownWordStrength;
-            var StimesX = S * Knobs.UnknownWordProb;
+                var S = Knobs.UnknownWordStrength;
+                var StimesX = S * Knobs.UnknownWordProb;
 
-            // Now do Robinson's Bayesian adjustment.
-            //
-            // s*x + n*p(w)
-            // f(w) = --------------
-            // s + n
-            //
-            // I find this easier to reason about like so (equivalent when
-            // s != 0):
-            //
-            // x - p
-            // p +  -------
-            //       1 + n/s
-            //
-            // IOW, it moves p a fraction of the distance from p to x, and
-            // less so the larger n is, or the smaller s is.
+                var n = m + nm;
+                prob = (StimesX + n * prob) / (S + n);
 
-            var n = m + nm;
-            prob = (StimesX + n * prob) / (S + n);
+                Prob[token] = prob;
+            }
 
-            Prob[token] = prob;
         }
 
         internal protected virtual double UpdateProbabilitySb(WordInfo record) 
