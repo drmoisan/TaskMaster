@@ -12,6 +12,7 @@ using FluentAssertions;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
+    [Obsolete("This class is obsolete. Use BayesianClassifierSharedTests instead")]
     [TestClass]
     public class BayesianClassifierTests
     {
@@ -50,7 +51,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         #region Helper Functions and Classes
 
         private MockRepository mockRepository;
-        private Mock<ClassifierGroupSub> mockClassifierGroup;
+        //private Mock<ClassifierGroupSub> mockClassifierGroup;
         private ClassifierGroupSub classifierGroup;
         private ClassifierGroupSub classifierGroup2;
 

@@ -6,7 +6,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <ProjectGuid>{46628EC9-8A89-491E-84A2-6CF3069BA011}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -487,7 +487,10 @@
     <Compile Include="HelperClasses\ComStreamWrapper.cs" />
     <Compile Include="HelperClasses\ObjectSize.cs" />
     <Compile Include="HelperClasses\ObjectCopier.cs" />
+    <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableStatic.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPackage.cs" />

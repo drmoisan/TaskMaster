@@ -23,7 +23,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
         private Mock<MailItem> mockMailItem;
         private Mock<AddressEntry> mockSender;
         private Mock<Folder> mockFolder;
-        private Mock<MailItemHelper> mockMailItemHelper;
+        //private Mock<MailItemHelper> mockMailItemHelper;
         private Mock<Recipients> mockRecipients;
         private Mock<Recipient> mockRecipient1;
         private Mock<Recipient> mockRecipient2;

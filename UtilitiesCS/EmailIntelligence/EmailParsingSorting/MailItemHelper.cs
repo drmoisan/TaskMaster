@@ -288,7 +288,7 @@ namespace UtilitiesCS //QuickFiler
         private ThreadSafeSingleShotGuard _recipientsStarted = new();
         private CancellationToken _token;
         private readonly ThreadSafeSingleShotGuard _loadNotStarted = new();
-        private bool _completedLoadingPriority;
+        //private bool _completedLoadingPriority;
         public SegmentStopWatch Sw { get; set; }
 
         #endregion

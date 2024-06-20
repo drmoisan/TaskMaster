@@ -44,8 +44,8 @@ namespace TaskMaster
         }
 
         private IApplicationGlobals _globals;
-        private SpamBayes _spamBayes;
-        private Triage _triage;
+        //private SpamBayes _spamBayes;
+        //private Triage _triage;
         private Items _olToDoItems;
         private Items OlToDoItems
         {

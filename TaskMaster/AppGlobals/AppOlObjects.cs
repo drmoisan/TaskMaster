@@ -128,7 +128,7 @@ namespace TaskMaster
         }
                 
         private Folder _junkPossible;
-        public Folder JunkPossible => Initializer.GetOrLoad(ref _archiveRoot, LoadJunkPossible);
+        public Folder JunkPossible => Initializer.GetOrLoad(ref _junkPossible, LoadJunkPossible);
         internal Folder LoadJunkPossible()
         {
             var folderHandler = new OlFolderHelper(_globals);

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TaskMaster.AppGlobals;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
@@ -368,6 +369,9 @@ namespace TaskMaster
             }
         }
 
+        //private AsyncLazy<ManagerClass> _manager2;
+        //public AsyncLazy<ManagerClass> Manager2 => _manager2;
+
         private ScDictionary<string, BayesianClassifierGroup> _manager;
         public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
         private ScDictionary<string, BayesianClassifierGroup> LoadManager()
@@ -408,7 +412,8 @@ namespace TaskMaster
 
         private JsonSerializerSettings GetSettings(bool compress)
         {
-            var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
+            var settings = ScDictionary<string, BayesianClassifierGroup>.Static.GetDefaultSettings();
+            //var settings = ScDictionary<string, BayesianClassifierGroup>.Factory.GetDefaultSettings();
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(_parent));
             if (compress)
@@ -420,7 +425,7 @@ namespace TaskMaster
             FilePathHelper disk, 
             JsonSerializerSettings settings)
         {
-            return ScDictionary<string, BayesianClassifierGroup>.Deserialize(
+            return new ScDictionary<string, BayesianClassifierGroup>().Deserialize(
                 fileName: disk.FileName,
                 folderPath: disk.FolderPath,
                 askUserOnError: false,
