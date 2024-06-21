@@ -411,6 +411,7 @@ namespace TaskMaster
             var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(_parent));
+            settings.TraceWriter = new NLogTraceWriter();
             if (compress)
                 settings.ContractResolver = new DoNotSerializeContractResolver("Prob","NotMatch");
             return settings;

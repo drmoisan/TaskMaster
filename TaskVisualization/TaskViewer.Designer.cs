@@ -125,7 +125,7 @@
             this.L0v_Tlp.Controls.Add(this.L0v3L1g_Tlp, 0, 2);
             this.L0v_Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v_Tlp.Location = new System.Drawing.Point(0, 0);
-            this.L0v_Tlp.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.L0v_Tlp.Margin = new System.Windows.Forms.Padding(2);
             this.L0v_Tlp.Name = "L0v_Tlp";
             this.L0v_Tlp.RowCount = 4;
             this.L0v_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26.73164F));
@@ -149,7 +149,7 @@
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.11259F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 43F));
             this.L0v1L2g_TlpTop.Controls.Add(this.LblDuration, 2, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.XlWorktime, 1, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.LblKbf, 2, 5);
@@ -174,7 +174,7 @@
             this.L0v1L2g_TlpTop.Controls.Add(this.C1S1, 4, 0);
             this.L0v1L2g_TlpTop.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v1L2g_TlpTop.Location = new System.Drawing.Point(5, 5);
-            this.L0v1L2g_TlpTop.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.L0v1L2g_TlpTop.Margin = new System.Windows.Forms.Padding(2);
             this.L0v1L2g_TlpTop.Name = "L0v1L2g_TlpTop";
             this.L0v1L2g_TlpTop.RowCount = 8;
             this.L0v1L2g_TlpTop.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33F));
@@ -268,7 +268,7 @@
             this.TaskName.ForeColor = System.Drawing.SystemColors.WindowText;
             this.TaskName.Location = new System.Drawing.Point(38, 32);
             this.TaskName.Name = "TaskName";
-            this.TaskName.Size = new System.Drawing.Size(716, 37);
+            this.TaskName.Size = new System.Drawing.Size(714, 37);
             this.TaskName.TabIndex = 15;
             // 
             // XlImportance
@@ -297,7 +297,7 @@
             "Low"});
             this.PriorityBox.Location = new System.Drawing.Point(138, 61);
             this.PriorityBox.Name = "PriorityBox";
-            this.PriorityBox.Size = new System.Drawing.Size(202, 21);
+            this.PriorityBox.Size = new System.Drawing.Size(201, 21);
             this.PriorityBox.TabIndex = 23;
             this.PriorityBox.SelectedIndexChanged += new System.EventHandler(this.PriorityBox_SelectedIndexChanged);
             // 
@@ -314,7 +314,7 @@
             "Complete"});
             this.KbSelector.Location = new System.Drawing.Point(138, 87);
             this.KbSelector.Name = "KbSelector";
-            this.KbSelector.Size = new System.Drawing.Size(202, 21);
+            this.KbSelector.Size = new System.Drawing.Size(201, 21);
             this.KbSelector.TabIndex = 7;
             this.KbSelector.SelectedIndexChanged += new System.EventHandler(this.KbSelector_SelectedIndexChanged);
             // 
@@ -326,7 +326,7 @@
             this.Duration.ForeColor = System.Drawing.SystemColors.WindowText;
             this.Duration.Location = new System.Drawing.Point(138, 113);
             this.Duration.Name = "Duration";
-            this.Duration.Size = new System.Drawing.Size(202, 37);
+            this.Duration.Size = new System.Drawing.Size(201, 37);
             this.Duration.TabIndex = 9;
             // 
             // LblReminder
@@ -334,7 +334,7 @@
             this.LblReminder.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblReminder.AutoSize = true;
             this.LblReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblReminder.Location = new System.Drawing.Point(405, 58);
+            this.LblReminder.Location = new System.Drawing.Point(404, 58);
             this.LblReminder.Margin = new System.Windows.Forms.Padding(0);
             this.LblReminder.Name = "LblReminder";
             this.LblReminder.Size = new System.Drawing.Size(125, 26);
@@ -346,7 +346,7 @@
             this.LblDuedate.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblDuedate.AutoSize = true;
             this.LblDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblDuedate.Location = new System.Drawing.Point(408, 84);
+            this.LblDuedate.Location = new System.Drawing.Point(407, 84);
             this.LblDuedate.Name = "LblDuedate";
             this.LblDuedate.Size = new System.Drawing.Size(74, 26);
             this.LblDuedate.TabIndex = 27;
@@ -358,7 +358,7 @@
             this.XlReminder.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlReminder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlReminder.Location = new System.Drawing.Point(531, 62);
+            this.XlReminder.Location = new System.Drawing.Point(530, 62);
             this.XlReminder.Margin = new System.Windows.Forms.Padding(0);
             this.XlReminder.Name = "XlReminder";
             this.XlReminder.Size = new System.Drawing.Size(18, 18);
@@ -371,7 +371,7 @@
             this.XlDuedate.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlDuedate.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlDuedate.Location = new System.Drawing.Point(531, 88);
+            this.XlDuedate.Location = new System.Drawing.Point(530, 88);
             this.XlDuedate.Margin = new System.Windows.Forms.Padding(0);
             this.XlDuedate.Name = "XlDuedate";
             this.XlDuedate.Size = new System.Drawing.Size(18, 18);
@@ -385,10 +385,10 @@
             this.DtReminder.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtReminder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtReminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtReminder.Location = new System.Drawing.Point(553, 61);
+            this.DtReminder.Location = new System.Drawing.Point(552, 61);
             this.DtReminder.Name = "DtReminder";
             this.DtReminder.ShowCheckBox = true;
-            this.DtReminder.Size = new System.Drawing.Size(201, 20);
+            this.DtReminder.Size = new System.Drawing.Size(200, 20);
             this.DtReminder.TabIndex = 29;
             // 
             // DtDuedate
@@ -398,16 +398,16 @@
             this.DtDuedate.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtDuedate.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtDuedate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtDuedate.Location = new System.Drawing.Point(553, 87);
+            this.DtDuedate.Location = new System.Drawing.Point(552, 87);
             this.DtDuedate.Name = "DtDuedate";
             this.DtDuedate.ShowCheckBox = true;
-            this.DtDuedate.Size = new System.Drawing.Size(201, 20);
+            this.DtDuedate.Size = new System.Drawing.Size(200, 20);
             this.DtDuedate.TabIndex = 11;
             // 
             // C3S1
             // 
             this.C3S1.AutoSize = true;
-            this.C3S1.Location = new System.Drawing.Point(532, 0);
+            this.C3S1.Location = new System.Drawing.Point(531, 0);
             this.C3S1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.C3S1.Name = "C3S1";
             this.C3S1.Size = new System.Drawing.Size(13, 3);
@@ -418,7 +418,7 @@
             // C4S1
             // 
             this.C4S1.AutoSize = true;
-            this.C4S1.Location = new System.Drawing.Point(739, 0);
+            this.C4S1.Location = new System.Drawing.Point(737, 0);
             this.C4S1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.C4S1.Name = "C4S1";
             this.C4S1.Size = new System.Drawing.Size(13, 3);
@@ -457,7 +457,7 @@
             // C1S1
             // 
             this.C1S1.AutoSize = true;
-            this.C1S1.Location = new System.Drawing.Point(325, 0);
+            this.C1S1.Location = new System.Drawing.Point(324, 0);
             this.C1S1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.C1S1.Name = "C1S1";
             this.C1S1.Size = new System.Drawing.Size(13, 3);
@@ -486,7 +486,7 @@
             this.L0v4L1h_TlpOkCancel.Controls.Add(this.C3S4, 5, 0);
             this.L0v4L1h_TlpOkCancel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v4L1h_TlpOkCancel.Location = new System.Drawing.Point(5, 488);
-            this.L0v4L1h_TlpOkCancel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.L0v4L1h_TlpOkCancel.Margin = new System.Windows.Forms.Padding(2);
             this.L0v4L1h_TlpOkCancel.Name = "L0v4L1h_TlpOkCancel";
             this.L0v4L1h_TlpOkCancel.RowCount = 3;
             this.L0v4L1h_TlpOkCancel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -612,7 +612,7 @@
             this.L0v2L1g_Tlp.Controls.Add(this.C4S2, 7, 0);
             this.L0v2L1g_Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v2L1g_Tlp.Location = new System.Drawing.Point(5, 152);
-            this.L0v2L1g_Tlp.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.L0v2L1g_Tlp.Margin = new System.Windows.Forms.Padding(2);
             this.L0v2L1g_Tlp.Name = "L0v2L1g_Tlp";
             this.L0v2L1g_Tlp.RowCount = 6;
             this.L0v2L1g_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -682,7 +682,7 @@
             this.CategorySelection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CategorySelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CategorySelection.Location = new System.Drawing.Point(158, 7);
-            this.CategorySelection.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.CategorySelection.Margin = new System.Windows.Forms.Padding(3);
             this.CategorySelection.Name = "CategorySelection";
             this.CategorySelection.Size = new System.Drawing.Size(604, 23);
             this.CategorySelection.TabIndex = 30;
@@ -698,7 +698,7 @@
             this.PeopleSelection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PeopleSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PeopleSelection.Location = new System.Drawing.Point(158, 36);
-            this.PeopleSelection.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.PeopleSelection.Margin = new System.Windows.Forms.Padding(3);
             this.PeopleSelection.Name = "PeopleSelection";
             this.PeopleSelection.Size = new System.Drawing.Size(604, 23);
             this.PeopleSelection.TabIndex = 31;
@@ -714,7 +714,7 @@
             this.ProjectSelection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ProjectSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ProjectSelection.Location = new System.Drawing.Point(158, 65);
-            this.ProjectSelection.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.ProjectSelection.Margin = new System.Windows.Forms.Padding(3);
             this.ProjectSelection.Name = "ProjectSelection";
             this.ProjectSelection.Size = new System.Drawing.Size(604, 23);
             this.ProjectSelection.TabIndex = 32;
@@ -730,7 +730,7 @@
             this.TopicSelection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TopicSelection.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TopicSelection.Location = new System.Drawing.Point(158, 94);
-            this.TopicSelection.Margin = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.TopicSelection.Margin = new System.Windows.Forms.Padding(3);
             this.TopicSelection.Name = "TopicSelection";
             this.TopicSelection.Size = new System.Drawing.Size(604, 23);
             this.TopicSelection.TabIndex = 33;
@@ -885,7 +885,7 @@
             this.L0v3L1g_Tlp.Controls.Add(this.XlScBullpin, 7, 5);
             this.L0v3L1g_Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
             this.L0v3L1g_Tlp.Location = new System.Drawing.Point(5, 284);
-            this.L0v3L1g_Tlp.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.L0v3L1g_Tlp.Margin = new System.Windows.Forms.Padding(2);
             this.L0v3L1g_Tlp.Name = "L0v3L1g_Tlp";
             this.L0v3L1g_Tlp.RowCount = 7;
             this.L0v3L1g_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -1286,7 +1286,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(810, 554);
             this.Controls.Add(this.L0v_Tlp);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MinimumSize = new System.Drawing.Size(607, 529);
             this.Name = "TaskViewer";
             this.Text = "Change Flagged Email Into Task";
