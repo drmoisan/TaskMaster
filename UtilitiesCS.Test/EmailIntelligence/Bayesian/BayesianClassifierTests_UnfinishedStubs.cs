@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using static UtilitiesCS.Test.EmailIntelligence.Bayesian.BayesianClassifierTests;
+//using static UtilitiesCS.Test.EmailIntelligence.Bayesian.BayesianClassifierTests;
 using System.Collections.Concurrent;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using System.Collections.Generic;

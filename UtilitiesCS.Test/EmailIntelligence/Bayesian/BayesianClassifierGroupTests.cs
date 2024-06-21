@@ -16,7 +16,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
     [TestClass]
     public class BayesianClassifierGroupTests
     {
-        private MockRepository mockRepository;
+        //private MockRepository mockRepository;
 
         [TestInitialize]
         public void TestInitialize()

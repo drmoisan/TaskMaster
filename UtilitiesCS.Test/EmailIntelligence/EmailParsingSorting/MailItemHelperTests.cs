@@ -23,7 +23,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
         private Mock<MailItem> mockMailItem;
         private Mock<AddressEntry> mockSender;
         private Mock<Folder> mockFolder;
-        private Mock<MailItemHelper> mockMailItemHelper;
+        //private Mock<MailItemHelper> mockMailItemHelper;
         private Mock<Recipients> mockRecipients;
         private Mock<Recipient> mockRecipient1;
         private Mock<Recipient> mockRecipient2;
@@ -219,7 +219,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
                 senderInfo.Html,
                 senderInfo.Name,
                 "Task",
-                "Body",
+                "Body <EOM>",
                 "ConversationID",
                 "EmailPrefixToStrip",
                 "StoreID",                              // 10
@@ -236,7 +236,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
                 new DateTime(2024, 1, 1),
                 "1/1/2024 12:00 AM",
                 "Subject",
-                new string[] {"charset:utf-8","filename:fname:FileName","subject:Subject","from:name:sendername","from:addr:sendername","from:addr:domain.com","to:name:recipient1","to:addr:recipient1","to:addr:domain.com","cc:name:recipient2","cc:addr:recipient2","cc:addr:domain.com","to:2**0","to:2**0","body" },
+                new string[] {"charset:utf-8","filename:fname:FileName","subject:Subject","from:name:sendername","from:addr:sendername","from:addr:domain.com","to:name:recipient1","to:addr:recipient1","to:addr:domain.com","cc:name:recipient2","cc:addr:recipient2","cc:addr:domain.com","to:2**0","to:2**0","body","<eom>" },
                 "Triage",
                 true,
                 attachmentsHelper,
