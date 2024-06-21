@@ -423,6 +423,7 @@
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="HelperClasses\DeepCompare.cs" />
     <Compile Include="HelperClasses\DispatchUtility.cs" />
+    <Compile Include="HelperClasses\NLogTraceWriter.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />

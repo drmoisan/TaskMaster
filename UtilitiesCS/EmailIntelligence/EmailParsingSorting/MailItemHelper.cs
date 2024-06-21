@@ -58,7 +58,6 @@ namespace UtilitiesCS //QuickFiler
             _htmlBody = new(() => _item.HTMLBody, true);
             _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);
-
             _olRecipients = new(() => _item.Recipients.Cast<Recipient>().ToArray(), true);
             _ccRecipients = new(() => OlRecipients.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray(), true);
             _toRecipients = new(() => OlRecipients.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray(), true);
