@@ -277,7 +277,7 @@ namespace QuickFiler.Controllers
             
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
-            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
+            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyDocuments, filename);
 
             Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
@@ -312,7 +312,7 @@ namespace QuickFiler.Controllers
                 .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
                 dataLineBeg, OlEndTime, ref OlAppointment);
 
-            FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
+            FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyDocuments);
         }
 
         public async Task WriteMetricsAsync(string filename)
@@ -335,7 +335,7 @@ namespace QuickFiler.Controllers
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
-            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
+            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyDocuments, filename);
 
             Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
@@ -434,7 +434,7 @@ namespace QuickFiler.Controllers
             var strOutput = _metrics.GetConsumingEnumerable().ToArray();
             if (strOutput.Length > 0)
             {
-                await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyD, default);
+                await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyDocuments, default);
             }
         }
 

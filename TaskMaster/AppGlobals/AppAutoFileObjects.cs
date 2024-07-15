@@ -3,6 +3,7 @@ using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using QuickFiler;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -44,6 +45,7 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
+            LoadManagerConfig();
             var tasks = new List<Task> 
             {
                 LoadRecentsListAsync(),
@@ -369,8 +371,15 @@ namespace TaskMaster
             }
         }
 
-        //private AsyncLazy<ManagerClass> _manager2;
-        //public AsyncLazy<ManagerClass> Manager2 => _manager2;
+        public void LoadManagerConfig()
+        {
+            //var str = System.Text.Encoding.Default.GetString(result);
+            Stream stream = new MemoryStream(Properties.Resources.manager_config);
+            
+
+        }
+        private AsyncLazy<ManagerClass> _manager2;
+        public AsyncLazy<ManagerClass> Manager2 => _manager2;
 
         private ScDictionary<string, BayesianClassifierGroup> _manager;
         public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
@@ -381,7 +390,19 @@ namespace TaskMaster
             
             var local = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrAppData);
             var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
-           
+
+            //var config = new SmartSerializableConfig(_parent);
+            //config.Local = local;
+            //config.Network = network;
+            //var configFP = new FilePathHelper("manager.config", _parent.FS.FldrAppData);
+            //var configSettings = config.LocalSettings;
+            //using (StreamWriter sw = File.CreateText(configFP.FilePath))
+            //{
+            //    var serializer = JsonSerializer.Create(configSettings);
+            //    serializer.Serialize(sw, config);
+            //    sw.Close();
+            //}
+
             var localSettings = GetSettings(false);
             var networkSettings = GetSettings(true);
             

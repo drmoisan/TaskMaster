@@ -1,6 +1,4 @@
-﻿using BrightIdeasSoftware;
-using log4net.Repository.Hierarchy;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 
@@ -20,7 +19,19 @@ namespace UtilitiesCS.ReusableTypeClasses
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SmartSerializable() { _jsonSettings = GetDefaultSettings(); }
+        public SmartSerializable() 
+        { 
+            _jsonSettings = GetDefaultSettings();
+            _parent = null;
+        }
+
+        public SmartSerializable(T parent)
+        {
+            _jsonSettings = GetDefaultSettings();
+            _parent = parent;
+        }
+
+        protected T _parent;
 
         #region Deserialization
 
@@ -125,7 +136,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 writeInstance = true;
             }
 
-            instance.FilePath = disk.FilePath;
+            instance.Disk.FilePath = disk.FilePath;
             if (writeInstance)
             {
                 instance.Serialize();
@@ -152,12 +163,11 @@ namespace UtilitiesCS.ReusableTypeClasses
         #region Serialization
 
         protected FilePathHelper _disk = new FilePathHelper();
+        public FilePathHelper Disk { get => _disk; set => _disk = value; }
 
-        public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
-
-        public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
-
-        public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
+        //public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
+        //public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
+        //public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
 
         public FilePathHelper LocalDisk { get => _localDisk; set => _localDisk = value; }
         private FilePathHelper _localDisk = new FilePathHelper();
@@ -179,15 +189,15 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public void Serialize()
         {
-            if (FilePath != "")
+            if (Disk.FilePath != "")
             {
-                Serialize(FilePath);
+                Serialize(Disk.FilePath);
             }
         }
 
         public void Serialize(string filePath)
         {
-            this.FilePath = filePath;
+            this.Disk.FilePath = filePath;
             RequestSerialization(filePath);
         }
 
@@ -220,6 +230,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         
         public void SerializeThreadSafe(string filePath)
         {
+            _parent.ThrowIfNull($"{nameof(SmartSerializable<T>)}.{nameof(_parent)} is null. It must be linked to the instance it is serializing.");
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
@@ -228,7 +239,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     using (StreamWriter sw = CreateStreamWriter(filePath))
                     {
                         var serializer = JsonSerializer.Create(JsonSettings);
-                        serializer.Serialize(sw, this);
+                        serializer.Serialize(sw, _parent);
                         sw.Close();
                         _serializationRequested = new ThreadSafeSingleShotGuard();
                     }

@@ -200,7 +200,7 @@ namespace QuickFiler
                     $"{itemInfo.SenderName},Email,{selectedFolder},{itemInfo.SentDate.ToString("MM/dd/yyyy")}," +
                     $"{itemInfo.SentDate.ToString("HH:mm:ss")}").ToArray();
 
-                FileIO2.WriteTextFile(filename, dataLines, _globals.FS.FldrMyD);
+                FileIO2.WriteTextFile(filename, dataLines, _globals.FS.FldrMyDocuments);
             }
         }
 

@@ -20,43 +20,86 @@ namespace TaskMaster.AppGlobals
     {
         public ManagerClass() { }
 
-        //public async static Task<ManagerClass> LoadAsync(string fileName, string localPath, string networkPath)
-        //{
-        //    var manager = new ManagerClass();
+        #region commented code
+        public async static Task<ManagerClass> LoadAsync(string fileName, string localPath, string networkPath)
+        {
+            var manager = new ManagerClass();
 
-        //    var network = new FilePathHelper(fileName, networkPath);
-        //    var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
+            //var config = SmartSerializableConfig
 
-        //    var local = new FilePathHelper(fileName, localPath);
-        //    var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
+            var network = new FilePathHelper(fileName, networkPath);
+            var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
 
-        //    //var localSettings = manager.GetSettings(false);
-        //    //var networkSettings = manager.GetSettings(true);
+            var local = new FilePathHelper(fileName, localPath);
+            var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
 
-        //    //var manager = GetManager(local, localSettings);
-        //    //manager.NetDisk = network;
-        //    //manager.NetJsonSettings = networkSettings;
-        //    //manager.LocalDisk = local;
-        //    //manager.LocalJsonSettings = localSettings;
+            //var localSettings = manager.GetSettings(false);
+            //var networkSettings = manager.GetSettings(true);
 
-        //    //if (networkDt != default && (localDt == default || networkDt > localDt))
-        //    //{
-        //    //    IdleActionQueue.AddEntry(async () =>
-        //    //        await Task.Run(() =>
-        //    //        {
-        //    //            _manager = GetManager(network, networkSettings);
-        //    //            _manager.NetDisk = network;
-        //    //            _manager.NetJsonSettings = networkSettings;
-        //    //            _manager.LocalDisk = local;
-        //    //            _manager.LocalJsonSettings = localSettings;
-        //    //            _manager.ActivateLocalDisk();
-        //    //            IdleActionQueue.AddEntry(() => _manager.Serialize());
-        //    //        }
-        //    //        ));
-        //    //}
+            //var manager = GetManager(local, localSettings);
+            //manager.NetDisk = network;
+            //manager.NetJsonSettings = networkSettings;
+            //manager.LocalDisk = local;
+            //manager.LocalJsonSettings = localSettings;
 
-        //    return manager;
-        //}
+            //if (networkDt != default && (localDt == default || networkDt > localDt))
+            //{
+            //    IdleActionQueue.AddEntry(async () =>
+            //        await Task.Run(() =>
+            //        {
+            //            _manager = GetManager(network, networkSettings);
+            //            _manager.NetDisk = network;
+            //            _manager.NetJsonSettings = networkSettings;
+            //            _manager.LocalDisk = local;
+            //            _manager.LocalJsonSettings = localSettings;
+            //            _manager.ActivateLocalDisk();
+            //            IdleActionQueue.AddEntry(() => _manager.Serialize());
+            //        }
+            //        ));
+            //}
+
+            return manager;
+        }
+
+        public async static Task<ManagerClass> LoadAsync(SmartSerializableConfig config)
+        {
+            var manager = new ManagerClass();
+
+            
+
+            //var network = new FilePathHelper(fileName, networkPath);
+            //var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
+
+            //var local = new FilePathHelper(fileName, localPath);
+            //var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
+
+            //var localSettings = manager.GetSettings(false);
+            //var networkSettings = manager.GetSettings(true);
+
+            //var manager = GetManager(local, localSettings);
+            //manager.NetDisk = network;
+            //manager.NetJsonSettings = networkSettings;
+            //manager.LocalDisk = local;
+            //manager.LocalJsonSettings = localSettings;
+
+            //if (networkDt != default && (localDt == default || networkDt > localDt))
+            //{
+            //    IdleActionQueue.AddEntry(async () =>
+            //        await Task.Run(() =>
+            //        {
+            //            _manager = GetManager(network, networkSettings);
+            //            _manager.NetDisk = network;
+            //            _manager.NetJsonSettings = networkSettings;
+            //            _manager.LocalDisk = local;
+            //            _manager.LocalJsonSettings = localSettings;
+            //            _manager.ActivateLocalDisk();
+            //            IdleActionQueue.AddEntry(() => _manager.Serialize());
+            //        }
+            //        ));
+            //}
+
+            return manager;
+        }
 
 
         //private ScDictionary<string, BayesianClassifierGroup> GetManager(
@@ -86,15 +129,16 @@ namespace TaskMaster.AppGlobals
         //    //_manager.ActivateNetDisk();
         //    //_manager.Serialize();
         //}
-
+        #endregion commented code
 
         #region ISmartSerializable
 
         protected SmartSerializable<ManagerClass> ism = new();
 
-        public string FileName { get => ism.FileName; set => ism.FileName = value; }
-        public string FilePath { get => ism.FilePath; set => ism.FilePath = value; }
-        public string FolderPath { get => ism.FolderPath; set => ism.FolderPath = value; }
+        public FilePathHelper Disk { get => ism.Disk; set => ism.Disk = value; }
+        //public string FileName { get => ism.Disk.FileName; set => ism.Disk.FileName = value; }
+        //public string FilePath { get => ism.Disk.FilePath; set => ism.Disk.FilePath = value; }
+        //public string FolderPath { get => ism.Disk.FolderPath; set => ism.Disk.FolderPath = value; }
         public JsonSerializerSettings JsonSettings { get => ism.JsonSettings; set => ism.JsonSettings = value; }
         public FilePathHelper LocalDisk { get => ism.LocalDisk; set => ism.LocalDisk = value; }
         public JsonSerializerSettings LocalJsonSettings { get => ism.LocalJsonSettings; set => ism.LocalJsonSettings = value; }

@@ -366,7 +366,7 @@
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />
     <Compile Include="AppGlobals\ManagerClass.cs" />
-    <Compile Include="AppGlobals\ManagerConfig.cs" />
+    <Compile Include="AppGlobals\SmartSerializableConfig.cs" />
     <Compile Include="AppGlobals\ToDoObj.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -402,6 +402,7 @@
     </Compile>
     <None Include="Resources\9999999CommonWords.json" />
     <None Include="Resources\999999PrefixList.json" />
+    <None Include="Resources\manager_config.json" />
     <None Include="TaskMaster_1_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>

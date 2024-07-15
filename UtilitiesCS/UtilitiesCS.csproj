@@ -423,7 +423,7 @@
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="HelperClasses\DeepCompare.cs" />
     <Compile Include="HelperClasses\DispatchUtility.cs" />
-    <Compile Include="HelperClasses\NLogTraceWriter.cs" />
+    <Compile Include="NewtonsoftHelpers\NLogTraceWriter.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
@@ -488,6 +488,7 @@
     <Compile Include="HelperClasses\ComStreamWrapper.cs" />
     <Compile Include="HelperClasses\ObjectSize.cs" />
     <Compile Include="HelperClasses\ObjectCopier.cs" />
+    <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
     <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable.cs" />
@@ -520,7 +521,7 @@
     <Compile Include="Threading\ProgressMultiStepViewer.Designer.cs">
       <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Threading\AppGlobalsConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\AppGlobalsConverter.cs" />
     <Compile Include="Threading\ProgressTrackerAsync.cs" />
     <Compile Include="Threading\ProgressTrackerPane.cs" />
     <Compile Include="Threading\ProgressViewer.cs">

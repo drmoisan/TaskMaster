@@ -57,7 +57,7 @@ namespace UtilitiesCS
         {
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
             var olAncestor = FolderConverter.ResolveOlRoot(((Folder)mailItems[0].Parent).FolderPath, appGlobals);
-            var fsAncestorEquivalent = appGlobals.FS.FldrRoot;
+            var fsAncestorEquivalent = appGlobals.FS.FldrOneDrive;
             await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
         }
 

@@ -140,7 +140,7 @@ namespace QuickFiler.Controllers
                                          removePreviousFsFiles: false,
                                          appGlobals: _globals,
                                          olAncestor: _globals.Ol.ArchiveRootPath,
-                                         fsAncestorEquivalent: _globals.FS.FldrRoot);
+                                         fsAncestorEquivalent: _globals.FS.FldrOneDrive);
                 SortEmail.Cleanup_Files();
             }
         }
