@@ -17,6 +17,7 @@ namespace QuickFiler.Helper_Classes
         Pair<DataFrame> Df { get; }
         Action<List<MailItemHelper>> UpdateUI { get; set; }
         bool FullyLoaded { get; }
+        object Parent { get; }
 
         event PropertyChangedEventHandler PropertyChanged;
 

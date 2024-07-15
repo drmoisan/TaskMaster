@@ -35,8 +35,8 @@ namespace QuickFiler.Helper_Classes
 
         private ConversationResolver() { }
 
-        public ConversationResolver(IApplicationGlobals appGlobals, MailItem mailItem) 
-        { 
+        public ConversationResolver(IApplicationGlobals appGlobals, MailItem mailItem)
+        {
             _globals = appGlobals;
             _mailItem = mailItem;
         }
@@ -109,8 +109,8 @@ namespace QuickFiler.Helper_Classes
                 .ToAsyncEnumerable()
                 .SelectAwaitWithCancellation(
                     async (mail, token) => await Task.Run(
-                        async() => 
-                        { 
+                        async () =>
+                        {
                             var helper = await MailItemHelper.FromMailItemAsync(mail, globals, token, false);
                             _ = helper.Tokens;
                             return helper;
@@ -121,10 +121,11 @@ namespace QuickFiler.Helper_Classes
             resolver.Mail = resolver.MailInfo.Item;
             resolver.ConversationInfo = new Pair<List<MailItemHelper>>(sameFolder: helpers, expanded: helpers);
             await resolver.LoadConversationItemsAsync(token, true);
+            resolver.Count = new Pair<int>(sameFolder: helpers.Count, expanded: helpers.Count);
             resolver.PropertyChanged += resolver.Handler_PropertyChanged;
             return resolver;
         }
-        
+
         public async Task BackgroundInitInfoItemsAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -144,7 +145,7 @@ namespace QuickFiler.Helper_Classes
         internal CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
 
         protected IApplicationGlobals _globals;
-        
+
         protected MailItem _mailItem;
         public MailItem Mail { get => _mailItem; protected set => _mailItem = value; }
 
@@ -152,14 +153,17 @@ namespace QuickFiler.Helper_Classes
         public bool FullyLoaded { get => _fullyLoaded; protected set => _fullyLoaded = value; }
 
         protected System.Action<List<MailItemHelper>> _updateUI;
-        public System.Action<List<MailItemHelper>> UpdateUI 
-        { 
-            get => _updateUI; 
-            set => Initializer.SetAndSave(ref _updateUI, value, (x) => NotifyPropertyChanged(nameof(UpdateUI))); 
+        public System.Action<List<MailItemHelper>> UpdateUI
+        {
+            get => _updateUI;
+            set => Initializer.SetAndSave(ref _updateUI, value, (x) => NotifyPropertyChanged(nameof(UpdateUI)));
         }
 
         protected MailItemHelper _mailInfo;
         public MailItemHelper MailInfo { get => _mailInfo; set => _mailInfo = value; }
+
+        protected object _parent;
+        public object Parent { get => _parent; protected internal set => _parent = value; }
 
         #region ConversationInfo
 
@@ -171,12 +175,12 @@ namespace QuickFiler.Helper_Classes
         }
         internal Pair<List<MailItemHelper>> LoadConversationInfo()
         {
-            if (Count.Expanded <= 0) 
-            { 
+            if (Count.Expanded <= 0)
+            {
                 throw new InvalidOperationException(
                     $"{ConversationInfo} cannot be loaded if {Df} cannot be resolved");
             }
-            
+
             var df = Df.Expanded;
             var olNs = _globals.Ol.App.GetNamespace("MAPI");
             var convInfoExpanded = Enumerable
@@ -189,7 +193,7 @@ namespace QuickFiler.Helper_Classes
                 itemInfo => itemInfo.FolderName == ((Folder)_mailItem.Parent).Name).ToList();
 
             return new Pair<List<MailItemHelper>>(sameFolder: convInfoSameFolder, expanded: convInfoExpanded);
-            
+
         }
         public async Task<Pair<List<MailItemHelper>>> LoadConversationInfoAsync(CancellationToken token, bool backgroundLoad)
         {
@@ -282,8 +286,8 @@ namespace QuickFiler.Helper_Classes
 
             await Task.Run(() => ConversationItems = LoadConversationItems(),
                                         token);//,
-                                        //options,
-                                        //priority);
+                                               //options,
+                                               //priority);
         }
 
         #endregion
@@ -297,41 +301,45 @@ namespace QuickFiler.Helper_Classes
             set => Initializer.SetAndSave(ref _df, value, (x) => NotifyPropertyChanged(nameof(Df)));
         }
 
-        internal Pair<DataFrame> LoadDf() 
-        {                        
+        internal Pair<DataFrame> LoadDf()
+        {
             var dfExpanded = _mailItem.GetConversation()
                                       .GetConversationDf()
                                       .FilterConversation(
-                                            ((Folder)_mailItem.Parent).Name, 
-                                            false, 
+                                            ((Folder)_mailItem.Parent).Name,
+                                            false,
                                             true);
 
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
             logger.Debug($"Source mail: {_mailItem.EntryID}");
             logger.Debug(dfExpanded.PrettyText());
-            return new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded); 
-            
+            return new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
+
         }
         internal void DfNotifyIfNotNull(Pair<DataFrame> df)
         {
-            if (df.SameFolder is not null && df.Expanded is not null) { NotifyPropertyChanged(nameof(Df)); }     
+            if (df.SameFolder is not null && df.Expanded is not null) { NotifyPropertyChanged(nameof(Df)); }
         }
         public async Task LoadDfAsync(CancellationToken token, bool backgroundLoad)
         {
             token.ThrowIfCancellationRequested();
-            
+
             var dfRaw = await _mailItem.GetConversationDfAsync(Token).ConfigureAwait(false);
             var dfExpanded = dfRaw.FilterConversation(((Folder)_mailItem.Parent).Name, false, true);
             dfExpanded = dfExpanded.Filter(dfExpanded["SentOn"].ElementwiseNotEquals<string>(""));
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
-            
+
             Df = new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
-            
-            
+
+
         }
 
         private Pair<int> _count;
-        public Pair<int> Count => Initializer.GetOrLoad(ref _count, LoadCount);
+        public Pair<int> Count 
+        { 
+            get => Initializer.GetOrLoad(ref _count, LoadCount);
+            internal set => _count = value;
+        }
         internal Pair<int> LoadCount()
         {
             var count = new Pair<int>(-1, -1);
