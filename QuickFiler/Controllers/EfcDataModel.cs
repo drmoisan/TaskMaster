@@ -53,10 +53,12 @@ namespace QuickFiler.Controllers
             if (mailItems.Count() > 1)
             {
                 dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mailItems, tokenSource, token);
+                dataModel.ConversationResolver.Parent = dataModel;
             }
             else
             {
                 dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mailItems[0], tokenSource, token, loadAll);
+                dataModel.ConversationResolver.Parent = dataModel;
             }
             
             return dataModel;
@@ -140,7 +142,7 @@ namespace QuickFiler.Controllers
                                          removePreviousFsFiles: false,
                                          appGlobals: _globals,
                                          olAncestor: _globals.Ol.ArchiveRootPath,
-                                         fsAncestorEquivalent: _globals.FS.FldrRoot);
+                                         fsAncestorEquivalent: _globals.FS.FldrOneDrive);
                 SortEmail.Cleanup_Files();
             }
         }

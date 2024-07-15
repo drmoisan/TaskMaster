@@ -12,7 +12,7 @@ using FluentAssertions;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
-    [Obsolete]
+    [Obsolete("This class is obsolete. Use BayesianClassifierSharedTests instead")]
     [TestClass]
     public class BayesianClassifierTests
     {

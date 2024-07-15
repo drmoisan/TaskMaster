@@ -68,7 +68,7 @@ namespace UtilitiesCS
             var olBranchPath = olFolderBranch.FolderPath;
             string olAncestor = ResolveOlRoot(olBranchPath, appGlobals);
 
-            return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, appGlobals.FS.FldrRoot);
+            return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, appGlobals.FS.FldrOneDrive);
         }
 
         public static string ToFsFolderpath(this MAPIFolder olFolderBranch, IApplicationGlobals appGlobals)
@@ -76,7 +76,7 @@ namespace UtilitiesCS
             var olBranchPath = olFolderBranch.FolderPath;
             string olAncestor = ResolveOlRoot(olBranchPath, appGlobals);
 
-            return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, appGlobals.FS.FldrRoot);
+            return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, appGlobals.FS.FldrOneDrive);
         }
 
         public static string ResolveOlRoot(string olBranchPath, IApplicationGlobals appGlobals)

@@ -364,7 +364,7 @@ namespace QuickFiler.Controllers
                 var folder = (await _dataModel.FolderHelper.CreateFolderAsync(
                     SelectedFolder, 
                     _globals.Ol.ArchiveRootPath, 
-                    _globals.FS.FldrRoot, 
+                    _globals.FS.FldrOneDrive, 
                     Token)) as MAPIFolder;
 
                 if (folder is not null)
@@ -552,7 +552,7 @@ namespace QuickFiler.Controllers
                                                    .FolderHelper
                                                    .CreateFolder(SelectedFolder,
                                                                  _globals.Ol.ArchiveRootPath,
-                                                                 _globals.FS.FldrRoot)).ConfigureAwait(false);
+                                                                 _globals.FS.FldrOneDrive)).ConfigureAwait(false);
                 if (folder is not null)
                 {
                     await _dataModel.MoveToFolder(folder,

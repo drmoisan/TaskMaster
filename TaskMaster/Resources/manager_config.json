@@ -1,0 +1,14 @@
+{
+  "$id": "1",
+  "Local": {
+    "FileName": "999999ClassifierManager.json",
+    "RelativePath": "",
+    "SpecialFolderName": "AppData"
+  },
+  "Network": {
+    "FileName": "999999ClassifierManager.json",
+    "RelativePath": "",
+    "SpecialFolderName": "PythonStaging"
+  },
+  "Active": false
+}

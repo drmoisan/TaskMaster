@@ -3,6 +3,7 @@ using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using QuickFiler;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TaskMaster.AppGlobals;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
@@ -43,6 +45,7 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
+            LoadManagerConfig();
             var tasks = new List<Task> 
             {
                 LoadRecentsListAsync(),
@@ -368,6 +371,16 @@ namespace TaskMaster
             }
         }
 
+        public void LoadManagerConfig()
+        {
+            //var str = System.Text.Encoding.Default.GetString(result);
+            Stream stream = new MemoryStream(Properties.Resources.manager_config);
+            
+
+        }
+        private AsyncLazy<ManagerClass> _manager2;
+        public AsyncLazy<ManagerClass> Manager2 => _manager2;
+
         private ScDictionary<string, BayesianClassifierGroup> _manager;
         public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
         private ScDictionary<string, BayesianClassifierGroup> LoadManager()
@@ -377,7 +390,19 @@ namespace TaskMaster
             
             var local = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrAppData);
             var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
-           
+
+            //var config = new SmartSerializableConfig(_parent);
+            //config.Local = local;
+            //config.Network = network;
+            //var configFP = new FilePathHelper("manager.config", _parent.FS.FldrAppData);
+            //var configSettings = config.LocalSettings;
+            //using (StreamWriter sw = File.CreateText(configFP.FilePath))
+            //{
+            //    var serializer = JsonSerializer.Create(configSettings);
+            //    serializer.Serialize(sw, config);
+            //    sw.Close();
+            //}
+
             var localSettings = GetSettings(false);
             var networkSettings = GetSettings(true);
             
@@ -408,7 +433,8 @@ namespace TaskMaster
 
         private JsonSerializerSettings GetSettings(bool compress)
         {
-            var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
+            var settings = ScDictionary<string, BayesianClassifierGroup>.Static.GetDefaultSettings();
+            //var settings = ScDictionary<string, BayesianClassifierGroup>.Factory.GetDefaultSettings();
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(_parent));
             settings.TraceWriter = new NLogTraceWriter();
@@ -421,7 +447,7 @@ namespace TaskMaster
             FilePathHelper disk, 
             JsonSerializerSettings settings)
         {
-            return ScDictionary<string, BayesianClassifierGroup>.Deserialize(
+            return new ScDictionary<string, BayesianClassifierGroup>().Deserialize(
                 fileName: disk.FileName,
                 folderPath: disk.FolderPath,
                 askUserOnError: false,

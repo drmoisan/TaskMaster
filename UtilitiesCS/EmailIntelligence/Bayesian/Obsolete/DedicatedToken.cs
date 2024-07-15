@@ -37,7 +37,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         #endregion IEquatable
 
         #region INotifyPropertyChanged
+
 #nullable enable
+
         public event PropertyChangedEventHandler? PropertyChanged { add { } remove { } }
         
         #endregion INotifyPropertyChanged

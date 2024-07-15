@@ -128,7 +128,7 @@ namespace TaskMaster
         }
                 
         private Folder _junkPossible;
-        public Folder JunkPossible => Initializer.GetOrLoad(ref _archiveRoot, LoadJunkPossible);
+        public Folder JunkPossible => Initializer.GetOrLoad(ref _junkPossible, LoadJunkPossible);
         internal Folder LoadJunkPossible()
         {
             var folderHandler = new OlFolderHelper(_globals);
@@ -191,8 +191,8 @@ namespace TaskMaster
             var writer = new TimedDiskWriter<string>();
             writer.Config.WriteInterval = TimeSpan.FromSeconds(5);
             writer.Config.TryAddTimeout = 20;
-            SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
-            writer.DiskWriter = async (items) => await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.MovedMails, items.ToArray(), _globals.FS.FldrMyD, default);
+            SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyDocuments);
+            writer.DiskWriter = async (items) => await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.MovedMails, items.ToArray(), _globals.FS.FldrMyDocuments, default);
             return writer;
         }
 
