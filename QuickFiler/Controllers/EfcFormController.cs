@@ -503,7 +503,8 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            if (_formViewer.FolderListBox.SelectedIndex == 0)
+            //if (_formViewer.FolderListBox.SelectedIndex == 0)
+            if (((string)_formViewer.FolderListBox.SelectedItem).StartsWith("===="))
             {
                 MessageBox.Show("Please select a valid folder.");
                 return;

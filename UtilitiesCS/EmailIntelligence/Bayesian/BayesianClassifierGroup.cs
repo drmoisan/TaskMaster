@@ -55,6 +55,23 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Public Model Training Methods
 
+        public void UnTrain(string tag, IEnumerable<string> matchTokens, int emailCount)
+        {
+            if(_classifiers.TryGetValue(tag, out var classifier))
+            {
+                if (classifier is not null) 
+                {
+                    var matchFrequency = matchTokens.GroupAndCount();
+                    classifier.UnTrain(matchFrequency, emailCount);
+                    if (classifier.MatchEmailCount <= 0)
+                    {
+                        _classifiers.TryRemove(tag, out _);
+                    }
+                }
+            }
+            
+        }
+
         public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens, int emailCount)
         {
             var classifier = _classifiers.GetOrAdd(tag, CreateNewClassifier(tag, this));

@@ -16,6 +16,7 @@ using TaskVisualization;
 using System.Threading;
 using System.Windows.Threading;
 using QuickFiler.Viewers;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 
 namespace QuickFiler.Controllers
 {
@@ -366,15 +367,16 @@ namespace QuickFiler.Controllers
 
         internal async Task AssignControlsAsync(MailItemHelper itemInfo, int viewerPosition)
         {
-            if (_itemViewer.InvokeRequired)
-            {
-                //await Task.Factory.StartNew(() => AssignControls(itemInfo, viewerPosition), _token, TaskCreationOptions.None, _itemViewer.UiScheduler);
-                await _itemViewer.UiDispatcher.InvokeAsync(() => AssignControls(itemInfo, viewerPosition));
-            }
-            else
-            {
-                AssignControls(itemInfo, viewerPosition);
-            }
+            //if (_itemViewer.InvokeRequired)
+            //{
+            //    //await Task.Factory.StartNew(() => AssignControls(itemInfo, viewerPosition), _token, TaskCreationOptions.None, _itemViewer.UiScheduler);
+            //    await _itemViewer.UiDispatcher.InvokeAsync(() => AssignControls(itemInfo, viewerPosition));
+            //}
+            //else
+            //{
+            //    AssignControls(itemInfo, viewerPosition);
+            //}
+            await _itemViewer.UiDispatcher.InvokeAsync(() => AssignControls(itemInfo, viewerPosition));
         }
         
 
@@ -528,14 +530,15 @@ namespace QuickFiler.Controllers
             token.ThrowIfCancellationRequested();
 
             await LoadFolderHandlerAsync(varList);
-            if (_itemViewer.InvokeRequired)
-            {
-                await _itemViewer.UiDispatcher.InvokeAsync(AssignFolderComboBox);
-            }
-            else
-            {
-                AssignFolderComboBox();
-            }
+            await _itemViewer.UiDispatcher.InvokeAsync(AssignFolderComboBox);
+            //if (_itemViewer.InvokeRequired)
+            //{
+            //    await _itemViewer.UiDispatcher.InvokeAsync(AssignFolderComboBox);
+            //}
+            //else
+            //{
+            //    AssignFolderComboBox();
+            //}
         }
 
         private void AssignFolderComboBox()
@@ -590,7 +593,6 @@ namespace QuickFiler.Controllers
         private IFilerHomeController _homeController;
         private IQfcKeyboardHandler _kbdHandler;
         private IQfcTipsDetails _itemPositionTips;
-        private MailItemHelper _itemInfo;
         private ItemViewer _itemViewer;
         private string _activeTheme;
         private System.Threading.Timer _emailIsReadTimer;
@@ -622,6 +624,9 @@ namespace QuickFiler.Controllers
         public int CounterComboRight { get => _intComboRightCtr; set => _intComboRightCtr = value; }
 
         public int Height { get => _itemViewer.Height; }
+
+        internal MailItemHelper ItemInfo { get => _itemInfo; set => _itemInfo = value; }
+        private MailItemHelper _itemInfo;
 
         public bool IsExpanded { get => _expanded; }
         private bool _expanded = false;
@@ -1576,22 +1581,34 @@ namespace QuickFiler.Controllers
         {
             TraceUtility.LogMethodCall();
 
-            if (Mail is not null)
+            if (ItemInfo is not null)
             {
-                IList<MailItem> selItems = PackageItems();
+                IList<MailItemHelper> helpers = PackageItems();
                 bool attachments = SelectedFolder != "Trash to Delete" && _optionAttachments;
                 try
                 {
-                    await SortEmail.SortAsync(
-                        mailItems: selItems,
-                        savePictures: _optionsPictures,
-                        destinationOlStem: SelectedFolder,
-                        saveMsg: _optionEmailCopy,
-                        saveAttachments: attachments,
-                        removePreviousFsFiles: false,
-                        appGlobals: _globals,
-                        olAncestor: _globals.Ol.ArchiveRootPath,
-                        fsAncestorEquivalent: _globals.FS.FldrOneDrive);
+                    var config = new EmailFilerConfig()
+                    {
+                        SavePictures = _optionsPictures,
+                        DestinationOlStem = SelectedFolder,
+                        SaveMsg = _optionEmailCopy,
+                        SaveAttachments = attachments,
+                        Globals = _globals,
+                        OlAncestor = _globals.Ol.ArchiveRootPath,
+                        FsAncestorEquivalent = _globals.FS.FldrOneDrive
+                    };
+                    var filer = new EmailFiler(config);
+                    await filer.SortAsync(helpers);
+                    //await SortEmail.SortAsync(
+                    //    mailItems: selItems,
+                    //    savePictures: _optionsPictures,
+                    //    destinationOlStem: SelectedFolder,
+                    //    saveMsg: _optionEmailCopy,
+                    //    saveAttachments: attachments,
+                    //    removePreviousFsFiles: false,
+                    //    appGlobals: _globals,
+                    //    olAncestor: _globals.Ol.ArchiveRootPath,
+                    //    fsAncestorEquivalent: _globals.FS.FldrOneDrive);
                 }
                 catch (System.Exception e)
                 {
@@ -1603,10 +1620,42 @@ namespace QuickFiler.Controllers
                 SortEmail.Cleanup_Files();
             }
         }
+        //async public Task MoveMailAsync()
+        //{
+        //    TraceUtility.LogMethodCall();
 
-        internal IList<MailItem> PackageItems()
+        //    if (Mail is not null)
+        //    {
+        //        IList<MailItem> selItems = PackageItems();
+        //        bool attachments = SelectedFolder != "Trash to Delete" && _optionAttachments;
+        //        try
+        //        {
+        //            await SortEmail.SortAsync(
+        //                mailItems: selItems,
+        //                savePictures: _optionsPictures,
+        //                destinationOlStem: SelectedFolder,
+        //                saveMsg: _optionEmailCopy,
+        //                saveAttachments: attachments,
+        //                removePreviousFsFiles: false,
+        //                appGlobals: _globals,
+        //                olAncestor: _globals.Ol.ArchiveRootPath,
+        //                fsAncestorEquivalent: _globals.FS.FldrOneDrive);
+        //        }
+        //        catch (System.Exception e)
+        //        {
+        //            logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
+        //            logger.Error($"{e}");
+        //            MessageBox.Show($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
+        //        }
+
+        //        SortEmail.Cleanup_Files();
+        //    }
+        //}
+
+        internal IList<MailItemHelper> PackageItems()
         {
-            return _optionConversationChecked ? ConversationResolver.ConversationItems.SameFolder : new List<MailItem> { Mail };
+            return _optionConversationChecked ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper> { ItemInfo };
+            //return _optionConversationChecked ? ConversationResolver.ConversationItems.SameFolder : new List<MailItem> { Mail };
         }
                
         public void FlagAsTask()

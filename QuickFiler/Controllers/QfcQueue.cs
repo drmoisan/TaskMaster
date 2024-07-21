@@ -177,9 +177,13 @@ namespace QuickFiler.Controllers
 
             try
             {
-                var itemGroups = await LoadControllersViewersAsync(items, _globals, 
+                var itemGroups = await LoadControllersViewersAsync(items, _globals,
                     _homeController, qfcCollectionController, tlp, 0);
                 _queue.Add((tlp, itemGroups));
+            }
+            catch (OperationCanceledException)
+            {
+                logger.Debug($"{nameof(EnqueueAsync)} was canceled by the user");
             }
             catch (System.Exception e)
             {

@@ -390,12 +390,27 @@ namespace QuickFiler.Controllers
             }
             else
             {
+                // Either end of email database or error loading queue
                 _groups.CacheMoveObjects();
                 _parent.SwapStopWatch();
-                var moveTask = BackGroundMoveAsync();
-                MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                await moveTask;
-                await ActionCancelAsync();
+                await BackGroundMoveAsync();
+                
+                // If DataModel is not Complete then an error happened loading the queue
+                if (!_parent.DataModel.Complete)
+                {
+                    // Since most common error is cross-thread error, we will try to load the queue again using the Ui Dispatcher
+                    await UiThread.Dispatcher.InvokeAsync(_parent.IterateQueueAsync);
+                }
+
+                // We have reached the end of the email database
+                else
+                {
+                    MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await ActionCancelAsync();
+                }
+                
+                
+                
             }
         }
 

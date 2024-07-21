@@ -75,6 +75,8 @@ namespace Tags
             LoadControls(_dictOptions, _prefix.Value);
 
             WireEvents();
+
+            _viewer.SearchText.Focus();
         }
 
         public MailItem ResolveMailItem(object objItem) //internal
@@ -521,7 +523,7 @@ namespace Tags
             CheckBoxController clsCheckBox;
 
             _filteredOptions = dictOptions;
-            intFocus = 0;
+            intFocus = -1;
             _colCbxCtrl = new();
             _colCbxEvent = new();
 
@@ -639,10 +641,10 @@ namespace Tags
         public void Select_Ctrl_By_Offset(int increment) //internal
         {
             int newpos = intFocus + increment;
-            if (newpos == -1)
+            if (newpos <= -1)
             {
                 _viewer.SearchText.Select();
-                intFocus = newpos;
+                intFocus = -1;
             }
             else if (newpos <= _colCbxCtrl.Count - 1)
             {

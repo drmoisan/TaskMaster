@@ -123,14 +123,14 @@ namespace ToDoModel
             _startDate = olItem.TaskStartDate;
         }
         
-        private void InitializeMail(MailItem OlMail)
+        private void InitializeMail(MailItem olMail)
         {
-            _taskSubject = OlMail.TaskSubject.Length != 0 ? OlMail.TaskSubject : OlMail.Subject;
-            _priority = OlMail.Importance;
-            _taskCreateDate = OlMail.CreationTime;
-            _startDate = OlMail.TaskStartDate;
-            _complete = (OlMail.FlagStatus == OlFlagStatus.olFlagComplete);
-            _totalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)OlMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
+            _taskSubject = olMail.TaskSubject.IsNullOrEmpty() ? olMail.Subject : olMail.TaskSubject;
+            _priority = olMail.Importance;
+            _taskCreateDate = olMail.CreationTime;
+            _startDate = olMail.TaskStartDate;
+            _complete = (olMail.FlagStatus == OlFlagStatus.olFlagComplete);
+            _totalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)olMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
         }
 
         private void InitializeTask(TaskItem OlTask)

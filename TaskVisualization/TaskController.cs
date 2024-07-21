@@ -551,7 +551,8 @@ namespace TaskVisualization
                 if (e.KeyCode >= Keys.A & e.KeyCode <= Keys.Z)
                 {
                     e.SuppressKeyPress = true;
-                    (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
+                    if (_xlCtrlsActive is not null)
+                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
                     return true;
                 }
                 else if (e.KeyCode == Keys.Down)
@@ -907,7 +908,7 @@ namespace TaskVisualization
                     return (dictActivate, true, 1);
                 }
             }
-            else { return (null, true, 0); }
+            else { return (_xlCtrlsActive, _altActive, _altLevel); }
         }
 
         internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar)

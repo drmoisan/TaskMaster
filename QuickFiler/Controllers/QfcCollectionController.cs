@@ -1559,7 +1559,9 @@ namespace QuickFiler.Controllers
         {
             TraceUtility.LogMethodCall(stackMovedItems);
 
-            await _itemGroupsToMove.ToAsyncEnumerable().ForEachAsync(
+            
+            await _itemGroupsToMove.ToAsyncEnumerable().ForEachAwaitAsync(
+                //ForEachAsync(
                 async grp => await grp.ItemController.MoveMailAsync());
             //_itemGroupsToMove.ForEach(async grp => await grp.ItemController.MoveMailAsync());
             //await Task.WhenAll(_itemGroupsToMove.Select(grp => grp.ItemController.MoveMailAsync()));

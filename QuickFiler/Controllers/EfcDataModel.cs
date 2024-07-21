@@ -11,6 +11,7 @@ using QuickFiler.Helper_Classes;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 
 namespace QuickFiler.Controllers
 {
@@ -134,15 +135,30 @@ namespace QuickFiler.Controllers
                 
                 bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
                 var mailHelpers = moveConversation ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper>() { MailInfo };
-                await SortEmail.SortAsync(mailHelpers: mailHelpers,
-                                         savePictures: savePictures,
-                                         destinationOlStem: folderpath,
-                                         saveMsg: saveEmail,
-                                         saveAttachments: attchments,
-                                         removePreviousFsFiles: false,
-                                         appGlobals: _globals,
-                                         olAncestor: _globals.Ol.ArchiveRootPath,
-                                         fsAncestorEquivalent: _globals.FS.FldrOneDrive);
+
+                var config = new EmailFilerConfig()
+                {
+                    SaveMsg = saveEmail,
+                    SaveAttachments = attchments,
+                    SavePictures = savePictures,
+                    DestinationOlStem = folderpath,
+                    Globals = Globals,
+                    OlAncestor = Globals.Ol.ArchiveRootPath,
+                    FsAncestorEquivalent = Globals.FS.FldrOneDrive
+                };
+            
+                var sorter = new EmailFiler(config);
+                await sorter.SortAsync(mailHelpers);
+
+                //await SortEmail.SortAsync(mailHelpers: mailHelpers,
+                //                         savePictures: savePictures,
+                //                         destinationOlStem: folderpath,
+                //                         saveMsg: saveEmail,
+                //                         saveAttachments: attchments,
+                //                         removePreviousFsFiles: false,
+                //                         appGlobals: _globals,
+                //                         olAncestor: _globals.Ol.ArchiveRootPath,
+                //                         fsAncestorEquivalent: _globals.FS.FldrOneDrive);
                 SortEmail.Cleanup_Files();
             }
         }
