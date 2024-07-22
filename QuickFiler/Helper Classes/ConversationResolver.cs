@@ -221,9 +221,16 @@ namespace QuickFiler.Helper_Classes
 
             var convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp)).OrderBy(x => x.ConversationID).ToList();
 
-            var idx = convInfoExpanded.FindIndex(x => x.EntryId == MailInfo.EntryId);
-            convInfoExpanded[idx] = MailInfo;
-
+            if (convInfoExpanded?.Count > 0) 
+            { 
+                var idx = convInfoExpanded.FindIndex(x => x.EntryId == MailInfo.EntryId);
+                if (idx > -1) { convInfoExpanded[idx] = MailInfo; }
+            }
+            else
+            {
+                logger.Debug("Error loading conversation. Setting to single item.");
+                convInfoExpanded = [MailInfo];
+            }
 
             //List<MailItemHelper> convInfoExpanded = null;
 

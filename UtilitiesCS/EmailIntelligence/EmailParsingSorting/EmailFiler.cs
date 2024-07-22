@@ -174,6 +174,9 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             {
 
                 var attachments = mailHelper.AttachmentsHelper.ToAsyncEnumerable();
+                if (!Config.SavePictures) { attachments = attachments.Where(x => !x.AttachmentInfo.IsImage); }
+                if (!Config.SaveAttachments) { attachments = attachments.Where(x => x.AttachmentInfo.IsImage); }
+
                 await attachments.ForEachAsync(async x =>
                 {
                     await x.SaveAttachmentAsync(Config.SaveFsPath);

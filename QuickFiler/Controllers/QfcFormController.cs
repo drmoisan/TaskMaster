@@ -50,7 +50,7 @@ namespace QuickFiler.Controllers
             RemoveTemplatesAndSetupTlp();
             SetupLightDark();
             RegisterFormEventHandlers();
-            _undoConsumerTask = Task.Run(UndoConsumer);
+            //_undoConsumerTask = Task.Run(UndoConsumer);
         }
 
         #endregion
@@ -408,9 +408,7 @@ namespace QuickFiler.Controllers
                     MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     await ActionCancelAsync();
                 }
-                
-                
-                
+                                
             }
         }
 
@@ -589,6 +587,7 @@ namespace QuickFiler.Controllers
 
         internal void UndoDialog()
         {
+            _undoConsumerTask ??= Task.Run(UndoConsumer);
             var olApp = _globals.Ol.App;
             DialogResult repeatResponse = DialogResult.Yes;
             var i = 0;
@@ -617,17 +616,22 @@ namespace QuickFiler.Controllers
 
         internal async Task UndoConsumer()
         {
-            while (!_undoQueue.IsCompleted)
+            var sw = new Stopwatch();
+            sw.Start();
+            bool exit = false;
+            while (!_undoQueue.IsCompleted || exit)
             {
-                if (_undoQueue.TryTake(out var item)) 
-                { 
+                if (_undoQueue.TryTake(out var item))
+                {
                     var mail = item.UndoMove();
                     await UiThread.Dispatcher.InvokeAsync(
-                        () => _groups.AddItemGroup(mail), 
+                        () => _groups.AddItemGroup(mail),
                         System.Windows.Threading.DispatcherPriority.ContextIdle);
                 }
+                else if (sw.ElapsedMilliseconds > 10000) { exit = true; }
                 else { await Task.Delay(200); }
             }
+            if (exit) { _undoConsumerTask = null;  }
         }
 
         // TODO: Implement Viewer_Activate

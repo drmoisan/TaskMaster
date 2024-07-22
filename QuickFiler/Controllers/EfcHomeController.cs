@@ -60,7 +60,6 @@ namespace QuickFiler
                 mailItems = globals.Ol.App.ActiveExplorer().Selection.Cast<MailItem>().ToList(); 
             }
             //mail ??= globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
-
             if (mailItems.Count() > 0) 
             {
                 var modelTask = Task.Run(() => EfcDataModel.CreateAsync(globals, mailItems, home.TokenSource, home.Token, false));
