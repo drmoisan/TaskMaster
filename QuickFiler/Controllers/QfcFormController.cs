@@ -15,11 +15,13 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Collections.Concurrent;
+using log4net.Repository.Hierarchy;
 
 namespace QuickFiler.Controllers
 {    
     internal class QfcFormController : IFilerFormController
     {
+        
         #region Contructors
 
         public QfcFormController(IApplicationGlobals appGlobals,
@@ -372,17 +374,20 @@ namespace QuickFiler.Controllers
                 try
                 {
                     await LoadUiFromQueue();
+                    await _parent.IterateQueueAsync();
                 }
                 catch (System.Exception e)
                 {
                     await moveTask;
-                    throw e;
+                    log.Error(e.Message, e);
+                    log.Debug("Shutting down QuickFiler");
+                    await ActionCancelAsync();
                 }
-                
-                var iterate = _parent.IterateQueueAsync();
+
+                //var iterate = _parent.IterateQueueAsync();
                 
                 await moveTask;
-                await iterate;
+                //await iterate;
             }
             else if (_formViewer.Worker.IsBusy)
             {
@@ -623,6 +628,8 @@ namespace QuickFiler.Controllers
             {
                 if (_undoQueue.TryTake(out var item))
                 {
+                    var helper = await MailItemHelper.FromMailItemAsync(item.MailItem, _globals, default, true);
+                    _globals.AF.Manager["Folder"].UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                     var mail = item.UndoMove();
                     await UiThread.Dispatcher.InvokeAsync(
                         () => _groups.AddItemGroup(mail),

@@ -316,11 +316,11 @@ namespace UtilitiesCS
         public static Table GetConversationTable(this Conversation conversation)
         {
             Outlook.Table table = conversation.GetTable();
-            table.RemoveColumns(new string[] { "EntryID" });
+            table.RemoveColumns(["EntryID"]);
             ConversationColumnSchemas.ForEach(schema => table.Columns.Add(schema));
             return table;
         }
-
+               
         public static Outlook.Table GetTable(this Outlook.Conversation conversation, bool WithFolder, bool WithStore) 
         { 
             if (conversation != null)

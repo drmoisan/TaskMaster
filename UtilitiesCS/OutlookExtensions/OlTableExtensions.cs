@@ -145,6 +145,13 @@ namespace UtilitiesCS
             }
         }
 
+        //TODO: Wire this to an asnyc version of GetConversationTable
+        public static async Task RemoveColumnsAsync(this Outlook.Table table, string[] columnNames, CancellationToken cancel, int timeOutMiliseconds) 
+        {
+            await Task.Run(() => RemoveColumns(table, columnNames), cancel).TimeoutAfter(timeOutMiliseconds);
+        }
+
+
         /// <summary>
         /// Extension method that iterates through an array of column names or
         /// schemas and adds the corresponding columns to an Outlook Table object

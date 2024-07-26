@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using UtilitiesCS;
 using QuickFiler.Helper_Classes;
 using System.Threading;
+using System.ComponentModel.Composition.Hosting;
 
 namespace QuickFiler.Controllers
 {
@@ -669,8 +670,10 @@ namespace QuickFiler.Controllers
 
         }
 
+        private static int removespecificcontrolgroupcounter = 0;
         public async Task RemoveSpecificControlGroupAsync(int selection)
         {
+            Interlocked.Increment(ref removespecificcontrolgroupcounter);
             UnregisterNavigation();
             
             // If the group is active, turn off the active item and select a new item
@@ -720,13 +723,23 @@ namespace QuickFiler.Controllers
                 await _kbdHandler.ToggleKeyboardDialogAsync();
             }
 
-            await UiThread.Dispatcher.InvokeAsync(() => 
+            await UiThread.Dispatcher.InvokeAsync(async () => 
             { 
                 TlpLayout = tlpState;
                 ResetPanelHeight();
-                if (_itemGroups.Count == 0) { _parent.ActionOkAsync(); }
+                if (_itemGroups.Count == 0) 
+                {
+                    await ((QfcFormController)_parent).SkipGroupAsync();
+                    //_parent.ActionOkAsync(); 
+                }
+
             });
+            if (removespecificcontrolgroupcounter > 1) 
+            { 
+                logger.Error("RemoveSpecificControlGroupAsync: Counter is greater than 1. Race Condition Exists");
+            }
             RegisterNavigation();
+            Interlocked.Decrement(ref removespecificcontrolgroupcounter);
         }
 
         #endregion
@@ -1615,6 +1628,8 @@ namespace QuickFiler.Controllers
 
         public static string xComma(string str)
         {
+            if (str.IsNullOrEmpty()) { return ""; }
+            
             string xCommaRet = default;
             string strTmp;
 

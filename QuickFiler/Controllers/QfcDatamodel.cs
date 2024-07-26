@@ -452,7 +452,16 @@ namespace QuickFiler.Controllers
                 await WaitForQueue(quantity, _token);
 
             var nodes = _masterQueue.TryTakeFirst(quantity).ToList();
-            nodes.ForEach(node => _moveMonitor.UnhookItem(node));
+            try
+            {
+                nodes.ForEach(node => _moveMonitor.UnhookItem(node));
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            
             
             return nodes;
         }

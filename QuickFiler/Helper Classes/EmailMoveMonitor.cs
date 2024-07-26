@@ -36,7 +36,7 @@ namespace QuickFiler.Helper_Classes
         {
             lock (_hookedItems)
             {
-                var count = _hookedItems.Count(x => x.Folder.EntryID == ((Folder)mail.Parent).EntryID);
+                var count = _hookedItems.Count(x => x.Folder.EntryID == (mail.Parent as Folder)?.EntryID);
                 var hookedItem = _hookedItems.FirstOrDefault(x => x.Mail.EntryID == mail.EntryID);
                 if (hookedItem != null)
                 {

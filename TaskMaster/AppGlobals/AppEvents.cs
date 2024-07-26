@@ -39,7 +39,8 @@ namespace TaskMaster
             var spamBayesTask = Task.Run(SetupSpamBayesAsync);
             var triageTask = Task.Run(SetupTriageAsync);
             await Task.WhenAll(spamBayesTask, triageTask);
-            
+            await ProcessNewInboxItemsAsync();
+
             return this;
         }
 
@@ -198,6 +199,8 @@ namespace TaskMaster
             ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, _globals);
         }
 
+        
+
         private async void OlInboxItems_ItemAdd(object item)
         {
             var engines = await MailAddEngines.ToAsyncEnumerable().WhereAwait(async e => await e.AsyncCondition(item)).Where(e => e.Engine is not null).ToArrayAsync();
@@ -219,6 +222,34 @@ namespace TaskMaster
             //        await _spamBayes.TestAsync(item);   
             //    }
             //}
+        }
+        
+        
+        internal async Task ProcessNewInboxItemsAsync()
+        {
+            if (OlInboxItems is not null)
+            {
+                // Restrict to unread MailItems
+                var unreadItems = OlInboxItems.Restrict("[UnRead] = true");
+
+                foreach (object item in unreadItems)
+                {
+                    if (item is MailItem mailItem)
+                    {
+                        var engines = await MailAddEngines.ToAsyncEnumerable()
+                            .WhereAwait(async e => await e.AsyncCondition(mailItem))
+                            .Where(e => e.Engine is not null)
+                            .ToArrayAsync();
+
+                        if (engines.Length > 0)
+                        {
+                            var helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false);
+                            await Task.Run(() => _ = helper.Tokens);
+                            await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
+                        }
+                    }
+                }
+            }
         }
 
         //private async void OlInboxItems_ItemAdd_TriageFilter(object item)

@@ -390,20 +390,22 @@ namespace UtilitiesCS
         }
 
         // Duplicative with QuickFiler but it is still mapped to main menu so I need to take it out
-        public static void Undo(ScoStack<IMovedMailInfo> movedStack, Outlook.Application olApp) 
+        public static async Task UndoAsync(ScoStack<IMovedMailInfo> movedStack, IApplicationGlobals globals) 
         {
             DialogResult repeatResponse = DialogResult.Yes;
             var i = 0;
 
             while (i < movedStack.Count && repeatResponse == DialogResult.Yes)
             {
-                var message = movedStack[i].UndoMoveMessage(olApp);
+                var message = movedStack[i].UndoMoveMessage(globals.Ol.App);
                 if (message is null) { i++; }
                 else
                 {
                     var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
                     if (undoResponse == DialogResult.Yes)
                     {
+                        var helper = await MailItemHelper.FromMailItemAsync(movedStack[i].MailItem, globals, default, true);
+                        globals.AF.Manager["Folder"].UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }

@@ -184,9 +184,9 @@ namespace TaskMaster
             taskFlagger.Run();
         }
 
-        internal void UndoSort()
+        internal async Task UndoSort()
         {
-            UtilitiesCS.SortEmail.Undo(_globals.AF.MovedMails, _globals.Ol.App);
+            await UtilitiesCS.SortEmail.UndoAsync(_globals.AF.MovedMails, _globals);
         }
 
         #region SettingsMenu

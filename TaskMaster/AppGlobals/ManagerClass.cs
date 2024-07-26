@@ -57,7 +57,7 @@ namespace TaskMaster.AppGlobals
             //        }
             //        ));
             //}
-
+            await Task.CompletedTask; // TODO: remove this line once the method is implemented
             return manager;
         }
 
@@ -97,7 +97,7 @@ namespace TaskMaster.AppGlobals
             //        }
             //        ));
             //}
-
+            await Task.CompletedTask; // TODO: remove this line once the method is implemented
             return manager;
         }
 
