@@ -128,7 +128,7 @@ namespace UtilitiesCS
             _topics.List = SplitToList(value, ",", _topics.Prefix);
         }
 
-        public ObservableCollection<string> GetTopicList(bool IncludePrefix = false) => IncludePrefix ? _topics.ListWithPrefix : _context.List;
+        public ObservableCollection<string> GetTopicList(bool IncludePrefix = false) => IncludePrefix ? _topics.ListWithPrefix : _topics.List;
         public void SetTopicList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _topics.List = value;
 
         #endregion

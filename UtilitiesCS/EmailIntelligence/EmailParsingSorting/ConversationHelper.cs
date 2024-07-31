@@ -309,8 +309,15 @@ namespace UtilitiesCS
         public static async Task<DataFrame> GetDataFrameAsync(this Outlook.Conversation conversation, CancellationToken token)
         {
             Table table = await TimeOutTask.RunWithTimeout(GetConversationTable, conversation, token, 1000, 3, false);
-            (object[,] data, Dictionary<string, int> columnInfo) = await TimeOutTask.RunWithTimeout(()=>table.ETL(), token, 1000, 3, false);
-            return data.ToDataFrame(columnInfo.Keys.ToArray());
+            if (table is null) 
+            { 
+                return null; 
+            }
+            else
+            {
+                (object[,] data, Dictionary<string, int> columnInfo) = await TimeOutTask.RunWithTimeout(()=>table.ETL(), token, 1000, 3, false);
+                return data.ToDataFrame(columnInfo.Keys.ToArray());
+            }
         }
 
         public static Table GetConversationTable(this Conversation conversation)

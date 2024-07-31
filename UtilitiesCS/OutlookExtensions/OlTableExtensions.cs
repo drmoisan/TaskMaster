@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -133,7 +134,27 @@ namespace UtilitiesCS
         {
             if (table is not null && columnNames is not null && columnNames.Count() > 0)
             {
-                columnNames.ForEach(column => table.Columns.Remove(column));
+                foreach (var column in columnNames) 
+                {
+                    try
+                    {
+                        table.Columns.Remove(column);
+                    }
+                    catch (COMException e)
+                    {
+                        var inner = e.InnerException;
+                        logger.Debug($"Error in {nameof(RemoveColumns)}\ne.Message  {e.Message}\n" +
+                            $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
+                        if (inner is not null)
+                        {
+                            logger.Debug($"InnerException in {nameof(RemoveColumns)}\ninner.Message  {inner.Message}\n" +
+                            $"e.HResult  {inner.HResult}\nStackTrace\n{inner.StackTrace}");
+                        }
+                        throw;
+                    }
+                    
+                }
+                //columnNames.ForEach(column => table.Columns.Remove(column));
             }
         }
 
