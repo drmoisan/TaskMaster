@@ -231,8 +231,8 @@ namespace TaskTree
             // 
             // OlvColumn2
             // 
-            this.OlvColumn2.AspectName = "Value.Topic.AsStringNoPrefix";
-            this.OlvColumn2.Text = "Topic";
+            this.OlvColumn2.AspectName = "Value.Topics.AsStringNoPrefix";
+            this.OlvColumn2.Text = "Topics";
             this.OlvColumn2.Width = 160;
             // 
             // OlvColumn9
