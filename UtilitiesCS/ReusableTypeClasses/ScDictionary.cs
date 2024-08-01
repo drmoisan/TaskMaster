@@ -28,6 +28,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         public ScDictionary(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { ism = new(this); }
         public ScDictionary(int concurrencyLevel, IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(concurrencyLevel, collection, comparer) { ism = new(this); }
         public ScDictionary(int concurrencyLevel, int capacity, IEqualityComparer<TKey> comparer) : base(concurrencyLevel, capacity, comparer) { ism = new(this); }
+        public ScDictionary(ScDictionary<TKey, TValue> dictionary) : base(dictionary) { ism = dictionary.ism; }
 
         #endregion Constructors
 

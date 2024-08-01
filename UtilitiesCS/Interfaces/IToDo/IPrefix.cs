@@ -33,5 +33,6 @@ namespace UtilitiesCS
         string Key { get; set; }
         string Value { get; set; }
         Microsoft.Office.Interop.Outlook.OlCategoryColor Color { get; set; }
+        string OlUserFieldName { get; set; }
     }
 }

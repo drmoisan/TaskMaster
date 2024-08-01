@@ -207,6 +207,7 @@ namespace TaskMaster
         #endregion Triage
 
         #region TryMethods  
+        public void NewTaskHeader_Click(Office.IRibbonControl control) => _controller.TryNewTaskHeader();
         public void DeepCompareEmails_Click(Office.IRibbonControl control) => _controller.TryDeepCompareEmails();
         public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
         public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();

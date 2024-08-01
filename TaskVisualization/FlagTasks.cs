@@ -25,29 +25,32 @@ namespace TaskVisualization
         
         private readonly TaskController _controller;
         private readonly ToDoDefaults _defaultsToDo = new ToDoDefaults();
-        private readonly AutoAssignPeople _autoAssign;
+        private readonly AutoAssignPeople _autoAssignPeople;
+        private readonly AutoCreateProject _autoCreateProject;
         private readonly Enums.FlagsToSet _flagsToSet;
         private readonly IApplicationGlobals _globals;
         private string _userEmailAddress;
 
 
-        public FlagTasks(IApplicationGlobals AppGlobals, IList ItemList = null, bool blFile = true, IntPtr hWndCaller = default, string strNameOfFunctionCalling = "")
+        public FlagTasks(IApplicationGlobals globals, IList itemList = null, bool blFile = true, IntPtr hWndCaller = default, string strNameOfFunctionCalling = "")
         {
-            _globals = AppGlobals;
-            _olExplorer = AppGlobals.Ol.App.ActiveExplorer();
-            _todoSelection = InitializeToDoList(ItemList, _olExplorer);
+            _globals = globals;
+            _olExplorer = globals.Ol.App.ActiveExplorer();
+            _todoSelection = InitializeToDoList(itemList, _olExplorer);
             _flagsToSet = GetFlagsToSet(_todoSelection.Count);
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
-            _autoAssign = new AutoAssignPeople(AppGlobals);
+            _autoAssignPeople = new AutoAssignPeople(globals);
+            _autoCreateProject = new AutoCreateProject(globals);
             _controller = new TaskController(formInstance: _viewer,
-                                             olCategories: AppGlobals.Ol.NamespaceMAPI.Categories,
+                                             olCategories: globals.Ol.NamespaceMAPI.Categories,
                                              toDoSelection: _todoSelection,
                                              defaults: _defaultsToDo,
-                                             autoAssign: _autoAssign,
+                                             autoAssign: _autoAssignPeople,
+                                             projectAssign: _autoCreateProject,
                                              flagOptions: _flagsToSet,
-                                             userEmailAddress: AppGlobals.Ol.UserEmailAddress);
-            _userEmailAddress = AppGlobals.Ol.UserEmailAddress;
+                                             userEmailAddress: globals.Ol.UserEmailAddress);
+            _userEmailAddress = globals.Ol.UserEmailAddress;
         }
 
         public DialogResult Run(bool modal = false)

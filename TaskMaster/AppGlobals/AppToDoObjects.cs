@@ -27,28 +27,28 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
-            //var tasks = new List<Task> 
-            //{
-            //    LoadDictPPLAsync(),
-            //    LoadDictRemapAsync(),
-            //    LoadProjInfoAsync(),
-            //    LoadIdListAsync(),
-            //    LoadCategoryFiltersAsync(),
-            //    LoadPrefixListAsync(),
-            //    LoadFilteredFolderScrapingAsync(),
-            //    LoadFolderRemapAsync()
-            //};
-            //await Task.WhenAll(tasks);
+            var tasks = new List<Task>
+            {
+                LoadPrefixAndDictPeopleAsync(),
+                LoadDictRemapAsync(),
+                LoadIdListAsync(),
+                LoadProgramInfoAsync(),
+                LoadProjInfoAsync(),
+                LoadCategoryFiltersAsync(),
+                LoadFilteredFolderScrapingAsync(),
+                LoadFolderRemapAsync()
+            };
+            await Task.WhenAll(tasks);
 
-            //await LoadDictPPLAsync();
-            await LoadPrefixAndDictPeopleAsync();
-            await LoadDictRemapAsync();
-            await LoadProjInfoAsync();
-            await LoadIdListAsync();
-            await LoadCategoryFiltersAsync();
-            //await LoadPrefixListAsync();
-            await LoadFilteredFolderScrapingAsync();
-            await LoadFolderRemapAsync();
+
+            //await LoadPrefixAndDictPeopleAsync();
+            //await LoadDictRemapAsync();
+            //await LoadProgramInfoAsync();
+            //await LoadProjInfoAsync();
+            //await LoadIdListAsync();
+            //await LoadCategoryFiltersAsync();
+            //await LoadFilteredFolderScrapingAsync();
+            //await LoadFolderRemapAsync();
 
             //logger.Debug($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
         }
@@ -93,6 +93,13 @@ namespace TaskMaster
             if (projectInfo.Count == 0) { projectInfo.Rebuild(Parent.Ol.App); }
             return projectInfo;
         }
+
+        private ScDictionary<string, string> _programInfo;
+        public ScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
+        private ScDictionary<string, string> LoadProgramInfo() => ScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, Parent.FS.FldrAppData);
+        async private Task LoadProgramInfoAsync() => _programInfo = await Task.Run(LoadProgramInfo);
+
+        //public ProgramData
 
         private PeopleScoDictionary _dictPPL;
         public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());

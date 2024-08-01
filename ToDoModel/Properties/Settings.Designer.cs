@@ -12,7 +12,7 @@ namespace ToDoModel.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.11.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -236,6 +236,78 @@ namespace ToDoModel.Properties {
             }
             set {
                 this["MaxSuggestions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TagPeople")]
+        public string UDF_People {
+            get {
+                return ((string)(this["UDF_People"]));
+            }
+            set {
+                this["UDF_People"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TagProject")]
+        public string UDF_Project {
+            get {
+                return ((string)(this["UDF_Project"]));
+            }
+            set {
+                this["UDF_Project"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TagContext")]
+        public string UDF_Context {
+            get {
+                return ((string)(this["UDF_Context"]));
+            }
+            set {
+                this["UDF_Context"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TagTopic")]
+        public string UDF_Topic {
+            get {
+                return ((string)(this["UDF_Topic"]));
+            }
+            set {
+                this["UDF_Topic"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("KB")]
+        public string UDF_Kb {
+            get {
+                return ((string)(this["UDF_Kb"]));
+            }
+            set {
+                this["UDF_Kb"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TagProgram")]
+        public string UDF_Program {
+            get {
+                return ((string)(this["UDF_Program"]));
+            }
+            set {
+                this["UDF_Program"] = value;
             }
         }
     }

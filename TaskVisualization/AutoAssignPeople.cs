@@ -16,7 +16,7 @@ namespace TaskVisualization
 
         public IList<string> FilterList
         {
-            get => _globals.TD.CategoryFilters.ToList();
+            get => [.. _globals.TD.CategoryFilters];
         }
 
         public IList<string> AutoFind(object objItem)

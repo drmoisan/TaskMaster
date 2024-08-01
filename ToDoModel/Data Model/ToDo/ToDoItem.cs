@@ -24,7 +24,7 @@ namespace ToDoModel
             _olItem = new OutlookItemFlaggable(OlMail);
             this.InitializeMail(OlMail);
             string strCategories = OlMail.Categories;
-            this._flags = new FlagParser(ref strCategories);
+            this.Flags = new FlagParser(ref strCategories);
             OlMail.Categories = strCategories;
             this.InitializeCustomFields(_olItem);
 
@@ -38,7 +38,7 @@ namespace ToDoModel
             {
                 InitializeMail(OlMail);
                 string argstrCats_All = OlMail.Categories;
-                _flags = new FlagParser(ref argstrCats_All);
+                Flags = new FlagParser(ref argstrCats_All);
                 OlMail.Categories = argstrCats_All;
                 InitializeCustomFields(_olItem);
             }
@@ -49,7 +49,7 @@ namespace ToDoModel
             _olItem = new OutlookItemFlaggable(OlTask);
             InitializeTask(OlTask);
             string argstrCats_All = OlTask.Categories;
-            _flags = new FlagParser(ref argstrCats_All);
+            Flags = new FlagParser(ref argstrCats_All);
             OlTask.Categories = argstrCats_All;
             InitializeCustomFields(_olItem);
 
@@ -63,7 +63,7 @@ namespace ToDoModel
             {
                 InitializeTask(OlTask);
                 string argstrCats_All = OlTask.Categories;
-                _flags = new FlagParser(ref argstrCats_All);
+                Flags = new FlagParser(ref argstrCats_All);
                 OlTask.Categories = argstrCats_All;
                 InitializeCustomFields(_olItem);
             }
@@ -74,7 +74,7 @@ namespace ToDoModel
             _olItem = new OutlookItemFlaggable(outlookItem);
             InitializeOutlookItem(ref _olItem);
             string argstrCats_All = outlookItem.Categories;
-            _flags = new FlagParser(ref argstrCats_All);
+            Flags = new FlagParser(ref argstrCats_All);
             outlookItem.Categories = argstrCats_All;
             InitializeCustomFields(_olItem);
         }
@@ -84,7 +84,7 @@ namespace ToDoModel
 
             _olItem = new OutlookItemFlaggable(Item);
             string argstrCats_All = _olItem.Categories;
-            _flags = new FlagParser(ref argstrCats_All);
+            Flags = new FlagParser(ref argstrCats_All);
             _olItem.Categories = argstrCats_All;
             if (OnDemand == false)
             {
@@ -110,6 +110,8 @@ namespace ToDoModel
         private string _expandChildrenState = "";
         private bool _EC2;
         private bool _readonly = false;
+        private List<IPrefix> _prefixes = new ToDoDefaults().PrefixList;
+        internal List<IPrefix> Prefixes => _prefixes;
 
         #endregion Private Variables
 
@@ -216,7 +218,7 @@ namespace ToDoModel
                 
         public void WriteFlagsBatch()
         {
-            _olItem.Categories = _flags.Combine();
+            _olItem.Categories = Flags.Combine();
             
             _olItem.TrySetUdf("TagContext", Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
             _olItem.TrySetUdf("TagPeople", People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
@@ -224,28 +226,78 @@ namespace ToDoModel
             // TODO: If ID exists and project reassigned, move any _children
             _olItem.TrySetUdf("TagProject", Projects.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
             _olItem.TrySetUdf("TagTopic", Topics.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
-            _olItem.TrySetUdf("KB", _flags.GetKb(false));
+            _olItem.TrySetUdf("KB", Flags.GetKb(false));
         }
 
         public void WriteFlagsBatch(Enums.FlagsToSet flagsToSet)
-        {            
-            //_olItem.Categories = _flags.Combine();
-            if (flagsToSet.HasFlag(Enums.FlagsToSet.context))
-                _olItem.SetUdf("TagContext", Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
-            if (flagsToSet.HasFlag(Enums.FlagsToSet.people))
-                _olItem.SetUdf("TagPeople", People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+        {
+            _olItem.Categories = _flags.Combine();
+
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.Context))
+            {
+                var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.Context);                
+                _olItem.SetUdf(prefix.OlUserFieldName, Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            }
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.People))
+            {
+                var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.People);
+                _olItem.SetUdf(prefix.OlUserFieldName, People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            }
             // TODO: Assign ToDoID if project assignment changes
             // TODO: If ID exists and project reassigned, move any _children
-            if (flagsToSet.HasFlag(Enums.FlagsToSet.projects))
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.Projects))
             {
-                _olItem.SetUdf("TagProject", Projects.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+                var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.Project);
+                _olItem.SetUdf(prefix.OlUserFieldName, Projects.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
                 _olItem.SetUdf("TagProgram", TagProgram, OlUserPropertyType.olText);
             }
-            if (flagsToSet.HasFlag(Enums.FlagsToSet.topics))
-                _olItem.SetUdf("TagTopic", Topics.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
-            if (flagsToSet.HasFlag(Enums.FlagsToSet.kbf))
-                _olItem.SetUdf("KB", _flags.GetKb(false));
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.Topics))
+            {
+                var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.Topic);
+                _olItem.SetUdf(prefix.OlUserFieldName, Topics.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            }
+            if (flagsToSet.HasFlag(Enums.FlagsToSet.Kbf))
+            {
+                var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.KB);
+                _olItem.SetUdf(prefix.OlUserFieldName, Flags.GetKb(false));
+            }
+
+            
         }
+
+        #region Events
+
+        public void FlagDetails_Changed(object sender, NotifyCollectionChangedEventArgs e) 
+        { 
+            if (e.Action == NotifyCollectionChangedAction.Reset) { WriteFlagsBatch(); }
+        }
+
+        public void People_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            WriteFlagsBatch(Enums.FlagsToSet.People); 
+        }
+
+        public void Projects_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            WriteFlagsBatch(Enums.FlagsToSet.Projects);
+        }
+
+        public void Context_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            WriteFlagsBatch(Enums.FlagsToSet.Context);
+        }
+
+        public void Topics_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            WriteFlagsBatch(Enums.FlagsToSet.Topics);
+        }
+
+        public void KB_Changed(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            WriteFlagsBatch(Enums.FlagsToSet.Kbf);
+        }
+
+        #endregion Events
 
         #region Public Properties
 
@@ -253,7 +305,29 @@ namespace ToDoModel
         public OutlookItem OlItem => _olItem;
 
         internal FlagParser _flags;
-        public FlagParser Flags => GetOrLoad(ref _flags, ()=> _flags = FlagsLoader());
+        public FlagParser Flags 
+        { 
+            get => GetOrLoad(ref _flags, () => _flags = FlagsLoader());
+            internal set 
+            {
+                if(_flags is not null)
+                {
+                    _flags.CollectionChanged -= FlagDetails_Changed;
+                    _flags.ProjectsChanged -= Projects_Changed;
+                    _flags.PeopleChanged -= People_Changed;
+                    _flags.ContextChanged -= Context_Changed;
+                    _flags.TopicsChanged -= Topics_Changed;
+                    _flags.KbChanged -= KB_Changed;
+                }
+                _flags = value;
+                _flags.CollectionChanged += FlagDetails_Changed;
+                _flags.ProjectsChanged += Projects_Changed;
+                _flags.PeopleChanged += People_Changed;
+                _flags.ContextChanged += Context_Changed;
+                _flags.TopicsChanged += Topics_Changed;
+                _flags.KbChanged += KB_Changed;
+            }
+        }
         private FlagParser FlagsLoader()
         {
             if (_olItem is null)
@@ -292,16 +366,16 @@ namespace ToDoModel
         {
             get
             {
-                return _flags.Bullpin;
+                return Flags.Bullpin;
             }
             set
             {
-                _flags.Bullpin = value;
+                Flags.Bullpin = value;
                 if (!_readonly)
                 {
                     if (_olItem is not null)
                     {
-                        _olItem.Categories = _flags.Combine();
+                        _olItem.Categories = Flags.Combine();
                         _olItem.Save();
                     }
                 }
@@ -313,17 +387,17 @@ namespace ToDoModel
         {
             get
             {
-                return _flags.Today;
+                return Flags.Today;
             }
             set
             {
-                _flags.Today = value;
+                Flags.Today = value;
                 if (!_readonly)
                 {
                     if (_olItem is not null)
                     {
                         
-                        _olItem.Categories = _flags.Combine();
+                        _olItem.Categories = Flags.Combine();
                         _olItem.Save();
                     }
                 }
@@ -408,7 +482,7 @@ namespace ToDoModel
             get => GetOrLoad(ref _people, () => LoadPeople(), Flags); 
             //set => SetAndSave(ref _people, value, (x) => UdfCategorySetter("TagPeople", x.AsStringNoPrefix));
         }
-        private FlagTranslator LoadPeople() => new(_flags.GetPeople, _flags.SetPeople, _flags.GetPeopleList, _flags.SetPeopleList);
+        private FlagTranslator LoadPeople() => new(Flags.GetPeople, Flags.SetPeople, Flags.GetPeopleList, Flags.SetPeopleList);
         async private Task LoadPeopleAsync() => await Task.Run(() => _people = LoadPeople());
 
         private FlagTranslator _projects;
@@ -417,7 +491,7 @@ namespace ToDoModel
             get => GetOrLoad(ref _projects, LoadProjects, Flags);
             //set => SetAndSave(ref _projects, value, (x) => UdfCategorySetter("TagProject", x.AsStringNoPrefix));
         }
-        private FlagTranslator LoadProjects() => new(_flags.GetProjects, _flags.SetProjects, _flags.GetProjectList, _flags.SetProjectList);
+        private FlagTranslator LoadProjects() => new(Flags.GetProjects, Flags.SetProjects, Flags.GetProjectList, Flags.SetProjectList);
         async private Task LoadProjectAsync() => await Task.Run(() => _projects = LoadProjects());
 
         public string TagProgram
@@ -458,7 +532,7 @@ namespace ToDoModel
             get => GetOrLoad(ref _context, LoadContext, Flags);
             //set => SetAndSave(ref _context, value, (x) => UdfCategorySetter("TagContext", x.AsStringNoPrefix));
         }
-        private FlagTranslator LoadContext() => new(_flags.GetContext, _flags.SetContext, _flags.GetContextList, _flags.SetContextList);
+        private FlagTranslator LoadContext() => new(Flags.GetContext, Flags.SetContext, Flags.GetContextList, Flags.SetContextList);
         async private Task LoadContextAsync() => await Task.Run(() => _context = LoadContext());
 
         private FlagTranslator _topic;
@@ -467,7 +541,7 @@ namespace ToDoModel
             get => GetOrLoad(ref _topic, LoadTopic, Flags);
             //set => SetAndSave(ref _topic, value, (x) => UdfCategorySetter("TagTopic", x.AsStringNoPrefix));
         }
-        private FlagTranslator LoadTopic() => new(_flags.GetTopics, _flags.SetTopics, _flags.GetTopicList, _flags.SetTopicList);
+        private FlagTranslator LoadTopic() => new(Flags.GetTopics, Flags.SetTopics, Flags.GetTopicList, Flags.SetTopicList);
         async private Task LoadTopicAsync() => await Task.Run(() => _topic = LoadTopic());
 
         private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -485,7 +559,7 @@ namespace ToDoModel
         public string get_KB(bool IncludePrefix = false)
         {
             EnsureInitialized(callerName: "KB");
-            return _flags.GetKb(IncludePrefix);
+            return Flags.GetKb(IncludePrefix);
             // Set Context and sanitize value
         }
 
@@ -494,21 +568,21 @@ namespace ToDoModel
             get
             {
                 EnsureInitialized(callerName: "KB");
-                return _flags.GetKb(false);
+                return Flags.GetKb(false);
             }
             set
             {
-                _flags.SetKb(value: value);
+                Flags.SetKb(value: value);
                 if (!_readonly)
-                    UdfCategorySetter("KB", _flags.GetKb(false));
+                    UdfCategorySetter("KB", Flags.GetKb(false));
             }
         }
 
         public void SetKB(bool IncludePrefix = false, string value = default)
         {
-            _flags.SetKb(value: value);
+            Flags.SetKb(value: value);
             if (!_readonly)
-                UdfCategorySetter("KB", _flags.GetKb(false));
+                UdfCategorySetter("KB", Flags.GetKb(false));
         }
 
         private void ThrowIfNull(object obj, string property)
@@ -842,9 +916,11 @@ namespace ToDoModel
             }
         }
 
+        #region Get<T> and Set<T>
+
         private void EnsureInitialized(string callerName)
         {
-            if (_flags is null)
+            if (Flags is null)
             {
                 if (_olItem is null)
                 {
@@ -852,7 +928,7 @@ namespace ToDoModel
                 }
                 dynamic olItem = _olItem;
                 string argstrCats_All = olItem.Categories;
-                _flags = new FlagParser(ref argstrCats_All);
+                Flags = new FlagParser(ref argstrCats_All);
                 olItem.Categories = argstrCats_All;
             }
         }
@@ -862,7 +938,7 @@ namespace ToDoModel
             if (_olItem is not null)
             {
                 _olItem.TrySetUdf(udfName, udfValue, OlUserPropertyType.olKeywords);
-                _olItem.Categories = _flags.Combine();
+                _olItem.Categories = Flags.Combine();
                 _olItem.Save();
             }
         }
@@ -999,6 +1075,8 @@ namespace ToDoModel
             if (dependencies is null || dependencies.Any(x => x is null)) { return defaultValue; }
             else { return loader(); }
         }
+
+        #endregion Get<T> and Set<T>
 
     }
 }

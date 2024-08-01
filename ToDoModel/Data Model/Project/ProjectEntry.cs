@@ -2,6 +2,7 @@
 using UtilitiesCS;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace ToDoModel
 {
@@ -50,12 +51,23 @@ namespace ToDoModel
                 
             }
         }
+        private string _programID;
+        public string ProgramID { get => _programID; set => _programID = value; }
 
         public ProjectEntry(string ProjName, string ProjID, string ProgName)
         {
             ProjectName = ProjName;
             ProjectID = ProjID;
             ProgramName = ProgName;
+        }
+
+        [JsonConstructor]
+        public ProjectEntry(string ProjName, string ProjID, string ProgName, string programID)
+        {
+            ProjectName = ProjName;
+            ProjectID = ProjID;
+            ProgramName = ProgName;
+            ProgramID = programID;
         }
 
         public void SetIdUpdateAction(Action<string, string> action) 

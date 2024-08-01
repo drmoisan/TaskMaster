@@ -627,6 +627,17 @@ namespace TaskMaster
             }
         }
 
+        internal void TryNewTaskHeader()
+        {
+            var projectCreator = new AutoCreateProject(_globals);
+            var prefix = new PrefixItem(
+                prefixType: PrefixTypeEnum.Project, 
+                key: "Project", value: Properties.Settings.Default.Prefix_Project, 
+                color: OlCategoryColor.olCategoryColorTeal,
+                olUserFieldName: "TagProject");
+            projectCreator.CreateProjectTaskItem("T3 ROUTINE - Reading", "T305");
+        }
+
         #endregion Triage
     }
 }

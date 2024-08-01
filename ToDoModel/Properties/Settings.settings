@@ -56,5 +56,23 @@
     <Setting Name="MaxSuggestions" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
+    <Setting Name="UDF_People" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TagPeople</Value>
+    </Setting>
+    <Setting Name="UDF_Project" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TagProject</Value>
+    </Setting>
+    <Setting Name="UDF_Context" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TagContext</Value>
+    </Setting>
+    <Setting Name="UDF_Topic" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TagTopic</Value>
+    </Setting>
+    <Setting Name="UDF_Kb" Type="System.String" Scope="User">
+      <Value Profile="(Default)">KB</Value>
+    </Setting>
+    <Setting Name="UDF_Program" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TagProgram</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

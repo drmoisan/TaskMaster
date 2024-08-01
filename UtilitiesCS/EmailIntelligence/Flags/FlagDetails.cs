@@ -60,6 +60,7 @@ namespace UtilitiesCS
                     if (!_list.SequenceEqual(temp))
                     {
                         Unsubscribe();
+                        var oldValue = _list;
                         _list = value;
                         Subscribe();
                         List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

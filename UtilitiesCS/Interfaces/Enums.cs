@@ -84,16 +84,16 @@ namespace UtilitiesCS
         public enum FlagsToSet
         {
             none = 0,
-            context = 1,
-            people = 2,
-            projects = 4,
-            topics = 8,
+            Context = 1,
+            People = 2,
+            Projects = 4,
+            Topics = 8,
             priority = 16,
             taskname = 32,
             worktime = 64,
             today = 128,
             bullpin = 256,
-            kbf = 512,
+            Kbf = 512,
             duedate = 1024,
             reminder = 2048,
             all = 4095

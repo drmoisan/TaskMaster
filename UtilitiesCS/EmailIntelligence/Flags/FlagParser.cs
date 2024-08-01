@@ -156,9 +156,9 @@ namespace UtilitiesCS
         #region Other Public Methods and Properties
         
         /// <summary>
-    /// Function recombines flag settings in one comma delimited string representing color categories
-    /// </summary>
-    /// <returns>A string containing color categories</returns>
+        /// Function recombines flag settings in one comma delimited string representing color categories
+        /// </summary>
+        /// <returns>A string containing color categories</returns>
         public string Combine(bool wtag = true)
         {
             string string_return = "";
@@ -209,18 +209,30 @@ namespace UtilitiesCS
         #region INotifyCollectionChanged Implementation
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-        
+        public event NotifyCollectionChangedEventHandler PeopleChanged;
+        public event NotifyCollectionChangedEventHandler ProjectsChanged;
+        public event NotifyCollectionChangedEventHandler TopicsChanged;
+        public event NotifyCollectionChangedEventHandler ContextChanged;
+        public event NotifyCollectionChangedEventHandler KbChanged;
+
         //public event PropertyChangedEventHandler PropertyChanged;
 
-        private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) 
-        {
-            CollectionChanged?.Invoke(sender, e);
-        }
+        private void People_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => PeopleChanged?.Invoke(sender, e);
+        private void Projects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ProjectsChanged?.Invoke(sender, e);
+        private void Topics_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => TopicsChanged?.Invoke(sender, e);
+        private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ContextChanged?.Invoke(sender, e);
+        private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => KbChanged?.Invoke(sender, e);
+
 
         public void WireEvents()
         {
-            var list = new List<FlagDetails> { _people, _projects, _topics, _context, _kb };
-            list.ForEach(x => x.CollectionChanged += List_CollectionChanged);
+            _people.CollectionChanged += People_CollectionChanged;
+            _projects.CollectionChanged += Projects_CollectionChanged;
+            _topics.CollectionChanged += Topics_CollectionChanged;
+            _context.CollectionChanged += Context_CollectionChanged;
+            _kb.CollectionChanged += Kb_CollectionChanged;
+            //var list = new List<FlagDetails> { _people, _projects, _topics, _context, _kb };
+            //list.ForEach(x => x.CollectionChanged += List_CollectionChanged);
         }
 
         #endregion

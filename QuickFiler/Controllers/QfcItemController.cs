@@ -1661,8 +1661,8 @@ namespace QuickFiler.Controllers
         public void FlagAsTask()
         {
             List<MailItem> itemList = [Mail];
-            var flagTask = new FlagTasks(AppGlobals: _globals,
-                                         ItemList: itemList,
+            var flagTask = new FlagTasks(globals: _globals,
+                                         itemList: itemList,
                                          blFile: false,
                                          hWndCaller: _homeController.FormController.FormHandle);
             _itemViewer.BtnFlagTask.DialogResult = flagTask.Run(modal: true);
@@ -1677,8 +1677,8 @@ namespace QuickFiler.Controllers
             List<MailItem> itemList = [Mail];
             await UiThread.Dispatcher.InvokeAsync(() => 
             {
-                var flagTask = new FlagTasks(AppGlobals: _globals,
-                                         ItemList: itemList,
+                var flagTask = new FlagTasks(globals: _globals,
+                                         itemList: itemList,
                                          blFile: false,
                                          hWndCaller: _homeController.FormController.FormHandle);
                 _itemViewer.BtnFlagTask.DialogResult = flagTask.Run(modal: true);

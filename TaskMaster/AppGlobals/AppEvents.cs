@@ -199,8 +199,6 @@ namespace TaskMaster
             ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, _globals);
         }
 
-        
-
         private async void OlInboxItems_ItemAdd(object item)
         {
             var engines = await MailAddEngines.ToAsyncEnumerable().WhereAwait(async e => await e.AsyncCondition(item)).Where(e => e.Engine is not null).ToArrayAsync();
