@@ -83,20 +83,21 @@ namespace UtilitiesCS
         [Flags]
         public enum FlagsToSet
         {
-            none = 0,
+            None = 0,
             Context = 1,
             People = 2,
             Projects = 4,
-            Topics = 8,
-            priority = 16,
-            taskname = 32,
-            worktime = 64,
-            today = 128,
-            bullpin = 256,
-            Kbf = 512,
-            duedate = 1024,
-            reminder = 2048,
-            all = 4095
+            Program = 8,
+            Topics = 16,
+            Priority = 32,
+            Taskname = 64,
+            Worktime = 128,
+            Today = 256,
+            Bullpin = 512,
+            Kbf = 1024,
+            DueDate = 2048,
+            Reminder = 4096,
+            All = 8191
         }
 
         public enum NotFoundEnum

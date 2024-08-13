@@ -310,5 +310,17 @@ namespace ToDoModel.Properties {
                 this["UDF_Program"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TagProgram")]
+        public string Prefix_Program {
+            get {
+                return ((string)(this["Prefix_Program"]));
+            }
+            set {
+                this["Prefix_Program"] = value;
+            }
+        }
     }
 }

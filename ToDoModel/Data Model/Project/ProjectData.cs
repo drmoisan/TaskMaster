@@ -165,7 +165,8 @@ namespace ToDoModel
                             join projectInfo in this on project equals projectInfo.ProjectName
                             select projectInfo.ProgramName;
 
-                string strTemp = query.First().ToString();
+                //string strTemp = query.First().ToString();
+                string strTemp = string.Join(",",query.Distinct());
 
                 return strTemp;
             }

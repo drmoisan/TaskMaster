@@ -23,17 +23,14 @@ namespace TaskMaster
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public AppEvents(IApplicationGlobals appGlobals)
+        public AppEvents(IApplicationGlobals globals)
         {
-            _globals = appGlobals;
+            _globals = globals;
         }
 
         private ConcurrentBag<ConditionalItemEngine<MailItemHelper>> _mailAddEngines = [];
         internal ConcurrentBag<ConditionalItemEngine<MailItemHelper>> MailAddEngines => _mailAddEngines;
         
-        //private Dictionary<string, Func<MailItemHelper, Task>> _mailAddFunctions = [];
-        //internal Dictionary<string, Func<MailItemHelper, Task>> MailAddFunctions => _mailAddFunctions;
-
         internal async Task<AppEvents> LoadAsync()
         {
             var spamBayesTask = Task.Run(SetupSpamBayesAsync);
@@ -45,8 +42,7 @@ namespace TaskMaster
         }
 
         private IApplicationGlobals _globals;
-        //private SpamBayes _spamBayes;
-        //private Triage _triage;
+        
         private Items _olToDoItems;
         private Items OlToDoItems
         {
@@ -133,14 +129,7 @@ namespace TaskMaster
             OlReminders = null;
         }
 
-        //internal async Task SetupSpamBayesAsync()
-        //{
-        //    _spamBayes = await SpamBayes.CreateAsync(_globals);
-
-        //    MailAddFunctions["Spam"] = _spamBayes is not null ? 
-        //        _spamBayes.TestAsync : 
-        //        (item) => LogAsync("SpamBayes is null. Skipping spam check");
-        //}
+        
         internal async Task SetupSpamBayesAsync()
         {
             var ce = new ConditionalItemEngine<MailItemHelper>();
@@ -179,14 +168,6 @@ namespace TaskMaster
             ce.Message = $"{ce.EngineName} is null. Skipping actions";
             MailAddEngines.Add(ce);
 
-            //internal async Task SetupTriageAsync()
-            //{
-            //    _triage = await Triage.CreateAsync(_globals);
-
-            //    MailAddFunctions["Triage"] = _triage is not null ?
-            //        (item) => _triage.TestAsync(item) :
-            //        (item) => LogAsync("Triage is null. Skipping triage");
-            //}
         }
 
         private void OlToDoItems_ItemAdd(object item)
@@ -209,17 +190,7 @@ namespace TaskMaster
                 await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
             }    
             
-            //if (item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" && mailItem.UserProperties.Find("Spam") is null)
-            //{
-            //    if (_spamBayes is null)
-            //    {
-            //        logger.Debug("SpamBayes is null. Skipping spam check.");
-            //    }
-            //    else 
-            //    { 
-            //        await _spamBayes.TestAsync(item);   
-            //    }
-            //}
+            
         }
         
         

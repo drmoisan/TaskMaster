@@ -62,19 +62,19 @@
                   <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" itemSize="large">
                     <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
                     <button id="DeepEmailCompare" imageMso ="TraceDependentCells" onAction="DeepCompareEmails_Click" label="Deep Compare Emails"/>
-                    <button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
-                    <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />
+                    <!--<button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
+                    <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />-->
                     <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
-                    <button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
+                    <!--<button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
                     <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
                     <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
                     <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
-                    <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />
+                    <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />-->
                     <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
                     <button id="LoadFolderFilter" imageMso="Filter" onAction="LoadFolderFilter_Click" label="Load Folder Filter" />
                     <button id="LoadFolderRemap" imageMso="Filter" onAction="LoadFolderRemap_Click" label="Load Folder Remap" />
-                    <button id="RebuildSubjectMap" imageMso="Filter" onAction="RebuildSubjectMap_Click" label="Rebuild Subject Map" />
-                    <button id="ShowSubjectMapMetrics" imageMso="Filter" onAction="ShowSubjectMapMetrics_Click" label="Show Subject Map Metrics" />
+                    <!--<button id="RebuildSubjectMap" imageMso="Filter" onAction="RebuildSubjectMap_Click" label="Rebuild Subject Map" />
+                    <button id="ShowSubjectMapMetrics" imageMso="Filter" onAction="ShowSubjectMapMetrics_Click" label="Show Subject Map Metrics" />-->
                     <button id="TokenizeEmail" imageMso="Filter" onAction="TokenizeEmail_Click" label="Tokenize Email" />
                     <button id="MineEmails" imageMso="Filter" onAction="MineEmails_Click" label="Mine Emails" />
                     <button id="BuildClassifier" imageMso="Filter" onAction="BuildClassifier_Click" label="Build Classifier" />

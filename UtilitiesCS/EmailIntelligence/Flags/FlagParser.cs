@@ -15,6 +15,8 @@ namespace UtilitiesCS
     /// </summary>
     public class FlagParser: INotifyCollectionChanged//, INotifyPropertyChanged
     {
+        #region Constructors and Initializers
+
         /// <summary>
         /// Constructor for the FlagParser class accepts a comma delimited string containing 
         /// color categories and initializes
@@ -37,11 +39,12 @@ namespace UtilitiesCS
 
         internal void Initialize(IList<string> categories)
         {
-            _people.List = FindMatches(categories, _people.Prefix);
-            _projects.List = FindMatches(categories, _projects.Prefix);
-            _topics.List = FindMatches(categories, _topics.Prefix);
-            _context.List = FindMatches(categories, _context.Prefix);
-            _kb.List = FindMatches(categories, _kb.Prefix);
+            People.List = FindMatches(categories, People.Prefix);
+            Projects.List = FindMatches(categories, Projects.Prefix);
+            Program.List = FindMatches(categories, Program.Prefix);
+            Topics.List = FindMatches(categories, Topics.Prefix);
+            Context.List = FindMatches(categories, Context.Prefix);
+            Kb.List = FindMatches(categories, Kb.Prefix);
 
             categories = categories.Except(_people.ListWithPrefix)
                                        .Except(_projects.ListWithPrefix)
@@ -55,9 +58,12 @@ namespace UtilitiesCS
             WireEvents();
         }
 
+        #endregion Constructors and Initializers
+
         #region Context
 
         private readonly FlagDetails _context = new FlagDetails(Properties.Settings.Default.Prefix_Context);
+        internal FlagDetails Context => _context;
 
         /// <summary>
         /// Property accesses a private instance of FlagDetails. 
@@ -84,6 +90,7 @@ namespace UtilitiesCS
         #region Projects
 
         private readonly FlagDetails _projects = new FlagDetails(Properties.Settings.Default.Prefix_Project);
+        internal FlagDetails Projects => _projects;
 
         /// <summary>
         /// Property accesses a private instance of FlagDetails. 
@@ -107,9 +114,37 @@ namespace UtilitiesCS
 
         #endregion
 
+        #region Program
+
+        private readonly FlagDetails _program = new FlagDetails(Properties.Settings.Default.Prefix_Program);
+        internal FlagDetails Program => _program;
+
+        /// <summary>
+        /// Property accesses a private instance of FlagDetails. 
+        /// SET splits a comma delimited String to a list excluding 
+        /// the Prefix which is passed to the FlagDetails class.
+        /// </summary>
+        /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
+        /// <returns>A string containing a comma separated Project names</returns>
+        public string GetProgram(bool includePrefix = false)
+        {
+            return includePrefix ? _program.WithPrefix : _program.NoPrefix;
+        }
+
+        public void SetProgram(bool includePrefix = false, string value = default)
+        {
+            _program.List = SplitToList(value, ",", _program.Prefix);
+        }
+
+        public ObservableCollection<string> GetProgramList(bool IncludePrefix = false) => IncludePrefix ? _program.ListWithPrefix : _program.List;
+        public void SetProgramList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _program.List = value;
+
+        #endregion Program
+
         #region Topics
 
         private readonly FlagDetails _topics = new FlagDetails(Properties.Settings.Default.Prefix_Topic);
+        internal FlagDetails Topics => _topics;
 
         /// <summary>
         /// Property accesses a private instance of FlagDetails. 
@@ -131,11 +166,12 @@ namespace UtilitiesCS
         public ObservableCollection<string> GetTopicList(bool IncludePrefix = false) => IncludePrefix ? _topics.ListWithPrefix : _topics.List;
         public void SetTopicList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _topics.List = value;
 
-        #endregion
+        #endregion Topics
 
         #region People
 
         private readonly FlagDetails _people = new FlagDetails(Properties.Settings.Default.Prefix_People);
+        internal FlagDetails People => _people;
 
         /// <summary>
         /// Property accesses a private instance of FlagDetails. 
@@ -151,10 +187,29 @@ namespace UtilitiesCS
         public ObservableCollection<string> GetPeopleList(bool IncludePrefix = false) => IncludePrefix ? _people.ListWithPrefix : _people.List;
         public void SetPeopleList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _people.List = value;
 
-        #endregion
+        #endregion People
+
+        #region Kanban
+
+        private readonly FlagDetails _kb = new FlagDetails(Properties.Settings.Default.Prefix_KB);
+        internal FlagDetails Kb => _kb;
+
+        public string GetKb(bool includePrefix = false)
+        {
+            return includePrefix ? _kb.WithPrefix : _kb.NoPrefix;
+        }
+        public void SetKb(bool includePrefix = false, string value = default)
+        {
+            _kb.List = SplitToList(value, ",", _kb.Prefix);
+        }
+
+        public ObservableCollection<string> GetKbList(bool IncludePrefix = false) => IncludePrefix ? _kb.ListWithPrefix : _kb.List;
+        public void SetKbList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _kb.List = value;
+
+        #endregion Kanban
 
         #region Other Public Methods and Properties
-        
+
         /// <summary>
         /// Function recombines flag settings in one comma delimited string representing color categories
         /// </summary>
@@ -182,19 +237,6 @@ namespace UtilitiesCS
             return string_return;
         }
         
-        private readonly FlagDetails _kb = new FlagDetails(Properties.Settings.Default.Prefix_KB);
-        public string GetKb(bool includePrefix = false)
-        {
-            return includePrefix ? _kb.WithPrefix : _kb.NoPrefix;
-        }
-        public void SetKb(bool includePrefix = false, string value = default)
-        {
-            _kb.List = SplitToList(value, ",", _kb.Prefix);
-        }
-
-        public ObservableCollection<string> GetKbList(bool IncludePrefix = false) => IncludePrefix ? _kb.ListWithPrefix : _kb.List;
-        public void SetKbList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _kb.List = value;
-
         private bool _today = false;
         public bool Today { get => _today; set => _today = value; }
 
@@ -211,28 +253,26 @@ namespace UtilitiesCS
         public event NotifyCollectionChangedEventHandler CollectionChanged;
         public event NotifyCollectionChangedEventHandler PeopleChanged;
         public event NotifyCollectionChangedEventHandler ProjectsChanged;
+        public event NotifyCollectionChangedEventHandler ProgramChanged;
         public event NotifyCollectionChangedEventHandler TopicsChanged;
         public event NotifyCollectionChangedEventHandler ContextChanged;
         public event NotifyCollectionChangedEventHandler KbChanged;
 
-        //public event PropertyChangedEventHandler PropertyChanged;
-
         private void People_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => PeopleChanged?.Invoke(sender, e);
         private void Projects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ProjectsChanged?.Invoke(sender, e);
+        private void Program_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ProgramChanged?.Invoke(sender, e);
         private void Topics_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => TopicsChanged?.Invoke(sender, e);
         private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ContextChanged?.Invoke(sender, e);
         private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => KbChanged?.Invoke(sender, e);
-
 
         public void WireEvents()
         {
             _people.CollectionChanged += People_CollectionChanged;
             _projects.CollectionChanged += Projects_CollectionChanged;
+            _program.CollectionChanged += Program_CollectionChanged;
             _topics.CollectionChanged += Topics_CollectionChanged;
             _context.CollectionChanged += Context_CollectionChanged;
             _kb.CollectionChanged += Kb_CollectionChanged;
-            //var list = new List<FlagDetails> { _people, _projects, _topics, _context, _kb };
-            //list.ForEach(x => x.CollectionChanged += List_CollectionChanged);
         }
 
         #endregion

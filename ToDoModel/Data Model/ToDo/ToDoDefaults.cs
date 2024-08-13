@@ -15,6 +15,7 @@ namespace ToDoModel
             { 
                 new PrefixItem(prefixType: PrefixTypeEnum.People, key: "People", value: defaults.Prefix_People, color: OlCategoryColor.olCategoryColorDarkGray, defaults.UDF_People), 
                 new PrefixItem(prefixType : PrefixTypeEnum.Project, key: "Project", value: Properties.Settings.Default.Prefix_Project, color: OlCategoryColor.olCategoryColorTeal, defaults.UDF_Project),
+                new PrefixItem(prefixType : PrefixTypeEnum.Program, key: "Program", value: Properties.Settings.Default.Prefix_Program, color: OlCategoryColor.olCategoryColorTeal, defaults.UDF_Program),
                 new PrefixItem(prefixType : PrefixTypeEnum.Topic, key: "Topic", value: Properties.Settings.Default.Prefix_Topic, color: OlCategoryColor.olCategoryColorDarkTeal, defaults.UDF_Topic), 
                 new PrefixItem(prefixType : PrefixTypeEnum.Context, key: "Context", value: Properties.Settings.Default.Prefix_Context, color: OlCategoryColor.olCategoryColorNone, defaults.UDF_Context), 
                 new PrefixItem(prefixType : PrefixTypeEnum.Today, key: "Today", value: Properties.Settings.Default.Prefix_Today, color: OlCategoryColor.olCategoryColorDarkRed, ""), 

@@ -23,5 +23,8 @@
     <Setting Name="Prefix_KB" Type="System.String" Scope="User">
       <Value Profile="(Default)">Tag KB </Value>
     </Setting>
+    <Setting Name="Prefix_Program" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TagProgram</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

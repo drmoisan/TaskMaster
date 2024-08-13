@@ -36,7 +36,7 @@ namespace TaskVisualization
         {
             _globals = globals;
             _olExplorer = globals.Ol.App.ActiveExplorer();
-            _todoSelection = InitializeToDoList(itemList, _olExplorer);
+            _todoSelection = InitializeToDoList(itemList, _olExplorer, globals.TD.ProjInfo.Programs_ByProjectNames);
             _flagsToSet = GetFlagsToSet(_todoSelection.Count);
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
@@ -48,6 +48,7 @@ namespace TaskVisualization
                                              defaults: _defaultsToDo,
                                              autoAssign: _autoAssignPeople,
                                              projectAssign: _autoCreateProject,
+                                             projectsToPrograms: globals.TD.ProjInfo.Programs_ByProjectNames,
                                              flagOptions: _flagsToSet,
                                              userEmailAddress: globals.Ol.UserEmailAddress);
             _userEmailAddress = globals.Ol.UserEmailAddress;
@@ -63,7 +64,7 @@ namespace TaskVisualization
                 return DialogResult.None;
         }
 
-        public static List<ToDoItem> InitializeToDoList(IList itemList, Explorer olExplorer)
+        public static List<ToDoItem> InitializeToDoList(IList itemList, Explorer olExplorer, Func<string, string> projectsToPrograms)
         {
             itemList ??= GetSelection(olExplorer);
             var ToDoSelection = new List<ToDoItem>();
@@ -84,14 +85,15 @@ namespace TaskVisualization
                 {
                     tmpToDo = new ToDoItem(objItem, OnDemand: true);
                 }
+                tmpToDo.ProjectsToPrograms = projectsToPrograms;
                 ToDoSelection.Add(tmpToDo);
             }
             return ToDoSelection;
         }
 
-        public static void PopulateUdf(IList itemList, Explorer olExplorer) 
+        public static void PopulateUdf(IList itemList, Explorer olExplorer, Func<string,string> projectsToPrograms) 
         { 
-            var toDoSelection = InitializeToDoList(itemList, olExplorer);
+            var toDoSelection = InitializeToDoList(itemList, olExplorer, projectsToPrograms);            
             var flagsToSet = GetFlagsToSet(toDoSelection.Count);
             toDoSelection.ForEach(x => x.WriteFlagsBatch(flagsToSet));
         }
@@ -113,7 +115,7 @@ namespace TaskVisualization
             if (selectionCount > 1)
             {
 
-                Enums.FlagsToSet[] excludedMembers = new[] { Enums.FlagsToSet.all, Enums.FlagsToSet.none };
+                Enums.FlagsToSet[] excludedMembers = new[] { Enums.FlagsToSet.All, Enums.FlagsToSet.None };
                 var symbolsDict = Enum.GetValues(typeof(Enums.FlagsToSet)).Cast<Enums.FlagsToSet>().ToList().AsEnumerable().Where(x => excludedMembers.Contains(x) == false).Select(x => x).ToDictionary(x => Enum.GetName(typeof(Enums.FlagsToSet), x), x => x);
 
 
@@ -143,7 +145,7 @@ namespace TaskVisualization
                 }
                 if (listSelections.Count == 0)
                 {
-                    return Enums.FlagsToSet.all;
+                    return Enums.FlagsToSet.All;
                 }
                 else
                 {
@@ -160,7 +162,7 @@ namespace TaskVisualization
             }
             else
             {
-                return Enums.FlagsToSet.all;
+                return Enums.FlagsToSet.All;
             }
         }
 

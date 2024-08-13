@@ -29,7 +29,7 @@ namespace TaskVisualization
         /// <param name="autoAssign">Class implementing <seealso cref="IAutoAssign"/> interface</param>
         /// <param name="userEmailAddress">Email address of user to avoid auto-tagging everything with user tag</param>
         /// <param name="flagOptions">Enumeration of fields to activate</param>
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.all)
+        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
         {
             //TODO: Add description of olCategories and defaults in documentation
             // Save parameters to internal variables
@@ -48,7 +48,7 @@ namespace TaskVisualization
 
             // First ToDoItem in list is cloned to _active and set to readonly
             _active = (ToDoItem)_todo_list[0].Clone();
-            _active.IsReadOnly = true;
+            _active.ReadOnly = true;
 
             // All color categories in Outlook.Namespace are loaded to a sorted dictionary
             _dict_categories = new SortedDictionary<string, bool>();
@@ -67,7 +67,7 @@ namespace TaskVisualization
 
         }
 
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.all)
+        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, Func<string, string> projectsToPrograms, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
         {
             _viewer = formInstance;
             _todo_list = toDoSelection;
@@ -84,7 +84,7 @@ namespace TaskVisualization
 
             // First ToDoItem in list is cloned to _active and set to readonly
             _active = (ToDoItem)_todo_list[0].Clone();
-            _active.IsReadOnly = true;
+            _active.ReadOnly = true;
 
             // All color categories in Outlook.Namespace are loaded to a sorted dictionary
             _dict_categories = new SortedDictionary<string, bool>();
@@ -102,6 +102,7 @@ namespace TaskVisualization
                                     controlCaption => controlCaption.Value[0]);
 
             ProjectAssign = projectAssign;
+            ProjectsToPrograms = projectsToPrograms;
         }
 
         /// <summary>
@@ -162,7 +163,7 @@ namespace TaskVisualization
                 Enums.ToggleState.Off);
 
             // Deactivate controls that are not set in _options
-            if (_options != Enums.FlagsToSet.all)
+            if (_options != Enums.FlagsToSet.All)
                 ActivateOptions();
 
             // Wire keypress event handler
@@ -242,24 +243,8 @@ namespace TaskVisualization
             set => _projectAssign = value;
         }
 
-        //[Flags]
-        //public enum FlagsToSet
-        //{
-        //    none = 0,
-        //    context = 1,
-        //    people = 2,
-        //    projects = 4,
-        //    topics = 8,
-        //    priority = 16,
-        //    taskname = 32,
-        //    worktime = 64,
-        //    today = 128,
-        //    bullpin = 256,
-        //    kbf = 512,
-        //    duedate = 1024,
-        //    reminder = 2048,
-        //    all = 4095
-        //}
+        private Func<string, string> _projectsToPrograms;
+        internal Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; private protected set => _projectsToPrograms = value; }
 
         #endregion
 
@@ -359,6 +344,7 @@ namespace TaskVisualization
                 {
                     _active.Projects.AsStringNoPrefix = controller.SelectionString();
                     _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+                    _active.Program.AsStringNoPrefix = ProjectsToPrograms(_active.Projects.AsStringNoPrefix);
                 }
             }
         }
@@ -457,7 +443,7 @@ namespace TaskVisualization
             {
 
                 // Capture the value of the task subject and if not empty write to ToDoItem
-                if (_options.HasFlag(Enums.FlagsToSet.taskname))
+                if (_options.HasFlag(Enums.FlagsToSet.Taskname))
                 {
                     if (!string.IsNullOrEmpty(_viewer.TaskName.Text))
                         _active.TaskSubject = _viewer.TaskName.Text;
@@ -553,8 +539,8 @@ namespace TaskVisualization
         {
             SetFlag("Reading - News | Articles | Other", Enums.FlagsToSet.Context);
             SetFlag("Routine - Reading", Enums.FlagsToSet.Projects);
-            SetFlag("READ: " + _viewer.TaskName.Text, Enums.FlagsToSet.taskname);
-            SetFlag("15", Enums.FlagsToSet.worktime);
+            SetFlag("READ: " + _viewer.TaskName.Text, Enums.FlagsToSet.Taskname);
+            SetFlag("15", Enums.FlagsToSet.Worktime);
             bool unused = _viewer.Duration.Focus();
         }
 
@@ -708,13 +694,13 @@ namespace TaskVisualization
                         _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                         break;
                     }
-                case Enums.FlagsToSet.taskname:
+                case Enums.FlagsToSet.Taskname:
                     {
                         _active.TaskSubject = value;
                         _viewer.TaskName.Text = value;
                         break;
                     }
-                case Enums.FlagsToSet.worktime:
+                case Enums.FlagsToSet.Worktime:
                     {
                         _viewer.Duration.Text = value;
                         break;
@@ -766,7 +752,7 @@ namespace TaskVisualization
             foreach (ToDoItem c in _todo_list)
             {
                 c.FlagAsTask = true;
-                c.IsReadOnly = true;
+                c.ReadOnly = true;
 
                 if (_options.HasFlag(Enums.FlagsToSet.Context))
                     c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
@@ -774,27 +760,29 @@ namespace TaskVisualization
                     c.People.AsListNoPrefix = _active.People.AsListNoPrefix;
                 if (_options.HasFlag(Enums.FlagsToSet.Projects))
                     c.Projects.AsListNoPrefix = _active.Projects.AsListNoPrefix;
+                if (_options.HasFlag(Enums.FlagsToSet.Program))
+                    c.Program.AsListNoPrefix = _active.Program.AsListNoPrefix;
                 if (_options.HasFlag(Enums.FlagsToSet.Topics))
                     c.Topics.AsListNoPrefix = _active.Topics.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.today))
+                if (_options.HasFlag(Enums.FlagsToSet.Today))
                     c.Today = _active.Today;
-                if (_options.HasFlag(Enums.FlagsToSet.bullpin))
+                if (_options.HasFlag(Enums.FlagsToSet.Bullpin))
                     c.Bullpin = _active.Bullpin;
                 if (_options.HasFlag(Enums.FlagsToSet.Kbf))
                     c.KB = _active.KB;
 
                 c.WriteFlagsBatch();
-                c.IsReadOnly = false;
+                c.ReadOnly = false;
 
-                if (_options.HasFlag(Enums.FlagsToSet.priority))
+                if (_options.HasFlag(Enums.FlagsToSet.Priority))
                     c.Priority = _active.Priority;
-                if (_options.HasFlag(Enums.FlagsToSet.taskname))
+                if (_options.HasFlag(Enums.FlagsToSet.Taskname))
                     c.TaskSubject = _active.TaskSubject;
-                if (_options.HasFlag(Enums.FlagsToSet.worktime))
+                if (_options.HasFlag(Enums.FlagsToSet.Worktime))
                     c.TotalWork = _active.TotalWork;
-                if (_options.HasFlag(Enums.FlagsToSet.duedate))
+                if (_options.HasFlag(Enums.FlagsToSet.DueDate))
                     c.DueDate = _active.DueDate;
-                if (_options.HasFlag(Enums.FlagsToSet.reminder))
+                if (_options.HasFlag(Enums.FlagsToSet.Reminder))
                     c.ReminderTime = _active.ReminderTime;
             }
         }
@@ -1215,32 +1203,32 @@ namespace TaskVisualization
             {
                 new ControlRelationship(0, _viewer.XlSector1,  true,  _viewer.XlSector1.Text,  _viewer.XlSector1),
                 new ControlRelationship(0, _viewer.XlSector2,  true,  _viewer.XlSector2.Text,  _viewer.XlSector2),
-                new ControlRelationship(0, _viewer.XlSector3,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.XlSector3.Text,  _viewer.XlSector3),
+                new ControlRelationship(0, _viewer.XlSector3,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.XlSector3.Text,  _viewer.XlSector3),
                 new ControlRelationship(0, _viewer.XlSector4,  true,  _viewer.XlSector4.Text,  _viewer.XlSector4),
                 new ControlRelationship(2, _viewer.XlTopic,  _options.HasFlag(Enums.FlagsToSet.Topics),  _viewer.LblTopic.Text,  _viewer.LblTopic),
                 new ControlRelationship(2, _viewer.XlProject,  _options.HasFlag(Enums.FlagsToSet.Projects),  _viewer.LblProject.Text,  _viewer.LblProject),
                 new ControlRelationship(2, _viewer.XlPeople,  _options.HasFlag(Enums.FlagsToSet.People),  _viewer.LblPeople.Text,  _viewer.LblPeople),
                 new ControlRelationship(2, _viewer.XlContext,  _options.HasFlag(Enums.FlagsToSet.Context),  _viewer.LblContext.Text,  _viewer.LblContext),
-                new ControlRelationship(1, _viewer.XlTaskname,  _options.HasFlag(Enums.FlagsToSet.taskname),  _viewer.LblTaskname.Text,  _viewer.TaskName),
-                new ControlRelationship(1, _viewer.XlImportance,  _options.HasFlag(Enums.FlagsToSet.priority),  _viewer.LblPriority.Text,  _viewer.PriorityBox),
+                new ControlRelationship(1, _viewer.XlTaskname,  _options.HasFlag(Enums.FlagsToSet.Taskname),  _viewer.LblTaskname.Text,  _viewer.TaskName),
+                new ControlRelationship(1, _viewer.XlImportance,  _options.HasFlag(Enums.FlagsToSet.Priority),  _viewer.LblPriority.Text,  _viewer.PriorityBox),
                 new ControlRelationship(1, _viewer.XlKanban,  _options.HasFlag(Enums.FlagsToSet.Kbf),  _viewer.LblKbf.Text,  _viewer.KbSelector),
-                new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(Enums.FlagsToSet.worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
+                new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(Enums.FlagsToSet.Worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
                 new ControlRelationship(4, _viewer.XlOk,  true,  _viewer.OKButton.Text,  _viewer.OKButton),
                 new ControlRelationship(4, _viewer.XlCancel,  true,  _viewer.Cancel_Button.Text,  _viewer.Cancel_Button),
-                new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(Enums.FlagsToSet.reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
-                new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(Enums.FlagsToSet.duedate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
-                new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
-                new ControlRelationship(3, _viewer.XlScUnprocessed,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutUnprocessed.Text,  _viewer.ShortcutUnprocessed),
-                new ControlRelationship(3, _viewer.XlScNews,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutNews.Text,  _viewer.ShortcutNews),
-                new ControlRelationship(3, _viewer.XlScEmail,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutEmail.Text,  _viewer.ShortcutEmail),
-                new ControlRelationship(3, _viewer.XlScReadingbusiness,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutReadingBusiness.Text,  _viewer.ShortcutReadingBusiness),
-                new ControlRelationship(3, _viewer.XlScCalls,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutCalls.Text,  _viewer.ShortcutCalls),
-                new ControlRelationship(3, _viewer.XlScInternet,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutInternet.Text,  _viewer.ShortcutInternet),
-                new ControlRelationship(3, _viewer.XlScPreread,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutPreRead.Text,  _viewer.ShortcutPreRead),
-                new ControlRelationship(3, _viewer.XlScMeeting,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutMeeting.Text,  _viewer.ShortcutMeeting),
-                new ControlRelationship(3, _viewer.XlScPersonal,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.ShortcutPersonal.Text,  _viewer.ShortcutPersonal),
-                new ControlRelationship(3, _viewer.XlScBullpin,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.CbxBullpin.Text,  _viewer.CbxBullpin),
-                new ControlRelationship(3, _viewer.XlScToday,  _options.HasFlag(Enums.FlagsToSet.all),  _viewer.CbxToday.Text,  _viewer.CbxToday)
+                new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(Enums.FlagsToSet.Reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
+                new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(Enums.FlagsToSet.DueDate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
+                new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
+                new ControlRelationship(3, _viewer.XlScUnprocessed,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutUnprocessed.Text,  _viewer.ShortcutUnprocessed),
+                new ControlRelationship(3, _viewer.XlScNews,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutNews.Text,  _viewer.ShortcutNews),
+                new ControlRelationship(3, _viewer.XlScEmail,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutEmail.Text,  _viewer.ShortcutEmail),
+                new ControlRelationship(3, _viewer.XlScReadingbusiness,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutReadingBusiness.Text,  _viewer.ShortcutReadingBusiness),
+                new ControlRelationship(3, _viewer.XlScCalls,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutCalls.Text,  _viewer.ShortcutCalls),
+                new ControlRelationship(3, _viewer.XlScInternet,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutInternet.Text,  _viewer.ShortcutInternet),
+                new ControlRelationship(3, _viewer.XlScPreread,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutPreRead.Text,  _viewer.ShortcutPreRead),
+                new ControlRelationship(3, _viewer.XlScMeeting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutMeeting.Text,  _viewer.ShortcutMeeting),
+                new ControlRelationship(3, _viewer.XlScPersonal,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutPersonal.Text,  _viewer.ShortcutPersonal),
+                new ControlRelationship(3, _viewer.XlScBullpin,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.CbxBullpin.Text,  _viewer.CbxBullpin),
+                new ControlRelationship(3, _viewer.XlScToday,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.CbxToday.Text,  _viewer.CbxToday)
             };
             return list;
         }
@@ -1279,13 +1267,13 @@ namespace TaskVisualization
                         { Enums.FlagsToSet.Topics, new List<Control>{ _viewer.TopicSelection, _viewer.LblTopic } },
                         { Enums.FlagsToSet.Projects, new List<Control>{ _viewer.ProjectSelection, _viewer.LblProject } },
                         { Enums.FlagsToSet.People, new List<Control>{ _viewer.PeopleSelection, _viewer.LblPeople } },
-                        { Enums.FlagsToSet.taskname, new List<Control>{ _viewer.TaskName, _viewer.LblTaskname } },
-                        { Enums.FlagsToSet.priority, new List<Control>{ _viewer.PriorityBox, _viewer.LblPriority } },
+                        { Enums.FlagsToSet.Taskname, new List<Control>{ _viewer.TaskName, _viewer.LblTaskname } },
+                        { Enums.FlagsToSet.Priority, new List<Control>{ _viewer.PriorityBox, _viewer.LblPriority } },
                         { Enums.FlagsToSet.Kbf, new List<Control>{ _viewer.KbSelector, _viewer.LblKbf } },
-                        { Enums.FlagsToSet.worktime, new List<Control>{ _viewer.Duration, _viewer.LblDuration } },
-                        { Enums.FlagsToSet.reminder, new List<Control>{ _viewer.DtReminder, _viewer.LblReminder } },
-                        { Enums.FlagsToSet.duedate, new List<Control>{ _viewer.DtDuedate, _viewer.LblDuedate } },
-                        { Enums.FlagsToSet.all, new List<Control> 
+                        { Enums.FlagsToSet.Worktime, new List<Control>{ _viewer.Duration, _viewer.LblDuration } },
+                        { Enums.FlagsToSet.Reminder, new List<Control>{ _viewer.DtReminder, _viewer.LblReminder } },
+                        { Enums.FlagsToSet.DueDate, new List<Control>{ _viewer.DtDuedate, _viewer.LblDuedate } },
+                        { Enums.FlagsToSet.All, new List<Control> 
                         { 
                             _viewer.ShortcutMeeting,_viewer.ShortcutCalls,_viewer.ShortcutPersonal,
                             _viewer.ShortcutEmail,_viewer.ShortcutInternet,_viewer.ShortcutReadingBusiness,

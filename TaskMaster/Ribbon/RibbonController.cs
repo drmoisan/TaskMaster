@@ -228,11 +228,19 @@ namespace TaskMaster
         }
         internal void TryGetMailItemInfo()
         {
+            var mailItem = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+            var helper = new MailItemHelper(mailItem, _globals);
+            logger.Debug(helper.Item.HTMLBody);
+        }
+
+        internal void TryGetMailItemInfoViaConversation()
+        {
             var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
             var conversation = (Outlook.Conversation)Mail.GetConversation();
             var df = conversation.GetDataFrame();
             df.PrettyPrint();
-            var mInfo = new MailItemHelper(df, 0, _globals.Ol.EmailPrefixToStrip);
+            //var mInfo = new MailItemHelper(df, 0, _globals.Ol.EmailPrefixToStrip);
+            var info = MailItemHelper.FromDf(df, 0, _globals);
         }
         internal void TryGetQfcDataModel()
         {
@@ -454,7 +462,7 @@ namespace TaskMaster
 
         internal void PopulateUdf()
         {
-            FlagTasks.PopulateUdf(null, _globals.Ol.App.ActiveExplorer());
+            FlagTasks.PopulateUdf(null, _globals.Ol.App.ActiveExplorer(), _globals.TD.ProjInfo.Programs_ByProjectNames);
         }
 
         internal void TryDeepCompareEmails()

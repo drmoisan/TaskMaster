@@ -183,7 +183,7 @@ namespace ToDoModel
                                                 {
                                                     // Change the Item's todoid to be a node of the project
                                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                                    todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
                                                     // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
                                                     // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
@@ -223,7 +223,7 @@ namespace ToDoModel
                                 if (_globals.TD.ProjInfo.Contains_ProjectName(strProject))
                                 {
                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                    todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                     // If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                     // strProjectToDo = ProjDict.ProjectDictionary(strProject)
                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
@@ -250,7 +250,7 @@ namespace ToDoModel
                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                     // Add the next ToDoID available in that branch
                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
-                                    todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                     _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
                                     
                                     todo.SplitID();
