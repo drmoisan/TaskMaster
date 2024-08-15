@@ -84,9 +84,9 @@ namespace TaskMaster
             _controller.RefreshIDList();
         }
 
-        public void BtnSplitToDoID_Click(Office.IRibbonControl control)
+        public async void BtnSplitToDoID_Click(Office.IRibbonControl control)
         {
-            _controller.SplitToDoID();
+            await _controller.SplitToDoIdAsync();
         }
 
         public void BtnReviseProjectInfo_Click(Office.IRibbonControl control)
@@ -139,9 +139,9 @@ namespace TaskMaster
 
         public async void SortEmail_Click(Office.IRibbonControl control) => await _controller.SortEmailAsync();
 
-        public void UndoSort_Click(Office.IRibbonControl control)
+        public async void UndoSort_Click(Office.IRibbonControl control)
         {
-            _controller.UndoSort();
+            await _controller.UndoSortAsync();
         }
 
         public bool ToggleDarkMode_GetPressed(Office.IRibbonControl control) => _controller.IsDarkModeActive();

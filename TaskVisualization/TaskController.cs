@@ -47,7 +47,7 @@ namespace TaskVisualization
 
 
             // First ToDoItem in list is cloned to _active and set to readonly
-            _active = (ToDoItem)_todo_list[0].Clone();
+            _active = _todo_list[0].DeepCopy();
             _active.ReadOnly = true;
 
             // All color categories in Outlook.Namespace are loaded to a sorted dictionary
@@ -83,7 +83,7 @@ namespace TaskVisualization
 
 
             // First ToDoItem in list is cloned to _active and set to readonly
-            _active = (ToDoItem)_todo_list[0].Clone();
+            _active = _todo_list[0].DeepCopy();
             _active.ReadOnly = true;
 
             // All color categories in Outlook.Namespace are loaded to a sorted dictionary
@@ -139,7 +139,7 @@ namespace TaskVisualization
                     }
             }
 
-            _viewer.KbSelector.SelectedItem = _active.KB.IsNullOrEmpty() ? "Backlog" : _active.KB;
+            _viewer.KbSelector.SelectedItem = _active.KB.AsStringNoPrefix.IsNullOrEmpty() ? "Backlog" : _active.KB.AsStringNoPrefix;
 
             if (_active.TotalWork == 0)
                 _active.TotalWork = _defaults.DefaultTaskLength;
@@ -385,7 +385,7 @@ namespace TaskVisualization
         /// <summary> Ensures ToDoItem model is in sync with changes in the viewer </summary>
         public void Assign_KB()
         {
-            _active.KB = _viewer.KbSelector.SelectedItem.ToString();
+            _active.KB.AsStringNoPrefix = _viewer.KbSelector.SelectedItem.ToString();
         }
 
         /// <summary> Ensures ToDoItem model is in sync with changes in the viewer </summary>
@@ -769,7 +769,7 @@ namespace TaskVisualization
                 if (_options.HasFlag(Enums.FlagsToSet.Bullpin))
                     c.Bullpin = _active.Bullpin;
                 if (_options.HasFlag(Enums.FlagsToSet.Kbf))
-                    c.KB = _active.KB;
+                    c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
 
                 c.WriteFlagsBatch();
                 c.ReadOnly = false;

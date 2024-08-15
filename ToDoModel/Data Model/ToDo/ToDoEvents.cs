@@ -11,6 +11,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS;
+using System.Threading.Tasks;
 //using Microsoft.VisualBasic;
 
 namespace ToDoModel
@@ -18,6 +19,9 @@ namespace ToDoModel
 
     public static class ToDoEvents
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static void Debug_OutputNsStores(Outlook.Application OlApp)
         {
             string storeList = string.Empty;
@@ -89,7 +93,7 @@ namespace ToDoModel
 
         }
         
-        public static List<object> GetListOfToDoItemsInView(Outlook.Application OlApp)
+        public static List<object> GetListOfToDoItemsInView(Outlook.Application olApp)
         {
             Items OlItems;
             Outlook.View objView;
@@ -98,11 +102,11 @@ namespace ToDoModel
             // QUESTION: ThisAddin.GetListOfToDoItemsInView When is this called? Is it needed?
             // CLEANUP: ThisAddin.GetListOfToDoItemsInView Move to a Class, Module or a Library depending on how it is used. 
 
-            objView = (Outlook.View)OlApp.ActiveExplorer().CurrentView;
+            objView = (Outlook.View)olApp.ActiveExplorer().CurrentView;
             strFilter = "@SQL=" + objView.Filter;
 
             OlItems = null;
-            foreach (Store oStore in OlApp.Session.Stores)
+            foreach (Store oStore in olApp.Session.Stores)
             {
                 OlFolder = (Folder)oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
                 OlItems = strFilter == "@SQL=" ? OlFolder.Items : OlFolder.Items.Restrict(strFilter);
@@ -112,6 +116,21 @@ namespace ToDoModel
                 ListObjects.Add(objItem);
             // GetToDoItemsInView = OlItems
             return ListObjects;
+        }
+
+        public static IAsyncEnumerable<object> GetAsyncEnumerableOfToDoItemsInView(Outlook.Application olApp) 
+        { 
+            var olView = (Outlook.View)olApp.ActiveExplorer().CurrentView;
+            var strFilter = "@SQL=" + olView.Filter;
+            var items = olApp.Session.Stores
+                ?.Cast<Store>()
+                ?.ToAsyncEnumerable()
+                ?.Select(store => store.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
+                ?.SelectMany(folder => 
+                    strFilter == "@SQL=" ? 
+                    folder?.Items?.Cast<object>()?.ToAsyncEnumerable() : 
+                    folder?.Items?.Restrict(strFilter)?.Cast<object>()?.ToAsyncEnumerable());
+            return items;   
         }
 
         public static Items GetToDoItemsInView(Outlook.Application OlApp)
@@ -177,38 +196,61 @@ namespace ToDoModel
         //    }
         //}
 
+        public static async Task RefreshToDoIdSplitsAsync(Outlook.Application olApp)
+        {
+            var itemsAsyncEnum = GetAsyncEnumerableOfToDoItemsInView(olApp);
+            await itemsAsyncEnum.ForEachAwaitAsync(
+                async item => await Task.Run(()=>TrySplitToDoID(item)));
+        }
+
+        private static void TrySplitToDoID(object item) 
+        {
+            try
+            {
+                new ToDoItem(new OutlookItem(item)).SplitID();
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            
+        }
+
+        [Obsolete]
         public static void Refresh_ToDoID_Splits(Outlook.Application OlApp)
         {
+            
             ToDoItem todo;
             var OlItems = GetToDoItemsInView(OlApp);
-            // QUESTION: Duplicate? If not, move to a class, module or library.
             foreach (var objItem in OlItems)
             {
-                todo = new ToDoItem(objItem, OnDemand: true);
+                todo = new ToDoItem(objItem, onDemand: true);
                 todo.SplitID();
             }
         }
 
         private static bool _blItemChangeRunning = false;
 
-        public static void OlToDoItems_ItemChange(object Item, Items OlToDoItems, IApplicationGlobals AppGlobals)
+        public static void OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
         {
             // TODO: Morph Functionality to handle proactively rather than reactively
             if (_blItemChangeRunning == false)
             {
                 _blItemChangeRunning = true;
 
-                var ProjInfo = AppGlobals.TD.ProjInfo;
-                var idList = AppGlobals.TD.IDList;
+                var ProjInfo = globals.TD.ProjInfo;
+                var idList = globals.TD.IDList;
 
-                var todo = new ToDoItem(Item, OnDemand: true);
+                var todo = new ToDoItem(new OutlookItem(item), onDemand: true);
                 
-                SynchronizeEC(OlToDoItems, todo);
+                SynchronizeEC(olToDoItems, todo);
 
                 AutoCodeId(ProjInfo, idList, todo);
                 
-                SynchronizeKanban(Item, todo);
-                
+                SynchronizeKanban(item, todo);
+
+                todo.OlItem.Save();
+
                 _blItemChangeRunning = false;
             }
 
@@ -240,10 +282,11 @@ namespace ToDoModel
                     }
                     olItem.Categories = strCats;
                     olItem.Save();
-                    todo.SetKB(value: "Completed");
+                    todo.KB.AsStringNoPrefix = "Completed";
+                    //todo.SetKB(value: "Completed");
                 }
             }
-            else if (todo.KB == "Completed")
+            else if (todo.KB.AsStringNoPrefix == "Completed")
             {
                 dynamic olItem = Item;
                 string strCats = (string)(olItem.Categories);
@@ -281,7 +324,8 @@ namespace ToDoModel
                 }
                 olItem.Categories = strCats;
                 olItem.Save();
-                todo.SetKB(value: strKB);
+                todo.KB.AsStringNoPrefix = strKB;
+                //todo.SetKB(value: strKB);
 
             }
         }
@@ -303,7 +347,7 @@ namespace ToDoModel
                     int intLVL = (int)Math.Round(Math.Truncate(todo.ToDoID.Length / 2d));
                     foreach (var objItem in OlChildren)
                     {
-                        var todoTmp = new ToDoItem(objItem, OnDemand: true);
+                        var todoTmp = new ToDoItem(new OutlookItem(objItem), onDemand: true);
 
                         // Set the toggle for that level to + or - for all descendants on the binary number
                         if ((todoTmp.ToDoID ?? "") != (todo.ToDoID ?? ""))
@@ -455,9 +499,9 @@ namespace ToDoModel
 
         }
 
-        public static void OlToDoItems_ItemAdd(object Item, IApplicationGlobals AppGlobals)
+        public static void OlToDoItems_ItemAdd(object item, IApplicationGlobals AppGlobals)
         {
-            var todo = new ToDoItem(Item, OnDemand: true);
+            var todo = new ToDoItem(new OutlookItem(item), onDemand: true);
             var ProjInfo = AppGlobals.TD.ProjInfo;
             var IDList = AppGlobals.TD.IDList;
             if (todo.ToDoID.Length == 0)
@@ -483,39 +527,6 @@ namespace ToDoModel
                 }
             }
             todo.VisibleTreeState = 63;
-        }
-
-        /// <summary>
-        /// This is a helper procedure to migrate ToDoIDs from one framework to another
-        /// </summary>
-        public static void MigrateToDoIDs(Outlook.Application OlApp)
-        {
-            // TODO: Move MigrateToDoIDs to a class, module, or library
-            var olItems = OlApp.GetNamespace("MAPI").GetDefaultFolder(OlDefaultFolders.olFolderToDo).Items;
-            int j = 0;
-            int i = 0;
-            foreach (var olItem in olItems)
-            {
-                var item = new ToDoItem(olItem, true);
-                if (item.OlItem.GetUdfString("NewID") != "20230606")
-                {
-                    string strToDoID = item.ToDoID;
-                    if (strToDoID.Length > 0)
-                    {
-                        string strToDoIDnew = SubstituteCharsInID(strToDoID);
-                        item.ToDoID = strToDoIDnew;
-                        item.OlItem.TrySetUdf("NewID", value: "20230606");
-                    }
-                }
-                i++;
-                if (++j == 40)
-                {
-                    j = 0;
-                    System.Windows.Forms.Application.DoEvents();
-                    Debug.WriteLine($"Converted {i} items");
-                }
-            }
-            MessageBox.Show("ToDoID Conversion Complete!");
         }
 
         private static string SubstituteCharsInID(string strToDoID)

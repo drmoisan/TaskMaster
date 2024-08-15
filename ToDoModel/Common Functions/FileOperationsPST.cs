@@ -141,7 +141,8 @@ namespace ToDoModel
                 {
 
                     __itemsPST_ItemChange_blIsRunning = true;
-                    var todo = new ToDoItem(olItem, OnDemand: true);
+                    //var todo = new ToDoItem(olItem, OnDemand: true);
+                    var todo = new ToDoItem(olItem, onDemand: true);
                     UserProperty objProperty_ToDoID = olItem.GetUdf("ToDoID");
                     UserProperty objProperty_Project = olItem.GetUdf("TagProject");
 
@@ -286,10 +287,10 @@ namespace ToDoModel
                                 strCats += "Tag KB Completed";
                             }
                             olItem.SetCategories(strCats);
-                            todo.KB = "Completed";
+                            todo.KB.AsStringNoPrefix = "Completed";
                         }
                     }
-                    else if (todo.KB == "Completed")
+                    else if (todo.KB.AsStringNoPrefix == "Completed")
                     {
                         string strCats = olItem.GetCategories();
 
@@ -325,7 +326,7 @@ namespace ToDoModel
                             strCats = strReplace;
                         }
                         olItem.SetCategories(strCats);
-                        todo.KB = strKB;
+                        todo.KB.AsStringNoPrefix = strKB;
 
                     }
                     __itemsPST_ItemChange_blIsRunning = false;

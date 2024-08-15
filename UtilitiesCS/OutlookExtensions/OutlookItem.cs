@@ -71,7 +71,7 @@ namespace UtilitiesCS
         public OutlookItem(object item)
         {
             _item = item;
-            _type = _item.GetType();
+            _type = _item?.GetType();
             _args = new Object[] { };
         }
         #endregion
@@ -209,12 +209,13 @@ namespace UtilitiesCS
             try
             {
                 // An invalid property name exception is propagated to client
-                return _type.InvokeMember(
+                var obj = _type.InvokeMember(
                     propertyName,
                     BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
                     null,
                     _item,
                     _args);
+                return obj;
             }
             catch (SystemException ex)
             {
@@ -252,12 +253,13 @@ namespace UtilitiesCS
             try
             {
                 // An invalid property name exception is propagated to client
-                return _type.InvokeMember(
+                var obj = _type.InvokeMember(
                     methodName,
                     BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,
                     _item,
                     _args);
+                return obj;
             }
             catch (SystemException)
             {

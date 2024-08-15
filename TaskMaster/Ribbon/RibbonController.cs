@@ -76,9 +76,9 @@ namespace TaskMaster
             MessageBox.Show("ID Refresh Complete");
         }
 
-        internal void SplitToDoID()
+        internal async Task SplitToDoIdAsync()
         {
-            ToDoEvents.Refresh_ToDoID_Splits(_globals.Ol.App);
+            await ToDoEvents.RefreshToDoIdSplitsAsync(_globals.Ol.App);
         }
 
         internal void LoadTaskTree()
@@ -132,12 +132,6 @@ namespace TaskMaster
             MessageBox.Show("ID Compression Complete");
         }
 
-        internal void BtnMigrateIDs_Click()
-        {
-            // Globals.ThisAddIn.MigrateToDoIDs()
-            ToDoEvents.MigrateToDoIDs(_globals.Ol.App);
-        }
-
         internal string GetHookButtonText(Office.IRibbonControl _)
         {
             if (blHook)
@@ -184,7 +178,7 @@ namespace TaskMaster
             taskFlagger.Run();
         }
 
-        internal async Task UndoSort()
+        internal async Task UndoSortAsync()
         {
             await UtilitiesCS.SortEmail.UndoAsync(_globals.AF.MovedMails, _globals);
         }
@@ -462,7 +456,7 @@ namespace TaskMaster
 
         internal void PopulateUdf()
         {
-            FlagTasks.PopulateUdf(null, _globals.Ol.App.ActiveExplorer(), _globals.TD.ProjInfo.Programs_ByProjectNames);
+            FlagTasks.PopulateUdf(null, _globals);
         }
 
         internal void TryDeepCompareEmails()

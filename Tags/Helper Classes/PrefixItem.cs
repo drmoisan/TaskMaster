@@ -30,7 +30,7 @@ namespace Tags
         private PrefixTypeEnum _prefixType;
         public PrefixTypeEnum PrefixType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        private string _olUserFieldName;
+        //private string _olUserFieldName;
         public string OlUserFieldName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 

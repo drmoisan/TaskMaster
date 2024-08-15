@@ -22,10 +22,13 @@ namespace UtilitiesCS.OutlookExtensions
 
         public OutlookItemFlaggable(OutlookItem item) : base()
         {
-            base._item = item.InnerObject;
-            base._type = item.InnerObject.GetType();
-            base._args = item.Args;
-            _olType = this.GetOlItemType();
+            if (item is not null)
+            {
+                base._item = item.InnerObject;
+                base._type = item.InnerObject?.GetType();
+                base._args = item.Args;
+                _olType = this.GetOlItemType();
+            }
         }
 
         private OlItemType _olType;

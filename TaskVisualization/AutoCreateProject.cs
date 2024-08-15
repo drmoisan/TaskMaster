@@ -14,7 +14,7 @@ namespace TaskVisualization
     public class AutoCreateProject(IApplicationGlobals globals) : IAutoAssign
     {
         private readonly IApplicationGlobals _globals = globals;
-        private readonly IList<IPrefix> _prefixes;
+        //private readonly IList<IPrefix> _prefixes;
 
         public IList<string> FilterList => [.. _globals.TD.CategoryFilters];
 
@@ -94,14 +94,11 @@ namespace TaskVisualization
         {
             var taskItems = GetTaskItems();
             var taskItem = (TaskItem)taskItems.Add(OlItemType.olTaskItem);
-            var todo = new ToDoItem(taskItem);
+            var todo = new ToDoItem(new OutlookItem(taskItem));
             todo.ToDoID = projectID;
             todo.TaskSubject = projectName;
             todo.Projects.AsStringNoPrefix = projectName;
-            todo.Context.AsStringNoPrefix = "PROJECTS";
-            //taskItem.Save();
-            //PrefixTypeEnum.
-            
+            todo.Context.AsStringNoPrefix = "PROJECTS";            
         }
 
         internal Items GetTaskItems()

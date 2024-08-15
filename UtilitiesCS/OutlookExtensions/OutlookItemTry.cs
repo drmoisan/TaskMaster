@@ -49,7 +49,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         public string Companies { get => TryGet(() => _olItem.Companies); set => TrySet<string>((x) => _olItem.Companies = x, value); }
 
-        public Outlook.OlObjectClass Class => TryGet(() => _olItem.Class);
+        public Outlook.OlObjectClass OlObjectClass => TryGet(() => _olItem.Class);
         //{
         //    get
         //    {

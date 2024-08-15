@@ -89,7 +89,6 @@
     <Compile Include="Common Functions\FileOperationsPST.cs" />
     <Compile Include="Data Model\ID\BaseChanger.cs" />
     <Compile Include="Data Model\ID\IDList.cs" />
-    <Compile Include="Data Model\ID\IDListUtilities.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionary.cs" />
     <Compile Include="Data Model\Project\ProgramData.cs" />
     <Compile Include="Data Model\Project\ProjectData.cs" />

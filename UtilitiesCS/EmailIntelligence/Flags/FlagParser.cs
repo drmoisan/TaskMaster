@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UtilitiesCS;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
+using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS
 {
     /// <summary>
     /// Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
     /// </summary>
-    public class FlagParser: INotifyCollectionChanged//, INotifyPropertyChanged
+    public class FlagParser: INotifyCollectionChanged, ICloneable
     {
         #region Constructors and Initializers
 
@@ -25,6 +24,7 @@ namespace UtilitiesCS
         /// <param name="deleteSearchSubString"></param>
         public FlagParser(ref string categoryString, bool deleteSearchSubString = false)
         {
+            _wiring = new Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>>(GetWiring);
             if (categoryString is null)
                 categoryString = "";
 
@@ -34,6 +34,7 @@ namespace UtilitiesCS
 
         public FlagParser(IList<string> categories)
         {
+            _wiring = new Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>>(GetWiring);
             Initialize(categories);
         }
 
@@ -47,14 +48,15 @@ namespace UtilitiesCS
             Kb.List = FindMatches(categories, Kb.Prefix);
 
             categories = categories.Except(_people.ListWithPrefix)
-                                       .Except(_projects.ListWithPrefix)
-                                       .Except(_topics.ListWithPrefix)
-                                       .Except(_context.ListWithPrefix)
-                                       .Except(_kb.ListWithPrefix).ToList();
+                                   .Except(_projects.ListWithPrefix)
+                                   .Except(_topics.ListWithPrefix)
+                                   .Except(_context.ListWithPrefix)
+                                   .Except(_kb.ListWithPrefix)
+                                   .ToList();
 
             Today = categories.Remove(Properties.Settings.Default.Prefix_Today);
             Bullpin = categories.Remove(Properties.Settings.Default.Prefix_Bullpin);
-            Other = categories.Count > 0 ? string.Join(", ", categories) : "";
+            Other = categories.Count > 0 ? string.Join(", ", categories) : "";            
             WireEvents();
         }
 
@@ -62,7 +64,7 @@ namespace UtilitiesCS
 
         #region Context
 
-        private readonly FlagDetails _context = new FlagDetails(Properties.Settings.Default.Prefix_Context);
+        private FlagDetails _context = new(Properties.Settings.Default.Prefix_Context);
         internal FlagDetails Context => _context;
 
         /// <summary>
@@ -89,7 +91,7 @@ namespace UtilitiesCS
 
         #region Projects
 
-        private readonly FlagDetails _projects = new FlagDetails(Properties.Settings.Default.Prefix_Project);
+        private FlagDetails _projects = new(Properties.Settings.Default.Prefix_Project);
         internal FlagDetails Projects => _projects;
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace UtilitiesCS
 
         #region Program
 
-        private readonly FlagDetails _program = new FlagDetails(Properties.Settings.Default.Prefix_Program);
+        private FlagDetails _program = new(Properties.Settings.Default.Prefix_Program);
         internal FlagDetails Program => _program;
 
         /// <summary>
@@ -143,7 +145,7 @@ namespace UtilitiesCS
 
         #region Topics
 
-        private readonly FlagDetails _topics = new FlagDetails(Properties.Settings.Default.Prefix_Topic);
+        private FlagDetails _topics = new(Properties.Settings.Default.Prefix_Topic);
         internal FlagDetails Topics => _topics;
 
         /// <summary>
@@ -170,7 +172,7 @@ namespace UtilitiesCS
 
         #region People
 
-        private readonly FlagDetails _people = new FlagDetails(Properties.Settings.Default.Prefix_People);
+        private FlagDetails _people = new FlagDetails(Properties.Settings.Default.Prefix_People);
         internal FlagDetails People => _people;
 
         /// <summary>
@@ -191,7 +193,7 @@ namespace UtilitiesCS
 
         #region Kanban
 
-        private readonly FlagDetails _kb = new FlagDetails(Properties.Settings.Default.Prefix_KB);
+        private FlagDetails _kb = new FlagDetails(Properties.Settings.Default.Prefix_KB);
         internal FlagDetails Kb => _kb;
 
         public string GetKb(bool includePrefix = false)
@@ -250,7 +252,7 @@ namespace UtilitiesCS
 
         #region INotifyCollectionChanged Implementation
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged { add { } remove { } }
         public event NotifyCollectionChangedEventHandler PeopleChanged;
         public event NotifyCollectionChangedEventHandler ProjectsChanged;
         public event NotifyCollectionChangedEventHandler ProgramChanged;
@@ -265,6 +267,21 @@ namespace UtilitiesCS
         private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ContextChanged?.Invoke(sender, e);
         private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => KbChanged?.Invoke(sender, e);
 
+        private Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>> _wiring;
+        internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring { get => _wiring.Value; set => _wiring = value.ToLazy(); }
+        private Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> GetWiring()
+        {
+            return new()
+            {
+                { People,  People_CollectionChanged },
+                { Projects , Projects_CollectionChanged },
+                { Program , Program_CollectionChanged   },
+                { Topics , Topics_CollectionChanged },
+                { Context , Context_CollectionChanged },
+                { Kb , Kb_CollectionChanged }
+            };
+        }
+
         public void WireEvents()
         {
             _people.CollectionChanged += People_CollectionChanged;
@@ -275,7 +292,40 @@ namespace UtilitiesCS
             _kb.CollectionChanged += Kb_CollectionChanged;
         }
 
+        public void UnWireEvents() => Wiring.ForEach(x => UnWireFlagParserEvent(x.Key, x.Value));        
+
+        public void UnWireFlagParserEvent(FlagDetails flagDetails,NotifyCollectionChangedEventHandler handler)
+        {
+            if (flagDetails is not null)
+            {
+                flagDetails.CollectionChanged -= handler;
+            }
+        }
+
         #endregion
+
+        #region IClonable
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public FlagParser DeepCopy()
+        {
+            var clone = (FlagParser)this.MemberwiseClone();
+            clone.UnWireEvents();
+            clone._context = _context.DeepCopy();
+            clone._people = _people.DeepCopy();
+            clone._projects = _projects.DeepCopy();
+            clone._program = _program.DeepCopy();
+            clone._topics = _topics.DeepCopy();
+            clone._kb = _kb.DeepCopy();
+            clone.WireEvents();
+            return clone;
+        }
+
+        #endregion IClonable
 
         #region Helper Methods
 
@@ -341,8 +391,8 @@ namespace UtilitiesCS
 
         }
 
-        #endregion
-    
+        #endregion Helper Methods
+
     }
 
 

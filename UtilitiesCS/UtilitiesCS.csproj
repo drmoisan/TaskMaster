@@ -518,8 +518,9 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
-    <Compile Include="HelperClasses\DeepCompare.cs" />
-    <Compile Include="HelperClasses\DispatchUtility.cs" />
+    <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
+    <Compile Include="HelperClasses\CloningFunctions\DispatchUtility.cs" />
+    <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="NewtonsoftHelpers\NLogTraceWriter.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
@@ -582,9 +583,9 @@
     <Compile Include="Extensions\LazyExtension.cs" />
     <Compile Include="Extensions\NullExtensions.cs" />
     <Compile Include="Extensions\TraceExtensions.cs" />
-    <Compile Include="HelperClasses\ComStreamWrapper.cs" />
+    <Compile Include="HelperClasses\WipUnfinished\ComStreamWrapper.cs" />
     <Compile Include="HelperClasses\ObjectSize.cs" />
-    <Compile Include="HelperClasses\ObjectCopier.cs" />
+    <Compile Include="HelperClasses\CloningFunctions\ObjectCopier.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
@@ -604,8 +605,8 @@
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="ReusableTypeClasses\AsyncLazy.cs" />
-    <Compile Include="HelperClasses\DebugTextLogger.cs" />
-    <Compile Include="HelperClasses\DebugTextWriter.cs" />
+    <Compile Include="HelperClasses\Logging\DebugTextLogger.cs" />
+    <Compile Include="HelperClasses\Logging\DebugTextWriter.cs" />
     <Compile Include="HelperClasses\DvgForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -629,16 +630,16 @@
     <Compile Include="Threading\ProgressViewer.Designer.cs">
       <DependentUpon>ProgressViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="HelperClasses\QfcTipsDetails.cs" />
+    <Compile Include="HelperClasses\ToolTips\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="HelperClasses\SegmentStopWatch.cs" />
     <Compile Include="HelperClasses\ShellUtilities.cs" />
-    <Compile Include="HelperClasses\TimedBatchAction.cs" />
-    <Compile Include="HelperClasses\VerboseLogger.cs" />
+    <Compile Include="HelperClasses\TimedActions\TimedBatchAction.cs" />
+    <Compile Include="HelperClasses\Logging\VerboseLogger.cs" />
     <Compile Include="Interfaces\IGlobals\IAppQuickFilerSettings.cs" />
     <Compile Include="Interfaces\ITimerWrapper.cs" />
-    <Compile Include="HelperClasses\TimedDiskWriter.cs" />
-    <Compile Include="HelperClasses\TimerWrapper.cs" />
+    <Compile Include="HelperClasses\TimedActions\TimedDiskWriter.cs" />
+    <Compile Include="HelperClasses\TimedActions\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
     <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\RecipientInfo.cs" />
@@ -659,7 +660,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\WinFormsExtensions.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\ConversationHelper.cs" />
-    <Compile Include="HelperClasses\GenericBitwise.cs" />
+    <Compile Include="HelperClasses\BinaryFlags\GenericBitwise.cs" />
     <Compile Include="HelperClasses\Initializer.cs" />
     <Compile Include="HelperClasses\MailResolution.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations.cs" />
@@ -668,11 +669,11 @@
     <Compile Include="Threading\ProgressTracker.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
     <Compile Include="HelperClasses\TableLayoutHelper.cs" />
-    <Compile Include="HelperClasses\Theme.cs" />
-    <Compile Include="HelperClasses\ThemeControlGroup.cs" />
-    <Compile Include="HelperClasses\TipsController.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\Theme.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\ThemeControlGroup.cs" />
+    <Compile Include="HelperClasses\ToolTips\TipsController.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
-    <Compile Include="HelperClasses\TraceUtility.cs" />
+    <Compile Include="HelperClasses\Logging\TraceUtility.cs" />
     <Compile Include="Interfaces\Enums.cs" />
     <Compile Include="Interfaces\IAppEvents.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IMovedMailInfo.cs" />

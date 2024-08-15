@@ -15,7 +15,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-    public class FlagDetails : INotifyCollectionChanged
+    public class FlagDetails : INotifyCollectionChanged, ICloneable
     {
         #region Constructors and Initializers
 
@@ -141,8 +141,26 @@ namespace UtilitiesCS
 
         #endregion
 
+        #region IClonable
 
-       
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public FlagDetails DeepCopy()
+        {
+            var clone = (FlagDetails)MemberwiseClone();
+            clone.Unsubscribe();
+            clone.UnsubscribeWithPrefix();
+            clone._list = new ObservableCollection<string>(_list);
+            clone._listWithPrefix = new ObservableCollection<string>(_listWithPrefix);
+            clone.Subscribe();
+            clone.SubscribeWithPrefix();
+            return clone;
+        }
+
+        #endregion IClonable
 
     }
 }
