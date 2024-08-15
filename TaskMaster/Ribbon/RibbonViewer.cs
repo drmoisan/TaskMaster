@@ -109,12 +109,6 @@ namespace TaskMaster
             return _controller.GetHookButtonText(control);
         }
 
-        public void BtnMigrateIDs_Click(Office.IRibbonControl control)
-        {
-            _controller.BtnMigrateIDs_Click();
-            // MessageBox.Show("Not Implemented");
-        }
-
         public void BtnPopulateUdf_Click(Office.IRibbonControl control) => _controller.PopulateUdf();
         
         //public void QuickFilerOld_Click(Office.IRibbonControl control)
