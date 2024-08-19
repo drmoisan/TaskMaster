@@ -44,7 +44,7 @@ namespace TaskMaster
         private IApplicationGlobals _globals;
         
         private Items _olToDoItems;
-        private Items OlToDoItems
+        public Items OlToDoItems
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -53,7 +53,7 @@ namespace TaskMaster
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
-            set
+            private set
             {
                 if (_olToDoItems != null)
                 {

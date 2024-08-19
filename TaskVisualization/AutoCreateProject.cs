@@ -95,6 +95,7 @@ namespace TaskVisualization
             var taskItems = GetTaskItems();
             var taskItem = (TaskItem)taskItems.Add(OlItemType.olTaskItem);
             var todo = new ToDoItem(new OutlookItem(taskItem));
+            todo.IdAutoCoding = false;
             todo.ToDoID = projectID;
             todo.TaskSubject = projectName;
             todo.Projects.AsStringNoPrefix = projectName;

@@ -223,6 +223,35 @@ namespace UtilitiesCS
             return dfTemp;
         }
 
+        private static async Task<Frame<int, string>> FromDefaultFolderAsync(Store store,
+                                                           OlDefaultFolders folderEnum,
+                                                           string[] removeColumns,
+                                                           string[] addColumns,
+                                                           CancellationToken cancel,
+                                                           int maxAttempts)
+        {
+            var table = await store.GetTableAsync(folderEnum: folderEnum,
+                                    removeColumns: removeColumns,
+                                    addColumns: addColumns,
+                                    cancel: cancel,
+                                    maxAttempts: maxAttempts) as Table;
+
+            if (table is null) { return null; }
+
+            (IAsyncEnumerable<Row> rows,
+                Dictionary<string, int> columnDictionary,
+                Dictionary<string, Func<object, string>> objectConverters,
+                IOrderedEnumerable<int> binIndices,
+                IEnumerable<string> objFields,
+                IEnumerable<int> objIndices) = await table.EtlPrepAsync(cancel);
+            var jagged = await rows.EtlByRowAsync(objectConverters, binIndices, objFields, objIndices).ToArrayAsync();
+            
+            var data = jagged.To2D();
+            Frame<int, string> df = FromArray2D(data: data, columnDictionary);
+
+            return df;
+        }
+
         public static Frame<int, string> FromDefaultFolder(Store store,
                                                            OlDefaultFolders folderEnum,
                                                            string[] removeColumns,
@@ -259,11 +288,7 @@ namespace UtilitiesCS
                 if (df is null) { df = dfEid; }
                 else if (dfTemp is not null) 
                 {
-                    //df.Print();
-                    //dfEid.Print();
                     df = df.Merge(dfEid);
-                    //df.Print();
-
                 }
             }
             // Set the index to the integer index as originally designed to maintain forward compatibility

@@ -65,16 +65,34 @@ namespace TaskVisualization
 
         public static List<ToDoItem> InitializeToDoList(IList itemList, IApplicationGlobals globals)
         {
-            //globals.TD.ProjInfo.Programs_ByProjectNames
-            return (itemList?.Cast<object>() ?? GetSelection(globals.Ol.App.ActiveExplorer()))?
-                .Select(x => new OutlookItem(x))?
-                .Select(x =>
+            var olItems = (itemList?.Cast<object>() ?? GetSelection(globals.Ol.App.ActiveExplorer()))
+                ?.Select(x => new OutlookItem(x)).ToArray();
+            if (olItems is null) { return null;  }
+
+            var todoList = Enumerable.Range(0, olItems.Count())
+                .Select(i =>
                 {
-                    var todo = new ToDoItem(x);
+                    var todo = new ToDoItem(olItems[i]);
+                    todo.Identifier = $"Original list index: {i}";
                     todo.ProjectsToPrograms = globals.TD.ProjInfo.Programs_ByProjectNames;
+                    todo.ProjectData = globals.TD.ProjInfo;
+                    todo.IdList = globals.TD.IDList;
                     return todo;
-                })?
-                .ToList();
+                })
+                ?.ToList();
+
+            //var todoList = (itemList?.Cast<object>() ?? GetSelection(globals.Ol.App.ActiveExplorer()))
+            //    ?.Select(x => new OutlookItem(x))
+            //    .Select(x =>
+            //    {
+            //        var todo = new ToDoItem(x);
+            //        todo.ProjectsToPrograms = globals.TD.ProjInfo.Programs_ByProjectNames;
+            //        todo.ProjectData = globals.TD.ProjInfo;
+            //        return todo;
+            //    })?
+            //    .ToList();
+
+            return todoList;
         }
 
         public static void PopulateUdf(IList itemList, IApplicationGlobals globals) 

@@ -9,6 +9,7 @@ using Microsoft.Office.Interop.Outlook;
 using Deedle;
 using System.Windows.Forms;
 using UtilitiesCS.OutlookExtensions;
+using System.Web.UI.WebControls;
 
 namespace ToDoModel
 {
@@ -129,6 +130,50 @@ namespace ToDoModel
             this.Serialize();
         }
 
+        public async Task<string> SubstituteIdRootAsync(string oldId, string newRoot, string oldRoot) 
+        {
+            return await Task.Run(() => 
+            { 
+                var newId = oldId.Replace(oldRoot, newRoot);
+                this.Remove(oldId);
+                this.Add(newId);
+                this.Serialize();
+                return newId;
+            });
+                
+            
+        }
+
+        public IAsyncEnumerable<IToDoItem> GetItemsWithRootIdAsync(string rootId) 
+        {
+            var strFilter = $"@SQL={OlTableExtensions.SchemaToDoID} like '{rootId}%'";
+            var items = _olApp.Session.Stores
+                ?.Cast<Store>()
+                ?.ToAsyncEnumerable()
+                ?.Select(TryGetDefaultToDoFolder)
+                ?.Where(store => store is not null)
+                ?.SelectMany(folder => 
+                    folder?
+                    .Items?
+                    .Restrict(strFilter)?
+                    .Cast<object>()?
+                    .ToAsyncEnumerable()?
+                    .Select(x => new ToDoItem(new OutlookItem(x))));
+            return items;
+        }
+
+        internal MAPIFolder TryGetDefaultToDoFolder(Store store)
+        {
+            try
+            {
+                return store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
+        }
+
         public void SubstituteIdRoot(string oldPrefix, string newPrefix)
         {
             if (_olApp is null)
@@ -141,12 +186,12 @@ namespace ToDoModel
                 var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
                                                     folderEnum: OlDefaultFolders.olFolderToDo,
                                                     removeColumns: null, 
-                                                    addColumns: new string[]
-                                                    {
+                                                    addColumns:
+                                                    [
                                                         OlTableExtensions.SchemaToDoID,
                                                         "Categories",
                                                         OlTableExtensions.SchemaMessageStore
-                                                    });
+                                                    ]);
 
                 df = df.FillMissing("");
                 var df2 = df.Where(x => ((string)x.Value["ToDoID"]).Contains(oldPrefix));

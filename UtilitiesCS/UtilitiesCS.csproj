@@ -520,7 +520,9 @@
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DispatchUtility.cs" />
+    <Compile Include="HelperClasses\ParamArray.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
+    <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
     <Compile Include="NewtonsoftHelpers\NLogTraceWriter.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />

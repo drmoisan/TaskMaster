@@ -24,7 +24,7 @@ namespace UtilitiesCS
         /// <param name="deleteSearchSubString"></param>
         public FlagParser(ref string categoryString, bool deleteSearchSubString = false)
         {
-            _wiring = new Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>>(GetWiring);
+            //_wiring = new Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>>(GetWiring);
             if (categoryString is null)
                 categoryString = "";
 
@@ -34,7 +34,7 @@ namespace UtilitiesCS
 
         public FlagParser(IList<string> categories)
         {
-            _wiring = new Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>>(GetWiring);
+            //_wiring = new Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>>(GetWiring);
             Initialize(categories);
         }
 
@@ -61,6 +61,17 @@ namespace UtilitiesCS
         }
 
         #endregion Constructors and Initializers
+
+        private string identifier = "not set";
+        public string Identifier 
+        { 
+            get => identifier;
+            set 
+            { 
+                identifier = value; 
+                Wiring.ForEach(x => x.Key.Identifier = value);
+            }
+        }
 
         #region Context
 
@@ -267,8 +278,9 @@ namespace UtilitiesCS
         private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ContextChanged?.Invoke(sender, e);
         private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => KbChanged?.Invoke(sender, e);
 
-        private Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>> _wiring;
-        internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring { get => _wiring.Value; set => _wiring = value.ToLazy(); }
+        //private Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>> _wiring;
+        //internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring { get => _wiring.Value; set => _wiring = value.ToLazy(); }
+        internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring { get => GetWiring(); }
         private Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> GetWiring()
         {
             return new()
@@ -313,14 +325,23 @@ namespace UtilitiesCS
 
         public FlagParser DeepCopy()
         {
+            lock (this)
+            {
+                return DeepCopyInternal();
+            }
+        }
+
+        private FlagParser DeepCopyInternal()
+        {
+            UnWireEvents();
             var clone = (FlagParser)this.MemberwiseClone();
-            clone.UnWireEvents();
             clone._context = _context.DeepCopy();
             clone._people = _people.DeepCopy();
             clone._projects = _projects.DeepCopy();
             clone._program = _program.DeepCopy();
             clone._topics = _topics.DeepCopy();
             clone._kb = _kb.DeepCopy();
+            WireEvents();
             clone.WireEvents();
             return clone;
         }

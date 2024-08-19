@@ -36,6 +36,9 @@ namespace UtilitiesCS
 
         #region Public Properties
 
+        private string identifier = "not set";
+        public string Identifier { get => identifier; set => identifier = value; }
+
         private ObservableCollection<string> _list = new();
         public ObservableCollection<string> List
         {
@@ -63,7 +66,7 @@ namespace UtilitiesCS
                         var oldValue = _list;
                         _list = value;
                         Subscribe();
-                        List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                        List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,oldValue, value));
                     }
                 }
             }
@@ -150,11 +153,21 @@ namespace UtilitiesCS
 
         public FlagDetails DeepCopy()
         {
+            lock (this)
+            {
+                return DeepCopyInternal();
+            }            
+        }
+
+        private FlagDetails DeepCopyInternal() 
+        {
+            Unsubscribe();
+            UnsubscribeWithPrefix();
             var clone = (FlagDetails)MemberwiseClone();
-            clone.Unsubscribe();
-            clone.UnsubscribeWithPrefix();
             clone._list = new ObservableCollection<string>(_list);
             clone._listWithPrefix = new ObservableCollection<string>(_listWithPrefix);
+            Subscribe();
+            SubscribeWithPrefix();
             clone.Subscribe();
             clone.SubscribeWithPrefix();
             return clone;

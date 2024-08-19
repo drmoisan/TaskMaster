@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using Tags;
@@ -49,6 +50,8 @@ namespace TaskVisualization
             // First ToDoItem in list is cloned to _active and set to readonly
             _active = _todo_list[0].DeepCopy();
             _active.ReadOnly = true;
+            _active.Identifier = "ReadOnly Clone From Task Controller";
+            _todo_list[0].Identifier = "Original ToDoItem passed into Task Controller";
 
             // All color categories in Outlook.Namespace are loaded to a sorted dictionary
             _dict_categories = new SortedDictionary<string, bool>();
@@ -85,6 +88,8 @@ namespace TaskVisualization
             // First ToDoItem in list is cloned to _active and set to readonly
             _active = _todo_list[0].DeepCopy();
             _active.ReadOnly = true;
+            _active.Identifier = "ReadOnly Clone From Task Controller";
+            _todo_list[0].Identifier = "Original ToDoItem passed into Task Controller";
 
             // All color categories in Outlook.Namespace are loaded to a sorted dictionary
             _dict_categories = new SortedDictionary<string, bool>();
@@ -437,7 +442,7 @@ namespace TaskVisualization
         /// Method determines if any category has been selected and copies the flags from the 
         /// sample _active item to all members of _todo_list based on flags set in _options
         /// </summary>
-        public void OK_Action()
+        public async Task OK_Action()
         {
             if (AnyCategorySelected)
             {
@@ -455,7 +460,7 @@ namespace TaskVisualization
                 _viewer.Hide();
 
                 // Apply values captured in _active to each member of _todo_list for flags in _options
-                ApplyChanges();
+                await Task.Run(ApplyChanges);
 
                 _viewer.DialogResult = DialogResult.OK;
 
@@ -747,13 +752,15 @@ namespace TaskVisualization
         /// <summary>
         /// Iterates through _todo_list and applies the values in _active for the fields in _options
         /// </summary>
-        private void ApplyChanges()
-        {
+        private async Task ApplyChanges()
+        {            
             foreach (ToDoItem c in _todo_list)
             {
-                c.FlagAsTask = true;
-                c.ReadOnly = true;
+                ToDoEvents.Editing.AddOrUpdate(c.OlItem.EntryID, 1, (key, existing) => existing + 1);
 
+                c.FlagAsTask = true;
+
+                c.ReadOnly = true;
                 if (_options.HasFlag(Enums.FlagsToSet.Context))
                     c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
                 if (_options.HasFlag(Enums.FlagsToSet.People))
@@ -771,7 +778,7 @@ namespace TaskVisualization
                 if (_options.HasFlag(Enums.FlagsToSet.Kbf))
                     c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
 
-                c.WriteFlagsBatch();
+                await c.WriteFlagsBatch();
                 c.ReadOnly = false;
 
                 if (_options.HasFlag(Enums.FlagsToSet.Priority))
@@ -784,6 +791,8 @@ namespace TaskVisualization
                     c.DueDate = _active.DueDate;
                 if (_options.HasFlag(Enums.FlagsToSet.Reminder))
                     c.ReminderTime = _active.ReminderTime;
+
+                ToDoEvents.Editing.UpdateOrRemove(c.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
             }
         }
 

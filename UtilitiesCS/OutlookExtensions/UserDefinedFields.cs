@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,9 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public static class UserDefinedFields
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static void DeleteUdf(this MailItem item, string fieldName)
         {
             UserProperty property = item.UserProperties.Find(fieldName);
@@ -177,8 +181,16 @@ namespace UtilitiesCS.OutlookExtensions
         /// <returns>true if exists. false if it does not exist</returns>
         public static bool UdfExists(this OutlookItem item, string fieldName)
         {
-            UserProperty objProperty = item.UserProperties.Find(fieldName);
-            return objProperty is not null;
+            UserProperty objProperty = null;
+            try
+            {
+                objProperty = item.UserProperties.Find(fieldName);
+                return true;
+            }
+            catch (System.Exception) 
+            {
+                return false;
+            }            
         }
 
         /// <summary>
@@ -219,7 +231,7 @@ namespace UtilitiesCS.OutlookExtensions
                 return false;
             }
         }
-
+                        
         /// <summary>
         /// Extension function to set a user defined property on an Outlook item of unknown type. 
         /// </summary>
@@ -252,6 +264,18 @@ namespace UtilitiesCS.OutlookExtensions
             property.Value = value;
             item.Save();
         }
+
+        public static void SetUdf(this OutlookItem olItem, string[] schemasNames, object[] values)
+        {
+            var oPA = olItem.PropertyAccessor;
+            var arrErrors = oPA.SetProperties(schemasNames, values);
+            var errors = arrErrors as object[];
+            if (!errors.IsNullOrEmpty())
+            {
+                logger.Debug($"Errors in setting properties: {string.Join(", ", errors)}");
+            }
+        }
+
         private static Dictionary<OlUserPropertyType, Type> udfTypeLookup = new Dictionary<OlUserPropertyType, Type> 
         {
             {OlUserPropertyType.olText, typeof(string)},

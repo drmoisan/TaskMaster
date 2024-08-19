@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 //using Microsoft.VisualBasic;
 
 namespace ToDoModel
@@ -21,6 +22,9 @@ namespace ToDoModel
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private static ConcurrentDictionary<string, int> _editing = new();
+        public static ConcurrentDictionary<string, int> Editing => _editing;
 
         private static void Debug_OutputNsStores(Outlook.Application OlApp)
         {
@@ -117,7 +121,7 @@ namespace ToDoModel
             // GetToDoItemsInView = OlItems
             return ListObjects;
         }
-
+                
         public static IAsyncEnumerable<object> GetAsyncEnumerableOfToDoItemsInView(Outlook.Application olApp) 
         { 
             var olView = (Outlook.View)olApp.ActiveExplorer().CurrentView;
@@ -231,27 +235,27 @@ namespace ToDoModel
 
         private static bool _blItemChangeRunning = false;
 
-        public static void OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
+        public static async void OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
         {
             // TODO: Morph Functionality to handle proactively rather than reactively
-            if (_blItemChangeRunning == false)
+            var olItem = new OutlookItem(item);
+            if (Editing.TryAdd(olItem.EntryID, 1))
             {
-                _blItemChangeRunning = true;
-
                 var ProjInfo = globals.TD.ProjInfo;
                 var idList = globals.TD.IDList;
 
-                var todo = new ToDoItem(new OutlookItem(item), onDemand: true);
-                
-                SynchronizeEC(olToDoItems, todo);
+                var todo = new ToDoItem(olItem);
+                todo.Identifier = $"ItemChangeEvent: {todo.ToDoID}";
+                todo.ProjectData = ProjInfo;
+                todo.IdList = idList;
+                todo.ProjectsToPrograms = ProjInfo.Programs_ByProjectNames;
 
-                AutoCodeId(ProjInfo, idList, todo);
-                
-                SynchronizeKanban(item, todo);
+                await Task.Run(() => SynchronizeEC(olToDoItems, todo));
+                //await Task.Run(() => AutoCodeId(ProjInfo, idList, todo));                
+                await Task.Run(() => SynchronizeKanban(item, todo));
+                await Task.Delay(500);
 
-                todo.OlItem.Save();
-
-                _blItemChangeRunning = false;
+                Editing.TryRemove(olItem.EntryID, out _);
             }
 
         }
@@ -501,32 +505,38 @@ namespace ToDoModel
 
         public static void OlToDoItems_ItemAdd(object item, IApplicationGlobals AppGlobals)
         {
-            var todo = new ToDoItem(new OutlookItem(item), onDemand: true);
-            var ProjInfo = AppGlobals.TD.ProjInfo;
-            var IDList = AppGlobals.TD.IDList;
-            if (todo.ToDoID.Length == 0)
+            var olItem = new OutlookItem(item);
+            if (Editing.TryAdd(olItem.EntryID, 1)) 
             {
-                if (todo.Projects.AsListWithPrefix.Count != 0)
+                var todo = new ToDoItem(olItem);
+                var ProjInfo = AppGlobals.TD.ProjInfo;
+                var IDList = AppGlobals.TD.IDList;
+                if (todo.ToDoID.Length == 0)
                 {
-                    foreach (var projectName in todo.Projects.AsListWithPrefix)
+                    if (todo.Projects.AsListWithPrefix.Count != 0)
                     {
-                        if (ProjInfo.Contains_ProjectName(projectName))
+                        foreach (var projectName in todo.Projects.AsListWithPrefix)
                         {
-                            string strProjectToDo = ProjInfo.Find_ByProjectName(projectName).First().ProjectID;
-                            // Add the next ToDoID available in that branch
-                            todo.ToDoID = IDList.GetNextToDoID(strProjectToDo + "00");
-                            todo.Program.AsStringNoPrefix = ProjInfo.Find_ByProjectName(projectName).First().ProgramName;
-                            IDList.Serialize();
-                            todo.SplitID();
+                            if (ProjInfo.Contains_ProjectName(projectName))
+                            {
+                                string strProjectToDo = ProjInfo.Find_ByProjectName(projectName).First().ProjectID;
+                                // Add the next ToDoID available in that branch
+                                todo.ToDoID = IDList.GetNextToDoID(strProjectToDo + "00");
+                                todo.Program.AsStringNoPrefix = ProjInfo.Find_ByProjectName(projectName).First().ProgramName;
+                                IDList.Serialize();
+                                todo.SplitID();
+                            }
                         }
-                    }   
+                    }
+                    else
+                    {
+                        todo.ToDoID = IDList.GetNextToDoID();
+                    }
                 }
-                else
-                {
-                    todo.ToDoID = IDList.GetNextToDoID();
-                }
-            }
-            todo.VisibleTreeState = 63;
+                todo.VisibleTreeState = 63;
+
+                Editing.TryRemove(olItem.EntryID, out _);
+            }            
         }
 
         private static string SubstituteCharsInID(string strToDoID)

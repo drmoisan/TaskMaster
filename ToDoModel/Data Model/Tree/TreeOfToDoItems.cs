@@ -16,22 +16,19 @@ namespace ToDoModel
     {
         #region constructors 
 
-        public TreeOfToDoItems()
-        {
-            ListOfToDoTree = new List<TreeNode<ToDoItem>>();
-        }
+        public TreeOfToDoItems() { }
 
         public TreeOfToDoItems(List<TreeNode<ToDoItem>> todoTree)
         {
-            _todoTree = todoTree;
+            Roots = todoTree;
         }
 
         #endregion
 
         #region Initialize and Access Encapsulated Tree
 
-        private List<TreeNode<ToDoItem>> _todoTree = new List<TreeNode<ToDoItem>>();        
-        public List<TreeNode<ToDoItem>> ListOfToDoTree { get => _todoTree; private set => _todoTree = value; }
+        private List<TreeNode<ToDoItem>> _roots = new List<TreeNode<ToDoItem>>();        
+        public List<TreeNode<ToDoItem>> Roots { get => _roots; private set => _roots = value; }
         
         public enum LoadOptions
         {
@@ -52,7 +49,7 @@ namespace ToDoModel
             
             tree = MakeTreeHierarchical(tree);
 
-            ListOfToDoTree = tree;
+            Roots = tree;
             
             //WriteTreeToCSVDebug(@"C:\temp\TreeOfToDoItems.csv");
         }
@@ -164,6 +161,23 @@ namespace ToDoModel
             return result;
         }
 
+        public IAsyncEnumerable<object> GetToDoListAsync(LoadOptions loadType, Application olApp)
+        {
+            var olView = (View)olApp.ActiveExplorer().CurrentView;
+            var strFilter = "@SQL=" + olView.Filter;
+            var items = olApp.Session.Stores
+                ?.Cast<Store>()
+                ?.ToAsyncEnumerable()
+                ?.Select(store => store.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
+                ?.SelectMany(folder =>
+                    (strFilter == "@SQL=" | loadType == LoadOptions.vbLoadAll) ?
+                    folder?.Items?.Cast<object>()?.ToAsyncEnumerable() :
+                    folder?.Items?.Restrict(strFilter)?.Cast<object>()?.ToAsyncEnumerable())
+                ?.Select(x => new OutlookItem(x));
+            items ??= new List<OutlookItem>().ToAsyncEnumerable();
+            return items;
+        }
+
         #endregion
 
         #region ToDoId
@@ -227,7 +241,7 @@ namespace ToDoModel
 
         public void ReNumberIDs(IDList idList)
         {
-            foreach (var RootNode in ListOfToDoTree)
+            foreach (var RootNode in Roots)
             {
                 foreach (var Child in RootNode.Children)
                 {
@@ -319,7 +333,7 @@ namespace ToDoModel
         {
             Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
 
-            foreach (TreeNode<ToDoItem> node in ListOfToDoTree)
+            foreach (TreeNode<ToDoItem> node in Roots)
                 node.Traverse(action);
         }
 
@@ -333,7 +347,7 @@ namespace ToDoModel
                 sw.WriteLine("File Dump");
             }
 
-            LoopTreeToWrite(ListOfToDoTree, FilePath, "");
+            LoopTreeToWrite(Roots, FilePath, "");
         }
         
         internal void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)

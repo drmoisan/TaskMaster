@@ -37,7 +37,7 @@ namespace TaskTree
                 _viewer.TreeLv.ChildrenGetter = x => ((TreeNode<ToDoItem>)x).Children;
                 _viewer.TreeLv.ParentGetter = x => ((TreeNode<ToDoItem>)x).Parent;
                 _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-                _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
+                _viewer.TreeLv.Roots = _dataModel.Roots;
                 _viewer.TreeLv.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
 
             }
@@ -226,9 +226,9 @@ namespace TaskTree
             {
                 if (x.Parent is null)
                 {
-                    if (_dataModel.ListOfToDoTree.Contains(x))
+                    if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.ListOfToDoTree.Remove(x);         // Data Model: Remove node from roots
+                        _dataModel.Roots.Remove(x);         // Data Model: Remove node from roots
                     }
                     else
                     {
@@ -249,14 +249,14 @@ namespace TaskTree
                 // targetRootsChanged = True                   'TreeListview:
                 // targetRoots.InsertRange(targetRoots.IndexOf(target) + siblingOffset, toMove) 'TreeListview: Inserted into new tree
                 // DataModel: Nothing here. Is this dealt with?
-                _dataModel.ListOfToDoTree.AddRange((IEnumerable<TreeNode<ToDoItem>>)toMove);
-                string strSeed = _dataModel.ListOfToDoTree.Count > toMove.Count ? _dataModel.ListOfToDoTree[_dataModel.ListOfToDoTree.Count - toMove.Count - 2].Value.ToDoID : "00";
+                _dataModel.Roots.AddRange((IEnumerable<TreeNode<ToDoItem>>)toMove);
+                string strSeed = _dataModel.Roots.Count > toMove.Count ? _dataModel.Roots[_dataModel.Roots.Count - toMove.Count - 2].Value.ToDoID : "00";
 
-                var loopTo = _dataModel.ListOfToDoTree.Count - 1;
-                for (int i = _dataModel.ListOfToDoTree.Count - toMove.Count - 1; i <= loopTo; i++)
+                var loopTo = _dataModel.Roots.Count - 1;
+                for (int i = _dataModel.Roots.Count - toMove.Count - 1; i <= loopTo; i++)
                 {
                     strSeed = _globals.TD.IDList.GetNextToDoID(strSeed);
-                    _dataModel.ListOfToDoTree[i].Value.ToDoID = strSeed;
+                    _dataModel.Roots[i].Value.ToDoID = strSeed;
                 }
             }
             else
@@ -279,9 +279,9 @@ namespace TaskTree
                 if (x.Parent is null)
                 {
                     sourceTree.RemoveObject(x);              
-                    if (_dataModel.ListOfToDoTree.Contains(x))
+                    if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.ListOfToDoTree.Remove(x);         
+                        _dataModel.Roots.Remove(x);         
                     }
                     else
                     {
@@ -320,7 +320,7 @@ namespace TaskTree
 
         internal void RebuildTreeVisual()
         {
-            _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
+            _viewer.TreeLv.Roots = _dataModel.Roots;
             _viewer.TreeLv.RebuildAll(preserveState: false);
         }
 
