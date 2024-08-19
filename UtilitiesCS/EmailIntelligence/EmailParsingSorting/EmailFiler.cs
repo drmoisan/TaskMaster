@@ -200,17 +200,19 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         }
 
         public async Task<MailItem> TryMoveMailItemHelperAsync(MailItemHelper mailHelper)
-        {
-            try
+        {            
+            return await Task.Run(() => 
             {
-                var mailItemTemp = await Task.Run(() => (MailItem)mailHelper.Item.Move(Config.DestinationOlFolder));
-                return mailItemTemp;
-            }
-            catch (System.Exception e)
-            {
-                logger.Error($"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder.FolderPath}\n{e.Message}", e);
-                return null;
-            }
+                try
+                {
+                    return (MailItem)mailHelper.Item.Move(Config.DestinationOlFolder);
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder.FolderPath}\n{e.Message}", e);
+                    return null;
+                }
+            });
         }
 
         public bool TryValidateParameters()

@@ -238,12 +238,18 @@ namespace ToDoModel
         public static async void OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
         {
             // TODO: Morph Functionality to handle proactively rather than reactively
-            var olItem = new OutlookItem(item);
-            if (Editing.TryAdd(olItem.EntryID, 1))
+            string entryId = null;
+            try
+            {
+                var entryID = ((dynamic)item).EntryID;
+            }
+            catch (System.Exception) {  }
+            if (entryId is not null && Editing.TryAdd(entryId, 1))
             {
                 var ProjInfo = globals.TD.ProjInfo;
                 var idList = globals.TD.IDList;
 
+                var olItem = new OutlookItem(item);
                 var todo = new ToDoItem(olItem);
                 todo.Identifier = $"ItemChangeEvent: {todo.ToDoID}";
                 todo.ProjectData = ProjInfo;
