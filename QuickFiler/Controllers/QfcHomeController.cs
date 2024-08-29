@@ -167,7 +167,8 @@ namespace QuickFiler.Controllers
             _formViewer.Refresh();
             logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(RunAsync)} is complete");
 
-            _ = IterateQueueAsync();
+            //_ = IterateQueueAsync();
+            await IterateQueueAsync();
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

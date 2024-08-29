@@ -451,14 +451,16 @@ namespace QuickFiler.Controllers
             if (_masterQueue.Count < quantity)
                 await WaitForQueue(quantity, _token);
 
-            var nodes = _masterQueue.TryTakeFirst(quantity).ToList();
+            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
             try
             {
-                nodes.ForEach(node => _moveMonitor.UnhookItem(node));
+                //nodes?.ForEach(_moveMonitor.UnhookItem);
+                await nodes?.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(_moveMonitor.UnhookItemAsync, _token);
+                //item => _moveMonitor.UnhookItemAsync(item), _token);
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
-
+                logger.Error("Error unhooking items from move monitor", e);
                 throw;
             }
             

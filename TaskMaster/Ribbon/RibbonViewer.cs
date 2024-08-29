@@ -224,7 +224,7 @@ namespace TaskMaster
         public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
         public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
-
+        public async void Intelligence_Click(Office.IRibbonControl control) => await _controller.IntelligenceAsync();
 
         #endregion
 

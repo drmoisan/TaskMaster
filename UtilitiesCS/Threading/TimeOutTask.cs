@@ -115,7 +115,7 @@ namespace UtilitiesCS
             {
                 result = await Task.Run(() => function(arg1), combinedToken.Token);
             }
-            catch (TaskCanceledException)
+            catch (TimeoutException)
             {
                 token.ThrowIfCancellationRequested();
 

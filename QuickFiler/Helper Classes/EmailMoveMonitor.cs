@@ -1,10 +1,13 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using log4net.Repository.Hierarchy;
+using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace QuickFiler.Helper_Classes
@@ -12,6 +15,9 @@ namespace QuickFiler.Helper_Classes
     // TODO: Determine what EmailMoveMonitor was supposed to be used for. It is now malfunctioning. Temprorarily disabling.
     internal class EmailMoveMonitor
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public EmailMoveMonitor()
         {
             SetupBeforeItemMove();
@@ -34,6 +40,7 @@ namespace QuickFiler.Helper_Classes
 
         public void UnhookItem(MailItem mail)
         {
+            if (mail is null) { return; }
             lock (_hookedItems)
             {
                 var count = _hookedItems.Count(x => x.Folder.EntryID == (mail.Parent as Folder)?.EntryID);
@@ -43,6 +50,57 @@ namespace QuickFiler.Helper_Classes
                     if (count == 1)
                         hookedItem.Folder.BeforeItemMove -= BeforeItemMove;
                     _hookedItems.Remove(hookedItem);
+                }
+            }
+        }
+
+        public async Task UnhookItemAsync(MailItem mail, CancellationToken cancel)
+        {
+            cancel.ThrowIfCancellationRequested();
+
+            if (mail is null) 
+            { 
+                logger.Debug("Mail item is null. Returning.");
+                return; 
+            }
+            var parent = await GetParentFolderAsync(mail);
+            if (parent is null) 
+            { 
+                logger.Debug("Parent folder is null. Returning.");
+                return; 
+            }
+            lock (_hookedItems)
+            {
+                var count = _hookedItems.Count(x => x.Folder.EntryID == parent.EntryID);
+                var hookedItem = _hookedItems.FirstOrDefault(x => x.Mail.EntryID == mail.EntryID);
+                if (hookedItem != null)
+                {
+                    if (count == 1)
+                        hookedItem.Folder.BeforeItemMove -= BeforeItemMove;
+                    _hookedItems.Remove(hookedItem);
+                }
+            }
+        }
+
+        private async Task<Folder> GetParentFolderAsync(MailItem mail, int remaining = 2)
+        {
+            if (mail is null) { return null; }
+            try
+            {
+                var parentObj = await Task.Run(() => mail.Parent);
+                return parentObj as Folder;
+            }
+            catch (System.Exception e)
+            {
+                if (remaining > 0)
+                {
+                    logger.Error($"Error getting parent folder for mail item {mail.EntryID}. {remaining} remaining attempts.");
+                    return await GetParentFolderAsync(mail, remaining - 1);
+                }
+                else
+                {
+                    logger.Error($"Error getting parent folder for mail item {mail.EntryID}. No remaining attempts. Returning null", e);
+                    return null;
                 }
             }
         }

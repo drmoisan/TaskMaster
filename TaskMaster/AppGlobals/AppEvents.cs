@@ -33,9 +33,10 @@ namespace TaskMaster
         
         internal async Task<AppEvents> LoadAsync()
         {
-            var spamBayesTask = Task.Run(SetupSpamBayesAsync);
-            var triageTask = Task.Run(SetupTriageAsync);
-            await Task.WhenAll(spamBayesTask, triageTask);
+            //var spamBayesTask = Task.Run(SetupSpamBayesAsync);
+            //var triageTask = Task.Run(SetupTriageAsync);
+            //await Task.WhenAll(spamBayesTask, triageTask);
+            await Task.WhenAll(SetupSpamBayesAsync(), SetupTriageAsync());
             await ProcessNewInboxItemsAsync();
 
             return this;
@@ -182,18 +183,34 @@ namespace TaskMaster
 
         private async void OlInboxItems_ItemAdd(object item)
         {
-            var engines = await MailAddEngines.ToAsyncEnumerable().WhereAwait(async e => await e.AsyncCondition(item)).Where(e => e.Engine is not null).ToArrayAsync();
-            if (engines.Count() > 0) 
-            {
-                var helper = await MailItemHelper.FromMailItemAsync(item as MailItem, _globals, default, false);
-                await Task.Run(() => _ = helper.Tokens);
-                await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
-            }    
-            
-            
+            await ProcessMailItemAsync(item);
+            //var engines = await MailAddEngines.ToAsyncEnumerable().WhereAwait(async e => await e.AsyncCondition(item)).Where(e => e.Engine is not null).ToArrayAsync();
+            //if (engines.Count() > 0) 
+            //{
+            //    var helper = await MailItemHelper.FromMailItemAsync(item as MailItem, _globals, default, false);
+            //    await Task.Run(() => _ = helper.Tokens);
+            //    await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
+            //}                   
         }
-        
-        
+
+        public async Task ProcessMailItemAsync(object item)
+        {
+            if (item is MailItem mailItem)
+            {
+                var engines = await MailAddEngines.ToAsyncEnumerable()
+                    .WhereAwait(async e => await e.AsyncCondition(mailItem))
+                    .Where(e => e.Engine is not null)
+                    .ToArrayAsync();
+
+                if (engines.Length > 0)
+                {
+                    var helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false);
+                    await Task.Run(() => _ = helper.Tokens);
+                    await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
+                }
+            }
+        }
+
         internal async Task ProcessNewInboxItemsAsync()
         {
             if (OlInboxItems is not null)
@@ -203,20 +220,21 @@ namespace TaskMaster
 
                 foreach (object item in unreadItems)
                 {
-                    if (item is MailItem mailItem)
-                    {
-                        var engines = await MailAddEngines.ToAsyncEnumerable()
-                            .WhereAwait(async e => await e.AsyncCondition(mailItem))
-                            .Where(e => e.Engine is not null)
-                            .ToArrayAsync();
+                    await ProcessMailItemAsync(item);
+                    //    if (item is MailItem mailItem)
+                    //    {
+                    //        var engines = await MailAddEngines.ToAsyncEnumerable()
+                    //            .WhereAwait(async e => await e.AsyncCondition(mailItem))
+                    //            .Where(e => e.Engine is not null)
+                    //            .ToArrayAsync();
 
-                        if (engines.Length > 0)
-                        {
-                            var helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false);
-                            await Task.Run(() => _ = helper.Tokens);
-                            await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
-                        }
-                    }
+                    //        if (engines.Length > 0)
+                    //        {
+                    //            var helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false);
+                    //            await Task.Run(() => _ = helper.Tokens);
+                    //            await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
+                    //        }
+                    //    }
                 }
             }
         }

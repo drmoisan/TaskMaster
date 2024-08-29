@@ -40,14 +40,13 @@
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
                 <menu id="Settings" imageMso="ContentTypeSettings" label="Settings" size="large" itemSize="large">
                   <menu id="QuickFilerSettings" imageMso="ContentTypeSettings" label="Quick Filer" itemSize="large">
-                    <menu id="ItemSortSettings" imageMso="CustomizeSearchFolder" label="Item Sort Settings" itemSize ="normal">            
+                    <menu id="ItemSortSettings" imageMso="CustomizeSearchFolder" label="Item Sort Settings" itemSize ="normal">
                       <checkBox id="MoveEntireConversationDefault" label="Move Entire Conversation" getPressed="MoveEntireConversation_GetPressed" onAction="MoveEntireConversation_Clicked"/>
                       <checkBox id="SaveAttachmentsDefault" label="Save Attachments" getPressed="SaveAttachments_GetPressed" onAction="SaveAttachments_Clicked"/>
                       <checkBox id="SaveEmailCopyDefault" label="Save Email Copy" getPressed="SaveEmailCopy_GetPressed" onAction="SaveEmailCopy_Clicked"/>
                       <checkBox id="SavePicturesDefault" label="Save Pictures" getPressed="SavePictures_GetPressed" onAction="SavePictures_Clicked"/>
                     </menu>
                   </menu>
-
                   <menu id="FolderClassifier" imageMso="Move" label ="Folder Classifier" itemSize="large">
                     <button id="ScrapeAndMine" imageMso="ProtectedActualsSynchronize" onAction="ScrapeAndMine_Click" label="Scrape/Mine" />
                   </menu>
@@ -57,8 +56,7 @@
                     <button id ="GetConfusionDetails" imageMso="CalendarMonthDetailsSplitButton" onAction="GetConfusionDrivers_Click" label="Get Confusion Drivers"/>
                     <button id ="ChartMetrics" imageMso="ChartChangeType" onAction="ChartMetrics_Click" label="Chart Metrics"/>
                     <button id ="InvestigateErrors" imageMso="ChartQuickExplore" onAction="InvestigateErrors_Click" label="Investigate Errors"/>
-                  </menu>
-                 
+                  </menu>                 
                   <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" itemSize="large">
                     <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
                     <button id="DeepEmailCompare" imageMso ="TraceDependentCells" onAction="DeepCompareEmails_Click" label="Deep Compare Emails"/>
@@ -83,7 +81,8 @@
                     <button id="SaveManagerNetwork" imageMso="SaveAll" onAction="SaveManagerNetwork_Click" label="Save Manager On Network" />
                     <button id="SerializeMailInfo" imageMso="SaveAll" onAction="SerializeMailInfo_Click" label="Serialize Mail Info"/>
                     <button id="DeleteTriageSpamFields" imageMso="Delete" onAction ="DeleteTriageSpamFields_Click" label ="Delete Triage Spam"/>
-                  </menu> 
+                  </menu>
+                  <button id="RunIntelligence" imageMso="ARMPreviewButton" onAction="Intelligence_Click" label="Intelligence"/>
                 </menu>  
               </group>
               <group id="TriageGroup" imageMso="Filter" label="Triage">

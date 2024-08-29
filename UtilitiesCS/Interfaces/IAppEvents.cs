@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
 
 namespace TaskMaster
 {
@@ -7,5 +8,6 @@ namespace TaskMaster
         void Hook();
         void Unhook();
         Items OlToDoItems { get; }
+        Task ProcessMailItemAsync(object item);
     }
 }

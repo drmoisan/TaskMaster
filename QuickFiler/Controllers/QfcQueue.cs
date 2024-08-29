@@ -31,6 +31,7 @@ namespace QuickFiler.Controllers
             _token = token; 
             _homeController = homeController;
             _globals = appGlobals;
+            //_templateViewer.Show();
         }
 
         private CancellationToken _token;
@@ -174,6 +175,8 @@ namespace QuickFiler.Controllers
             logger.Debug($"{nameof(EnqueueAsync)} called and jobsRunning increased to {_jobsRunning}");
             
             var tlp = await UiIdleCallAsync(() => _tlpTemplate.Clone(name: "BackgroundTableLayout"));
+            
+            //ActivateTlpTemplate(tlp);
 
             try
             {
@@ -223,8 +226,22 @@ namespace QuickFiler.Controllers
             {
                 _tlpTemplate = value.Clone();
                 _tlpTemplate.Name = "TemplateTableLayout";
+                //_templateViewer.L1v0L2_PanelMain.Controls.Remove(_templateViewer.L1v0L2L3v_TableLayout);
+                //_templateViewer.L1v0L2L3v_TableLayout = _tlpTemplate;
+                //_templateViewer.L1v0L2L3v_TableLayout.Parent = _templateViewer.L1v0L2_PanelMain;
             }
         }
+
+        internal void ActivateTlpTemplate(TableLayoutPanel tlp)
+        {
+            //_templateViewer.Text = "TemplateViewer";
+            //_templateViewer.L1v0L2_PanelMain.Controls.Remove(_templateViewer.L1v0L2L3v_TableLayout);
+            //_templateViewer.L1v0L2L3v_TableLayout = tlp;
+            //_templateViewer.L1v0L2L3v_TableLayout.Parent = _templateViewer.L1v0L2_PanelMain;
+            //_templateViewer.L1v0L2L3v_TableLayout.Visible = true;
+        }
+
+        //private QfcFormViewer _templateViewer = new();
 
         private TlpCellStates _tlpStates;
         public TlpCellStates TlpStates { get => _tlpStates; set => _tlpStates = value; }

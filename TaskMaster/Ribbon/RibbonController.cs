@@ -641,5 +641,17 @@ namespace TaskMaster
         }
 
         #endregion Triage
+
+        internal async Task IntelligenceAsync()
+        {
+            var selection = _globals.Ol.App.ActiveExplorer().Selection;
+            if (selection is not null &&  selection.Count > 0)
+            {
+                await selection
+                 .Cast<object>()
+                 .ToAsyncEnumerable()
+                 .ForEachAwaitAsync(_globals.Events.ProcessMailItemAsync);
+            }
+        }
     }
 }

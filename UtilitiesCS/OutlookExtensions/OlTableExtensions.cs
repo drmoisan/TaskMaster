@@ -152,7 +152,27 @@ namespace UtilitiesCS
                             logger.Debug($"InnerException in {nameof(RemoveColumns)}\ninner.Message  {inner.Message}\n" +
                             $"e.HResult  {inner.HResult}\nStackTrace\n{inner.StackTrace}");
                         }
-                        throw;
+                        if (e.ErrorCode == -2147221233)
+                        {
+                            logger.Debug($"Column {column} not found in table");
+                        }
+                        else if (e.ErrorCode == -2147352567)
+                        {
+                            logger.Debug($"Column {column} is read-only");
+                        }
+                        else if (e.ErrorCode == -555728891)
+                        {
+                            throw new TimeoutException(e.Message, e);
+                        }
+                        else if (e.Message.Contains("timeout"))
+                        {
+                            throw new TimeoutException(e.Message, e);
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                        
                     }
                     
                 }
