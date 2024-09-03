@@ -1571,13 +1571,34 @@ namespace QuickFiler.Controllers
         async public Task MoveEmailsAsync(ScoStack<IMovedMailInfo> stackMovedItems)
         {
             TraceUtility.LogMethodCall(stackMovedItems);
+            var count = _itemGroupsToMove?.Count() ?? 0;
+            if (count <= 0) { return; }
+            await Enumerable.Range(0, count).ToAsyncEnumerable().ForEachAwaitAsync(TryMoveEmailAsync);
 
-            
-            await _itemGroupsToMove.ToAsyncEnumerable().ForEachAwaitAsync(
-                //ForEachAsync(
-                async grp => await grp.ItemController.MoveMailAsync());
-            //_itemGroupsToMove.ForEach(async grp => await grp.ItemController.MoveMailAsync());
-            //await Task.WhenAll(_itemGroupsToMove.Select(grp => grp.ItemController.MoveMailAsync()));
+            //await _itemGroupsToMove.ToAsyncEnumerable().ForEachAwaitAsync(
+            //    async grp => await grp.ItemController.MoveMailAsync());
+        }
+
+        async private Task TryMoveEmailAsync(int i) 
+        {
+            var grp = _itemGroupsToMove[i];
+            try
+            {
+                await grp.ItemController.MoveMailAsync();
+            }
+            catch (System.Exception e)
+            {
+                var subject = "";
+                try
+                {
+                    subject = grp.MailItem.Subject;
+                }
+                catch (System.Exception e2)
+                {
+                    logger.Error($"Unable to retrieve subject {e2.Message}", e2);
+                }
+                logger.Error($"Error moving message {subject}. Continuing execution.\n{e.Message}", e);
+            }
         }
 
         public string[] GetMoveDiagnostics(
