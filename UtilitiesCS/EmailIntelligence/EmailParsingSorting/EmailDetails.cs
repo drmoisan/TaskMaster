@@ -48,7 +48,7 @@ namespace UtilitiesCS
             strAry[4] = GetSenderAddress(OlMail);
             strAry[7] = OlMail.Subject;
             strAry[8] = OlMail.Body;
-            int idx = strAry[4].LastIndexOf("@");
+            int idx = strAry[4]?.LastIndexOf("@") ?? -1;
             if (idx > -1) { strAry[9] = strAry[4].Substring(idx); }
             else { strAry[9] = strAry[4]; }
             strAry[10] = OlMail.ConversationID;

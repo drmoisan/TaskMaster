@@ -88,7 +88,10 @@ namespace QuickFiler.Controllers
             {
                 logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
                     $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} was cancelled");
-                
+                if (progress is not null)
+                    progress.Report(100);
+
+
                 controller = null;
             }
                         

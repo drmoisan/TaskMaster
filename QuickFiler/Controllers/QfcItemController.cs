@@ -1599,16 +1599,6 @@ namespace QuickFiler.Controllers
                     };
                     var filer = new EmailFiler(config);
                     await filer.SortAsync(helpers);
-                    //await SortEmail.SortAsync(
-                    //    mailItems: selItems,
-                    //    savePictures: _optionsPictures,
-                    //    destinationOlStem: SelectedFolder,
-                    //    saveMsg: _optionEmailCopy,
-                    //    saveAttachments: attachments,
-                    //    removePreviousFsFiles: false,
-                    //    appGlobals: _globals,
-                    //    olAncestor: _globals.Ol.ArchiveRootPath,
-                    //    fsAncestorEquivalent: _globals.FS.FldrOneDrive);
                 }
                 catch (System.Exception e)
                 {
@@ -1655,7 +1645,6 @@ namespace QuickFiler.Controllers
         internal IList<MailItemHelper> PackageItems()
         {
             return _optionConversationChecked ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper> { ItemInfo };
-            //return _optionConversationChecked ? ConversationResolver.ConversationItems.SameFolder : new List<MailItem> { Mail };
         }
                
         public void FlagAsTask()

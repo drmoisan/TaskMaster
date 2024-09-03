@@ -172,6 +172,7 @@ namespace QuickFiler.Controllers
             _worker = worker;
             
             // Extract first batch
+            batchSize = batchSize < _frame.RowCount ? batchSize : _frame.RowCount;
             var firstIteration = _frame.GetRowsAt(Enumerable.Range(0, batchSize).ToArray());
 
             // Drop extracted range from source table
