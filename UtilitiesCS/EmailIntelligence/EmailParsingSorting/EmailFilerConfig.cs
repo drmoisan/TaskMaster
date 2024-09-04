@@ -124,6 +124,15 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         }
 
+        public void ResolvePaths()
+        {
+            TraceUtility.LogMethodCall(DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
+
+            DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
+            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);            
+            DestinationOlFolder = TryResolveDestinationFolder();
+        }
+
         public Folder TryResolveDestinationFolder()
         {
             try

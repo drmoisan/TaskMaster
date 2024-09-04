@@ -9,6 +9,7 @@ using UtilitiesCS.OutlookExtensions;
 using System.IO;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 {
@@ -60,6 +61,45 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         #region Public Methods
 
+        async public Task OpenOlFolderAsync()
+        {
+            TraceUtility.LogMethodCall();
+            await Task.Run(TryOpenOlFolder);
+        }
+
+        internal void TryOpenOlFolder()
+        {
+            try
+            {
+                Config.ResolvePaths();
+                Config.Globals.Ol.App.ActiveExplorer().CurrentFolder = Config.DestinationOlFolder;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex);
+                MessageBox.Show($"Error opening folder \n{ex.Message}");
+            }
+        }
+
+        async public Task OpenFileSystemFolderAsync()
+        {
+            TraceUtility.LogMethodCall();
+            Config.ResolvePaths();
+            await Task.Run(() => OpenFileSystemFolder(Config.SaveFsPath)); 
+        }
+
+        internal void OpenFileSystemFolder(string folderPath)
+        {
+            if (Directory.Exists(folderPath))
+            {
+                System.Diagnostics.Process.Start("explorer.exe", folderPath);
+            }
+            else
+            {
+                logger.Error($"The folder path '{folderPath}' does not exist.");
+            }
+        }
+
         async public Task SortAsync(IList<MailItemHelper> mailHelpers)
         {
             TraceUtility.LogMethodCall(mailHelpers);
@@ -82,7 +122,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         }
 
-        public async Task ProcessMailHelperAsync(MailItemHelper mailHelper)
+        async public Task ProcessMailHelperAsync(MailItemHelper mailHelper)
         {
             // Save the message
             if (Config.SaveMsg) { await SaveMessageAsMsgAsync(mailHelper.Item, Config.SaveFsPath); }

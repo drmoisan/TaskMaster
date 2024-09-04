@@ -353,18 +353,23 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
-                        
             if (!IsValidSelection)
             {
                 MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
             }
-            else 
+            else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find)) 
+            {
+                await _homeController.OpenFsFolderAsync(SelectedFolder);
+                
+                _formViewer.Close();
+                Cleanup();
+            }
+            else
             {
                 var folder = (await _dataModel.FolderHelper.CreateFolderAsync(
-                    SelectedFolder, 
-                    _globals.Ol.ArchiveRootPath, 
-                    _globals.FS.FldrOneDrive, 
+                    SelectedFolder,
+                    _globals.Ol.ArchiveRootPath,
+                    _globals.FS.FldrOneDrive,
                     Token)) as MAPIFolder;
 
                 if (folder is not null)
@@ -412,7 +417,7 @@ namespace QuickFiler.Controllers
         private void SearchText_TextChanged(object sender, EventArgs e)
         {
             _formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
-            if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
+            if (_formViewer.FolderListBox.Items.Count > 1) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }
 
         public void EditFiltersMenuItem_Click(object sender, EventArgs e)
@@ -503,7 +508,6 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            //if (_formViewer.FolderListBox.SelectedIndex == 0)
             if (((string)_formViewer.FolderListBox.SelectedItem).StartsWith("===="))
             {
                 MessageBox.Show("Please select a valid folder.");
@@ -512,8 +516,18 @@ namespace QuickFiler.Controllers
             else
             {
                 _formViewer.Hide();
-                await _homeController.ExecuteMovesAsync();
-                //await _formViewer.UiSyncContext;
+                if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort)) 
+                { 
+                    await _homeController.ExecuteMovesAsync();
+                }
+                else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
+                {
+                    await _homeController.OpenOlFolderAsync(SelectedFolder);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
                 _formViewer.Dispose();
                 Cleanup();
             }
@@ -538,12 +552,14 @@ namespace QuickFiler.Controllers
         }
 
         async public Task CreateFolderAsync()
-        {
-            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
-
+        {            
             if (!IsValidSelection)
             {
-                MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
+                MessageBox.Show("Please select a valid folder");
+            }
+            else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find)) 
+            {
+                await _homeController.OpenFsFolderAsync(SelectedFolder);
             }
             else
             {

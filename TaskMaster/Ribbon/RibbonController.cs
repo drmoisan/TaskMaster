@@ -344,6 +344,16 @@ namespace TaskMaster
             sorter.Run();
         }
 
+        internal async Task FindFolderAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var sorter = await EfcHomeController.LoadFinderAsync(_globals, () => { });
+            sorter.Run();
+
+        }
+
         internal async Task TryMineEmails()
         {
             if (SynchronizationContext.Current is null)
@@ -653,5 +663,6 @@ namespace TaskMaster
                  .ForEachAwaitAsync(_globals.Events.ProcessMailItemAsync);
             }
         }
+
     }
 }
