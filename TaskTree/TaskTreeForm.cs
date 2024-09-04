@@ -57,10 +57,13 @@ namespace TaskTree
                 _controller.HandleModelDropped(sender, e);
         }
                 
-        private void TLV_ItemActivate(object sender, EventArgs e)
+        private async void TLV_ItemActivate(object sender, EventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_context);
+
             if (_controller is not null)
-                _controller.TreeLvActivateItem();
+                await _controller.TreeLvActivateItemAsync();
         }
 
         private void FormatRow(object sender, FormatRowEventArgs e)

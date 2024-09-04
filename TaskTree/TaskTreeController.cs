@@ -12,6 +12,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
 using Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
 
 namespace TaskTree
 {
@@ -173,6 +174,24 @@ namespace TaskTree
                     activeExplorer.AddToSelection(item);
                 }
                 else { item.Display(); }
+            }
+        }
+
+        internal async Task ActivateOlItemAsync(dynamic item)
+        {
+            if (item is not null)
+            {
+                var activeExplorer = _globals.Ol.App.ActiveExplorer();
+                await Task.Run(() => 
+                { 
+                    if (activeExplorer.IsItemSelectableInView(item))
+                    {
+                        activeExplorer.ClearSelection();
+                        activeExplorer.AddToSelection(item);
+                    }
+                    else { item.Display(); }
+                });
+                await Task.Run(activeExplorer.Activate);
             }
         }
 
@@ -343,8 +362,22 @@ namespace TaskTree
             var node = GetSelectedTreeNode();
             if (node is not null) 
             {
-                var objItem = node.Value.GetItem();
+                var objItem = node.Value.OlItem.InnerObject;
                 if (IsValidType(objItem)) { ActivateOlItem(objItem); }
+                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
+            }
+        }
+
+        internal async Task TreeLvActivateItemAsync()
+        {
+            var node = GetSelectedTreeNode();
+            if (node is not null)
+            {
+                var objItem = node.Value.OlItem.InnerObject;
+                if (IsValidType(objItem)) 
+                { 
+                    await ActivateOlItemAsync(objItem); 
+                }
                 else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
             }
         }
@@ -380,8 +413,16 @@ namespace TaskTree
         
         internal TreeNode<ToDoItem> GetSelectedTreeNode()
         {
-            var item = _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject;
-            return item as TreeNode<ToDoItem>;
+            try
+            {
+                return _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject as TreeNode<ToDoItem>;
+            }
+            catch (System.Exception)
+            {
+                return null;                
+            }
+            
+            
         }
 
         internal bool IsValidType(object item)
