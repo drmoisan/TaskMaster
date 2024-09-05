@@ -233,7 +233,7 @@ namespace ToDoModel
             }
         }
 
-        private static bool _blItemChangeRunning = false;
+        //private static bool _blItemChangeRunning = false;
 
         public static async void OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
         {

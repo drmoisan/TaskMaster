@@ -328,7 +328,7 @@ namespace QuickFiler.Controllers
 
         async public Task ActionOkAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             if (!_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
@@ -355,7 +355,7 @@ namespace QuickFiler.Controllers
 
         private async Task LoadUiFromQueue() 
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
             
             (var tlp, var itemGroups) = await _qfcQueue.TryDequeueAsync(Token, 4000);
             LoadItems(tlp, itemGroups);
@@ -364,7 +364,7 @@ namespace QuickFiler.Controllers
         
         private async Task MoveAndIterate()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
             {
@@ -419,7 +419,7 @@ namespace QuickFiler.Controllers
 
         internal async Task BackGroundMoveAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             // Move emails
             await _groups.MoveEmailsAsync(_movedItems);

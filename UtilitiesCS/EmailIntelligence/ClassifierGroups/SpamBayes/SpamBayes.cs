@@ -288,7 +288,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task TestActionAsync(object item, double probability)
         {
-            await Task.Run(() => 
+            await Task.Run(async () => 
             {
                 var mailItem = item as MailItem;
                 if (mailItem is not null)
@@ -298,17 +298,20 @@ namespace UtilitiesCS.EmailIntelligence
                     if (isSpam == true)
                     {
                         if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkCertain.FolderPath)
-                            mailItem.Move(Globals.Ol.JunkCertain);
+                            await mailItem.TryMoveAsync(Globals.Ol.JunkCertain, 3);
+                        //mailItem.Move(Globals.Ol.JunkCertain);
                     }
                     else if (isSpam == false)
                     {
                         if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.Inbox.FolderPath)
-                            mailItem.Move(Globals.Ol.Inbox);
+                            await mailItem.TryMoveAsync(Globals.Ol.Inbox, 3);
+                        //mailItem.Move(Globals.Ol.Inbox);
                     }
                     else
                     {
                         if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkPossible.FolderPath)
-                            mailItem.Move(Globals.Ol.JunkPossible);
+                            await mailItem.TryMoveAsync(Globals.Ol.JunkPossible, 3);
+                        //mailItem.Move(Globals.Ol.JunkPossible);
                     }
                 }
                 

@@ -88,7 +88,7 @@ namespace QuickFiler.Controllers
                                                  _dflt2Ctrls,
                                                  _selectorsCtrls,
                                                  _mailCtrls,
-                                                 () => !_dataModel.Mail.UnRead,
+                                                 () => !_dataModel.Mail?.UnRead ?? false,
                                                  _itemViewer.TopicThread.Columns.Cast<object>().ToList(),
                                                  (columns, fore, back) => SetOlvTheme(columns, fore, back),
                                                  _itemViewer.L0v2h2_WebView2,
@@ -191,7 +191,7 @@ namespace QuickFiler.Controllers
             CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
 
             await _itemViewer.UiSyncContext;
-            Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            //logger.Debug($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
             // Create the environment manually
             Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
@@ -246,6 +246,7 @@ namespace QuickFiler.Controllers
         public void PopulateControls(EfcDataModel dataModel)
         {
             _itemInfo = dataModel.MailInfo;
+            if (_itemInfo is null) { return; }
             _itemViewer.LblSender.Text = _itemInfo.SenderName;
             _itemViewer.LblSubject.Text = _itemInfo.Subject;
             _itemViewer.TxtboxBody.Text = _itemInfo.Body;
@@ -263,6 +264,7 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void PopulateConversation()
         {
+            if (_dataModel.ConversationResolver is null) { return; }
             _dataModel.ConversationResolver.UpdateUI = SetTopicThread;
             var count = _dataModel.ConversationResolver.Count.SameFolder;
             _itemViewer.LblConvCt.Text = count.ToString();
@@ -513,7 +515,8 @@ namespace QuickFiler.Controllers
             new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
                         
             _itemViewer.L0v2h2_WebView2.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
-            _dataModel.ConversationResolver.PropertyChanged += new PropertyChangedEventHandler(ConversationResolverPropertyChanged);
+            if (_dataModel.ConversationResolver is not null)
+                _dataModel.ConversationResolver.PropertyChanged += new PropertyChangedEventHandler(ConversationResolverPropertyChanged);
             _itemViewer.TopicThread.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
             _globals.Ol.PropertyChanged += DarkMode_Changed;
             Buttons.ForEach(x =>
@@ -592,6 +595,8 @@ namespace QuickFiler.Controllers
                 throw (e.InitializationException);
             }
             _isWebViewerInitialized = true;
+            // Do not initialize if there is no item 
+            if (_itemInfo is null) { return; }
             if (DarkMode)
             {
                 _itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.ToggleDark(Enums.ToggleState.On));

@@ -228,7 +228,7 @@ namespace QuickFiler.Helper_Classes
             }
             else
             {
-                logger.Debug("Error loading conversation. Setting to single item.");
+                //logger.Debug("Error loading conversation. Setting to single item.");
                 convInfoExpanded = [MailInfo];
             }
 
@@ -318,8 +318,8 @@ namespace QuickFiler.Helper_Classes
                                             true);
 
             var dfSameFolder = dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
-            logger.Debug($"Source mail: {_mailItem.EntryID}");
-            logger.Debug(dfExpanded.PrettyText());
+            //logger.Debug($"Source mail: {_mailItem.EntryID}");
+            //logger.Debug(dfExpanded.PrettyText());
             return new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
 
         }
@@ -384,7 +384,7 @@ namespace QuickFiler.Helper_Classes
                 }
                 catch (OperationCanceledException)
                 {
-                    logger.Debug("Background load of ConversationResolver cancelled"); 
+                    //logger.Debug("Background load of ConversationResolver cancelled"); 
                 }
             }
             else if (e.PropertyName == nameof(UpdateUI))

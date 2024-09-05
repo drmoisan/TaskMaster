@@ -133,10 +133,10 @@ namespace TaskMaster
 
         public async void SortEmail_Click(Office.IRibbonControl control) => await _controller.SortEmailAsync();
 
-        public async void UndoSort_Click(Office.IRibbonControl control)
-        {
-            await _controller.UndoSortAsync();
-        }
+        public async void UndoSort_Click(Office.IRibbonControl control) => await _controller.UndoSortAsync();
+
+        public async void FindFolder_Click(Office.IRibbonControl control) => await _controller.FindFolderAsync();
+
 
         public bool ToggleDarkMode_GetPressed(Office.IRibbonControl control) => _controller.IsDarkModeActive();
         public void ToggleDarkMode_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleDarkMode();

@@ -36,6 +36,7 @@
               <group id="Group2" label="Task Master">
                 <button id="FlagAsTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
                 <button id="SortEmail" imageMso="MoveToFolder" onAction="SortEmail_Click" label="Sort Email" size="large"/>
+                <button id="FindEmailFolder" imageMso="FindDialog" onAction="FindFolder_Click" label="Find Folder" size="large"/>
                 <button id="UndoSort" imageMso="Undo" onAction="UndoSort_Click" label="Undo Sort" size="large"/>
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
                 <menu id="Settings" imageMso="ContentTypeSettings" label="Settings" size="large" itemSize="large">

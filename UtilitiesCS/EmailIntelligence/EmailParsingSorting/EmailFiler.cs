@@ -9,6 +9,7 @@ using UtilitiesCS.OutlookExtensions;
 using System.IO;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 {
@@ -35,14 +36,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         #region Private Fields
 
-        //private YesNoToAllResponse _responseSaveFile = YesNoToAllResponse.Empty;
-        //private YesNoToAllResponse _attachmentsOverwrite = YesNoToAllResponse.Empty;
-        //private YesNoToAllResponse _attachmentsAltName = YesNoToAllResponse.Empty;
-        //private YesNoToAllResponse _picturesOverwrite = YesNoToAllResponse.Empty;
-        //private YesNoToAllResponse _removeReadOnly = YesNoToAllResponse.Empty;
-
-        //private const int MAX_PATH = 256;
-
+        
         #endregion Private Fields
 
         #region Public Properties
@@ -60,9 +54,48 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         #region Public Methods
 
+        async public Task OpenOlFolderAsync()
+        {
+            //TraceUtility.LogMethodCall();
+            await Task.Run(TryOpenOlFolder);
+        }
+
+        internal void TryOpenOlFolder()
+        {
+            try
+            {
+                Config.ResolvePaths();
+                Config.Globals.Ol.App.ActiveExplorer().CurrentFolder = Config.DestinationOlFolder;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex);
+                MessageBox.Show($"Error opening folder \n{ex.Message}");
+            }
+        }
+
+        async public Task OpenFileSystemFolderAsync()
+        {
+            //TraceUtility.LogMethodCall();
+            Config.ResolvePaths();
+            await Task.Run(() => OpenFileSystemFolder(Config.SaveFsPath)); 
+        }
+
+        internal void OpenFileSystemFolder(string folderPath)
+        {
+            if (Directory.Exists(folderPath))
+            {
+                System.Diagnostics.Process.Start("explorer.exe", folderPath);
+            }
+            else
+            {
+                logger.Error($"The folder path '{folderPath}' does not exist.");
+            }
+        }
+
         async public Task SortAsync(IList<MailItemHelper> mailHelpers)
         {
-            TraceUtility.LogMethodCall(mailHelpers);
+            //TraceUtility.LogMethodCall(mailHelpers);
             mailHelpers.ThrowIfNullOrEmpty(nameof(mailHelpers));
             MailHelpers = mailHelpers;
             Config.ResolvePaths((Folder)MailHelpers.FirstOrDefault().FolderInfo.OlFolder);
@@ -71,7 +104,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         async public Task SortAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
             if (!TryValidateParameters()) { return; }
 
             // Process each email
@@ -82,7 +115,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         }
 
-        public async Task ProcessMailHelperAsync(MailItemHelper mailHelper)
+        async public Task ProcessMailHelperAsync(MailItemHelper mailHelper)
         {
             // Save the message
             if (Config.SaveMsg) { await SaveMessageAsMsgAsync(mailHelper.Item, Config.SaveFsPath); }
@@ -114,7 +147,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         private void CaptureMoveDetails(MailItem mailItem, MailItem oMailTmp)
         {
-            TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
+            //TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
             string[] strAry = oMailTmp.Details(Globals.Ol.ArchiveRootPath).Skip(1).ToArray();
             var output = SanitizeArrayLineTSV(ref strAry);
@@ -151,10 +184,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 Task.Run(() => Globals.AF.Manager["Folder"].AddOrUpdateClassifier(Config.DestinationOlStem, mailHelper.Tokens, 1)),
                 Task.Run(() => Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem))
             };
-            //if(Config.DeleteAndUnTrain)
-            //{
-            //    tasks.Add(Task.Run(() => Globals.AF.Manager["Folder"].UnTrain(Config.OriginOlStem, mailHelper.Tokens, 1)));
-            //}
+            
             return tasks;
         }
 
@@ -191,7 +221,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             MailItem mailItem,
             string fsLocation)
         {
-            TraceUtility.LogMethodCall(mailItem, fsLocation);
+            //TraceUtility.LogMethodCall(mailItem, fsLocation);
 
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
 

@@ -38,7 +38,7 @@ namespace UtilitiesCS.OneDriveHelpers
             }
             else 
             { 
-                logger.Debug($"Failed to get stream from {url}");
+                //logger.Debug($"Failed to get stream from {url}");
                 return null;  
             }
         }

@@ -229,7 +229,7 @@ namespace UtilitiesCS.EmailIntelligence
 
             if (w1 * w2 * h1 * h2 == 0)
             {
-                logger.Debug($"Invalid image dimensions: w1: {w1}, h1: {h1}, w2: {w2}, h2: {h2}");
+                //logger.Debug($"Invalid image dimensions: w1: {w1}, h1: {h1}, w2: {w2}, h2: {h2}");
                 return top;
             }
 
@@ -244,7 +244,7 @@ namespace UtilitiesCS.EmailIntelligence
                 }
                 catch (System.OutOfMemoryException e)
                 {
-                    logger.Debug($"Variables before exception: w1: {w1}, h1: {h1}, w2: {w2}, h2: {h2}");
+                    //logger.Debug($"Variables before exception: w1: {w1}, h1: {h1}, w2: {w2}, h2: {h2}");
                     logger.Error(e.Message,e);
                     bitmap = top;
                 }

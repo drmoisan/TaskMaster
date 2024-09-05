@@ -119,7 +119,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 [Enums.Justification.Left, Enums.Justification.Right],
                 $"{objectName} Size");
 
-            logger.Debug($"Object size calculations:\n{text}");
+            //logger.Debug($"Object size calculations:\n{text}");
         }
 
         public virtual void SerializeActiveItem()

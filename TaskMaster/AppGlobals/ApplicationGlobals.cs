@@ -23,11 +23,11 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
-            logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
+            //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
 
             await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
             await _events.LoadAsync();
-            logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
+            //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
         }
 
         private AppFileSystemFolderPaths _fs;

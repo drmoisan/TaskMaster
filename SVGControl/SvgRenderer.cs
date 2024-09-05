@@ -16,6 +16,8 @@ namespace SVGControl
 {
     internal class SvgRenderer : INotifyPropertyChanged
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public SvgRenderer(byte[] doc, Size size, AutoSize autoSize)
         {
             _doc = GetSvgDocument(doc);
@@ -58,7 +60,7 @@ namespace SVGControl
             Margin = margin;
             AutoSize = autoSize;
             Size = CalcInnerSize(outer, margin);
-            Debug.WriteLine("SvgRenderer Initialized");
+            //logger.Debug("SvgRenderer Initialized");
         }
 
         private Size _outer;

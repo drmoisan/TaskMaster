@@ -210,7 +210,7 @@ namespace UtilitiesCS
             {
                 token.ThrowIfCancellationRequested();
                     
-                logger.Debug($"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} time for email {mailItem.Subject}");
+                logger.Warn($"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} time for email {mailItem.Subject}");
                 if (retryCount < 2)
                 { 
                     df = await mailItem.GetConversationDfAsync(token, timeout, retryCount + 1, options, scheduler);
@@ -218,7 +218,7 @@ namespace UtilitiesCS
                 else 
                 {     
                     var message = $"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} times for email {mailItem.Subject} and was canceled";
-                    logger.Debug($"{message} {e.StackTrace}");
+                    logger.Warn($"{message} {e.StackTrace}");
                     MessageBox.Show(message, "Operation Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }

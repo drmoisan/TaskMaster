@@ -101,7 +101,7 @@ namespace UtilitiesCS
                     if (token.IsCancellationRequested) { break; }
                     else
                     {
-                        logger.Debug($"Timeout adding {item}");
+                        //logger.Debug($"Timeout adding {item}");
                     }
                 }
             } while (!success);
@@ -130,7 +130,7 @@ namespace UtilitiesCS
                     if (token.IsCancellationRequested) { break; }
                     else
                     {
-                        logger.Debug($"Timeout adding {item}");
+                        //logger.Debug($"Timeout adding {item}");
                         await Task.Delay(Config.TryAddTimeout);
                     }
                 }

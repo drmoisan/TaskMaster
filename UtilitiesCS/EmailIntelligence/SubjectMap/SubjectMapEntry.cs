@@ -260,8 +260,8 @@ namespace UtilitiesCS
                 if (value is null)
                 {
                     var stack = TraceUtility.GetMyMethods(new StackTrace());
-                    logger.Debug($"SubjectEncoded set to null. See stack:\n" +
-                        $"{string.Join(" -> ",stack.Select(x => x.Name).ToArray())}");
+                    //logger.Debug($"SubjectEncoded set to null. See stack:\n" +
+                    //    $"{string.Join(" -> ",stack.Select(x => x.Name).ToArray())}");
                 }
                 _folderEncoded = value;
             }

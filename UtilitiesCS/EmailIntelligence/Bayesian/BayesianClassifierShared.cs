@@ -448,7 +448,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (tokenIncidence is null)
             {
-                logger.Debug($"Parameter {nameof(tokenIncidence)} is null. Returning empty list");
+                //logger.Debug($"Parameter {nameof(tokenIncidence)} is null. Returning empty list");
                 return interestingList;
             }
 

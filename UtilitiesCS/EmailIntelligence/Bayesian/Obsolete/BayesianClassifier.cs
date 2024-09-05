@@ -425,7 +425,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (tokens is null)
             {
-                logger.Debug($"Parameter {nameof(tokens)} is null. Returning empty list");
+                //logger.Debug($"Parameter {nameof(tokens)} is null. Returning empty list");
                 return probabilities;
             }
 

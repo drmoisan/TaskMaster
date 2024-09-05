@@ -12,6 +12,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
+using System.Net.Mail;
 
 namespace QuickFiler.Controllers
 {
@@ -24,7 +25,7 @@ namespace QuickFiler.Controllers
             Globals = globals;
             Token = token;
             TokenSource = tokenSource;
-            Mail = mail ?? Globals.Ol.App.ActiveExplorer().Selection[1] as MailItem; 
+            Mail = mail ?? TryGetFirstInSelection();
             if (Mail is not null)
             {
                 ConversationResolver = new ConversationResolver(Globals, Mail, TokenSource, Token);
@@ -93,8 +94,15 @@ namespace QuickFiler.Controllers
         {
             if (folderList is null)
             {
-                FolderHelper = await Task.Run(() => new OlFolderHelper(
-                    Globals, MailInfo, OlFolderHelper.InitOptions.FromField), Token);
+                if (MailInfo is null) 
+                {
+                    FolderHelper = await Task.Run(() => new OlFolderHelper(Globals), Token);
+                }
+                else
+                {
+                    FolderHelper = await Task.Run(() => new OlFolderHelper(
+                        Globals, MailInfo, OlFolderHelper.InitOptions.FromField), Token);
+                }
             }
             else
             {
@@ -111,14 +119,30 @@ namespace QuickFiler.Controllers
         {
             get
             {
-                _mail ??= _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+                _mail ??= TryGetFirstInSelection();
                 return _mail;
             }
             set => _mail = value;
         }
                 
-        public MailItemHelper MailInfo => ConversationResolver.MailInfo;
-        
+        public MailItemHelper MailInfo => ConversationResolver?.MailInfo;
+
+        private MailItem TryGetFirstInSelection() 
+        {
+            try
+            {
+                var selection = _globals.Ol.App.ActiveExplorer().Selection;
+                if ((selection?.Count ?? 0) > 0)
+                {
+                    return selection[1] as MailItem;
+                }
+                else { return null; }
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
+        }
 
         #endregion Public Properties
 
@@ -133,13 +157,13 @@ namespace QuickFiler.Controllers
             if (MailInfo is not null)
             {
                 
-                bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
+                bool attachments = (folderpath != "Trash to Delete") ? saveAttachments : false;
                 var mailHelpers = moveConversation ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper>() { MailInfo };
 
                 var config = new EmailFilerConfig()
                 {
                     SaveMsg = saveEmail,
-                    SaveAttachments = attchments,
+                    SaveAttachments = attachments,
                     SavePictures = savePictures,
                     DestinationOlStem = folderpath,
                     Globals = Globals,
@@ -150,44 +174,37 @@ namespace QuickFiler.Controllers
                 var sorter = new EmailFiler(config);
                 await sorter.SortAsync(mailHelpers);
 
-                //await SortEmail.SortAsync(mailHelpers: mailHelpers,
-                //                         savePictures: savePictures,
-                //                         destinationOlStem: folderpath,
-                //                         saveMsg: saveEmail,
-                //                         saveAttachments: attchments,
-                //                         removePreviousFsFiles: false,
-                //                         appGlobals: _globals,
-                //                         olAncestor: _globals.Ol.ArchiveRootPath,
-                //                         fsAncestorEquivalent: _globals.FS.FldrOneDrive);
                 SortEmail.Cleanup_Files();
             }
         }
 
-        //async public Task MoveToFolder(string folderpath,
-        //                               bool saveAttachments,
-        //                               bool saveEmail,
-        //                               bool savePictures,
-        //                               bool moveConversation)
-        //{
-        //    if (Mail is not null)
-        //    {
-        //        IList<MailItem> items = PackageItems(moveConversation);
-        //        bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
+        internal async Task OpenOlFolderAsync(string folderpath)
+        {
+            var config = new EmailFilerConfig()
+            {
+                DestinationOlStem = folderpath,
+                Globals = Globals,
+                OlAncestor = Globals.Ol.ArchiveRootPath,
+                FsAncestorEquivalent = Globals.FS.FldrOneDrive
+            };
 
-        //        //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-        //        await SortEmail.SortAsync(mailItems: items,
-        //                                 savePictures: savePictures,
-        //                                 destinationOlStem: folderpath,
-        //                                 saveMsg: saveEmail,
-        //                                 saveAttachments: attchments,
-        //                                 removePreviousFsFiles: false,
-        //                                 appGlobals: _globals,
-        //                                 olAncestor: _globals.Ol.ArchiveRootPath,
-        //                                 fsAncestorEquivalent: _globals.FS.FldrRoot);
-        //        SortEmail.Cleanup_Files();
-        //        // blDoMove
-        //    }
-        //}
+            var sorter = new EmailFiler(config);
+            await sorter.OpenOlFolderAsync();
+        }
+
+        internal async Task OpenFsFolderAsync(string folderpath)
+        {
+            var config = new EmailFilerConfig()
+            {
+                DestinationOlStem = folderpath,
+                Globals = Globals,
+                OlAncestor = Globals.Ol.ArchiveRootPath,
+                FsAncestorEquivalent = Globals.FS.FldrOneDrive
+            };
+
+            var sorter = new EmailFiler(config);
+            await sorter.OpenFileSystemFolderAsync();
+        }
 
         async public Task MoveToFolder(MAPIFolder folder,
                                        string olAncestor,
@@ -226,9 +243,10 @@ namespace QuickFiler.Controllers
 
         public void RefreshSuggestions()
         {
-            _folderHelper.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
-            _folderHelper.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
+            //_folderHelper.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
+            _folderHelper.RefreshSuggestions(mailItem: Mail);
         }
+                
 
         #endregion Public Methods
 
