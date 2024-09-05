@@ -36,6 +36,11 @@ namespace TaskVisualization
             _globals = globals;
             _olExplorer = globals.Ol.App.ActiveExplorer();
             _todoSelection = InitializeToDoList(itemList, globals);
+            if (_todoSelection.Count == 0)
+            {
+                MessageBox.Show("No items selected. Exiting.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             _flagsToSet = GetFlagsToSet(_todoSelection.Count);
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
@@ -55,19 +60,35 @@ namespace TaskVisualization
 
         public DialogResult Run(bool modal = false)
         {
-            _controller.Initialize();
-            if (modal)
-                return _viewer.ShowDialog();
+            if (_controller is not null)
+            {
+                _controller.Initialize();
+                if (modal)
+                    return _viewer.ShowDialog();
+                else
+                    _viewer.Show();
+                    return DialogResult.None;
+            }
             else
-                _viewer.Show();
+            {
                 return DialogResult.None;
+            }
         }
 
         public static List<ToDoItem> InitializeToDoList(IList itemList, IApplicationGlobals globals)
         {
             var olItems = (itemList?.Cast<object>() ?? GetSelection(globals.Ol.App.ActiveExplorer()))
-                ?.Select(x => new OutlookItem(x)).ToArray();
-            if (olItems is null) { return null;  }
+                ?.Select(x => new OutlookItem(x)).ToList();
+            if (olItems.Count() == 0)
+            {
+                var response = MessageBox.Show("No items selected. Would you like to create a new task?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.Yes)
+                {
+                    var taskItems = globals.Ol.App.Session.GetDefaultFolder(OlDefaultFolders.olFolderTasks).Items;
+                    olItems.Add(new OutlookItem(taskItems.Add(OlItemType.olTaskItem)));
+                }
+            }
+                
 
             var todoList = Enumerable.Range(0, olItems.Count())
                 .Select(i =>
@@ -80,17 +101,6 @@ namespace TaskVisualization
                     return todo;
                 })
                 ?.ToList();
-
-            //var todoList = (itemList?.Cast<object>() ?? GetSelection(globals.Ol.App.ActiveExplorer()))
-            //    ?.Select(x => new OutlookItem(x))
-            //    .Select(x =>
-            //    {
-            //        var todo = new ToDoItem(x);
-            //        todo.ProjectsToPrograms = globals.TD.ProjInfo.Programs_ByProjectNames;
-            //        todo.ProjectData = globals.TD.ProjInfo;
-            //        return todo;
-            //    })?
-            //    .ToList();
 
             return todoList;
         }

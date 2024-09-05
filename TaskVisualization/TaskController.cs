@@ -791,6 +791,8 @@ namespace TaskVisualization
                     c.DueDate = _active.DueDate;
                 if (_options.HasFlag(Enums.FlagsToSet.Reminder))
                     c.ReminderTime = _active.ReminderTime;
+                if (_options == Enums.FlagsToSet.All)
+                    c.ActiveBranch = true;
 
                 ToDoEvents.Editing.UpdateOrRemove(c.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
             }

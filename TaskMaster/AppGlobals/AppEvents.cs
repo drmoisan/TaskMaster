@@ -111,7 +111,6 @@ namespace TaskMaster
             }
         }
 
-
         #region Events
 
         public void Hook()
@@ -130,7 +129,6 @@ namespace TaskMaster
             OlReminders = null;
         }
 
-        
         internal async Task SetupSpamBayesAsync()
         {
             var ce = new ConditionalItemEngine<MailItemHelper>();
@@ -176,9 +174,9 @@ namespace TaskMaster
             ToDoEvents.OlToDoItems_ItemAdd(item, _globals);
         }
 
-        private void OlToDoItems_ItemChange(object item)
+        private async void OlToDoItems_ItemChange(object item)
         {
-            ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, _globals);
+            await ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, _globals);
         }
 
         private async void OlInboxItems_ItemAdd(object item)
@@ -253,7 +251,6 @@ namespace TaskMaster
         //        }
         //    }
         //}
-
 
         #endregion
 
