@@ -98,7 +98,7 @@ namespace UtilitiesCS
         private ScoCollection<T> LoadFromBackup(AltListLoader backupLoader, string backupFilepath, FilePathHelper disk)
         {
             ScoCollection<T> collection;
-            logger.Debug($"Attempting to load {Path.GetFileName(backupFilepath)} from backup");
+            //logger.Debug($"Attempting to load {Path.GetFileName(backupFilepath)} from backup");
             collection = new ScoCollection<T>(backupLoader(backupFilepath));
 
             //NotifyPropertyChanged("BackupLoader");

@@ -238,7 +238,7 @@ namespace UtilitiesCS
             appGlobals.AF.Encoder.RebuildEncoding(this);
             var timeEncoding = stopwatch.ElapsedMilliseconds - timeRebuilding;
 
-            logger.Debug($"Time Metrics => Repopulate Subject Map Entries \nConsume: " +
+            logger.Info($"Time Metrics => Repopulate Subject Map Entries \nConsume: " +
                 $"{timeConsuming}\nCount: {timeCounting}\nRebuild: {timeRebuilding}\n" +
                 $"Encoding: {timeEncoding}");
         }
@@ -281,12 +281,12 @@ namespace UtilitiesCS
                 progress.Increment(2);
 
                 var timeFolders = stopwatch.ElapsedMilliseconds;
-                logger.Debug($"Time querying folders {timeFolders}");
+                //logger.Debug($"Time querying folders {timeFolders}");
 
                 // Query MailItems from these folders
                 var mailItems = QueryMailTuples(folders);
                 var timeItems = stopwatch.ElapsedMilliseconds - timeFolders;
-                logger.Debug($"Time querying items {timeItems}");
+                //logger.Debug($"Time querying items {timeItems}");
 
                 // Convert MailItems to SubjectMapEntries
                 RepopulateSubjectMapEntries(appGlobals, progress, folders, mailItems);

@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic.ApplicationServices;
+using ToDoModel.Data_Model.ToDo;
 using UtilitiesCS;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
@@ -28,6 +29,7 @@ namespace ToDoModel
         public ToDoItem(OutlookItem outlookItem)
         {
             FlaggableItem = new OutlookItemFlaggable(outlookItem);
+            Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
             InitializeOutlookItem(_olItem);
             string argstrCats_All = outlookItem.Categories;
             Flags = new FlagParser(ref argstrCats_All);
@@ -144,6 +146,9 @@ namespace ToDoModel
 
         private IProjectData _projectData;
         public IProjectData ProjectData { get => _projectData; set => _projectData = value; }
+
+        private ToDoLoader _loader;
+        internal ToDoLoader Loader { get => _loader; private set => _loader = value; }
 
         #endregion Private Variables
 
@@ -419,7 +424,7 @@ namespace ToDoModel
         public FlagParser Flags
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
-            get => GetOrLoad(ref _flags, () => _flags = FlagsLoader());
+            get => Loader.GetOrLoad(ref _flags, () => _flags = FlagsLoader());
             [MethodImpl(MethodImplOptions.Synchronized)]
             internal set
             {
@@ -472,14 +477,14 @@ namespace ToDoModel
 
         public bool FlagAsTask
         {
-            get => (bool)GetOrLoad(ref _flagAsTask, () => FlaggableItem.FlagAsTask, FlaggableItem);
-            set => SetAndSave(ref _flagAsTask, value, (x) => FlaggableItem.FlagAsTask = (bool)x);
+            get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.FlagAsTask, FlaggableItem);
+            set => Loader.SetAndSave(ref _flagAsTask, value, (x) => FlaggableItem.FlagAsTask = (bool)x);
         }
         private bool? _flagAsTask = null;
 
         public DateTime TaskCreateDate
         {
-            get => (DateTime)GetOrLoad(ref _taskCreateDate, () => FlaggableItem.CreationTime, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _taskCreateDate, () => FlaggableItem.CreationTime, FlaggableItem);
             set => _taskCreateDate = value;
         }
         private DateTime? _taskCreateDate = null;
@@ -529,50 +534,50 @@ namespace ToDoModel
 
         public DateTime ReminderTime
         {
-            get => (DateTime)GetOrLoad(ref _reminderTime, () => FlaggableItem.ReminderTime, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _reminderTime, () => FlaggableItem.ReminderTime, FlaggableItem);
             set => _reminderTime = value;
         }
         private DateTime? _reminderTime = null;
 
         public DateTime DueDate
         {
-            get => (DateTime)GetOrLoad(ref _dueDate, DateTime.Parse("1/1/4501"), () => FlaggableItem.DueDate, FlaggableItem);
-            set => SetAndSave(ref _dueDate, value, (x) => FlaggableItem.DueDate = (DateTime)x);
+            get => (DateTime)Loader.GetOrLoad(ref _dueDate, DateTime.Parse("1/1/4501"), () => FlaggableItem.DueDate, FlaggableItem);
+            set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.DueDate = (DateTime)x);
         }
         private DateTime? _dueDate = null;
 
         public DateTime StartDate
         {
-            get => (DateTime)GetOrLoad(ref _startDate, TaskCreateDate, () => FlaggableItem.TaskStartDate, FlaggableItem);
-            set => SetAndSave(ref _dueDate, value, (x) => FlaggableItem.TaskStartDate = (DateTime)x);
+            get => (DateTime)Loader.GetOrLoad(ref _startDate, TaskCreateDate, () => FlaggableItem.TaskStartDate, FlaggableItem);
+            set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.TaskStartDate = (DateTime)x);
         }
         private DateTime? _startDate = null;
 
         public OlImportance Priority
         {
-            get => (OlImportance)GetOrLoad(ref _priority, OlImportance.olImportanceNormal, () => FlaggableItem.Importance, FlaggableItem);
-            set => SetAndSave(ref _priority, value, (x) => FlaggableItem.Importance = (OlImportance)x);
+            get => (OlImportance)Loader.GetOrLoad(ref _priority, OlImportance.olImportanceNormal, () => FlaggableItem.Importance, FlaggableItem);
+            set => Loader.SetAndSave(ref _priority, value, (x) => FlaggableItem.Importance = (OlImportance)x);
         }
         private OlImportance? _priority = null;
 
         public bool Complete
         {
-            get => (bool)GetOrLoad(ref _complete, () => FlaggableItem.Complete, FlaggableItem);
-            set => SetAndSave(ref _complete, value, (x) => FlaggableItem.Complete = (bool)x);
+            get => (bool)Loader.GetOrLoad(ref _complete, () => FlaggableItem.Complete, FlaggableItem);
+            set => Loader.SetAndSave(ref _complete, value, (x) => FlaggableItem.Complete = (bool)x);
         }
         private bool? _complete = null;
 
         public string TaskSubject
         {
-            get => GetOrLoad(ref _taskSubject, () => FlaggableItem.TaskSubject, FlaggableItem);
-            set => SetAndSave(ref _taskSubject, value, (x) => FlaggableItem.TaskSubject = x);
+            get => Loader.GetOrLoad(ref _taskSubject, () => FlaggableItem.TaskSubject, FlaggableItem);
+            set => Loader.SetAndSave(ref _taskSubject, value, (x) => FlaggableItem.TaskSubject = x);
         }
         private string _taskSubject = null;
 
         internal string Categories
         {
-            get => Load(() => FlaggableItem.Categories, FlaggableItem);
-            set => SetAndSave(value, (x) => FlaggableItem.Categories = x);
+            get => Loader.Load(() => FlaggableItem.Categories, FlaggableItem);
+            set => Loader.SetAndSave(value, (x) => FlaggableItem.Categories = x);
         }
 
         //public string get_People(bool IncludePrefix = false)
@@ -629,7 +634,7 @@ namespace ToDoModel
         private FlagTranslator _people;
         public FlagTranslator People
         {
-            get => GetOrLoad(ref _people, () => LoadPeople(), Flags);
+            get => Loader.GetOrLoad(ref _people, () => LoadPeople(), Flags);
             //set => SetAndSave(ref _people, value, (x) => UdfCategorySetter("TagPeople", x.AsStringNoPrefix));
         }
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -643,7 +648,7 @@ namespace ToDoModel
         private FlagTranslator _projects;
         public FlagTranslator Projects
         {
-            get => GetOrLoad(ref _projects, LoadProjects, Flags);
+            get => Loader.GetOrLoad(ref _projects, LoadProjects, Flags);
             //set => SetAndSave(ref _projects, value, (x) => UdfCategorySetter("TagProject", x.AsStringNoPrefix));
         }
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -655,7 +660,7 @@ namespace ToDoModel
         #region Program
 
         private FlagTranslator _program;
-        public FlagTranslator Program => GetOrLoad(ref _program, LoadProgram, Flags);
+        public FlagTranslator Program => Loader.GetOrLoad(ref _program, LoadProgram, Flags);
         [MethodImpl(MethodImplOptions.Synchronized)]
         private FlagTranslator LoadProgram() => new(Flags.GetProgram, Flags.SetProgram, Flags.GetProgramList, Flags.SetProgramList);
         async protected Task LoadProgramAsync() => await Task.Run(() => _program = LoadProgram());
@@ -667,7 +672,7 @@ namespace ToDoModel
         private FlagTranslator _context;
         public FlagTranslator Context
         {
-            get => GetOrLoad(ref _context, LoadContext, Flags);
+            get => Loader.GetOrLoad(ref _context, LoadContext, Flags);
             //set => SetAndSave(ref _context, value, (x) => UdfCategorySetter("TagContext", x.AsStringNoPrefix));
         }
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -681,7 +686,7 @@ namespace ToDoModel
         private FlagTranslator _topic;
         public FlagTranslator Topics
         {
-            get => GetOrLoad(ref _topic, LoadTopic, Flags);
+            get => Loader.GetOrLoad(ref _topic, LoadTopic, Flags);
             //set => SetAndSave(ref _topic, value, (x) => UdfCategorySetter("TagTopic", x.AsStringNoPrefix));
         }
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -695,7 +700,7 @@ namespace ToDoModel
         private FlagTranslator _kb;
         public FlagTranslator KB
         {
-            get => GetOrLoad(ref _kb, LoadKb, Flags);
+            get => Loader.GetOrLoad(ref _kb, LoadKb, Flags);
         }
         [MethodImpl(MethodImplOptions.Synchronized)]
         private FlagTranslator LoadKb() => new(Flags.GetKb, Flags.SetKb, Flags.GetKbList, Flags.SetKbList);
@@ -744,15 +749,15 @@ namespace ToDoModel
         private int? _totalWork = null;
         public int TotalWork
         {
-            get => (int)GetOrLoad(ref _totalWork, () => FlaggableItem.TotalWork, FlaggableItem);
-            set => SetAndSave(ref _totalWork, value, (x) => FlaggableItem.TotalWork = (int)x);
+            get => (int)Loader.GetOrLoad(ref _totalWork, () => FlaggableItem.TotalWork, FlaggableItem);
+            set => Loader.SetAndSave(ref _totalWork, value, (x) => FlaggableItem.TotalWork = (int)x);
         }
 
         private string _toDoID = null;
         public string ToDoID
         {
-            get => GetOrLoad(ref _toDoID, () => FlaggableItem.GetUdfString("ToDoID"), FlaggableItem);
-            set => SetAndSave(ref _toDoID, value, (x) =>
+            get => Loader.GetOrLoad(ref _toDoID, () => FlaggableItem.GetUdfString("ToDoID"), FlaggableItem);
+            set => Loader.SetAndSave(ref _toDoID, value, (x) =>
             {
                 if (!ReadOnly)
                 {
@@ -783,12 +788,12 @@ namespace ToDoModel
         private int? _visibleTreeState;
         public int VisibleTreeState
         {
-            get => (int)GetOrLoad(ref _visibleTreeState, 63, () => FlaggableItem.GetUdfValue<int>("VTS"), (x) => VisibleTreeSetAndSaver((int)x), FlaggableItem);
+            get => (int)Loader.GetOrLoad(ref _visibleTreeState, 63, () => FlaggableItem.GetUdfValue<int>("VTS"), (x) => VisibleTreeSetAndSaver((int)x), FlaggableItem);
             set => VisibleTreeSetAndSaver(value);
         }
         private void VisibleTreeSetAndSaver(int value)
         {
-            SetAndSave(ref _visibleTreeState, value, (x) => { FlaggableItem.TrySetUdf("VTS", x, OlUserPropertyType.olInteger); SplitID(); });
+            Loader.SetAndSave(ref _visibleTreeState, value, (x) => { FlaggableItem.TrySetUdf("VTS", x, OlUserPropertyType.olInteger); SplitID(); });
         }
 
         public bool ActiveBranch
@@ -827,12 +832,12 @@ namespace ToDoModel
         public bool EC3
         {
             //internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, Action<T> defaultSetAndSaver, params object[] dependencies)
-            get => GetOrLoad(value: ref _ec2, defaultValue: false, loader: () => FlaggableItem.GetUdfValue<bool>("EC2"), EC2SetAndSaver, FlaggableItem);
+            get => Loader.GetOrLoad(value: ref _ec2, defaultValue: false, loader: () => FlaggableItem.GetUdfValue<bool>("EC2"), EC2SetAndSaver, FlaggableItem);
             set => EC2SetAndSaver(value);
         }
         private void EC2SetAndSaver(bool value)
         {
-            SetAndSave(ref _ec2, value, (x) =>
+            Loader.SetAndSave(ref _ec2, value, (x) =>
             {
                 if (!ReadOnly) { FlaggableItem.TrySetUdf("EC2", value, OlUserPropertyType.olYesNo); }
                 var ecSymbolMeaning = ExpandChildren == "+";
@@ -1210,138 +1215,138 @@ namespace ToDoModel
             }
         }
 
-        internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter)
-        {
-            SetAndSave(ref variable, value, objectSetter, () => FlaggableItem.Save());
-        }
+        //internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter)
+        //{
+        //    SetAndSave(ref variable, value, objectSetter, () => FlaggableItem.Save());
+        //}
 
-        /// <summary>
-        /// Sets the value of a local private variable. If the item is not readonly, it also
-        /// sets the value of the corresponding property in the <seealso cref="OutlookItem"/> object"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="variable">Private variable caching the value</param>
-        /// <param name="value">Value to be saved</param>
-        /// <param name="objectSetter">Action that sets an object property to the value</param>
-        /// <param name="objectSaver">Action to save the object</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter, System.Action objectSaver)
-        {
-            variable = value;
-            if (!ReadOnly)
-            {
-                if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
-                objectSetter(value);
-                if (objectSaver is not null) { objectSaver(); }
-            }
-        }
+        ///// <summary>
+        ///// Sets the value of a local private variable. If the item is not readonly, it also
+        ///// sets the value of the corresponding property in the <seealso cref="OutlookItem"/> object"/>
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="variable">Private variable caching the value</param>
+        ///// <param name="value">Value to be saved</param>
+        ///// <param name="objectSetter">Action that sets an object property to the value</param>
+        ///// <param name="objectSaver">Action to save the object</param>
+        ///// <exception cref="ArgumentNullException"></exception>
+        //internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter, System.Action objectSaver)
+        //{
+        //    variable = value;
+        //    if (!ReadOnly)
+        //    {
+        //        if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
+        //        objectSetter(value);
+        //        if (objectSaver is not null) { objectSaver(); }
+        //    }
+        //}
 
-        /// <summary>
-        /// Sets the value of an <seealso cref="OutlookItem"/> property using a delegate. 
-        /// Value is not cached in a local variable in this overload. <seealso cref="OutlookItem.Save()"/> is called
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value">Value to be saved</param>
-        /// <param name="objectSetter">Action that sets an object property to the value</param>
-        internal void SetAndSave<T>(T value, Action<T> objectSetter)
-        {
-            SetAndSave(value, objectSetter, () => FlaggableItem.Save());
-        }
+        ///// <summary>
+        ///// Sets the value of an <seealso cref="OutlookItem"/> property using a delegate. 
+        ///// Value is not cached in a local variable in this overload. <seealso cref="OutlookItem.Save()"/> is called
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="value">Value to be saved</param>
+        ///// <param name="objectSetter">Action that sets an object property to the value</param>
+        //internal void SetAndSave<T>(T value, Action<T> objectSetter)
+        //{
+        //    SetAndSave(value, objectSetter, () => FlaggableItem.Save());
+        //}
 
-        internal void SetAndSave<T>(T value, Action<T> objectSetter, System.Action objectSaver)
-        {
-            if (!ReadOnly)
-            {
-                if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
-                objectSetter(value);
-                if (objectSaver is not null) { objectSaver(); }
-            }
-        }
+        //internal void SetAndSave<T>(T value, Action<T> objectSetter, System.Action objectSaver)
+        //{
+        //    if (!ReadOnly)
+        //    {
+        //        if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
+        //        objectSetter(value);
+        //        if (objectSaver is not null) { objectSaver(); }
+        //    }
+        //}
 
-        internal T GetOrLoad<T>(ref T value, Func<T> loader)
-        {
-            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
-            return value;
-        }
+        //internal T GetOrLoad<T>(ref T value, Func<T> loader)
+        //{
+        //    if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
+        //    return value;
+        //}
 
-        internal T GetOrLoad<T>(ref T value, Func<T> loader, params object[] dependencies)
-        {
-            if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
-            if (dependencies.Any(x => x is null))
-            {
-                var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
-                throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
-            }
-            return GetOrLoad(ref value, loader);
-        }
+        //internal T GetOrLoad<T>(ref T value, Func<T> loader, params object[] dependencies)
+        //{
+        //    if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
+        //    if (dependencies.Any(x => x is null))
+        //    {
+        //        var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
+        //        throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
+        //    }
+        //    return GetOrLoad(ref value, loader);
+        //}
 
-        internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, params object[] dependencies)
-        {
-            if (dependencies is null || dependencies.Any(x => x is null))
-            {
-                value = defaultValue;
-                return value;
-            }
-            else
-            {
-                try
-                {
-                    if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
-                    if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = defaultValue; }
-                }
-                catch (System.Exception)
-                {
-                    value = defaultValue;
-                }
+        //internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, params object[] dependencies)
+        //{
+        //    if (dependencies is null || dependencies.Any(x => x is null))
+        //    {
+        //        value = defaultValue;
+        //        return value;
+        //    }
+        //    else
+        //    {
+        //        try
+        //        {
+        //            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
+        //            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = defaultValue; }
+        //        }
+        //        catch (System.Exception)
+        //        {
+        //            value = defaultValue;
+        //        }
 
-                return value;
-            }
-        }
+        //        return value;
+        //    }
+        //}
 
-        internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, Action<T> defaultSetAndSaver, params object[] dependencies)
-        {
-            if (dependencies is null || dependencies.Any(x => x is null))
-            {
-                value = defaultValue;
-                return value;
-            }
-            else
-            {
-                try
-                {
-                    if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
-                    if (EqualityComparer<T>.Default.Equals(value, default(T)))
-                    {
-                        value = defaultValue;
-                        defaultSetAndSaver(value);
-                    }
-                }
-                catch (System.Exception)
-                {
-                    value = defaultValue;
-                    defaultSetAndSaver(value);
-                }
+        //internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, Action<T> defaultSetAndSaver, params object[] dependencies)
+        //{
+        //    if (dependencies is null || dependencies.Any(x => x is null))
+        //    {
+        //        value = defaultValue;
+        //        return value;
+        //    }
+        //    else
+        //    {
+        //        try
+        //        {
+        //            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
+        //            if (EqualityComparer<T>.Default.Equals(value, default(T)))
+        //            {
+        //                value = defaultValue;
+        //                defaultSetAndSaver(value);
+        //            }
+        //        }
+        //        catch (System.Exception)
+        //        {
+        //            value = defaultValue;
+        //            defaultSetAndSaver(value);
+        //        }
 
-                return value;
-            }
-        }
+        //        return value;
+        //    }
+        //}
 
-        internal T Load<T>(Func<T> loader, params object[] dependencies)
-        {
-            if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
-            if (dependencies.Any(x => x is null))
-            {
-                var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
-                throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
-            }
-            return loader();
-        }
+        //internal T Load<T>(Func<T> loader, params object[] dependencies)
+        //{
+        //    if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
+        //    if (dependencies.Any(x => x is null))
+        //    {
+        //        var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
+        //        throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
+        //    }
+        //    return loader();
+        //}
 
-        internal T Load<T>(Func<T> loader, T defaultValue, params object[] dependencies)
-        {
-            if (dependencies is null || dependencies.Any(x => x is null)) { return defaultValue; }
-            else { return loader(); }
-        }
+        //internal T Load<T>(Func<T> loader, T defaultValue, params object[] dependencies)
+        //{
+        //    if (dependencies is null || dependencies.Any(x => x is null)) { return defaultValue; }
+        //    else { return loader(); }
+        //}
 
         #endregion Get<T> and Set<T>
 

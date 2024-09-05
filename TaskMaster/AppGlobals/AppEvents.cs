@@ -245,7 +245,7 @@ namespace TaskMaster
         //    {
         //        if (_triage is null)
         //        {
-        //            logger.Debug("Triage is null. Skipping triage.");
+        //            //logger.Debug("Triage is null. Skipping triage.");
         //        }
         //        else
         //        {

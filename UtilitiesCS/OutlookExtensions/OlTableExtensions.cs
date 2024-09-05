@@ -145,20 +145,20 @@ namespace UtilitiesCS
                     catch (COMException e)
                     {
                         var inner = e.InnerException;
-                        logger.Debug($"Error in {nameof(RemoveColumns)}\ne.Message  {e.Message}\n" +
+                        logger.Warn($"Error in {nameof(RemoveColumns)}\ne.Message  {e.Message}\n" +
                             $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
                         if (inner is not null)
                         {
-                            logger.Debug($"InnerException in {nameof(RemoveColumns)}\ninner.Message  {inner.Message}\n" +
+                            logger.Error($"InnerException in {nameof(RemoveColumns)}\ninner.Message  {inner.Message}\n" +
                             $"e.HResult  {inner.HResult}\nStackTrace\n{inner.StackTrace}");
                         }
                         if (e.ErrorCode == -2147221233)
                         {
-                            logger.Debug($"Column {column} not found in table");
+                            logger.Warn($"Column {column} not found in table");
                         }
                         else if (e.ErrorCode == -2147352567)
                         {
-                            logger.Debug($"Column {column} is read-only");
+                            logger.Warn($"Column {column} is read-only");
                         }
                         else if (e.ErrorCode == -555728891)
                         {
@@ -292,7 +292,7 @@ namespace UtilitiesCS
                                                                                Dictionary<string, Func<object, string>> objectConverters = null,
                                                                                ProgressTracker progress = null)
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
             var columnDictionary = table.GetColumnDictionary();
             object[,] data = null;
             
@@ -302,7 +302,7 @@ namespace UtilitiesCS
                (objectConverters is not null && 
                objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
             {
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
                 data = EtlByRow(table, objectConverters, columnDictionary, progress);
             }
             else { data = (object[,])table.GetArray(table.GetRowCount()); }
@@ -325,7 +325,7 @@ namespace UtilitiesCS
             var attempts = 3;
             object[,] data = null;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
             var columnDictionary = table.GetColumnDictionary();
 
             table.MoveToStart();
@@ -337,7 +337,7 @@ namespace UtilitiesCS
                    (objectConverters is not null &&
                    objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
                 {
-                    logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRowAsync)} ...");
+                    //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRowAsync)} ...");
                     data = await EtlByRowAsync(table, objectConverters, columnDictionary, token, milliseconds, attempts, progress);
                 }
                 else
@@ -380,7 +380,7 @@ namespace UtilitiesCS
             object[,] data = null;
             Dictionary<string, int> columnInfo = null;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
             try
             {
                 (data, columnInfo) = await Task.Factory.StartNew(() => table.ETL(objectConverters, progress),
@@ -404,7 +404,7 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
             (var binFields, var binIndices) = GetBinFields(columnDictionary);
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
 
@@ -412,7 +412,7 @@ namespace UtilitiesCS
             //var rows = table.GetRows().ToAsyncEnumerable();
 
             token.ThrowIfCancellationRequested();
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
 
             int completed = 0;
             var jagged = rows.Select(rows => EtlRow(ref completed, rows, objectConverters, binIndices, objFields, objIndices));
@@ -454,7 +454,7 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
             (var binFields, var binIndices) = GetBinFields(columnDictionary);
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
             
@@ -463,14 +463,14 @@ namespace UtilitiesCS
                 token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
 
             token.ThrowIfCancellationRequested();
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
             var jagged = await Task.Factory.StartNew(() => rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild()),
                 token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
             
             //var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
             var data = jagged.To2D();
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
             return data;
         }
 
@@ -485,18 +485,18 @@ namespace UtilitiesCS
         /// <returns>2D object array with string data</returns>
         private static object[,] EtlByRow(Table table, Dictionary<string, Func<object, string>> objectConverters, Dictionary<string, int> columnDictionary, ProgressTracker progress = null)
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
             
             (var binFields, var binIndices) = GetBinFields(columnDictionary);
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
             var rows = table.CastToRowArray(progress?.SpawnChild(65));
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
 
             var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
             var data = jagged.To2D();
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
             return data;
         }
 
@@ -556,7 +556,7 @@ namespace UtilitiesCS
 
         private static Row[] CastToRowArray(this Table table, ProgressTracker progress) 
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Casting {nameof(Outlook.Table)} to IEnumerable<{nameof(Outlook.Row)}");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Casting {nameof(Outlook.Table)} to IEnumerable<{nameof(Outlook.Row)}");
             Row[] rows;
             var rowCount = table.GetRowCount();
             int completed = 0;
@@ -871,12 +871,12 @@ namespace UtilitiesCS
             }
             catch (TaskCanceledException e) 
             { 
-                logger.Debug($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                logger.Info($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
                 return null;
             }
             catch (System.Exception)
             {
-                logger.Debug($"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null");
+                logger.Warn($"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null");
                 return null;
             }
         }
@@ -889,12 +889,12 @@ namespace UtilitiesCS
             }
             catch (COMException e)
             {
-                logger.Debug($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
+                logger.Warn($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
                         $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
 
                 if (maxAttempts > 1) 
                 {                     
-                    logger.Debug($"Retrying {maxAttempts - 1} times ...");
+                    logger.Info($"Retrying {maxAttempts - 1} times ...");
                     return await folder.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts - 1); 
                 }
                 else { throw; }
@@ -922,12 +922,12 @@ namespace UtilitiesCS
             }
             catch (TaskCanceledException e)
             {
-                logger.Debug($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                logger.Info($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
                 return null;
             }
             catch (System.Exception)
             {
-                logger.Debug($"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null");
+                //logger.Debug($"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null");
                 return null;
             }
         }
@@ -940,7 +940,7 @@ namespace UtilitiesCS
             }
             catch (COMException e)
             {
-                logger.Debug($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
+                logger.Warn($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
                         $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
 
                 if (maxAttempts > 1)

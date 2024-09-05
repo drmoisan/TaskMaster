@@ -35,7 +35,7 @@ namespace UtilitiesCS
 
         public static void WriteTextFile(string filename, string[] strOutput, string folderpath)
         {
-            TraceUtility.LogMethodCall(filename, strOutput, folderpath);
+            //TraceUtility.LogMethodCall(filename, strOutput, folderpath);
 
             string filepath = Path.Combine(folderpath, filename);
             var listOutput = new List<string>(strOutput);
@@ -47,7 +47,7 @@ namespace UtilitiesCS
 
         public static async Task WriteTextFileAsync(string filename, string[] strOutput, string folderpath, CancellationToken token)
         {
-            TraceUtility.LogMethodCall(filename, strOutput, folderpath, token);
+            //TraceUtility.LogMethodCall(filename, strOutput, folderpath, token);
 
             string filepath = Path.Combine(folderpath, filename);
             bool success = false;

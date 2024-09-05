@@ -683,7 +683,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         {
                             logger.Error(e.Message, e);
                             Serialization.SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
-                            logger.Debug($"original prediction: {prediction}");
+                            //logger.Debug($"original prediction: {prediction}");
                             var predictions = classifierGroup.Classify(tokens).ToArray();
                             Serialization.SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
 
@@ -742,7 +742,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     logger.Error(e.Message, e);
                     Serialization.SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
-                    logger.Debug($"original prediction: {prediction}");
+                    //logger.Debug($"original prediction: {prediction}");
                     var predictions = classifierGroup.Classify(tokens).ToArray();
                     Serialization.SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
 
@@ -1025,7 +1025,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             await Serialization.SaveTextsAsync([scoresText], "TestScores");
             
             progress.Report(100);
-            logger.Debug($"\n{scoresText}");
+            //logger.Debug($"\n{scoresText}");
         }
 
         public virtual async Task SaveScoresAsync(IEnumerable<VerboseTestScores> verboseScores, ProgressTrackerPane progress)
@@ -1056,7 +1056,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 ["Class", "TP", "FP", "FN", "TN", "Precision", "Recall", "F1"],
                 Enumerable.Repeat(Enums.Justification.Center, 8).ToArray(), "Classifier Performance By Class");
             await Serialization.SaveTextsAsync([scoresText], "TestScores");
-            logger.Debug($"\n{scoresText}");
+            //logger.Debug($"\n{scoresText}");
             progress.Report(100);
         }
 

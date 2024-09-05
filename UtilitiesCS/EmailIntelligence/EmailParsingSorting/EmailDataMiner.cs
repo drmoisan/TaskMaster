@@ -82,7 +82,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     }
                     catch (System.Exception e)
                     {
-                        logger.Debug($"Error deleting file {file}. \n{e.Message}\n{e.StackTrace}");
+                        logger.Error($"Error deleting file {file}. \n{e.Message}\n{e.StackTrace}");
                     }
                 }
             });
@@ -172,12 +172,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         private static void LogFolderChunkMetrics(long availableRAM, OlFolderInfo[][] folderChunks, long totalSize, int totalCount)
         {
-            logger.Debug($"Available RAM {availableRAM / (double)1000000:N0} MG");
-            logger.Debug($"Max Object Size in VSTO {MaxObjectSize / (double)1000000000:N1} GB");
-            logger.Debug($"Total Size: {totalSize / (double)1000000:N0} MG");
-            logger.Debug($"Total Item Count: {totalCount:N0}");
-            logger.Debug($"Average Item Size: {(totalSize / (double)totalCount) / 1000:N0} K");
-            logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
+            //logger.Debug($"Available RAM {availableRAM / (double)1000000:N0} MG");
+            //logger.Debug($"Max Object Size in VSTO {MaxObjectSize / (double)1000000000:N1} GB");
+            //logger.Debug($"Total Size: {totalSize / (double)1000000:N0} MG");
+            //logger.Debug($"Total Item Count: {totalCount:N0}");
+            //logger.Debug($"Average Item Size: {(totalSize / (double)totalCount) / 1000:N0} K");
+            //logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
         }
 
         internal async Task<bool> TryResolveMapiHandles(OlFolderInfo[] folders)
@@ -244,9 +244,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var availableRam = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
             var maxChunkSize = Math.Min(availableRam, MaxObjectSize) * 95 / 100;
-            logger.Debug($"Available RAM {availableRam / (double)1000000000:N2} GB");
-            logger.Debug($"Max Obj Size  {MaxObjectSize / (double)1000000000:N2} GB");
-            logger.Debug($"Min(RAM, Max) {maxChunkSize / (double)1000000000:N2} GB");
+            //logger.Debug($"Available RAM {availableRam / (double)1000000000:N2} GB");
+            //logger.Debug($"Max Obj Size  {MaxObjectSize / (double)1000000000:N2} GB");
+            //logger.Debug($"Min(RAM, Max) {maxChunkSize / (double)1000000000:N2} GB");
 
             var folderRecords = AddRollingMeasures(maxChunkSize, folders);
             SerializeAndSave(folderRecords, "StagingFolderRecordsWithTotals");
@@ -286,7 +286,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     ],
                     "Summary Metrics");
 
-            logger.Debug($"Summary data on folder chunking\n{summaryText}");
+            //logger.Debug($"Summary data on folder chunking\n{summaryText}");
 
             SerializeAndSave(folderChunks, "StagingFolderChunks");
 
@@ -409,7 +409,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var (completed, chunkCount) = await EmailDataMiner.DeserializeAsync<(int, int)>(folderPath, "FolderGroupCompleted");
             if (folderChunks.Count() != chunkCount)
             {
-                logger.Debug($"FolderChunks count {folderChunks.Count()} does not match chunkCount {chunkCount}. Restarting transformation with new data");
+                //logger.Debug($"FolderChunks count {folderChunks.Count()} does not match chunkCount {chunkCount}. Restarting transformation with new data");
                 chunkCount = folderChunks.Count();
                 completed = 0;
             }
@@ -878,7 +878,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    }
         //    catch (OperationCanceledException)
         //    {
-        //        logger.Debug("Classifier calculation canceled");
+        //        //logger.Debug("Classifier calculation canceled");
         //    }
 
         //    progress.Report(100);
@@ -958,7 +958,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    }
         //    catch (OperationCanceledException)
         //    {
-        //        logger.Debug("Classifier calculation canceled");
+        //        //logger.Debug("Classifier calculation canceled");
         //    }
             
 
@@ -984,7 +984,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    //{
         //    //    progressTimer.Stop();
         //    //    progressTimer.Dispose();
-        //    //    logger.Debug("Classifier calculation canceled");
+        //    //    //logger.Debug("Classifier calculation canceled");
         //    //}
 
         //    progress.Report(100);
@@ -1103,7 +1103,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    }
         //    catch (OperationCanceledException)
         //    {
-        //        logger.Debug("Classifier calculation canceled");
+        //        //logger.Debug("Classifier calculation canceled");
         //    }
 
         //    progress.Report(100);
@@ -1216,7 +1216,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 [Enums.Justification.Left, Enums.Justification.Right],
                 $"{objectName} Size");
 
-            logger.Debug($"Object size calculations:\n{text}");
+            //logger.Debug($"Object size calculations:\n{text}");
         }
 
         public virtual void SerializeActiveItem()

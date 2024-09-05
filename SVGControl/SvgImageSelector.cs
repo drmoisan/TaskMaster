@@ -10,10 +10,7 @@ using System.Drawing;
 using System.Diagnostics;
 using Svg;
 using System.Runtime.CompilerServices;
-using System.Reflection;
-using System.Resources;
-using System.Xml.Linq;
-using System.Globalization;
+
 
 namespace SVGControl
 {
@@ -27,14 +24,14 @@ namespace SVGControl
     [TypeConverter(typeof(SvgOptionsConverter))]
     public class SvgImageSelector : INotifyPropertyChanged
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize)
         {
             ResourceNames = new List<ISvgResource>();
             _renderer = new SvgRenderer(outer, margin, autoSize);
             _renderer.PropertyChanged += Renderer_PropertyChanged;
-            Debug.WriteLine("SvgImageSelector Initialized");
+            //logger.Debug("SvgImageSelector Initialized");
         }
 
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize, bool useDefaultImage)
@@ -50,7 +47,7 @@ namespace SVGControl
             }
             else { _renderer = new SvgRenderer(outer, margin, autoSize); }
             _renderer.PropertyChanged += Renderer_PropertyChanged;
-            Debug.WriteLine("SvgImageSelector Initialized");
+            //logger.Debug("SvgImageSelector Initialized");
         }
 
         //private SvgDocument _doc;

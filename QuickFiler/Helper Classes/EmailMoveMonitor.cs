@@ -60,13 +60,13 @@ namespace QuickFiler.Helper_Classes
 
             if (mail is null) 
             { 
-                logger.Debug("Mail item is null. Returning.");
+                //logger.Debug("Mail item is null. Returning.");
                 return; 
             }
             var parent = await GetParentFolderAsync(mail);
             if (parent is null) 
             { 
-                logger.Debug("Parent folder is null. Returning.");
+                //logger.Debug("Parent folder is null. Returning.");
                 return; 
             }
             lock (_hookedItems)

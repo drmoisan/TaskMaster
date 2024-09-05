@@ -48,14 +48,14 @@ namespace QuickFiler.Controllers
 
         public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress) 
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
             progress.Report(0, "Initializing Data Model");
 
             var model = new QfcDatamodel(appGlobals);
             model.Token = token;
             model.TokenSource = tokenSource;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
             await model.InitDfAsync(appGlobals.Ol.App.ActiveExplorer(), progress.Increment(2)).ConfigureAwait(false);
             return model;
         }
@@ -233,7 +233,7 @@ namespace QuickFiler.Controllers
                 }
                 catch (OperationCanceledException)
                 {
-                    logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
                     return false;
                 }
                 catch (System.Exception e)
@@ -263,7 +263,7 @@ namespace QuickFiler.Controllers
             //}
             //catch (TaskCanceledException)
             //{
-            //    logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+            //    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
             //    return false;
             //}
 
@@ -294,7 +294,7 @@ namespace QuickFiler.Controllers
             }
             catch (TaskCanceledException)
             {
-                logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
+                //logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
                 return false;
             }
             
@@ -345,14 +345,14 @@ namespace QuickFiler.Controllers
 
             if (df is not null)
             {
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
                 // Filter out non-email items
                 df = df.FilterRowsBy("MessageClass", "IPM.Note");
 
                 // Filter to the latest email in each conversation
                 var dfFiltered = MostRecentByConversation(df);
 
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
                 // Sort by triage classification and then date
                 _frame = SortTriageDate(dfFiltered);
 
@@ -364,10 +364,10 @@ namespace QuickFiler.Controllers
         {
             Frame<int, string> df = null;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
             var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
             try
             {
                 df = await DfDeedle.GetEmailDataInViewAsync(
@@ -381,7 +381,7 @@ namespace QuickFiler.Controllers
             }
             catch (TaskCanceledException)
             {
-                logger.Debug($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Task cancelled");
+                //logger.Debug($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Task cancelled");
                 await ToggleOfflineMode(offline);
                 return null;
             }

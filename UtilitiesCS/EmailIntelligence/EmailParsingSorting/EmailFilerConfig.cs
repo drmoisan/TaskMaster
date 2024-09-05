@@ -111,7 +111,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         
         public void ResolvePaths(Folder currentFolder)
         {
-            TraceUtility.LogMethodCall(currentFolder, DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(currentFolder, DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
             
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
             SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
@@ -126,7 +126,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         public void ResolvePaths()
         {
-            TraceUtility.LogMethodCall(DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
             SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);            
@@ -142,7 +142,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             }
             catch (System.Exception e)
             {
-                logger.Debug($"Cannot grab handle on Folder {DestinationOlPath}. Emails will not be moved");
+                //logger.Debug($"Cannot grab handle on Folder {DestinationOlPath}. Emails will not be moved");
                 logger.Error(e);
                 return null;
             }

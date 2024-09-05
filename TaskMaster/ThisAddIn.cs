@@ -13,7 +13,7 @@ namespace TaskMaster
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            logger.Debug($"Application Starting");
+            //logger.Debug($"Application Starting");
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
@@ -22,12 +22,12 @@ namespace TaskMaster
 
             Application.Startup += Application_Startup;
 
-            logger.Debug("ThisAddIn_Startup() complete");
+            //logger.Debug("ThisAddIn_Startup() complete");
         }
 
         private async void Application_Startup()
         {
-            logger.Debug("Application_Startup() fired");
+            //logger.Debug("Application_Startup() fired");
             // Create the global variables
             _globals = new ApplicationGlobals(Application);
 
@@ -38,24 +38,13 @@ namespace TaskMaster
             tlvIndent = (int)(tlvIndent * UiThread.AutoScaleFactor.Width);
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
 
-            // Initialize long loading elements on a low priority thread
-            //EfcViewerQueue.BuildQueue(2);
-            //ItemViewerQueue.BuildQueueBackground(30);
-
             // Initialize the global variables on a low priority thread
             var loadGlobals = _globals.LoadAsync();
-
-            // Initialize IdleAction Queue so that breakpoint is hit after UI
-            //IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
-            //IdleActionQueue.AddEntry(() => _globals.TD.LoadPrefixList());
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new();
             Console.SetOut(tw);
-            //Console.SetOut(new DebugTextWriter());
-            //Console.SetOut(new DebugTextLogger());
-            //Console.WriteLine("Test of console output redirect to logger");
-
+            
             // Send a reference to the ribbon controller and external utilities for future use
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
@@ -65,7 +54,7 @@ namespace TaskMaster
             
             await loadGlobals;
 
-            logger.Debug("Application_Startup() complete");
+            //logger.Debug("Application_Startup() complete");
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

@@ -191,7 +191,7 @@ namespace QuickFiler.Controllers
             CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
 
             await _itemViewer.UiSyncContext;
-            Debug.WriteLine($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
+            //logger.Debug($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
             // Create the environment manually
             Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 

@@ -114,19 +114,19 @@ namespace UtilitiesCS
         {
             if (OlRoot is null || OlFolder is null)
             {
-                logger.Debug($"{nameof(OlRoot)} or {nameof(OlFolder)} is null. Unable to load {nameof(RelativePath)}.\n" +
+                logger.Warn($"{nameof(OlRoot)} or {nameof(OlFolder)} is null. Unable to load {nameof(RelativePath)}.\n" +
                     $"Call hierarchy {new StackTrace().GetMyTraceString()}");
                 return null;
             }
             else if (OlFolder.FolderPath == OlRoot.FolderPath)
             {
-                logger.Debug($"{nameof(OlFolder.FolderPath)} is the same as {nameof(OlRoot.FolderPath)}. " +
+                logger.Warn($"{nameof(OlFolder.FolderPath)} is the same as {nameof(OlRoot.FolderPath)}. " +
                     $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}");
                 return OlFolder.FolderPath;
             }
             else if (!OlFolder.FolderPath.Contains(OlRoot.FolderPath))
             {
-                logger.Debug($"{nameof(OlFolder.FolderPath)} does not contain {nameof(OlRoot.FolderPath)}. " +
+                logger.Warn($"{nameof(OlFolder.FolderPath)} does not contain {nameof(OlRoot.FolderPath)}. " +
                     $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}");
                 return OlFolder.FolderPath;
             }

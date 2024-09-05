@@ -9,6 +9,7 @@ using FluentAssertions;
 
 namespace UtilitiesCS.Test
 {
+    [Obsolete]
     [TestClass]
     public class OutlookItemSummary_Test
     {

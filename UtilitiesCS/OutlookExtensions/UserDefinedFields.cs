@@ -272,7 +272,7 @@ namespace UtilitiesCS.OutlookExtensions
             var errors = arrErrors as object[];
             if (!errors.IsNullOrEmpty())
             {
-                logger.Debug($"Errors in setting properties: {string.Join(", ", errors)}");
+                //logger.Debug($"Errors in setting properties: {string.Join(", ", errors)}");
             }
         }
 

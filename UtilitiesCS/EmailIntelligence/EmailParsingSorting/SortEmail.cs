@@ -71,8 +71,8 @@ namespace UtilitiesCS
                                            string olAncestor,
                                            string fsAncestorEquivalent)
         {
-            TraceUtility.LogMethodCall(mailHelpers, savePictures, destinationOlStem, saveMsg,
-                saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(mailHelpers, savePictures, destinationOlStem, saveMsg,
+            //    saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
 
             if (mailHelpers is null || mailHelpers.Count == 0)
             { throw new ArgumentNullException($"{mailHelpers} is null or empty"); }
@@ -87,7 +87,7 @@ namespace UtilitiesCS
             // Exit if the destination folder cannot be resolved
             if (destinationFolder is null)
             {
-                logger.Debug($"Folder with path {destinationOlPath} could not be resolved. Emails will not be moved");
+                //logger.Debug($"Folder with path {destinationOlPath} could not be resolved. Emails will not be moved");
                 return;
             }
 
@@ -191,8 +191,8 @@ namespace UtilitiesCS
                                      string olAncestor,
                                      string fsAncestorEquivalent)
         {
-            TraceUtility.LogMethodCall(mailItems, savePictures, destinationOlStem, saveMsg, 
-                saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(mailItems, savePictures, destinationOlStem, saveMsg, 
+            //    saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
 
             if (mailItems is null || mailItems.Count == 0) 
             { throw new ArgumentNullException($"{mailItems} is null or empty"); }
@@ -249,7 +249,7 @@ namespace UtilitiesCS
                 }
                 if (olDestination is null)
                 {
-                    logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
+                    //logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
                 }
                 
                 MailItem mailItemTemp = null;
@@ -261,7 +261,7 @@ namespace UtilitiesCS
                     }
                     else 
                     { 
-                        logger.Debug($"Folder with path {destinationOlPath} could not be resolved so the mail cannot be moved");
+                        //logger.Debug($"Folder with path {destinationOlPath} could not be resolved so the mail cannot be moved");
                     }
                     
                 }
@@ -466,7 +466,7 @@ namespace UtilitiesCS
             bool saveAttachments,
             bool savePictures)
         {
-            TraceUtility.LogMethodCall(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
+            //TraceUtility.LogMethodCall(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
             var attachments = mailItem.Attachments
                                       .Cast<Attachment>()
                                       .Where(x => x.Type != OlAttachmentType.olOLE)
@@ -527,7 +527,7 @@ namespace UtilitiesCS
 
         async public static Task SaveAttachmentAsync(this AttachmentHelper attachmentHelper)
         {
-            TraceUtility.LogMethodCall(attachmentHelper);
+            //TraceUtility.LogMethodCall(attachmentHelper);
 
             if (File.Exists(attachmentHelper.FilePathSave))
             {
@@ -567,10 +567,10 @@ namespace UtilitiesCS
 
         async public static Task SaveAttachmentAsync(this AttachmentHelper attachmentHelper, string destinationPath)
         {
-            TraceUtility.LogMethodCall(attachmentHelper);
-            logger.Debug($"Original Destination Path {attachmentHelper.FolderPathSave}");
+            //TraceUtility.LogMethodCall(attachmentHelper);
+            //logger.Debug($"Original Destination Path {attachmentHelper.FolderPathSave}");
             attachmentHelper.FolderPathSave = destinationPath;
-            logger.Debug($"New Destination Path {attachmentHelper.FolderPathSave}");
+            //logger.Debug($"New Destination Path {attachmentHelper.FolderPathSave}");
 
 
             await SaveAttachmentAsync(attachmentHelper);
@@ -719,7 +719,7 @@ namespace UtilitiesCS
             out string saveFsPath, 
             out string deleteFsPath)
         {
-            TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
 
             destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
 
@@ -749,7 +749,7 @@ namespace UtilitiesCS
             out string deleteFsPath,
             out Folder destinationFolder)
         {
-            TraceUtility.LogMethodCall(currentFolder, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(currentFolder, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
 
             destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
             
@@ -772,7 +772,7 @@ namespace UtilitiesCS
             }
             catch (System.Exception e)
             {
-                logger.Debug($"Cannot grab handle on Folder {destinationOlPath}. Emails will not be moved");
+                //logger.Debug($"Cannot grab handle on Folder {destinationOlPath}. Emails will not be moved");
                 logger.Error(e);
             }
             
@@ -782,7 +782,7 @@ namespace UtilitiesCS
             MailItem mailItem,
             string fsLocation)
         {
-            TraceUtility.LogMethodCall(mailItem, fsLocation);
+            //TraceUtility.LogMethodCall(mailItem, fsLocation);
 
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
             
@@ -1012,7 +1012,7 @@ namespace UtilitiesCS
             MailItem oMailTmp,
             IApplicationGlobals _globals)
         {
-            TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
+            //TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath).Skip(1).ToArray();
             var output = SanitizeArrayLineTSV(ref strAry);

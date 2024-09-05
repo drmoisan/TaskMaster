@@ -7,7 +7,7 @@ namespace UtilitiesCS
     {
         public static Folder GetCalendar(string CalendarName, NameSpace Session)
         {
-            TraceUtility.LogMethodCall(CalendarName, Session);
+            //TraceUtility.LogMethodCall(CalendarName, Session);
 
             Folders OlCalendars;
             Folder foundCalendar = null;

@@ -94,7 +94,7 @@ namespace QuickFiler.Controllers
 
         public async Task InitializeAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             // Group controls into collections
             _token.ThrowIfCancellationRequested();
@@ -247,7 +247,7 @@ namespace QuickFiler.Controllers
 
         internal async Task InitializeWebViewAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             _token.ThrowIfCancellationRequested();
 
@@ -354,7 +354,7 @@ namespace QuickFiler.Controllers
 
         internal async Task PopulateControlsAsync(MailItem mailItem, int viewerPosition, bool loadAll)
         {
-            TraceUtility.LogMethodCall(mailItem, viewerPosition, loadAll);
+            //TraceUtility.LogMethodCall(mailItem, viewerPosition, loadAll);
 
             _token.ThrowIfCancellationRequested();
 
@@ -382,7 +382,7 @@ namespace QuickFiler.Controllers
 
         internal void AssignControls(MailItemHelper itemInfo, int viewerPosition)
         {
-            TraceUtility.LogMethodCall(itemInfo, viewerPosition);
+            //TraceUtility.LogMethodCall(itemInfo, viewerPosition);
 
             _itemViewer.LblSender.Text = itemInfo.SenderName;
             _itemViewer.LblSubject.Text = itemInfo.Subject;
@@ -510,7 +510,7 @@ namespace QuickFiler.Controllers
 
         public void PopulateFolderComboBox(object varList = null)
         {
-            TraceUtility.LogMethodCall(varList);
+            //TraceUtility.LogMethodCall(varList);
 
             LoadFolderHandler(varList);
 
@@ -941,7 +941,7 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            TraceUtility.LogMethodCall(sender, e);
+            //TraceUtility.LogMethodCall(sender, e);
 
             _optionConversationChecked = _itemViewer.ConversationMenuItem.Checked;
             if (!SuppressEvents)
@@ -1429,7 +1429,7 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleTipsAsync(Enums.ToggleState desiredState)
         {
-            TraceUtility.LogMethodCall(desiredState);
+            //TraceUtility.LogMethodCall(desiredState);
 
             _token.ThrowIfCancellationRequested();
 
@@ -1537,7 +1537,7 @@ namespace QuickFiler.Controllers
 
         internal void CollapseConversation()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             var entryID = _convOriginID != "" ? _convOriginID :  Mail.EntryID;
@@ -1546,7 +1546,7 @@ namespace QuickFiler.Controllers
 
         internal void EnumerateConversation() 
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
             _parent.ToggleUnGroupConv(ConversationResolver,
@@ -1579,7 +1579,7 @@ namespace QuickFiler.Controllers
 
         async public Task MoveMailAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             if (ItemInfo is not null)
             {
@@ -1602,7 +1602,7 @@ namespace QuickFiler.Controllers
                 }
                 catch (System.Exception e)
                 {
-                    logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
+                    //logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
                     logger.Error($"{e}");
                     MessageBox.Show($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
                 }
@@ -1612,7 +1612,7 @@ namespace QuickFiler.Controllers
         }
         //async public Task MoveMailAsync()
         //{
-        //    TraceUtility.LogMethodCall();
+        //    //TraceUtility.LogMethodCall();
 
         //    if (Mail is not null)
         //    {
@@ -1633,7 +1633,7 @@ namespace QuickFiler.Controllers
         //        }
         //        catch (System.Exception e)
         //        {
-        //            logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
+        //            //logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
         //            logger.Error($"{e}");
         //            MessageBox.Show($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
         //        }

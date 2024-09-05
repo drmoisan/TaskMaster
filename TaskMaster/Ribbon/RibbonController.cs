@@ -210,7 +210,7 @@ namespace TaskMaster
             var Mail = _globals.Ol.App.ActiveExplorer().Selection[1];
             Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
             Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
-            Debug.WriteLine(df.PrettyText());
+            //logger.Debug(df.PrettyText());
             df.Display();
         }
         internal void TryGetConversationOutlookTable()
@@ -224,7 +224,7 @@ namespace TaskMaster
         {
             var mailItem = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
             var helper = new MailItemHelper(mailItem, _globals);
-            logger.Debug(helper.Item.HTMLBody);
+            //logger.Debug(helper.Item.HTMLBody);
         }
 
         internal void TryGetMailItemInfoViaConversation()

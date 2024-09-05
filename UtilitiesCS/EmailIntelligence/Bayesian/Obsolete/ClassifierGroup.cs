@@ -126,7 +126,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var jagged = metrics.Select(x => new[] { x.Descriptor, x.Match.ToString("N0"), x.NotMatch.ToString("N0"), x.Probability.ToString("N0"), x.Total.ToString("N0") }).ToArray();
             //var jagged = metrics.Select(x => new object[] { x.Descriptor, x.Match, x.NotMatch, x.Probability, x.Total }).ToArray();
 
-            logger.Debug($"\n{jagged.ToFormattedText(
+            logger.Info($"\n{jagged.ToFormattedText(
                     ["Descriptor", "Matches", "Not Match", "Probability", "Total Lines"],
                     [Enums.Justification.Left, Enums.Justification.Right, 
                         Enums.Justification.Right, Enums.Justification.Right, 
@@ -136,7 +136,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public void LogState() 
         {
-            logger.Debug($"\n{
+            logger.Info($"\n{
                 Classifiers
                 .Select(x => new[]
                     {
@@ -171,7 +171,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var sw = new SegmentStopWatch().Start();
             
             AppGlobals.AF.ProgressPane.Visible = true;
-            logger.Debug("Starting Classifier Probability Calculation");
+            //logger.Debug("Starting Classifier Probability Calculation");
             AppGlobals.AF.ProgressTracker.Report(0, "Starting Classifier Probability Calculation");
             sw.LogDuration("Initialized AfterDeserialize");
 
@@ -260,7 +260,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
             catch (OperationCanceledException)
             {
-                logger.Debug("Loading Canceled by User");
+                //logger.Debug("Loading Canceled by User");
             }
         }
 
@@ -282,7 +282,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
             catch (OperationCanceledException)
             {
-                logger.Debug("Loading Canceled by User");
+                //logger.Debug("Loading Canceled by User");
             }
         }
         

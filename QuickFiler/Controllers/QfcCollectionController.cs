@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using UtilitiesCS;
 using QuickFiler.Helper_Classes;
 using System.Threading;
-using System.ComponentModel.Composition.Hosting;
+using System.Collections.Concurrent;
 
 namespace QuickFiler.Controllers
 {
@@ -59,7 +59,7 @@ namespace QuickFiler.Controllers
         private TableLayoutPanel _itemTlp;
         private TableLayoutPanel _itemTlpToMove;
         private TableLayoutPanel _templateTlp;
-        private List<QfcItemGroup> _itemGroupsToMove;
+        private ConcurrentDictionary<QfcItemGroup, int> _itemGroupsToMove;
         private bool _darkMode;
         private RowStyle _template;
         private RowStyle _templateExpanded;
@@ -481,7 +481,9 @@ namespace QuickFiler.Controllers
 
         internal void CacheItemGroupsForMove()
         {
-            _itemGroupsToMove = _itemGroups;
+            _itemGroupsToMove = _itemGroups
+                .Select(group => new KeyValuePair<QfcItemGroup, int>(group,1))
+                .ToConcurrentDictionary();
         }
         
         internal void ActivateQueuedItemGroups(List<QfcItemGroup> itemGroups)
@@ -502,7 +504,7 @@ namespace QuickFiler.Controllers
         public void CacheMoveObjects()
         {
             _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
-            _itemGroupsToMove = _itemGroups;
+            CacheItemGroupsForMove();
         }
                 
         public ItemViewer LoadItemViewer_03(int indexNumber,
@@ -584,7 +586,7 @@ namespace QuickFiler.Controllers
         {
             if (_itemGroupsToMove is not null)
             {
-                _itemGroupsToMove.ForEach(grp => grp.ItemController.Cleanup());
+                _itemGroupsToMove.ForEach(kvp => kvp.Key.ItemController.Cleanup());
                 _itemGroupsToMove.Clear();
             }
             if (_itemTlpToMove is not null)
@@ -1570,34 +1572,51 @@ namespace QuickFiler.Controllers
 
         async public Task MoveEmailsAsync(ScoStack<IMovedMailInfo> stackMovedItems)
         {
-            TraceUtility.LogMethodCall(stackMovedItems);
+            //TraceUtility.LogMethodCall(stackMovedItems);
             var count = _itemGroupsToMove?.Count() ?? 0;
             if (count <= 0) { return; }
-            await Enumerable.Range(0, count).ToAsyncEnumerable().ForEachAwaitAsync(TryMoveEmailAsync);
+            await Enumerable.Range(0, count).ToAsyncEnumerable().ForEachAwaitAsync(TryMoveEmailByGroupIndexAsync);
 
             //await _itemGroupsToMove.ToAsyncEnumerable().ForEachAwaitAsync(
             //    async grp => await grp.ItemController.MoveMailAsync());
         }
 
-        async private Task TryMoveEmailAsync(int i) 
+        async private Task TryMoveEmailByGroupIndexAsync(int i)
         {
-            var grp = _itemGroupsToMove[i];
+            var group = TryGetItemGroupByIndex(i);
+            await TryMoveEmailByGroupAsync(group);
+        }
+
+        private static async Task TryMoveEmailByGroupAsync(QfcItemGroup group)
+        {
             try
             {
-                await grp.ItemController.MoveMailAsync();
+                await group.ItemController.MoveMailAsync();
             }
             catch (System.Exception e)
             {
                 var subject = "";
                 try
                 {
-                    subject = grp.MailItem.Subject;
+                    subject = group.MailItem.Subject;
                 }
                 catch (System.Exception e2)
                 {
                     logger.Error($"Unable to retrieve subject {e2.Message}", e2);
                 }
                 logger.Error($"Error moving message {subject}. Continuing execution.\n{e.Message}", e);
+            }
+        }
+
+        private QfcItemGroup TryGetItemGroupByIndex(int index)
+        {
+            try
+            {
+                return _itemGroupsToMove.ElementAt(index).Key;                
+            }
+            catch (System.Exception)
+            {
+                return null;
             }
         }
 
@@ -1609,14 +1628,14 @@ namespace QuickFiler.Controllers
             DateTime OlEndTime,
             ref AppointmentItem OlAppointment)
         {
-            TraceUtility.LogMethodCall(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, OlAppointment);
+            //TraceUtility.LogMethodCall(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, OlAppointment);
             
             int k;
             string[] strOutput = new string[_itemGroupsToMove.Count + 1];
             var loopTo = _itemGroupsToMove.Count;
             for (k = 0; k < loopTo; k++)
             {
-                var QF = _itemGroupsToMove[k].ItemController;
+                var QF = TryGetItemGroupByIndex(k)?.ItemController;
                 var infoMail = new cInfoMail();
                 if (infoMail.Init_wMail(QF.Mail, OlEndTime: OlEndTime, lngDurationSec: (int)Math.Round(Duration)))
                 {
@@ -1631,16 +1650,16 @@ namespace QuickFiler.Controllers
                         OlAppointment.Save();
                     }
                 }
-                string dataLine = dataLineBeg + xComma(QF.Subject);
-                dataLine = dataLine + "," + "QuickFiled";
-                dataLine = dataLine + "," + durationText;
-                dataLine = dataLine + "," + durationMinutesText;
-                dataLine = dataLine + "," + xComma(QF.To);
-                dataLine = dataLine + "," + xComma(QF.Sender);
-                dataLine = dataLine + "," + "Email";
-                dataLine = dataLine + "," + xComma(QF.SelectedFolder);           // Target Folder
-                dataLine = dataLine + "," + QF.SentDate;
-                dataLine = dataLine + "," + QF.SentTime;
+                var dataLine = $"{dataLineBeg} {xComma(QF.Subject)},QuickFiled,{durationText},{durationMinutesText},";
+                if (QF is not null)
+                {
+                    dataLine += $"{xComma(QF.To)},{xComma(QF.Sender)},Email,{xComma(QF.SelectedFolder)},{QF.SentDate},{QF.SentTime}";
+                }
+                else
+                {
+                    dataLine += $"To Unknown,Sender Unknown,Email,Folder Unknown,Sent Date Unknown,Sent Time Unknown";
+                }
+                                
                 strOutput[k] = dataLine;
             }
 

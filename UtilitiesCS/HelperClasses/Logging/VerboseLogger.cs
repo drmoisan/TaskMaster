@@ -37,14 +37,14 @@ namespace UtilitiesCS
         {
             if (IsVerbose(memberName))
             {
-                logger.Debug(message);
+                //logger.Debug(message);
             }
         }
         public void LogObject(IDictionary<string, long> dict, string name, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
         {
             if (IsVerbose(memberName))
             {
-                logger.Debug($"{memberName}.{name} :\n{dict.ToFormattedText()}");
+                //logger.Debug($"{memberName}.{name} :\n{dict.ToFormattedText()}");
             }
         }
     }

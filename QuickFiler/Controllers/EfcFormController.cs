@@ -70,6 +70,7 @@ namespace QuickFiler.Controllers
         {
             LoadUserSettings();
             CaptureConfigureItemViewer();
+            ConfigureFind();
             ResolveControlGroups();
             _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel, _token);
             SetupThemes();
@@ -82,6 +83,7 @@ namespace QuickFiler.Controllers
         {
             LoadUserSettings();
             CaptureConfigureItemViewer();
+            ConfigureFind();
             ResolveControlGroups();
             _itemController.InitializeWithoutData();
             SetupThemes();
@@ -156,6 +158,17 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
+        public void ConfigureFind() 
+        { 
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
+            {
+                _formViewer.Text = "Quick Filer - Find Folder";
+                _formViewer.Ok.Text = "Open Outlook Folder";
+                _formViewer.NewFolder.Text = "Open File System Folder";
+
+            }
+        }
+        
         internal void ResolveControlGroups()
         {
             _listTipsDetails = _formViewer.TipsLabels

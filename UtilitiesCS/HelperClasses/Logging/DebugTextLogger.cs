@@ -24,7 +24,7 @@ namespace UtilitiesCS.HelperClasses
         {
             public override void Write(byte[] buffer, int offset, int count)
             {
-                logger.Debug(Encoding.Unicode.GetString(buffer, offset, count));
+                //logger.Debug(Encoding.Unicode.GetString(buffer, offset, count));
             }
 
             public override bool CanRead => false;

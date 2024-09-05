@@ -131,7 +131,12 @@ namespace QuickFiler.Controllers
         {
             try
             {
-                return _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+                var selection = _globals.Ol.App.ActiveExplorer().Selection;
+                if ((selection?.Count ?? 0) > 0)
+                {
+                    return selection[1] as MailItem;
+                }
+                else { return null; }
             }
             catch (System.Exception)
             {
@@ -238,8 +243,8 @@ namespace QuickFiler.Controllers
 
         public void RefreshSuggestions()
         {
-            _folderHelper.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
-            _folderHelper.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
+            //_folderHelper.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
+            _folderHelper.RefreshSuggestions(mailItem: Mail);
         }
                 
 
