@@ -40,6 +40,7 @@ namespace ToDoModel
         public ToDoItem(OutlookItem outlookItem, bool onDemand)
         {
             FlaggableItem = new OutlookItemFlaggable(outlookItem);
+            Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
             if (!onDemand)
             {
                 InitializeOutlookItem(_olItem);
@@ -53,6 +54,7 @@ namespace ToDoModel
         public ToDoItem(string strID)
         {
             _toDoID = strID;
+            Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
         }
 
         #region Obsolete Constructors

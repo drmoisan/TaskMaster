@@ -235,26 +235,31 @@ namespace ToDoModel
 
         //private static bool _blItemChangeRunning = false;
 
-        public static async void OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
+        public static async Task OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
         {
             // TODO: Morph Functionality to handle proactively rather than reactively
             string entryId = null;
             try
             {
-                var entryID = ((dynamic)item).EntryID;
+                entryId = ((dynamic)item).EntryID;
             }
-            catch (System.Exception) {  }
+            catch (System.Exception e) 
+            {  
+                logger.Error($"Error in {nameof(ToDoEvents)}.{nameof(OlToDoItems_ItemChange)} getting EntryID from item\n{e.Message}");
+            }
+            
             if (entryId is not null && Editing.TryAdd(entryId, 1))
             {
-                var ProjInfo = globals.TD.ProjInfo;
+                var projInfo = globals.TD.ProjInfo;
                 var idList = globals.TD.IDList;
 
                 var olItem = new OutlookItem(item);
                 var todo = new ToDoItem(olItem);
+                
                 todo.Identifier = $"ItemChangeEvent: {todo.ToDoID}";
-                todo.ProjectData = ProjInfo;
+                todo.ProjectData = projInfo;
                 todo.IdList = idList;
-                todo.ProjectsToPrograms = ProjInfo.Programs_ByProjectNames;
+                todo.ProjectsToPrograms = projInfo.Programs_ByProjectNames;
 
                 await Task.Run(() => SynchronizeEC(olToDoItems, todo));
                 //await Task.Run(() => AutoCodeId(ProjInfo, idList, todo));                
@@ -352,6 +357,9 @@ namespace ToDoModel
                 {
                     string strChFilter = "@SQL=" + '"' + "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID" + '"' + " like '" + todo.ToDoID + "%'";
                     var OlChildren = OlToDoItems.Restrict(strChFilter);
+                    OlChildren.Cast<object>()
+                        .Select(item => ((dynamic)item).EntryID as string)
+                        .ForEach(entryId => Editing.AddOrUpdate(entryId, 1, (key, existing) => existing + 1));
 
                     // Identify the tree depth of the current ToDoID (Length of ToDoID / 2)
                     int intLVL = (int)Math.Round(Math.Truncate(todo.ToDoID.Length / 2d));
