@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
@@ -102,6 +103,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             return Deserialize(disk, askUserOnError, settings);
         }
 
+        public T Deserialize(SmartSerializableConfig config) => DeserializeJson(config.Disk, config.JsonSettings);
+
         protected T Deserialize(FilePathHelper disk, bool askUserOnError, JsonSerializerSettings settings)
         {
             bool writeInstance = false;
@@ -143,6 +146,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
             return instance;
         }
+
+        public async Task<T> DeserializeAsync(SmartSerializableConfig config) => await Task.Run(() => Deserialize(config));
 
         protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
         {
@@ -216,7 +221,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         private JsonSerializerSettings _localJsonSettings;
         //= GetDefaultSettings()
 
-        public JsonSerializerSettings GetDefaultSettings()
+        public static JsonSerializerSettings GetDefaultSettings()
         {
             return new JsonSerializerSettings()
             {
@@ -269,6 +274,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 _timer.StartTimer();
             }
         }
+               
 
         #endregion Serialization
     }

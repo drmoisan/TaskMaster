@@ -12,6 +12,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskVisualization", "TaskVisualization\TaskVisualization.csproj", "{7F3550A0-1128-0BE2-3020-EC4136E3F015}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskMaster.Test", "TaskMaster.Test\TaskMaster.Test.csproj", "{F535E5EC-CFBC-40F4-AB2E-7159F53FDB44}"
+	ProjectSection(ProjectDependencies) = postProject
+		{68924FDF-614D-447C-A175-450860DDB597} = {68924FDF-614D-447C-A175-450860DDB597}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilitiesCS", "UtilitiesCS\UtilitiesCS.csproj", "{46628EC9-8A89-491E-84A2-6CF3069BA011}"
 EndProject

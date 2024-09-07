@@ -10,10 +10,10 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace TaskMaster.AppGlobals
 {
-    public class SmartSerializableConfig: ISmartSerializable<SmartSerializableConfig>
+    public class SmartSerializableConfigOld: ISmartSerializable<SmartSerializableConfigOld>
     {
-        public SmartSerializableConfig() { }
-        public SmartSerializableConfig(IApplicationGlobals globals)
+        public SmartSerializableConfigOld() { }
+        public SmartSerializableConfigOld(IApplicationGlobals globals)
         {
             Globals = globals;
             ResetLazy();
@@ -74,17 +74,17 @@ namespace TaskMaster.AppGlobals
             throw new NotImplementedException();
         }
 
-        public SmartSerializableConfig Deserialize(string fileName, string folderPath)
+        public SmartSerializableConfigOld Deserialize(string fileName, string folderPath)
         {
             throw new NotImplementedException();
         }
 
-        public SmartSerializableConfig Deserialize(string fileName, string folderPath, bool askUserOnError)
+        public SmartSerializableConfigOld Deserialize(string fileName, string folderPath, bool askUserOnError)
         {
             throw new NotImplementedException();
         }
 
-        public SmartSerializableConfig Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings)
+        public SmartSerializableConfigOld Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings)
         {
             throw new NotImplementedException();
         }

@@ -4,12 +4,14 @@ using Newtonsoft.Json;
 using QuickFiler;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,6 +21,7 @@ using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
 namespace TaskMaster
@@ -29,7 +32,7 @@ namespace TaskMaster
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public AppAutoFileObjects(ApplicationGlobals parent)
+        public AppAutoFileObjects(IApplicationGlobals parent)
         {
             _parent = parent;
         }
@@ -45,7 +48,8 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
-            LoadManagerConfig();
+            //LoadManagerConfig();
+            LoadManager2Async();
             var tasks = new List<Task> 
             {
                 LoadRecentsListAsync(),
@@ -57,6 +61,7 @@ namespace TaskMaster
                 LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
+            await Manager2;
             //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
         }
         
@@ -371,15 +376,68 @@ namespace TaskMaster
             }
         }
 
-        public void LoadManagerConfig()
+        //using (Stream stream = new MemoryStream(Properties.Resources.manager_config))
+        public async Task<string> LoadResourceFileToStringAsync(string resourceName)
         {
-            //var str = System.Text.Encoding.Default.GetString(result);
-            Stream stream = new MemoryStream(Properties.Resources.manager_config);
-            
+            string result = string.Empty;
+            var assembly = Assembly.GetExecutingAssembly();
 
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream is null)
+                {
+                    logger.Error($"Resource '{resourceName}' not found.");
+                    return result;
+                }
+                using StreamReader reader = new(stream);
+                result = await reader.ReadToEndAsync();
+            }
+
+            return result;
         }
-        private AsyncLazy<ManagerClass> _manager2;
+
+        private Lazy<ConcurrentDictionary<string, byte[]>> _binaryResources = new(() => 
+        {
+            var rsMgr = Properties.Resources.ResourceManager;
+            var rsSet = rsMgr.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+            var rsDict = rsSet
+                .Cast<DictionaryEntry>()
+                .Where(x => x.Value is byte[])
+                .ToDictionary<string, byte[]>()
+                .ToConcurrentDictionary();
+            return rsDict;
+        });
+        internal ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
+
+        public string[] GetManifestResourceNames()
+        {
+            //var rsMgr = Properties.Resources.ResourceManager;
+            //var rsSet = rsMgr.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+            //var rsDict = rsSet.Cast<DictionaryEntry>().Where(x => x.Value is byte[]).ToDictionary<string, byte[]>();
+            var rsDict = BinaryResources;
+            var configBin = rsDict["manager_config"];
+            var configStr = System.Text.Encoding.UTF8.GetString(configBin);
+            var configLoader = new SmartSerializableConfig(_parent);
+            var config = configLoader.DeserializeJson(configStr, configLoader.LocalSettings);
+            return rsDict.Keys.ToArray();
+            //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
+        }
+
+
+
+        private AsyncLazy<ManagerClass> _manager2; 
         public AsyncLazy<ManagerClass> Manager2 => _manager2;
+        private void LoadManager2Async() 
+        { 
+            var mgr = new AsyncLazy<ManagerClass>(async () => 
+            {
+                var configLoader = new SmartSerializableConfig(_parent);
+                var configStr = System.Text.Encoding.UTF8.GetString(BinaryResources["manager_config"]);
+                var config = configLoader.DeserializeJson(configStr, configLoader.LocalSettings);
+                return await ManagerClass.Static.DeserializeAsync(config); 
+            });
+            _manager2 = mgr;
+        }
 
         private ScDictionary<string, BayesianClassifierGroup> _manager;
         public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
@@ -433,7 +491,7 @@ namespace TaskMaster
 
         private JsonSerializerSettings GetSettings(bool compress)
         {
-            var settings = ScDictionary<string, BayesianClassifierGroup>.Static.GetDefaultSettings();
+            var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
             //var settings = ScDictionary<string, BayesianClassifierGroup>.Factory.GetDefaultSettings();
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(_parent));

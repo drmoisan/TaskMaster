@@ -56,79 +56,7 @@ namespace ToDoModel
             _toDoID = strID;
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
         }
-
-        #region Obsolete Constructors
-        //TODO: Simplify Implementation by Leveraging new OutlookItem Class
-        [Obsolete("Use new ToDoItem(OutlookItem) instead")]
-        public ToDoItem(MailItem OlMail)
-        {
-            FlaggableItem = new OutlookItemFlaggable(OlMail);
-            this.InitializeMail(OlMail);
-            string strCategories = OlMail.Categories;
-            this.Flags = new FlagParser(ref strCategories);
-            OlMail.Categories = strCategories;
-            this.InitializeCustomFields(FlaggableItem);
-
-        }
-
-        [Obsolete("Use new ToDoItem(OutlookItem) instead")]
-        public ToDoItem(MailItem OlMail, bool OnDemand)
-        {
-            FlaggableItem = new OutlookItemFlaggable(OlMail);
-
-            if (OnDemand == false)
-            {
-                InitializeMail(OlMail);
-                string argstrCats_All = OlMail.Categories;
-                Flags = new FlagParser(ref argstrCats_All);
-                OlMail.Categories = argstrCats_All;
-                InitializeCustomFields(FlaggableItem);
-            }
-        }
-
-        [Obsolete("Use new ToDoItem(OutlookItem) instead")]
-        public ToDoItem(TaskItem OlTask)
-        {
-            FlaggableItem = new OutlookItemFlaggable(OlTask);
-            InitializeTask(OlTask);
-            string argstrCats_All = OlTask.Categories;
-            Flags = new FlagParser(ref argstrCats_All);
-            OlTask.Categories = argstrCats_All;
-            InitializeCustomFields(FlaggableItem);
-
-        }
-
-        [Obsolete("Use new ToDoItem(OutlookItem) instead")]
-        public ToDoItem(TaskItem OlTask, bool OnDemand)
-        {
-            FlaggableItem = new OutlookItemFlaggable(OlTask);
-
-            if (OnDemand == false)
-            {
-                InitializeTask(OlTask);
-                string argstrCats_All = OlTask.Categories;
-                Flags = new FlagParser(ref argstrCats_All);
-                OlTask.Categories = argstrCats_All;
-                InitializeCustomFields(FlaggableItem);
-            }
-        }
-
-        [Obsolete("Use new ToDoItem(OutlookItem) instead")]
-        public ToDoItem(object item, bool onDemand)
-        {
-
-            FlaggableItem = new OutlookItemFlaggable(item);
-            string argstrCats_All = FlaggableItem.Categories;
-            Flags = new FlagParser(ref argstrCats_All);
-            FlaggableItem.Categories = argstrCats_All;
-            if (onDemand == false)
-            {
-                MessageBox.Show("Coding Error: New ToDoItem() is overloaded. Only supply the OnDemand variable if you want to load values on demand");
-            }
-        }
-
-        #endregion Obsolete Constructors
-
+                
         #endregion Constructors
 
         #region Private Variables
@@ -139,19 +67,7 @@ namespace ToDoModel
         private string _tagProgram = "";
         private bool? _activeBranch = null;
         private string _expandChildren = "";
-
-        private List<IPrefix> _prefixes = new ToDoDefaults().PrefixList;
-        internal List<IPrefix> Prefixes => _prefixes;
-
-        private Func<string, string> _projectsToPrograms;
-        public Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; set => _projectsToPrograms = value; }
-
-        private IProjectData _projectData;
-        public IProjectData ProjectData { get => _projectData; set => _projectData = value; }
-
-        private ToDoLoader _loader;
-        internal ToDoLoader Loader { get => _loader; private set => _loader = value; }
-
+        
         #endregion Private Variables
 
         #region Initializers
@@ -164,41 +80,14 @@ namespace ToDoModel
             _startDate = olItem.TaskStartDate;
         }
 
-        #region Obsolete Initializers
-
-        [Obsolete("Use InitializeOutlookItem instead")]
-        private void InitializeMail(MailItem olMail)
-        {
-            _taskSubject = olMail.TaskSubject.IsNullOrEmpty() ? olMail.Subject : olMail.TaskSubject;
-            _priority = olMail.Importance;
-            _taskCreateDate = olMail.CreationTime;
-            _startDate = olMail.TaskStartDate;
-            _complete = (olMail.FlagStatus == OlFlagStatus.olFlagComplete);
-            _totalWork = get_PA_FieldExists(PA_TOTAL_WORK) ? (int)olMail.PropertyAccessor.GetProperty(PA_TOTAL_WORK) : 0;
-        }
-
-        [Obsolete("Use InitializeOutlookItem instead")]
-        private void InitializeTask(TaskItem OlTask)
-        {
-            _taskSubject = OlTask.Subject;
-            _priority = OlTask.Importance;
-            _taskCreateDate = OlTask.CreationTime;
-            _startDate = OlTask.StartDate;
-            _complete = OlTask.Complete;
-            _totalWork = OlTask.TotalWork;
-        }
-
         private void InitializeCustomFields(object item)
         {
             _tagProgram = FlaggableItem.GetUdfString("TagProgram");
             _activeBranch = (bool)(FlaggableItem.GetUdfValue("AB", OlUserPropertyType.olYesNo));
-            //EC2 = (bool)(FlaggableItem.GetUdfValue("EC2", OlUserPropertyType.olYesNo));
             _ec2 = (bool)(FlaggableItem.GetUdfValue("EC2", OlUserPropertyType.olYesNo));
             _expandChildren = FlaggableItem.GetUdfString("EC");
             _expandChildrenState = FlaggableItem.GetUdfString("EcState");
         }
-
-        #endregion Obsolete Initializers
 
         #endregion Initializers
 
@@ -232,7 +121,6 @@ namespace ToDoModel
             }
         }
         private string _identifier = "not set";
-
 
         /// <summary>
         /// Saves all internal variables to the [Object]
@@ -399,6 +287,17 @@ namespace ToDoModel
 
         #region Public Properties
 
+        private List<IPrefix> _prefixes = new ToDoDefaults().PrefixList;
+        internal List<IPrefix> Prefixes => _prefixes;
+
+        private Func<string, string> _projectsToPrograms;
+        public Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; set => _projectsToPrograms = value; }
+
+        private IProjectData _projectData;
+        public IProjectData ProjectData { get => _projectData; set => _projectData = value; }
+
+        private ToDoLoader _loader;
+        internal ToDoLoader Loader { get => _loader; private set => _loader = value; }
 
         public bool IdAutoCoding { get => _idAutoCoding; set => _idAutoCoding = value; }
         private bool _idAutoCoding = true;
@@ -582,30 +481,6 @@ namespace ToDoModel
             set => Loader.SetAndSave(value, (x) => FlaggableItem.Categories = x);
         }
 
-        //public string get_People(bool IncludePrefix = false)
-        //{
-        //    EnsureInitialized(CallerName: "People");
-        //    return _flags.get_People(IncludePrefix);
-        //    // Set People and sanitize value
-        //}
-
-        //public string People 
-        //{
-        //    get 
-        //    {
-        //        EnsureInitialized(CallerName: "People");
-        //        return _flags.GetPeople(false);
-        //    }
-        //    set 
-        //    {
-        //        _flags.SetPeople(value: value);
-        //        if (!ReadOnly)
-        //            SaveCatsToObj("TagPeople", _flags.GetPeople(false));
-        //    } 
-        //}
-
-        //TODO: Convert People Property to use FlagTranslator
-
         internal FlagTranslator[] GetFlagTranslators()
         {
             return [People, Projects, Program, Context, Topics, KB];
@@ -707,36 +582,6 @@ namespace ToDoModel
         [MethodImpl(MethodImplOptions.Synchronized)]
         private FlagTranslator LoadKb() => new(Flags.GetKb, Flags.SetKb, Flags.GetKbList, Flags.SetKbList);
         async private Task LoadKbAsync() => await Task.Run(() => _kb = LoadKb());
-
-        public string get_KB(bool IncludePrefix = false)
-        {
-            EnsureInitialized(callerName: "KB");
-            return Flags.GetKb(IncludePrefix);
-            // Set Context and sanitize value
-        }
-        [Obsolete("Use KB instead")]
-        public string KBSimple
-        {
-            get
-            {
-                EnsureInitialized(callerName: "KB");
-                return Flags.GetKb(false);
-            }
-            set
-            {
-                Flags.SetKb(value: value);
-                if (!ReadOnly)
-                    UdfCategorySetter("KB", Flags.GetKb(false));
-            }
-        }
-
-        [Obsolete("Use KB instead")]
-        public void SetKB(bool IncludePrefix = false, string value = default)
-        {
-            Flags.SetKb(value: value);
-            if (!ReadOnly)
-                UdfCategorySetter("KB", Flags.GetKb(false));
-        }
 
         #endregion KB
 
@@ -1189,168 +1034,6 @@ namespace ToDoModel
         }
 
         #endregion Other Methods
-
-        #region Get<T> and Set<T>
-
-        private void EnsureInitialized(string callerName)
-        {
-            if (Flags is null)
-            {
-                if (FlaggableItem is null)
-                {
-                    throw new ArgumentNullException("Cannot get property " + callerName + " if both _flags AND olObject are Null");
-                }
-                dynamic olItem = FlaggableItem;
-                string argstrCats_All = olItem.Categories;
-                Flags = new FlagParser(ref argstrCats_All);
-                olItem.Categories = argstrCats_All;
-            }
-        }
-
-        private void UdfCategorySetter(string udfName, string udfValue)
-        {
-            if (FlaggableItem is not null)
-            {
-                FlaggableItem.TrySetUdf(udfName, udfValue, OlUserPropertyType.olKeywords);
-                FlaggableItem.Categories = Flags.Combine();
-                FlaggableItem.Save();
-            }
-        }
-
-        //internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter)
-        //{
-        //    SetAndSave(ref variable, value, objectSetter, () => FlaggableItem.Save());
-        //}
-
-        ///// <summary>
-        ///// Sets the value of a local private variable. If the item is not readonly, it also
-        ///// sets the value of the corresponding property in the <seealso cref="OutlookItem"/> object"/>
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="variable">Private variable caching the value</param>
-        ///// <param name="value">Value to be saved</param>
-        ///// <param name="objectSetter">Action that sets an object property to the value</param>
-        ///// <param name="objectSaver">Action to save the object</param>
-        ///// <exception cref="ArgumentNullException"></exception>
-        //internal void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter, System.Action objectSaver)
-        //{
-        //    variable = value;
-        //    if (!ReadOnly)
-        //    {
-        //        if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
-        //        objectSetter(value);
-        //        if (objectSaver is not null) { objectSaver(); }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Sets the value of an <seealso cref="OutlookItem"/> property using a delegate. 
-        ///// Value is not cached in a local variable in this overload. <seealso cref="OutlookItem.Save()"/> is called
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="value">Value to be saved</param>
-        ///// <param name="objectSetter">Action that sets an object property to the value</param>
-        //internal void SetAndSave<T>(T value, Action<T> objectSetter)
-        //{
-        //    SetAndSave(value, objectSetter, () => FlaggableItem.Save());
-        //}
-
-        //internal void SetAndSave<T>(T value, Action<T> objectSetter, System.Action objectSaver)
-        //{
-        //    if (!ReadOnly)
-        //    {
-        //        if (objectSetter is null) { throw new ArgumentNullException($"Method {nameof(SetAndSave)} failed because {nameof(objectSetter)} was passed as null"); }
-        //        objectSetter(value);
-        //        if (objectSaver is not null) { objectSaver(); }
-        //    }
-        //}
-
-        //internal T GetOrLoad<T>(ref T value, Func<T> loader)
-        //{
-        //    if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
-        //    return value;
-        //}
-
-        //internal T GetOrLoad<T>(ref T value, Func<T> loader, params object[] dependencies)
-        //{
-        //    if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
-        //    if (dependencies.Any(x => x is null))
-        //    {
-        //        var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
-        //        throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
-        //    }
-        //    return GetOrLoad(ref value, loader);
-        //}
-
-        //internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, params object[] dependencies)
-        //{
-        //    if (dependencies is null || dependencies.Any(x => x is null))
-        //    {
-        //        value = defaultValue;
-        //        return value;
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
-        //            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = defaultValue; }
-        //        }
-        //        catch (System.Exception)
-        //        {
-        //            value = defaultValue;
-        //        }
-
-        //        return value;
-        //    }
-        //}
-
-        //internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, Action<T> defaultSetAndSaver, params object[] dependencies)
-        //{
-        //    if (dependencies is null || dependencies.Any(x => x is null))
-        //    {
-        //        value = defaultValue;
-        //        return value;
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            if (EqualityComparer<T>.Default.Equals(value, default(T))) { value = loader(); }
-        //            if (EqualityComparer<T>.Default.Equals(value, default(T)))
-        //            {
-        //                value = defaultValue;
-        //                defaultSetAndSaver(value);
-        //            }
-        //        }
-        //        catch (System.Exception)
-        //        {
-        //            value = defaultValue;
-        //            defaultSetAndSaver(value);
-        //        }
-
-        //        return value;
-        //    }
-        //}
-
-        //internal T Load<T>(Func<T> loader, params object[] dependencies)
-        //{
-        //    if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
-        //    if (dependencies.Any(x => x is null))
-        //    {
-        //        var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
-        //        throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
-        //    }
-        //    return loader();
-        //}
-
-        //internal T Load<T>(Func<T> loader, T defaultValue, params object[] dependencies)
-        //{
-        //    if (dependencies is null || dependencies.Any(x => x is null)) { return defaultValue; }
-        //    else { return loader(); }
-        //}
-
-        #endregion Get<T> and Set<T>
 
     }
 }

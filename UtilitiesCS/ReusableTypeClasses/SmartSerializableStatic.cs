@@ -19,7 +19,5 @@ namespace UtilitiesCS.ReusableTypeClasses
         public static T Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => 
             GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
 
-        public static JsonSerializerSettings GetDefaultSettings() => 
-            GetInstance().GetDefaultSettings();
     }
 }

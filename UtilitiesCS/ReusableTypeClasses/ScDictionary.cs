@@ -75,8 +75,6 @@ namespace UtilitiesCS.ReusableTypeClasses
             public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
 
-            public static JsonSerializerSettings GetDefaultSettings() =>
-                GetInstance().GetDefaultSettings();
         }
 
         #endregion ISmartSerializable

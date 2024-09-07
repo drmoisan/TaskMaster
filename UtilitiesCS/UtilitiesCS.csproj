@@ -594,6 +594,7 @@
     <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableStatic.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />

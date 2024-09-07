@@ -366,7 +366,7 @@
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />
     <Compile Include="AppGlobals\ManagerClass.cs" />
-    <Compile Include="AppGlobals\SmartSerializableConfig.cs" />
+    <Compile Include="AppGlobals\SmartSerializableConfigOld.cs" />
     <Compile Include="AppGlobals\ToDoObj.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
