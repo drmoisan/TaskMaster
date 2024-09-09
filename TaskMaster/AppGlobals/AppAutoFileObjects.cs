@@ -49,7 +49,7 @@ namespace TaskMaster
         async public Task LoadAsync()
         {
             //LoadManagerConfig();
-            LoadManager2Async();
+            ResetLoadManager();
             var tasks = new List<Task> 
             {
                 LoadRecentsListAsync(),
@@ -418,7 +418,7 @@ namespace TaskMaster
             var configBin = rsDict["manager_config"];
             var configStr = System.Text.Encoding.UTF8.GetString(configBin);
             var configLoader = new SmartSerializableConfig(_parent);
-            var config = configLoader.DeserializeJson(configStr, configLoader.LocalSettings);
+            var config = configLoader.DeserializeConfig(configStr);
             return rsDict.Keys.ToArray();
             //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
         }
@@ -427,7 +427,7 @@ namespace TaskMaster
 
         private AsyncLazy<ManagerClass> _manager2; 
         public AsyncLazy<ManagerClass> Manager2 => _manager2;
-        private void LoadManager2Async() 
+        public void ResetLoadManager() 
         { 
             var mgr = new AsyncLazy<ManagerClass>(async () => 
             {

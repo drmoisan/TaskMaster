@@ -3,7 +3,7 @@ using System;
 using TaskMaster;
 using UtilitiesCS;
 using Moq;
-
+using System.Threading.Tasks;
 namespace TaskMaster.Test
 {
     [TestClass]
@@ -23,17 +23,20 @@ namespace TaskMaster.Test
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public async Task TestMethod1()
         {
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             //var af = new AppAutoFileObjects(mockGlobals.Object);
             var af = new AppAutoFileObjects(appGlobals);
+            af.ResetLoadManager();
+            var managerTask = af.Manager2;
+            var manager = await managerTask;
             //af.LoadManagerConfig();
-            var names = af.GetManifestResourceNames();
-            foreach (var name in names)
-            {
-                Console.WriteLine(name);
-            }
+            //var names = af.GetManifestResourceNames();
+            //foreach (var name in names)
+            //{
+            //    Console.WriteLine(name);
+            //}
 
         }
     }

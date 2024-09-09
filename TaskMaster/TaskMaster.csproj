@@ -402,6 +402,7 @@
     </Compile>
     <None Include="Resources\9999999CommonWords.json" />
     <None Include="Resources\999999PrefixList.json" />
+    <None Include="Resources\ConfigManager.json" />
     <None Include="Resources\manager_config.json" />
     <None Include="TaskMaster_1_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">

@@ -7,13 +7,13 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TaskMaster.Test")]
-[assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")]
+[assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 
-[assembly: Guid("f535e5ec-cfbc-40f4-ab2e-7159f53fdb44")]
+[assembly: Guid("b6b59f70-e372-4c2b-bba6-4fbcd715e8c5")]
 
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]

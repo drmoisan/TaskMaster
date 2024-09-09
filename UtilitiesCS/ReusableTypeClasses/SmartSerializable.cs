@@ -36,6 +36,26 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region Deserialization
 
+        public void ActivateMostRecent()
+        {
+            if (NetworkDate != default && (LocalDate == default || NetworkDate > LocalDate))
+            {
+                ActivateNetDisk();
+            }
+            else
+            {
+                ActivateLocalDisk();
+            }
+        }
+
+        [JsonIgnore]
+        public DateTime NetworkDate => File.Exists(NetDisk.FilePath) ? 
+            File.GetLastWriteTimeUtc(NetDisk.FilePath) : default;
+
+        [JsonIgnore]
+        public DateTime LocalDate => File.Exists(LocalDisk.FilePath) ? 
+            File.GetLastWriteTimeUtc(LocalDisk.FilePath) : default;
+
         protected T CreateEmpty(DialogResult response, FilePathHelper disk)
         {
             if (response == DialogResult.Yes)
@@ -103,7 +123,13 @@ namespace UtilitiesCS.ReusableTypeClasses
             return Deserialize(disk, askUserOnError, settings);
         }
 
-        public T Deserialize(SmartSerializableConfig config) => DeserializeJson(config.Disk, config.JsonSettings);
+        //public T Deserialize<U>(SmartSerializable<U> config) => DeserializeJson(config.Disk, config.JsonSettings);
+
+        public T Deserialize<U>(SmartSerializable<U> config) 
+            where U : class, ISmartSerializable<U>, new()
+        {
+            return DeserializeJson(config.Disk, config.JsonSettings);
+        }
 
         protected T Deserialize(FilePathHelper disk, bool askUserOnError, JsonSerializerSettings settings)
         {
@@ -147,7 +173,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return instance;
         }
 
-        public async Task<T> DeserializeAsync(SmartSerializableConfig config) => await Task.Run(() => Deserialize(config));
+        public async Task<T> DeserializeAsync(SmartSerializable<T> config) => await Task.Run(() => Deserialize(config));
 
         protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
         {
@@ -274,8 +300,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 _timer.StartTimer();
             }
         }
-               
-
+        
         #endregion Serialization
     }
 }
