@@ -5,9 +5,6 @@ namespace UtilitiesCS.ReusableTypeClasses
 {
     public interface ISmartSerializable<T> where T: class, ISmartSerializable<T>, new()
     {
-        //string FileName { get; set; }
-        //string FilePath { get; set; }
-        //string FolderPath { get; set; }
         FilePathHelper Disk { get; set; }
         JsonSerializerSettings JsonSettings { get; set; }
         FilePathHelper LocalDisk { get; set; }

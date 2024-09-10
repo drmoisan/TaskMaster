@@ -17,10 +17,12 @@ namespace UtilitiesCS.ReusableTypeClasses
     using global::UtilitiesCS.Extensions;
     using System.IO;
     using System.Threading;
+    using System.Runtime.CompilerServices;
+    using System.ComponentModel;
 
     namespace UtilitiesCS.ReusableTypeClasses
     {
-        public class SmartSerializableConfig : SmartSerializable<SmartSerializableConfig>
+        public class SmartSerializableConfig : SmartSerializable<SmartSerializableConfig>, INotifyPropertyChanged
         {
             private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -32,49 +34,21 @@ namespace UtilitiesCS.ReusableTypeClasses
                 //ResetLazy();
             }
 
-            //private void ResetLazy()
-            //{
-            //    _localSettings = new Lazy<JsonSerializerSettings>(() => GetSettings(false));
-            //    _networkSettings = new Lazy<JsonSerializerSettings>(() => GetSettings(true));
-            //}
+            private new void ResetLazy()
+            {
+                base._localJsonSettings = new Lazy<JsonSerializerSettings>(GetSettings);
+                base._netJsonSettings = new Lazy<JsonSerializerSettings>(GetSettings);
+            }
 
-            //protected FilePathHelper _local;
-            //public FilePathHelper Local { get => _local; set => _local = value; }
+            protected bool _activated;
+            public bool Activated { get => _activated; set { _activated = value; Notify(); }}
 
-            //protected FilePathHelper _network;
-            //public FilePathHelper Network { get => _network; set => _network = value; }
-
-            //[JsonIgnore]
-            //public JsonSerializerSettings LocalSettings => _localSettings?.Value;
-            //private Lazy<JsonSerializerSettings> _localSettings;
-
-            //[JsonIgnore]
-            //public JsonSerializerSettings NetworkSettings => _networkSettings?.Value;
-            //private Lazy<JsonSerializerSettings> _networkSettings;
-
-            //[JsonIgnore]
-            //public DateTime NetworkDate => File.Exists(Network.FilePath) ? File.GetLastWriteTimeUtc(Network.FilePath) : default;
-
-            //[JsonIgnore]
-            //public DateTime LocalDate => File.Exists(Local.FilePath) ? File.GetLastWriteTimeUtc(Local.FilePath) : default;
-
-            //public void ActivateMostRecent()
-            //{
-            //    if (NetworkDate != default && (LocalDate == default || NetworkDate > LocalDate))
-            //    {
-            //        ActivateNetDisk();
-            //    }
-            //    else
-            //    {
-            //        ActivateLocalDisk();
-            //    }
-            //}
-
-            protected bool _active;
-            public bool Active { get => _active; set => _active = value; }
-
+            [JsonProperty]
             internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
             private IApplicationGlobals _globals;
+
+            public string Name { get => _name; set { _name = value; Notify(); }}
+            private string _name;
 
             private JsonSerializerSettings GetSettings()
             {
@@ -150,9 +124,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
                 
                 instance.Globals = Globals;
+                instance.ResetLazy();
                 instance.ActivateMostRecent();
-                instance.JsonSettings = settings;
-                //instance.ResetLazy();
                 return instance;
             }
 
@@ -169,6 +142,19 @@ namespace UtilitiesCS.ReusableTypeClasses
                     return null;
                 }
             }
+
+            #region INotifyPropertyChanged
+
+            public void PropertyChangedHandler(object sender, PropertyChangedEventArgs e) => Serialize();
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            public void Notify([CallerMemberName] string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            #endregion INotifyPropertyChanged
         }
     }
 

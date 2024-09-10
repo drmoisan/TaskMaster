@@ -9,30 +9,75 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class SmartSerializable<T>: ISmartSerializable<T> where T : class, ISmartSerializable<T>, new()
+    public class SmartSerializable<T> : ISmartSerializable<T> where T : class, ISmartSerializable<T>, new()
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SmartSerializable() 
-        { 
-            _jsonSettings = GetDefaultSettings();
+        public SmartSerializable()
+        {
+            ResetLazy();
             _parent = null;
         }
 
         public SmartSerializable(T parent)
         {
-            _jsonSettings = GetDefaultSettings();
             _parent = parent;
+            ResetLazy();
         }
 
         protected T _parent;
+
+        #region SerializationConfig
+
+        protected FilePathHelper _disk = new FilePathHelper();
+        public FilePathHelper Disk { get => _disk; set => _disk = value; }
+
+        public FilePathHelper LocalDisk { get => _localDisk; set => _localDisk = value; }
+        private FilePathHelper _localDisk = new FilePathHelper();
+
+        public FilePathHelper NetDisk { get => _netDisk; set => _netDisk = value; }
+        private FilePathHelper _netDisk = new();
+
+        [JsonIgnore]
+        public DateTime NetworkDate => File.Exists(NetDisk.FilePath) ?
+            File.GetLastWriteTimeUtc(NetDisk.FilePath) : default;
+
+        [JsonIgnore]
+        public DateTime LocalDate => File.Exists(LocalDisk.FilePath) ?
+            File.GetLastWriteTimeUtc(LocalDisk.FilePath) : default;
+
+        private bool _classifierActivated;
+        public bool ClassifierActivated { get => _classifierActivated; set => _classifierActivated = value; }
+
+        public void ResetLazy()
+        {
+            _localJsonSettings = new Lazy<JsonSerializerSettings>(GetDefaultSettings);
+            _netJsonSettings = new Lazy<JsonSerializerSettings>(GetDefaultSettings);
+            _jsonSettings = new Lazy<JsonSerializerSettings>(GetDefaultSettings);
+        }
+
+        [JsonIgnore]
+        public JsonSerializerSettings JsonSettings { get => _jsonSettings.Value; set => _jsonSettings = value.ToLazy(); }
+        protected Lazy<JsonSerializerSettings> _jsonSettings;
+
+        [JsonIgnore]
+        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings.Value; set => _netJsonSettings = value.ToLazy(); }
+        protected Lazy<JsonSerializerSettings> _netJsonSettings;
+
+        [JsonIgnore]
+        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings.Value; set => _localJsonSettings = value.ToLazy(); }
+        protected Lazy<JsonSerializerSettings> _localJsonSettings;
+        
+
+        #endregion SerializationConfig
 
         #region Deserialization
 
@@ -47,14 +92,6 @@ namespace UtilitiesCS.ReusableTypeClasses
                 ActivateLocalDisk();
             }
         }
-
-        [JsonIgnore]
-        public DateTime NetworkDate => File.Exists(NetDisk.FilePath) ? 
-            File.GetLastWriteTimeUtc(NetDisk.FilePath) : default;
-
-        [JsonIgnore]
-        public DateTime LocalDate => File.Exists(LocalDisk.FilePath) ? 
-            File.GetLastWriteTimeUtc(LocalDisk.FilePath) : default;
 
         protected T CreateEmpty(DialogResult response, FilePathHelper disk)
         {
@@ -123,9 +160,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return Deserialize(disk, askUserOnError, settings);
         }
 
-        //public T Deserialize<U>(SmartSerializable<U> config) => DeserializeJson(config.Disk, config.JsonSettings);
-
-        public T Deserialize<U>(SmartSerializable<U> config) 
+        public T Deserialize<U>(SmartSerializable<U> config)
             where U : class, ISmartSerializable<U>, new()
         {
             return DeserializeJson(config.Disk, config.JsonSettings);
@@ -173,7 +208,10 @@ namespace UtilitiesCS.ReusableTypeClasses
             return instance;
         }
 
-        public async Task<T> DeserializeAsync(SmartSerializable<T> config) => await Task.Run(() => Deserialize(config));
+        public async Task<T> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new()
+        {
+            return await Task.Run(() => Deserialize(config));
+        }
 
         protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
         {
@@ -193,19 +231,6 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region Serialization
 
-        protected FilePathHelper _disk = new FilePathHelper();
-        public FilePathHelper Disk { get => _disk; set => _disk = value; }
-
-        //public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
-        //public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
-        //public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
-
-        public FilePathHelper LocalDisk { get => _localDisk; set => _localDisk = value; }
-        private FilePathHelper _localDisk = new FilePathHelper();
-
-        public FilePathHelper NetDisk { get => _netDisk; set => _netDisk = value; }
-        private FilePathHelper _netDisk = new();
-
         public void ActivateLocalDisk()
         {
             _disk = _localDisk;
@@ -222,7 +247,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             if (Disk.FilePath != "")
             {
-                Serialize(Disk.FilePath);
+                RequestSerialization(Disk.FilePath);
             }
         }
 
@@ -233,19 +258,6 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         protected ReaderWriterLockSlim _readWriteLock = new();
-
-        [JsonIgnore]
-        public JsonSerializerSettings JsonSettings { get => _jsonSettings; set => _jsonSettings = value; }
-        private JsonSerializerSettings _jsonSettings;
-
-        [JsonIgnore]
-        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings; set => _netJsonSettings = value; }
-        private JsonSerializerSettings _netJsonSettings;
-
-        [JsonIgnore]
-        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings; set => _localJsonSettings = value; }
-        private JsonSerializerSettings _localJsonSettings;
-        //= GetDefaultSettings()
 
         public static JsonSerializerSettings GetDefaultSettings()
         {
@@ -258,7 +270,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         private Func<string, StreamWriter> _createStreamWriter = File.CreateText;
         protected Func<string, StreamWriter> CreateStreamWriter { get => _createStreamWriter; set => _createStreamWriter = value; }
-        
+
         public void SerializeThreadSafe(string filePath)
         {
             _parent.ThrowIfNull($"{nameof(SmartSerializable<T>)}.{nameof(_parent)} is null. It must be linked to the instance it is serializing.");
@@ -300,7 +312,30 @@ namespace UtilitiesCS.ReusableTypeClasses
                 _timer.StartTimer();
             }
         }
-        
+
         #endregion Serialization
+
+        public static class Static
+        {
+            private static SmartSerializable<T> GetInstance() => new();
+
+            public static T Deserialize(string fileName, string folderPath) =>
+                GetInstance().Deserialize(fileName, folderPath);
+
+            public static T Deserialize(string fileName, string folderPath, bool askUserOnError) =>
+                GetInstance().Deserialize(fileName, folderPath, askUserOnError);
+
+            public static T Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
+                GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
+
+            public static T Deserialize<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
+                GetInstance().Deserialize(config);
+
+            public static async Task<T> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
+                await GetInstance().DeserializeAsync(config);
+
+            internal static JsonSerializerSettings GetDefaultSettings() =>
+                SmartSerializable<T>.GetDefaultSettings();
+        }
     }
 }

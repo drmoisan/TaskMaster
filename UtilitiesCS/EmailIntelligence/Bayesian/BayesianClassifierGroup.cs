@@ -8,10 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class BayesianClassifierGroup
+    public class BayesianClassifierGroup: SmartSerializable<BayesianClassifierGroup>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -228,12 +229,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Serialization
 
-        [OnDeserialized]
-        internal void OnDeserializedMethod(StreamingContext context)
-        {
-            //IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
-            //LogMetrics();
-        }
+        //[OnDeserialized]
+        //internal void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    //IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
+        //    //LogMetrics();
+        //}
 
         internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed")
         {

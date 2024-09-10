@@ -4,6 +4,7 @@ using TaskMaster;
 using UtilitiesCS;
 using Moq;
 using System.Threading.Tasks;
+using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 namespace TaskMaster.Test
 {
     [TestClass]
@@ -29,14 +30,55 @@ namespace TaskMaster.Test
             //var af = new AppAutoFileObjects(mockGlobals.Object);
             var af = new AppAutoFileObjects(appGlobals);
             af.ResetLoadManager();
-            var managerTask = af.Manager2;
-            var manager = await managerTask;
+            
+            var manager = await af.Manager2;
+            Assert.IsNotNull(manager);
             //af.LoadManagerConfig();
             //var names = af.GetManifestResourceNames();
             //foreach (var name in names)
             //{
             //    Console.WriteLine(name);
             //}
+
+        }
+
+        [TestMethod]
+        public async Task TestMethod2()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            //var af = new AppAutoFileObjects(mockGlobals.Object);
+            var af = new AppAutoFileObjects(appGlobals);
+            af.ResetLoadManager();
+
+            var manager = await af.Manager2;
+
+            var spam = manager["Spam"];
+            if (af.BinaryResources.TryGetValue("ConfigSpam", out byte[] configBin))
+            {
+                var config = await SmartSerializableConfig.DeserializeAsync(appGlobals, configBin);
+                spam.Disk = config.Disk;
+                spam.NetDisk = config.NetDisk;
+                spam.LocalDisk = config.LocalDisk;
+                spam.LocalJsonSettings = config.LocalJsonSettings;
+                spam.NetJsonSettings = config.NetJsonSettings;
+                spam.JsonSettings = config.JsonSettings;
+                spam.ClassifierActivated = config.Activated;
+                spam.Serialize();
+            }
+
+
+
+        }
+
+        [TestMethod]
+        public async Task TestMethod3()
+        {
+            var globals = new ApplicationGlobals(mockApplication.Object);
+            var af = new AppAutoFileObjects(globals);
+            af.ResetLoadManagerLazy();
+
+            var spam = await af.ManagerLazy["Spam"];
+            Assert.IsNotNull(spam);
 
         }
     }

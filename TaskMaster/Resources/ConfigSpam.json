@@ -2,19 +2,19 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": "Manager",
+  "Name": "Spam",
   "Disk": {
-    "FileName": "999999ClassifierManager.json",
+    "FileName": "SpamClassifier.json",
     "RelativePath": "",
     "SpecialFolderName": "AppData"
   },
   "LocalDisk": {
-    "FileName": "999999ClassifierManager.json",
+    "FileName": "SpamClassifier.json",
     "RelativePath": "",
     "SpecialFolderName": "AppData"
   },
   "NetDisk": {
-    "FileName": "999999ClassifierManager.json",
+    "FileName": "SpamClassifier.json",
     "RelativePath": "",
     "SpecialFolderName": "PythonStaging"
   }

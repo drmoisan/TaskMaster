@@ -2,19 +2,19 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": "Manager",
+  "Name": "Triage",
   "Disk": {
-    "FileName": "999999ClassifierManager.json",
+    "FileName": "TriageClassifier.json",
     "RelativePath": "",
     "SpecialFolderName": "AppData"
   },
   "LocalDisk": {
-    "FileName": "999999ClassifierManager.json",
+    "FileName": "TriageClassifier.json",
     "RelativePath": "",
     "SpecialFolderName": "AppData"
   },
   "NetDisk": {
-    "FileName": "999999ClassifierManager.json",
+    "FileName": "TriageClassifier.json",
     "RelativePath": "",
     "SpecialFolderName": "PythonStaging"
   }

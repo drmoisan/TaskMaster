@@ -407,7 +407,8 @@ namespace TaskMaster
                 .ToConcurrentDictionary();
             return rsDict;
         });
-        internal ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
+
+        public ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
 
         public string[] GetManifestResourceNames()
         {
@@ -418,25 +419,56 @@ namespace TaskMaster
             var configBin = rsDict["manager_config"];
             var configStr = System.Text.Encoding.UTF8.GetString(configBin);
             var configLoader = new SmartSerializableConfig(_parent);
-            var config = configLoader.DeserializeConfig(configStr);
+            //var config = configLoader.DeserializeConfig(configStr);
             return rsDict.Keys.ToArray();
             //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
         }
 
-
-
         private AsyncLazy<ManagerClass> _manager2; 
         public AsyncLazy<ManagerClass> Manager2 => _manager2;
         public void ResetLoadManager() 
-        { 
-            var mgr = new AsyncLazy<ManagerClass>(async () => 
+        {
+            _manager2 = new AsyncLazy<ManagerClass>(async () => 
             {
-                var configLoader = new SmartSerializableConfig(_parent);
-                var configStr = System.Text.Encoding.UTF8.GetString(BinaryResources["manager_config"]);
-                var config = configLoader.DeserializeJson(configStr, configLoader.LocalSettings);
-                return await ManagerClass.Static.DeserializeAsync(config); 
+                if (BinaryResources.TryGetValue("ConfigManager", out byte[] configBin))
+                {
+                    var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
+                    return await ManagerClass.Static.DeserializeAsync(config); 
+                }
+                else { return null; }
             });
-            _manager2 = mgr;
+            //_manager2 = mgr;
+        }
+
+        public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(string classifierName, string configName)
+        {
+            return new AsyncLazy<BayesianClassifierGroup>(async () =>
+            {
+                if (BinaryResources.TryGetValue(configName, out byte[] configBin))
+                {
+                    var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
+                    return await BayesianClassifierGroup.Static.DeserializeAsync(config);                    
+                }
+                else { return null; }                
+            });
+        }
+
+        private ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> _managerLazy = [];
+        public ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy => _managerLazy;
+        public void ResetLoadManagerLazy()
+        {
+            var classifierConfigs = new Dictionary<string, string>()
+            {
+                {"Spam", "ConfigSpam" },
+                {"Folder", "ConfigFolder"},
+                {"Triage", "ConfigTriage" }
+            };
+            
+            foreach (var classifier in classifierConfigs)
+            {
+                var value = GetClassifierAsyncLazy(classifier.Key, classifier.Value);
+                if (value != null) { _managerLazy[classifier.Key] = value; }
+            }
         }
 
         private ScDictionary<string, BayesianClassifierGroup> _manager;

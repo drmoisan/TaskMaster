@@ -121,6 +121,12 @@
   <data name="CommonWords" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\9999999CommonWords.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="ConfigManager" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ConfigManager.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ConfigSpam" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ConfigSpam.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="Email Prefix To Strip" xml:space="preserve">
     <value>WARNING: Email originated outside of PepsiCo.</value>
   </data>
