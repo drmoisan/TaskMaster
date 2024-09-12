@@ -602,6 +602,7 @@
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableLoader.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
+    <Compile Include="ReusableTypeClasses\ScDictionaryNew.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializableConfig.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />

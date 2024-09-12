@@ -93,5 +93,16 @@ namespace TaskMaster.Test
             };
             
         }
+
+        [TestMethod]
+        public async Task TestMethodConverter()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var af = new AppAutoFileObjects(appGlobals);
+            var manager = af.LoadManager();
+            var managerNew = 
+        }
+
+
     }
 }
