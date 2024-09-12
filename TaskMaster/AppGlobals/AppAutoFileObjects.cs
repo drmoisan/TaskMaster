@@ -418,7 +418,7 @@ namespace TaskMaster
             var rsDict = BinaryResources;
             var configBin = rsDict["manager_config"];
             var configStr = System.Text.Encoding.UTF8.GetString(configBin);
-            var configLoader = new SmartSerializableLoader(_parent);
+            var configLoader = new SmartSerializableConfig(_parent);
             //var config = configLoader.DeserializeConfig(configStr);
             return rsDict.Keys.ToArray();
             //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
@@ -432,7 +432,7 @@ namespace TaskMaster
             {
                 if (BinaryResources.TryGetValue("ConfigManager", out byte[] configBin))
                 {
-                    var config = await SmartSerializableLoader.DeserializeAsync(_parent, configBin);
+                    var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
                     return await ManagerClass.Static.DeserializeAsync(config); 
                 }
                 else { return null; }
@@ -446,7 +446,7 @@ namespace TaskMaster
             {
                 if (BinaryResources.TryGetValue(configName, out byte[] configBin))
                 {
-                    var config = await SmartSerializableLoader.DeserializeAsync(_parent, configBin);
+                    var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
                     return await BayesianClassifierGroup.Static.DeserializeAsync(config);                    
                 }
                 else { return null; }                

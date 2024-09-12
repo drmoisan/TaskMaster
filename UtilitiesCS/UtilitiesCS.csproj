@@ -596,11 +596,14 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\DictionaryChangedEventArgs.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
-    <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\INewSmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\ISmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\NewSmartSerializableLoader.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializable.cs" />
-    <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializableLoader.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\NewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\NewSmartSerializable.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPackage.cs" />

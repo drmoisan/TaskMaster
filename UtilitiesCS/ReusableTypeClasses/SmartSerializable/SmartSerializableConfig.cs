@@ -1,102 +1,151 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UtilitiesCS;
+using Newtonsoft.Json;
+using UtilitiesCS.ReusableTypeClasses;
 using System.IO;
-using UtilitiesCS.Extensions.Lazy;
+using System.Threading;
+using System.Runtime.CompilerServices;
+using System.ComponentModel;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class SmartSerializableConfig
+    public class SmartSerializableConfig : SmartSerializable<SmartSerializableConfig>, INotifyPropertyChanged
     {
-        public SmartSerializableConfig() 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+        System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public SmartSerializableConfig() { }
+        public SmartSerializableConfig(IApplicationGlobals globals)
         {
-            ResetLazy();
+            Globals = globals;
+            //ResetLazy();
         }
 
-        #region SerializationConfig
-
-        protected FilePathHelper _disk = new FilePathHelper();
-        public FilePathHelper Disk { get => _disk; set => _disk = value; }
-
-        public FilePathHelper LocalDisk { get => _localDisk; set => _localDisk = value; }
-        private FilePathHelper _localDisk = new FilePathHelper();
-
-        public FilePathHelper NetDisk { get => _netDisk; set => _netDisk = value; }
-        private FilePathHelper _netDisk = new();
-
-        [JsonIgnore]
-        public DateTime NetworkDate => File.Exists(NetDisk.FilePath) ?
-            File.GetLastWriteTimeUtc(NetDisk.FilePath) : default;
-
-        [JsonIgnore]
-        public DateTime LocalDate => File.Exists(LocalDisk.FilePath) ?
-            File.GetLastWriteTimeUtc(LocalDisk.FilePath) : default;
-
-        private bool _classifierActivated;
-        public bool ClassifierActivated { get => _classifierActivated; set => _classifierActivated = value; }
-
-        public void ResetLazy()
+        private new void ResetLazy()
         {
-            _localJsonSettings = new Lazy<JsonSerializerSettings>(GetDefaultSettings);
-            _netJsonSettings = new Lazy<JsonSerializerSettings>(GetDefaultSettings);
-            _jsonSettings = new Lazy<JsonSerializerSettings>(GetDefaultSettings);
+            base._localJsonSettings = new Lazy<JsonSerializerSettings>(GetSettings);
+            base._netJsonSettings = new Lazy<JsonSerializerSettings>(GetSettings);
         }
 
-        public void ResetLazy(
-            Lazy<JsonSerializerSettings> localJsonSettings,
-            Lazy<JsonSerializerSettings> netJsonSettings,
-            Lazy<JsonSerializerSettings> jsonSettings)
+        protected bool _activated;
+        public bool Activated { get => _activated; set { _activated = value; Notify(); } }
+
+        [JsonProperty]
+        internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+        private IApplicationGlobals _globals;
+
+        public string Name { get => _name; set { _name = value; Notify(); } }
+        private string _name;
+
+        private JsonSerializerSettings GetSettings()
         {
-            _localJsonSettings = localJsonSettings;
-            _netJsonSettings = netJsonSettings;
-            _jsonSettings = jsonSettings;
-        }          
+            Globals.ThrowIfNull();
+            var settings = GetDefaultSettings();
+            settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+            settings.Converters.Add(new AppGlobalsConverter(Globals));
+            settings.Converters.Add(new FilePathHelperConverter(Globals.FS));
+            return settings;
+        }
 
-        [JsonIgnore]
-        public JsonSerializerSettings JsonSettings { get => _jsonSettings.Value; set => _jsonSettings = value.ToLazy(); }
-        protected Lazy<JsonSerializerSettings> _jsonSettings;
-
-        [JsonIgnore]
-        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings.Value; set => _netJsonSettings = value.ToLazy(); }
-        protected Lazy<JsonSerializerSettings> _netJsonSettings;
-
-        [JsonIgnore]
-        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings.Value; set => _localJsonSettings = value.ToLazy(); }
-        protected Lazy<JsonSerializerSettings> _localJsonSettings;
-
-        public static JsonSerializerSettings GetDefaultSettings()
+        public static async Task<SmartSerializableConfig> DeserializeAsync(
+            IApplicationGlobals globals, byte[] binary, CancellationToken cancel = default)
         {
-            return new JsonSerializerSettings()
+            try
             {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
-            };
+                if (globals is null) { throw new ArgumentNullException(nameof(globals)); }
+                var loader = new SmartSerializableConfig(globals);
+                return await Task.Run(() => loader.DeserializeConfig(binary), cancel);
+            }
+            catch (ArgumentNullException e)
+            {
+                logger.Error($"Error in {nameof(DeserializeAsync)}. {nameof(globals)} cannot be null\n{e.Message}", e);
+                throw;
+            }
+
+            catch (TaskCanceledException)
+            {
+                logger.Warn("Task was cancelled.");
+                return null;
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error in {nameof(DeserializeAsync)}.\n{e.Message}", e);
+                throw;
+            }
         }
 
-        public void ActivateMostRecent()
+        //internal static SmartSerializableConfig DeserializeConfig(IApplicationGlobals globals, byte[] binary)
+        //{                
+        //    var loader = new SmartSerializableConfig(globals);
+        //    var jsonObject = loader.TryConvertBinaryToJson(binary);
+        //    if (jsonObject.IsNullOrEmpty()) { return null; }
+        //    else { return loader.DeserializeConfig(jsonObject); }                
+        //}
+
+        internal SmartSerializableConfig DeserializeConfig(byte[] binary)
         {
-            if (NetworkDate != default && (LocalDate == default || NetworkDate > LocalDate))
+            var jsonObject = TryConvertBinaryToJson(binary);
+            if (jsonObject.IsNullOrEmpty())
             {
-                ActivateNetDisk();
+                return null;
             }
             else
             {
-                ActivateLocalDisk();
+                return DeserializeConfig(jsonObject);
             }
         }
 
-        public void ActivateLocalDisk()
+        internal SmartSerializableConfig DeserializeConfig(string jsonObject)
         {
-            _disk = _localDisk;
-            _jsonSettings = _localJsonSettings;
+            var settings = GetSettings();
+            SmartSerializableConfig instance = null;
+            try
+            {
+                instance = JsonConvert.DeserializeObject<SmartSerializableConfig>(
+                    jsonObject, settings);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error in {nameof(DeserializeConfig)}.\n{e.Message}", e);
+                return null;
+            }
+
+            instance.Globals = Globals;
+            instance.ResetLazy();
+            instance.ActivateMostRecent();
+            return instance;
         }
 
-        public void ActivateNetDisk()
+        internal string TryConvertBinaryToJson(byte[] binary)
         {
-            _disk = _netDisk;
-            _jsonSettings = _netJsonSettings;
+            try
+            {
+                var jsonObject = System.Text.Encoding.UTF8.GetString(binary);
+                return jsonObject;
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error in {nameof(TryConvertBinaryToJson)}.\n{e.Message}", e);
+                return null;
+            }
         }
 
+        #region INotifyPropertyChanged
 
-        #endregion SerializationConfig
+        public void PropertyChangedHandler(object sender, PropertyChangedEventArgs e) => Serialize();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void Notify([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion INotifyPropertyChanged
     }
 }
