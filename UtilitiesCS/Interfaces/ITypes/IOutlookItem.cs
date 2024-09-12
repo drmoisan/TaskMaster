@@ -7,6 +7,7 @@ namespace UtilitiesCS
     {
         Actions Actions { get; }
         Application Application { get; }
+        object[] Args { get; }
         Attachments Attachments { get; }
         string BillingInformation { get; set; }
         string Body { get; set; }
@@ -34,6 +35,7 @@ namespace UtilitiesCS
         string OutlookVersion { get; }
         Folder Parent { get; }
         PropertyAccessor PropertyAccessor { get; }
+        DateTime ReminderTime { get; set; }
         bool Saved { get; }
         OlSensitivity Sensitivity { get; set; }
         NameSpace Session { get; }

@@ -20,7 +20,7 @@ namespace UtilitiesCS.OutlookExtensions
             _olType = this.GetOlItemType();
         }
 
-        public OutlookItemFlaggable(OutlookItem item) : base()
+        public OutlookItemFlaggable(IOutlookItem item) : base()
         {
             if (item is not null)
             {
@@ -47,7 +47,6 @@ namespace UtilitiesCS.OutlookExtensions
         #endregion
 
         #region Public Properties and Methods
-
 
         public bool Complete
         {

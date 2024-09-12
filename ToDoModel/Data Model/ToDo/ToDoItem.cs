@@ -16,9 +16,9 @@ using UtilitiesCS;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 
+[assembly: InternalsVisibleTo("ToDoModel.Tests")]
 namespace ToDoModel
 {
-
     [Serializable()]
     public class ToDoItem : ICloneable, IToDoItem
     {
@@ -26,7 +26,7 @@ namespace ToDoModel
 
         private ToDoItem() { }
 
-        public ToDoItem(OutlookItem outlookItem)
+        public ToDoItem(IOutlookItem outlookItem)
         {
             FlaggableItem = new OutlookItemFlaggable(outlookItem);
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
@@ -37,7 +37,7 @@ namespace ToDoModel
             InitializeCustomFields(FlaggableItem);
         }
 
-        public ToDoItem(OutlookItem outlookItem, bool onDemand)
+        public ToDoItem(IOutlookItem outlookItem, bool onDemand)
         {
             FlaggableItem = new OutlookItemFlaggable(outlookItem);
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
@@ -302,7 +302,7 @@ namespace ToDoModel
         public bool IdAutoCoding { get => _idAutoCoding; set => _idAutoCoding = value; }
         private bool _idAutoCoding = true;
 
-        public OutlookItem OlItem => _olItem;
+        public IOutlookItem OlItem => _olItem;
         private OutlookItemFlaggable _olItem;
         internal OutlookItemFlaggable FlaggableItem { get => _olItem; set => _olItem = value; }
 

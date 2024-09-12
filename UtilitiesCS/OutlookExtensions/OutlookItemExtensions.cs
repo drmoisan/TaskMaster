@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.OutlookExtensions
 {
+    //TODO: Move to OutlookItem rather than as extensions
     public static class OutlookItemExtensions
     {
         public static OutlookItemTry Try(this OutlookItem item) => new OutlookItemTry(item);
@@ -27,9 +28,6 @@ namespace UtilitiesCS.OutlookExtensions
             else if (item.InnerObject is TaskItem) { return OlItemType.olTaskItem; }
             else { throw new ArgumentException($"{item.InnerObject.GetType().Name} is not a supported type for {nameof(OlItemType)} class."); }
         }
-
-
-        
 
 
         #region Helper Methods

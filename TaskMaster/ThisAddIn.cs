@@ -2,11 +2,12 @@
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.Office.Core;
 using UtilitiesCS;
+using System.Runtime.CompilerServices;
 
 
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
-
+[assembly: InternalsVisibleTo("TaskMaster.Test")]
 namespace TaskMaster
 {
     public partial class ThisAddIn

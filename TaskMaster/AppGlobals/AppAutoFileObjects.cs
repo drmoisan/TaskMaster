@@ -473,7 +473,7 @@ namespace TaskMaster
 
         private ScDictionary<string, BayesianClassifierGroup> _manager;
         public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
-        private ScDictionary<string, BayesianClassifierGroup> LoadManager()
+        internal ScDictionary<string, BayesianClassifierGroup> LoadManager()
         {
             var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
             var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;

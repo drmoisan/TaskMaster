@@ -91,6 +91,8 @@
     <Compile Include="Extensions\DeedleTests.cs" />
     <Compile Include="HelperClasses\SimpleRegex_Test.cs" />
     <Compile Include="Dialogs\YesNoToAll_Test.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\ConcurrentObservableDictionaryTest.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />

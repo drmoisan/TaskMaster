@@ -5,6 +5,8 @@ using UtilitiesCS;
 using Moq;
 using System.Threading.Tasks;
 using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
+using TaskMaster.AppGlobals;
+using System.Collections.Generic;
 namespace TaskMaster.Test
 {
     [TestClass]
@@ -48,9 +50,9 @@ namespace TaskMaster.Test
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             //var af = new AppAutoFileObjects(mockGlobals.Object);
             var af = new AppAutoFileObjects(appGlobals);
-            af.ResetLoadManager();
-
-            var manager = await af.Manager2;
+            var manager = af.LoadManager();            
+            //af.ResetLoadManager();
+            //var manager = await af.Manager2;
 
             var spam = manager["Spam"];
             if (af.BinaryResources.TryGetValue("ConfigSpam", out byte[] configBin))
@@ -65,9 +67,6 @@ namespace TaskMaster.Test
                 spam.ClassifierActivated = config.Activated;
                 spam.Serialize();
             }
-
-
-
         }
 
         [TestMethod]
@@ -80,6 +79,19 @@ namespace TaskMaster.Test
             var spam = await af.ManagerLazy["Spam"];
             Assert.IsNotNull(spam);
 
+        }
+
+        [TestMethod]
+        public void TestMethod4()
+        {
+            var config = new ManagerLazyConfig();
+            config.Configurations = new List<ManagerLazyConfigStruct>() 
+            { 
+                new ManagerLazyConfigStruct() { ResourceName = "ConfigSpam", ClassifierName = "Spam", Active = true },
+                new ManagerLazyConfigStruct() { ResourceName = "ConfigFolder", ClassifierName = "Folder", Active = true },
+                new ManagerLazyConfigStruct() { ResourceName = "ConfigTriage", ClassifierName = "Triage", Active = true }
+            };
+            
         }
     }
 }

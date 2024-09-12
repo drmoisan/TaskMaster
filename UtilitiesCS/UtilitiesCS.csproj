@@ -591,6 +591,11 @@
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
+    <Compile Include="Interfaces\ITypes\IOutlookItem.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\ConcurrentObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\DictionaryChangedEventArgs.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable.cs" />
@@ -711,7 +716,6 @@
     <Compile Include="OutlookExtensions\CreateCategory.cs" />
     <Compile Include="OutlookExtensions\ExplorerActions.cs" />
     <Compile Include="OutlookExtensions\FolderConverter.cs" />
-    <Compile Include="OutlookExtensions\IOutlookItem.cs" />
     <Compile Include="OutlookExtensions\MailItemExtensions.cs" />
     <Compile Include="OutlookExtensions\MsgToMime\MAPIMethods.cs" />
     <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />

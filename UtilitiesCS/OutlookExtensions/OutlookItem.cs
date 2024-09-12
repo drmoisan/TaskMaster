@@ -10,7 +10,7 @@ namespace UtilitiesCS
     /// Helper class to access common Outlook item members. 
     /// <see href="https://learn.microsoft.com/en-us/office/client-developer/outlook/pia/how-to-create-a-helper-class-to-access-common-outlook-item-members"/> 
     /// </summary>
-    public class OutlookItem
+    public class OutlookItem : IOutlookItem
     {
         protected object _item;  // the wrapped Outlook item
         protected Type _type;  // type for the Outlook item 
@@ -80,7 +80,7 @@ namespace UtilitiesCS
 
         internal object Item { get => _item; }
         internal Type ItemType { get => _type; }
-        internal object[] Args { get => _args; }
+        public object[] Args { get => _args; }
 
         #endregion
 

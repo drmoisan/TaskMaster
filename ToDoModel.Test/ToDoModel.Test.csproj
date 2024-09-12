@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="AssertAll.cs" />
     <Compile Include="Data Model\ID\BaseChangerTests.cs" />
+    <Compile Include="Data Model\ToDo\ToDoItemTests.cs" />
     <Compile Include="Data Model\Tree\TreeNodeTests.cs" />
     <Compile Include="Data Model\Tree\TreeNodeTests_UnfinishedStubs.cs" />
     <Compile Include="Email Utilities\FolderHandlerTests_UnfinishedStubs.cs" />

@@ -366,11 +366,22 @@
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />
     <Compile Include="AppGlobals\ManagerClass.cs" />
+    <Compile Include="AppGlobals\ManagerLazyClass.cs" />
+    <Compile Include="AppGlobals\ManagerLazyConfig.cs" />
     <Compile Include="AppGlobals\SmartSerializableConfigOld.cs" />
     <Compile Include="AppGlobals\ToDoObj.cs" />
+    <Compile Include="ManagerResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ManagerResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <EmbeddedResource Include="ManagerResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -26,7 +26,7 @@ namespace UtilitiesCS
         FlagTranslator KB { get; }
         string MetaTaskLvl { get; set; }
         string MetaTaskSubject { get; set; }
-        OutlookItem OlItem { get; }
+        IOutlookItem OlItem { get; }
         FlagTranslator People { get; }
         OlImportance Priority { get; set; }
         FlagTranslator Program { get; }
