@@ -19,7 +19,7 @@ using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 
 namespace TaskMaster.AppGlobals
 {
-    public class ManagerClass: ConcurrentDictionary<string, BayesianClassifierGroup>, ISmartSerializable<ManagerClass>
+    public class ManagerClass: ConcurrentDictionary<string, BayesianClassifierGroup>, INewSmartSerializable<ManagerClass>
     {
         public ManagerClass() { }
 
@@ -136,7 +136,7 @@ namespace TaskMaster.AppGlobals
 
         #region ISmartSerializable
 
-        protected SmartSerializable<ManagerClass> ism = new();
+        protected NewSmartSerializable<ManagerClass> ism = new();
 
         public FilePathHelper Disk { get => ism.Disk; set => ism.Disk = value; }
         public JsonSerializerSettings JsonSettings { get => ism.JsonSettings; set => ism.JsonSettings = value; }
@@ -152,12 +152,12 @@ namespace TaskMaster.AppGlobals
         public ManagerClass Deserialize(string fileName, string folderPath) => ism.Deserialize(fileName, folderPath);
         public ManagerClass Deserialize(string fileName, string folderPath, bool askUserOnError) => ism.Deserialize(fileName, folderPath, askUserOnError);
         public ManagerClass Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
-        public ManagerClass Deserialize(SmartSerializableLoader config) => ism.Deserialize(config);
-        public async Task<ManagerClass> DeserializeAsync(SmartSerializableLoader config) => await Task.Run(()=>ism.Deserialize(config));
+        public ManagerClass Deserialize(NewSmartSerializableLoader config) => ism.Deserialize(config);
+        public async Task<ManagerClass> DeserializeAsync(NewSmartSerializableLoader config) => await Task.Run(()=>ism.Deserialize(config));
 
         public static class Static
         {
-            private static SmartSerializable<ManagerClass> GetInstance() => new();
+            private static NewSmartSerializable<ManagerClass> GetInstance() => new();
 
             public static ManagerClass Deserialize(string fileName, string folderPath) =>
             GetInstance().Deserialize(fileName, folderPath);
@@ -168,14 +168,14 @@ namespace TaskMaster.AppGlobals
             public static ManagerClass Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
             GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
 
-            public static ManagerClass Deserialize(SmartSerializableLoader config) =>
+            public static ManagerClass Deserialize(NewSmartSerializableLoader config) =>
                 GetInstance().Deserialize(config);
 
-            public static async Task<ManagerClass> DeserializeAsync(SmartSerializableLoader config) =>
+            public static async Task<ManagerClass> DeserializeAsync(NewSmartSerializableLoader config) =>
                 await GetInstance().DeserializeAsync(config);
 
             internal static JsonSerializerSettings GetDefaultSettings() => 
-                SmartSerializable<ManagerClass>.GetDefaultSettings();
+                NewSmartSerializable<ManagerClass>.GetDefaultSettings();
         }
 
         #endregion ISmartSerializable

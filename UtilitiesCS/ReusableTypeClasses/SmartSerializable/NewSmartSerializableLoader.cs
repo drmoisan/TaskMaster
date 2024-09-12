@@ -22,13 +22,13 @@ namespace UtilitiesCS.ReusableTypeClasses
 
     namespace UtilitiesCS.ReusableTypeClasses
     {
-        public class SmartSerializableLoader : SmartSerializable<SmartSerializableLoader>, INotifyPropertyChanged
+        public class NewSmartSerializableLoader : NewSmartSerializable<NewSmartSerializableLoader>, INotifyPropertyChanged
         {
             private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-            public SmartSerializableLoader() { }
-            public SmartSerializableLoader(IApplicationGlobals globals)
+            public NewSmartSerializableLoader() { }
+            public NewSmartSerializableLoader(IApplicationGlobals globals)
             {
                 Globals = globals;
                 //ResetLazy();
@@ -62,13 +62,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 return settings;
             }
             
-            public static async Task<SmartSerializableLoader> DeserializeAsync(
+            public static async Task<NewSmartSerializableLoader> DeserializeAsync(
                 IApplicationGlobals globals, byte[] binary, CancellationToken cancel = default)
             {                
                 try
                 {
                     if (globals is null) { throw new ArgumentNullException(nameof(globals)); }
-                    var loader = new SmartSerializableLoader(globals);
+                    var loader = new NewSmartSerializableLoader(globals);
                     return await Task.Run(() => loader.DeserializeConfig(binary), cancel);
                 }
                 catch (ArgumentNullException e)
@@ -97,7 +97,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             //    else { return loader.DeserializeConfig(jsonObject); }                
             //}
 
-            internal SmartSerializableLoader DeserializeConfig(byte[] binary)
+            internal NewSmartSerializableLoader DeserializeConfig(byte[] binary)
             {
                 var jsonObject = TryConvertBinaryToJson(binary);
                 if (jsonObject.IsNullOrEmpty())
@@ -110,13 +110,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
             }
 
-            internal SmartSerializableLoader DeserializeConfig(string jsonObject)
+            internal NewSmartSerializableLoader DeserializeConfig(string jsonObject)
             {
                 var settings = GetSettings();
-                SmartSerializableLoader instance = null;
+                NewSmartSerializableLoader instance = null;
                 try
                 {
-                    instance = JsonConvert.DeserializeObject<SmartSerializableLoader>(
+                    instance = JsonConvert.DeserializeObject<NewSmartSerializableLoader>(
                         jsonObject, settings);
                 }
                 catch (Exception e)

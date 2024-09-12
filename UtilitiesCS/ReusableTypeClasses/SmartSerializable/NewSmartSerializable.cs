@@ -16,29 +16,29 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class SmartSerializable<T> : ISmartSerializable<T> where T : class, ISmartSerializable<T>, new()
+    public class NewSmartSerializable<T> : INewSmartSerializable<T> where T : class, INewSmartSerializable<T>, new()
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SmartSerializable()
+        public NewSmartSerializable()
         {
             _parent = null;
-            Config = new SmartSerializableConfig();
+            Config = new NewSmartSerializableConfig();
         }
 
-        public SmartSerializable(T parent)
+        public NewSmartSerializable(T parent)
         {
             _parent = parent;            
-            Config = new SmartSerializableConfig();
+            Config = new NewSmartSerializableConfig();
         }
 
         protected T _parent;
 
         #region SerializationConfig
 
-        private SmartSerializableConfig _config = new();
-        public SmartSerializableConfig Config { get => _config; set => _config = value; }
+        private NewSmartSerializableConfig _config = new();
+        public NewSmartSerializableConfig Config { get => _config; set => _config = value; }
 
         #endregion SerializationConfig
 
@@ -111,8 +111,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             return Deserialize(disk, askUserOnError, settings);
         }
 
-        public T TryDeserialize<U>(SmartSerializable<U> loader)
-            where U : class, ISmartSerializable<U>, new()
+        public T TryDeserialize<U>(NewSmartSerializable<U> loader)
+            where U : class, INewSmartSerializable<U>, new()
         {
             try
             {
@@ -125,8 +125,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public T Deserialize<U>(SmartSerializable<U> loader)
-            where U : class, ISmartSerializable<U>, new()
+        public T Deserialize<U>(NewSmartSerializable<U> loader)
+            where U : class, INewSmartSerializable<U>, new()
         {
             try
             {
@@ -183,7 +183,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return instance;
         }
 
-        public async Task<T> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new()
+        public async Task<T> DeserializeAsync<U>(NewSmartSerializable<U> config) where U : class, INewSmartSerializable<U>, new()
         {
             return await Task.Run(() => Deserialize(config));
         }
@@ -236,7 +236,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public void SerializeThreadSafe(string filePath)
         {
-            _parent.ThrowIfNull($"{nameof(SmartSerializable<T>)}.{nameof(_parent)} is null. It must be linked to the instance it is serializing.");
+            _parent.ThrowIfNull($"{nameof(NewSmartSerializable<T>)}.{nameof(_parent)} is null. It must be linked to the instance it is serializing.");
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
@@ -282,7 +282,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         
         public static class Static
         {
-            private static SmartSerializable<T> GetInstance() => new();
+            private static NewSmartSerializable<T> GetInstance() => new();
 
             public static T Deserialize(string fileName, string folderPath) =>
                 GetInstance().Deserialize(fileName, folderPath);
@@ -293,14 +293,14 @@ namespace UtilitiesCS.ReusableTypeClasses
             public static T Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
 
-            public static T Deserialize<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
+            public static T Deserialize<U>(NewSmartSerializable<U> config) where U : class, INewSmartSerializable<U>, new() =>
                 GetInstance().Deserialize(config);
 
-            public static async Task<T> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
+            public static async Task<T> DeserializeAsync<U>(NewSmartSerializable<U> config) where U : class, INewSmartSerializable<U>, new() =>
                 await GetInstance().DeserializeAsync(config);
 
             internal static JsonSerializerSettings GetDefaultSettings() =>
-                SmartSerializable<T>.GetDefaultSettings();
+                NewSmartSerializable<T>.GetDefaultSettings();
         }
         
         #endregion Static

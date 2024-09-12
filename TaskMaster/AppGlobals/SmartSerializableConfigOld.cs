@@ -10,7 +10,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace TaskMaster.AppGlobals
 {
-    public class SmartSerializableConfigOld: ISmartSerializable<SmartSerializableConfigOld>
+    public class SmartSerializableConfigOld: INewSmartSerializable<SmartSerializableConfigOld>
     {
         public SmartSerializableConfigOld() { }
         public SmartSerializableConfigOld(IApplicationGlobals globals)

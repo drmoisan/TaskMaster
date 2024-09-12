@@ -14,7 +14,7 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class ScDictionary<TKey, TValue>: ConcurrentDictionary<TKey, TValue>, ISmartSerializable<ScDictionary<TKey, TValue>>
+    public class ScDictionary<TKey, TValue>: ConcurrentDictionary<TKey, TValue>, INewSmartSerializable<ScDictionary<TKey, TValue>>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -34,7 +34,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region ISmartSerializable
 
-        protected SmartSerializable<ScDictionary<TKey, TValue>> ism;
+        protected NewSmartSerializable<ScDictionary<TKey, TValue>> ism;
 
         [JsonIgnore]
         public FilePathHelper Disk { get => ism.Disk; set => ism.Disk = value; }
@@ -65,7 +65,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public static class Static 
         {
-            private static SmartSerializable<ScDictionary<TKey, TValue>> GetInstance() => new();
+            private static NewSmartSerializable<ScDictionary<TKey, TValue>> GetInstance() => new();
             public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) =>
                 GetInstance().Deserialize(fileName, folderPath);
 

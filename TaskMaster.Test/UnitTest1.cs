@@ -57,7 +57,7 @@ namespace TaskMaster.Test
             var spam = manager["Spam"];
             if (af.BinaryResources.TryGetValue("ConfigSpam", out byte[] configBin))
             {
-                var config = await SmartSerializableLoader.DeserializeAsync(appGlobals, configBin);
+                var config = await NewSmartSerializableLoader.DeserializeAsync(appGlobals, configBin);
                 spam.Config.Disk = config.Config.Disk;
                 spam.Config.NetDisk = config.Config.NetDisk;
                 spam.Config.LocalDisk = config.Config.LocalDisk;

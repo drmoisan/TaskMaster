@@ -11,7 +11,7 @@ using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 
 namespace TaskMaster.AppGlobals
 {
-    public class ManagerLazyConfig: SmartSerializable<ManagerLazyConfig>
+    public class ManagerLazyConfig: NewSmartSerializable<ManagerLazyConfig>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

@@ -5,9 +5,9 @@ using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class SmartSerializableConfig
+    public class NewSmartSerializableConfig
     {
-        public SmartSerializableConfig() 
+        public NewSmartSerializableConfig() 
         {
             ResetLazy();
         }

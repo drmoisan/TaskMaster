@@ -3,7 +3,7 @@ using System;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public interface ISmartSerializable<T> where T: class, ISmartSerializable<T>, new()
+    public interface INewSmartSerializable<T> where T: class, INewSmartSerializable<T>, new()
     {
         //FilePathHelper Disk { get; set; }
         //JsonSerializerSettings JsonSettings { get; set; }
@@ -23,6 +23,6 @@ namespace UtilitiesCS.ReusableTypeClasses
         void Serialize(string filePath);
         void SerializeThreadSafe(string filePath);
 
-        SmartSerializableConfig Config { get; set; }
+        NewSmartSerializableConfig Config { get; set; }
     }
 }
