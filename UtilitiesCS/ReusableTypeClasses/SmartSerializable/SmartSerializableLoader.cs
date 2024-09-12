@@ -22,22 +22,24 @@ namespace UtilitiesCS.ReusableTypeClasses
 
     namespace UtilitiesCS.ReusableTypeClasses
     {
-        public class SmartSerializableConfig : SmartSerializable<SmartSerializableConfig>, INotifyPropertyChanged
+        public class SmartSerializableLoader : SmartSerializable<SmartSerializableLoader>, INotifyPropertyChanged
         {
             private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-            public SmartSerializableConfig() { }
-            public SmartSerializableConfig(IApplicationGlobals globals)
+            public SmartSerializableLoader() { }
+            public SmartSerializableLoader(IApplicationGlobals globals)
             {
                 Globals = globals;
                 //ResetLazy();
             }
 
-            private new void ResetLazy()
+            private void ResetLazy()
             {
-                base._localJsonSettings = new Lazy<JsonSerializerSettings>(GetSettings);
-                base._netJsonSettings = new Lazy<JsonSerializerSettings>(GetSettings);
+                base.Config.ResetLazy(
+                    localJsonSettings: new Lazy<JsonSerializerSettings>(GetSettings),
+                    netJsonSettings: new Lazy<JsonSerializerSettings>(GetSettings),
+                    jsonSettings: new Lazy<JsonSerializerSettings>(GetSettings));
             }
 
             protected bool _activated;
@@ -60,13 +62,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 return settings;
             }
             
-            public static async Task<SmartSerializableConfig> DeserializeAsync(
+            public static async Task<SmartSerializableLoader> DeserializeAsync(
                 IApplicationGlobals globals, byte[] binary, CancellationToken cancel = default)
             {                
                 try
                 {
                     if (globals is null) { throw new ArgumentNullException(nameof(globals)); }
-                    var loader = new SmartSerializableConfig(globals);
+                    var loader = new SmartSerializableLoader(globals);
                     return await Task.Run(() => loader.DeserializeConfig(binary), cancel);
                 }
                 catch (ArgumentNullException e)
@@ -95,7 +97,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             //    else { return loader.DeserializeConfig(jsonObject); }                
             //}
 
-            internal SmartSerializableConfig DeserializeConfig(byte[] binary)
+            internal SmartSerializableLoader DeserializeConfig(byte[] binary)
             {
                 var jsonObject = TryConvertBinaryToJson(binary);
                 if (jsonObject.IsNullOrEmpty())
@@ -108,13 +110,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
             }
 
-            internal SmartSerializableConfig DeserializeConfig(string jsonObject)
+            internal SmartSerializableLoader DeserializeConfig(string jsonObject)
             {
                 var settings = GetSettings();
-                SmartSerializableConfig instance = null;
+                SmartSerializableLoader instance = null;
                 try
                 {
-                    instance = JsonConvert.DeserializeObject<SmartSerializableConfig>(
+                    instance = JsonConvert.DeserializeObject<SmartSerializableLoader>(
                         jsonObject, settings);
                 }
                 catch (Exception e)
@@ -125,7 +127,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 
                 instance.Globals = Globals;
                 instance.ResetLazy();
-                instance.ActivateMostRecent();
+                instance.Config.ActivateMostRecent();
                 return instance;
             }
 

@@ -57,14 +57,14 @@ namespace TaskMaster.Test
             var spam = manager["Spam"];
             if (af.BinaryResources.TryGetValue("ConfigSpam", out byte[] configBin))
             {
-                var config = await SmartSerializableConfig.DeserializeAsync(appGlobals, configBin);
-                spam.Disk = config.Disk;
-                spam.NetDisk = config.NetDisk;
-                spam.LocalDisk = config.LocalDisk;
-                spam.LocalJsonSettings = config.LocalJsonSettings;
-                spam.NetJsonSettings = config.NetJsonSettings;
-                spam.JsonSettings = config.JsonSettings;
-                spam.ClassifierActivated = config.Activated;
+                var config = await SmartSerializableLoader.DeserializeAsync(appGlobals, configBin);
+                spam.Config.Disk = config.Config.Disk;
+                spam.Config.NetDisk = config.Config.NetDisk;
+                spam.Config.LocalDisk = config.Config.LocalDisk;
+                spam.Config.LocalJsonSettings = config.Config.LocalJsonSettings;
+                spam.Config.NetJsonSettings = config.Config.NetJsonSettings;
+                spam.Config.JsonSettings = config.Config.JsonSettings;
+                spam.Config.ClassifierActivated = config.Activated;
                 spam.Serialize();
             }
         }
