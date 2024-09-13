@@ -264,16 +264,24 @@ namespace UtilitiesCS
                     else
                         _filePath = null;
                     break;
+                
                 case "FilePath":
+                    if (_filePath.IsNullOrEmpty())
+                    {
+                        _folderPath = "";
+                        _fileName = "";
+                        return;
+                    }                    
+                    
                     try
                     {
                         _folderPath = Path.GetDirectoryName(_filePath);    
                     }
-                    catch (System.Exception)
+                    catch (System.Exception ex)
                     {
                         var st = string.Join("\n",TraceUtility.GetMyMethodNames(new StackTrace()));
                         string msg = $"FilePath: {_filePath} is invalid.\n{st}";
-                        logger.Error(msg);
+                        logger.Error(msg, ex);
                         throw;
                     }
                     
