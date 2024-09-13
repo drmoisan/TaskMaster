@@ -9,6 +9,12 @@ using TaskMaster.AppGlobals;
 using System.Collections.Generic;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
+using TaskMaster.Properties;
+using System.Reflection;
+using Microsoft.Build.Evaluation;
+using System.Linq;
+using UtilitiesCS.NewtonsoftHelpers;
+
 namespace TaskMaster.Test
 {
     [TestClass]
@@ -97,7 +103,7 @@ namespace TaskMaster.Test
         }
 
         [TestMethod]
-        public async Task TestMethodConverter()
+        public void TestMethodConverter()
         {
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             var af = new AppAutoFileObjects(appGlobals);
@@ -109,11 +115,71 @@ namespace TaskMaster.Test
             managerNew.Config.LocalJsonSettings = manager.LocalJsonSettings;
             managerNew.Config.NetJsonSettings = manager.NetJsonSettings;
             managerNew.Config.JsonSettings = manager.JsonSettings;
+            managerNew.Config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            managerNew.Config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            managerNew.Config.JsonSettings.TraceWriter = new NLogTraceWriter();
+            managerNew.Config.Disk.FileName = "managerConverted.json";
 
-            managerNew.Serialize();
-            await Task.Delay(5000);
+            managerNew.SerializeThreadSafe(managerNew.Config.Disk.FilePath);
+
             Assert.IsTrue(System.IO.File.Exists(managerNew.Config.Disk.FilePath));
         }
+
+        [TestMethod]
+        public void TestNewScDict()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var af = new AppAutoFileObjects(appGlobals);
+            var dict = new NewScDictionary<string, string>();
+            dict["key1"] = "value1";
+            dict.Config.Disk.FileName = "testdict.json";
+            dict.Config.Disk.FolderPath = appGlobals.FS.FldrAppData;            
+            dict.Config.NetDisk.FileName = "testdict.json";
+            dict.Config.NetDisk.FolderPath = appGlobals.FS.FldrAppData;
+            dict.Config.LocalDisk = dict.Config.Disk;
+            dict.Config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            dict.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
+            dict.Config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            //dict.Config.JsonSettings.TraceWriter = new NLogTraceWriter();
+            Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
+            dict.Config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
+
+            dict.SerializeThreadSafe(dict.Config.Disk.FilePath);
+
+            Assert.IsTrue(System.IO.File.Exists(dict.Config.Disk.FilePath));
+        }
+
+        [TestMethod]
+        public void PrintAssemblies()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            //var classes = appGlobals.GetClasses();
+            //projects.Select(project => project.)
+            //foreach (var c in classes)
+            //{
+            //    if (c.Name.Contains("ToDoObj"))
+            //    {
+            //        continue;
+            //    }
+            //    Console.WriteLine($"{c.Attributes} => {c.Name}");
+            //}
+
+            //var assemblies = AppDomain.CurrentDomain.GetAssemblies();            
+            //foreach (var assembly in assemblies)
+            //{
+            //    Console.WriteLine(assembly.GetName().Name);
+            //}
+        }
+
+        [TestMethod]
+        public void GetBinder() 
+        { 
+
+        }
+
+        
+
+
 
 
     }

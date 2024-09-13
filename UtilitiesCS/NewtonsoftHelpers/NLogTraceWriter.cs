@@ -13,7 +13,7 @@ public class NLogTraceWriter : ITraceWriter
     
     internal virtual ILog Logger => _logger; 
     
-    private TraceLevel _levelFilter = TraceLevel.Error;
+    private TraceLevel _levelFilter = TraceLevel.Verbose;
     public TraceLevel LevelFilter { get => _levelFilter; set => _levelFilter = value; }
     
     private List<string> _messageFilter = ["Deserialized JSON:", "Serialized JSON:"];

@@ -34,40 +34,22 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region ISmartSerializable
 
-        protected INewSmartSerializable<NewScDictionary<TKey, TValue>> ism;
         public INewSmartSerializableConfig Config { get => ism.Config; set => ism.Config = value; }
-
-        [JsonIgnore]
-        public FilePathHelper Disk { get => ism.Config.Disk; set => ism.Config.Disk = value; }
-        //[JsonIgnore]
-        //public string FileName { get => ism.FileName; set => ism.FileName = value; }
-        //[JsonIgnore]
-        //public string FilePath { get => ism.FilePath; set => ism.FilePath = value; }
-        //[JsonIgnore]
-        //public string FolderPath { get => ism.FolderPath; set => ism.FolderPath = value; }
-        [JsonIgnore]
-        public JsonSerializerSettings JsonSettings { get => ism.Config.JsonSettings; set => ism.Config.JsonSettings = value; }
-        [JsonIgnore]
-        public FilePathHelper LocalDisk { get => ism.Config.LocalDisk; set => ism.Config.LocalDisk = value; }
-        [JsonIgnore]
-        public JsonSerializerSettings LocalJsonSettings { get => ism.Config.LocalJsonSettings; set => ism.Config.LocalJsonSettings = value; }
-        [JsonIgnore]
-        public FilePathHelper NetDisk { get => ism.Config.NetDisk; set => ism.Config.NetDisk = value; }
-        [JsonIgnore]
-        public JsonSerializerSettings NetJsonSettings { get => ism.Config.NetJsonSettings; set => ism.Config.NetJsonSettings = value; }
-        public void ActivateLocalDisk() => ism.Config.ActivateLocalDisk();
-        public void ActivateNetDisk() => ism.Config.ActivateNetDisk();
+        protected INewSmartSerializable<NewScDictionary<TKey, TValue>> ism;
+        
         public void Serialize() => ism.Serialize();
         public void Serialize(string filePath) => ism.Serialize(filePath);
         public void SerializeThreadSafe(string filePath) => ism.SerializeThreadSafe(filePath);
         public NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) => ism.Deserialize(fileName, folderPath);
         public NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) => ism.Deserialize(fileName, folderPath, askUserOnError);
         public NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
-        
+
+        #endregion ISmartSerializable
 
         public static class Static 
         {
             private static NewSmartSerializable<NewScDictionary<TKey, TValue>> GetInstance() => new();
+            
             public static NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) =>
                 GetInstance().Deserialize(fileName, folderPath);
 
@@ -76,10 +58,9 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             public static NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
-
         }
 
-        #endregion ISmartSerializable
+        
 
 
 

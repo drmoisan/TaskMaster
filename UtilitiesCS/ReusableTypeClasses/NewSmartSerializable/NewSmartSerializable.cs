@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -37,8 +38,8 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region SerializationConfig
 
-        private INewSmartSerializableConfig _config = new NewSmartSerializableConfig();
         public INewSmartSerializableConfig Config { get => _config; set => _config = value; }
+        private INewSmartSerializableConfig _config = new NewSmartSerializableConfig();
 
         #endregion SerializationConfig
 
@@ -245,7 +246,16 @@ namespace UtilitiesCS.ReusableTypeClasses
                     using (StreamWriter sw = CreateStreamWriter(filePath))
                     {
                         var serializer = JsonSerializer.Create(Config.JsonSettings);
-                        serializer.Serialize(sw, _parent);
+                        
+                        if (Config.JsonSettings.TypeNameHandling == TypeNameHandling.Auto)
+                        {
+                            serializer.Serialize(sw, _parent, _parent.GetType());
+                        }
+                        else
+                        {
+                            serializer.Serialize(sw, _parent);
+                        }
+                        
                         sw.Close();
                         _serializationRequested = new ThreadSafeSingleShotGuard();
                     }
@@ -262,7 +272,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
 
         }
-
+        
         private ThreadSafeSingleShotGuard _serializationRequested = new();
         private TimerWrapper _timer;
         protected void RequestSerialization(string filePath)

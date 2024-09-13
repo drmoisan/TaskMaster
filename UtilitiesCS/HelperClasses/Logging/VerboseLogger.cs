@@ -24,6 +24,7 @@ namespace UtilitiesCS
         public void SetVerbose(string methodName) => VerboseMethods[methodName] = true;
         public bool IsVerbose([System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
         {
+            
             return VerboseMethods.ContainsKey(memberName) ? VerboseMethods[memberName] : false;
         }
         public void VerboseAction(System.Action action, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "")

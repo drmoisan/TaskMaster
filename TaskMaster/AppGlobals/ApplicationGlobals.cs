@@ -1,8 +1,11 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.HelperClasses;
 
 namespace TaskMaster
 {
@@ -48,6 +51,20 @@ namespace TaskMaster
         private AppQuickFilerSettings _quickFilerSettings;
         public IAppQuickFilerSettings QfSettings => _quickFilerSettings;
         internal AppQuickFilerSettings InternalQfSettings => _quickFilerSettings;
+
+        public List<Type> GetClasses()
+        {
+            return ReflectionHelper.GetAllClassesInSolution();
+        }
+        
+        public string[] GetProjectNames()
+        {
+            //ProjectCollection.GlobalProjectCollection.LoadedProjects
+            return AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Select(assembly => assembly.GetName().Name)
+                .ToArray();
+        }
 
         #region Legacy Definitions and Constants
 
