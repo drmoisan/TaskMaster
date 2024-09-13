@@ -42,6 +42,7 @@ namespace TaskMaster.AppGlobals
         protected bool _active;
         public bool Active { get => _active; set => _active = value; }
 
+        public INewSmartSerializableConfig Config { get; set; }
         internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
         public FilePathHelper Disk { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public JsonSerializerSettings JsonSettings { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

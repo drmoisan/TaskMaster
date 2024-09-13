@@ -471,9 +471,9 @@ namespace TaskMaster
             }
         }
 
-        private ScDictionary<string, BayesianClassifierGroup> _manager;
-        public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
-        internal ScDictionary<string, BayesianClassifierGroup> LoadManager()
+        private NewScDictionary<string, BayesianClassifierGroup> _manager;
+        public NewScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
+        internal NewScDictionary<string, BayesianClassifierGroup> LoadManager()
         {
             var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
             var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
@@ -523,7 +523,7 @@ namespace TaskMaster
 
         private JsonSerializerSettings GetSettings(bool compress)
         {
-            var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
+            var settings = NewScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
             //var settings = ScDictionary<string, BayesianClassifierGroup>.Factory.GetDefaultSettings();
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(_parent));
@@ -533,11 +533,11 @@ namespace TaskMaster
             return settings;
         }
         
-        private ScDictionary<string, BayesianClassifierGroup> GetManager(
+        private NewScDictionary<string, BayesianClassifierGroup> GetManager(
             FilePathHelper disk, 
             JsonSerializerSettings settings)
         {
-            return new ScDictionary<string, BayesianClassifierGroup>().Deserialize(
+            return new NewScDictionary<string, BayesianClassifierGroup>().Deserialize(
                 fileName: disk.FileName,
                 folderPath: disk.FolderPath,
                 askUserOnError: false,

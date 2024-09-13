@@ -5,9 +5,9 @@ using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class NewSmartSerializableConfig
+    public class NewSmartSerializableConfig : INewSmartSerializableConfig
     {
-        public NewSmartSerializableConfig() 
+        public NewSmartSerializableConfig()
         {
             ResetLazy();
         }
@@ -49,7 +49,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             _localJsonSettings = localJsonSettings;
             _netJsonSettings = netJsonSettings;
             _jsonSettings = jsonSettings;
-        }          
+        }
 
         [JsonIgnore]
         public JsonSerializerSettings JsonSettings { get => _jsonSettings.Value; set => _jsonSettings = value.ToLazy(); }

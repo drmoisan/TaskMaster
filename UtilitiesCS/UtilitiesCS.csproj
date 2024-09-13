@@ -598,6 +598,7 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\INewSmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\INewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\NewSmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\NewSmartSerializableLoader.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\NewSmartSerializableConfig.cs" />
@@ -746,7 +747,7 @@
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ObserverHelper.cs" />
-    <Compile Include="ReusableTypeClasses\ScDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\NewScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
     <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
     <Compile Include="ReusableTypeClasses\ScoSortedDictionary.cs" />

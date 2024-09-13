@@ -137,15 +137,15 @@ namespace TaskMaster.AppGlobals
         #region ISmartSerializable
 
         protected NewSmartSerializable<ManagerClass> ism = new();
-
-        public FilePathHelper Disk { get => ism.Disk; set => ism.Disk = value; }
-        public JsonSerializerSettings JsonSettings { get => ism.JsonSettings; set => ism.JsonSettings = value; }
-        public FilePathHelper LocalDisk { get => ism.LocalDisk; set => ism.LocalDisk = value; }
-        public JsonSerializerSettings LocalJsonSettings { get => ism.LocalJsonSettings; set => ism.LocalJsonSettings = value; }
-        public FilePathHelper NetDisk { get => ism.NetDisk; set => ism.NetDisk = value; }
-        public JsonSerializerSettings NetJsonSettings { get => ism.NetJsonSettings; set => ism.NetJsonSettings = value; }
-        public void ActivateLocalDisk() => ism.ActivateLocalDisk();
-        public void ActivateNetDisk() => ism.ActivateNetDisk();
+        public INewSmartSerializableConfig Config { get => ism.Config; set => ism.Config = value; }
+        public FilePathHelper Disk { get => ism.Config.Disk; set => ism.Config.Disk = value; }
+        public JsonSerializerSettings JsonSettings { get => ism.Config.JsonSettings; set => ism.Config.JsonSettings = value; }
+        public FilePathHelper LocalDisk { get => ism.Config.LocalDisk; set => ism.Config.LocalDisk = value; }
+        public JsonSerializerSettings LocalJsonSettings { get => ism.Config.LocalJsonSettings; set => ism.Config.LocalJsonSettings = value; }
+        public FilePathHelper NetDisk { get => ism.Config.NetDisk; set => ism.Config.NetDisk = value; }
+        public JsonSerializerSettings NetJsonSettings { get => ism.Config.NetJsonSettings; set => ism.Config.NetJsonSettings = value; }
+        public void ActivateLocalDisk() => ism.Config.ActivateLocalDisk();
+        public void ActivateNetDisk() => ism.Config.ActivateNetDisk();
         public void Serialize() => ism.Serialize();
         public void Serialize(string filePath) => ism.Serialize(filePath);
         public void SerializeThreadSafe(string filePath) => ism.SerializeThreadSafe(filePath);

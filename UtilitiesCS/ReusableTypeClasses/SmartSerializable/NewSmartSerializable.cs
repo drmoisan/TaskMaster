@@ -37,8 +37,8 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region SerializationConfig
 
-        private NewSmartSerializableConfig _config = new();
-        public NewSmartSerializableConfig Config { get => _config; set => _config = value; }
+        private INewSmartSerializableConfig _config = new NewSmartSerializableConfig();
+        public INewSmartSerializableConfig Config { get => _config; set => _config = value; }
 
         #endregion SerializationConfig
 

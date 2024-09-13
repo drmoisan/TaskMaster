@@ -23,6 +23,6 @@ namespace UtilitiesCS.ReusableTypeClasses
         void Serialize(string filePath);
         void SerializeThreadSafe(string filePath);
 
-        NewSmartSerializableConfig Config { get; set; }
+        INewSmartSerializableConfig Config { get; set; }
     }
 }

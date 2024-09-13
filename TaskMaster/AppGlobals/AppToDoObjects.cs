@@ -94,9 +94,9 @@ namespace TaskMaster
             return projectInfo;
         }
 
-        private ScDictionary<string, string> _programInfo;
-        public ScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
-        private ScDictionary<string, string> LoadProgramInfo() => ScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, Parent.FS.FldrAppData);
+        private NewScDictionary<string, string> _programInfo;
+        public NewScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
+        private NewScDictionary<string, string> LoadProgramInfo() => NewScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, Parent.FS.FldrAppData);
         async private Task LoadProgramInfoAsync() => _programInfo = await Task.Run(LoadProgramInfo);
 
         //public ProgramData

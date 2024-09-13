@@ -23,7 +23,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
 
         public Triage(
             IApplicationGlobals globals,
-            ScDictionary<string, BayesianClassifierGroup> manager,
+            NewScDictionary<string, BayesianClassifierGroup> manager,
             CancellationToken token = default)
         {
             //Manager = manager;
