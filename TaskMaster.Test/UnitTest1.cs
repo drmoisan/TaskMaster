@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 using TaskMaster.AppGlobals;
 using System.Collections.Generic;
+using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.ReusableTypeClasses;
 namespace TaskMaster.Test
 {
     [TestClass]
@@ -100,7 +102,17 @@ namespace TaskMaster.Test
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             var af = new AppAutoFileObjects(appGlobals);
             var manager = af.LoadManager();
-            var managerNew = 
+            var managerNew = new NewScDictionary<string, BayesianClassifierGroup>(manager);
+            managerNew.Config.Disk = manager.Disk;
+            managerNew.Config.NetDisk = manager.NetDisk;
+            managerNew.Config.LocalDisk = manager.LocalDisk;
+            managerNew.Config.LocalJsonSettings = manager.LocalJsonSettings;
+            managerNew.Config.NetJsonSettings = manager.NetJsonSettings;
+            managerNew.Config.JsonSettings = manager.JsonSettings;
+
+            managerNew.Serialize();
+            await Task.Delay(5000);
+            Assert.IsTrue(System.IO.File.Exists(managerNew.Config.Disk.FilePath));
         }
 
 

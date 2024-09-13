@@ -598,6 +598,9 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\INewSmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\INewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewProgramData.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableLoader.cs" />
