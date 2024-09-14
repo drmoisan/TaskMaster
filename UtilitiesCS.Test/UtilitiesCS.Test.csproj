@@ -72,6 +72,9 @@
     <Compile Include="HelperClasses\PrettyPrintTest.cs" />
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
+    <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionaryTests.cs" />
+    <Compile Include="NewtonsoftHelpers\MyTypeBuilder.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScDictionaryTest.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBodyTests.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloaderTests.cs" />
     <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />

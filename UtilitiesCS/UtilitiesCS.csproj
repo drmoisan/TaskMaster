@@ -527,6 +527,8 @@
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScDictionary.cs" />
+    <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionary.cs" />
     <Compile Include="NewtonsoftHelpers\KnownTypesBinder.cs" />
     <Compile Include="NewtonsoftHelpers\NConsoleTraceWriter.cs" />
     <Compile Include="NewtonsoftHelpers\NLogTraceWriter.cs" />
@@ -595,6 +597,7 @@
     <Compile Include="HelperClasses\ObjectSize.cs" />
     <Compile Include="HelperClasses\CloningFunctions\ObjectCopier.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\ScDictionaryConverter.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
     <Compile Include="Interfaces\ITypes\IOutlookItem.cs" />
@@ -611,7 +614,6 @@
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableLoader.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
-    <Compile Include="ReusableTypeClasses\ScDictionaryNew.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializableConfig.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />

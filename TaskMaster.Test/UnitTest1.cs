@@ -14,6 +14,12 @@ using System.Reflection;
 using Microsoft.Build.Evaluation;
 using System.Linq;
 using UtilitiesCS.NewtonsoftHelpers;
+using Newtonsoft.Json;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json.Linq;
+using System.Collections.Concurrent;
 
 namespace TaskMaster.Test
 {
@@ -40,7 +46,7 @@ namespace TaskMaster.Test
             //var af = new AppAutoFileObjects(mockGlobals.Object);
             var af = new AppAutoFileObjects(appGlobals);
             af.ResetLoadManager();
-            
+
             var manager = await af.Manager2;
             Assert.IsNotNull(manager);
             //af.LoadManagerConfig();
@@ -58,7 +64,7 @@ namespace TaskMaster.Test
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             //var af = new AppAutoFileObjects(mockGlobals.Object);
             var af = new AppAutoFileObjects(appGlobals);
-            var manager = af.LoadManager();            
+            var manager = af.LoadManager();
             //af.ResetLoadManager();
             //var manager = await af.Manager2;
 
@@ -93,13 +99,13 @@ namespace TaskMaster.Test
         public void TestMethod4()
         {
             var config = new ManagerLazyConfig();
-            config.Configurations = new List<ManagerLazyConfigStruct>() 
-            { 
+            config.Configurations = new List<ManagerLazyConfigStruct>()
+            {
                 new ManagerLazyConfigStruct() { ResourceName = "ConfigSpam", ClassifierName = "Spam", Active = true },
                 new ManagerLazyConfigStruct() { ResourceName = "ConfigFolder", ClassifierName = "Folder", Active = true },
                 new ManagerLazyConfigStruct() { ResourceName = "ConfigTriage", ClassifierName = "Triage", Active = true }
             };
-            
+
         }
 
         [TestMethod]
@@ -133,7 +139,7 @@ namespace TaskMaster.Test
             var dict = new NewScDictionary<string, string>();
             dict["key1"] = "value1";
             dict.Config.Disk.FileName = "testdict.json";
-            dict.Config.Disk.FolderPath = appGlobals.FS.FldrAppData;            
+            dict.Config.Disk.FolderPath = appGlobals.FS.FldrAppData;
             dict.Config.NetDisk.FileName = "testdict.json";
             dict.Config.NetDisk.FolderPath = appGlobals.FS.FldrAppData;
             dict.Config.LocalDisk = dict.Config.Disk;
@@ -147,6 +153,21 @@ namespace TaskMaster.Test
             dict.SerializeThreadSafe(dict.Config.Disk.FilePath);
 
             Assert.IsTrue(System.IO.File.Exists(dict.Config.Disk.FilePath));
+        }
+
+        [TestMethod]
+        public void TestSerializeConfig()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            NewSmartSerializableConfig config = new NewSmartSerializableConfig();
+            config.Disk.FileName = "testConfig.json";
+            config.Disk.FolderPath = appGlobals.FS.FldrAppData;
+            config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
+            config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
+            var serialized = JsonConvert.SerializeObject(config, config.GetType(), config.JsonSettings);
+            Console.WriteLine(serialized);
         }
 
         [TestMethod]
@@ -172,15 +193,132 @@ namespace TaskMaster.Test
         }
 
         [TestMethod]
-        public void GetBinder() 
-        { 
+        public void GetBinder()
+        {
 
         }
 
+        [TestMethod]
+        public void TestSerializeConfigWrapper()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            NewSmartSerializableConfig config = new NewSmartSerializableConfig();
+            config.Disk.FileName = "testConfig.json";
+            config.Disk.FolderPath = appGlobals.FS.FldrAppData;
+            config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            config.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
+            Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
+            config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
+            var wrapper = new WrapperSerializeConfig(config);
+            //var serialized = JsonConvert.SerializeObject(wrapper, wrapper.GetType(), config.JsonSettings);
+            var jsonSerializer = JsonSerializer.Create(config.JsonSettings);
+            var serialized = SerializeObjectInternal(wrapper, wrapper.GetType(), jsonSerializer);
+            Console.WriteLine(serialized);
+        }
         
+        public class WrapperSerializeConfig 
+
+        {
+            public WrapperSerializeConfig() { }
+            public WrapperSerializeConfig(NewSmartSerializableConfig config)
+            {
+                _config = config;
+            }
+            
+            private INewSmartSerializableConfig _config;
+            public INewSmartSerializableConfig Config { get => _config; set => _config = value; }
+        }
+
+        [TestMethod]
+        public void TestSerializeConfigWrapperDict()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            NewSmartSerializableConfig config = new NewSmartSerializableConfig();
+            config.Disk.FileName = "testConfig.json";
+            config.Disk.FolderPath = appGlobals.FS.FldrAppData;
+            config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            config.JsonSettings.TypeNameHandling = TypeNameHandling.All;
+            config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            config.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
+            Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
+            config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
+            WrapperSerializeConfig2<string, string> wrapper = new WrapperSerializeConfig2<string, string>(config);
+            wrapper["key1"] = "value1";
+            //var serialized = JsonConvert.SerializeObject(wrapper, wrapper.GetType(), config.JsonSettings);
+            var jsonSerializer = JsonSerializer.Create(config.JsonSettings);
+            var serialized = SerializeObjectInternal(wrapper, wrapper.GetType(), jsonSerializer);
+            Console.WriteLine(serialized);
+            Console.WriteLine($"\nMethodology #2:\n");
+            //serialized = JsonConvert.SerializeObject(wrapper, wrapper.GetType(), config.JsonSettings);
+            serialized = JsonConvert.SerializeObject(wrapper, typeof(WrapperSerializeConfig2<string, string>), config.JsonSettings);
+            Console.WriteLine(serialized);
+        }
+
+        public class WrapperSerializeConfig2<TKey, TValue> : ConcurrentDictionary<TKey,TValue>
+
+        {
+            public WrapperSerializeConfig2() { }
+            public WrapperSerializeConfig2(NewSmartSerializableConfig config)
+            {
+                _config = config;
+            }
+
+            private NewSmartSerializableConfig _config;
+            public NewSmartSerializableConfig Config { get => _config; set => _config = value; }
+        }
+
+        private static string SerializeObjectInternal(object value, Type type, JsonSerializer jsonSerializer)
+        {
+            StringBuilder sb = new StringBuilder(256);
+            StringWriter sw = new StringWriter(sb, CultureInfo.InvariantCulture);
+            using (JsonTextWriter jsonWriter = new JsonTextWriter(sw))
+            {
+                jsonWriter.Formatting = jsonSerializer.Formatting;
+
+                jsonSerializer.Serialize(jsonWriter, value, type);
+            }
+
+            return sw.ToString();
+        }
 
 
+        [TestMethod]
+        public void TestSerializeScDictionary()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var dict = new NewScDictionary<string, string>();
+            dict.Config.Disk.FileName = "testConfig.json";
+            dict.Config.Disk.FolderPath = appGlobals.FS.FldrAppData;
+            dict.Config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            dict.Config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            dict.Config.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
+            Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
+            dict.Config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
+            dict.Config2 = dict.Config;
+            //var serialized = JsonConvert.SerializeObject(wrapper, wrapper.GetType(), config.JsonSettings);
+            var jsonSerializer = JsonSerializer.Create(dict.Config.JsonSettings);
+            var serialized = SerializeObjectInternal(dict, dict.GetType(), jsonSerializer);
+            Console.WriteLine(serialized);
+        }
 
-
+        [TestMethod]
+        public void TestSerializeScDictionary2()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var dict = new NewScDictionary<string, string>();
+            dict.Config2.Disk.FileName = "testConfig.json";
+            dict.Config2.Disk.FolderPath = appGlobals.FS.FldrAppData;
+            dict.Config2.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            dict.Config2.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            dict.Config2.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
+            Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
+            dict.Config2.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
+            //dict.Config2 = dict.Config;
+            //var serialized = JsonConvert.SerializeObject(wrapper, wrapper.GetType(), config.JsonSettings);
+            var jsonSerializer = JsonSerializer.Create(dict.Config2.JsonSettings);
+            var serialized = SerializeObjectInternal(dict, dict.GetType(), jsonSerializer);
+            Console.WriteLine(serialized);
+        }
     }
 }

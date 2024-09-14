@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UtilitiesCS.ReusableTypeClasses
+namespace UtilitiesCS.NewtonsoftHelpers
 {
-    public class ScDictionaryNew
+    public class ScDictionaryConverter
     {
+        public ScDictionaryConverter() { }
+
     }
 }
