@@ -282,6 +282,7 @@ namespace TaskMaster.Test
             return sw.ToString();
         }
 
+            
 
         [TestMethod]
         public void TestSerializeScDictionary()
