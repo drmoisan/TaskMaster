@@ -34,8 +34,6 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region ISmartSerializable
 
-        public NewSmartSerializableConfig Config2 { get; set; } = new();
-
         public NewSmartSerializableConfig Config { get => ism.Config; set => ism.Config = value; }
         protected NewSmartSerializable<NewScDictionary<TKey, TValue>> ism;
         

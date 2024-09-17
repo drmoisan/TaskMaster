@@ -144,8 +144,10 @@ namespace TaskMaster.Test
             dict.Config.NetDisk.FolderPath = appGlobals.FS.FldrAppData;
             dict.Config.LocalDisk = dict.Config.Disk;
             dict.Config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
-            dict.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
+            dict.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
             dict.Config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            dict.Config.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
+            dict.Config.JsonSettings.Converters.Add(new ScDictionaryConverter<NewScDictionary<string, string>, string, string>());
             //dict.Config.JsonSettings.TraceWriter = new NLogTraceWriter();
             Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
             dict.Config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
@@ -296,7 +298,6 @@ namespace TaskMaster.Test
             dict.Config.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
             Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
             dict.Config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
-            dict.Config2 = dict.Config;
             //var serialized = JsonConvert.SerializeObject(wrapper, wrapper.GetType(), config.JsonSettings);
             var jsonSerializer = JsonSerializer.Create(dict.Config.JsonSettings);
             var serialized = SerializeObjectInternal(dict, dict.GetType(), jsonSerializer);
@@ -308,16 +309,16 @@ namespace TaskMaster.Test
         {
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             var dict = new NewScDictionary<string, string>();
-            dict.Config2.Disk.FileName = "testConfig.json";
-            dict.Config2.Disk.FolderPath = appGlobals.FS.FldrAppData;
-            dict.Config2.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
-            dict.Config2.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
-            dict.Config2.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
+            dict.Config.Disk.FileName = "testConfig.json";
+            dict.Config.Disk.FolderPath = appGlobals.FS.FldrAppData;
+            dict.Config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+            dict.Config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
+            dict.Config.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
             Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
-            dict.Config2.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
+            dict.Config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };
             //dict.Config2 = dict.Config;
             //var serialized = JsonConvert.SerializeObject(wrapper, wrapper.GetType(), config.JsonSettings);
-            var jsonSerializer = JsonSerializer.Create(dict.Config2.JsonSettings);
+            var jsonSerializer = JsonSerializer.Create(dict.Config.JsonSettings);
             var serialized = SerializeObjectInternal(dict, dict.GetType(), jsonSerializer);
             Console.WriteLine(serialized);
         }

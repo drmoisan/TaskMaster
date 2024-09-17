@@ -527,6 +527,7 @@
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder.cs" />
+    <Compile Include="NewtonsoftHelpers\NonRecursiveConverter.cs" />
     <Compile Include="NewtonsoftHelpers\WrapperScDictionary.cs" />
     <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionary.cs" />
     <Compile Include="NewtonsoftHelpers\KnownTypesBinder.cs" />
