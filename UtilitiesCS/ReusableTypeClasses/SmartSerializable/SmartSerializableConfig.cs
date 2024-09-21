@@ -86,15 +86,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     throw;
                 }                
             }
-
-            //internal static SmartSerializableConfig DeserializeConfig(IApplicationGlobals globals, byte[] binary)
-            //{                
-            //    var loader = new SmartSerializableConfig(globals);
-            //    var jsonObject = loader.TryConvertBinaryToJson(binary);
-            //    if (jsonObject.IsNullOrEmpty()) { return null; }
-            //    else { return loader.DeserializeConfig(jsonObject); }                
-            //}
-
+            
             internal SmartSerializableConfig DeserializeConfig(byte[] binary)
             {
                 var jsonObject = TryConvertBinaryToJson(binary);

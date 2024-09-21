@@ -70,17 +70,25 @@ namespace TaskMaster.Test
             var spam = manager["Spam"];
             if (af.BinaryResources.TryGetValue("ConfigSpam", out byte[] configBin))
             {
-                var config = await SmartSerializableConfig.DeserializeAsync(appGlobals, configBin);
-                spam.Disk = config.Disk;
-                spam.NetDisk = config.NetDisk;
-                spam.LocalDisk = config.LocalDisk;
-                spam.LocalJsonSettings = config.LocalJsonSettings;
-                spam.NetJsonSettings = config.NetJsonSettings;
-                spam.JsonSettings = config.JsonSettings;
-                spam.ClassifierActivated = config.Activated;
-                spam.SerializeThreadSafe(spam.Disk.FilePath);
+                var loader = await NewSmartSerializableLoader.DeserializeAsync(appGlobals, configBin);
+                spam.Config = loader.Config;
+                spam.SerializeThreadSafe(spam.Config.Disk.FilePath);
                 //spam.Serialize();
             }
+        }
+
+        [TestMethod]
+        public void CreateSpamConfig() 
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var af = new AppAutoFileObjects(appGlobals);
+            var loader = new NewSmartSerializableLoader(appGlobals);
+            loader.Config.LocalDisk.FileName = "ManagerSpam.json";
+            loader.Config.LocalDisk.FolderPath = appGlobals.FS.FldrAppData;
+            loader.Config.NetDisk.FileName = "ManagerSpam.json";
+            loader.Config.NetDisk.FolderPath = appGlobals.FS.FldrFlow;            
+            loader.Config.ActivateLocalDisk();
+            loader.SerializeThreadSafe(loader.Config.LocalDisk.FilePath);
         }
 
         [TestMethod]

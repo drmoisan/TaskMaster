@@ -122,21 +122,25 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": "Spam",
-  "Disk": {
-    "FileName": "SpamClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "AppData"
-  },
-  "LocalDisk": {
-    "FileName": "SpamClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "AppData"
-  },
-  "NetDisk": {
-    "FileName": "SpamClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "PythonStaging"
+  "Name": null,
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerSpam.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerSpam.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerSpam.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": false
   }
 }</value>
   </data>
@@ -145,21 +149,25 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": "Folder",
-  "Disk": {
-    "FileName": "FolderClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "AppData"
-  },
-  "LocalDisk": {
-    "FileName": "FolderClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "AppData"
-  },
-  "NetDisk": {
-    "FileName": "FolderClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "PythonStaging"
+  "Name": null,
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerFolder.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerFolder.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerFolder.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": false
   }
 }</value>
   </data>
@@ -168,21 +176,25 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": "Triage",
-  "Disk": {
-    "FileName": "TriageClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "AppData"
-  },
-  "LocalDisk": {
-    "FileName": "TriageClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "AppData"
-  },
-  "NetDisk": {
-    "FileName": "TriageClassifier.json",
-    "RelativePath": "",
-    "SpecialFolderName": "PythonStaging"
+  "Name": null,
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerTriage.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerTriage.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerTriage.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": false
   }
 }</value>
   </data>

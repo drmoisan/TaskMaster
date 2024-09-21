@@ -27,12 +27,14 @@ namespace UtilitiesCS.ReusableTypeClasses
             private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-            public NewSmartSerializableLoader() { }
-            public NewSmartSerializableLoader(IApplicationGlobals globals)
+            public NewSmartSerializableLoader(): base() { base._parent = this; }
+            public NewSmartSerializableLoader(IApplicationGlobals globals) 
             {
+                base._parent = this;
                 Globals = globals;
-                //ResetLazy();
+                ResetLazy();
             }
+
 
             private void ResetLazy()
             {

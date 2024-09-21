@@ -98,5 +98,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
 
         #endregion SerializationConfig
+
+
     }
 }

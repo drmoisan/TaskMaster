@@ -446,7 +446,7 @@ namespace TaskMaster
             {
                 if (BinaryResources.TryGetValue(configName, out byte[] configBin))
                 {
-                    var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
+                    var config = await NewSmartSerializableLoader.DeserializeAsync(_parent, configBin);
                     return await BayesianClassifierGroup.Static.DeserializeAsync(config);                    
                 }
                 else { return null; }                

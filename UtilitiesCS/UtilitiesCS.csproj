@@ -221,6 +221,9 @@
     <Reference Include="Mono.Cecil.Rocks, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <HintPath>..\packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Reflection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.2.0.0\lib\net40\Mono.Reflection.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -815,10 +818,6 @@
     <Compile Include="Windows Forms\ScreenHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\mono.reflection\Mono.Reflection.csproj">
-      <Project>{1a29e95b-2599-4b45-a894-70ca70416edb}</Project>
-      <Name>Mono.Reflection</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
       <Project>{d0fee0d9-901a-4fb8-97d1-96a8f634b83c}</Project>
       <Name>SVGControl</Name>
