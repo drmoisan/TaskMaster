@@ -4,13 +4,30 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using UtilitiesCS.NewtonsoftHelpers;
 using FluentAssertions;
+using UtilitiesCS.ReusableTypeClasses;
+using Moq;
+using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {
     [TestClass]
     public class WrapperScDictionaryTest
     {
-        private class TestDerived : ConcurrentDictionary<string, int>
+        private MockRepository mockRepository;
+        private Mock<IApplicationGlobals> mockGlobals;
+        private Mock<Microsoft.Office.Interop.Outlook.Application> mockApplication;
+        private IApplicationGlobals globals;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            Console.SetOut(new DebugTextWriter());
+            mockRepository = new MockRepository(MockBehavior.Strict);
+            mockGlobals = mockRepository.Create<IApplicationGlobals>();
+            mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
+        }
+
+        private class TestDerived : NewScDictionary<string, int>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
@@ -40,6 +57,109 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                 AdditionalField2 = 42;
                 AdditionalField3 = "Test3";
             }
+        }
+
+        private class RemainingObjectClass1
+        {            
+            public SmartSerializableConfig Config { get; set; }
+        }
+
+        private class DerivedTest2: NewScDictionary<string, string>
+        {
+            public string AdditionalField1 { get; set; }
+            private int AdditionalField2;
+            private string _additionalField3;
+            public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            
+            public DerivedTest2()
+            {
+                AdditionalField1 = "Test";
+                AdditionalField2 = 42;
+                AdditionalField3 = "Test3";
+            }
+            public int GetAdditionalField2() => AdditionalField2;
+        }
+
+        private DerivedTest2 GetDerivedTest2()
+        {
+            var dt = new DerivedTest2();
+            dt.TryAdd("key1", "value1");
+            dt.TryAdd("key2", "value2");
+            globals = new TaskMaster.ApplicationGlobals(mockApplication.Object);
+            dt.Config = ConfigInitializer.InitConfig(new NewSmartSerializableConfig(), globals);
+            return dt;
+        }
+
+        private class RemainingObjectClass2
+        {
+            public NewSmartSerializableConfig Config { get; set; }
+            public string AdditionalField1 { get; set; }
+            private int AdditionalField2;
+            private string _additionalField3;
+            public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            public RemainingObjectClass2()
+            {
+                AdditionalField1 = "Test";
+                AdditionalField2 = 42;
+                AdditionalField3 = "Test3";
+            }
+        }
+
+        private WrapperScDictionary<DerivedTest2, string, string> GetWrapperComposedTest2()
+        {            
+            var wrapper = new WrapperScDictionary<DerivedTest2, string, string>();
+            wrapper.ConcurrentDictionary.TryAdd("key1", "value1");
+            wrapper.ConcurrentDictionary.TryAdd("key2", "value2");
+            var ro = new RemainingObjectClass2();
+            ro.Config = ConfigInitializer.InitConfig(new NewSmartSerializableConfig(), globals);
+            wrapper.RemainingObject = ro;
+            return wrapper;
+        }
+
+        public static class ConfigInitializer 
+        {
+            public static NewSmartSerializableConfig InitConfig(NewSmartSerializableConfig config, IApplicationGlobals globals)
+            {
+                config.Disk.FileName = "testdict.json";
+                config.Disk.FolderPath = globals.FS.FldrAppData;
+                config.NetDisk.FileName = "testdict.json";
+                config.NetDisk.FolderPath = globals.FS.FldrAppData;
+                config.LocalDisk = config.Disk;
+                config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+                config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
+                config.JsonSettings.Converters.Add(new AppGlobalsConverter(globals));
+                config.JsonSettings.Converters.Add(new FilePathHelperConverter(globals.FS));
+                config.JsonSettings.Converters.Add(new ScDictionaryConverter<NewScDictionary<string, string>, string, string>());
+                return config;
+            }
+        }
+
+        [TestMethod]
+        public void ToComposition_ShouldExtractScDictionaryAndFields() 
+        { 
+            // Arrange
+            var derived = GetDerivedTest2();
+            var expected = GetWrapperComposedTest2();
+
+            // Act
+            var actual = new WrapperScDictionary<DerivedTest2, string, string>().ToComposition(derived);
+
+            // Assert
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void ToDerived_ShouldRecreateScDictionaryDerivative()
+        {
+            // Arrange
+            var expected = GetDerivedTest2();
+            var composed = GetWrapperComposedTest2();
+
+            // Act
+            var actual = composed.ToDerived();
+
+            // Assert
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [TestMethod]

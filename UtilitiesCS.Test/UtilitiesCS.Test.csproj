@@ -299,6 +299,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TaskMaster\TaskMaster.csproj">
+      <Project>{68924fdf-614d-447c-a175-450860ddb597}</Project>
+      <Name>TaskMaster</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>

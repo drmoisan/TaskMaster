@@ -46,10 +46,10 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #endregion ISmartSerializable
 
-        public static class Static 
+        public static class Static
         {
             private static NewSmartSerializable<NewScDictionary<TKey, TValue>> GetInstance() => new();
-            
+
             public static NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) =>
                 GetInstance().Deserialize(fileName, folderPath);
 
@@ -60,7 +60,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
         }
 
-        
+
 
 
 

@@ -12,7 +12,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class BayesianClassifierGroup: SmartSerializable<BayesianClassifierGroup>
+    public class BayesianClassifierGroup: NewSmartSerializable<BayesianClassifierGroup>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
