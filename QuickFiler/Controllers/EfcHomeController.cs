@@ -145,7 +145,7 @@ namespace QuickFiler
         //[STAThread]
         public void Run() 
         { 
-            if (_dataModel.Mail is not null || InitType.HasFlag(QfEnums.InitTypeEnum.Find))
+            if (_dataModel?.Mail is not null || InitType.HasFlag(QfEnums.InitTypeEnum.Find))
             {
                 _formViewer.Show();
             }
@@ -154,7 +154,7 @@ namespace QuickFiler
 
         public async Task RunAsync(ProgressTracker progress = null)
         {
-            if (_dataModel.Mail is not null || InitType.HasFlag(QfEnums.InitTypeEnum.Find))
+            if (_dataModel?.Mail is not null || InitType.HasFlag(QfEnums.InitTypeEnum.Find))
             {
                 await UiThread.Dispatcher.InvokeAsync(() => _formViewer.Show());
             }

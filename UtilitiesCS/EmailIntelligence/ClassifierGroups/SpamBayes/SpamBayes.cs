@@ -46,7 +46,7 @@ namespace UtilitiesCS.EmailIntelligence
             CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
             CalculateProbabilityAsync = Globals.AF.Manager["Spam"].Classifiers["Spam"].Chi2SpamProbAsync;
             CallbackAsync = TrainCallbackAsync;
-            Threshhold = new TristateThreshhold(0.9, 0.1);
+            Threshhold = new TristateThreshhold(0.8, 0.2);
             
             return this; 
         }
