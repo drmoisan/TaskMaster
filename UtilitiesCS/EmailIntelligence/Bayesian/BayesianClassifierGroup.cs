@@ -22,6 +22,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public BayesianClassifierGroup()
         {
             _classifiers = [];
+            base._parent = this;
         }
 
         #endregion Constructors

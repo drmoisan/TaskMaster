@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace UtilitiesCS.Extensions
 {
@@ -149,6 +150,40 @@ namespace UtilitiesCS.Extensions
             }
 
             return sl;
+        }
+
+
+        public static async Task<ConcurrentDictionary<TKey, TElement>> ToConcurrentDictionaryAsync<TKey, TElement>(
+            this IAsyncEnumerable<KeyValuePair<TKey, TElement>> source)
+        { 
+            var d = await source.ToConcurrentDictionaryAsync(x => x.Key, x => x.Value, new ConcurrentDictionary<TKey, TElement>(), default);
+            return d;
+        }
+
+        public static async Task<ConcurrentDictionary<TKey, TElement>> ToConcurrentDictionaryAsync<TSource, TKey, TElement>(
+            this IAsyncEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector,
+            IEqualityComparer<TKey> comparer, CancellationToken cancellationToken)
+        {
+            var d = await source.ToConcurrentDictionaryAsync(keySelector, elementSelector, new ConcurrentDictionary<TKey, TElement>(comparer), cancellationToken);            
+            return d;
+        }
+
+        internal static async Task<ConcurrentDictionary<TKey, TElement>> ToConcurrentDictionaryAsync<TSource, TKey, TElement>(
+            this IAsyncEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector,
+            ConcurrentDictionary<TKey, TElement> d, CancellationToken cancellationToken)
+        {
+            source.ThrowIfNull();
+            keySelector.ThrowIfNull();
+            elementSelector.ThrowIfNull();
+
+            await
+                source.ForEachAsync(element => 
+                { 
+                    if(!d.TryAdd(keySelector(element), elementSelector(element)))
+                        throw new InvalidCastException($"Duplicate Key {keySelector(element)} in {nameof(ToConcurrentDictionaryAsync)}"); 
+                }, cancellationToken).ConfigureAwait(
+                    continueOnCapturedContext: false);
+            return d;
         }
     }
 }

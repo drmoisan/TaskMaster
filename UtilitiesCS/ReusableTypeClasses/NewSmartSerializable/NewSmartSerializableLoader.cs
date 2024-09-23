@@ -63,7 +63,35 @@ namespace UtilitiesCS.ReusableTypeClasses
                 settings.Converters.Add(new FilePathHelperConverter(Globals.FS));
                 return settings;
             }
-            
+
+            public static async Task<NewSmartSerializableLoader> DeserializeAsync(
+                IApplicationGlobals globals, string jsonObject, CancellationToken cancel = default)
+            {
+                try
+                {
+                    if (globals is null) { throw new ArgumentNullException(nameof(globals)); }
+                    var loader = new NewSmartSerializableLoader(globals);
+                    return await Task.Run(() => loader.DeserializeConfig(jsonObject), cancel);
+                }
+                catch (ArgumentNullException e)
+                {
+                    logger.Error($"Error in {nameof(DeserializeAsync)}. {nameof(globals)} cannot be null\n{e.Message}", e);
+                    throw;
+                }
+
+                catch (TaskCanceledException)
+                {
+                    logger.Warn("Task was cancelled.");
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Error in {nameof(DeserializeAsync)}.\n{e.Message}", e);
+                    throw;
+                }
+            }
+
+
             public static async Task<NewSmartSerializableLoader> DeserializeAsync(
                 IApplicationGlobals globals, byte[] binary, CancellationToken cancel = default)
             {                
@@ -112,7 +140,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
             }
 
-            internal NewSmartSerializableLoader DeserializeConfig(string jsonObject)
+            private NewSmartSerializableLoader DeserializeConfig(string jsonObject)
             {
                 var settings = GetSettings();
                 NewSmartSerializableLoader instance = null;

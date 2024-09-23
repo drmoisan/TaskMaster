@@ -71,41 +71,11 @@ namespace TaskMaster.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] ConfigManager {
-            get {
-                object obj = ResourceManager.GetObject("ConfigManager", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] ConfigSpam {
-            get {
-                object obj = ResourceManager.GetObject("ConfigSpam", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to WARNING: Email originated outside of PepsiCo..
         /// </summary>
         internal static string Email_Prefix_To_Strip {
             get {
                 return ResourceManager.GetString("Email Prefix To Strip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] manager_config {
-            get {
-                object obj = ResourceManager.GetObject("manager_config", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         

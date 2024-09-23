@@ -20,6 +20,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
@@ -50,7 +51,7 @@ namespace TaskMaster
         {
             //LoadManagerConfig();
             ResetLoadManager();
-            var tasks = new List<Task> 
+            var tasks = new List<Task>
             {
                 LoadRecentsListAsync(),
                 LoadCtfMapAsync(),
@@ -61,10 +62,10 @@ namespace TaskMaster
                 LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
-            await Manager2;
+            //await Manager2;
             //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
         }
-        
+
         private bool _sugFilesLoaded = false;
         private IApplicationGlobals _parent;
         private ISerializableList<string> _commonWords;
@@ -72,7 +73,7 @@ namespace TaskMaster
 
         private System.Action _maximizeQuickFileWindow = null;
         public System.Action MaximizeQuickFileWindow { get => _maximizeQuickFileWindow; set => _maximizeQuickFileWindow = value; }
-        
+
         public int LngConvCtPwr
         {
             get => _defaults.ConversationExponent;
@@ -145,14 +146,14 @@ namespace TaskMaster
             }
         }
         async private Task LoadRecentsListAsync()
-        {   
+        {
             await Task.Factory.StartNew(
                 () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
                 CancelToken,
-                TaskCreationOptions.None, 
+                TaskCreationOptions.None,
                 TaskScheduler.Current);
-        }   
-        
+        }
+
         private CtfMap _ctfMap;
         public CtfMap CtfMap
         {
@@ -162,7 +163,7 @@ namespace TaskMaster
                     _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc,
                                          folderpath: _parent.FS.FldrPythonStaging,
                                          backupFilepath: Path.Combine(
-                                             _parent.FS.FldrPythonStaging, 
+                                             _parent.FS.FldrPythonStaging,
                                              _defaults.BackupFile_CTF_Inc),
                                          askUserOnError: true);
                 return _ctfMap;
@@ -194,9 +195,9 @@ namespace TaskMaster
             await Task.Factory.StartNew(
                 () => _ctfMap = LoadCtfMap(),
                 CancelToken);
-                //default,
-                //TaskCreationOptions.None,
-                //PriorityScheduler.BelowNormal);
+            //default,
+            //TaskCreationOptions.None,
+            //PriorityScheduler.BelowNormal);
         }
 
         public ISerializableList<string> CommonWords
@@ -233,9 +234,9 @@ namespace TaskMaster
                                                                                                _defaults.BackupFile_CommonWords),
                                                                   askUserOnError: false),
                 default(CancellationToken));
-                //default,
-                //TaskCreationOptions.None,
-                //PriorityScheduler.BelowNormal);
+            //default,
+            //TaskCreationOptions.None,
+            //PriorityScheduler.BelowNormal);
         }
         private IList<string> CommonWordsBackupLoader(string filepath)
         {
@@ -254,19 +255,19 @@ namespace TaskMaster
             return encoder;
         }
 
-        
+
         private SubjectMapSco _subjectMap;
         public SubjectMapSco SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
 
         private ObserverHelper<NotifyCollectionChangedEventArgs> _filterObserver;
         private ScoCollection<FilterEntry> _filters;
-        public ScoCollection<FilterEntry> Filters => Initializer.GetOrLoad(ref _filters, LoadFilters); 
+        public ScoCollection<FilterEntry> Filters => Initializer.GetOrLoad(ref _filters, LoadFilters);
         private ScoCollection<FilterEntry> LoadFilters()
         {
             var filters = new ScoCollection<FilterEntry>(
                 fileName: _defaults.FileName_Filters,
                 folderPath: _parent.FS.FldrPythonStaging);
-            _filterObserver = new ObserverHelper<NotifyCollectionChangedEventArgs>("FilterObserver", (x)=>Filters.Serialize());
+            _filterObserver = new ObserverHelper<NotifyCollectionChangedEventArgs>("FilterObserver", (x) => Filters.Serialize());
             filters.Subscribe(_filterObserver);
             //filters.CollectionChanged += ScoFilterEntry_CollectionChanged;
             return filters;
@@ -279,7 +280,7 @@ namespace TaskMaster
         }
         private void ScoFilterEntry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var collection= (ScoCollection<FilterEntry>)sender;
+            var collection = (ScoCollection<FilterEntry>)sender;
             collection.Serialize();
         }
 
@@ -302,7 +303,7 @@ namespace TaskMaster
             await Task.Run(
                  () => _subjectMap = LoadSubjectMap(),
                  CancelToken);
-            
+
             await Task.Run(
                  () => _encoder = LoadEncoder(),
                  CancelToken);
@@ -310,29 +311,29 @@ namespace TaskMaster
             await Task.Run(
                 () =>
                 {
-                    var toRecode = this.SubjectMap.Where(x => x.Encoder is null || 
-                                                              x.FolderEncoded is null || 
-                                                              x.SubjectEncoded is null );
-                    if (toRecode.Any()) 
+                    var toRecode = this.SubjectMap.Where(x => x.Encoder is null ||
+                                                              x.FolderEncoded is null ||
+                                                              x.SubjectEncoded is null);
+                    if (toRecode.Any())
                     {
                         toRecode.ForEach(x => x.Encoder = this.Encoder);
                         this.SubjectMap.Serialize();
                     }
-                }); 
+                });
 
-        }   
+        }
 
         private IList<SubjectMapEntry> SubjectMapBackupLoader(string filepath)
         {
             var subjectMapEntries = new List<SubjectMapEntry>();
 
             string[] fileContents = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: true);
-            
-            var rowQueue = fileContents.IsNullOrEmpty() ? new Queue<string>(): new Queue<string>(fileContents);
+
+            var rowQueue = fileContents.IsNullOrEmpty() ? new Queue<string>() : new Queue<string>(fileContents);
 
             while (rowQueue.Count > 0)
             {
-                string emailFolderPath = "not set"; 
+                string emailFolderPath = "not set";
                 string emailSubject = "not set";
                 int emailSubjectCount = -1;
                 try
@@ -340,14 +341,14 @@ namespace TaskMaster
                     emailFolderPath = rowQueue.Dequeue();
                     emailSubject = rowQueue.Dequeue();
                     emailSubjectCount = int.Parse(rowQueue.Dequeue());
-                    
+
                     subjectMapEntries.Add(
                         new SubjectMapEntry(
                             emailFolder: emailFolderPath,
                             emailSubject: emailSubject,
                             emailSubjectCount: emailSubjectCount,
                             commonWords: CommonWords));
-                    
+
                 }
                 catch (Exception e)
                 {
@@ -360,17 +361,17 @@ namespace TaskMaster
             }
             return subjectMapEntries;
         }
-        
+
         internal void SubjectMap_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             SubjectMapSco map = (SubjectMapSco)sender;
-            
+
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 var entry = map.Last();
                 entry.Encode(Encoder);
             }
-            else if (e.Action == NotifyCollectionChangedAction.Reset) 
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 Encoder.RebuildEncoding(map);
             }
@@ -396,7 +397,7 @@ namespace TaskMaster
             return result;
         }
 
-        private Lazy<ConcurrentDictionary<string, byte[]>> _binaryResources = new(() => 
+        private Lazy<ConcurrentDictionary<string, byte[]>> _binaryResources = new(() =>
         {
             var rsMgr = Properties.Resources.ResourceManager;
             var rsSet = rsMgr.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
@@ -409,6 +410,30 @@ namespace TaskMaster
         });
 
         public ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
+
+        public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration => _managerConfiguration;
+
+        private AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> _managerConfiguration;
+        public void ResetLoadManagerLazyConfigurationAsync()
+        {
+            _managerConfiguration = new(async () =>
+            {
+                var resourceManager = ManagerResources.ResourceManager;
+                var resourceSet = resourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+                var resourceDictionary = await resourceSet
+                    .Cast<DictionaryEntry>()
+                    .ToDictionary<string, string>()
+                    .ToAsyncEnumerable()
+                    .SelectAwait(async kvp =>
+                    {
+                        var loader = await NewSmartSerializableLoader.DeserializeAsync(_parent, kvp.Value);
+                        return new KeyValuePair<string, NewSmartSerializableLoader>(kvp.Key, loader);
+                    }).ToConcurrentDictionaryAsync();
+
+                return resourceDictionary;
+            });
+        }
+
 
         public string[] GetManifestResourceNames()
         {
@@ -424,22 +449,29 @@ namespace TaskMaster
             //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
         }
 
-        private AsyncLazy<ManagerClass> _manager2; 
+        private AsyncLazy<ManagerClass> _manager2;
+        [Obsolete]
         public AsyncLazy<ManagerClass> Manager2 => _manager2;
-        public void ResetLoadManager() 
+        public void ResetLoadManager()
         {
-            _manager2 = new AsyncLazy<ManagerClass>(async () => 
+            _manager2 = new AsyncLazy<ManagerClass>(async () =>
             {
                 if (BinaryResources.TryGetValue("ConfigManager", out byte[] configBin))
                 {
                     var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
-                    return await ManagerClass.Static.DeserializeAsync(config); 
+                    return await ManagerClass.Static.DeserializeAsync(config);
                 }
                 else { return null; }
             });
             //_manager2 = mgr;
         }
 
+        public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(NewSmartSerializableLoader loader)
+        {
+            return new AsyncLazy<BayesianClassifierGroup>(async () => await BayesianClassifierGroup.Static.DeserializeAsync(loader));
+        }
+
+        [Obsolete]
         public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(string classifierName, string configName)
         {
             return new AsyncLazy<BayesianClassifierGroup>(async () =>
@@ -455,7 +487,25 @@ namespace TaskMaster
 
         private ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> _managerLazy = [];
         public ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy => _managerLazy;
-        public void ResetLoadManagerLazy()
+        public async Task ResetLoadManagerLazyAsync() 
+        {
+            if (ManagerConfiguration is null) { ResetLoadManagerLazyConfigurationAsync(); }
+            foreach (var configuration in await ManagerConfiguration)
+            {                
+                if (configuration.Value.Activated)
+                {
+                    var classifierGroup = GetClassifierAsyncLazy(configuration.Value);
+                    if (classifierGroup != null) { ManagerLazy[configuration.Value.Name] = classifierGroup; }
+                }
+                else
+                {
+                    ManagerLazy.TryRemove(configuration.Key, out _);
+                }
+            }
+        }
+
+        [Obsolete]
+        public void ResetLoadManagerLazyOld()
         {
             var classifierConfigs = new Dictionary<string, string>()
             {

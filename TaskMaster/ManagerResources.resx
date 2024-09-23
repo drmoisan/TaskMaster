@@ -122,7 +122,7 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": null,
+  "Name": "Spam",
   "Config": {
     "$id": "2",
     "Disk": {
@@ -149,7 +149,7 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": null,
+  "Name": "Folder",
   "Config": {
     "$id": "2",
     "Disk": {
@@ -176,7 +176,7 @@
   "$id": "1",
   "Activated": false,
   "Globals": "default",
-  "Name": null,
+  "Name": "Triage",
   "Config": {
     "$id": "2",
     "Disk": {

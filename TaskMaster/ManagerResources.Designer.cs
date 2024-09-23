@@ -65,7 +65,7 @@ namespace TaskMaster {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Activated&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
-        ///  &quot;Name&quot;: null,
+        ///  &quot;Name&quot;: &quot;Folder&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
         ///    &quot;Disk&quot;: {
@@ -83,7 +83,7 @@ namespace TaskMaster {
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
-        ///    &quot; [rest of string was truncated]&quot;;.
+        ///  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ConfigFolder {
             get {
@@ -96,7 +96,7 @@ namespace TaskMaster {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Activated&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
-        ///  &quot;Name&quot;: null,
+        ///  &quot;Name&quot;: &quot;Spam&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
         ///    &quot;Disk&quot;: {
@@ -114,7 +114,7 @@ namespace TaskMaster {
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
-        ///    &quot;Classi [rest of string was truncated]&quot;;.
+        ///    &quot;Clas [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ConfigSpam {
             get {
@@ -127,7 +127,7 @@ namespace TaskMaster {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Activated&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
-        ///  &quot;Name&quot;: null,
+        ///  &quot;Name&quot;: &quot;Triage&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
         ///    &quot;Disk&quot;: {
@@ -145,7 +145,7 @@ namespace TaskMaster {
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
-        ///    &quot; [rest of string was truncated]&quot;;.
+        ///  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ConfigTriage {
             get {

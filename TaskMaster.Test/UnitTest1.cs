@@ -40,6 +40,7 @@ namespace TaskMaster.Test
             mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
         }
 
+        [Obsolete]
         [TestMethod]
         public async Task TestMethod1()
         {
@@ -68,14 +69,81 @@ namespace TaskMaster.Test
             var manager = af.LoadManager();
             
             var spam = manager["Spam"];
-            if (af.BinaryResources.TryGetValue("ConfigSpam", out byte[] configBin))
+            var configurations = await af.ManagerConfiguration;
+            if (configurations.TryGetValue("ConfigSpam", out NewSmartSerializableLoader loader))
             {
-                var loader = await NewSmartSerializableLoader.DeserializeAsync(appGlobals, configBin);
                 spam.Config = loader.Config;
                 spam.SerializeThreadSafe(spam.Config.Disk.FilePath);
-                //spam.Serialize();
+            }
+            
+            Assert.IsTrue(File.Exists(spam.Config.Disk.FilePath));
+        }
+
+        [TestMethod]
+        public async Task LoadSpam() 
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var af = new AppAutoFileObjects(appGlobals);
+            af.ResetLoadManagerLazyConfigurationAsync();
+            var configurations = await af.ManagerConfiguration;
+            if (configurations.TryGetValue("ConfigSpam", out NewSmartSerializableLoader loader))
+            {
+                loader.Activated = true;
+            }
+            await af.ResetLoadManagerLazyAsync();
+            var spam = af.ManagerLazy.TryGetValue("Spam", out AsyncLazy<BayesianClassifierGroup> spamAsyncLazy)? await spamAsyncLazy: null;
+            Assert.IsNotNull(spam);
+            //var spam = await af.ManagerLazy["Spam"];
+        }
+
+        [TestMethod]
+        public async Task ConvertAll()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var af = new AppAutoFileObjects(appGlobals);
+            var manager = af.LoadManager();
+            
+            af.ResetLoadManagerLazyConfigurationAsync();
+            var configurations = await af.ManagerConfiguration;
+            foreach (var config in configurations)
+            {
+                var name = config.Value.Name;
+                if (manager.TryGetValue(name, out BayesianClassifierGroup group))
+                {
+                    group.Config = config.Value.Config;
+                    group.SerializeThreadSafe(group.Config.Disk.FilePath);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Could not find {name} in manager.");
+                }
             }
         }
+
+        [TestMethod]
+        public async Task LoadAll()
+        {
+            var appGlobals = new ApplicationGlobals(mockApplication.Object);
+            var af = new AppAutoFileObjects(appGlobals);
+            af.ResetLoadManagerLazyConfigurationAsync();
+            var configurations = await af.ManagerConfiguration;
+
+            foreach (var config in configurations)
+            {
+                config.Value.Activated = true;
+            }
+                
+            await af.ResetLoadManagerLazyAsync();
+
+            foreach (var config in configurations)
+            {
+                var name = config.Value.Name;
+                var classifier = af.ManagerLazy.TryGetValue(name, out AsyncLazy<BayesianClassifierGroup> classifierAsyncLazy) ? await classifierAsyncLazy : null;
+                Assert.IsNotNull(classifier);
+                Console.WriteLine($"Loaded classifier \"{name}\" successfully");
+            }            
+        }
+
 
         [TestMethod]
         public void CreateSpamConfig() 
@@ -91,12 +159,13 @@ namespace TaskMaster.Test
             loader.SerializeThreadSafe(loader.Config.LocalDisk.FilePath);
         }
 
+        [Obsolete]
         [TestMethod]
         public async Task TestMethod3()
         {
             var globals = new ApplicationGlobals(mockApplication.Object);
             var af = new AppAutoFileObjects(globals);
-            af.ResetLoadManagerLazy();
+            af.ResetLoadManagerLazyOld();
 
             var spam = await af.ManagerLazy["Spam"];
             Assert.IsNotNull(spam);
