@@ -48,6 +48,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
+            public int GetAdditionalField2() => AdditionalField2;
             private string _additionalField3;
             public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
 
@@ -97,6 +98,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             private int AdditionalField2;
             private string _additionalField3;
             public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            public int GetAdditionalField2() => AdditionalField2;
             public RemainingObjectClass2()
             {
                 AdditionalField1 = "Test";
@@ -144,7 +146,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Act
             var actual = new WrapperScDictionary<DerivedTest2, string, string>().ToComposition(derived);
 
-            // Assert
+            // Assert            
             actual.Should().BeEquivalentTo(expected);
         }
 

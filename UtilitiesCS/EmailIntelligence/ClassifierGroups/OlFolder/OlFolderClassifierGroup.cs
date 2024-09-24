@@ -14,6 +14,7 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using System.IO;
+using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 {
@@ -109,8 +110,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         public async Task BuildFolderClassifiersAsync()
         {
-            //Globals.AF.Manager.Clear();
-            Globals.AF.Manager.TryRemove("Folder", out _);
+            Globals.AF.ManagerLazy.TryRemove("Folder", out _);
             var miner = new EmailDataMiner(Globals);
 
             var ppkg = await ProgressPackage //.CreateAsTupleAsync(screen: Globals.Ol.GetExplorerScreen());
@@ -142,8 +142,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
             {
                 Globals.AF.ProgressPane.Visible = false;
-                Globals.AF.Manager["Folder"] = classifierGroup;
-                Globals.AF.Manager.Serialize();
+                Globals.AF.ManagerLazy["Folder"] = classifierGroup.ToAsyncLazy();
+                classifierGroup.Serialize();
+                //Globals.AF.Manager.Serialize();
                 MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -158,9 +159,15 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                     SharedTokenBase = new Corpus()
                 };
                 return group;
-            });
-            Globals.AF.Manager["Spam"] = temp;
-            Globals.AF.Manager.Serialize();
+            });            
+            Globals.AF.ManagerLazy["Spam"] = temp.ToAsyncLazy();
+            var configurations = await Globals.AF.ManagerConfiguration;
+            if (configurations.TryGetValue("Spam", out var loader))
+            {
+                temp.Config = loader.Config;
+            }
+            temp.Serialize();
+            //Globals.AF.Manager.Serialize();
         }
                         
         #endregion Build Classifiers

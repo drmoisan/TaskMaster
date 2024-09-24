@@ -63,7 +63,7 @@ namespace TaskMaster {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
-        ///  &quot;Activated&quot;: false,
+        ///  &quot;Activated&quot;: true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Folder&quot;,
         ///  &quot;Config&quot;: {
@@ -83,7 +83,7 @@ namespace TaskMaster {
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
-        ///  [rest of string was truncated]&quot;;.
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ConfigFolder {
             get {
@@ -94,7 +94,7 @@ namespace TaskMaster {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
-        ///  &quot;Activated&quot;: false,
+        ///  &quot;Activated&quot;: true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Spam&quot;,
         ///  &quot;Config&quot;: {
@@ -114,7 +114,7 @@ namespace TaskMaster {
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
-        ///    &quot;Clas [rest of string was truncated]&quot;;.
+        ///    &quot;Class [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ConfigSpam {
             get {
@@ -125,7 +125,7 @@ namespace TaskMaster {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
-        ///  &quot;Activated&quot;: false,
+        ///  &quot;Activated&quot;: true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Triage&quot;,
         ///  &quot;Config&quot;: {
@@ -145,7 +145,7 @@ namespace TaskMaster {
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
-        ///  [rest of string was truncated]&quot;;.
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ConfigTriage {
             get {

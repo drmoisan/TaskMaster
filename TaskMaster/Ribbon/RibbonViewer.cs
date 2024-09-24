@@ -220,8 +220,6 @@ namespace TaskMaster
         public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.TryMineEmails();
         public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.TryBuildClassifier();        
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.TryPrintManagerState();
-        public void SaveManagerLocally_Click(Office.IRibbonControl control) => _controller.TrySaveManagerLocally();
-        public void SaveManagerNetwork_Click(Office.IRibbonControl control) => _controller.TrySaveManagerNetwork();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
         public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
         public async void Intelligence_Click(Office.IRibbonControl control) => await _controller.IntelligenceAsync();

@@ -38,23 +38,27 @@ namespace UtilitiesCS
 
             Suggestions = new Suggestions();
 
-            switch(options)
+        }
+
+        public async Task<OlFolderHelper> InitAsync(InitOptions options)
+        {
+            switch (options)
             {
                 case InitOptions.NoSuggestions:
                     break;
                 case InitOptions.FromArrayOrString:
-                    FromArrayOrString(objItem);
+                    FromArrayOrString(null);
                     break;
                 case InitOptions.FromField:
-                    InitializeFromEmail(objItem);
+                    await InitializeFromEmail(null);
                     break;
                 case InitOptions.Recalculate:
-                    RefreshSuggestions(objItem);
+                    RefreshSuggestions(null);
                     break;
                 default:
                     throw new ArgumentException($"Unknown option value {options}");
             }
-            
+            return this;
         }
 
         public enum InitOptions
@@ -65,13 +69,13 @@ namespace UtilitiesCS
             Recalculate = 4
         }
         
-        public void InitializeFromEmail(object objItem) //internal
+        public async Task InitializeFromEmail(object objItem) //internal
         {
             if (objItem is null) { throw new ArgumentException("Cannot initialize suggestions from email because reference is null"); }
             else if (objItem is MailItemHelper) 
             {                 
                 var mailInfo = (MailItemHelper)objItem;
-                FromFolderKey(mailInfo);
+                await FromFolderKey(mailInfo);
             }
             else if (objItem is MailItem && MailResolution.TryResolveMailItem(objItem) is not null)
             {
@@ -114,11 +118,11 @@ namespace UtilitiesCS
             }
         }
 
-        public void FromFolderKey(MailItemHelper mailInfo)//internal
+        public async Task FromFolderKey(MailItemHelper mailInfo)//internal
         {
             if (!Suggestions.LoadFromField(mailInfo, _globals))
             {
-                Suggestions.RefreshSuggestions(mailInfo: mailInfo, appGlobals: _globals);
+                await Suggestions.RefreshSuggestions(mailInfo: mailInfo, appGlobals: _globals);
             }
         }
 

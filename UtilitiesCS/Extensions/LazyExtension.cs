@@ -27,5 +27,10 @@ namespace UtilitiesCS.Extensions.Lazy
         {
             return value;
         }
+
+        public static AsyncLazy<T> ToAsyncLazy<T>(this T value) where T : class
+        {
+            return new AsyncLazy<T>(() => value);
+        }
     }
 }

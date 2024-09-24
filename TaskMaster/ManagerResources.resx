@@ -120,7 +120,7 @@
   <data name="ConfigSpam" xml:space="preserve">
     <value>{
   "$id": "1",
-  "Activated": false,
+  "Activated": true,
   "Globals": "default",
   "Name": "Spam",
   "Config": {
@@ -147,7 +147,7 @@
   <data name="ConfigFolder" xml:space="preserve">
     <value>{
   "$id": "1",
-  "Activated": false,
+  "Activated": true,
   "Globals": "default",
   "Name": "Folder",
   "Config": {
@@ -174,7 +174,7 @@
   <data name="ConfigTriage" xml:space="preserve">
     <value>{
   "$id": "1",
-  "Activated": false,
+  "Activated": true,
   "Globals": "default",
   "Name": "Triage",
   "Config": {

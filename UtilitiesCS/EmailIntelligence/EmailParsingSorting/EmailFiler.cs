@@ -123,7 +123,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             // Save the attachments and pictures
             await SaveAttachmentsPicturesAsync(mailHelper);
 
-            await Task.Run(() => Globals.AF.Manager["Folder"].UnTrain(Config.OriginOlStem, mailHelper.Tokens, 1));
+            await Task.Run(async () => (await Globals.AF.ManagerLazy["Folder"]).UnTrain(Config.OriginOlStem, mailHelper.Tokens, 1));
             // Move the email to the destination folder
             var mailItemTemp = await TryMoveMailItemHelperAsync(mailHelper);
 
@@ -181,7 +181,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             var tasks = new List<Task>()
             {
-                Task.Run(() => Globals.AF.Manager["Folder"].AddOrUpdateClassifier(Config.DestinationOlStem, mailHelper.Tokens, 1)),
+                Task.Run(async() =>(await Globals.AF.ManagerLazy["Folder"]).AddOrUpdateClassifier(Config.DestinationOlStem, mailHelper.Tokens, 1)),
                 Task.Run(() => Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem))
             };
             

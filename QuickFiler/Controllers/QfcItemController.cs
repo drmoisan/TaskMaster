@@ -504,8 +504,18 @@ namespace QuickFiler.Controllers
 
         internal async Task LoadFolderHandlerAsync(object varList = null)
         {
-            //await Task.Factory.StartNew(() => LoadFolderHandler(varList), _token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            await Task.Run(() => LoadFolderHandler(varList), _token);
+            if (varList is null)
+            {
+                _folderHandler = await new OlFolderHelper(
+                    _globals, _itemInfo, OlFolderHelper.InitOptions.FromField)
+                    .InitAsync(OlFolderHelper.InitOptions.FromField);
+            }
+            else
+            {
+                _folderHandler = await new OlFolderHelper(
+                    _globals, varList, OlFolderHelper.InitOptions.FromArrayOrString)
+                    .InitAsync(OlFolderHelper.InitOptions.FromArrayOrString);
+            }
         }
 
         public void PopulateFolderComboBox(object varList = null)

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -25,33 +26,26 @@ namespace UtilitiesCS.EmailIntelligence
         public SpamBayes(IApplicationGlobals globals) : base()
         {
             Globals = globals;
-            Init();
-            //Tokenize = TokenizeEmail;
-            //TokenizeAsync = TokenizeEmailAsync;
-            //CalculateProbability = Globals.AF.Manager["Spam"].Classifiers["Spam"].chi2_spamprob;
-            //CalculateProbabilityAsync = Globals.AF.Manager["Spam"].Classifiers["Spam"].Chi2SpamProbAsync;
-            //CallbackAsync = TrainCallbackAsync;
-            //Threshhold = new TristateThreshhold(0.9, 0.1);
+            //Init();
         }
 
         private SpamBayes() : base() { }
 
-        public SpamBayes Init() 
+        public async Task<SpamBayes> Init() 
         {
             Globals.ThrowIfNull();
             
-            SpamHamGroup = Globals.AF.Manager["Spam"];
+            SpamHamGroup = await Globals.AF.ManagerLazy["Spam"];
             Tokenize = TokenizeEmail;
             TokenizeAsync = TokenizeEmailAsync;
             CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
-            CalculateProbabilityAsync = Globals.AF.Manager["Spam"].Classifiers["Spam"].Chi2SpamProbAsync;
+            CalculateProbabilityAsync = SpamHamGroup.Classifiers["Spam"].Chi2SpamProbAsync;
             CallbackAsync = TrainCallbackAsync;
             Threshhold = new TristateThreshhold(0.8, 0.2);
             
             return this; 
         }
 
-        
 
         internal async Task<bool> ValidateSpamManagerAsync(
             Func<CancellationToken, Task<(bool,string)>> asyncValidator,
@@ -63,52 +57,33 @@ namespace UtilitiesCS.EmailIntelligence
             return isValid ? true : await asyncAction(treatment, message, cancel);
         }
 
-        public virtual bool HasValidSpamManager(out string message)
-        {
+        public async Task<(bool, string)> HasValidSpamManagerAsync(CancellationToken token)
+        {            
             try
             {
-                Globals.ThrowIfNull().AF.ThrowIfNull().Manager.ThrowIfNull();
+                Globals.ThrowIfNull().AF.ThrowIfNull().ManagerLazy.ThrowIfNull();
             }
             catch (ArgumentNullException e)
             {
-                message = e.Message;
-                return false;
+                return (false, e.Message);
             }
 
-            if (!Globals.AF.Manager.TryGetValue(GroupName, out var classifierGroup))
+            if (!Globals.AF.ManagerLazy.TryGetValue(GroupName, out var classifierGroupTask))
             {
-                message = $"No classifier group named {GroupName} was found in manager.";
-                return false;
+                return (false, $"No classifier group named {GroupName} was found in manager.");
             }
             else
             {
+                var classifierGroup = await classifierGroupTask;
                 foreach (var name in ClassNames)
                 {
                     if (!classifierGroup.Classifiers.TryGetValue(name, out var classifier))
                     {
-                        message = $"{GroupName} classifier group cannot find classifier named {name}.";
-                        return false;
+                        return (false, $"{GroupName} classifier group cannot find classifier named {name}.");
                     }
                 }
-                message = "";
-                return true;
+                return (true, "");
             }
-            //else if (!classifierGroup.Classifiers.TryGetValue("Spam", out var spamClassifier))
-            //{
-            //    message = "SpamBayes classifier group cannot find a Spam classifier.";
-            //    return false;
-            //}
-            //else
-            //{
-            //    message = "";
-            //    return true;
-            //}
-        }
-
-        public async Task<(bool, string)> HasValidSpamManagerAsync(CancellationToken token)
-        {
-            string message = "";
-            return await Task.Run(() => HasValidSpamManager(out message), token) ? (true, message) : (false, message);
         }
 
         public async Task<bool> SpamBayesMissingHandlerAsync(Enums.NotFoundEnum treatment, string message, CancellationToken cancel)
@@ -121,7 +96,7 @@ namespace UtilitiesCS.EmailIntelligence
 
                 case Enums.NotFoundEnum.Create:
                     logger.Warn($"{message} Creating new classifier");
-                    Globals.AF.Manager[GroupName] = await CreateSpamClassifiersAsync(cancel);
+                    Globals.AF.ManagerLazy[GroupName] = (await CreateSpamClassifiersAsync(cancel)).ToAsyncLazy();
                     return true;
 
                 case Enums.NotFoundEnum.Throw:
@@ -137,9 +112,20 @@ namespace UtilitiesCS.EmailIntelligence
                         MessageBoxIcon.Warning);
                     if (result == DialogResult.Yes)
                     {
-                        Globals.AF.Manager[GroupName] = await CreateSpamClassifiersAsync(cancel);
-                        Globals.AF.Manager.Serialize();
-                        return true;
+                        SpamHamGroup = await CreateSpamClassifiersAsync(cancel);
+                        Globals.AF.ManagerLazy[GroupName] = SpamHamGroup.ToAsyncLazy();
+                        if ((await Globals.AF.ManagerConfiguration)?.TryGetValue("ConfigSpam", out var loader) ?? false && loader is not null)
+                        {
+                            SpamHamGroup.Config = loader.Config;
+                            SpamHamGroup.Serialize();
+                            return true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Could not create Spam classifier because configuration could not be found.", 
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
                     }
                     else
                     {
@@ -174,8 +160,6 @@ namespace UtilitiesCS.EmailIntelligence
                 TotalEmailCount = 0,
                 SharedTokenBase = new Corpus()
             };
-            //group.Classifiers["Spam"] = new BayesianClassifierShared("Spam", group);
-            //group.Classifiers["Ham"] = new BayesianClassifierShared("Ham", group);
             foreach (var name in ClassNames)
             {
                 group.Classifiers[name] = new BayesianClassifierShared(name, group);
@@ -242,7 +226,8 @@ namespace UtilitiesCS.EmailIntelligence
                     await TrainAsync(mailItem, isSpam);
                 }
             }
-            Globals.AF.Manager.Serialize();
+            
+            SpamHamGroup.Serialize();
         }
 
         public override async Task TrainAsync(string[] tokens, bool isSpam)

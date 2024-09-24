@@ -50,7 +50,9 @@ namespace TaskMaster
         async public Task LoadAsync()
         {
             //LoadManagerConfig();
-            ResetLoadManager();
+            //ResetLoadManager();
+            ResetLoadManagerLazyConfiguration();
+
             var tasks = new List<Task>
             {
                 LoadRecentsListAsync(),
@@ -59,7 +61,8 @@ namespace TaskMaster
                 LoadSubjectMapAndEncoderAsync(),
                 LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
-                LoadManagerAsync(),
+                ResetLoadManagerLazyAsync(),
+                //LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
             //await Manager2;
@@ -397,6 +400,7 @@ namespace TaskMaster
             return result;
         }
 
+        [Obsolete]
         private Lazy<ConcurrentDictionary<string, byte[]>> _binaryResources = new(() =>
         {
             var rsMgr = Properties.Resources.ResourceManager;
@@ -408,13 +412,12 @@ namespace TaskMaster
                 .ToConcurrentDictionary();
             return rsDict;
         });
-
+        [Obsolete]
         public ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
 
         public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration => _managerConfiguration;
-
         private AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> _managerConfiguration;
-        public void ResetLoadManagerLazyConfigurationAsync()
+        public void ResetLoadManagerLazyConfiguration()
         {
             _managerConfiguration = new(async () =>
             {
@@ -434,7 +437,7 @@ namespace TaskMaster
             });
         }
 
-
+        [Obsolete]
         public string[] GetManifestResourceNames()
         {
             //var rsMgr = Properties.Resources.ResourceManager;
@@ -449,9 +452,11 @@ namespace TaskMaster
             //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
         }
 
+        [Obsolete]
         private AsyncLazy<ManagerClass> _manager2;
         [Obsolete]
         public AsyncLazy<ManagerClass> Manager2 => _manager2;
+        [Obsolete]
         public void ResetLoadManager()
         {
             _manager2 = new AsyncLazy<ManagerClass>(async () =>
@@ -489,7 +494,7 @@ namespace TaskMaster
         public ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy => _managerLazy;
         public async Task ResetLoadManagerLazyAsync() 
         {
-            if (ManagerConfiguration is null) { ResetLoadManagerLazyConfigurationAsync(); }
+            if (ManagerConfiguration is null) { ResetLoadManagerLazyConfiguration(); }
             foreach (var configuration in await ManagerConfiguration)
             {                
                 if (configuration.Value.Activated)
@@ -521,8 +526,11 @@ namespace TaskMaster
             }
         }
 
+        [Obsolete]
         private ScDictionary<string, BayesianClassifierGroup> _manager;
+        [Obsolete]
         public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
+        [Obsolete]
         internal ScDictionary<string, BayesianClassifierGroup> LoadManager()
         {
             var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
@@ -570,7 +578,7 @@ namespace TaskMaster
 
             return manager;
         }
-
+        [Obsolete]
         private JsonSerializerSettings GetSettings(bool compress)
         {
             var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
@@ -582,7 +590,7 @@ namespace TaskMaster
                 settings.ContractResolver = new DoNotSerializeContractResolver("Prob","NotMatch");
             return settings;
         }
-        
+        [Obsolete]
         private ScDictionary<string, BayesianClassifierGroup> GetManager(
             FilePathHelper disk, 
             JsonSerializerSettings settings)
@@ -593,6 +601,7 @@ namespace TaskMaster
                 askUserOnError: false,
                 settings: settings);
         }
+        [Obsolete]
         private async Task LoadManagerAsync()
         {
             LoadProgressPane(_tokenSource);
@@ -600,11 +609,13 @@ namespace TaskMaster
                 () => _manager = LoadManager(),
                 CancelToken);
         }
+        [Obsolete]
         public void SaveManagerLocal()
         {
             _manager.ActivateLocalDisk();
             _manager.Serialize();
         }
+        [Obsolete]
         public void SaveManagerNetwork()
         {
             _manager.ActivateNetDisk();

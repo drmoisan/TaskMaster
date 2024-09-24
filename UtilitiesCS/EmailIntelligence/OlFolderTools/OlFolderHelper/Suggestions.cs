@@ -100,7 +100,7 @@ namespace UtilitiesCS
             
         }
 
-        public void RefreshSuggestions(MailItemHelper mailInfo,
+        public async Task RefreshSuggestions(MailItemHelper mailInfo,
                                        IApplicationGlobals appGlobals,
                                        int topNfolderKeys = -1,
                                        bool parallel = false)
@@ -108,7 +108,7 @@ namespace UtilitiesCS
             var _globals = appGlobals;
             _folderNameScores.Clear();
 
-            AddBayesianSuggestions(mailInfo, appGlobals, topNfolderKeys);
+            await AddBayesianSuggestionsAsync(mailInfo, appGlobals, topNfolderKeys);
 
             AddConversationBasedSuggestions(mailInfo.Item, _globals);
             //if (topNfolderKeys > 0)
@@ -122,17 +122,17 @@ namespace UtilitiesCS
 
         }
 
-        private void AddBayesianSuggestions(MailItemHelper mailInfo, IApplicationGlobals globals, int topNfolderKeys)
+        private async Task AddBayesianSuggestionsAsync(MailItemHelper mailInfo, IApplicationGlobals globals, int topNfolderKeys)
         {
             EmailIntelligence.Bayesian.Prediction<string>[] predictions = null;
             
             if (topNfolderKeys > 0)
             {
-                predictions = globals.AF.Manager["Folder"].Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
+                predictions = (await globals.AF.ManagerLazy["Folder"]).Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
             }
             else
             {
-                predictions = globals.AF.Manager["Folder"].Classify(mailInfo.Tokens).ToArray();
+                predictions = (await globals.AF.ManagerLazy["Folder"]).Classify(mailInfo.Tokens).ToArray();
             }
             
             foreach (var prediction in predictions)

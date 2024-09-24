@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
@@ -27,6 +29,11 @@ namespace UtilitiesCS
         System.Action MaximizeQuickFileWindow { get; set; }
         ScoStack<IMovedMailInfo> MovedMails { get; }
         ScoCollection<FilterEntry> Filters { get; }
+
+        AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration { get; }
+        ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy { get; }
+
+        [Obsolete]
         ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         ProgressTrackerPane ProgressTracker { get; }
         Microsoft.Office.Tools.CustomTaskPane ProgressPane { get; }

@@ -152,7 +152,7 @@ namespace UtilitiesCS
                 mailHelper.Item.Save();
             });
 
-            var bayesianTask = Task.Run(() => appGlobals.AF.Manager["Folder"].AddOrUpdateClassifier(destinationOlStem, mailHelper.Tokens, 1));
+            var bayesianTask = Task.Run(async () => (await appGlobals.AF.ManagerLazy["Folder"]).AddOrUpdateClassifier(destinationOlStem, mailHelper.Tokens, 1));
             // Update Subject Map and Subject Encoder
             var subjectMapTask = Task.Run(() => appGlobals.AF.SubjectMap.Add(mailHelper.Subject, destinationOlStem));
 
@@ -405,7 +405,7 @@ namespace UtilitiesCS
                     if (undoResponse == DialogResult.Yes)
                     {
                         var helper = await MailItemHelper.FromMailItemAsync(movedStack[i].MailItem, globals, default, true);
-                        globals.AF.Manager["Folder"].UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
+                        (await globals.AF.ManagerLazy["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }

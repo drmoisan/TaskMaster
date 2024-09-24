@@ -31,6 +31,7 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using BrightIdeasSoftware;
+using UtilitiesCS.Extensions.Lazy;
 
 
 namespace TaskMaster
@@ -377,18 +378,6 @@ namespace TaskMaster
             //_globals.AF.Manager["Folder"].LogMetrics();
         }
 
-        internal void TrySaveManagerLocally()
-        {
-            _globals.AF.Manager.ActivateLocalDisk();
-            _globals.AF.Manager.Serialize();
-        }
-
-        internal void TrySaveManagerNetwork()
-        {
-            _globals.AF.Manager.ActivateNetDisk();
-            _globals.AF.Manager.Serialize();
-        }
-
         internal void TrySerializeMailInfo()
         {
             new EmailDataMiner(_globals).SerializeActiveItem();
@@ -500,8 +489,13 @@ namespace TaskMaster
             var response = MessageBox.Show("Are you sure you want to clear the Spam Manager? This cannot be undone", "Clear Spam Manager", MessageBoxButtons.YesNo);
             if (response == DialogResult.Yes)
             {
-                _globals.AF.Manager[SpamBayes.GroupName] = await SpamBayes.CreateSpamClassifiersAsync();
-                _globals.AF.Manager.Serialize();
+                if ((await _globals.AF.ManagerConfiguration).TryGetValue("Spam", out var loader))
+                {
+                    var classifier = await SpamBayes.CreateSpamClassifiersAsync();
+                    classifier.Config = loader.Config;
+                    classifier.Serialize();
+                    _globals.AF.ManagerLazy[SpamBayes.GroupName] = classifier.ToAsyncLazy();
+                }                
             }
         }
                 
@@ -613,7 +607,8 @@ namespace TaskMaster
                 if (double.TryParse(precision, out double result))
                 {
                     triage.ClassifierGroup.MinimumProbability = result;
-                    _globals.AF.Manager.Serialize();
+                    //_globals.AF.Manager.Serialize();
+                    triage.ClassifierGroup.Serialize();
                 }
             }
         }
@@ -623,7 +618,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var triage = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals, _globals.AF.Manager);
+            var triage = await new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(_globals).InitAsync();
             await triage.CreateNewTriageClassifierGroupAsync(default);
         }
 

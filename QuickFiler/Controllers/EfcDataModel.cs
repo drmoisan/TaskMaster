@@ -85,7 +85,7 @@ namespace QuickFiler.Controllers
         {
             get 
             { 
-                _folderHelper ??= new OlFolderHelper(Globals, MailInfo, OlFolderHelper.InitOptions.FromField);
+                //_folderHelper ??= new OlFolderHelper(Globals, MailInfo, OlFolderHelper.InitOptions.FromField);
                 return _folderHelper; 
             }
             protected set => _folderHelper = value;
@@ -100,14 +100,16 @@ namespace QuickFiler.Controllers
                 }
                 else
                 {
-                    FolderHelper = await Task.Run(() => new OlFolderHelper(
-                        Globals, MailInfo, OlFolderHelper.InitOptions.FromField), Token);
+                    FolderHelper = await Task.Run(async () => await new OlFolderHelper(
+                        Globals, MailInfo, OlFolderHelper.InitOptions.FromField)
+                        .InitAsync(OlFolderHelper.InitOptions.FromField), Token);
                 }
             }
             else
             {
-                FolderHelper = await Task.Run(() => new OlFolderHelper(
-                    Globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString), Token);
+                FolderHelper = await Task.Run(async () => await new OlFolderHelper(
+                    Globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString)
+                    .InitAsync(OlFolderHelper.InitOptions.FromArrayOrString), Token);
             }
         }
 

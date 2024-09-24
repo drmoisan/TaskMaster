@@ -60,6 +60,7 @@ namespace TaskMaster.Test
 
         }
 
+        [Obsolete]
         [TestMethod]
         public async Task ConvertSpam()
         {
@@ -84,7 +85,7 @@ namespace TaskMaster.Test
         {
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             var af = new AppAutoFileObjects(appGlobals);
-            af.ResetLoadManagerLazyConfigurationAsync();
+            af.ResetLoadManagerLazyConfiguration();
             var configurations = await af.ManagerConfiguration;
             if (configurations.TryGetValue("ConfigSpam", out NewSmartSerializableLoader loader))
             {
@@ -96,6 +97,7 @@ namespace TaskMaster.Test
             //var spam = await af.ManagerLazy["Spam"];
         }
 
+        [Obsolete]
         [TestMethod]
         public async Task ConvertAll()
         {
@@ -103,7 +105,7 @@ namespace TaskMaster.Test
             var af = new AppAutoFileObjects(appGlobals);
             var manager = af.LoadManager();
             
-            af.ResetLoadManagerLazyConfigurationAsync();
+            af.ResetLoadManagerLazyConfiguration();
             var configurations = await af.ManagerConfiguration;
             foreach (var config in configurations)
             {
@@ -125,7 +127,7 @@ namespace TaskMaster.Test
         {
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             var af = new AppAutoFileObjects(appGlobals);
-            af.ResetLoadManagerLazyConfigurationAsync();
+            af.ResetLoadManagerLazyConfiguration();
             var configurations = await af.ManagerConfiguration;
 
             foreach (var config in configurations)
@@ -185,6 +187,7 @@ namespace TaskMaster.Test
 
         }
 
+        [Obsolete]
         [TestMethod]
         public void TestMethodConverter()
         {
