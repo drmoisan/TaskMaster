@@ -102,14 +102,14 @@ namespace QuickFiler.Controllers
                 {
                     FolderHelper = await Task.Run(async () => await new OlFolderHelper(
                         Globals, MailInfo, OlFolderHelper.InitOptions.FromField)
-                        .InitAsync(OlFolderHelper.InitOptions.FromField), Token);
+                        .InitAsync(MailInfo, OlFolderHelper.InitOptions.FromField), Token);
                 }
             }
             else
             {
                 FolderHelper = await Task.Run(async () => await new OlFolderHelper(
                     Globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString)
-                    .InitAsync(OlFolderHelper.InitOptions.FromArrayOrString), Token);
+                    .InitAsync(folderList, OlFolderHelper.InitOptions.FromArrayOrString), Token);
             }
         }
 

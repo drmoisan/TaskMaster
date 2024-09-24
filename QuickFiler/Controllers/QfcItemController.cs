@@ -508,13 +508,13 @@ namespace QuickFiler.Controllers
             {
                 _folderHandler = await new OlFolderHelper(
                     _globals, _itemInfo, OlFolderHelper.InitOptions.FromField)
-                    .InitAsync(OlFolderHelper.InitOptions.FromField);
+                    .InitAsync(_itemInfo, OlFolderHelper.InitOptions.FromField);
             }
             else
             {
                 _folderHandler = await new OlFolderHelper(
                     _globals, varList, OlFolderHelper.InitOptions.FromArrayOrString)
-                    .InitAsync(OlFolderHelper.InitOptions.FromArrayOrString);
+                    .InitAsync(varList, OlFolderHelper.InitOptions.FromArrayOrString);
             }
         }
 

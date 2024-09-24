@@ -33,8 +33,8 @@ namespace UtilitiesCS
         AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration { get; }
         ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy { get; }
 
-        [Obsolete]
-        ScDictionary<string, BayesianClassifierGroup> Manager { get; }
+        //[Obsolete]
+        //ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         ProgressTrackerPane ProgressTracker { get; }
         Microsoft.Office.Tools.CustomTaskPane ProgressPane { get; }
         CancellationToken CancelToken { get; }

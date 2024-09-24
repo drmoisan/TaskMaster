@@ -40,20 +40,20 @@ namespace UtilitiesCS
 
         }
 
-        public async Task<OlFolderHelper> InitAsync(InitOptions options)
+        public async Task<OlFolderHelper> InitAsync(object objItem, InitOptions options)
         {
             switch (options)
             {
                 case InitOptions.NoSuggestions:
                     break;
                 case InitOptions.FromArrayOrString:
-                    FromArrayOrString(null);
+                    FromArrayOrString(objItem);
                     break;
                 case InitOptions.FromField:
-                    await InitializeFromEmail(null);
+                    await InitializeFromEmail(objItem);
                     break;
                 case InitOptions.Recalculate:
-                    RefreshSuggestions(null);
+                    RefreshSuggestions(objItem);
                     break;
                 default:
                     throw new ArgumentException($"Unknown option value {options}");

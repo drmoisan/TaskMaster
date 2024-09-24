@@ -400,20 +400,20 @@ namespace TaskMaster
             return result;
         }
 
-        [Obsolete]
-        private Lazy<ConcurrentDictionary<string, byte[]>> _binaryResources = new(() =>
-        {
-            var rsMgr = Properties.Resources.ResourceManager;
-            var rsSet = rsMgr.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
-            var rsDict = rsSet
-                .Cast<DictionaryEntry>()
-                .Where(x => x.Value is byte[])
-                .ToDictionary<string, byte[]>()
-                .ToConcurrentDictionary();
-            return rsDict;
-        });
-        [Obsolete]
-        public ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
+        //[Obsolete]
+        //private Lazy<ConcurrentDictionary<string, byte[]>> _binaryResources = new(() =>
+        //{
+        //    var rsMgr = Properties.Resources.ResourceManager;
+        //    var rsSet = rsMgr.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+        //    var rsDict = rsSet
+        //        .Cast<DictionaryEntry>()
+        //        .Where(x => x.Value is byte[])
+        //        .ToDictionary<string, byte[]>()
+        //        .ToConcurrentDictionary();
+        //    return rsDict;
+        //});
+        //[Obsolete]
+        //public ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
 
         public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration => _managerConfiguration;
         private AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> _managerConfiguration;
@@ -437,58 +437,58 @@ namespace TaskMaster
             });
         }
 
-        [Obsolete]
-        public string[] GetManifestResourceNames()
-        {
-            //var rsMgr = Properties.Resources.ResourceManager;
-            //var rsSet = rsMgr.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
-            //var rsDict = rsSet.Cast<DictionaryEntry>().Where(x => x.Value is byte[]).ToDictionary<string, byte[]>();
-            var rsDict = BinaryResources;
-            var configBin = rsDict["manager_config"];
-            var configStr = System.Text.Encoding.UTF8.GetString(configBin);
-            var configLoader = new SmartSerializableConfig(_parent);
-            //var config = configLoader.DeserializeConfig(configStr);
-            return rsDict.Keys.ToArray();
-            //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
-        }
+        //[Obsolete]
+        //public string[] GetManifestResourceNames()
+        //{
+        //    //var rsMgr = Properties.Resources.ResourceManager;
+        //    //var rsSet = rsMgr.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+        //    //var rsDict = rsSet.Cast<DictionaryEntry>().Where(x => x.Value is byte[]).ToDictionary<string, byte[]>();
+        //    var rsDict = BinaryResources;
+        //    var configBin = rsDict["manager_config"];
+        //    var configStr = System.Text.Encoding.UTF8.GetString(configBin);
+        //    var configLoader = new SmartSerializableConfig(_parent);
+        //    //var config = configLoader.DeserializeConfig(configStr);
+        //    return rsDict.Keys.ToArray();
+        //    //return Assembly.GetExecutingAssembly().GetManifestResourceNames();
+        //}
 
-        [Obsolete]
-        private AsyncLazy<ManagerClass> _manager2;
-        [Obsolete]
-        public AsyncLazy<ManagerClass> Manager2 => _manager2;
-        [Obsolete]
-        public void ResetLoadManager()
-        {
-            _manager2 = new AsyncLazy<ManagerClass>(async () =>
-            {
-                if (BinaryResources.TryGetValue("ConfigManager", out byte[] configBin))
-                {
-                    var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
-                    return await ManagerClass.Static.DeserializeAsync(config);
-                }
-                else { return null; }
-            });
-            //_manager2 = mgr;
-        }
+        //[Obsolete]
+        //private AsyncLazy<ManagerClass> _manager2;
+        //[Obsolete]
+        //public AsyncLazy<ManagerClass> Manager2 => _manager2;
+        //[Obsolete]
+        //public void ResetLoadManager()
+        //{
+        //    _manager2 = new AsyncLazy<ManagerClass>(async () =>
+        //    {
+        //        if (BinaryResources.TryGetValue("ConfigManager", out byte[] configBin))
+        //        {
+        //            var config = await SmartSerializableConfig.DeserializeAsync(_parent, configBin);
+        //            return await ManagerClass.Static.DeserializeAsync(config);
+        //        }
+        //        else { return null; }
+        //    });
+        //    //_manager2 = mgr;
+        //}
 
         public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(NewSmartSerializableLoader loader)
         {
             return new AsyncLazy<BayesianClassifierGroup>(async () => await BayesianClassifierGroup.Static.DeserializeAsync(loader));
         }
 
-        [Obsolete]
-        public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(string classifierName, string configName)
-        {
-            return new AsyncLazy<BayesianClassifierGroup>(async () =>
-            {
-                if (BinaryResources.TryGetValue(configName, out byte[] configBin))
-                {
-                    var config = await NewSmartSerializableLoader.DeserializeAsync(_parent, configBin);
-                    return await BayesianClassifierGroup.Static.DeserializeAsync(config);                    
-                }
-                else { return null; }                
-            });
-        }
+        //[Obsolete]
+        //public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(string classifierName, string configName)
+        //{
+        //    return new AsyncLazy<BayesianClassifierGroup>(async () =>
+        //    {
+        //        if (BinaryResources.TryGetValue(configName, out byte[] configBin))
+        //        {
+        //            var config = await NewSmartSerializableLoader.DeserializeAsync(_parent, configBin);
+        //            return await BayesianClassifierGroup.Static.DeserializeAsync(config);                    
+        //        }
+        //        else { return null; }                
+        //    });
+        //}
 
         private ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> _managerLazy = [];
         public ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy => _managerLazy;
@@ -509,118 +509,118 @@ namespace TaskMaster
             }
         }
 
-        [Obsolete]
-        public void ResetLoadManagerLazyOld()
-        {
-            var classifierConfigs = new Dictionary<string, string>()
-            {
-                {"Spam", "ConfigSpam" },
-                {"Folder", "ConfigFolder"},
-                {"Triage", "ConfigTriage" }
-            };
+        //[Obsolete]
+        //public void ResetLoadManagerLazyOld()
+        //{
+        //    var classifierConfigs = new Dictionary<string, string>()
+        //    {
+        //        {"Spam", "ConfigSpam" },
+        //        {"Folder", "ConfigFolder"},
+        //        {"Triage", "ConfigTriage" }
+        //    };
             
-            foreach (var classifier in classifierConfigs)
-            {
-                var value = GetClassifierAsyncLazy(classifier.Key, classifier.Value);
-                if (value != null) { _managerLazy[classifier.Key] = value; }
-            }
-        }
+        //    foreach (var classifier in classifierConfigs)
+        //    {
+        //        var value = GetClassifierAsyncLazy(classifier.Key, classifier.Value);
+        //        if (value != null) { _managerLazy[classifier.Key] = value; }
+        //    }
+        //}
 
-        [Obsolete]
-        private ScDictionary<string, BayesianClassifierGroup> _manager;
-        [Obsolete]
-        public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
-        [Obsolete]
-        internal ScDictionary<string, BayesianClassifierGroup> LoadManager()
-        {
-            var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
-            var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
+        //[Obsolete]
+        //private ScDictionary<string, BayesianClassifierGroup> _manager;
+        //[Obsolete]
+        //public ScDictionary<string, BayesianClassifierGroup> Manager => Initialized(_manager, LoadManager);
+        //[Obsolete]
+        //internal ScDictionary<string, BayesianClassifierGroup> LoadManager()
+        //{
+        //    var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
+        //    var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
             
-            var local = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrAppData);
-            var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
+        //    var local = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrAppData);
+        //    var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
 
-            //var config = new SmartSerializableConfig(_parent);
-            //config.Local = local;
-            //config.Network = network;
-            //var configFP = new FilePathHelper("manager.config", _parent.FS.FldrAppData);
-            //var configSettings = config.LocalSettings;
-            //using (StreamWriter sw = File.CreateText(configFP.FilePath))
-            //{
-            //    var serializer = JsonSerializer.Create(configSettings);
-            //    serializer.Serialize(sw, config);
-            //    sw.Close();
-            //}
+        //    //var config = new SmartSerializableConfig(_parent);
+        //    //config.Local = local;
+        //    //config.Network = network;
+        //    //var configFP = new FilePathHelper("manager.config", _parent.FS.FldrAppData);
+        //    //var configSettings = config.LocalSettings;
+        //    //using (StreamWriter sw = File.CreateText(configFP.FilePath))
+        //    //{
+        //    //    var serializer = JsonSerializer.Create(configSettings);
+        //    //    serializer.Serialize(sw, config);
+        //    //    sw.Close();
+        //    //}
 
-            var localSettings = GetSettings(false);
-            var networkSettings = GetSettings(true);
+        //    var localSettings = GetSettings(false);
+        //    var networkSettings = GetSettings(true);
             
-            var manager = GetManager(local, localSettings);
-            manager.NetDisk = network;
-            manager.NetJsonSettings = networkSettings;
-            manager.LocalDisk = local;
-            manager.LocalJsonSettings = localSettings;
+        //    var manager = GetManager(local, localSettings);
+        //    manager.NetDisk = network;
+        //    manager.NetJsonSettings = networkSettings;
+        //    manager.LocalDisk = local;
+        //    manager.LocalJsonSettings = localSettings;
 
-            if (networkDt != default && (localDt == default || networkDt > localDt))
-            {
-                IdleActionQueue.AddEntry(async () =>
-                    await Task.Run(() =>
-                    {
-                        _manager = GetManager(network, networkSettings);
-                        _manager.NetDisk = network;
-                        _manager.NetJsonSettings = networkSettings;
-                        _manager.LocalDisk = local;
-                        _manager.LocalJsonSettings = localSettings;
-                        _manager.ActivateLocalDisk();
-                        IdleActionQueue.AddEntry(() => _manager.Serialize());
-                    }
-                    ));
-            }
+        //    if (networkDt != default && (localDt == default || networkDt > localDt))
+        //    {
+        //        IdleActionQueue.AddEntry(async () =>
+        //            await Task.Run(() =>
+        //            {
+        //                _manager = GetManager(network, networkSettings);
+        //                _manager.NetDisk = network;
+        //                _manager.NetJsonSettings = networkSettings;
+        //                _manager.LocalDisk = local;
+        //                _manager.LocalJsonSettings = localSettings;
+        //                _manager.ActivateLocalDisk();
+        //                IdleActionQueue.AddEntry(() => _manager.Serialize());
+        //            }
+        //            ));
+        //    }
 
-            return manager;
-        }
-        [Obsolete]
-        private JsonSerializerSettings GetSettings(bool compress)
-        {
-            var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
-            //var settings = ScDictionary<string, BayesianClassifierGroup>.Factory.GetDefaultSettings();
-            settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
-            settings.Converters.Add(new AppGlobalsConverter(_parent));
-            settings.TraceWriter = new NLogTraceWriter();
-            if (compress)
-                settings.ContractResolver = new DoNotSerializeContractResolver("Prob","NotMatch");
-            return settings;
-        }
-        [Obsolete]
-        private ScDictionary<string, BayesianClassifierGroup> GetManager(
-            FilePathHelper disk, 
-            JsonSerializerSettings settings)
-        {
-            return new ScDictionary<string, BayesianClassifierGroup>().Deserialize(
-                fileName: disk.FileName,
-                folderPath: disk.FolderPath,
-                askUserOnError: false,
-                settings: settings);
-        }
-        [Obsolete]
-        private async Task LoadManagerAsync()
-        {
-            LoadProgressPane(_tokenSource);
-            await Task.Run(
-                () => _manager = LoadManager(),
-                CancelToken);
-        }
-        [Obsolete]
-        public void SaveManagerLocal()
-        {
-            _manager.ActivateLocalDisk();
-            _manager.Serialize();
-        }
-        [Obsolete]
-        public void SaveManagerNetwork()
-        {
-            _manager.ActivateNetDisk();
-            _manager.Serialize();
-        }
+        //    return manager;
+        //}
+        //[Obsolete]
+        //private JsonSerializerSettings GetSettings(bool compress)
+        //{
+        //    var settings = ScDictionary<string, BayesianClassifierGroup>.GetDefaultSettings();
+        //    //var settings = ScDictionary<string, BayesianClassifierGroup>.Factory.GetDefaultSettings();
+        //    settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+        //    settings.Converters.Add(new AppGlobalsConverter(_parent));
+        //    settings.TraceWriter = new NLogTraceWriter();
+        //    if (compress)
+        //        settings.ContractResolver = new DoNotSerializeContractResolver("Prob","NotMatch");
+        //    return settings;
+        //}
+        //[Obsolete]
+        //private ScDictionary<string, BayesianClassifierGroup> GetManager(
+        //    FilePathHelper disk, 
+        //    JsonSerializerSettings settings)
+        //{
+        //    return new ScDictionary<string, BayesianClassifierGroup>().Deserialize(
+        //        fileName: disk.FileName,
+        //        folderPath: disk.FolderPath,
+        //        askUserOnError: false,
+        //        settings: settings);
+        //}
+        //[Obsolete]
+        //private async Task LoadManagerAsync()
+        //{
+        //    LoadProgressPane(_tokenSource);
+        //    await Task.Run(
+        //        () => _manager = LoadManager(),
+        //        CancelToken);
+        //}
+        //[Obsolete]
+        //public void SaveManagerLocal()
+        //{
+        //    _manager.ActivateLocalDisk();
+        //    _manager.Serialize();
+        //}
+        //[Obsolete]
+        //public void SaveManagerNetwork()
+        //{
+        //    _manager.ActivateNetDisk();
+        //    _manager.Serialize();
+        //}
 
         private ProgressTrackerPane _progressTracker;
         public ProgressTrackerPane ProgressTracker => _progressTracker;
