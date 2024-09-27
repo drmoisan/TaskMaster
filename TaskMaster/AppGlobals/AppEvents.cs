@@ -33,9 +33,6 @@ namespace TaskMaster
         
         internal async Task<AppEvents> LoadAsync()
         {
-            //var spamBayesTask = Task.Run(SetupSpamBayesAsync);
-            //var triageTask = Task.Run(SetupTriageAsync);
-            //await Task.WhenAll(spamBayesTask, triageTask);
             await Task.WhenAll(SetupSpamBayesAsync(), SetupTriageAsync());
             await ProcessNewInboxItemsAsync();
 
@@ -219,38 +216,9 @@ namespace TaskMaster
                 foreach (object item in unreadItems)
                 {
                     await ProcessMailItemAsync(item);
-                    //    if (item is MailItem mailItem)
-                    //    {
-                    //        var engines = await MailAddEngines.ToAsyncEnumerable()
-                    //            .WhereAwait(async e => await e.AsyncCondition(mailItem))
-                    //            .Where(e => e.Engine is not null)
-                    //            .ToArrayAsync();
-
-                    //        if (engines.Length > 0)
-                    //        {
-                    //            var helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false);
-                    //            await Task.Run(() => _ = helper.Tokens);
-                    //            await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.AsyncAction(helper));
-                    //        }
-                    //    }
                 }
             }
         }
-
-        //private async void OlInboxItems_ItemAdd_TriageFilter(object item)
-        //{
-        //    if (item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" && mailItem.UserProperties.Find("Triage") is null)
-        //    {
-        //        if (_triage is null)
-        //        {
-        //            //logger.Debug("Triage is null. Skipping triage.");
-        //        }
-        //        else
-        //        {
-        //            await _triage.TestAsync(mailItem);
-        //        }
-        //    }
-        //}
 
         #endregion
 

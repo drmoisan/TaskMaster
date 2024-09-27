@@ -165,6 +165,7 @@ namespace TaskMaster
         
         public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
         public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.TrainSpam();
+        //public async void TrainSpam_Click(Office.IRibbonControl control) => (await Controller.SB) is null;
         public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.TrainHam();
         public async void TestSpam_Click(Office.IRibbonControl control) => await Controller.TestSpam();
         public void TestSpamVerbose_Click(Office.IRibbonControl control) => Controller.TestSpamVerbose();
