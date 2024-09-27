@@ -110,7 +110,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         public async Task BuildFolderClassifiersAsync()
         {
-            Globals.AF.ManagerLazy.TryRemove("Folder", out _);
+            Globals.AF.Manager.TryRemove("Folder", out _);
             var miner = new EmailDataMiner(Globals);
 
             var ppkg = await ProgressPackage //.CreateAsTupleAsync(screen: Globals.Ol.GetExplorerScreen());
@@ -142,7 +142,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
             {
                 Globals.AF.ProgressPane.Visible = false;
-                Globals.AF.ManagerLazy["Folder"] = classifierGroup.ToAsyncLazy();
+                Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();
                 classifierGroup.Serialize();
                 //Globals.AF.Manager.Serialize();
                 MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -160,9 +160,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 };
                 return group;
             });            
-            Globals.AF.ManagerLazy["Spam"] = temp.ToAsyncLazy();
-            var configurations = await Globals.AF.ManagerConfiguration;
-            if (configurations.TryGetValue("Spam", out var loader))
+            Globals.AF.Manager["Spam"] = temp.ToAsyncLazy();
+            var configurations = await Globals.AF.Manager.ManagerConfiguration;
+            if (configurations.TryGetValue("ConfigSpam", out var loader))
             {
                 temp.Config = loader.Config;
             }

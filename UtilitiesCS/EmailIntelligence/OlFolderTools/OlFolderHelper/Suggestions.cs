@@ -128,11 +128,11 @@ namespace UtilitiesCS
             
             if (topNfolderKeys > 0)
             {
-                predictions = (await globals.AF.ManagerLazy["Folder"]).Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
+                predictions = (await globals.AF.Manager["Folder"]).Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
             }
             else
             {
-                predictions = (await globals.AF.ManagerLazy["Folder"]).Classify(mailInfo.Tokens).ToArray();
+                predictions = (await globals.AF.Manager["Folder"]).Classify(mailInfo.Tokens).ToArray();
             }
             
             foreach (var prediction in predictions)

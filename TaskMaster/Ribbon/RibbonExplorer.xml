@@ -24,8 +24,14 @@
             <tab idMso="TabMail">
               <group id="SpamBayesGroup" imageMso="RecycleBin" label="Spam Bayes">
                 <button id="TrainSpam" imageMso="CancelAll" onAction="TrainSpam_Click" label="Train Spam" />
-                <button id="TrainHam" imageMso="ClickToRunEnableUpdates" onAction="TrainHam_Click" label="Train Ham" />
+                <button id="TrainHam" imageMso="ClickToRunEnableUpdates" onAction="TrainHam_Click" label="Train Ham" />                
                 <menu id="OtherSpamActions" imageMso="AdministrationHome" label="Other" size="normal">
+                  <menu id = "SpamSaveOptions" imageMso="FileSave" label="Save Options" >
+                    <button id="SpamSaveNetwork" imageMso="ServerConnection" onAction="SpamSaveNetwork_Click" label="Network"/>
+                    <button id="SpamSaveLocal" imageMso="FillDown" onAction="SpamSaveLocal_Click" label="Local"/>
+                    <button id ="GetSaveState" imageMso="Help" onAction="GetSaveLocation_Click" label="Current Location"/>
+                  </menu>
+                  <checkBox id="SpamBayesEnabledToggle" getPressed="SpamBayesEnabled_GetPressed" onAction="SpamBayesEnabled_Click" label="Spam Bayes Enabled"/>                  
                   <button id="NewSpam" imageMso="NewComment" onAction="ClearSpam_Click" label="Clear Spam Manager" />
                   <button id="TestSpam" imageMso="CalculateNow" onAction="TestSpam_Click" label="Test Spam" />
                   <button id="TestSpamVerbose" imageMso="CalculateSheet" onAction="TestSpamVerbose_Click" label="Test Spam Verbose" />

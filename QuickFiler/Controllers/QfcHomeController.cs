@@ -4,20 +4,14 @@ using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using ToDoModel;
 using UtilitiesCS;
 using System.IO;
 using System.ComponentModel;
 using System.Windows.Forms;
-using UtilitiesCS.Threading;
 using System.Threading;
 using System.Collections.Concurrent;
-using QuickFiler.Viewers;
-using System.Globalization;
 using System.Diagnostics;
-using static Microsoft.FSharp.Core.ByRefKinds;
 using System.Timers;
 
 namespace QuickFiler.Controllers

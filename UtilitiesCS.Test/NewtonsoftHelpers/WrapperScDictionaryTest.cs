@@ -62,7 +62,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
         private class RemainingObjectClass1
         {            
-            public SmartSerializableConfig Config { get; set; }
+            public NewSmartSerializableConfig Config { get; set; }
         }
 
         private class DerivedTest2: NewScDictionary<string, string>

@@ -51,8 +51,8 @@ namespace TaskMaster
         {
             //LoadManagerConfig();
             //ResetLoadManager();
-            ResetLoadManagerLazyConfiguration();
-
+            //ResetLoadManagerLazyConfiguration();
+            Manager = new ManagerAsyncLazy(_parent);
             var tasks = new List<Task>
             {
                 LoadRecentsListAsync(),
@@ -61,7 +61,7 @@ namespace TaskMaster
                 LoadSubjectMapAndEncoderAsync(),
                 LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
-                ResetLoadManagerLazyAsync(),
+                Manager.InitAsync(),
                 //LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
@@ -314,9 +314,11 @@ namespace TaskMaster
             await Task.Run(
                 () =>
                 {
-                    var toRecode = this.SubjectMap.Where(x => x.Encoder is null ||
-                                                              x.FolderEncoded is null ||
-                                                              x.SubjectEncoded is null);
+                    var toRecode = this.SubjectMap
+                        .Where(
+                        x => x.Encoder is null || x.FolderEncoded is null || x.SubjectEncoded is null)
+                        .ToArray();
+
                     if (toRecode.Any())
                     {
                         toRecode.ForEach(x => x.Encoder = this.Encoder);
@@ -380,25 +382,100 @@ namespace TaskMaster
             }
         }
 
-        //using (Stream stream = new MemoryStream(Properties.Resources.manager_config))
-        public async Task<string> LoadResourceFileToStringAsync(string resourceName)
+
+        public ManagerAsyncLazy Manager { get; internal set; } 
+
+        //public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration => _managerConfiguration;
+        //private AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> _managerConfiguration;
+        //public void ResetLoadManagerLazyConfiguration()
+        //{
+        //    _managerConfiguration = new(async () =>
+        //    {
+        //        var resourceManager = ManagerResources.ResourceManager;
+        //        var resourceSet = resourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+        //        var resourceDictionary = await resourceSet
+        //            .Cast<DictionaryEntry>()
+        //            .ToDictionary<string, string>()
+        //            .ToAsyncEnumerable()
+        //            .SelectAwait(async kvp =>
+        //            {
+        //                var loader = await NewSmartSerializableLoader.DeserializeAsync(_parent, kvp.Value);
+        //                return new KeyValuePair<string, NewSmartSerializableLoader>(kvp.Key, loader);
+        //            }).ToConcurrentDictionaryAsync();
+
+        //        return resourceDictionary;
+        //    });
+        //}
+                
+        //public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(NewSmartSerializableLoader loader)
+        //{
+        //    return new AsyncLazy<BayesianClassifierGroup>(async () => await BayesianClassifierGroup.Static.DeserializeAsync(loader));
+        //}
+                
+        //public ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> Manager { get; private set; } = [];
+        //public async Task ResetLoadManagerLazyAsync() 
+        //{
+        //    if (ManagerConfiguration is null) { ResetLoadManagerLazyConfiguration(); }
+        //    foreach (var configuration in await ManagerConfiguration)
+        //    {                
+        //        if (configuration.Value.Activated)
+        //        {
+        //            var classifierGroup = GetClassifierAsyncLazy(configuration.Value);
+        //            if (classifierGroup != null) { Manager[configuration.Value.Name] = classifierGroup; }
+        //        }
+        //        else
+        //        {
+        //            Manager.TryRemove(configuration.Key, out _);
+        //        }
+        //    }
+        //}
+                
+        private ProgressTrackerPane _progressTracker;
+        public ProgressTrackerPane ProgressTracker => _progressTracker;
+        private Microsoft.Office.Tools.CustomTaskPane _progressPane;
+        public Microsoft.Office.Tools.CustomTaskPane ProgressPane => _progressPane;
+        private void LoadProgressPane(CancellationTokenSource tokenSource)
         {
-            string result = string.Empty;
-            var assembly = Assembly.GetExecutingAssembly();
-
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            if (_progressTracker is null)
             {
-                if (stream is null)
-                {
-                    logger.Error($"Resource '{resourceName}' not found.");
-                    return result;
-                }
-                using StreamReader reader = new(stream);
-                result = await reader.ReadToEndAsync();
+                _progressTracker = new ProgressTrackerPane(tokenSource);
+                _progressPane = Globals.ThisAddIn.CustomTaskPanes.Add(
+                    _progressTracker.ProgressViewer, "Progress Tracker");
+                _progressPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionBottom;
             }
-
-            return result;
         }
+
+        public CancellationTokenSource CancelSource { get; private set; } = new();
+        public CancellationToken CancelToken => Initializer.GetOrLoad(ref _token, LoadToken);
+        private CancellationToken _token;
+        private CancellationToken LoadToken() => CancelSource.Token;
+        
+        #region Unused Commented Code
+
+        //using (Stream stream = new MemoryStream(Properties.Resources.manager_config))
+        //public async Task<string> LoadResourceFileToStringAsync(string resourceName)
+        //{
+        //    string result = string.Empty;
+        //    var assembly = Assembly.GetExecutingAssembly();
+
+        //    using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+        //    {
+        //        if (stream is null)
+        //        {
+        //            logger.Error($"Resource '{resourceName}' not found.");
+        //            return result;
+        //        }
+        //        using StreamReader reader = new(stream);
+        //        result = await reader.ReadToEndAsync();
+        //    }
+
+        //    return result;
+        //}
+
+
+        #endregion Unused Commented Code
+
+        #region Obsolete And Commented
 
         //[Obsolete]
         //private Lazy<ConcurrentDictionary<string, byte[]>> _binaryResources = new(() =>
@@ -414,28 +491,6 @@ namespace TaskMaster
         //});
         //[Obsolete]
         //public ConcurrentDictionary<string, byte[]> BinaryResources => _binaryResources.Value;
-
-        public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration => _managerConfiguration;
-        private AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> _managerConfiguration;
-        public void ResetLoadManagerLazyConfiguration()
-        {
-            _managerConfiguration = new(async () =>
-            {
-                var resourceManager = ManagerResources.ResourceManager;
-                var resourceSet = resourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
-                var resourceDictionary = await resourceSet
-                    .Cast<DictionaryEntry>()
-                    .ToDictionary<string, string>()
-                    .ToAsyncEnumerable()
-                    .SelectAwait(async kvp =>
-                    {
-                        var loader = await NewSmartSerializableLoader.DeserializeAsync(_parent, kvp.Value);
-                        return new KeyValuePair<string, NewSmartSerializableLoader>(kvp.Key, loader);
-                    }).ToConcurrentDictionaryAsync();
-
-                return resourceDictionary;
-            });
-        }
 
         //[Obsolete]
         //public string[] GetManifestResourceNames()
@@ -471,11 +526,6 @@ namespace TaskMaster
         //    //_manager2 = mgr;
         //}
 
-        public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(NewSmartSerializableLoader loader)
-        {
-            return new AsyncLazy<BayesianClassifierGroup>(async () => await BayesianClassifierGroup.Static.DeserializeAsync(loader));
-        }
-
         //[Obsolete]
         //public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(string classifierName, string configName)
         //{
@@ -490,25 +540,6 @@ namespace TaskMaster
         //    });
         //}
 
-        private ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> _managerLazy = [];
-        public ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy => _managerLazy;
-        public async Task ResetLoadManagerLazyAsync() 
-        {
-            if (ManagerConfiguration is null) { ResetLoadManagerLazyConfiguration(); }
-            foreach (var configuration in await ManagerConfiguration)
-            {                
-                if (configuration.Value.Activated)
-                {
-                    var classifierGroup = GetClassifierAsyncLazy(configuration.Value);
-                    if (classifierGroup != null) { ManagerLazy[configuration.Value.Name] = classifierGroup; }
-                }
-                else
-                {
-                    ManagerLazy.TryRemove(configuration.Key, out _);
-                }
-            }
-        }
-
         //[Obsolete]
         //public void ResetLoadManagerLazyOld()
         //{
@@ -518,7 +549,7 @@ namespace TaskMaster
         //        {"Folder", "ConfigFolder"},
         //        {"Triage", "ConfigTriage" }
         //    };
-            
+
         //    foreach (var classifier in classifierConfigs)
         //    {
         //        var value = GetClassifierAsyncLazy(classifier.Key, classifier.Value);
@@ -535,7 +566,7 @@ namespace TaskMaster
         //{
         //    var network = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrPythonStaging);
         //    var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
-            
+
         //    var local = new FilePathHelper(_defaults.File_ClassifierManager, _parent.FS.FldrAppData);
         //    var localDt = File.Exists(local.FilePath) ? File.GetLastWriteTimeUtc(local.FilePath) : default;
 
@@ -553,7 +584,7 @@ namespace TaskMaster
 
         //    var localSettings = GetSettings(false);
         //    var networkSettings = GetSettings(true);
-            
+
         //    var manager = GetManager(local, localSettings);
         //    manager.NetDisk = network;
         //    manager.NetJsonSettings = networkSettings;
@@ -622,29 +653,7 @@ namespace TaskMaster
         //    _manager.Serialize();
         //}
 
-        private ProgressTrackerPane _progressTracker;
-        public ProgressTrackerPane ProgressTracker => _progressTracker;
-        private Microsoft.Office.Tools.CustomTaskPane _progressPane;
-        public Microsoft.Office.Tools.CustomTaskPane ProgressPane => _progressPane;
-        private void LoadProgressPane(CancellationTokenSource tokenSource)
-        {
-            if (_progressTracker is null)
-            {
-                _progressTracker = new ProgressTrackerPane(tokenSource);
-                _progressPane = Globals.ThisAddIn.CustomTaskPanes.Add(
-                    _progressTracker.ProgressViewer, "Progress Tracker");
-                _progressPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionBottom;
-            }
-        }
+        #endregion Obsolete And Commented
 
-        public CancellationTokenSource CancelSource => _tokenSource;
-        private CancellationTokenSource _tokenSource = new();
-        public CancellationToken CancelToken => Initializer.GetOrLoad(ref _token, LoadToken);
-        private CancellationToken _token;
-        private CancellationToken LoadToken()
-        {
-            return _tokenSource.Token;
-        }
-            
     }
 }

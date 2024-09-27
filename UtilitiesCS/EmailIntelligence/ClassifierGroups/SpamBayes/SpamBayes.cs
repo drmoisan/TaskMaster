@@ -13,6 +13,7 @@ using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config;
 
 namespace UtilitiesCS.EmailIntelligence
 {
@@ -34,16 +35,23 @@ namespace UtilitiesCS.EmailIntelligence
         public async Task<SpamBayes> Init() 
         {
             Globals.ThrowIfNull();
-            
-            SpamHamGroup = await Globals.AF.ManagerLazy["Spam"];
-            Tokenize = TokenizeEmail;
-            TokenizeAsync = TokenizeEmailAsync;
-            CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
-            CalculateProbabilityAsync = SpamHamGroup.Classifiers["Spam"].Chi2SpamProbAsync;
-            CallbackAsync = TrainCallbackAsync;
-            Threshhold = new TristateThreshhold(0.8, 0.2);
-            
-            return this; 
+
+            Globals.AF.Manager.TryGetValue("Spam", out var spamHamGroupTask);
+            if (spamHamGroupTask is not null)
+            {
+                SpamHamGroup = await spamHamGroupTask;
+                Tokenize = TokenizeEmail;
+                TokenizeAsync = TokenizeEmailAsync;
+                CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
+                CalculateProbabilityAsync = SpamHamGroup.Classifiers["Spam"].Chi2SpamProbAsync;
+                CallbackAsync = TrainCallbackAsync;
+                Threshhold = new TristateThreshhold(0.8, 0.2);
+                return this; 
+            }
+            else
+            {
+                return null;
+            }
         }
 
 
@@ -61,25 +69,29 @@ namespace UtilitiesCS.EmailIntelligence
         {            
             try
             {
-                Globals.ThrowIfNull().AF.ThrowIfNull().ManagerLazy.ThrowIfNull();
+                Globals.ThrowIfNull().AF.ThrowIfNull().Manager.ThrowIfNull();
             }
             catch (ArgumentNullException e)
             {
                 return (false, e.Message);
             }
 
-            if (!Globals.AF.ManagerLazy.TryGetValue(GroupName, out var classifierGroupTask))
+            if (!Globals.AF.Manager.TryGetValue(GroupName, out var classifierGroupTask))
             {
                 return (false, $"No classifier group named {GroupName} was found in manager.");
             }
             else
             {
                 var classifierGroup = await classifierGroupTask;
-                foreach (var name in ClassNames)
+                if (classifierGroup is null) {return (false, $"No classifier group named {GroupName} was found in manager."); }
+                else
                 {
-                    if (!classifierGroup.Classifiers.TryGetValue(name, out var classifier))
+                    foreach (var name in ClassNames)
                     {
-                        return (false, $"{GroupName} classifier group cannot find classifier named {name}.");
+                        if (!classifierGroup.Classifiers.TryGetValue(name, out var classifier))
+                        {
+                            return (false, $"{GroupName} classifier group cannot find classifier named {name}.");
+                        }
                     }
                 }
                 return (true, "");
@@ -96,7 +108,7 @@ namespace UtilitiesCS.EmailIntelligence
 
                 case Enums.NotFoundEnum.Create:
                     logger.Warn($"{message} Creating new classifier");
-                    Globals.AF.ManagerLazy[GroupName] = (await CreateSpamClassifiersAsync(cancel)).ToAsyncLazy();
+                    Globals.AF.Manager[GroupName] = (await CreateSpamClassifiersAsync(cancel)).ToAsyncLazy();
                     return true;
 
                 case Enums.NotFoundEnum.Throw:
@@ -113,8 +125,8 @@ namespace UtilitiesCS.EmailIntelligence
                     if (result == DialogResult.Yes)
                     {
                         SpamHamGroup = await CreateSpamClassifiersAsync(cancel);
-                        Globals.AF.ManagerLazy[GroupName] = SpamHamGroup.ToAsyncLazy();
-                        if ((await Globals.AF.ManagerConfiguration)?.TryGetValue("ConfigSpam", out var loader) ?? false && loader is not null)
+                        Globals.AF.Manager[GroupName] = SpamHamGroup.ToAsyncLazy();
+                        if ((await Globals.AF.Manager.ManagerConfiguration)?.TryGetValue("ConfigSpam", out var loader) ?? false && loader is not null)
                         {
                             SpamHamGroup.Config = loader.Config;
                             SpamHamGroup.Serialize();
@@ -187,8 +199,52 @@ namespace UtilitiesCS.EmailIntelligence
 
         #endregion public Properties
 
+        public bool IsActivated => SpamHamGroup is not null;
+                
+        public async Task ToggleActivationAsync() 
+        {
+            var configurations = await Globals.AF.Manager.ManagerConfiguration;
+            if (configurations.TryGetValue("ConfigSpam", out var loader))
+            {
+                loader.Activated = !loader.Activated;
+                SpamHamGroup = loader.Activated ? await Globals.AF.Manager["Spam"]: null;
+            }
+            else
+            {
+                MessageBox.Show("Could not find configuration for SpamBayes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public async Task ShowDiskDialogue(bool local)
+        {
+            if (local) { SpamHamGroup.Config.ActivateLocalDisk(); }
+            else { SpamHamGroup.Config.ActivateNetDisk(); }
+            var response = MessageBox.Show($"SpamBayes is now using {(local ? "local" : "network")} disk. Would you like to save the current classifier?",
+                "Save Configuration",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+            if (response == DialogResult.Yes) { SpamHamGroup.Serialize(); }
+            else
+            {
+                response = MessageBox.Show($"Would you like to reload the classifier from {(local ? "local" : "network")}", "Reload Classifier", 
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.Yes) 
+                {
+                    await Globals.AF.Manager.ResetLoadManagerLazyAsync();
+                    Globals.AF.Manager.TryGetValue("Spam", out var spamHamGroupTask);
+                    if (spamHamGroupTask is not null)
+                    {
+                        SpamHamGroup = await spamHamGroupTask;
+                        CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
+                        CalculateProbabilityAsync = SpamHamGroup.Classifiers["Spam"].Chi2SpamProbAsync;                        
+                    }
+                }
+            }
+        }
+
         public async Task TestAsync(Selection selection)
         {
+            if (SpamHamGroup is null) { return; }
             foreach (object item in selection)
             {
                 if (item is MailItem mailItem)
@@ -219,6 +275,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task TrainAsync(Selection selection, bool isSpam)
         {
+            if (SpamHamGroup is null) { return; }
             foreach (object item in selection)
             {
                 if (item is MailItem mailItem)
@@ -307,6 +364,8 @@ namespace UtilitiesCS.EmailIntelligence
         #region Not Implemented
 
         public override void Train(string[] tokens, bool isSpam) { throw new NotImplementedException(); }
+
+        public void ShowSaveInfo() => ConfigController.Show(Globals, SpamHamGroup.Config);
 
         #endregion Not Implemented
 

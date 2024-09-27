@@ -9,7 +9,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel
 {
-    public class ProgramData: ScDictionary<string, int>
+    public class ProgramData: NewScDictionary<string, int>
     {
         #region Constructors
 
@@ -20,7 +20,7 @@ namespace ToDoModel
         public ProgramData(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { ism = new(this); }
         public ProgramData(int concurrencyLevel, IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) : base(concurrencyLevel, collection, comparer) { ism = new(this); }
         public ProgramData(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) : base(concurrencyLevel, capacity, comparer) { ism = new(this); }
-        public ProgramData(ScDictionary<string, int> dictionary) : base(dictionary) { }
+        public ProgramData(NewScDictionary<string, int> dictionary) : base(dictionary) { }
 
         #endregion Constructors
 
@@ -29,13 +29,13 @@ namespace ToDoModel
         public new static class Static
         {         
             public static ProgramData Deserialize(string fileName, string folderPath) =>
-                new ProgramData(ScDictionary<string, int>.Static.Deserialize(fileName, folderPath));
+                new ProgramData(NewScDictionary<string, int>.Static.Deserialize(fileName, folderPath));
 
             public static ProgramData Deserialize(string fileName, string folderPath, bool askUserOnError) =>
-                new ProgramData(ScDictionary<string, int>.Static.Deserialize(fileName, folderPath, askUserOnError));
+                new ProgramData(NewScDictionary<string, int>.Static.Deserialize(fileName, folderPath, askUserOnError));
 
             public static ProgramData Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
-                new ProgramData(ScDictionary<string, int>.Static.Deserialize(fileName, folderPath, askUserOnError, settings));
+                new ProgramData(NewScDictionary<string, int>.Static.Deserialize(fileName, folderPath, askUserOnError, settings));
         }
 
         #endregion Deserialization

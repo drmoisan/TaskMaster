@@ -35,7 +35,6 @@ namespace UtilitiesCS.ReusableTypeClasses
                 ResetLazy();
             }
 
-
             private void ResetLazy()
             {
                 base.Config.ResetLazy(
@@ -45,7 +44,11 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
 
             protected bool _activated;
-            public bool Activated { get => _activated; set { _activated = value; Notify(); }}
+            public bool Activated 
+            { 
+                get => _activated; 
+                set { _activated = value; Notify(); }
+            }
 
             [JsonProperty]
             internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
@@ -176,8 +179,6 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
 
             #region INotifyPropertyChanged
-
-            public void PropertyChangedHandler(object sender, PropertyChangedEventArgs e) => Serialize();
 
             public event PropertyChangedEventHandler PropertyChanged;
 

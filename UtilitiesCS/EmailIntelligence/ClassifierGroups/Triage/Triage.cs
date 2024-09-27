@@ -38,7 +38,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
             TokenizeAsync = new EmailTokenizer().TokenizeAsync;
             CallbackAsync = (item, value) => Task.Run(() => ((MailItem)item).SetUdf("Triage", value));
             
-            ClassifierGroup = await Globals.AF.ManagerLazy[GroupName];
+            ClassifierGroup = await Globals.AF.Manager[GroupName];
             return this;
         }
 
@@ -60,14 +60,14 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
         {
             try
             {
-                Globals.ThrowIfNull().AF.ThrowIfNull().ManagerLazy.ThrowIfNull();
+                Globals.ThrowIfNull().AF.ThrowIfNull().Manager.ThrowIfNull();
             }
             catch (ArgumentNullException e)
             {
                 return (false, e.Message);
             }
 
-            if (!Globals.AF.ManagerLazy.TryGetValue(GroupName, out var classifierGroupTask))
+            if (!Globals.AF.Manager.TryGetValue(GroupName, out var classifierGroupTask))
             {
                 return (false, $"No classifier group named {GroupName} was found in manager.");
             }
@@ -96,12 +96,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
                 case Enums.NotFoundEnum.Create:
                     logger.Warn($"{message} Creating new classifier");
                     ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
-                    if ((await Globals.AF.ManagerConfiguration).TryGetValue($"Config{GroupName}", out var loader))
+                    if ((await Globals.AF.Manager.ManagerConfiguration).TryGetValue($"Config{GroupName}", out var loader))
                     {
                         ClassifierGroup.Config = loader.Config;
                         ClassifierGroup.Serialize();
                     }
-                    Globals.AF.ManagerLazy[GroupName] = ClassifierGroup.ToAsyncLazy();
+                    Globals.AF.Manager[GroupName] = ClassifierGroup.ToAsyncLazy();
                     return true;
 
                 case Enums.NotFoundEnum.Throw:
@@ -118,12 +118,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
                     if (result == DialogResult.Yes)
                     {
                         ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
-                        if ((await Globals.AF.ManagerConfiguration).TryGetValue($"Config{GroupName}", out loader))
+                        if ((await Globals.AF.Manager.ManagerConfiguration).TryGetValue($"Config{GroupName}", out loader))
                         {
                             ClassifierGroup.Config = loader.Config;
                             ClassifierGroup.Serialize();
                         }
-                        Globals.AF.ManagerLazy[GroupName] = ClassifierGroup.ToAsyncLazy();
+                        Globals.AF.Manager[GroupName] = ClassifierGroup.ToAsyncLazy();
                         return true;
                     }
                     else
@@ -205,12 +205,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
             await Task.Run(async () =>
             {
                 ClassifierGroup = new BayesianClassifierGroup();
-                if ((await Globals.AF.ManagerConfiguration).TryGetValue($"Config{GroupName}", out var loader)) 
+                if ((await Globals.AF.Manager.ManagerConfiguration).TryGetValue($"Config{GroupName}", out var loader)) 
                 { 
                     ClassifierGroup.Config = loader.Config;
                     ClassifierGroup.Serialize();
                 }
-                Globals.AF.ManagerLazy[GroupName] = ClassifierGroup.ToAsyncLazy();
+                Globals.AF.Manager[GroupName] = ClassifierGroup.ToAsyncLazy();
                 
             }, token);
         }

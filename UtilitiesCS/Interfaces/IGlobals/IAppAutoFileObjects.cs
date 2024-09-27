@@ -30,8 +30,9 @@ namespace UtilitiesCS
         ScoStack<IMovedMailInfo> MovedMails { get; }
         ScoCollection<FilterEntry> Filters { get; }
 
-        AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration { get; }
-        ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> ManagerLazy { get; }
+        //AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration { get; }
+        //ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> Manager { get; }
+        ManagerAsyncLazy Manager { get; }
 
         //[Obsolete]
         //ScDictionary<string, BayesianClassifierGroup> Manager { get; }

@@ -120,7 +120,7 @@ namespace UtilitiesCS
             return reader.Value as string ?? "";
         }
 
-        internal (string Name, string RelativePath) GetSerializablePath(string folderPath)
+        public (string Name, string RelativePath) GetSerializablePath(string folderPath)
         {
             string name = "";
             string relativePath = "";

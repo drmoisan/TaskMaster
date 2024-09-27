@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TaskMaster {
+namespace UtilitiesCS {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TaskMaster {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TaskMaster.ManagerResources", typeof(ManagerResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UtilitiesCS.ManagerResources", typeof(ManagerResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

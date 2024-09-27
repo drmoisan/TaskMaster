@@ -2,6 +2,7 @@
 using Office = Microsoft.Office.Core;
 using Microsoft.VisualBasic;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace TaskMaster
 {
@@ -111,24 +112,9 @@ namespace TaskMaster
 
         public void BtnPopulateUdf_Click(Office.IRibbonControl control) => _controller.PopulateUdf();
         
-        //public void QuickFilerOld_Click(Office.IRibbonControl control)
-        //{
-        //    _controller.LoadQuickFilerOld();
-        //}
-
-        //public void QuickFiler_Click(Office.IRibbonControl control)
-        //{
-        //    _controller.LoadQuickFiler();
-        //}
-
         public async void QuickFiler_Click(Office.IRibbonControl control)
         {
             await _controller.LoadQuickFilerAsync();
-        }
-
-        public void Runtest(Office.IRibbonControl control)
-        {
-            _controller.RunTry();
         }
 
         public async void SortEmail_Click(Office.IRibbonControl control) => await _controller.SortEmailAsync();
@@ -136,7 +122,6 @@ namespace TaskMaster
         public async void UndoSort_Click(Office.IRibbonControl control) => await _controller.UndoSortAsync();
 
         public async void FindFolder_Click(Office.IRibbonControl control) => await _controller.FindFolderAsync();
-
 
         public bool ToggleDarkMode_GetPressed(Office.IRibbonControl control) => _controller.IsDarkModeActive();
         public void ToggleDarkMode_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleDarkMode();
@@ -162,8 +147,8 @@ namespace TaskMaster
 
         #region BayesianPerformance
 
-        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierAsync();
-        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.TryTestClassifierVerboseAsync();
+        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryTestClassifierAsync();
+        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.Try.TryTestClassifierVerboseAsync();
         public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDriversAsync();
         public async void ChartMetrics_Click(Office.IRibbonControl control) => await _controller.TryChartMetricsAsync();
         public async void InvestigateErrors_Click(Office.IRibbonControl control) => await _controller.InvestigateErrorsAsync();
@@ -186,6 +171,15 @@ namespace TaskMaster
         public void SpamMetrics_Click(Office.IRibbonControl control) => Controller.SpamMetrics();
         public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => Controller.SpamInvestigateErrors();
 
+        #region Spam Config
+        
+        public async void SpamBayesEnabled_Click(Office.IRibbonControl control) => await (await Controller.SB).ToggleActivationAsync();
+        public async Task<bool> SpamBayesEnabled_GetPressed(Office.IRibbonControl control) => (await Controller.SB).IsActivated;
+        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialogue(false);
+        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialogue(true);
+        public async void GetSaveLocation_Click(Office.IRibbonControl control) => (await Controller.SB).ShowSaveInfo();
+
+        #endregion Spam Config
 
         #endregion Spam Manager
 
@@ -201,30 +195,31 @@ namespace TaskMaster
         #endregion Triage
 
         #region TryMethods  
-        public void NewTaskHeader_Click(Office.IRibbonControl control) => _controller.TryNewTaskHeader();
+        public void NewTaskHeader_Click(Office.IRibbonControl control) => _controller.Try.TryNewTaskHeader();
         public void DeepCompareEmails_Click(Office.IRibbonControl control) => _controller.TryDeepCompareEmails();
-        public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
-        public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();
-        public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();
-        public void GetQfcDataModel_Click(Office.IRibbonControl control) => _controller.TryGetQfcDataModel();
-        public void GetTableInView_Click(Office.IRibbonControl control) => _controller.TryGetTableInView();
-        public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.TryRebuildProjInfo();
-        public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.TryRecipientGetInfo();
-        public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.TrySubstituteIdRoot();
-        public void GetImage_Click(Office.IRibbonControl control) => _controller.TryGetImage();
-        public void LoadFolderFilter_Click(Office.IRibbonControl control) => _controller.TryLoadFolderFilter();
-        public void LoadFolderRemap_Click(Office.IRibbonControl control) => _controller.TryLoadFolderRemap();
-        public async void RebuildSubjectMap_Click(Office.IRibbonControl control) => await _controller.RebuildSubjectMapAsync();
-        public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.ShowSubjectMapMetrics();
-        public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.TryTokenizeEmail();
-        public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.TryMineEmails();
-        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.TryBuildClassifier();        
-        public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.TryPrintManagerState();
-        public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.TrySerializeMailInfo();
-        public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
-        public async void Intelligence_Click(Office.IRibbonControl control) => await _controller.IntelligenceAsync();
+        public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.Try.TryGetConversationDataframe();
+        public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.Try.TryGetConversationOutlookTable();
+        public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.Try.TryGetMailItemInfo();
+        public void GetQfcDataModel_Click(Office.IRibbonControl control) => _controller.Try.TryGetQfcDataModel();
+        public void GetTableInView_Click(Office.IRibbonControl control) => _controller.Try.TryGetTableInView();
+        public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.Try.TryRebuildProjInfo();
+        public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.Try.TryRecipientGetInfo();
+        public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.Try.TrySubstituteIdRoot();
+        public void GetImage_Click(Office.IRibbonControl control) => _controller.Try.TryGetImage();
+        public void LoadFolderFilter_Click(Office.IRibbonControl control) => _controller.Try.TryLoadFolderFilter();
+        public void LoadFolderRemap_Click(Office.IRibbonControl control) => _controller.Try.TryLoadFolderRemap();
+        public async void RebuildSubjectMap_Click(Office.IRibbonControl control) => await _controller.Try.RebuildSubjectMapAsync();
+        public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.Try.ShowSubjectMapMetrics();
+        public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.Try.TryTokenizeEmail();
+        public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.Try.TryMineEmails();
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();        
+        public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.Try.TryPrintManagerState();
+        public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.Try.TrySerializeMailInfo();
 
         #endregion
+
+        public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
+        public async void Intelligence_Click(Office.IRibbonControl control) => await _controller.IntelligenceAsync();
 
         #region Helpers
 

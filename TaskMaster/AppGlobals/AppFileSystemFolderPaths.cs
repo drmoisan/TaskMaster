@@ -8,9 +8,7 @@ namespace TaskMaster
 {
 
     public class AppFileSystemFolderPaths : IFileSystemFolderPaths
-    {
-        
-
+    {       
         public AppFileSystemFolderPaths()
         {
             LoadFolders();

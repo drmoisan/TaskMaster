@@ -117,33 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ConfigSpam" xml:space="preserve">
-    <value>{
-  "$id": "1",
-  "Activated": true,
-  "Globals": "default",
-  "Name": "Spam",
-  "Config": {
-    "$id": "2",
-    "Disk": {
-      "FileName": "ManagerSpam.json",
-      "RelativePath": "",
-      "SpecialFolderName": "AppData"
-    },
-    "LocalDisk": {
-      "FileName": "ManagerSpam.json",
-      "RelativePath": "",
-      "SpecialFolderName": "AppData"
-    },
-    "NetDisk": {
-      "FileName": "ManagerSpam.json",
-      "RelativePath": "",
-      "SpecialFolderName": "Flow"
-    },
-    "ClassifierActivated": false
-  }
-}</value>
-  </data>
   <data name="ConfigFolder" xml:space="preserve">
     <value>{
   "$id": "1",
@@ -164,6 +137,33 @@
     },
     "NetDisk": {
       "FileName": "ManagerFolder.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": false
+  }
+}</value>
+  </data>
+  <data name="ConfigSpam" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Activated": true,
+  "Globals": "default",
+  "Name": "Spam",
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerSpam.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerSpam.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerSpam.json",
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },

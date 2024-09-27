@@ -27,7 +27,7 @@ namespace SVGControl
         }
 
         private void ButtonSVG_Resize(object sender, EventArgs e)
-        {
+        {            
             _imageSVG.Outer = this.Size;
         }
 

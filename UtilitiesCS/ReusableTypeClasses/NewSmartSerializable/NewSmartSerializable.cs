@@ -134,7 +134,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
                 var settings = loader.Config.JsonSettings.ThrowIfNull();
-                return DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
+                T instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
+                if (instance is not null) { instance.Config = loader.Config; }
+                return instance;
             }
             catch (ArgumentNullException e)
             {
@@ -194,7 +196,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             var instance = JsonConvert.DeserializeObject<T>(
                 File.ReadAllText(disk.FilePath), settings);
-            instance.Config.JsonSettings = settings;
+            if (instance is not null) { instance.Config.JsonSettings = settings; }
             return instance;
         }
 
@@ -236,6 +238,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         private Func<string, StreamWriter> _createStreamWriter = File.CreateText;
         protected Func<string, StreamWriter> CreateStreamWriter { get => _createStreamWriter; set => _createStreamWriter = value; }
 
+        
         public void SerializeThreadSafe(string filePath)
         {
             _parent.ThrowIfNull($"{nameof(NewSmartSerializable<T>)}.{nameof(_parent)} is null. It must be linked to the instance it is serializing.");
@@ -246,20 +249,9 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     using (StreamWriter sw = CreateStreamWriter(filePath))
                     {
-                        var serializer = JsonSerializer.Create(Config.JsonSettings);
-                        
-                        if (Config.JsonSettings.TypeNameHandling == TypeNameHandling.Auto)
-                        {
-                            serializer.Serialize(sw, _parent, _parent.GetType());
-                        }
-                        else
-                        {
-                            serializer.Serialize(sw, _parent);
-                        }
-                        
+                        SerializeToStream(sw);
                         sw.Close();
-                        _serializationRequested = new ThreadSafeSingleShotGuard();
-                    }
+                    }                    
                 }
                 catch (System.Exception e)
                 {
@@ -269,11 +261,46 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     // Release lock
                     _readWriteLock.ExitWriteLock();
+                    _serializationRequested = new ThreadSafeSingleShotGuard();
                 }
             }
 
         }
-        
+
+        public string SerializeToString()
+        {
+            using var memoryStream = new MemoryStream();
+            using var streamWriter = new StreamWriter(memoryStream);
+            try
+            {
+                SerializeToStream(streamWriter);
+                streamWriter.Flush();
+                memoryStream.Position = 0;
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error serializing to string", e);
+                return "";
+            }
+            using var streamReader = new StreamReader(memoryStream);
+            return streamReader.ReadToEnd();
+        }
+
+        public void SerializeToStream(StreamWriter sw)
+        {
+            sw.ThrowIfNull();
+            var serializer = JsonSerializer.Create(Config.JsonSettings);
+
+            if (Config.JsonSettings.TypeNameHandling == TypeNameHandling.Auto)
+            {
+                serializer.Serialize(sw, _parent, _parent.GetType());
+            }
+            else
+            {
+                serializer.Serialize(sw, _parent);
+            }
+        }
+
         private ThreadSafeSingleShotGuard _serializationRequested = new();
         private TimerWrapper _timer;
         protected void RequestSerialization(string filePath)

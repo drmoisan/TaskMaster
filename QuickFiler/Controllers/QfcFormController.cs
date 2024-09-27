@@ -629,7 +629,7 @@ namespace QuickFiler.Controllers
                 if (_undoQueue.TryTake(out var item))
                 {
                     var helper = await MailItemHelper.FromMailItemAsync(item.MailItem, _globals, default, true);
-                    (await _globals.AF.ManagerLazy["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
+                    (await _globals.AF.Manager["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                     var mail = item.UndoMove();
                     await UiThread.Dispatcher.InvokeAsync(
                         () => _groups.AddItemGroup(mail),

@@ -533,6 +533,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
+    <Compile Include="EmailIntelligence\ManagerAsyncLazy.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
@@ -541,6 +542,11 @@
     <Compile Include="HelperClasses\ReflectionHelper.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
+    <Compile Include="ManagerResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ManagerResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder.cs" />
     <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtension.cs" />
     <Compile Include="NewtonsoftHelpers\NonRecursiveConverter.cs" />
@@ -626,12 +632,19 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.Designer.cs">
+      <DependentUpon>ConfigViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\INewSmartSerializable.cs" />
-    <Compile Include="ReusableTypeClasses\NewSmartSerializable\INewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\INewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewProgramData.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializable.cs" />
-    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableLoader.cs" />
     <Compile Include="ReusableTypeClasses\ScBag.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializable.cs" />
@@ -875,6 +888,13 @@
     <EmbeddedResource Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.resx">
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ManagerResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.resx">
+      <DependentUpon>ConfigViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Threading\ProgressPane.resx">
       <DependentUpon>ProgressPane.cs</DependentUpon>
     </EmbeddedResource>
@@ -903,6 +923,7 @@
     <Content Include="Resources\Cancel.png" />
     <Content Include="Resources\Cancel.svg" />
     <None Include="Resources\charset_lookup.json" />
+    <None Include="Resources\CancelBlue.svg" />
     <Content Include="Resources\Cloud.svg" />
     <Content Include="Resources\CSEventReceiver.svg" />
     <Content Include="Resources\CSWorkflowAssociationForm.svg" />
@@ -911,6 +932,7 @@
     <Content Include="Resources\EventTracepointOn.svg" />
     <Content Include="Resources\ExceptionPublic.png" />
     <Content Include="Resources\ExclamationPoint.svg" />
+    <None Include="Resources\Folder Open.svg" />
     <Content Include="Resources\FolderError.svg" />
     <Content Include="Resources\History.svg" />
     <Content Include="Resources\LibraryWarning.svg" />
@@ -935,6 +957,8 @@
     <Content Include="Resources\RepeatUntilFailure.svg" />
     <Content Include="Resources\Run.png" />
     <Content Include="Resources\Run.svg" />
+    <None Include="Resources\Save.svg" />
+    <None Include="Resources\SaveAs.svg" />
     <Content Include="Resources\ScatterLineChart.svg" />
     <Content Include="Resources\SearchFolderClosed.svg" />
     <Content Include="Resources\ShowAssignedConfigurations.svg" />
