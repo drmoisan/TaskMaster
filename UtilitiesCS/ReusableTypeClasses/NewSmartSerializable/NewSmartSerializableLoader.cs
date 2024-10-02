@@ -50,6 +50,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 set { _activated = value; Notify(); }
             }
 
+            protected bool _engine;
+            public bool Engine
+            {
+                get => _engine;
+                set { _engine= value; Notify(); }
+            }
+
             [JsonProperty]
             internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
             private IApplicationGlobals _globals;

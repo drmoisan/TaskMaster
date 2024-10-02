@@ -161,6 +161,13 @@ namespace UtilitiesCS.Extensions
         }
 
         public static async Task<ConcurrentDictionary<TKey, TElement>> ToConcurrentDictionaryAsync<TSource, TKey, TElement>(
+            this IAsyncEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
+        {
+            var d = await source.ToConcurrentDictionaryAsync(keySelector, elementSelector, new ConcurrentDictionary<TKey, TElement>(), default);
+            return d;
+        }
+
+        public static async Task<ConcurrentDictionary<TKey, TElement>> ToConcurrentDictionaryAsync<TSource, TKey, TElement>(
             this IAsyncEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer, CancellationToken cancellationToken)
         {

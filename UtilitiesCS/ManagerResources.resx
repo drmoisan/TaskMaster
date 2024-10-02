@@ -117,10 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ConfigFolder" xml:space="preserve">
+  <data name="Folder" xml:space="preserve">
     <value>{
   "$id": "1",
   "Activated": true,
+  "Engine": false,
   "Globals": "default",
   "Name": "Folder",
   "Config": {
@@ -144,10 +145,11 @@
   }
 }</value>
   </data>
-  <data name="ConfigSpam" xml:space="preserve">
+  <data name="Spam" xml:space="preserve">
     <value>{
   "$id": "1",
   "Activated": true,
+  "Engine":true,
   "Globals": "default",
   "Name": "Spam",
   "Config": {
@@ -171,10 +173,11 @@
   }
 }</value>
   </data>
-  <data name="ConfigTriage" xml:space="preserve">
+  <data name="Triage" xml:space="preserve">
     <value>{
   "$id": "1",
   "Activated": true,
+  "Engine": true,
   "Globals": "default",
   "Name": "Triage",
   "Config": {

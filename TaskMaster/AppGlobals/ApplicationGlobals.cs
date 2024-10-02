@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
@@ -22,15 +23,20 @@ namespace TaskMaster
             _autoFileObjects = new AppAutoFileObjects(this);
             _events = new AppEvents(this);
             _quickFilerSettings = new AppQuickFilerSettings();
+            Engines = new AppItemEngines(this);
         }
 
         async public Task LoadAsync()
         {
             //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
-
+            //IdleAsyncQueue.AddEntry(false, () => Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync()));
             await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
+            await Engines.InitAsync();
+            //IdleAsyncQueue.AddEntry(false, Engines.InitAsync);
             await _events.LoadAsync();
+            //IdleAsyncQueue.AddEntry(false, _events.LoadAsync);
             //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
+            //await Task.CompletedTask;
         }
 
         private AppFileSystemFolderPaths _fs;
@@ -51,11 +57,13 @@ namespace TaskMaster
         private AppQuickFilerSettings _quickFilerSettings;
         public IAppQuickFilerSettings QfSettings => _quickFilerSettings;
         internal AppQuickFilerSettings InternalQfSettings => _quickFilerSettings;
+        
+        public IAppItemEngines Engines { get; private set; } 
 
         public List<Type> GetClasses()
-        {
-            return ReflectionHelper.GetAllClassesInSolution();
-        }
+            {
+                return ReflectionHelper.GetAllClassesInSolution();
+            }
         
         public string[] GetProjectNames()
         {

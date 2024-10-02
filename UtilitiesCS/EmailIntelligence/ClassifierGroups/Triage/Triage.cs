@@ -13,14 +13,14 @@ using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
 
-namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
+namespace UtilitiesCS.EmailIntelligence
 {
     public class Triage
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Constructors
+        #region ctor
 
         public Triage(
             IApplicationGlobals globals,
@@ -41,6 +41,44 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
             ClassifierGroup = await Globals.AF.Manager[GroupName];
             return this;
         }
+
+        public static async Task<Triage> CreateAsync(
+            IApplicationGlobals globals,
+            bool initialize = true,
+            Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
+            CancellationToken token = default)
+        {
+            var triage = new Triage();
+            triage.Globals = globals;
+
+            if (!await triage.ValidateTriageManagerAsync(
+                triage.HasValidTriageManagerAsync,
+                triage.TriageMissingHandlerAsync,
+                treatment,
+                token)) { return null; }
+
+            return await Task.Run(triage.InitAsync, token);
+
+        }
+
+        public static async Task<ConditionalItemEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
+        {
+            var ce = new ConditionalItemEngine<MailItemHelper>();
+
+            ce.AsyncCondition = (item) => Task.Run(() =>
+                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
+                mailItem.UserProperties.Find("Triage") is null);
+
+            ce.EngineInitializer = async (globals) => ce.Engine = await Triage.CreateAsync(globals);
+            await ce.EngineInitializer(globals);
+            ce.AsyncAction = (item) => ce.Engine is not null ? ((Triage)ce.Engine).TestAsync(item) : null;
+            ce.EngineName = "Triage";
+            ce.Message = $"{ce.EngineName} is null. Skipping actions";
+            
+            return ce;
+        }
+
+        #endregion ctor
 
         public static readonly HashSet<string> ClassNames = ["A", "B", "C"];
         public static readonly string UnknownClassMarker = "U";
@@ -96,7 +134,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
                 case Enums.NotFoundEnum.Create:
                     logger.Warn($"{message} Creating new classifier");
                     ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
-                    if ((await Globals.AF.Manager.ManagerConfiguration).TryGetValue($"Config{GroupName}", out var loader))
+                    if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out var loader))
                     {
                         ClassifierGroup.Config = loader.Config;
                         ClassifierGroup.Serialize();
@@ -118,7 +156,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
                     if (result == DialogResult.Yes)
                     {
                         ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
-                        if ((await Globals.AF.Manager.ManagerConfiguration).TryGetValue($"Config{GroupName}", out loader))
+                        if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out loader))
                         {
                             ClassifierGroup.Config = loader.Config;
                             ClassifierGroup.Serialize();
@@ -136,26 +174,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
                     throw new ArgumentOutOfRangeException(nameof(treatment), "Unknown treatment");
             }
         }
-
-        public static async Task<Triage> CreateAsync(
-            IApplicationGlobals globals,
-            bool initialize = true,
-            Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
-            CancellationToken token = default)
-        {
-            var triage = new Triage();
-            triage.Globals = globals;
-
-            if (!await triage.ValidateTriageManagerAsync(
-                triage.HasValidTriageManagerAsync,
-                triage.TriageMissingHandlerAsync,
-                treatment,
-                token)) { return null; }
-
-            return await Task.Run(triage.InitAsync, token);
-
-        }
-
+                
         public static BayesianClassifierGroup CreateClassifier()
         {
             var group = new BayesianClassifierGroup
@@ -176,7 +195,6 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
             return await Task.Run(CreateClassifier, token);
         }
 
-        #endregion Constructors
 
         #region Properties
 
@@ -205,7 +223,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
             await Task.Run(async () =>
             {
                 ClassifierGroup = new BayesianClassifierGroup();
-                if ((await Globals.AF.Manager.ManagerConfiguration).TryGetValue($"Config{GroupName}", out var loader)) 
+                if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out var loader)) 
                 { 
                     ClassifierGroup.Config = loader.Config;
                     ClassifierGroup.Serialize();

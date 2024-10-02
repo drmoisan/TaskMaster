@@ -384,52 +384,9 @@ namespace TaskMaster
 
 
         public ManagerAsyncLazy Manager { get; internal set; } 
+        
+        
 
-        //public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration => _managerConfiguration;
-        //private AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> _managerConfiguration;
-        //public void ResetLoadManagerLazyConfiguration()
-        //{
-        //    _managerConfiguration = new(async () =>
-        //    {
-        //        var resourceManager = ManagerResources.ResourceManager;
-        //        var resourceSet = resourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
-        //        var resourceDictionary = await resourceSet
-        //            .Cast<DictionaryEntry>()
-        //            .ToDictionary<string, string>()
-        //            .ToAsyncEnumerable()
-        //            .SelectAwait(async kvp =>
-        //            {
-        //                var loader = await NewSmartSerializableLoader.DeserializeAsync(_parent, kvp.Value);
-        //                return new KeyValuePair<string, NewSmartSerializableLoader>(kvp.Key, loader);
-        //            }).ToConcurrentDictionaryAsync();
-
-        //        return resourceDictionary;
-        //    });
-        //}
-                
-        //public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(NewSmartSerializableLoader loader)
-        //{
-        //    return new AsyncLazy<BayesianClassifierGroup>(async () => await BayesianClassifierGroup.Static.DeserializeAsync(loader));
-        //}
-                
-        //public ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> Manager { get; private set; } = [];
-        //public async Task ResetLoadManagerLazyAsync() 
-        //{
-        //    if (ManagerConfiguration is null) { ResetLoadManagerLazyConfiguration(); }
-        //    foreach (var configuration in await ManagerConfiguration)
-        //    {                
-        //        if (configuration.Value.Activated)
-        //        {
-        //            var classifierGroup = GetClassifierAsyncLazy(configuration.Value);
-        //            if (classifierGroup != null) { Manager[configuration.Value.Name] = classifierGroup; }
-        //        }
-        //        else
-        //        {
-        //            Manager.TryRemove(configuration.Key, out _);
-        //        }
-        //    }
-        //}
-                
         private ProgressTrackerPane _progressTracker;
         public ProgressTrackerPane ProgressTracker => _progressTracker;
         private Microsoft.Office.Tools.CustomTaskPane _progressPane;
@@ -545,9 +502,9 @@ namespace TaskMaster
         //{
         //    var classifierConfigs = new Dictionary<string, string>()
         //    {
-        //        {"Spam", "ConfigSpam" },
-        //        {"Folder", "ConfigFolder"},
-        //        {"Triage", "ConfigTriage" }
+        //        {"Spam", "Spam" },
+        //        {"Folder", "Folder"},
+        //        {"Triage", "Triage" }
         //    };
 
         //    foreach (var classifier in classifierConfigs)

@@ -17,7 +17,7 @@ using UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class SpamBayes : TristateEngine
+    public class SpamBayes : TristateEngine, IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -32,7 +32,29 @@ namespace UtilitiesCS.EmailIntelligence
 
         private SpamBayes() : base() { }
 
-        public async Task<SpamBayes> Init() 
+        public static async Task<SpamBayes> CreateAsync(
+            IApplicationGlobals globals,
+            bool initialize = true,
+            Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
+            CancellationToken token = default)
+        {
+            var sb = new SpamBayes();
+            sb.Globals = globals;
+            
+            if (!await sb.ValidateSpamClassifierAsync(
+                sb.HasValidSpamClassifierAsync, 
+                sb.SpamBayesMissingHandlerAsync,
+                treatment, 
+                token)) 
+            { 
+                return null; 
+            }
+
+            return await Task.Run(sb.InitAsync, token);
+
+        }
+
+        public async Task<SpamBayes> InitAsync() 
         {
             Globals.ThrowIfNull();
 
@@ -53,20 +75,42 @@ namespace UtilitiesCS.EmailIntelligence
                 return null;
             }
         }
+                
+        public static BayesianClassifierGroup CreateNewSpamClassifier()
+        {
+            var group = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 0,
+                SharedTokenBase = new Corpus()
+            };
+            foreach (var name in ClassNames)
+            {
+                group.Classifiers[name] = new BayesianClassifierShared(name, group);
+            }
+            return group;
+        }
 
+        public static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
+        {
+            return await Task.Run(CreateNewSpamClassifier, token);            
+        }
 
-        internal async Task<bool> ValidateSpamManagerAsync(
-            Func<CancellationToken, Task<(bool,string)>> asyncValidator,
-            Func<Enums.NotFoundEnum, string, CancellationToken, Task<bool>> asyncAction, 
-            Enums.NotFoundEnum treatment, 
+        #endregion Constructors and Static Methods
+
+        #region Classifier Validation
+
+        internal async Task<bool> ValidateSpamClassifierAsync(
+            Func<CancellationToken, Task<(bool, string)>> asyncValidator,
+            Func<Enums.NotFoundEnum, string, CancellationToken, Task<bool>> asyncAction,
+            Enums.NotFoundEnum treatment,
             CancellationToken cancel)
         {
             var (isValid, message) = await asyncValidator(cancel);
             return isValid ? true : await asyncAction(treatment, message, cancel);
         }
 
-        public async Task<(bool, string)> HasValidSpamManagerAsync(CancellationToken token)
-        {            
+        public async Task<(bool, string)> HasValidSpamClassifierAsync(CancellationToken token)
+        {
             try
             {
                 Globals.ThrowIfNull().AF.ThrowIfNull().Manager.ThrowIfNull();
@@ -83,7 +127,7 @@ namespace UtilitiesCS.EmailIntelligence
             else
             {
                 var classifierGroup = await classifierGroupTask;
-                if (classifierGroup is null) {return (false, $"No classifier group named {GroupName} was found in manager."); }
+                if (classifierGroup is null) { return (false, $"No classifier group named {GroupName} was found in manager."); }
                 else
                 {
                     foreach (var name in ClassNames)
@@ -126,7 +170,7 @@ namespace UtilitiesCS.EmailIntelligence
                     {
                         SpamHamGroup = await CreateSpamClassifiersAsync(cancel);
                         Globals.AF.Manager[GroupName] = SpamHamGroup.ToAsyncLazy();
-                        if ((await Globals.AF.Manager.ManagerConfiguration)?.TryGetValue("ConfigSpam", out var loader) ?? false && loader is not null)
+                        if ((await Globals.AF.Manager.Configuration)?.TryGetValue("Spam", out var loader) ?? false && loader is not null)
                         {
                             SpamHamGroup.Config = loader.Config;
                             SpamHamGroup.Serialize();
@@ -134,7 +178,7 @@ namespace UtilitiesCS.EmailIntelligence
                         }
                         else
                         {
-                            MessageBox.Show("Could not create Spam classifier because configuration could not be found.", 
+                            MessageBox.Show("Could not create Spam classifier because configuration could not be found.",
                                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return false;
                         }
@@ -150,43 +194,9 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        public static async Task<SpamBayes> CreateAsync(
-            IApplicationGlobals globals,
-            bool initialize = true,
-            Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip, 
-            CancellationToken token = default)
-        {
-            var sb = new SpamBayes();
-            sb.Globals = globals;
-            if (!await sb.ValidateSpamManagerAsync(sb.HasValidSpamManagerAsync, sb.SpamBayesMissingHandlerAsync,
-                treatment, token)) { return null;  }
-            
-            return await Task.Run(sb.Init, token);
-             
-        }
+        #endregion Classifier Validation
 
-        public static BayesianClassifierGroup CreateSpamClassifier()
-        {
-            var group = new BayesianClassifierGroup
-            {
-                TotalEmailCount = 0,
-                SharedTokenBase = new Corpus()
-            };
-            foreach (var name in ClassNames)
-            {
-                group.Classifiers[name] = new BayesianClassifierShared(name, group);
-            }
-            return group;
-        }
-
-        public static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
-        {
-            return await Task.Run(CreateSpamClassifier, token);            
-        }
-
-        #endregion Constructors and Static Methods
-
-        #region public Properties
+        #region Public Properties
 
         protected internal IApplicationGlobals Globals { get => _globals; protected set => _globals = value; }
         private IApplicationGlobals _globals;
@@ -196,51 +206,12 @@ namespace UtilitiesCS.EmailIntelligence
 
         public static readonly HashSet<string> ClassNames = ["Spam", "Ham"];
         public static readonly string GroupName = "Spam";
-
-        #endregion public Properties
-
+        
         public bool IsActivated => SpamHamGroup is not null;
                 
-        public async Task ToggleActivationAsync() 
-        {
-            var configurations = await Globals.AF.Manager.ManagerConfiguration;
-            if (configurations.TryGetValue("ConfigSpam", out var loader))
-            {
-                loader.Activated = !loader.Activated;
-                SpamHamGroup = loader.Activated ? await Globals.AF.Manager["Spam"]: null;
-            }
-            else
-            {
-                MessageBox.Show("Could not find configuration for SpamBayes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        #endregion Public Properties
 
-        public async Task ShowDiskDialogue(bool local)
-        {
-            if (local) { SpamHamGroup.Config.ActivateLocalDisk(); }
-            else { SpamHamGroup.Config.ActivateNetDisk(); }
-            var response = MessageBox.Show($"SpamBayes is now using {(local ? "local" : "network")} disk. Would you like to save the current classifier?",
-                "Save Configuration",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-            if (response == DialogResult.Yes) { SpamHamGroup.Serialize(); }
-            else
-            {
-                response = MessageBox.Show($"Would you like to reload the classifier from {(local ? "local" : "network")}", "Reload Classifier", 
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (response == DialogResult.Yes) 
-                {
-                    await Globals.AF.Manager.ResetLoadManagerLazyAsync();
-                    Globals.AF.Manager.TryGetValue("Spam", out var spamHamGroupTask);
-                    if (spamHamGroupTask is not null)
-                    {
-                        SpamHamGroup = await spamHamGroupTask;
-                        CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
-                        CalculateProbabilityAsync = SpamHamGroup.Classifiers["Spam"].Chi2SpamProbAsync;                        
-                    }
-                }
-            }
-        }
+        #region Public Classifier Methods
 
         public async Task TestAsync(Selection selection)
         {
@@ -361,15 +332,101 @@ namespace UtilitiesCS.EmailIntelligence
             
         }
 
+        #endregion Public Classifier Methods
+
+        #region Activation and Configuration
+
+        public async Task ToggleActivationAsync()
+        {
+            var configurations = await Globals.AF.Manager.Configuration;
+            if (configurations.TryGetValue("Spam", out var loader))
+            {
+                loader.Activated = !loader.Activated;
+                SpamHamGroup = loader.Activated ? await Globals.AF.Manager["Spam"] : null;
+            }
+            else
+            {
+                MessageBox.Show("Could not find configuration for SpamBayes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public async Task ShowDiskDialog(bool local)
+        {
+            if (local) { SpamHamGroup.Config.ActivateLocalDisk(); }
+            else { SpamHamGroup.Config.ActivateNetDisk(); }
+            var response = MessageBox.Show($"SpamBayes is now using {(local ? "local" : "network")} disk. Would you like to save the current classifier?",
+                "Save Configuration",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+            if (response == DialogResult.Yes) { SpamHamGroup.Serialize(); }
+            else
+            {
+                response = MessageBox.Show($"Would you like to reload the classifier from {(local ? "local" : "network")}", "Reload Classifier",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.Yes)
+                {
+                    await Globals.AF.Manager.ResetLoadManagerAsyncLazy();
+                    Globals.AF.Manager.TryGetValue("Spam", out var spamHamGroupTask);
+                    if (spamHamGroupTask is not null)
+                    {
+                        SpamHamGroup = await spamHamGroupTask;
+                        CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
+                        CalculateProbabilityAsync = SpamHamGroup.Classifiers["Spam"].Chi2SpamProbAsync;
+                    }
+                }
+            }
+        }
+
+        public void ShowSaveInfo() => ConfigController.Show(Globals, SpamHamGroup.Config);
+
+        #endregion Activation and Configuration
+
         #region Not Implemented
 
         public override void Train(string[] tokens, bool isSpam) { throw new NotImplementedException(); }
 
-        public void ShowSaveInfo() => ConfigController.Show(Globals, SpamHamGroup.Config);
-
         #endregion Not Implemented
 
-        //var probability = await CalculateProbabilityAsync(tokens);
+        #region IConditionalEngine Implementation
+
+        //public static async Task<ConditionalItemEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
+        //{
+        //    var ce = new ConditionalItemEngine<MailItemHelper>();
+        //    ce.AsyncCondition = (item) => Task.Run(() =>
+        //        item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
+        //        mailItem.UserProperties.Find("Spam") is null);
+        //    ce.EngineInitializer = async (globals) => ce.Engine = await CreateAsync(globals);
+        //    await ce.EngineInitializer(globals);
+        //    ce.AsyncAction = (item) => ce.Engine is not null ? ((SpamBayes)ce.Engine).TestAsync(item) : null;
+        //    ce.EngineName = "SpamBayes";
+        //    ce.Message = $"{ce.EngineName} is null. Skipping actions";
+        //    return ce;
+        //}
+
+        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
+        {
+            var sb = await CreateAsync(globals);
+            return sb;
+        }
+
+        public Func<MailItemHelper, Task> AsyncAction => (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null;
+
+        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() =>
+                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
+                mailItem.UserProperties.Find("Spam") is null);
+
+        public object Engine => this;
+
+        public Func<IApplicationGlobals, Task> EngineInitializer => async (globals) => await Task.CompletedTask;
+
+        public string EngineName => "SpamBayes";
+
+        public string Message => $"{nameof(SpamBayes)} is null. Skipping actions";
+
+        public MailItemHelper TypedItem { get; set; }
+
+        #endregion IConditionalEngine Implementation
+
     }
 
 }

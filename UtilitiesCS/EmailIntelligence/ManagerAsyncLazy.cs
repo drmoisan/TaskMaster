@@ -26,40 +26,20 @@ namespace UtilitiesCS
         public ManagerAsyncLazy(IApplicationGlobals globals) : base() 
         { 
             Globals = globals;
-            ResetConfiguration();
+            ResetConfigAsyncLazy();
         }
 
-        public async Task InitAsync() => await ResetLoadManagerLazyAsync();
+        public async Task InitAsync() => await ResetLoadManagerAsyncLazy();
 
         #endregion ctors
 
-        #region Public Properties
-
         protected IApplicationGlobals Globals { get; set; }
-
-        public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration { get; protected set; }
-
-        #endregion Public Properties
 
         #region Configuration
 
-        internal async void Loader_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(NewSmartSerializableLoader.Activated))
-            {
-                var loader = (NewSmartSerializableLoader)sender;
-                if (loader.Activated && !this.TryGetValue(nameof(loader.Name), out var classifier))
-                {                    
-                    var classifierGroup = GetClassifierAsyncLazy(loader);
-                    if (classifierGroup != null) { this[loader.Name] = classifierGroup; }
-                }
-                else if (!loader.Activated)
-                {
-                    this.TryRemove(loader.Name, out _);
-                }
-                await WriteConfigurationAsync();
-            }
-        }
+        public AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> Configuration { get; protected set; }
+
+        #region Configuration
 
         internal async Task<ConcurrentDictionary<string, NewSmartSerializableLoader>> ReadConfiguration()
         {
@@ -79,6 +59,8 @@ namespace UtilitiesCS
             return resourceDictionary;
         }
 
+        public void ResetConfigAsyncLazy() => Configuration = new(ReadConfiguration);
+
         internal async Task WriteConfigurationAsync() 
         {
             string assemblyDirectory = Path.GetDirectoryName(typeof(ManagerResources).Assembly.Location);
@@ -86,7 +68,7 @@ namespace UtilitiesCS
             //string resxFilePath = Path.Combine(assemblyDirectory, "Resources", "ManagerResources.resx");
             string resxFilePath = Path.Combine(assemblyDirectory, "ManagerResources.resx");
 
-            var configurations = (await ManagerConfiguration)
+            var configurations = (await Configuration)
                 .Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value.SerializeToString()))
                 .ToDictionary();
 
@@ -100,25 +82,43 @@ namespace UtilitiesCS
             }
         }
 
+        #endregion Serialization of Configuration
+
+        internal async void Loader_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(NewSmartSerializableLoader.Activated))
+            {
+                var loader = (NewSmartSerializableLoader)sender;
+                if (loader.Activated && !this.TryGetValue(nameof(loader.Name), out var classifier))
+                {                    
+                    var classifierGroup = ResetLoadClassifierAsyncLazy(loader);
+                    if (classifierGroup != null) { this[loader.Name] = classifierGroup; }
+                }
+                else if (!loader.Activated)
+                {
+                    this.TryRemove(loader.Name, out _);
+                }
+                await WriteConfigurationAsync();
+            }
+        }
+        
         #endregion Configuration
 
-        #region AsyncLazy Methods
+        #region Manager Initialization
 
-        public AsyncLazy<BayesianClassifierGroup> GetClassifierAsyncLazy(NewSmartSerializableLoader loader)
+        public AsyncLazy<BayesianClassifierGroup> ResetLoadClassifierAsyncLazy(NewSmartSerializableLoader loader)
         {
             return new AsyncLazy<BayesianClassifierGroup>(async () => await BayesianClassifierGroup.Static.DeserializeAsync(loader));
         }
 
-        public void ResetConfiguration() => ManagerConfiguration = new(ReadConfiguration);
-
-        public async Task ResetLoadManagerLazyAsync()
+        public async Task ResetLoadManagerAsyncLazy()
         {
-            if (ManagerConfiguration is null) { ResetConfiguration(); }
-            foreach (var configuration in await ManagerConfiguration)
+            if (Configuration is null) { ResetConfigAsyncLazy(); }
+            foreach (var configuration in await Configuration)
             {
                 if (configuration.Value.Activated)
                 {
-                    var classifierGroup = GetClassifierAsyncLazy(configuration.Value);
+                    var classifierGroup = ResetLoadClassifierAsyncLazy(configuration.Value);
                     if (classifierGroup != null) { this[configuration.Value.Name] = classifierGroup; }
                 }
                 else
@@ -128,6 +128,7 @@ namespace UtilitiesCS
             }
         }
 
-        #endregion AsyncLazy Methods
+        #endregion Manager Initialization
+
     }
 }

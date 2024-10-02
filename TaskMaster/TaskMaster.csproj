@@ -360,16 +360,15 @@
     <Compile Include="AppGlobals\AppAutoFileObjects.cs" />
     <Compile Include="AppGlobals\AppEvents.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.cs" />
+    <Compile Include="AppGlobals\AppItemEngines.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettings.cs" />
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />
     <Compile Include="AppGlobals\Deprecated\ManagerClassOld.cs" />
-    <Compile Include="AppGlobals\ManagerAsyncLazy.cs" />
     <Compile Include="AppGlobals\Deprecated\ManagerLazyConfig.cs" />
     <Compile Include="AppGlobals\Deprecated\SmartSerializableConfigOld.cs" />
-    <Compile Include="AppGlobals\ToDoObj.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -13,5 +13,6 @@ namespace UtilitiesCS
         IAppAutoFileObjects AF { get; }
         IAppEvents Events { get; }
         IAppQuickFilerSettings QfSettings { get; }
+        IAppItemEngines Engines { get; }
     }
 }

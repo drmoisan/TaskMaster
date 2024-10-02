@@ -301,7 +301,7 @@ namespace TaskMaster
             var response = MessageBox.Show("Are you sure you want to clear the Spam Manager? This cannot be undone", "Clear Spam Manager", MessageBoxButtons.YesNo);
             if (response == DialogResult.Yes)
             {
-                if ((await Globals.AF.Manager.ManagerConfiguration).TryGetValue("Spam", out var loader))
+                if ((await Globals.AF.Manager.Configuration).TryGetValue("Spam", out var loader))
                 {
                     var classifier = await SpamBayes.CreateSpamClassifiersAsync();
                     classifier.Config = loader.Config;
@@ -349,8 +349,8 @@ namespace TaskMaster
 
         #region Triage
 
-        private AsyncLazy<UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage> _triage;
-        internal AsyncLazy<UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage> Triage
+        private AsyncLazy<Triage> _triage;
+        internal AsyncLazy<Triage> Triage
         {
             get
             {
@@ -362,7 +362,7 @@ namespace TaskMaster
         }
         internal void ResetTriage()
         {
-            _triage = new(async () => await UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage.CreateAsync(
+            _triage = new(async () => await UtilitiesCS.EmailIntelligence.Triage.CreateAsync(
                 Globals, true, Enums.NotFoundEnum.Ask));
         }
 
@@ -427,7 +427,7 @@ namespace TaskMaster
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var triage = await new UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage.Triage(Globals).InitAsync();
+            var triage = await new UtilitiesCS.EmailIntelligence.Triage(Globals).InitAsync();
             await triage.CreateNewTriageClassifierGroupAsync(default);
         }
 

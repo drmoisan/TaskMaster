@@ -176,8 +176,8 @@ namespace TaskMaster
         
         public async void SpamBayesEnabled_Click(Office.IRibbonControl control) => await (await Controller.SB).ToggleActivationAsync();
         public async Task<bool> SpamBayesEnabled_GetPressed(Office.IRibbonControl control) => (await Controller.SB).IsActivated;
-        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialogue(false);
-        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialogue(true);
+        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialog(false);
+        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialog(true);
         public async void GetSaveLocation_Click(Office.IRibbonControl control) => (await Controller.SB).ShowSaveInfo();
 
         #endregion Spam Config

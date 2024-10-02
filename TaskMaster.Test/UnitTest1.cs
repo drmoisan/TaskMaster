@@ -46,7 +46,7 @@ namespace TaskMaster.Test
         //    var af = new AppAutoFileObjects(appGlobals);
         //    af.ResetLoadManagerLazyConfiguration();
         //    var configurations = await af.ManagerConfiguration;
-        //    if (configurations.TryGetValue("ConfigSpam", out NewSmartSerializableLoader loader))
+        //    if (configurations.TryGetValue("Spam", out NewSmartSerializableLoader loader))
         //    {
         //        loader.Activated = true;
         //    }
@@ -63,7 +63,7 @@ namespace TaskMaster.Test
             var af = new AppAutoFileObjects(appGlobals);
             af.Manager = new ManagerAsyncLazy(appGlobals);
             await af.Manager.InitAsync();
-            var configurations = await af.Manager.ManagerConfiguration;
+            var configurations = await af.Manager.Configuration;
 
             foreach (var config in configurations)
             {
@@ -139,8 +139,8 @@ namespace TaskMaster.Test
             var globals = new ApplicationGlobals(mockApplication.Object);
             var manager = new ManagerAsyncLazy(globals);
             await manager.InitAsync();
-            var configs = await manager.ManagerConfiguration;
-            configs["ConfigSpam"].Activated = false;
+            var configs = await manager.Configuration;
+            configs["Spam"].Activated = false;
             
         }
 
@@ -176,7 +176,7 @@ namespace TaskMaster.Test
 
         //    var spam = manager["Spam"];
         //    var configurations = await af.ManagerConfiguration;
-        //    if (configurations.TryGetValue("ConfigSpam", out NewSmartSerializableLoader loader))
+        //    if (configurations.TryGetValue("Spam", out NewSmartSerializableLoader loader))
         //    {
         //        spam.Config = loader.Config;
         //        spam.SerializeThreadSafe(spam.Config.Disk.FilePath);
@@ -230,9 +230,9 @@ namespace TaskMaster.Test
         //    var config = new ManagerLazyConfig();
         //    config.Configurations = new List<ManagerLazyConfigStruct>()
         //    {
-        //        new ManagerLazyConfigStruct() { ResourceName = "ConfigSpam", ClassifierName = "Spam", Active = true },
-        //        new ManagerLazyConfigStruct() { ResourceName = "ConfigFolder", ClassifierName = "Folder", Active = true },
-        //        new ManagerLazyConfigStruct() { ResourceName = "ConfigTriage", ClassifierName = "Triage", Active = true }
+        //        new ManagerLazyConfigStruct() { ResourceName = "Spam", ClassifierName = "Spam", Active = true },
+        //        new ManagerLazyConfigStruct() { ResourceName = "Folder", ClassifierName = "Folder", Active = true },
+        //        new ManagerLazyConfigStruct() { ResourceName = "Triage", ClassifierName = "Triage", Active = true }
         //    };
 
         //}

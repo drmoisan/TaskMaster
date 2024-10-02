@@ -64,6 +64,7 @@ namespace UtilitiesCS {
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Activated&quot;: true,
+        ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Folder&quot;,
         ///  &quot;Config&quot;: {
@@ -81,13 +82,11 @@ namespace UtilitiesCS {
         ///    &quot;NetDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;ManagerFolder.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///    },
-        ///   [rest of string was truncated]&quot;;.
+        ///      &quot;SpecialFolderName&quot; [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string ConfigFolder {
+        internal static string Folder {
             get {
-                return ResourceManager.GetString("ConfigFolder", resourceCulture);
+                return ResourceManager.GetString("Folder", resourceCulture);
             }
         }
         
@@ -95,6 +94,7 @@ namespace UtilitiesCS {
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Activated&quot;: true,
+        ///  &quot;Engine&quot;:true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Spam&quot;,
         ///  &quot;Config&quot;: {
@@ -113,12 +113,11 @@ namespace UtilitiesCS {
         ///      &quot;FileName&quot;: &quot;ManagerSpam.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///    },
-        ///    &quot;Class [rest of string was truncated]&quot;;.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string ConfigSpam {
+        internal static string Spam {
             get {
-                return ResourceManager.GetString("ConfigSpam", resourceCulture);
+                return ResourceManager.GetString("Spam", resourceCulture);
             }
         }
         
@@ -126,6 +125,7 @@ namespace UtilitiesCS {
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Activated&quot;: true,
+        ///  &quot;Engine&quot;: true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Triage&quot;,
         ///  &quot;Config&quot;: {
@@ -143,13 +143,11 @@ namespace UtilitiesCS {
         ///    &quot;NetDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;ManagerTriage.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///    },
-        ///   [rest of string was truncated]&quot;;.
+        ///      &quot;SpecialFolderName&quot;: [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string ConfigTriage {
+        internal static string Triage {
             get {
-                return ResourceManager.GetString("ConfigTriage", resourceCulture);
+                return ResourceManager.GetString("Triage", resourceCulture);
             }
         }
     }

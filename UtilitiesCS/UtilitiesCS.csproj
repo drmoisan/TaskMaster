@@ -514,6 +514,7 @@
     </Compile>
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\ConditionalItemEngine.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />
@@ -541,6 +542,8 @@
     <Compile Include="HelperClasses\ParamArray.cs" />
     <Compile Include="HelperClasses\ReflectionHelper.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
+    <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
+    <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
     <Compile Include="ManagerResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -650,6 +653,7 @@
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializableConfig.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
+    <Compile Include="Threading\IdleAsyncQueue.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPackage.cs" />
     <Compile Include="Threading\ProgressPane.cs">
@@ -731,7 +735,7 @@
     <Compile Include="HelperClasses\Tokenizer.cs" />
     <Compile Include="HelperClasses\Logging\TraceUtility.cs" />
     <Compile Include="Interfaces\Enums.cs" />
-    <Compile Include="Interfaces\IAppEvents.cs" />
+    <Compile Include="Interfaces\IGlobals\IAppEvents.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IMovedMailInfo.cs" />
     <Compile Include="Interfaces\IGenericTimer.cs" />
     <Compile Include="Interfaces\IGlobals\IAppAutoFileObjects.cs" />
@@ -805,7 +809,7 @@
     <Compile Include="ReusableTypeClasses\StackObjectCS.cs" />
     <Compile Include="ReusableTypeClasses\TreeNodeOfT.cs" />
     <Compile Include="Threading\ApplicationIdleTimer.cs" />
-    <Compile Include="Threading\AsyncIdleQueue.cs" />
+    <Compile Include="Threading\AsyncIdleQueue1.cs" />
     <Compile Include="Threading\IdleActionQueue.cs" />
     <Compile Include="Threading\PriorityScheduler.cs" />
     <Compile Include="Threading\SyncContextForm.cs">

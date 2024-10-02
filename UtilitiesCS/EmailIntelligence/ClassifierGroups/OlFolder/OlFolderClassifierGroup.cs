@@ -161,8 +161,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 return group;
             });            
             Globals.AF.Manager["Spam"] = temp.ToAsyncLazy();
-            var configurations = await Globals.AF.Manager.ManagerConfiguration;
-            if (configurations.TryGetValue("ConfigSpam", out var loader))
+            var configurations = await Globals.AF.Manager.Configuration;
+            if (configurations.TryGetValue("Spam", out var loader))
             {
                 temp.Config = loader.Config;
             }
