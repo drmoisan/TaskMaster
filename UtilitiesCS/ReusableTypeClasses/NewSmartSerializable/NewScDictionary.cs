@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,7 +37,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public NewSmartSerializableConfig Config { get => ism.Config; set => ism.Config = value; }
         protected NewSmartSerializable<NewScDictionary<TKey, TValue>> ism;
-        
+
         public void Serialize() => ism.Serialize();
         public void Serialize(string filePath) => ism.Serialize(filePath);
         public void SerializeThreadSafe(string filePath) => ism.SerializeThreadSafe(filePath);
@@ -45,6 +46,25 @@ namespace UtilitiesCS.ReusableTypeClasses
         public NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
 
         #endregion ISmartSerializable
+
+        public string Name { get; set; }
+
+        #region INotifyPropertyChanged
+
+        private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        public void Notify([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
+
 
         public static class Static
         {

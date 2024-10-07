@@ -48,6 +48,23 @@ namespace UtilitiesCS
             }
         }
 
+        internal string ExtractFolderPath(string specialFolderName, string relativePath)
+        {
+            if (specialFolderName != "None" && FileSystemFolders.SpecialFolders.TryGetValue(specialFolderName, out string folderPath))
+            {
+                if (relativePath.IsNullOrEmpty())
+                {
+                    return folderPath;
+                }
+                else
+                {
+                    return Path.Combine(folderPath, relativePath);
+                }
+            }
+
+            return relativePath;
+        }
+
         internal string ExtractFileName(Dictionary<string, string> info)
         {
             if (info.TryGetValue("FileName", out string fileName))

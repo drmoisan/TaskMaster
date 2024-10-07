@@ -1,4 +1,6 @@
-﻿namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
+﻿using System;
+
+namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 {
     partial class ConfigViewer
     {
@@ -29,70 +31,55 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigViewer));
-            SVGControl.SvgResource svgResource1 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource2 = new SVGControl.SvgResource();
-            SVGControl.SvgResource svgResource3 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource5 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource6 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource7 = new SVGControl.SvgResource();
+            SVGControl.SvgResource svgResource8 = new SVGControl.SvgResource();
             this.label1 = new System.Windows.Forms.Label();
-            this.ComboSpecialFolder = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.RelativePath = new System.Windows.Forms.TextBox();
-            this.FileName = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.ButtonSave = new SVGControl.ButtonSVG();
             this.ButtonCancel = new SVGControl.ButtonSVG();
-            this.ButtonOpen = new SVGControl.ButtonSVG();
+            this.groupBoxLocal = new ConfigGroupBox();
+            this.LocalActiveLabel = new System.Windows.Forms.Label();
+            this.buttonSVG1 = new SVGControl.ButtonSVG();
+            this.FileNameLocal = new System.Windows.Forms.TextBox();
+            this.RelativePathLocal = new System.Windows.Forms.TextBox();
+            this.ComboSpecialFolderLocal = new System.Windows.Forms.ComboBox();
+            this.groupBoxNet = new ConfigGroupBox();
+            this.NetActiveLabel = new System.Windows.Forms.Label();
+            this.buttonSVG2 = new SVGControl.ButtonSVG();
+            this.FileNameNet = new System.Windows.Forms.TextBox();
+            this.RelativePathNet = new System.Windows.Forms.TextBox();
+            this.ComboSpecialFolderNet = new System.Windows.Forms.ComboBox();
+            this.groupBoxLocal.SuspendLayout();
+            this.groupBoxNet.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(64, 63);
+            this.label1.Location = new System.Drawing.Point(64, 73);
             this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(150, 25);
             this.label1.TabIndex = 0;
             this.label1.Text = "Special Folder";
             // 
-            // ComboSpecialFolder
-            // 
-            this.ComboSpecialFolder.FormattingEnabled = true;
-            this.ComboSpecialFolder.Location = new System.Drawing.Point(300, 56);
-            this.ComboSpecialFolder.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
-            this.ComboSpecialFolder.Name = "ComboSpecialFolder";
-            this.ComboSpecialFolder.Size = new System.Drawing.Size(454, 33);
-            this.ComboSpecialFolder.TabIndex = 1;
-            this.ComboSpecialFolder.SelectedValueChanged += new System.EventHandler(this.ComboSpecialFolder_SelectedValueChanged);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(64, 142);
+            this.label2.Location = new System.Drawing.Point(64, 140);
             this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(140, 25);
             this.label2.TabIndex = 2;
             this.label2.Text = "Relative Path";
             // 
-            // RelativePath
-            // 
-            this.RelativePath.Location = new System.Drawing.Point(300, 135);
-            this.RelativePath.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
-            this.RelativePath.Name = "RelativePath";
-            this.RelativePath.Size = new System.Drawing.Size(454, 31);
-            this.RelativePath.TabIndex = 3;
-            // 
-            // FileName
-            // 
-            this.FileName.Location = new System.Drawing.Point(300, 212);
-            this.FileName.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
-            this.FileName.Name = "FileName";
-            this.FileName.Size = new System.Drawing.Size(454, 31);
-            this.FileName.TabIndex = 5;
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(64, 219);
+            this.label3.Location = new System.Drawing.Point(64, 205);
             this.label3.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(109, 25);
@@ -101,12 +88,12 @@
             // 
             // ButtonSave
             // 
-            this.ButtonSave.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.ButtonSave.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ButtonSave.Image = ((System.Drawing.Image)(resources.GetObject("ButtonSave.Image")));
             this.ButtonSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ButtonSave.ImageSVG.ImagePath = "(none)";
             this.ButtonSave.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 10, 3, 10);
-            svgResource1.Data = new byte[] {
+            svgResource5.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -821,12 +808,12 @@
         ((byte)(62)),
         ((byte)(13)),
         ((byte)(10))};
-            svgResource1.Name = "Save";
-            this.ButtonSave.ImageSVG.ResourceName = svgResource1;
+            svgResource5.Name = "Save";
+            this.ButtonSave.ImageSVG.ResourceName = svgResource5;
             this.ButtonSave.ImageSVG.SaveRendering = false;
             this.ButtonSave.ImageSVG.Size = new System.Drawing.Size(222, 65);
             this.ButtonSave.ImageSVG.UseDefaultImage = false;
-            this.ButtonSave.Location = new System.Drawing.Point(32, 333);
+            this.ButtonSave.Location = new System.Drawing.Point(465, 361);
             this.ButtonSave.Margin = new System.Windows.Forms.Padding(16, 12, 16, 12);
             this.ButtonSave.Name = "ButtonSave";
             this.ButtonSave.Size = new System.Drawing.Size(228, 85);
@@ -839,12 +826,12 @@
             // 
             // ButtonCancel
             // 
-            this.ButtonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.ButtonCancel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ButtonCancel.Image = ((System.Drawing.Image)(resources.GetObject("ButtonCancel.Image")));
             this.ButtonCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ButtonCancel.ImageSVG.ImagePath = "(none)";
             this.ButtonCancel.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 10, 3, 10);
-            svgResource2.Data = new byte[] {
+            svgResource6.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
         ((byte)(120)),
@@ -2053,12 +2040,12 @@
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource2.Name = "CancelBlue";
-            this.ButtonCancel.ImageSVG.ResourceName = svgResource2;
+            svgResource6.Name = "CancelBlue";
+            this.ButtonCancel.ImageSVG.ResourceName = svgResource6;
             this.ButtonCancel.ImageSVG.SaveRendering = false;
             this.ButtonCancel.ImageSVG.Size = new System.Drawing.Size(222, 65);
             this.ButtonCancel.ImageSVG.UseDefaultImage = false;
-            this.ButtonCancel.Location = new System.Drawing.Point(282, 333);
+            this.ButtonCancel.Location = new System.Drawing.Point(742, 361);
             this.ButtonCancel.Margin = new System.Windows.Forms.Padding(16, 15, 16, 15);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(228, 85);
@@ -2069,14 +2056,44 @@
             this.ButtonCancel.UseVisualStyleBackColor = true;
             this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
             // 
-            // ButtonOpen
+            // groupBoxLocal
             // 
-            this.ButtonOpen.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.ButtonOpen.Image = ((System.Drawing.Image)(resources.GetObject("ButtonOpen.Image")));
-            this.ButtonOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ButtonOpen.ImageSVG.ImagePath = "(none)";
-            this.ButtonOpen.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
-            svgResource3.Data = new byte[] {
+            this.groupBoxLocal.BackColor = System.Drawing.SystemColors.Highlight;
+            this.groupBoxLocal.Controls.Add(this.LocalActiveLabel);
+            this.groupBoxLocal.Controls.Add(this.buttonSVG1);
+            this.groupBoxLocal.Controls.Add(this.FileNameLocal);
+            this.groupBoxLocal.Controls.Add(this.RelativePathLocal);
+            this.groupBoxLocal.Controls.Add(this.ComboSpecialFolderLocal);
+            this.groupBoxLocal.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.groupBoxLocal.Location = new System.Drawing.Point(292, 27);
+            this.groupBoxLocal.Name = "groupBoxLocal";
+            this.groupBoxLocal.Size = new System.Drawing.Size(484, 277);
+            this.groupBoxLocal.TabIndex = 14;
+            this.groupBoxLocal.TabStop = false;
+            this.groupBoxLocal.Text = "Local Settings";
+            this.groupBoxLocal.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GroupBox_Click);
+            this.groupBoxLocal.Enter += new System.EventHandler(this.GroupBox_Enter);
+            this.groupBoxLocal.Leave += new System.EventHandler(this.GroupBox_Leave);
+            // 
+            // LocalActiveLabel
+            // 
+            this.LocalActiveLabel.AutoSize = true;
+            this.LocalActiveLabel.Location = new System.Drawing.Point(202, 227);
+            this.LocalActiveLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.LocalActiveLabel.Name = "LocalActiveLabel";
+            this.LocalActiveLabel.Size = new System.Drawing.Size(87, 25);
+            this.LocalActiveLabel.TabIndex = 16;
+            this.LocalActiveLabel.Text = "ACTIVE";
+            this.LocalActiveLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // buttonSVG1
+            // 
+            this.buttonSVG1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonSVG1.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG1.Image")));
+            this.buttonSVG1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buttonSVG1.ImageSVG.ImagePath = "(none)";
+            this.buttonSVG1.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
+            svgResource7.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
         ((byte)(118)),
@@ -2814,54 +2831,904 @@
         ((byte)(103)),
         ((byte)(62)),
         ((byte)(10))};
-            svgResource3.Name = "OpenFolderBlue";
-            this.ButtonOpen.ImageSVG.ResourceName = svgResource3;
-            this.ButtonOpen.ImageSVG.SaveRendering = false;
-            this.ButtonOpen.ImageSVG.Size = new System.Drawing.Size(222, 73);
-            this.ButtonOpen.ImageSVG.UseDefaultImage = false;
-            this.ButtonOpen.Location = new System.Drawing.Point(530, 333);
-            this.ButtonOpen.Margin = new System.Windows.Forms.Padding(16, 12, 16, 12);
-            this.ButtonOpen.Name = "ButtonOpen";
-            this.ButtonOpen.Size = new System.Drawing.Size(228, 85);
-            this.ButtonOpen.TabIndex = 13;
-            this.ButtonOpen.Text = "Choose\r\nFolder";
-            this.ButtonOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.ButtonOpen.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.ButtonOpen.UseVisualStyleBackColor = true;
-            this.ButtonOpen.Click += new System.EventHandler(this.ButtonOpen_Click);
+            svgResource7.Name = "OpenFolderBlue";
+            this.buttonSVG1.ImageSVG.ResourceName = svgResource7;
+            this.buttonSVG1.ImageSVG.SaveRendering = false;
+            this.buttonSVG1.ImageSVG.Size = new System.Drawing.Size(53, 51);
+            this.buttonSVG1.ImageSVG.UseDefaultImage = false;
+            this.buttonSVG1.Location = new System.Drawing.Point(396, 27);
+            this.buttonSVG1.Margin = new System.Windows.Forms.Padding(16, 12, 16, 12);
+            this.buttonSVG1.Name = "buttonSVG1";
+            this.buttonSVG1.Size = new System.Drawing.Size(59, 63);
+            this.buttonSVG1.TabIndex = 14;
+            this.buttonSVG1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.buttonSVG1.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.buttonSVG1.UseVisualStyleBackColor = true;
+            // 
+            // FileNameLocal
+            // 
+            this.FileNameLocal.Location = new System.Drawing.Point(62, 175);
+            this.FileNameLocal.Margin = new System.Windows.Forms.Padding(6);
+            this.FileNameLocal.Name = "FileNameLocal";
+            this.FileNameLocal.Size = new System.Drawing.Size(393, 31);
+            this.FileNameLocal.TabIndex = 6;
+            // 
+            // RelativePathLocal
+            // 
+            this.RelativePathLocal.Location = new System.Drawing.Point(62, 107);
+            this.RelativePathLocal.Margin = new System.Windows.Forms.Padding(6);
+            this.RelativePathLocal.Name = "RelativePathLocal";
+            this.RelativePathLocal.Size = new System.Drawing.Size(393, 31);
+            this.RelativePathLocal.TabIndex = 4;
+            // 
+            // ComboSpecialFolderLocal
+            // 
+            this.ComboSpecialFolderLocal.FormattingEnabled = true;
+            this.ComboSpecialFolderLocal.Location = new System.Drawing.Point(62, 43);
+            this.ComboSpecialFolderLocal.Margin = new System.Windows.Forms.Padding(6);
+            this.ComboSpecialFolderLocal.Name = "ComboSpecialFolderLocal";
+            this.ComboSpecialFolderLocal.Size = new System.Drawing.Size(322, 33);
+            this.ComboSpecialFolderLocal.TabIndex = 2;
+            this.ComboSpecialFolderLocal.SelectedValueChanged += new System.EventHandler(this.SpecialFolder_SelectedValueChanged);
+            // 
+            // groupBoxNet
+            // 
+            this.groupBoxNet.Controls.Add(this.NetActiveLabel);
+            this.groupBoxNet.Controls.Add(this.buttonSVG2);
+            this.groupBoxNet.Controls.Add(this.FileNameNet);
+            this.groupBoxNet.Controls.Add(this.RelativePathNet);
+            this.groupBoxNet.Controls.Add(this.ComboSpecialFolderNet);
+            this.groupBoxNet.Location = new System.Drawing.Point(825, 27);
+            this.groupBoxNet.Name = "groupBoxNet";
+            this.groupBoxNet.Size = new System.Drawing.Size(484, 277);
+            this.groupBoxNet.TabIndex = 15;
+            this.groupBoxNet.TabStop = false;
+            this.groupBoxNet.Text = "Network Settings";
+            this.groupBoxNet.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GroupBox_Click);
+            this.groupBoxNet.Enter += new System.EventHandler(this.GroupBox_Enter);
+            this.groupBoxNet.Leave += new System.EventHandler(this.GroupBox_Leave);
+            // 
+            // NetActiveLabel
+            // 
+            this.NetActiveLabel.AutoSize = true;
+            this.NetActiveLabel.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.NetActiveLabel.Location = new System.Drawing.Point(216, 227);
+            this.NetActiveLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.NetActiveLabel.Name = "NetActiveLabel";
+            this.NetActiveLabel.Size = new System.Drawing.Size(87, 25);
+            this.NetActiveLabel.TabIndex = 15;
+            this.NetActiveLabel.Text = "ACTIVE";
+            this.NetActiveLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.NetActiveLabel.Visible = false;
+            // 
+            // buttonSVG2
+            // 
+            this.buttonSVG2.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonSVG2.Image = ((System.Drawing.Image)(resources.GetObject("buttonSVG2.Image")));
+            this.buttonSVG2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buttonSVG2.ImageSVG.ImagePath = "(none)";
+            this.buttonSVG2.ImageSVG.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
+            svgResource8.Data = new byte[] {
+        ((byte)(60)),
+        ((byte)(115)),
+        ((byte)(118)),
+        ((byte)(103)),
+        ((byte)(32)),
+        ((byte)(119)),
+        ((byte)(105)),
+        ((byte)(100)),
+        ((byte)(116)),
+        ((byte)(104)),
+        ((byte)(61)),
+        ((byte)(34)),
+        ((byte)(52)),
+        ((byte)(56)),
+        ((byte)(34)),
+        ((byte)(32)),
+        ((byte)(104)),
+        ((byte)(101)),
+        ((byte)(105)),
+        ((byte)(103)),
+        ((byte)(104)),
+        ((byte)(116)),
+        ((byte)(61)),
+        ((byte)(34)),
+        ((byte)(52)),
+        ((byte)(56)),
+        ((byte)(34)),
+        ((byte)(32)),
+        ((byte)(118)),
+        ((byte)(105)),
+        ((byte)(101)),
+        ((byte)(119)),
+        ((byte)(66)),
+        ((byte)(111)),
+        ((byte)(120)),
+        ((byte)(61)),
+        ((byte)(34)),
+        ((byte)(48)),
+        ((byte)(32)),
+        ((byte)(48)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(56)),
+        ((byte)(34)),
+        ((byte)(32)),
+        ((byte)(102)),
+        ((byte)(105)),
+        ((byte)(108)),
+        ((byte)(108)),
+        ((byte)(61)),
+        ((byte)(34)),
+        ((byte)(110)),
+        ((byte)(111)),
+        ((byte)(110)),
+        ((byte)(101)),
+        ((byte)(34)),
+        ((byte)(32)),
+        ((byte)(120)),
+        ((byte)(109)),
+        ((byte)(108)),
+        ((byte)(110)),
+        ((byte)(115)),
+        ((byte)(61)),
+        ((byte)(34)),
+        ((byte)(104)),
+        ((byte)(116)),
+        ((byte)(116)),
+        ((byte)(112)),
+        ((byte)(58)),
+        ((byte)(47)),
+        ((byte)(47)),
+        ((byte)(119)),
+        ((byte)(119)),
+        ((byte)(119)),
+        ((byte)(46)),
+        ((byte)(119)),
+        ((byte)(51)),
+        ((byte)(46)),
+        ((byte)(111)),
+        ((byte)(114)),
+        ((byte)(103)),
+        ((byte)(47)),
+        ((byte)(50)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(47)),
+        ((byte)(115)),
+        ((byte)(118)),
+        ((byte)(103)),
+        ((byte)(34)),
+        ((byte)(62)),
+        ((byte)(10)),
+        ((byte)(60)),
+        ((byte)(112)),
+        ((byte)(97)),
+        ((byte)(116)),
+        ((byte)(104)),
+        ((byte)(32)),
+        ((byte)(100)),
+        ((byte)(61)),
+        ((byte)(34)),
+        ((byte)(77)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(52)),
+        ((byte)(67)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(48)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(54)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(53)),
+        ((byte)(52)),
+        ((byte)(53)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(53)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(72)),
+        ((byte)(49)),
+        ((byte)(54)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(49)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(67)),
+        ((byte)(49)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(54)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(56)),
+        ((byte)(48)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(51)),
+        ((byte)(54)),
+        ((byte)(55)),
+        ((byte)(57)),
+        ((byte)(51)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(57)),
+        ((byte)(46)),
+        ((byte)(50)),
+        ((byte)(56)),
+        ((byte)(56)),
+        ((byte)(51)),
+        ((byte)(32)),
+        ((byte)(57)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(53)),
+        ((byte)(76)),
+        ((byte)(50)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(53)),
+        ((byte)(48)),
+        ((byte)(51)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(72)),
+        ((byte)(51)),
+        ((byte)(53)),
+        ((byte)(46)),
+        ((byte)(53)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(57)),
+        ((byte)(67)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(54)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(48)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(53)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(52)),
+        ((byte)(53)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(48)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(86)),
+        ((byte)(49)),
+        ((byte)(57)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(72)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(52)),
+        ((byte)(51)),
+        ((byte)(49)),
+        ((byte)(67)),
+        ((byte)(49)),
+        ((byte)(48)),
+        ((byte)(46)),
+        ((byte)(55)),
+        ((byte)(55)),
+        ((byte)(55)),
+        ((byte)(53)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(57)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(55)),
+        ((byte)(55)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(48)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(49)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(55)),
+        ((byte)(55)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(49)),
+        ((byte)(52)),
+        ((byte)(50)),
+        ((byte)(76)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(54)),
+        ((byte)(51)),
+        ((byte)(50)),
+        ((byte)(57)),
+        ((byte)(55)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(49)),
+        ((byte)(53)),
+        ((byte)(55)),
+        ((byte)(67)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(54)),
+        ((byte)(51)),
+        ((byte)(48)),
+        ((byte)(57)),
+        ((byte)(55)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(50)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(55)),
+        ((byte)(49)),
+        ((byte)(56)),
+        ((byte)(56)),
+        ((byte)(55)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(55)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(54)),
+        ((byte)(51)),
+        ((byte)(50)),
+        ((byte)(57)),
+        ((byte)(55)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(49)),
+        ((byte)(53)),
+        ((byte)(55)),
+        ((byte)(67)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(53)),
+        ((byte)(56)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(49)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(49)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(54)),
+        ((byte)(46)),
+        ((byte)(51)),
+        ((byte)(52)),
+        ((byte)(53)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(50)),
+        ((byte)(49)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(53)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(52)),
+        ((byte)(76)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(57)),
+        ((byte)(56)),
+        ((byte)(52)),
+        ((byte)(90)),
+        ((byte)(77)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(56)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(51)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(55)),
+        ((byte)(53)),
+        ((byte)(55)),
+        ((byte)(57)),
+        ((byte)(67)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(51)),
+        ((byte)(51)),
+        ((byte)(50)),
+        ((byte)(52)),
+        ((byte)(51)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(46)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(56)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(48)),
+        ((byte)(57)),
+        ((byte)(55)),
+        ((byte)(54)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(48)),
+        ((byte)(32)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(54)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(55)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(48)),
+        ((byte)(72)),
+        ((byte)(51)),
+        ((byte)(54)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(53)),
+        ((byte)(67)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(53)),
+        ((byte)(52)),
+        ((byte)(53)),
+        ((byte)(53)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(48)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(52)),
+        ((byte)(53)),
+        ((byte)(52)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(57)),
+        ((byte)(48)),
+        ((byte)(55)),
+        ((byte)(49)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(48)),
+        ((byte)(46)),
+        ((byte)(51)),
+        ((byte)(51)),
+        ((byte)(53)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(51)),
+        ((byte)(52)),
+        ((byte)(57)),
+        ((byte)(49)),
+        ((byte)(76)),
+        ((byte)(52)),
+        ((byte)(51)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(54)),
+        ((byte)(49)),
+        ((byte)(52)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(51)),
+        ((byte)(46)),
+        ((byte)(50)),
+        ((byte)(52)),
+        ((byte)(54)),
+        ((byte)(53)),
+        ((byte)(67)),
+        ((byte)(52)),
+        ((byte)(52)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(49)),
+        ((byte)(57)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(54)),
+        ((byte)(49)),
+        ((byte)(53)),
+        ((byte)(51)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(51)),
+        ((byte)(46)),
+        ((byte)(53)),
+        ((byte)(52)),
+        ((byte)(49)),
+        ((byte)(56)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(52)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(57)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(72)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(56)),
+        ((byte)(52)),
+        ((byte)(51)),
+        ((byte)(49)),
+        ((byte)(67)),
+        ((byte)(49)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(49)),
+        ((byte)(53)),
+        ((byte)(52)),
+        ((byte)(54)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(51)),
+        ((byte)(57)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(49)),
+        ((byte)(46)),
+        ((byte)(53)),
+        ((byte)(53)),
+        ((byte)(52)),
+        ((byte)(53)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(50)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(55)),
+        ((byte)(50)),
+        ((byte)(54)),
+        ((byte)(32)),
+        ((byte)(49)),
+        ((byte)(49)),
+        ((byte)(46)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(55)),
+        ((byte)(55)),
+        ((byte)(32)),
+        ((byte)(50)),
+        ((byte)(51)),
+        ((byte)(46)),
+        ((byte)(49)),
+        ((byte)(52)),
+        ((byte)(48)),
+        ((byte)(55)),
+        ((byte)(76)),
+        ((byte)(55)),
+        ((byte)(46)),
+        ((byte)(52)),
+        ((byte)(56)),
+        ((byte)(57)),
+        ((byte)(57)),
+        ((byte)(51)),
+        ((byte)(32)),
+        ((byte)(51)),
+        ((byte)(56)),
+        ((byte)(46)),
+        ((byte)(55)),
+        ((byte)(53)),
+        ((byte)(55)),
+        ((byte)(57)),
+        ((byte)(90)),
+        ((byte)(34)),
+        ((byte)(32)),
+        ((byte)(102)),
+        ((byte)(105)),
+        ((byte)(108)),
+        ((byte)(108)),
+        ((byte)(61)),
+        ((byte)(34)),
+        ((byte)(35)),
+        ((byte)(48)),
+        ((byte)(48)),
+        ((byte)(55)),
+        ((byte)(56)),
+        ((byte)(68)),
+        ((byte)(52)),
+        ((byte)(34)),
+        ((byte)(47)),
+        ((byte)(62)),
+        ((byte)(10)),
+        ((byte)(60)),
+        ((byte)(47)),
+        ((byte)(115)),
+        ((byte)(118)),
+        ((byte)(103)),
+        ((byte)(62)),
+        ((byte)(10))};
+            svgResource8.Name = "OpenFolderBlue";
+            this.buttonSVG2.ImageSVG.ResourceName = svgResource8;
+            this.buttonSVG2.ImageSVG.SaveRendering = false;
+            this.buttonSVG2.ImageSVG.Size = new System.Drawing.Size(53, 51);
+            this.buttonSVG2.ImageSVG.UseDefaultImage = false;
+            this.buttonSVG2.Location = new System.Drawing.Point(396, 27);
+            this.buttonSVG2.Margin = new System.Windows.Forms.Padding(16, 12, 16, 12);
+            this.buttonSVG2.Name = "buttonSVG2";
+            this.buttonSVG2.Size = new System.Drawing.Size(59, 63);
+            this.buttonSVG2.TabIndex = 14;
+            this.buttonSVG2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.buttonSVG2.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.buttonSVG2.UseVisualStyleBackColor = true;
+            // 
+            // FileNameNet
+            // 
+            this.FileNameNet.Location = new System.Drawing.Point(62, 175);
+            this.FileNameNet.Margin = new System.Windows.Forms.Padding(6);
+            this.FileNameNet.Name = "FileNameNet";
+            this.FileNameNet.Size = new System.Drawing.Size(393, 31);
+            this.FileNameNet.TabIndex = 6;
+            // 
+            // RelativePathNet
+            // 
+            this.RelativePathNet.Location = new System.Drawing.Point(62, 107);
+            this.RelativePathNet.Margin = new System.Windows.Forms.Padding(6);
+            this.RelativePathNet.Name = "RelativePathNet";
+            this.RelativePathNet.Size = new System.Drawing.Size(393, 31);
+            this.RelativePathNet.TabIndex = 4;
+            // 
+            // ComboSpecialFolderNet
+            // 
+            this.ComboSpecialFolderNet.FormattingEnabled = true;
+            this.ComboSpecialFolderNet.Location = new System.Drawing.Point(62, 43);
+            this.ComboSpecialFolderNet.Margin = new System.Windows.Forms.Padding(6);
+            this.ComboSpecialFolderNet.Name = "ComboSpecialFolderNet";
+            this.ComboSpecialFolderNet.Size = new System.Drawing.Size(322, 33);
+            this.ComboSpecialFolderNet.TabIndex = 2;
+            this.ComboSpecialFolderNet.SelectedValueChanged += new System.EventHandler(this.SpecialFolder_SelectedValueChanged);
             // 
             // ConfigViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 458);
+            this.ClientSize = new System.Drawing.Size(1376, 492);
+            this.Controls.Add(this.groupBoxNet);
+            this.Controls.Add(this.groupBoxLocal);
             this.Controls.Add(this.ButtonSave);
             this.Controls.Add(this.ButtonCancel);
-            this.Controls.Add(this.ButtonOpen);
-            this.Controls.Add(this.FileName);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.RelativePath);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.ComboSpecialFolder);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "ConfigViewer";
             this.Text = "Configuration Viewer";
+            this.groupBoxLocal.ResumeLayout(false);
+            this.groupBoxLocal.PerformLayout();
+            this.groupBoxNet.ResumeLayout(false);
+            this.groupBoxNet.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
+
 
         #endregion
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        internal SVGControl.ButtonSVG ButtonOpen;
         internal SVGControl.ButtonSVG ButtonCancel;
         internal SVGControl.ButtonSVG ButtonSave;
-        protected internal System.Windows.Forms.ComboBox ComboSpecialFolder;
-        protected internal System.Windows.Forms.TextBox RelativePath;
-        protected internal System.Windows.Forms.TextBox FileName;
+        private ConfigGroupBox groupBoxLocal;
+        protected internal System.Windows.Forms.TextBox FileNameLocal;
+        protected internal System.Windows.Forms.TextBox RelativePathLocal;
+        protected internal System.Windows.Forms.ComboBox ComboSpecialFolderLocal;
+        internal SVGControl.ButtonSVG buttonSVG1;
+        private System.Windows.Forms.Label LocalActiveLabel;
+        private ConfigGroupBox groupBoxNet;
+        private System.Windows.Forms.Label NetActiveLabel;
+        internal SVGControl.ButtonSVG buttonSVG2;
+        protected internal System.Windows.Forms.TextBox FileNameNet;
+        protected internal System.Windows.Forms.TextBox RelativePathNet;
+        protected internal System.Windows.Forms.ComboBox ComboSpecialFolderNet;
     }
 }

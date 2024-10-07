@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,6 +17,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         public ConfigController(IApplicationGlobals globals, INewSmartSerializableConfig config) 
         { 
             Config = config;
+            ConfigCopy = config.DeepCopy();
             Globals = globals;           
         }
 
@@ -26,12 +28,23 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             SpecialFolderList.Insert(0, "None");
 
             Viewer = new ConfigViewer();            
-            Viewer.ComboSpecialFolder.DataSource = Globals.FS.SpecialFolders.Keys;
-            var (specialFolder, relativePath) = FilePathConverter.GetSerializablePath(Config.Disk.FolderPath);
-            var specialFolderSelection = specialFolder == "Not Found" ? "None" : specialFolder;
-            Viewer.ComboSpecialFolder.SelectedItem = specialFolderSelection;
-            Viewer.RelativePath.Text = relativePath;
-            Viewer.FileName.Text = Config.Disk.FileName;
+            
+            Viewer.ComboSpecialFolderLocal.DataSource = Globals.FS.SpecialFolders.Keys;
+            var (specialFolderLocal, relativePathLocal) = FilePathConverter.GetSerializablePath(ConfigCopy.LocalDisk.FolderPath);
+            var specialFolderSelectionLocal = specialFolderLocal == "Not Found" ? "None" : specialFolderLocal;
+            Viewer.ComboSpecialFolderLocal.SelectedItem = specialFolderSelectionLocal;
+            Viewer.RelativePathLocal.Text = relativePathLocal;
+            Viewer.FileNameLocal.Text = ConfigCopy.LocalDisk.FileName;
+
+            Viewer.ComboSpecialFolderNet.DataSource = Globals.FS.SpecialFolders.Keys;
+            var (specialFolderNet, relativePathNet) = FilePathConverter.GetSerializablePath(ConfigCopy.NetDisk.FolderPath);
+            var specialFolderSelectionNet = specialFolderNet == "Not Found" ? "None" : specialFolderNet;
+            Viewer.ComboSpecialFolderNet.SelectedItem = specialFolderSelectionNet;
+            Viewer.RelativePathNet.Text = relativePathNet;
+            Viewer.FileNameNet.Text = ConfigCopy.NetDisk.FileName;
+
+            Viewer.ActivateUiBox(ConfigCopy.ActiveDisk);
+
             Viewer.SetController(this);
             return this;
         }
@@ -46,6 +59,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         #endregion ctor
 
         #region Properties
+        internal INewSmartSerializableConfig ConfigCopy { get; set; }
         internal INewSmartSerializableConfig Config { get; set; }
         internal ConfigViewer Viewer { get; set; }
         internal IApplicationGlobals Globals { get; set; }
@@ -60,19 +74,55 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             Viewer.Close();
         }
 
-        internal async Task ChangeSpecialFolderAsync()
+        internal void ChangeSpecialFolder(string specialFolderName, string relativePath, INewSmartSerializableConfig.ActiveDiskEnum diskType)
         {
-            throw new NotImplementedException();
+            var folderPath = FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
+            if (ConfigCopy.ActiveDisk == diskType) { ConfigCopy.Disk.FolderPath = folderPath; }
+            
+            switch (diskType)
+            {
+                case INewSmartSerializableConfig.ActiveDiskEnum.Local:
+                    ConfigCopy.LocalDisk.FolderPath = folderPath; // FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
+                    break;
+                case INewSmartSerializableConfig.ActiveDiskEnum.Net:
+                    ConfigCopy.NetDisk.FolderPath = folderPath; // FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
+                    break;
+                default:
+                    break;
+            }            
+        }
+
+        internal void ActivateDiskGroup(INewSmartSerializableConfig.ActiveDiskEnum diskType)
+        {
+            switch (diskType)
+            {
+                case INewSmartSerializableConfig.ActiveDiskEnum.Local:
+                    ConfigCopy.ActivateLocalDisk();
+                    Viewer.ActivateUiBox(diskType);
+                    break;
+                case INewSmartSerializableConfig.ActiveDiskEnum.Net:
+                    ConfigCopy.ActivateNetDisk();
+                    Viewer.ActivateUiBox(diskType);
+                    break;
+                default:
+                    break;
+            }
         }
 
         internal async Task OpenFileChooserAsync()
         {
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
         internal async Task SaveAsync()
         {
-            throw new NotImplementedException();
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            
+            await Task.Run(() => Config.CopyFrom(ConfigCopy, true));
+            Viewer.Close();
         }
 
         #endregion Events

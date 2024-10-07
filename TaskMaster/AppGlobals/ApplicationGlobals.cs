@@ -28,7 +28,6 @@ namespace TaskMaster
 
         async public Task LoadAsync()
         {
-            //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
             //IdleAsyncQueue.AddEntry(false, () => Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync()));
             await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
             await Engines.InitAsync();

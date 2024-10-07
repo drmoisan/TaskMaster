@@ -2,6 +2,8 @@
 using System;
 using System.IO;
 using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.Extensions;
+using System.ComponentModel;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
@@ -10,6 +12,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         public NewSmartSerializableConfig()
         {
             ResetLazy();
+            _activeDisk = INewSmartSerializableConfig.ActiveDiskEnum.Neither;
         }
 
         #region SerializationConfig
@@ -52,16 +55,20 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         [JsonIgnore]
-        public JsonSerializerSettings JsonSettings { get => _jsonSettings.Value; set => _jsonSettings = value.ToLazy(); }
+        public JsonSerializerSettings JsonSettings { get => _jsonSettings.Value; set { _jsonSettings = value.ToLazy(); Notify(); } }
         protected Lazy<JsonSerializerSettings> _jsonSettings;
 
         [JsonIgnore]
-        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings.Value; set => _netJsonSettings = value.ToLazy(); }
+        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings.Value; set { _netJsonSettings = value.ToLazy(); Notify(); } }
         protected Lazy<JsonSerializerSettings> _netJsonSettings;
 
         [JsonIgnore]
-        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings.Value; set => _localJsonSettings = value.ToLazy(); }
+        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings.Value; set { _localJsonSettings = value.ToLazy(); Notify(); } }
         protected Lazy<JsonSerializerSettings> _localJsonSettings;
+
+        [JsonIgnore]
+        public INewSmartSerializableConfig.ActiveDiskEnum ActiveDisk { get => _activeDisk; protected set { _activeDisk = value; Notify(); } } 
+        protected INewSmartSerializableConfig.ActiveDiskEnum _activeDisk;
 
         public static JsonSerializerSettings GetDefaultSettings()
         {
@@ -88,16 +95,64 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             _disk = _localDisk;
             _jsonSettings = _localJsonSettings;
+            ActiveDisk = INewSmartSerializableConfig.ActiveDiskEnum.Local;
         }
 
         public void ActivateNetDisk()
         {
             _disk = _netDisk;
             _jsonSettings = _netJsonSettings;
+            ActiveDisk = INewSmartSerializableConfig.ActiveDiskEnum.Net;
         }
 
-
         #endregion SerializationConfig
+
+        #region IClonable
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public INewSmartSerializableConfig DeepCopy() 
+        { 
+            var clone = (NewSmartSerializableConfig)Clone();
+            clone._disk = _disk.DeepCopy();
+            clone._localDisk = _localDisk.DeepCopy();
+            clone._netDisk = _netDisk.DeepCopy();
+            clone._jsonSettings = JsonSettings.DeepCopy().ToLazy();
+            clone._netJsonSettings = NetJsonSettings.DeepCopy().ToLazy();
+            clone._localJsonSettings = LocalJsonSettings.DeepCopy().ToLazy();
+            return clone;
+        }
+
+        public void CopyFrom(INewSmartSerializableConfig other, bool deep)
+        {
+            if (deep) { other = other.DeepCopy(); }
+
+            // Using private fields to avoid triggering events recursively
+            _classifierActivated = other.ClassifierActivated;
+            Disk.CopyFrom(other.Disk);
+            LocalDisk.CopyFrom(other.LocalDisk);
+            NetDisk.CopyFrom(other.NetDisk);
+            _jsonSettings = other.JsonSettings.ToLazy();
+            _netJsonSettings = other.NetJsonSettings.ToLazy();
+            _localJsonSettings = other.LocalJsonSettings.ToLazy();
+            Notify("CopyFrom");
+        }
+
+        #endregion IClonable
+
+        #region INotifyPropertyChanged
+
+        public void Notify([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
 
 
     }

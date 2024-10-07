@@ -113,6 +113,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 await ProcessMailHelperAsync(mailHelper).ConfigureAwait(false);
             }
 
+            (await Globals.AF.Manager["Folder"]).Serialize();
         }
 
         async public Task ProcessMailHelperAsync(MailItemHelper mailHelper)

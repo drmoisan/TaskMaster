@@ -62,6 +62,7 @@ namespace UtilitiesCS.EmailIntelligence
             if (spamHamGroupTask is not null)
             {
                 SpamHamGroup = await spamHamGroupTask;
+                SpamHamGroup.Config.PropertyChanged += Config_PropertyChanged;
                 Tokenize = TokenizeEmail;
                 TokenizeAsync = TokenizeEmailAsync;
                 CalculateProbability = SpamHamGroup.Classifiers["Spam"].chi2_spamprob;
@@ -350,14 +351,29 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
+        
+
         public async Task ShowDiskDialog(bool local)
         {
             if (local) { SpamHamGroup.Config.ActivateLocalDisk(); }
             else { SpamHamGroup.Config.ActivateNetDisk(); }
+            await ChangeDiskCallback(local);
+        }
+
+        internal async void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ActiveDisk") 
+            { 
+                await ChangeDiskCallback(SpamHamGroup.Config.ActiveDisk == INewSmartSerializableConfig.ActiveDiskEnum.Local);
+            }
+        }
+
+        internal virtual async Task ChangeDiskCallback(bool local)
+        {
             var response = MessageBox.Show($"SpamBayes is now using {(local ? "local" : "network")} disk. Would you like to save the current classifier?",
-                "Save Configuration",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
+                            "Save Configuration",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question);
             if (response == DialogResult.Yes) { SpamHamGroup.Serialize(); }
             else
             {

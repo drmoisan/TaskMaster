@@ -164,21 +164,21 @@ namespace TaskMaster
         #region Spam Manager
         
         public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
-        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.TrainSpam();
+        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);  //await Controller.TrainSpam();
         //public async void TrainSpam_Click(Office.IRibbonControl control) => (await Controller.SB) is null;
-        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.TrainHam();
-        public async void TestSpam_Click(Office.IRibbonControl control) => await Controller.TestSpam();
+        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false); //await Controller.TrainHam();
+        public async void TestSpam_Click(Office.IRibbonControl control) => await Controller.SB.TestAsync(Controller.OlSelection);
         public void TestSpamVerbose_Click(Office.IRibbonControl control) => Controller.TestSpamVerbose();
         public void SpamMetrics_Click(Office.IRibbonControl control) => Controller.SpamMetrics();
         public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => Controller.SpamInvestigateErrors();
 
         #region Spam Config
         
-        public async void SpamBayesEnabled_Click(Office.IRibbonControl control) => await (await Controller.SB).ToggleActivationAsync();
-        public async Task<bool> SpamBayesEnabled_GetPressed(Office.IRibbonControl control) => (await Controller.SB).IsActivated;
-        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialog(false);
-        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await (await Controller.SB).ShowDiskDialog(true);
-        public async void GetSaveLocation_Click(Office.IRibbonControl control) => (await Controller.SB).ShowSaveInfo();
+        public async void SpamBayesEnabled_Click(Office.IRibbonControl control) => await Controller.SB.ToggleActivationAsync();
+        public bool SpamBayesEnabled_GetPressed(Office.IRibbonControl control) => Controller.SB.IsActivated;
+        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await Controller.SB.ShowDiskDialog(false);
+        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await Controller.SB.ShowDiskDialog(true);
+        public void GetSaveLocation_Click(Office.IRibbonControl control) => Controller.SB.ShowSaveInfo();
 
         #endregion Spam Config
 

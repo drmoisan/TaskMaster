@@ -10,7 +10,7 @@ using Microsoft.VisualBasic;
 
 namespace UtilitiesCS
 {
-    public class FilePathHelper: INotifyPropertyChanged
+    public class FilePathHelper: INotifyPropertyChanged, ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -317,5 +317,38 @@ namespace UtilitiesCS
         }
 
         #endregion INotifyPropertyChanged Implementation
+
+        #region ICloneable Implementation
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public FilePathHelper DeepCopy()
+        {
+            var clone = new FilePathHelper();
+            clone._folderPath = _folderPath;
+            clone._fileName = _fileName;
+            clone._filePath = _filePath;
+            clone._fileStemSeed = _fileStemSeed;
+            clone._fileStemSuffix = _fileStemSuffix;
+            clone._fileStem = _fileStem;
+            clone._fileExtension = _fileExtension;
+            return clone;
+        }
+
+        public void CopyFrom(FilePathHelper other)
+        {
+            _folderPath = other._folderPath;
+            _fileName = other._fileName;
+            _filePath = other._filePath;
+            _fileStemSeed = other._fileStemSeed;
+            _fileStemSuffix = other._fileStemSuffix;
+            _fileStem = other._fileStem;
+            _fileExtension = other._fileExtension;
+        }
+
+        #endregion ICloneable Implementation
     }
 }

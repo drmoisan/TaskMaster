@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -39,10 +40,39 @@ namespace UtilitiesCS.ReusableTypeClasses
         #region SerializationConfig
 
         [JsonProperty]
-        public NewSmartSerializableConfig Config { get => _config; set => _config = value; }
+        public NewSmartSerializableConfig Config 
+        { 
+            get => _config;
+            set 
+            { 
+                if (_config is not null)
+                    _config.PropertyChanged -= Config_PropertyChanged;
+                _config = value;
+                _config.PropertyChanged -= Config_PropertyChanged;
+            }
+        }
+        
         private NewSmartSerializableConfig _config = new NewSmartSerializableConfig();
 
         #endregion SerializationConfig
+
+        public string Name { get; set; }
+
+        #region INotifyPropertyChanged
+        
+        private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        public void Notify([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
 
         #region Deserialization
 
@@ -303,6 +333,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         private ThreadSafeSingleShotGuard _serializationRequested = new();
         private TimerWrapper _timer;
+
         protected void RequestSerialization(string filePath)
         {
             if (_serializationRequested.CheckAndSetFirstCall)

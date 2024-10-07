@@ -3,17 +3,11 @@ using UtilitiesCS.Interfaces;
 
 namespace UtilitiesCS.Interfaces
 {
-    public interface ITimerWrapper
+    public interface ITimerWrapper: IGenericTimer
     {
         bool AutoReset { get; set; }
-        bool Enabled { get; set; }
-        TimeSpan Interval { get; set; }
-        double IntervalInMilliseconds { get; set; }
+        void ResetTimer();
 
-        event EventHandler<TimeElapsedEventArgs> Elapsed;
 
-        void Dispose();
-        void StartTimer();
-        void StopTimer();
     }
 }

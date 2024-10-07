@@ -69,7 +69,7 @@ namespace QuickFiler.Controllers
         
         private Padding _itemMarginTemplate;
         private QfEnums.InitTypeEnum _initType;
-        private bool _blRunningModalCode = false;
+        //private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
         private QfcHomeController _parent;
         private delegate Task WriteMetricsDelegate(string filename);
@@ -337,18 +337,18 @@ namespace QuickFiler.Controllers
                     $"implemented for {nameof(_initType)} {_initType}");
             }
             
-            else if (_blRunningModalCode)
-            {
-                MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            //else if (_blRunningModalCode)
+            //{
+            //    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
             else if (_groups.ReadyForMove)
             {
-                _blRunningModalCode = true;
+                //_blRunningModalCode = true;
                 
                 if (_parent.KeyboardHandler.KbdActive) { _parent.KeyboardHandler.ToggleKeyboardDialog(); }
                 await MoveAndIterate();
                 
-                _blRunningModalCode = false;
+                //_blRunningModalCode = false;
             }
 
         }

@@ -41,14 +41,14 @@ namespace TaskMaster
         {
             Globals = globals;
             Try = new(globals);
-            ResetSb();
+            //ResetSb();
             ResetTriage();
         }
 
-        internal void ResetSb()
-        {
-            _sb = new(async () => await SpamBayes.CreateAsync(Globals, true, Enums.NotFoundEnum.Ask));
-        }
+        //internal void ResetSb()
+        //{
+        //    _sb = new(async () => await SpamBayes.CreateAsync(Globals, true, Enums.NotFoundEnum.Ask));
+        //}
 
         internal void SetViewer(RibbonViewer Viewer)
         {
@@ -281,15 +281,25 @@ namespace TaskMaster
 
         #region Spam Manager
 
-        private AsyncLazy<SpamBayes> _sb;
-        internal AsyncLazy<SpamBayes> SB 
+        //private AsyncLazy<SpamBayes> _sb;
+        //internal AsyncLazy<SpamBayes> SB 
+        //{
+        //    get 
+        //    {
+        //        if (SynchronizationContext.Current is null)
+        //            SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+        //        if (_sb is null) { ResetSb(); }
+        //        return _sb; 
+        //    }
+        //}
+        internal SpamBayes SB 
         {
             get 
             {
                 if (SynchronizationContext.Current is null)
-                    SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
-                if (_sb is null) { ResetSb(); }
-                return _sb; 
+                    SynchronizationContext.SetSynchronizationContext(
+                        new WindowsFormsSynchronizationContext());
+                return Globals.Engines.InboxEngines.TryGetValue("Spam", out var engine) ? engine as SpamBayes : null; 
             }
         }
 
@@ -311,24 +321,24 @@ namespace TaskMaster
             }
         }
                 
-        internal async Task TrainSpam()
-        {
-            var sb = await SB;
-            if (sb is not null) { await sb.TrainAsync(OlSelection, true); }
-        }
+        //internal async Task TrainSpam()
+        //{
+        //    var sb = await SB;
+        //    if (sb is not null) { await sb.TrainAsync(OlSelection, true); }
+        //}
 
-        internal async Task TrainHam()
-        {
-            var sb = await SB;
-            if (sb is not null) { await sb.TrainAsync(OlSelection, false); }
-        }
+        //internal async Task TrainHam()
+        //{
+        //    var sb = await SB;
+        //    if (sb is not null) { await sb.TrainAsync(OlSelection, false); }
+        //}
 
-        internal async Task TestSpam()
-        {
-            var sb = await SB;
-            if (sb is not null) { await sb.TestAsync(OlSelection); }
+        //internal async Task TestSpam()
+        //{
+        //    var sb = await SB;
+        //    if (sb is not null) { await sb.TestAsync(OlSelection); }
             
-        }
+        //}
 
         internal void TestSpamVerbose()
         {

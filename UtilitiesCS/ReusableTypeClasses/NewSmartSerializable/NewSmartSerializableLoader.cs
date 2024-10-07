@@ -22,7 +22,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
     namespace UtilitiesCS.ReusableTypeClasses
     {
-        public class NewSmartSerializableLoader : NewSmartSerializable<NewSmartSerializableLoader>, INotifyPropertyChanged
+        public class NewSmartSerializableLoader : NewSmartSerializable<NewSmartSerializableLoader>
         {
             private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -61,8 +61,6 @@ namespace UtilitiesCS.ReusableTypeClasses
             internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
             private IApplicationGlobals _globals;
 
-            public string Name { get => _name; set { _name = value; Notify(); }}
-            private string _name;
 
             private JsonSerializerSettings GetSettings()
             {
@@ -185,16 +183,16 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
             }
 
-            #region INotifyPropertyChanged
+            //#region INotifyPropertyChanged
 
-            public event PropertyChangedEventHandler PropertyChanged;
+            //public event PropertyChangedEventHandler PropertyChanged;
 
-            public void Notify([CallerMemberName] string propertyName = "")
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
+            //public void Notify([CallerMemberName] string propertyName = "")
+            //{
+            //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            //}
 
-            #endregion INotifyPropertyChanged
+            //#endregion INotifyPropertyChanged
         }
     }
 

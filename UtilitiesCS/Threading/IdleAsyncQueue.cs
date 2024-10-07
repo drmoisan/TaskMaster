@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Threading
 {
@@ -18,7 +19,7 @@ namespace UtilitiesCS.Threading
         static IdleAsyncQueue()
         {
             //System.Windows.Forms.Application.Idle += new EventHandler(OnApplicationIdle);
-            ApplicationIdleTimer.ApplicationIdle += new ApplicationIdleTimer.ApplicationIdleEventHandler(OnApplicationIdle);
+            //ApplicationIdleTimer.ApplicationIdle += new ApplicationIdleTimer.ApplicationIdleEventHandler(OnApplicationIdle);
             ApplicationIdleTimer.GUIActivityThreshold = GUIActivityThreshold;
             ApplicationIdleTimer.CPUUsageThreshold = CPUUsageThreshold;
         }
@@ -27,30 +28,49 @@ namespace UtilitiesCS.Threading
 
         public static void AddEntry(bool useUiThread, Func<Task> actionAsync)
         {
+            if (_subscribeGuard.CheckAndSetFirstCall) 
+            {
+                ApplicationIdleTimer.Subscribe(OnApplicationIdle);
+                logger.Debug($"{nameof(IdleAsyncQueue)}.{nameof(AddEntry)} subscribed to {nameof(ApplicationIdleTimer)}");
+            }
             Entries.Enqueue((useUiThread, actionAsync));
         }
 
-        private static ConcurrentQueue<(bool UiThread, Func<Task> AsyncAction)> Entries { get; } = new();
+        private static ThreadSafeSingleShotGuard _subscribeGuard = new ThreadSafeSingleShotGuard();
 
+        private static TimedBatchAction _unsubscribe = new (TimeSpan.FromSeconds(3), () =>
+        {
+            ApplicationIdleTimer.Unsubscribe(OnApplicationIdle);
+            logger.Debug($"{nameof(IdleAsyncQueue)} unsubscribed from {nameof(ApplicationIdleTimer)}");
+            _subscribeGuard = new ThreadSafeSingleShotGuard();
+        });
+
+        private static ConcurrentQueue<(bool UiThread, Func<Task> AsyncAction)> Entries { get; } = new();
+                
         private static async void OnApplicationIdle(ApplicationIdleTimer.ApplicationIdleEventArgs e)
         {
             if (e.IdleDuration.TotalMilliseconds > IdleActionDuration)
             {
                 if (Entries.TryDequeue(out (bool useUiThread, Func<Task> actionAsync) entry))
                 {
+                    _unsubscribe.CancelAction();
                     try
                     {
                         if (entry.useUiThread)
                             await UiThread.Dispatcher.InvokeAsync(entry.actionAsync);
                         else
                             await entry.actionAsync();
-                        
+
                     }
                     catch (Exception ex)
                     {
                         logger.Error($"Failed to execute {nameof(entry.actionAsync)}");
                         logger.Error(ex.Message);
                     }
+                }
+                else 
+                {
+                    _unsubscribe.RequestAction();
                 }
             }
         }

@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public interface INewSmartSerializable<T> where T: class, INewSmartSerializable<T>, new()
+    public interface INewSmartSerializable<T>:INotifyPropertyChanged where T: class, INewSmartSerializable<T>, new()
     {
         T Deserialize(string fileName, string folderPath);
         T Deserialize(string fileName, string folderPath, bool askUserOnError);
@@ -14,5 +15,8 @@ namespace UtilitiesCS.ReusableTypeClasses
         void SerializeThreadSafe(string filePath);
 
         NewSmartSerializableConfig Config { get; set; }
+
+        string Name { get; set; }
+
     }
 }

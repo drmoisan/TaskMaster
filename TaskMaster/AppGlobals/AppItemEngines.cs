@@ -28,17 +28,6 @@ namespace TaskMaster
 
         public async Task InitAsync()
         {
-            //InboxEngines = await 
-            //    (await Globals.AF.Manager.Configuration)
-            //    .Where(config => config.Value.Engine)
-            //    .Select(config => new KeyValuePair<string, Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>>(
-            //        config.Key, engineInitiator.TryGetValue(config.Key, out var engineAsync) ? engineAsync : null))
-            //    .Where(kvp => kvp.Value is not null)
-            //    .ToAsyncEnumerable()
-            //    .SelectAwait(async kvp => new KeyValuePair<string, IConditionalEngine<MailItemHelper>>(
-            //        kvp.Key, await kvp.Value(Globals)))
-            //    .ToConcurrentDictionaryAsync(kvp => kvp.Key, kvp => kvp.Value);
-
             InboxEngines = await
                 (await Globals.AF.Manager.Configuration)
                 .Where(config => config.Value.Engine)
