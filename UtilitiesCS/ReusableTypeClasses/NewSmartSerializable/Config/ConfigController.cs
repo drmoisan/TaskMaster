@@ -120,8 +120,9 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            
-            await Task.Run(() => Config.CopyFrom(ConfigCopy, true));
+            Viewer.Enabled = false;
+            await Task.Run(() => Config.CopyChanged(ConfigCopy, true, true));
+
             Viewer.Close();
         }
 

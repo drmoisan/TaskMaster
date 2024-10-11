@@ -327,14 +327,17 @@ namespace UtilitiesCS
 
         public FilePathHelper DeepCopy()
         {
-            var clone = new FilePathHelper();
-            clone._folderPath = _folderPath;
-            clone._fileName = _fileName;
-            clone._filePath = _filePath;
-            clone._fileStemSeed = _fileStemSeed;
-            clone._fileStemSuffix = _fileStemSuffix;
-            clone._fileStem = _fileStem;
-            clone._fileExtension = _fileExtension;
+            //var clone = new FilePathHelper();
+            var clone = new FilePathHelper
+            {
+                _folderPath = _folderPath,
+                _fileName = _fileName,
+                _filePath = _filePath,
+                _fileStemSeed = _fileStemSeed,
+                _fileStemSuffix = _fileStemSuffix,
+                _fileStem = _fileStem,
+                _fileExtension = _fileExtension
+            };
             return clone;
         }
 
@@ -347,6 +350,49 @@ namespace UtilitiesCS
             _fileStemSuffix = other._fileStemSuffix;
             _fileStem = other._fileStem;
             _fileExtension = other._fileExtension;
+        }
+
+        internal IList<string> CopyChanged(FilePathHelper other)
+        {
+            var changed = new List<string>();
+            if (_folderPath != other._folderPath)
+            {
+                _folderPath = other._folderPath;
+                changed.Add(nameof(FolderPath));
+            }
+
+            if (_fileName != other._fileName)
+            {
+                _fileName = other._fileName;
+                changed.Add(nameof(FileName));
+            }
+            
+            if (_filePath != other._filePath)
+            {
+                _filePath = other._filePath;
+                changed.Add(nameof(FilePath));
+            }
+            if (_fileStemSeed != other._fileStemSeed)
+            {
+                _fileStemSeed = other._fileStemSeed;
+                changed.Add(nameof(FileStemSeed));
+            }
+            if (_fileStemSuffix != other._fileStemSuffix)
+            {
+                _fileStemSuffix = other._fileStemSuffix;
+                changed.Add(nameof(FileStemSuffix));
+            }
+            if (_fileStem != other._fileStem)
+            {
+                _fileStem = other._fileStem;
+                changed.Add(nameof(FileStem));
+            }
+            if (_fileExtension != other._fileExtension)
+            {
+                _fileExtension = other._fileExtension;
+                changed.Add(nameof(FileExtension));
+            }
+            return changed;
         }
 
         #endregion ICloneable Implementation

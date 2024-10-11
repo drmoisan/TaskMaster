@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
@@ -15,7 +14,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class Triage
+    public class Triage: IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -59,23 +58,6 @@ namespace UtilitiesCS.EmailIntelligence
 
             return await Task.Run(triage.InitAsync, token);
 
-        }
-
-        public static async Task<ConditionalItemEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
-        {
-            var ce = new ConditionalItemEngine<MailItemHelper>();
-
-            ce.AsyncCondition = (item) => Task.Run(() =>
-                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
-                mailItem.UserProperties.Find("Triage") is null);
-
-            ce.EngineInitializer = async (globals) => ce.Engine = await Triage.CreateAsync(globals);
-            await ce.EngineInitializer(globals);
-            ce.AsyncAction = (item) => ce.Engine is not null ? ((Triage)ce.Engine).TestAsync(item) : null;
-            ce.EngineName = "Triage";
-            ce.Message = $"{ce.EngineName} is null. Skipping actions";
-            
-            return ce;
         }
 
         #endregion ctor
@@ -195,11 +177,14 @@ namespace UtilitiesCS.EmailIntelligence
             return await Task.Run(CreateClassifier, token);
         }
 
+        private Func<object, string, Task> _callbackAsync;
 
         #region Properties
 
         public BayesianClassifierGroup ClassifierGroup { get => _classifierGroup; set => _classifierGroup = value; }
         private BayesianClassifierGroup _classifierGroup;
+
+        public INewSmartSerializableConfig Config => ClassifierGroup.Config; 
 
         //internal ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         internal CancellationToken Token { get; }
@@ -213,10 +198,49 @@ namespace UtilitiesCS.EmailIntelligence
         private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync;
 
         public Func<object, string, Task> CallbackAsync { get => _callbackAsync; set => _callbackAsync = value; }
-        private Func<object, string, Task> _callbackAsync;
-
 
         #endregion Properties
+
+        #region IConditionalEngine
+
+        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
+        {
+            var triage = await CreateAsync(globals);
+            return triage;
+            //var ce = new ConditionalItemEngine<MailItemHelper>();
+
+            //ce.AsyncCondition = (item) => Task.Run(() =>
+            //    item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
+            //    mailItem.UserProperties.Find("Triage") is null);
+
+            //ce.EngineInitializer = async (globals) => ce.Engine = await Triage.CreateAsync(globals);
+            //await ce.EngineInitializer(globals);
+            //ce.AsyncAction = (item) => ce.Engine is not null ? ((Triage)ce.Engine).TestAsync(item) : null;
+            //ce.EngineName = "Triage";
+            //ce.Message = $"{ce.EngineName} is null. Skipping actions";
+
+            //return ce;
+        }
+
+        public Func<MailItemHelper, Task> AsyncAction => (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null;
+
+        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() =>
+                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
+                mailItem.UserProperties.Find("Triage") is null);
+
+        public object Engine => this;
+
+        public Func<IApplicationGlobals, Task> EngineInitializer => throw new NotImplementedException();
+
+        public string EngineName => "Triage";
+
+        public string Message => $"{EngineName} is null. Skipping actions";
+
+        public MailItemHelper TypedItem { get; set; }
+        
+        public void Serialize() => ClassifierGroup.Serialize();
+
+        #endregion IConditionalEngine
 
         public async Task CreateNewTriageClassifierGroupAsync(CancellationToken token)
         {
@@ -321,5 +345,6 @@ namespace UtilitiesCS.EmailIntelligence
         {
             await Task.Run(() => mailItem.SetUdf("Triage", predictedClass), token);
         }
+
     }
 }

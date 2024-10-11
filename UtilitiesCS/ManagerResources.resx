@@ -120,7 +120,6 @@
   <data name="Folder" xml:space="preserve">
     <value>{
   "$id": "1",
-  "Activated": true,
   "Engine": false,
   "Globals": "default",
   "Name": "Folder",
@@ -141,14 +140,13 @@
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },
-    "ClassifierActivated": false
+    "ClassifierActivated": true
   }
 }</value>
   </data>
   <data name="Spam" xml:space="preserve">
     <value>{
   "$id": "1",
-  "Activated": true,
   "Engine":true,
   "Globals": "default",
   "Name": "Spam",
@@ -169,14 +167,13 @@
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },
-    "ClassifierActivated": false
+    "ClassifierActivated": true
   }
 }</value>
   </data>
   <data name="Triage" xml:space="preserve">
     <value>{
   "$id": "1",
-  "Activated": true,
   "Engine": true,
   "Globals": "default",
   "Name": "Triage",
@@ -197,7 +194,7 @@
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },
-    "ClassifierActivated": false
+    "ClassifierActivated": true
   }
 }</value>
   </data>

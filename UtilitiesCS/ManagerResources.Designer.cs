@@ -63,7 +63,6 @@ namespace UtilitiesCS {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
-        ///  &quot;Activated&quot;: true,
         ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Folder&quot;,
@@ -82,7 +81,9 @@ namespace UtilitiesCS {
         ///    &quot;NetDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;ManagerFolder.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot; [rest of string was truncated]&quot;;.
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
+        ///    },
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Folder {
             get {
@@ -93,7 +94,6 @@ namespace UtilitiesCS {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
-        ///  &quot;Activated&quot;: true,
         ///  &quot;Engine&quot;:true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Spam&quot;,
@@ -113,7 +113,8 @@ namespace UtilitiesCS {
         ///      &quot;FileName&quot;: &quot;ManagerSpam.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        /// [rest of string was truncated]&quot;;.
+        ///    },
+        ///    &quot;Classifie [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Spam {
             get {
@@ -124,7 +125,6 @@ namespace UtilitiesCS {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
-        ///  &quot;Activated&quot;: true,
         ///  &quot;Engine&quot;: true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Triage&quot;,
@@ -143,7 +143,9 @@ namespace UtilitiesCS {
         ///    &quot;NetDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;ManagerTriage.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: [rest of string was truncated]&quot;;.
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
+        ///    },
+        ///    &quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Triage {
             get {

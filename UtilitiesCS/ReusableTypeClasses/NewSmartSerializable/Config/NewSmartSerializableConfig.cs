@@ -4,6 +4,8 @@ using System.IO;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.Extensions;
 using System.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
@@ -35,7 +37,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             File.GetLastWriteTimeUtc(LocalDisk.FilePath) : default;
 
         private bool _classifierActivated;
-        public bool ClassifierActivated { get => _classifierActivated; set => _classifierActivated = value; }
+        public bool ClassifierActivated { get => _classifierActivated; set { _classifierActivated = value; Notify(); } }
 
         public void ResetLazy()
         {
@@ -66,7 +68,6 @@ namespace UtilitiesCS.ReusableTypeClasses
         public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings.Value; set { _localJsonSettings = value.ToLazy(); Notify(); } }
         protected Lazy<JsonSerializerSettings> _localJsonSettings;
 
-        [JsonIgnore]
         public INewSmartSerializableConfig.ActiveDiskEnum ActiveDisk { get => _activeDisk; protected set { _activeDisk = value; Notify(); } } 
         protected INewSmartSerializableConfig.ActiveDiskEnum _activeDisk;
 
@@ -93,14 +94,14 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public void ActivateLocalDisk()
         {
-            _disk = _localDisk;
+            _disk.CopyFrom(_localDisk);
             _jsonSettings = _localJsonSettings;
             ActiveDisk = INewSmartSerializableConfig.ActiveDiskEnum.Local;
         }
 
         public void ActivateNetDisk()
         {
-            _disk = _netDisk;
+            _disk.CopyFrom(_netDisk);
             _jsonSettings = _netJsonSettings;
             ActiveDisk = INewSmartSerializableConfig.ActiveDiskEnum.Net;
         }
@@ -115,14 +116,19 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         public INewSmartSerializableConfig DeepCopy() 
-        { 
-            var clone = (NewSmartSerializableConfig)Clone();
-            clone._disk = _disk.DeepCopy();
-            clone._localDisk = _localDisk.DeepCopy();
-            clone._netDisk = _netDisk.DeepCopy();
-            clone._jsonSettings = JsonSettings.DeepCopy().ToLazy();
-            clone._netJsonSettings = NetJsonSettings.DeepCopy().ToLazy();
-            clone._localJsonSettings = LocalJsonSettings.DeepCopy().ToLazy();
+        {
+            //var clone = (NewSmartSerializableConfig)Clone();
+            var clone = new NewSmartSerializableConfig
+            {
+                _activeDisk = _activeDisk,
+                _classifierActivated = _classifierActivated,
+                _disk = _disk.DeepCopy(),
+                _localDisk = _localDisk.DeepCopy(),
+                _netDisk = _netDisk.DeepCopy(),
+                _jsonSettings = JsonSettings.DeepCopy().ToLazy(),
+                _netJsonSettings = NetJsonSettings.DeepCopy().ToLazy(),
+                _localJsonSettings = LocalJsonSettings.DeepCopy().ToLazy()
+            };
             return clone;
         }
 
@@ -131,6 +137,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             if (deep) { other = other.DeepCopy(); }
 
             // Using private fields to avoid triggering events recursively
+            _activeDisk = other.ActiveDisk;
             _classifierActivated = other.ClassifierActivated;
             Disk.CopyFrom(other.Disk);
             LocalDisk.CopyFrom(other.LocalDisk);
@@ -139,6 +146,58 @@ namespace UtilitiesCS.ReusableTypeClasses
             _netJsonSettings = other.NetJsonSettings.ToLazy();
             _localJsonSettings = other.LocalJsonSettings.ToLazy();
             Notify("CopyFrom");
+        }
+
+        public void CopyChanged(INewSmartSerializableConfig other, bool deep, bool notify) 
+        {
+            var changed = CopyChanged(other, deep);
+            if (notify) 
+            { 
+                Notify(string.Join(",", changed));
+            }
+        }
+
+        public IList<string> CopyChanged(INewSmartSerializableConfig other, bool deep)
+        {
+            List<string> changed = [];
+            
+            if (_activeDisk != other.ActiveDisk)
+            {
+                _activeDisk = other.ActiveDisk;
+                changed.Add(nameof(ActiveDisk));
+            }
+
+            if (_classifierActivated != other.ClassifierActivated)
+            {
+                _classifierActivated = other.ClassifierActivated;
+                changed.Add(nameof(ClassifierActivated));
+            }
+
+            changed.AddRange(Disk.CopyChanged(other.Disk).Select(x => $"{nameof(Disk)}.{x}"));
+            changed.AddRange(LocalDisk.CopyChanged(other.LocalDisk).Select(x => $"{nameof(LocalDisk)}.{x}"));
+            changed.AddRange(NetDisk.CopyChanged(other.NetDisk).Select(x => $"{nameof(NetDisk)}.{x}"));
+
+            if (JsonSettings != other.JsonSettings)
+            {
+                _jsonSettings = other.JsonSettings.ToLazy();
+                changed.Add(nameof(JsonSettings));
+            }
+
+            if (NetJsonSettings != other.NetJsonSettings)
+            {
+                _netJsonSettings = other.NetJsonSettings.ToLazy();
+                changed.Add(nameof(NetJsonSettings));
+            }
+
+            if (LocalJsonSettings != other.LocalJsonSettings)
+            {
+                _localJsonSettings = other.LocalJsonSettings.ToLazy();
+                changed.Add(nameof(LocalJsonSettings));
+            }
+
+            return changed;
+
+
         }
 
         #endregion IClonable

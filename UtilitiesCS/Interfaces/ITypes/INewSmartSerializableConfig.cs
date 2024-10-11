@@ -18,6 +18,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         ActiveDiskEnum ActiveDisk { get; }
         INewSmartSerializableConfig DeepCopy();
         void CopyFrom(INewSmartSerializableConfig config, bool deep);
+        void CopyChanged(INewSmartSerializableConfig other, bool deep, bool notify);
 
         void ActivateLocalDisk();
         void ActivateMostRecent();

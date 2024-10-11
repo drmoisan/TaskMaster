@@ -98,6 +98,12 @@
                   <button id="ClearTriage" imageMso="Clear" onAction="ClearTriage_Click" label="Clear Triage"/>
                   <button id="TriageSelection" imageMso="FilterBySelection" onAction="TriageSelection_Click" label="Triage Selection"/>
                   <button id="SetPrecision" imageMso="EditCitation" onAction="SetPrecision_Click" label="Set Precision"/>
+                  <menu id = "TriageSaveOptions" imageMso="FileSave" label="Save Options" >
+                    <button id="TriageSaveNetwork" imageMso="ServerConnection" onAction="TriageSaveNetwork_Click" label="Network"/>
+                    <button id="TriageSaveLocal" imageMso="FillDown" onAction="TriageSaveLocal_Click" label="Local"/>
+                    <button id ="TriageGetSaveState" imageMso="Help" onAction="TriageGetSaveLocation_Click" label="Current Location"/>
+                  </menu>
+                  <checkBox id="TriageEnabledToggle" getPressed="TriageEnabled_GetPressed" onAction="TriageEnabled_Click" label="Triage Enabled"/>
                 </menu>
               </group>
             </tab>

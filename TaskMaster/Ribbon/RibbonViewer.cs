@@ -3,6 +3,7 @@ using Office = Microsoft.Office.Core;
 using Microsoft.VisualBasic;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using UtilitiesCS.EmailIntelligence;
 
 namespace TaskMaster
 {
@@ -164,21 +165,20 @@ namespace TaskMaster
         #region Spam Manager
         
         public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
-        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);  //await Controller.TrainSpam();
-        //public async void TrainSpam_Click(Office.IRibbonControl control) => (await Controller.SB) is null;
-        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false); //await Controller.TrainHam();
-        public async void TestSpam_Click(Office.IRibbonControl control) => await Controller.SB.TestAsync(Controller.OlSelection);
+        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);         
+        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false); 
+        public async void TestSpam_Click(Office.IRibbonControl control) => await ((SpamBayes)Controller.Engines.InboxEngines[SpamBayes.GroupName].Engine).TestAsync(Controller.OlSelection);
         public void TestSpamVerbose_Click(Office.IRibbonControl control) => Controller.TestSpamVerbose();
         public void SpamMetrics_Click(Office.IRibbonControl control) => Controller.SpamMetrics();
         public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => Controller.SpamInvestigateErrors();
 
         #region Spam Config
-        
-        public async void SpamBayesEnabled_Click(Office.IRibbonControl control) => await Controller.SB.ToggleActivationAsync();
-        public bool SpamBayesEnabled_GetPressed(Office.IRibbonControl control) => Controller.SB.IsActivated;
-        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await Controller.SB.ShowDiskDialog(false);
-        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await Controller.SB.ShowDiskDialog(true);
-        public void GetSaveLocation_Click(Office.IRibbonControl control) => Controller.SB.ShowSaveInfo();
+
+        public void SpamBayesEnabled_Click(Office.IRibbonControl control, bool pressed) => Controller.Engines.ToggleEngineAsync(SpamBayes.GroupName);
+        public async Task<bool> SpamBayesEnabled_GetPressed(Office.IRibbonControl control) => await Controller.Engines.EngineActiveAsync(SpamBayes.GroupName);
+        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, false);
+        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, true);
+        public void GetSaveLocation_Click(Office.IRibbonControl control) => Controller.Engines.ShowSaveInfo(SpamBayes.GroupName);
 
         #endregion Spam Config
 
@@ -192,6 +192,16 @@ namespace TaskMaster
         public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
         public async void ClearTriage_Click(Office.IRibbonControl control) => await _controller.ClearTriageAync();
         public async void SetPrecision_Click(Office.IRibbonControl control) => await _controller.TriageSetPrecision();
+
+        #region Triage Config
+
+        public void TriageEnabled_Click(Office.IRibbonControl control, bool pressed) => Controller.Engines.ToggleEngineAsync("Triage");
+        public async Task<bool> TriageEnabled_GetPressed(Office.IRibbonControl control) => await Controller.Engines.EngineActiveAsync("Triage");
+        public async void TriageSaveNetwork_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog("Triage", false);
+        public async void TriageSaveLocal_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog("Triage", true);
+        public void TriageGetSaveLocation_Click(Office.IRibbonControl control) => Controller.Engines.ShowSaveInfo("Triage");
+
+        #endregion Triage Config
 
         #endregion Triage
 

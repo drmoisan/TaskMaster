@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using log4net.Repository.Hierarchy;
+using System;
 using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
@@ -32,6 +31,14 @@ namespace UtilitiesCS
         public Func<IApplicationGlobals, Task> EngineInitializer { get; set; }
         public string EngineName { get; set; }
         public T TypedItem { get; set; }
-
+        public INewSmartSerializableConfig Config { get; set; }
+        public System.Action SerializationEngine { get; set; }
+        public void Serialize() 
+        { 
+            if (SerializationEngine is not null)
+            {
+                SerializationEngine();
+            }
+        }
     }
 }

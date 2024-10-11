@@ -67,7 +67,7 @@ namespace TaskMaster.Test
 
             foreach (var config in configurations)
             {
-                config.Value.Activated = true;
+                config.Value.Config.ClassifierActivated = true;
                 var name = config.Value.Name;
                 var classifier = af.Manager.TryGetValue(name, out AsyncLazy<BayesianClassifierGroup> classifierAsyncLazy) ? await classifierAsyncLazy : null;
                 Assert.IsNotNull(classifier);
@@ -140,7 +140,7 @@ namespace TaskMaster.Test
             var manager = new ManagerAsyncLazy(globals);
             await manager.InitAsync();
             var configs = await manager.Configuration;
-            configs["Spam"].Activated = false;
+            configs["Spam"].Config.ClassifierActivated = false;
             
         }
 

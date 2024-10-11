@@ -48,7 +48,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 if (_config is not null)
                     _config.PropertyChanged -= Config_PropertyChanged;
                 _config = value;
-                _config.PropertyChanged -= Config_PropertyChanged;
+                _config.PropertyChanged += Config_PropertyChanged;
             }
         }
         
@@ -62,7 +62,10 @@ namespace UtilitiesCS.ReusableTypeClasses
         
         private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            PropertyChanged?.Invoke(this, e);
+            //var properties = string.Join(",",e.PropertyName.Split(',').Select(name => $"{typeof(T).Name}.{name}"));
+            //var properties = $"{typeof(T).Name},{e.PropertyName}";
+            //Notify(properties);
+            Notify(e.PropertyName);
         }
 
         public void Notify([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
@@ -165,7 +168,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
                 var settings = loader.Config.JsonSettings.ThrowIfNull();
                 T instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
-                if (instance is not null) { instance.Config = loader.Config; }
+                if (instance is not null) { instance.Config.CopyFrom(loader.Config, true); }
                 return instance;
             }
             catch (ArgumentNullException e)

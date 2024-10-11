@@ -42,14 +42,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     netJsonSettings: new Lazy<JsonSerializerSettings>(GetSettings),
                     jsonSettings: new Lazy<JsonSerializerSettings>(GetSettings));
             }
-
-            protected bool _activated;
-            public bool Activated 
-            { 
-                get => _activated; 
-                set { _activated = value; Notify(); }
-            }
-
+                        
             protected bool _engine;
             public bool Engine
             {

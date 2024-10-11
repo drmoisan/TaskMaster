@@ -303,6 +303,8 @@ namespace TaskMaster
             }
         }
 
+        internal IAppItemEngines Engines => Globals.Engines;
+
         internal async Task ClearSpamManagerAsync()
         {
             if (SynchronizationContext.Current is null)
@@ -311,12 +313,13 @@ namespace TaskMaster
             var response = MessageBox.Show("Are you sure you want to clear the Spam Manager? This cannot be undone", "Clear Spam Manager", MessageBoxButtons.YesNo);
             if (response == DialogResult.Yes)
             {
-                if ((await Globals.AF.Manager.Configuration).TryGetValue("Spam", out var loader))
+                if ((await Globals.AF.Manager.Configuration).TryGetValue(SpamBayes.GroupName, out var loader))
                 {
                     var classifier = await SpamBayes.CreateSpamClassifiersAsync();
-                    classifier.Config = loader.Config;
+                    classifier.Config.CopyFrom(loader.Config, true);
                     classifier.Serialize();
                     Globals.AF.Manager[SpamBayes.GroupName] = classifier.ToAsyncLazy();
+                    await Globals.Engines.RestartEngineAsync(SpamBayes.GroupName);
                 }                
             }
         }

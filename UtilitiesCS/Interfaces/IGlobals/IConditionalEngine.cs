@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
@@ -12,6 +14,7 @@ namespace UtilitiesCS
         string EngineName { get; }
         string Message { get; }
         T TypedItem { get; set; }
-        
+        INewSmartSerializableConfig Config { get; }
+        void Serialize();
     }
 }
