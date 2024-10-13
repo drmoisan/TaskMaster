@@ -164,7 +164,7 @@ namespace UtilitiesCS.EmailIntelligence
 
                 case Enums.NotFoundEnum.Ask:
                     logger.Warn($"{message}. Asking user");
-                    var result = MessageBox.Show(
+                    var result = MyBox.ShowDialog(
                         $"{message} Would you like to create a new classifier?",
                         $"Cannot Load {GroupName}",
                         MessageBoxButtons.YesNo,
@@ -181,7 +181,7 @@ namespace UtilitiesCS.EmailIntelligence
                         }
                         else
                         {
-                            MessageBox.Show("Could not create Spam classifier because configuration could not be found.",
+                            MyBox.ShowDialog("Could not create Spam classifier because configuration could not be found.",
                                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return false;
                         }

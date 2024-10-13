@@ -130,7 +130,7 @@ namespace UtilitiesCS.EmailIntelligence
 
                 case Enums.NotFoundEnum.Ask:
                     logger.Warn($"{message}. Asking user");
-                    var result = MessageBox.Show(
+                    var result = MyBox.ShowDialog(
                         $"{message} Would you like to create a new classifier?",
                         $"Cannot Load {GroupName}",
                         MessageBoxButtons.YesNo,

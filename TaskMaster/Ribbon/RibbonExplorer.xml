@@ -86,6 +86,7 @@
                     <button id="PrintManagerState" imageMso="PrintAttach" onAction="PrintManagerState_Click" label="Print Manager State" />
                     <button id="SerializeMailInfo" imageMso="SaveAll" onAction="SerializeMailInfo_Click" label="Serialize Mail Info"/>
                     <button id="DeleteTriageSpamFields" imageMso="Delete" onAction ="DeleteTriageSpamFields_Click" label ="Delete Triage Spam"/>
+                    <button id="TryGetInboxes" imageMso="AccessListIssues" onAction ="TryGetInboxes_Click" label ="TryGetInboxes"/>
                   </menu>
                   <button id="RunIntelligence" imageMso="ARMPreviewButton" onAction="Intelligence_Click" label="Intelligence"/>
                 </menu>  

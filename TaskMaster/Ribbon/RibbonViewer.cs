@@ -226,7 +226,7 @@ namespace TaskMaster
         public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();        
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.Try.TryPrintManagerState();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.Try.TrySerializeMailInfo();
-
+        public void TryGetInboxes_Click(Office.IRibbonControl control) => _controller.Try.TryGetInboxes();
         #endregion
 
         public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();

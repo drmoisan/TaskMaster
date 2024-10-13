@@ -145,7 +145,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();
                 classifierGroup.Serialize();
                 //Globals.AF.Manager.Serialize();
-                MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MyBox.ShowDialog("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

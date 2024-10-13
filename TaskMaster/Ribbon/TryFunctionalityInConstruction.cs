@@ -24,9 +24,11 @@ namespace TaskMaster.Ribbon
     {
         public IApplicationGlobals Globals { get; internal protected set; } = globals;
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Try specific methods
-        
+
         internal void TryGetConversationDataframe()
         {
             var Mail = Globals.Ol.App.ActiveExplorer().Selection[1];
@@ -208,6 +210,28 @@ namespace TaskMaster.Ribbon
                 color: OlCategoryColor.olCategoryColorTeal,
                 olUserFieldName: "TagProject");
             projectCreator.CreateProjectTaskItem("T3 ROUTINE - Reading", "T305");
+        }
+
+        internal void TryGetInboxes()
+        {
+            var stores = Globals.Ol.NamespaceMAPI.Stores;
+            var inboxes = stores
+                .Cast<Store>()
+                .Select(store => 
+                {
+                    try
+                    {
+                        return store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                    }
+                    catch (System.Exception)
+                    {
+                        return null;
+                    }
+                     
+                })
+                .Where(store => store is not null).ToArray();
+            var mailboxes = inboxes.Select(x => x.FolderPath.Split("\\").Where(x => !x.IsNullOrEmpty()).FirstOrDefault()).ToArray();
+            logger.Debug($"Inboxes: {mailboxes.SentenceJoin()}");
         }
 
         #endregion
