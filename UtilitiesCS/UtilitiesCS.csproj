@@ -536,6 +536,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
+    <Compile Include="Extensions\CompilerServicesExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
@@ -636,6 +637,7 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
     <Compile Include="Interfaces\ITypes\ISmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\LazyTry\LazyTry.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs">
       <SubType>Component</SubType>

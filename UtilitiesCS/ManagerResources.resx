@@ -167,7 +167,7 @@
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },
-    "ClassifierActivated": true
+    "ClassifierActivated": false
   }
 }</value>
   </data>
@@ -182,7 +182,7 @@
     "Disk": {
       "FileName": "ManagerTriage.json",
       "RelativePath": "",
-      "SpecialFolderName": "AppData"
+      "SpecialFolderName": "Flow"
     },
     "LocalDisk": {
       "FileName": "ManagerTriage.json",
@@ -194,7 +194,7 @@
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },
-    "ClassifierActivated": true
+    "ClassifierActivated": false
   }
 }</value>
   </data>

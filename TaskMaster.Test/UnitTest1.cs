@@ -84,9 +84,11 @@ namespace TaskMaster.Test
             var af = new AppAutoFileObjects(appGlobals);
             var loader = new NewSmartSerializableLoader(appGlobals);
             loader.Config.LocalDisk.FileName = "ManagerSpam.json";
-            loader.Config.LocalDisk.FolderPath = appGlobals.FS.FldrAppData;
+            if (!appGlobals.FS.SpecialFolders.TryGetValue("AppData", out var appData)) { loader.Config.LocalDisk.FolderPath = appData; }
+            
             loader.Config.NetDisk.FileName = "ManagerSpam.json";
-            loader.Config.NetDisk.FolderPath = appGlobals.FS.FldrFlow;            
+
+            if (!appGlobals.FS.SpecialFolders.TryGetValue("AppData", out var flow)) { loader.Config.NetDisk.FolderPath = flow; }                            
             loader.Config.ActivateLocalDisk();
             loader.SerializeThreadSafe(loader.Config.LocalDisk.FilePath);
         }
@@ -100,9 +102,13 @@ namespace TaskMaster.Test
             ILGlobals.LoadOpCodes();
             dict["key1"] = "value1";
             dict.Config.Disk.FileName = "testdict.json";
-            dict.Config.Disk.FolderPath = appGlobals.FS.FldrAppData;
-            dict.Config.NetDisk.FileName = "testdict.json";
-            dict.Config.NetDisk.FolderPath = appGlobals.FS.FldrAppData;
+            if (appGlobals.FS.SpecialFolders.TryGetValue("AppData", out var appData)) 
+            {
+                dict.Config.Disk.FolderPath = appData;
+                dict.Config.NetDisk.FileName = "testdict.json";
+                dict.Config.NetDisk.FolderPath = appData;
+
+            }
             dict.Config.LocalDisk = dict.Config.Disk;
             dict.Config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             dict.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;

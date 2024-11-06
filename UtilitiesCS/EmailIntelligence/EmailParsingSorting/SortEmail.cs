@@ -12,6 +12,7 @@ using UtilitiesCS.EmailIntelligence;
 using System.Collections.Generic;
 using Deedle;
 using System.Threading.Tasks;
+using SDILReader;
 
 namespace UtilitiesCS
 {
@@ -57,8 +58,11 @@ namespace UtilitiesCS
         {
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
             var olAncestor = FolderConverter.ResolveOlRoot(((Folder)mailItems[0].Parent).FolderPath, appGlobals);
-            var fsAncestorEquivalent = appGlobals.FS.FldrOneDrive;
-            await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            if (appGlobals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+            {
+                var fsAncestorEquivalent = folderRoot;
+                await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            }
         }
 
         async public static Task SortAsync(IList<MailItemHelper> mailHelpers,

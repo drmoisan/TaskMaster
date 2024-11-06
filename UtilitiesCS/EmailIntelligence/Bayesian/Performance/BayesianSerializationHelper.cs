@@ -29,14 +29,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             };
             jsonSettings.Converters.Add(new AppGlobalsConverter(Globals));
 
-            var disk = new FilePathHelper { FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian") };
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
-                var item = JsonConvert.DeserializeObject<T>(
-                    File.ReadAllText(disk.FilePath), jsonSettings);
-                return item;
+                var disk = new FilePathHelper { FolderPath = Path.Combine(folderRoot, "Bayesian") };
+                var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+                disk.FileName = fileName;
+                if (File.Exists(disk.FilePath))
+                {
+                    var item = JsonConvert.DeserializeObject<T>(
+                        File.ReadAllText(disk.FilePath), jsonSettings);
+                    return item;
+                }
+                else { return default(T); }
             }
             else { return default(T); }
         }
@@ -51,20 +55,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             };
             jsonSettings.Converters.Add(new AppGlobalsConverter(Globals));
 
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
-                string fileText = null;
-                using (var reader = File.OpenText(disk.FilePath))
+                var disk = new FilePathHelper();
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
+                var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+                disk.FileName = fileName;
+                if (File.Exists(disk.FilePath))
                 {
-                    fileText = await reader.ReadToEndAsync();
-                }
+                    string fileText = null;
+                    using (var reader = File.OpenText(disk.FilePath))
+                    {
+                        fileText = await reader.ReadToEndAsync();
+                    }
 
-                var item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
-                return item;
+                    var item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
+                    return item;
+                }
+                else { return default(T); }
             }
             else { return default(T); }
         }
@@ -95,11 +103,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
         protected FilePathHelper GetDisk(string fileNameSeed, string fileNameSuffix, string extension)
         {
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}{extension}" : $"{fileNameSeed}_{fileNameSuffix}{extension}";
-            disk.FileName = fileName;
-            return disk;
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                var disk = new FilePathHelper();
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
+                var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}{extension}" : $"{fileNameSeed}_{fileNameSuffix}{extension}";
+                disk.FileName = fileName;
+                return disk;
+            }
+            else { return null; }
         }
 
         protected JsonSerializerSettings GetJsonSettings()
@@ -116,15 +128,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
         public virtual async Task SaveTextsAsync(IEnumerable<string> texts, string fileNameSeed, string fileNameSuffix = "", string fileExtension = ".txt")
         {
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ?
-                $"{fileNameSeed}{fileExtension}" :
-                $"{fileNameSeed}_{fileNameSuffix}{fileExtension}";
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                var disk = new FilePathHelper();
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
+                var fileName = fileNameSuffix.IsNullOrEmpty() ?
+                    $"{fileNameSeed}{fileExtension}" :
+                    $"{fileNameSeed}_{fileNameSuffix}{fileExtension}";
 
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath)) { File.Delete(disk.FilePath); }
-            await WriteTextsAsync(disk.FilePath, texts);
+                disk.FileName = fileName;
+                if (File.Exists(disk.FilePath)) { File.Delete(disk.FilePath); }
+                await WriteTextsAsync(disk.FilePath, texts);
+            }
         }
 
         public virtual async Task SaveCsvAsync(string[][] jagged, string fileNameSeed, string fileNameSuffix = "")
@@ -144,11 +159,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             jsonSettings.Converters.Add(new AppGlobalsConverter(Globals));
 
             var serializer = JsonSerializer.Create(jsonSettings);
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            SerializeAndSave(obj, serializer, disk);
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                var disk = new FilePathHelper();
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
+                var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+                disk.FileName = fileName;
+                SerializeAndSave(obj, serializer, disk);
+            }
         }
 
         public virtual async Task SerializeAndSaveAsync<T>(T obj, ProgressTrackerPane progress, string fileNameSeed, string fileNameSuffix = "", string fileExtension = ".json", string progressPrefix = "", CancellationToken cancel = default)

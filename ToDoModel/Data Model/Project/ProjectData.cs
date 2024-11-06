@@ -16,6 +16,9 @@ namespace ToDoModel
     [Serializable()]
     public class ProjectData : SerializableList<IProjectEntry>, IProjectData
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public ProjectData() : base() { }
         public ProjectData(IList<IProjectEntry> projInfoEntries) : base(projInfoEntries) { }
         public ProjectData(IEnumerable<IProjectEntry> projInfoEntries) : base(projInfoEntries) { }
@@ -55,7 +58,7 @@ namespace ToDoModel
             else { return (false, new int[] { -1 }); } 
         }
 
-        internal Frame<int, string> GetDfToDo(Microsoft.Office.Interop.Outlook.Store store)
+        internal Frame<string, string> GetDfToDo(Outlook.Store store)
         {
             var table = store.GetToDoTable();
             
@@ -63,12 +66,80 @@ namespace ToDoModel
 
             (var data, var columnInfo) = table.ETL();
             
-            Frame<int, string> df = DfDeedle.FromArray2D(data: data, columnInfo);
+            var df = DfDeedle.FromArray2D(data: data, columnInfo);
                         
             df = df.FillMissing("");
 
-            df = Frame.FromRows(df.Rows.Where(x => (string)x.Value["ToDoID"] != ""));           
-            return df;
+            df = Frame.FromRows(df.Rows.Where(x => (string)x.Value["ToDoID"] != ""));
+
+
+            Frame<string, string> dfToDo = null;
+            try
+            {
+                dfToDo = df.IndexRows<string>("ToDoID");
+            }
+            catch (Exception e)
+            {                
+                var duplicateIDs = df.GetDuplicateEntriesByColumn<int,string,string>("ToDoID");
+
+                if (duplicateIDs.Count() > 0)
+                {
+                    var duplicateRowsGroups = duplicateIDs.Select(x => df.FilterRowsBy("ToDoID", x));
+                    LogDuplicates(duplicateRowsGroups);
+                    var dfTemp = DropDuplicates(df, duplicateRowsGroups);
+                    try
+                    {
+                        dfToDo = dfTemp.IndexRows<string>("ToDoID");
+                    }
+                    catch (Exception e2)
+                    {
+                        logger.Error(e2.Message, e2);
+                        throw;
+                    }
+                }
+
+                else
+                {
+                    logger.Error(e.Message, e);
+                    throw;
+                }
+            }
+
+            return dfToDo;
+        }
+
+                
+        //private static TColumn[] GetDuplicateEntriesByColumn<TRow, TColumn, TColumnData>(Frame<TRow, TColumn> df, TColumn columnId)
+        //{
+        //    var column = df.GetColumn<TColumn>(columnId);
+        //    var duplicates = column.Values
+        //        .GroupBy(x => x)
+        //        .Where(group => group.Count() > 1)
+        //        .Select(group => group.Key)
+        //        .ToArray();
+        //    return duplicates;
+        //}
+
+        private static Frame<int,string> DropDuplicates(Frame<int, string> df, IEnumerable<Frame<int, string>> duplicateRows)
+        {
+            var dfTemp = df.Clone();
+            foreach (var frame in duplicateRows)
+            {
+                dfTemp = dfTemp.Exclude(frame.DropFirstN(1));
+            }
+            return dfTemp;
+        }
+
+        
+
+        private static void LogDuplicates(IEnumerable<Frame<int, string>> duplicateRows)
+        {
+            var dfDuplicates = duplicateRows.FirstOrDefault();
+            foreach (var frame in duplicateRows.Skip(1))
+            {
+                dfDuplicates = dfDuplicates.Merge(frame);
+            }
+            dfDuplicates.PrintToLog(logger);
         }
 
         /// <summary>
@@ -78,13 +149,14 @@ namespace ToDoModel
         /// <param name="df">Deedle dataframe</param>
         /// <returns>Filtered Deedle dataframe</returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal Frame<int, string> FilterToProjectIDs(Frame<int, string> df) 
+        internal Frame<string, string> FilterToProjectIDs(Frame<string, string> df) 
         { 
             if (df is null) { return df; }
-            if (!df.ColumnKeys.Contains("ToDoID")) 
-            { throw new ArgumentOutOfRangeException(nameof(df), $"{nameof(df)} is missing column ToDoID"); }
+            //if (!df.ColumnKeys.Contains("ToDoID")) 
+            //{ throw new ArgumentOutOfRangeException(nameof(df), $"{nameof(df)} is missing column ToDoID"); }
 
-            df.AddColumn("IdLength", df.GetColumn<string>("ToDoID").Select(id => id.Value.Length));
+            df.AddColumn("IdLength", df.RowIndex.Keys.Select(id => id.Length));
+            //df.AddColumn("IdLength", df.GetColumn<string>("ToDoID").Select(id => id.Value.Length));
             df = df.FilterRowsBy("IdLength", 4);
             df.DropColumn("IdLength");
             //df.Print();
@@ -102,13 +174,14 @@ namespace ToDoModel
         /// </summary>
         /// <param name="df">Deedle dataframe with ToDoID and Categories</param>
         /// <returns>A new <seealso cref="List{T}"/> where T is <seealso cref="IProjectEntry"/></returns>
-        internal List<IProjectEntry> DfToListEntries(Frame<int, string> df)
+        internal List<IProjectEntry> DfToListEntries(Frame<string, string> df)
         {
             return df.Rows
                      .Select(row => new
                      {
-                        ID = row.Value.GetAs<string>("ToDoID"),
-                        Categories = row.Value.GetAs<string>("Categories")
+                        ID = row.Key,
+                         //ID = row.Value.GetAs<string>("ToDoID"),
+                         Categories = row.Value.GetAs<string>("Categories")
                      })
                      .Values
                      .Select(x =>
@@ -130,7 +203,7 @@ namespace ToDoModel
         /// <param name="olApp">Handle to current <seealso cref="Outlook.Application"/></param>
         public void Rebuild(Outlook.Application olApp)
         {
-            Frame<int,string> df = null;
+            Frame<string,string> df = null;
             foreach (Outlook.Store store in olApp.Session.Stores)
             {
                 var dfTemp = GetDfToDo(store);
@@ -139,8 +212,42 @@ namespace ToDoModel
                 {
                     //df.Print();
                     //dfTemp.Print();
-                    df = df.Merge(dfTemp);
-                    df.Print();
+                    try
+                    {
+                        df = df.Merge(dfTemp);
+                    }
+                    catch (Exception e)
+                    {
+                        
+                        logger.Debug($"\n{TraceUtility.GetMyTraceString(new StackTrace())}\n");
+                        var overlapIDs = df.RowIndex.Keys.Intersect(dfTemp.RowIndex.Keys).ToArray();
+                        if (overlapIDs.Count() > 0)
+                        { 
+                            logger.Error($"{e.Message}\n\nOverlap found in following ToDoID's: {overlapIDs.SentenceJoin()}", e); 
+                            var dfOverlap = df.Where(x => overlapIDs.Contains(x.Key));
+                            dfOverlap.PrintToLog(logger);
+                            var dfTempOverlap = dfTemp.Where(x => overlapIDs.Contains(x.Key));
+                            dfTempOverlap.PrintToLog(logger);
+                            dfTemp = dfTemp.Exclude(dfOverlap);
+                            df = df.Merge(dfTemp);
+                        }
+                        else
+                        {
+                            logger.Error(e.Message, e);
+                            throw;
+                        }   
+
+                        //df.Log(logger);
+                        //dfTemp.Log(logger);
+                        //logger.Error(e.Message, e);
+                        //dfTemp.RenameColumn("Categories", "dfTemp_Categories");
+                        //dfTemp.RenameColumn("ToDoID", "dfTemp_ToDoID");
+                        //var overlap = df.Join(dfTemp, JoinKind.Inner, Lookup.Exact);
+                        //overlap.Log(logger);
+                        //throw;
+                    }
+                    
+                    df.PrintToLog(logger);
                 }
             }
 

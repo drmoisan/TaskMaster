@@ -350,8 +350,8 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<IRecipientInfo> _sender;
         public virtual IRecipientInfo Sender { get => _sender.Value; set => _sender = value.ToLazy(); }
 
-        private Lazy<Recipient[]> _olRecipients;
-        internal virtual Recipient[] OlRecipients { get => _olRecipients.Value; set => _olRecipients = value.ToLazy(); }
+        private LazyTry<Recipient[]> _olRecipients;
+        internal virtual Recipient[] OlRecipients { get => _olRecipients.Value; set => _olRecipients = value.ToLazyTry(); }
 
         private Lazy<string> _ccRecipientsHtml;
         public virtual string CcRecipientsHtml

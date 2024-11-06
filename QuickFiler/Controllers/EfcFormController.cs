@@ -379,10 +379,15 @@ namespace QuickFiler.Controllers
             }
             else
             {
+                if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+                {
+                    logger.Debug($"Cannot create folder without OneDrive location");
+                    return;
+                }
                 var folder = (await _dataModel.FolderHelper.CreateFolderAsync(
                     SelectedFolder,
                     _globals.Ol.ArchiveRootPath,
-                    _globals.FS.FldrOneDrive,
+                    folderRoot,
                     Token)) as MAPIFolder;
 
                 if (folder is not null)
@@ -489,10 +494,6 @@ namespace QuickFiler.Controllers
             {
                 new KaChar("Controller", 'S', async (x) => await JumpToAsync(_formViewer.SearchText)),
                 new KaChar("Controller", 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox)),
-                //new KaChar("Controller", 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments)),
-                //new KaChar("Controller", 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail)),
-                //new KaChar("Controller", 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures)),
-                //new KaChar("Controller", 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation)),
                 new KaChar("Controller", 'K', async (x) => await KbdExecuteAsync(ActionOkAsync)),
                 new KaChar("Controller", 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync)),
                 new KaChar("Controller", 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync)),
@@ -578,11 +579,12 @@ namespace QuickFiler.Controllers
             {
                 await _formViewer.UiSyncContext;
                 _formViewer.Hide();
+                if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return;  }
                 var folder = await Task.FromResult(_dataModel
                                                    .FolderHelper
                                                    .CreateFolder(SelectedFolder,
                                                                  _globals.Ol.ArchiveRootPath,
-                                                                 _globals.FS.FldrOneDrive)).ConfigureAwait(false);
+                                                                 oneDrive)).ConfigureAwait(false);
                 if (folder is not null)
                 {
                     await _dataModel.MoveToFolder(folder,

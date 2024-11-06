@@ -36,8 +36,10 @@ namespace Swordfish.NET.Collections {
     // ************************************************************************
     #region Constructors
 
-    public ImmutableCollection(IEnumerable<T> source) {
-      _baseCollection = new List<T>(source);
+    public ImmutableCollection(IEnumerable<T> source) 
+    {
+            if (source is null) { _baseCollection = new List<T>(); }
+            else { _baseCollection = new List<T>(source); }
     }
 
     public ImmutableCollection() {

@@ -64,15 +64,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             await Transform<MinedMailInfo[], MinedMailInfo[]>(Consolidate);
 
             await ToggleOfflineMode(offline);
-            var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
-            return new ScBag<MinedMailInfo>(await Load<MinedMailInfo[]>(folderPath));
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                var folderPath = Path.Combine(folderRoot, "Bayesian");
+                return new ScBag<MinedMailInfo>(await Load<MinedMailInfo[]>(folderPath));
+            }
+            return null;
         }
 
         public async Task DeleteStagingFilesAsync() 
         {
             await Task.Run(() => 
-            { 
-                var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            {
+                if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
+                var folderPath = Path.Combine(folderRoot, "Bayesian");
                 var files = Directory.GetFiles(folderPath);
                 foreach (var file in files)
                 {
@@ -405,7 +410,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var message = $"Transforming from {typeof(OlFolderInfo[][]).Name} to {typeof(IItemInfo[])}";
             progress.Report(0, message);
 
-            var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
+            var folderPath = Path.Combine(folderRoot, "Bayesian");
             var (completed, chunkCount) = await EmailDataMiner.DeserializeAsync<(int, int)>(folderPath, "FolderGroupCompleted");
             if (folderChunks.Count() != chunkCount)
             {
@@ -518,7 +524,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
             var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
-            var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                logger.Debug($"AppData Folder Not Found. Aborting method {nameof(ToMinedMail)}");
+                return;
+            }
+            var folderPath = Path.Combine(folderRoot, "Bayesian");
             (_, var count) = await EmailDataMiner.DeserializeAsync<(int, int)>(folderPath, "FolderGroupCompleted").ConfigureAwait(false);
             var completed = await EmailDataMiner.DeserializeAsync<int>(folderPath, $"{tOutName}Completed").ConfigureAwait(false);
             var completedPerChunk = 100 / (double)count;
@@ -610,7 +621,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             for (int i = 0; i < count; i++)
             {
                 Tin obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
-                list.Add(obj);
+                if (obj is not null) { list.Add(obj); }
             }
             Tout result = await transformer([.. list]);
             SerializeAndSave(result, tOutName);
@@ -653,9 +664,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             progress.Report(100);
 
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
+            {
+                logger.Debug($"AppData Folder Not Found. Aborting method {nameof(ToMinedMail)}");
+                return;  
+            }
+            
             var minedBag = new ScBag<MinedMailInfo>(cBag)
             {
-                FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian"),
+                FolderPath = Path.Combine(folderRoot, "Bayesian"),
                 FileName = $"MinedMailInfo_{batch:000}.json"
             };
 
@@ -1129,7 +1146,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Formatting = Formatting.Indented
             };
             var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");;
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                logger.Debug($"{nameof(EmailDataMiner)}.{nameof(Deserialize)} aborting due to lack of AppData Special Folder");
+                return default(T);
+            }
+            
+            disk.FolderPath = Path.Combine(folderRoot, "Bayesian");;
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
@@ -1174,8 +1197,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Formatting = Formatting.Indented
             };
             var serializer = JsonSerializer.Create(jsonSettings);
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
+            {
+                logger.Debug($"{nameof(EmailDataMiner)}.{nameof(SerializeAndSave)} is aborting due to lack of AppData special folder");
+                return;
+            }
             var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             SerializeAndSave(obj, serializer, disk);
@@ -1240,8 +1268,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var serializer = JsonSerializer.Create(jsonSettings);
 
             var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");;
-
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
+            {
+                logger.Debug($"{nameof(EmailDataMiner)}.{nameof(SerializeMailInfo)} aborted due to lack of AppData special folder");
+                return;
+            }
+            
+            disk.FolderPath = Path.Combine(folderRoot, "Bayesian");;
             SerializeFsSave(mailItem, "MailItem", serializer, disk);
 
 
@@ -1329,7 +1362,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             try
             {
-                var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+                if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return false; }
+                var folderPath = Path.Combine(folderRoot, "Bayesian");
                 T obj = await DeserializeAsync<T>(folderPath, fileNameSeed, fileNameSuffix);
                 if (obj != null)
                     return true;

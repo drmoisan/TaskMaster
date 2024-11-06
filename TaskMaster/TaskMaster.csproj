@@ -407,7 +407,7 @@
     <None Include="Resources\ConfigManager.json" />
     <None Include="Resources\ConfigSpam.json" />
     <None Include="Resources\manager_config.json" />
-    <None Include="TaskMaster_1_TemporaryKey.pfx" />
+    <None Include="TaskMaster_12_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
@@ -457,10 +457,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_12_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>62541DDD0A576BDAD0D3FB987C22E368FA1CA33A</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>704065BE0000C524BC91A9490EAD7E5B922F5E8A</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
