@@ -47,11 +47,16 @@ namespace TaskMaster
             return obj;
         }
 
-        async public Task LoadAsync()
+        async public Task LoadAsync(bool parallel = true)
         {
-            //LoadManagerConfig();
-            //ResetLoadManager();
-            //ResetLoadManagerLazyConfiguration();
+            if (parallel) { await LoadParallelAsync(); }
+            else { await LoadSequentialAsync(); }
+
+            LoadProgressPane(CancelSource);
+        }
+
+        async public Task LoadParallelAsync()
+        {
             Manager = new ManagerAsyncLazy(_parent);
             var tasks = new List<Task>
             {
@@ -62,12 +67,21 @@ namespace TaskMaster
                 LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
                 Manager.InitAsync(),
-                //LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
-            LoadProgressPane(CancelSource);
-            //await Manager2;
-            //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
+        }
+
+        async public Task LoadSequentialAsync()
+        {
+            Manager = new ManagerAsyncLazy(_parent);
+
+            await LoadRecentsListAsync();
+            await LoadCtfMapAsync();
+            await LoadCommonWordsAsync();
+            await LoadSubjectMapAndEncoderAsync();
+            await LoadMovedMailsAsync();
+            await LoadFiltersAsync();
+            await Manager.InitAsync();            
         }
 
         private bool _sugFilesLoaded = false;

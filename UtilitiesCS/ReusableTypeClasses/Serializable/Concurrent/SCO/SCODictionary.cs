@@ -313,7 +313,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 log.Error($"File {filepath} does not exist.");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show($"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
+                    response = MyBox.ShowDialog($"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
                                                "File Not Found",
                                                MessageBoxButtons.YesNo,
                                                MessageBoxIcon.Error);
@@ -325,7 +325,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 log.Error($"Error! {e.Message}");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(filepath + " encountered a problem. " +
+                    response = MyBox.ShowDialog(filepath + " encountered a problem. " +
                                                e.Message + " Create a new list? Excecution will stop if answer is no.",
                                                "Error",
                                                MessageBoxButtons.YesNo,

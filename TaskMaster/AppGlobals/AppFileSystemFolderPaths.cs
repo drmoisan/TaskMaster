@@ -116,6 +116,7 @@ namespace TaskMaster
             SpecialFolders.TryGetValue("OneDrive", out var oneDrive);
 
             TryAddSpecialFolder("Flow", [oneDrive, "Email attachments from Flow"]);
+            SpecialFolders.TryGetValue("Flow", out var flow);
             TryAddSpecialFolder("PreReads", [oneDrive, "_  Workflow", "_ Pre-Reads"]);
             
             if (SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
@@ -123,7 +124,7 @@ namespace TaskMaster
                 _remap = Path.Combine(myDocuments, "dictRemap.csv");
             }
 
-            TryAddSpecialFolder("PythonStaging", [oneDrive, "Combined", "data"]);
+            TryAddSpecialFolder("PythonStaging", [flow, "Combined", "data"]);
             
         }
 

@@ -12,7 +12,7 @@ namespace UtilitiesCS
 
     public interface IAppAutoFileObjects
     {
-        Task LoadAsync();
+        Task LoadAsync(bool parallel);
         CtfMap LoadCtfMap();
         int Conversation_Weight { get; set; }
         int LngConvCtPwr { get; set; }

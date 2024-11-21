@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.HelperClasses;
@@ -26,16 +27,32 @@ namespace TaskMaster
             Engines = new AppItemEngines(this);
         }
 
-        async public Task LoadAsync()
+        async public Task LoadAsync(bool parallel = true)
         {
-            //IdleAsyncQueue.AddEntry(false, () => Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync()));
+            if (parallel) { await LoadParallelAsync(); }
+            else { await LoadSequentialAsync(); }
+        }
+
+        async public Task LoadParallelAsync()
+        {
             await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
             await Engines.InitAsync();
-            //IdleAsyncQueue.AddEntry(false, Engines.InitAsync);
             await _events.LoadAsync();
-            //IdleAsyncQueue.AddEntry(false, _events.LoadAsync);
-            //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
-            //await Task.CompletedTask;
+        }
+
+        async public Task LoadSequentialAsync() 
+        {
+            await _toDoObjects.LoadAsync(false);
+            await _autoFileObjects.LoadAsync(false);
+            await Engines.InitAsync();
+            await _events.LoadAsync();
+        }
+
+        public void LoadWhenIdle()
+        {
+            IdleAsyncQueue.AddEntry(false, () => Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync()));
+            IdleAsyncQueue.AddEntry(false, Engines.InitAsync);
+            IdleAsyncQueue.AddEntry(false, _events.LoadAsync);
         }
 
         private AppFileSystemFolderPaths _fs;

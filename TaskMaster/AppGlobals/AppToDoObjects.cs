@@ -25,7 +25,14 @@ namespace TaskMaster
             _parent = ParentInstance;
         }
 
-        async public Task LoadAsync()
+        async public Task LoadAsync(bool parallel = true)
+        {
+            if (parallel) { await LoadParallelAsync(); }
+            else { await LoadSequentialAsync(); }
+        }
+
+
+        async public Task LoadParallelAsync() 
         {
             var tasks = new List<Task>
             {
@@ -39,7 +46,18 @@ namespace TaskMaster
                 LoadFolderRemapAsync()
             };
             await Task.WhenAll(tasks);
-
+        }
+        
+        async public Task LoadSequentialAsync() 
+        {
+            await LoadPrefixAndDictPeopleAsync();
+            await LoadDictRemapAsync();
+            await LoadIdListAsync();
+            await LoadProgramInfoAsync();
+            await LoadProjInfoAsync();
+            await LoadCategoryFiltersAsync();
+            await LoadFilteredFolderScrapingAsync();
+            await LoadFolderRemapAsync();
         }
 
         private Properties.Settings _defaults = Properties.Settings.Default;

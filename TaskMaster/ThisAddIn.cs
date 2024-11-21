@@ -37,7 +37,7 @@ namespace TaskMaster
             // Create the global variables
             _globals = new ApplicationGlobals(Application);
             // Initialize the global variables on a low priority thread
-            loadGlobals = _globals.LoadAsync();
+            loadGlobals = _globals.LoadAsync(false);
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new();
