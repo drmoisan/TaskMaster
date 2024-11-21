@@ -436,7 +436,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public Func<MailItemHelper, Task> AsyncAction => (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null;
 
-        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() => Condition(item));
+        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() => ConditionLog(item));
 
         private bool Condition(object item)
         {
@@ -448,12 +448,37 @@ namespace UtilitiesCS.EmailIntelligence
 
         private bool ConditionLog(object item)
         {
-            var olTryItem = new OutlookItem(item).Try();
+            var olItem = new OutlookItem(item);
+            if (olItem.TryGet().OlItemType(out var result) && result != OlItemType.olMailItem) 
+            { 
+                logger.Debug($"Skipping item because it is not a MailItem\n{GetOlItemString(olItem)}");
+                return false; 
+            }
             
-            if (item is not MailItem mailItem) { return false; }
-            if (mailItem.MessageClass != "IPM.Note") { return false; }
-            if (mailItem.UserProperties.Find("Spam") is not null) { return false; }
+            if (olItem.MessageClass != "IPM.Note") 
+            {
+                logger.Debug($"Skipping item because it is of message class {olItem.MessageClass}\n{GetOlItemString(olItem)}");
+                return false; 
+            }
+            var spamProp = olItem.UserProperties.Find("Spam");
+            if (spamProp is not null) 
+            { 
+                logger.Debug($"Skipping item because it already has a Spam property {spamProp.Value}\n{GetOlItemString(olItem)}");
+                return false;
+            }
+            
             return true;
+        }
+
+        private string GetOlItemString(OutlookItem olItem)
+        {
+            var type = olItem.TryGet().OlItemType(out var typeVal)? $"{typeVal}": $"{olItem.InnerObject.GetType()}";
+            var created = olItem.TryGet().CreationTime(out var result) ? $" created on {result:g}" : "";
+            var subject = olItem.Try().Subject;            
+            subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject.Substring(0,10)}";
+            var sender = olItem.Try().SenderName;
+            sender = sender.IsNullOrEmpty() ? "" : $" from {sender}";
+            return $"{type}{created}{sender}{subject}";
         }
 
         public object Engine => this;

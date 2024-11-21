@@ -101,6 +101,8 @@ namespace UtilitiesCS.OutlookExtensions
 
         public string Subject { get => TryGet(() => _olItem.Subject); set => TrySet((x) => _olItem.Subject = x, value); }
 
+        public string SenderName => TryGet(() => ((Outlook.Recipient)_olItem.TryGetPropertyValue("Sender")).Name);
+
         public bool UnRead { get => TryGet(() => _olItem.UnRead); set => TrySet((x) => _olItem.UnRead = x, value); }
 
         public Outlook.UserProperties UserProperties => TryGet(() => _olItem.UserProperties);
