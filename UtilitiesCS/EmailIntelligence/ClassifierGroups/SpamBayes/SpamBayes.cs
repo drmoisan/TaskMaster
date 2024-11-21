@@ -448,7 +448,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         private bool ConditionLog(object item)
         {
-            var olItem = new OutlookItem(item).Try();
+            var olTryItem = new OutlookItem(item).Try();
             
             if (item is not MailItem mailItem) { return false; }
             if (mailItem.MessageClass != "IPM.Note") { return false; }

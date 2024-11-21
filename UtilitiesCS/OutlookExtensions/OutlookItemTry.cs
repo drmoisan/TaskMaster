@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 
 
 namespace UtilitiesCS.OutlookExtensions
@@ -35,6 +36,7 @@ namespace UtilitiesCS.OutlookExtensions
         public Outlook.Application Application => TryGet(()=>_olItem.Application);
 
         public Outlook.Attachments Attachments => TryGet(() => _olItem.Attachments);
+        
         public string BillingInformation { get => TryGet(() => _olItem.BillingInformation); set => TrySet<string>((x) => _olItem.BillingInformation = x, value); }
 
         public string Body { get => TryGet(() => _olItem.Body); set => TrySet<string>((x) => _olItem.Body = x, value); }
@@ -79,6 +81,8 @@ namespace UtilitiesCS.OutlookExtensions
 
         public object Move(Outlook.Folder DestinationFolder) => TryGet(() => _olItem.Move(DestinationFolder));
         
+        public OlItemType OlItemType => TryGet(_olItem.GetOlItemType);
+
         public long OutlookInternalVersion => TryGet(() => _olItem.OutlookInternalVersion);
 
         public string OutlookVersion => TryGet(() => _olItem.OutlookVersion);
@@ -146,7 +150,7 @@ namespace UtilitiesCS.OutlookExtensions
             } 
         }
         
-        internal void TryCall(Action action)
+        internal void TryCall(System.Action action)
         {
             try
             {

@@ -632,6 +632,7 @@
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
     <Compile Include="Interfaces\ITypes\IOutlookItem.cs" />
+    <Compile Include="OutlookExtensions\OutlookItemTryGet.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\ConcurrentObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\DictionaryChangedEventArgs.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
