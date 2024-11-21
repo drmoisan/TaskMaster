@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using SDILReader;
 
 
 namespace UtilitiesCS
@@ -68,7 +69,11 @@ namespace UtilitiesCS
             var olBranchPath = olFolderBranch.FolderPath;
             string olAncestor = ResolveOlRoot(olBranchPath, appGlobals);
 
-            return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, appGlobals.FS.FldrOneDrive);
+            if (appGlobals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+            {
+                return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, folderRoot);
+            }
+            else { return null; }
         }
 
         public static string ToFsFolderpath(this MAPIFolder olFolderBranch, IApplicationGlobals appGlobals)
@@ -76,7 +81,12 @@ namespace UtilitiesCS
             var olBranchPath = olFolderBranch.FolderPath;
             string olAncestor = ResolveOlRoot(olBranchPath, appGlobals);
 
-            return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, appGlobals.FS.FldrOneDrive);
+            if (appGlobals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+            {
+                return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, folderRoot);
+            }
+            else { return null; }
+            
         }
 
         public static string ResolveOlRoot(string olBranchPath, IApplicationGlobals appGlobals)

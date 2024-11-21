@@ -183,7 +183,7 @@ namespace UtilitiesCS
         {
             return new AsyncLazy<BayesianClassifierGroup>(async () => 
             {
-                var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(loader);
+                var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(loader, true);
                 classifier.PropertyChanged += Config_PropertyChanged;
                 return classifier; 
             });

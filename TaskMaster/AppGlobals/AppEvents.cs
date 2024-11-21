@@ -185,8 +185,9 @@ namespace TaskMaster
             {
                 var engines = await Globals.Engines.InboxEngines
                     .ToAsyncEnumerable()
-                    .WhereAwait(async e => await e.Value.AsyncCondition(mailItem))
-                    .Where(e => e.Value.Engine is not null)
+                    .Where(kvp => kvp.Value is not null)
+                    .WhereAwait(async kvp => await kvp.Value.AsyncCondition(mailItem))
+                    .Where(kvp => kvp.Value.Engine is not null)
                     .ToArrayAsync();
 
                 if (engines.Length > 0)

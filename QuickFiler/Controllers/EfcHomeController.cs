@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using UtilitiesCS;
 using System.Diagnostics;
 using UtilitiesCS.Extensions;
+using log4net.Repository.Hierarchy;
 
 namespace QuickFiler
 {
@@ -261,7 +262,10 @@ namespace QuickFiler
                     $"{itemInfo.SenderName},Email,{selectedFolder},{itemInfo.SentDate.ToString("MM/dd/yyyy")}," +
                     $"{itemInfo.SentDate.ToString("HH:mm:ss")}").ToArray();
 
-                FileIO2.WriteTextFile(filename, dataLines, _globals.FS.FldrMyDocuments);
+                if (Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
+                {
+                    FileIO2.WriteTextFile(filename, dataLines, folderRoot);                    
+                }
             }
         }
 

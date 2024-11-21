@@ -47,11 +47,16 @@ namespace TaskMaster
             return obj;
         }
 
-        async public Task LoadAsync()
+        async public Task LoadAsync(bool parallel = true)
         {
-            //LoadManagerConfig();
-            //ResetLoadManager();
-            //ResetLoadManagerLazyConfiguration();
+            if (parallel) { await LoadParallelAsync(); }
+            else { await LoadSequentialAsync(); }
+
+            LoadProgressPane(CancelSource);
+        }
+
+        async public Task LoadParallelAsync()
+        {
             Manager = new ManagerAsyncLazy(_parent);
             var tasks = new List<Task>
             {
@@ -62,11 +67,21 @@ namespace TaskMaster
                 LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
                 Manager.InitAsync(),
-                //LoadManagerAsync(),
             };
             await Task.WhenAll(tasks);
-            //await Manager2;
-            //logger.Debug($"{nameof(AppAutoFileObjects)}.{nameof(LoadAsync)} is complete.");
+        }
+
+        async public Task LoadSequentialAsync()
+        {
+            Manager = new ManagerAsyncLazy(_parent);
+
+            await LoadRecentsListAsync();
+            await LoadCtfMapAsync();
+            await LoadCommonWordsAsync();
+            await LoadSubjectMapAndEncoderAsync();
+            await LoadMovedMailsAsync();
+            await LoadFiltersAsync();
+            await Manager.InitAsync();            
         }
 
         private bool _sugFilesLoaded = false;
@@ -115,10 +130,14 @@ namespace TaskMaster
         public ScoStack<IMovedMailInfo> MovedMails { get => Initialized(_movedMails, LoadMovedMails); }
         private ScoStack<IMovedMailInfo> LoadMovedMails()
         {
-            var movedMails = new ScoStack<IMovedMailInfo>(filename: _defaults.FileName_MovedEmails,
-                                                          folderpath: _parent.FS.FldrPythonStaging,
-                                                          askUserOnError: false);
-            return movedMails;
+            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging)) 
+            { 
+                var movedMails = new ScoStack<IMovedMailInfo>(filename: _defaults.FileName_MovedEmails,
+                                                              folderpath: pythonStaging,
+                                                              askUserOnError: false);
+                return movedMails;
+            }
+            else { return null; }
         }
         async private Task LoadMovedMailsAsync()
         {
@@ -134,7 +153,12 @@ namespace TaskMaster
             get
             {
                 if (_recentsList is null)
-                    _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents);
+                {
+                    if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                    {
+                        _recentsList = new RecentsList<string>(_defaults.FileName_Recents, pythonStaging, max: MaxRecents);
+                    }
+                }
                 return _recentsList;
             }
             set
@@ -142,19 +166,24 @@ namespace TaskMaster
                 _recentsList = value;
                 if (_recentsList.FolderPath == "")
                 {
-                    _recentsList.FolderPath = _parent.FS.FldrPythonStaging;
-                    _recentsList.FileName = Properties.Settings.Default.FileName_Recents;
+                    if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                    {
+                        _recentsList.FolderPath = pythonStaging;
+                        _recentsList.FileName = Properties.Settings.Default.FileName_Recents;
+                    }
                 }
                 _recentsList.Serialize();
             }
         }
         async private Task LoadRecentsListAsync()
         {
-            await Task.Factory.StartNew(
-                () => _recentsList = new RecentsList<string>(_defaults.FileName_Recents, _parent.FS.FldrPythonStaging, max: MaxRecents),
-                CancelToken,
-                TaskCreationOptions.None,
-                TaskScheduler.Current);
+            await Task.Run(() => 
+            {
+                if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                {
+                    _recentsList = new RecentsList<string>(_defaults.FileName_Recents, pythonStaging, max: MaxRecents); 
+                }
+            }, CancelToken);
         }
 
         private CtfMap _ctfMap;
@@ -163,12 +192,15 @@ namespace TaskMaster
             get
             {
                 if (_ctfMap is null)
-                    _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc,
-                                         folderpath: _parent.FS.FldrPythonStaging,
-                                         backupFilepath: Path.Combine(
-                                             _parent.FS.FldrPythonStaging,
-                                             _defaults.BackupFile_CTF_Inc),
-                                         askUserOnError: true);
+                {
+                    if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                    {
+                        _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc, folderpath: pythonStaging, 
+                            backupFilepath: Path.Combine(pythonStaging, _defaults.BackupFile_CTF_Inc),
+                            askUserOnError: true);
+                    }
+
+                }
                 return _ctfMap;
             }
             set
@@ -176,31 +208,31 @@ namespace TaskMaster
                 _ctfMap = value;
                 if (_ctfMap.FilePath == "")
                 {
-                    _ctfMap.FolderPath = _parent.FS.FldrPythonStaging;
-                    _ctfMap.FileName = _defaults.File_CTF_Inc;
+                    if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                    {
+                        _ctfMap.FolderPath = pythonStaging;
+                        _ctfMap.FileName = _defaults.File_CTF_Inc;
+                    }
                 }
                 _ctfMap.Serialize();
             }
         }
         public CtfMap LoadCtfMap()
         {
-            var map = new CtfMap(
-                filename: _defaults.File_CTF_Inc,
-                folderpath: _parent.FS.FldrPythonStaging,
-                backupFilepath: Path.Combine(
-                    _parent.FS.FldrPythonStaging,
-                    _defaults.BackupFile_CTF_Inc),
-                askUserOnError: true);
+            CtfMap map = null;
+            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                map = new CtfMap(
+                    filename: _defaults.File_CTF_Inc,
+                    folderpath: pythonStaging,
+                    backupFilepath: Path.Combine(pythonStaging, _defaults.BackupFile_CTF_Inc),
+                    askUserOnError: true);
+            }
             return map;
         }
         async private Task LoadCtfMapAsync()
         {
-            await Task.Factory.StartNew(
-                () => _ctfMap = LoadCtfMap(),
-                CancelToken);
-            //default,
-            //TaskCreationOptions.None,
-            //PriorityScheduler.BelowNormal);
+            await Task.Run(() => _ctfMap = LoadCtfMap(), CancelToken);
         }
 
         public ISerializableList<string> CommonWords
@@ -208,12 +240,16 @@ namespace TaskMaster
             get
             {
                 if (_commonWords is null)
-                    _commonWords = new SerializableList<string>(filename: _defaults.File_Common_Words,
-                                                                folderpath: _parent.FS.FldrPythonStaging,
+                    if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                    {
+                        _commonWords = new SerializableList<string>(filename: _defaults.File_Common_Words,
+                                                                folderpath: pythonStaging,
                                                                 backupLoader: CommonWordsBackupLoader,
-                                                                backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
+                                                                backupFilepath: Path.Combine(pythonStaging,
                                                                                              _defaults.BackupFile_CommonWords),
                                                                 askUserOnError: false);
+
+                    }
                 return _commonWords;
             }
             set
@@ -221,39 +257,58 @@ namespace TaskMaster
                 _commonWords = value;
                 if (_commonWords.Folderpath == "")
                 {
-                    _commonWords.Folderpath = _parent.FS.FldrFlow;
-                    _commonWords.Filename = _defaults.FileName_Recents;
+                    if (_parent.FS.SpecialFolders.TryGetValue("Flow", out var flow))
+                    {
+                        _commonWords.Folderpath = flow;
+                        _commonWords.Filename = _defaults.FileName_Recents;
+                    }
                 }
-                _commonWords.Serialize();
+                if (_commonWords.Folderpath != "") { _commonWords.Serialize(); }
             }
         }
         async private Task LoadCommonWordsAsync()
         {
-            await Task.Factory.StartNew(
-                () => _commonWords = new SerializableList<string>(filename: _defaults.File_Common_Words,
-                                                                  folderpath: _parent.FS.FldrPythonStaging,
+            await Task.Run(() =>
+            {
+                if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                {
+                    _commonWords = new SerializableList<string>(filename: _defaults.File_Common_Words,
+                                                                  folderpath: pythonStaging,
                                                                   backupLoader: CommonWordsBackupLoader,
-                                                                  backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
+                                                                  backupFilepath: Path.Combine(pythonStaging,
                                                                                                _defaults.BackupFile_CommonWords),
-                                                                  askUserOnError: false),
-                default(CancellationToken));
-            //default,
-            //TaskCreationOptions.None,
-            //PriorityScheduler.BelowNormal);
+                                                                  askUserOnError: false);
+                }
+            }, default(CancellationToken)); 
+            
+            
         }
         private IList<string> CommonWordsBackupLoader(string filepath)
         {
-            string[] cw = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: false);
-            return cw.ToList();
+            if (File.Exists(filepath))
+            {
+                string[] cw = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: false);
+                return cw.ToList();
+            }
+            else 
+            {
+                logger.Error($"File not found {filepath}");
+                return []; 
+            }
         }
 
         private ISubjectMapEncoder _encoder;
         public ISubjectMapEncoder Encoder => Initialized(_encoder, LoadEncoder);
         private ISubjectMapEncoder LoadEncoder()
         {
-            var encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
-                                                folderpath: _parent.FS.FldrPythonStaging,
+            SubjectMapEncoder encoder = null;
+            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                encoder = new SubjectMapEncoder(filename: _defaults.FileName_SubjectEncoding,
+                                                folderpath: pythonStaging,
                                                 subjectMap: SubjectMap);
+
+            }
             if (encoder.Encoder.Count == 0) { encoder.RebuildEncoding(SubjectMap); }
             return encoder;
         }
@@ -267,12 +322,16 @@ namespace TaskMaster
         public ScoCollection<FilterEntry> Filters => Initializer.GetOrLoad(ref _filters, LoadFilters);
         private ScoCollection<FilterEntry> LoadFilters()
         {
-            var filters = new ScoCollection<FilterEntry>(
-                fileName: _defaults.FileName_Filters,
-                folderPath: _parent.FS.FldrPythonStaging);
+            ScoCollection<FilterEntry> filters = null;
+            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                filters = new ScoCollection<FilterEntry>(
+                    fileName: _defaults.FileName_Filters,
+                    folderPath: pythonStaging);
+            }
             _filterObserver = new ObserverHelper<NotifyCollectionChangedEventArgs>("FilterObserver", (x) => Filters.Serialize());
             filters.Subscribe(_filterObserver);
-            //filters.CollectionChanged += ScoFilterEntry_CollectionChanged;
+            
             return filters;
         }
         async private Task LoadFiltersAsync()
@@ -289,15 +348,18 @@ namespace TaskMaster
 
         private SubjectMapSco LoadSubjectMap()
         {
-            var subMap = new SubjectMapSco(filename: _defaults.File_Subject_Map,
-                                          folderpath: _parent.FS.FldrPythonStaging,
+            SubjectMapSco subMap = null;
+            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                subMap = new SubjectMapSco(filename: _defaults.File_Subject_Map,
+                                          folderpath: pythonStaging,
                                           backupLoader: SubjectMapBackupLoader,
-                                          backupFilepath: Path.Combine(_parent.FS.FldrPythonStaging,
-                                          _defaults.BackupFile_SubjectMap),
+                                          backupFilepath: Path.Combine(pythonStaging, _defaults.BackupFile_SubjectMap),
                                           askUserOnError: false,
                                           commonWords: CommonWords);
+                subMap.CollectionChanged += SubjectMap_CollectionChanged;
+            }
 
-            subMap.CollectionChanged += SubjectMap_CollectionChanged;
             return subMap;
         }
 
@@ -382,11 +444,8 @@ namespace TaskMaster
             }
         }
 
-
         public ManagerAsyncLazy Manager { get; internal set; } 
         
-        
-
         private ProgressTrackerPane _progressTracker;
         public ProgressTrackerPane ProgressTracker => _progressTracker;
         private Microsoft.Office.Tools.CustomTaskPane _progressPane;

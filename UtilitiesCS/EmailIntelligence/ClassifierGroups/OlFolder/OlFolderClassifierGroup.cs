@@ -15,6 +15,7 @@ using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using System.IO;
 using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 {
@@ -32,10 +33,14 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         public virtual async Task<ScoCollection<MinedMailInfo>> LoadStaging()
         {
-            _mailInfoCollection = await Task.Run(
-                () => new ScoCollection<MinedMailInfo>(
-                    Globals.FS.Filenames.EmailInfoStagingFile,
-                    Globals.FS.FldrPythonStaging));
+            _mailInfoCollection = await Task.Run(() =>
+            {
+                if (Globals.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                {
+                    return new ScoCollection<MinedMailInfo>(Globals.FS.Filenames.EmailInfoStagingFile, pythonStaging);
+                }
+                else { return null; }
+            });
 
             return _mailInfoCollection;
         }
@@ -119,7 +124,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             Globals.AF.ProgressPane.Visible = true;
             ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier -> Load Mined Mail Info");
 
-            var folderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
+            
+            var folderPath = Path.Combine(folderRoot, "Bayesian");
             var collection = await EmailDataMiner.Load<MinedMailInfo[]>(folderPath);
             collection.ThrowIfNullOrEmpty();
             sw.LogDuration("Load Staging");
@@ -142,10 +149,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
             {
                 Globals.AF.ProgressPane.Visible = false;
-                Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();
-                classifierGroup.Serialize();
-                //Globals.AF.Manager.Serialize();
-                MyBox.ShowDialog("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // set the configuration of classifierGroup
+                if ((await Globals.AF.Manager.Configuration).TryGetValue("Folder", out var loader))
+                {
+                    classifierGroup.Config = loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                    classifierGroup.Serialize();
+
+                    Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();                
+                    //Globals.AF.Manager.Serialize();
+                    MyBox.ShowDialog("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 

@@ -1597,6 +1597,11 @@ namespace QuickFiler.Controllers
                 bool attachments = SelectedFolder != "Trash to Delete" && _optionAttachments;
                 try
                 {
+                    if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive))
+                    {
+                        logger.Debug($"{nameof(MoveMailAsync)} aborted due to lack of OneDrive location");
+                        return;
+                    }
                     var config = new EmailFilerConfig()
                     {
                         SavePictures = _optionsPictures,
@@ -1605,7 +1610,7 @@ namespace QuickFiler.Controllers
                         SaveAttachments = attachments,
                         Globals = _globals,
                         OlAncestor = _globals.Ol.ArchiveRootPath,
-                        FsAncestorEquivalent = _globals.FS.FldrOneDrive
+                        FsAncestorEquivalent = oneDrive,
                     };
                     var filer = new EmailFiler(config);
                     await filer.SortAsync(helpers);

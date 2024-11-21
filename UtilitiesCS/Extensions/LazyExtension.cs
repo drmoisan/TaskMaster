@@ -18,6 +18,16 @@ namespace UtilitiesCS.Extensions.Lazy
             return new Lazy<T>(() => value);
         }
 
+        public static LazyTry<T> ToLazyTry<T>(this T value) where T : class
+        {
+            return new LazyTry<T>(value.Return);
+        }
+
+        public static LazyTry<T> ToLazyTryValue<T>(this T value) where T : struct
+        {
+            return new LazyTry<T>(() => value);
+        }
+
         public static Func<T> AsFunc<T>(this T value) where T: class
         {
             return new Func<T>(value.Return);

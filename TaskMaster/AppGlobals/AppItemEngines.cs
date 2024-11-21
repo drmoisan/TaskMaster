@@ -148,7 +148,7 @@ namespace TaskMaster
 
         public void ShowSaveInfo(string engineName) 
         {
-            if (InboxEngines.TryGetValue(engineName, out var engine))
+            if (InboxEngines.TryGetValue(engineName, out var engine) && engine is not null)
             {
                 ConfigController.Show(Globals, engine.Config); 
             }

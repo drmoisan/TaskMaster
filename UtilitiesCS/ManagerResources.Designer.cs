@@ -133,7 +133,7 @@ namespace UtilitiesCS {
         ///    &quot;Disk&quot;: {
         ///      &quot;FileName&quot;: &quot;ManagerTriage.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
         ///    &quot;LocalDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;ManagerTriage.json&quot;,
@@ -145,7 +145,7 @@ namespace UtilitiesCS {
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
-        ///    &quot; [rest of string was truncated]&quot;;.
+        ///    &quot;Cla [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Triage {
             get {

@@ -31,15 +31,19 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 TypeNameHandling = TypeNameHandling.Auto,
                 Formatting = Formatting.Indented
             };
-            var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian"); ;
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
-                var item = JsonConvert.DeserializeObject<T>(
-                    File.ReadAllText(disk.FilePath), jsonSettings);
-                return item;
+                var disk = new FilePathHelper();
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); ;
+                var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+                disk.FileName = fileName;
+                if (File.Exists(disk.FilePath))
+                {
+                    var item = JsonConvert.DeserializeObject<T>(
+                        File.ReadAllText(disk.FilePath), jsonSettings);
+                    return item;
+                }
+                else { return default(T); }
             }
             else { return default(T); }
         }
@@ -52,7 +56,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 Formatting = Formatting.Indented
             };
             var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian"); ;
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
+            { 
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); ;
+            }
+            else { return default(T); }
+
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
@@ -78,7 +87,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             };
             var serializer = JsonSerializer.Create(jsonSettings);
             var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian");
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
+            }
+            else { return; }
+
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             SerializeAndSave(obj, serializer, disk);
@@ -143,7 +157,11 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var serializer = JsonSerializer.Create(jsonSettings);
 
             var disk = new FilePathHelper();
-            disk.FolderPath = Path.Combine(_globals.FS.FldrAppData, "Bayesian"); ;
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); 
+            }
+            else { return;  }
 
             SerializeFsSave(mailItem, "MailItem", serializer, disk);
 

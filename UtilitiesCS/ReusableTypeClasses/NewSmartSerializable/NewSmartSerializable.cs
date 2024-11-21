@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Azure;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -178,6 +179,50 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
+        public T Deserialize<U>(NewSmartSerializable<U> loader, bool askUserOnError)
+            where U : class, INewSmartSerializable<U>, new()
+        {           
+            var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
+            var settings = loader.Config.JsonSettings.ThrowIfNull();
+            bool writeInstance = false;
+            T instance = default;
+
+            try
+            {
+                instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
+                if (instance is null) 
+                {
+                    throw new InvalidOperationException($"{disk.FilePath} deserialized to null.");
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                logger.Error(e.Message);
+                var response = AskUser(askUserOnError,
+                    $"{disk.FilePath} not found. Need an instance of {typeof(T)} to " +
+                    $"continue. Create a new dictionary or abort execution?");
+                instance = CreateEmpty(response, disk, settings);
+                writeInstance = true;
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error! {e.Message}");
+                var response = AskUser(askUserOnError,
+                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
+                    $"Need a dictionary to continue. Create a new dictionary or abort execution?");
+                instance = CreateEmpty(response, disk, settings);
+                writeInstance = true;
+            }
+            instance.Config.CopyFrom(loader.Config, true);
+
+            if (writeInstance)
+            {
+                instance.Serialize();
+            }
+
+            return instance;
+        }
+
         protected T Deserialize(FilePathHelper disk, bool askUserOnError, JsonSerializerSettings settings)
         {
             bool writeInstance = false;
@@ -213,6 +258,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
 
             instance.Config.Disk.FilePath = disk.FilePath;
+
             if (writeInstance)
             {
                 instance.Serialize();
@@ -225,10 +271,24 @@ namespace UtilitiesCS.ReusableTypeClasses
             return await Task.Run(() => Deserialize(config));
         }
 
+        public async Task<T> DeserializeAsync<U>(NewSmartSerializable<U> config, bool askUserOnError) where U : class, INewSmartSerializable<U>, new()
+        {
+            return await Task.Run(() => Deserialize(config, askUserOnError));
+        }
+
         protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
         {
-            var instance = JsonConvert.DeserializeObject<T>(
-                File.ReadAllText(disk.FilePath), settings);
+            T instance = null;
+            if (!disk.Exists()){ return instance; }
+            try
+            {
+                instance = JsonConvert.DeserializeObject<T>(
+                    File.ReadAllText(disk.FilePath), settings);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
             if (instance is not null) { instance.Config.JsonSettings = settings; }
             return instance;
         }
@@ -370,6 +430,9 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             public static async Task<T> DeserializeAsync<U>(NewSmartSerializable<U> config) where U : class, INewSmartSerializable<U>, new() =>
                 await GetInstance().DeserializeAsync(config);
+
+            public static async Task<T> DeserializeAsync<U>(NewSmartSerializable<U> config, bool askUserOnError) where U : class, INewSmartSerializable<U>, new() =>
+                await GetInstance().DeserializeAsync(config, askUserOnError);
 
             internal static JsonSerializerSettings GetDefaultSettings() =>
                 NewSmartSerializable<T>.GetDefaultSettings();

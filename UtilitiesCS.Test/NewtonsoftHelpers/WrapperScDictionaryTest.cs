@@ -123,16 +123,21 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public static NewSmartSerializableConfig InitConfig(NewSmartSerializableConfig config, IApplicationGlobals globals)
             {
                 config.Disk.FileName = "testdict.json";
-                config.Disk.FolderPath = globals.FS.FldrAppData;
-                config.NetDisk.FileName = "testdict.json";
-                config.NetDisk.FolderPath = globals.FS.FldrAppData;
-                config.LocalDisk = config.Disk;
-                config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
-                config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
-                config.JsonSettings.Converters.Add(new AppGlobalsConverter(globals));
-                config.JsonSettings.Converters.Add(new FilePathHelperConverter(globals.FS));
-                config.JsonSettings.Converters.Add(new ScDictionaryConverter<NewScDictionary<string, string>, string, string>());
-                return config;
+                if (globals.FS.SpecialFolders.TryGetValue("AppData", out var appData)) 
+                { 
+                    config.Disk.FolderPath = appData; 
+                    config.NetDisk.FileName = "testdict.json";
+                    config.NetDisk.FolderPath = appData;
+                    config.LocalDisk = config.Disk;
+                    config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+                    config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
+                    config.JsonSettings.Converters.Add(new AppGlobalsConverter(globals));
+                    config.JsonSettings.Converters.Add(new FilePathHelperConverter(globals.FS));
+                    config.JsonSettings.Converters.Add(new ScDictionaryConverter<NewScDictionary<string, string>, string, string>());
+                    return config;
+                }
+                return null;
+                
             }
         }
 
