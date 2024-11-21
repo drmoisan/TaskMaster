@@ -20,7 +20,7 @@ namespace UtilitiesCS
         OlDownloadState DownloadState { get; }
         string EntryID { get; }
         FormDescription FormDescription { get; }
-        Inspector GetInspector { get; }
+        Inspector Inspector { get; }
         OlImportance Importance { get; set; }
         object InnerObject { get; }
         bool IsConflict { get; }

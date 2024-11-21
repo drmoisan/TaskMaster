@@ -436,9 +436,25 @@ namespace UtilitiesCS.EmailIntelligence
 
         public Func<MailItemHelper, Task> AsyncAction => (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null;
 
-        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() =>
-                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
-                mailItem.UserProperties.Find("Spam") is null);
+        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() => Condition(item));
+
+        private bool Condition(object item)
+        {
+            if (item is not MailItem mailItem) { return false; }
+            if (mailItem.MessageClass != "IPM.Note") { return false; }
+            if (mailItem.UserProperties.Find("Spam") is not null) { return false; }
+            return true;
+        }
+
+        private bool ConditionLog(object item)
+        {
+            var olItem = new OutlookItem(item).Try();
+            
+            if (item is not MailItem mailItem) { return false; }
+            if (mailItem.MessageClass != "IPM.Note") { return false; }
+            if (mailItem.UserProperties.Find("Spam") is not null) { return false; }
+            return true;
+        }
 
         public object Engine => this;
 

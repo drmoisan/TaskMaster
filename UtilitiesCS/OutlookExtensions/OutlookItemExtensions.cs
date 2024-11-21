@@ -120,20 +120,20 @@ namespace UtilitiesCS.OutlookExtensions
 
         internal static bool TrySetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, Func<object, T> converter, Func<object, Table> converterAlt)
         {
-            if (item.TrySetPropertyValue(propertyName, converter(propertyValue))) { return true; }
-            else { return item.TrySetPropertyValue(propertyNameAlt, converterAlt(propertyValue)); }
+            if (TrySetPropertyValue(item, propertyName, converter(propertyValue))) { return true; }
+            else { return TrySetPropertyValue(item, propertyNameAlt, converterAlt(propertyValue)); }
         }
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, object propertyValueAlt)
         {
-            if (item.TrySetPropertyValue(propertyName, propertyValue)) { return true; }
-            else { return item.TrySetPropertyValue(propertyNameAlt, propertyValueAlt); }
+            if (TrySetPropertyValue(item, propertyName, propertyValue)) { return true; }
+            else { return TrySetPropertyValue(item, propertyNameAlt, propertyValueAlt); }
         }
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue)
         {
-            if (item.TrySetPropertyValue(propertyName, propertyValue)) { return true; }
-            else { return item.TrySetPropertyValue(propertyNameAlt, propertyValue); }
+            if (TrySetPropertyValue(item, propertyName, propertyValue)) { return true; }
+            else { return TrySetPropertyValue(item, propertyNameAlt, propertyValue); }
         }
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, object propertyValue)

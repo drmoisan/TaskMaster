@@ -55,8 +55,8 @@ namespace UtilitiesCS.OutlookExtensions
                 try
                 {
                     bool complete;
-                    if (_olType == OlItemType.olTaskItem) { complete = (bool)(this.TryGetPropertyValue(_olComplete) ?? false); }
-                    else { complete = (OlFlagStatus)this.GetPropertyValue(_olFlagStatus) == OlFlagStatus.olFlagComplete; }
+                    if (_olType == OlItemType.olTaskItem) { complete = (bool)(OutlookItemExtensions.TryGetPropertyValue(this, _olComplete) ?? false); }
+                    else { complete = (OlFlagStatus)this.TryGetPropertyValue(_olFlagStatus) == OlFlagStatus.olFlagComplete; }
                     return complete;
                 }
                 // if neither property exists, catch the exception and throw a custom one
@@ -70,8 +70,8 @@ namespace UtilitiesCS.OutlookExtensions
                 if (Complete != value)
                 {
                     bool success;
-                    if (_olType == OlItemType.olTaskItem) { success = this.TrySetPropertyValue(_olComplete, value); }
-                    else { success = this.TrySetPropertyValue(_olFlagStatus, value ? OlFlagStatus.olFlagComplete : OlFlagStatus.olFlagMarked); }
+                    if (_olType == OlItemType.olTaskItem) { success = OutlookItemExtensions.TrySetPropertyValue(this, _olComplete, value); }
+                    else { success = OutlookItemExtensions.TrySetPropertyValue(this, _olFlagStatus, value ? OlFlagStatus.olFlagComplete : OlFlagStatus.olFlagMarked); }
                     if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(Complete))); }
                 }
             }
@@ -82,7 +82,7 @@ namespace UtilitiesCS.OutlookExtensions
             get
             {
                 object dueDate;
-                if (_olType == OlItemType.olTaskItem) { dueDate = this.TryGetPropertyValue(_olDueDate); }
+                if (_olType == OlItemType.olTaskItem) { dueDate = OutlookItemExtensions.TryGetPropertyValue(this, _olDueDate); }
                 else
                 {
                     dueDate = this.TryGetPropertyValue(_olTaskDueDate, _olDueDate);
@@ -99,9 +99,9 @@ namespace UtilitiesCS.OutlookExtensions
                 if (current != value)
                 {
                     bool success;
-                    if (_olType == OlItemType.olTaskItem) { success = this.TrySetPropertyValue(_olDueDate, value); }
-                    else { success = this.TrySetPropertyValue(_olTaskDueDate, value); }
-                    if (!success) { success = this.TrySetPropertyValue(_olDueDate, value); }
+                    if (_olType == OlItemType.olTaskItem) { success = OutlookItemExtensions.TrySetPropertyValue(this, _olDueDate, value); }
+                    else { success = OutlookItemExtensions.TrySetPropertyValue(this, _olTaskDueDate, value); }
+                    if (!success) { success = OutlookItemExtensions.TrySetPropertyValue(this, _olDueDate, value); }
                     if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(DueDate))); }
                 }
             }
@@ -112,7 +112,7 @@ namespace UtilitiesCS.OutlookExtensions
             get
             {
                 if (_olType == OlItemType.olTaskItem) { return true; }
-                var mailFlag = this.TryGetPropertyValue(_olFlagStatus);
+                var mailFlag = OutlookItemExtensions.TryGetPropertyValue(this, _olFlagStatus);
                 if (mailFlag != null)
                 {
                     return (OlFlagStatus)mailFlag == OlFlagStatus.olFlagMarked ||
@@ -127,18 +127,18 @@ namespace UtilitiesCS.OutlookExtensions
                 {
                     //If it was false and now is true, set the flag status to olFlagMarked. Irrelevant for TaskItems
                     if (value) 
-                    { 
-                        this.TryCallMethod("MarkAsTask", new object[] { OlMarkInterval.olMarkNoDate });
+                    {
+                        OutlookItemExtensions.TryCallMethod(this, "MarkAsTask", new object[] { OlMarkInterval.olMarkNoDate });
                         //this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olFlagMarked); 
                     }
                     else
                     {
                         // If it was true and now is false, set the flag status to olNoFlag
                         //if (!this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olNoFlag))
-                        if (this.TryCallMethod("ClearTaskFlag") is null)
+                        if (OutlookItemExtensions.TryCallMethod(this, "ClearTaskFlag") is null)
                             {
                             // TaskItems cannot be set to false
-                            throw new ArgumentOutOfRangeException($"{nameof(TaskItem)} items cannot be set to False");
+                            throw new ArgumentOutOfRangeException($"{nameof(Outlook.TaskItem)} items cannot be set to False");
                         }
                     }
                 }
@@ -163,8 +163,8 @@ namespace UtilitiesCS.OutlookExtensions
                 DateTime current = TaskStartDate;
                 if (current != value)
                 {
-                    var success = this.TrySetPropertyValue(_olTaskStartDate, value);
-                    if (!success) { success = this.TrySetPropertyValue(_olStartDate, value); }
+                    var success = OutlookItemExtensions.TrySetPropertyValue(this, _olTaskStartDate, value);
+                    if (!success) { success = OutlookItemExtensions.TrySetPropertyValue(this, _olStartDate, value); }
                     if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(TaskStartDate))); }
                 }
             }
@@ -200,7 +200,7 @@ namespace UtilitiesCS.OutlookExtensions
             get 
             {
                 object work;
-                if (_olType == OlItemType.olTaskItem) { work = this.TryGetPropertyValue(_olTotalWork); }
+                if (_olType == OlItemType.olTaskItem) { work = OutlookItemExtensions.TryGetPropertyValue(this, _olTotalWork); }
                 else { work = this.PropertyAccessor.TryGetProperty(PA_TOTAL_WORK); }
                 try { return (int)work; }
                 catch (System.Exception) { return 0; }
@@ -212,7 +212,7 @@ namespace UtilitiesCS.OutlookExtensions
                     bool success;
                     try
                     {
-                        if (_olType == OlItemType.olTaskItem) { success = this.TrySetPropertyValue(_olTotalWork, value); }
+                        if (_olType == OlItemType.olTaskItem) { success = OutlookItemExtensions.TrySetPropertyValue(this, _olTotalWork, value); }
                         else { success = this.PropertyAccessor.TrySetProperty(PA_TOTAL_WORK, value); }
                         if (!success) { this.PropertyAccessor.SetProperty(PA_TOTAL_WORK, value); }
                     }
