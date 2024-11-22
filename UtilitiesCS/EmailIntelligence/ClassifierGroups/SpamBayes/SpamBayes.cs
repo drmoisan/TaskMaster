@@ -475,7 +475,7 @@ namespace UtilitiesCS.EmailIntelligence
             var type = olItem.TryGet().OlItemType(out var typeVal)? $"{typeVal}": $"{olItem.InnerObject.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result) ? $" created on {result:g}" : "";
             var subject = olItem.Try().Subject;            
-            subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject.Substring(0,10)}";
+            subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject}";
             var sender = olItem.Try().SenderName;
             sender = sender.IsNullOrEmpty() ? "" : $" from {sender}";
             return $"{type}{created}{sender}{subject}";

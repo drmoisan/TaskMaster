@@ -195,6 +195,7 @@ namespace TaskMaster
                     var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false);
                     await Task.Run(() => _ = helper.Tokens);
                     await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
+                    mailItem.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
                 }
             }
         }
@@ -203,13 +204,17 @@ namespace TaskMaster
         {
             if (OlInboxItems is not null)
             {
-                // Restrict to unread MailItems
-                var unreadItems = OlInboxItems.Restrict("[UnRead] = true");
+                // Restrict to unprocessed items
+                string filter = $"@SQL=\"{OlTableExtensions.SchemaCustomPrefix}AutoProcessed\" is null";
+                
+                var unreadItems = OlInboxItems.Restrict(filter);
 
-                foreach (object item in unreadItems)
-                {
-                    await ProcessMailItemAsync(item);
-                }
+                await unreadItems
+                    .Cast<object>()
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(ProcessMailItemAsync);
+                
+                logger.Debug("Finished processing new inbox items");
             }
         }
 
