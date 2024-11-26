@@ -346,6 +346,7 @@ namespace QuickFiler.Controllers
                 //_blRunningModalCode = true;
                 
                 if (_parent.KeyboardHandler.KbdActive) { _parent.KeyboardHandler.ToggleKeyboardDialog(); }
+                
                 await MoveAndIterate();
                 
                 //_blRunningModalCode = false;

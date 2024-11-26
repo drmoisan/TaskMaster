@@ -451,19 +451,19 @@ namespace UtilitiesCS.EmailIntelligence
             var olItem = new OutlookItem(item);
             if (olItem.TryGet().OlItemType(out var result) && result != OlItemType.olMailItem) 
             { 
-                logger.Debug($"Skipping item because it is not a MailItem\n{GetOlItemString(olItem)}");
+                logger.Debug($"Skipping: Not MailItem -> {GetOlItemString(olItem)}");
                 return false; 
             }
             
             if (olItem.MessageClass != "IPM.Note") 
             {
-                logger.Debug($"Skipping item because it is of message class {olItem.MessageClass}\n{GetOlItemString(olItem)}");
+                logger.Debug($"Skipping: Message class {olItem.MessageClass} -> {GetOlItemString(olItem)}");
                 return false; 
             }
             var spamProp = olItem.UserProperties.Find("Spam");
             if (spamProp is not null) 
             { 
-                logger.Debug($"Skipping item because it already has a Spam property {spamProp.Value}\n{GetOlItemString(olItem)}");
+                logger.Debug($"Skipping: Has Spam property {spamProp.Value} -> {GetOlItemString(olItem)}");
                 return false;
             }
             

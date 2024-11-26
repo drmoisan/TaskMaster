@@ -123,47 +123,12 @@ namespace TaskMaster
             OlInboxItems = null;
             OlReminders = null;
         }
-
-        //internal async Task SetupSpamBayesAsync()
-        //{
-        //    var ce = new ConditionalItemEngine<MailItemHelper>();
-            
-        //    ce.AsyncCondition = (item) => Task.Run(() => 
-        //        item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" && 
-        //        mailItem.UserProperties.Find("Spam") is null);
-
-        //    ce.EngineInitializer = async (globals) => ce.Engine = await SpamBayes.CreateAsync(globals);
-        //    await ce.EngineInitializer(Globals);
-        //    ce.AsyncAction = (item) => ce.Engine is not null ? ((SpamBayes)ce.Engine).TestAsync(item) : null;
-        //    ce.EngineName = "SpamBayes";
-        //    ce.Message = $"{ce.EngineName} is null. Skipping actions";
-        //    //InboxEngines.Add(ce);
-        //    Globals.Engines.InboxEngines.TryAdd(ce.EngineName, ce);
-
-        //}
-
+                
         internal async Task LogAsync(string message)
         {
             await Task.Run(() => logger.Debug(message));
         }
-
-        //internal async Task SetupTriageAsync()
-        //{
-        //    var ce = new ConditionalItemEngine<MailItemHelper>();
-
-        //    ce.AsyncCondition = (item) => Task.Run(() =>
-        //        item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
-        //        mailItem.UserProperties.Find("Triage") is null);
-
-        //    ce.EngineInitializer = async (globals) => ce.Engine = await Triage.CreateAsync(globals);
-        //    await ce.EngineInitializer(Globals);
-        //    ce.AsyncAction = (item) => ce.Engine is not null ? ((Triage)ce.Engine).TestAsync(item) : null;
-        //    ce.EngineName = "Triage";
-        //    ce.Message = $"{ce.EngineName} is null. Skipping actions";
-        //    //InboxEngines.Add(ce);
-        //    Globals.Engines.InboxEngines.TryAdd(ce.EngineName, ce);
-        //}
-
+                
         private void OlToDoItems_ItemAdd(object item)
         {
             ToDoEvents.OlToDoItems_ItemAdd(item, Globals);
@@ -207,9 +172,10 @@ namespace TaskMaster
                 // Restrict to unprocessed items
                 string filter = $"@SQL=\"{OlTableExtensions.SchemaCustomPrefix}AutoProcessed\" is null";
                 
-                var unreadItems = OlInboxItems.Restrict(filter);
+                var olMailItems = OlInboxItems.Restrict("[MessageClass] = 'IPM.Note'");
+                var unprocessedItems = olMailItems.Restrict(filter);
 
-                await unreadItems
+                await unprocessedItems
                     .Cast<object>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(ProcessMailItemAsync);
