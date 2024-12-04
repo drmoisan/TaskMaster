@@ -514,7 +514,11 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null) 
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
             
+            _formViewer.L1v1L2h5_BtnSkip.Enabled = false;
+            _formViewer.L1v1L2h5_BtnSkip.Text = "Skipping...";
             await SkipGroupAsync();
+            _formViewer.L1v1L2h5_BtnSkip.Text = "Skip Group";
+            _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
         }
 
         async public Task SkipGroupAsync()
@@ -572,7 +576,7 @@ namespace QuickFiler.Controllers
                                                   tokenSource: TokenSource,
                                                   token: Token,
                                                   _states);
-            await _groups.LoadControlsAndHandlersAsync_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+            await _groups.LoadControlsAndHandlers_01Async(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
         /// <summary>

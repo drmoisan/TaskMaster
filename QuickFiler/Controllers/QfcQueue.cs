@@ -99,7 +99,7 @@ namespace QuickFiler.Controllers
             int pollInterval = 100;
 
             (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) result = default;
-            try 
+            try
             {
                 while (!_queue.IsCompleted && !token.IsCancellationRequested && result == default && _queue.Count + _jobsRunning > 0)
                 {
@@ -109,20 +109,30 @@ namespace QuickFiler.Controllers
                         await Task.Delay(pollInterval, token);
                     }
                 }
+                if (_queue.IsCompleted && _queue.Count > 0) 
+                {
+                    _queue.TryTake(out result, queueTimeout, token);
+                }
                 if (result != default)
                 {
                     result.ItemGroups.ForEach(group => _moveMonitor.UnhookItem(group.MailItem));
                     CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
                 }
-                
+
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
                 if (!token.IsCancellationRequested)
                 {
-                    //logger.Debug($"{nameof(TryDequeueAsync)} timed out after {timeout} milliseconds");
+                    logger.Debug($"{nameof(TryDequeueAsync)} timed out after {timeout} milliseconds");
                 }
+                else { logger.Debug($"{nameof(TryDequeueAsync)} was cancelled"); }
             }
+            catch (System.Exception e)
+            {
+                logger.Error($"{nameof(TryDequeueAsync)} failed to dequeue. \n {e.Message}\n{e.StackTrace}");
+            }
+
             
             return result;
 
@@ -316,7 +326,7 @@ namespace QuickFiler.Controllers
                     .SelectAwait(async x =>
                     {
                         x.grp.ItemController = new QfcItemController(
-                            AppGlobals: appGlobals,
+                            appGlobals: appGlobals,
                             homeController: homeController,
                             parent: qfcCollectionController,
                             itemViewer: x.grp.ItemViewer,
