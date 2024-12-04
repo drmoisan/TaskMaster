@@ -69,7 +69,7 @@ namespace QuickFiler.Controllers
         
         private Padding _itemMarginTemplate;
         private QfEnums.InitTypeEnum _initType;
-        private bool _blRunningModalCode = false;
+        //private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
         private QfcHomeController _parent;
         private delegate Task WriteMetricsDelegate(string filename);
@@ -337,18 +337,19 @@ namespace QuickFiler.Controllers
                     $"implemented for {nameof(_initType)} {_initType}");
             }
             
-            else if (_blRunningModalCode)
-            {
-                MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            //else if (_blRunningModalCode)
+            //{
+            //    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
             else if (_groups.ReadyForMove)
             {
-                _blRunningModalCode = true;
+                //_blRunningModalCode = true;
                 
                 if (_parent.KeyboardHandler.KbdActive) { _parent.KeyboardHandler.ToggleKeyboardDialog(); }
+                
                 await MoveAndIterate();
                 
-                _blRunningModalCode = false;
+                //_blRunningModalCode = false;
             }
 
         }
@@ -513,7 +514,11 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null) 
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
             
+            _formViewer.L1v1L2h5_BtnSkip.Enabled = false;
+            _formViewer.L1v1L2h5_BtnSkip.Text = "Skipping...";
             await SkipGroupAsync();
+            _formViewer.L1v1L2h5_BtnSkip.Text = "Skip Group";
+            _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
         }
 
         async public Task SkipGroupAsync()
@@ -571,7 +576,7 @@ namespace QuickFiler.Controllers
                                                   tokenSource: TokenSource,
                                                   token: Token,
                                                   _states);
-            await _groups.LoadControlsAndHandlersAsync_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+            await _groups.LoadControlsAndHandlers_01Async(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
         /// <summary>
@@ -629,7 +634,7 @@ namespace QuickFiler.Controllers
                 if (_undoQueue.TryTake(out var item))
                 {
                     var helper = await MailItemHelper.FromMailItemAsync(item.MailItem, _globals, default, true);
-                    _globals.AF.Manager["Folder"].UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
+                    (await _globals.AF.Manager["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                     var mail = item.UndoMove();
                     await UiThread.Dispatcher.InvokeAsync(
                         () => _groups.AddItemGroup(mail),

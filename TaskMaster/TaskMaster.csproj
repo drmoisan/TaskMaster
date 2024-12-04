@@ -360,14 +360,15 @@
     <Compile Include="AppGlobals\AppAutoFileObjects.cs" />
     <Compile Include="AppGlobals\AppEvents.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.cs" />
+    <Compile Include="AppGlobals\AppItemEngines.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettings.cs" />
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />
-    <Compile Include="AppGlobals\ManagerClass.cs" />
-    <Compile Include="AppGlobals\SmartSerializableConfig.cs" />
-    <Compile Include="AppGlobals\ToDoObj.cs" />
+    <Compile Include="AppGlobals\Deprecated\ManagerClassOld.cs" />
+    <Compile Include="AppGlobals\Deprecated\ManagerLazyConfig.cs" />
+    <Compile Include="AppGlobals\Deprecated\SmartSerializableConfigOld.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -397,13 +398,17 @@
     </Compile>
     <Compile Include="Ribbon\RibbonController.cs" />
     <Compile Include="Ribbon\RibbonViewer.cs" />
+    <Compile Include="Ribbon\TryFunctionalityInConstruction.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
     <None Include="Resources\9999999CommonWords.json" />
     <None Include="Resources\999999PrefixList.json" />
+    <None Include="Resources\ConfigManager.json" />
+    <None Include="Resources\ConfigSpam.json" />
     <None Include="Resources\manager_config.json" />
-    <None Include="TaskMaster_1_TemporaryKey.pfx" />
+    <None Include="TaskMaster_12_TemporaryKey.pfx" />
+    <None Include="TaskMaster_TemporaryKey.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
@@ -453,10 +458,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>62541DDD0A576BDAD0D3FB987C22E368FA1CA33A</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>FCD6D5C0FB402CCB1CA37C3E471585313C04A793</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>

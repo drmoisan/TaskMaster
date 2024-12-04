@@ -220,21 +220,6 @@ namespace ToDoModel
             
         }
 
-        [Obsolete]
-        public static void Refresh_ToDoID_Splits(Outlook.Application OlApp)
-        {
-            
-            ToDoItem todo;
-            var OlItems = GetToDoItemsInView(OlApp);
-            foreach (var objItem in OlItems)
-            {
-                todo = new ToDoItem(objItem, onDemand: true);
-                todo.SplitID();
-            }
-        }
-
-        //private static bool _blItemChangeRunning = false;
-
         public static async Task OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
         {
             // TODO: Morph Functionality to handle proactively rather than reactively

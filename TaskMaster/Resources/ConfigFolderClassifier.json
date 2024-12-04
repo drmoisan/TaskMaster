@@ -1,0 +1,21 @@
+{
+  "$id": "1",
+  "Activated": false,
+  "Globals": "default",
+  "Name": "Folder",
+  "Disk": {
+    "FileName": "FolderClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "AppData"
+  },
+  "LocalDisk": {
+    "FileName": "FolderClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "AppData"
+  },
+  "NetDisk": {
+    "FileName": "FolderClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "PythonStaging"
+  }
+}

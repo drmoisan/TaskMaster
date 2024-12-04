@@ -24,10 +24,9 @@ namespace UtilitiesCS
         IIDList IdList { get; set; }
         string InFolder { get; }
         FlagTranslator KB { get; }
-        string KBSimple { get; set; }
         string MetaTaskLvl { get; set; }
         string MetaTaskSubject { get; set; }
-        OutlookItem OlItem { get; }
+        IOutlookItem OlItem { get; }
         FlagTranslator People { get; }
         OlImportance Priority { get; set; }
         FlagTranslator Program { get; }
@@ -47,10 +46,8 @@ namespace UtilitiesCS
 
         Task ForceSave();
         object GetItem();
-        string get_KB(bool IncludePrefix = false);
         bool get_PA_FieldExists(string PA_Schema);
         bool get_VisibleTreeStateLVL(int Lvl);
-        void SetKB(bool IncludePrefix = false, string value = null);
         void set_VisibleTreeStateLVL(int Lvl, bool value);
         void SplitID();
         Task WriteFlagsBatch();

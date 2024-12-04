@@ -24,8 +24,14 @@
             <tab idMso="TabMail">
               <group id="SpamBayesGroup" imageMso="RecycleBin" label="Spam Bayes">
                 <button id="TrainSpam" imageMso="CancelAll" onAction="TrainSpam_Click" label="Train Spam" />
-                <button id="TrainHam" imageMso="ClickToRunEnableUpdates" onAction="TrainHam_Click" label="Train Ham" />
+                <button id="TrainHam" imageMso="ClickToRunEnableUpdates" onAction="TrainHam_Click" label="Train Ham" />                
                 <menu id="OtherSpamActions" imageMso="AdministrationHome" label="Other" size="normal">
+                  <menu id = "SpamSaveOptions" imageMso="FileSave" label="Save Options" >
+                    <button id="SpamSaveNetwork" imageMso="ServerConnection" onAction="SpamSaveNetwork_Click" label="Network"/>
+                    <button id="SpamSaveLocal" imageMso="FillDown" onAction="SpamSaveLocal_Click" label="Local"/>
+                    <button id ="GetSaveState" imageMso="Help" onAction="GetSaveLocation_Click" label="Current Location"/>
+                  </menu>
+                  <checkBox id="SpamBayesEnabledToggle" getPressed="SpamBayesEnabled_GetPressed" onAction="SpamBayesEnabled_Click" label="Spam Bayes Enabled"/>                  
                   <button id="NewSpam" imageMso="NewComment" onAction="ClearSpam_Click" label="Clear Spam Manager" />
                   <button id="TestSpam" imageMso="CalculateNow" onAction="TestSpam_Click" label="Test Spam" />
                   <button id="TestSpamVerbose" imageMso="CalculateSheet" onAction="TestSpamVerbose_Click" label="Test Spam Verbose" />
@@ -78,10 +84,9 @@
                     <button id="MineEmails" imageMso="Filter" onAction="MineEmails_Click" label="Mine Emails" />
                     <button id="BuildClassifier" imageMso="Filter" onAction="BuildClassifier_Click" label="Build Classifier" />
                     <button id="PrintManagerState" imageMso="PrintAttach" onAction="PrintManagerState_Click" label="Print Manager State" />
-                    <button id="SaveManagerLocally" imageMso="SaveAll" onAction="SaveManagerLocally_Click" label="Save Manager Locally" />
-                    <button id="SaveManagerNetwork" imageMso="SaveAll" onAction="SaveManagerNetwork_Click" label="Save Manager On Network" />
                     <button id="SerializeMailInfo" imageMso="SaveAll" onAction="SerializeMailInfo_Click" label="Serialize Mail Info"/>
                     <button id="DeleteTriageSpamFields" imageMso="Delete" onAction ="DeleteTriageSpamFields_Click" label ="Delete Triage Spam"/>
+                    <button id="TryGetInboxes" imageMso="AccessListIssues" onAction ="TryGetInboxes_Click" label ="TryGetInboxes"/>
                   </menu>
                   <button id="RunIntelligence" imageMso="ARMPreviewButton" onAction="Intelligence_Click" label="Intelligence"/>
                 </menu>  
@@ -94,6 +99,12 @@
                   <button id="ClearTriage" imageMso="Clear" onAction="ClearTriage_Click" label="Clear Triage"/>
                   <button id="TriageSelection" imageMso="FilterBySelection" onAction="TriageSelection_Click" label="Triage Selection"/>
                   <button id="SetPrecision" imageMso="EditCitation" onAction="SetPrecision_Click" label="Set Precision"/>
+                  <menu id = "TriageSaveOptions" imageMso="FileSave" label="Save Options" >
+                    <button id="TriageSaveNetwork" imageMso="ServerConnection" onAction="TriageSaveNetwork_Click" label="Network"/>
+                    <button id="TriageSaveLocal" imageMso="FillDown" onAction="TriageSaveLocal_Click" label="Local"/>
+                    <button id ="TriageGetSaveState" imageMso="Help" onAction="TriageGetSaveLocation_Click" label="Current Location"/>
+                  </menu>
+                  <checkBox id="TriageEnabledToggle" getPressed="TriageEnabled_GetPressed" onAction="TriageEnabled_Click" label="Triage Enabled"/>
                 </menu>
               </group>
             </tab>

@@ -10,10 +10,13 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.OutlookExtensions
 {
+    //TODO: Move to OutlookItem rather than as extensions
     public static class OutlookItemExtensions
     {
         public static OutlookItemTry Try(this OutlookItem item) => new OutlookItemTry(item);
-        
+
+        public static OutlookItemTryGet TryGet(this OutlookItem item) => new OutlookItemTryGet(item);
+
         public static OlItemType GetOlItemType(this OutlookItem item)
         {
             if (item.InnerObject is AppointmentItem) { return OlItemType.olAppointmentItem; }
@@ -27,9 +30,6 @@ namespace UtilitiesCS.OutlookExtensions
             else if (item.InnerObject is TaskItem) { return OlItemType.olTaskItem; }
             else { throw new ArgumentException($"{item.InnerObject.GetType().Name} is not a supported type for {nameof(OlItemType)} class."); }
         }
-
-
-        
 
 
         #region Helper Methods
@@ -122,20 +122,20 @@ namespace UtilitiesCS.OutlookExtensions
 
         internal static bool TrySetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, Func<object, T> converter, Func<object, Table> converterAlt)
         {
-            if (item.TrySetPropertyValue(propertyName, converter(propertyValue))) { return true; }
-            else { return item.TrySetPropertyValue(propertyNameAlt, converterAlt(propertyValue)); }
+            if (TrySetPropertyValue(item, propertyName, converter(propertyValue))) { return true; }
+            else { return TrySetPropertyValue(item, propertyNameAlt, converterAlt(propertyValue)); }
         }
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, object propertyValueAlt)
         {
-            if (item.TrySetPropertyValue(propertyName, propertyValue)) { return true; }
-            else { return item.TrySetPropertyValue(propertyNameAlt, propertyValueAlt); }
+            if (TrySetPropertyValue(item, propertyName, propertyValue)) { return true; }
+            else { return TrySetPropertyValue(item, propertyNameAlt, propertyValueAlt); }
         }
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue)
         {
-            if (item.TrySetPropertyValue(propertyName, propertyValue)) { return true; }
-            else { return item.TrySetPropertyValue(propertyNameAlt, propertyValue); }
+            if (TrySetPropertyValue(item, propertyName, propertyValue)) { return true; }
+            else { return TrySetPropertyValue(item, propertyNameAlt, propertyValue); }
         }
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, object propertyValue)

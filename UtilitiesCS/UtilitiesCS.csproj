@@ -74,6 +74,8 @@
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Analysis.0.20.1\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
@@ -206,6 +208,21 @@
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Reflection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.2.0.0\lib\net40\Mono.Reflection.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -497,6 +514,7 @@
     </Compile>
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />
@@ -516,13 +534,34 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
+    <Compile Include="Extensions\CompilerServicesExtensions.cs" />
+    <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DispatchUtility.cs" />
     <Compile Include="HelperClasses\ParamArray.cs" />
+    <Compile Include="HelperClasses\ReflectionHelper.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
+    <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
+    <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
+    <Compile Include="ManagerResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ManagerResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="NewtonsoftHelpers\AllInclusiveBinder.cs" />
+    <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtension.cs" />
+    <Compile Include="NewtonsoftHelpers\NonRecursiveConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\SDIL Reader\ILGlobals.cs" />
+    <Compile Include="NewtonsoftHelpers\SDIL Reader\ILInstruction.cs" />
+    <Compile Include="NewtonsoftHelpers\SDIL Reader\MethodBodyReader.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScDictionary.cs" />
+    <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionary.cs" />
+    <Compile Include="NewtonsoftHelpers\KnownTypesBinder.cs" />
+    <Compile Include="NewtonsoftHelpers\NConsoleTraceWriter.cs" />
     <Compile Include="NewtonsoftHelpers\NLogTraceWriter.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
@@ -589,13 +628,39 @@
     <Compile Include="HelperClasses\ObjectSize.cs" />
     <Compile Include="HelperClasses\CloningFunctions\ObjectCopier.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\ScDictionaryConverter.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
-    <Compile Include="ReusableTypeClasses\ISmartSerializable.cs" />
-    <Compile Include="ReusableTypeClasses\ScBag.cs" />
-    <Compile Include="ReusableTypeClasses\SmartSerializable.cs" />
-    <Compile Include="ReusableTypeClasses\SmartSerializableStatic.cs" />
+    <Compile Include="Interfaces\ITypes\IOutlookItem.cs" />
+    <Compile Include="OutlookExtensions\OutlookItemTryGet.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\ConcurrentObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\DictionaryChangedEventArgs.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
+    <Compile Include="Interfaces\ITypes\ISmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\LazyTry\LazyTry.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.Designer.cs">
+      <DependentUpon>ConfigViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Interfaces\ITypes\INewSmartSerializable.cs" />
+    <Compile Include="Interfaces\ITypes\INewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewProgramData.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewScDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializableConfig.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
+    <Compile Include="Threading\IdleAsyncQueue.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPackage.cs" />
     <Compile Include="Threading\ProgressPane.cs">
@@ -606,7 +671,7 @@
     </Compile>
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
-    <Compile Include="ReusableTypeClasses\AsyncLazy.cs" />
+    <Compile Include="ReusableTypeClasses\AsyncLazy\AsyncLazy.cs" />
     <Compile Include="HelperClasses\Logging\DebugTextLogger.cs" />
     <Compile Include="HelperClasses\Logging\DebugTextWriter.cs" />
     <Compile Include="HelperClasses\DvgForm.cs">
@@ -616,7 +681,7 @@
       <DependentUpon>DvgForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HelperClasses\MyFileSystemInfo.cs" />
-    <Compile Include="ReusableTypeClasses\AbstractCloneable.cs" />
+    <Compile Include="ReusableTypeClasses\Other\AbstractCloneable.cs" />
     <Compile Include="Threading\ProgressMultiStepViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -670,14 +735,14 @@
     <Compile Include="HelperClasses\PrettyPrint.cs" />
     <Compile Include="Threading\ProgressTracker.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
-    <Compile Include="HelperClasses\TableLayoutHelper.cs" />
+    <Compile Include="Windows Forms\TableLayoutHelper.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\Theme.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\ThemeControlGroup.cs" />
     <Compile Include="HelperClasses\ToolTips\TipsController.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
     <Compile Include="HelperClasses\Logging\TraceUtility.cs" />
     <Compile Include="Interfaces\Enums.cs" />
-    <Compile Include="Interfaces\IAppEvents.cs" />
+    <Compile Include="Interfaces\IGlobals\IAppEvents.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IMovedMailInfo.cs" />
     <Compile Include="Interfaces\IGenericTimer.cs" />
     <Compile Include="Interfaces\IGlobals\IAppAutoFileObjects.cs" />
@@ -710,7 +775,6 @@
     <Compile Include="OutlookExtensions\CreateCategory.cs" />
     <Compile Include="OutlookExtensions\ExplorerActions.cs" />
     <Compile Include="OutlookExtensions\FolderConverter.cs" />
-    <Compile Include="OutlookExtensions\IOutlookItem.cs" />
     <Compile Include="OutlookExtensions\MailItemExtensions.cs" />
     <Compile Include="OutlookExtensions\MsgToMime\MAPIMethods.cs" />
     <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
@@ -733,28 +797,26 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ReusableTypeClasses\AsyncQueue.cs" />
+    <Compile Include="ReusableTypeClasses\Other\AsyncQueue.cs" />
     <Compile Include="ReusableTypeClasses\Matrices\DenMatrix.cs" />
     <Compile Include="ReusableTypeClasses\Matrices\JaggedMatrix.cs" />
     <Compile Include="ReusableTypeClasses\Matrices\Matrix.cs" />
     <Compile Include="ReusableTypeClasses\Matrices\DataConverter2d.cs" />
-    <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
-    <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\ObserverHelper.cs" />
-    <Compile Include="ReusableTypeClasses\ScDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
-    <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
-    <Compile Include="ReusableTypeClasses\ScoSortedDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\ScoStack.cs" />
-    <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\SerializableList.cs" />
-    <Compile Include="ReusableTypeClasses\StackGeek.cs" />
-    <Compile Include="ReusableTypeClasses\StackObjectCS.cs" />
-    <Compile Include="ReusableTypeClasses\TreeNodeOfT.cs" />
+    <Compile Include="ReusableTypeClasses\Observable\ObservableCollectionBatchUpdate.cs" />
+    <Compile Include="ReusableTypeClasses\Observable\ObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Observable\ObserverHelper.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoCollection.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoSortedDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoStack.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\SerializableList.cs" />
+    <Compile Include="ReusableTypeClasses\Other\StackGeek.cs" />
+    <Compile Include="ReusableTypeClasses\Other\StackObjectCS.cs" />
+    <Compile Include="ReusableTypeClasses\Other\TreeNodeOfT.cs" />
     <Compile Include="Threading\ApplicationIdleTimer.cs" />
-    <Compile Include="Threading\AsyncIdleQueue.cs" />
+    <Compile Include="Threading\AsyncIdleQueue1.cs" />
     <Compile Include="Threading\IdleActionQueue.cs" />
-    <Compile Include="Threading\PriorityScheduler.cs" />
     <Compile Include="Threading\SyncContextForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -835,6 +897,13 @@
     <EmbeddedResource Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.resx">
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ManagerResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.resx">
+      <DependentUpon>ConfigViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Threading\ProgressPane.resx">
       <DependentUpon>ProgressPane.cs</DependentUpon>
     </EmbeddedResource>
@@ -863,6 +932,7 @@
     <Content Include="Resources\Cancel.png" />
     <Content Include="Resources\Cancel.svg" />
     <None Include="Resources\charset_lookup.json" />
+    <None Include="Resources\CancelBlue.svg" />
     <Content Include="Resources\Cloud.svg" />
     <Content Include="Resources\CSEventReceiver.svg" />
     <Content Include="Resources\CSWorkflowAssociationForm.svg" />
@@ -871,6 +941,7 @@
     <Content Include="Resources\EventTracepointOn.svg" />
     <Content Include="Resources\ExceptionPublic.png" />
     <Content Include="Resources\ExclamationPoint.svg" />
+    <None Include="Resources\Folder Open.svg" />
     <Content Include="Resources\FolderError.svg" />
     <Content Include="Resources\History.svg" />
     <Content Include="Resources\LibraryWarning.svg" />
@@ -895,6 +966,8 @@
     <Content Include="Resources\RepeatUntilFailure.svg" />
     <Content Include="Resources\Run.png" />
     <Content Include="Resources\Run.svg" />
+    <None Include="Resources\Save.svg" />
+    <None Include="Resources\SaveAs.svg" />
     <Content Include="Resources\ScatterLineChart.svg" />
     <Content Include="Resources\SearchFolderClosed.svg" />
     <Content Include="Resources\ShowAssignedConfigurations.svg" />

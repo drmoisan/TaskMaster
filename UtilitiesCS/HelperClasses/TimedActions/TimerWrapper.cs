@@ -7,7 +7,7 @@ using System.Timers;
 
 namespace UtilitiesCS.HelperClasses
 {
-    public class TimerWrapper : IGenericTimer, ITimerWrapper
+    public class TimerWrapper : ITimerWrapper
     {
         public TimerWrapper(TimeSpan interval)
         {
@@ -52,6 +52,12 @@ namespace UtilitiesCS.HelperClasses
         public void StartTimer() => this.timer.Start();
 
         public void StopTimer() => this.timer.Stop();
+
+        public void ResetTimer()
+        {
+            this.timer.Stop(); 
+            this.timer.Start();
+        }
 
         public void Dispose()
         {

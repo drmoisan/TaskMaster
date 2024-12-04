@@ -33,6 +33,17 @@ namespace UtilitiesCS.HelperClasses
         private ThreadSafeSingleShotGuard _actionRequested = new();
         private TimerWrapper _timer;
         
+        public void ResetTimer()
+        {
+            _timer?.ResetTimer();
+        }
+
+        public void CancelAction() 
+        {
+            _timer?.StopTimer();
+            _actionRequested = new();
+        }
+
         public void RequestAction()
         {
             if (_actionRequested.CheckAndSetFirstCall)

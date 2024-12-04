@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -11,12 +12,13 @@ namespace UtilitiesCS
         //Dictionary<string, string> DictPPL { get; }
         //string DictPPL_Filename { get; }
         //void DictPPL_Save();
+        Task LoadAsync(bool parallel);
         IScoDictionary<string, string> DictRemap { get; }
         ISerializableList<string> CategoryFilters { get; }
         IIDList IDList { get; }
         IApplicationGlobals Parent { get; }
         IProjectData ProjInfo { get; }
-        ScDictionary<string, string> ProgramInfo { get; }
+        NewScDictionary<string, string> ProgramInfo { get; }
         ScoCollection<IPrefix> PrefixList { get; }
         ScoCollection<IPrefix> LoadPrefixList();
         ScoDictionary<string, int> FilteredFolderScraping { get; }

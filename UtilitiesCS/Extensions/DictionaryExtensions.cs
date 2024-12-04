@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,12 @@ namespace UtilitiesCS
                 result[e.Key] = e.Value;
 
             return result;
+        }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<DictionaryEntry> entries)
+        {
+            return entries.Cast<DictionaryEntry>()
+                          .ToDictionary(entry => (TKey)entry.Key, entry => (TValue)entry.Value);
         }
 
         public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source)

@@ -4,20 +4,14 @@ using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using ToDoModel;
 using UtilitiesCS;
 using System.IO;
 using System.ComponentModel;
 using System.Windows.Forms;
-using UtilitiesCS.Threading;
 using System.Threading;
 using System.Collections.Concurrent;
-using QuickFiler.Viewers;
-using System.Globalization;
 using System.Diagnostics;
-using static Microsoft.FSharp.Core.ByRefKinds;
 using System.Timers;
 
 namespace QuickFiler.Controllers
@@ -280,7 +274,12 @@ namespace QuickFiler.Controllers
             
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
-            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyDocuments, filename);
+            if (!_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
+            {
+                logger.Debug($"{nameof(QuickFileMetrics_WRITE)} aborted due to lack of MyDocuments location");
+                return;
+            }
+            LOC_TXT_FILE = Path.Combine(folderRoot, filename);
 
             Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
@@ -315,7 +314,10 @@ namespace QuickFiler.Controllers
                 .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
                 dataLineBeg, OlEndTime, ref OlAppointment);
 
-            FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyDocuments);
+            if(_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
+            {
+                FileIO2.WriteTextFile(filename, strOutput, myDocuments);
+            }
         }
 
         public async Task WriteMetricsAsync(string filename)
@@ -338,7 +340,8 @@ namespace QuickFiler.Controllers
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
-            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyDocuments, filename);
+            if (!_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments)) { return; }
+            LOC_TXT_FILE = Path.Combine(myDocuments, filename);
 
             Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
@@ -437,7 +440,8 @@ namespace QuickFiler.Controllers
             var strOutput = _metrics.GetConsumingEnumerable().ToArray();
             if (strOutput.Length > 0)
             {
-                await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyDocuments, default);
+                if(_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments)) 
+                { await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, myDocuments, default); }                
             }
         }
 

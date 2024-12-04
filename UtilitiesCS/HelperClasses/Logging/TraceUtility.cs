@@ -1,4 +1,5 @@
 ﻿using Deedle;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,13 +16,13 @@ namespace UtilitiesCS
     public static class TraceUtility
     {
         [Conditional("TRACE")]
-        public static void LogMethodCall(params object[] callingMethodParamValues)
+        public static void LogMethodCallOld(params object[] callingMethodParamValues)
         {
             var sf = new StackTrace();
             //var assembliesAndMethods = Enumerable.Range(0, sf.FrameCount).Select(i => (sf.GetFrame(i).GetMethod().DeclaringType.Assembly.GetName().Name, sf.GetFrame(i).GetMethod().Name)).ToArray();
             
             int frameLevel = 0;
-            MethodBase method, methodCalledBy;
+            MethodBase method; 
             try
             {
                 method = GetFirstMethodOfMine(sf, ref frameLevel);
@@ -44,6 +45,7 @@ namespace UtilitiesCS
                 methodName = $"{GetClassName(method)}.{method.Name}";
             }
 
+            MethodBase methodCalledBy;
             try
             {
                 methodCalledBy = GetFirstMethodOfMine(sf, ref frameLevel);
@@ -79,6 +81,83 @@ namespace UtilitiesCS
             }
         }
 
+        [Conditional("TRACE")]
+        public static void LogMethodCall(params object[] callingMethodParamValues)
+        {
+            var message = GetMethodCallLogString(callingMethodParamValues);
+            logger.Info(message);
+        }
+
+        public static string GetMethodCallLogString(params object[] callingMethodParamValues)
+        {
+            var st = new StackTrace();
+            int level = 0;
+
+            var method = st.GetCallerMethod(ref level);
+            var methodName = method is null ? "Error getting method name" : $"{GetClassName(method)}.{method.Name}";
+
+            var methodCalledBy = st.GetCallerMethod(ref level);
+            var methodCaller = methodCalledBy is null ? "Error getting caller name" : $"{GetClassName(methodCalledBy)}.{methodCalledBy.Name}";
+
+            var paramString = method.GetParameterString(callingMethodParamValues);
+            return $"TRACE\t{methodCaller} -> {method.Name}({paramString})";
+        }
+
+        [Conditional("TRACE")]
+        public static void LogMethodTrace(params object[] callingMethodParamValues)
+        {
+            var message = GetMethodTraceString(callingMethodParamValues);
+            logger.Info(message);
+        }
+
+        public static string GetMethodTraceString(params object[] callingMethodParamValues)
+        {
+            var st = new StackTrace();
+            var methods = st.GetMyMethods();
+            var lastMethod = methods.Pop();
+            var paramString = lastMethod is null? "method not resolved": lastMethod.GetParameterString(callingMethodParamValues);
+            var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
+            var methodNames = methods.Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})").ToList();
+            methodNames.Add(lastName);
+            return string.Join(" -> ", methodNames);
+        }
+
+        private static string GetParameterNames(this MethodBase method)
+        {
+            var methodParameters = method?.GetParameters();
+            return string.Join(", ", methodParameters.Select(p => $"{p.Name}"));
+        }
+
+        private static T Pop<T>(this List<T> list)
+        {
+            if (list.IsNullOrEmpty()) { return default; }
+            var result = list.Last();
+            list.RemoveAt(list.Count - 1);
+            return result;
+        }
+
+        private static string GetParameterString(this MethodBase method, params object[] callingMethodParamValues)
+        {
+            var methodParameters = method?.GetParameters();
+            
+            // Exclude out parameters
+            var methodParamsExcludingOut = methodParameters?.Where(p => !p.IsOut).ToArray();
+            if (methodParamsExcludingOut.Length == callingMethodParamValues.Length)
+            {
+                List<string> parameterList = new List<string>();
+                foreach (var parameter in methodParamsExcludingOut)
+                {
+                    parameterList.Add($"{parameter.Name}={callingMethodParamValues[parameter.Position]}");
+                }
+
+                return string.Join(", ", parameterList);
+            }
+            else
+            {
+                return "/* Please update to pass in all parameters */";
+            }
+        }
+
         public static ParameterInfo[] GetCallerParameters(this StackTrace st) => st.GetCallerMethod()?.GetParameters();
 
         public static ParameterInfo[] GetCallerParameters(this StackTrace st, ref int frameLevel) => st.GetCallerMethod(ref frameLevel)?.GetParameters();
@@ -91,19 +170,20 @@ namespace UtilitiesCS
 
         public static MethodBase GetCallerMethod(this StackTrace st, ref int frameLevel)
         {
+            var nextLevel = frameLevel + 1;
             MethodBase methodCalledBy = null;
             try
             {
                 methodCalledBy = GetFirstMethodOfMine(st, ref frameLevel);
-                //if (methodCalledBy is null)
-                //{
-                //    frameLevel = 2;
-                //    methodCalledBy = new StackFrame(skipFrames: frameLevel).GetMethod();
-                //}
+                if (methodCalledBy is null)
+                {
+                    frameLevel = nextLevel;
+                    methodCalledBy = st.GetFrame(frameLevel).GetMethod();
+                }
             }
             catch (Exception)
             {
-                frameLevel = 2;
+                frameLevel = nextLevel;
                 methodCalledBy = null;
             }
             return methodCalledBy;

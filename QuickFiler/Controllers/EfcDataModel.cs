@@ -18,6 +18,9 @@ namespace QuickFiler.Controllers
 {
     internal class EfcDataModel
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Constructors and Initializers
 
         public EfcDataModel(IApplicationGlobals globals, MailItem mail, CancellationTokenSource tokenSource, CancellationToken token)
@@ -85,7 +88,7 @@ namespace QuickFiler.Controllers
         {
             get 
             { 
-                _folderHelper ??= new OlFolderHelper(Globals, MailInfo, OlFolderHelper.InitOptions.FromField);
+                //_folderHelper ??= new OlFolderHelper(Globals, MailInfo, OlFolderHelper.InitOptions.FromField);
                 return _folderHelper; 
             }
             protected set => _folderHelper = value;
@@ -100,14 +103,16 @@ namespace QuickFiler.Controllers
                 }
                 else
                 {
-                    FolderHelper = await Task.Run(() => new OlFolderHelper(
-                        Globals, MailInfo, OlFolderHelper.InitOptions.FromField), Token);
+                    FolderHelper = await Task.Run(async () => await new OlFolderHelper(
+                        Globals, MailInfo, OlFolderHelper.InitOptions.FromField)
+                        .InitAsync(MailInfo, OlFolderHelper.InitOptions.FromField), Token);
                 }
             }
             else
             {
-                FolderHelper = await Task.Run(() => new OlFolderHelper(
-                    Globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString), Token);
+                FolderHelper = await Task.Run(async () => await new OlFolderHelper(
+                    Globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString)
+                    .InitAsync(folderList, OlFolderHelper.InitOptions.FromArrayOrString), Token);
             }
         }
 
@@ -160,6 +165,11 @@ namespace QuickFiler.Controllers
                 bool attachments = (folderpath != "Trash to Delete") ? saveAttachments : false;
                 var mailHelpers = moveConversation ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper>() { MailInfo };
 
+                if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot)) 
+                {
+                    logger.Debug($"Cannot sort without OneDrive location");
+                    return;
+                }
                 var config = new EmailFilerConfig()
                 {
                     SaveMsg = saveEmail,
@@ -168,7 +178,7 @@ namespace QuickFiler.Controllers
                     DestinationOlStem = folderpath,
                     Globals = Globals,
                     OlAncestor = Globals.Ol.ArchiveRootPath,
-                    FsAncestorEquivalent = Globals.FS.FldrOneDrive
+                    FsAncestorEquivalent = folderRoot,
                 };
             
                 var sorter = new EmailFiler(config);
@@ -180,12 +190,14 @@ namespace QuickFiler.Controllers
 
         internal async Task OpenOlFolderAsync(string folderpath)
         {
+            if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return; }
+              
             var config = new EmailFilerConfig()
             {
                 DestinationOlStem = folderpath,
                 Globals = Globals,
                 OlAncestor = Globals.Ol.ArchiveRootPath,
-                FsAncestorEquivalent = Globals.FS.FldrOneDrive
+                FsAncestorEquivalent = oneDrive,
             };
 
             var sorter = new EmailFiler(config);
@@ -194,12 +206,13 @@ namespace QuickFiler.Controllers
 
         internal async Task OpenFsFolderAsync(string folderpath)
         {
+            if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return; }
             var config = new EmailFilerConfig()
             {
                 DestinationOlStem = folderpath,
                 Globals = Globals,
                 OlAncestor = Globals.Ol.ArchiveRootPath,
-                FsAncestorEquivalent = Globals.FS.FldrOneDrive
+                FsAncestorEquivalent = oneDrive
             };
 
             var sorter = new EmailFiler(config);

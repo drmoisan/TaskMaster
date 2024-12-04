@@ -219,7 +219,7 @@ namespace UtilitiesCS
                 {     
                     var message = $"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} times for email {mailItem.Subject} and was canceled";
                     logger.Warn($"{message} {e.StackTrace}");
-                    MessageBox.Show(message, "Operation Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MyBox.ShowDialog(message, "Operation Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             

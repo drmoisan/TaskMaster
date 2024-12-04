@@ -110,6 +110,11 @@ namespace UtilitiesCS.Threading
         /// </summary> 
         private ApplicationIdleTimer()
         {
+            StartTimer();
+        }
+
+        private void StartTimer()
+        {
             // Initialize counters
             isIdle = false;
             lastAppIdleTime = DateTime.Now;
@@ -122,9 +127,10 @@ namespace UtilitiesCS.Threading
             _timer.Start();
 
             // Hook into the events
-            _timer.Elapsed += new System.Timers.ElapsedEventHandler(Heartbeat);
-            System.Windows.Forms.Application.Idle += new EventHandler(Application_Idle);
+            _timer.Elapsed += Heartbeat;
+            System.Windows.Forms.Application.Idle += Application_Idle;
         }
+
         /// <summary>
         /// Static initialization.  Called once per AppDomain.
         /// </summary>
@@ -134,6 +140,7 @@ namespace UtilitiesCS.Threading
             if (instance == null)
             {
                 instance = new ApplicationIdleTimer();
+                _ = Guard.CheckAndSetFirstCall;
             }
         }
         #endregion
@@ -335,7 +342,47 @@ namespace UtilitiesCS.Threading
                 instance.cpuThreshold = value;
             }
         }
+        
+        internal static ThreadSafeSingleShotGuard Guard { get; private set; } = new ThreadSafeSingleShotGuard();
+
         #endregion
+
+        #region Static Public Methods
+
+        internal static void Stop()
+        {
+            instance._timer.Stop();
+            instance._timer.Elapsed -= instance.Heartbeat;
+            System.Windows.Forms.Application.Idle -= instance.Application_Idle;
+            instance._timer.Dispose();
+        }
+
+        internal static void Start()
+        {
+            if (Guard.CheckAndSetFirstCall)
+            {
+                instance.StartTimer();
+            }
+        }
+
+        public static void Subscribe(ApplicationIdleEventHandler handler)
+        {
+            ApplicationIdle += handler;
+            Start();
+        }
+
+        public static void Unsubscribe(ApplicationIdleEventHandler handler) 
+        {
+            ApplicationIdle -= handler;
+            //if (ApplicationIdle.GetInvocationList().Length == 0)
+            if (ApplicationIdle is null)
+            {
+                Stop();
+                Guard = new ThreadSafeSingleShotGuard();
+            }
+        }
+
+        #endregion Static Public Methods
     }
 
 }

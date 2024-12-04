@@ -12,6 +12,7 @@ using UtilitiesCS.EmailIntelligence;
 using System.Collections.Generic;
 using Deedle;
 using System.Threading.Tasks;
+using SDILReader;
 
 namespace UtilitiesCS
 {
@@ -57,8 +58,11 @@ namespace UtilitiesCS
         {
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
             var olAncestor = FolderConverter.ResolveOlRoot(((Folder)mailItems[0].Parent).FolderPath, appGlobals);
-            var fsAncestorEquivalent = appGlobals.FS.FldrOneDrive;
-            await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            if (appGlobals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+            {
+                var fsAncestorEquivalent = folderRoot;
+                await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            }
         }
 
         async public static Task SortAsync(IList<MailItemHelper> mailHelpers,
@@ -152,7 +156,7 @@ namespace UtilitiesCS
                 mailHelper.Item.Save();
             });
 
-            var bayesianTask = Task.Run(() => appGlobals.AF.Manager["Folder"].AddOrUpdateClassifier(destinationOlStem, mailHelper.Tokens, 1));
+            var bayesianTask = Task.Run(async () => (await appGlobals.AF.Manager["Folder"]).AddOrUpdateClassifier(destinationOlStem, mailHelper.Tokens, 1));
             // Update Subject Map and Subject Encoder
             var subjectMapTask = Task.Run(() => appGlobals.AF.SubjectMap.Add(mailHelper.Subject, destinationOlStem));
 
@@ -405,7 +409,7 @@ namespace UtilitiesCS
                     if (undoResponse == DialogResult.Yes)
                     {
                         var helper = await MailItemHelper.FromMailItemAsync(movedStack[i].MailItem, globals, default, true);
-                        globals.AF.Manager["Folder"].UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
+                        (await globals.AF.Manager["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }

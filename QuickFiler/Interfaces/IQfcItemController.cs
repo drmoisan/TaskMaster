@@ -30,6 +30,7 @@ namespace QuickFiler.Interfaces
         bool IsActiveUI { get; set; }
         string ConvOriginID { get; set; }
         int Height { get; }
+        MailItemHelper ItemInfo { get; set; }
         MailItem Mail { get; set; }
         void ToggleExpansion(); 
         string SelectedFolder { get; }
@@ -58,11 +59,11 @@ namespace QuickFiler.Interfaces
         void SetThemeLight(bool async);
         void Cleanup();
         Task MoveMailAsync();
-        string Subject { get; }
-        string To { get; }
-        string Sender { get; }
-        string SentDate { get; }
-        string SentTime { get; }
+        //string Subject { get; }
+        //string To { get; }
+        //string Sender { get; }
+        //string SentDate { get; }
+        //string SentTime { get; }
         IList<TableLayoutPanel> TableLayoutPanels { get; }
         IList<Button> Buttons { get; }
         IList<IQfcTipsDetails> ListTipsDetails { get; }

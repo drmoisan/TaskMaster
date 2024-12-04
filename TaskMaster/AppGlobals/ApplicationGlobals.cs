@@ -1,8 +1,13 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
@@ -19,15 +24,35 @@ namespace TaskMaster
             _autoFileObjects = new AppAutoFileObjects(this);
             _events = new AppEvents(this);
             _quickFilerSettings = new AppQuickFilerSettings();
+            Engines = new AppItemEngines(this);
         }
 
-        async public Task LoadAsync()
+        async public Task LoadAsync(bool parallel = true)
         {
-            //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is beginning.");
+            if (parallel) { await LoadParallelAsync(); }
+            else { await LoadSequentialAsync(); }
+        }
 
+        async public Task LoadParallelAsync()
+        {
             await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
+            await Engines.InitAsync();
             await _events.LoadAsync();
-            //logger.Debug($"{nameof(ApplicationGlobals)}.{nameof(LoadAsync)} is complete.");
+        }
+
+        async public Task LoadSequentialAsync() 
+        {
+            await _toDoObjects.LoadAsync(false);
+            await _autoFileObjects.LoadAsync(false);
+            await Engines.InitAsync();
+            await _events.LoadAsync();
+        }
+
+        public void LoadWhenIdle()
+        {
+            IdleAsyncQueue.AddEntry(false, () => Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync()));
+            IdleAsyncQueue.AddEntry(false, Engines.InitAsync);
+            IdleAsyncQueue.AddEntry(false, _events.LoadAsync);
         }
 
         private AppFileSystemFolderPaths _fs;
@@ -48,6 +73,22 @@ namespace TaskMaster
         private AppQuickFilerSettings _quickFilerSettings;
         public IAppQuickFilerSettings QfSettings => _quickFilerSettings;
         internal AppQuickFilerSettings InternalQfSettings => _quickFilerSettings;
+        
+        public IAppItemEngines Engines { get; private set; } 
+
+        public List<Type> GetClasses()
+            {
+                return ReflectionHelper.GetAllClassesInSolution();
+            }
+        
+        public string[] GetProjectNames()
+        {
+            //ProjectCollection.GlobalProjectCollection.LoadedProjects
+            return AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Select(assembly => assembly.GetName().Name)
+                .ToArray();
+        }
 
         #region Legacy Definitions and Constants
 

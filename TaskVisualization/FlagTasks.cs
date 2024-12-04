@@ -193,51 +193,6 @@ namespace TaskVisualization
             return listSelections;
         }
 
-        #region Obsolete Methods
-        
-        [Obsolete("Use the other InitializeToDoList method")]
-        public static List<ToDoItem> InitializeToDoList2(IList itemList, Explorer olExplorer, Func<string, string> projectsToPrograms)
-        {
-            itemList ??= GetSelectionIList(olExplorer);
-            var ToDoSelection = new List<ToDoItem>();
-            foreach (var objItem in itemList)
-            {
-                ToDoItem tmpToDo;
-                if (objItem is MailItem)
-                {
-                    MailItem olMail = (MailItem)objItem;
-                    tmpToDo = new ToDoItem(olMail);
-                }
-                else if (objItem is TaskItem)
-                {
-                    TaskItem olTask = (TaskItem)objItem;
-                    tmpToDo = new ToDoItem(olTask);
-                }
-                else
-                {
-                    tmpToDo = new ToDoItem(objItem, onDemand: true);
-                }
-                tmpToDo.ProjectsToPrograms = projectsToPrograms;
-                ToDoSelection.Add(tmpToDo);
-            }
-            return ToDoSelection;
-        }
-
-        /// <summary>
-        /// Adds the Selection from the ActiveExplorer to a new Collection
-        /// </summary>
-        /// <returns>Collection of Outlook Items</returns>
-        [Obsolete("Use the other GetSelection method")]
-        private static IList GetSelectionIList(Explorer olExplorer)
-        {
-            var itemList = new List<object>();
-            foreach (var obj in olExplorer.Selection)
-                itemList.Add(obj);
-            return itemList;
-        }
-
-
-        #endregion Obsolete Methods
 
     }
 }

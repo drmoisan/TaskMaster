@@ -85,24 +85,31 @@ namespace QuickFiler.Helper_Classes
         private async Task<Folder> GetParentFolderAsync(MailItem mail, int remaining = 2)
         {
             if (mail is null) { return null; }
-            try
+                        
+            var parentFolder = await Task.Run(async () => 
             {
-                var parentObj = await Task.Run(() => mail.Parent);
-                return parentObj as Folder;
-            }
-            catch (System.Exception e)
-            {
-                if (remaining > 0)
+                try
                 {
-                    logger.Error($"Error getting parent folder for mail item {mail.EntryID}. {remaining} remaining attempts.");
-                    return await GetParentFolderAsync(mail, remaining - 1);
+                    return mail.Parent as Folder;
                 }
-                else
+                catch (System.Exception e)
                 {
-                    logger.Error($"Error getting parent folder for mail item {mail.EntryID}. No remaining attempts. Returning null", e);
-                    return null;
+                    if (remaining > 0)
+                    {
+                        logger.Error($"Error getting parent folder for mail item {mail.EntryID}. {remaining} remaining attempts.");
+                        return await GetParentFolderAsync(mail, remaining - 1);
+                    }
+                    else
+                    {
+                        logger.Error($"Error getting parent folder for mail item {mail.EntryID}. No remaining attempts. Returning null", e);
+                        return null;
+                    }
                 }
-            }
+                
+            });
+
+            return parentFolder;
+
         }
 
         public void UnhookAll()

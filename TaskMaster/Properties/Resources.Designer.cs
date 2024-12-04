@@ -82,16 +82,6 @@ namespace TaskMaster.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] manager_config {
-            get {
-                object obj = ResourceManager.GetObject("manager_config", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] PrefixList {
             get {
                 object obj = ResourceManager.GetObject("PrefixList", resourceCulture);

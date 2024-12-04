@@ -8,10 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class BayesianClassifierGroup
+    public class BayesianClassifierGroup: NewSmartSerializable<BayesianClassifierGroup>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -21,6 +22,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public BayesianClassifierGroup()
         {
             _classifiers = [];
+            base._parent = this;
         }
 
         #endregion Constructors
@@ -38,7 +40,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public int TotalEmailCount { get => _totalEmailCount; set => _totalEmailCount = value; }
         protected int _totalEmailCount;
 
-        public IApplicationGlobals AppGlobals { get; set; }
+        public IApplicationGlobals Globals { get; set; }
 
         [JsonIgnore]
         public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
@@ -98,7 +100,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public OrderedParallelQuery<Prediction<string>> Classify(object source)
         {
-            var tokens = _tokenize(source, AppGlobals);
+            var tokens = _tokenize(source, Globals);
             var tokenIncidence = tokens.GroupAndCount();
             var result = this.Classify(tokenIncidence).OrderByDescending(x => x.Probability);
             var sl = new SortedList<int, Prediction<string>>();
@@ -126,7 +128,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async ValueTask<Prediction<string>[]> ClassifyAsync(object source, CancellationToken cancel)
         {
-            var tokens = await TokenizeAsync(source, AppGlobals, cancel);
+            var tokens = await TokenizeAsync(source, Globals, cancel);
             var tokenIncidence = await tokens.GroupAndCountAsync();
             var result = await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
             return result;
@@ -228,12 +230,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Serialization
 
-        [OnDeserialized]
-        internal void OnDeserializedMethod(StreamingContext context)
-        {
-            //IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
-            //LogMetrics();
-        }
+        //[OnDeserialized]
+        //internal void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    //IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
+        //    //LogMetrics();
+        //}
 
         internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed")
         {

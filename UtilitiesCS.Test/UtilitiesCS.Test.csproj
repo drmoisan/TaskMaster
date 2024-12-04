@@ -71,6 +71,10 @@
     <Compile Include="HelperClasses\TimedDiskWriterTests.cs" />
     <Compile Include="HelperClasses\PrettyPrintTest.cs" />
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
+    <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
+    <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionaryTests.cs" />
+    <Compile Include="NewtonsoftHelpers\MyTypeBuilder.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScDictionaryTest.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBodyTests.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloaderTests.cs" />
     <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />
@@ -90,6 +94,8 @@
     <Compile Include="Extensions\DeedleTests.cs" />
     <Compile Include="HelperClasses\SimpleRegex_Test.cs" />
     <Compile Include="Dialogs\YesNoToAll_Test.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\ConcurrentObservableDictionaryTest.cs" />
+    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
@@ -293,6 +299,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TaskMaster\TaskMaster.csproj">
+      <Project>{68924fdf-614d-447c-a175-450860ddb597}</Project>
+      <Name>TaskMaster</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>

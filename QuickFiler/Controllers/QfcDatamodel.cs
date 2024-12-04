@@ -244,30 +244,6 @@ namespace QuickFiler.Controllers
             }
             return true;
             
-            
-            
-
-            //try
-            //{
-            //    rows.Select(row =>
-            //    (MailItem)_olApp.GetNamespace("MAPI")
-            //    .GetItemFromID(row.EntryId, row.StoreId))
-            //    .ForEach(item =>
-            //    {
-            //        token.ThrowIfCancellationRequested();
-            //        _masterQueue.AddLast(item);
-            //        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-            //    });
-
-            //    return true;
-            //}
-            //catch (TaskCanceledException)
-            //{
-            //    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
-            //    return false;
-            //}
-
-
         }
 
         private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
@@ -277,7 +253,6 @@ namespace QuickFiler.Controllers
                 MessageBox.Show("Email Frame is empty");
                 return false;
             }
-
 
             try
             {
@@ -455,9 +430,17 @@ namespace QuickFiler.Controllers
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
             try
             {
-                //nodes?.ForEach(_moveMonitor.UnhookItem);
-                await nodes?.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(_moveMonitor.UnhookItemAsync, _token);
-                //item => _moveMonitor.UnhookItemAsync(item), _token);
+                if (nodes is not null)
+                {
+                    await Task.Run(async () => 
+                    {
+                        foreach (var node in nodes)
+                        {
+                            await _moveMonitor.UnhookItemAsync(node, _token);
+                        }
+                    }, _token);                    
+                }
+                
             }
             catch (System.Exception e)
             {
@@ -488,14 +471,20 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
-        void Application_NewMailEx(string EntryIDCollection)
+        void Application_NewMailEx(string entryID)
         {
-            var item = _globals.Ol.App.Session.GetItemFromID(EntryIDCollection, System.Reflection.Missing.Value);
-            if (item is MailItem newMail)
+            //var item = _globals.Ol.App.Session.GetItemFromID(entryID, System.Reflection.Missing.Value);
+            try
             {
-                _masterQueue.AddFirst(newMail);
+                var item = _globals.Ol.App.Session.GetItemFromID(entryID) as MailItem;
+                if (item is not null) { _masterQueue.AddFirst(item); }
             }
-            //MailItem newMail = (MailItem)_globals.Ol.App.Session.GetItemFromID(EntryIDCollection, System.Reflection.Missing.Value);
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            
+            
         }
 
         #endregion Event Handlers

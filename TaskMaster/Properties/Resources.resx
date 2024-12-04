@@ -124,9 +124,6 @@
   <data name="Email Prefix To Strip" xml:space="preserve">
     <value>WARNING: Email originated outside of PepsiCo.</value>
   </data>
-  <data name="manager_config" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\manager_config.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="PrefixList" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\999999PrefixList.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
