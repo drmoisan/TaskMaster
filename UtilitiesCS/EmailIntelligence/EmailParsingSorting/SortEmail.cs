@@ -162,11 +162,13 @@ namespace UtilitiesCS
 
             // Move the email to the destination folder
 
-            MailItem mailItemTemp = null;
+            MailItem mailItemNew = null;
+            MailItem mailItemOriginal = mailHelper.Item;
 
             try
             {
-                mailItemTemp = await Task.Run(() => (MailItem)mailHelper.Item.Move(destinationFolder));
+                mailItemNew = await Task.Run(() => (MailItem)mailHelper.Item.Move(destinationFolder));
+                mailHelper.Item = mailItemNew;
             }
             catch (System.Exception e)
             {
@@ -177,11 +179,11 @@ namespace UtilitiesCS
             await subjectMapTask;
             
             // Add the email to the Undo Stack
-            if (mailItemTemp is not null)
+            if (mailItemNew is not null)
             {
-                PushToUndoStack(mailHelper.Item, mailItemTemp, appGlobals);
+                PushToUndoStack(mailItemOriginal, mailItemNew, appGlobals);
                 // Capture the move details in the log
-                await Task.Run(() => CaptureMoveDetails(mailHelper.Item, mailItemTemp, appGlobals)).ConfigureAwait(false);
+                await Task.Run(() => CaptureMoveDetails(mailItemOriginal, mailItemNew, appGlobals)).ConfigureAwait(false);
             }
         }
 
@@ -257,6 +259,7 @@ namespace UtilitiesCS
                 }
                 
                 MailItem mailItemTemp = null;
+                
                 try
                 {
                     if (olDestination is not null)

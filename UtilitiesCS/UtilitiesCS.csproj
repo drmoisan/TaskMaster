@@ -654,6 +654,7 @@
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableLoader.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Sco\ScoDictionaryNew.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
     <Compile Include="Threading\IdleAsyncQueue.cs" />

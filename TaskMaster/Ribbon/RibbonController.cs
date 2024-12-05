@@ -450,6 +450,7 @@ namespace TaskMaster
             {
                 if (item is MailItem mailItem)
                 {
+                    mailItem.DeleteUdf("AutoProcessed");
                     mailItem.DeleteUdf("Triage");
                     mailItem.DeleteUdf("Spam");                    
                 }
