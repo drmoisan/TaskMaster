@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Web.UI.WebControls;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
