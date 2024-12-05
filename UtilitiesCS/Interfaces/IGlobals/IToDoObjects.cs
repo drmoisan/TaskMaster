@@ -18,7 +18,7 @@ namespace UtilitiesCS
         IIDList IDList { get; }
         IApplicationGlobals Parent { get; }
         IProjectData ProjInfo { get; }
-        NewScDictionary<string, string> ProgramInfo { get; }
+        ScDictionary<string, string> ProgramInfo { get; }
         ScoCollection<IPrefix> PrefixList { get; }
         ScoCollection<IPrefix> LoadPrefixList();
         ScoDictionary<string, int> FilteredFolderScraping { get; }

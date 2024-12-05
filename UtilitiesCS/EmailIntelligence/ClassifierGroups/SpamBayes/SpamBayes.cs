@@ -201,7 +201,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Public Properties
 
-        public INewSmartSerializableConfig Config => ClassifierGroup.Config;
+        public ISmartSerializableConfig Config => ClassifierGroup.Config;
 
         protected internal IApplicationGlobals Globals { get => _globals; protected set => _globals = value; }
         private IApplicationGlobals _globals;

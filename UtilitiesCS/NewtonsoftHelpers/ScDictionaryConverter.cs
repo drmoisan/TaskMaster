@@ -11,7 +11,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.NewtonsoftHelpers
 {
-    public class ScDictionaryConverter<TDerived, TKey, TValue>: JsonConverter<TDerived> where TDerived : NewScDictionary<TKey, TValue>
+    public class ScDictionaryConverter<TDerived, TKey, TValue>: JsonConverter<TDerived> where TDerived : ScDictionary<TKey, TValue>
     {
         public ScDictionaryConverter() { }
 

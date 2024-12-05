@@ -14,7 +14,7 @@ namespace UtilitiesCS
         string EngineName { get; }
         string Message { get; }
         T TypedItem { get; set; }
-        INewSmartSerializableConfig Config { get; }
+        ISmartSerializableConfig Config { get; }
         void Serialize();
     }
 }

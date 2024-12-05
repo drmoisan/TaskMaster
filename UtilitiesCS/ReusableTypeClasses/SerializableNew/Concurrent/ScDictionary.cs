@@ -15,35 +15,35 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class NewScDictionary<TKey, TValue>: ConcurrentDictionary<TKey, TValue>, INewSmartSerializable<NewScDictionary<TKey, TValue>>
+    public class ScDictionary<TKey, TValue>: ConcurrentDictionary<TKey, TValue>, ISmartSerializable<ScDictionary<TKey, TValue>>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constructors
 
-        public NewScDictionary() : base() { ism = new NewSmartSerializable<NewScDictionary<TKey, TValue>>(this); }
-        public NewScDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : base(collection) { ism = new NewSmartSerializable<NewScDictionary<TKey, TValue>>(this); }
-        public NewScDictionary(IEqualityComparer<TKey> comparer) : base(comparer) { ism = new NewSmartSerializable<NewScDictionary<TKey, TValue>>(this); }
-        public NewScDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(collection, comparer) { ism = new NewSmartSerializable<NewScDictionary<TKey, TValue>>(this); }
-        public NewScDictionary(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { ism = new NewSmartSerializable<NewScDictionary<TKey, TValue>>(this); }
-        public NewScDictionary(int concurrencyLevel, IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(concurrencyLevel, collection, comparer) { ism = new NewSmartSerializable<NewScDictionary<TKey, TValue>>(this); }
-        public NewScDictionary(int concurrencyLevel, int capacity, IEqualityComparer<TKey> comparer) : base(concurrencyLevel, capacity, comparer) { ism = new NewSmartSerializable<NewScDictionary<TKey, TValue>>(this); }
-        public NewScDictionary(NewScDictionary<TKey, TValue> dictionary) : base(dictionary) { ism = dictionary.ism; }
+        public ScDictionary() : base() { ism = new SmartSerializable<ScDictionary<TKey, TValue>>(this); }
+        public ScDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : base(collection) { ism = new SmartSerializable<ScDictionary<TKey, TValue>>(this); }
+        public ScDictionary(IEqualityComparer<TKey> comparer) : base(comparer) { ism = new SmartSerializable<ScDictionary<TKey, TValue>>(this); }
+        public ScDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(collection, comparer) { ism = new SmartSerializable<ScDictionary<TKey, TValue>>(this); }
+        public ScDictionary(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { ism = new SmartSerializable<ScDictionary<TKey, TValue>>(this); }
+        public ScDictionary(int concurrencyLevel, IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(concurrencyLevel, collection, comparer) { ism = new SmartSerializable<ScDictionary<TKey, TValue>>(this); }
+        public ScDictionary(int concurrencyLevel, int capacity, IEqualityComparer<TKey> comparer) : base(concurrencyLevel, capacity, comparer) { ism = new SmartSerializable<ScDictionary<TKey, TValue>>(this); }
+        public ScDictionary(ScDictionary<TKey, TValue> dictionary) : base(dictionary) { ism = dictionary.ism; }
 
         #endregion Constructors
 
         #region ISmartSerializable
 
         public NewSmartSerializableConfig Config { get => ism.Config; set => ism.Config = value; }
-        protected NewSmartSerializable<NewScDictionary<TKey, TValue>> ism;
+        protected SmartSerializable<ScDictionary<TKey, TValue>> ism;
 
         public void Serialize() => ism.Serialize();
         public void Serialize(string filePath) => ism.Serialize(filePath);
         public void SerializeThreadSafe(string filePath) => ism.SerializeThreadSafe(filePath);
-        public NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) => ism.Deserialize(fileName, folderPath);
-        public NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) => ism.Deserialize(fileName, folderPath, askUserOnError);
-        public NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
+        public ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) => ism.Deserialize(fileName, folderPath);
+        public ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) => ism.Deserialize(fileName, folderPath, askUserOnError);
+        public ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
 
         #endregion ISmartSerializable
 
@@ -68,15 +68,15 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public static class Static
         {
-            private static NewSmartSerializable<NewScDictionary<TKey, TValue>> GetInstance() => new();
+            private static SmartSerializable<ScDictionary<TKey, TValue>> GetInstance() => new();
 
-            public static NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) =>
+            public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath) =>
                 GetInstance().Deserialize(fileName, folderPath);
 
-            public static NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) =>
+            public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) =>
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError);
 
-            public static NewScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
+            public static ScDictionary<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
         }
 

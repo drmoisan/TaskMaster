@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public interface INewSmartSerializableConfig: ICloneable, INotifyPropertyChanged
+    public interface ISmartSerializableConfig: ICloneable, INotifyPropertyChanged
     {
         bool ClassifierActivated { get; set; }
         FilePathHelper Disk { get; set; }
@@ -16,9 +16,9 @@ namespace UtilitiesCS.ReusableTypeClasses
         JsonSerializerSettings NetJsonSettings { get; set; }
         DateTime NetworkDate { get; }
         ActiveDiskEnum ActiveDisk { get; }
-        INewSmartSerializableConfig DeepCopy();
-        void CopyFrom(INewSmartSerializableConfig config, bool deep);
-        void CopyChanged(INewSmartSerializableConfig other, bool deep, bool notify);
+        ISmartSerializableConfig DeepCopy();
+        void CopyFrom(ISmartSerializableConfig config, bool deep);
+        void CopyChanged(ISmartSerializableConfig other, bool deep, bool notify);
 
         void ActivateLocalDisk();
         void ActivateMostRecent();

@@ -14,7 +14,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.NewtonsoftHelpers
 {
-    public class WrapperScDictionary<TDerived, TKey, TValue> where TDerived : NewScDictionary<TKey, TValue>
+    public class WrapperScDictionary<TDerived, TKey, TValue> where TDerived : ScDictionary<TKey, TValue>
     {
         public ConcurrentDictionary<TKey, TValue> ConcurrentDictionary { get; set; }
         public object RemainingObject { get; set; }

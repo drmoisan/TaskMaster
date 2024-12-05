@@ -27,7 +27,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
         }
 
-        private class TestDerived : NewScDictionary<string, int>
+        private class TestDerived : ScDictionary<string, int>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
@@ -65,7 +65,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public NewSmartSerializableConfig Config { get; set; }
         }
 
-        private class DerivedTest2: NewScDictionary<string, string>
+        private class DerivedTest2: ScDictionary<string, string>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
@@ -133,7 +133,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                     config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
                     config.JsonSettings.Converters.Add(new AppGlobalsConverter(globals));
                     config.JsonSettings.Converters.Add(new FilePathHelperConverter(globals.FS));
-                    config.JsonSettings.Converters.Add(new ScDictionaryConverter<NewScDictionary<string, string>, string, string>());
+                    config.JsonSettings.Converters.Add(new ScDictionaryConverter<ScDictionary<string, string>, string, string>());
                     return config;
                 }
                 return null;

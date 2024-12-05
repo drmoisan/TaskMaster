@@ -22,13 +22,13 @@ namespace UtilitiesCS.ReusableTypeClasses
 
     namespace UtilitiesCS.ReusableTypeClasses
     {
-        public class NewSmartSerializableLoader : NewSmartSerializable<NewSmartSerializableLoader>
+        public class SmartSerializableLoader : SmartSerializable<SmartSerializableLoader>
         {
             private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-            public NewSmartSerializableLoader(): base() { base._parent = this; }
-            public NewSmartSerializableLoader(IApplicationGlobals globals) 
+            public SmartSerializableLoader(): base() { base._parent = this; }
+            public SmartSerializableLoader(IApplicationGlobals globals) 
             {
                 base._parent = this;
                 Globals = globals;
@@ -65,13 +65,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 return settings;
             }
 
-            public static async Task<NewSmartSerializableLoader> DeserializeAsync(
+            public static async Task<SmartSerializableLoader> DeserializeAsync(
                 IApplicationGlobals globals, string jsonObject, CancellationToken cancel = default)
             {
                 try
                 {
                     if (globals is null) { throw new ArgumentNullException(nameof(globals)); }
-                    var loader = new NewSmartSerializableLoader(globals);
+                    var loader = new SmartSerializableLoader(globals);
                     return await Task.Run(() => loader.DeserializeConfig(jsonObject), cancel);
                 }
                 catch (ArgumentNullException e)
@@ -93,13 +93,13 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
 
 
-            public static async Task<NewSmartSerializableLoader> DeserializeAsync(
+            public static async Task<SmartSerializableLoader> DeserializeAsync(
                 IApplicationGlobals globals, byte[] binary, CancellationToken cancel = default)
             {                
                 try
                 {
                     if (globals is null) { throw new ArgumentNullException(nameof(globals)); }
-                    var loader = new NewSmartSerializableLoader(globals);
+                    var loader = new SmartSerializableLoader(globals);
                     return await Task.Run(() => loader.DeserializeConfig(binary), cancel);
                 }
                 catch (ArgumentNullException e)
@@ -128,7 +128,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             //    else { return loader.DeserializeConfig(jsonObject); }                
             //}
 
-            internal NewSmartSerializableLoader DeserializeConfig(byte[] binary)
+            internal SmartSerializableLoader DeserializeConfig(byte[] binary)
             {
                 var jsonObject = TryConvertBinaryToJson(binary);
                 if (jsonObject.IsNullOrEmpty())
@@ -141,13 +141,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
             }
 
-            private NewSmartSerializableLoader DeserializeConfig(string jsonObject)
+            private SmartSerializableLoader DeserializeConfig(string jsonObject)
             {
                 var settings = GetSettings();
-                NewSmartSerializableLoader instance = null;
+                SmartSerializableLoader instance = null;
                 try
                 {
-                    instance = JsonConvert.DeserializeObject<NewSmartSerializableLoader>(
+                    instance = JsonConvert.DeserializeObject<SmartSerializableLoader>(
                         jsonObject, settings);
                 }
                 catch (Exception e)

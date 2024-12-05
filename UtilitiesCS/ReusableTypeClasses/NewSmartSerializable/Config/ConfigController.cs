@@ -14,7 +14,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         #region ctor
 
-        public ConfigController(IApplicationGlobals globals, INewSmartSerializableConfig config) 
+        public ConfigController(IApplicationGlobals globals, ISmartSerializableConfig config) 
         { 
             Config = config;
             ConfigCopy = config.DeepCopy();
@@ -49,7 +49,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             return this;
         }
 
-        public static ConfigController Show(IApplicationGlobals globals, INewSmartSerializableConfig config)
+        public static ConfigController Show(IApplicationGlobals globals, ISmartSerializableConfig config)
         {            
             var controller = new ConfigController(globals, config).Init();            
             controller.Viewer.Show();
@@ -59,8 +59,8 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         #endregion ctor
 
         #region Properties
-        internal INewSmartSerializableConfig ConfigCopy { get; set; }
-        internal INewSmartSerializableConfig Config { get; set; }
+        internal ISmartSerializableConfig ConfigCopy { get; set; }
+        internal ISmartSerializableConfig Config { get; set; }
         internal ConfigViewer Viewer { get; set; }
         internal IApplicationGlobals Globals { get; set; }
         internal FilePathHelperConverter FilePathConverter { get; set; }
@@ -74,17 +74,17 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             Viewer.Close();
         }
 
-        internal void ChangeSpecialFolder(string specialFolderName, string relativePath, INewSmartSerializableConfig.ActiveDiskEnum diskType)
+        internal void ChangeSpecialFolder(string specialFolderName, string relativePath, ISmartSerializableConfig.ActiveDiskEnum diskType)
         {
             var folderPath = FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
             if (ConfigCopy.ActiveDisk == diskType) { ConfigCopy.Disk.FolderPath = folderPath; }
             
             switch (diskType)
             {
-                case INewSmartSerializableConfig.ActiveDiskEnum.Local:
+                case ISmartSerializableConfig.ActiveDiskEnum.Local:
                     ConfigCopy.LocalDisk.FolderPath = folderPath; // FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
                     break;
-                case INewSmartSerializableConfig.ActiveDiskEnum.Net:
+                case ISmartSerializableConfig.ActiveDiskEnum.Net:
                     ConfigCopy.NetDisk.FolderPath = folderPath; // FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
                     break;
                 default:
@@ -92,15 +92,15 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             }            
         }
 
-        internal void ActivateDiskGroup(INewSmartSerializableConfig.ActiveDiskEnum diskType)
+        internal void ActivateDiskGroup(ISmartSerializableConfig.ActiveDiskEnum diskType)
         {
             switch (diskType)
             {
-                case INewSmartSerializableConfig.ActiveDiskEnum.Local:
+                case ISmartSerializableConfig.ActiveDiskEnum.Local:
                     ConfigCopy.ActivateLocalDisk();
                     Viewer.ActivateUiBox(diskType);
                     break;
-                case INewSmartSerializableConfig.ActiveDiskEnum.Net:
+                case ISmartSerializableConfig.ActiveDiskEnum.Net:
                     ConfigCopy.ActivateNetDisk();
                     Viewer.ActivateUiBox(diskType);
                     break;
