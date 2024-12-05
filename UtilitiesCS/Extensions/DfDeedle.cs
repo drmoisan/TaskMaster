@@ -12,6 +12,9 @@ using System.Data;
 using System.Threading;
 using System.Windows;
 using UtilitiesCS;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 
 namespace UtilitiesCS
 {
@@ -70,23 +73,23 @@ namespace UtilitiesCS
             
             //logger.Debug($"{nameof(GetEmailDataInViewAsync)}: {activeExplorer.CurrentFolder.Name}");
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
             Outlook.Table table = await activeExplorer.GetTableInViewAsync(token, 0);
             //table.EnumerateTable();
             var storeID = activeExplorer.CurrentFolder.StoreID;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(AddQfcColumnsAsync)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(AddQfcColumnsAsync)} ...");
             await AddQfcColumnsAsync(table, token, 0);
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.EtlAsync)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.EtlAsync)} ...");
             (object[,] data, Dictionary<string, int> columnInfo) = await table.EtlAsync(token, tokenSource, 0, progress.Increment(2).SpawnChild(96));
             //(PrettyPrinters.ArraytoDatatable(data, columnInfo.Keys.Cast<string>().ToArray())).DisplayDialog();
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Email2dArrayToDf)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Email2dArrayToDf)} ...");
             Frame<int, string> df = await Task.Factory.StartNew(() => Email2dArrayToDf(storeID, data, columnInfo),
                 token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(GetEmailDataInViewAsync)} complete");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(GetEmailDataInViewAsync)} complete");
             progress.Report(100);
             return df;
         }
@@ -173,7 +176,7 @@ namespace UtilitiesCS
                 await Task.Factory.StartNew(() => AddQfcColumns(table),
                 token,
                 TaskCreationOptions.LongRunning,
-                TaskScheduler.Default).TimeoutAfter(1000);
+                TaskScheduler.Default).TimeoutAfter(3000);
             }
             catch (TaskCanceledException)
             {
@@ -182,7 +185,14 @@ namespace UtilitiesCS
                     await AddQfcColumnsAsync(table, token, counter + 1);
                 }
             }
-            
+            catch (TimeoutException)
+            {
+                if (!token.IsCancellationRequested && counter < 2)
+                {
+                    await AddQfcColumnsAsync(table, token, counter + 1);
+                }
+            }
+
         }
 
         internal static Series<int, string> GetColumnEid(object[] slice)
@@ -214,6 +224,35 @@ namespace UtilitiesCS
             });
             var dfTemp = Frame.FromRows(rows);
             return dfTemp;
+        }
+
+        private static async Task<Frame<int, string>> FromDefaultFolderAsync(Store store,
+                                                           OlDefaultFolders folderEnum,
+                                                           string[] removeColumns,
+                                                           string[] addColumns,
+                                                           CancellationToken cancel,
+                                                           int maxAttempts)
+        {
+            var table = await store.GetTableAsync(folderEnum: folderEnum,
+                                    removeColumns: removeColumns,
+                                    addColumns: addColumns,
+                                    cancel: cancel,
+                                    maxAttempts: maxAttempts) as Table;
+
+            if (table is null) { return null; }
+
+            (IAsyncEnumerable<Row> rows,
+                Dictionary<string, int> columnDictionary,
+                Dictionary<string, Func<object, string>> objectConverters,
+                IOrderedEnumerable<int> binIndices,
+                IEnumerable<string> objFields,
+                IEnumerable<int> objIndices) = await table.EtlPrepAsync(cancel);
+            var jagged = await rows.EtlByRowAsync(objectConverters, binIndices, objFields, objIndices).ToArrayAsync();
+            
+            var data = jagged.To2D();
+            Frame<int, string> df = FromArray2D(data: data, columnDictionary);
+
+            return df;
         }
 
         public static Frame<int, string> FromDefaultFolder(Store store,
@@ -252,11 +291,7 @@ namespace UtilitiesCS
                 if (df is null) { df = dfEid; }
                 else if (dfTemp is not null) 
                 {
-                    //df.Print();
-                    //dfEid.Print();
                     df = df.Merge(dfEid);
-                    //df.Print();
-
                 }
             }
             // Set the index to the integer index as originally designed to maintain forward compatibility
@@ -284,38 +319,53 @@ namespace UtilitiesCS
             table.DisplayDialog();
         }
 
-        //public static  GetDfColumn(string columnName, object[] columnData)
-        //{
-        //    object T = GetFirstNonNull(columnData);
-        //    if (T is string) { return new StringDataFrameColumn(columnName, columnData.CastNullSafe<string>().ToArray()); }
-        //    else if (T is bool) { return new PrimitiveDataFrameColumn<bool>(columnName, columnData.CastNullSafe<bool>().ToArray()); }
-        //    else if (T is byte) { return new PrimitiveDataFrameColumn<byte>(columnName, columnData.CastNullSafe<byte>().ToArray()); }
-        //    else if (T is sbyte) { return new PrimitiveDataFrameColumn<sbyte>(columnName, columnData.CastNullSafe<sbyte>().ToArray()); }
-        //    else if (T is char) { return new PrimitiveDataFrameColumn<char>(columnName, columnData.CastNullSafe<char>().ToArray()); }
-        //    else if (T is decimal) { return new PrimitiveDataFrameColumn<decimal>(columnName, columnData.CastNullSafe<decimal>().ToArray()); }
-        //    else if (T is double) { return new PrimitiveDataFrameColumn<double>(columnName, columnData.CastNullSafe<double>().ToArray()); }
-        //    else if (T is float) { return new PrimitiveDataFrameColumn<float>(columnName, columnData.CastNullSafe<float>().ToArray()); }
-        //    else if (T is int) { return new PrimitiveDataFrameColumn<int>(columnName, columnData.CastNullSafe<int>().ToArray()); }
-        //    else if (T is uint) { return new PrimitiveDataFrameColumn<uint>(columnName, columnData.CastNullSafe<uint>().ToArray()); }
-        //    else if (T is nint) { return new PrimitiveDataFrameColumn<nint>(columnName, columnData.CastNullSafe<nint>().ToArray()); }
-        //    else if (T is nuint) { return new PrimitiveDataFrameColumn<nuint>(columnName, columnData.CastNullSafe<nuint>().ToArray()); }
-        //    else if (T is long) { return new PrimitiveDataFrameColumn<long>(columnName, columnData.CastNullSafe<long>().ToArray()); }
-        //    else if (T is ulong) { return new PrimitiveDataFrameColumn<ulong>(columnName, columnData.CastNullSafe<ulong>().ToArray()); }
-        //    else if (T is short) { return new PrimitiveDataFrameColumn<short>(columnName, columnData.CastNullSafe<short>().ToArray()); }
-        //    else if (T is ushort) { return new PrimitiveDataFrameColumn<ushort>(columnName, columnData.CastNullSafe<ushort>().ToArray()); }
-        //    else { return new StringDataFrameColumn(columnName, columnData.ToStringArray(nullReplacement: "")); }
+        //public static void Log<TRowKey,TColumnKey>(this Frame<TRowKey, TColumnKey> frame) 
+        //{            
+        //    var caller = TraceUtility.GetCallerMethod(new System.Diagnostics.StackTrace());
+        //    var declaringType = caller.DeclaringType;
+        //    log4net.ILog logger = log4net.LogManager.GetLogger(declaringType);
+        //    logger.Debug(frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true));
         //}
+        
+        public static void PrintToLog<TRowKey, TColumnKey>(this Frame<TRowKey, TColumnKey> frame, log4net.ILog logger, [CallerArgumentExpression(nameof(frame))] string frameName = "")
+        {
+            var frameText = frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true);
+            
+            // Find the width of the frame in characters. If multi-line, find the position of the newline character.
+            // Else use the length of the entire string
+            var loc = frameText.IndexOf("\n");
+            if (loc == -1) { loc = frameText.Length; }
+            var separator = new string('_',loc);
+            logger.Debug($"\n{frameName}\n{separator}\n{frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true)}\n");
+        }
+
+        public static Frame<TRowKey, TColumnKey> DropFirstN<TRowKey, TColumnKey>(this Frame<TRowKey, TColumnKey> df, int n)
+        {
+            n = n < df.RowCount ? n : df.RowCount;
+            return df.GetRowsAt(Enumerable.Range(n, df.RowCount - n).ToArray());
+        }
+
+        public static Frame<TRowKey, TColumnKey> Exclude<TRowKey, TColumnKey>(this Frame<TRowKey, TColumnKey> df, Frame<TRowKey, TColumnKey> other)
+        {
+            var idx = other.RowIndex.Keys.ToArray();
+            if (idx.Length == 0) { return df; }
+            df = df.Where(row => !idx.Contains(row.Key));            
+            return df;
+        }
+
+        
+
+        public static TColumn[] GetDuplicateEntriesByColumn<TRow, TColumn, TColumnData>(this Frame<TRow, TColumn> df, TColumn columnId)
+        {
+            var column = df.GetColumn<TColumn>(columnId);
+            var duplicates = column.Values
+                .GroupBy(x => x)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToArray();
+            return duplicates;
+        }
 
 
-
-        //internal static object GetFirstNonNull(object[] columnData)
-        //{
-        //    if ((columnData is null) || (columnData.Length == 0)) { return null; }
-
-        //    var filteredData = columnData.Where(x => x is not null).ToArray();
-        //    if ((filteredData is null) || (filteredData.Length == 0)) { return null; }
-
-        //    return filteredData.First();
-        //}
     }
 }

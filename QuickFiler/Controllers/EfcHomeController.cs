@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
 using System.Diagnostics;
+using UtilitiesCS.Extensions;
+using log4net.Repository.Hierarchy;
 
 namespace QuickFiler
 {
@@ -19,35 +21,132 @@ namespace QuickFiler
     {
         #region Constructors, Initializers, and Destructors
 
-        public EfcHomeController(IApplicationGlobals appGlobals, System.Action parentCleanup, MailItem mail = null)
+        public EfcHomeController(IApplicationGlobals globals, System.Action parentCleanup, MailItem mail = null)
         {
             CreateCancellationToken();
-            _globals = appGlobals;
+            Globals = globals;
             _parentCleanup = parentCleanup;
-            _dataModel = new EfcDataModel(_globals, mail, this.TokenSource, this.Token);
+            DataModel = new EfcDataModel(_globals, mail, this.TokenSource, this.Token);
 
-            if (_dataModel.Mail is not null)
+            if (DataModel.Mail is not null)
             {
-                _initType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
+                InitType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
                 _stopWatch = new Stopwatch();
-                //_formViewer = new EfcViewer();
-                _formViewer = EfcViewerQueue.Dequeue();
-                _uiSyncContext = _formViewer.UiSyncContext;
-                _keyboardHandler = new KeyboardHandler(_formViewer, this);
-                _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, appGlobals, this);
-                _formController = new EfcFormController(_globals, _dataModel, _formViewer, this, Cleanup, _initType, Token);
+                FormViewer = EfcViewerQueue.Dequeue();
+                _uiSyncContext = FormViewer.UiSyncContext;
+                _keyboardHandler = new KeyboardHandler(FormViewer, this);
+                _explorerController = new QfcExplorerController(QfEnums.InitTypeEnum.Sort, globals, this);
+                _formController = new EfcFormController(Globals, _dataModel, FormViewer, this, Cleanup, InitType, Token).Initialize();
             }
         }
 
+        private EfcHomeController(IApplicationGlobals globals, System.Action parentCleanup)
+        {
+            Globals = globals;
+            _parentCleanup = parentCleanup;
+        }
+
+        public static async Task<EfcHomeController> CreateAsync(IApplicationGlobals globals, System.Action parentCleanup, MailItem mail = null)
+        {
+            globals.ThrowIfNull();
+            parentCleanup.ThrowIfNull();
+
+            var home = new EfcHomeController(globals, parentCleanup);
+            home.CreateCancellationToken();
+            var mailItems = LoadToList(globals, mail);
+
+            if (mailItems.Count() > 0)
+            {
+                await home.InitAsync(globals, mailItems, QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv);
+            }
+            return home;
+        }
+
+        public static async Task<EfcHomeController> LoadFinderAsync(IApplicationGlobals globals, System.Action parentCleanup, MailItem mail = null)
+        {
+            globals.ThrowIfNull();
+            parentCleanup.ThrowIfNull();
+
+            var home = new EfcHomeController(globals, parentCleanup);
+            home.CreateCancellationToken();
+            var mailItems = LoadToList(globals, mail);
+
+            await home.InitAsync(globals, mailItems, QfEnums.InitTypeEnum.Find);
+            
+            return home;
+        }
+        
+        protected async Task InitAsync(IApplicationGlobals globals, List<MailItem> mailItems, QfEnums.InitTypeEnum initType)
+        {
+            // Start initializing data model
+            Task<EfcDataModel> modelTask = null;
+            if (mailItems.Count() > 0)
+            {
+                modelTask = Task.Run(() => EfcDataModel.CreateAsync(globals, mailItems, TokenSource, Token, false));
+            }
+
+            // Initialize the rest of the home controller
+            InitType = initType;
+            _stopWatch = new Stopwatch();
+            FormViewer = EfcViewerQueue.Dequeue();
+            _uiSyncContext = FormViewer.UiSyncContext;
+            _keyboardHandler = new KeyboardHandler(FormViewer, this);
+            _explorerController = new QfcExplorerController(initType, globals, this);
+            _formController = new EfcFormController(globals, FormViewer, this, Cleanup, initType, Token).InitializeWithoutData();
+
+            if (mailItems.Count() > 0)
+            {
+                // Wait for data model to finish initializing
+                DataModel = await modelTask;
+
+                // Initialize data fields in form controller
+                _formController.InitializeDataFields(DataModel);
+            }
+            else
+            {
+                // Dummy data model
+                DataModel = new EfcDataModel(globals, null, TokenSource, Token);
+                _formController.InitializeDataFields(DataModel);
+            }
+        }
+
+        private static List<MailItem> LoadToList(IApplicationGlobals globals, MailItem mail)
+        {
+            List<MailItem> mailItems = [];
+
+            if (mail is not null) { mailItems.Add(mail); }
+            else
+            {
+                var selection = globals.Ol.App.ActiveExplorer().Selection;
+                if (selection.Count > 0)
+                {
+                    mailItems = selection
+                        .Cast<object>()
+                        .Where(x => x is MailItem)
+                        .Cast<MailItem>()
+                        .ToList();
+                }
+            }
+
+            return mailItems;
+        }
+
         private EfcViewer _formViewer;
+        internal EfcViewer FormViewer { get => _formViewer; private set => _formViewer = value; }
+        
         private IApplicationGlobals _globals;
+        internal IApplicationGlobals Globals { get => _globals; private set => _globals = value; }
+
         private QfEnums.InitTypeEnum _initType;
+        internal QfEnums.InitTypeEnum InitType { get => _initType; set => _initType = value; }
+
         private System.Action _parentCleanup;
+        internal System.Action ParentCleanup { get => _parentCleanup; private set => _parentCleanup = value; }
 
         //[STAThread]
         public void Run() 
         { 
-            if (_dataModel.Mail is not null)
+            if (_dataModel?.Mail is not null || InitType.HasFlag(QfEnums.InitTypeEnum.Find))
             {
                 _formViewer.Show();
             }
@@ -56,9 +155,9 @@ namespace QuickFiler
 
         public async Task RunAsync(ProgressTracker progress = null)
         {
-            if (_dataModel.Mail is not null)
+            if (_dataModel?.Mail is not null || InitType.HasFlag(QfEnums.InitTypeEnum.Find))
             {
-                await UiThread.Dispatcher.InvokeAsync(()=>_formViewer.Show());
+                await UiThread.Dispatcher.InvokeAsync(() => _formViewer.Show());
             }
             else { MessageBox.Show("Error", "No MailItem Selected", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
@@ -112,17 +211,17 @@ namespace QuickFiler
 
         #region Major Actions
 
-        async public Task ExecuteMoves()
+        async public Task ExecuteMovesAsync()
         {
             var selectedFolder = _formController.SelectedFolder;
             var moveConversation = _formController.MoveConversation;
             var convInfo = DataModel.ConversationResolver.ConversationInfo.SameFolder;
             if (!moveConversation)
             {
-                convInfo.Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID).ToList();
+                convInfo = convInfo.Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID).ToList();
             }
 
-            await _dataModel.MoveToFolder(selectedFolder,
+            await _dataModel.MoveToFolderAsync(selectedFolder,
                                           _formController.SaveAttachments,
                                           _formController.SaveEmail,
                                           _formController.SavePictures,
@@ -130,7 +229,17 @@ namespace QuickFiler
             
             QuickFileMetrics_WRITE(_globals.FS.Filenames.EmailSession, selectedFolder, convInfo);
         }
-                
+
+        internal async Task OpenOlFolderAsync(string selectedFolder)
+        {
+            await DataModel.OpenOlFolderAsync(selectedFolder);
+        }
+
+        internal async Task OpenFsFolderAsync(string selectedFolder)
+        {
+            await DataModel.OpenFsFolderAsync(selectedFolder);
+        }
+
         public void QuickFileMetrics_WRITE(string filename, string selectedFolder, List<MailItemHelper> moved)
         {
             if (moved is not null && moved.Count == 0) 
@@ -153,7 +262,10 @@ namespace QuickFiler
                     $"{itemInfo.SenderName},Email,{selectedFolder},{itemInfo.SentDate.ToString("MM/dd/yyyy")}," +
                     $"{itemInfo.SentDate.ToString("HH:mm:ss")}").ToArray();
 
-                FileIO2.WriteTextFile(filename, dataLines, _globals.FS.FldrMyD);
+                if (Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
+                {
+                    FileIO2.WriteTextFile(filename, dataLines, folderRoot);                    
+                }
             }
         }
 
@@ -162,6 +274,7 @@ namespace QuickFiler
             throw new NotImplementedException();
         }
                 
+
         #endregion
 
         #region Helper Methods

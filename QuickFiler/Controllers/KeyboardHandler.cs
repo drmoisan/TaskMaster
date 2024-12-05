@@ -84,6 +84,8 @@ namespace QuickFiler.Controllers
 
         public void KeyboardHandler_PreviewKeyDownAsync(object sender, PreviewKeyDownEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
             if (KbdActive && (KeyActionsAsync != null) && KeyActionsAsync.ContainsKey(e.KeyCode))
             {
                 e.IsInputKey = true;
@@ -119,6 +121,9 @@ namespace QuickFiler.Controllers
 
         public async Task KeyDownTaskAsync(object sender, KeyEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
+
             if ((AlwaysOnKeyActionsAsync != null) && AlwaysOnKeyActionsAsync.ContainsKey(e.KeyCode)) 
             { 
                 e.SuppressKeyPress = true;
@@ -192,6 +197,7 @@ namespace QuickFiler.Controllers
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
+
             await ToggleKeyboardDialogAsync();
             e.Handled = true;
         }
@@ -207,6 +213,9 @@ namespace QuickFiler.Controllers
 
         public void CboFolders_KeyDown(object sender, KeyEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+
             ItemViewer viewer = null;
             if (_cboKeys.Contains(e.KeyCode)) { viewer = GetItemViewer(sender as Control); }
 
@@ -400,6 +409,8 @@ namespace QuickFiler.Controllers
 
         public async void CboFolders_KeyDownAsync(object sender, KeyEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
             if (sender is not ComboBox)
             {
                 throw new ArgumentException(
@@ -413,6 +424,8 @@ namespace QuickFiler.Controllers
 
         public async Task DdOpen_KeyDownAsync(ComboBox cbo, KeyEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
             switch (e.KeyCode)
             {
                 //case Keys.Escape:
@@ -470,6 +483,8 @@ namespace QuickFiler.Controllers
 
         public async Task DdClosed_KeyDownAsync(ComboBox cbo, KeyEventArgs e)
         {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
             switch (e.KeyCode)
             {
                 case Keys.Right:

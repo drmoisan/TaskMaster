@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using UtilitiesCS;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
@@ -24,7 +25,7 @@ namespace UtilitiesCS
         }
 
         private string _folderPathOld;
-        public string folderPathOld { get => _folderPathOld; set => _folderPathOld = value; }
+        public string FolderPathOld { get => _folderPathOld; set => _folderPathOld = value; }
 
         private string _folderPathNew;
         public string FolderPathNew { get => _folderPathNew; set => _folderPathNew = value; }
@@ -37,7 +38,7 @@ namespace UtilitiesCS
 
         private Outlook.Application _olApp;
         [JsonIgnore]
-        public Outlook.Application olApp
+        public Outlook.Application OlApp
         {
             get => _olApp;
             set
@@ -47,8 +48,12 @@ namespace UtilitiesCS
             }
         }
 
+        private IApplicationGlobals _globals;
+        [JsonIgnore]
+        public IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+
         private string _olRootPath;
-        public string olRootPath { get => _olRootPath; set => _olRootPath = value; }
+        public string OlRootPath { get => _olRootPath; set => _olRootPath = value; }
 
         private MailItem _mailItem;
         [JsonIgnore]
@@ -56,11 +61,11 @@ namespace UtilitiesCS
         {
             get
             {
-                if (_mailItem is null && this.olApp is not null)
+                if (_mailItem is null && this.OlApp is not null)
                 {
                     try
                     {
-                        _mailItem = (MailItem)this.olApp.Session.GetItemFromID(this.EntryId, this.StoreId);
+                        _mailItem = (MailItem)this.OlApp.Session.GetItemFromID(this.EntryId, this.StoreId);
                     }
                     catch (System.Exception)
                     {
@@ -78,10 +83,10 @@ namespace UtilitiesCS
         {
             get
             {
-                if (_folderOld is null && NotNull(folderPathOld, olRootPath, olApp))
+                if (_folderOld is null && NotNull(FolderPathOld, OlRootPath, OlApp))
                 {
-                    var folderHandler = new OlFolderHelper(olApp);
-                    _folderOld = folderHandler.GetFolder($"{olRootPath}\\{folderPathOld}", olApp);
+                    var folderHandler = new OlFolderHelper(OlApp);
+                    _folderOld = folderHandler.GetFolder($"{OlRootPath}\\{FolderPathOld}", OlApp);
                 }
                 return _folderOld;
             }
@@ -107,7 +112,7 @@ namespace UtilitiesCS
             var ready = true;
             if (!IsReadyToUndoMove)
             {
-                this.olApp = olApp;
+                this.OlApp = olApp;
                 if (!IsReadyToUndoMove)
                 {
                     ready = false;
@@ -117,7 +122,7 @@ namespace UtilitiesCS
             {
                 return $"Undo Move of email?{Environment.NewLine}SentOn: {MailItem.SentOn.ToString("MM/dd/yyyy")}" +
                        $"{System.Environment.NewLine}{MailItem.Subject}{System.Environment.NewLine}"+
-                       $"From: {FolderPathNew}{System.Environment.NewLine}To: {folderPathOld}";
+                       $"From: {FolderPathNew}{System.Environment.NewLine}To: {FolderPathOld}";
             }
             else
             {

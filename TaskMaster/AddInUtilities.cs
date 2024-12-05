@@ -12,7 +12,7 @@ namespace TaskMaster
     {
         void MaximizeQuickFilerWindow();
         Task LaunchQuickFilerAsync();
-        void LaunchSortEmail();
+        Task LaunchSortEmailAsync();
         void LaunchFlagAsTask();
     }
 
@@ -61,6 +61,14 @@ namespace TaskMaster
             if (_globals is not null)
             {
                 _ribbonController.SortEmail();
+            }
+        }
+
+        public async Task LaunchSortEmailAsync()
+        {
+            if (_globals is not null)
+            {
+                await _ribbonController.SortEmailAsync();
             }
         }
     }

@@ -42,6 +42,7 @@ namespace QuickFiler
         }
 
         private IQfcKeyboardHandler _keyboardHandler;
+        internal IQfcKeyboardHandler KeyboardHandler { get => _keyboardHandler; }
         public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;

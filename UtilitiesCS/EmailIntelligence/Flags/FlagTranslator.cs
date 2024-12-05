@@ -25,6 +25,9 @@ namespace UtilitiesCS
             _setListFunc = setListFunc ?? throw new ArgumentNullException(nameof(setListFunc));
         }
 
+        private string identifier = "not set";
+        public string Identifier { get => identifier; set => identifier = value; }
+
         private Func<bool, string> _getStrFunc;
         public Func<bool, string> GetStrFunc { get => _getStrFunc; set => _getStrFunc = value; }
         

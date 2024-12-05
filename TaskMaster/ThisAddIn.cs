@@ -2,18 +2,18 @@
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.Office.Core;
 using UtilitiesCS;
-
-
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using UtilitiesCS.Threading;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
-
+[assembly: InternalsVisibleTo("TaskMaster.Test")]
 namespace TaskMaster
 {
     public partial class ThisAddIn
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            logger.Debug($"Application Starting");
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
@@ -21,15 +21,11 @@ namespace TaskMaster
             UiThread.Init(monitorUiThread: false);
 
             Application.Startup += Application_Startup;
-
-            logger.Debug("ThisAddIn_Startup() complete");
         }
 
-        private async void Application_Startup()
+        private void Application_Startup()
         {
-            logger.Debug("Application_Startup() fired");
-            // Create the global variables
-            _globals = new ApplicationGlobals(Application);
+            //logger.Debug("Application_Startup() fired");
 
             // Set the indent for TreeListView Renderer which does not autoscale.
             // Default pixels per level was 16 + 1 but designed for 100% scaling.
@@ -38,33 +34,24 @@ namespace TaskMaster
             tlvIndent = (int)(tlvIndent * UiThread.AutoScaleFactor.Width);
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
 
-            // Initialize long loading elements on a low priority thread
-            //EfcViewerQueue.BuildQueue(2);
-            //ItemViewerQueue.BuildQueueBackground(30);
-
+            // Create the global variables
+            _globals = new ApplicationGlobals(Application);
             // Initialize the global variables on a low priority thread
-            var loadGlobals = _globals.LoadAsync();
-
-            // Initialize IdleAction Queue so that breakpoint is hit after UI
-            //IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
-            //IdleActionQueue.AddEntry(() => _globals.TD.LoadPrefixList());
+            loadGlobals = _globals.LoadAsync(false);
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new();
             Console.SetOut(tw);
-            //Console.SetOut(new DebugTextWriter());
-            //Console.SetOut(new DebugTextLogger());
-            //Console.WriteLine("Test of console output redirect to logger");
-
+            
             // Send a reference to the ribbon controller and external utilities for future use
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
             // Hook the Inbox and ToDo events
-            //_globals.Events.Hook();
+            _globals.Events.Hook();
             
-            await loadGlobals;
-
+            //await loadGlobals;
+            IdleAsyncQueue.AddEntry(false, FinishLoadingGlobalsAsync);
             logger.Debug("Application_Startup() complete");
         }
 
@@ -72,6 +59,7 @@ namespace TaskMaster
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
+        private System.Threading.Tasks.Task loadGlobals;
 
         /// <summary>
         /// Overrides the default behavior of the COM add-in to create an XML ribbon
@@ -106,6 +94,13 @@ namespace TaskMaster
                 _externalUtilities = new AddInUtilities();
 
             return _externalUtilities;
+        }
+
+        private async Task FinishLoadingGlobalsAsync()
+        {
+            await loadGlobals;
+            logger.Debug("Finished loading globals");
+
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)

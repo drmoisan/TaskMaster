@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
@@ -159,9 +160,11 @@ namespace TaskVisualization
             _controller.Shortcut_WaitingFor();
         }
 
-        private void OKButton_Click(object sender, EventArgs e)
+        private async void OKButton_Click(object sender, EventArgs e)
         {
-            _controller.OK_Action();
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+            await _controller.OK_Action();
         }
 
         private void CbxToday_CheckedChanged(object sender, EventArgs e)

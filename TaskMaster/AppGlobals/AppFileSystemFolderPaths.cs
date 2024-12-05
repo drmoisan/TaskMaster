@@ -1,28 +1,25 @@
-﻿using System;
+﻿using log4net.Repository.Hierarchy;
+using System;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.Extensions;
 
 namespace TaskMaster
 {
 
     public class AppFileSystemFolderPaths : IFileSystemFolderPaths
-    {
-        private string _appStaging;
-        private string _stagingPath;
-        private string _myD;
-        private string _oneDrive;
-        private string _flow;
-        private string _prereads;
-        private string _remap;
-        private string _fldrPythonStaging;
-        private IAppStagingFilenames _filenames;
-
+    {       
         public AppFileSystemFolderPaths()
         {
             LoadFolders();
             _filenames = new AppStagingFilenames();
         }
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private AppFileSystemFolderPaths(bool async){}
 
@@ -55,62 +52,112 @@ namespace TaskMaster
             }
         }
 
+        private bool TryAddSpecialFolder(string name, string[] pathParts)
+        {
+            if (name.IsNullOrEmpty()) { return false; }
+            
+            else if (pathParts.IsNullOrEmpty())
+            {
+                logger.Debug($"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} is null or empty. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}");
+                return false;
+            }
+            
+            else if (pathParts.Any(x => x is null)) 
+            {
+                var locations = Enumerable.Range(0, pathParts.Length).Where(i => pathParts[i] is null).Select(i => i.ToString()).SentenceJoin();
+                logger.Debug($"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} has null elements at {locations}. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}");
+                return false;
+            }
+
+            SpecialFolders ??= [];
+            
+            try
+            {
+                SpecialFolders[name] = Path.Combine(pathParts);
+                CreateMissingPaths(SpecialFolders[name]);
+                return true;
+            }
+            
+            catch (Exception e)
+            {
+                logger.Error(e.Message, e);
+                return false;
+            }
+
+        }
+
         private void LoadFolders()
         {
-            _appStaging = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskMaster");
-            _ = Task.Run(() => CreateMissingPaths(_appStaging));
-            //_ = Task.Factory.StartNew(() => CreateMissingPaths(_appStaging),
-            //                          default,
-            //                          TaskCreationOptions.None,
-            //                          PriorityScheduler.BelowNormal);
+            SpecialFolders = [];
+            TryAddSpecialFolder("AppData", [Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), nameof(TaskMaster)]);
+            TryAddSpecialFolder("MyDocuments", [Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)]);
 
-            _stagingPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            _myD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            _oneDrive = Environment.GetEnvironmentVariable("OneDriveCommercial");
-            _flow = Path.Combine(_oneDrive, "Email attachments from Flow");
-            CreateMissingPaths(_flow);
-            _prereads = Path.Combine(_oneDrive, "_  Workflow", "_ Pre-Reads");
-            CreateMissingPaths(_prereads);
-            _remap = Path.Combine(_stagingPath, "dictRemap.csv");
-            _fldrPythonStaging = Path.Combine(_flow, "Combined", "data");
+            if (!TryAddSpecialFolder("OneDrive", [Environment.GetEnvironmentVariable("OneDriveCommercial")])) 
+            {
+                if (!TryAddSpecialFolder("OneDrive", [Environment.GetEnvironmentVariable("OneDrive")])) 
+                {
+                    if (!TryAddSpecialFolder("OneDrive", [Environment.GetEnvironmentVariable("OneDrivePersonal")])) 
+                    {
+                        if(SpecialFolders.Count > 0) 
+                        {
+                            if(SpecialFolders.TryGetValue("AppData", out var appData))
+                            {
+                                TryAddSpecialFolder("OneDrive", [appData]);
+                            }
+                            else
+                            {
+                                TryAddSpecialFolder("OneDrive", [SpecialFolders.First().Value]);
+                            }
+                        }
+                        else { throw new InvalidOperationException("No know network or local folders set in environment variables"); }
+                    }
+                }
+            }
+            SpecialFolders.TryGetValue("OneDrive", out var oneDrive);
+
+            TryAddSpecialFolder("Flow", [oneDrive, "Email attachments from Flow"]);
+            SpecialFolders.TryGetValue("Flow", out var flow);
+            TryAddSpecialFolder("PreReads", [oneDrive, "_  Workflow", "_ Pre-Reads"]);
+            
+            if (SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
+            {
+                _remap = Path.Combine(myDocuments, "dictRemap.csv");
+            }
+
+            TryAddSpecialFolder("PythonStaging", [flow, "Combined", "data"]);
+            
         }
 
         //TODO: Cleanup Staging Files so that they are in one or two directories and not all over the place
         async private Task LoadFoldersAsync()
         {
-            _appStaging = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskMaster");
-            Task a = CreateMissingPathsAsync(_appStaging);  
-
-            _stagingPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            _myD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            _oneDrive = Environment.GetEnvironmentVariable("OneDriveCommercial");
-            _flow = Path.Combine(_oneDrive, "Email attachments from Flow");
-            Task b = CreateMissingPathsAsync(_flow);
-
-            _prereads = Path.Combine(_oneDrive, "_  Workflow", "_ Pre-Reads");
-            Task c = CreateMissingPathsAsync(_prereads);
-
-            _remap = Path.Combine(_stagingPath, "dictRemap.csv");
-            _fldrPythonStaging = Path.Combine(_flow, "Combined", "data");
-
-            await Task.WhenAll(a, b, c);
+            await Task.Run(LoadFolders);
         }
 
-        public string FldrAppData { get => _appStaging; }
+        //private string _appData;
+        //public string FldrAppData { get => _appData; protected set => _appData = value; }
 
-        public string FldrStaging { get => _stagingPath; }
+        //private string _myDocuments;
+        //public string FldrMyDocuments { get => _myDocuments; protected set => _myDocuments = value; }
         
-        public string FldrMyD { get => _myD; }
+        //private string _oneDrive;
+        //public string FldrOneDrive { get => _oneDrive; protected set => _oneDrive = value; }
+        
+        //private string _flow;
+        //public string FldrFlow { get => _flow; protected set => _flow = value; }
 
-        public string FldrRoot { get => _oneDrive; }
+        //private string _prereads;
+        //public string FldrPreReads { get => _prereads; protected set => _prereads = value; }
         
-        public string FldrFlow { get => _flow; }
+        //private string _fldrPythonStaging;
+        //public string FldrPythonStaging { get => _fldrPythonStaging; protected set => _fldrPythonStaging = value; }
+        
+        private IAppStagingFilenames _filenames;
+        public IAppStagingFilenames Filenames { get => _filenames; protected set => _filenames = value; }
 
-        public string FldrPreReads { get => _prereads; }
-        
-        public string FldrPythonStaging { get => _fldrPythonStaging; set => _fldrPythonStaging = value; }
-        
-        public IAppStagingFilenames Filenames { get => _filenames; }
+        private ConcurrentDictionary<string, string> _specialFolders;
+        public ConcurrentDictionary<string, string> SpecialFolders { get => _specialFolders; protected set => _specialFolders = value; }
 
+        private string _remap;
     }
 }

@@ -126,7 +126,28 @@ namespace TaskMaster
                 return _emailRootPath;
             }
         }
+                
+        private Folder _junkPossible;
+        public Folder JunkPossible => Initializer.GetOrLoad(ref _junkPossible, LoadJunkPossible);
+        internal Folder LoadJunkPossible()
+        {
+            var folderHandler = new OlFolderHelper(_globals);
+            return folderHandler.GetFolder(Root.Folders, "Junk - Potential");
+        }
 
+        private Folder _junkCertain;
+        public Folder JunkCertain
+        {
+            get
+            {
+                if (_junkCertain is null)
+                {
+                    _junkCertain = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderJunk);
+                }
+                return _junkCertain;
+            }
+        }
+        
         private string _archiveRootPath;
         public string ArchiveRootPath
         {
@@ -170,9 +191,13 @@ namespace TaskMaster
             var writer = new TimedDiskWriter<string>();
             writer.Config.WriteInterval = TimeSpan.FromSeconds(5);
             writer.Config.TryAddTimeout = 20;
-            SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, _globals.FS.FldrMyD);
-            writer.DiskWriter = async (items) => await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.MovedMails, items.ToArray(), _globals.FS.FldrMyD, default);
-            return writer;
+            if (_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
+            {
+                SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, myDocuments);
+                writer.DiskWriter = async (items) => await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.MovedMails, items.ToArray(), myDocuments, default);
+                return writer;
+            }
+            else { return null; }
         }
 
         private string _userEmailAddress;
@@ -211,6 +236,13 @@ namespace TaskMaster
             return System.Windows.Forms.Screen.AllScreens.ToList().IndexOf(screen);
         }
 
+        public Size GetExplorerScreenSize() 
+        {
+            var explorer = App.ActiveExplorer();
+            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
+            return bounds.Size;
+        }
+        
         public System.Windows.Forms.Screen GetExplorerScreen()
         {
             var explorer = App.ActiveExplorer();

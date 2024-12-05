@@ -75,6 +75,8 @@ namespace Tags
             LoadControls(_dictOptions, _prefix.Value);
 
             WireEvents();
+
+            _viewer.SearchText.Focus();
         }
 
         public MailItem ResolveMailItem(object objItem) //internal
@@ -200,7 +202,7 @@ namespace Tags
         private readonly IAutoAssign _autoAssigner;
         private ControlPosition _gridTemplate;
 
-        #endregion
+        #endregion Contructors and Initializers
 
 
         #region Public Functions and Properties
@@ -360,10 +362,10 @@ namespace Tags
 
         }
 
-        public void AddColorCategory(string categoryName = "") //internal
+        internal bool TryGetAutoAssignment(out IList<string> assignments) 
         {
             bool autoAdded = false;
-            IList<string> colCatName = new List<string>();
+            assignments = [];
 
             // Check to see if can be automatically created
             if (_autoAssigner is not null & _isMail)
@@ -373,47 +375,64 @@ namespace Tags
 
                 if (vbR == DialogResult.Yes)
                 {
-                    colCatName = _autoAssigner.AddChoicesToDict(_olMail, _prefixes, _prefix.Key, _userEmailAddress);
-                    // Dim colChoices As Collection = AutoFile.dictPPL_AddMissingEntries(_olMail)
-                    foreach (string newCatName in colCatName)
+                    assignments = _autoAssigner.AddChoicesToDict(_olMail, _prefixes, _prefix.Key, _userEmailAddress);
+
+                    foreach (string newCatName in assignments)
                     {
                         AddOption(newCatName, blClickTrue: true);
                         autoAdded = true;
                     }
                 }
             }
-
-            if (!autoAdded)
+            return autoAdded; 
+        }
+        
+        public void AddColorCategory(string categoryName = "") //internal
+        {
+            // Only create category if we can't auto-assign to an existing
+            if (!TryGetAutoAssignment(out var assignments))
             {
+                // Get the category name from the user
+                categoryName = GetUserInputCategory(categoryName);
+
+                // If the user entered a category name, add it to the options
                 if (!string.IsNullOrEmpty(categoryName))
                 {
-                    categoryName = InputBox.ShowDialog("The following category name will be added:","Add Category Dialog", DefaultResponse: categoryName);
-                }
-                else
-                {
-                    bool advance = false;
-                    string msg = "Enter new category name:";
-                    while (!advance)
-                    {
-                        categoryName = InputBox.ShowDialog(msg, "Add Category Dialog", DefaultResponse: " ");
-                        if (categoryName != " ")
-                            advance = true;
-                        msg = "Please enter a name or hit cancel:";
-                    }
-                }
-                if (!string.IsNullOrEmpty(categoryName)&&_autoAssigner is not null)
-                {
-                    var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
-                    if (newCategory is not null)
-                    {
-                        AddOption(newCategory.Name, blClickTrue: true);
-                        colCatName.Add(newCategory.Name);
-                    }
+                    // If the _autoAssigner is not null, use its delegate to add the category
+                    if (_autoAssigner is not null) 
+                    { 
+                        var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
+                        categoryName = newCategory.Name;
+                    }                    
+                    AddOption(categoryName, blClickTrue: true);
+                    assignments.Add(categoryName);                    
                 }
             }
 
-            if (colCatName.Count > 0)
+            if (assignments.Count > 0)
                 FilterToSelected();
+        }
+
+        internal static string GetUserInputCategory(string categoryName)
+        {
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                categoryName = InputBox.ShowDialog("The following category name will be added:", "Add Category Dialog", DefaultResponse: categoryName);
+            }
+            else
+            {
+                bool advance = false;
+                string msg = "Enter new category name:";
+                while (!advance)
+                {
+                    categoryName = InputBox.ShowDialog(msg, "Add Category Dialog", DefaultResponse: " ");
+                    if (categoryName != " ")
+                        advance = true;
+                    msg = "Please enter a name or hit cancel:";
+                }
+            }
+
+            return categoryName;
         }
 
         public void FocusCheckbox(CheckBox cbx) //internal
@@ -521,7 +540,7 @@ namespace Tags
             CheckBoxController clsCheckBox;
 
             _filteredOptions = dictOptions;
-            intFocus = 0;
+            intFocus = -1;
             _colCbxCtrl = new();
             _colCbxEvent = new();
 
@@ -639,10 +658,10 @@ namespace Tags
         public void Select_Ctrl_By_Offset(int increment) //internal
         {
             int newpos = intFocus + increment;
-            if (newpos == -1)
+            if (newpos <= -1)
             {
                 _viewer.SearchText.Select();
-                intFocus = newpos;
+                intFocus = -1;
             }
             else if (newpos <= _colCbxCtrl.Count - 1)
             {

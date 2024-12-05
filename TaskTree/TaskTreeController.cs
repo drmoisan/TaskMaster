@@ -12,6 +12,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
 using Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
 
 namespace TaskTree
 {
@@ -37,7 +38,7 @@ namespace TaskTree
                 _viewer.TreeLv.ChildrenGetter = x => ((TreeNode<ToDoItem>)x).Children;
                 _viewer.TreeLv.ParentGetter = x => ((TreeNode<ToDoItem>)x).Parent;
                 _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-                _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
+                _viewer.TreeLv.Roots = _dataModel.Roots;
                 _viewer.TreeLv.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
 
             }
@@ -48,8 +49,8 @@ namespace TaskTree
             sink1.CanDropOnBackground = true;
 
             _rs.FindAllControls(_viewer);
-            _rs.SetResizeDimensions(_viewer.SplitContainer1, Resizer.ResizeDimensions.None, true);
-            _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position | Resizer.ResizeDimensions.Size, true);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1, ControlResizer.ResizeDimensions.None, true);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, ControlResizer.ResizeDimensions.Position | ControlResizer.ResizeDimensions.Size, true);
             _rs.ResizeAllControls(_viewer);
             //_rs.PrintDict();
         }
@@ -59,8 +60,8 @@ namespace TaskTree
         #region Private Fields
 
         public List<TreeNode<ToDoItem>> ToDoTree = new List<TreeNode<ToDoItem>>();
-        private readonly Resizer _rs = new Resizer();
-        private readonly Resizer _rscol = new Resizer();
+        private readonly ControlResizer _rs = new ControlResizer();
+        private readonly ControlResizer _rscol = new ControlResizer();
         private bool _expanded = false;
         private bool _filterCompleted = true;
         private TaskTreeForm _viewer;
@@ -176,6 +177,24 @@ namespace TaskTree
             }
         }
 
+        internal async Task ActivateOlItemAsync(dynamic item)
+        {
+            if (item is not null)
+            {
+                var activeExplorer = _globals.Ol.App.ActiveExplorer();
+                await Task.Run(() => 
+                { 
+                    if (activeExplorer.IsItemSelectableInView(item))
+                    {
+                        activeExplorer.ClearSelection();
+                        activeExplorer.AddToSelection(item);
+                    }
+                    else { item.Display(); }
+                });
+                await Task.Run(activeExplorer.Activate);
+            }
+        }
+
         internal void FormatRow(object sender, FormatRowEventArgs e)
         {
             var node = (TreeNode<ToDoItem>)e.Model;
@@ -226,9 +245,9 @@ namespace TaskTree
             {
                 if (x.Parent is null)
                 {
-                    if (_dataModel.ListOfToDoTree.Contains(x))
+                    if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.ListOfToDoTree.Remove(x);         // Data Model: Remove node from roots
+                        _dataModel.Roots.Remove(x);         // Data Model: Remove node from roots
                     }
                     else
                     {
@@ -249,14 +268,14 @@ namespace TaskTree
                 // targetRootsChanged = True                   'TreeListview:
                 // targetRoots.InsertRange(targetRoots.IndexOf(target) + siblingOffset, toMove) 'TreeListview: Inserted into new tree
                 // DataModel: Nothing here. Is this dealt with?
-                _dataModel.ListOfToDoTree.AddRange((IEnumerable<TreeNode<ToDoItem>>)toMove);
-                string strSeed = _dataModel.ListOfToDoTree.Count > toMove.Count ? _dataModel.ListOfToDoTree[_dataModel.ListOfToDoTree.Count - toMove.Count - 2].Value.ToDoID : "00";
+                _dataModel.Roots.AddRange((IEnumerable<TreeNode<ToDoItem>>)toMove);
+                string strSeed = _dataModel.Roots.Count > toMove.Count ? _dataModel.Roots[_dataModel.Roots.Count - toMove.Count - 2].Value.ToDoID : "00";
 
-                var loopTo = _dataModel.ListOfToDoTree.Count - 1;
-                for (int i = _dataModel.ListOfToDoTree.Count - toMove.Count - 1; i <= loopTo; i++)
+                var loopTo = _dataModel.Roots.Count - 1;
+                for (int i = _dataModel.Roots.Count - toMove.Count - 1; i <= loopTo; i++)
                 {
                     strSeed = _globals.TD.IDList.GetNextToDoID(strSeed);
-                    _dataModel.ListOfToDoTree[i].Value.ToDoID = strSeed;
+                    _dataModel.Roots[i].Value.ToDoID = strSeed;
                 }
             }
             else
@@ -279,9 +298,9 @@ namespace TaskTree
                 if (x.Parent is null)
                 {
                     sourceTree.RemoveObject(x);              
-                    if (_dataModel.ListOfToDoTree.Contains(x))
+                    if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.ListOfToDoTree.Remove(x);         
+                        _dataModel.Roots.Remove(x);         
                     }
                     else
                     {
@@ -320,7 +339,7 @@ namespace TaskTree
 
         internal void RebuildTreeVisual()
         {
-            _viewer.TreeLv.Roots = _dataModel.ListOfToDoTree;
+            _viewer.TreeLv.Roots = _dataModel.Roots;
             _viewer.TreeLv.RebuildAll(preserveState: false);
         }
 
@@ -343,8 +362,22 @@ namespace TaskTree
             var node = GetSelectedTreeNode();
             if (node is not null) 
             {
-                var objItem = node.Value.GetItem();
+                var objItem = node.Value.OlItem.InnerObject;
                 if (IsValidType(objItem)) { ActivateOlItem(objItem); }
+                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
+            }
+        }
+
+        internal async Task TreeLvActivateItemAsync()
+        {
+            var node = GetSelectedTreeNode();
+            if (node is not null)
+            {
+                var objItem = node.Value.OlItem.InnerObject;
+                if (IsValidType(objItem)) 
+                { 
+                    await ActivateOlItemAsync(objItem); 
+                }
                 else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
             }
         }
@@ -380,8 +413,16 @@ namespace TaskTree
         
         internal TreeNode<ToDoItem> GetSelectedTreeNode()
         {
-            var item = _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject;
-            return item as TreeNode<ToDoItem>;
+            try
+            {
+                return _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject as TreeNode<ToDoItem>;
+            }
+            catch (System.Exception)
+            {
+                return null;                
+            }
+            
+            
         }
 
         internal bool IsValidType(object item)

@@ -80,5 +80,33 @@ namespace UtilitiesCS
             True = 1
         }
 
+        [Flags]
+        public enum FlagsToSet
+        {
+            None = 0,
+            Context = 1,
+            People = 2,
+            Projects = 4,
+            Program = 8,
+            Topics = 16,
+            Priority = 32,
+            Taskname = 64,
+            Worktime = 128,
+            Today = 256,
+            Bullpin = 512,
+            Kbf = 1024,
+            DueDate = 2048,
+            Reminder = 4096,
+            All = 8191
+        }
+
+        public enum NotFoundEnum
+        {
+            Skip = 0,
+            Create = 1,
+            Ask = 2,
+            Throw = 3
+        }
+
     }
 }

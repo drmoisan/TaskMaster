@@ -38,7 +38,11 @@ namespace UtilitiesCS
 
             Suggestions = new Suggestions();
 
-            switch(options)
+        }
+
+        public async Task<OlFolderHelper> InitAsync(object objItem, InitOptions options)
+        {
+            switch (options)
             {
                 case InitOptions.NoSuggestions:
                     break;
@@ -46,7 +50,7 @@ namespace UtilitiesCS
                     FromArrayOrString(objItem);
                     break;
                 case InitOptions.FromField:
-                    InitializeFromEmail(objItem);
+                    await InitializeFromEmail(objItem);
                     break;
                 case InitOptions.Recalculate:
                     RefreshSuggestions(objItem);
@@ -54,7 +58,7 @@ namespace UtilitiesCS
                 default:
                     throw new ArgumentException($"Unknown option value {options}");
             }
-            
+            return this;
         }
 
         public enum InitOptions
@@ -65,12 +69,22 @@ namespace UtilitiesCS
             Recalculate = 4
         }
         
-        public void InitializeFromEmail(object objItem) //internal
+        public async Task InitializeFromEmail(object objItem) //internal
         {
-            var OlMail = MailResolution.TryResolveMailItem(objItem);
-            if (OlMail is null) { throw new ArgumentException("Constructor Requires the Email Object to be passed as MailItem to use this flag"); }
-            
-            FromFolderKey(OlMail);
+            if (objItem is null) { throw new ArgumentException("Cannot initialize suggestions from email because reference is null"); }
+            else if (objItem is MailItemHelper) 
+            {                 
+                var mailInfo = (MailItemHelper)objItem;
+                await FromFolderKey(mailInfo);
+            }
+            else if (objItem is MailItem && MailResolution.TryResolveMailItem(objItem) is not null)
+            {
+                FromFolderKey((MailItem)objItem);
+            }
+            else
+            {
+                throw new ArgumentException($"Obj is of type {objItem.GetType().Name}, but selected option requires a MailItem or MailItemHelper");
+            }
         }
 
         public void FromArrayOrString(object obj)
@@ -103,7 +117,15 @@ namespace UtilitiesCS
                 Suggestions.RefreshSuggestions(olMail: olMail, appGlobals: _globals);
             }
         }
-        
+
+        public async Task FromFolderKey(MailItemHelper mailInfo)//internal
+        {
+            if (!Suggestions.LoadFromField(mailInfo, _globals))
+            {
+                await Suggestions.RefreshSuggestions(mailInfo: mailInfo, appGlobals: _globals);
+            }
+        }
+
         #endregion
 
         #region Private Fields

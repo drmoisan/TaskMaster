@@ -4,20 +4,14 @@ using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using ToDoModel;
 using UtilitiesCS;
 using System.IO;
 using System.ComponentModel;
 using System.Windows.Forms;
-using UtilitiesCS.Threading;
 using System.Threading;
 using System.Collections.Concurrent;
-using QuickFiler.Viewers;
-using System.Globalization;
 using System.Diagnostics;
-using static Microsoft.FSharp.Core.ByRefKinds;
 using System.Timers;
 
 namespace QuickFiler.Controllers
@@ -51,8 +45,7 @@ namespace QuickFiler.Controllers
         public static async Task<QfcHomeController> LaunchAsync(IApplicationGlobals appGlobals,
                                                                 System.Action parentCleanup)
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
-                $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} is beginning");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(LaunchAsync)} is beginning");
             
             // Create uninitialized instance of QfcHomeController
             var controller = new QfcHomeController();
@@ -69,26 +62,29 @@ namespace QuickFiler.Controllers
             
             try
             {
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
-                    $"Calling {nameof(QfcHomeController)}.{nameof(InitAsync)} ...");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                //    $"Calling {nameof(QfcHomeController)}.{nameof(InitAsync)} ...");
 
                 await controller.InitAsync(appGlobals, parentCleanup, tokenSource, token, progress.SpawnChild(86));
                 controller.Loaded = true;
 
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
-                    $"Calling {nameof(QfcHomeController)}.{nameof(RunAsync)} ...");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                //    $"Calling {nameof(QfcHomeController)}.{nameof(RunAsync)} ...");
 
                 await controller.RunAsync(progress.SpawnChild());
 
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
-                    $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} is complete");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                //    $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} is complete");
 
             }
             catch (OperationCanceledException)
             {
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} " +
+                logger.Info($"{DateTime.Now.ToString("mm:ss.fff")} " +
                     $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} was cancelled");
-                
+                if (progress is not null)
+                    progress.Report(100);
+
+
                 controller = null;
             }
                         
@@ -147,27 +143,28 @@ namespace QuickFiler.Controllers
         public async Task RunAsync(ProgressTracker progress)
         {
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcDatamodel.InitEmailQueueAsync)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcDatamodel.InitEmailQueueAsync)} ...");
             progress.Report(0, "Initializing Email Queue");
             
             IList<MailItem> listEmail = await _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker, Token, TokenSource);
             
             progress.Report(30, "Initializing Qfc Items");
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
             await _formController.LoadItemsAsync(listEmail);
 
             progress.Report(100);
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Showing and Refreshing {nameof(QfcFormViewer)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Showing and Refreshing {nameof(QfcFormViewer)} ...");
             _stopWatch = new Stopwatch();
             _stopWatch.Start();
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();
             _formViewer.Refresh();
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(RunAsync)} is complete");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(RunAsync)} is complete");
 
-            _ = IterateQueueAsync();
+            //_ = IterateQueueAsync();
+            await IterateQueueAsync();
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -176,7 +173,7 @@ namespace QuickFiler.Controllers
             {
                 // The user canceled the operation.
                 //MessageBox.Show("Operation was canceled");
-                logger.Debug($"{nameof(QfcDatamodel)} background worker cancelled");
+                //logger.Debug($"{nameof(QfcDatamodel)} background worker cancelled");
             }
             else if (e.Error != null)
             {
@@ -186,7 +183,7 @@ namespace QuickFiler.Controllers
             }
             else
             {
-                logger.Debug("Background load of email database complete.");
+                //logger.Debug("Background load of email database complete.");
                 UiThread.Dispatcher.Invoke(() =>
                 {
                     _formViewer.L1v1L2h5_SpnEmailPerLoad.Enabled = true;
@@ -211,23 +208,23 @@ namespace QuickFiler.Controllers
                 }
                 else 
                 { 
-                    logger.Debug($"{nameof(IterateQueueAsync)} completed");
+                    //logger.Debug($"{nameof(IterateQueueAsync)} completed");
                     await _qfcQueue.CompleteAddingAsync(Token, 10000);
                 }
             }
             catch (OperationCanceledException)
             {
-                logger.Debug($"{nameof(IterateQueueAsync)} cancelled");
+                //logger.Debug($"{nameof(IterateQueueAsync)} cancelled");
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 if (this.Token.IsCancellationRequested)
                 {
-                    logger.Debug($"{nameof(IterateQueueAsync)} cancelled");
+                    //logger.Debug($"{nameof(IterateQueueAsync)} cancelled");
                 }
                 else
                 {
-                    throw ex;
+                    throw;
                 }     
             }
             
@@ -277,7 +274,12 @@ namespace QuickFiler.Controllers
             
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
-            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
+            if (!_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
+            {
+                logger.Debug($"{nameof(QuickFileMetrics_WRITE)} aborted due to lack of MyDocuments location");
+                return;
+            }
+            LOC_TXT_FILE = Path.Combine(folderRoot, filename);
 
             Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
@@ -312,12 +314,15 @@ namespace QuickFiler.Controllers
                 .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
                 dataLineBeg, OlEndTime, ref OlAppointment);
 
-            FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
+            if(_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
+            {
+                FileIO2.WriteTextFile(filename, strOutput, myDocuments);
+            }
         }
 
         public async Task WriteMetricsAsync(string filename)
         {
-            TraceUtility.LogMethodCall(filename);
+            //TraceUtility.LogMethodCall(filename);
 
             string LOC_TXT_FILE;
             string curDateText, curTimeText, durationText, durationMinutesText;
@@ -335,7 +340,8 @@ namespace QuickFiler.Controllers
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
-            LOC_TXT_FILE = Path.Combine(_globals.FS.FldrMyD, filename);
+            if (!_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments)) { return; }
+            LOC_TXT_FILE = Path.Combine(myDocuments, filename);
 
             Duration = _stopWatchMoved.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
@@ -364,7 +370,7 @@ namespace QuickFiler.Controllers
 
         private void WriteMoveToCalendar(DateTime OlEndTime, DateTime OlStartTime, int emailsLoaded, out AppointmentItem OlAppointment, out Folder OlEmailCalendar)
         {
-            TraceUtility.LogMethodCall(OlEndTime, OlStartTime, emailsLoaded);
+            //TraceUtility.LogMethodCall(OlEndTime, OlStartTime, emailsLoaded);
             
             OlEmailCalendar = UtilitiesCS.Calendar.GetCalendar("Email Time", _globals.Ol.App.Session);
             OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
@@ -387,7 +393,7 @@ namespace QuickFiler.Controllers
 
         private async Task NonBlockingProducer(string[] lines, CancellationToken ct)
         {
-            TraceUtility.LogMethodCall(lines, ct);
+            //TraceUtility.LogMethodCall(lines, ct);
 
             foreach (string line in lines)
             {
@@ -413,7 +419,7 @@ namespace QuickFiler.Controllers
                     if (ct.IsCancellationRequested) { break; }
                     else 
                     { 
-                        logger.Debug($"Timeout adding {line}");
+                        //logger.Debug($"Timeout adding {line}");
                         await Task.Delay(20);
                     }
                 }
@@ -429,12 +435,13 @@ namespace QuickFiler.Controllers
 
         private async void TimedConsumer(object source, ElapsedEventArgs e)
         {
-            TraceUtility.LogMethodCall(source, e);
+            //TraceUtility.LogMethodCall(source, e);
             Interlocked.Decrement(ref _metricsConsumers);
             var strOutput = _metrics.GetConsumingEnumerable().ToArray();
             if (strOutput.Length > 0)
             {
-                await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, _globals.FS.FldrMyD, default);
+                if(_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments)) 
+                { await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.EmailSession, strOutput, myDocuments, default); }                
             }
         }
 

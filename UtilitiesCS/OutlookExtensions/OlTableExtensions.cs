@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+//using System.Web.UI;
+
 //using System.Web.UI;
 //using System.Web.UI.WebControls;
 using Deedle.Internal;
@@ -63,6 +66,7 @@ namespace UtilitiesCS
         public static string SchemaMessageStore = PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
         public static string SchemaConversationDepth = PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
         public static string SchemaConversationIndex = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
+        public static string SchemaCustomPrefix = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/";
         public static string SchemaTriage = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
         public static string SchemaToDoID = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
         //public static string SchemaReceivedByName = PROPTAG_SPECIFIER + PR_RECEIVED_BY_NAME + PT_TSTRING;
@@ -133,7 +137,47 @@ namespace UtilitiesCS
         {
             if (table is not null && columnNames is not null && columnNames.Count() > 0)
             {
-                columnNames.ForEach(column => table.Columns.Remove(column));
+                foreach (var column in columnNames) 
+                {
+                    try
+                    {
+                        table.Columns.Remove(column);
+                    }
+                    catch (COMException e)
+                    {
+                        var inner = e.InnerException;
+                        logger.Warn($"Error in {nameof(RemoveColumns)}\ne.Message  {e.Message}\n" +
+                            $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
+                        if (inner is not null)
+                        {
+                            logger.Error($"InnerException in {nameof(RemoveColumns)}\ninner.Message  {inner.Message}\n" +
+                            $"e.HResult  {inner.HResult}\nStackTrace\n{inner.StackTrace}");
+                        }
+                        if (e.ErrorCode == -2147221233)
+                        {
+                            logger.Warn($"Column {column} not found in table");
+                        }
+                        else if (e.ErrorCode == -2147352567)
+                        {
+                            logger.Warn($"Column {column} is read-only");
+                        }
+                        else if (e.ErrorCode == -555728891)
+                        {
+                            throw new TimeoutException(e.Message, e);
+                        }
+                        else if (e.Message.Contains("timeout"))
+                        {
+                            throw new TimeoutException(e.Message, e);
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                        
+                    }
+                    
+                }
+                //columnNames.ForEach(column => table.Columns.Remove(column));
             }
         }
 
@@ -144,6 +188,13 @@ namespace UtilitiesCS
                 table.Columns.RemoveAll(); 
             }
         }
+
+        //TODO: Wire this to an asnyc version of GetConversationTable
+        public static async Task RemoveColumnsAsync(this Outlook.Table table, string[] columnNames, CancellationToken cancel, int timeOutMiliseconds) 
+        {
+            await Task.Run(() => RemoveColumns(table, columnNames), cancel).TimeoutAfter(timeOutMiliseconds);
+        }
+
 
         /// <summary>
         /// Extension method that iterates through an array of column names or
@@ -242,7 +293,7 @@ namespace UtilitiesCS
                                                                                Dictionary<string, Func<object, string>> objectConverters = null,
                                                                                ProgressTracker progress = null)
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
             var columnDictionary = table.GetColumnDictionary();
             object[,] data = null;
             
@@ -252,13 +303,14 @@ namespace UtilitiesCS
                (objectConverters is not null && 
                objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
             {
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
                 data = EtlByRow(table, objectConverters, columnDictionary, progress);
             }
             else { data = (object[,])table.GetArray(table.GetRowCount()); }
             return (data, columnDictionary);
         }
 
+        
         public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsync(
             this Outlook.Table table,
             CancellationToken token,
@@ -274,7 +326,7 @@ namespace UtilitiesCS
             var attempts = 3;
             object[,] data = null;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
             var columnDictionary = table.GetColumnDictionary();
 
             table.MoveToStart();
@@ -286,7 +338,7 @@ namespace UtilitiesCS
                    (objectConverters is not null &&
                    objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
                 {
-                    logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRowAsync)} ...");
+                    //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRowAsync)} ...");
                     data = await EtlByRowAsync(table, objectConverters, columnDictionary, token, milliseconds, attempts, progress);
                 }
                 else
@@ -329,7 +381,7 @@ namespace UtilitiesCS
             object[,] data = null;
             Dictionary<string, int> columnInfo = null;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
             try
             {
                 (data, columnInfo) = await Task.Factory.StartNew(() => table.ETL(objectConverters, progress),
@@ -344,6 +396,54 @@ namespace UtilitiesCS
             
             return (data, columnInfo);
         }
+        
+        private static async Task<IAsyncEnumerable<object[]>> EtlByRowAsync(
+            Table table,
+            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, int> columnDictionary,
+            CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
+            (var binFields, var binIndices) = GetBinFields(columnDictionary);
+            (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
+
+            var rows = await Task.Run(() => table.GetRows().ToArray().ToAsyncEnumerable(), token);            
+            //var rows = table.GetRows().ToAsyncEnumerable();
+
+            token.ThrowIfCancellationRequested();
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
+
+            int completed = 0;
+            var jagged = rows.Select(rows => EtlRow(ref completed, rows, objectConverters, binIndices, objFields, objIndices));
+            return jagged;            
+        }
+
+        public static async Task<(
+            IAsyncEnumerable<Row> rows,
+            Dictionary<string, int> columnDictionary,
+            Dictionary<string, Func<object, string>> objectConverters,
+            IOrderedEnumerable<int> binIndices,
+            IEnumerable<string> objFields,
+            IEnumerable<int> objIndices)> EtlPrepAsync(this Outlook.Table table, CancellationToken cancel, Dictionary<string, Func<object, string>> objectConverters = null)
+        {
+            var columnDictionary = await Task.Run(table.GetColumnDictionary);
+            (var binFields, var binIndices) = await Task.Run(() => GetBinFields(columnDictionary));
+            (var objFields, var objIndices) = await Task.Run(() => GetObjectFields(objectConverters, columnDictionary));
+            var rows = await Task.Run(() => table.GetRows().ToAsyncEnumerable(), cancel);
+            return (rows, columnDictionary, objectConverters, binIndices, objFields, objIndices);
+        }
+        
+        public static IAsyncEnumerable<object[]> EtlByRowAsync(
+            this IAsyncEnumerable<Row> rows,
+            Dictionary<string, Func<object, string>> objectConverters,
+            IOrderedEnumerable<int> binIndices,
+            IEnumerable<string> objFields,
+            IEnumerable<int> objIndices)
+        { 
+            return rows.Select(rows => EtlRow(rows, objectConverters, binIndices, objFields, objIndices));
+        }
 
         private static async Task<object[,]> EtlByRowAsync(Table table,
                                                            Dictionary<string, Func<object, string>> objectConverters,
@@ -355,7 +455,7 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
             (var binFields, var binIndices) = GetBinFields(columnDictionary);
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
             
@@ -364,14 +464,14 @@ namespace UtilitiesCS
                 token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
 
             token.ThrowIfCancellationRequested();
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
             var jagged = await Task.Factory.StartNew(() => rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild()),
                 token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
             
             //var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
             var data = jagged.To2D();
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
             return data;
         }
 
@@ -386,18 +486,18 @@ namespace UtilitiesCS
         /// <returns>2D object array with string data</returns>
         private static object[,] EtlByRow(Table table, Dictionary<string, Func<object, string>> objectConverters, Dictionary<string, int> columnDictionary, ProgressTracker progress = null)
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
             
             (var binFields, var binIndices) = GetBinFields(columnDictionary);
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
             var rows = table.CastToRowArray(progress?.SpawnChild(65));
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
 
             var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
             var data = jagged.To2D();
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
             return data;
         }
 
@@ -457,7 +557,7 @@ namespace UtilitiesCS
 
         private static Row[] CastToRowArray(this Table table, ProgressTracker progress) 
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Casting {nameof(Outlook.Table)} to IEnumerable<{nameof(Outlook.Row)}");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Casting {nameof(Outlook.Table)} to IEnumerable<{nameof(Outlook.Row)}");
             Row[] rows;
             var rowCount = table.GetRowCount();
             int completed = 0;
@@ -536,11 +636,21 @@ namespace UtilitiesCS
                                        IEnumerable<string> objFields,
                                        IEnumerable<int> objIndices)
         {
+            var objectRow = EtlRow(row, objectConverters, binIndices, objFields, objIndices);
+            Interlocked.Increment(ref rowsCompleted);
+            return objectRow;
+        }
+
+        private static object[] EtlRow(Outlook.Row row,
+                                       Dictionary<string, Func<object, string>> objectConverters,
+                                       IOrderedEnumerable<int> binIndices,
+                                       IEnumerable<string> objFields,
+                                       IEnumerable<int> objIndices)
+        {
             object[] rawValues = (object[])row.GetValues();
             var binStrings = ConvertBinColumnsToString(row, binIndices);
             var objStrings = ConvertObjectColumnsToString(row, objIndices, objFields, objectConverters);
             var objectRow = rawValues.ToObjectRow(binIndices, binStrings, objIndices, objStrings);
-            Interlocked.Increment(ref rowsCompleted);
             return objectRow;
         }
 
@@ -668,7 +778,7 @@ namespace UtilitiesCS
                     () => view.GetTable(), 
                     token, 
                     TaskCreationOptions.LongRunning, 
-                    TaskScheduler.Default).TimeoutAfter(1000);
+                    TaskScheduler.Default).TimeoutAfter(2000);
 
                 //table = await Task.Run(() => view.GetTable(), combinedTokenSource.Token);
             }
@@ -691,8 +801,52 @@ namespace UtilitiesCS
                     }
                 } 
             }
+            catch (TimeoutException)
+            {
+                Console.WriteLine($"Task timed out on try {counter}");
+                if (counter < 2)
+                {
+                    table = await activeExplorer.GetTableInViewAsync(token, counter + 1);
+                }
+                else
+                {
+                    table = null;
+                }
+            }
 
             return table;
+        }
+
+        public static async Task<object> TryGetTableAsync(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        {
+            if (store is null) { throw new ArgumentNullException(nameof(store)); }
+            MAPIFolder folder = null;
+            try
+            {
+                folder = store.GetDefaultFolder(folderEnum);
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error in {nameof(GetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                return null;
+            }
+            return await folder.TryGetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
+        }
+
+        public static async Task<object> GetTableAsync(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts) 
+        {
+            if (store is null) { throw new ArgumentNullException(nameof(store)); }
+            MAPIFolder folder = null;
+            try
+            {
+                folder = store.GetDefaultFolder(folderEnum);
+            }
+            catch (System.Exception e) 
+            {
+                logger.Error($"Error in {nameof(GetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                throw;
+            }
+            return await folder.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
         }
 
         public static Outlook.Table GetTable(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns)
@@ -710,12 +864,98 @@ namespace UtilitiesCS
             return folder.GetTable(removeColumns: removeColumns, addColumns: addColumns);
         }
 
+        public static async Task<object> TryGetTableAsync(this MAPIFolder folder, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        {
+            try
+            {
+                return await folder.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
+            }
+            catch (TaskCanceledException e) 
+            { 
+                logger.Info($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                return null;
+            }
+            catch (System.Exception)
+            {
+                logger.Warn($"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null");
+                return null;
+            }
+        }
+
+        public static async Task<object> GetTableAsync(this MAPIFolder folder, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        {
+            try
+            {
+                return await Task.Run(() => folder.GetTable(removeColumns, addColumns));
+            }
+            catch (COMException e)
+            {
+                logger.Warn($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
+                        $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
+
+                if (maxAttempts > 1) 
+                {                     
+                    logger.Info($"Retrying {maxAttempts - 1} times ...");
+                    return await folder.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts - 1); 
+                }
+                else { throw; }
+            }
+
+            catch (System.Exception)
+            {
+                throw;
+            }            
+        }
+
         public static Outlook.Table GetTable(this MAPIFolder folder, string[] removeColumns, string[] addColumns)
         {
             var table = folder.GetTable();
             table.RemoveColumns(removeColumns);
             table.AddColumns(addColumns);
             return table;
+        }
+
+        public static async Task<object> TryGetTableAsync(this Conversation conversation, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        {
+            try
+            {
+                return await conversation.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
+            }
+            catch (TaskCanceledException e)
+            {
+                logger.Info($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                return null;
+            }
+            catch (System.Exception)
+            {
+                //logger.Debug($"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null");
+                return null;
+            }
+        }
+
+        public static async Task<object> GetTableAsync(this Conversation conversation, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        {
+            try
+            {
+                return await Task.Run(() => conversation.GetTable(removeColumns, addColumns));
+            }
+            catch (COMException e)
+            {
+                logger.Warn($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
+                        $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
+
+                if (maxAttempts > 1)
+                {
+                    logger.Debug($"Retrying {maxAttempts - 1} times ...");
+                    return await conversation.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts - 1);
+                }
+                else { throw; }
+            }
+
+            catch (System.Exception)
+            {
+                throw;
+            }
         }
 
         public static Outlook.Table GetTable(this Conversation conversation, string[] removeColumns, string[] addColumns)

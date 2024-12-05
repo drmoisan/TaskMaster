@@ -55,7 +55,7 @@ namespace UtilitiesCS.HelperClasses
             _durations.Push((actionName, duration));
             if (logImmediately)
             {
-                logger.Debug($"{actionName} duration was {duration:%m\\:ss\\.ff}");
+                //logger.Debug($"{actionName} duration was {duration:%m\\:ss\\.ff}");
             }
         }
 

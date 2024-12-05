@@ -12,6 +12,7 @@ using UtilitiesCS.EmailIntelligence;
 using System.Collections.Generic;
 using Deedle;
 using System.Threading.Tasks;
+using SDILReader;
 
 namespace UtilitiesCS
 {
@@ -57,11 +58,14 @@ namespace UtilitiesCS
         {
             if (mailItems is null || mailItems.Count == 0) { throw new ArgumentNullException($"{mailItems} is null or empty"); }
             var olAncestor = FolderConverter.ResolveOlRoot(((Folder)mailItems[0].Parent).FolderPath, appGlobals);
-            var fsAncestorEquivalent = appGlobals.FS.FldrRoot;
-            await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            if (appGlobals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+            {
+                var fsAncestorEquivalent = folderRoot;
+                await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals, olAncestor, fsAncestorEquivalent);
+            }
         }
 
-        async public static Task SortAsync(IList<MailItemHelper> mailInfoList,
+        async public static Task SortAsync(IList<MailItemHelper> mailHelpers,
                                            bool savePictures,
                                            string destinationOlStem,
                                            bool saveMsg,
@@ -71,16 +75,115 @@ namespace UtilitiesCS
                                            string olAncestor,
                                            string fsAncestorEquivalent)
         {
-            TraceUtility.LogMethodCall(mailInfoList, savePictures, destinationOlStem, saveMsg,
-                saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(mailHelpers, savePictures, destinationOlStem, saveMsg,
+            //    saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
 
-            if (mailInfoList is null || mailInfoList.Count == 0)
-            { throw new ArgumentNullException($"{mailInfoList} is null or empty"); }
-            
-            await Task.CompletedTask;
-            throw new NotImplementedException();
+            if (mailHelpers is null || mailHelpers.Count == 0)
+            { throw new ArgumentNullException($"{mailHelpers} is null or empty"); }
+
+            var conversationID = mailHelpers.FirstOrDefault().ConversationID;
+
+            // Resolve the paths for the emails
+            ResolvePaths((Folder)mailHelpers.FirstOrDefault().FolderInfo.OlFolder,
+                destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent,
+                out string destinationOlPath, out string saveFsPath, out string deleteFsPath, out Folder destinationFolder);
+
+            // Exit if the destination folder cannot be resolved
+            if (destinationFolder is null)
+            {
+                //logger.Debug($"Folder with path {destinationOlPath} could not be resolved. Emails will not be moved");
+                return;
+            }
+
+            // Process each email
+            foreach (var mailHelper in mailHelpers)
+            {
+                await ProcessMailItemAsync(savePictures, destinationOlStem, saveMsg, saveAttachments, appGlobals, saveFsPath, destinationFolder, mailHelper).ConfigureAwait(false);
+            }
+
+            // Update Predictive Engine
+            await UpdatePredictiveEngineAsync(mailHelpers, destinationOlStem, appGlobals, conversationID).ConfigureAwait(false);
+
         }
 
+        public static async Task UpdatePredictiveEngineAsync(IList<MailItemHelper> mailHelpers, string destinationOlStem, IApplicationGlobals appGlobals, string conversationID)
+        {
+            // Update the Recents list and save
+            appGlobals.AF.RecentsList.Add(destinationOlStem);
+
+            // Update the CtfMap and save
+            appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailHelpers.Count);
+
+            // Serialize the data
+            var tasks = new List<Task>
+            {
+                appGlobals.AF.RecentsList.SerializeAsync(),
+                appGlobals.AF.CtfMap.SerializeAsync(),
+                appGlobals.AF.SubjectMap.SerializeAsync(),
+                appGlobals.AF.MovedMails.SerializeAsync()
+            };
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+        }
+
+        public static async Task ProcessMailItemAsync(bool savePictures, string destinationOlStem, bool saveMsg, bool saveAttachments, IApplicationGlobals appGlobals, string saveFsPath, Folder destinationFolder, MailItemHelper mailHelper)
+        {
+            // If saveMsg is true, save the message as an .msg file
+            if (saveMsg) { await SaveMessageAsMsgAsync(mailHelper.Item, saveFsPath); }
+
+            if (saveAttachments || savePictures)
+            {
+
+                var attachments = mailHelper.AttachmentsHelper.ToAsyncEnumerable();
+                await attachments.ForEachAsync(async x => 
+                { 
+                    
+                    await x.SaveAttachmentAsync(saveFsPath); 
+                });
+
+                // Delete the original attachments if removePreviousFsFiles is true
+                var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
+                await foreach (var attachment in toDelete) { await Task.Run(() => File.Delete(attachment.FilePathDelete)); }
+            }
+
+            // Label the email as autosorted
+            await Task.Run(() =>
+            {
+                mailHelper.Item.SetUdf("AutoSorted", "Yes");
+                mailHelper.Item.UnRead = false;
+                mailHelper.Item.Save();
+            });
+
+            var bayesianTask = Task.Run(async () => (await appGlobals.AF.Manager["Folder"]).AddOrUpdateClassifier(destinationOlStem, mailHelper.Tokens, 1));
+            // Update Subject Map and Subject Encoder
+            var subjectMapTask = Task.Run(() => appGlobals.AF.SubjectMap.Add(mailHelper.Subject, destinationOlStem));
+
+            // Move the email to the destination folder
+
+            MailItem mailItemTemp = null;
+
+            try
+            {
+                mailItemTemp = await Task.Run(() => (MailItem)mailHelper.Item.Move(destinationFolder));
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error moving email {mailHelper.Subject} to {destinationFolder.FolderPath}\n{e.Message}", e);
+            }
+
+            await bayesianTask;
+            await subjectMapTask;
+            
+            // Add the email to the Undo Stack
+            if (mailItemTemp is not null)
+            {
+                PushToUndoStack(mailHelper.Item, mailItemTemp, appGlobals);
+                // Capture the move details in the log
+                await Task.Run(() => CaptureMoveDetails(mailHelper.Item, mailItemTemp, appGlobals)).ConfigureAwait(false);
+            }
+        }
 
         async public static Task SortAsync(IList<MailItem> mailItems,
                                      bool savePictures,
@@ -92,8 +195,8 @@ namespace UtilitiesCS
                                      string olAncestor,
                                      string fsAncestorEquivalent)
         {
-            TraceUtility.LogMethodCall(mailItems, savePictures, destinationOlStem, saveMsg, 
-                saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(mailItems, savePictures, destinationOlStem, saveMsg, 
+            //    saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
 
             if (mailItems is null || mailItems.Count == 0) 
             { throw new ArgumentNullException($"{mailItems} is null or empty"); }
@@ -150,7 +253,7 @@ namespace UtilitiesCS
                 }
                 if (olDestination is null)
                 {
-                    logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
+                    //logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
                 }
                 
                 MailItem mailItemTemp = null;
@@ -162,7 +265,7 @@ namespace UtilitiesCS
                     }
                     else 
                     { 
-                        logger.Debug($"Folder with path {destinationOlPath} could not be resolved so the mail cannot be moved");
+                        //logger.Debug($"Folder with path {destinationOlPath} could not be resolved so the mail cannot be moved");
                     }
                     
                 }
@@ -291,20 +394,22 @@ namespace UtilitiesCS
         }
 
         // Duplicative with QuickFiler but it is still mapped to main menu so I need to take it out
-        public static void Undo(ScoStack<IMovedMailInfo> movedStack, Outlook.Application olApp) 
+        public static async Task UndoAsync(ScoStack<IMovedMailInfo> movedStack, IApplicationGlobals globals) 
         {
             DialogResult repeatResponse = DialogResult.Yes;
             var i = 0;
 
             while (i < movedStack.Count && repeatResponse == DialogResult.Yes)
             {
-                var message = movedStack[i].UndoMoveMessage(olApp);
+                var message = movedStack[i].UndoMoveMessage(globals.Ol.App);
                 if (message is null) { i++; }
                 else
                 {
                     var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
                     if (undoResponse == DialogResult.Yes)
                     {
+                        var helper = await MailItemHelper.FromMailItemAsync(movedStack[i].MailItem, globals, default, true);
+                        (await globals.AF.Manager["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }
@@ -365,7 +470,7 @@ namespace UtilitiesCS
             bool saveAttachments,
             bool savePictures)
         {
-            TraceUtility.LogMethodCall(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
+            //TraceUtility.LogMethodCall(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
             var attachments = mailItem.Attachments
                                       .Cast<Attachment>()
                                       .Where(x => x.Type != OlAttachmentType.olOLE)
@@ -426,7 +531,7 @@ namespace UtilitiesCS
 
         async public static Task SaveAttachmentAsync(this AttachmentHelper attachmentHelper)
         {
-            TraceUtility.LogMethodCall(attachmentHelper);
+            //TraceUtility.LogMethodCall(attachmentHelper);
 
             if (File.Exists(attachmentHelper.FilePathSave))
             {
@@ -462,6 +567,17 @@ namespace UtilitiesCS
                 //await Task.Run(() => attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FolderPathSave));
                 await attachmentHelper.Attachment.TrySaveAttachmentAsync(attachmentHelper.FilePathSave);
             }
+        }
+
+        async public static Task SaveAttachmentAsync(this AttachmentHelper attachmentHelper, string destinationPath)
+        {
+            //TraceUtility.LogMethodCall(attachmentHelper);
+            //logger.Debug($"Original Destination Path {attachmentHelper.FolderPathSave}");
+            attachmentHelper.FolderPathSave = destinationPath;
+            //logger.Debug($"New Destination Path {attachmentHelper.FolderPathSave}");
+
+
+            await SaveAttachmentAsync(attachmentHelper);
         }
 
         async internal static Task SaveCaseAsync(
@@ -607,7 +723,7 @@ namespace UtilitiesCS
             out string saveFsPath, 
             out string deleteFsPath)
         {
-            TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
+            //TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
 
             destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
 
@@ -626,11 +742,51 @@ namespace UtilitiesCS
 
         }
 
+        private static void ResolvePaths(
+            Folder currentFolder,
+            string destinationOlStem,
+            IApplicationGlobals appGlobals,
+            string olAncestor,
+            string fsAncestorEquivalent,
+            out string destinationOlPath,
+            out string saveFsPath,
+            out string deleteFsPath,
+            out Folder destinationFolder)
+        {
+            //TraceUtility.LogMethodCall(currentFolder, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
+
+            destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
+            
+            // Resolve the file system destination folder path 
+            saveFsPath = destinationOlPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
+
+            // Resolve the file system deletion folder path if relevant
+            deleteFsPath = null;
+            if ((currentFolder.FolderPath != appGlobals.Ol.EmailRootPath) &&
+                (currentFolder.FolderPath.Contains(olAncestor)) &&
+                (currentFolder.FolderPath != olAncestor))
+            {
+                deleteFsPath = currentFolder.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
+            }
+
+            destinationFolder = null;
+            try
+            {
+                destinationFolder = new OlFolderHelper(appGlobals).GetFolder(destinationOlPath, appGlobals.Ol.App);
+            }
+            catch (System.Exception e)
+            {
+                //logger.Debug($"Cannot grab handle on Folder {destinationOlPath}. Emails will not be moved");
+                logger.Error(e);
+            }
+            
+        }
+
         async internal static Task SaveMessageAsMsgAsync(
             MailItem mailItem,
             string fsLocation)
         {
-            TraceUtility.LogMethodCall(mailItem, fsLocation);
+            //TraceUtility.LogMethodCall(mailItem, fsLocation);
 
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
             
@@ -860,7 +1016,7 @@ namespace UtilitiesCS
             MailItem oMailTmp,
             IApplicationGlobals _globals)
         {
-            TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
+            //TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath).Skip(1).ToArray();
             var output = SanitizeArrayLineTSV(ref strAry);

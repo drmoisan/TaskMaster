@@ -228,12 +228,12 @@ namespace UtilitiesCS
 
         internal static void LogMatrixState(int[,] matrix)
         {
-            logger.Debug($"\n{GetFormattedMatrixText(matrix)}");
+            //logger.Debug($"\n{GetFormattedMatrixText(matrix)}");
         }
 
         internal static void LogMatrixState(int[,] matrix, string xString, string yString)
         {
-            logger.Debug($"Smith-Watterman Matrix for \n{xString} and \n{yString}\n{GetFormattedMatrixText(matrix)}");
+            //logger.Debug($"Smith-Watterman Matrix for \n{xString} and \n{yString}\n{GetFormattedMatrixText(matrix)}");
         }
 
         internal static string GetFormattedMatrixText(int[,] matrix)

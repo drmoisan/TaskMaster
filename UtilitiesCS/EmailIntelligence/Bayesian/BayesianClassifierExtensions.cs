@@ -52,9 +52,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #endregion BayesianClassifierShared
 
+    }
+
+    [Obsolete("This class is not used in the current implementation of the Bayesian Classifier.")]
+    public static class BayesianClassifierExtensionsObs
+    {
         #region OriginalBayesianClassifier
         public static BayesianClassifier ToClassifier(
-            this ClassifierGroup parent, 
+            this ClassifierGroup parent,
             string tag,
             IEnumerable<string> positiveTokens)
         {
@@ -71,6 +76,5 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         #endregion OriginalBayesianClassifier
-
     }
 }

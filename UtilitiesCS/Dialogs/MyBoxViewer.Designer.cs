@@ -134,6 +134,7 @@
             this.TextMessage.Size = new System.Drawing.Size(386, 136);
             this.TextMessage.TabIndex = 1;
             this.TextMessage.Text = "Message Contents";
+            this.TextMessage.TextChanged += new System.EventHandler(this.TextMessage_TextChanged);
             // 
             // SvgIcon
             // 
@@ -172,7 +173,6 @@
         private System.Windows.Forms.TableLayoutPanel L1v1L2h;
         internal System.Windows.Forms.TableLayoutPanel L2Bottom;
         internal System.Windows.Forms.TextBox TextMessage;
-        //internal SVGControl.PictureBoxSVG SvgIcon;
-        internal System.Windows.Forms.PictureBox SvgIcon;
+        internal SVGControl.PictureBoxSVG SvgIcon;
     }
 }

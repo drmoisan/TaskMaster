@@ -11,6 +11,7 @@ using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -79,7 +80,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = progressState;
         }
 
-        public async Task TestFolderClassifierAsync(EmailDataMiner dataMiner = null, MinedMailInfo[] collection = null)
+        public async Task TestFolderClassifierAsync(OlFolderClassifierGroup dataMiner = null, MinedMailInfo[] collection = null)
         {
             var progressState = _globals.AF.ProgressPane.Visible;
             _globals.AF.ProgressPane.Visible = true;
@@ -140,7 +141,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Step 1: Build Classifier
 
-        public async Task<BayesianClassifierGroup> BuildClassifierAsync(EmailDataMiner dataMiner, ProgressPackage ppkg, MinedMailInfo[] train)
+        public async Task<BayesianClassifierGroup> BuildClassifierAsync(OlFolderClassifierGroup dataMiner, ProgressPackage ppkg, MinedMailInfo[] train)
         {
             ppkg.ProgressTrackerPane.Increment(0, "Building Folder Classifier -> Create Classifier Group");
 
@@ -682,7 +683,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         {
                             logger.Error(e.Message, e);
                             Serialization.SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
-                            logger.Debug($"original prediction: {prediction}");
+                            //logger.Debug($"original prediction: {prediction}");
                             var predictions = classifierGroup.Classify(tokens).ToArray();
                             Serialization.SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
 
@@ -741,7 +742,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     logger.Error(e.Message, e);
                     Serialization.SerializeAndSave(source, "ErrorSource", $"{outcome.SourceIndex:00000}");
-                    logger.Debug($"original prediction: {prediction}");
+                    //logger.Debug($"original prediction: {prediction}");
                     var predictions = classifierGroup.Classify(tokens).ToArray();
                     Serialization.SerializeAndSave(predictions, "Predictions", $"{outcome.SourceIndex:00000}");
 
@@ -981,14 +982,28 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return (testOutcomes, testSource, classifierGroup, ppkg);
         }
 
-        public virtual async Task<(EmailDataMiner, MinedMailInfo[], List<string>, ProgressPackage)> LoadIfNullAsync(
-            EmailDataMiner dataMiner, MinedMailInfo[] collection, ProgressPackage ppkg)
+        //public virtual async Task<(EmailDataMiner, MinedMailInfo[], List<string>, ProgressPackage)> LoadIfNullAsync(
+        //    EmailDataMiner dataMiner, MinedMailInfo[] collection, ProgressPackage ppkg)
+        //{
+        //    ppkg ??= await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
+        //    ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
+
+        //    dataMiner ??= new EmailDataMiner(Globals);
+            
+        //    collection ??= await Serialization.DeserializeAsync<MinedMailInfo[]>(ppkg.ProgressTrackerPane, typeof(MinedMailInfo[]).Name);
+        //    var folderPaths = collection.Select(x => x.FolderInfo.RelativePath).OrderBy(x => x).Distinct().ToList();
+
+        //    return (dataMiner, collection, folderPaths, ppkg);
+        //}
+
+        public virtual async Task<(OlFolderClassifierGroup, MinedMailInfo[], List<string>, ProgressPackage)> LoadIfNullAsync(
+            OlFolderClassifierGroup dataMiner, MinedMailInfo[] collection, ProgressPackage ppkg)
         {
             ppkg ??= await new ProgressPackage().InitializeAsync(progressTrackerPane: _globals.AF.ProgressTracker);
             ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
 
-            dataMiner ??= new EmailDataMiner(Globals);
-            
+            dataMiner ??= new OlFolderClassifierGroup(Globals);
+
             collection ??= await Serialization.DeserializeAsync<MinedMailInfo[]>(ppkg.ProgressTrackerPane, typeof(MinedMailInfo[]).Name);
             var folderPaths = collection.Select(x => x.FolderInfo.RelativePath).OrderBy(x => x).Distinct().ToList();
 
@@ -1010,7 +1025,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             await Serialization.SaveTextsAsync([scoresText], "TestScores");
             
             progress.Report(100);
-            logger.Debug($"\n{scoresText}");
+            //logger.Debug($"\n{scoresText}");
         }
 
         public virtual async Task SaveScoresAsync(IEnumerable<VerboseTestScores> verboseScores, ProgressTrackerPane progress)
@@ -1041,7 +1056,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 ["Class", "TP", "FP", "FN", "TN", "Precision", "Recall", "F1"],
                 Enumerable.Repeat(Enums.Justification.Center, 8).ToArray(), "Classifier Performance By Class");
             await Serialization.SaveTextsAsync([scoresText], "TestScores");
-            logger.Debug($"\n{scoresText}");
+            //logger.Debug($"\n{scoresText}");
             progress.Report(100);
         }
 

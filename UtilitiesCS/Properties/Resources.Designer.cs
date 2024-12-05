@@ -93,9 +93,9 @@ namespace UtilitiesCS.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] charset_lookup {
+        internal static byte[] CancelBlue {
             get {
-                object obj = ResourceManager.GetObject("charset_lookup", resourceCulture);
+                object obj = ResourceManager.GetObject("CancelBlue", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace UtilitiesCS.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] eng {
+        internal static byte[] charset_lookup {
             get {
-                object obj = ResourceManager.GetObject("eng", resourceCulture);
+                object obj = ResourceManager.GetObject("charset_lookup", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -167,6 +167,16 @@ namespace UtilitiesCS.Properties {
             get {
                 object obj = ResourceManager.GetObject("OpenFolder1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] OpenFolderBlue {
+            get {
+                object obj = ResourceManager.GetObject("OpenFolderBlue", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
@@ -243,6 +253,26 @@ namespace UtilitiesCS.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Save {
+            get {
+                object obj = ResourceManager.GetObject("Save", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] SaveAs {
+            get {
+                object obj = ResourceManager.GetObject("SaveAs", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] SearchFolderClosed {
             get {
                 object obj = ResourceManager.GetObject("SearchFolderClosed", resourceCulture);
@@ -256,6 +286,16 @@ namespace UtilitiesCS.Properties {
         internal static byte[] StatusInProgress {
             get {
                 object obj = ResourceManager.GetObject("StatusInProgress", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] TesseractEnglish {
+            get {
+                object obj = ResourceManager.GetObject("TesseractEnglish", resourceCulture);
                 return ((byte[])(obj));
             }
         }

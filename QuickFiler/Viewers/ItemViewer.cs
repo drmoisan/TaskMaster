@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 //using System.Web.UI.WebControls;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using UtilitiesCS;
 
 namespace QuickFiler
@@ -20,6 +21,7 @@ namespace QuickFiler
             InitializeComponent();
             _context = SynchronizationContext.Current;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            _uiDispatcher = Dispatcher.CurrentDispatcher;
             InitControlGroups();
         }
 
@@ -42,6 +44,9 @@ namespace QuickFiler
 
         private TaskScheduler _uiScheduler;
         public TaskScheduler UiScheduler { get => _uiScheduler; }
+
+        private Dispatcher _uiDispatcher;
+        public Dispatcher UiDispatcher { get => _uiDispatcher; }
 
         public void RemoveControlsColsRightOf(Control furthestRight)
         {

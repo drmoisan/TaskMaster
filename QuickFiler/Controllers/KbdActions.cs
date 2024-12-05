@@ -3,6 +3,7 @@ using QuickFiler.Interfaces;
 using Swordfish.NET.Collections;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -98,6 +99,7 @@ namespace QuickFiler.Controllers
 
         public void Add(UClass instance)
         {
+            
             if (_list.Any(x => x.SourceId == instance.SourceId && x.KeyEquals(instance.Key)))
             {
                 string message = $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";

@@ -16,6 +16,9 @@ using System.Windows.Forms;
 using System.Threading;
 using QuickFiler.Helper_Classes;
 
+
+
+
 namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
@@ -45,20 +48,22 @@ namespace QuickFiler.Controllers
 
         public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress) 
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
             progress.Report(0, "Initializing Data Model");
 
             var model = new QfcDatamodel(appGlobals);
             model.Token = token;
             model.TokenSource = tokenSource;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
             await model.InitDfAsync(appGlobals.Ol.App.ActiveExplorer(), progress.Increment(2)).ConfigureAwait(false);
             return model;
         }
 
         public void Cleanup() 
-        { 
+        {
+            _tokenSource?.Cancel();
+            _worker?.CancelAsync();
             _globals.Ol.App.NewMailEx -= Application_NewMailEx;
             _moveMonitor.UnhookAll();
             _moveMonitor = null;
@@ -123,7 +128,8 @@ namespace QuickFiler.Controllers
             //zxxint arg = (int)e.Argument;
 
             // Start the time-consuming operation.
-            e.Result = LoadRemainingEmailsToQueue(bw);
+            //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
+            e.Result = LoadRemainingEmailsToQueue(bw, _token);
 
             // If the operation was canceled by the user,
             // set the DoWorkEventArgs.Cancel property to true.
@@ -166,6 +172,7 @@ namespace QuickFiler.Controllers
             _worker = worker;
             
             // Extract first batch
+            batchSize = batchSize < _frame.RowCount ? batchSize : _frame.RowCount;
             var firstIteration = _frame.GetRowsAt(Enumerable.Range(0, batchSize).ToArray());
 
             // Drop extracted range from source table
@@ -195,15 +202,12 @@ namespace QuickFiler.Controllers
             _tokenSource = tokenSource;
             _worker = worker;
 
-            var emailList = await Task.Factory.StartNew(() => InitEmailQueue(batchSize, worker), 
-                                                        token,
-                                                        TaskCreationOptions.LongRunning, 
-                                                        TaskScheduler.Default);
+            var emailList = await Task.Run(() => InitEmailQueue(batchSize, worker), token);
 
             return emailList;
         }
 
-        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw)
+        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
         {
             if ((_frame is null) || (_frame.RowCount == 0))
             {
@@ -213,20 +217,69 @@ namespace QuickFiler.Controllers
             
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
-           
-            rows.Select(row => 
-                (MailItem)_olApp.GetNamespace("MAPI")
-                .GetItemFromID(row.EntryId, row.StoreId))
-                .ForEach(item => 
-                { 
-                    _masterQueue.AddLast(item);
-                    _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-                });
-            
+
+            foreach (var row in rows)
+            {
+                try
+                {
+                    token.ThrowIfCancellationRequested();
+                    //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    var item = _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    if (item is not null && item is MailItem mailItem)
+                    {
+                        _masterQueue.AddLast(mailItem);
+                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+                    return false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    throw e;
+                }
+            }
             return true;
             
         }
-                
+
+        private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
+        {
+            if ((_frame is null) || (_frame.RowCount == 0))
+            {
+                MessageBox.Show("Email Frame is empty");
+                return false;
+            }
+
+            try
+            {
+                await _frame.GetRowsAs<IEmailSortInfo>().Values.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(
+                    async (row, token) => await Task.Run(() =>
+                    {
+                        token.ThrowIfCancellationRequested();    
+                        var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                        _masterQueue.AddLast(item);
+                        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
+                    }, token),
+                    token);
+                return true;
+            }
+            catch (TaskCanceledException)
+            {
+                //logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
+                return false;
+            }
+            
+
+            
+
+            
+
+        }
+
         public Frame<int, string> InitDf(Explorer activeExplorer)
         {
             var df = DfDeedle.GetEmailDataInView(activeExplorer);
@@ -267,14 +320,14 @@ namespace QuickFiler.Controllers
 
             if (df is not null)
             {
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
                 // Filter out non-email items
                 df = df.FilterRowsBy("MessageClass", "IPM.Note");
 
                 // Filter to the latest email in each conversation
                 var dfFiltered = MostRecentByConversation(df);
 
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
                 // Sort by triage classification and then date
                 _frame = SortTriageDate(dfFiltered);
 
@@ -286,10 +339,10 @@ namespace QuickFiler.Controllers
         {
             Frame<int, string> df = null;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
             var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
             
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
             try
             {
                 df = await DfDeedle.GetEmailDataInViewAsync(
@@ -303,7 +356,7 @@ namespace QuickFiler.Controllers
             }
             catch (TaskCanceledException)
             {
-                logger.Debug($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Task cancelled");
+                //logger.Debug($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Task cancelled");
                 await ToggleOfflineMode(offline);
                 return null;
             }
@@ -374,8 +427,27 @@ namespace QuickFiler.Controllers
             if (_masterQueue.Count < quantity)
                 await WaitForQueue(quantity, _token);
 
-            var nodes = _masterQueue.TryTakeFirst(quantity).ToList();
-            nodes.ForEach(node => _moveMonitor.UnhookItem(node));
+            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            try
+            {
+                if (nodes is not null)
+                {
+                    await Task.Run(async () => 
+                    {
+                        foreach (var node in nodes)
+                        {
+                            await _moveMonitor.UnhookItemAsync(node, _token);
+                        }
+                    }, _token);                    
+                }
+                
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Error unhooking items from move monitor", e);
+                throw;
+            }
+            
             
             return nodes;
         }
@@ -399,10 +471,20 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
-        void Application_NewMailEx(string EntryIDCollection)
+        void Application_NewMailEx(string entryID)
         {
-            MailItem newMail = (MailItem)_globals.Ol.App.Session.GetItemFromID(EntryIDCollection, System.Reflection.Missing.Value);
-            _masterQueue.AddFirst(newMail);
+            //var item = _globals.Ol.App.Session.GetItemFromID(entryID, System.Reflection.Missing.Value);
+            try
+            {
+                var item = _globals.Ol.App.Session.GetItemFromID(entryID) as MailItem;
+                if (item is not null) { _masterQueue.AddFirst(item); }
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            
+            
         }
 
         #endregion Event Handlers

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 [assembly: InternalsVisibleTo("UtilitiesCS.Test")]
 namespace UtilitiesCS
 {
+    [Obsolete]
     public static class OlItemSummary
     {
         [Flags]
@@ -21,6 +22,8 @@ namespace UtilitiesCS
             All = 7,
             Folderpath = 8
         }
+
+        [Obsolete]
         public static string Extract(object Item, Details Flags) 
         {
             if (Item is AppointmentItem) { return ExtractSummary((AppointmentItem)Item).ToString(Flags); }
@@ -36,6 +39,7 @@ namespace UtilitiesCS
             return String.Join(", ",Dict.Where(x => Flags.HasFlag(x.Key)).Select(x => $"{x.Key}: {x.Value}"));
         }
 
+        [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(MailItem item)
         {
             MailItem OlMail = MailResolution.TryResolveMailItem(item);
@@ -58,6 +62,7 @@ namespace UtilitiesCS
             //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
         }
 
+        [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(object Item)
         {
             if (Item is AppointmentItem) { return ExtractSummary((AppointmentItem)Item); }
@@ -69,6 +74,7 @@ namespace UtilitiesCS
             //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
         }
 
+        [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(AppointmentItem item)
         {
             return new Dictionary<Details, string>()
@@ -81,6 +87,7 @@ namespace UtilitiesCS
             //return $"Type: {item.GetType()} Subject: {item.Subject} StartsOn: {item.Start.ToString("MM-dd-yyyy h:mm t")}";
         }
 
+        [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(MeetingItem item)
         {
             return new Dictionary<Details, string>()
@@ -93,6 +100,7 @@ namespace UtilitiesCS
             //return $"Type: {item.GetType()} Subject: {item.Subject} SentOn: {item.SentOn.ToString("MM-dd-yyyy h:mm t")}";
         }
 
+        [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(TaskRequestItem item)
         {
             
@@ -106,6 +114,7 @@ namespace UtilitiesCS
             //AppointmentItem, MeetingItem, TaskRequestItem, TaskRequestUpdateItem
         }
 
+        [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(TaskRequestUpdateItem item)
         {
             return new Dictionary<Details, string>()

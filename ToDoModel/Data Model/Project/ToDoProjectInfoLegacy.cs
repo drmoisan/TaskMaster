@@ -13,7 +13,7 @@ namespace ToDoModel.Legacy
 {
 
     [Serializable()]
-    public class ProjectInfoLegacy : List<IToDoProjectInfoEntry>, IProjectInfoLegacy
+    public class ProjectInfoLegacy : List<IProjectEntry>, IProjectInfoLegacy
     {
         public string FileName = "";
 
@@ -71,7 +71,7 @@ namespace ToDoModel.Legacy
 
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProjectName(string projectName)
+        public List<IProjectEntry> Find_ByProjectName(string projectName)
         {
             return this.Where(x => x.ProjectName.ToLower() == projectName.ToLower()).ToList();
         }
@@ -81,7 +81,7 @@ namespace ToDoModel.Legacy
             return base.FindIndex(x => x.ProjectID == projectID) != -1;
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProjectID(string projectID)
+        public List<IProjectEntry> Find_ByProjectID(string projectID)
         {
             return this.Where(x => x.ProjectID == projectID).ToList();
         }
@@ -91,7 +91,7 @@ namespace ToDoModel.Legacy
             return base.FindIndex(x => x.ProgramName.ToLower() == programName.ToLower()) != -1;
         }
 
-        public List<IToDoProjectInfoEntry> Find_ByProgramName(string programName)
+        public List<IProjectEntry> Find_ByProgramName(string programName)
         {
             return this.Where(x => x.ProgramName.ToLower() == programName.ToLower()).ToList();
         }

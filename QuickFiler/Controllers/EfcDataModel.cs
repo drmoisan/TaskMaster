@@ -10,97 +10,213 @@ using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Helper_Classes;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.Extensions;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
+using System.Net.Mail;
 
 namespace QuickFiler.Controllers
 {
     internal class EfcDataModel
     {
-        public EfcDataModel(IApplicationGlobals appGlobals, MailItem mail, CancellationTokenSource tokenSource, CancellationToken token)
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        #region Constructors and Initializers
+
+        public EfcDataModel(IApplicationGlobals globals, MailItem mail, CancellationTokenSource tokenSource, CancellationToken token)
         {
-            _globals = appGlobals;
-            _token = token;
-            _mail = mail;
+            Globals = globals;
+            Token = token;
+            TokenSource = tokenSource;
+            Mail = mail ?? TryGetFirstInSelection();
             if (Mail is not null)
             {
-                _conversationResolver = new ConversationResolver(_globals, Mail, tokenSource, token);
+                ConversationResolver = new ConversationResolver(Globals, Mail, TokenSource, Token);
                 _conversationResolver.Df = _conversationResolver.LoadDf(); // Load Synchronously
-                //_ = Task.Run(async ()=> _conversationResolver.ConversationItems = await _conversationResolver.ResolveItemsAsync(dfConvExp));
+                
             }
         }
 
+        private EfcDataModel(IApplicationGlobals globals, MailItem mail)
+        {
+            Globals = globals;
+            Mail = mail;
+        }
+
+        public async static Task<EfcDataModel> CreateAsync(
+            IApplicationGlobals globals, 
+            IList<MailItem> mailItems, 
+            CancellationTokenSource tokenSource, 
+            CancellationToken token, 
+            bool loadAll)
+        {
+            globals.ThrowIfNull(nameof(globals));
+            mailItems.ThrowIfNullOrEmpty(nameof(mailItems));
+
+            
+            var dataModel = new EfcDataModel(globals, mailItems[0]);
+            if (mailItems.Count() > 1)
+            {
+                dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mailItems, tokenSource, token);
+                dataModel.ConversationResolver.Parent = dataModel;
+            }
+            else
+            {
+                dataModel.ConversationResolver = await ConversationResolver.LoadAsync(globals, mailItems[0], tokenSource, token, loadAll);
+                dataModel.ConversationResolver.Parent = dataModel;
+            }
+            
+            return dataModel;
+        }
+
+
+        #endregion Constructors and Initializers
+
+        #region Public Properties
+
         private IApplicationGlobals _globals;
+        public IApplicationGlobals Globals { get => _globals; protected set => _globals = value; }
+
         private CancellationToken _token;
-        
+        public CancellationToken Token { get => _token; protected set => _token = value; }
+
+        private CancellationTokenSource _tokenSource;
+        public CancellationTokenSource TokenSource { get => _tokenSource; protected set => _tokenSource = value; }
+
         private OlFolderHelper _folderHelper;
-        public OlFolderHelper FolderHelper { get => _folderHelper; }
+        public OlFolderHelper FolderHelper 
+        {
+            get 
+            { 
+                //_folderHelper ??= new OlFolderHelper(Globals, MailInfo, OlFolderHelper.InitOptions.FromField);
+                return _folderHelper; 
+            }
+            protected set => _folderHelper = value;
+        }
         async public Task InitFolderHandlerAsync(object folderList = null)
         {
             if (folderList is null)
             {
-                _folderHelper = await Task.Run(() => new OlFolderHelper(
-                    _globals, _mail, OlFolderHelper.InitOptions.FromField), _token);
+                if (MailInfo is null) 
+                {
+                    FolderHelper = await Task.Run(() => new OlFolderHelper(Globals), Token);
+                }
+                else
+                {
+                    FolderHelper = await Task.Run(async () => await new OlFolderHelper(
+                        Globals, MailInfo, OlFolderHelper.InitOptions.FromField)
+                        .InitAsync(MailInfo, OlFolderHelper.InitOptions.FromField), Token);
+                }
             }
             else
             {
-                _folderHelper = await Task.Run(() => new OlFolderHelper(
-                    _globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString), _token);
+                FolderHelper = await Task.Run(async () => await new OlFolderHelper(
+                    Globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString)
+                    .InitAsync(folderList, OlFolderHelper.InitOptions.FromArrayOrString), Token);
             }
         }
 
         ConversationResolver _conversationResolver;
-        public ConversationResolver ConversationResolver { get => _conversationResolver; }
+        public ConversationResolver ConversationResolver { get => _conversationResolver; protected set => _conversationResolver = value; }
 
         private MailItem _mail;
         public MailItem Mail
         {
             get
             {
-                if (_mail is null)
-                    _mail = _globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+                _mail ??= TryGetFirstInSelection();
                 return _mail;
             }
             set => _mail = value;
         }
+                
+        public MailItemHelper MailInfo => ConversationResolver?.MailInfo;
 
-        private MailItemHelper _mailInfo;
-        public MailItemHelper MailInfo
+        private MailItem TryGetFirstInSelection() 
         {
-            get
+            try
             {
-                if (_mailInfo is null && Mail is not null)
+                var selection = _globals.Ol.App.ActiveExplorer().Selection;
+                if ((selection?.Count ?? 0) > 0)
                 {
-                    _mailInfo = new MailItemHelper(Mail);
-                    _mailInfo.LoadPriority(_globals, _token);
+                    return selection[1] as MailItem;
                 }
-                return _mailInfo;
+                else { return null; }
+            }
+            catch (System.Exception)
+            {
+                return null;
             }
         }
 
-        async public Task MoveToFolder(string folderpath, 
+        #endregion Public Properties
+
+        #region Public Methods
+
+        async public Task MoveToFolderAsync(string folderpath, 
                                        bool saveAttachments,
                                        bool saveEmail,
                                        bool savePictures,
                                        bool moveConversation)
         {
-            if (Mail is not null)
+            if (MailInfo is not null)
             {
-                IList<MailItem> items = PackageItems(moveConversation);
-                bool attchments = (folderpath != "Trash to Delete") ? saveAttachments : false;
+                
+                bool attachments = (folderpath != "Trash to Delete") ? saveAttachments : false;
+                var mailHelpers = moveConversation ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper>() { MailInfo };
 
-                //LoadCTFANDSubjectsANDRecents.Load_CTF_AND_Subjects_AND_Recents();
-                await SortEmail.SortAsync(mailItems: items,
-                                         savePictures: savePictures,
-                                         destinationOlStem: folderpath,
-                                         saveMsg: saveEmail,
-                                         saveAttachments: attchments,
-                                         removePreviousFsFiles: false,
-                                         appGlobals: _globals,
-                                         olAncestor: _globals.Ol.ArchiveRootPath,
-                                         fsAncestorEquivalent: _globals.FS.FldrRoot);
+                if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot)) 
+                {
+                    logger.Debug($"Cannot sort without OneDrive location");
+                    return;
+                }
+                var config = new EmailFilerConfig()
+                {
+                    SaveMsg = saveEmail,
+                    SaveAttachments = attachments,
+                    SavePictures = savePictures,
+                    DestinationOlStem = folderpath,
+                    Globals = Globals,
+                    OlAncestor = Globals.Ol.ArchiveRootPath,
+                    FsAncestorEquivalent = folderRoot,
+                };
+            
+                var sorter = new EmailFiler(config);
+                await sorter.SortAsync(mailHelpers);
+
                 SortEmail.Cleanup_Files();
-                // blDoMove
             }
-            //stackMovedItems.Push(grp.MailItem);
+        }
+
+        internal async Task OpenOlFolderAsync(string folderpath)
+        {
+            if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return; }
+              
+            var config = new EmailFilerConfig()
+            {
+                DestinationOlStem = folderpath,
+                Globals = Globals,
+                OlAncestor = Globals.Ol.ArchiveRootPath,
+                FsAncestorEquivalent = oneDrive,
+            };
+
+            var sorter = new EmailFiler(config);
+            await sorter.OpenOlFolderAsync();
+        }
+
+        internal async Task OpenFsFolderAsync(string folderpath)
+        {
+            if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return; }
+            var config = new EmailFilerConfig()
+            {
+                DestinationOlStem = folderpath,
+                Globals = Globals,
+                OlAncestor = Globals.Ol.ArchiveRootPath,
+                FsAncestorEquivalent = oneDrive
+            };
+
+            var sorter = new EmailFiler(config);
+            await sorter.OpenFileSystemFolderAsync();
         }
 
         async public Task MoveToFolder(MAPIFolder folder,
@@ -115,7 +231,7 @@ namespace QuickFiler.Controllers
             {
                 folderpath = folderpath.Substring(1);
             }
-            await MoveToFolder(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
+            await MoveToFolderAsync(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
         }
 
         public IList<MailItem> PackageItems(bool moveConversation)
@@ -140,9 +256,12 @@ namespace QuickFiler.Controllers
 
         public void RefreshSuggestions()
         {
-            _folderHelper.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
-            _folderHelper.RefreshSuggestions(mailItem: Mail, topNfolderKeys: 1);
+            //_folderHelper.Suggestions.Vlog.SetVerbose(new List<string> { "RefreshSuggestions","AddWordSequenceSuggestions" });
+            _folderHelper.RefreshSuggestions(mailItem: Mail);
         }
+                
+
+        #endregion Public Methods
 
     }
 }

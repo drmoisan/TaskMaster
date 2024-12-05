@@ -15,7 +15,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-    public class FlagDetails : INotifyCollectionChanged
+    public class FlagDetails : INotifyCollectionChanged, ICloneable
     {
         #region Constructors and Initializers
 
@@ -35,6 +35,9 @@ namespace UtilitiesCS
         #endregion
 
         #region Public Properties
+
+        private string identifier = "not set";
+        public string Identifier { get => identifier; set => identifier = value; }
 
         private ObservableCollection<string> _list = new();
         public ObservableCollection<string> List
@@ -60,9 +63,10 @@ namespace UtilitiesCS
                     if (!_list.SequenceEqual(temp))
                     {
                         Unsubscribe();
+                        var oldValue = _list;
                         _list = value;
                         Subscribe();
-                        List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                        List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,oldValue, value));
                     }
                 }
             }
@@ -140,8 +144,36 @@ namespace UtilitiesCS
 
         #endregion
 
+        #region IClonable
 
-       
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public FlagDetails DeepCopy()
+        {
+            lock (this)
+            {
+                return DeepCopyInternal();
+            }            
+        }
+
+        private FlagDetails DeepCopyInternal() 
+        {
+            Unsubscribe();
+            UnsubscribeWithPrefix();
+            var clone = (FlagDetails)MemberwiseClone();
+            clone._list = new ObservableCollection<string>(_list);
+            clone._listWithPrefix = new ObservableCollection<string>(_listWithPrefix);
+            Subscribe();
+            SubscribeWithPrefix();
+            clone.Subscribe();
+            clone.SubscribeWithPrefix();
+            return clone;
+        }
+
+        #endregion IClonable
 
     }
 }

@@ -10,10 +10,12 @@ using Microsoft.VisualBasic;
 
 namespace UtilitiesCS
 {
-    public class FilePathHelper: INotifyPropertyChanged
+    public class FilePathHelper: INotifyPropertyChanged, ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        #region Constructors
 
         public FilePathHelper() { PropertyChanged += FilePathHelper_PropertyChanged; }
 
@@ -42,6 +44,10 @@ namespace UtilitiesCS
             return fph;
         }
 
+        #endregion Constructors
+
+        #region Public Properties
+
         private string _filePath = "";
         public string FilePath { get => _filePath; set { _filePath = value; NotifyPropertyChanged(); } }
         
@@ -64,6 +70,41 @@ namespace UtilitiesCS
         public string FileExtension { get => _fileExtension; set { _fileExtension = value; NotifyPropertyChanged(); } }
 
         public const int MAX_PATH = 256;
+
+        #endregion Public Properties
+
+        #region Public Methods
+
+        public virtual bool Exists()
+        {
+            if(FilePath.IsNullOrEmpty())
+                return false;
+            try
+            {
+                return File.Exists(FilePath);
+            }
+            catch (Exception e)
+            {
+                logger.Error($"{e.StackTrace}\n{e.Message}\nError checking if file exists for FilePath {FilePath}");
+                return false;
+            }
+        }
+
+        public virtual DateTime GetLastWriteTimeUtc()
+        {
+            if (Exists())
+                try
+                {
+                    return File.GetLastWriteTimeUtc(FilePath);
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"{e.StackTrace}\n{e.Message}\nError getting last write time for FilePath {FilePath}");
+                    return default;                    
+                }
+            else
+                return default;
+        }
 
         internal bool StemInitialized()
         {
@@ -196,6 +237,8 @@ namespace UtilitiesCS
             return filepath;
         }
 
+        #endregion Public Methods
+
         #region INotifyPropertyChanged Implementation
 
         private void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
@@ -221,16 +264,24 @@ namespace UtilitiesCS
                     else
                         _filePath = null;
                     break;
+                
                 case "FilePath":
+                    if (_filePath.IsNullOrEmpty())
+                    {
+                        _folderPath = "";
+                        _fileName = "";
+                        return;
+                    }                    
+                    
                     try
                     {
                         _folderPath = Path.GetDirectoryName(_filePath);    
                     }
-                    catch (System.Exception)
+                    catch (System.Exception ex)
                     {
                         var st = string.Join("\n",TraceUtility.GetMyMethodNames(new StackTrace()));
                         string msg = $"FilePath: {_filePath} is invalid.\n{st}";
-                        logger.Error(msg);
+                        logger.Error(msg, ex);
                         throw;
                     }
                     
@@ -266,5 +317,84 @@ namespace UtilitiesCS
         }
 
         #endregion INotifyPropertyChanged Implementation
+
+        #region ICloneable Implementation
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public FilePathHelper DeepCopy()
+        {
+            //var clone = new FilePathHelper();
+            var clone = new FilePathHelper
+            {
+                _folderPath = _folderPath,
+                _fileName = _fileName,
+                _filePath = _filePath,
+                _fileStemSeed = _fileStemSeed,
+                _fileStemSuffix = _fileStemSuffix,
+                _fileStem = _fileStem,
+                _fileExtension = _fileExtension
+            };
+            return clone;
+        }
+
+        public void CopyFrom(FilePathHelper other)
+        {
+            _folderPath = other._folderPath;
+            _fileName = other._fileName;
+            _filePath = other._filePath;
+            _fileStemSeed = other._fileStemSeed;
+            _fileStemSuffix = other._fileStemSuffix;
+            _fileStem = other._fileStem;
+            _fileExtension = other._fileExtension;
+        }
+
+        internal IList<string> CopyChanged(FilePathHelper other)
+        {
+            var changed = new List<string>();
+            if (_folderPath != other._folderPath)
+            {
+                _folderPath = other._folderPath;
+                changed.Add(nameof(FolderPath));
+            }
+
+            if (_fileName != other._fileName)
+            {
+                _fileName = other._fileName;
+                changed.Add(nameof(FileName));
+            }
+            
+            if (_filePath != other._filePath)
+            {
+                _filePath = other._filePath;
+                changed.Add(nameof(FilePath));
+            }
+            if (_fileStemSeed != other._fileStemSeed)
+            {
+                _fileStemSeed = other._fileStemSeed;
+                changed.Add(nameof(FileStemSeed));
+            }
+            if (_fileStemSuffix != other._fileStemSuffix)
+            {
+                _fileStemSuffix = other._fileStemSuffix;
+                changed.Add(nameof(FileStemSuffix));
+            }
+            if (_fileStem != other._fileStem)
+            {
+                _fileStem = other._fileStem;
+                changed.Add(nameof(FileStem));
+            }
+            if (_fileExtension != other._fileExtension)
+            {
+                _fileExtension = other._fileExtension;
+                changed.Add(nameof(FileExtension));
+            }
+            return changed;
+        }
+
+        #endregion ICloneable Implementation
     }
 }

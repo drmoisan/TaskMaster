@@ -57,9 +57,9 @@ namespace UtilitiesCS.EmailIntelligence
         public SegmentStopWatch Sw { get; set;}
         
         public IItemInfo.PlainTextOptionsEnum PlainTextOptions { get; set; }
-        public RecipientInfo Sender { get; set; }
-        public RecipientInfo[] CcRecipients { get; set; }
-        public RecipientInfo[] ToRecipients { get; set; }
+        public IRecipientInfo Sender { get; set; }
+        public IRecipientInfo[] CcRecipients { get; set; }
+        public IRecipientInfo[] ToRecipients { get; set; }
 
         public DateTime SentDate { get; set; }
         public string SentOn { get; set; }

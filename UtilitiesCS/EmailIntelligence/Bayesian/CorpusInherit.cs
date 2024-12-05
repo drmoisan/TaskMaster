@@ -87,7 +87,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             DialogResult response;
             if (askUserOnError)
             {
-                response = MessageBox.Show(
+                response = MyBox.ShowDialog(
                     messageText,
                     "Error",
                     MessageBoxButtons.YesNo,

@@ -12,6 +12,7 @@ using FluentAssertions;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
+    [Obsolete("This class is obsolete. Use BayesianClassifierSharedTests instead")]
     [TestClass]
     public class BayesianClassifierTests
     {
@@ -50,7 +51,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         #region Helper Functions and Classes
 
         private MockRepository mockRepository;
-        private Mock<ClassifierGroupSub> mockClassifierGroup;
+        //private Mock<ClassifierGroupSub> mockClassifierGroup;
         private ClassifierGroupSub classifierGroup;
         private ClassifierGroupSub classifierGroup2;
 
@@ -59,6 +60,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         private ConcurrentDictionary<string, int> sharedTokens, sharedTokens2;
         //private Mock<BayesianClassifier> mockBayesianClassifier;
 
+        [Obsolete]
         private class BayesianClassifierSub: BayesianClassifier
         {
             public BayesianClassifierSub() { }
@@ -79,7 +81,8 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             public new Corpus NotMatch { get => base._notMatch; set => base._notMatch = value; }
 
         }
-        
+
+        [Obsolete]
         public class ClassifierGroupSub: ClassifierGroup
         {
             public ClassifierGroupSub() { }

@@ -1,15 +1,17 @@
 ﻿
+using System.Collections.Concurrent;
+
 namespace UtilitiesCS
 {
     public interface IFileSystemFolderPaths
     {
-        string FldrAppData { get; }
-        string FldrFlow { get; }
-        string FldrMyD { get; }
-        string FldrPreReads { get; }
-        string FldrRoot { get; }
-        string FldrStaging { get; }
-        string FldrPythonStaging { get; }
+        ConcurrentDictionary<string, string> SpecialFolders { get; }
+        //string FldrAppData { get; }
+        //string FldrFlow { get; }
+        //string FldrMyDocuments { get; }
+        //string FldrPreReads { get; }
+        //string FldrOneDrive { get; }
+        //string FldrPythonStaging { get; }
         void Reload();
         IAppStagingFilenames Filenames { get; }
     }

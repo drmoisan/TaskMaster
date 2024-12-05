@@ -25,7 +25,7 @@ namespace UtilitiesCS.Test.Threading
             Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Loose);
             this.mockFileSystemsFolderPaths = this.mockRepository.Create<IFileSystemFolderPaths>();
-            this.mockFileSystemsFolderPaths.SetupGet(x => x.FldrPythonStaging).Returns("Working");
+            //this.mockFileSystemsFolderPaths.SetupGet(x => x.FldrPythonStaging).Returns("Working");
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
             this.mockApplicationGlobals.SetupAllProperties();
             this.mockApplicationGlobals.SetupGet(x => x.FS).Returns(this.mockFileSystemsFolderPaths.Object);

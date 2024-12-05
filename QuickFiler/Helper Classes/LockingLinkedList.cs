@@ -182,7 +182,9 @@ namespace QuickFiler.Helper_Classes
             lock (this)
             {
                 if (n < 1) { return null; }
-                
+                // Take the lesser of n and the number of elements in the list
+                if (n > base.Count) { n = base.Count; }
+
                 var nodes = new T[n];
                 var nAdj = Math.Min(n, base.Count);
                 

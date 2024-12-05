@@ -43,20 +43,60 @@ namespace QuickFiler.Controllers
             _initType = initType;
             _itemViewer = _formViewer.ItemViewer;
             _itemTlp = _formViewer.L0vh_TLP;
-
-            Initialize();
         }
 
-        internal void Initialize()
+        public EfcFormController(
+            IApplicationGlobals globals,
+            EfcViewer formViewer,
+            EfcHomeController homeController,
+            System.Action parentCleanup,
+            QfEnums.InitTypeEnum initType,
+            CancellationToken token)
+        {
+            _token = token;
+            _globals = globals;
+            _parentCleanup = parentCleanup;
+            _formViewer = formViewer;
+            _homeController = homeController;
+            _initType = initType;
+            _itemViewer = _formViewer.ItemViewer;
+            _itemController = new EfcItemController(globals, homeController, this, _itemViewer, token);
+            _itemTlp = _formViewer.L0vh_TLP;
+        }
+
+        private EfcFormController() { }
+
+        internal EfcFormController Initialize()
         {
             LoadUserSettings();
             CaptureConfigureItemViewer();
+            ConfigureFind();
             ResolveControlGroups();
             _itemController = new EfcItemController(_globals, _homeController, this, _itemViewer, _dataModel, _token);
             SetupThemes();
             WireEventHandlers();
             _ = PopulateFolderCombobox();
+            return this;
+        }
 
+        internal EfcFormController InitializeWithoutData()
+        {
+            LoadUserSettings();
+            CaptureConfigureItemViewer();
+            ConfigureFind();
+            ResolveControlGroups();
+            _itemController.InitializeWithoutData();
+            SetupThemes();
+            WireEventHandlers();
+            return this;
+        }
+
+        internal EfcFormController InitializeDataFields(EfcDataModel dataModel)
+        {
+            _dataModel = dataModel;
+            _itemController.InitializeDataFields(dataModel);
+            _ = PopulateFolderCombobox();
+            return this;
         }
 
         #endregion Constructors
@@ -94,12 +134,19 @@ namespace QuickFiler.Controllers
 
         internal void CaptureConfigureItemViewer()
         {
+            var explorerSize = _globals.Ol.GetExplorerScreenSize();
             _tlpHeightExpanded = (int)Math.Round(_itemTlp.RowStyles[1].Height, 0);
             var heightDiff = _tlpHeightExpanded - _itemViewer.Height;
             _tlpHeightCollapsed = _itemViewer.MinimumSize.Height + heightDiff;
             _tlpHeightDiff = _tlpHeightExpanded - _tlpHeightCollapsed;
             _itemViewerTlpRow = _itemTlp.GetPositionFromControl(_itemViewer).Row;
             ToggleExpansionStyle(Enums.ToggleState.Off);
+            var itemTlpRows = _itemViewer.L0vh_Tlp.RowStyles.Cast<RowStyle>().Take(5);
+            var bodyRow = itemTlpRows.ElementAt(4);
+            var bodyRowHeight = _tlpHeightCollapsed - itemTlpRows.Select(x => x.Height).Sum(x => x) + bodyRow.Height;
+            bodyRow.Height = bodyRowHeight;
+            _formViewer.MinimumSize = new Size((int)(explorerSize.Width * 0.75), (int)(explorerSize.Height * 0.75));
+            _formViewer.Size = _formViewer.MinimumSize;
         }
         
         public void Cleanup()
@@ -111,6 +158,17 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
+        public void ConfigureFind() 
+        { 
+            if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
+            {
+                _formViewer.Text = "Quick Filer - Find Folder";
+                _formViewer.Ok.Text = "Open Outlook Folder";
+                _formViewer.NewFolder.Text = "Open File System Folder";
+
+            }
+        }
+        
         internal void ResolveControlGroups()
         {
             _listTipsDetails = _formViewer.TipsLabels
@@ -228,6 +286,15 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
+        internal void RegisterAlwaysOnAsyncKeyActions()
+        {
+            _formViewer.KeyboardHandler.AlwaysOnKeyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>(
+                new List<KaKeyAsync>
+                {
+                    new KaKeyAsync("Collection", Keys.Return, (k) => ActionOkAsync())
+                });
+        }
+        
         public void WireEventHandlers()
         {
             //_homeController.KeyboardHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
@@ -246,15 +313,30 @@ namespace QuickFiler.Controllers
             _formViewer.SavePicturesMenuItem.CheckedChanged += SavePictures_CheckedChanged;
             _formViewer.ConversationMenuItem.CheckedChanged += MoveConversation_CheckedChanged;
             _formViewer.Ok.Click += ButtonOK_Click;
+            RegisterAlwaysOnAsyncKeyActions();
+            _formViewer.FolderListBox.KeyDown += FolderListBox_KeyDown;
             _formViewer.Cancel.Click += ButtonCancel_Click;
             _formViewer.RefreshPredicted.Click += ButtonRefresh_Click;
             _formViewer.NewFolder.Click += ButtonCreate_Click;
             _formViewer.BtnDelItem.Click += ButtonDelete_Click;
             _formViewer.SearchText.TextChanged += SearchText_TextChanged;
+            _formViewer.SearchText.KeyDown += SearchText_DownArrow;
             _formViewer.EditFiltersMenuItem.Click += EditFiltersMenuItem_Click;
             _globals.Ol.PropertyChanged += DarkMode_Changed;
         }
                
+        public void SearchText_DownArrow(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down) { _formViewer.FolderListBox.Select(); }
+        }
+
+        public void FolderListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up && _formViewer.FolderListBox.SelectedIndex == 0) { _formViewer.SearchText.Select(); }
+            else if (e.KeyCode == Keys.Left) { }
+            else if (e.KeyCode == Keys.Right) { }
+        }
+        
         async public void ButtonCancel_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
@@ -284,18 +366,28 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
-                        
             if (!IsValidSelection)
             {
                 MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
             }
-            else 
+            else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find)) 
             {
+                await _homeController.OpenFsFolderAsync(SelectedFolder);
+                
+                _formViewer.Close();
+                Cleanup();
+            }
+            else
+            {
+                if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+                {
+                    logger.Debug($"Cannot create folder without OneDrive location");
+                    return;
+                }
                 var folder = (await _dataModel.FolderHelper.CreateFolderAsync(
-                    SelectedFolder, 
-                    _globals.Ol.ArchiveRootPath, 
-                    _globals.FS.FldrRoot, 
+                    SelectedFolder,
+                    _globals.Ol.ArchiveRootPath,
+                    folderRoot,
                     Token)) as MAPIFolder;
 
                 if (folder is not null)
@@ -343,7 +435,7 @@ namespace QuickFiler.Controllers
         private void SearchText_TextChanged(object sender, EventArgs e)
         {
             _formViewer.FolderListBox.DataSource = _dataModel.FindMatches(_formViewer.SearchText.Text);
-            if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
+            if (_formViewer.FolderListBox.Items.Count > 1) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }
 
         public void EditFiltersMenuItem_Click(object sender, EventArgs e)
@@ -402,10 +494,6 @@ namespace QuickFiler.Controllers
             {
                 new KaChar("Controller", 'S', async (x) => await JumpToAsync(_formViewer.SearchText)),
                 new KaChar("Controller", 'F', async (x) => await JumpToAsync(_formViewer.FolderListBox)),
-                //new KaChar("Controller", 'A', async (x) => await ToggleCheckboxAsync(_formViewer.SaveAttachments)),
-                //new KaChar("Controller", 'M', async (x) => await ToggleCheckboxAsync(_formViewer.SaveEmail)),
-                //new KaChar("Controller", 'P', async (x) => await ToggleCheckboxAsync(_formViewer.SavePictures)),
-                //new KaChar("Controller", 'C', async (x) => await ToggleCheckboxAsync(_formViewer.MoveConversation)),
                 new KaChar("Controller", 'K', async (x) => await KbdExecuteAsync(ActionOkAsync)),
                 new KaChar("Controller", 'X', async (x) => await KbdExecuteAsync(ActionCancelAsync)),
                 new KaChar("Controller", 'R', async (x) => await KbdExecuteAsync(RefreshSuggestionsAsync)),
@@ -431,12 +519,32 @@ namespace QuickFiler.Controllers
 
         async public Task ActionOkAsync()
         {
-            await _formViewer.UiSyncContext;
-            _formViewer.Hide();
-            await _homeController.ExecuteMoves().ConfigureAwait(false);
-            await _formViewer.UiSyncContext;
-            _formViewer.Dispose();
-            Cleanup();
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+
+            if (((string)_formViewer.FolderListBox.SelectedItem).StartsWith("===="))
+            {
+                MessageBox.Show("Please select a valid folder.");
+                return;
+            }
+            else
+            {
+                _formViewer.Hide();
+                if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort)) 
+                { 
+                    await _homeController.ExecuteMovesAsync();
+                }
+                else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
+                {
+                    await _homeController.OpenOlFolderAsync(SelectedFolder);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+                _formViewer.Dispose();
+                Cleanup();
+            }
         }
 
         async public Task ActionCancelAsync()
@@ -458,22 +566,25 @@ namespace QuickFiler.Controllers
         }
 
         async public Task CreateFolderAsync()
-        {
-            if (_initType == QfEnums.InitTypeEnum.Find) { throw new NotImplementedException(); }
-
+        {            
             if (!IsValidSelection)
             {
-                MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
+                MessageBox.Show("Please select a valid folder");
+            }
+            else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find)) 
+            {
+                await _homeController.OpenFsFolderAsync(SelectedFolder);
             }
             else
             {
                 await _formViewer.UiSyncContext;
                 _formViewer.Hide();
+                if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return;  }
                 var folder = await Task.FromResult(_dataModel
                                                    .FolderHelper
                                                    .CreateFolder(SelectedFolder,
                                                                  _globals.Ol.ArchiveRootPath,
-                                                                 _globals.FS.FldrRoot)).ConfigureAwait(false);
+                                                                 oneDrive)).ConfigureAwait(false);
                 if (folder is not null)
                 {
                     await _dataModel.MoveToFolder(folder,
@@ -601,7 +712,6 @@ namespace QuickFiler.Controllers
             //    await tip.ToggleAsync(desiredState, shareColumn: true);
             //}
         }
-
 
         internal void LoadUserSettings()
         {

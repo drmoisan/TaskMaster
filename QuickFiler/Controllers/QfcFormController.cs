@@ -15,11 +15,13 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Collections.Concurrent;
+using log4net.Repository.Hierarchy;
 
 namespace QuickFiler.Controllers
 {    
     internal class QfcFormController : IFilerFormController
     {
+        
         #region Contructors
 
         public QfcFormController(IApplicationGlobals appGlobals,
@@ -50,7 +52,7 @@ namespace QuickFiler.Controllers
             RemoveTemplatesAndSetupTlp();
             SetupLightDark();
             RegisterFormEventHandlers();
-            _undoConsumerTask = Task.Run(UndoConsumer);
+            //_undoConsumerTask = Task.Run(UndoConsumer);
         }
 
         #endregion
@@ -67,7 +69,7 @@ namespace QuickFiler.Controllers
         
         private Padding _itemMarginTemplate;
         private QfEnums.InitTypeEnum _initType;
-        private bool _blRunningModalCode = false;
+        //private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
         private QfcHomeController _parent;
         private delegate Task WriteMetricsDelegate(string filename);
@@ -326,7 +328,7 @@ namespace QuickFiler.Controllers
 
         async public Task ActionOkAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             if (!_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
@@ -335,25 +337,26 @@ namespace QuickFiler.Controllers
                     $"implemented for {nameof(_initType)} {_initType}");
             }
             
-            else if (_blRunningModalCode)
-            {
-                MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            //else if (_blRunningModalCode)
+            //{
+            //    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
             else if (_groups.ReadyForMove)
             {
-                _blRunningModalCode = true;
+                //_blRunningModalCode = true;
                 
                 if (_parent.KeyboardHandler.KbdActive) { _parent.KeyboardHandler.ToggleKeyboardDialog(); }
+                
                 await MoveAndIterate();
                 
-                _blRunningModalCode = false;
+                //_blRunningModalCode = false;
             }
 
         }
 
         private async Task LoadUiFromQueue() 
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
             
             (var tlp, var itemGroups) = await _qfcQueue.TryDequeueAsync(Token, 4000);
             LoadItems(tlp, itemGroups);
@@ -362,7 +365,7 @@ namespace QuickFiler.Controllers
         
         private async Task MoveAndIterate()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
             {
@@ -372,17 +375,20 @@ namespace QuickFiler.Controllers
                 try
                 {
                     await LoadUiFromQueue();
+                    await _parent.IterateQueueAsync();
                 }
                 catch (System.Exception e)
                 {
                     await moveTask;
-                    throw e;
+                    log.Error(e.Message, e);
+                    log.Debug("Shutting down QuickFiler");
+                    await ActionCancelAsync();
                 }
-                
-                var iterate = _parent.IterateQueueAsync();
+
+                //var iterate = _parent.IterateQueueAsync();
                 
                 await moveTask;
-                await iterate;
+                //await iterate;
             }
             else if (_formViewer.Worker.IsBusy)
             {
@@ -390,18 +396,31 @@ namespace QuickFiler.Controllers
             }
             else
             {
+                // Either end of email database or error loading queue
                 _groups.CacheMoveObjects();
                 _parent.SwapStopWatch();
-                var moveTask = BackGroundMoveAsync();
-                MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                await moveTask;
-                await ActionCancelAsync();
+                await BackGroundMoveAsync();
+                
+                // If DataModel is not Complete then an error happened loading the queue
+                if (!_parent.DataModel.Complete)
+                {
+                    // Since most common error is cross-thread error, we will try to load the queue again using the Ui Dispatcher
+                    await UiThread.Dispatcher.InvokeAsync(_parent.IterateQueueAsync);
+                }
+
+                // We have reached the end of the email database
+                else
+                {
+                    MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await ActionCancelAsync();
+                }
+                                
             }
         }
 
         internal async Task BackGroundMoveAsync()
         {
-            TraceUtility.LogMethodCall();
+            //TraceUtility.LogMethodCall();
 
             // Move emails
             await _groups.MoveEmailsAsync(_movedItems);
@@ -495,7 +514,11 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null) 
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
             
+            _formViewer.L1v1L2h5_BtnSkip.Enabled = false;
+            _formViewer.L1v1L2h5_BtnSkip.Text = "Skipping...";
             await SkipGroupAsync();
+            _formViewer.L1v1L2h5_BtnSkip.Text = "Skip Group";
+            _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
         }
 
         async public Task SkipGroupAsync()
@@ -553,7 +576,7 @@ namespace QuickFiler.Controllers
                                                   tokenSource: TokenSource,
                                                   token: Token,
                                                   _states);
-            await _groups.LoadControlsAndHandlersAsync_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+            await _groups.LoadControlsAndHandlers_01Async(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
         /// <summary>
@@ -574,6 +597,7 @@ namespace QuickFiler.Controllers
 
         internal void UndoDialog()
         {
+            _undoConsumerTask ??= Task.Run(UndoConsumer);
             var olApp = _globals.Ol.App;
             DialogResult repeatResponse = DialogResult.Yes;
             var i = 0;
@@ -602,17 +626,24 @@ namespace QuickFiler.Controllers
 
         internal async Task UndoConsumer()
         {
-            while (!_undoQueue.IsCompleted)
+            var sw = new Stopwatch();
+            sw.Start();
+            bool exit = false;
+            while (!_undoQueue.IsCompleted || exit)
             {
-                if (_undoQueue.TryTake(out var item)) 
-                { 
+                if (_undoQueue.TryTake(out var item))
+                {
+                    var helper = await MailItemHelper.FromMailItemAsync(item.MailItem, _globals, default, true);
+                    (await _globals.AF.Manager["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                     var mail = item.UndoMove();
                     await UiThread.Dispatcher.InvokeAsync(
-                        () => _groups.AddItemGroup(mail), 
+                        () => _groups.AddItemGroup(mail),
                         System.Windows.Threading.DispatcherPriority.ContextIdle);
                 }
+                else if (sw.ElapsedMilliseconds > 10000) { exit = true; }
                 else { await Task.Delay(200); }
             }
+            if (exit) { _undoConsumerTask = null;  }
         }
 
         // TODO: Implement Viewer_Activate

@@ -54,17 +54,36 @@ namespace UtilitiesCS
             viewer.TextMessage.Text = Message;
             viewer.SetDialogIcon(icon);
             viewer.Hide();
+            viewer.TopMost = true;
             DialogResult result = viewer.ShowDialog();
             return result;
         }
 
+        public static DialogResult ShowDialog(MyBoxViewer viewer, string Message, string Title, MessageBoxIcon icon, IList<ActionButton> actionButtons)
+        {
+            viewer.Show();
+            ReplaceButtons(viewer, actionButtons);
+            viewer.Text = Title;
+            viewer.TextMessage.Text = Message;
+            viewer.SetDialogIcon(icon);
+            viewer.Hide();
+            viewer.TopMost = true;
+            DialogResult result = viewer.ShowDialog();
+            return result;
+        }
+
+        public static DialogResult ShowDialog(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon) 
+        {
+            var actionButtons = GetStandardButtons(buttons);
+            using MyBoxViewer viewer = new();
+            return ShowDialog(viewer, message, title, icon, actionButtons);
+        }
+
         public static DialogResult ShowDialog(string message, string title, BoxIcon icon, Dictionary<string, Action> actions)
         {
-            using (MyBoxViewer viewer = new MyBoxViewer())
-            {
-                var actionButtons = actions.ToActionButtons(viewer);
-                return ShowDialog(viewer, message, title, icon, actionButtons);
-            }
+            using MyBoxViewer viewer = new();
+            var actionButtons = actions.ToActionButtons(viewer);
+            return ShowDialog(viewer, message, title, icon, actionButtons);
         }
         
         internal static void ReplaceButtons(MyBoxViewer viewer, IList<ActionButton> actionButtons)
@@ -127,6 +146,33 @@ namespace UtilitiesCS
             tlp.Controls.Add(actionButton.Button, tlp.ColumnCount - 2, 0);
         }
 
+        private static void SetDialogIcon(this MyBoxViewer viewer, MessageBoxIcon icon)
+        {
+            switch (icon)
+            {
+                case MessageBoxIcon.None:
+                    viewer.SvgIcon.Visible = false;
+                    break;
+                case MessageBoxIcon.Error:
+                    viewer.SvgIcon.Image = SystemIcons.Error.ToBitmap();
+                    break;
+                case MessageBoxIcon.Warning:
+                    // Same as MessageBoxIcon.Exclamation
+                    viewer.SvgIcon.Image = SystemIcons.Warning.ToBitmap();
+                    break;
+                case MessageBoxIcon.Question:
+                    viewer.SvgIcon.Image = SystemIcons.Question.ToBitmap();
+                    break;
+                case MessageBoxIcon.Information:
+                    // Same as MessageBoxIcon.Asterisk
+                    viewer.SvgIcon.Image = SystemIcons.Information.ToBitmap();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
         private static void SetDialogIcon(this MyBoxViewer viewer, BoxIcon icon)
         {
             switch (icon)
@@ -145,6 +191,57 @@ namespace UtilitiesCS
                     break;
                 default: break;
             }
+        }
+
+        internal static IList<ActionButton> GetStandardButtons(MessageBoxButtons buttons)
+        {
+            List<ActionButton> actionButtons = [];
+            switch (buttons) 
+            { 
+                case MessageBoxButtons.OK:
+                    actionButtons = [new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { })];
+                    break;
+                case MessageBoxButtons.OKCancel:
+                    actionButtons = 
+                        [
+                            new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { }),
+                            new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { })
+                        ];
+                    break;
+                case MessageBoxButtons.AbortRetryIgnore:
+                    actionButtons =
+                        [
+                            new ActionButton("ButtonAbort", "Abort", DialogResult.Abort, () => { }),
+                            new ActionButton("ButtonRetry", "Retry", DialogResult.Retry, () => { }),
+                            new ActionButton("ButtonIgnore", "Ignore", DialogResult.Ignore, () => { })
+                        ];
+                    break;
+                case MessageBoxButtons.YesNoCancel:
+                    actionButtons =
+                        [
+                            new ActionButton("ButtonYes", "Yes", DialogResult.Yes, () => { }),
+                            new ActionButton("ButtonNo", "No", DialogResult.No, () => { }),
+                            new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { })
+                        ];
+                    break;
+                case MessageBoxButtons.YesNo:
+                    actionButtons =
+                        [
+                            new ActionButton("ButtonYes", "Yes", DialogResult.Yes, () => { }),
+                            new ActionButton("ButtonNo", "No", DialogResult.No, () => { }),
+                        ];
+                    break;
+                case MessageBoxButtons.RetryCancel:
+                    actionButtons =
+                        [
+                            new ActionButton("ButtonRetry", "Retry", DialogResult.Yes, () => { }),
+                            new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { })
+                        ];
+                    break;
+                default:
+                    break;
+            }
+            return actionButtons;
         }
 
     }

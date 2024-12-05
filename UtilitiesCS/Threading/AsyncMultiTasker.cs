@@ -49,12 +49,12 @@ namespace UtilitiesCS.Threading
                         }
                         catch (OperationCanceledException)
                         {
-                            logger.Debug("Request to cancel task was received");
+                            logger.Info("Request to cancel task was received");
                             break;
                         }
                         catch (System.Exception e)
                         {
-                            logger.Debug($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
+                            logger.Error($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
                         }
                     }
                 },
@@ -92,7 +92,7 @@ namespace UtilitiesCS.Threading
             }
             catch (TaskCanceledException)
             {
-                logger.Debug("Request to cancel task was received");
+                //logger.Debug("Request to cancel task was received");
                 timer.StopTimer();
                 timer.Dispose();
                 throw;
@@ -122,7 +122,7 @@ namespace UtilitiesCS.Threading
             int complete = 0;
 
             int chunkNum = Environment.ProcessorCount - 2;
-            int chunkSize = count / chunkNum;
+            int chunkSize = Math.Max(1,count / chunkNum);
 
             var chunks = obj.Chunk(chunkSize).ToArray();
             // temp override to test
@@ -144,12 +144,12 @@ namespace UtilitiesCS.Threading
                         }
                         catch (OperationCanceledException)
                         {
-                            logger.Debug("Request to cancel task was received");
+                            logger.Info("Request to cancel task was received");
                             break;
                         }
                         catch (System.Exception e)
                         {
-                            logger.Debug($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
+                            logger.Error($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
                         }
                     }
                 },
@@ -179,7 +179,7 @@ namespace UtilitiesCS.Threading
             }
             catch (TaskCanceledException)
             {
-                logger.Debug("Request to cancel task was received");
+                //logger.Debug("Request to cancel task was received");
             }
             catch (System.Exception e)
             {                
@@ -228,12 +228,12 @@ namespace UtilitiesCS.Threading
                         }
                         catch (OperationCanceledException)
                         {
-                            logger.Debug("Request to cancel task was received");
+                            logger.Info("Request to cancel task was received");
                             break;
                         }
                         catch (System.Exception e)
                         {
-                            logger.Debug($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
+                            logger.Error($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
                         }
                     }
                 },
@@ -260,7 +260,7 @@ namespace UtilitiesCS.Threading
             }
             catch (TaskCanceledException)
             {
-                logger.Debug("Request to cancel task was received");
+                //logger.Debug("Request to cancel task was received");
                 timer.StopTimer();
                 timer.Dispose();
                 throw;
@@ -311,12 +311,12 @@ namespace UtilitiesCS.Threading
                         }
                         catch (OperationCanceledException)
                         {
-                            logger.Debug("Request to cancel task was received");
+                            logger.Info("Request to cancel task was received");
                             break;
                         }
                         catch (System.Exception e)
                         {
-                            logger.Debug($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
+                            logger.Error($"Skipping {typeof(T)} {item} due to exception: {e.Message}");
                         }
                     }
                 },
@@ -342,7 +342,7 @@ namespace UtilitiesCS.Threading
             }
             catch (TaskCanceledException)
             {
-                logger.Debug("Request to cancel task was received");
+                //logger.Debug("Request to cancel task was received");
             }
             catch (System.Exception e)
             {

@@ -8,10 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class BayesianClassifierGroup
+    public class BayesianClassifierGroup: NewSmartSerializable<BayesianClassifierGroup>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -21,6 +22,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public BayesianClassifierGroup()
         {
             _classifiers = [];
+            base._parent = this;
         }
 
         #endregion Constructors
@@ -38,26 +40,48 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public int TotalEmailCount { get => _totalEmailCount; set => _totalEmailCount = value; }
         protected int _totalEmailCount;
 
-        public IApplicationGlobals AppGlobals { get; set; }
+        public IApplicationGlobals Globals { get; set; }
 
         [JsonIgnore]
-        public Func<object, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
-        private Func<object, IEnumerable<string>> _tokenize = new EmailTokenizer().tokenize;
+        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
+        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenize = new EmailTokenizer().Tokenize;
 
         [JsonIgnore]
-        public Func<object, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
-        private Func<object, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().tokenizeAsync;
+        public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
+        private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().TokenizeAsync;
+
+        public double MinimumProbability { get => _minimumProbability; set => _minimumProbability = value; }
+        protected double _minimumProbability = 0.0;
 
         #endregion Public Properties
 
         #region Public Model Training Methods
 
+        public void UnTrain(string tag, IEnumerable<string> matchTokens, int emailCount)
+        {
+            if(_classifiers.TryGetValue(tag, out var classifier))
+            {
+                if (classifier is not null) 
+                {
+                    var matchFrequency = matchTokens.GroupAndCount();
+                    classifier.UnTrain(matchFrequency, emailCount);
+                    if (classifier.MatchEmailCount <= 0)
+                    {
+                        _classifiers.TryRemove(tag, out _);
+                    }
+                }
+            }
+            
+        }
+
         public void AddOrUpdateClassifier(string tag, IEnumerable<string> matchTokens, int emailCount)
         {
-            var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifierShared(tag));
+            var classifier = _classifiers.GetOrAdd(tag, CreateNewClassifier(tag, this));
             var matchFrequency = matchTokens.GroupAndCount();
             classifier.Train(matchFrequency, emailCount);
         }
+
+        private BayesianClassifierShared CreateNewClassifier(string tag, BayesianClassifierGroup instance) => new BayesianClassifierShared(tag, instance);
 
         public void AddToEmailCount(int count)
         {
@@ -76,11 +100,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public OrderedParallelQuery<Prediction<string>> Classify(object source)
         {
-            var tokens = _tokenize(source);
+            var tokens = _tokenize(source, Globals);
             var tokenIncidence = tokens.GroupAndCount();
             var result = this.Classify(tokenIncidence).OrderByDescending(x => x.Probability);
             var sl = new SortedList<int, Prediction<string>>();
             return result;
+        }
+
+        public OrderedParallelQuery<Prediction<string>> Classify(string[] tokens)
+        {
+            var tokenIncidence = tokens.GroupAndCount();
+            return this.Classify(tokenIncidence);
         }
 
         public OrderedParallelQuery<Prediction<string>> Classify(
@@ -89,26 +119,37 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var results = Classifiers.AsParallel()
                 .Select(classifier => new Prediction<string>(
                     classifier.Key,
-                    classifier.Value.GetMatchProbability(tokenIncidence)))
+                    //classifier.Value.GetMatchProbability(tokenIncidence)))
+                    classifier.Value.Chi2SpamProb(tokenIncidence)))
+                .Where(x => x.Probability >= MinimumProbability)
                 .OrderByDescending(x => x.Probability);
             return results;
         }
 
         public async ValueTask<Prediction<string>[]> ClassifyAsync(object source, CancellationToken cancel)
         {
-            var tokens = await TokenizeAsync(source, cancel);
+            var tokens = await TokenizeAsync(source, Globals, cancel);
             var tokenIncidence = await tokens.GroupAndCountAsync();
             var result = await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
             return result;
         }
-        
+
+        public async ValueTask<Prediction<string>[]> ClassifyAsync(string[] tokens, CancellationToken cancel)
+        {
+            var tokenIncidence = tokens.GroupAndCount();
+            return await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
+        }
+
+
         public IOrderedAsyncEnumerable<Prediction<string>> ClassifyAsync(
             IDictionary<string, int> tokenIncidence, CancellationToken cancel)
         {
             var results = Classifiers.ToAsyncEnumerable()
                 .SelectAwait(async(classifier) => new Prediction<string>(
                     classifier.Key, 
-                    await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
+                    await classifier.Value.Chi2SpamProbAsync(tokenIncidence.Keys.ToArray())))
+                //await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
+                .Where(x => x.Probability >= MinimumProbability)
                 .OrderByDescending(prediction => prediction.Probability);
             return results;
         }
@@ -157,7 +198,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    var jagged = metrics.Select(x => new[] { x.Descriptor, x.Match.ToString("N0"), x.NotMatch.ToString("N0"), x.Probability.ToString("N0"), x.Total.ToString("N0") }).ToArray();
         //    //var jagged = metrics.Select(x => new object[] { x.Descriptor, x.Match, x.NotMatch, x.Probability, x.Total }).ToArray();
 
-        //    logger.Debug($"\n{jagged.ToFormattedText(
+        //    //logger.Debug($"\n{jagged.ToFormattedText(
         //            ["Descriptor", "Matches", "Not Match", "Probability", "Total Lines"],
         //            [Enums.Justification.Left, Enums.Justification.Right,
         //                Enums.Justification.Right, Enums.Justification.Right,
@@ -167,7 +208,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         //public void LogState()
         //{
-        //    logger.Debug($"\n{Classifiers
+        //    //logger.Debug($"\n{Classifiers
         //        .Select(x => new[]
         //            {
         //                x.Value.Tag,
@@ -189,12 +230,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Serialization
 
-        [OnDeserialized]
-        internal void OnDeserializedMethod(StreamingContext context)
-        {
-            //IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
-            //LogMetrics();
-        }
+        //[OnDeserialized]
+        //internal void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    //IdleActionQueue.AddEntry(async () => await AfterDeserialize(AppGlobals.AF.CancelLoad));
+        //    //LogMetrics();
+        //}
 
         internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed")
         {

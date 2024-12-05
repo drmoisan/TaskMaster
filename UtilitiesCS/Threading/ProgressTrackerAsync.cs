@@ -43,7 +43,7 @@ namespace UtilitiesCS.Threading
                     _progressViewer.TrySwitchScreens(_screen, true);
                 }
 
-                _isRoot = true;
+                //_isRoot = true;
                 _progressViewer.JobName.Text = "Initializing...";
                 _progressViewer.Show();
             });
@@ -57,7 +57,7 @@ namespace UtilitiesCS.Threading
 
         private CancellationTokenSource _cancelSource;
         private Screen _screen;
-        private bool _isRoot = false;
+        //private bool _isRoot = false;
 
         #endregion Private Fields
 
@@ -69,8 +69,8 @@ namespace UtilitiesCS.Threading
         protected string _jobName;
         internal string JobName { get => _jobName; set => _jobName = value; }
 
-        private double _progress;
-        internal double Progress { get => _progress; }
+        //private double _progress;
+        //internal double Progress { get => _progress; }
 
         protected Dispatcher _uiDispatcher;
         internal Dispatcher UiDispatcher { get => _uiDispatcher; set => _uiDispatcher = value; }
