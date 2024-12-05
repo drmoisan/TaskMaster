@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UtilitiesCS.Extensions;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace UtilitiesCS.OutlookExtensions
