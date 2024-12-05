@@ -82,7 +82,7 @@ namespace TaskMaster.Test
         {
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             var af = new AppAutoFileObjects(appGlobals);
-            var loader = new NewSmartSerializableLoader(appGlobals);
+            var loader = new SmartSerializableLoader(appGlobals);
             loader.Config.LocalDisk.FileName = "ManagerSpam.json";
             if (!appGlobals.FS.SpecialFolders.TryGetValue("AppData", out var appData)) { loader.Config.LocalDisk.FolderPath = appData; }
             
@@ -98,7 +98,7 @@ namespace TaskMaster.Test
         {
             var appGlobals = new ApplicationGlobals(mockApplication.Object);
             var af = new AppAutoFileObjects(appGlobals);
-            var dict = new NewScDictionary<string, string>();
+            var dict = new ScDictionary<string, string>();
             ILGlobals.LoadOpCodes();
             dict["key1"] = "value1";
             dict.Config.Disk.FileName = "testdict.json";
@@ -114,7 +114,7 @@ namespace TaskMaster.Test
             dict.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
             dict.Config.JsonSettings.Converters.Add(new AppGlobalsConverter(appGlobals));
             dict.Config.JsonSettings.Converters.Add(new FilePathHelperConverter(appGlobals.FS));
-            dict.Config.JsonSettings.Converters.Add(new ScDictionaryConverter<NewScDictionary<string, string>, string, string>());
+            dict.Config.JsonSettings.Converters.Add(new ScDictionaryConverter<ScDictionary<string, string>, string, string>());
             //dict.Config.JsonSettings.TraceWriter = new NLogTraceWriter();
             Action<string, Exception> action = (msg, ex) => Console.WriteLine(msg);
             dict.Config.JsonSettings.TraceWriter = new NConsoleTraceWriter() { Log = action };

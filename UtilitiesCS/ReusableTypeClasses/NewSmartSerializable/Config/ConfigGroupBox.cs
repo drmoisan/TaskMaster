@@ -9,7 +9,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 {
     internal class ConfigGroupBox:GroupBox
     {
-        internal INewSmartSerializableConfig.ActiveDiskEnum DiskType { get; set; }
+        internal ISmartSerializableConfig.ActiveDiskEnum DiskType { get; set; }
 
         internal TextBox FileNameTextBox { get; set; }
         internal string FileName { get => FileNameTextBox.Text; set => FileNameTextBox.Text = value; }

@@ -113,13 +113,13 @@ namespace TaskMaster
             else { return null; }
         }
 
-        private NewScDictionary<string, string> _programInfo;
-        public NewScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
-        private NewScDictionary<string, string> LoadProgramInfo() 
+        private ScDictionary<string, string> _programInfo;
+        public ScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
+        private ScDictionary<string, string> LoadProgramInfo() 
         {
             if (_parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
             {
-                return NewScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, appData); 
+                return ScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, appData); 
             }
             else { return null; }
         }

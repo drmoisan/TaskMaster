@@ -637,7 +637,6 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\DictionaryChangedEventArgs.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
-    <Compile Include="Interfaces\ITypes\ISmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\LazyTry\LazyTry.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs">
@@ -649,16 +648,13 @@
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.Designer.cs">
       <DependentUpon>ConfigViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\ITypes\INewSmartSerializable.cs" />
-    <Compile Include="Interfaces\ITypes\INewSmartSerializableConfig.cs" />
-    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewProgramData.cs" />
-    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewScDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializable.cs" />
+    <Compile Include="Interfaces\ITypes\ISmartSerializable.cs" />
+    <Compile Include="Interfaces\ITypes\ISmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
-    <Compile Include="ReusableTypeClasses\NewSmartSerializable\NewSmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
-    <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializable.cs" />
-    <Compile Include="ReusableTypeClasses\SmartSerializable\SmartSerializableConfig.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
     <Compile Include="Threading\IdleAsyncQueue.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
@@ -805,7 +801,6 @@
     <Compile Include="ReusableTypeClasses\Observable\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\Observable\ObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Observable\ObserverHelper.cs" />
-    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoCollection.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoSortedDictionary.cs" />

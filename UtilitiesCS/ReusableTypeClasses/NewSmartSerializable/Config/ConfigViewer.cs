@@ -27,14 +27,14 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             groupBoxLocal.RelativePathTextBox = RelativePathLocal;
             groupBoxLocal.FileNameTextBox = FileNameLocal;
             groupBoxLocal.LabelActive = LocalActiveLabel;
-            groupBoxLocal.DiskType = INewSmartSerializableConfig.ActiveDiskEnum.Local;
+            groupBoxLocal.DiskType = ISmartSerializableConfig.ActiveDiskEnum.Local;
             groupBoxLocal.IsActive = true;
 
             groupBoxNet.SpecialFolderComboBox = ComboSpecialFolderNet;
             groupBoxNet.RelativePathTextBox = RelativePathNet;
             groupBoxNet.FileNameTextBox = FileNameNet;
             groupBoxNet.LabelActive = NetActiveLabel;
-            groupBoxNet.DiskType = INewSmartSerializableConfig.ActiveDiskEnum.Net;
+            groupBoxNet.DiskType = ISmartSerializableConfig.ActiveDiskEnum.Net;
             groupBoxNet.IsActive = false;
 
             Boxes = [groupBoxLocal, groupBoxNet];
@@ -104,7 +104,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         #region Methods
 
-        public void ActivateUiBox(INewSmartSerializableConfig.ActiveDiskEnum diskType)
+        public void ActivateUiBox(ISmartSerializableConfig.ActiveDiskEnum diskType)
         {
             foreach (var box in Boxes)
             {

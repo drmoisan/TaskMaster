@@ -184,7 +184,7 @@ namespace UtilitiesCS.EmailIntelligence
         public BayesianClassifierGroup ClassifierGroup { get => _classifierGroup; set => _classifierGroup = value; }
         private BayesianClassifierGroup _classifierGroup;
 
-        public INewSmartSerializableConfig Config => ClassifierGroup.Config; 
+        public ISmartSerializableConfig Config => ClassifierGroup.Config; 
 
         //internal ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         internal CancellationToken Token { get; }

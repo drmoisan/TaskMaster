@@ -31,7 +31,7 @@ namespace UtilitiesCS
         public Func<IApplicationGlobals, Task> EngineInitializer { get; set; }
         public string EngineName { get; set; }
         public T TypedItem { get; set; }
-        public INewSmartSerializableConfig Config { get; set; }
+        public ISmartSerializableConfig Config { get; set; }
         public System.Action SerializationEngine { get; set; }
         public void Serialize() 
         { 
