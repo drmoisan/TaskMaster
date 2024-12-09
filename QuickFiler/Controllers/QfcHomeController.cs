@@ -46,15 +46,15 @@ namespace QuickFiler.Controllers
                                                                 System.Action parentCleanup)
         {
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(LaunchAsync)} is beginning");
-            
-            // Create uninitialized instance of QfcHomeController
-            var controller = new QfcHomeController();
-
+                        
             // Establish a SynchronizationContext for the UI thread
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            
+
+            // Create uninitialized instance of QfcHomeController
+            var controller = new QfcHomeController();
+
             // Create cancellation token and progress tracker
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
@@ -472,6 +472,8 @@ namespace QuickFiler.Controllers
         
         private IQfcDatamodel _datamodel;
         public IQfcDatamodel DataModel { get => _datamodel; internal set => _datamodel = value; }
+
+        public FilerQueue FilerQueue { get; } = new FilerQueue();
 
         private TaskScheduler _uiScheduler;
         internal TaskScheduler UiScheduler { get => _uiScheduler; }

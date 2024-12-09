@@ -275,6 +275,7 @@
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcItemController.cs" />
+    <Compile Include="Controllers\FilerQueue.cs" />
     <Compile Include="Controllers\KaChar.cs" />
     <Compile Include="Controllers\KaKey.cs" />
     <Compile Include="Controllers\KaStringAsync.cs" />
@@ -295,7 +296,6 @@
     <Compile Include="Helper Classes\EmailMoveMonitor.cs" />
     <Compile Include="Helper Classes\IConversationResolver.cs" />
     <Compile Include="Helper Classes\ItemViewerQueue.cs" />
-    <Compile Include="Helper Classes\LockingLinkedList.cs" />
     <Compile Include="Helper Classes\QfcThemeHelper.cs" />
     <Compile Include="Helper Classes\QfEnums.cs" />
     <Compile Include="Helper Classes\TlpCellSnapShot.cs" />

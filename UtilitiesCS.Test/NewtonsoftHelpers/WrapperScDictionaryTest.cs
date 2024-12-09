@@ -6,7 +6,7 @@ using UtilitiesCS.NewtonsoftHelpers;
 using FluentAssertions;
 using UtilitiesCS.ReusableTypeClasses;
 using Moq;
-using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
+
 
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {

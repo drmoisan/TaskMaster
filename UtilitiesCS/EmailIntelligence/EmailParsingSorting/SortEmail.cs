@@ -109,15 +109,16 @@ namespace UtilitiesCS
         public static async Task UpdatePredictiveEngineAsync(IList<MailItemHelper> mailHelpers, string destinationOlStem, IApplicationGlobals appGlobals, string conversationID)
         {
             // Update the Recents list and save
-            appGlobals.AF.RecentsList.Add(destinationOlStem);
+            appGlobals.AF.RecentsList.AddOrMoveFirst(destinationOlStem, 5);
+            appGlobals.AF.RecentsList.Serialize();
 
             // Update the CtfMap and save
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailHelpers.Count);
 
             // Serialize the data
             var tasks = new List<Task>
-            {
-                appGlobals.AF.RecentsList.SerializeAsync(),
+            {                
+                //appGlobals.AF.RecentsList.SerializeAsync(),
                 appGlobals.AF.CtfMap.SerializeAsync(),
                 appGlobals.AF.SubjectMap.SerializeAsync(),
                 appGlobals.AF.MovedMails.SerializeAsync()
@@ -289,7 +290,8 @@ namespace UtilitiesCS
             }
 
             // Update the Recents list and save
-            appGlobals.AF.RecentsList.Add(destinationOlStem);
+            appGlobals.AF.RecentsList.AddOrMoveFirst(destinationOlStem, 5);
+            appGlobals.AF.RecentsList.Serialize();
 
             // Update the CtfMap and save
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);
@@ -297,7 +299,7 @@ namespace UtilitiesCS
             // Serialize the data
             var tasks = new List<Task> 
             { 
-                appGlobals.AF.RecentsList.SerializeAsync(),
+                //appGlobals.AF.RecentsList.SerializeAsync(),
                 appGlobals.AF.CtfMap.SerializeAsync(),
                 appGlobals.AF.SubjectMap.SerializeAsync(),
                 appGlobals.AF.MovedMails.SerializeAsync() 
@@ -370,7 +372,7 @@ namespace UtilitiesCS
             }
 
             // Update the Recents list and save
-            appGlobals.AF.RecentsList.Add(destinationOlStem);
+            appGlobals.AF.RecentsList.AddOrMoveFirst(destinationOlStem, 5);
 
             // Update the CtfMap and save
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);

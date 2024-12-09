@@ -22,7 +22,8 @@ using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
 
 namespace TaskMaster
@@ -58,6 +59,7 @@ namespace TaskMaster
         async public Task LoadParallelAsync()
         {
             Manager = new ManagerAsyncLazy(_parent);
+            await LoadIntelConfigAsync();
             var tasks = new List<Task>
             {
                 LoadRecentsListAsync(),
@@ -75,6 +77,7 @@ namespace TaskMaster
         {
             Manager = new ManagerAsyncLazy(_parent);
 
+            await LoadIntelConfigAsync();
             await LoadRecentsListAsync();
             await LoadCtfMapAsync();
             await LoadCommonWordsAsync();
@@ -147,44 +150,64 @@ namespace TaskMaster
             await Task.Run(() => _movedMails = LoadMovedMails());
         }
 
-        private RecentsList<string> _recentsList;
-        public RecentsList<string> RecentsList
+        public SloLinkedList<string> RecentsList { get; private set; }
+        async private Task LoadRecentsListAsync() => await Task.Run(async () =>
         {
-            get
+            if (IntelRes.Config.TryGetValue("RecentFolders", out var config))
             {
-                if (_recentsList is null)
-                {
-                    if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
-                    {
-                        _recentsList = new RecentsList<string>(_defaults.FileName_Recents, pythonStaging, max: MaxRecents);
-                    }
-                }
-                return _recentsList;
+                RecentsList = await SloLinkedList<string>.Static.DeserializeAsync(config, true);
+                RecentsList.CollectionChanged += SmartSerializable_CollectionChanged;
             }
-            set
-            {
-                _recentsList = value;
-                if (_recentsList.FolderPath == "")
-                {
-                    if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
-                    {
-                        _recentsList.FolderPath = pythonStaging;
-                        _recentsList.FileName = Properties.Settings.Default.FileName_Recents;
-                    }
-                }
-                _recentsList.Serialize();
-            }
-        }
-        async private Task LoadRecentsListAsync()
+            else { logger.Error("Recents config not found."); }
+        }, CancelToken);
+
+        public void SmartSerializable_CollectionChanged<T>(object Sender, LockingObservableLinkedListChangedEventArgs<T> args)
         {
-            await Task.Run(() => 
-            {
-                if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
-                {
-                    _recentsList = new RecentsList<string>(_defaults.FileName_Recents, pythonStaging, max: MaxRecents); 
-                }
-            }, CancelToken);
+            var list = (SloLinkedList<T>)Sender;
+            list.Serialize();
         }
+        
+        public IntelligenceConfig IntelRes { get; private set; }
+        async private Task LoadIntelConfigAsync() => await Task.Run(async () => IntelRes = await IntelligenceConfig.LoadAsync(_parent), CancelToken);
+
+        //private RecentsList<string> _recentsList;
+        //public RecentsList<string> RecentsList
+        //{
+        //    get
+        //    {
+        //        if (_recentsList is null)
+        //        {
+        //            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+        //            {
+        //                _recentsList = new RecentsList<string>(_defaults.FileName_Recents, pythonStaging, max: MaxRecents);
+        //            }
+        //        }
+        //        return _recentsList;
+        //    }
+        //    set
+        //    {
+        //        _recentsList = value;
+        //        if (_recentsList.FolderPath == "")
+        //        {
+        //            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+        //            {
+        //                _recentsList.FolderPath = pythonStaging;
+        //                _recentsList.FileName = Properties.Settings.Default.FileName_Recents;
+        //            }
+        //        }
+        //        _recentsList.Serialize();
+        //    }
+        //}        
+        //async private Task LoadRecentsListAsync()
+        //{
+        //    await Task.Run(() => 
+        //    {
+        //        if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+        //        {
+        //            _recentsList = new RecentsList<string>(_defaults.FileName_Recents, pythonStaging, max: MaxRecents); 
+        //        }
+        //    }, CancelToken);
+        //}
 
         private CtfMap _ctfMap;
         public CtfMap CtfMap

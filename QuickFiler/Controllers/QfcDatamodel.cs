@@ -15,7 +15,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Threading;
 using QuickFiler.Helper_Classes;
-
+using UtilitiesCS.ReusableTypeClasses;
 
 
 

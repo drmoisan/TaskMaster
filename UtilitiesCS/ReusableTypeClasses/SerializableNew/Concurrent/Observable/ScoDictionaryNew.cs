@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using System.Runtime.CompilerServices;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
@@ -45,7 +46,9 @@ namespace UtilitiesCS.ReusableTypeClasses
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath) => ism.Deserialize(fileName, folderPath);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) => ism.Deserialize(fileName, folderPath, askUserOnError);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
-
+        public async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() => await ism.DeserializeAsync(config);
+        public async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError) where U : class, ISmartSerializable<U>, new() => await ism.DeserializeAsync(config, askUserOnError);
+        
         #endregion ISmartSerializable
 
         public string Name { get; set; }

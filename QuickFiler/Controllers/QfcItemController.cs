@@ -1636,7 +1636,9 @@ namespace QuickFiler.Controllers
                         FsAncestorEquivalent = oneDrive,
                     };
                     var filer = new EmailFiler(config);
-                    await filer.SortAsync(helpers);
+                    _homeController.FilerQueue.Enqueue(filer, helpers);
+                    await Task.CompletedTask;
+                    //await filer.SortAsync(helpers);
                 }
                 catch (System.Exception e)
                 {
@@ -1645,7 +1647,7 @@ namespace QuickFiler.Controllers
                     MessageBox.Show($"Error moving mail {ItemInfo.Subject} from {ItemInfo.Sender} on {ItemInfo.SentDate}. Skipping");
                 }
 
-                SortEmail.Cleanup_Files();
+                //SortEmail.Cleanup_Files();
             }
         }
         //async public Task MoveMailAsync()

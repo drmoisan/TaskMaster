@@ -9,6 +9,7 @@ using System.Reflection;
 using System;
 using System.Text.RegularExpressions;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
@@ -156,80 +157,53 @@ namespace UtilitiesCS
             }
 
             return senderAddress;
-
-            //string senderAddress;
-
-            //if (olMail.Sender.Type == "EX")
-            //{
-            //    var OlPA = olMail.Sender.PropertyAccessor;
-            //    try
-            //    {
-            //        senderAddress =(string)OlPA.GetProperty(PR_SMTP_ADDRESS);
-            //    }
-            //    catch
-            //    {
-            //        try
-            //        {
-            //            senderAddress = olMail.Sender.Name;
-            //        }
-            //        catch
-            //        {
-            //            senderAddress = "";
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    senderAddress = olMail.SenderEmailAddress;
-            //}
-            //return senderAddress;
         }
 
         public static IRecipientInfo GetSenderInfo(this MailItem olMail)
         {
-            var name = olMail.GetSenderName();
-            var address = olMail.GetSenderAddress();
-            var html = ConvertRecipientToHtml(name, address);
-            return new RecipientInfo(name, address, html);
-        }
-
-        public static string GetTriage(this MailItem OlMail)
-        {
-            var OlProperty = OlMail.UserProperties.Find("Triage", true);
-            return OlProperty is null ? "" : (string)OlProperty.Value;
-        }
-
-        public static (string recipientsTo, string recipientsCC) GetRecipients(this MailItem OlMail)
-        {
-
-            string StrSMTPAddress;
-            Recipients OlRecipients;
-            string recipientsTo = "";
-            string recipientsCC = "";
-
-            OlRecipients = OlMail.Recipients;
-
-            foreach (Recipient OlRecipient in OlRecipients)
+            olMail.ThrowIfNull();
+            if (olMail.Sender is null)
             {
-                StrSMTPAddress = GetRecipientAddress(OlRecipient);
+                return new RecipientInfo("", "", "");
+            }
+            else
+            {
+                var name = olMail.GetSenderName();
+                var address = olMail.GetSenderAddress();
+                var html = ConvertRecipientToHtml(name, address);
+                return new RecipientInfo(name, address, html);
+            }                
+        }
 
-                if (OlRecipient.Type == (int)OlMailRecipientType.olTo)
+        public static string GetTriage(this MailItem olMail)
+        {
+            olMail.ThrowIfNull();
+            var olProperty = olMail.UserProperties.Find("Triage", true);
+            return olProperty is null ? "" : (string)olProperty.Value;
+        }
+
+        public static (string recipientsTo, string recipientsCC) GetRecipients(this MailItem olMail)
+        {            
+            var olRecipients = olMail.Recipients;
+            if (olRecipients is null) { return ("", ""); }
+
+            var recipientsTo = new List<string>();
+            var recipientsCC = new List<string>();
+
+            foreach (Recipient olRecipient in olRecipients) 
+            { 
+                var smtpAddress = GetRecipientAddress(olRecipient);
+                if (olRecipient.Type == (int)OlMailRecipientType.olTo)
                 {
-                    recipientsTo = recipientsTo + "; " + StrSMTPAddress;
+                    recipientsTo.Add(smtpAddress);
                 }
-                else if (OlRecipient.Type == (int)OlMailRecipientType.olCC)
+                else if (olRecipient.Type == (int)OlMailRecipientType.olCC)
                 {
-                    recipientsCC = recipientsCC + "; " + StrSMTPAddress;
+                    recipientsCC.Add(smtpAddress);
                 }
             }
 
-            // Trim off extra semicolon if any values were set
-            if (recipientsCC.Length > 2)
-                recipientsCC = recipientsCC.Substring(2);
-            if (recipientsTo.Length > 2)
-                recipientsTo = recipientsTo.Substring(2);
-
-            return (recipientsTo, recipientsCC);
+            return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
         }
 
         public static IEnumerable<RecipientInfo> GetInfo(this IEnumerable<Recipient> recipients)
@@ -241,8 +215,6 @@ namespace UtilitiesCS
         {
             (var name, var address) = GetRecipientInfo(recipient);
             sw?.LogDuration("GetRecipientInfo");
-            //string name = GetRecipientName(recipient);
-            //string address = GetRecipientAddress(recipient);
             string html = ConvertRecipientToHtml(name, address);
             sw?.LogDuration("ConvertRecipientToHtml");
             var ri = new RecipientInfo(name, address, html);

@@ -380,6 +380,7 @@ namespace QuickFiler.Controllers
                 catch (System.Exception e)
                 {
                     await moveTask;
+                    await _parent.FilerQueue.Consumer;
                     log.Error(e.Message, e);
                     log.Debug("Shutting down QuickFiler");
                     await ActionCancelAsync();
@@ -400,7 +401,8 @@ namespace QuickFiler.Controllers
                 _groups.CacheMoveObjects();
                 _parent.SwapStopWatch();
                 await BackGroundMoveAsync();
-                
+                await _parent.FilerQueue.Consumer;
+
                 // If DataModel is not Complete then an error happened loading the queue
                 if (!_parent.DataModel.Complete)
                 {
