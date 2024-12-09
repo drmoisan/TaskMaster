@@ -535,6 +535,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
+    <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
@@ -547,6 +548,11 @@
     <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
     <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
+    <Compile Include="IntelligenceResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IntelligenceResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ManagerResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -633,11 +639,19 @@
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
     <Compile Include="Interfaces\ITypes\IOutlookItem.cs" />
     <Compile Include="OutlookExtensions\OutlookItemTryGet.cs" />
-    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\ConcurrentObservableDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\DictionaryChangedEventArgs.cs" />
-    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\IDictionaryObserver.cs" />
-    <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionary\SimpleActionDictionaryObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\DictionaryChangedEventArgs.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\IDictionaryObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\SimpleActionDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\LazyTry\LazyTry.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\ILockingLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\LockingLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\LockingLinkedListNode.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\ILockingLinkedListObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedListChangedEventArgs.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedListNode.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\SimpleActionLockingLinkedListObserver.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs">
       <SubType>Component</SubType>
@@ -653,6 +667,8 @@
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNew.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloLinkedList.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
@@ -892,6 +908,10 @@
     <EmbeddedResource Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.resx">
       <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="IntelligenceResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>IntelligenceResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="ManagerResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
@@ -982,6 +1002,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="EmailIntelligence\TaskPane\" />
+    <Folder Include="ReusableTypeClasses\SerializableNew\Locking\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

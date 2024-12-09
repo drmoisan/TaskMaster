@@ -113,10 +113,21 @@ namespace UtilitiesCS
 
         public static string GetMethodTraceString(params object[] callingMethodParamValues)
         {
-            var st = new StackTrace();
+            var st = new StackTrace(1);
             var methods = st.GetMyMethods();
             var lastMethod = methods.Pop();
             var paramString = lastMethod is null? "method not resolved": lastMethod.GetParameterString(callingMethodParamValues);
+            var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
+            var methodNames = methods.Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})").ToList();
+            methodNames.Add(lastName);
+            return string.Join(" -> ", methodNames);
+        }
+
+        public static string GetMethodTraceString(this StackTrace st, params object[] callingMethodParamValues)
+        {
+            var methods = st.GetMyMethods();
+            var lastMethod = methods.Pop();
+            var paramString = lastMethod is null ? "method not resolved" : lastMethod.GetParameterString(callingMethodParamValues);
             var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
             var methodNames = methods.Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})").ToList();
             methodNames.Add(lastName);

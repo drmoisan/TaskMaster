@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using UtilitiesCS;
 using System.Diagnostics;
+using QuickFiler.Controllers;
 
 namespace QuickFiler.Interfaces
 {
@@ -28,13 +29,14 @@ namespace QuickFiler.Interfaces
         IQfcExplorerController ExplorerController { get; set; }
 		IFilerFormController FormController { get; }
 		IQfcKeyboardHandler KeyboardHandler { get; set; }
+        FilerQueue FilerQueue { get; }
         //QfcFormViewer FormViewer { get; }
 
         #endregion
 
         #region Major Actions
-        
-		//void Iterate();
+
+        //void Iterate();
         void QuickFileMetrics_WRITE(string filename);
 
         #endregion

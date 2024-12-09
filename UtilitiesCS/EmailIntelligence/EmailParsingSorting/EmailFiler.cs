@@ -126,16 +126,17 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
             await Task.Run(async () => (await Globals.AF.Manager["Folder"]).UnTrain(Config.OriginOlStem, mailHelper.Tokens, 1));
             // Move the email to the destination folder
-            var mailItemTemp = await TryMoveMailItemHelperAsync(mailHelper);
+            //var mailItemOriginal = mailHelper.Item;
+            var (mailItemOriginal, mailItemTemp) = await TryMoveMailItemHelperAsync(mailHelper);
 
             // If successful, mark it as sorted, push to undo stack, and capture training metrics and move details
             if (mailItemTemp is not null)
             {
                 var trainingTasks = StartTrainingMetrics(mailHelper);
                 await LabelAutoSortedAsync(mailItemTemp);
-                PushToUndoStack(mailHelper.Item, mailItemTemp);
+                PushToUndoStack(mailItemOriginal, mailItemTemp);
                 await Task.WhenAll(trainingTasks).ConfigureAwait(false);
-                await Task.Run(() => CaptureMoveDetails(mailHelper.Item, mailItemTemp)).ConfigureAwait(false);
+                await Task.Run(() => CaptureMoveDetails(mailItemOriginal, mailItemTemp)).ConfigureAwait(false);
             }
             
         }
@@ -183,7 +184,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             var tasks = new List<Task>()
             {
                 Task.Run(async() =>(await Globals.AF.Manager["Folder"]).AddOrUpdateClassifier(Config.DestinationOlStem, mailHelper.Tokens, 1)),
-                Task.Run(() => Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem))
+                Task.Run(() => Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem)),
+                Task.Run(() => Globals.AF.RecentsList.AddOrMoveFirst(Config.DestinationOlStem, 5))
             };
             
             return tasks;
@@ -230,18 +232,39 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             await Task.Run(() => mailItem.SaveAs(strPath, OlSaveAsType.olMSG));
         }
 
-        public async Task<MailItem> TryMoveMailItemHelperAsync(MailItemHelper mailHelper)
-        {            
-            return await Task.Run(() => 
+        //public async Task<MailItem> TryMoveMailItemHelperAsync(MailItemHelper mailHelper)
+        //{            
+        //    return await Task.Run(() => 
+        //    {
+        //        try
+        //        {
+        //            return (MailItem)mailHelper.Item.Move(Config.DestinationOlFolder);
+        //        }
+        //        catch (System.Exception e)
+        //        {
+        //            logger.Error($"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder.FolderPath}\n{e.Message}", e);
+        //            return null;
+        //        }
+        //    });
+        //}
+
+        public async Task<(MailItem Original, MailItem Moved)> TryMoveMailItemHelperAsync(MailItemHelper mailHelper)
+        {
+            return await Task.Run(() =>
             {
-                try
+                lock (mailHelper.Item)
                 {
-                    return (MailItem)mailHelper.Item.Move(Config.DestinationOlFolder);
-                }
-                catch (System.Exception e)
-                {
-                    logger.Error($"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder.FolderPath}\n{e.Message}", e);
-                    return null;
+                    var original = mailHelper.Item;
+                    try
+                    {
+                        var moved = (MailItem)mailHelper.Item.Move(Config.DestinationOlFolder);
+                        return (original, moved);
+                    }
+                    catch (System.Exception e)
+                    {
+                        logger.Error($"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder.FolderPath}\n{e.Message}", e);
+                        return (original, null);
+                    }                    
                 }
             });
         }

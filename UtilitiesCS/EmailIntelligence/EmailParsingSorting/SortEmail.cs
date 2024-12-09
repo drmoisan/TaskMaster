@@ -109,15 +109,16 @@ namespace UtilitiesCS
         public static async Task UpdatePredictiveEngineAsync(IList<MailItemHelper> mailHelpers, string destinationOlStem, IApplicationGlobals appGlobals, string conversationID)
         {
             // Update the Recents list and save
-            appGlobals.AF.RecentsList.Add(destinationOlStem);
+            appGlobals.AF.RecentsList.AddOrMoveFirst(destinationOlStem, 5);
+            appGlobals.AF.RecentsList.Serialize();
 
             // Update the CtfMap and save
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailHelpers.Count);
 
             // Serialize the data
             var tasks = new List<Task>
-            {
-                appGlobals.AF.RecentsList.SerializeAsync(),
+            {                
+                //appGlobals.AF.RecentsList.SerializeAsync(),
                 appGlobals.AF.CtfMap.SerializeAsync(),
                 appGlobals.AF.SubjectMap.SerializeAsync(),
                 appGlobals.AF.MovedMails.SerializeAsync()
@@ -162,11 +163,13 @@ namespace UtilitiesCS
 
             // Move the email to the destination folder
 
-            MailItem mailItemTemp = null;
+            MailItem mailItemNew = null;
+            MailItem mailItemOriginal = mailHelper.Item;
 
             try
             {
-                mailItemTemp = await Task.Run(() => (MailItem)mailHelper.Item.Move(destinationFolder));
+                mailItemNew = await Task.Run(() => (MailItem)mailHelper.Item.Move(destinationFolder));
+                mailHelper.Item = mailItemNew;
             }
             catch (System.Exception e)
             {
@@ -177,11 +180,11 @@ namespace UtilitiesCS
             await subjectMapTask;
             
             // Add the email to the Undo Stack
-            if (mailItemTemp is not null)
+            if (mailItemNew is not null)
             {
-                PushToUndoStack(mailHelper.Item, mailItemTemp, appGlobals);
+                PushToUndoStack(mailItemOriginal, mailItemNew, appGlobals);
                 // Capture the move details in the log
-                await Task.Run(() => CaptureMoveDetails(mailHelper.Item, mailItemTemp, appGlobals)).ConfigureAwait(false);
+                await Task.Run(() => CaptureMoveDetails(mailItemOriginal, mailItemNew, appGlobals)).ConfigureAwait(false);
             }
         }
 
@@ -257,6 +260,7 @@ namespace UtilitiesCS
                 }
                 
                 MailItem mailItemTemp = null;
+                
                 try
                 {
                     if (olDestination is not null)
@@ -286,7 +290,8 @@ namespace UtilitiesCS
             }
 
             // Update the Recents list and save
-            appGlobals.AF.RecentsList.Add(destinationOlStem);
+            appGlobals.AF.RecentsList.AddOrMoveFirst(destinationOlStem, 5);
+            appGlobals.AF.RecentsList.Serialize();
 
             // Update the CtfMap and save
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);
@@ -294,7 +299,7 @@ namespace UtilitiesCS
             // Serialize the data
             var tasks = new List<Task> 
             { 
-                appGlobals.AF.RecentsList.SerializeAsync(),
+                //appGlobals.AF.RecentsList.SerializeAsync(),
                 appGlobals.AF.CtfMap.SerializeAsync(),
                 appGlobals.AF.SubjectMap.SerializeAsync(),
                 appGlobals.AF.MovedMails.SerializeAsync() 
@@ -367,7 +372,7 @@ namespace UtilitiesCS
             }
 
             // Update the Recents list and save
-            appGlobals.AF.RecentsList.Add(destinationOlStem);
+            appGlobals.AF.RecentsList.AddOrMoveFirst(destinationOlStem, 5);
 
             // Update the CtfMap and save
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);

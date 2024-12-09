@@ -4,7 +4,7 @@ using TaskMaster;
 using UtilitiesCS;
 using Moq;
 using System.Threading.Tasks;
-using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
+
 using System.Collections.Generic;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;

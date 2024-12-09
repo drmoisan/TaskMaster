@@ -18,7 +18,6 @@ using Newtonsoft.Json;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS

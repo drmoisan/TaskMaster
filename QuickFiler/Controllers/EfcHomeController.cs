@@ -207,6 +207,8 @@ namespace QuickFiler
         private SynchronizationContext _uiSyncContext;
         public SynchronizationContext UiSyncContext { get => _uiSyncContext; }
 
+        public FilerQueue FilerQueue => throw new NotImplementedException();
+
         #endregion
 
         #region Major Actions

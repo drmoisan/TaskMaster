@@ -160,7 +160,7 @@ namespace TaskMaster
                     var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false);
                     await Task.Run(() => _ = helper.Tokens);
                     await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
-                    mailItem.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
+                    helper.Item.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
                 }
             }
         }

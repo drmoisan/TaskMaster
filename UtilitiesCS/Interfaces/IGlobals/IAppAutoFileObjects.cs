@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS.ReusableTypeClasses.UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace UtilitiesCS
 {
@@ -17,7 +17,8 @@ namespace UtilitiesCS
         int Conversation_Weight { get; set; }
         int LngConvCtPwr { get; set; }
         int MaxRecents { get; set; }
-        RecentsList<string> RecentsList { get; set; }
+        //RecentsList<string> RecentsList { get; set; }
+        SloLinkedList<string> RecentsList { get;}
         CtfMap CtfMap { get; set; }
         ISerializableList<string> CommonWords { get; set; }
         bool SuggestionFilesLoaded { get; set; }

@@ -111,7 +111,7 @@ namespace UtilitiesCS.EmailIntelligence
                 
                 try
                 {
-                    image = GetImage(GetStream(bytes));
+                    image = bytes is not null? GetImage(GetStream(bytes)): null;
                     //image = GetImage(part);
                 }
                 catch (System.Exception)

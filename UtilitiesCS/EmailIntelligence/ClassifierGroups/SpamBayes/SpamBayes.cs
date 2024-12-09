@@ -16,6 +16,8 @@ using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config;
 using UtilitiesCS.Threading;
+using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace UtilitiesCS.EmailIntelligence
 {
@@ -235,7 +237,7 @@ namespace UtilitiesCS.EmailIntelligence
         public async Task TestAsync(MailItemHelper helper)
         {
             var probability = await CalculateProbabilityAsync(helper.Tokens);
-            await TestActionAsync(helper.Item, probability);
+            await TestActionAsync(helper, probability);
         }
 
         public async Task TestAsync(object item)
@@ -304,38 +306,103 @@ namespace UtilitiesCS.EmailIntelligence
             
         }
 
-        public async Task TestActionAsync(object item, double probability)
+        internal void MoveSpamOrHam(object item, double probability)
         {
-            await Task.Run(async () => 
+            var isSpam = GetTristate(probability);
+            if ( item is MailItemHelper helper && helper.Item is not null)
             {
-                var mailItem = item as MailItem;
-                if (mailItem is not null)
+                helper.Item.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
+                MoveSpamOrHam(helper, isSpam);
+
+            }
+            else if (item is MailItem mailItem)
+            {
+                mailItem.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
+                MoveSpamOrHam(mailItem, isSpam);
+            }
+        }
+        
+        internal void MoveSpamOrHam(MailItemHelper helper, bool? isSpam)
+        {
+            lock (helper.Item)
+            {
+                Folder destination = GetDestinationFolder(helper.Item, isSpam);
+                if (destination is not null)
                 {
-                    mailItem.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
-                    var isSpam = GetTristate(probability);
-                    if (isSpam == true)
+                    var moved = helper.Item.Move(destination);
+                    if (moved is not null)
                     {
-                        if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkCertain.FolderPath)
-                            await mailItem.TryMoveAsync(Globals.Ol.JunkCertain, 3);
-                        //mailItem.Move(Globals.Ol.JunkCertain);
-                    }
-                    else if (isSpam == false)
-                    {
-                        if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.Inbox.FolderPath)
-                            await mailItem.TryMoveAsync(Globals.Ol.Inbox, 3);
-                        //mailItem.Move(Globals.Ol.Inbox);
-                    }
-                    else
-                    {
-                        if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkPossible.FolderPath)
-                            await mailItem.TryMoveAsync(Globals.Ol.JunkPossible, 3);
-                        //mailItem.Move(Globals.Ol.JunkPossible);
+                        helper.Item = moved;
                     }
                 }
-                
-            });
-            
+            }               
         }
+
+        internal void MoveSpamOrHam(MailItem mailItem, bool? isSpam)
+        {
+            Folder destination = GetDestinationFolder(mailItem, isSpam);
+            if (destination is not null)
+                mailItem.Move(destination);
+        }
+
+        internal Folder GetDestinationFolder(MailItem mailItem, bool? isSpam)
+        {
+            if (mailItem is null) { return null; }
+            if (isSpam == true)
+            {
+                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.JunkCertain.FolderPath) { }
+                    return Globals.Ol.JunkCertain;
+            }
+            else if (isSpam == false)
+            {
+                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.Inbox.FolderPath)
+                    return Globals.Ol.Inbox;
+            }
+            else
+            {
+                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.JunkPossible.FolderPath)
+                    return Globals.Ol.JunkPossible;
+            }
+            return null;
+        }
+
+        public async Task TestActionAsync(object item, double probability)
+        {
+            await Task.Run(() => MoveSpamOrHam(item, probability));
+        }
+
+        //public async Task TestActionAsync(object item, double probability)
+        //{
+        //    await Task.Run(async () => 
+        //    {
+        //        var mailItem = item as MailItem;
+        //        if (mailItem is not null)
+        //        {
+        //            mailItem.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
+        //            var isSpam = GetTristate(probability);
+        //            if (isSpam == true)
+        //            {
+        //                if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkCertain.FolderPath)
+        //                    await mailItem.TryMoveAsync(Globals.Ol.JunkCertain, 3);
+        //                //mailItem.Move(Globals.Ol.JunkCertain);
+        //            }
+        //            else if (isSpam == false)
+        //            {
+        //                if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.Inbox.FolderPath)
+        //                    await mailItem.TryMoveAsync(Globals.Ol.Inbox, 3);
+        //                //mailItem.Move(Globals.Ol.Inbox);
+        //            }
+        //            else
+        //            {
+        //                if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkPossible.FolderPath)
+        //                    await mailItem.TryMoveAsync(Globals.Ol.JunkPossible, 3);
+        //                //mailItem.Move(Globals.Ol.JunkPossible);
+        //            }
+        //        }
+                
+        //    });
+            
+        //}
 
         #endregion Public Classifier Methods
 

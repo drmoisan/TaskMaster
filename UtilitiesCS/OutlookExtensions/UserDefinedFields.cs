@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
+using UtilitiesCS;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace UtilitiesCS.OutlookExtensions
@@ -517,8 +518,9 @@ namespace UtilitiesCS.OutlookExtensions
             }
             catch (System.Exception ex)
             {
-                Debug.WriteLine($"Error in set user property: {ex.Message}");
-                Debug.WriteLine($"Call Stack: {ex.StackTrace}");
+                logger.Error($"Error in set user property: {ex.Message}");
+                logger.Error($"Callstack {TraceUtility.GetMethodTraceString(item, udfName, value, olUdfType)}");
+                
                 return false;
             }
         }
