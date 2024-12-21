@@ -68,18 +68,18 @@ namespace UtilitiesCS
         
         private void SetupTree()
         {
-            this.TlvNotFiltered.CanExpandGetter = x => ((TreeNode<OlFolderInfo>)x).ChildCount>0;
-            this.TlvNotFiltered.ChildrenGetter = x => ((TreeNode<OlFolderInfo>)x).Children;
-            this.TlvNotFiltered.ParentGetter = x => ((TreeNode<OlFolderInfo>)x).Parent;
+            this.TlvNotFiltered.CanExpandGetter = x => ((TreeNode<OlFolderWrapper>)x).ChildCount>0;
+            this.TlvNotFiltered.ChildrenGetter = x => ((TreeNode<OlFolderWrapper>)x).Children;
+            this.TlvNotFiltered.ParentGetter = x => ((TreeNode<OlFolderWrapper>)x).Parent;
             this.OlvNameNotFiltered.ImageGetter = x => 0;
             this.TlvNotFiltered.Roots = _controller.OlFolderTree.FilterSelected(false);
             //this.TlvNotFiltered.Roots = _controller.OlFolderTree.Roots;
             //this.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
 
 
-            this.TlvFiltered.CanExpandGetter = x => ((TreeNode<OlFolderInfo>)x).ChildCount > 0;
-            this.TlvFiltered.ChildrenGetter = x => ((TreeNode<OlFolderInfo>)x).Children;
-            this.TlvFiltered.ParentGetter = x => ((TreeNode<OlFolderInfo>)x).Parent;
+            this.TlvFiltered.CanExpandGetter = x => ((TreeNode<OlFolderWrapper>)x).ChildCount > 0;
+            this.TlvFiltered.ChildrenGetter = x => ((TreeNode<OlFolderWrapper>)x).Children;
+            this.TlvFiltered.ParentGetter = x => ((TreeNode<OlFolderWrapper>)x).Parent;
             this.OlvNameFiltered.ImageGetter = x => 0;
             this.TlvFiltered.Roots = _controller.OlFolderTree.FilterSelected(true);
             //this.TlvFiltered.Roots = _controller.OlFolderTree.Roots;

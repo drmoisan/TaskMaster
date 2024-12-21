@@ -152,5 +152,11 @@
     <Setting Name="FileName_ProgramDictionary" Type="System.String" Scope="User">
       <Value Profile="(Default)">999999ProgramDictionary.json</Value>
     </Setting>
+    <Setting Name="EventsHooked" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="OlJunkPotential" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Junk - Potential</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

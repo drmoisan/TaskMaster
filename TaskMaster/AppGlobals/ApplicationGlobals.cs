@@ -15,22 +15,29 @@ namespace TaskMaster
     public class ApplicationGlobals : IApplicationGlobals
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private Application _outlookApp;
 
         public ApplicationGlobals(Application olApp)
         {
+            _outlookApp = olApp;
+        }
+
+        async public Task LoadAsync(bool parallel = true)
+        {
+            LoadBasic();
+            if (parallel) { await LoadParallelAsync(); }
+            else { await LoadSequentialAsync(); }
+        }
+
+        private void LoadBasic()
+        {
             _fs = new AppFileSystemFolderPaths();
-            _olObjects = new AppOlObjects(olApp, this);
+            _olObjects = new AppOlObjects(_outlookApp, this);
             _toDoObjects = new AppToDoObjects(this);
             _autoFileObjects = new AppAutoFileObjects(this);
             _events = new AppEvents(this);
             _quickFilerSettings = new AppQuickFilerSettings();
             Engines = new AppItemEngines(this);
-        }
-
-        async public Task LoadAsync(bool parallel = true)
-        {
-            if (parallel) { await LoadParallelAsync(); }
-            else { await LoadSequentialAsync(); }
         }
 
         async public Task LoadParallelAsync()

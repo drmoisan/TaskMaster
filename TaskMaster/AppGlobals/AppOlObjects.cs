@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Office.Interop.Outlook;
-using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.Windows_Forms;
 
@@ -127,12 +127,27 @@ namespace TaskMaster
             }
         }
                 
-        private Folder _junkPossible;
-        public Folder JunkPossible => Initializer.GetOrLoad(ref _junkPossible, LoadJunkPossible);
-        internal Folder LoadJunkPossible()
+        private Folder _junkPotential;
+        public Folder JunkPotential => Initializer.GetOrLoad(ref _junkPotential, LoadJunkPotential);
+        internal Folder LoadJunkPotential()
         {
-            var folderHandler = new OlFolderHelper(_globals);
-            return folderHandler.GetFolder(Root.Folders, "Junk - Potential");
+            var root = new OlFolderTree(Root).Roots.FirstOrDefault();
+            var folderPath = Properties.Settings.Default.OlJunkPotential;
+            if (folderPath.IsNullOrEmpty()) { return null; }
+            var sequence = new Queue<string>(folderPath.Split('\\'));
+            
+            var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
+            var folder = node?.Value?.OlFolder as Folder;
+            if (folder is null) 
+            { 
+                MyBox.ShowDialog("Junk Potential Folder not found. Please select it manually.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                folder = NamespaceMAPI.PickFolder() as Folder;
+                if (folder is null) { return null; }
+                var wrapper = new OlFolderWrapper(folder, Root);
+                Properties.Settings.Default.OlJunkPotential = wrapper.RelativePath;
+                Properties.Settings.Default.Save();
+            }
+            return folder;
         }
 
         private Folder _junkCertain;

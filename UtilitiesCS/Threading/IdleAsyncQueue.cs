@@ -64,8 +64,8 @@ namespace UtilitiesCS.Threading
                     }
                     catch (Exception ex)
                     {
-                        logger.Error($"Failed to execute {nameof(entry.actionAsync)}");
-                        logger.Error(ex.Message);
+                        logger.Error($"Failed to execute {nameof(IdleAsyncQueue)}.{nameof(entry.actionAsync)}");
+                        logger.Error(ex.Message, ex);
                     }
                 }
                 else 

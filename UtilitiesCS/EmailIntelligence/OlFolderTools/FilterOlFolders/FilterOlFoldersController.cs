@@ -62,8 +62,8 @@ namespace UtilitiesCS
             {
                 //_viewer.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
                 //_viewer.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
-                var expanded = (_viewer.TlvNotFiltered.ExpandedObjects.Cast<TreeNode<OlFolderInfo>>()
-                    .Concat(_viewer.TlvFiltered.ExpandedObjects.Cast<TreeNode<OlFolderInfo>>()))
+                var expanded = (_viewer.TlvNotFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()
+                    .Concat(_viewer.TlvFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()))
                     .Select(x=>x.Value.RelativePath).ToArray();
 
                 var notFiltered = OlFolderTree.FilterSelected(false);
@@ -86,7 +86,7 @@ namespace UtilitiesCS
 
         internal CheckStateGetterDelegate GetCheckedState = delegate (object rowObject)
         {
-            var node = (TreeNode<OlFolderInfo>)rowObject;
+            var node = (TreeNode<OlFolderWrapper>)rowObject;
             if (node.Value.Selected)
                 return CheckState.Checked;
             else
@@ -99,7 +99,7 @@ namespace UtilitiesCS
 
         internal CheckStatePutterDelegate PutCheckedState = delegate (object rowObject, CheckState newValue)
         {
-            var node = (TreeNode<OlFolderInfo>)rowObject;
+            var node = (TreeNode<OlFolderWrapper>)rowObject;
             if (newValue == CheckState.Checked)
             {
                 node.Traverse(x => x.Value.Selected = true);

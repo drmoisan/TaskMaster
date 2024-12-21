@@ -66,6 +66,7 @@ namespace UtilitiesCS {
         ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Folder&quot;,
+        ///  &quot;T&quot;: null,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
         ///    &quot;Disk&quot;: {
@@ -81,9 +82,7 @@ namespace UtilitiesCS {
         ///    &quot;NetDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;ManagerFolder.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///    },
-        ///     [rest of string was truncated]&quot;;.
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Folder {
             get {
@@ -96,6 +95,7 @@ namespace UtilitiesCS {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Engine&quot;:true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
+        ///  &quot;T&quot;: &quot;UtilitiesCS.EmailIntelligence.SpamBayes, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;,
         ///  &quot;Name&quot;: &quot;Spam&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
@@ -110,11 +110,7 @@ namespace UtilitiesCS {
         ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
         ///    },
         ///    &quot;NetDisk&quot;: {
-        ///      &quot;FileName&quot;: &quot;ManagerSpam.json&quot;,
-        ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///    },
-        ///    &quot;Classifie [rest of string was truncated]&quot;;.
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Spam {
             get {
@@ -127,6 +123,7 @@ namespace UtilitiesCS {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Engine&quot;: true,
         ///  &quot;Globals&quot;: &quot;default&quot;,
+        ///  &quot;T&quot;: &quot;UtilitiesCS.EmailIntelligence.Triage, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;,
         ///  &quot;Name&quot;: &quot;Triage&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
@@ -141,11 +138,7 @@ namespace UtilitiesCS {
         ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
         ///    },
         ///    &quot;NetDisk&quot;: {
-        ///      &quot;FileName&quot;: &quot;ManagerTriage.json&quot;,
-        ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///    },
-        ///    &quot;Cla [rest of string was truncated]&quot;;.
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Triage {
             get {

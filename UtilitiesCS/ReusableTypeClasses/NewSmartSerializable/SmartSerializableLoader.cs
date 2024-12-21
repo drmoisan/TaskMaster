@@ -19,8 +19,8 @@ namespace UtilitiesCS.ReusableTypeClasses
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
         System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SmartSerializableLoader(): base() { base._parent = this; }
-        public SmartSerializableLoader(IApplicationGlobals globals) 
+        public SmartSerializableLoader() : base() { base._parent = this; }
+        public SmartSerializableLoader(IApplicationGlobals globals)
         {
             base._parent = this;
             Globals = globals;
@@ -34,18 +34,20 @@ namespace UtilitiesCS.ReusableTypeClasses
                 netJsonSettings: new Lazy<JsonSerializerSettings>(GetSettings),
                 jsonSettings: new Lazy<JsonSerializerSettings>(GetSettings));
         }
-                        
+
         protected bool _engine;
         public bool Engine
         {
             get => _engine;
-            set { _engine= value; Notify(); }
+            set { _engine = value; Notify(); }
         }
 
         [JsonProperty]
         internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
         private IApplicationGlobals _globals;
 
+        public Type T { get => _t; set { _t = value; Notify(); } }
+        private Type _t;
 
         private JsonSerializerSettings GetSettings()
         {
@@ -111,15 +113,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 throw;
             }                
         }
-
-        //internal static SmartSerializableConfig DeserializeConfig(IApplicationGlobals globals, byte[] binary)
-        //{                
-        //    var loader = new SmartSerializableConfig(globals);
-        //    var jsonObject = loader.TryConvertBinaryToJson(binary);
-        //    if (jsonObject.IsNullOrEmpty()) { return null; }
-        //    else { return loader.DeserializeConfig(jsonObject); }                
-        //}
-
+        
         internal SmartSerializableLoader DeserializeConfig(byte[] binary)
         {
             var jsonObject = TryConvertBinaryToJson(binary);
@@ -168,16 +162,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        //#region INotifyPropertyChanged
-
-        //public event PropertyChangedEventHandler PropertyChanged;
-
-        //public void Notify([CallerMemberName] string propertyName = "")
-        //{
-        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        //}
-
-        //#endregion INotifyPropertyChanged
+        
     }
 }
 

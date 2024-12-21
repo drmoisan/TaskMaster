@@ -33,6 +33,7 @@ namespace TaskMaster
         public async Task InitAsync()
         {
             var configs = await Globals.AF.Manager.Configuration;
+            
             InboxEngines = await configs
                 .Where(config => config.Value.Engine)
                 .Select(config => (

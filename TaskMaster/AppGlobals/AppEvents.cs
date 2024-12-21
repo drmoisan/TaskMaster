@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Threading;
 using UtilitiesCS.Extensions;
 using System.Collections.Concurrent;
+using TaskMaster.Properties;
 
 
 namespace TaskMaster
@@ -31,9 +32,8 @@ namespace TaskMaster
 
         internal async Task<AppEvents> LoadAsync()
         {
-            //await Task.WhenAll(SetupSpamBayesAsync(), SetupTriageAsync());
+            if (Settings.Default.EventsHooked) { Hook(); }
             await ProcessNewInboxItemsAsync();
-
             return this;
         }
 
@@ -117,6 +117,7 @@ namespace TaskMaster
             }
         }
 
+        
         public void Unhook()
         {
             OlToDoItems = null;
@@ -165,7 +166,7 @@ namespace TaskMaster
             }
         }
 
-        internal async Task ProcessNewInboxItemsAsync()
+        public async Task ProcessNewInboxItemsAsync()
         {
             if (OlInboxItems is not null)
             {
@@ -173,13 +174,42 @@ namespace TaskMaster
                 string filter = $"@SQL=\"{OlTableExtensions.SchemaCustomPrefix}AutoProcessed\" is null";
                 
                 var olMailItems = OlInboxItems.Restrict("[MessageClass] = 'IPM.Note'");
-                var unprocessedItems = olMailItems.Restrict(filter);
+                var unprocessedItems = olMailItems?.Restrict(filter)?.Cast<object>();
+                if (unprocessedItems is null) { return; }
+                var unprocessedQueue = new ConcurrentQueue<object>(unprocessedItems);
+                int errors = 0;
+                int success = 0;
+                logger.Debug($"Unprocessed queue has {unprocessedQueue.Count()} items");
 
-                await unprocessedItems
-                    .Cast<object>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(ProcessMailItemAsync);
-                
+
+                while (unprocessedQueue.Count > 0)
+                {
+                    if (unprocessedQueue.TryDequeue(out var item))
+                    {
+                        await ProcessMailItemAsync(item);
+                        success++;
+                    }
+                    else if (errors >= 3) 
+                    {
+                        logger.Warn($"Tried to DeQueue remaining {unprocessedQueue.Count()} unprocessed items 3 times without success. Exiting loop.");
+                        break;
+                    }
+                    else
+                    {
+                        await Task.Delay(100);
+                        errors++;
+                    }
+                }
+                logger.Debug($"Processed {success} items in the unprocessed Queue");
+
+
+
+
+                //await unprocessedItems
+                //    .Cast<object>()
+                //    .ToAsyncEnumerable()
+                //    .ForEachAwaitAsync(ProcessMailItemAsync);
+
                 logger.Debug("Finished processing new inbox items");
             }
         }

@@ -45,6 +45,8 @@ namespace UtilitiesCS.EmailIntelligence
             var sb = new SpamBayes();
             sb.Globals = globals;
             
+            if (!sb.ValidatePathsSet()) { return null; }
+
             if (!await sb.ValidateSpamClassifierAsync(
                 sb.HasValidSpamClassifierAsync, 
                 sb.SpamBayesMissingHandlerAsync,
@@ -80,7 +82,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
                 
-        public static BayesianClassifierGroup CreateNewSpamClassifier()
+        public static BayesianClassifierGroup CreateNewClassifier()
         {
             var group = new BayesianClassifierGroup
             {
@@ -97,13 +99,30 @@ namespace UtilitiesCS.EmailIntelligence
 
         public static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
         {
-            return await Task.Run(CreateNewSpamClassifier, token);            
+            return await Task.Run(CreateNewClassifier, token);            
         }
 
         #endregion Constructors and Static Methods
 
         #region Classifier Validation
 
+        internal bool ValidatePathsSet() 
+        {
+            try
+            {
+                Globals.ThrowIfNull().Ol.ThrowIfNull().JunkCertain.ThrowIfNull();
+                Globals.Ol.JunkPotential.ThrowIfNull();
+                Globals.Ol.Inbox.ThrowIfNull();
+            }
+            catch (ArgumentNullException e)
+            {
+                logger.Error($"Error initializing {nameof(SpamBayes)} in {nameof(ValidatePathsSet)}: {e.Message}");
+                return false;
+            }
+            return true;
+            
+        }
+        
         internal async Task<bool> ValidateSpamClassifierAsync(
             Func<CancellationToken, Task<(bool, string)>> asyncValidator,
             Func<Enums.NotFoundEnum, string, CancellationToken, Task<bool>> asyncAction,
@@ -131,6 +150,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else
             {
+                
                 var classifierGroup = await classifierGroupTask;
                 if (classifierGroup is null) { return (false, $"No classifier group named {GroupName} was found in manager."); }
                 else
@@ -360,8 +380,8 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else
             {
-                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.JunkPossible.FolderPath)
-                    return Globals.Ol.JunkPossible;
+                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.JunkPotential.FolderPath)
+                    return Globals.Ol.JunkPotential;
             }
             return null;
         }

@@ -10,13 +10,15 @@ using System.Diagnostics;
 
 namespace UtilitiesCS
 {
-    public class OlFolderInfo : INotifyPropertyChanged, IFolderInfo
+    public class OlFolderWrapper : INotifyPropertyChanged, IFolderInfo
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        protected OlFolderWrapper() { }
+
         [JsonConstructor]
-        public OlFolderInfo(bool selected, int itemCount, long folderSize, string name, string relativePath)
+        public OlFolderWrapper(bool selected, int itemCount, long folderSize, string name, string relativePath)
         {
             Selected = selected;
             ItemCount = itemCount;
@@ -26,7 +28,7 @@ namespace UtilitiesCS
             SubscribeToPropertyChanged(IFolderInfo.PropertyEnum.All);
         }
 
-        public OlFolderInfo(MAPIFolder olFolder, MAPIFolder olRoot)
+        public OlFolderWrapper(MAPIFolder olFolder, MAPIFolder olRoot)
         {
             _olFolder = olFolder;
             _olRoot = olRoot;

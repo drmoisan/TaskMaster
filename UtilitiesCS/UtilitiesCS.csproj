@@ -536,6 +536,8 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
     <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OlFolderResolver.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OlFolderTreeLazy.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
@@ -667,6 +669,7 @@
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\Other\LazyTreeNodeOfT.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNew.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloLinkedList.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />

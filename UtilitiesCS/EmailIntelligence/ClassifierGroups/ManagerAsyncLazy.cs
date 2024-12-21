@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using log4net.Repository.Hierarchy;
+using Microsoft.Graph.Security.AttackSimulation.Trainings.Item.LanguageDetails;
 using Newtonsoft.Json;
 
 using UtilitiesCS.EmailIntelligence.Bayesian;
@@ -25,6 +27,9 @@ namespace UtilitiesCS
     public class ManagerAsyncLazy : ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>
     {
         #region ctors
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public ManagerAsyncLazy(IApplicationGlobals globals) : base() 
         { 
@@ -103,6 +108,8 @@ namespace UtilitiesCS
                 }
                 await WriteConfigurationAsync();
             }
+            else if (e.PropertyName.Contains(nameof(SmartSerializableLoader.T))) 
+            { await WriteConfigurationAsync(); }
         }
 
         internal async void Config_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -182,10 +189,54 @@ namespace UtilitiesCS
         {
             return new AsyncLazy<BayesianClassifierGroup>(async () => 
             {
-                var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(loader, true);
+                //Type outerClassType = loader.T;
+                //Type staticClassType = loader.T.GetNestedType("Static", BindingFlags.Static | BindingFlags.Public);
+                //if (staticClassType != null)
+                //{
+                //    // Get the MethodInfo of the static method
+                //    MethodInfo staticMethod = staticClassType.GetMethod("DeserializeAsync", BindingFlags.Static | BindingFlags.Public);
+
+                //    if (staticMethod != null)
+                //    {
+                //        // Make the method generic
+                //        MethodInfo genericMethod = staticMethod.MakeGenericMethod(loader.T);
+
+                //        // Invoke the static async method
+                //        Task task = (Task)genericMethod.Invoke(null, new object[] { loader, true });
+                //        await task.ConfigureAwait(false);
+
+                //        // Get the result of the task
+                //        PropertyInfo resultProperty = task.GetType().GetProperty("Result");
+                //        var classifier = resultProperty.GetValue(task) as BayesianClassifierGroup;
+                //        if (classifier is null) { logger.Error($"{loader.T.Name}.Static.DeserializeAsync returned null."); return null; }
+                //        classifier.PropertyChanged += Config_PropertyChanged;
+                //        return classifier;
+                //    }
+                //    else
+                //    {
+                //        logger.Error($"{loader.T.Name}.Static.DeserializeAsync not found.");
+                //        return null;
+                //    }
+                //}
+                //else
+                //{
+                //    logger.Error($"{loader.T.Name}.Static nested static class was not found.");
+                //    return null;
+                //}
+                
+                var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(loader, true, GetAltLoader(loader));
                 classifier.PropertyChanged += Config_PropertyChanged;
-                return classifier; 
+                return classifier;
             });
+        }
+
+        private Func<BayesianClassifierGroup> GetAltLoader(SmartSerializableLoader loader) 
+        {
+            // Get the MethodInfo of the static method
+            MethodInfo staticMethod = loader.T.GetMethod("CreateNewClassifier", BindingFlags.Static | BindingFlags.Public);
+            Func<BayesianClassifierGroup> altLoader = staticMethod is null ? null : () => staticMethod.Invoke(null,null) as BayesianClassifierGroup;
+
+            return altLoader;
         }
 
         public async Task ResetLoadManagerAsyncLazy()
