@@ -1,5 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
-//using Microsoft.TeamFoundation.Common;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,82 +9,30 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 using Tags;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
-using Outlook = Microsoft.Office.Interop.Outlook;
 
-namespace ToDoModel
+namespace ToDoModel.Data_Model.People
 {
-    public class PeopleScoDictionary : ScoDictionary<string, string>, IPeopleScoDictionary
+    public class PeopleScoDictionaryNew: ScoDictionaryNew<string, string>
     {
-        #region Constructors and Initializers
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        //public PeopleScoDictionary(IApplicationGlobals appGlobals, IPrefix prefix) : base()
-        //{ Initialize(appGlobals, prefix); }
+        #region Constructors
 
-        //public PeopleScoDictionary(IDictionary<string, string> source, IApplicationGlobals appGlobals, IPrefix prefix) : base(source)
-        //{ Initialize(appGlobals, prefix); }
+        public PeopleScoDictionaryNew() : base() { }
+        //public PeopleScoDictionaryNew(IEnumerable<KeyValuePair<string, string>> collection) : base(collection) { }
+        //public PeopleScoDictionaryNew(IEqualityComparer<string> comparer) : base(comparer) { }
+        //public PeopleScoDictionaryNew(IEnumerable<KeyValuePair<string, string>> collection, IEqualityComparer<string> comparer) : base(collection, comparer) { }
+        //public PeopleScoDictionaryNew(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { }
+        //public PeopleScoDictionaryNew(int concurrencyLevel, IEnumerable<KeyValuePair<string, string>> collection, IEqualityComparer<string> comparer) : base(concurrencyLevel, collection, comparer) { }
+        public PeopleScoDictionaryNew(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) : base(concurrencyLevel, capacity, comparer) { }
+        public PeopleScoDictionaryNew(ScoDictionaryNew<string, string> dictionary) : base(dictionary) { }
 
-        //public PeopleScoDictionary(IEqualityComparer<string> equalityComparer,
-        //                           IApplicationGlobals appGlobals,
-        //                           IPrefix prefix) : base(equalityComparer)
-        //{ Initialize(appGlobals, prefix); }
-
-        //public PeopleScoDictionary(int capactity,
-        //                           IApplicationGlobals appGlobals,
-        //                           IPrefix prefix) : base(capactity)
-        //{ Initialize(appGlobals, prefix); }
-
-        //public PeopleScoDictionary(IDictionary<string, string> source,
-        //                           IEqualityComparer<string> equalityComparer,
-        //                           IApplicationGlobals appGlobals,
-        //                           IPrefix prefix) : base(source, equalityComparer)
-        //{ Initialize(appGlobals, prefix); }
-
-        //public PeopleScoDictionary(int capacity,
-        //                           IEqualityComparer<string> equalityComparer,
-        //                           IApplicationGlobals appGlobals,
-        //                           IPrefix prefix) : base(capacity, equalityComparer)
-        //{ Initialize(appGlobals, prefix); }
-
-        public PeopleScoDictionary(string filename,
-                                   string folderpath,
-                                   IApplicationGlobals appGlobals,
-                                   IPrefix prefix) : base(filename, folderpath)
-        { Initialize(appGlobals, prefix); }
-
-        /// <summary>
-        /// Creates a new serializable concurrent observable dictionary from an existing dictionary and filepath
-        /// </summary>
-        /// <param name="dictionary">Existing dictionary</param>
-        /// <param name="filename">Name of json file to house the PeopleScoDictionary</param>
-        /// <param name="folderpath">Location of json file</param>
-        /// <param name="appGlobals">Reference to global variables</param>
-        /// <param name="prefix">Reference to class implementing <seealso cref="IPrefix"/> interface</param>
-        //public PeopleScoDictionary(IDictionary<string, string> dictionary,
-        //                           string filename,
-        //                           string folderpath,
-        //                           IApplicationGlobals appGlobals,
-        //                           IPrefix prefix) : base(dictionary, filename, folderpath)
-        //{ Initialize(appGlobals, prefix); }
-
-        //public PeopleScoDictionary(string filename,
-        //                           string folderpath,
-        //                           IScoDictionary<string, string>.AltLoader backupLoader,
-        //                           string backupFilepath,
-        //                           bool askUserOnError,
-        //                           IApplicationGlobals appGlobals,
-        //                           IPrefix prefix) : base(filename, folderpath, backupLoader, backupFilepath, askUserOnError)
-        //{ Initialize(appGlobals, prefix); }
-
-        internal void Initialize(IApplicationGlobals appGlobals, IPrefix prefix)
-        {
-            _globals = appGlobals;
-            _prefix = prefix;
-        }
-
-        #endregion
+        #endregion Constructors
 
         private IApplicationGlobals _globals;
 
@@ -116,7 +64,7 @@ namespace ToDoModel
                                                        .Select(x => x)
                                                        .ToList();
             IList<string> newPeople = new List<string>();
-            
+
             foreach (var address in addressList)
             {
                 var response = MessageBox.Show($"Add mapping for {address}?", "Dialog", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -128,7 +76,7 @@ namespace ToDoModel
                 }
             }
             if (!newPeople.IsNullOrEmpty()) { this.Serialize(); }
-            return newPeople;            
+            return newPeople;
         }
 
         public string AddMissingEntry(string address) //internal
@@ -145,7 +93,8 @@ namespace ToDoModel
             }
             else
             {
-                this.Add(address, matchResult);
+                this.AddOrUpdate(address, matchResult);
+                //this.Add(address, matchResult);
                 return matchResult;
             }
         }
@@ -157,8 +106,8 @@ namespace ToDoModel
             if (seed.StartsWith(prefix)) { return seed; }
             else { return $"{prefix}{seed}"; }
         }
-        
-        public string RefineValidateCategory(string newPerson, IPrefix prefix) 
+
+        public string RefineValidateCategory(string newPerson, IPrefix prefix)
         {
             bool continueAsking = true;
             while (continueAsking)
@@ -169,13 +118,13 @@ namespace ToDoModel
                 // if user leaves blank, continue asking
                 else if (newPerson == "") { continueAsking = true; }
                 // else check if input is valid
-                else 
+                else
                 {
                     // Add prefix if not already there
                     newPerson = AddPrefix(newPerson, prefix.Value);
                     // if category already exists, tell the user and continue asking
-                    if (CategoryExists(newPerson)) 
-                    { 
+                    if (CategoryExists(newPerson))
+                    {
                         MessageBox.Show($"Category {newPerson} already exists. Please choose another name.", "Category Exists", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         continueAsking = true;
                     }
@@ -186,8 +135,8 @@ namespace ToDoModel
             return newPerson;
         }
 
-        public void AddColorCategory(string newPerson) 
-        { 
+        public void AddColorCategory(string newPerson)
+        {
             _globals.Ol.NamespaceMAPI.Categories.Add(newPerson, _prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
         }
 
@@ -208,5 +157,7 @@ namespace ToDoModel
             var launcher = new TagLauncher(existingPeople, _prefix, _globals.Ol.UserEmailAddress);
             return launcher.FindMatch(searchString);
         }
+
+
     }
 }

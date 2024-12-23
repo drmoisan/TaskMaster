@@ -117,6 +117,33 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="People" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": false,
+  "Globals": "default",
+  "Name": "People",
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "pplkey.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "LocalDisk": {
+      "FileName": "pplkey.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "pplkey.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true
+  }
+}</value>
+  </data>
   <data name="RecentFolders" xml:space="preserve">
     <value>{
   "$id": "1",
@@ -126,7 +153,7 @@
   "Config": {
     "$id": "2",
     "Disk": {
-      "FileName": "ManagerFolder.json",
+      "FileName": "9999999RecentsFile.json",
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },

@@ -65,11 +65,42 @@ namespace UtilitiesCS {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
+        ///  &quot;Name&quot;: &quot;People&quot;,
+        ///  &quot;Config&quot;: {
+        ///    &quot;$id&quot;: &quot;2&quot;,
+        ///    &quot;Disk&quot;: {
+        ///      &quot;FileName&quot;: &quot;pplkey.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
+        ///    },
+        ///    &quot;LocalDisk&quot;: {
+        ///      &quot;FileName&quot;: &quot;pplkey.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
+        ///    },
+        ///    &quot;NetDisk&quot;: {
+        ///      &quot;FileName&quot;: &quot;pplkey.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
+        ///    },
+        ///    &quot;ClassifierActivated&quot;: t [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string People {
+            get {
+                return ResourceManager.GetString("People", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;$id&quot;: &quot;1&quot;,
+        ///  &quot;Engine&quot;: false,
+        ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Recents&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
         ///    &quot;Disk&quot;: {
-        ///      &quot;FileName&quot;: &quot;ManagerFolder.json&quot;,
+        ///      &quot;FileName&quot;: &quot;9999999RecentsFile.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
         ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
         ///    },
@@ -81,8 +112,7 @@ namespace UtilitiesCS {
         ///    &quot;NetDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;9999999RecentsFile.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///     [rest of string was truncated]&quot;;.
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string RecentFolders {
             get {

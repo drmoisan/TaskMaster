@@ -466,10 +466,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>TaskMaster_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>TaskMaster_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>3FD9DD77F984D7F1C773A791C4A79507E7A62432</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>E3DBEBBF9EEF3EEB6C7A08F42FF40F3681E5284F</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>

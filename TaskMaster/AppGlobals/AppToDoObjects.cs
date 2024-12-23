@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ConcurrentObservableCollections.ConcurrentObservableDictionary;
 using Newtonsoft.Json;
 using ToDoModel;
+using ToDoModel.Data_Model.People;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
 
 namespace TaskMaster
@@ -50,6 +55,7 @@ namespace TaskMaster
         
         async public Task LoadSequentialAsync() 
         {
+            await LoadPeopleAsync();
             await LoadPrefixAndDictPeopleAsync();
             await LoadDictRemapAsync();
             await LoadIdListAsync();
@@ -127,6 +133,23 @@ namespace TaskMaster
         async private Task LoadProgramInfoAsync() => _programInfo = await Task.Run(LoadProgramInfo);
 
         //public ProgramData
+
+        async private Task LoadPeopleAsync() => await Task.Run(async () =>
+        {
+            if (_parent.IntelRes.Config.TryGetValue("People", out var config))
+            {
+                People = await PeopleScoDictionaryNew.Static.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew()) as PeopleScoDictionaryNew;
+                People.CollectionChanged += People_CollectionChanged;
+            }
+            else { logger.Error("People config not found."); }
+        }, _parent.AF.CancelToken);
+        public PeopleScoDictionaryNew People {  get; private set; }
+        public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
+        {
+            var dict = (PeopleScoDictionaryNew)Sender;
+            dict.Serialize();
+        }
+
 
         private PeopleScoDictionary _dictPPL;
         public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
