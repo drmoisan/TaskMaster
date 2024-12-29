@@ -81,7 +81,12 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             public static ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
+
+            public static async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError, Func<ScoDictionaryNew<TKey, TValue>> altLoader) where U : class, ISmartSerializable<U>, new() =>
+                await GetInstance().DeserializeAsync(config, askUserOnError, altLoader);
+
+
         }
-              
+
     }
 }

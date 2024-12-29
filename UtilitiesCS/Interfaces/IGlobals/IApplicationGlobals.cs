@@ -1,6 +1,7 @@
 ﻿
 using System.Threading.Tasks;
 using TaskMaster;
+using UtilitiesCS.EmailIntelligence;
 
 namespace UtilitiesCS
 {
@@ -14,5 +15,6 @@ namespace UtilitiesCS
         IAppEvents Events { get; }
         IAppQuickFilerSettings QfSettings { get; }
         IAppItemEngines Engines { get; }
+        IntelligenceConfig IntelRes { get; }
     }
 }

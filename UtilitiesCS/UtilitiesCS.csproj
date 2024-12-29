@@ -535,7 +535,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
-    <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />    
+    <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
@@ -561,6 +561,7 @@
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder.cs" />
     <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtension.cs" />
     <Compile Include="NewtonsoftHelpers\NonRecursiveConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\ScoDictionaryConverter.cs" />
     <Compile Include="NewtonsoftHelpers\SDIL Reader\ILGlobals.cs" />
     <Compile Include="NewtonsoftHelpers\SDIL Reader\ILInstruction.cs" />
     <Compile Include="NewtonsoftHelpers\SDIL Reader\MethodBodyReader.cs" />
@@ -635,6 +636,7 @@
     <Compile Include="HelperClasses\CloningFunctions\ObjectCopier.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
     <Compile Include="NewtonsoftHelpers\ScDictionaryConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScoDictionary.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
     <Compile Include="Interfaces\ITypes\IOutlookItem.cs" />
