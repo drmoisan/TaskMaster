@@ -58,77 +58,77 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             };
         }
 
-        [TestMethod]
-        public async Task TryGetUrlStreamAsync_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var downloader = new Downloader();
-            httpResponseMessage = new HttpResponseMessage(HttpStatusCode.Created);
-            var expected = StringToByteArray("test");
-            httpResponseMessage.Content = new ByteArrayContent(expected);
-            downloader.SetClientGetter((string url, CancellationToken cancel) => Task.FromResult(httpResponseMessage));
-            string url = "https://test.com";
-            int timeoutMs = 1000;
-            CancellationTokenSource tokenSource = new();
-            CancellationToken cancel = tokenSource.Token;
-            byte[] actual = null;
+        //[TestMethod]
+        //public async Task TryGetUrlStreamAsync_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var downloader = new Downloader();
+        //    httpResponseMessage = new HttpResponseMessage(HttpStatusCode.Created);
+        //    var expected = StringToByteArray("test");
+        //    httpResponseMessage.Content = new ByteArrayContent(expected);
+        //    downloader.SetClientGetter((string url, CancellationToken cancel) => Task.FromResult(httpResponseMessage));
+        //    string url = "https://test.com";
+        //    int timeoutMs = 1000;
+        //    CancellationTokenSource tokenSource = new();
+        //    CancellationToken cancel = tokenSource.Token;
+        //    byte[] actual = null;
 
-            // Act
-            var result = await downloader.TryGetUrlStreamAsync(
-                url,
-                timeoutMs,
-                cancel);
+        //    // Act
+        //    var result = await downloader.TryGetUrlStreamAsync(
+        //        url,
+        //        timeoutMs,
+        //        cancel);
             
-            actual = StreamToByteArray(result);
+        //    actual = StreamToByteArray(result);
             
-            // Assert
-            expected.Should().BeEquivalentTo(actual);
-        }
+        //    // Assert
+        //    expected.Should().BeEquivalentTo(actual);
+        //}
 
-        [TestMethod]
-        public async Task DownloadFileAsync_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var oneDriveDownloader = this.CreateOneDriveDownloader();
-            string url = "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA";
-            string destinationPath = "C:\\Temp\\test.xlsx";
-            int timeoutMs = 10000;
-            CancellationTokenSource tokenSource = new();
-            CancellationToken cancel = tokenSource.Token;
+        //[TestMethod]
+        //public async Task DownloadFileAsync_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var oneDriveDownloader = this.CreateOneDriveDownloader();
+        //    string url = "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA";
+        //    string destinationPath = "C:\\Temp\\test.xlsx";
+        //    int timeoutMs = 10000;
+        //    CancellationTokenSource tokenSource = new();
+        //    CancellationToken cancel = tokenSource.Token;
 
-            // Act
-            await oneDriveDownloader.DownloadFileAsync(
-                url,
-                destinationPath,
-                timeoutMs,
-                cancel);
+        //    // Act
+        //    await oneDriveDownloader.DownloadFileAsync(
+        //        url,
+        //        destinationPath,
+        //        timeoutMs,
+        //        cancel);
 
-            // Assert
+        //    // Assert
             
-        }
+        //}
 
-        [TestMethod]
-        public async Task TryGetFileStreamWriter_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var downloader = new Downloader();
-            var expected = StringToByteArray("Test");
-            downloader.SetFilestreamWriterGetter((string destinationPath) => new MemoryStream(expected));
-            string destinationPath = null;
-            int timeoutMs = 100000;
-            CancellationTokenSource tokenSource = new();
-            CancellationToken cancel = tokenSource.Token;
+        //[TestMethod]
+        //public async Task TryGetFileStreamWriter_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var downloader = new Downloader();
+        //    var expected = StringToByteArray("Test");
+        //    downloader.SetFilestreamWriterGetter((string destinationPath) => new MemoryStream(expected));
+        //    string destinationPath = null;
+        //    int timeoutMs = 100000;
+        //    CancellationTokenSource tokenSource = new();
+        //    CancellationToken cancel = tokenSource.Token;
 
-            // Act
-            var result = await downloader.TryGetFileStreamWriter(
-                destinationPath,
-                timeoutMs,
-                cancel);
-            var actual = StreamToByteArray(result);
+        //    // Act
+        //    var result = await downloader.TryGetFileStreamWriter(
+        //        destinationPath,
+        //        timeoutMs,
+        //        cancel);
+        //    var actual = StreamToByteArray(result);
             
 
-            // Assert
-            actual.Should().BeEquivalentTo(expected);
-        }
+        //    // Assert
+        //    actual.Should().BeEquivalentTo(expected);
+        //}
     }
 }

@@ -30,9 +30,10 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     //instruction.Operand = branches;
                     //break;
                 case OperandType.ShortInlineBrTarget:
-                    throw new NotImplementedException();
+                    //throw new NotImplementedException();
+                    gen.Emit(instruction.OpCode, (int)instruction.Offset);
                     //instruction.Operand = (((sbyte)il.ReadByte()) + il.position);
-                    //break;
+                    break;
                 case OperandType.InlineBrTarget:
                     throw new NotImplementedException();
                     //instruction.Operand = il.ReadInt32() + il.position;
@@ -70,9 +71,40 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     gen.Emit(instruction.OpCode, (string)instruction.Operand);
                     break;
                 case OperandType.InlineTok:
+                    if (instruction.Operand is Type type)
+                    {
+                        gen.Emit(instruction.OpCode, type);
+                    }
+                    else if (instruction.Operand is MethodInfo methodInfo1)
+                    {
+                        gen.Emit(instruction.OpCode, methodInfo1);
+                    }
+                    else if (instruction.Operand is FieldInfo fieldInfo)
+                    {
+                        gen.Emit(instruction.OpCode, fieldInfo);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("Operand is not a valid type, method, or field.");
+                    }
+                    break;
                 case OperandType.InlineType:
+                    gen.Emit(instruction.OpCode, (Type)instruction.Operand);
+                    break;
                 case OperandType.InlineMethod:
-                    gen.Emit(instruction.OpCode, (MethodInfo)instruction.Operand);
+                    if (instruction.Operand is MethodInfo methodInfo)
+                    {
+                        gen.Emit(instruction.OpCode, methodInfo);
+                    }
+                    else if (instruction.Operand is ConstructorInfo constructorInfo)
+                    {
+                        gen.Emit(instruction.OpCode, constructorInfo);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("Operand is neither MethodInfo nor ConstructorInfo.");
+                    }
+                    //gen.Emit(instruction.OpCode, (MethodInfo)instruction.Operand);
                     break;
                 case OperandType.InlineField:
                     //instruction.Operand = module.ResolveMember(il.ReadInt32(), type_arguments, method_arguments);

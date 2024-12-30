@@ -77,6 +77,7 @@
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
     <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionaryTests.cs" />
     <Compile Include="NewtonsoftHelpers\MyTypeBuilder.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScoDictionaryTest.cs" />
     <Compile Include="NewtonsoftHelpers\WrapperScDictionaryTest.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBodyTests.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloaderTests.cs" />

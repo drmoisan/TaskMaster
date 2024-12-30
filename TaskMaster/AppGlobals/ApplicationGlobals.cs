@@ -23,6 +23,12 @@ namespace TaskMaster
             _outlookApp = olApp;
         }
 
+        public ApplicationGlobals(Application olApp, bool loadBasic)
+        {
+            _outlookApp = olApp;
+            if (loadBasic) { LoadBasic(); }
+        }
+
         async public Task LoadAsync(bool parallel = true)
         {
             LoadBasic();

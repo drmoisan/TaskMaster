@@ -181,10 +181,10 @@ namespace UtilitiesCS.NewtonsoftHelpers
         {
             PropertyBuilder propertyBuilder = tb.DefineProperty(property.Name, property.Attributes, property.PropertyType, property.DeclaringType.GetGenericArguments());
             var getMethod = ModifyGetMethod(tb, property, ref capturedFields);
-            propertyBuilder.SetGetMethod(getMethod);
+            if (getMethod is not null) { propertyBuilder.SetGetMethod(getMethod); }
 
             var setMethod = ModifySetMethod(tb, property, ref capturedFields);
-            propertyBuilder.SetSetMethod(setMethod);
+            if (setMethod is not null) { propertyBuilder.SetSetMethod(setMethod); };
         }
 
         public void ReplicateProperty(TypeBuilder tb, PropertyInfo property, FieldInfo existingField)
@@ -229,7 +229,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             //Type[] method_arguments = null;
             Type[] type_arguments = null;
             var oldSetMethod = property.GetSetMethod();
-            if (oldSetMethod == null) { throw new InvalidOperationException("Property does not have a setter."); }
+            if (oldSetMethod == null) { return null; }
 
             //if (!(oldGetMethod is ConstructorInfo))
             //    method_arguments = oldGetMethod.GetGenericArguments();
@@ -255,7 +255,8 @@ namespace UtilitiesCS.NewtonsoftHelpers
                         backingFields[bf.Name] = fieldBuilder;
                     }
 
-                    setIl.Emit(OpCodes.Ldfld, fieldBuilder);
+                    setIl.Emit(instruction.OpCode, fieldBuilder);
+                    //setIl.Emit(OpCodes.Ldfld, fieldBuilder);
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {
@@ -309,7 +310,8 @@ namespace UtilitiesCS.NewtonsoftHelpers
                         backingFields[bf.Name] = fieldBuilder;
                     }
 
-                    getIl.Emit(OpCodes.Ldfld, fieldBuilder);
+                    getIl.Emit(instruction.OpCode, fieldBuilder);
+                    //getIl.Emit(OpCodes.Ldfld, fieldBuilder);
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {

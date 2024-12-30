@@ -11,7 +11,7 @@ using Moq;
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {
     [TestClass]
-    public class WrapperScDictionaryTest
+    public class WrapperScoDictionaryTest
     {
         private MockRepository mockRepository;
         private Mock<IApplicationGlobals> mockGlobals;
@@ -27,7 +27,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
         }
 
-        private class TestDerived : ScDictionary<string, int>
+        private class TestDerived : ScoDictionaryNew<string, int>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
@@ -43,7 +43,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             public int GetAdditionalField2() => AdditionalField2;
         }
-                
+
         private class RemainingObjectClass
         {
             public string AdditionalField1 { get; set; }
@@ -61,17 +61,17 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         }
 
         private class RemainingObjectClass1
-        {            
+        {
             public NewSmartSerializableConfig Config { get; set; }
         }
 
-        private class DerivedTest2: ScDictionary<string, string>
+        private class DerivedTest2 : ScoDictionaryNew<string, string>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
             private string _additionalField3;
             public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
-            
+
             public DerivedTest2()
             {
                 AdditionalField1 = "Test";
@@ -107,25 +107,25 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             }
         }
 
-        private WrapperScDictionary<DerivedTest2, string, string> GetWrapperComposedTest2()
-        {            
-            var wrapper = new WrapperScDictionary<DerivedTest2, string, string>();
-            wrapper.ConcurrentDictionary.TryAdd("key1", "value1");
-            wrapper.ConcurrentDictionary.TryAdd("key2", "value2");
+        private WrapperScoDictionary<DerivedTest2, string, string> GetWrapperComposedTest2()
+        {
+            var wrapper = new WrapperScoDictionary<DerivedTest2, string, string>();
+            wrapper.CoDictionary.TryAdd("key1", "value1");
+            wrapper.CoDictionary.TryAdd("key2", "value2");
             var ro = new RemainingObjectClass2();
             ro.Config = ConfigInitializer.InitConfig(new NewSmartSerializableConfig(), globals);
             wrapper.RemainingObject = ro;
             return wrapper;
         }
 
-        public static class ConfigInitializer 
+        public static class ConfigInitializer
         {
             public static NewSmartSerializableConfig InitConfig(NewSmartSerializableConfig config, IApplicationGlobals globals)
             {
                 config.Disk.FileName = "testdict.json";
-                if (globals.FS.SpecialFolders.TryGetValue("AppData", out var appData)) 
-                { 
-                    config.Disk.FolderPath = appData; 
+                if (globals.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+                {
+                    config.Disk.FolderPath = appData;
                     config.NetDisk.FileName = "testdict.json";
                     config.NetDisk.FolderPath = appData;
                     config.LocalDisk = config.Disk;
@@ -137,19 +137,19 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                     return config;
                 }
                 return null;
-                
+
             }
         }
 
         [TestMethod]
-        public void ToComposition_ShouldExtractScDictionaryAndFields() 
-        { 
+        public void ToComposition_ShouldExtractScDictionaryAndFields()
+        {
             // Arrange
             var derived = GetDerivedTest2();
             var expected = GetWrapperComposedTest2();
 
             // Act
-            var actual = new WrapperScDictionary<DerivedTest2, string, string>().ToComposition(derived);
+            var actual = new WrapperScoDictionary<DerivedTest2, string, string>().ToComposition(derived);
 
             // Assert            
             actual.Should().BeEquivalentTo(expected);
@@ -177,15 +177,15 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             derivedInstance.TryAdd("key1", 1);
             derivedInstance.TryAdd("key2", 2);
 
-            var wrapper = new WrapperScDictionary<TestDerived, string, int>();
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>();
 
             // Act
             wrapper.ToComposition(derivedInstance);
 
             // Assert
-            Assert.AreEqual(2, wrapper.ConcurrentDictionary.Count);
-            Assert.AreEqual(1, wrapper.ConcurrentDictionary["key1"]);
-            Assert.AreEqual(2, wrapper.ConcurrentDictionary["key2"]);
+            Assert.AreEqual(2, wrapper.CoDictionary.Count);
+            Assert.AreEqual(1, wrapper.CoDictionary["key1"]);
+            Assert.AreEqual(2, wrapper.CoDictionary["key2"]);
 
             var remainingObjectType = wrapper.RemainingObject.GetType();
             var additionalProperty1 = remainingObjectType.GetProperty("AdditionalField1", BindingFlags.Instance | BindingFlags.Public);
@@ -201,9 +201,9 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         public void ToDerived_ShouldRecreateDerivedInstance()
         {
             // Arrange
-            var composedInstance = new WrapperScDictionary<TestDerived, string, int>();
-            composedInstance.ConcurrentDictionary.TryAdd("key1", 1);
-            composedInstance.ConcurrentDictionary.TryAdd("key2", 2);
+            var composedInstance = new WrapperScoDictionary<TestDerived, string, int>();
+            composedInstance.CoDictionary.TryAdd("key1", 1);
+            composedInstance.CoDictionary.TryAdd("key2", 2);
             composedInstance.RemainingObject = new RemainingObjectClass();
             var expected = new TestDerived();
             expected.TryAdd("key1", 1);
@@ -226,7 +226,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
 
             // Act
-            var wrapper = new WrapperScDictionary<TestDerived, string, int>().ToComposition(derivedInstance);
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>().ToComposition(derivedInstance);
             var recreatedInstance = wrapper.ToDerived();
 
             // Assert
@@ -237,7 +237,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         public void CompileType_ShouldCreateTypeWithAdditionalFields()
         {
             // Arrange
-            var wrapper = new WrapperScDictionary<TestDerived, string, int>();
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>();
 
             // Act
             var newType = wrapper.CompileType();
@@ -262,13 +262,13 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var derivedInstance = new TestDerived();
             derivedInstance.TryAdd("key1", 1);
             derivedInstance.TryAdd("key2", 2);
-            var expected = new WrapperScDictionary<TestDerived, string, int>();
-            expected.ConcurrentDictionary.TryAdd("key1", 1);
-            expected.ConcurrentDictionary.TryAdd("key2", 2);
+            var expected = new WrapperScoDictionary<TestDerived, string, int>();
+            expected.CoDictionary.TryAdd("key1", 1);
+            expected.CoDictionary.TryAdd("key2", 2);
             expected.RemainingObject = new RemainingObjectClass();
 
             // Act
-            var wrapper = new WrapperScDictionary<TestDerived, string, int>().ToComposition(derivedInstance);
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>().ToComposition(derivedInstance);
 
             var newClassInstance = wrapper.RemainingObject;
             var newClassType = newClassInstance.GetType();
