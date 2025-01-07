@@ -145,7 +145,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        public DateTime TaskStartDate
+        public new DateTime TaskStartDate
         {
             get
             {

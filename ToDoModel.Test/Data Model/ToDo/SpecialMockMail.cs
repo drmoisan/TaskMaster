@@ -261,9 +261,9 @@ namespace ToDoModel.Test.Data_Model.ToDo
 
         public DateTime RetentionExpirationDate { get; set; }
 
-        public event ItemEvents_10_OpenEventHandler Open;
-        public event ItemEvents_10_CustomActionEventHandler CustomAction;
-        public event ItemEvents_10_CustomPropertyChangeEventHandler CustomPropertyChange;
+        public event ItemEvents_10_OpenEventHandler Open { add { } remove { } }
+        public event ItemEvents_10_CustomActionEventHandler CustomAction { add { } remove { } }
+        public event ItemEvents_10_CustomPropertyChangeEventHandler CustomPropertyChange { add { } remove { } }
 
         event ItemEvents_10_ForwardEventHandler ItemEvents_10_Event.Forward
         {
@@ -291,8 +291,8 @@ namespace ToDoModel.Test.Data_Model.ToDo
             }
         }
 
-        public event ItemEvents_10_PropertyChangeEventHandler PropertyChange;
-        public event ItemEvents_10_ReadEventHandler Read;
+        public event ItemEvents_10_PropertyChangeEventHandler PropertyChange { add { } remove { } }
+        public event ItemEvents_10_ReadEventHandler Read { add { } remove { } }
 
         event ItemEvents_10_ReplyEventHandler ItemEvents_10_Event.Reply
         {
@@ -333,21 +333,21 @@ namespace ToDoModel.Test.Data_Model.ToDo
             }
         }
 
-        public event ItemEvents_10_WriteEventHandler Write;
-        public event ItemEvents_10_BeforeCheckNamesEventHandler BeforeCheckNames;
-        public event ItemEvents_10_AttachmentAddEventHandler AttachmentAdd;
-        public event ItemEvents_10_AttachmentReadEventHandler AttachmentRead;
-        public event ItemEvents_10_BeforeAttachmentSaveEventHandler BeforeAttachmentSave;
-        public event ItemEvents_10_BeforeDeleteEventHandler BeforeDelete;
-        public event ItemEvents_10_AttachmentRemoveEventHandler AttachmentRemove;
-        public event ItemEvents_10_BeforeAttachmentAddEventHandler BeforeAttachmentAdd;
-        public event ItemEvents_10_BeforeAttachmentPreviewEventHandler BeforeAttachmentPreview;
-        public event ItemEvents_10_BeforeAttachmentReadEventHandler BeforeAttachmentRead;
-        public event ItemEvents_10_BeforeAttachmentWriteToTempFileEventHandler BeforeAttachmentWriteToTempFile;
-        public event ItemEvents_10_UnloadEventHandler Unload;
-        public event ItemEvents_10_BeforeAutoSaveEventHandler BeforeAutoSave;
-        public event ItemEvents_10_BeforeReadEventHandler BeforeRead;
-        public event ItemEvents_10_AfterWriteEventHandler AfterWrite;
-        public event ItemEvents_10_ReadCompleteEventHandler ReadComplete;
+        public event ItemEvents_10_WriteEventHandler Write { add { } remove { } }
+        public event ItemEvents_10_BeforeCheckNamesEventHandler BeforeCheckNames { add { } remove { } }
+        public event ItemEvents_10_AttachmentAddEventHandler AttachmentAdd { add { } remove { } }
+        public event ItemEvents_10_AttachmentReadEventHandler AttachmentRead { add { } remove { } }
+        public event ItemEvents_10_BeforeAttachmentSaveEventHandler BeforeAttachmentSave { add { } remove { } }
+        public event ItemEvents_10_BeforeDeleteEventHandler BeforeDelete { add { } remove { } }
+        public event ItemEvents_10_AttachmentRemoveEventHandler AttachmentRemove { add { } remove { } }
+        public event ItemEvents_10_BeforeAttachmentAddEventHandler BeforeAttachmentAdd { add { } remove { } }
+        public event ItemEvents_10_BeforeAttachmentPreviewEventHandler BeforeAttachmentPreview { add { } remove { } }
+        public event ItemEvents_10_BeforeAttachmentReadEventHandler BeforeAttachmentRead { add { } remove { } }
+        public event ItemEvents_10_BeforeAttachmentWriteToTempFileEventHandler BeforeAttachmentWriteToTempFile { add { } remove { } }
+        public event ItemEvents_10_UnloadEventHandler Unload { add { } remove { } }
+        public event ItemEvents_10_BeforeAutoSaveEventHandler BeforeAutoSave { add { } remove { } }
+        public event ItemEvents_10_BeforeReadEventHandler BeforeRead { add { } remove { } }
+        public event ItemEvents_10_AfterWriteEventHandler AfterWrite { add { } remove { } }
+        public event ItemEvents_10_ReadCompleteEventHandler ReadComplete { add { } remove { } }
     }
 }
