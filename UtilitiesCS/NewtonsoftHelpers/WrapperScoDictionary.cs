@@ -11,12 +11,16 @@ using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.NewtonsoftHelpers.MonoExtension;
 using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using Newtonsoft.Json;
 
 namespace UtilitiesCS.NewtonsoftHelpers
 {
     public class WrapperScoDictionary<TDerived, TKey, TValue> where TDerived : ScoDictionaryNew<TKey, TValue>
     {
+        [JsonProperty("CoDictionary")]
         public ConcurrentObservableDictionary<TKey, TValue> CoDictionary { get; set; }
+
+        [JsonProperty("RemainingObject")]
         public object RemainingObject { get; set; }
 
         public WrapperScoDictionary()

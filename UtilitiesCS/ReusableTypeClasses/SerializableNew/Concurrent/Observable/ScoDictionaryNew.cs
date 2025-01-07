@@ -14,6 +14,7 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 using ConcurrentObservableCollections.ConcurrentObservableDictionary;
 using System.Runtime.CompilerServices;
+using UtilitiesCS.NewtonsoftHelpers.Sco;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
@@ -54,7 +55,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         #endregion ISmartSerializable
 
         public string Name { get; set; }
-
+                
         #region INotifyPropertyChanged
 
         private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -71,27 +72,56 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #endregion INotifyPropertyChanged
 
+        #region Static Deserialization
+
         public static class Static
         {
-            private static SmartSerializable<ScoDictionaryNew<TKey, TValue>> GetInstance() => new();
+            private static SmartSerializable<T> GetInstance<T>() where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new() => new();
 
-            public static ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath) =>
-                GetInstance().Deserialize(fileName, folderPath);
+            public static JsonSerializerSettings GetSettingsJson<T>(IApplicationGlobals globals) where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new()
+            {
+                var settings = new JsonSerializerSettings()
+                {
+                    //TypeNameHandling = TypeNameHandling.Auto,
+                    Formatting = Formatting.Indented,
+                    PreserveReferencesHandling = PreserveReferencesHandling.All,
+                    TraceWriter = new NLogTraceWriter()
+                };
+                settings.Converters.Add(new AppGlobalsConverter(globals));
+                settings.Converters.Add(new FilePathHelperConverter(globals.FS));
+                settings.Converters.Add(new ScoDictionaryConverter<T, TKey, TValue>());
+                return settings;
+            }
 
-            public static ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) =>
-                GetInstance().Deserialize(fileName, folderPath, askUserOnError);
+            public static T Deserialize<T>(string fileName, string folderPath) where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new() =>
+                GetInstance<T>().Deserialize(fileName, folderPath);
+                        
+            public static T Deserialize<T>(string fileName, string folderPath, bool askUserOnError) where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new() =>
+                GetInstance<T>().Deserialize(fileName, folderPath, askUserOnError);
 
-            public static ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
-                GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
+            public static T Deserialize<T>(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) 
+                where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new() =>
+                GetInstance<T>().Deserialize(fileName, folderPath, askUserOnError, settings);
 
-            public static ScoDictionaryNew<TKey, TValue> DeserializeObject(string json, JsonSerializerSettings settings) =>
-                GetInstance().DeserializeObject(json, settings);
+            public static T DeserializeObject<T>(string json, JsonSerializerSettings settings) where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new()
+            {
+                return GetInstance<T>().DeserializeObject(json, settings);
+            }
 
-            public static async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError, Func<ScoDictionaryNew<TKey, TValue>> altLoader) where U : class, ISmartSerializable<U>, new() =>
-                await GetInstance().DeserializeAsync(config, askUserOnError, altLoader);
+            public static T DeserializeObject<T>(string json, IApplicationGlobals globals) where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new()
+            {
+                var settings = GetSettingsJson<T>(globals);
+                return GetInstance<T>().DeserializeObject(json, settings);
+            }
 
-
+            public static async Task<T> DeserializeAsync<T, U>
+                (SmartSerializable<U> config, bool askUserOnError, Func<T> altLoader)
+                where T : ScoDictionaryNew<TKey, TValue>, ISmartSerializable<T>, new()
+                where U : class, ISmartSerializable<U>, new() =>
+                await GetInstance<T>().DeserializeAsync<U>(config, askUserOnError, altLoader);
         }
 
+        #endregion Static Deserialization
+    
     }
 }

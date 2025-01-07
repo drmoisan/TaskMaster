@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using UtilitiesCS.ReusableTypeClasses;
 using System.Windows.Input;
 using FluentAssertions;
+using UtilitiesCS.NewtonsoftHelpers;
 
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {
@@ -48,9 +49,10 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             var settings = new JsonSerializerSettings()
             {
-                TypeNameHandling = TypeNameHandling.Auto,
+                //TypeNameHandling = TypeNameHandling.Auto,
                 Formatting = Formatting.Indented,
-                PreserveReferencesHandling = PreserveReferencesHandling.All
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                TraceWriter = new NLogTraceWriter()
             };
             settings.Converters.Add(new AppGlobalsConverter(globals));
             settings.Converters.Add(new FilePathHelperConverter(globals.FS));
@@ -100,10 +102,17 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Act
             var json = expected.SerializeToString();
             Console.WriteLine(json);
-            
-            
-            var actual = TestDerived.Static.DeserializeObject(json, settings);
-            
+
+            // Sequential actions to do without custom converter
+            // var wrap = JsonConvert.DeserializeObject<WrapperScoDictionary<TestDerived, string, int>>(json, settings);
+            // var actual = wrap.ToDerived();
+
+            // Direct action with custom converter
+            var actual = JsonConvert.DeserializeObject<TestDerived>(json, settings);
+
+            // Static class deserialization with custom converter
+            //var actual = TestDerived.Static.DeserializeObject<TestDerived>(json, settings);
+
             // Assert
 
             actual.Should().BeEquivalentTo(expected);

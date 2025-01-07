@@ -1,6 +1,10 @@
 ﻿using UtilitiesCS.ReusableTypeClasses;
 using Newtonsoft.Json;
 using System;
+using UtilitiesCS.Properties;
+using System.IO;
+using System.Text;
+using System.Runtime;
 
 namespace UtilitiesCS.NewtonsoftHelpers.Sco
 {
@@ -10,11 +14,10 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
 
         public override TDerived ReadJson(JsonReader reader, Type typeToConvert, TDerived existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            WrapperScoDictionary<TDerived, TKey, TValue> dictionary = serializer.Deserialize(reader) as WrapperScoDictionary<TDerived, TKey, TValue>;            
-            return dictionary?.ToDerived();
-            
+            var wrapper = serializer.Deserialize(reader, typeof(WrapperScoDictionary<TDerived, TKey, TValue>)) as WrapperScoDictionary<TDerived, TKey, TValue>;
+            return wrapper?.ToDerived();            
         }
-
+                
         public override void WriteJson(JsonWriter writer, TDerived value, JsonSerializer serializer)
         {
             var wrapper = new WrapperScoDictionary<TDerived, TKey, TValue>().ToComposition(value);
