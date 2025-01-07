@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Outlook = Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
@@ -12,6 +13,9 @@ namespace UtilitiesCS
     /// </summary>
     public class OutlookItem : IOutlookItem
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         protected object _item;  // the wrapped Outlook item
         protected Type _type;  // type for the Outlook item 
         protected object[] _args;  // dummy argument array
@@ -19,50 +23,51 @@ namespace UtilitiesCS
 
         #region OutlookItem Constants
 
-        private const string OlActions = "Actions";
-        private const string OlApplication = "Application";
-        private const string OlAttachments = "Attachments";
-        private const string OlBillingInformation = "BillingInformation";
-        private const string OlBody = "Body";
-        private const string OlCategories = "Categories";
-        private const string OlClass = "Class";
-        private const string OlClose = "Close";
-        private const string OlCompanies = "Companies";
-        private const string OlConversationIndex = "ConversationIndex";
-        private const string OlConversationTopic = "ConversationTopic";
-        private const string OlCopy = "Copy";
-        private const string OlCreationTime = "CreationTime";
-        private const string OlDisplay = "Display";
-        private const string OlDownloadState = "DownloadState";
-        private const string OlEntryID = "EntryID";
-        private const string OlFormDescription = "FormDescription";
-        private const string OlGetInspector = "GetInspector";
-        private const string OlImportance = "Importance";
-        private const string OlIsConflict = "IsConflict";
-        private const string OlItemProperties = "ItemProperties";
-        private const string OlLastModificationTime = "LastModificationTime";
-        private const string OlLinks = "Links";
-        private const string OlMarkForDownload = "MarkForDownload";
-        private const string OlMessageClass = "MessageClass";
-        private const string OlMileage = "Mileage";
-        private const string OlMove = "Move";
-        private const string OlNoAging = "NoAging";
-        private const string OlOutlookInternalVersion = "OutlookInternalVersion";
-        private const string OlOutlookVersion = "OutlookVersion";
-        private const string OlParent = "Parent";
-        private const string OlPrintOut = "PrintOut";
-        private const string OlPropertyAccessor = "PropertyAccessor";
-        private const string OlReminderTime = "ReminderTime";
-        private const string OlSave = "Save";
-        private const string OlSaveAs = "SaveAs";
-        private const string OlSaved = "Saved";
-        private const string OlSensitivity = "Sensitivity";
-        private const string OlSession = "Session";
-        private const string OlShowCategoriesDialog = "ShowCategoriesDialog";
-        private const string OlSize = "Size";
-        private const string OlSubject = "Subject";
-        private const string OlUnRead = "UnRead";
-        private const string OlUserProperties = "UserProperties";
+        private const string olActions = "Actions";
+        private const string olApplication = "Application";
+        private const string olAttachments = "Attachments";
+        private const string olBillingInformation = "BillingInformation";
+        private const string olBody = "Body";
+        private const string olCategories = "Categories";
+        private const string olClass = "Class";
+        private const string olClose = "Close";
+        private const string olCompanies = "Companies";
+        private const string olConversationIndex = "ConversationIndex";
+        private const string olConversationTopic = "ConversationTopic";
+        private const string olCopy = "Copy";
+        private const string olCreationTime = "CreationTime";
+        private const string olDisplay = "Display";
+        private const string olDownloadState = "DownloadState";
+        private const string olEntryID = "EntryID";
+        private const string olFormDescription = "FormDescription";
+        private const string olGetInspector = "GetInspector";
+        private const string olImportance = "Importance";
+        private const string olIsConflict = "IsConflict";
+        private const string olItemProperties = "ItemProperties";
+        private const string olLastModificationTime = "LastModificationTime";
+        private const string olLinks = "Links";
+        private const string olMarkForDownload = "MarkForDownload";
+        private const string olMessageClass = "MessageClass";
+        private const string olMileage = "Mileage";
+        private const string olMove = "Move";
+        private const string olNoAging = "NoAging";
+        private const string olOutlookInternalVersion = "OutlookInternalVersion";
+        private const string olOutlookVersion = "OutlookVersion";
+        private const string olParent = "Parent";
+        private const string olPrintOut = "PrintOut";
+        private const string olPropertyAccessor = "PropertyAccessor";
+        private const string olReminderTime = "ReminderTime";
+        private const string olSave = "Save";
+        private const string olSaveAs = "SaveAs";
+        private const string olSaved = "Saved";
+        private const string olSensitivity = "Sensitivity";
+        private const string olSession = "Session";
+        private const string olShowCategoriesDialog = "ShowCategoriesDialog";
+        private const string olSize = "Size";
+        private const string olSubject = "Subject";
+        private const string olTaskStartDate = "TaskStartDate";
+        private const string olUnRead = "UnRead";
+        private const string olUserProperties = "UserProperties";
         #endregion
 
         #region ctor
@@ -86,25 +91,25 @@ namespace UtilitiesCS
 
         #region Predefined Properties
 
-        public Outlook.Actions Actions => this.GetPropertyValue< Outlook.Actions>(OlActions);
+        public Outlook.Actions Actions => this.GetPropertyValue< Outlook.Actions>(olActions);
 
-        public Outlook.Application Application => this.GetPropertyValue<Outlook.Application>(OlApplication);
+        public Outlook.Application Application => this.GetPropertyValue<Outlook.Application>(olApplication);
 
-        public Outlook.Attachments Attachments => this.GetPropertyValue<Outlook.Attachments>(OlAttachments);
+        public Outlook.Attachments Attachments => this.GetPropertyValue<Outlook.Attachments>(olAttachments);
 
-        public string BillingInformation { get => this.GetPropertyValue<string>(OlBillingInformation); set => SetPropertyValue(OlBillingInformation, value); }
+        public string BillingInformation { get => this.GetPropertyValue<string>(olBillingInformation); set => SetPropertyValue(olBillingInformation, value); }
 
-        public string Body { get => this.GetPropertyValue<string>(OlBody); set => SetPropertyValue(OlBody, value); }
+        public string Body { get => this.GetPropertyValue<string>(olBody); set => SetPropertyValue(olBody, value); }
 
-        public string Categories { get => this.GetPropertyValue<string>(OlCategories); set => SetPropertyValue(OlCategories, value); }
+        public string Categories { get => this.GetPropertyValue<string>(olCategories); set => SetPropertyValue(olCategories, value); }
 
         public void Close(Outlook.OlInspectorClose SaveMode)
         {
             object[] MyArgs = { SaveMode };
-            this.CallMethod(OlClose);
+            this.CallMethod(olClose);
         }
 
-        public string Companies { get => this.GetPropertyValue<string>(OlCompanies); set => SetPropertyValue(OlCompanies, value); }
+        public string Companies { get => this.GetPropertyValue<string>(olCompanies); set => SetPropertyValue(olCompanies, value); }
 
         public Outlook.OlObjectClass Class
         {
@@ -117,139 +122,163 @@ namespace UtilitiesCS
                     Outlook.OlObjectClass objClass = Outlook.OlObjectClass.olAction;
                     _typeOlObjectClass = objClass.GetType();
                 }
-                return (Outlook.OlObjectClass)System.Enum.ToObject(_typeOlObjectClass, this.GetPropertyValue<object>(OlClass));
+                return (Outlook.OlObjectClass)System.Enum.ToObject(_typeOlObjectClass, this.GetPropertyValue<object>(olClass));
             }
         }
 
-        public string ConversationIndex => this.GetPropertyValue<string>(OlConversationIndex);
+        public string ConversationIndex => this.GetPropertyValue<string>(olConversationIndex);
 
-        public string ConversationTopic => this.GetPropertyValue<string>(OlConversationTopic);
+        public string ConversationTopic => this.GetPropertyValue<string>(olConversationTopic);
 
-        public System.DateTime CreationTime => this.GetPropertyValue<System.DateTime>(OlCreationTime);
+        public System.DateTime CreationTime => this.GetPropertyValue<System.DateTime>(olCreationTime);
 
-        public Outlook.OlDownloadState DownloadState => this.GetPropertyValue<Outlook.OlDownloadState>(OlDownloadState);
+        public Outlook.OlDownloadState DownloadState => this.GetPropertyValue<Outlook.OlDownloadState>(olDownloadState);
 
-        public string EntryID => this.GetPropertyValue<string>(OlEntryID);
+        public string EntryID => this.GetPropertyValue<string>(olEntryID);
 
-        public Outlook.FormDescription FormDescription => this.GetPropertyValue<Outlook.FormDescription>(OlFormDescription);
+        public Outlook.FormDescription FormDescription => this.GetPropertyValue<Outlook.FormDescription>(olFormDescription);
 
-        public Object InnerObject => this._item;
+        public object InnerObject => this._item;
 
-        public Outlook.Inspector Inspector => this.GetPropertyValue<Outlook.Inspector>(OlGetInspector);
+        public Outlook.Inspector Inspector => this.GetPropertyValue<Outlook.Inspector>(olGetInspector);
 
-        public Outlook.OlImportance Importance { get => this.GetPropertyValue<Outlook.OlImportance>(OlImportance); set => SetPropertyValue(OlImportance, value); }
+        public Outlook.OlImportance Importance { get => this.GetPropertyValue<Outlook.OlImportance>(olImportance); set => SetPropertyValue(olImportance, value); }
 
-        public bool IsConflict => this.GetPropertyValue<bool>(OlIsConflict);
+        public bool IsConflict => this.GetPropertyValue<bool>(olIsConflict);
         
-        public Outlook.ItemProperties ItemProperties => this.GetPropertyValue<Outlook.ItemProperties>(OlItemProperties);
+        public Outlook.ItemProperties ItemProperties => this.GetPropertyValue<Outlook.ItemProperties>(olItemProperties);
 
-        public System.DateTime LastModificationTime => this.GetPropertyValue<System.DateTime>(OlLastModificationTime);
+        public System.DateTime LastModificationTime => this.GetPropertyValue<System.DateTime>(olLastModificationTime);
 
-        public Outlook.Links Links => this.GetPropertyValue<Outlook.Links>(OlLinks);
+        public Outlook.Links Links => this.GetPropertyValue<Outlook.Links>(olLinks);
 
-        public Outlook.OlRemoteStatus MarkForDownload { get => this.GetPropertyValue<Outlook.OlRemoteStatus>(OlMarkForDownload); set => SetPropertyValue(OlMarkForDownload, value); }
+        public Outlook.OlRemoteStatus MarkForDownload { get => this.GetPropertyValue<Outlook.OlRemoteStatus>(olMarkForDownload); set => SetPropertyValue(olMarkForDownload, value); }
 
-        public string MessageClass { get => this.GetPropertyValue<string>(OlMessageClass); set => SetPropertyValue(OlMessageClass, value); }
+        public string MessageClass { get => this.GetPropertyValue<string>(olMessageClass); set => SetPropertyValue(olMessageClass, value); }
 
-        public string Mileage { get => this.GetPropertyValue<string>(OlMileage); set => SetPropertyValue(OlMileage, value); }
+        public string Mileage { get => this.GetPropertyValue<string>(olMileage); set => SetPropertyValue(olMileage, value); }
 
         public object Move(Outlook.Folder DestinationFolder)
         {
             object[] myArgs = { DestinationFolder };
-            return this.CallMethod(OlMove, myArgs);
+            return this.CallMethod(olMove, myArgs);
         }
 
-        public bool NoAging { get => this.GetPropertyValue<bool>(OlNoAging); set => SetPropertyValue(OlNoAging, value); }
+        public bool NoAging { get => this.GetPropertyValue<bool>(olNoAging); set => SetPropertyValue(olNoAging, value); }
 
-        public long OutlookInternalVersion => this.GetPropertyValue<long>(OlOutlookInternalVersion);
+        public long OutlookInternalVersion => this.GetPropertyValue<long>(olOutlookInternalVersion);
 
-        public string OutlookVersion => this.GetPropertyValue<string>(OlOutlookVersion);
+        public string OutlookVersion => this.GetPropertyValue<string>(olOutlookVersion);
 
-        public Outlook.Folder Parent => this.GetPropertyValue<Outlook.Folder>(OlParent);
+        public Outlook.Folder Parent => this.GetPropertyValue<Outlook.Folder>(olParent);
 
-        public Outlook.PropertyAccessor PropertyAccessor => this.GetPropertyValue<Outlook.PropertyAccessor>(OlPropertyAccessor);
+        public Outlook.PropertyAccessor PropertyAccessor => this.GetPropertyValue<Outlook.PropertyAccessor>(olPropertyAccessor);
 
-        public DateTime ReminderTime { get => this.GetPropertyValue<DateTime>(OlReminderTime); set => SetPropertyValue(OlReminderTime, value); }
+        public DateTime ReminderTime { get => this.GetPropertyValue<DateTime>(olReminderTime); set => SetPropertyValue(olReminderTime, value); }
 
-        public bool Saved => this.GetPropertyValue<bool>(OlSaved);
+        public bool Saved => this.GetPropertyValue<bool>(olSaved);
 
-        public Outlook.OlSensitivity Sensitivity { get => this.GetPropertyValue<Outlook.OlSensitivity>(OlSensitivity); set => SetPropertyValue(OlSensitivity, value); }
+        public Outlook.OlSensitivity Sensitivity { get => this.GetPropertyValue<Outlook.OlSensitivity>(olSensitivity); set => SetPropertyValue(olSensitivity, value); }
 
-        public Outlook.NameSpace Session => this.GetPropertyValue<Outlook.NameSpace>(OlSession);
+        public Outlook.NameSpace Session => this.GetPropertyValue<Outlook.NameSpace>(olSession);
 
-        public long Size => this.GetPropertyValue<long>(OlSize);
+        public long Size => this.GetPropertyValue<long>(olSize);
 
-        public string Subject { get => this.GetPropertyValue<string>(OlSubject); set => SetPropertyValue(OlSubject, value); }
+        public string Subject { get => this.GetPropertyValue<string>(olSubject); set => SetPropertyValue(olSubject, value); }
 
-        public bool UnRead { get => this.GetPropertyValue<bool>(OlUnRead); set => SetPropertyValue(OlUnRead, value); }
+        public DateTime TaskStartDate => this.GetPropertyValueIfExists<DateTime>(olTaskStartDate);
 
-        public Outlook.UserProperties UserProperties => this.GetPropertyValue<Outlook.UserProperties>(OlUserProperties);
+        public bool UnRead { get => this.GetPropertyValue<bool>(olUnRead); set => SetPropertyValue(olUnRead, value); }
+
+        public Outlook.UserProperties UserProperties => this.GetPropertyValue<Outlook.UserProperties>(olUserProperties);
 
         #endregion Predefined Properties
 
         #region Predefined Methods
 
-        public object Copy() => (this.CallMethod(OlCopy));
+        public object Copy() => (this.CallMethod(olCopy));
 
-        public void Display() => this.CallMethod(OlDisplay);
+        public void Display() => this.CallMethod(olDisplay);
 
-        public void PrintOut() => this.CallMethod(OlPrintOut);
+        public void PrintOut() => this.CallMethod(olPrintOut);
 
-        public void Save() => this.CallMethod(OlSave);
+        public void Save() => this.CallMethod(olSave);
 
         public void SaveAs(string path, Outlook.OlSaveAsType type)
         {
             object[] myArgs = { path, type };
-            this.CallMethod(OlSaveAs, myArgs);
+            this.CallMethod(olSaveAs, myArgs);
         }
 
-        public void ShowCategoriesDialog() => this.CallMethod(OlShowCategoriesDialog);
+        public void ShowCategoriesDialog() => this.CallMethod(olShowCategoriesDialog);
 
         #endregion Predefined Methods
 
         #region Internal Helper Functions
 
-        internal virtual T GetPropertyValue<T>(string propertyName)
+        internal virtual T GetPropertyValueIfExists<T>(string propertyName)
+        {
+            var propertyInfo = TryGetPropertyInfo(propertyName);
+            try
+            {
+               return (T)(propertyInfo?.GetValue(_item) ?? default(T));
+            }
+            catch (SystemException e)
+            {
+                logger.Info($"{nameof(OutlookItem)}.{nameof(GetPropertyValueIfExists)}<{nameof(T)}> threw an " +
+                    $"exception for property [{propertyName}]. {e.Message}", e);
+                return default(T);
+            }
+        }
+
+        internal virtual PropertyInfo TryGetPropertyInfo(string propertyName)
         {
             try
             {
-                // An invalid property name exception is propagated to client
-                T obj = (T)_type.InvokeMember(
-                    propertyName,
-                    BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
-                    null,
-                    _item,
-                    _args);
-                return obj;
+                return _type.GetProperty(propertyName);
             }
-            catch (SystemException ex)
+            catch (SystemException e)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: GetPropertyValue for {0} Exception: {1} ",
-                    propertyName, ex.Message));
+                logger.Debug($"{nameof(OutlookItem)}.{nameof(TryGetPropertyInfo)} threw an " +
+                    $"exception for property [{propertyName}] of item type [{ItemType.Name}]. {e.Message}", e);
+                return null;
+            }
+        }
+
+        internal virtual T GetPropertyValue<T>(string propertyName)
+        {
+            var propertyInfo = TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(ItemType.Name, propertyName);
+            try
+            {
+                var value = propertyInfo.GetValue(_item);
+                if (value is null) { return default(T); }
+                else
+                {
+                    var typedValue = (T)value;
+                    return typedValue;
+                }
+                //return (T)(propertyInfo.GetValue(_item) ?? default(T));
+            }
+            catch (SystemException e)
+            {
+                // An invalid property name exception is propagated to client
+                logger.Error($"{nameof(OutlookItem)}.{nameof(GetPropertyValue)}<{nameof(T)}> threw an " +
+                    $"exception for property [{propertyName}]. {e.Message}", e );
                 throw;
             }
         }
 
         internal virtual void SetPropertyValue<T>(string propertyName, T propertyValue)
         {
+            var propertyInfo = TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(ItemType.Name, propertyName);
             try
             {
-                _type.InvokeMember(
-                    propertyName,
-                    BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
-                    null,
-                    _item,
-                    new object[] { propertyValue });
-                
+                propertyInfo.SetValue(_item, propertyValue);
             }
             catch (SystemException ex)
             {
-                Debug.WriteLine(
-                   string.Format(
-                   "OutlookItem: SetPropertyValue for {0} Exception: {1} ",
-                   propertyName, ex.Message));
+                logger.Error($"{nameof(OutlookItem)}.{nameof(SetPropertyValue)}<{nameof(T)}> threw an " +
+                    $"exception for property [{propertyName}]. {ex.Message}", ex);
                 throw;
             }
         }
@@ -258,17 +287,19 @@ namespace UtilitiesCS
         {
             try
             {
-                // An invalid property name exception is propagated to client
-                var obj = _type.InvokeMember(
-                    methodName,
-                    BindingFlags.Public | BindingFlags.InvokeMethod,
-                    null,
-                    _item,
-                    _args);
-                return obj;
+                var methodInfo = _type.GetMethod(methodName).ThrowIfNull();
+                return methodInfo.Invoke(_item, _args);
+                //var obj = _type.InvokeMember(
+                //    methodName,
+                //    BindingFlags.Public | BindingFlags.InvokeMethod,
+                //    null,
+                //    _item,
+                //    _args);
+                //return obj;
             }
             catch (SystemException)
             {
+                // An invalid property name exception is propagated to client
                 //Debug.WriteLine(
                 //    string.Format(
                 //    "OutlookItem: CallMethod for {0} Exception: {1} ",

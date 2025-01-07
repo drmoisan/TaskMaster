@@ -59,6 +59,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             return settings;
         }
 
+
+
         public static async Task<SmartSerializableLoader> DeserializeAsync(
             IApplicationGlobals globals, string jsonObject, CancellationToken cancel = default)
         {

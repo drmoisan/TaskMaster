@@ -43,6 +43,8 @@ namespace UtilitiesCS.ReusableTypeClasses
         public void Serialize() => ism.Serialize();
         public void Serialize(string filePath) => ism.Serialize(filePath);
         public void SerializeThreadSafe(string filePath) => ism.SerializeThreadSafe(filePath);
+        public string SerializeToString() => ism.SerializeToString();
+        public void SerializeToStream(StreamWriter sw) => ism.SerializeToStream(sw);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath) => ism.Deserialize(fileName, folderPath);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) => ism.Deserialize(fileName, folderPath, askUserOnError);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
@@ -81,6 +83,9 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             public static ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
                 GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
+
+            public static ScoDictionaryNew<TKey, TValue> DeserializeObject(string json, JsonSerializerSettings settings) =>
+                GetInstance().DeserializeObject(json, settings);
 
             public static async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError, Func<ScoDictionaryNew<TKey, TValue>> altLoader) where U : class, ISmartSerializable<U>, new() =>
                 await GetInstance().DeserializeAsync(config, askUserOnError, altLoader);

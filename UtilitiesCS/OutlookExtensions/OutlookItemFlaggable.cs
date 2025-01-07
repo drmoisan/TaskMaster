@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.OutlookExtensions
 {
-    public class OutlookItemFlaggable : OutlookItem
+    public class OutlookItemFlaggable : OutlookItem, IOutlookItemFlaggable
     {
         #region Constructor
 
-        public OutlookItemFlaggable(object item) : base(item) 
-        { 
+        public OutlookItemFlaggable(object item) : base(item)
+        {
             _olType = this.GetOlItemType();
         }
 
@@ -76,7 +76,7 @@ namespace UtilitiesCS.OutlookExtensions
                 }
             }
         }
-        
+
         public DateTime DueDate
         {
             get
@@ -89,7 +89,7 @@ namespace UtilitiesCS.OutlookExtensions
                 }
                 if (dueDate is null)
                 {
-                    throw new ArgumentException(GetTypeErrorMessage(nameof(DueDate))); 
+                    throw new ArgumentException(GetTypeErrorMessage(nameof(DueDate)));
                 }
                 return (DateTime)dueDate;
             }
@@ -126,7 +126,7 @@ namespace UtilitiesCS.OutlookExtensions
                 if (current != value)
                 {
                     //If it was false and now is true, set the flag status to olFlagMarked. Irrelevant for TaskItems
-                    if (value) 
+                    if (value)
                     {
                         OutlookItemExtensions.TryCallMethod(this, "MarkAsTask", new object[] { OlMarkInterval.olMarkNoDate });
                         //this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olFlagMarked); 
@@ -136,7 +136,7 @@ namespace UtilitiesCS.OutlookExtensions
                         // If it was true and now is false, set the flag status to olNoFlag
                         //if (!this.TrySetPropertyValue(_olFlagStatus, OlFlagStatus.olNoFlag))
                         if (OutlookItemExtensions.TryCallMethod(this, "ClearTaskFlag") is null)
-                            {
+                        {
                             // TaskItems cannot be set to false
                             throw new ArgumentOutOfRangeException($"{nameof(Outlook.TaskItem)} items cannot be set to False");
                         }
@@ -144,11 +144,11 @@ namespace UtilitiesCS.OutlookExtensions
                 }
             }
         }
-                
+
         public DateTime TaskStartDate
         {
             get
-            {                
+            {
                 object startDate = null;
                 if (_olType == OlItemType.olTaskItem) { startDate = this.TryGetPropertyValue(_olStartDate, _olCreationTime); }
                 else { startDate = this.TryGetPropertyValue(_olTaskStartDate, _olCreationTime); }
@@ -186,8 +186,8 @@ namespace UtilitiesCS.OutlookExtensions
                 if (TaskSubject != value)
                 {
                     if (_olType == OlItemType.olTaskItem) { Subject = value; }
-                    else 
-                    { 
+                    else
+                    {
                         var success = this.TrySetPropertyValue(_olTaskSubject, _olSubject, value);
                         if (!success) { throw new ArgumentException(GetTypeErrorMessage(nameof(TaskSubject))); }
                     }
@@ -195,9 +195,9 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        public int TotalWork 
+        public int TotalWork
         {
-            get 
+            get
             {
                 object work;
                 if (_olType == OlItemType.olTaskItem) { work = OutlookItemExtensions.TryGetPropertyValue(this, _olTotalWork); }
@@ -220,7 +220,7 @@ namespace UtilitiesCS.OutlookExtensions
                     {
                         Debug.WriteLine($"Error setting TotalWork to value {value}");
                     }
-                    
+
                 }
             }
         }
@@ -233,6 +233,6 @@ namespace UtilitiesCS.OutlookExtensions
 
         #endregion
 
-        
+
     }
 }

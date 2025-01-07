@@ -41,6 +41,7 @@ namespace UtilitiesCS
         NameSpace Session { get; }
         long Size { get; }
         string Subject { get; set; }
+        DateTime TaskStartDate { get; }
         bool UnRead { get; set; }
         UserProperties UserProperties { get; }
 

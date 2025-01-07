@@ -16,24 +16,38 @@ using UtilitiesCS;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 
-[assembly: InternalsVisibleTo("ToDoModel.Tests")]
+[assembly: InternalsVisibleTo("ToDoModel.Test")]
 namespace ToDoModel
 {
     [Serializable()]
     public class ToDoItem : ICloneable, IToDoItem
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Constructors
 
         private ToDoItem() { }
 
-        public ToDoItem(IOutlookItem outlookItem)
+        public ToDoItem(IOutlookItem outlookItem): this(new OutlookItemFlaggable(outlookItem)) 
+        {            
+            //FlaggableItem = new OutlookItemFlaggable(outlookItem);
+            //Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
+            //InitializeOutlookItem(_flaggableItem);
+            //string argstrCats_All = outlookItem.Categories;
+            //Flags = new FlagParser(ref argstrCats_All);
+            //outlookItem.Categories = argstrCats_All;
+            //InitializeCustomFields(FlaggableItem);
+        }
+
+        public ToDoItem(IOutlookItemFlaggable flaggableItem)
         {
-            FlaggableItem = new OutlookItemFlaggable(outlookItem);
+            FlaggableItem = flaggableItem;
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
-            InitializeOutlookItem(_olItem);
-            string argstrCats_All = outlookItem.Categories;
+            InitializeOutlookItem(_flaggableItem);
+            string argstrCats_All = FlaggableItem.Categories;
             Flags = new FlagParser(ref argstrCats_All);
-            outlookItem.Categories = argstrCats_All;
+            FlaggableItem.Categories = argstrCats_All;
             InitializeCustomFields(FlaggableItem);
         }
 
@@ -43,7 +57,7 @@ namespace ToDoModel
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
             if (!onDemand)
             {
-                InitializeOutlookItem(_olItem);
+                InitializeOutlookItem(_flaggableItem);
                 string argstrCats_All = outlookItem.Categories;
                 Flags = new FlagParser(ref argstrCats_All);
                 outlookItem.Categories = argstrCats_All;
@@ -72,7 +86,7 @@ namespace ToDoModel
 
         #region Initializers
 
-        private void InitializeOutlookItem(OutlookItemFlaggable olItem)
+        private void InitializeOutlookItem(IOutlookItemFlaggable olItem)
         {
             _taskSubject = olItem.TaskSubject;
             _priority = olItem.Importance;
@@ -82,7 +96,7 @@ namespace ToDoModel
 
         private void InitializeCustomFields(object item)
         {
-            _tagProgram = FlaggableItem.GetUdfString("TagProgram");
+            //_tagProgram = FlaggableItem.GetUdfString("TagProgram");
             _activeBranch = (bool)(FlaggableItem.GetUdfValue("AB", OlUserPropertyType.olYesNo));
             _ec2 = (bool)(FlaggableItem.GetUdfValue("EC2", OlUserPropertyType.olYesNo));
             _expandChildren = FlaggableItem.GetUdfString("EC");
@@ -142,7 +156,7 @@ namespace ToDoModel
             MetaTaskLvl = _metaTaskLvl;
             Priority = (OlImportance)_priority;
             StartDate = (DateTime)_startDate;
-            Complete = (bool)_complete;
+            Complete = _complete ?? false;
             TotalWork = (int)_totalWork;
             ActiveBranch = _activeBranch ?? false;
             ExpandChildren = _expandChildren;
@@ -302,9 +316,9 @@ namespace ToDoModel
         public bool IdAutoCoding { get => _idAutoCoding; set => _idAutoCoding = value; }
         private bool _idAutoCoding = true;
 
-        public IOutlookItem OlItem => _olItem;
-        private OutlookItemFlaggable _olItem;
-        internal OutlookItemFlaggable FlaggableItem { get => _olItem; set => _olItem = value; }
+        public IOutlookItem OlItem => _flaggableItem;
+        private IOutlookItemFlaggable _flaggableItem;
+        internal IOutlookItemFlaggable FlaggableItem { get => _flaggableItem; set => _flaggableItem = value; }
 
         private IIDList _idList;
         public IIDList IdList { get => _idList; set => _idList = value; }

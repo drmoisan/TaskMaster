@@ -53,6 +53,8 @@
   <ItemGroup>
     <Compile Include="AssertAll.cs" />
     <Compile Include="Data Model\ID\BaseChangerTests.cs" />
+    <Compile Include="Data Model\ToDo\SpecialMockMail.cs" />
+    <Compile Include="Data Model\ToDo\SpecialMockOutlookItem.cs" />
     <Compile Include="Data Model\ToDo\ToDoItemTests.cs" />
     <Compile Include="Data Model\Tree\TreeNodeTests.cs" />
     <Compile Include="Data Model\Tree\TreeNodeTests_UnfinishedStubs.cs" />

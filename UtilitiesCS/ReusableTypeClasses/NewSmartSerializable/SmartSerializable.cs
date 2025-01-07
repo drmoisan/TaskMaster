@@ -303,6 +303,24 @@ namespace UtilitiesCS.ReusableTypeClasses
             return instance;
         }
 
+        public T DeserializeObject(string json, JsonSerializerSettings settings)
+        {
+            T instance = null;
+            try
+            {
+                instance = JsonConvert.DeserializeObject<T>(json, settings);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            if (instance is not null) 
+            { 
+                instance.Config.JsonSettings = settings.DeepCopy(); 
+            }
+            return instance;
+        }
+
         protected T DeserializeJson(FilePathHelper disk)
         {
             var settings = GetDefaultSettings();

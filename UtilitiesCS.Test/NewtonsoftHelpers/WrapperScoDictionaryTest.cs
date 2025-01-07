@@ -27,7 +27,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
         }
 
-        private class TestDerived : ScoDictionaryNew<string, int>
+        internal class TestDerived : ScoDictionaryNew<string, int>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
@@ -44,7 +44,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public int GetAdditionalField2() => AdditionalField2;
         }
 
-        private class RemainingObjectClass
+        internal class RemainingObjectClass
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
@@ -60,12 +60,12 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             }
         }
 
-        private class RemainingObjectClass1
+        internal class RemainingObjectClass1
         {
             public NewSmartSerializableConfig Config { get; set; }
         }
 
-        private class DerivedTest2 : ScoDictionaryNew<string, string>
+        internal class DerivedTest2 : ScoDictionaryNew<string, string>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
@@ -81,7 +81,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public int GetAdditionalField2() => AdditionalField2;
         }
 
-        private DerivedTest2 GetDerivedTest2()
+        internal DerivedTest2 GetDerivedTest2()
         {
             var dt = new DerivedTest2();
             dt.TryAdd("key1", "value1");
@@ -91,7 +91,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             return dt;
         }
 
-        private class RemainingObjectClass2
+        internal class RemainingObjectClass2
         {
             public NewSmartSerializableConfig Config { get; set; }
             public string AdditionalField1 { get; set; }
@@ -107,7 +107,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             }
         }
 
-        private WrapperScoDictionary<DerivedTest2, string, string> GetWrapperComposedTest2()
+        internal WrapperScoDictionary<DerivedTest2, string, string> GetWrapperComposedTest2()
         {
             var wrapper = new WrapperScoDictionary<DerivedTest2, string, string>();
             wrapper.CoDictionary.TryAdd("key1", "value1");
