@@ -669,8 +669,11 @@
     <Compile Include="Interfaces\ITypes\ISmartSerializableConfig.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableBase.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableStatic.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNew.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryStatic.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloLinkedList.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />

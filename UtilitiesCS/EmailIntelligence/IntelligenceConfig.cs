@@ -43,6 +43,12 @@ namespace UtilitiesCS.EmailIntelligence
                 .SelectAwait(async kvp =>
                 {
                     var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
+                    if (IsDerivedFromScoDictionaryNew(loader.T))
+                    {
+                        loader.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.None;
+                        loader.Config.JsonSettings.Converters.Add(new NewtonsoftHelpers.Sco.ScoDictionaryConverter());
+                        //add a converter for sco dictionary
+                    }
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
                 }).ToConcurrentDictionaryAsync();
@@ -77,6 +83,25 @@ namespace UtilitiesCS.EmailIntelligence
                 }
                 resxWriter.Generate();
             }
+        }
+
+        private static bool IsDerivedFromScoDictionaryNew(Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            Type baseType = typeof(ScoDictionaryNew<,>);
+            while (type != null && type != typeof(object))
+            {
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == baseType)
+                {
+                    return true;
+                }
+                type = type.BaseType;
+            }
+            return false;
         }
     }
 }

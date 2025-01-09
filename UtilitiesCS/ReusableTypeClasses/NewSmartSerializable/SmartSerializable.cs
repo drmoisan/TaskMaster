@@ -456,6 +456,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             public static T Deserialize<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
                 GetInstance().Deserialize(config);
 
+            public static T DeseriealizeObject(string json, JsonSerializerSettings settings) =>
+                GetInstance().DeserializeObject(json, settings);
+
             public static async Task<T> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
                 await GetInstance().DeserializeAsync(config);
 
@@ -471,4 +474,5 @@ namespace UtilitiesCS.ReusableTypeClasses
         
         #endregion Static
     }
+
 }

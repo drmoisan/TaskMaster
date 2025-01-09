@@ -7,6 +7,8 @@ using UtilitiesCS.ReusableTypeClasses;
 using System.Windows.Input;
 using FluentAssertions;
 using UtilitiesCS.NewtonsoftHelpers;
+using System.Threading.Tasks;
+using static System.Resources.ResXFileRef;
 
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {
@@ -35,34 +37,43 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             private string _additionalField3;
             public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
 
-            public TestDerived()
+            public TestDerived() { }
+
+            public TestDerived Init(IApplicationGlobals globals)
             {
                 AdditionalField1 = "Test";
                 AdditionalField2 = 42;
                 AdditionalField3 = "Test3";
+                this.TryAdd("key1", 1);
+                this.TryAdd("key2", 2);
+
+                var settings = GetSettings(globals);                
+                this.Config.JsonSettings = settings;
+                return this;
             }
 
             public int GetAdditionalField2() => AdditionalField2;
-        }
-        
-        private JsonSerializerSettings GetSettings()
-        {
-            var settings = new JsonSerializerSettings()
+
+            public static JsonSerializerSettings GetJsonSettings(IApplicationGlobals globals) { return new TestDerived().GetSettings(globals); }
+            private JsonSerializerSettings GetSettings(IApplicationGlobals globals)
             {
-                //TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented,
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                TraceWriter = new NLogTraceWriter()
-            };
-            settings.Converters.Add(new AppGlobalsConverter(globals));
-            settings.Converters.Add(new FilePathHelperConverter(globals.FS));
-            return settings;
+                var settings = new JsonSerializerSettings()
+                {
+                    //TypeNameHandling = TypeNameHandling.Auto,
+                    Formatting = Formatting.Indented,
+                    PreserveReferencesHandling = PreserveReferencesHandling.All,
+                    TraceWriter = new NLogTraceWriter()
+                };
+                settings.Converters.Add(new AppGlobalsConverter(globals));
+                settings.Converters.Add(new FilePathHelperConverter(globals.FS));
+                
+                return settings;
+            }
+
+
         }
 
-        private ScoDictionaryConverter<TestDerived, string, int> CreateScoDictionaryConverter()
-        {
-            return new ScoDictionaryConverter<TestDerived, string, int>();
-        }
+
 
         //[TestMethod]
         //public void ReadJson_StateUnderTest_ExpectedBehavior()
@@ -89,15 +100,40 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         //}
 
         [TestMethod]
-        public void WriteJson_StateUnderTest_ExpectedBehavior()
+        public void TypedConverter_IntegrationTest_SerializeAndDeserialize()
         {
             // Arrange
-            var expected = new TestDerived();
-            expected.TryAdd("key1", 1);
-            expected.TryAdd("key2", 2);
-            var settings = GetSettings();
-            settings.Converters.Add(CreateScoDictionaryConverter());
-            expected.Config.JsonSettings = settings;
+            var expected = new TestDerived().Init(globals);
+            expected.Config.JsonSettings.Converters.Add(new ScoDictionaryConverter<TestDerived, string, int>());
+            
+            // Act
+            var json = expected.SerializeToString();
+            Console.WriteLine(json);
+
+            // Sequential actions to do without custom converter
+            // var wrap = JsonConvert.DeserializeObject<WrapperScoDictionary<TestDerived, string, int>>(json, settings);
+            // var actual = wrap.ToDerived();
+
+            // Direct action with custom converter
+            //var actual = JsonConvert.DeserializeObject<TestDerived>(json, settings);
+            
+            // Static class deserialization with custom converter
+            var settings = TestDerived.GetJsonSettings(globals);
+            settings.Converters.Add(new ScoDictionaryConverter<TestDerived, string, int>());
+            var actual = SmartSerializable.DeserializeObject<TestDerived>(json, settings);
+
+            // Assert
+
+            actual.Should().BeEquivalentTo(expected);
+                        
+        }
+
+        [TestMethod]
+        public void UntypedConverter_IntegrationTest_SerializeAndDeserialize()
+        {
+            // Arrange
+            var expected = new TestDerived().Init(globals);
+            expected.Config.JsonSettings.Converters.Add(new ScoDictionaryConverter());
 
             // Act
             var json = expected.SerializeToString();
@@ -108,14 +144,24 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // var actual = wrap.ToDerived();
 
             // Direct action with custom converter
-            var actual = JsonConvert.DeserializeObject<TestDerived>(json, settings);
+            //var actual = JsonConvert.DeserializeObject<TestDerived>(json, settings);
 
             // Static class deserialization with custom converter
-            //var actual = TestDerived.Static.DeserializeObject<TestDerived>(json, settings);
+            var settings = TestDerived.GetJsonSettings(globals);
+            settings.Converters.Add(new ScoDictionaryConverter());
+            var actual = SmartSerializable.DeserializeObject<TestDerived>(json, settings);
 
             // Assert
 
             actual.Should().BeEquivalentTo(expected);
+
+        }
+
+        [TestMethod]
+        public void WriteJson_StateUnderTest_ExpectedBehavior()
+        {
+            // Arrange
+            var expected = new TestDerived().Init(globals);
 
             //// Act
             //scoDictionaryConverter.WriteJson(

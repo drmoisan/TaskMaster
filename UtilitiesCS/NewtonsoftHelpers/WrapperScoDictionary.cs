@@ -232,7 +232,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         {
             //Type[] method_arguments = null;
             Type[] type_arguments = null;
-            var oldSetMethod = property.GetSetMethod();
+            var oldSetMethod = property.GetSetMethod(true);
             if (oldSetMethod == null) { return null; }
 
             //if (!(oldGetMethod is ConstructorInfo))
@@ -287,7 +287,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         {
             //Type[] method_arguments = null;
             Type[] type_arguments = null;
-            var oldGetMethod = property.GetGetMethod();
+            var oldGetMethod = property.GetGetMethod(true);
             if (oldGetMethod == null) { throw new InvalidOperationException("Property does not have a getter."); }
 
             //if (!(oldGetMethod is ConstructorInfo))

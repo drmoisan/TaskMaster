@@ -103,6 +103,7 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNewTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
   </ItemGroup>

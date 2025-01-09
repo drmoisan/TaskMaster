@@ -138,7 +138,7 @@ namespace TaskMaster
         {
             if (_parent.IntelRes.Config.TryGetValue("People", out var config))
             {
-                People = await PeopleScoDictionaryNew.Static.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew()) as PeopleScoDictionaryNew;
+                People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew());
                 People.CollectionChanged += People_CollectionChanged;
             }
             else { logger.Error("People config not found."); }
