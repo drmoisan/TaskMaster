@@ -16,7 +16,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel.Data_Model.People
 {
-    public class PeopleScoDictionaryNew: ScoDictionaryNew<string, string>
+    public class PeopleScoDictionaryNew : ScoDictionaryNew<string, string>, IPeopleScoDictionaryNew
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

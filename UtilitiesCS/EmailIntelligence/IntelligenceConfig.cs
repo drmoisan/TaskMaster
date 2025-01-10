@@ -43,7 +43,7 @@ namespace UtilitiesCS.EmailIntelligence
                 .SelectAwait(async kvp =>
                 {
                     var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
-                    if (IsDerivedFromScoDictionaryNew(loader.T))
+                    if (loader.T is not null && IsDerivedFromScoDictionaryNew(loader.T))
                     {
                         loader.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.None;
                         loader.Config.JsonSettings.Converters.Add(new NewtonsoftHelpers.Sco.ScoDictionaryConverter());

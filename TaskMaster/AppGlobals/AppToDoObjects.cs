@@ -25,9 +25,9 @@ namespace TaskMaster
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public AppToDoObjects(ApplicationGlobals ParentInstance)
+        public AppToDoObjects(IApplicationGlobals parentInstance)
         {
-            _parent = ParentInstance;
+            Parent = parentInstance;
         }
 
         async public Task LoadAsync(bool parallel = true)
@@ -77,14 +77,8 @@ namespace TaskMaster
             return obj;
         }
 
-        private readonly ApplicationGlobals _parent;
-        public IApplicationGlobals Parent
-        {
-            get
-            {
-                return _parent;
-            }
-        }
+        public IApplicationGlobals Parent { get; protected set; }
+        internal ISmartSerializableNonTyped SmartSerializable { get; set; } = new SmartSerializableNonTyped();
 
         private string _projInfo_Filename;
         public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _projInfo_Filename = _defaults.FileName_ProjInfo);
@@ -94,7 +88,7 @@ namespace TaskMaster
         {
             _projInfo = await Task.Run(() => 
             {
-                if (_parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+                if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
                 {
                     return new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: appData); 
                 }
@@ -109,7 +103,7 @@ namespace TaskMaster
         private IProjectData LoadProjInfo()
         {
 
-            if (_parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+            if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
             {
                 var projectInfo = new ProjectData(filename: _defaults.FileName_ProjInfo,
                                                   folderpath: appData);
@@ -123,7 +117,7 @@ namespace TaskMaster
         public ScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
         private ScDictionary<string, string> LoadProgramInfo() 
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+            if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
             {
                 return ScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, appData); 
             }
@@ -134,15 +128,15 @@ namespace TaskMaster
 
         //public ProgramData
 
-        async private Task LoadPeopleAsync() => await Task.Run(async () =>
+        async internal Task LoadPeopleAsync() => await Task.Run(async () =>
         {
-            if (_parent.IntelRes.Config.TryGetValue("People", out var config))
+            if (Parent.IntelRes.Config.TryGetValue("People", out var config))
             {
                 People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew());
                 People.CollectionChanged += People_CollectionChanged;
             }
             else { logger.Error("People config not found."); }
-        }, _parent.AF.CancelToken);
+        }, Parent.AF.CancelToken);
         public PeopleScoDictionaryNew People {  get; private set; }
         public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
         {
@@ -155,7 +149,7 @@ namespace TaskMaster
         public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
         private PeopleScoDictionary LoadDictPPL()
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
                 var dictPPL = new PeopleScoDictionary(filename: _defaults.FilenameDictPpl,
                                                   folderpath: pythonStaging,
@@ -182,7 +176,7 @@ namespace TaskMaster
         
         private IIDList LoadIDList()
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+            if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
             {
                 var idList = new IDList(FnameIDList,
                                     appData,
@@ -201,7 +195,7 @@ namespace TaskMaster
         public IScoDictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictRemap());
         private ScoDictionary<string, string> LoadDictRemap()
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
                 var dictRemap = new ScoDictionary<string, string>(filename: FnameDictRemap,
                                                               folderpath: pythonStaging);
@@ -218,7 +212,7 @@ namespace TaskMaster
         {
             get => Initialized(_catFilters, () =>
             {
-                if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                 {
                     return new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
                                                         folderpath: pythonStaging);
@@ -229,7 +223,7 @@ namespace TaskMaster
             {
                 _catFilters = value;
                 
-                if (_catFilters.Folderpath == "" && _parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                if (_catFilters.Folderpath == "" && Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                 {
                     _catFilters.Folderpath = pythonStaging;
                     _catFilters.Filename = _defaults.FileName_CategoryFilters;
@@ -242,7 +236,7 @@ namespace TaskMaster
             
             _catFilters = await Task.Run(() =>
             {
-                if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                 {
                     return new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
                                                        folderpath: pythonStaging);
@@ -256,7 +250,7 @@ namespace TaskMaster
         public ScoCollection<IPrefix> PrefixList => Initialized(_prefixList, () => LoadPrefixList());
         public ScoCollection<IPrefix> LoadPrefixList()
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
                 var prefixList = new ScoCollection<IPrefix>(fileName: _defaults.FileName_PrefixList,
                                                             folderPath: pythonStaging);
@@ -280,7 +274,7 @@ namespace TaskMaster
         public ScoDictionary<string, int> FilteredFolderScraping => Initialized(_filteredFolderScraping, () => LoadFilteredFolderScraping());
         public ScoDictionary<string, int> LoadFilteredFolderScraping()
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
                 var filteredFolderScraping = new ScoDictionary<string, int>(_defaults.FileName_FilteredFolderScraping,
                                                                             pythonStaging);
@@ -299,7 +293,7 @@ namespace TaskMaster
         public ScoDictionary<string, string> FolderRemap => Initializer.GetOrLoad(ref _folderRemap, () => LoadFolderRemap());
         public ScoDictionary<string, string> LoadFolderRemap()
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
                 var folderRemap = new ScoDictionary<string, string>(_defaults.FileName_FolderRemap,
                                                                     pythonStaging);

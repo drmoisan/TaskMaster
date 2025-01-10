@@ -70,10 +70,31 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                 return settings;
             }
 
-
         }
 
+        internal class DerivedSimple : ScoDictionaryNew<string, int>
+        {
+            public string AdditionalField1 { get; set; }
+            
+            public DerivedSimple() { AdditionalField1 = "Test"; }
+            
+            public static JsonSerializerSettings GetJsonSettings(IApplicationGlobals globals) { return new DerivedSimple().GetSettings(globals); }
+            private JsonSerializerSettings GetSettings(IApplicationGlobals globals)
+            {
+                var settings = new JsonSerializerSettings()
+                {
+                    //TypeNameHandling = TypeNameHandling.Auto,
+                    Formatting = Formatting.Indented,
+                    PreserveReferencesHandling = PreserveReferencesHandling.All,
+                    TraceWriter = new NLogTraceWriter()
+                };
+                settings.Converters.Add(new AppGlobalsConverter(globals));
+                settings.Converters.Add(new FilePathHelperConverter(globals.FS));
 
+                return settings;
+            }
+
+        }
 
         //[TestMethod]
         //public void ReadJson_StateUnderTest_ExpectedBehavior()
@@ -120,10 +141,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Static class deserialization with custom converter
             var settings = TestDerived.GetJsonSettings(globals);
             settings.Converters.Add(new ScoDictionaryConverter<TestDerived, string, int>());
-            var actual = SmartSerializable.DeserializeObject<TestDerived>(json, settings);
+            var smartSerializable = new SmartSerializableNonTyped();
+            var actual = smartSerializable.DeserializeObject<TestDerived>(json, settings);
 
             // Assert
-
+            
             actual.Should().BeEquivalentTo(expected);
                         
         }
@@ -149,7 +171,8 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Static class deserialization with custom converter
             var settings = TestDerived.GetJsonSettings(globals);
             settings.Converters.Add(new ScoDictionaryConverter());
-            var actual = SmartSerializable.DeserializeObject<TestDerived>(json, settings);
+            var smartSerializable = new SmartSerializableNonTyped();
+            var actual = smartSerializable.DeserializeObject<TestDerived>(json, settings);
 
             // Assert
 

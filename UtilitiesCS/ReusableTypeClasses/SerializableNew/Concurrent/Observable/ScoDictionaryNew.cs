@@ -18,7 +18,7 @@ using UtilitiesCS.NewtonsoftHelpers.Sco;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class ScoDictionaryNew<TKey, TValue>: ConcurrentObservableDictionary<TKey, TValue>, ISmartSerializable<ScoDictionaryNew<TKey, TValue>>
+    public class ScoDictionaryNew<TKey, TValue> : ConcurrentObservableDictionary<TKey, TValue>, /*ISmartSerializable<ScoDictionaryNew<TKey, TValue>>,*/ IScoDictionaryNew<TKey, TValue>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -36,7 +36,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         private void InitIsm()
         {
-            ism = new SmartSerializable<ScoDictionaryNew<TKey, TValue>>(this);            
+            ism = new SmartSerializable<ScoDictionaryNew<TKey, TValue>>(this);
         }
 
         #endregion Constructors
@@ -45,7 +45,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         [JsonProperty]
         public NewSmartSerializableConfig Config { get => ism.Config; set => ism.Config = value; }
-        
+
         [JsonProperty]
         protected virtual SmartSerializable<ScoDictionaryNew<TKey, TValue>> ism { get; set; }
 
@@ -54,26 +54,26 @@ namespace UtilitiesCS.ReusableTypeClasses
         public void SerializeThreadSafe(string filePath) => ism.SerializeThreadSafe(filePath);
         public string SerializeToString() => ism.SerializeToString();
         public void SerializeToStream(StreamWriter sw) => ism.SerializeToStream(sw);
-        
+
         public ScoDictionaryNew<TKey, TValue> DeserializeObject(string json, JsonSerializerSettings settings) => ism.DeserializeObject(json, settings);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath) => ism.Deserialize(fileName, folderPath);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError) => ism.Deserialize(fileName, folderPath, askUserOnError);
         public ScoDictionaryNew<TKey, TValue> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) => ism.Deserialize(fileName, folderPath, askUserOnError, settings);
         ScoDictionaryNew<TKey, TValue> ISmartSerializable<ScoDictionaryNew<TKey, TValue>>.Deserialize<U>(SmartSerializable<U> loader) => ism.Deserialize(loader);
         ScoDictionaryNew<TKey, TValue> ISmartSerializable<ScoDictionaryNew<TKey, TValue>>.Deserialize<U>(SmartSerializable<U> loader, bool askUserOnError, Func<ScoDictionaryNew<TKey, TValue>> altLoader) => ism.Deserialize(loader, askUserOnError, altLoader);
-        
-        public async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config) 
-            where U : class, ISmartSerializable<U>, new() => 
+
+        public async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config)
+            where U : class, ISmartSerializable<U>, new() =>
             await ism.DeserializeAsync(config);
-        
-        public async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError) 
-            where U : class, ISmartSerializable<U>, new() => 
+
+        public async Task<ScoDictionaryNew<TKey, TValue>> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError)
+            where U : class, ISmartSerializable<U>, new() =>
             await ism.DeserializeAsync(config, askUserOnError);
-        
+
         async Task<ScoDictionaryNew<TKey, TValue>> ISmartSerializable<ScoDictionaryNew<TKey, TValue>>.DeserializeAsync<U>(
-            SmartSerializable<U> config, bool askUserOnError, Func<ScoDictionaryNew<TKey, TValue>> altLoader) => 
+            SmartSerializable<U> config, bool askUserOnError, Func<ScoDictionaryNew<TKey, TValue>> altLoader) =>
             await ism.DeserializeAsync(config, askUserOnError, altLoader);
-        
+
         #endregion ISmartSerializable
 
         public string Name { get; set; }

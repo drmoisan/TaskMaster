@@ -137,6 +137,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppGlobals\AppToDoObjectsTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -151,6 +152,10 @@
     <ProjectReference Include="..\TaskMaster\TaskMaster.csproj">
       <Project>{68924fdf-614d-447c-a175-450860ddb597}</Project>
       <Name>TaskMaster</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ToDoModel\ToDoModel.csproj">
+      <Project>{238efd29-3cf3-07f3-28d3-c60d88f99769}</Project>
+      <Name>ToDoModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
