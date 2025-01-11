@@ -68,12 +68,12 @@ namespace Tags
         { 
             var autoAssign = new LauncherAutoAssign();
             autoAssign.FilterList = new List<string>();
-            autoAssign.AddChoicesToDictDelegate = _globals.TD.DictPPL.AddMissingEntries;
+            autoAssign.AddChoicesToDictDelegate = _globals.TD.People.AddMissingEntries;
             autoAssign.AddColorCategoryDelegate = (IPrefix prefix, string categoryName) => 
                 CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
 
             autoAssign.AutoFindDelegate = (object objItem) => AutoFile2.AutoFindPeople(objItem: objItem,
-                                                                                       ppl_dict: _globals.TD.DictPPL,
+                                                                                       ppl_dict: _globals.TD.People,
                                                                                        emailRootFolder: _globals.Ol.EmailRootPath,
                                                                                        dictRemap: _globals.TD.DictRemap,
                                                                                        userAddress: _globals.Ol.UserEmailAddress,

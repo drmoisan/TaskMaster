@@ -41,7 +41,7 @@ namespace TaskMaster
         {
             var tasks = new List<Task>
             {
-                LoadPrefixAndDictPeopleAsync(),
+                LoadPrefixListAsync(),                
                 LoadDictRemapAsync(),
                 LoadIdListAsync(),
                 LoadProgramInfoAsync(),
@@ -55,8 +55,8 @@ namespace TaskMaster
         
         async public Task LoadSequentialAsync() 
         {
+            await LoadPrefixListAsync();
             await LoadPeopleAsync();
-            await LoadPrefixAndDictPeopleAsync();
             await LoadDictRemapAsync();
             await LoadIdListAsync();
             await LoadProgramInfoAsync();
@@ -138,7 +138,7 @@ namespace TaskMaster
             else { logger.Error("People config not found."); }
         }, Parent.AF.CancelToken);
 
-        public PeopleScoDictionaryNew People {  get; private set; }
+        public IPeopleScoDictionaryNew People {  get; private set; }
         public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
         {
             var dict = (PeopleScoDictionaryNew)Sender;
@@ -146,27 +146,27 @@ namespace TaskMaster
         }
 
 
-        private PeopleScoDictionary _dictPPL;
-        public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
-        private PeopleScoDictionary LoadDictPPL()
-        {
-            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
-            {
-                var dictPPL = new PeopleScoDictionary(filename: _defaults.FilenameDictPpl,
-                                                  folderpath: pythonStaging,
-                                                  appGlobals: Parent,
-                                                  prefix: PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People));
+        //private PeopleScoDictionary _dictPPL;
+        //public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
+        //private PeopleScoDictionary LoadDictPPL()
+        //{
+        //    if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+        //    {
+        //        var dictPPL = new PeopleScoDictionary(filename: _defaults.FilenameDictPpl,
+        //                                          folderpath: pythonStaging,
+        //                                          appGlobals: Parent,
+        //                                          prefix: PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People));
 
-                return dictPPL;
-            }
-            else { return null; }
-        }
-        async private Task LoadDictPPLAsync() => _dictPPL = await Task.Run(LoadDictPPL);
-        async private Task LoadPrefixAndDictPeopleAsync()
-        {
-            await LoadPrefixListAsync();
-            await LoadDictPPLAsync();
-        }
+        //        return dictPPL;
+        //    }
+        //    else { return null; }
+        //}
+        //async private Task LoadDictPPLAsync() => _dictPPL = await Task.Run(LoadDictPPL);
+        //async private Task LoadPrefixAndDictPeopleAsync()
+        //{
+        //    await LoadPrefixListAsync();
+        //    await LoadDictPPLAsync();
+        //}
 
         public string FnameIDList => _defaults.FileName_IDList;
         

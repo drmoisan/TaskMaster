@@ -5,7 +5,7 @@ using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 using ConcurrentObservableCollections.ConcurrentObservableDictionary;
 
-namespace ToDoModel.Data_Model.People
+namespace UtilitiesCS
 {
     //public interface IPeopleScoDictionaryNew : ISmartSerializable<ScoDictionaryNew<string, string>>, IConcurrentObservableDictionary<string, string>
     //IScoDictionaryNew<TKey, TValue>

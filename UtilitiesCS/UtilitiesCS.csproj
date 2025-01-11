@@ -547,6 +547,7 @@
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
     <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
+    <Compile Include="Interfaces\IToDo\IPeopleScoDictionaryNew.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
     <Compile Include="IntelligenceResources.Designer.cs">
       <AutoGen>True</AutoGen>

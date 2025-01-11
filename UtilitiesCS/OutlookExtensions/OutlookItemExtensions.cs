@@ -119,23 +119,31 @@ namespace UtilitiesCS.OutlookExtensions
 
         internal static object TryGetPropertyValue(this OutlookItem item, string propertyName)
         {
-            var propertyInfo = item.TryGetPropertyInfo(propertyName);
+            
             try
             {
-                return propertyInfo?.GetValue(item.InnerObject);
-                //return item.ItemType.InvokeMember(
-                //    propertyName,
-                //    BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
-                //    null,
-                //    item.InnerObject,
-                //    item.Args);
+                return item.ItemType.InvokeMember(
+                    propertyName,
+                    BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
+                    null,
+                    item.InnerObject,
+                    item.Args);
             }
             catch (COMException e)
             {
-                logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryGetPropertyValue)} threw an " +
-                    $"exception for property [{propertyName}]. {e.Message}", e);
-                return null;
+                var propertyInfo = item.TryGetPropertyInfo(propertyName);
+                try
+                {
+                    return propertyInfo?.GetValue(item.InnerObject);
+                }
+                catch (COMException e2)
+                {
+                    logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryGetPropertyValue)} threw an " +
+                        $"exception for property [{propertyName}]. {e2.Message}", e2);
+                    return null;                    
+                }
             }
+
         }
 
         internal static bool TrySetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, Func<object, T> converter, Func<object, Table> converterAlt)
@@ -158,25 +166,36 @@ namespace UtilitiesCS.OutlookExtensions
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, object propertyValue)
         {
-            var propertyInfo = item.TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(item.ItemType.Name, propertyName);
+            
             try
             {
-                propertyInfo.SetValue(item.InnerObject, propertyValue);
-                //item.ItemType.InvokeMember(
-                //    propertyName,
-                //    BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
-                //    null,
-                //    item.InnerObject,
-                //    new object[] { propertyValue });
+                item.ItemType.InvokeMember(
+                    propertyName,
+                    BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
+                    null,
+                    item.InnerObject,
+                    new object[] { propertyValue });
                 return true;
             }
-            catch (COMException e)
+            catch (COMException e1)
             {
-                logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TrySetPropertyValue)} threw a " +
-                    $"COM exception for property [{propertyName}] and value {propertyValue}. \n{e.Message}", e);
+                var propertyInfo = item.TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(item.ItemType.Name, propertyName);
+                try
+                {
+                    propertyInfo.SetValue(item.InnerObject, propertyValue);
+                    return true;
+                }
+                catch (COMException e)
+                {
+                    logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TrySetPropertyValue)} threw a " +
+                        $"COM exception for property [{propertyName}] and value {propertyValue}. \n{e.Message}", e);
 
-                return false;
+                    return false;
+                }
             }
+
+
+            
         }
 
         internal static object TryCallMethod(this OutlookItem item, string methodName)

@@ -8,7 +8,8 @@ namespace UtilitiesCS
 
     public interface IToDoObjects
     {
-        IPeopleScoDictionary DictPPL { get; }
+        //IPeopleScoDictionary DictPPL { get; }
+        IPeopleScoDictionaryNew People { get; }
         //Dictionary<string, string> DictPPL { get; }
         //string DictPPL_Filename { get; }
         //void DictPPL_Save();

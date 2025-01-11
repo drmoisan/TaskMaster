@@ -22,7 +22,7 @@ namespace TaskVisualization
         public IList<string> AutoFind(object objItem)
         {
             return AutoFile.AutoFindPeople(objItem: objItem,
-                                           ppl_dict: _globals.TD.DictPPL,
+                                           ppl_dict: _globals.TD.People,
                                            emailRootFolder: _globals.Ol.EmailRootPath,
                                            dictRemap: _globals.TD.DictRemap,
                                            userAddress: _globals.Ol.UserEmailAddress,
@@ -32,7 +32,7 @@ namespace TaskVisualization
 
         public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
         {
-            return _globals.TD.DictPPL.AddMissingEntries(olMail);
+            return _globals.TD.People.AddMissingEntries(olMail);
         }
 
         public Category AddColorCategory(IPrefix prefix, string categoryName)
