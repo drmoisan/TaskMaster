@@ -122,13 +122,13 @@
   "$id": "1",
   "Engine": false,
   "Globals": "default",
-  "Name": "People",
+  "T": "ToDoModel.Data_Model.People.PeopleScoDictionaryNew, ToDoModel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
   "Config": {
     "$id": "2",
     "Disk": {
       "FileName": "pplkey.json",
       "RelativePath": "",
-      "SpecialFolderName": "Flow"
+      "SpecialFolderName": "AppData"
     },
     "LocalDisk": {
       "FileName": "pplkey.json",
@@ -140,8 +140,10 @@
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },
-    "ClassifierActivated": true
-  }
+    "ClassifierActivated": true,
+    "ActiveDisk": 1
+  },
+  "Name": "People"
 }</value>
   </data>
   <data name="RecentFolders" xml:space="preserve">

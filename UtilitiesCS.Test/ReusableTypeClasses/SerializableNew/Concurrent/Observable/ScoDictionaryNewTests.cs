@@ -4,14 +4,12 @@ using System;
 using System.Threading.Tasks;
 using UtilitiesCS.ReusableTypeClasses;
 
-namespace UtilitiesCS.Test.ReusableTypeClasses.SerializableNew.Concurrent.Observable
+namespace UtilitiesCS.Test.ReusableTypeClasses
 {
     [TestClass]
     public class ScoDictionaryNewTests
     {
         private MockRepository mockRepository;
-
-
 
         [TestInitialize]
         public void TestInitialize()

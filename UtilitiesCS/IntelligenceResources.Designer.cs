@@ -65,13 +65,13 @@ namespace UtilitiesCS {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
-        ///  &quot;Name&quot;: &quot;People&quot;,
+        ///  &quot;T&quot;: &quot;ToDoModel.Data_Model.People.PeopleScoDictionaryNew, ToDoModel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
         ///    &quot;Disk&quot;: {
         ///      &quot;FileName&quot;: &quot;pplkey.json&quot;,
         ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
+        ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
         ///    },
         ///    &quot;LocalDisk&quot;: {
         ///      &quot;FileName&quot;: &quot;pplkey.json&quot;,
@@ -79,11 +79,7 @@ namespace UtilitiesCS {
         ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
         ///    },
         ///    &quot;NetDisk&quot;: {
-        ///      &quot;FileName&quot;: &quot;pplkey.json&quot;,
-        ///      &quot;RelativePath&quot;: &quot;&quot;,
-        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
-        ///    },
-        ///    &quot;ClassifierActivated&quot;: t [rest of string was truncated]&quot;;.
+        ///      &quot;FileName&quot;: &quot;ppl [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string People {
             get {

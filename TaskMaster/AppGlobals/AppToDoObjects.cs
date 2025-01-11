@@ -131,12 +131,13 @@ namespace TaskMaster
         async internal Task LoadPeopleAsync() => await Task.Run(async () =>
         {
             if (Parent.IntelRes.Config.TryGetValue("People", out var config))
-            {
+            {                
                 People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew());
                 People.CollectionChanged += People_CollectionChanged;
             }
             else { logger.Error("People config not found."); }
         }, Parent.AF.CancelToken);
+
         public PeopleScoDictionaryNew People {  get; private set; }
         public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
         {

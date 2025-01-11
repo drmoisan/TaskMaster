@@ -1,20 +1,21 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class SmartSerializableNonTyped : ISmartSerializableNonTyped
+    public class SmartSerializableNonTyped() : ISmartSerializableNonTyped
     {
-        private readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public bool IsSmartSerializable<T>(T instance)
         {
-            return instance.GetType().IsSmartSerializable();
+            return IsSmartSerializable(instance.GetType());
         }
 
         public bool IsSmartSerializable(Type type)
@@ -81,5 +82,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             where T : class, new()
             where U : class, ISmartSerializable<U>, new() =>
             await GetInstance().DeserializeAsync<T, U>(config, askUserOnError, altLoader);
+
+
+
     }
 }

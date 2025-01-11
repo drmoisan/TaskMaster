@@ -363,7 +363,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public void SerializeThreadSafe<T>(T instance, string filePath)
         {
-            instance.ThrowIfNull($"{nameof(SmartSerializable)}.{nameof(instance)} is null. It must be linked to the instance it is serializing.");
+            instance.ThrowIfNull($"{nameof(SmartSerializableBase)}.{nameof(instance)} is null. It must be linked to the instance it is serializing.");
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {

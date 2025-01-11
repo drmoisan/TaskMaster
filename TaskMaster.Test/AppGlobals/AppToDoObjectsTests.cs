@@ -10,76 +10,162 @@ using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
 using ToDoModel.Data_Model.People;
 using System.Threading;
+using System.Collections.Specialized;
+using FluentAssertions;
+using System.Linq;
+using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using System.Reflection;
 
 namespace TaskMaster.Test.AppGlobals
 {
     [TestClass]
     public class AppToDoObjectsTests
     {
-        private MockRepository mockRepository;
-        private Mock<ApplicationGlobals> mockApplicationGlobals;
-        private Mock<AppAutoFileObjects> mockAutoFileObjects;
-        private AppFileSystemFolderPaths appFP; 
-        private Mock<IntelligenceConfig> mockIntelligenceConfig;
-
         [TestInitialize]
         public void TestInitialize()
         {
-            //this.mockRepository = new MockRepository(MockBehavior.Strict);
-            //this.mockApplicationGlobals = this.mockRepository.Create<ApplicationGlobals>();
-            //this.mockAutoFileObjects = this.mockRepository.Create<AppAutoFileObjects>();
-            //this.mockAutoFileObjects.SetupGet(x => x.CancelToken).Returns(new System.Threading.CancellationToken());
-            //this.mockApplicationGlobals.SetupGet(x => x.AF).Returns(this.mockAutoFileObjects.Object);
-            //appFP = new AppFileSystemFolderPaths();
-            //this.mockApplicationGlobals.SetupGet(x => x.FS).Returns(appFP);
+            Console.SetOut(new DebugTextWriter());
+            this.mockRepository = new MockRepository(MockBehavior.Strict);
+            this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
+            this.mockApplicationGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);            
+        }
+
+        #region Helper Classes and Variables
+
+        private MockRepository mockRepository;
+        private Mock<IApplicationGlobals> mockApplicationGlobals;
+        private Mock<AppAutoFileObjects> mockAutoFileObjects;
+        private AppFileSystemFolderPaths appFP;
+        private Mock<IntelligenceConfig> mockIntelligenceConfig;
+        private Mock<ISmartSerializableNonTyped> mockSmartSerializable;
+
+        private Mock<ISmartSerializableNonTyped> GetMockSS()
+        {
+            var mockSS = this.mockRepository.Create<ISmartSerializableNonTyped>();
+            mockSS
+                .Setup(m => m.DeserializeAsync(It.IsAny<SmartSerializableLoader>(), true, It.IsAny<Func<PeopleScoDictionaryNew>>()))
+                .ReturnsAsync(new PeopleScoDictionaryNew());
+
+            return mockSS;
+        }
+
+        private Mock<IntelligenceConfig> SetUpMockIntelRes(Mock<IApplicationGlobals> mockGlobals)
+        {
+            var intel = this.mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
+            var config = new Dictionary<string, SmartSerializableLoader>
+            {
+                { "People", new SmartSerializableLoader()   }
+            }.ToConcurrentDictionary();
+            intel.SetupGet(x => x.Config).Returns(config);
+            mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
             
-            //this.mockApplicationGlobals.SetupGet(x => x.IntelRes).Returns(this.mockIntelligenceConfig.Object);
-
+            return intel;
         }
 
-        private IntelligenceConfig CreateMockIntelRes()
+        public static class EventHelper
         {
-            this.mockIntelligenceConfig = this.mockRepository.Create<IntelligenceConfig>();
-            var config = new ConcurrentDictionary<string, SmartSerializableLoader>();
+            public static Delegate[] GetEventInvocationList(object target, string eventName)
+            {
+                if (target == null) throw new ArgumentNullException(nameof(target));
+                if (string.IsNullOrEmpty(eventName)) throw new ArgumentNullException(nameof(eventName));
 
-            return this.mockIntelligenceConfig.Object;
+                Type targetType = target.GetType();
+                EventInfo eventInfo = targetType.GetEvent(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                if (eventInfo == null) throw new ArgumentException($"Event '{eventName}' not found on type '{targetType}'.");
+
+                // Get the method that adds the event handler
+                MethodInfo addMethod = eventInfo.GetAddMethod(true);
+                if (addMethod == null) throw new ArgumentException($"Event '{eventName}' does not have an accessible add method.");
+
+                // Get the declaring type of the event
+                Type declaringType = eventInfo.DeclaringType;
+                if (declaringType == null) throw new ArgumentException($"Event '{eventName}' does not have a declaring type.");
+
+                // Get the field that stores the event handlers
+                FieldInfo eventField = declaringType.GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                if (eventField == null)
+                {
+                    // Try to find the field that stores the event handlers in the base class
+                    eventField = FindEventFieldInBaseClasses(declaringType, eventName);
+                }
+
+                if (eventField == null) throw new ArgumentException($"Event field '{eventName}' not found on type '{declaringType}'.");
+
+                object eventFieldValue = eventField.GetValue(target);
+                if (eventFieldValue is Delegate eventDelegate)
+                {
+                    return eventDelegate.GetInvocationList();
+                }
+
+                return Array.Empty<Delegate>();
+            }
+
+            private static FieldInfo FindEventFieldInBaseClasses(Type type, string eventName)
+            {
+                while (type != null)
+                {
+                    FieldInfo field = type.GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                    if (field != null)
+                    {
+                        return field;
+                    }
+                    type = type.BaseType;
+                }
+                return null;
+            }
         }
 
-        private AppToDoObjects CreateAppToDoObjects()
-        {
-            return new AppToDoObjects(
-                this.mockApplicationGlobals.Object);
-        }
+        #endregion Helper Classes and Variables
 
         [TestMethod]
         public async Task LoadPeopleAsync_CanLoadProperly()
         {
             // Arrange
-            //var appToDoObjects = this.CreateAppToDoObjects();
-            var mockParent = new Mock<IApplicationGlobals>();
-            var mockIntelRes = new Mock<IntelligenceConfig>(mockParent.Object);
-            var mockConfig = new Dictionary<string, SmartSerializableLoader>
-            {
-                { "People", new SmartSerializableLoader()   }
-            }.ToConcurrentDictionary();
-
-            mockIntelRes.SetupGet(x => x.Config).Returns(mockConfig);
-            mockParent.SetupGet(x => x.IntelRes).Returns(mockIntelRes.Object);
-            mockParent.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);
-
-            var mockSmartSerializable = new Mock<ISmartSerializableNonTyped>();
-            mockSmartSerializable
-                .Setup(m => m.DeserializeAsync(It.IsAny<SmartSerializableLoader>(), true, It.IsAny<Func<IPeopleScoDictionaryNew>>()))
-                .ReturnsAsync(new PeopleScoDictionaryNew());
+            this.mockIntelligenceConfig = SetUpMockIntelRes(mockApplicationGlobals);
+            var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);            
+            this.mockSmartSerializable = GetMockSS();
+            appToDoObjects.SmartSerializable = mockSmartSerializable.Object;
+            var expectedHandler = typeof(AppToDoObjects).GetMethod("People_CollectionChanged", [typeof(object), typeof(DictionaryChangedEventArgs<string, string>)]);
 
             // Act
-            //await appToDoObjects.LoadPeopleAsync();
+            await appToDoObjects.LoadPeopleAsync();
 
             // Assert
+            
+            // that SmartSerializable.DeserializeAsync was called once,
+            // the return value was properly assigned to the People property,
+            // and the CollectionChanged event was properly assigned
+           
+            mockSmartSerializable.Verify(m => m.DeserializeAsync(It.IsAny<SmartSerializableLoader>(), true, It.IsAny<Func<PeopleScoDictionaryNew>>()), Times.Once);
+            Assert.IsNotNull(appToDoObjects.People);
+            var assignedHandlers = EventHelper.GetEventInvocationList(appToDoObjects.People, "CollectionChanged");
+            Assert.IsTrue(assignedHandlers.Any(d => d.Method == expectedHandler), "CollectionChanged event does not contain the expected handler");
 
-
-            await Task.CompletedTask;
         }
+
+        //[TestMethod]
+        //public async Task IntegrationTest_LoadPeopleAsync_CanLoadProperly()
+        //{
+        //    // Arrange
+        //    mockApplicationGlobals.SetupGet(x => x.FS).Returns(new AppFileSystemFolderPaths());
+        //    var intelRes = await IntelligenceConfig.LoadAsync(mockApplicationGlobals.Object);
+        //    mockApplicationGlobals.SetupGet(x => x.IntelRes).Returns(intelRes);
+        //    var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);                       
+
+        //    // Act
+        //    await appToDoObjects.LoadPeopleAsync();            
+            
+        //    // Assert
+
+        //    // the return value was properly assigned to the People property,
+        //    // and the CollectionChanged event was properly assigned
+
+        //    Assert.IsNotNull(appToDoObjects.People);            
+
+        //}
+
+
+        #region Commented Tests
 
         //[TestMethod]
         //public async Task LoadAsync_StateUnderTest_ExpectedBehavior()
@@ -184,5 +270,7 @@ namespace TaskMaster.Test.AppGlobals
         //    Assert.Fail();
         //    this.mockRepository.VerifyAll();
         //}
+
+        #endregion Commented Tests
     }
 }

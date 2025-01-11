@@ -183,6 +183,24 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
+        public T Deserialize<U>(ISmartSerializable<U> loader)
+            where U : class, ISmartSerializable<U>, new()
+        {
+            try
+            {
+                var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
+                var settings = loader.Config.JsonSettings.ThrowIfNull();
+                T instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
+                if (instance is not null) { instance.Config.CopyFrom(loader.Config, true); }
+                return instance;
+            }
+            catch (ArgumentNullException e)
+            {
+                logger.Error(e.Message);
+                throw;
+            }
+        }
+
         public T Deserialize<U>(SmartSerializable<U> loader, bool askUserOnError, Func<T> altLoader)
             where U : class, ISmartSerializable<U>, new()
         {
