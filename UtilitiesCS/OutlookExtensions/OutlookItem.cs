@@ -247,40 +247,65 @@ namespace UtilitiesCS
 
         internal virtual T GetPropertyValue<T>(string propertyName)
         {
-            var propertyInfo = TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(ItemType.Name, propertyName);
             try
             {
-                var value = propertyInfo.GetValue(_item);
-                if (value is null) { return default(T); }
-                else
-                {
-                    var typedValue = (T)value;
-                    return typedValue;
-                }
-                //return (T)(propertyInfo.GetValue(_item) ?? default(T));
+                return (T)ItemType.InvokeMember(
+                    propertyName,
+                    BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
+                    null,
+                    InnerObject,
+                    Args);
+                
             }
-            catch (SystemException e)
+            catch (Exception)
             {
-                // An invalid property name exception is propagated to client
-                logger.Error($"{nameof(OutlookItem)}.{nameof(GetPropertyValue)}<{nameof(T)}> threw an " +
-                    $"exception for property [{propertyName}]. {e.Message}", e );
-                throw;
+                var propertyInfo = TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(ItemType.Name, propertyName);
+                try
+                {
+                    var value = propertyInfo.GetValue(_item);
+                    if (value is null) { return default(T); }
+                    else
+                    {
+                        var typedValue = (T)value;
+                        return typedValue;
+                    }
+                }
+                catch (SystemException e)
+                {
+                    // An invalid property name exception is propagated to client
+                    logger.Error($"{nameof(OutlookItem)}.{nameof(GetPropertyValue)}<{nameof(T)}> threw an " +
+                        $"exception for property [{propertyName}]. {e.Message}", e);
+                    throw;
+                }
             }
+            
         }
 
         internal virtual void SetPropertyValue<T>(string propertyName, T propertyValue)
         {
-            var propertyInfo = TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(ItemType.Name, propertyName);
             try
             {
-                propertyInfo.SetValue(_item, propertyValue);
+                ItemType.InvokeMember(
+                    propertyName,
+                    BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
+                    null,
+                    InnerObject,
+                    [propertyValue]);
             }
-            catch (SystemException ex)
+            catch (Exception)
             {
-                logger.Error($"{nameof(OutlookItem)}.{nameof(SetPropertyValue)}<{nameof(T)}> threw an " +
-                    $"exception for property [{propertyName}]. {ex.Message}", ex);
-                throw;
-            }
+                var propertyInfo = TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(ItemType.Name, propertyName);
+                try
+                {
+                    propertyInfo.SetValue(_item, propertyValue);
+                }
+                catch (SystemException ex)
+                {
+                    logger.Error($"{nameof(OutlookItem)}.{nameof(SetPropertyValue)}<{nameof(T)}> threw an " +
+                        $"exception for property [{propertyName}]. {ex.Message}", ex);
+                    throw;
+                }
+            }                        
         }
 
         internal virtual object CallMethod(string methodName)
