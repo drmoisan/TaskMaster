@@ -299,7 +299,7 @@ namespace TaskMaster
                 if (SynchronizationContext.Current is null)
                     SynchronizationContext.SetSynchronizationContext(
                         new WindowsFormsSynchronizationContext());
-                return Globals.Engines.InboxEngines.TryGetValue("Spam", out var engine) ? engine as SpamBayes : null; 
+                return Globals?.Engines?.InboxEngines?.TryGetValue("Spam", out var engine) ?? false ? engine as SpamBayes : null; 
             }
         }
 
