@@ -18,7 +18,7 @@ namespace ToDoModel.Test
     {
         private Mock<MailItem> mockMailItem;
         private Mock<IOutlookItem> mockOutlookItem;
-        private Mock<IOutlookItemFlaggable> mockFlaggableItem;
+        //private Mock<IOutlookItemFlaggable> mockFlaggableItem;
 
         /// <summary>
         /// Sets up the mock objects before each test.
@@ -28,18 +28,20 @@ namespace ToDoModel.Test
         {
             mockMailItem = new Mock<MailItem>(MockBehavior.Strict);
             mockOutlookItem = new Mock<IOutlookItem>(MockBehavior.Strict);
-            mockFlaggableItem = new Mock<IOutlookItemFlaggable>(MockBehavior.Strict);
+            //mockFlaggableItem = new Mock<IOutlookItemFlaggable>(MockBehavior.Strict);
         }
                 
         private ToDoModel.Test.Data_Model.ToDo.SpecialMockMail CreateSpecialMockMail(DateTime timestamp)
         {
-            var mock = new ToDoModel.Test.Data_Model.ToDo.SpecialMockMail();
-            mock.TaskSubject = "Test Task";
-            mock.Importance = OlImportance.olImportanceNormal;
-            
-            mock.CreationTime = timestamp;
-            mock.TaskStartDate = timestamp;
-            mock.Categories = "Category1,Category2";
+            var mock = new ToDoModel.Test.Data_Model.ToDo.SpecialMockMail
+            {
+                TaskSubject = "Test Task",
+                Importance = OlImportance.olImportanceNormal,
+
+                CreationTime = timestamp,
+                TaskStartDate = timestamp,
+                Categories = "Category1,Category2"
+            };
             var mockUserProps = GetMockUserProperties();
             mock.UserProperties = mockUserProps.Object;
 

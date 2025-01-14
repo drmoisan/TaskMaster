@@ -21,14 +21,9 @@ using UtilitiesCS.Threading;
 namespace TaskMaster
 {
 
-    public class AppToDoObjects : IToDoObjects
+    public class AppToDoObjects(IApplicationGlobals parentInstance) : IToDoObjects
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        public AppToDoObjects(IApplicationGlobals parentInstance)
-        {
-            Parent = parentInstance;
-        }
 
         async public Task LoadAsync(bool parallel = true)
         {
@@ -66,18 +61,15 @@ namespace TaskMaster
             await LoadFolderRemapAsync();
         }
 
-        private Properties.Settings _defaults = Properties.Settings.Default;
+        private readonly Properties.Settings _defaults = Properties.Settings.Default;
         
         private T Initialized<T>(T obj, Func<T> initializer)
         {
-            if (obj is null)
-            {
-                obj = initializer.Invoke();
-            }
+            obj ??= initializer.Invoke();
             return obj;
         }
 
-        public IApplicationGlobals Parent { get; protected set; }
+        public IApplicationGlobals Parent { get; protected set; } = parentInstance;
         internal ISmartSerializableNonTyped SmartSerializable { get; set; } = new SmartSerializableNonTyped();
 
         private string _projInfo_Filename;
@@ -132,7 +124,7 @@ namespace TaskMaster
         {
             if (Parent.IntelRes.Config.TryGetValue("People", out var config))
             {                
-                People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew());
+                People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew(Parent));
                 People.CollectionChanged += People_CollectionChanged;
             }
             else { logger.Error("People config not found."); }
@@ -243,7 +235,7 @@ namespace TaskMaster
                                                        folderpath: pythonStaging);
                 }
                 else { return null; }
-            }, default(CancellationToken));
+            }, default);
         }
 
         // Prefix List

@@ -17,11 +17,11 @@ namespace UtilitiesCS.OutlookExtensions
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static OutlookItemTry Try(this OutlookItem item) => new OutlookItemTry(item);
+        public static OutlookItemTry Try(this OutlookItem item) => new(item);
 
-        public static OutlookItemFlaggableTry Try(this IOutlookItemFlaggable item) => new OutlookItemFlaggableTry(item);
+        public static OutlookItemFlaggableTry Try(this IOutlookItemFlaggable item) => new(item);
 
-        public static OutlookItemTryGet TryGet(this OutlookItem item) => new OutlookItemTryGet(item);
+        public static OutlookItemTryGet TryGet(this OutlookItem item) => new(item);
 
         public static OlItemType GetOlItemType(this IOutlookItem item)
         {
@@ -48,7 +48,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
             catch (SystemException)
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -82,7 +82,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
             catch (SystemException)
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -131,7 +131,7 @@ namespace UtilitiesCS.OutlookExtensions
                     item.InnerObject,
                     item.Args);
             }
-            catch (COMException)
+            catch (System.Exception)
             {
                 var propertyInfo = item.TryGetPropertyInfo(propertyName);
                 try
@@ -176,7 +176,7 @@ namespace UtilitiesCS.OutlookExtensions
                     BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
                     null,
                     item.InnerObject,
-                    new object[] { propertyValue });
+                    [propertyValue]);
                 return true;
             }
             catch (COMException)

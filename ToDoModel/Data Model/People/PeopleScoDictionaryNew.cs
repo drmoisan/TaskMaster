@@ -12,25 +12,27 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Tags;
 using UtilitiesCS;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel.Data_Model.People
 {
     public class PeopleScoDictionaryNew : ScoDictionaryNew<string, string>, IPeopleScoDictionaryNew
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        //private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+        //    System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constructors
 
         public PeopleScoDictionaryNew() : base() { }
+        public PeopleScoDictionaryNew(IApplicationGlobals globals) : base() { Globals = globals; }
         //public PeopleScoDictionaryNew(IEnumerable<KeyValuePair<string, string>> collection) : base(collection) { }
         //public PeopleScoDictionaryNew(IEqualityComparer<string> comparer) : base(comparer) { }
         //public PeopleScoDictionaryNew(IEnumerable<KeyValuePair<string, string>> collection, IEqualityComparer<string> comparer) : base(collection, comparer) { }
         //public PeopleScoDictionaryNew(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { }
         //public PeopleScoDictionaryNew(int concurrencyLevel, IEnumerable<KeyValuePair<string, string>> collection, IEqualityComparer<string> comparer) : base(concurrencyLevel, collection, comparer) { }
-        public PeopleScoDictionaryNew(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) : base(concurrencyLevel, capacity, comparer) { }
-        public PeopleScoDictionaryNew(ScoDictionaryNew<string, string> dictionary) : base(dictionary) { }
+        public PeopleScoDictionaryNew(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer, IApplicationGlobals globals) : base(concurrencyLevel, capacity, comparer) { Globals = globals; }
+        public PeopleScoDictionaryNew(ScoDictionaryNew<string, string> dictionary, IApplicationGlobals globals) : base(dictionary) { Globals = globals; }
 
         #endregion Constructors
 
@@ -47,27 +49,28 @@ namespace ToDoModel.Data_Model.People
 
         public List<string> GetPeopleCatNames()
         {
-            return Globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Where(cat => IsPeopleCategory(cat.Name)).Select(cat => cat.Name).ToList();
+            return [.. Globals.ThrowIfNull().Ol.App.Session.Categories.Cast<Outlook.Category>().Where(cat => IsPeopleCategory(cat.Name)).Select(cat => cat.Name)];
         }
 
         public bool CategoryExists(string category)
         {
-            return Globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Any(cat => cat.Name == category);
+            return Globals.ThrowIfNull().Ol.App.Session.Categories.Cast<Outlook.Category>().Any(cat => cat.Name == category);
         }
 
         public IList<string> AddMissingEntries(Outlook.MailItem olMail)
         {
+            Globals.ThrowIfNull();
             var addressList = olMail.GetEmailAddresses(Globals.Ol.EmailRootPath,
                                                        Globals.TD.DictRemap,
                                                        Globals.Ol.UserEmailAddress)
                                                        .Where(x => !this.ContainsKey(x))
                                                        .Select(x => x)
                                                        .ToList();
-            IList<string> newPeople = new List<string>();
+            IList<string> newPeople = [];
 
             foreach (var address in addressList)
             {
-                var response = MessageBox.Show($"Add mapping for {address}?", "Dialog", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                var response = MyBox.ShowDialog($"Add mapping for {address}?", "Dialog", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                 if (response == DialogResult.Cancel) { break; }
                 if (response == DialogResult.Yes)
                 {
@@ -137,7 +140,7 @@ namespace ToDoModel.Data_Model.People
 
         public void AddColorCategory(string newPerson)
         {
-            Globals.Ol.NamespaceMAPI.Categories.Add(newPerson, _prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
+            Globals.ThrowIfNull().Ol.NamespaceMAPI.Categories.Add(newPerson, _prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
         }
 
         public string SplitAddressToFirstLastName(string address)

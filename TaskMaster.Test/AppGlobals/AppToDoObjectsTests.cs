@@ -36,7 +36,7 @@ namespace TaskMaster.Test.AppGlobals
         private Mock<IApplicationGlobals> mockApplicationGlobals;
         //private Mock<AppAutoFileObjects> mockAutoFileObjects;
         //private AppFileSystemFolderPaths appFP;
-        private Mock<IntelligenceConfig> mockIntelligenceConfig;
+        //private Mock<IntelligenceConfig> mockIntelligenceConfig;
         private Mock<ISmartSerializableNonTyped> mockSmartSerializable;
 
         private Mock<ISmartSerializableNonTyped> GetMockSS()
@@ -44,23 +44,23 @@ namespace TaskMaster.Test.AppGlobals
             var mockSS = this.mockRepository.Create<ISmartSerializableNonTyped>();
             mockSS
                 .Setup(m => m.DeserializeAsync(It.IsAny<SmartSerializableLoader>(), true, It.IsAny<Func<PeopleScoDictionaryNew>>()))
-                .ReturnsAsync(new PeopleScoDictionaryNew());
+                .ReturnsAsync(new PeopleScoDictionaryNew(mockApplicationGlobals.Object));
 
             return mockSS;
         }
 
-        private Mock<IntelligenceConfig> SetUpMockIntelRes(Mock<IApplicationGlobals> mockGlobals)
-        {
-            var intel = this.mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
-            var config = new Dictionary<string, SmartSerializableLoader>
-            {
-                { "People", new SmartSerializableLoader()   }
-            }.ToConcurrentDictionary();
-            intel.SetupGet(x => x.Config).Returns(config);
-            mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
+        //private Mock<IntelligenceConfig> SetUpMockIntelRes(Mock<IApplicationGlobals> mockGlobals)
+        //{
+        //    var intel = this.mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
+        //    var config = new Dictionary<string, SmartSerializableLoader>
+        //    {
+        //        { "People", new SmartSerializableLoader()   }
+        //    }.ToConcurrentDictionary();
+        //    intel.SetupGet(x => x.Config).Returns(config);
+        //    mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
             
-            return intel;
-        }
+        //    return intel;
+        //}
 
         public static class EventHelper
         {
@@ -70,34 +70,23 @@ namespace TaskMaster.Test.AppGlobals
                 if (string.IsNullOrEmpty(eventName)) throw new ArgumentNullException(nameof(eventName));
 
                 Type targetType = target.GetType();
-                EventInfo eventInfo = targetType.GetEvent(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                if (eventInfo == null) throw new ArgumentException($"Event '{eventName}' not found on type '{targetType}'.");
+                EventInfo eventInfo = targetType.GetEvent(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public) ?? throw new ArgumentException($"Event '{eventName}' not found on type '{targetType}'.");
 
                 // Get the method that adds the event handler
-                MethodInfo addMethod = eventInfo.GetAddMethod(true);
-                if (addMethod == null) throw new ArgumentException($"Event '{eventName}' does not have an accessible add method.");
+                //MethodInfo addMethod = eventInfo.GetAddMethod(true) ?? throw new ArgumentException($"Event '{eventName}' does not have an accessible add method.");
 
                 // Get the declaring type of the event
-                Type declaringType = eventInfo.DeclaringType;
-                if (declaringType == null) throw new ArgumentException($"Event '{eventName}' does not have a declaring type.");
+                Type declaringType = eventInfo.DeclaringType ?? throw new ArgumentException($"Event '{eventName}' does not have a declaring type.");
 
                 // Get the field that stores the event handlers
-                FieldInfo eventField = declaringType.GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-                if (eventField == null)
-                {
-                    // Try to find the field that stores the event handlers in the base class
-                    eventField = FindEventFieldInBaseClasses(declaringType, eventName);
-                }
-
-                if (eventField == null) throw new ArgumentException($"Event field '{eventName}' not found on type '{declaringType}'.");
-
+                FieldInfo eventField = (declaringType.GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) ?? FindEventFieldInBaseClasses(declaringType, eventName)) ?? throw new ArgumentException($"Event field '{eventName}' not found on type '{declaringType}'.");
                 object eventFieldValue = eventField.GetValue(target);
                 if (eventFieldValue is Delegate eventDelegate)
                 {
                     return eventDelegate.GetInvocationList();
                 }
 
-                return Array.Empty<Delegate>();
+                return [];
             }
 
             private static FieldInfo FindEventFieldInBaseClasses(Type type, string eventName)
@@ -121,7 +110,7 @@ namespace TaskMaster.Test.AppGlobals
         public async Task LoadPeopleAsync_CanLoadProperly()
         {
             // Arrange
-            this.mockIntelligenceConfig = SetUpMockIntelRes(mockApplicationGlobals);
+            //this.mockIntelligenceConfig = SetUpMockIntelRes(mockApplicationGlobals);
             var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);            
             this.mockSmartSerializable = GetMockSS();
             appToDoObjects.SmartSerializable = mockSmartSerializable.Object;

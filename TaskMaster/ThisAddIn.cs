@@ -101,8 +101,7 @@ namespace TaskMaster
         /// <returns>Instance of the <seealso cref="AddInUtilities"/> class</returns>
         protected override object RequestComAddInAutomationService()
         {
-            if (_externalUtilities is null)
-                _externalUtilities = new AddInUtilities();
+            _externalUtilities ??= new AddInUtilities();
 
             return _externalUtilities;
         }
