@@ -35,7 +35,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Arrange
             var expected = "property";
             var filePathHelperConverter = this.CreateFilePathHelperConverter();
-            mockJsonReader.Setup(x => x.Read()).Returns(true);
+            //mockJsonReader.Setup(x => x.Read()).Returns(true);
             mockJsonReader.Setup(x => x.TokenType).Returns(JsonToken.PropertyName);
             mockJsonReader.Setup(x => x.Value).Returns(expected);
 
@@ -44,7 +44,8 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
-            this.mockJsonReader.Verify(x => x.Read(), Times.Once());
+            this.mockJsonReader.Verify(x => x.TokenType, Times.Once());
+            this.mockJsonReader.Verify(x => x.Value, Times.Once());
         }
 
         [ExpectedException(typeof(JsonReaderException))]
@@ -89,7 +90,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Arrange
             var expected = "value";
             var filePathHelperConverter = this.CreateFilePathHelperConverter();
-            mockJsonReader.Setup(x => x.Read()).Returns(true);
+            //mockJsonReader.Setup(x => x.Read()).Returns(true);
             mockJsonReader.Setup(x => x.TokenType).Returns(JsonToken.String);
             mockJsonReader.Setup(x => x.Value).Returns(expected);
 
@@ -98,7 +99,9 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
-            this.mockJsonReader.Verify(x => x.Read(), Times.Once());
+            this.mockJsonReader.Verify(x => x.TokenType, Times.Once());
+            this.mockJsonReader.Verify(x => x.Value, Times.Once());
+
         }
 
         [ExpectedException(typeof(JsonReaderException))]

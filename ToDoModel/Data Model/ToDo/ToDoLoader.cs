@@ -80,18 +80,21 @@ namespace ToDoModel.Data_Model.ToDo
 
         internal T GetOrLoad<T>(ref T value, Func<T> loader, params object[] dependencies)
         {
-            if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
-            if (dependencies.Any(x => x is null))
-            {
-                var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
-                throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
+            if (value is null || value.Equals(default)) 
+            { 
+                if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
+                if (dependencies.Any(x => x is null))
+                {
+                    var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
+                    throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} contains a null value at position {errors}");
+                }
             }
             return GetOrLoad(ref value, loader);
         }
 
         internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, params object[] dependencies)
         {
-            if (dependencies is null || dependencies.Any(x => x is null))
+            if (EqualityComparer<T>.Default.Equals(value, default(T)) && (dependencies is null || dependencies.Any(x => x is null)))
             {
                 value = defaultValue;
                 return value;
@@ -114,7 +117,7 @@ namespace ToDoModel.Data_Model.ToDo
 
         internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, Action<T> defaultSetAndSaver, params object[] dependencies)
         {
-            if (dependencies is null || dependencies.Any(x => x is null))
+            if (EqualityComparer<T>.Default.Equals(value, default(T)) && (dependencies is null || dependencies.Any(x => x is null)))
             {
                 value = defaultValue;
                 return value;

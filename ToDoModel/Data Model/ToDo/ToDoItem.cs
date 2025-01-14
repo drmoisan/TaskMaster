@@ -16,24 +16,38 @@ using UtilitiesCS;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 
-[assembly: InternalsVisibleTo("ToDoModel.Tests")]
+[assembly: InternalsVisibleTo("ToDoModel.Test")]
 namespace ToDoModel
 {
     [Serializable()]
     public class ToDoItem : ICloneable, IToDoItem
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Constructors
 
         private ToDoItem() { }
 
-        public ToDoItem(IOutlookItem outlookItem)
+        public ToDoItem(IOutlookItem outlookItem): this(new OutlookItemFlaggable(outlookItem)) 
+        {            
+            //FlaggableItem = new OutlookItemFlaggable(outlookItem);
+            //Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
+            //InitializeOutlookItem(_flaggableItem);
+            //string argstrCats_All = outlookItem.Categories;
+            //Flags = new FlagParser(ref argstrCats_All);
+            //outlookItem.Categories = argstrCats_All;
+            //InitializeCustomFields(FlaggableItem);
+        }
+
+        public ToDoItem(IOutlookItemFlaggable flaggableItem)
         {
-            FlaggableItem = new OutlookItemFlaggable(outlookItem);
+            FlaggableItem = flaggableItem;
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
-            InitializeOutlookItem(_olItem);
-            string argstrCats_All = outlookItem.Categories;
+            InitializeOutlookItem(_flaggableItem);
+            string argstrCats_All = FlaggableItem.Categories;
             Flags = new FlagParser(ref argstrCats_All);
-            outlookItem.Categories = argstrCats_All;
+            FlaggableItem.Categories = argstrCats_All;
             InitializeCustomFields(FlaggableItem);
         }
 
@@ -43,7 +57,7 @@ namespace ToDoModel
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
             if (!onDemand)
             {
-                InitializeOutlookItem(_olItem);
+                InitializeOutlookItem(_flaggableItem);
                 string argstrCats_All = outlookItem.Categories;
                 Flags = new FlagParser(ref argstrCats_All);
                 outlookItem.Categories = argstrCats_All;
@@ -64,7 +78,7 @@ namespace ToDoModel
         private const string PA_TOTAL_WORK = "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
         private string _metaTaskSubject = "";
         private string _metaTaskLvl = "";
-        private string _tagProgram = "";
+        //private string _tagProgram = "";
         private bool? _activeBranch = null;
         private string _expandChildren = "";
         
@@ -72,7 +86,7 @@ namespace ToDoModel
 
         #region Initializers
 
-        private void InitializeOutlookItem(OutlookItemFlaggable olItem)
+        private void InitializeOutlookItem(IOutlookItemFlaggable olItem)
         {
             _taskSubject = olItem.TaskSubject;
             _priority = olItem.Importance;
@@ -82,7 +96,7 @@ namespace ToDoModel
 
         private void InitializeCustomFields(object item)
         {
-            _tagProgram = FlaggableItem.GetUdfString("TagProgram");
+            //_tagProgram = FlaggableItem.GetUdfString("TagProgram");
             _activeBranch = (bool)(FlaggableItem.GetUdfValue("AB", OlUserPropertyType.olYesNo));
             _ec2 = (bool)(FlaggableItem.GetUdfValue("EC2", OlUserPropertyType.olYesNo));
             _expandChildren = FlaggableItem.GetUdfString("EC");
@@ -142,7 +156,7 @@ namespace ToDoModel
             MetaTaskLvl = _metaTaskLvl;
             Priority = (OlImportance)_priority;
             StartDate = (DateTime)_startDate;
-            Complete = (bool)_complete;
+            Complete = _complete ?? false;
             TotalWork = (int)_totalWork;
             ActiveBranch = _activeBranch ?? false;
             ExpandChildren = _expandChildren;
@@ -302,9 +316,9 @@ namespace ToDoModel
         public bool IdAutoCoding { get => _idAutoCoding; set => _idAutoCoding = value; }
         private bool _idAutoCoding = true;
 
-        public IOutlookItem OlItem => _olItem;
-        private OutlookItemFlaggable _olItem;
-        internal OutlookItemFlaggable FlaggableItem { get => _olItem; set => _olItem = value; }
+        public IOutlookItem OlItem => _flaggableItem;
+        private IOutlookItemFlaggable _flaggableItem;
+        internal IOutlookItemFlaggable FlaggableItem { get => _flaggableItem; set => _flaggableItem = value; }
 
         private IIDList _idList;
         public IIDList IdList { get => _idList; set => _idList = value; }
@@ -378,14 +392,14 @@ namespace ToDoModel
 
         public bool FlagAsTask
         {
-            get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.FlagAsTask, FlaggableItem);
-            set => Loader.SetAndSave(ref _flagAsTask, value, (x) => FlaggableItem.FlagAsTask = (bool)x);
+            get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.Try().FlagAsTask, FlaggableItem);
+            set => Loader.SetAndSave(ref _flagAsTask, value, (x) => FlaggableItem.Try().FlagAsTask = (bool)x);
         }
         private bool? _flagAsTask = null;
 
         public DateTime TaskCreateDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _taskCreateDate, () => FlaggableItem.CreationTime, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _taskCreateDate, () => FlaggableItem.Try().CreationTime, FlaggableItem);
             set => _taskCreateDate = value;
         }
         private DateTime? _taskCreateDate = null;
@@ -435,42 +449,42 @@ namespace ToDoModel
 
         public DateTime ReminderTime
         {
-            get => (DateTime)Loader.GetOrLoad(ref _reminderTime, () => FlaggableItem.ReminderTime, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _reminderTime, () => FlaggableItem.Try().ReminderTime, FlaggableItem);
             set => _reminderTime = value;
         }
         private DateTime? _reminderTime = null;
 
         public DateTime DueDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _dueDate, DateTime.Parse("1/1/4501"), () => FlaggableItem.DueDate, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _dueDate, DateTime.Parse("1/1/4501"), () => FlaggableItem.Try().DueDate, FlaggableItem);
             set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.DueDate = (DateTime)x);
         }
         private DateTime? _dueDate = null;
 
         public DateTime StartDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _startDate, TaskCreateDate, () => FlaggableItem.TaskStartDate, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _startDate, TaskCreateDate, () => FlaggableItem.Try().TaskStartDate, FlaggableItem);
             set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.TaskStartDate = (DateTime)x);
         }
         private DateTime? _startDate = null;
 
         public OlImportance Priority
         {
-            get => (OlImportance)Loader.GetOrLoad(ref _priority, OlImportance.olImportanceNormal, () => FlaggableItem.Importance, FlaggableItem);
+            get => (OlImportance)Loader.GetOrLoad(ref _priority, OlImportance.olImportanceNormal, () => FlaggableItem.Try().Importance, FlaggableItem);
             set => Loader.SetAndSave(ref _priority, value, (x) => FlaggableItem.Importance = (OlImportance)x);
         }
         private OlImportance? _priority = null;
 
         public bool Complete
         {
-            get => (bool)Loader.GetOrLoad(ref _complete, () => FlaggableItem.Complete, FlaggableItem);
+            get => (bool)Loader.GetOrLoad(ref _complete, () => FlaggableItem.Try().Complete, FlaggableItem);
             set => Loader.SetAndSave(ref _complete, value, (x) => FlaggableItem.Complete = (bool)x);
         }
         private bool? _complete = null;
 
         public string TaskSubject
         {
-            get => Loader.GetOrLoad(ref _taskSubject, () => FlaggableItem.TaskSubject, FlaggableItem);
+            get => Loader.GetOrLoad(ref _taskSubject, () => FlaggableItem.Try().TaskSubject, FlaggableItem);
             set => Loader.SetAndSave(ref _taskSubject, value, (x) => FlaggableItem.TaskSubject = x);
         }
         private string _taskSubject = null;
@@ -596,14 +610,14 @@ namespace ToDoModel
         private int? _totalWork = null;
         public int TotalWork
         {
-            get => (int)Loader.GetOrLoad(ref _totalWork, () => FlaggableItem.TotalWork, FlaggableItem);
+            get => (int)Loader.GetOrLoad(ref _totalWork, () => FlaggableItem.Try().TotalWork, FlaggableItem);
             set => Loader.SetAndSave(ref _totalWork, value, (x) => FlaggableItem.TotalWork = (int)x);
         }
 
         private string _toDoID = null;
         public string ToDoID
         {
-            get => Loader.GetOrLoad(ref _toDoID, () => FlaggableItem.GetUdfString("ToDoID"), FlaggableItem);
+            get => Loader.GetOrLoad(ref _toDoID, () => FlaggableItem.Try().GetUdfString("ToDoID"), FlaggableItem);
             set => Loader.SetAndSave(ref _toDoID, value, (x) =>
             {
                 if (!ReadOnly)
@@ -732,7 +746,7 @@ namespace ToDoModel
         {
             get
             {
-                if (ExpandChildren.Length == 0)
+                if (ExpandChildren?.Length == 0)
                 {
                     ExpandChildren = "-";
                 }
@@ -762,7 +776,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _expandChildren = FlaggableItem.GetUdfString("EC");
+                    _expandChildren = FlaggableItem.Try().GetUdfString("EC");
                     return _expandChildren;
                 }
             }
@@ -794,7 +808,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _expandChildrenState = FlaggableItem.GetUdfString("EcState");
+                    _expandChildrenState = FlaggableItem.Try().GetUdfString("EcState");
                     return _expandChildrenState;
                 }
             }
@@ -861,7 +875,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _metaTaskLvl = FlaggableItem.GetUdfString("Meta Task Level");
+                    _metaTaskLvl = FlaggableItem.Try().GetUdfString("Meta Task Level");
                     return _metaTaskLvl;
                 }
             }
@@ -870,10 +884,7 @@ namespace ToDoModel
                 _metaTaskLvl = value;
                 if (!ReadOnly)
                 {
-                    if (FlaggableItem is not null)
-                    {
-                        FlaggableItem.TrySetUdf("Meta Task Level", value);
-                    }
+                    FlaggableItem?.TrySetUdf("Meta Task Level", value);
                 }
             }
         }
@@ -892,7 +903,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _metaTaskSubject = FlaggableItem.GetUdfString("Meta Task Subject");
+                    _metaTaskSubject = FlaggableItem.Try().GetUdfString("Meta Task Subject");
                     return _metaTaskSubject;
                 }
             }

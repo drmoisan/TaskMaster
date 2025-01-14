@@ -85,5 +85,43 @@ namespace UtilitiesCS.Extensions
             }
             return copiedSerializer;
         }
+
+        public static JsonSerializerSettings ExtractSettings(this JsonSerializer serializer)
+        {
+            if (serializer == null)
+                throw new ArgumentNullException(nameof(serializer));
+
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = serializer.Formatting,
+                DateFormatHandling = serializer.DateFormatHandling,
+                DateTimeZoneHandling = serializer.DateTimeZoneHandling,
+                DateParseHandling = serializer.DateParseHandling,
+                FloatFormatHandling = serializer.FloatFormatHandling,
+                FloatParseHandling = serializer.FloatParseHandling,
+                StringEscapeHandling = serializer.StringEscapeHandling,
+                Culture = serializer.Culture,
+                MaxDepth = serializer.MaxDepth,
+                CheckAdditionalContent = serializer.CheckAdditionalContent,
+                ConstructorHandling = serializer.ConstructorHandling,
+                ContractResolver = serializer.ContractResolver,
+                DefaultValueHandling = serializer.DefaultValueHandling,
+                MissingMemberHandling = serializer.MissingMemberHandling,
+                NullValueHandling = serializer.NullValueHandling,
+                ObjectCreationHandling = serializer.ObjectCreationHandling,
+                PreserveReferencesHandling = serializer.PreserveReferencesHandling,
+                ReferenceLoopHandling = serializer.ReferenceLoopHandling,
+                TypeNameHandling = serializer.TypeNameHandling,
+                MetadataPropertyHandling = serializer.MetadataPropertyHandling,
+                TypeNameAssemblyFormatHandling = serializer.TypeNameAssemblyFormatHandling,
+                Context = serializer.Context,
+                SerializationBinder = serializer.SerializationBinder,
+                TraceWriter = serializer.TraceWriter,
+                EqualityComparer = serializer.EqualityComparer
+            };
+
+            return settings;
+        }
+
     }
 }

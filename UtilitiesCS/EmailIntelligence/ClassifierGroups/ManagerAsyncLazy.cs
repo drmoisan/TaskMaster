@@ -233,7 +233,12 @@ namespace UtilitiesCS
         private Func<BayesianClassifierGroup> GetAltLoader(SmartSerializableLoader loader) 
         {
             // Get the MethodInfo of the static method
-            MethodInfo staticMethod = loader.T.GetMethod("CreateNewClassifier", BindingFlags.Static | BindingFlags.Public);
+            MethodInfo staticMethod = null;
+            if(loader.T is not null)
+            {
+                staticMethod = loader.T.GetMethod("CreateNewClassifier", BindingFlags.Static | BindingFlags.Public);
+            }
+            
             Func<BayesianClassifierGroup> altLoader = staticMethod is null ? null : () => staticMethod.Invoke(null,null) as BayesianClassifierGroup;
 
             return altLoader;

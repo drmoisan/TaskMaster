@@ -15,8 +15,8 @@ using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class IntelligenceConfig(IApplicationGlobals globals)
-    {        
+    public class IntelligenceConfig(IApplicationGlobals globals) 
+    {
         public static async Task<IntelligenceConfig> LoadAsync(IApplicationGlobals globals)
         {
             return await new IntelligenceConfig(globals).InitAsync();
@@ -30,7 +30,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal IApplicationGlobals Globals { get; } = globals;
 
-        public ConcurrentDictionary<string, SmartSerializableLoader> Config { get; protected set; }
+        public virtual ConcurrentDictionary<string, SmartSerializableLoader> Config { get; protected set; }
 
         internal async Task<ConcurrentDictionary<string, SmartSerializableLoader>> ReadConfigurationAsync()
         {
@@ -43,6 +43,13 @@ namespace UtilitiesCS.EmailIntelligence
                 .SelectAwait(async kvp =>
                 {
                     var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
+
+                    if (loader.T is not null && IsDerivedFromScoDictionaryNew(loader.T))
+                    {
+                        loader.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.None;
+                        loader.Config.JsonSettings.Converters.Add(new NewtonsoftHelpers.Sco.ScoDictionaryConverter());
+                        //add a converter for sco dictionary
+                    }
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
                 }).ToConcurrentDictionaryAsync();
@@ -55,7 +62,7 @@ namespace UtilitiesCS.EmailIntelligence
             if (e.PropertyName.Contains(nameof(SmartSerializableLoader.Config.ClassifierActivated)))
             {
                 var loader = (SmartSerializableLoader)sender;
-                
+
                 WriteConfiguration();
             }
         }
@@ -77,6 +84,25 @@ namespace UtilitiesCS.EmailIntelligence
                 }
                 resxWriter.Generate();
             }
+        }
+
+        private static bool IsDerivedFromScoDictionaryNew(Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            Type baseType = typeof(ScoDictionaryNew<,>);
+            while (type != null && type != typeof(object))
+            {
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == baseType)
+                {
+                    return true;
+                }
+                type = type.BaseType;
+            }
+            return false;
         }
     }
 }

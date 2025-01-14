@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 
@@ -20,6 +21,12 @@ namespace TaskMaster
         public ApplicationGlobals(Application olApp)
         {
             _outlookApp = olApp;
+        }
+
+        public ApplicationGlobals(Application olApp, bool loadBasic)
+        {
+            _outlookApp = olApp;
+            if (loadBasic) { LoadBasic(); }
         }
 
         async public Task LoadAsync(bool parallel = true)
@@ -42,6 +49,7 @@ namespace TaskMaster
 
         async public Task LoadParallelAsync()
         {
+            await LoadIntelConfigAsync();
             await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
             await Engines.InitAsync();
             await _events.LoadAsync();
@@ -49,6 +57,7 @@ namespace TaskMaster
 
         async public Task LoadSequentialAsync() 
         {
+            await LoadIntelConfigAsync();
             await _toDoObjects.LoadAsync(false);
             await _autoFileObjects.LoadAsync(false);
             await Engines.InitAsync();
@@ -80,7 +89,11 @@ namespace TaskMaster
         private AppQuickFilerSettings _quickFilerSettings;
         public IAppQuickFilerSettings QfSettings => _quickFilerSettings;
         internal AppQuickFilerSettings InternalQfSettings => _quickFilerSettings;
-        
+
+        public IntelligenceConfig IntelRes { get; private set; }
+        async private Task LoadIntelConfigAsync() => await Task.Run(async () => IntelRes = await IntelligenceConfig.LoadAsync(this), default);
+
+
         public IAppItemEngines Engines { get; private set; } 
 
         public List<Type> GetClasses()

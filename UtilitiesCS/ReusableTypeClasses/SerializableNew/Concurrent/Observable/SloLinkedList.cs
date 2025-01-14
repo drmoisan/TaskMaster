@@ -36,6 +36,29 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
         public async Task<SloLinkedList<T>> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() => await ism.DeserializeAsync(config);
         public async Task<SloLinkedList<T>> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError) where U : class, ISmartSerializable<U>, new() => await ism.DeserializeAsync(config, askUserOnError);
 
+        #region Not Implemented Yet
+
+        SloLinkedList<T> ISmartSerializable<SloLinkedList<T>>.Deserialize<U>(SmartSerializable<U> loader)
+        {
+            throw new NotImplementedException();
+        }
+
+        SloLinkedList<T> ISmartSerializable<SloLinkedList<T>>.Deserialize<U>(SmartSerializable<U> loader, bool askUserOnError, Func<SloLinkedList<T>> altLoader)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<SloLinkedList<T>> ISmartSerializable<SloLinkedList<T>>.DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError, Func<SloLinkedList<T>> altLoader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SloLinkedList<T> DeserializeObject(string json, JsonSerializerSettings settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion Not Implemented Yet
 
         public string Name { get; set; }
 
@@ -52,7 +75,7 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion INotifyPropertyChanged

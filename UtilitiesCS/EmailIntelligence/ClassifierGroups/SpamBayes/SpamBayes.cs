@@ -542,11 +542,17 @@ namespace UtilitiesCS.EmailIntelligence
                 return false; 
             }
             
-            if (olItem.MessageClass != "IPM.Note") 
+            if (olItem.Try().MessageClass != "IPM.Note")
             {
-                logger.Debug($"Skipping: Message class {olItem.MessageClass} -> {GetOlItemString(olItem)}");
-                return false; 
+                logger.Debug($"Skipping: Message class -> {GetOlItemString(olItem)}");
+                return false;
             }
+
+            //if (olItem.MessageClass != "IPM.Note") 
+            //{
+            //    logger.Debug($"Skipping: Message class {olItem.MessageClass} -> {GetOlItemString(olItem)}");
+            //    return false; 
+            //}
             var spamProp = olItem.UserProperties.Find("Spam");
             if (spamProp is not null) 
             { 

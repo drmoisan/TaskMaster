@@ -306,7 +306,7 @@ namespace UtilitiesCS
                 //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
                 data = EtlByRow(table, objectConverters, columnDictionary, progress);
             }
-            else { data = (object[,])table.GetArray(table.GetRowCount()); }
+            else { data = table?.GetArray(table.GetRowCount()) as object[,]; }
             return (data, columnDictionary);
         }
 

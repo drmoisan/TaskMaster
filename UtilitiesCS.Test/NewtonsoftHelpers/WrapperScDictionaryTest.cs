@@ -86,7 +86,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var dt = new DerivedTest2();
             dt.TryAdd("key1", "value1");
             dt.TryAdd("key2", "value2");
-            globals = new TaskMaster.ApplicationGlobals(mockApplication.Object);
+            globals = new TaskMaster.ApplicationGlobals(mockApplication.Object, true);
             dt.Config = ConfigInitializer.InitConfig(new NewSmartSerializableConfig(), globals);
             return dt;
         }

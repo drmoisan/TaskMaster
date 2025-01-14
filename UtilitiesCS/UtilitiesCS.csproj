@@ -37,8 +37,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=1.1.2.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.1.1.2\lib\net472\AngleSharp.dll</HintPath>
+    <Reference Include="AngleSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.1.2.0\lib\net472\AngleSharp.dll</HintPath>
     </Reference>
     <Reference Include="Apache.Arrow, Version=18.1.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
       <HintPath>..\packages\Apache.Arrow.18.1.0\lib\net462\Apache.Arrow.dll</HintPath>
@@ -85,14 +85,14 @@
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Analysis.0.22.0\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Graph, Version=5.64.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.5.64.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
+    <Reference Include="Microsoft.Graph, Version=5.68.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.5.68.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Graph.Core, Version=3.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.Core.3.2.1\lib\net462\Microsoft.Graph.Core.dll</HintPath>
+    <Reference Include="Microsoft.Graph.Core, Version=3.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.Core.3.2.2\lib\net462\Microsoft.Graph.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Identity.Client, Version=4.66.2.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Identity.Client.4.66.2\lib\net472\Microsoft.Identity.Client.dll</HintPath>
+    <Reference Include="Microsoft.Identity.Client, Version=4.67.1.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.67.1\lib\net472\Microsoft.Identity.Client.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.3.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
@@ -118,26 +118,26 @@
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Abstractions, Version=1.15.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Abstractions.1.15.2\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Abstractions, Version=1.16.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Abstractions.1.16.3\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=1.15.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.1.15.2\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=1.16.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.1.16.3\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=1.15.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.1.15.2\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=1.16.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.1.16.3\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Form, Version=1.15.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.1.15.2\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Form, Version=1.16.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.1.16.3\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Json, Version=1.15.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.1.15.2\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Json, Version=1.16.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.1.16.3\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=1.15.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.1.15.2\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=1.16.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.1.16.3\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Text, Version=1.15.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.1.15.2\lib\netstandard2.0\Microsoft.Kiota.Serialization.Text.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Text, Version=1.16.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.1.16.3\lib\netstandard2.0\Microsoft.Kiota.Serialization.Text.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ML.4.0.0\lib\netstandard2.0\Microsoft.ML.Core.dll</HintPath>
@@ -535,7 +535,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
-    <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />    
+    <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
@@ -547,12 +547,14 @@
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
     <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
+    <Compile Include="Interfaces\IToDo\IPeopleScoDictionaryNew.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
     <Compile Include="IntelligenceResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IntelligenceResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\IConcurrentDictionary.cs" />
     <Compile Include="ManagerResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -561,6 +563,7 @@
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder.cs" />
     <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtension.cs" />
     <Compile Include="NewtonsoftHelpers\NonRecursiveConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\ScoDictionaryConverter.cs" />
     <Compile Include="NewtonsoftHelpers\SDIL Reader\ILGlobals.cs" />
     <Compile Include="NewtonsoftHelpers\SDIL Reader\ILInstruction.cs" />
     <Compile Include="NewtonsoftHelpers\SDIL Reader\MethodBodyReader.cs" />
@@ -635,13 +638,17 @@
     <Compile Include="HelperClasses\CloningFunctions\ObjectCopier.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
     <Compile Include="NewtonsoftHelpers\ScDictionaryConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScoDictionary.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
-    <Compile Include="Interfaces\ITypes\IOutlookItem.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IOutlookItem.cs" />
+    <Compile Include="OutlookExtensions\IOutlookItemFlaggable.cs" />
+    <Compile Include="OutlookExtensions\OutlookItemFlaggableTry.cs" />
     <Compile Include="OutlookExtensions\OutlookItemTryGet.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\DictionaryChangedEventArgs.cs" />
-    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\IDictionaryObserver.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\Observable\Dictionary\IConcurrentObservableDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\Observable\Dictionary\IDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\SimpleActionDictionaryObserver.cs" />
     <Compile Include="ReusableTypeClasses\LazyTry\LazyTry.cs" />
     <Compile Include="ReusableTypeClasses\Locking\ILockingLinkedList.cs" />
@@ -662,12 +669,18 @@
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.Designer.cs">
       <DependentUpon>ConfigViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\ITypes\ISmartSerializable.cs" />
-    <Compile Include="Interfaces\ITypes\ISmartSerializableConfig.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISmartSerializable.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISmartSerializableConfig.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISmartSerializableNonTyped.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializable.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableBase.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableNonTyped.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableStatic.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\SerializableNew\Concurrent\Observable\IScoDictionaryNew.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNew.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryStatic.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloLinkedList.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
@@ -775,12 +788,12 @@
     <Compile Include="Interfaces\IToDo\ISubjectMapEntry.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapSco.cs" />
     <Compile Include="Interfaces\IToDo\IProjectEntry.cs" />
-    <Compile Include="Interfaces\ITypes\IObservableDictionary.cs" />
-    <Compile Include="Interfaces\ITypes\IScoCollection.cs" />
-    <Compile Include="Interfaces\ITypes\IScoCollection2.cs" />
-    <Compile Include="Interfaces\ITypes\IScoDictionary.cs" />
-    <Compile Include="Interfaces\ITypes\ISerializableDictionary.cs" />
-    <Compile Include="Interfaces\ITypes\ISerializableList.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\Observable\IObservableDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection2.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IScoDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISerializableDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISerializableList.cs" />
     <Compile Include="OutlookExtensions\Calendar.cs" />
     <Compile Include="OutlookExtensions\CategoryExt.cs" />
     <Compile Include="OutlookExtensions\ComType.cs" />

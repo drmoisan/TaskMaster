@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using ExCSS;
+using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,11 +14,16 @@ namespace UtilitiesCS.OutlookExtensions
     //TODO: Move to OutlookItem rather than as extensions
     public static class OutlookItemExtensions
     {
-        public static OutlookItemTry Try(this OutlookItem item) => new OutlookItemTry(item);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static OutlookItemTryGet TryGet(this OutlookItem item) => new OutlookItemTryGet(item);
+        public static OutlookItemTry Try(this OutlookItem item) => new(item);
 
-        public static OlItemType GetOlItemType(this OutlookItem item)
+        public static OutlookItemFlaggableTry Try(this IOutlookItemFlaggable item) => new(item);
+
+        public static OutlookItemTryGet TryGet(this OutlookItem item) => new(item);
+
+        public static OlItemType GetOlItemType(this IOutlookItem item)
         {
             if (item.InnerObject is AppointmentItem) { return OlItemType.olAppointmentItem; }
             else if (item.InnerObject is ContactItem) { return OlItemType.olContactItem; }
@@ -42,7 +48,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
             catch (SystemException)
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -76,7 +82,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
             catch (SystemException)
             {
-                return default(T);
+                return default;
             }
         }
 
@@ -96,11 +102,26 @@ namespace UtilitiesCS.OutlookExtensions
             }
             else { return null; }            
         }
-        
+
+        internal static PropertyInfo TryGetPropertyInfo(this OutlookItem item, string propertyName)
+        {
+            try
+            {
+                return item.ItemType.GetProperty(propertyName);
+            }
+            catch (SystemException e)
+            {
+                logger.Info($"{nameof(OutlookItem)}.{nameof(TryGetPropertyInfo)} threw an " +
+                    $"exception for property [{propertyName}]. {e.Message}", e);
+                return null;
+            }
+        }
+
         internal static object TryGetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt) => TryGetPropertyValue(item, propertyName) ?? TryGetPropertyValue(item, propertyNameAlt);
 
         internal static object TryGetPropertyValue(this OutlookItem item, string propertyName)
         {
+            
             try
             {
                 return item.ItemType.InvokeMember(
@@ -110,14 +131,21 @@ namespace UtilitiesCS.OutlookExtensions
                     item.InnerObject,
                     item.Args);
             }
-            catch (COMException ex)
+            catch (System.Exception)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: GetPropertyValue for {0} Exception: {1} ",
-                    propertyName, ex.Message));
-                return null;
+                var propertyInfo = item.TryGetPropertyInfo(propertyName);
+                try
+                {
+                    return propertyInfo?.GetValue(item.InnerObject);
+                }
+                catch (COMException e)
+                {
+                    logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryGetPropertyValue)} threw an " +
+                        $"exception for property [{propertyName}]. {e.Message}", e);
+                    return null;                    
+                }
             }
+
         }
 
         internal static bool TrySetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, Func<object, T> converter, Func<object, Table> converterAlt)
@@ -140,6 +168,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, object propertyValue)
         {
+            
             try
             {
                 item.ItemType.InvokeMember(
@@ -147,17 +176,28 @@ namespace UtilitiesCS.OutlookExtensions
                     BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
                     null,
                     item.InnerObject,
-                    new object[] { propertyValue });
+                    [propertyValue]);
                 return true;
             }
             catch (COMException)
             {
-                //Debug.WriteLine(
-                //   string.Format(
-                //   "OutlookItem: SetPropertyValue for {0} Exception: {1} ",
-                //   propertyName, ex.Message));
-                return false;
+                var propertyInfo = item.TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(item.ItemType.Name, propertyName);
+                try
+                {
+                    propertyInfo.SetValue(item.InnerObject, propertyValue);
+                    return true;
+                }
+                catch (COMException e)
+                {
+                    logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TrySetPropertyValue)} threw a " +
+                        $"COM exception for property [{propertyName}] and value {propertyValue}. \n{e.Message}", e);
+
+                    return false;
+                }
             }
+
+
+            
         }
 
         internal static object TryCallMethod(this OutlookItem item, string methodName)
@@ -172,12 +212,11 @@ namespace UtilitiesCS.OutlookExtensions
                     item.InnerObject,
                     item.Args);
             }
-            catch (SystemException ex)
+            catch (SystemException e)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: CallMethod for {0} Exception: {1} ",
-                    methodName, ex.Message));
+                logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryCallMethod)} threw an " +
+                    $"exception for property [{methodName}]. \n{e.Message}", e);
+
                 return null;
             }
         }
@@ -194,12 +233,10 @@ namespace UtilitiesCS.OutlookExtensions
                     item.InnerObject,
                     args);
             }
-            catch (SystemException ex)
+            catch (SystemException e)
             {
-                Debug.WriteLine(
-                    string.Format(
-                    "OutlookItem: CallMethod for {0} Exception: {1} ",
-                    methodName, ex.Message));
+                logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryCallMethod)} threw an " +
+                    $"exception for property [{methodName}]. \n{e.Message}", e);
                 return null;
             }
         }

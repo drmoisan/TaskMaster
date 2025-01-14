@@ -12,7 +12,7 @@ namespace UtilitiesCS
     public static class AutoFile2
     {
         public static IList<string> AutoFindPeople(object objItem,
-                                                   IScoDictionary<string, string> ppl_dict,
+                                                   IScoDictionaryNew<string, string> ppl_dict,
                                                    string emailRootFolder,
                                                    IScoDictionary<string, string> dictRemap,
                                                    string userAddress,

@@ -25,7 +25,7 @@ namespace TaskMaster
             Application.Startup += Application_Startup;
         }
 
-        private async void Application_Startup()
+        private void Application_Startup()
         {
             logger.Debug("Application_Startup() fired");
 
@@ -70,7 +70,7 @@ namespace TaskMaster
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
-        private System.Threading.Tasks.Task loadGlobals;
+        //private System.Threading.Tasks.Task loadGlobals;
 
         /// <summary>
         /// Overrides the default behavior of the COM add-in to create an XML ribbon
@@ -101,18 +101,17 @@ namespace TaskMaster
         /// <returns>Instance of the <seealso cref="AddInUtilities"/> class</returns>
         protected override object RequestComAddInAutomationService()
         {
-            if (_externalUtilities is null)
-                _externalUtilities = new AddInUtilities();
+            _externalUtilities ??= new AddInUtilities();
 
             return _externalUtilities;
         }
 
-        private async Task FinishLoadingGlobalsAsync()
-        {
-            await loadGlobals;
-            logger.Debug("Finished loading globals");
+        //private async Task FinishLoadingGlobalsAsync()
+        //{
+        //    await loadGlobals;
+        //    logger.Debug("Finished loading globals");
 
-        }
+        //}
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {

@@ -17,7 +17,8 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
         public override TDerived ReadJson(JsonReader reader, Type typeToConvert, TDerived existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            var wrapper = serializer.Deserialize(reader, typeof(WrapperScDictionary<TDerived, TKey, TValue>)) as WrapperScDictionary<TDerived, TKey, TValue>;
+            return wrapper?.ToDerived();
         }
 
         public override void WriteJson(JsonWriter writer, TDerived value, JsonSerializer serializer)

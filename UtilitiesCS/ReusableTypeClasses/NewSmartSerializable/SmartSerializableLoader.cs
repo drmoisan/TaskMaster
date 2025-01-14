@@ -86,7 +86,6 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-
         public static async Task<SmartSerializableLoader> DeserializeAsync(
             IApplicationGlobals globals, byte[] binary, CancellationToken cancel = default)
         {                
