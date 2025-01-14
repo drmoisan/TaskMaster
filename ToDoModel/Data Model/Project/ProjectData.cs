@@ -108,17 +108,6 @@ namespace ToDoModel
             return dfToDo;
         }
 
-                
-        //private static TColumn[] GetDuplicateEntriesByColumn<TRow, TColumn, TColumnData>(Frame<TRow, TColumn> df, TColumn columnId)
-        //{
-        //    var column = df.GetColumn<TColumn>(columnId);
-        //    var duplicates = column.Values
-        //        .GroupBy(x => x)
-        //        .Where(group => group.Count() > 1)
-        //        .Select(group => group.Key)
-        //        .ToArray();
-        //    return duplicates;
-        //}
 
         private static Frame<int,string> DropDuplicates(Frame<int, string> df, IEnumerable<Frame<int, string>> duplicateRows)
         {
@@ -152,11 +141,8 @@ namespace ToDoModel
         internal Frame<string, string> FilterToProjectIDs(Frame<string, string> df) 
         { 
             if (df is null) { return df; }
-            //if (!df.ColumnKeys.Contains("ToDoID")) 
-            //{ throw new ArgumentOutOfRangeException(nameof(df), $"{nameof(df)} is missing column ToDoID"); }
-
+            
             df.AddColumn("IdLength", df.RowIndex.Keys.Select(id => id.Length));
-            //df.AddColumn("IdLength", df.GetColumn<string>("ToDoID").Select(id => id.Value.Length));
             df = df.FilterRowsBy("IdLength", 4);
             df.DropColumn("IdLength");
             //df.Print();
@@ -237,14 +223,6 @@ namespace ToDoModel
                             throw;
                         }   
 
-                        //df.Log(logger);
-                        //dfTemp.Log(logger);
-                        //logger.Error(e.Message, e);
-                        //dfTemp.RenameColumn("Categories", "dfTemp_Categories");
-                        //dfTemp.RenameColumn("ToDoID", "dfTemp_ToDoID");
-                        //var overlap = df.Join(dfTemp, JoinKind.Inner, Lookup.Exact);
-                        //overlap.Log(logger);
-                        //throw;
                     }
                     
                     df.PrintToLog(logger);

@@ -25,6 +25,7 @@ namespace UtilitiesCS
         object InnerObject { get; }
         bool IsConflict { get; }
         ItemProperties ItemProperties { get; }
+        Type ItemType { get; }
         DateTime LastModificationTime { get; }
         Links Links { get; }
         OlRemoteStatus MarkForDownload { get; set; }
@@ -53,5 +54,7 @@ namespace UtilitiesCS
         void Save();
         void SaveAs(string path, OlSaveAsType type);
         void ShowCategoriesDialog();
+
+        T GetPropertyValue<T>(string propertyName);
     }
 }

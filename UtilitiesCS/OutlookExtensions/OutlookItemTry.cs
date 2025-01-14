@@ -13,15 +13,15 @@ using Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookExtensions
 {
-    public class OutlookItemTry
+    public class OutlookItemTry: IOutlookItem
     {
-        protected OutlookItem _olItem;
+        protected IOutlookItem _olItem;
         protected object _item;  // the wrapped Outlook item
         protected Type _type;  // type for the Outlook item 
         protected object[] _args;  // dummy argument array
         //private System.Type _typeOlObjectClass;
 
-        public OutlookItemTry(OutlookItem olItem)
+        public OutlookItemTry(IOutlookItem olItem)
         {
             _olItem = olItem;
             _item = olItem.InnerObject;
@@ -101,11 +101,24 @@ namespace UtilitiesCS.OutlookExtensions
 
         public string Subject { get => TryGet(() => _olItem.Subject); set => TrySet((x) => _olItem.Subject = x, value); }
 
-        public string SenderName => TryGet(() => ((Outlook.Recipient)_olItem.TryGetPropertyValue("Sender")).Name);
+        public string SenderName => TryGet(() => ((Outlook.Recipient)_olItem.GetPropertyValue<Recipient>("Sender")).Name);
 
         public bool UnRead { get => TryGet(() => _olItem.UnRead); set => TrySet((x) => _olItem.UnRead = x, value); }
 
         public Outlook.UserProperties UserProperties => TryGet(() => _olItem.UserProperties);
+
+        public object[] Args => TryGet(() => _olItem.Args);
+
+        public OlObjectClass Class => TryGet(() => _olItem.Class);
+
+        public Inspector Inspector => TryGet(() => _olItem.Inspector);
+
+        public Type ItemType => TryGet(() => _olItem.ItemType);
+
+        public bool NoAging { get => TryGet(() => _olItem.NoAging); set => TrySet((x) => _olItem.NoAging = x, value); }
+        public DateTime ReminderTime { get => TryGet(() => _olItem.ReminderTime); set => TrySet((x) => _olItem.ReminderTime = x, value); }
+
+        public DateTime TaskStartDate => TryGet(() => _olItem.TaskStartDate);
 
         #endregion Predefined Properties
 
@@ -174,6 +187,8 @@ namespace UtilitiesCS.OutlookExtensions
                 return default(T); 
             } 
         }
+
+        public T GetPropertyValue<T>(string propertyName) => TryGet(() => _olItem.GetPropertyValue<T>(propertyName));
 
         #endregion
     }

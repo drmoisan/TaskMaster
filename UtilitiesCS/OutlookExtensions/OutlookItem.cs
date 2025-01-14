@@ -84,7 +84,7 @@ namespace UtilitiesCS
         #region Internal Properties
 
         internal object Item { get => _item; }
-        internal Type ItemType { get => _type; }
+        public Type ItemType { get => _type; }
         public object[] Args { get => _args; }
 
         #endregion
@@ -245,7 +245,7 @@ namespace UtilitiesCS
             }
         }
 
-        internal virtual T GetPropertyValue<T>(string propertyName)
+        public virtual T GetPropertyValue<T>(string propertyName)
         {
             try
             {

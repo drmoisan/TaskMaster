@@ -145,7 +145,7 @@ namespace TaskMaster
             await ProcessMailItemAsync(item);               
         }
 
-        public async Task ProcessMailItemAsync(object item)
+        public async Task<bool> ProcessMailItemAsync(object item)
         {
             if (item is MailItem mailItem)
             {
@@ -162,8 +162,10 @@ namespace TaskMaster
                     await Task.Run(() => _ = helper.Tokens);
                     await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
                     helper.Item.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
+                    return true;
                 }
             }
+            return false;
         }
 
         public async Task ProcessNewInboxItemsAsync()
@@ -179,36 +181,30 @@ namespace TaskMaster
                 var unprocessedQueue = new ConcurrentQueue<object>(unprocessedItems);
                 int errors = 0;
                 int success = 0;
-                logger.Debug($"Unprocessed queue has {unprocessedQueue.Count()} items");
+                var unprocessedCount = unprocessedQueue.Count();
+                logger.Debug($"Unprocessed queue has {unprocessedCount} items");
 
 
                 while (unprocessedQueue.Count > 0)
                 {
-                    if (unprocessedQueue.TryDequeue(out var item))
+                    var remaining = unprocessedQueue.Count();
+                    if (unprocessedQueue.TryDequeue(out var item) && await ProcessMailItemAsync(item))
                     {
-                        await ProcessMailItemAsync(item);
-                        success++;
+                        success++;                        
+                        logger.Debug($"Successfully processed {success} items of {unprocessedCount} in the unprocessed Queue");
                     }
-                    else if (errors >= 3) 
+                    else if (++errors >= 3) 
                     {
-                        logger.Warn($"Tried to DeQueue remaining {unprocessedQueue.Count()} unprocessed items 3 times without success. Exiting loop.");
+                        logger.Warn($"Tried to process remaining {remaining} unprocessed items 3 times without success. Exiting loop.");
                         break;
                     }
                     else
                     {
+                        if (item != default) { unprocessedQueue.Enqueue(item); }
                         await Task.Delay(100);
-                        errors++;
                     }
                 }
-                logger.Debug($"Processed {success} items in the unprocessed Queue");
-
-
-
-
-                //await unprocessedItems
-                //    .Cast<object>()
-                //    .ToAsyncEnumerable()
-                //    .ForEachAwaitAsync(ProcessMailItemAsync);
+                logger.Debug($"Successfully processed {success} of {unprocessedCount} items in the unprocessed Queue");
 
                 logger.Debug("Finished processing new inbox items");
             }

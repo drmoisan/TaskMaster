@@ -392,14 +392,14 @@ namespace ToDoModel
 
         public bool FlagAsTask
         {
-            get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.FlagAsTask, FlaggableItem);
-            set => Loader.SetAndSave(ref _flagAsTask, value, (x) => FlaggableItem.FlagAsTask = (bool)x);
+            get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.Try().FlagAsTask, FlaggableItem);
+            set => Loader.SetAndSave(ref _flagAsTask, value, (x) => FlaggableItem.Try().FlagAsTask = (bool)x);
         }
         private bool? _flagAsTask = null;
 
         public DateTime TaskCreateDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _taskCreateDate, () => FlaggableItem.CreationTime, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _taskCreateDate, () => FlaggableItem.Try().CreationTime, FlaggableItem);
             set => _taskCreateDate = value;
         }
         private DateTime? _taskCreateDate = null;
@@ -449,42 +449,42 @@ namespace ToDoModel
 
         public DateTime ReminderTime
         {
-            get => (DateTime)Loader.GetOrLoad(ref _reminderTime, () => FlaggableItem.ReminderTime, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _reminderTime, () => FlaggableItem.Try().ReminderTime, FlaggableItem);
             set => _reminderTime = value;
         }
         private DateTime? _reminderTime = null;
 
         public DateTime DueDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _dueDate, DateTime.Parse("1/1/4501"), () => FlaggableItem.DueDate, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _dueDate, DateTime.Parse("1/1/4501"), () => FlaggableItem.Try().DueDate, FlaggableItem);
             set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.DueDate = (DateTime)x);
         }
         private DateTime? _dueDate = null;
 
         public DateTime StartDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _startDate, TaskCreateDate, () => FlaggableItem.TaskStartDate, FlaggableItem);
+            get => (DateTime)Loader.GetOrLoad(ref _startDate, TaskCreateDate, () => FlaggableItem.Try().TaskStartDate, FlaggableItem);
             set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.TaskStartDate = (DateTime)x);
         }
         private DateTime? _startDate = null;
 
         public OlImportance Priority
         {
-            get => (OlImportance)Loader.GetOrLoad(ref _priority, OlImportance.olImportanceNormal, () => FlaggableItem.Importance, FlaggableItem);
+            get => (OlImportance)Loader.GetOrLoad(ref _priority, OlImportance.olImportanceNormal, () => FlaggableItem.Try().Importance, FlaggableItem);
             set => Loader.SetAndSave(ref _priority, value, (x) => FlaggableItem.Importance = (OlImportance)x);
         }
         private OlImportance? _priority = null;
 
         public bool Complete
         {
-            get => (bool)Loader.GetOrLoad(ref _complete, () => FlaggableItem.Complete, FlaggableItem);
+            get => (bool)Loader.GetOrLoad(ref _complete, () => FlaggableItem.Try().Complete, FlaggableItem);
             set => Loader.SetAndSave(ref _complete, value, (x) => FlaggableItem.Complete = (bool)x);
         }
         private bool? _complete = null;
 
         public string TaskSubject
         {
-            get => Loader.GetOrLoad(ref _taskSubject, () => FlaggableItem.TaskSubject, FlaggableItem);
+            get => Loader.GetOrLoad(ref _taskSubject, () => FlaggableItem.Try().TaskSubject, FlaggableItem);
             set => Loader.SetAndSave(ref _taskSubject, value, (x) => FlaggableItem.TaskSubject = x);
         }
         private string _taskSubject = null;
@@ -610,14 +610,14 @@ namespace ToDoModel
         private int? _totalWork = null;
         public int TotalWork
         {
-            get => (int)Loader.GetOrLoad(ref _totalWork, () => FlaggableItem.TotalWork, FlaggableItem);
+            get => (int)Loader.GetOrLoad(ref _totalWork, () => FlaggableItem.Try().TotalWork, FlaggableItem);
             set => Loader.SetAndSave(ref _totalWork, value, (x) => FlaggableItem.TotalWork = (int)x);
         }
 
         private string _toDoID = null;
         public string ToDoID
         {
-            get => Loader.GetOrLoad(ref _toDoID, () => FlaggableItem.GetUdfString("ToDoID"), FlaggableItem);
+            get => Loader.GetOrLoad(ref _toDoID, () => FlaggableItem.Try().GetUdfString("ToDoID"), FlaggableItem);
             set => Loader.SetAndSave(ref _toDoID, value, (x) =>
             {
                 if (!ReadOnly)
@@ -746,7 +746,7 @@ namespace ToDoModel
         {
             get
             {
-                if (ExpandChildren.Length == 0)
+                if (ExpandChildren?.Length == 0)
                 {
                     ExpandChildren = "-";
                 }
@@ -776,7 +776,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _expandChildren = FlaggableItem.GetUdfString("EC");
+                    _expandChildren = FlaggableItem.Try().GetUdfString("EC");
                     return _expandChildren;
                 }
             }
@@ -808,7 +808,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _expandChildrenState = FlaggableItem.GetUdfString("EcState");
+                    _expandChildrenState = FlaggableItem.Try().GetUdfString("EcState");
                     return _expandChildrenState;
                 }
             }
@@ -875,7 +875,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _metaTaskLvl = FlaggableItem.GetUdfString("Meta Task Level");
+                    _metaTaskLvl = FlaggableItem.Try().GetUdfString("Meta Task Level");
                     return _metaTaskLvl;
                 }
             }
@@ -884,10 +884,7 @@ namespace ToDoModel
                 _metaTaskLvl = value;
                 if (!ReadOnly)
                 {
-                    if (FlaggableItem is not null)
-                    {
-                        FlaggableItem.TrySetUdf("Meta Task Level", value);
-                    }
+                    FlaggableItem?.TrySetUdf("Meta Task Level", value);
                 }
             }
         }
@@ -906,7 +903,7 @@ namespace ToDoModel
                 }
                 else
                 {
-                    _metaTaskSubject = FlaggableItem.GetUdfString("Meta Task Subject");
+                    _metaTaskSubject = FlaggableItem.Try().GetUdfString("Meta Task Subject");
                     return _metaTaskSubject;
                 }
             }

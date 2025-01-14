@@ -19,9 +19,11 @@ namespace UtilitiesCS.OutlookExtensions
 
         public static OutlookItemTry Try(this OutlookItem item) => new OutlookItemTry(item);
 
+        public static OutlookItemFlaggableTry Try(this IOutlookItemFlaggable item) => new OutlookItemFlaggableTry(item);
+
         public static OutlookItemTryGet TryGet(this OutlookItem item) => new OutlookItemTryGet(item);
 
-        public static OlItemType GetOlItemType(this OutlookItem item)
+        public static OlItemType GetOlItemType(this IOutlookItem item)
         {
             if (item.InnerObject is AppointmentItem) { return OlItemType.olAppointmentItem; }
             else if (item.InnerObject is ContactItem) { return OlItemType.olContactItem; }
