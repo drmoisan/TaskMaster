@@ -122,5 +122,12 @@ namespace ToDoModel.Test.Data_Model.ToDo
         {
             throw new NotImplementedException();
         }
+
+        public T GetPropertyValue<T>(string propertyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Type ItemType { get => throw new NotImplementedException(); }
     }
 }
