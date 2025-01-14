@@ -36,7 +36,7 @@ namespace TaskMaster.Test.AppGlobals
         private Mock<IApplicationGlobals> mockApplicationGlobals;
         //private Mock<AppAutoFileObjects> mockAutoFileObjects;
         //private AppFileSystemFolderPaths appFP;
-        //private Mock<IntelligenceConfig> mockIntelligenceConfig;
+        private Mock<IntelligenceConfig> mockIntelligenceConfig;
         private Mock<ISmartSerializableNonTyped> mockSmartSerializable;
 
         private Mock<ISmartSerializableNonTyped> GetMockSS()
@@ -49,18 +49,18 @@ namespace TaskMaster.Test.AppGlobals
             return mockSS;
         }
 
-        //private Mock<IntelligenceConfig> SetUpMockIntelRes(Mock<IApplicationGlobals> mockGlobals)
-        //{
-        //    var intel = this.mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
-        //    var config = new Dictionary<string, SmartSerializableLoader>
-        //    {
-        //        { "People", new SmartSerializableLoader()   }
-        //    }.ToConcurrentDictionary();
-        //    intel.SetupGet(x => x.Config).Returns(config);
-        //    mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
-            
-        //    return intel;
-        //}
+        private Mock<IntelligenceConfig> SetUpMockIntelRes(Mock<IApplicationGlobals> mockGlobals)
+        {
+            var intel = this.mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
+            var config = new Dictionary<string, SmartSerializableLoader>
+            {
+                { "People", new SmartSerializableLoader()   }
+            }.ToConcurrentDictionary();
+            intel.SetupGet(x => x.Config).Returns(config);
+            mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
+
+            return intel;
+        }
 
         public static class EventHelper
         {
@@ -110,7 +110,7 @@ namespace TaskMaster.Test.AppGlobals
         public async Task LoadPeopleAsync_CanLoadProperly()
         {
             // Arrange
-            //this.mockIntelligenceConfig = SetUpMockIntelRes(mockApplicationGlobals);
+            this.mockIntelligenceConfig = SetUpMockIntelRes(mockApplicationGlobals);
             var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);            
             this.mockSmartSerializable = GetMockSS();
             appToDoObjects.SmartSerializable = mockSmartSerializable.Object;
