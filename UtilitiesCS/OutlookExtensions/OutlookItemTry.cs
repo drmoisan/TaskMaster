@@ -15,10 +15,10 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public class OutlookItemTry
     {
-        private OutlookItem _olItem;
-        private object _item;  // the wrapped Outlook item
-        private Type _type;  // type for the Outlook item 
-        private object[] _args;  // dummy argument array
+        protected OutlookItem _olItem;
+        protected object _item;  // the wrapped Outlook item
+        protected Type _type;  // type for the Outlook item 
+        protected object[] _args;  // dummy argument array
         //private System.Type _typeOlObjectClass;
 
         public OutlookItemTry(OutlookItem olItem)

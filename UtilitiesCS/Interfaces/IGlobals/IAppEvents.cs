@@ -10,7 +10,7 @@ namespace TaskMaster
         void Hook();
         void Unhook();
         Items OlToDoItems { get; }
-        Task ProcessMailItemAsync(object item);
+        Task<bool> ProcessMailItemAsync(object item);
         //ConcurrentBag<IConditionalEngine<MailItemHelper>> InboxEngines { get; }
     }
 }

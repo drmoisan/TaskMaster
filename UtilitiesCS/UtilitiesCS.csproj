@@ -643,6 +643,7 @@
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\IOutlookItem.cs" />
     <Compile Include="OutlookExtensions\IOutlookItemFlaggable.cs" />
+    <Compile Include="OutlookExtensions\OutlookItemFlaggableTry.cs" />
     <Compile Include="OutlookExtensions\OutlookItemTryGet.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\DictionaryChangedEventArgs.cs" />

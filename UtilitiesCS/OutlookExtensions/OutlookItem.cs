@@ -309,27 +309,28 @@ namespace UtilitiesCS
         }
 
         internal virtual object CallMethod(string methodName)
-        {
+        {            
             try
             {
-                var methodInfo = _type.GetMethod(methodName).ThrowIfNull();
-                return methodInfo.Invoke(_item, _args);
-                //var obj = _type.InvokeMember(
-                //    methodName,
-                //    BindingFlags.Public | BindingFlags.InvokeMethod,
-                //    null,
-                //    _item,
-                //    _args);
-                //return obj;
+                var obj = _type.InvokeMember(
+                    methodName,
+                    BindingFlags.Public | BindingFlags.InvokeMethod,
+                    null,
+                    _item,
+                    _args);
+                return obj;
             }
-            catch (SystemException)
+            catch (Exception)
             {
-                // An invalid property name exception is propagated to client
-                //Debug.WriteLine(
-                //    string.Format(
-                //    "OutlookItem: CallMethod for {0} Exception: {1} ",
-                //    methodName, ex.Message));
-                throw;
+                try
+                {
+                    var methodInfo = _type.GetMethod(methodName).ThrowIfNull();
+                    return methodInfo.Invoke(_item, _args);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }                
             }
         }
 
