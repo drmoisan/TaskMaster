@@ -20,33 +20,33 @@ namespace ToDoModel
     {
         #region Constructors and Initializers
 
-        public PeopleScoDictionary(IApplicationGlobals appGlobals, IPrefix prefix) : base()
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(IApplicationGlobals appGlobals, IPrefix prefix) : base()
+        //{ Initialize(appGlobals, prefix); }
 
-        public PeopleScoDictionary(IDictionary<string, string> source, IApplicationGlobals appGlobals, IPrefix prefix) : base(source)
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(IDictionary<string, string> source, IApplicationGlobals appGlobals, IPrefix prefix) : base(source)
+        //{ Initialize(appGlobals, prefix); }
 
-        public PeopleScoDictionary(IEqualityComparer<string> equalityComparer,
-                                   IApplicationGlobals appGlobals,
-                                   IPrefix prefix) : base(equalityComparer)
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(IEqualityComparer<string> equalityComparer,
+        //                           IApplicationGlobals appGlobals,
+        //                           IPrefix prefix) : base(equalityComparer)
+        //{ Initialize(appGlobals, prefix); }
 
-        public PeopleScoDictionary(int capactity,
-                                   IApplicationGlobals appGlobals,
-                                   IPrefix prefix) : base(capactity)
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(int capactity,
+        //                           IApplicationGlobals appGlobals,
+        //                           IPrefix prefix) : base(capactity)
+        //{ Initialize(appGlobals, prefix); }
 
-        public PeopleScoDictionary(IDictionary<string, string> source,
-                                   IEqualityComparer<string> equalityComparer,
-                                   IApplicationGlobals appGlobals,
-                                   IPrefix prefix) : base(source, equalityComparer)
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(IDictionary<string, string> source,
+        //                           IEqualityComparer<string> equalityComparer,
+        //                           IApplicationGlobals appGlobals,
+        //                           IPrefix prefix) : base(source, equalityComparer)
+        //{ Initialize(appGlobals, prefix); }
 
-        public PeopleScoDictionary(int capacity,
-                                   IEqualityComparer<string> equalityComparer,
-                                   IApplicationGlobals appGlobals,
-                                   IPrefix prefix) : base(capacity, equalityComparer)
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(int capacity,
+        //                           IEqualityComparer<string> equalityComparer,
+        //                           IApplicationGlobals appGlobals,
+        //                           IPrefix prefix) : base(capacity, equalityComparer)
+        //{ Initialize(appGlobals, prefix); }
 
         public PeopleScoDictionary(string filename,
                                    string folderpath,
@@ -62,21 +62,21 @@ namespace ToDoModel
         /// <param name="folderpath">Location of json file</param>
         /// <param name="appGlobals">Reference to global variables</param>
         /// <param name="prefix">Reference to class implementing <seealso cref="IPrefix"/> interface</param>
-        public PeopleScoDictionary(IDictionary<string, string> dictionary,
-                                   string filename,
-                                   string folderpath,
-                                   IApplicationGlobals appGlobals,
-                                   IPrefix prefix) : base(dictionary, filename, folderpath)
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(IDictionary<string, string> dictionary,
+        //                           string filename,
+        //                           string folderpath,
+        //                           IApplicationGlobals appGlobals,
+        //                           IPrefix prefix) : base(dictionary, filename, folderpath)
+        //{ Initialize(appGlobals, prefix); }
 
-        public PeopleScoDictionary(string filename,
-                                   string folderpath,
-                                   IScoDictionary<string, string>.AltLoader backupLoader,
-                                   string backupFilepath,
-                                   bool askUserOnError,
-                                   IApplicationGlobals appGlobals,
-                                   IPrefix prefix) : base(filename, folderpath, backupLoader, backupFilepath, askUserOnError)
-        { Initialize(appGlobals, prefix); }
+        //public PeopleScoDictionary(string filename,
+        //                           string folderpath,
+        //                           IScoDictionary<string, string>.AltLoader backupLoader,
+        //                           string backupFilepath,
+        //                           bool askUserOnError,
+        //                           IApplicationGlobals appGlobals,
+        //                           IPrefix prefix) : base(filename, folderpath, backupLoader, backupFilepath, askUserOnError)
+        //{ Initialize(appGlobals, prefix); }
 
         internal void Initialize(IApplicationGlobals appGlobals, IPrefix prefix)
         {

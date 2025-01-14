@@ -83,18 +83,15 @@ namespace TaskVisualization.Test
         {
             var mockUserProperties = new Mock<UserProperties>();
             mockUserProperties.As<IEnumerable>().Setup(x => x.GetEnumerator()).Returns(UserPropertyCollection());
-            //mockUserProperties.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object[]>()))
-            //    .Returns(FindProperty(It.IsAny<string>(), It.IsAny<object[]>()));
-            //mockUserProperties.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object[]>()))
-            //    .Returns((string y, object z) => FindProperty(y,z));
+
             mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "TagProgram"), It.IsAny<object[]>()))
                 .Returns(MockProperty<string>("TestProgram", "TagProgram", OlUserPropertyType.olText));
             
             mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "AB"), It.IsAny<object[]>()))
-                .Returns(MockProperty<Boolean>(true, "AB", OlUserPropertyType.olYesNo));
+                .Returns(MockProperty<bool>(true, "AB", OlUserPropertyType.olYesNo));
 
             mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EC2"), It.IsAny<object[]>()))
-                .Returns(MockProperty<Boolean>(true, "EC2", OlUserPropertyType.olYesNo));
+                .Returns(MockProperty<bool>(true, "EC2", OlUserPropertyType.olYesNo));
 
             mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EC"), It.IsAny<object[]>()))
                 .Returns(MockProperty<string>("+", "EC", OlUserPropertyType.olText));

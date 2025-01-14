@@ -60,6 +60,12 @@ namespace UtilitiesCS
         //    }
         //}
 
+        public static bool IsSubsetOf<T>(this IEnumerable<T> source, IEnumerable<T> other)
+        {
+            if (source is null || other is null) { return false; }
+            return !source.Except(other).Any();
+        }
+
         public static IEnumerable<TValue> SelectGroup<TKey, TValue>(this IEnumerable<IGrouping<TKey, TValue>> groups, TKey key) 
         {
             return groups.Where(x => x.Key.Equals(key)).SelectMany(x => x);

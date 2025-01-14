@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
@@ -47,7 +48,7 @@ namespace UtilitiesCS
 
         #endregion Public Properties
 
-        #region Public Methods
+        #region Change Structure
 
         public TreeNode<T> AddChild(T value)
         {
@@ -76,6 +77,22 @@ namespace UtilitiesCS
         {
             return values.Select(new Func<T, TreeNode<T>>(AddChild)).ToArray();
         }
+
+        public TreeNode<T> InsertChild(TreeNode<T> node)
+        {
+            node.Parent = this;
+            Children.Insert(0, node);
+            return node;
+        }
+
+        public bool RemoveChild(TreeNode<T> node)
+        {
+            return Children.Remove(node);
+        }
+
+        #endregion Change Structure
+
+        #region Public Methods
 
         public IEnumerable<TreeNode<T>> Descendents(bool includeSelf = false)
         {
@@ -117,6 +134,53 @@ namespace UtilitiesCS
             return null;
         }
 
+        public TreeNode<T> FindSequentialNode<U>(Func<T, U, bool> comparator, Queue<U> sequence)
+        {
+            comparator.ThrowIfNull();
+            var first = sequence.ThrowIfNullOrEmpty().Dequeue();
+            var node = FindNode((current) => comparator(current, first), true);
+            while (node is not null && !sequence.IsEmpty())
+            {
+                var next = sequence.Dequeue();
+                node = node.Children?.Where(x => comparator(x.Value, next))?.FirstOrDefault();
+            }
+            return node;
+        }
+
+        public TreeNode<T> FindNode(Func<T, bool> comparator, bool descendByLevel = false) 
+        { 
+            if (!descendByLevel) 
+            { 
+                return FindAll(comparator).FirstOrDefault(); 
+            }
+            else
+            {
+                TreeNode<T>[] nodes = { this };
+                while (!nodes.IsNullOrEmpty())
+                {
+                    var first = nodes.FirstOrDefault(node => comparator(node.Value));
+                    if (first != default) { return first; }
+                    else { nodes = GetNextLevel(nodes).Where(node => node is not null).ToArray(); }
+                }
+                return default;
+            }
+            
+        }
+        
+        public TreeNode<T>[] GetNextLevel(TreeNode<T>[] nodes) 
+        { 
+            if (nodes is null) { return null; }
+            return nodes.Where(x => !x.Children.IsNullOrEmpty()).SelectMany(x => x.Children).ToArray();
+        }
+
+        public IEnumerable<TreeNode<T>> FindAll(Func<T, bool> comparator)
+        {
+            if (comparator(this.Value))
+                return new TreeNode<T>[] { this }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
+            else
+                return new TreeNode<T>[] { }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
+        }
+
         public IEnumerable<TreeNode<T>> FindAll(Func<TreeNode<T>, bool> comparator) 
         {
             if (comparator(this))
@@ -143,13 +207,6 @@ namespace UtilitiesCS
                 return false;
             return Parent.IsAncestor(model);
         }
-                
-        public TreeNode<T> InsertChild(TreeNode<T> node)
-        {
-            node.Parent = this;
-            Children.Insert(0, node);
-            return node;
-        }
         
         public virtual IEnumerable<TreeNode<T>> Leaves()
         {
@@ -162,12 +219,7 @@ namespace UtilitiesCS
                     return x.Leaves();
             }));
         }
-
-        public bool RemoveChild(TreeNode<T> node)
-        {
-            return Children.Remove(node);
-        }
-
+                
         public void Traverse(Action<T> action)
         {
             action(Value);

@@ -59,7 +59,7 @@ namespace TaskMaster
         async public Task LoadParallelAsync()
         {
             Manager = new ManagerAsyncLazy(_parent);
-            await LoadIntelConfigAsync();
+            //await LoadIntelConfigAsync();
             var tasks = new List<Task>
             {
                 LoadRecentsListAsync(),
@@ -77,7 +77,7 @@ namespace TaskMaster
         {
             Manager = new ManagerAsyncLazy(_parent);
 
-            await LoadIntelConfigAsync();
+            //await LoadIntelConfigAsync();
             await LoadRecentsListAsync();
             await LoadCtfMapAsync();
             await LoadCommonWordsAsync();
@@ -153,7 +153,7 @@ namespace TaskMaster
         public SloLinkedList<string> RecentsList { get; private set; }
         async private Task LoadRecentsListAsync() => await Task.Run(async () =>
         {
-            if (IntelRes.Config.TryGetValue("RecentFolders", out var config))
+            if (_parent.IntelRes.Config.TryGetValue("RecentFolders", out var config))
             {
                 RecentsList = await SloLinkedList<string>.Static.DeserializeAsync(config, true);
                 RecentsList.CollectionChanged += SmartSerializable_CollectionChanged;
@@ -167,8 +167,8 @@ namespace TaskMaster
             list.Serialize();
         }
         
-        public IntelligenceConfig IntelRes { get; private set; }
-        async private Task LoadIntelConfigAsync() => await Task.Run(async () => IntelRes = await IntelligenceConfig.LoadAsync(_parent), CancelToken);
+        //public IntelligenceConfig IntelRes { get; private set; }
+        //async private Task LoadIntelConfigAsync() => await Task.Run(async () => IntelRes = await IntelligenceConfig.LoadAsync(_parent), CancelToken);
 
         //private RecentsList<string> _recentsList;
         //public RecentsList<string> RecentsList

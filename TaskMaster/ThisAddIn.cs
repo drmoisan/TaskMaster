@@ -14,6 +14,8 @@ namespace TaskMaster
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            logger.Debug("ThisAddIn_Startup() fired");
+
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
@@ -25,7 +27,7 @@ namespace TaskMaster
 
         private void Application_Startup()
         {
-            //logger.Debug("Application_Startup() fired");
+            logger.Debug("Application_Startup() fired");
 
             // Set the indent for TreeListView Renderer which does not autoscale.
             // Default pixels per level was 16 + 1 but designed for 100% scaling.
@@ -35,23 +37,32 @@ namespace TaskMaster
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
 
             // Create the global variables
-            _globals = new ApplicationGlobals(Application);
+            //_globals = new ApplicationGlobals(Application);
             // Initialize the global variables on a low priority thread
-            loadGlobals = _globals.LoadAsync(false);
+            //loadGlobals = _globals.LoadAsync(false);
 
             // Redirect the console output to the debug window for Deedle df.Print() calls
             DebugTextWriter tw = new();
             Console.SetOut(tw);
-            
-            // Send a reference to the ribbon controller and external utilities for future use
-            _ribbonController.SetGlobals(_globals);
-            _externalUtilities.SetGlobals(_globals, _ribbonController);
 
-            // Hook the Inbox and ToDo events
-            _globals.Events.Hook();
-            
+            // Send a reference to the ribbon controller and external utilities for future use
+            //_ribbonController.SetGlobals(_globals);
+            //_externalUtilities.SetGlobals(_globals, _ribbonController);
+
             //await loadGlobals;
-            IdleAsyncQueue.AddEntry(false, FinishLoadingGlobalsAsync);
+            IdleAsyncQueue.AddEntry(true, async () => 
+            { 
+                _globals = new ApplicationGlobals(Application); 
+                await _globals.LoadAsync(false); 
+                logger.Debug("Finished loading globals");
+            });
+            //IdleAsyncQueue.AddEntry(true, async () => await Task.Run(() => _globals = new ApplicationGlobals(Application)));
+            //IdleAsyncQueue.AddEntry(true, async () => { _globals = new ApplicationGlobals(Application); await Task.CompletedTask; });
+            //IdleAsyncQueue.AddEntry(true, async () => await Task.Run(() => loadGlobals = _globals.LoadAsync(false)));
+            //IdleAsyncQueue.AddEntry(false, FinishLoadingGlobalsAsync);
+            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _ribbonController.SetGlobals(_globals)));
+            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _externalUtilities.SetGlobals(_globals, _ribbonController)));
+
             logger.Debug("Application_Startup() complete");
         }
 
@@ -59,7 +70,7 @@ namespace TaskMaster
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
-        private System.Threading.Tasks.Task loadGlobals;
+        //private System.Threading.Tasks.Task loadGlobals;
 
         /// <summary>
         /// Overrides the default behavior of the COM add-in to create an XML ribbon
@@ -90,18 +101,17 @@ namespace TaskMaster
         /// <returns>Instance of the <seealso cref="AddInUtilities"/> class</returns>
         protected override object RequestComAddInAutomationService()
         {
-            if (_externalUtilities is null)
-                _externalUtilities = new AddInUtilities();
+            _externalUtilities ??= new AddInUtilities();
 
             return _externalUtilities;
         }
 
-        private async Task FinishLoadingGlobalsAsync()
-        {
-            await loadGlobals;
-            logger.Debug("Finished loading globals");
+        //private async Task FinishLoadingGlobalsAsync()
+        //{
+        //    await loadGlobals;
+        //    logger.Debug("Finished loading globals");
 
-        }
+        //}
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {

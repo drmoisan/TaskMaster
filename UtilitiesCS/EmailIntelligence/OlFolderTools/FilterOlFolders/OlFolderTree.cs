@@ -12,15 +12,24 @@ namespace UtilitiesCS
 {
     public class OlFolderTree: INotifyPropertyChanged
     {
+        #region ctor
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public OlFolderTree() { }
 
+        public OlFolderTree(IEnumerable<MAPIFolder> olRoots)
+        {
+            _roots = olRoots.Select(RootFromFolder).ToList();
+            DetangleRoots();            
+            WireNotifications();
+        }
+
         public OlFolderTree(MAPIFolder olRoot)
         {
             var root = RootFromFolder(olRoot);
-            _roots = new List<TreeNode<OlFolderInfo>>() { root };
+            _roots = new List<TreeNode<OlFolderWrapper>>() { root };
             WireNotifications();
         }
 
@@ -28,7 +37,7 @@ namespace UtilitiesCS
         {
             var root = RootFromFolder(olRoot);
             root.Traverse(node => node.Selected = selections.Contains(node.RelativePath));
-            _roots = new List<TreeNode<OlFolderInfo>>() { root };
+            _roots = new List<TreeNode<OlFolderWrapper>>() { root };
             WireNotifications();
         }
 
@@ -50,24 +59,78 @@ namespace UtilitiesCS
                     traverseProgress.Report(rt);
                 });
             }
-            _roots = new List<TreeNode<OlFolderInfo>>() { root };
+            _roots = new List<TreeNode<OlFolderWrapper>>() { root };
             WireNotifications();
 
             progress.Report(100);
         }
 
-        private TreeNode<OlFolderInfo> RootFromFolder(MAPIFolder olRoot)
+        public async static Task<OlFolderTree> CreateAsync(MAPIFolder olRoot)
         {
-            var info = new OlFolderInfo(olRoot, olRoot);
-            var root = new TreeNode<OlFolderInfo>(info);
+            var tree = new OlFolderTree();
+            await Task.Run(() =>
+            {
+                tree._roots = new List<TreeNode<OlFolderWrapper>>() { tree.RootFromFolder(olRoot) };
+                tree.WireNotifications();
+            });
+            
+            return tree;
+        }
+
+        public async static Task<OlFolderTree> CreateAsync(IEnumerable<MAPIFolder> olRoots)
+        {
+            var tree = new OlFolderTree();
+            await Task.Run(() =>
+            {
+                tree._roots = olRoots.Select(tree.RootFromFolder).ToList();
+                tree.DetangleRoots();
+                tree.WireNotifications();
+            });
+
+            return tree;
+        }
+
+        #endregion ctor
+
+        #region Initialization
+
+        private void DetangleRoots()
+        {
+            if (_roots.Count > 1)
+            {
+                int i = 0, j = 0;
+                var dict = _roots.Select(x => (Key: x, Value: x.Flatten().ToList())).ToDictionary(x => x.Key, x => x.Value);
+
+                while (i < _roots.Count - 1)
+                {
+                    j = 0;
+                    while (j < _roots.Count - 1)
+                    {
+                        if (i == j) { j++; continue; }
+                        if (dict.ElementAt(i).Value.IsSubsetOf(dict.ElementAt(j).Value))
+                        {
+                            _roots.RemoveAt(i);
+                            dict.Remove(dict.Keys.ElementAt(i));
+                        }
+                        j++;
+                    }
+                    i++;
+                }
+            }
+        }
+
+        private TreeNode<OlFolderWrapper> RootFromFolder(MAPIFolder olRoot)
+        {
+            var info = new OlFolderWrapper(olRoot, olRoot);
+            var root = new TreeNode<OlFolderWrapper>(info);
             this.InitializeChildren(root, olRoot);
             return root;
         }
 
-        private TreeNode<OlFolderInfo> RootFromFolder(MAPIFolder olRoot, ProgressTracker progress, ref int runningCount)
+        private TreeNode<OlFolderWrapper> RootFromFolder(MAPIFolder olRoot, ProgressTracker progress, ref int runningCount)
         {
-            var info = new OlFolderInfo(olRoot, olRoot);
-            var root = new TreeNode<OlFolderInfo>(info);
+            var info = new OlFolderWrapper(olRoot, olRoot);
+            var root = new TreeNode<OlFolderWrapper>(info);
             Interlocked.Increment(ref runningCount);
 
             if (olRoot.Folders.Count > 0)
@@ -81,21 +144,21 @@ namespace UtilitiesCS
             return root;
         }
 
-        private List<TreeNode<OlFolderInfo>> _roots;
-        public List<TreeNode<OlFolderInfo>> Roots { get => _roots; }
+        private List<TreeNode<OlFolderWrapper>> _roots;
+        public List<TreeNode<OlFolderWrapper>> Roots { get => _roots; }
 
-        private void InitializeChildren(TreeNode<OlFolderInfo> node, MAPIFolder olRoot)
+        private void InitializeChildren(TreeNode<OlFolderWrapper> node, MAPIFolder olRoot)
         {
             node.Value.OlFolder.Folders.Cast<MAPIFolder>()
                 .ForEach(child =>
                 {
-                    var childNode = node.AddChild(new OlFolderInfo(child, olRoot));
+                    var childNode = node.AddChild(new OlFolderWrapper(child, olRoot));
                     if (child.Folders.Count > 0)
                         InitializeChildren(childNode, olRoot);
                 });
         }
 
-        private void InitializeChildren(TreeNode<OlFolderInfo> node, MAPIFolder olRoot, ProgressTracker progress, ref int runningTotal)
+        private void InitializeChildren(TreeNode<OlFolderWrapper> node, MAPIFolder olRoot, ProgressTracker progress, ref int runningTotal)
         {
             var children = node.Value.OlFolder.Folders.Cast<MAPIFolder>().ToArray();
             var count = children.Count();
@@ -106,7 +169,7 @@ namespace UtilitiesCS
                 double rt = 0;
                 foreach (var child in children) 
                 {
-                    var childNode = node.AddChild(new OlFolderInfo(child, olRoot));
+                    var childNode = node.AddChild(new OlFolderWrapper(child, olRoot));
                     Interlocked.Increment(ref runningTotal);
                     
                     rt += increment;
@@ -126,7 +189,11 @@ namespace UtilitiesCS
             }                
         }
 
-        public void Select(TreeNode<OlFolderInfo> node, bool includeDescendents)
+        #endregion Initialization
+
+        #region Tree Filtering and Selection
+
+        public void SetSelected(TreeNode<OlFolderWrapper> node, bool includeDescendents)
         {
             if (includeDescendents)
             {
@@ -135,10 +202,10 @@ namespace UtilitiesCS
             
         }
 
-        public List<TreeNode<OlFolderInfo>> FilterSelected(bool include)
+        public List<TreeNode<OlFolderWrapper>> FilterSelected(bool include)
         {
-            var dummyRootOut = new TreeNode<OlFolderInfo>(_roots[0].Value);
-            var dummyRootIn = new TreeNode<OlFolderInfo>(_roots[0].Value);
+            var dummyRootOut = new TreeNode<OlFolderWrapper>(_roots[0].Value);
+            var dummyRootIn = new TreeNode<OlFolderWrapper>(_roots[0].Value);
             dummyRootIn.Children = _roots;
 
             FilterChildren(dummyRootIn, dummyRootOut, include); 
@@ -146,7 +213,7 @@ namespace UtilitiesCS
             return selected;
         }
 
-        private void FilterChildren(TreeNode<OlFolderInfo> source, TreeNode<OlFolderInfo> destination, bool include)
+        private void FilterChildren(TreeNode<OlFolderWrapper> source, TreeNode<OlFolderWrapper> destination, bool include)
         {
             foreach (var sourceChild in source.Children)
             {
@@ -161,6 +228,8 @@ namespace UtilitiesCS
                 }
             }
         }
+
+        #endregion Tree Filtering and Selection
 
         #region INotifyPropertyChanged
 

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Deedle;
 
 namespace UtilitiesCS.Extensions
 {
@@ -15,12 +16,20 @@ namespace UtilitiesCS.Extensions
         public static T ThrowIfNull<T>(
             this T? argument,
             string? message = default,
-            [CallerMemberName] string callerName = ""
+            [CallerMemberName] string callerName = "",
+            [CallerArgumentExpression(nameof(argument))] string argumentExpression = ""
         ) where T : notnull
         {
             if (argument is null)
             {
-                var paramName = new StackTrace().GetCallerByName(callerName).GetParameterName(0);
+                var traceString = new StackTrace().TryGetMyTraceString("[unable to get trace info]");
+                
+                var paramName = argumentExpression;
+                if (string.IsNullOrEmpty(message))
+                {
+                    message = $"{paramName} cannot be null. Called from {traceString}";
+                }
+
                 throw new ArgumentNullException(paramName, message);
             }
             else
@@ -45,12 +54,18 @@ namespace UtilitiesCS.Extensions
         public static IEnumerable<T> ThrowIfNullOrEmpty<T>(
             this IEnumerable<T> argument,
             string? message = default,
-            [CallerMemberName] string callerName = ""
+            [CallerMemberName] string callerName = "",
+            [CallerArgumentExpression(nameof(argument))] string argumentExpression = ""
         ) 
         {
             if (argument is null || argument.Count() == 0)
             {
-                var paramName = new StackTrace().GetCallerByName(callerName).GetParameterName(0);
+                var traceString = new StackTrace().TryGetMyTraceString("[unable to get trace info]");
+                var paramName = argumentExpression;
+                if (string.IsNullOrEmpty(message))
+                {
+                    message = $"{paramName} cannot be null. Called from {traceString}";
+                }
                 throw new ArgumentNullException(paramName, message);
             }
             else

@@ -54,7 +54,7 @@ namespace UtilitiesCS //QuickFiler
             _emailPrefixToStrip = new(() => Globals.Ol.EmailPrefixToStrip, true);
             _storeId = new(() => ((Folder)_item.Parent).StoreID, true);
             _folderName = new(() => ((Folder)_item.Parent).Name, true);
-            _folderInfo = new(() => new OlFolderInfo((Folder)Item.Parent, ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)));
+            _folderInfo = new(() => new OlFolderWrapper((Folder)Item.Parent, ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)));
             _htmlBody = new(() => _item.HTMLBody, true);
             _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);

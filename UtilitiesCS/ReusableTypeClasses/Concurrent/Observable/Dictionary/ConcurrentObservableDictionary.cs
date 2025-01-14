@@ -12,7 +12,7 @@ namespace ConcurrentObservableCollections.ConcurrentObservableDictionary
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class ConcurrentObservableDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>
+    public class ConcurrentObservableDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>, IConcurrentObservableDictionary<TKey, TValue>
     {
         public event EventHandler<DictionaryChangedEventArgs<TKey, TValue>> CollectionChanged;
 

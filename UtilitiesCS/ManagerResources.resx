@@ -123,6 +123,7 @@
   "Engine": false,
   "Globals": "default",
   "Name": "Folder",
+  "T": null,
   "Config": {
     "$id": "2",
     "Disk": {
@@ -149,6 +150,7 @@
   "$id": "1",
   "Engine":true,
   "Globals": "default",
+  "T": "UtilitiesCS.EmailIntelligence.SpamBayes, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
   "Name": "Spam",
   "Config": {
     "$id": "2",
@@ -176,6 +178,7 @@
   "$id": "1",
   "Engine": true,
   "Globals": "default",
+  "T": "UtilitiesCS.EmailIntelligence.Triage, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
   "Name": "Triage",
   "Config": {
     "$id": "2",

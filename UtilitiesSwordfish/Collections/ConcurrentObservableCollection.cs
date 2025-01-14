@@ -17,9 +17,12 @@ using System.Threading;
 using System.ComponentModel;
 using System.Collections;
 using Swordfish.NET.General.Collections;
+using System.Data.SqlClient;
 
 namespace Swordfish.NET.Collections 
 {
+    
+    
     /// <summary>
     /// This class provides a collection that can be bound to
     /// a WPF control, where the collection can be modified from a thread
@@ -95,7 +98,14 @@ namespace Swordfish.NET.Collections
         // ************************************************************************
         #region ICollection<T> Implementation
 
-        public void Add(T item) => DoBaseWrite(() => WriteCollection.Add(item));
+        public void Add(T item) => DoBaseWrite(() => 
+        { 
+            if (WriteCollection is null) 
+            {
+                Console.WriteLine("Error");
+            }
+            WriteCollection?.Add(item); 
+        });
 
         public void Clear() => DoBaseClear(() => { });
 
@@ -103,7 +113,7 @@ namespace Swordfish.NET.Collections
 
         public void CopyTo(T[] array, int arrayIndex) => DoBaseRead(() => ReadCollection.CopyTo(array, arrayIndex));
 
-        public int Count => DoBaseRead(() => ReadCollection.Count);
+        public int Count => DoBaseRead(() => ReadCollection?.Count ?? 0);
 
         public bool IsReadOnly => DoBaseRead(() => ((ICollection<T>)ReadCollection).IsReadOnly);
 

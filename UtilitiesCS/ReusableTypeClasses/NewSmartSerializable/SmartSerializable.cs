@@ -94,11 +94,11 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        protected T CreateEmpty(DialogResult response, FilePathHelper disk, JsonSerializerSettings settings)
+        protected T CreateEmpty(DialogResult response, FilePathHelper disk, JsonSerializerSettings settings, Func<T> altLoader)
         {
             if (response == DialogResult.Yes)
             {
-                var instance = new T();
+                var instance = altLoader is null ? new T(): altLoader();
                 instance.Config.JsonSettings = settings;
                 instance.Serialize(disk.FilePath);
                 return instance;
@@ -108,6 +108,11 @@ namespace UtilitiesCS.ReusableTypeClasses
                 throw new ArgumentNullException(
                 $"Must have an instance of {typeof(T)} or create one to continue executing");
             }
+        }
+
+        protected T CreateEmpty(DialogResult response, FilePathHelper disk, JsonSerializerSettings settings)
+        {
+            return CreateEmpty(response, disk, settings, null);
         }
 
         protected DialogResult AskUser(bool askUserOnError, string messageText)
@@ -178,9 +183,28 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public T Deserialize<U>(SmartSerializable<U> loader, bool askUserOnError)
+        public T Deserialize<U>(ISmartSerializable<U> loader)
             where U : class, ISmartSerializable<U>, new()
-        {           
+        {
+            try
+            {
+                var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
+                var settings = loader.Config.JsonSettings.ThrowIfNull();
+                T instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
+                if (instance is not null) { instance.Config.CopyFrom(loader.Config, true); }
+                return instance;
+            }
+            catch (ArgumentNullException e)
+            {
+                logger.Error(e.Message);
+                throw;
+            }
+        }
+
+        public T Deserialize<U>(SmartSerializable<U> loader, bool askUserOnError, Func<T> altLoader)
+            where U : class, ISmartSerializable<U>, new()
+        {
+            //Func<T> altLoader = null;
             var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
             var settings = loader.Config.JsonSettings.ThrowIfNull();
             bool writeInstance = false;
@@ -200,7 +224,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 var response = AskUser(askUserOnError,
                     $"{disk.FilePath} not found. Need an instance of {typeof(T)} to " +
                     $"continue. Create a new dictionary or abort execution?");
-                instance = CreateEmpty(response, disk, settings);
+                instance = CreateEmpty(response, disk, settings, altLoader);
                 writeInstance = true;
             }
             catch (System.Exception e)
@@ -209,7 +233,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 var response = AskUser(askUserOnError,
                     $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
                     $"Need a dictionary to continue. Create a new dictionary or abort execution?");
-                instance = CreateEmpty(response, disk, settings);
+                instance = CreateEmpty(response, disk, settings, altLoader);
                 writeInstance = true;
             }
             instance.Config.CopyFrom(loader.Config, true);
@@ -272,7 +296,12 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public async Task<T> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError) where U : class, ISmartSerializable<U>, new()
         {
-            return await Task.Run(() => Deserialize(config, askUserOnError));
+            return await Task.Run(() => Deserialize(config, askUserOnError, null));
+        }
+
+        public async Task<T> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError, Func<T> altLoader) where U : class, ISmartSerializable<U>, new()
+        {
+            return await Task.Run(() => Deserialize(config, askUserOnError, altLoader));
         }
 
         protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
@@ -289,6 +318,24 @@ namespace UtilitiesCS.ReusableTypeClasses
                 logger.Error(e.Message, e);
             }
             if (instance is not null) { instance.Config.JsonSettings = settings; }
+            return instance;
+        }
+
+        public T DeserializeObject(string json, JsonSerializerSettings settings)
+        {
+            T instance = null;
+            try
+            {
+                instance = JsonConvert.DeserializeObject<T>(json, settings);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            if (instance is not null) 
+            { 
+                instance.Config.JsonSettings = settings.DeepCopy(); 
+            }
             return instance;
         }
 
@@ -427,11 +474,17 @@ namespace UtilitiesCS.ReusableTypeClasses
             public static T Deserialize<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
                 GetInstance().Deserialize(config);
 
+            public static T DeseriealizeObject(string json, JsonSerializerSettings settings) =>
+                GetInstance().DeserializeObject(json, settings);
+
             public static async Task<T> DeserializeAsync<U>(SmartSerializable<U> config) where U : class, ISmartSerializable<U>, new() =>
                 await GetInstance().DeserializeAsync(config);
 
             public static async Task<T> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError) where U : class, ISmartSerializable<U>, new() =>
                 await GetInstance().DeserializeAsync(config, askUserOnError);
+
+            public static async Task<T> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError, Func<T> altLoader) where U : class, ISmartSerializable<U>, new() =>
+                await GetInstance().DeserializeAsync(config, askUserOnError, altLoader);
 
             internal static JsonSerializerSettings GetDefaultSettings() =>
                 SmartSerializable<T>.GetDefaultSettings();
@@ -439,4 +492,5 @@ namespace UtilitiesCS.ReusableTypeClasses
         
         #endregion Static
     }
+
 }

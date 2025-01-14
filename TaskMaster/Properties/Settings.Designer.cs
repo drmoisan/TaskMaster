@@ -610,5 +610,29 @@ namespace TaskMaster.Properties {
                 this["FileName_ProgramDictionary"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EventsHooked {
+            get {
+                return ((bool)(this["EventsHooked"]));
+            }
+            set {
+                this["EventsHooked"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Junk - Potential")]
+        public string OlJunkPotential {
+            get {
+                return ((string)(this["OlJunkPotential"]));
+            }
+            set {
+                this["OlJunkPotential"] = value;
+            }
+        }
     }
 }

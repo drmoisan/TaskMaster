@@ -33,11 +33,17 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        public static UserProperty GetUdf(this OutlookItem item, string fieldName) => item.UserProperties.Find(fieldName);
+        //public static UserProperty GetUdf(this IOutlookItem item, string fieldName) => item.UserProperties.Find(fieldName);
+        public static UserProperty GetUdf(this IOutlookItem item, string fieldName)
+        { 
+            var ups = item.UserProperties;
+            var up = ups.Find(fieldName, true);
+            return up;
+        }
         public static UserProperty GetUdf(this MailItem item, string fieldName) => item.UserProperties.Find(fieldName);
 
         public static string GetUdfString(this MailItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
-        public static string GetUdfString(this OutlookItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
+        public static string GetUdfString(this IOutlookItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
 
         public static string GetUdfString(this UserProperty property) 
         { 
@@ -92,7 +98,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        public static object GetUdfValue(this OutlookItem item,
+        public static object GetUdfValue(this IOutlookItem item,
                                          string fieldName,
                                          OlUserPropertyType olFieldType = OlUserPropertyType.olText,
                                          bool flatten = true)
@@ -101,7 +107,7 @@ namespace UtilitiesCS.OutlookExtensions
             return property.GetUdfValue(olFieldType, flatten);
         }
 
-        public static T GetUdfValue<T>(this OutlookItem item,
+        public static T GetUdfValue<T>(this IOutlookItem item,
                                          string fieldName,
                                          OlUserPropertyType olFieldType = OlUserPropertyType.olText,
                                          bool flatten = true)
@@ -181,7 +187,7 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="item">Outlook.MailItem</param>
         /// <param name="fieldName">Name of field to check</param>
         /// <returns>true if exists. false if it does not exist</returns>
-        public static bool UdfExists(this OutlookItem item, string fieldName)
+        public static bool UdfExists(this IOutlookItem item, string fieldName)
         {
             UserProperty objProperty = null;
             try
@@ -204,7 +210,7 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="value">Value to assign to the user defined field</param>
         /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
         /// <returns>true if successful. false if unsuccessful</returns>
-        public static bool TrySetUdf(this OutlookItem item,
+        public static bool TrySetUdf(this IOutlookItem item,
                                   string udfName,
                                   object value,
                                   OlUserPropertyType olUdfType = OlUserPropertyType.olText)
@@ -243,7 +249,7 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="value">Value to assign to the user defined field</param>
         /// <param name="olUdfType">Property type as defined by OlUserPropertyType enum</param>
         /// <returns>true if successful. false if unsuccessful</returns>
-        public static void SetUdf(this OutlookItem item,
+        public static void SetUdf(this IOutlookItem item,
                                   string udfName,
                                   object value,
                                   OlUserPropertyType olUdfType = OlUserPropertyType.olText)
@@ -267,7 +273,7 @@ namespace UtilitiesCS.OutlookExtensions
             item.Save();
         }
 
-        public static void SetUdf(this OutlookItem olItem, string[] schemasNames, object[] values)
+        public static void SetUdf(this IOutlookItem olItem, string[] schemasNames, object[] values)
         {
             var oPA = olItem.PropertyAccessor;
             var arrErrors = oPA.SetProperties(schemasNames, values);

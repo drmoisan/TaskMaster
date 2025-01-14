@@ -27,7 +27,7 @@ namespace UtilitiesCS
         int GetExplorerScreenNumber();
         System.Windows.Forms.Screen GetExplorerScreen();
         public Folder JunkCertain { get; }
-        public Folder JunkPossible { get; }
+        public Folder JunkPotential { get; }
         public Size GetExplorerScreenSize();
     }
 }

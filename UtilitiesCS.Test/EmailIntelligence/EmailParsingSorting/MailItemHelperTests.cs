@@ -60,7 +60,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
             m.Setup(x => x.Body).Returns("Body");
             m.Setup(m => m.ConversationID).Returns("ConversationID");
             m.Setup(f => f.FolderName).Returns("FolderName");
-            var mockFolderInfo = mockRepository.Create<OlFolderInfo>();
+            var mockFolderInfo = mockRepository.Create<OlFolderWrapper>();
             mockFolderInfo.Setup(x => x.OlFolder).Returns(mockFolder.Object);
             mockFolderInfo.Setup(x => x.Name).Returns("FolderName");
             m.Setup(x => x.FolderInfo).Returns(mockFolderInfo.Object);
@@ -203,7 +203,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
                 "sendername@domain.com", 
                 "SenderName &lt;<a href=\"mailto:sendername@domain.com\">sendername@domain.com</a>&gt;");
 
-            var folderInfo = new OlFolderInfo((Folder)mockMailItem.Object.Parent, mockOl.Object.EmailRoot);
+            var folderInfo = new OlFolderWrapper((Folder)mockMailItem.Object.Parent, mockOl.Object.EmailRoot);
             var mail = mockMailItem.Object;
             var attachmentsHelper = mail.Attachments
                                         .Cast<Attachment>()

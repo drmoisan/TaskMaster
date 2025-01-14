@@ -206,6 +206,26 @@ namespace UtilitiesCS
             return trace.GetMyMethods().Select(m => $"{GetClassName(m)}.{m.Name}").ToArray();
         }
 
+        public static string TryGetMyTraceString(this StackTrace trace)
+        {
+            return trace.TryGetMyTraceString("");
+        }
+
+        public static string TryGetMyTraceString(this StackTrace trace, string altFailure)
+        {
+            try
+            {
+                var traceString = string.Join(" -> ", trace.GetMyMethodNames());
+                return traceString;
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error in TryGetMyTraceString. Returning empty string. Details: {e.Message}", e);
+                return altFailure;
+            }
+        }
+
+
         public static string GetMyTraceString(this StackTrace trace)
         {
             return string.Join(" -> ", trace.GetMyMethodNames());
