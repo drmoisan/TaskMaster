@@ -34,7 +34,7 @@ namespace ToDoModel.Data_Model.People
 
         #endregion Constructors
 
-        private IApplicationGlobals _globals;
+        internal IApplicationGlobals Globals { get; set; }
 
         [JsonIgnore]
         private IPrefix _prefix;
@@ -47,19 +47,19 @@ namespace ToDoModel.Data_Model.People
 
         public List<string> GetPeopleCatNames()
         {
-            return _globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Where(cat => IsPeopleCategory(cat.Name)).Select(cat => cat.Name).ToList();
+            return Globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Where(cat => IsPeopleCategory(cat.Name)).Select(cat => cat.Name).ToList();
         }
 
         public bool CategoryExists(string category)
         {
-            return _globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Any(cat => cat.Name == category);
+            return Globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Any(cat => cat.Name == category);
         }
 
         public IList<string> AddMissingEntries(Outlook.MailItem olMail)
         {
-            var addressList = olMail.GetEmailAddresses(_globals.Ol.EmailRootPath,
-                                                       _globals.TD.DictRemap,
-                                                       _globals.Ol.UserEmailAddress)
+            var addressList = olMail.GetEmailAddresses(Globals.Ol.EmailRootPath,
+                                                       Globals.TD.DictRemap,
+                                                       Globals.Ol.UserEmailAddress)
                                                        .Where(x => !this.ContainsKey(x))
                                                        .Select(x => x)
                                                        .ToList();
@@ -137,7 +137,7 @@ namespace ToDoModel.Data_Model.People
 
         public void AddColorCategory(string newPerson)
         {
-            _globals.Ol.NamespaceMAPI.Categories.Add(newPerson, _prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
+            Globals.Ol.NamespaceMAPI.Categories.Add(newPerson, _prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
         }
 
         public string SplitAddressToFirstLastName(string address)
@@ -154,7 +154,7 @@ namespace ToDoModel.Data_Model.People
         public string MatchToExisting(List<string> existingPeople, string newPerson)
         {
             var searchString = newPerson.Replace(" ", "*");
-            var launcher = new TagLauncher(existingPeople, _prefix, _globals.Ol.UserEmailAddress);
+            var launcher = new TagLauncher(existingPeople, _prefix, Globals.Ol.UserEmailAddress);
             return launcher.FindMatch(searchString);
         }
 

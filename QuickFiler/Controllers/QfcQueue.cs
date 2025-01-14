@@ -120,7 +120,7 @@ namespace QuickFiler.Controllers
                 }
 
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 if (!token.IsCancellationRequested)
                 {

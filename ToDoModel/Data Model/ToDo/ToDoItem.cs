@@ -78,7 +78,7 @@ namespace ToDoModel
         private const string PA_TOTAL_WORK = "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
         private string _metaTaskSubject = "";
         private string _metaTaskLvl = "";
-        private string _tagProgram = "";
+        //private string _tagProgram = "";
         private bool? _activeBranch = null;
         private string _expandChildren = "";
         

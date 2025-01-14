@@ -19,7 +19,7 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         private MockRepository mockRepository;
         //private Mock<OneDriveDownloader> downloaderMock;
         //private Mock<HttpClient> clientMock;
-        private HttpResponseMessage httpResponseMessage;
+        //private HttpResponseMessage httpResponseMessage;
         
 
 

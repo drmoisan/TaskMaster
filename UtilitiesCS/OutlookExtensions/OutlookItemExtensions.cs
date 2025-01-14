@@ -131,17 +131,17 @@ namespace UtilitiesCS.OutlookExtensions
                     item.InnerObject,
                     item.Args);
             }
-            catch (COMException e)
+            catch (COMException)
             {
                 var propertyInfo = item.TryGetPropertyInfo(propertyName);
                 try
                 {
                     return propertyInfo?.GetValue(item.InnerObject);
                 }
-                catch (COMException e2)
+                catch (COMException e)
                 {
                     logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryGetPropertyValue)} threw an " +
-                        $"exception for property [{propertyName}]. {e2.Message}", e2);
+                        $"exception for property [{propertyName}]. {e.Message}", e);
                     return null;                    
                 }
             }
@@ -179,7 +179,7 @@ namespace UtilitiesCS.OutlookExtensions
                     new object[] { propertyValue });
                 return true;
             }
-            catch (COMException e1)
+            catch (COMException)
             {
                 var propertyInfo = item.TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(item.ItemType.Name, propertyName);
                 try

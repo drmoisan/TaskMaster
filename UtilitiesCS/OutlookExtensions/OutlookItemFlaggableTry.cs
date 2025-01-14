@@ -21,14 +21,11 @@ namespace UtilitiesCS.OutlookExtensions
         public string TaskSubject { get => TryGet(() => OlItem.TaskSubject); set => TrySet((x) => OlItem.TaskSubject = x, value); }
         public int TotalWork { get => TryGet(() => OlItem.TotalWork); set => TrySet((x) => OlItem.TotalWork = x, value); }
 
-        public object[] Args => TryGet(() => OlItem.Args); 
-
-        public OlObjectClass Class => TryGet(() => OlItem.Class);
-
-        public Inspector Inspector => TryGet(() => OlItem.Inspector); 
-
-        public bool NoAging { get => TryGet(() => OlItem.NoAging); set => TrySet((x) => OlItem.NoAging = x, value); }
-        public DateTime ReminderTime { get => TryGet(() => OlItem.ReminderTime); set => TrySet((x) => OlItem.ReminderTime = x, value); }
+        //public object[] Args => TryGet(() => OlItem.Args); 
+        //public OlObjectClass Class => TryGet(() => OlItem.Class);
+        //public Inspector Inspector => TryGet(() => OlItem.Inspector); 
+        //public bool NoAging { get => TryGet(() => OlItem.NoAging); set => TrySet((x) => OlItem.NoAging = x, value); }
+        //public DateTime ReminderTime { get => TryGet(() => OlItem.ReminderTime); set => TrySet((x) => OlItem.ReminderTime = x, value); }
 
         DateTime IOutlookItem.TaskStartDate => TryGet(() => OlItem.TaskStartDate);
 
