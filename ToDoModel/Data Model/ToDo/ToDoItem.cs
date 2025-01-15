@@ -47,7 +47,12 @@ namespace ToDoModel
             InitializeOutlookItem(_flaggableItem);
             string argstrCats_All = FlaggableItem.Categories;
             Flags = new FlagParser(ref argstrCats_All);
-            FlaggableItem.Categories = argstrCats_All;
+            var combined = Flags.Combine();
+            if (argstrCats_All != combined)
+            {
+                FlaggableItem.Categories = combined;
+                FlaggableItem.Save();
+            }
             InitializeCustomFields(FlaggableItem);
         }
 
