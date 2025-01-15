@@ -236,6 +236,20 @@ namespace UtilitiesCS
                 child.Traverse(action);
         }
 
+        public void TraverseAncestors(Action<T> action)
+        {
+            action(Value);
+            if (Parent is not null)
+                Parent.TraverseAncestors(action);
+        }
+
+        public void TraverseAncestors(Action<TreeNode<T>> action)
+        {
+            action(this);
+            if (Parent is not null)
+                Parent.TraverseAncestors(action);
+        }
+
         #endregion Public Methods
     }
 }
