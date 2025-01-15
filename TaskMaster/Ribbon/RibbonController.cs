@@ -155,11 +155,18 @@ namespace TaskMaster
         internal void ToggleDarkMode() => Globals.Ol.DarkMode = !Globals.Ol.DarkMode;
         internal bool IsDarkModeActive() => Globals.Ol.DarkMode;
 
-        internal void HideHeadersNoChildren()
+        internal async Task HideHeadersNoChildrenAsync()
         {
             var dataTree = new TreeOfToDoItems([]);
-            dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, Globals);
-            dataTree.HideEmptyHeadersInView();
+            await Task.Run(() => dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadInView, Globals));
+            await Task.Run(dataTree.HideEmptyHeadersInView);
+        }
+
+        internal async Task ShowHeadersNoChildrenAsync()
+        {
+            var dataTree = new TreeOfToDoItems([]);
+            await Task.Run(() => dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, Globals));
+            await Task.Run(dataTree.ShowEmptyHeadersInView);
         }
 
         internal void FlagAsTask()

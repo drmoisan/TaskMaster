@@ -8,6 +8,7 @@
                     <button id="BtnFlagTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
                     <menu id="ViewMenu" imageMso="FindDialog" label="View" size="large" itemSize="large">
                         <button id="BtnHideHeadersNoChildren" imageMso="ReviewShowOrHideComment" onAction="BtnHideHeadersNoChildren_Click" label="Hide Empty Headers" />
+                        <button id="BtnShowHeadersNoChildren" imageMso="ReviewShowOrHideComment" onAction="BtnShowHeadersNoChildren_Click" label="Show Empty Headers" />
                     </menu>
                     <menu id="UtilitiesMenu" imageMso="CurrentViewSettings" label="Utilities" size="large" itemSize="large">
                         <button id="BtnRefreshIDList" imageMso="AccessRefreshAllLists" onAction="BtnRefreshIDList_Click" label="Refresh IDList" />
