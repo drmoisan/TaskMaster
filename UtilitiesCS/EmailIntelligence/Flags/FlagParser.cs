@@ -235,6 +235,7 @@ namespace UtilitiesCS
             string_return = AppendDetails(string_return, _topics, wtag);
             string_return = AppendDetails(string_return, _context, wtag);
             string_return = AppendDetails(string_return, _kb, wtag);
+            string_return += $", {Other}";
 
             if (Today)
                 string_return = string_return + ", " + "Tag A Top Priority Today";

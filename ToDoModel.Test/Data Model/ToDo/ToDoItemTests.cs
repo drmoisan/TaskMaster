@@ -1,15 +1,11 @@
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using System.Threading.Tasks;
-using ToDoModel;
-using UtilitiesCS;
-using Microsoft.Office.Interop.Outlook;
-using UtilitiesCS.OutlookExtensions;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
+using UtilitiesCS;
 
 namespace ToDoModel.Test
 {
@@ -30,7 +26,7 @@ namespace ToDoModel.Test
             mockOutlookItem = new Mock<IOutlookItem>(MockBehavior.Strict);
             //mockFlaggableItem = new Mock<IOutlookItemFlaggable>(MockBehavior.Strict);
         }
-                
+
         private ToDoModel.Test.Data_Model.ToDo.SpecialMockMail CreateSpecialMockMail(DateTime timestamp)
         {
             var mock = new ToDoModel.Test.Data_Model.ToDo.SpecialMockMail
@@ -47,7 +43,7 @@ namespace ToDoModel.Test
 
             return mock;
         }
-                
+
         private Mock<UserProperties> GetMockUserProperties()
         {
             var mock = new Mock<UserProperties>(MockBehavior.Loose);
@@ -96,12 +92,12 @@ namespace ToDoModel.Test
         {
             // Arrange
             var timestamp = DateTime.Now;
-            var mockMail = CreateSpecialMockMail(timestamp);           
+            var mockMail = CreateSpecialMockMail(timestamp);
 
             var outlookItem = new OutlookItem(mockMail);
-            
+
             // Act
-            var toDoItem = new ToDoItem(outlookItem);            
+            var toDoItem = new ToDoItem(outlookItem);
 
             // Assert
             var flaggableItem = typeof(ToDoItem).GetProperty("FlaggableItem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(toDoItem);
@@ -111,14 +107,14 @@ namespace ToDoModel.Test
             Assert.AreEqual(OlImportance.olImportanceNormal, toDoItem.Priority);
             Assert.AreEqual(timestamp, toDoItem.TaskCreateDate);
             Assert.AreEqual(timestamp, toDoItem.StartDate);
-            Assert.AreEqual("Category1,Category2", toDoItem.FlaggableItem.Categories);
+            Assert.AreEqual("Category1, Category2", toDoItem.FlaggableItem.Categories);
             //Assert.AreEqual("TestProgram", toDoItem.Program.AsStringNoPrefix);
             Assert.IsTrue(toDoItem.ActiveBranch);
             Assert.IsTrue(toDoItem.EC2);
             Assert.AreEqual("EcVal", toDoItem.ExpandChildren);
             Assert.AreEqual("EcStateVal", toDoItem.ExpandChildrenState);
         }
-                
+
         [TestMethod]
         public void Constructor_WithOutlookItemAndOnDemand_ShouldNotInitializeProperties()
         {
@@ -131,7 +127,7 @@ namespace ToDoModel.Test
             var toDoItem = new ToDoItem(mockOutlookItem.Object, true);
 
             // Assert
-            
+
             // Verify the flaggableItem was initialized
             var flaggableItem = typeof(ToDoItem).GetProperty("FlaggableItem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(toDoItem);
             Assert.IsNotNull(flaggableItem);
