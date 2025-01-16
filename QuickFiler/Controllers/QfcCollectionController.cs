@@ -268,7 +268,6 @@ namespace QuickFiler.Controllers
                            
         }
 
-
         private async Task<QfcItemGroup> LoadGroup_03bAsync(RowStyle template, MailItem mailItem, int i, int digits, TlpCellStates tlpStates)
         {
             var ui = TaskScheduler.FromCurrentSynchronizationContext();

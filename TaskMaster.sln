@@ -16,6 +16,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilitiesCS.Test", "UtilitiesCS.Test\UtilitiesCS.Test.csproj", "{5DB8647F-4479-451F-B19A-10A4A0D62675}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{586F8EE3-DE4F-4787-9F8D-23B02BAEB8ED}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFiler", "QuickFiler\QuickFiler.csproj", "{71735D4F-611A-4470-9170-4D9437534377}"
 EndProject

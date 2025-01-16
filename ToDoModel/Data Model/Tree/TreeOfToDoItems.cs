@@ -322,7 +322,7 @@ namespace ToDoModel
 
         internal bool IsHeader(string TagContext)
         {
-            if (TagContext.Contains("@PROJECTS") || TagContext.Contains("HEADER") || TagContext.Contains("DELIVERABLE") || TagContext.Contains("@PROGRAMS"))
+            if (TagContext.Contains("PROJECTS") || TagContext.Contains("HEADER") || TagContext.Contains("DELIVERABLE") || TagContext.Contains("@PROGRAMS"))
             {
                 return true;
             }
@@ -331,7 +331,33 @@ namespace ToDoModel
 
         public void HideEmptyHeadersInView()
         {
-            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
+            //Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
+            Action<TreeNode<ToDoItem>> action = node => 
+            { 
+                if (node.ChildCount == 0 || !node.Children.Any(x => x.Value.ActiveBranch)) 
+                { 
+                    if (IsHeader(node.Value.Context.AsStringNoPrefix)) 
+                    { node.Value.ActiveBranch = false; } 
+                } 
+            };
+
+
+            var leaves = Roots.SelectMany(x => x.Leaves());
+            foreach (TreeNode<ToDoItem> node in leaves)
+                node.TraverseAncestors(action);
+        }
+
+        public void ShowEmptyHeadersInView()
+        {
+            //Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
+            Action<TreeNode<ToDoItem>> action = node =>
+            {
+                if (node.ChildCount == 0)
+                {
+                    if (IsHeader(node.Value.Context.AsStringNoPrefix))
+                    { node.Value.ActiveBranch = true; }
+                }
+            };
 
             foreach (TreeNode<ToDoItem> node in Roots)
                 node.Traverse(action);

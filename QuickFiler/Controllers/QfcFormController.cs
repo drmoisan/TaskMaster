@@ -197,12 +197,30 @@ namespace QuickFiler.Controllers
             _formViewer.L1v1L2h5_SpnEmailPerLoad.ValueChanged += this.SpnEmailPerLoad_ValueChanged;
             _formViewer.L1v1L2h5_BtnSkip.Click += this.ButtonSkip_Click;
         }
-        
+
+        public void UnregisterFormEventHandlers()
+        {
+            _formViewer.ForAllControls(x =>
+            {
+                x.PreviewKeyDown -= new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHandler.KeyboardHandler_PreviewKeyDownAsync);
+                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
+                x.KeyDown -= new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHandler.KeyboardHandler_KeyDownAsync);
+            },
+            new List<Control> { _formViewer.QfcItemViewerTemplate });
+
+            _formViewer.L1v1L2h2_ButtonOK.Click -= this.ButtonOK_Click;
+            _formViewer.L1v1L2h3_ButtonCancel.Click -= this.ButtonCancel_Click;
+            _formViewer.L1v1L2h4_ButtonUndo.Click -= this.ButtonUndo_Click;
+            _formViewer.L1v1L2h5_SpnEmailPerLoad.ValueChanged -= this.SpnEmailPerLoad_ValueChanged;
+            _formViewer.L1v1L2h5_BtnSkip.Click -= this.ButtonSkip_Click;
+        }
+
         /// <summary>
         /// Release all resources and call the parent cleanup
         /// </summary>
         public void Cleanup()
         {
+            _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
             _undoConsumerTask.Dispose();
             _undoQueue.Dispose();
             _globals = null;
@@ -213,6 +231,7 @@ namespace QuickFiler.Controllers
             _movedItems = null;
             WriteMetrics = null;
             Iterate = null;
+            UnregisterFormEventHandlers();
             _parentCleanup.Invoke();
             _parentCleanup = null;
         }
@@ -313,11 +332,9 @@ namespace QuickFiler.Controllers
             _parent.TokenSource.Cancel();
             await _formViewer.UiSyncContext;
             _formViewer.Hide();
-            _groups.Cleanup();
-            _globals = null;
-            _groups = null;
+            _groups.Cleanup();            
             _formViewer.Dispose();
-            _parentCleanup.Invoke();
+            Cleanup();
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e) 
@@ -336,11 +353,7 @@ namespace QuickFiler.Controllers
                     $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been " +
                     $"implemented for {nameof(_initType)} {_initType}");
             }
-            
-            //else if (_blRunningModalCode)
-            //{
-            //    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
+                        
             else if (_groups.ReadyForMove)
             {
                 //_blRunningModalCode = true;
