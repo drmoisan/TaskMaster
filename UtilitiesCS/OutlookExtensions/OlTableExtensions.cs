@@ -343,8 +343,8 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    data = await Task.Factory.StartNew(() => (object[,])table.GetArray(table.GetRowCount()),
-                        token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(milliseconds, attempts);
+                    data = await Task.Run(() => table?.GetArray(table.GetRowCount()) as object[,],
+                        token).TimeoutAfter(milliseconds, attempts);
                 }
                 
             }
