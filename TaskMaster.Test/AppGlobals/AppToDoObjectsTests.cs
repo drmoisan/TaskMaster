@@ -13,7 +13,7 @@ using System.Threading;
 using System.Collections.Specialized;
 using FluentAssertions;
 using System.Linq;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using System.Reflection;
 
 namespace TaskMaster.Test.AppGlobals

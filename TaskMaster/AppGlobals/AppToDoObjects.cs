@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Newtonsoft.Json;
 using ToDoModel;
 using ToDoModel.Data_Model.People;

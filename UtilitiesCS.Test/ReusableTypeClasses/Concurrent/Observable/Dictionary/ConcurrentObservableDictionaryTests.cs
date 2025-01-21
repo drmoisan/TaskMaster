@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace ConcurrentObservableCollections.Tests
 {

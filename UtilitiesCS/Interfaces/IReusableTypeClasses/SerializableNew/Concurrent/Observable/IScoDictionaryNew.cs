@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {

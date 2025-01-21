@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using System.Runtime.CompilerServices;
 using UtilitiesCS.NewtonsoftHelpers.Sco;
 

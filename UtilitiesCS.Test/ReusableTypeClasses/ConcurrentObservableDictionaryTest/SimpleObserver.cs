@@ -1,4 +1,4 @@
-﻿using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+﻿using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace ConcurrentObservableCollections.Tests
 {

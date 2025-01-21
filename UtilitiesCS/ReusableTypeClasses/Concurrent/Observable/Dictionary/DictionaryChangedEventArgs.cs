@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace ConcurrentObservableCollections.ConcurrentObservableDictionary
+namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 {
     public class DictionaryChangedEventArgs<TKey, TValue>
     {

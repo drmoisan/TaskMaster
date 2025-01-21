@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ConcurrentObservableCollections.Tests

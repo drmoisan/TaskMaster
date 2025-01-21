@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.NewtonsoftHelpers.MonoExtension;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Newtonsoft.Json;
 
 namespace UtilitiesCS.NewtonsoftHelpers
