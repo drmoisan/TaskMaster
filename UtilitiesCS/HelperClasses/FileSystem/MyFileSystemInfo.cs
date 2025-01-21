@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UtilitiesCS;
+using UtilitiesCS.HelperClasses.FileSystem;
 
 namespace ObjectListViewDemo
 {
@@ -21,19 +23,50 @@ namespace ObjectListViewDemo
         public MyFileSystemInfo(FileSystemInfo fileSystemInfo)
         {
             if (fileSystemInfo == null) throw new ArgumentNullException("fileSystemInfo");
+            this.info = new FileSystemInfoWrapper(fileSystemInfo);
+        }
+
+        public MyFileSystemInfo(FileInfo fileInfo)
+        {
+            if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            this.info = new FileInfoWrapper(fileInfo);
+        }
+
+        public MyFileSystemInfo(DirectoryInfo fileInfo)
+        {
+            if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            this.info = new DirectoryInfoWrapper(fileInfo);
+        }
+
+        public MyFileSystemInfo(IFileSystemInfo fileSystemInfo)
+        {
+            if (fileSystemInfo == null) throw new ArgumentNullException(nameof(fileSystemInfo));
             this.info = fileSystemInfo;
         }
 
         public bool IsDirectory { get { return this.AsDirectory != null; } }
 
-        public DirectoryInfo AsDirectory { get { return this.info as DirectoryInfo; } }
-        public FileInfo AsFile { get { return this.info as FileInfo; } }
+        public IDirectoryInfo AsDirectory { get { return this.info as IDirectoryInfo; } }
+        //public IDirectoryInfo AsDirectory 
+        //{ 
+        //    get 
+        //    {
+        //        var di = this.info as IDirectoryInfo;
+        //        if (di is null)
+        //        {
+        //            var fi = this.info as IFileInfo;
+        //            if (fi is not null) { di = fi.Directory; }
+        //        }
+        //        return di; 
+        //    } 
+        //}
+        public IFileInfo AsFile { get { return this.info as IFileInfo; } }
 
-        public FileSystemInfo Info
+        public IFileSystemInfo Info
         {
             get { return this.info; }
         }
-        private readonly FileSystemInfo info;
+        private readonly IFileSystemInfo info;
 
         public string Name
         {
@@ -75,7 +108,7 @@ namespace ObjectListViewDemo
             ArrayList children = new ArrayList();
             if (this.IsDirectory)
             {
-                foreach (FileSystemInfo x in this.AsDirectory.GetFileSystemInfos())
+                foreach (IFileSystemInfo x in this.AsDirectory.GetFileSystemInfos())
                     children.Add(new MyFileSystemInfo(x));
             }
             return children;

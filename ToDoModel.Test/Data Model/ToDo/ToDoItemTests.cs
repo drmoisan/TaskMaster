@@ -101,18 +101,18 @@ namespace ToDoModel.Test
 
             // Assert
             var flaggableItem = typeof(ToDoItem).GetProperty("FlaggableItem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(toDoItem);
-            Assert.IsNotNull(flaggableItem);
-            Assert.IsNotNull(toDoItem.Flags);
-            Assert.AreEqual("Test Task", toDoItem.TaskSubject);
-            Assert.AreEqual(OlImportance.olImportanceNormal, toDoItem.Priority);
-            Assert.AreEqual(timestamp, toDoItem.TaskCreateDate);
-            Assert.AreEqual(timestamp, toDoItem.StartDate);
-            Assert.AreEqual("Category1, Category2", toDoItem.FlaggableItem.Categories);
+            Assert.IsNotNull(flaggableItem, "FlaggableItem is null");
+            Assert.IsNotNull(toDoItem.Flags, "Flags are null");
+            Assert.AreEqual("Test Task", toDoItem.TaskSubject, "TaskSubject does not match expected");
+            Assert.AreEqual(OlImportance.olImportanceNormal, toDoItem.Priority, "Importance does not match expected");
+            Assert.AreEqual(timestamp, toDoItem.TaskCreateDate, "TaskCreateDate does not match expected timestamp");
+            Assert.AreEqual(timestamp, toDoItem.StartDate, "StartDate does not match expected timestamp");
+            Assert.IsTrue(toDoItem.Flags.AreEquivalentTo("Category1,Category2"), "Flags are not equivalent to expected");
             //Assert.AreEqual("TestProgram", toDoItem.Program.AsStringNoPrefix);
-            Assert.IsTrue(toDoItem.ActiveBranch);
-            Assert.IsTrue(toDoItem.EC2);
-            Assert.AreEqual("EcVal", toDoItem.ExpandChildren);
-            Assert.AreEqual("EcStateVal", toDoItem.ExpandChildrenState);
+            Assert.IsTrue(toDoItem.ActiveBranch, "ActiveBranch value did not match expected");
+            Assert.IsTrue(toDoItem.EC2, "EC2 value did not match expected");
+            Assert.AreEqual("EcVal", toDoItem.ExpandChildren, "ExpandChildren did not match expected");
+            Assert.AreEqual("EcStateVal", toDoItem.ExpandChildrenState, "ExpandChildrenState did not match expected");
         }
 
         [TestMethod]

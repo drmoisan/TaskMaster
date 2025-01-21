@@ -208,7 +208,7 @@ namespace ObjectListViewDemo
             SHFILEINFO shfi = new SHFILEINFO();
             int flags = SHGFI_TYPENAME;
             IntPtr result = ShellUtilities.SHGetFileInfo(path, 0, out shfi, Marshal.SizeOf(shfi), flags);
-            if (result.ToInt32() == 0)
+            if (result == IntPtr.Zero)
                 return String.Empty;
             else
                 return shfi.szTypeName;
@@ -239,7 +239,7 @@ namespace ObjectListViewDemo
 
             SHFILEINFO shfi = new SHFILEINFO();
             IntPtr result = ShellUtilities.SHGetFileInfo(path, fileAttributes, out shfi, Marshal.SizeOf(shfi), flags);
-            if (result.ToInt32() == 0)
+            if (result == IntPtr.Zero)
                 return null;
             else
                 return Icon.FromHandle(shfi.hIcon);
@@ -257,7 +257,8 @@ namespace ObjectListViewDemo
             SHFILEINFO shfi = new SHFILEINFO();
             int flags = SHGFI_ICON | SHGFI_SYSICONINDEX;
             IntPtr result = ShellUtilities.SHGetFileInfo(path, 0, out shfi, Marshal.SizeOf(shfi), flags);
-            if (result.ToInt32() == 0)
+            //if (result.ToInt32() == 0)
+            if (result == IntPtr.Zero)
                 return -1;
             else
                 return shfi.iIcon;

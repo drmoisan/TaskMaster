@@ -13,9 +13,11 @@ using System.Threading;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Timers;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("QuickFiler.Test")]
 namespace QuickFiler.Controllers
-{
+{    
     public class QfcHomeController : IFilerHomeController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

@@ -47,10 +47,10 @@ namespace ToDoModel
             InitializeOutlookItem(_flaggableItem);
             string argstrCats_All = FlaggableItem.Categories;
             Flags = new FlagParser(ref argstrCats_All);
-            var combined = Flags.Combine();
-            if (argstrCats_All != combined)
+            
+            if (!Flags.AreEquivalentTo(FlaggableItem.Categories))
             {
-                FlaggableItem.Categories = combined;
+                FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
                 FlaggableItem.Save();
             }
             InitializeCustomFields(FlaggableItem);
@@ -62,10 +62,14 @@ namespace ToDoModel
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
             if (!onDemand)
             {
-                InitializeOutlookItem(_flaggableItem);
+                InitializeOutlookItem(FlaggableItem);
                 string argstrCats_All = outlookItem.Categories;
                 Flags = new FlagParser(ref argstrCats_All);
-                outlookItem.Categories = argstrCats_All;
+                if (!Flags.AreEquivalentTo(FlaggableItem.Categories))
+                {
+                    FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
+                    FlaggableItem.Save();
+                }
                 InitializeCustomFields(FlaggableItem);
             }
         }
@@ -184,7 +188,7 @@ namespace ToDoModel
             var ro = ReadOnly;
             ReadOnly = false;
 
-            FlaggableItem.Categories = Flags.Combine();
+            FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
 
             FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.Context), Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
             FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.People), People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
@@ -209,7 +213,7 @@ namespace ToDoModel
         {
             ToDoEvents.Editing.AddOrUpdate(OlItem.EntryID, 1, (key, existing) => existing + 1);
 
-            FlaggableItem.Categories = Flags.Combine();
+            FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
 
             if (flagsToSet.HasFlag(Enums.FlagsToSet.Context))
             {
@@ -423,7 +427,7 @@ namespace ToDoModel
                 {
                     if (FlaggableItem is not null)
                     {
-                        FlaggableItem.Categories = Flags.Combine();
+                        FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
                         FlaggableItem.Save();
                     }
                 }
@@ -445,7 +449,7 @@ namespace ToDoModel
                     if (FlaggableItem is not null)
                     {
 
-                        FlaggableItem.Categories = Flags.Combine();
+                        FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
                         FlaggableItem.Save();
                     }
                 }

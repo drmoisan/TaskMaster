@@ -189,6 +189,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Outlook.v4.0.Utilities.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2903.40, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2903.40\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
@@ -535,6 +536,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagConsolidator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
@@ -542,11 +544,17 @@
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DispatchUtility.cs" />
+    <Compile Include="HelperClasses\FileSystem\DirectoryInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\FileInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\FileSystemInfoWrapper.cs" />
     <Compile Include="HelperClasses\ParamArray.cs" />
     <Compile Include="HelperClasses\ReflectionHelper.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
     <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
+    <Compile Include="Interfaces\IHelperClasses\IDirectoryInfo.cs" />
+    <Compile Include="Interfaces\IHelperClasses\IFileInfo.cs" />
+    <Compile Include="Interfaces\IHelperClasses\IFileSystemInfo.cs" />
     <Compile Include="Interfaces\IToDo\IPeopleScoDictionaryNew.cs" />
     <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
     <Compile Include="IntelligenceResources.Designer.cs">
@@ -705,7 +713,7 @@
     <Compile Include="HelperClasses\DvgForm.Designer.cs">
       <DependentUpon>DvgForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="HelperClasses\MyFileSystemInfo.cs" />
+    <Compile Include="HelperClasses\FileSystem\MyFileSystemInfo.cs" />
     <Compile Include="ReusableTypeClasses\Other\AbstractCloneable.cs" />
     <Compile Include="Threading\ProgressMultiStepViewer.cs">
       <SubType>Form</SubType>
@@ -725,7 +733,7 @@
     <Compile Include="HelperClasses\ToolTips\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="HelperClasses\SegmentStopWatch.cs" />
-    <Compile Include="HelperClasses\ShellUtilities.cs" />
+    <Compile Include="HelperClasses\FileSystem\ShellUtilities.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedBatchAction.cs" />
     <Compile Include="HelperClasses\Logging\VerboseLogger.cs" />
     <Compile Include="Interfaces\IGlobals\IAppQuickFilerSettings.cs" />
@@ -795,7 +803,6 @@
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableDictionary.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableList.cs" />
     <Compile Include="OutlookExtensions\Calendar.cs" />
-    <Compile Include="OutlookExtensions\CategoryExt.cs" />
     <Compile Include="OutlookExtensions\ComType.cs" />
     <Compile Include="OutlookExtensions\CreateCategory.cs" />
     <Compile Include="OutlookExtensions\ExplorerActions.cs" />
@@ -1016,6 +1023,9 @@
   <ItemGroup>
     <Folder Include="EmailIntelligence\TaskPane\" />
     <Folder Include="ReusableTypeClasses\SerializableNew\Locking\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

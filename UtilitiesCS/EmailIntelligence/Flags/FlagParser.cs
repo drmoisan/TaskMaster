@@ -6,15 +6,20 @@ using UtilitiesCS;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using UtilitiesCS.Extensions.Lazy;
+using Microsoft.Office.Interop.Outlook;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using UtilitiesCS.Threading;
+using UtilitiesCS.EmailIntelligence.Flags;
 
 namespace UtilitiesCS
 {
     /// <summary>
     /// Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
     /// </summary>
-    public class FlagParser: INotifyCollectionChanged, ICloneable
+    public class FlagParser: INotifyCollectionChanged, ICloneable, INotifyPropertyChanged
     {
-        #region Constructors and Initializers
+        #region ctor
 
         /// <summary>
         /// Constructor for the FlagParser class accepts a comma delimited string containing 
@@ -29,7 +34,7 @@ namespace UtilitiesCS
                 categoryString = "";
 
             var categories = categoryString.Split(separator: ',', trim: true).ToList();
-            Initialize(categories);
+            Initialize(categories);            
         }
 
         public FlagParser(IList<string> categories)
@@ -56,12 +61,11 @@ namespace UtilitiesCS
 
             Today = categories.Remove(Properties.Settings.Default.Prefix_Today);
             Bullpin = categories.Remove(Properties.Settings.Default.Prefix_Bullpin);
-            Other = categories.Count > 0 ? string.Join(", ", categories) : "";            
+            Other = categories.Count > 0 ? string.Join(", ", categories) : "";    
+            Combined = new(this);
             WireEvents();
         }
-
-        #endregion Constructors and Initializers
-
+        
         private string identifier = "not set";
         public string Identifier 
         { 
@@ -72,6 +76,10 @@ namespace UtilitiesCS
                 Wiring.ForEach(x => x.Key.Identifier = value);
             }
         }
+
+        #endregion ctor
+
+        #region Flags By Type
 
         #region Context
 
@@ -221,48 +229,86 @@ namespace UtilitiesCS
 
         #endregion Kanban
 
-        #region Other Public Methods and Properties
-
-        /// <summary>
-        /// Function recombines flag settings in one comma delimited string representing color categories
-        /// </summary>
-        /// <returns>A string containing color categories</returns>
-        public string Combine(bool wtag = true)
-        {
-            string string_return = "";
-            string_return = AppendDetails(string_return, _people, wtag);
-            string_return = AppendDetails(string_return, _projects, wtag);
-            string_return = AppendDetails(string_return, _topics, wtag);
-            string_return = AppendDetails(string_return, _context, wtag);
-            string_return = AppendDetails(string_return, _kb, wtag);
-            string_return += $", {Other}";
-
-            if (Today)
-                string_return = string_return + ", " + "Tag A Top Priority Today";
-            if (Bullpin)
-                string_return = string_return + ", " + "Tag Bullpin Priorities";
-
-
-            if (string_return.Length > 2)
-            {
-                string_return = string_return.Substring(2);
-            }
-
-            return string_return;
-        }
-        
         private bool _today = false;
-        public bool Today { get => _today; set => _today = value; }
+        public bool Today
+        {
+            get => _today;
+            set
+            {
+                if (_today != value)
+                {
+                    _today = value;
+                    Notify();
+                }
+            }
+        }
 
         private bool _bullpin = false;
-        public bool Bullpin { get => _bullpin; set => _bullpin = value; }
+        public bool Bullpin
+        {
+            get => _bullpin;
+            set
+            {
+                if (_bullpin != value)
+                {
+                    _bullpin = value;
+                    Notify();
+                }
+            }
+        }
 
         private string _other = "";
-        public string Other { get => _other; set => _other = value; }
+        public string Other
+        {
+            get => _other;
+            set
+            {
+                if (_other != value)
+                {
+                    _other = value;
+                    Notify();
+                }
+            }
+        }
 
-        #endregion
+        private void Update() => updated = false;
+        protected bool updated;
+        
+        public FlagConsolidator Combined { get; protected set; }
 
-        #region INotifyCollectionChanged Implementation
+        #region commented out
+        ///// <summary>
+        ///// Function recombines flag settings in one comma delimited string representing color categories
+        ///// </summary>
+        ///// <returns>A string containing color categories</returns>
+        //public string Combine(bool wtag = true)
+        //{
+        //    string string_return = "";
+        //    string_return = AppendDetails(string_return, _people, wtag);
+        //    string_return = AppendDetails(string_return, _projects, wtag);
+        //    string_return = AppendDetails(string_return, _topics, wtag);
+        //    string_return = AppendDetails(string_return, _context, wtag);
+        //    string_return = AppendDetails(string_return, _kb, wtag);
+        //    string_return += $", {Other}";
+
+        //    if (Today)
+        //        string_return = string_return + ", " + "Tag A Top Priority Today";
+        //    if (Bullpin)
+        //        string_return = string_return + ", " + "Tag Bullpin Priorities";
+
+
+        //    if (string_return.Length > 2)
+        //    {
+        //        string_return = string_return.Substring(2);
+        //    }
+
+        //    return string_return;
+        //}
+        #endregion commented out
+
+        #endregion Flags By Type
+
+        #region INotifyCollectionChanged and INotifyPropertyChanged Implementations
 
         public event NotifyCollectionChangedEventHandler CollectionChanged { add { } remove { } }
         public event NotifyCollectionChangedEventHandler PeopleChanged;
@@ -271,13 +317,20 @@ namespace UtilitiesCS
         public event NotifyCollectionChangedEventHandler TopicsChanged;
         public event NotifyCollectionChangedEventHandler ContextChanged;
         public event NotifyCollectionChangedEventHandler KbChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private void People_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => PeopleChanged?.Invoke(sender, e);
-        private void Projects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ProjectsChanged?.Invoke(sender, e);
-        private void Program_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ProgramChanged?.Invoke(sender, e);
-        private void Topics_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => TopicsChanged?.Invoke(sender, e);
-        private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => ContextChanged?.Invoke(sender, e);
-        private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => KbChanged?.Invoke(sender, e);
+        private void People_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { PeopleChanged?.Invoke(sender, e); Update(); }
+        private void Projects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { ProjectsChanged?.Invoke(sender, e); Update(); }
+        private void Program_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { ProgramChanged?.Invoke(sender, e); Update(); }
+        private void Topics_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { TopicsChanged?.Invoke(sender, e); Update(); }
+        private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { ContextChanged?.Invoke(sender, e); Update(); }
+        private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { KbChanged?.Invoke(sender, e); Update(); }
+        private void PropertyChanged_CollectionChanged(object sender, PropertyChangedEventArgs e) { Update(); }
+
+        protected virtual void Notify([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         //private Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>> _wiring;
         //internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring { get => _wiring.Value; set => _wiring = value.ToLazy(); }
@@ -294,7 +347,7 @@ namespace UtilitiesCS
                 { Kb , Kb_CollectionChanged }
             };
         }
-
+        
         public void WireEvents()
         {
             _people.CollectionChanged += People_CollectionChanged;
@@ -315,7 +368,7 @@ namespace UtilitiesCS
             }
         }
 
-        #endregion
+        #endregion INotifyCollectionChanged and INotifyPropertyChanged Implementations
 
         #region IClonable
 
@@ -414,6 +467,41 @@ namespace UtilitiesCS
         }
 
         #endregion Helper Methods
+
+        #region Comparison
+        
+        public bool AreEquivalentTo(string other) 
+        {
+            if (Combined.AsStringWithPrefix.IsNullOrEmpty())
+            {
+                if (other.IsNullOrEmpty()) { return true; }
+                else { return false; }
+            }
+            else if (other.IsNullOrEmpty()) { return false; }                
+            else if (Combined.AsStringWithPrefix == other) { return true; }            
+            else 
+            {
+                var otherList = other.Split(separator: ',', trim: true).OrderBy(x => x).ToList();
+                return Combined.AsListWithPrefix.SequenceEqual(otherList);
+            }
+        }
+
+        public bool AreEquivalentTo(IList<string> other)
+        {
+            if (Combined.AsListWithPrefix.IsNullOrEmpty())
+            {
+                if (other.IsNullOrEmpty()) { return true; }
+                else { return false; }
+            }
+            else if (other.IsNullOrEmpty()) { return false; }
+            else
+            {
+                other = other.OrderBy(x => x).ToList();
+                return Combined.AsListWithPrefix.SequenceEqual(other);
+            }
+        }
+
+        #endregion Comparison
 
     }
 

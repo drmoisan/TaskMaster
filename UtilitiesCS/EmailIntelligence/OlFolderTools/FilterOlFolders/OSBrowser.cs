@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS.HelperClasses.FileSystem;
 
 namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
 {
@@ -103,7 +104,10 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             foreach (DriveInfo di in DriveInfo.GetDrives())
             {
                 if (di.IsReady)
-                    roots.Add(new MyFileSystemInfo(new DirectoryInfo(di.Name)));
+
+                    // Update the code to use DirectoryInfoWrapper
+                    roots.Add(new MyFileSystemInfo(new DirectoryInfoWrapper(new DirectoryInfo(di.Name))));
+                    //roots.Add(new MyFileSystemInfo(new DirectoryInfo(di.Name)));
             }
             this.treeListView.Roots = roots;
         }
@@ -194,6 +198,10 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             return String.Format("{0} bytes", size);
         }
     }
+    
+    
+
+    
 }
 
     
