@@ -19,6 +19,7 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.Extensions.Lazy;
 using TaskMaster.Ribbon;
+using UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders;
 
 
 namespace TaskMaster
@@ -480,5 +481,16 @@ namespace TaskMaster
             }
         }
 
+        internal void GetFolderInfo()
+        {
+            var currentFolder = Globals.Ol.App.ActiveExplorer().CurrentFolder;
+            if (currentFolder is not null)
+            {
+                var folderTree = new OlFolderTree(currentFolder);
+                var folderViewer = new FolderInfoViewer();
+                folderViewer.SetFolderTree(folderTree);
+                folderViewer.Show();
+            }
+        }
     }
 }

@@ -2,6 +2,11 @@
 <customUI onLoad="Ribbon_Load" xmlns="http://schemas.microsoft.com/office/2006/01/customui">
     <ribbon>
         <tabs>
+          <tab idMso="TabFolder">
+            <group id="FolderInfoGroup" label="Folder Info">
+              <button id="GetFolderInfo" imageMso="FileProperties" onAction="GetFolderInfo_Click" label="Get Folder Info" />
+            </group>
+          </tab>
             <tab idMso="TabTasks">
                 <group id="Group1" label="Task Master">
                     <button id="BtnLoadTree" imageMso="OutlineShowDetail" onAction="BtnLoadTree_Click" label="Load Tree" size="large" />

@@ -76,6 +76,17 @@ namespace UtilitiesCS
         private Lazy<int> _lazyItemCount;
         public int ItemCount { get => _lazyItemCount.Value; set => _lazyItemCount = value.ToLazyValue(); }
 
+        private Lazy<int> _lazyItemCountSubFolders;
+        public int ItemCountSubFolders { get => _lazyItemCountSubFolders.Value; set => _lazyItemCountSubFolders = value.ToLazyValue(); }
+        internal int LoadItemCountSubFolders()
+        {
+            return ItemCount + SumItemCountRecursively(OlFolder);
+        }
+        internal int SumItemCountRecursively(MAPIFolder folder) 
+        {
+            return folder.Folders?.Cast<MAPIFolder>().Sum(f => f.Items.Count + SumItemCountRecursively(f)) ?? 0;
+        }
+
         private Lazy<long> _lazyFolderSize;
         public long FolderSize { get => _lazyFolderSize.Value; set => _lazyFolderSize = value.ToLazyValue(); }
         private long LoadFolderSize()
@@ -155,6 +166,7 @@ namespace UtilitiesCS
             _lazyItemCount = new Lazy<int>(() => OlFolder.Items.Count);
             _lazyName = new Lazy<string>(LoadName);
             _lazyRelativePath = new Lazy<string>(LoadRelativePath);
+            _lazyItemCountSubFolders = new Lazy<int>(LoadItemCountSubFolders);
         }
 
         #endregion Lazy Properties

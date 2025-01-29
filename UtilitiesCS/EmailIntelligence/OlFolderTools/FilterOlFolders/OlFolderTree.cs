@@ -119,6 +119,15 @@ namespace UtilitiesCS
             }
         }
 
+        public void LoadItemCounts()
+        {
+            Roots.ForEach(root => root.TraverseByLevel(false, node => 
+            { 
+                var descendantItemCount = node.ChildCount == 0 ? 0 : node.Children.Sum(child => child.Value.ItemCountSubFolders);
+                node.Value.ItemCountSubFolders = node.Value.ItemCount + descendantItemCount;
+            }));
+        }
+        
         private TreeNode<OlFolderWrapper> RootFromFolder(MAPIFolder olRoot)
         {
             var info = new OlFolderWrapper(olRoot, olRoot);
@@ -190,6 +199,12 @@ namespace UtilitiesCS
         }
 
         #endregion Initialization
+
+        #region Tree Traversal
+
+
+
+        #endregion Tree Traversal
 
         #region Tree Filtering and Selection
 

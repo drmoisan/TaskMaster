@@ -22,6 +22,7 @@ namespace UtilitiesCS
 
         long FolderSize { get; set; }
         int ItemCount { get; set; }
+        int ItemCountSubFolders { get; set; }
         string Name { get; }
         MAPIFolder OlFolder { get; set; }
         MAPIFolder OlRoot { get; set; }
