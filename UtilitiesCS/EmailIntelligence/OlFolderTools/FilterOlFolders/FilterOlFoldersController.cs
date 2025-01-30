@@ -14,15 +14,16 @@ namespace UtilitiesCS
     {
         public FilterOlFoldersController(IApplicationGlobals appGlobals) 
         { 
-            _globals = appGlobals;
+            _globals = appGlobals;            
             _olFolderTree = new OlFolderTree(_globals.Ol.ArchiveRoot,_globals.TD.FilteredFolderScraping.Keys.ToList());
             _olFolderTree.PropertyChanged += OlFolderTree_PropertyChanged;
             _viewer = new FilterOlFoldersViewer();
             _viewer.SetController(this);
+            //PutCheckedState = PutCheckedStateMethod;
             _viewer.TlvNotFiltered.CheckStateGetter = GetCheckedState;
-            _viewer.TlvNotFiltered.CheckStatePutter = PutCheckedState;
+            _viewer.TlvNotFiltered.CheckStatePutter = PutCheckedStateMethodNotFiltered;
             _viewer.TlvFiltered.CheckStateGetter = GetCheckedState;
-            _viewer.TlvFiltered.CheckStatePutter = PutCheckedState;
+            _viewer.TlvFiltered.CheckStatePutter = PutCheckedStateMethodFiltered;
 
             _viewer.Show();
         }
@@ -97,22 +98,46 @@ namespace UtilitiesCS
 
         };
 
-        internal CheckStatePutterDelegate PutCheckedState = delegate (object rowObject, CheckState newValue)
+        //internal CheckStatePutterDelegate PutCheckedState = delegate (object rowObject, CheckState newValue)
+        //{
+        //    var node = (TreeNode<OlFolderWrapper>)rowObject;
+        //    if (newValue == CheckState.Checked)
+        //    {
+        //        node.Traverse(x => x.Value.Selected = true);
+        //        //node.Value.Selected = true;
+        //        return CheckState.Checked;
+        //    }
+        //    else
+        //    {
+        //        node.Traverse(x => x.Value.Selected = false);
+        //        //node.Value.Selected = false;
+        //        return CheckState.Unchecked;
+        //    }
+        //};
+
+        internal CheckStatePutterDelegate PutCheckedState;
+
+        internal CheckState PutCheckedStateMethodFiltered(object rowObject, CheckState newValue) => PutCheckedStateMethod(rowObject, newValue, _viewer.TlvFiltered);
+
+        internal CheckState PutCheckedStateMethodNotFiltered(object rowObject, CheckState newValue) => PutCheckedStateMethod(rowObject, newValue, _viewer.TlvNotFiltered);
+
+        internal CheckState PutCheckedStateMethod(object rowObject, CheckState newValue, TreeListView tree)
         {
             var node = (TreeNode<OlFolderWrapper>)rowObject;
-            if (newValue == CheckState.Checked)
+                        
+            if (!tree.IsExpanded(node))
             {
-                node.Traverse(x => x.Value.Selected = true);
+                node.Traverse(x => x.Value.Selected = (newValue == CheckState.Checked));
                 //node.Value.Selected = true;
-                return CheckState.Checked;
+                return newValue;
             }
             else
             {
-                node.Traverse(x => x.Value.Selected = false);
-                //node.Value.Selected = false;
-                return CheckState.Unchecked;
-            }
-        };
+                node.Value.Selected = (newValue == CheckState.Checked);
+                return newValue;
+            }           
+           
+        }
 
         #endregion Event Handlers
 

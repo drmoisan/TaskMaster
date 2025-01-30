@@ -40,7 +40,7 @@ namespace TaskMaster
             
             IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _ribbonController.SetGlobals(_globals)));
             IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _externalUtilities.SetGlobals(_globals, _ribbonController)));
-
+            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => logger.Debug("IdleAsyncQueue Complete")));
             logger.Debug("Application_Startup() complete");
         }
 

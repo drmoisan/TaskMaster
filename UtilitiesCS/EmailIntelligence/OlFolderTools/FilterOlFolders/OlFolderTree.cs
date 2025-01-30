@@ -200,12 +200,6 @@ namespace UtilitiesCS
 
         #endregion Initialization
 
-        #region Tree Traversal
-
-
-
-        #endregion Tree Traversal
-
         #region Tree Filtering and Selection
 
         public void SetSelected(TreeNode<OlFolderWrapper> node, bool includeDescendents)
