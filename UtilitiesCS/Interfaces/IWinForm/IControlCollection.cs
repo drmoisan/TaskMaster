@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Windows.Forms;
 
-namespace QuickFiler.Interfaces
+namespace UtilitiesCS.Interfaces.IWinForm
 {
     public interface IControlCollection
     {

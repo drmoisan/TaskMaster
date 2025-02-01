@@ -2,26 +2,21 @@
 using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using System.Windows.Forms;
-using System.Drawing;
 using System.Diagnostics;
-using System.IO;
-using ToDoModel;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Collections.Concurrent;
-using log4net.Repository.Hierarchy;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.Interfaces.IWinForm;
 
 namespace QuickFiler.Controllers
 {
     internal class QfcFormController : IQfcFormController
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Contructors
 
@@ -30,7 +25,7 @@ namespace QuickFiler.Controllers
                                  IQfcQueue qfcQueue,
                                  QfEnums.InitTypeEnum initType,
                                  System.Action parentCleanup,
-                                 QfcHomeController parent,
+                                 IQfcHomeController parent,
                                  CancellationTokenSource tokenSource,
                                  CancellationToken token)
         {
@@ -43,17 +38,20 @@ namespace QuickFiler.Controllers
             _formViewer.SetController(this);
             _parentCleanup = parentCleanup;
             _parent = parent;
-            //WriteMetrics = parent.QuickFileMetrics_WRITE;
             WriteMetrics = parent.WriteMetricsAsync;
             Iterate = parent.Iterate;
             _movedItems = _globals.AF.MovedMails;
             _qfcQueue = qfcQueue;
+        }
 
+        public IQfcFormController Init()
+        {
             CaptureItemSettings();
             RemoveTemplatesAndSetupTlp();
             SetupLightDark();
             RegisterFormEventHandlers();
-            //_undoConsumerTask = Task.Run(UndoConsumer);
+
+            return this;
         }
 
         #endregion
@@ -72,7 +70,7 @@ namespace QuickFiler.Controllers
         private QfEnums.InitTypeEnum _initType;
         //private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
-        private QfcHomeController _parent;
+        private IQfcHomeController _parent;
         private delegate Task WriteMetricsDelegate(string filename);
         private WriteMetricsDelegate WriteMetrics;
         private delegate void IterateDelegate();
@@ -261,7 +259,7 @@ namespace QuickFiler.Controllers
             set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
         }
 
-        private QfcCollectionController _groups;
+        private IQfcCollectionController _groups;
         public IQfcCollectionController Groups { get => _groups; }
 
         public IntPtr FormHandle { get => _formViewer.Handle; }
@@ -284,7 +282,7 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
-        private void DarkMode_CheckedChanged(object sender, EventArgs e)
+        internal void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
             SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
             _darkMode = _globals.Ol.DarkMode;
@@ -324,8 +322,16 @@ namespace QuickFiler.Controllers
 
         async public void ButtonCancel_Click(object sender, EventArgs e)
         {
-            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
-            await ActionCancelAsync();
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+                await ActionCancelAsync();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;
+            }            
         }
 
         async public Task ActionCancelAsync()
@@ -340,8 +346,16 @@ namespace QuickFiler.Controllers
 
         async public void ButtonOK_Click(object sender, EventArgs e)
         {
-            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
-            await ActionOkAsync();
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+                await ActionOkAsync();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;
+            }            
         }
 
         async public Task ActionOkAsync()
@@ -368,7 +382,7 @@ namespace QuickFiler.Controllers
 
         }
 
-        private async Task LoadUiFromQueue()
+        internal async Task LoadUiFromQueue()
         {
             //TraceUtility.LogMethodCall();
 
@@ -377,7 +391,7 @@ namespace QuickFiler.Controllers
             _parent.SwapStopWatch();
         }
 
-        private async Task MoveAndIterate()
+        internal async Task MoveAndIterate()
         {
             //TraceUtility.LogMethodCall();
 
@@ -461,14 +475,13 @@ namespace QuickFiler.Controllers
             //SortEmail.Undo(_movedItems, _globals.Ol.App);
         }
 
-        public async void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
+        public async Task SpnEmailPerLoadHandler(object sender, EventArgs e) 
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
             while (!_parent.WorkerComplete)
             {
-
                 await Task.Delay(100);
             }
 
@@ -495,9 +508,18 @@ namespace QuickFiler.Controllers
                     _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = _itemsPerIteration;
                     break;
             }
-
-
-
+        }
+        
+        public async void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                await SpnEmailPerLoadHandler(sender, e);
+            }
+            catch (System.Exception ex)
+            {
+                log.Error("Error in SpnEmailPerLoad_ValueChanged", ex);
+            }
         }
 
         internal void AdjustTlp(TableLayoutPanel tlp, int newCount)
@@ -525,16 +547,29 @@ namespace QuickFiler.Controllers
             }
         }
 
-        async public void ButtonSkip_Click(object sender, EventArgs e)
+        async public Task ButtonSkipHandler(object sender, EventArgs e)
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
-
             _formViewer.L1v1L2h5_BtnSkip.Enabled = false;
             _formViewer.L1v1L2h5_BtnSkip.Text = "Skipping...";
             await SkipGroupAsync();
             _formViewer.L1v1L2h5_BtnSkip.Text = "Skip Group";
             _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
+        }
+        
+        async public void ButtonSkip_Click(object sender, EventArgs e)
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+
+            try
+            {
+                await ButtonSkipHandler(sender, e);
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;
+            }
         }
 
         async public Task SkipGroupAsync()

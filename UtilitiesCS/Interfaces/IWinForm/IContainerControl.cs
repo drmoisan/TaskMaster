@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace QuickFiler.Interfaces
+namespace UtilitiesCS.Interfaces.IWinForm
 {
     public interface IContainerControlLocal: IScrollableControl
     {

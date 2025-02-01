@@ -13,7 +13,6 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
-using static QuickFiler.QfEnums;
 using FluentAssertions;
 
 namespace QuickFiler.Controllers.Tests
@@ -29,6 +28,12 @@ namespace QuickFiler.Controllers.Tests
         private Mock<Outlook.Application> _mockOlApp;
         private Mock<ProgressTracker> _mockProgressTracker;
         private Mock<Explorer> _mockExplorer;
+
+        private void SetPrivateField<T>(object obj, string fieldName, T value)
+        {
+            var field = obj.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            field.SetValue(obj, value);
+        }
 
         [TestInitialize]
         public void Setup()
@@ -643,12 +648,15 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public void WorkerComplete_PropertyWorksCorrectly()
         {
-            // Arrange & Act
+            // Arrange
             _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
-            _controller.GetType().GetProperty("WorkerComplete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, true);
+            
+            // Act & Assert
+            SetPrivateField(_controller, "_workerComplete", true);
+            Assert.IsTrue(_controller.WorkerComplete);
 
-            // Assert
-            Assert.IsTrue((bool)_controller.GetType().GetProperty("WorkerComplete", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(_controller));
+            SetPrivateField(_controller, "_workerComplete", false);
+            Assert.IsFalse(_controller.WorkerComplete);
         }
 
         [TestMethod]

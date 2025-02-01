@@ -180,7 +180,7 @@ namespace QuickFiler.Controllers
         }
 
         private List<QfcItemGroup> _itemGroups;
-        internal List<QfcItemGroup> ItemGroups 
+        public List<QfcItemGroup> ItemGroups 
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get => _itemGroups;
@@ -330,24 +330,28 @@ namespace QuickFiler.Controllers
         {
             await AsyncEnumerable.Range(0, _itemGroups.Count)
                                  .Select(i => (i,grp:_itemGroups[i]))
-                                 .ForEachAsync(async x => 
-                                 { 
-                                     x.grp.ItemController = new QfcItemController(appGlobals: _globals,
-                                                                                  homeController: _homeController,
-                                                                                  parent: this,
-                                                                                  itemViewer: x.grp.ItemViewer,
-                                                                                  viewerPosition: x.i + 1,
-                                                                                  itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
-                                                                                  x.grp.MailItem,
-                                                                                  _tlpStates);
-                                     var tasks = new List<Task>
-                                     {
-                                        x.grp.ItemController.InitializeAsync(),
-                                        Task.Run(() => x.grp.ItemController.PopulateConversation()),
-                                        Task.Run(() => x.grp.ItemController.PopulateFolderComboBox()),
-                                     };
-                                     await Task.WhenAll(tasks).ConfigureAwait(false);
-                                 });
+                                 .ForEachAsync(async x => await LoadItemGroup(x.i, x.grp));
+        }
+
+        internal async Task LoadItemGroup(int i, QfcItemGroup group)
+        {
+            group.ItemController = new QfcItemController(
+                appGlobals: _globals,
+                homeController: _homeController,
+                parent: this,
+                itemViewer: group.ItemViewer,
+                viewerPosition: i + 1,
+                itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
+                group.MailItem,
+                _tlpStates);
+            var tasks = new List<Task>
+            {
+                group.ItemController.InitializeAsync(),
+                Task.Run(() => group.ItemController.PopulateConversation()),
+                Task.Run(() => group.ItemController.PopulateFolderComboBox()),
+            };
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public void LoadSequential_5()
@@ -375,26 +379,24 @@ namespace QuickFiler.Controllers
         {
             await AsyncEnumerable.Range(0, _itemGroups.Count)
                                  .Select(i => (i, grp: _itemGroups[i]))
-                                 .ForEachAsync(async x =>
-                                 {
-                                     x.grp.ItemController = new QfcItemController(appGlobals: _globals,
-                                                                                  homeController: _homeController,
-                                                                                  parent: this,
-                                                                                  itemViewer: x.grp.ItemViewer,
-                                                                                  viewerPosition: x.i + 1,
-                                                                                  itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
-                                                                                  x.grp.MailItem,
-                                                                                  _tlpStates);
-                                     var tasks = new List<Task>
-                                     {
-                                        x.grp.ItemController.InitializeAsync(),
-                                        Task.Run(() => x.grp.ItemController.PopulateConversation()),
-                                        Task.Run(() => x.grp.ItemController.PopulateFolderComboBox()),
-                                     };
-                                     await Task.WhenAll(tasks).ConfigureAwait(false);
-                                 });
+                                 .ForEachAsync(async x => await LoadGroupSequential(x.i, x.grp));
         }
-        
+
+        public async Task LoadGroupSequential(int i, QfcItemGroup grp)
+        {
+            grp.ItemController = new QfcItemController(appGlobals: _globals,
+                                                       homeController: _homeController,
+                                                       parent: this,
+                                                       itemViewer: grp.ItemViewer,
+                                                       viewerPosition: i + 1,
+                                                       itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
+                                                       grp.MailItem,
+                                                       _tlpStates);
+            await grp.ItemController.InitializeAsync();
+            await Task.Run(() => grp.ItemController.PopulateConversation());
+            await Task.Run(() => grp.ItemController.PopulateFolderComboBox());
+        }
+
         internal void ActivateQueuedTlp(TableLayoutPanel tlp)
         {
             _formViewer.L1v0L2_PanelMain.Controls.Remove(_formViewer.L1v0L2L3v_TableLayout);
@@ -761,7 +763,7 @@ namespace QuickFiler.Controllers
             return state; 
         }
 
-        internal void RegisterNavigation()
+        public void RegisterNavigation()
         {
             var digits = Digits;
             if (_digitRefreshNeeded) { SetVisualDigits(digits); }
@@ -771,7 +773,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        internal void UnregisterNavigation()
+        public void UnregisterNavigation()
         {
             for (int i = 0; i < _itemGroups.Count; i++)
             {

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows.Forms.Layout;
 using System.Windows.Forms;
 
-namespace QuickFiler.Interfaces
+namespace UtilitiesCS.Interfaces.IWinForm
 {
     public interface IControl: IComponent, IDropTarget, ISynchronizeInvoke, IWin32Window, IDisposable, IBindableComponent //,IArrangedElement
     {

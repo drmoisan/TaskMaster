@@ -18,6 +18,8 @@ using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.Threading;
+using UtilitiesCS.Interfaces.IWinForm;
+
 
 namespace QuickFiler.Controllers
 {
@@ -339,77 +341,118 @@ namespace QuickFiler.Controllers
         
         async public void ButtonCancel_Click(object sender, EventArgs e)
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            try
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            await ActionCancelAsync();
+                await ActionCancelAsync();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;
+            }            
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e)
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            try
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            await ActionOkAsync();
+                await ActionOkAsync();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;
+            }            
         }
 
         async public void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
-            
-            await RefreshSuggestionsAsync();
+            try
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+
+                await RefreshSuggestionsAsync();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;                
+            }
         }
 
         async public void ButtonCreate_Click(object sender, EventArgs e)
         {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            try
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            if (!IsValidSelection)
-            {
-                MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
-            }
-            else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find)) 
-            {
-                await _homeController.OpenFsFolderAsync(SelectedFolder);
-                
-                _formViewer.Close();
-                Cleanup();
-            }
-            else
-            {
-                if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+                if (!IsValidSelection)
                 {
-                    logger.Debug($"Cannot create folder without OneDrive location");
-                    return;
+                    MessageBox.Show("Please select a valid parent folder where you would like to place the new folder.");
                 }
-                var folder = (await _dataModel.FolderHelper.CreateFolderAsync(
-                    SelectedFolder,
-                    _globals.Ol.ArchiveRootPath,
-                    folderRoot,
-                    Token)) as MAPIFolder;
-
-                if (folder is not null)
+                else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
                 {
-                    await _dataModel.MoveToFolder(
-                        folder,
-                        _globals.Ol.ArchiveRootPath,
-                        SaveAttachments,
-                        SaveEmail,
-                        SavePictures,
-                        MoveConversation);
+                    await _homeController.OpenFsFolderAsync(SelectedFolder);
 
                     _formViewer.Close();
                     Cleanup();
                 }
+                else
+                {
+                    if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
+                    {
+                        logger.Debug($"Cannot create folder without OneDrive location");
+                        return;
+                    }
+                    var folder = (await _dataModel.FolderHelper.CreateFolderAsync(
+                        SelectedFolder,
+                        _globals.Ol.ArchiveRootPath,
+                        folderRoot,
+                        Token)) as MAPIFolder;
+
+                    if (folder is not null)
+                    {
+                        await _dataModel.MoveToFolder(
+                            folder,
+                            _globals.Ol.ArchiveRootPath,
+                            SaveAttachments,
+                            SaveEmail,
+                            SavePictures,
+                            MoveConversation);
+
+                        _formViewer.Close();
+                        Cleanup();
+                    }
+                }
             }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;
+            }
+            
             
         }
 
         async public void ButtonDelete_Click(object sender, EventArgs e)
         {
-            await ActionDeleteAsync();
+            try
+            {
+                await ActionDeleteAsync();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw;
+            }            
         }
                 
         private void SaveAttachments_CheckedChanged(object sender, EventArgs e)

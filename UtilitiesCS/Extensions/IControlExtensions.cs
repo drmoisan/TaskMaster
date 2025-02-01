@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using QuickFiler.Interfaces;
+using UtilitiesCS.Interfaces.IWinForm;
+
 
 namespace UtilitiesCS.Extensions
 {

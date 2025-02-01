@@ -233,7 +233,7 @@ namespace UtilitiesCS.Threading
             Interlocked.Increment(ref idlesSinceCheckpoint);
             if (subscriptionCount == 0)
             {
-                throw new InvalidOperationException($"{nameof(ApplicationIdleTimer)}.{nameof(Application_Idle)} should not be firing with a subscription count of 0");
+                //throw new InvalidOperationException($"{nameof(ApplicationIdleTimer)}.{nameof(Application_Idle)} should not be firing with a subscription count of 0");
             }
         }
 

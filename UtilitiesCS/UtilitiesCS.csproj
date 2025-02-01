@@ -577,7 +577,7 @@
     <Compile Include="Interfaces\IWinForm\IControlCollection.cs" />
     <Compile Include="Interfaces\IWinForm\IForm.cs" />
     <Compile Include="Interfaces\IWinForm\IScrollableControl.cs" />
-    <Compile Include="Interfaces\IWinForm\IWinForm.cs" />
+    <Compile Include="Interfaces\IWinForm\IUserControl.cs" />
     <Compile Include="Interfaces\IWinForm\PropertyStore.cs" />
     <Compile Include="ManagerResources.Designer.cs">
       <AutoGen>True</AutoGen>

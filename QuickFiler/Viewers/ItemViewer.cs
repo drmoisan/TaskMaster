@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SVGControl;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +15,7 @@ using UtilitiesCS;
 
 namespace QuickFiler
 {
-    public partial class ItemViewer : UserControl
+    public partial class ItemViewer : UserControl, IItemViewer
     {
         public ItemViewer()
         {
@@ -181,6 +182,56 @@ namespace QuickFiler
         {
 
         }
+
+        #region Field to Property for Interface
+
+        public System.Windows.Forms.Label LblItemNumber { get => _lblItemNumber; set => _lblItemNumber = value; }
+        public System.Windows.Forms.Label LblSender { get => _lblSender; set => _lblSender = value; }
+        public System.Windows.Forms.Label LblCaptionTriage { get => _lblCaptionTriage; set => _lblCaptionTriage = value; }
+        public System.Windows.Forms.Label LblTriage { get => _lblTriage; set => _lblTriage = value; }
+        public System.Windows.Forms.Label LblCaptionPredicted { get => _lblCaptionPredicted; set => _lblCaptionPredicted = value; }
+        public System.Windows.Forms.Label LblActionable { get => _lblActionable; set => _lblActionable = value; }
+        public System.Windows.Forms.Label LblSentOn { get => _lblSentOn; set => _lblSentOn = value; }
+        public System.Windows.Forms.Label LblSubject { get => _lblSubject; set => _lblSubject = value; }
+        public System.Windows.Forms.Label LblConvCt { get => _lblConvCt; set => _lblConvCt = value; }
+        public System.Windows.Forms.Label LblAcOpen { get => _lblAcOpen; set => _lblAcOpen = value; }
+        public System.Windows.Forms.Label LblFolder { get => _lblFolder; set => _lblFolder = value; }
+        public System.Windows.Forms.Label LblAcSearch { get => _lblAcSearch; set => _lblAcSearch = value; }
+        public System.Windows.Forms.Label LblSearch { get => _lblSearch; set => _lblSearch = value; }
+        public System.Windows.Forms.Label LblAcFolder { get => _lblAcFolder; set => _lblAcFolder = value; }
+        public System.Windows.Forms.TextBox TxtboxBody { get => _txtboxBody; set => _txtboxBody = value; }
+        public BrightIdeasSoftware.FastObjectListView TopicThread { get => _topicThread; set => _topicThread = value; }
+        public BrightIdeasSoftware.OLVColumn Sender { get => _sender; set => _sender = value; }
+        public BrightIdeasSoftware.OLVColumn SentDate { get => _sentDate; set => _sentDate = value; }
+        public BrightIdeasSoftware.OLVColumn Infolder { get => _infolder; set => _infolder = value; }
+        public System.Windows.Forms.Label LblAcBody { get => _lblAcBody; set => _lblAcBody = value; }
+        public Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_WebView2 { get => _l0v2h2_WebView2; set => _l0v2h2_WebView2 = value; }
+        public System.Windows.Forms.TableLayoutPanel L0vh_Tlp { get => _l0vh_Tlp; set => _l0vh_Tlp = value; }
+        public System.Windows.Forms.TableLayoutPanel L1h0L2hv3h_TlpBodyToggle { get => _l1h0L2hv3h_TlpBodyToggle; set => _l1h0L2hv3h_TlpBodyToggle = value; }
+        public System.Windows.Forms.Panel L1h1L2v1h3Panel { get => _l1h1L2v1h3Panel; set => _l1h1L2v1h3Panel = value; }
+        public System.Windows.Forms.Label LblAcDelete { get => _lblAcDelete; set => _lblAcDelete = value; }
+        public ButtonSVG BtnDelItem { get => _btnDelItem; set => _btnDelItem = value; }
+        public System.Windows.Forms.Label LblAcPopOut { get => _lblAcPopOut; set => _lblAcPopOut = value; }
+        public ButtonSVG BtnPopOut { get => _btnPopOut; set => _btnPopOut = value; }
+        public System.Windows.Forms.Label LblAcTask { get => _lblAcTask; set => _lblAcTask = value; }
+        public ButtonSVG BtnFlagTask { get => _btnFlagTask; set => _btnFlagTask = value; }
+        public ButtonSVG BtnForward { get => _btnForward; set => _btnForward = value; }
+        public System.Windows.Forms.Label LblAcReply { get => _lblAcReply; set => _lblAcReply = value; }
+        public System.Windows.Forms.Label LblAcReplyAll { get => _lblAcReplyAll; set => _lblAcReplyAll = value; }
+        public System.Windows.Forms.Label LblAcFwd { get => _lblAcFwd; set => _lblAcFwd = value; }
+        public ButtonSVG BtnReply { get => _btnReply; set => _btnReply = value; }
+        public ButtonSVG BtnReplyAll { get => _btnReplyAll; set => _btnReplyAll = value; }
+        public System.Windows.Forms.ComboBox CboFolders { get => _cboFolders; set => _cboFolders = value; }
+        public System.Windows.Forms.TextBox TxtboxSearch { get => _txtboxSearch; set => _txtboxSearch = value; }
+        public System.Windows.Forms.MenuStrip MoveOptionsStrip { get => _moveOptionsStrip; set => _moveOptionsStrip = value; }
+        public System.Windows.Forms.ToolStripMenuItem MoveOptionsMenu { get => _moveOptionsMenu; set => _moveOptionsMenu = value; }
+        public Viewers.ToolStripMenuItemCb ConversationMenuItem { get => _conversationMenuItem; set => _conversationMenuItem = value; }
+        public Viewers.ToolStripMenuItemCb SaveAttachmentsMenuItem { get => _saveAttachmentsMenuItem; set => _saveAttachmentsMenuItem = value; }
+        public Viewers.ToolStripMenuItemCb SaveEmailMenuItem { get => _saveEmailMenuItem; set => _saveEmailMenuItem = value; }
+        public Viewers.ToolStripMenuItemCb SavePicturesMenuItem { get => _savePicturesMenuItem; set => _savePicturesMenuItem = value; }
+        public System.Windows.Forms.Label LblAcMoveOptions { get => _lblAcMoveOptions; set => _lblAcMoveOptions = value; }
+
+        #endregion Field to Property for Interface
     }
 }
 

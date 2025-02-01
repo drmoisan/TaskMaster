@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace QuickFiler.Interfaces
+namespace UtilitiesCS.Interfaces.IWinForm
 {
     public interface IForm: IContainerControl, IScrollableControl
     {

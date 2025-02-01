@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
 using System.Threading.Tasks;
+using UtilitiesCS.Interfaces.IWinForm;
+
 
 namespace QuickFiler.Interfaces
 {
     public interface IFilerFormController
     {
-
         Task ActionCancelAsync();
         Task ActionOkAsync();
         void ButtonCancel_Click(object sender, EventArgs e);
@@ -22,17 +23,5 @@ namespace QuickFiler.Interfaces
 
         IntPtr FormHandle { get; }
         
-        // Removed methods never called through the interface so they
-        // are unnecessary in the promise
-
-        //IQfcCollectionController Groups { get; }
-        //void FormResize(bool Force = false); // might not be necessary
-        //void ButtonUndo_Click();
-        //void ButtonUndo_Click(object sender, EventArgs e);
-        //void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e);
-        //void Viewer_Activate();
-        //int SpaceForEmail { get; }
-        //int ItemsPerIteration { get; }
-        //void LoadItems(IList<MailItem> listObjects);
     }
 }
