@@ -1,17 +1,20 @@
-﻿using System;
+﻿using BrightIdeasSoftware;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ObjectListViewDemo
 {
+    
     /// <summary>
     /// ShellUtilities contains routines to interact with the Windows Shell.
     /// </summary>
-    public class ShellUtilities()
+    public static class ShellUtilitiesStatic
     {
         /// <summary>
         /// Execute the default verb on the file or directory identified by the given path.
@@ -21,9 +24,9 @@ namespace ObjectListViewDemo
         /// <param name="path">The file or directory to be executed</param>
         /// <returns>Values &lt; 31 indicate some sort of error. See ShellExecute() documentation for specifics.</returns>
         /// <remarks>The same effect can be achieved by <code>System.Diagnostics.Process.Start(path)</code>.</remarks>
-        public int Execute(string path)
+        public static int Execute(string path)
         {
-            return Execute(path, "");
+            return ShellUtilitiesStatic.Execute(path, "");
         }
 
         /// <summary>
@@ -33,9 +36,9 @@ namespace ObjectListViewDemo
         /// <param name="path">The file or directory to be operated on</param>
         /// <param name="operation">What operation should be performed</param>
         /// <returns>Values &lt; 31 indicate some sort of error. See ShellExecute() documentation for specifics.</returns>
-        public int Execute(string path, string operation)
+        public static int Execute(string path, string operation)
         {
-            IntPtr result = ShellExecute(0, operation, path, "", "", SW_SHOWNORMAL);
+            IntPtr result = ShellUtilitiesStatic.ShellExecute(0, operation, path, "", "", SW_SHOWNORMAL);
             return result.ToInt32();
         }
 
@@ -44,13 +47,13 @@ namespace ObjectListViewDemo
         /// </summary>
         /// <param name="path">The file or directory whose type is to be fetched</param>
         /// <returns>A string describing the type of the file, or an empty string if something goes wrong.</returns>
-        public string GetFileType(string path)
+        public static String GetFileType(string path)
         {
             SHFILEINFO shfi = new SHFILEINFO();
             int flags = SHGFI_TYPENAME;
-            IntPtr result = SHGetFileInfo(path, 0, out shfi, Marshal.SizeOf(shfi), flags);
+            IntPtr result = ShellUtilitiesStatic.SHGetFileInfo(path, 0, out shfi, Marshal.SizeOf(shfi), flags);
             if (result == IntPtr.Zero)
-                return string.Empty;
+                return String.Empty;
             else
                 return shfi.szTypeName;
         }
@@ -62,7 +65,7 @@ namespace ObjectListViewDemo
         /// <param name="isSmallImage">True if the small (16x16) icon is required, otherwise the 32x32 icon will be returned</param>
         /// <param name="useFileType">If this is true, only the file extension will be considered</param>
         /// <returns>The icon of the given file, or null if something goes wrong</returns>
-        public Icon GetFileIcon(string path, bool isSmallImage, bool useFileType)
+        public static Icon GetFileIcon(string path, bool isSmallImage, bool useFileType)
         {
             int flags = SHGFI_ICON;
             if (isSmallImage)
@@ -79,7 +82,7 @@ namespace ObjectListViewDemo
             }
 
             SHFILEINFO shfi = new SHFILEINFO();
-            IntPtr result = SHGetFileInfo(path, fileAttributes, out shfi, Marshal.SizeOf(shfi), flags);
+            IntPtr result = ShellUtilitiesStatic.SHGetFileInfo(path, fileAttributes, out shfi, Marshal.SizeOf(shfi), flags);
             if (result == IntPtr.Zero)
                 return null;
             else
@@ -93,11 +96,11 @@ namespace ObjectListViewDemo
         /// <returns>The index of the icon, or -1 if something goes wrong</returns>
         /// <remarks>This is only useful if you are using the system image lists directly. Since there is
         /// no way to do that in .NET, it isn't a very useful.</remarks>
-        public int GetSysImageIndex(string path)
+        public static int GetSysImageIndex(string path)
         {
             SHFILEINFO shfi = new SHFILEINFO();
             int flags = SHGFI_ICON | SHGFI_SYSICONINDEX;
-            IntPtr result = SHGetFileInfo(path, 0, out shfi, Marshal.SizeOf(shfi), flags);
+            IntPtr result = ShellUtilitiesStatic.SHGetFileInfo(path, 0, out shfi, Marshal.SizeOf(shfi), flags);
             //if (result.ToInt32() == 0)
             if (result == IntPtr.Zero)
                 return -1;
@@ -109,8 +112,7 @@ namespace ObjectListViewDemo
 
         private const int SHGFI_ICON = 0x00100;     // get icon
         private const int SHGFI_DISPLAYNAME = 0x00200;     // get display name
-        //private const int SHGFI_TYPENAME = 0x00400;     // get type name
-        private const int SHGFI_TYPENAME = 0x000000400;     // get type name
+        private const int SHGFI_TYPENAME = 0x00400;     // get type name
         private const int SHGFI_ATTRIBUTES = 0x00800;     // get attributes
         private const int SHGFI_ICONLOCATION = 0x01000;     // get icon location
         private const int SHGFI_EXETYPE = 0x02000;     // return exe type
@@ -157,5 +159,4 @@ namespace ObjectListViewDemo
 
         #endregion
     }
-
 }

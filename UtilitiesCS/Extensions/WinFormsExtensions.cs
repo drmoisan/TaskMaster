@@ -12,6 +12,7 @@ using UtilitiesCS.ReusableTypeClasses;
 using System.Threading.Channels;
 using System.Collections;
 using System.Diagnostics;
+using QuickFiler.Interfaces;
 
 namespace UtilitiesCS
 {
@@ -40,6 +41,15 @@ namespace UtilitiesCS
             action(parent);
         }
 
+        public static void ForAllControls(this IEnumerable<Control> controls, Action<Control> action)
+        {
+            foreach (Control c in controls)
+            {
+                ForAllControls(c, action);
+            }
+        }
+
+
         public static void ForAllControls(this Control parent, Action<Control> action, IList<Control> except)
         {
             if (!except.Contains(parent))
@@ -49,6 +59,24 @@ namespace UtilitiesCS
                     ForAllControls(c, action, except);
                 }
                 action(parent);
+            }
+        }
+
+        public static void ForAllControls(this IEnumerable<Control> controls, Action<Control> action, IList<Control> except)
+        {           
+            foreach (Control c in controls)
+            {
+                if (!except.Contains(c))
+                    ForAllControls(c, action, except);
+            }                       
+        }
+
+        public static void ForAllControls(this Control.ControlCollection controls, Action<Control> action, IList<Control> except)
+        {
+            foreach (Control c in controls)
+            {
+                if (!except.Contains(c))
+                    ForAllControls(c, action, except);
             }
         }
 

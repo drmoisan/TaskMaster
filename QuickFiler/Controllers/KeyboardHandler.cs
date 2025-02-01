@@ -25,7 +25,7 @@ namespace QuickFiler.Controllers
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public KeyboardHandler(QfcFormViewer viewer, IFilerHomeController parent)
+        public KeyboardHandler(IQfcFormViewer viewer, IFilerHomeController parent)
         {
             viewer.SetKeyboardHandler(this);
             _parent = parent;

@@ -16,7 +16,7 @@ namespace UtilitiesCS
     {
         public static void Init(bool monitorUiThread = false) 
         { 
-            if (!_loaded.CheckAndSetFirstCall)
+            if (_loaded.CheckAndSetFirstCall)
             {
                 Initialize(monitorUiThread);
             }

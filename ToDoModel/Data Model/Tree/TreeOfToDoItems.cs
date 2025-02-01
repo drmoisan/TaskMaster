@@ -87,7 +87,7 @@ namespace ToDoModel
                         }
                         if (strParentID.Length > 2)
                         {
-                            strParentID = strParentID.Substring(1, strParentID.Length - 2);
+                            strParentID = strParentID.Substring(0, strParentID.Length - 2);
                         }
                         else
                         {

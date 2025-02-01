@@ -25,7 +25,7 @@ namespace UtilitiesCS
             _screen = screen;
         }
 
-        public ProgressTracker Initialize() 
+        public virtual ProgressTracker Initialize() 
         {
             UiDispatcher = UiThread.Dispatcher;
 
@@ -82,25 +82,25 @@ namespace UtilitiesCS
         private double _progress;
         public double Progress { get => _progress; }
 
-        public ProgressTracker Increment(double value, string jobName)
+        public virtual ProgressTracker Increment(double value, string jobName)
         {
             _jobName = jobName;
             return Increment(value);
         }
 
-        public ProgressTracker Increment(double value)
+        public virtual ProgressTracker Increment(double value)
         {
             var newProgress = Math.Max(Math.Min(_progress + value,100),0);
             Report(newProgress);
             return this;
         }
 
-        public void Report((int Value, string JobName) report)
+        public virtual void Report((int Value, string JobName) report)
         {
             Report((double)report.Value, report.JobName);
         }
 
-        public void Report(double value, string jobName)
+        public virtual void Report(double value, string jobName)
         {
             if (value < 0)
             {
@@ -119,7 +119,7 @@ namespace UtilitiesCS
             }
         }
 
-        public void Report(double value)
+        public virtual void Report(double value)
         {
             if (value < 0)
             {
@@ -155,7 +155,7 @@ namespace UtilitiesCS
             }
         }
 
-        public async Task ReportAsync(double value) 
+        public async virtual Task ReportAsync(double value) 
         {
             if (value < 0)
             {
@@ -181,17 +181,17 @@ namespace UtilitiesCS
             }
         }
 
-        public ProgressTracker SpawnChild(int allocation)
+        public virtual ProgressTracker SpawnChild(int allocation)
         {
             return new ProgressTracker(this, allocation, (int)_progress);
         }
 
-        public ProgressTracker SpawnChild(double allocation)
+        public virtual ProgressTracker SpawnChild(double allocation)
         {
             return this.SpawnChild((int)Math.Round(allocation, 0));            
         }
 
-        public ProgressTracker SpawnChild()
+        public virtual ProgressTracker SpawnChild()
         {
             var progress = (int)_progress;
             var remaining = 100 - progress;

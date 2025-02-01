@@ -157,7 +157,7 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
 
             // Show the system description for this object
             this.olvColumnFileType.AspectGetter = delegate (object x) {
-                return ShellUtilities.GetFileType(((MyFileSystemInfo)x).FullName);
+                return ShellUtilitiesStatic.GetFileType(((MyFileSystemInfo)x).FullName);
             };
 
             // Show the file attributes for this object

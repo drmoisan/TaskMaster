@@ -21,7 +21,7 @@ namespace QuickFiler.Controllers
         #region Constructors
 
         public QfcCollectionController(IApplicationGlobals AppGlobals,
-                                       QfcFormViewer viewerInstance,
+                                       IQfcFormViewer viewerInstance,
                                        QfEnums.InitTypeEnum InitType,
                                        IFilerHomeController homeController,
                                        IFilerFormController parent,
@@ -49,7 +49,7 @@ namespace QuickFiler.Controllers
 
         
 
-        private QfcFormViewer _formViewer;
+        private IQfcFormViewer _formViewer;
         private QfEnums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IFilerHomeController _homeController;

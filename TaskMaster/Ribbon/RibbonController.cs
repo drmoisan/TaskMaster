@@ -87,7 +87,7 @@ namespace TaskMaster
                 loaded = _quickFiler.Loaded;
             if (loaded == false)
             {
-                _quickFiler = new QuickFiler.Controllers.QfcHomeController(Globals, ReleaseQuickFiler);
+                _quickFiler = new QuickFiler.Controllers.QfcHomeController(Globals, ReleaseQuickFiler).Init();
                 _quickFiler.Run();
             }
         }

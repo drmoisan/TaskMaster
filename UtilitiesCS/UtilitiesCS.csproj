@@ -540,6 +540,7 @@
     <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
+    <Compile Include="Extensions\IControlExtensions.cs" />
     <Compile Include="Extensions\JsonSerializerExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
@@ -547,6 +548,8 @@
     <Compile Include="HelperClasses\FileSystem\DirectoryInfoWrapper.cs" />
     <Compile Include="HelperClasses\FileSystem\FileInfoWrapper.cs" />
     <Compile Include="HelperClasses\FileSystem\FileSystemInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\ShellUtilities.cs" />
+    <Compile Include="HelperClasses\FileSystem\SysImageListHelper.cs" />
     <Compile Include="HelperClasses\ParamArray.cs" />
     <Compile Include="HelperClasses\ReflectionHelper.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
@@ -563,6 +566,13 @@
       <DependentUpon>IntelligenceResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\IConcurrentDictionary.cs" />
+    <Compile Include="Interfaces\IWinForm\IContainerControl.cs" />
+    <Compile Include="Interfaces\IWinForm\IControl.cs" />
+    <Compile Include="Interfaces\IWinForm\IControlCollection.cs" />
+    <Compile Include="Interfaces\IWinForm\IForm.cs" />
+    <Compile Include="Interfaces\IWinForm\IScrollableControl.cs" />
+    <Compile Include="Interfaces\IWinForm\IWinForm.cs" />
+    <Compile Include="Interfaces\IWinForm\PropertyStore.cs" />
     <Compile Include="ManagerResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -733,7 +743,7 @@
     <Compile Include="HelperClasses\ToolTips\QfcTipsDetails.cs" />
     <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="HelperClasses\SegmentStopWatch.cs" />
-    <Compile Include="HelperClasses\FileSystem\ShellUtilities.cs" />
+    <Compile Include="HelperClasses\FileSystem\ShellUtilitiesStatic.cs" />
     <Compile Include="HelperClasses\TimedActions\TimedBatchAction.cs" />
     <Compile Include="HelperClasses\Logging\VerboseLogger.cs" />
     <Compile Include="Interfaces\IGlobals\IAppQuickFilerSettings.cs" />

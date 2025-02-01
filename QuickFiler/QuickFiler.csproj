@@ -276,6 +276,9 @@
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcItemController.cs" />
     <Compile Include="Controllers\FilerQueue.cs" />
+    <Compile Include="Controllers\IQfcFormController.cs" />
+    <Compile Include="Controllers\IQfcQueue.cs" />
+    <Compile Include="Controllers\IQfcQueue1.cs" />
     <Compile Include="Controllers\KaChar.cs" />
     <Compile Include="Controllers\KaKey.cs" />
     <Compile Include="Controllers\KaStringAsync.cs" />
@@ -307,7 +310,6 @@
     <Compile Include="Interfaces\IQfcDatamodel.cs" />
     <Compile Include="Interfaces\IQfcExplorerController.cs" />
     <Compile Include="Interfaces\IQfcFormController.cs" />
-    <Compile Include="Interfaces\IQfcFormViewer.cs" />
     <Compile Include="Interfaces\IQfcItemController.cs" />
     <Compile Include="Interfaces\IQfcKeyboardHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -333,6 +335,7 @@
     <Compile Include="Viewers\EfcViewer.Designer.cs">
       <DependentUpon>EfcViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IQfcFormViewer.cs" />
     <Compile Include="Viewers\ItemViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>

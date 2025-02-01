@@ -34,8 +34,6 @@ namespace TaskMaster.Test.AppGlobals
 
         private MockRepository mockRepository;
         private Mock<IApplicationGlobals> mockApplicationGlobals;
-        //private Mock<AppAutoFileObjects> mockAutoFileObjects;
-        //private AppFileSystemFolderPaths appFP;
         private Mock<IntelligenceConfig> mockIntelligenceConfig;
         private Mock<ISmartSerializableNonTyped> mockSmartSerializable;
 

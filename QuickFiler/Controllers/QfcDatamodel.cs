@@ -452,6 +452,30 @@ namespace QuickFiler.Controllers
             return nodes;
         }
 
+        public IList<MailItem> DequeueNextItemGroup(int quantity)
+        {
+            _token.ThrowIfCancellationRequested();
+
+            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            try
+            {
+                if (nodes is not null)
+                {                    
+                    foreach (var node in nodes)
+                    {
+                        _moveMonitor.UnhookItem(node);
+                    }                    
+                }
+
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Error unhooking items from move monitor", e);
+                throw;
+            }
+            return nodes;
+        }
+
         internal async Task WaitForQueue(int quantity, CancellationToken token)
         {
             while (_worker.IsBusy && (_masterQueue?.Count < quantity))
