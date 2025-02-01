@@ -237,6 +237,8 @@ namespace TaskMaster
         public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
         public async void Intelligence_Click(Office.IRibbonControl control) => await _controller.IntelligenceAsync();
 
+        public void GetFolderInfo_Click(Office.IRibbonControl control) => _controller.GetFolderInfo();
+
         #region Helpers
 
         private static string GetResourceText(string resourceName)

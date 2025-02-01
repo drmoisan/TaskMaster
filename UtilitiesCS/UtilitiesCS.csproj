@@ -538,6 +538,12 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagConsolidator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.Designer.cs">
+      <DependentUpon>FolderInfoViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
     <Compile Include="Extensions\IControlExtensions.cs" />
@@ -924,6 +930,9 @@
     <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.resx">
       <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.resx">
+      <DependentUpon>FolderInfoViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.resx">
       <DependentUpon>OSBrowser.cs</DependentUpon>
