@@ -58,6 +58,42 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _parent = classifierShared.Parent;
         }
 
+        //public static async Task<BayesianClassifierShared> FromTokenBaseAsync(
+        //    BayesianClassifierGroup parent,
+        //    string tag,
+        //    IDictionary<string, int> matches,
+        //    int matchEmailCount,
+        //    bool addToParent,
+        //    CancellationToken token)
+        //{
+        //    ValidateParameters(parent, tag, matches, matchEmailCount);
+
+        //    BayesianClassifierShared classifier = null;
+
+        //    await Task.Run(
+        //        () =>
+        //        {
+        //            // Call constructor
+        //            classifier = new BayesianClassifierShared(tag, new Corpus(matches), parent)
+        //            {
+        //                MatchEmailCount = matchEmailCount,
+        //            };
+
+        //            // Update and cache probabilities
+        //            matches.ForEach(kvp =>
+        //            {
+        //                var tokenCount = addToParent ?
+        //                    parent.SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value,
+        //                        (sharedKey, existingValue) => existingValue + kvp.Value) :
+        //                    parent.SharedTokenBase.TokenFrequency[kvp.Key];
+        //                classifier.UpdateProbabilitySb(kvp.Key, kvp.Value, tokenCount - kvp.Value);
+        //            });
+        //        },
+        //        token);
+
+        //    return classifier;
+        //}
+
         public static async Task<BayesianClassifierShared> FromTokenBaseAsync(
             BayesianClassifierGroup parent,
             string tag,
@@ -66,42 +102,52 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             bool addToParent,
             CancellationToken token)
         {
+            var classifier = await Task.Run(() => FromTokenBase(parent, tag, matches, matchEmailCount, addToParent), token);
+            return classifier;
+        }
+
+        internal static BayesianClassifierShared FromTokenBase(BayesianClassifierGroup parent, string tag,
+            IDictionary<string, int> matches, int matchEmailCount, bool addToParent)
+        {
+            ValidateParameters(parent, tag, matches, matchEmailCount);
+
+            var classifier = new BayesianClassifierShared(tag, new Corpus(matches), parent) { MatchEmailCount = matchEmailCount };
+
+            // Update and cache probabilities
+            CalcProbability(parent, matches, addToParent, classifier);
+            return classifier;
+        }
+
+        private static void CalcProbability(BayesianClassifierGroup parent, IDictionary<string, int> matches, 
+            bool addToParent, BayesianClassifierShared classifier)
+        {
+            matches.ForEach(kvp =>
+            {
+                var tokenCount = addToParent ?
+                    parent.SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value,
+                        (sharedKey, existingValue) => existingValue + kvp.Value) :
+                    parent.SharedTokenBase.TokenFrequency[kvp.Key];
+                classifier.UpdateProbabilitySb(kvp.Key, kvp.Value, tokenCount - kvp.Value);
+            });
+        }
+
+        private static void ValidateParameters(BayesianClassifierGroup parent, string tag, 
+            IDictionary<string, int> matches, int matchEmailCount)
+        {
             var nullPositions = NullCheckParams(parent, tag, matches);
-            if (nullPositions > 0) 
-            { 
-                List<string>paramNames = [];
+            if (nullPositions > 0)
+            {
+                List<string> paramNames = [];
                 if ((nullPositions & 1) == 1) { paramNames.Add(nameof(parent)); }
                 if ((nullPositions & 2) == 2) { paramNames.Add(nameof(tag)); }
                 if ((nullPositions & 4) == 4) { paramNames.Add(nameof(matches)); }
                 throw new ArgumentNullException($"Null parameters received: {paramNames.StringJoin(", ")}");
             }
-            if (matchEmailCount < 1) { throw new ArgumentOutOfRangeException(nameof(matchEmailCount), 
-                $"Parameter {nameof(matchEmailCount)} was {matchEmailCount} must be greater than 0");}
-            
-            BayesianClassifierShared classifier = null;
-            
-            await Task.Run(
-                () =>
-                {
-                    // Call constructor
-                    classifier = new BayesianClassifierShared(tag, new Corpus(matches), parent)
-                    {
-                        MatchEmailCount = matchEmailCount,
-                    };
-                    
-                    // Update and cache probabilities
-                    matches.ForEach(kvp =>
-                    {
-                        var tokenCount = addToParent ?
-                            parent.SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value,
-                                (sharedKey, existingValue) => existingValue + kvp.Value) :
-                            parent.SharedTokenBase.TokenFrequency[kvp.Key];
-                        classifier.UpdateProbabilitySb(kvp.Key, kvp.Value, tokenCount - kvp.Value);
-                    });
-                },
-                token);
-
-            return classifier;
+            if (matchEmailCount < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(matchEmailCount),
+                $"Parameter {nameof(matchEmailCount)} was {matchEmailCount} must be greater than 0");
+            }
         }
 
         private static int NullCheckParams(params object[] parameters)
@@ -163,6 +209,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 var tokenCount = Parent.SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value,
                     (sharedKey, existingValue) => existingValue + kvp.Value);
                 UpdateProbabilitySb(kvp.Key, matchCount, tokenCount - matchCount);
+            });
+
+            otherMatches.ForEach(token => UpdateProbabilitySb(token));
+        }
+
+        public void TrainMultiTag(IDictionary<string, int> tokenFrequency, int emailCount)
+        {
+            var otherMatches = Match.TokenFrequency.Keys.Except(tokenFrequency.Keys);
+
+            Interlocked.Add(ref _matchEmailCount, emailCount);
+            
+            tokenFrequency.ForEach(kvp =>
+            {
+                var matchCount = Match.AddOrSumTokenValue(kvp.Key, kvp.Value);
+                if (Parent.SharedTokenBase.TokenFrequency.TryGetValue(kvp.Key, out int tokenCount))
+                {
+                    UpdateProbabilitySb(kvp.Key, matchCount, tokenCount - matchCount);
+                }
             });
 
             otherMatches.ForEach(token => UpdateProbabilitySb(token));

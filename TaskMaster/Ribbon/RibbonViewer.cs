@@ -164,11 +164,13 @@ namespace TaskMaster
         #region Folder Classifier
 
         public async void ScrapeAndMine_Click(Office.IRibbonControl control) => await _controller.ScrapeAndMineAsync();
+        public async void BuildFolderClassifier_Click(Office.IRibbonControl control) => await _controller.BuildFolderClassifierAsync();
+        public async void BuildCategoryClassifier_Click(Office.IRibbonControl control) => await _controller.BuildCategoryClassifierAsync();
 
         #endregion Folder Classifier
 
         #region Spam Manager
-        
+
         public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
         public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);         
         public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false); 
@@ -228,7 +230,7 @@ namespace TaskMaster
         public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.Try.ShowSubjectMapMetrics();
         public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.Try.TryTokenizeEmail();
         public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.Try.TryMineEmails();
-        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();        
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();                
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.Try.TryPrintManagerState();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.Try.TrySerializeMailInfo();
         public void TryGetInboxes_Click(Office.IRibbonControl control) => _controller.Try.TryGetInboxes();

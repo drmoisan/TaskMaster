@@ -81,6 +81,25 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             classifier.Train(matchFrequency, emailCount);
         }
 
+        public void AddOrUpdateClassifier(string[] tags, IEnumerable<string> matchTokens, int emailCount)
+        {
+            var matchFrequency = matchTokens.GroupAndCount();
+            
+            AddToEmailCount(emailCount);
+            
+            matchFrequency.ForEach(
+                kvp => SharedTokenBase.TokenFrequency.AddOrUpdate(
+                    kvp.Key, 
+                    kvp.Value,
+                    (sharedKey, existingValue) => existingValue + kvp.Value));
+            
+            foreach (var tag in tags)
+            {
+                var classifier = _classifiers.GetOrAdd(tag, CreateNewClassifier(tag, this));
+                classifier.TrainMultiTag(matchFrequency, emailCount);
+            }
+        }
+
         private BayesianClassifierShared CreateNewClassifier(string tag, BayesianClassifierGroup instance) => new BayesianClassifierShared(tag, instance);
 
         public void AddToEmailCount(int count)

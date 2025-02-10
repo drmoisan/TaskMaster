@@ -45,6 +45,7 @@ namespace UtilitiesCS //QuickFiler
         {
             _globals = globals.ToLazy();
             _entryId = new(() => _item.EntryID, true);
+            _categories = new(() => _item.Categories, true);
             _sender = new(() => _item.GetSenderInfo(), true);
             _senderHtml = new(() => Sender?.Html ?? "", true);
             _senderName = new(() => Sender?.Name ?? "", true);

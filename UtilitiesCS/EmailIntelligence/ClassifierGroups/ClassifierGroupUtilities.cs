@@ -1,4 +1,5 @@
-﻿using log4net.Repository.Hierarchy;
+﻿using AngleSharp.Css;
+using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 using System;
@@ -21,6 +22,35 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
         private IApplicationGlobals _globals = globals;
         internal IApplicationGlobals Globals => _globals;
+
+        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection, string name)
+        {
+            collection.ThrowIfNull();
+
+            var group = await Task.Run(() => Deserialize<BayesianClassifierGroup>($"Staging_{name}"));
+            if (group is null)
+            {
+                group = await CreateClassifierGroupAsync(collection);
+                SerializeAndSave(group, "$Staging_{name}");
+            }
+            return group;
+        }
+
+        public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
+            MinedMailInfo[] collection)
+        {
+            return await Task.Run(() =>
+            {
+                var group = new BayesianClassifierGroup
+                {
+                    TotalEmailCount = collection.Count(),
+                    SharedTokenBase = new Corpus(
+                        collection.SelectMany(x => x.Tokens).GroupAndCount())
+                };
+                return group;
+            });
+        }
+
 
         #region Testing Sizing and Serialization Methods
 
@@ -266,10 +296,6 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
 
         }
-
-
-
-
 
 
         #endregion Testing Sizing and Serialization Methods

@@ -166,7 +166,7 @@ namespace TaskMaster.Ribbon
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
             var miner = new OlFolderClassifierGroup(Globals);
-            await miner.BuildFolderClassifiersAsync();
+            await miner.BuildClassifiersAsync();
         }
 
         internal void TryPrintManagerState()

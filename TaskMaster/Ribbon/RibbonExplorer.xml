@@ -62,6 +62,7 @@
                   </menu>
                   <menu id="FolderClassifier" imageMso="Move" label ="Folder Classifier" itemSize="large">
                     <button id="ScrapeAndMine" imageMso="ProtectedActualsSynchronize" onAction="ScrapeAndMine_Click" label="Scrape/Mine" />
+                    <button id="BuildCategoryClassifier" imageMso="ProtectedActualsSynchronize" onAction="BuildCategoryClassifier_Click" label="Build Category Classifier" />                    
                   </menu>
                   <menu id="BayesianPerformance" imageMso="TaskEarnedValueForm" label="Bayesian Performance" itemSize="large">
                     <button id="TestClassifier" imageMso="AutoSummarize" onAction="TestClassifier_Click" label="Test Classifier" />

@@ -45,7 +45,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         private IApplicationGlobals _globals;
         private SegmentStopWatch _sw = default;
-        internal const int MaxObjectSize = 2000000000;
+        internal const int MaxObjectSize = 1000000000;
 
         #endregion Constructors and private fields
 

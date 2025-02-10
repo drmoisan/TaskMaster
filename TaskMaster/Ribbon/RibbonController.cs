@@ -20,6 +20,8 @@ using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.Extensions.Lazy;
 using TaskMaster.Ribbon;
 using UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 
 
 namespace TaskMaster
@@ -236,11 +238,38 @@ namespace TaskMaster
             await miner.MineEmails();
         }
 
+        internal async Task ContinueMiningAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(Globals);
+            await miner.MineEmails();
+        }
+        
+        internal async Task BuildFolderClassifierAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new OlFolderClassifierGroup(Globals);
+            await miner.BuildClassifiersAsync();
+        }
+
+        internal async Task BuildCategoryClassifierAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new CategoryClassifierGroup(Globals);
+            await miner.BuildClassifiersAsync();
+        }
+
         #endregion Folder Classifier
 
         #region BayesianPerformance
 
-        
+
         internal async Task GetConfusionDriversAsync()
         {
             if (SynchronizationContext.Current is null)

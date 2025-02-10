@@ -113,7 +113,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             return success;
         }
 
-        public async Task BuildFolderClassifiersAsync()
+        public async Task BuildClassifiersAsync()
         {
             Globals.AF.Manager.TryRemove("Folder", out _);
             var miner = new EmailDataMiner(Globals);

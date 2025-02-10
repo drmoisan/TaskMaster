@@ -220,9 +220,11 @@ namespace QuickFiler.Controllers
         public void Cleanup()
         {
             _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
+            UnregisterFormEventHandlers();
             _undoConsumerTask?.Dispose();
             _undoQueue?.Dispose();
             _globals = null;
+            _formViewer?.Dispose();
             _formViewer = null;
             _groups = null;
             _rowStyleTemplate = null;
@@ -230,7 +232,6 @@ namespace QuickFiler.Controllers
             _movedItems = null;
             WriteMetrics = null;
             Iterate = null;
-            UnregisterFormEventHandlers();
             _parentCleanup.Invoke();
             _parentCleanup = null;
         }
@@ -340,8 +341,7 @@ namespace QuickFiler.Controllers
             await _formViewer.UiSyncContext;
             _formViewer.Hide();
             _groups.Cleanup();
-            _formViewer.Dispose();
-            Cleanup();
+            Cleanup();            
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e)
