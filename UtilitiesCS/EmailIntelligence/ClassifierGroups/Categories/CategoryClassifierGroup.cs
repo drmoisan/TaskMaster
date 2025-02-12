@@ -121,7 +121,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
         public async Task<bool> BuildClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg, IPrefix prefix)
         {            
-            var exploded = collection.Select(x => ExplodeMailsByCategory(x, prefix)).SelectMany(x => x).ToList();
+            var exploded = collection.Where(x => !x.Categories.IsNullOrEmpty()).Select(x => ExplodeMailsByCategory(x, prefix)).SelectMany(x => x).ToList();
 
             var groups = exploded.GroupBy(x => x.GroupingKey);
             
