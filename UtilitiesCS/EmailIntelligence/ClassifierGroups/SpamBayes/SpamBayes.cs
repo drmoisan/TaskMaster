@@ -556,7 +556,7 @@ namespace UtilitiesCS.EmailIntelligence
             var spamProp = olItem.UserProperties.Find("Spam");
             if (spamProp is not null) 
             { 
-                logger.Debug($"Skipping: Has Spam property {spamProp.Value} -> {GetOlItemString(olItem)}");
+                logger.Debug($"Skipping: Has Spam property with value of {spamProp.Value} -> {GetOlItemString(olItem)}");
                 return false;
             }
             

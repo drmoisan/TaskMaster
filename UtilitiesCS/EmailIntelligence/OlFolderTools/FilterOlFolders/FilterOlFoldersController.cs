@@ -59,30 +59,36 @@ namespace UtilitiesCS
 
         public void OlFolderTree_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            UiThread.Dispatcher.Invoke(() =>
+            if (_viewer.InvokeRequired)
             {
-                //_viewer.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
-                //_viewer.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
-                var expanded = (_viewer.TlvNotFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()
-                    .Concat(_viewer.TlvFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()))
-                    .Select(x=>x.Value.RelativePath).ToArray();
+                _viewer.Invoke(new Action(() => OlFolderTree_PropertyChangedInternal(sender, e)));                
+            }
+            else 
+            {
+                OlFolderTree_PropertyChangedInternal(sender, e);
+            }
+        }
 
-                var notFiltered = OlFolderTree.FilterSelected(false);
-                _viewer.TlvNotFiltered.Roots = notFiltered;
-                
-                //var nfExpanded = notFiltered.SelectMany(x => x.Flatten()).Where(x => expanded.Contains(x.RelativePath)).ToList();
-                var nfExpanded = notFiltered.SelectMany(x => x.FindAll(x=>expanded.Contains(x.Value.RelativePath))).ToList();
-                _viewer.TlvNotFiltered.ExpandedObjects = nfExpanded;
-                _viewer.TlvNotFiltered.RebuildAll(true);
-                _viewer.TlvNotFiltered.Refresh();
-                
-                var filtered = OlFolderTree.FilterSelected(true);
-                _viewer.TlvFiltered.Roots = filtered;
-                var filteredExpanded = filtered.SelectMany(x => x.FindAll(x => expanded.Contains(x.Value.RelativePath))).ToList();
-                _viewer.TlvFiltered.ExpandedObjects = filteredExpanded;
-                _viewer.TlvFiltered.RebuildAll(true);
-                _viewer.TlvFiltered.Refresh();
-            });
+        internal void OlFolderTree_PropertyChangedInternal(object sender, PropertyChangedEventArgs e)
+        {
+            var expanded = (_viewer.TlvNotFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()
+                .Concat(_viewer.TlvFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()))
+                .Select(x => x.Value.RelativePath).ToArray();
+
+            var notFiltered = OlFolderTree.FilterSelected(false);
+            _viewer.TlvNotFiltered.Roots = notFiltered;
+
+            var nfExpanded = notFiltered.SelectMany(x => x.FindAll(x => expanded.Contains(x.Value.RelativePath))).ToList();
+            _viewer.TlvNotFiltered.ExpandedObjects = nfExpanded;
+            _viewer.TlvNotFiltered.RebuildAll(true);
+            _viewer.TlvNotFiltered.Refresh();
+
+            var filtered = OlFolderTree.FilterSelected(true);
+            _viewer.TlvFiltered.Roots = filtered;
+            var filteredExpanded = filtered.SelectMany(x => x.FindAll(x => expanded.Contains(x.Value.RelativePath))).ToList();
+            _viewer.TlvFiltered.ExpandedObjects = filteredExpanded;
+            _viewer.TlvFiltered.RebuildAll(true);
+            _viewer.TlvFiltered.Refresh();
         }
 
         internal CheckStateGetterDelegate GetCheckedState = delegate (object rowObject)
