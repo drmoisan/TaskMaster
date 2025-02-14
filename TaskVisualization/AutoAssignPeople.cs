@@ -20,6 +20,18 @@ namespace TaskVisualization
             get => [.. _globals.TD.CategoryFilters];
         }
 
+        public async Task<IList<string>> AutoFindAsync(object objItem)
+        {
+            try
+            {
+                return await Task.Run(() => AutoFind(objItem)).ConfigureAwait(true);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
         public IList<string> AutoFind(object objItem)
         {
             return AutoFile.AutoFindPeople(objItem: objItem,

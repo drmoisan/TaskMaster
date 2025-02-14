@@ -1,31 +1,75 @@
-﻿using SDILReader;
+﻿using AngleSharp.Css;
+using Microsoft.Graph.Communications.OnlineMeetings.GetAllRecordingsmeetingOrganizerUserIdMeetingOrganizerUserIdWithStartDateTimeWithEndDateTime;
+using Microsoft.Graph.Drives.Item.Items.Item.GetActivitiesByInterval;
+using Microsoft.Office.Interop.Outlook;
+using SDILReader;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.Extensions;
+using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.HelperClasses;
+using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
-using UtilitiesCS.Extensions;
-using AngleSharp.Css;
-using UtilitiesCS.Extensions.Lazy;
-using System.Threading;
-using UtilitiesCS.HelperClasses;
-using Microsoft.Graph.Communications.OnlineMeetings.GetAllRecordingsmeetingOrganizerUserIdMeetingOrganizerUserIdWithStartDateTimeWithEndDateTime;
 
 namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 {
-    public class CategoryClassifierGroup(IApplicationGlobals globals)
+    public class CategoryClassifierGroup: IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        internal IApplicationGlobals Globals { get; private set; } = globals;
+        #region ctor
+        
+        private CategoryClassifierGroup() { }
 
-        internal readonly ClassifierGroupUtilities CgUtilities = new(globals);
+        public CategoryClassifierGroup(IApplicationGlobals globals)
+        {
+            Globals = globals;
+            CgUtilities = new(Globals);
+        }
+
+        public async Task<CategoryClassifierGroup> InitAsync(string groupName)
+        {
+            Globals.ThrowIfNull();
+                                    
+            Globals.AF.Manager.TryGetValue(groupName, out var classifierTask);
+            if (classifierTask is not null)
+            {
+                ClassifierGroup = await classifierTask;
+                EngineName = groupName;
+                return this;
+            }
+            else { return null; }
+            
+        }
+
+        public static async Task<CategoryClassifierGroup> CreateEngineAsync(
+            IApplicationGlobals globals,
+            string categoryGroup,
+            CancellationToken token = default)
+        {
+            var cg = new CategoryClassifierGroup();
+            cg.Globals = globals;
+
+            return await Task.Run(() => cg.InitAsync(categoryGroup), token);
+
+        }
+
+        #endregion ctor
+
+        internal IApplicationGlobals Globals { get; private set; } 
+
+        internal ClassifierGroupUtilities CgUtilities;
+
+        #region Build Category Classifier
 
         public async Task BuildClassifiersAsync()
         {            
@@ -40,7 +84,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                 (100 - ppkg.ProgressTrackerPane.Progress) / Globals.TD.PrefixList.Count: 
                 100 - ppkg.ProgressTrackerPane.Progress;
 
-            List<string> prefixList = ["Project"];
+            List<string> prefixList = ["Context","Project"];
             foreach (var prefixLu in prefixList)
             {
                 var prefix = Globals.TD.PrefixList.Find(x => x.Key == prefixLu);
@@ -174,6 +218,124 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             await classifierGroup.RebuildClassifier(
                 group.Key, matchFrequency, matchEmailCount, cancel);
         }
+        #endregion Build Category Classifier
+
+        #region Public Properties
+
+        
+        public BayesianClassifierGroup ClassifierGroup { get; set; }
+
+        public bool IsActivated => ClassifierGroup is not null;
+
+        public double ProbabilityThreshold { get; set; } = 0.8;
+        
+        public Func<IEnumerable<string>, MailItemHelper, Task> CategorySetter { get; set; }
+
+        public async Task TestAsync(MailItemHelper helper)
+        {
+            var results = await GetMatchingCategoriesAsync(helper);
+            if (results.Count() > 0) { await CategorySetter(results, helper); }            
+        }
+
+        public async Task<string[]> GetMatchingCategoriesAsync(MailItemHelper helper)
+        {
+            var results = await ClassifierGroup.ClassifyAsync(helper.Tokens, default);
+            var filtered = results
+                .Where(x => x.Probability > ProbabilityThreshold).Select(x => x.Class)
+                .ToArray();
+            return filtered;
+        }
+
+        public string[] GetMatchingCategories(MailItemHelper helper)
+        {
+            var results = ClassifierGroup.Classify(helper.Tokens);
+            var filtered = results
+                .Where(x => x.Probability > ProbabilityThreshold).Select(x => x.Class)
+                .ToArray();
+            return filtered;
+        }
+
+        #endregion Public Properties
+
+
+        #region IConditionalEngine Implementation
+
+        public ISmartSerializableConfig Config => ClassifierGroup.Config;
+
+        //public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
+        //{
+        //    var sb = await CreateAsync(globals);
+        //    return sb;
+        //}
+
+        void IConditionalEngine<MailItemHelper>.Serialize()
+        {
+            this.ClassifierGroup.Serialize();
+        }
+
+        public Func<MailItemHelper, Task> AsyncAction => (item) => 
+            (Engine is not null && CategorySetter is not null) ? 
+            ((CategoryClassifierGroup)Engine).TestAsync(item) : null;
+        //public Func<MailItemHelper, Task> AsyncAction { get; set; }
+       
+        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() => ConditionLog(item));
+
+        private bool Condition(object item)
+        {
+            if (item is not MailItem mailItem) { return false; }
+            if (mailItem.MessageClass != "IPM.Note") { return false; }
+            //if (mailItem.UserProperties.Find("Spam") is not null) { return false; }
+            return true;
+        }
+
+        private bool ConditionLog(object item)
+        {
+            var olItem = new OutlookItem(item);
+            if (olItem.TryGet().OlItemType(out var result) && result != OlItemType.olMailItem)
+            {
+                logger.Debug($"Skipping: Not MailItem -> {GetOlItemString(olItem)}");
+                return false;
+            }
+
+            if (olItem.Try().MessageClass != "IPM.Note")
+            {
+                logger.Debug($"Skipping: Message class -> {GetOlItemString(olItem)}");
+                return false;
+            }
+
+            //var spamProp = olItem.UserProperties.Find("Spam");
+            //if (spamProp is not null)
+            //{
+            //    logger.Debug($"Skipping: Has Spam property with value of {spamProp.Value} -> {GetOlItemString(olItem)}");
+            //    return false;
+            //}
+
+            return true;
+        }
+
+        private string GetOlItemString(OutlookItem olItem)
+        {
+            var type = olItem.TryGet().OlItemType(out var typeVal) ? $"{typeVal}" : $"{olItem.InnerObject.GetType()}";
+            var created = olItem.TryGet().CreationTime(out var result) ? $" created on {result:g}" : "";
+            var subject = olItem.Try().Subject;
+            subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject}";
+            var sender = olItem.Try().SenderName;
+            sender = sender.IsNullOrEmpty() ? "" : $" from {sender}";
+            return $"{type}{created}{sender}{subject}";
+        }
+
+        public object Engine => this;
+
+        public Func<IApplicationGlobals, Task> EngineInitializer => async (globals) => await Task.CompletedTask;
+
+        public string EngineName { get; internal set; }
+
+        public string Message => $"{nameof(CategoryClassifierGroup)} is null. Skipping actions";
+
+        public MailItemHelper TypedItem { get; set; }
+
+
+        #endregion IConditionalEngine Implementation
 
     }
 }

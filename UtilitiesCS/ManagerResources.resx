@@ -229,4 +229,32 @@
   }
 }</value>
   </data>
+  <data name="Context" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": false,
+  "Globals": "default",
+  "Name": "Context",
+  "T": null,
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerContext.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerContext.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerContext.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true
+  }
+}</value>
+  </data>
 </root>

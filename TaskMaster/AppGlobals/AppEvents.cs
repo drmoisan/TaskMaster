@@ -116,8 +116,7 @@ namespace TaskMaster
                 OlReminders = Globals.Ol.OlReminders;
             }
         }
-
-        
+                
         public void Unhook()
         {
             OlToDoItems = null;
@@ -137,12 +136,28 @@ namespace TaskMaster
 
         private async void OlToDoItems_ItemChange(object item)
         {
-            await ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, Globals);
+            try
+            {
+                await ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, Globals);
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
         }
 
         private async void OlInboxItems_ItemAdd(object item)
         {
-            await ProcessMailItemAsync(item);               
+            try
+            {
+                await ProcessMailItemAsync(item);               
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<bool> ProcessMailItemAsync(object item)

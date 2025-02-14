@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -70,7 +71,10 @@ namespace TaskVisualization
 
         }
 
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, Func<string, string> projectsToPrograms, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
+        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, 
+            ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, IAutoAssign contextAssign,
+            Func<string, string> projectsToPrograms, string userEmailAddress, 
+            Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
         {
             _viewer = formInstance;
             _todo_list = toDoSelection;
@@ -108,6 +112,7 @@ namespace TaskVisualization
 
             ProjectAssign = projectAssign;
             ProjectsToPrograms = projectsToPrograms;
+            ContextAssign = contextAssign;
         }
 
         /// <summary>
@@ -247,6 +252,8 @@ namespace TaskVisualization
             get => _projectAssign;
             set => _projectAssign = value;
         }
+
+        public IAutoAssign ContextAssign { get; set; }
 
         private Func<string, string> _projectsToPrograms;
         internal Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; private protected set => _projectsToPrograms = value; }
@@ -552,7 +559,19 @@ namespace TaskVisualization
         #endregion
 
         #region Public Keyboard Events and Properties
-        
+
+        internal async Task AutoAssignAllAsync()
+        {
+            var projects = await ProjectAssign.AutoFindAsync(this._active.OlItem).ConfigureAwait(true);
+            MergeFlag(projects, Enums.FlagsToSet.Projects);
+
+            var context = await ContextAssign.AutoFindAsync(this._active.OlItem).ConfigureAwait(true);
+            MergeFlag(context, Enums.FlagsToSet.Context);
+
+            var people = await _autoAssign.AutoFindAsync(this._active.OlItem).ConfigureAwait(true);
+            MergeFlag(people, Enums.FlagsToSet.People);
+        }
+
         public bool KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Alt)
@@ -671,7 +690,7 @@ namespace TaskVisualization
         /// </summary>
         /// <param name="value">Comma separated list of tags</param>
         /// <param name="flagType">Used to identify field names and tag Prefix</param>
-        private void SetFlag(string value, Enums.FlagsToSet flagType)
+        internal void SetFlag(string value, Enums.FlagsToSet flagType)
         {
             switch (flagType)
             {
@@ -714,6 +733,57 @@ namespace TaskVisualization
             }
 
         }
+
+
+        internal ObservableCollection<string> MergeToCollection(ObservableCollection<string> original, IList<string> toMerge)
+        {
+            var hash = new HashSet<string>(toMerge);
+            original.ForEach(x =>  hash.Add(x));
+            return new ObservableCollection<string>(hash);
+        }
+
+        /// <summary>
+        /// Sets value based on the flag type and value
+        /// </summary>
+        /// <param name="value">Comma separated list of tags</param>
+        /// <param name="flagType">Used to identify field names and tag Prefix</param>
+        internal void MergeFlag(IList<string> value, Enums.FlagsToSet flagType)
+        {
+            if (value.IsNullOrEmpty()) { return; }
+            switch (flagType)
+            {
+                case Enums.FlagsToSet.Context:
+                    {
+                        _active.Context.AsListNoPrefix = MergeToCollection(
+                            _active.Context.AsListNoPrefix, value);
+                        _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.People:
+                    {
+                        _active.People.AsListNoPrefix = MergeToCollection(
+                            _active.People.AsListNoPrefix, value);
+                        _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.Projects:
+                    {
+                        _active.Projects.AsListNoPrefix = MergeToCollection(
+                            _active.Projects.AsListNoPrefix, value);
+                        _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.Topics:
+                    {
+                        _active.Topics.AsListNoPrefix = MergeToCollection(
+                            _active.Topics.AsListNoPrefix, value);
+                        _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
+                        break;
+                    }                    // Note that _active is set after OK click
+            }
+
+        }
+
 
         /// <summary>
         /// Method grabs the work Duration out of a text box, converts to an integer, 
@@ -1226,6 +1296,7 @@ namespace TaskVisualization
                 new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(Enums.FlagsToSet.Worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
                 new ControlRelationship(4, _viewer.XlOk,  true,  _viewer.OKButton.Text,  _viewer.OKButton),
                 new ControlRelationship(4, _viewer.XlCancel,  true,  _viewer.Cancel_Button.Text,  _viewer.Cancel_Button),
+                new ControlRelationship(4, _viewer.XlAutotag,  true,  _viewer.AutoTagButton.Text,  _viewer.AutoTagButton),
                 new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(Enums.FlagsToSet.Reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
                 new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(Enums.FlagsToSet.DueDate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
                 new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
@@ -1243,6 +1314,8 @@ namespace TaskVisualization
             };
             return list;
         }
+
+
 
         private struct ControlRelationship
         {

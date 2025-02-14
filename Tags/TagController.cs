@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -302,22 +303,31 @@ namespace Tags
 
         private void ButtonNew_Click(object sender, EventArgs e) => AddColorCategory();
 
-        private void ButtonAutoAssign_Click(object sender, EventArgs e)
+        private async void ButtonAutoAssign_Click(object sender, EventArgs e)
         {
-            var col_choices = _autoAssigner.AutoFind(_objItem);
-            foreach (string str_choice in col_choices)
+            try
             {
-                if (_dictOptions.ContainsKey(str_choice))
+                var col_choices = await _autoAssigner.AutoFindAsync(_objItem).ConfigureAwait(true);
+                foreach (string str_choice in col_choices)
                 {
-                    ToggleOn(str_choice);
+                    if (_dictOptions.ContainsKey(str_choice))
+                    {
+                        ToggleOn(str_choice);
+                    }
+                    else
+                    {
+                        AddOption(str_choice, blClickTrue: true);
+                    }
                 }
-                else
-                {
-                    AddOption(str_choice, blClickTrue: true);
-                }
+                if (col_choices.Count > 0)
+                    FilterToSelected();
             }
-            if (col_choices.Count > 0)
-                FilterToSelected();
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)

@@ -65,6 +65,36 @@ namespace UtilitiesCS {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
+        ///  &quot;Name&quot;: &quot;Context&quot;,
+        ///  &quot;T&quot;: null,
+        ///  &quot;Config&quot;: {
+        ///    &quot;$id&quot;: &quot;2&quot;,
+        ///    &quot;Disk&quot;: {
+        ///      &quot;FileName&quot;: &quot;ManagerContext.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
+        ///    },
+        ///    &quot;LocalDisk&quot;: {
+        ///      &quot;FileName&quot;: &quot;ManagerContext.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
+        ///    },
+        ///    &quot;NetDisk&quot;: {
+        ///      &quot;FileName&quot;: &quot;ManagerContext.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;F [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Context {
+            get {
+                return ResourceManager.GetString("Context", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;$id&quot;: &quot;1&quot;,
+        ///  &quot;Engine&quot;: false,
+        ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Folder&quot;,
         ///  &quot;T&quot;: null,
         ///  &quot;Config&quot;: {

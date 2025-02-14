@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 using UtilitiesCS.Extensions;
 
 namespace TaskVisualization
@@ -124,6 +125,20 @@ namespace TaskVisualization
         {
             // TODO: Link this to the Bayesian project prediction model
             throw new NotImplementedException();
+            
+        }
+
+        public async Task<IList<string>> AutoFindAsync(object objItem)
+        {
+            MailItem mailItem = null;
+            if (objItem is OutlookItem olItem) { mailItem = olItem.InnerObject as MailItem; }
+            else if (objItem is MailItem mail) { mailItem = mail; }
+            if (mailItem is null) { return null; }
+            var project = await CategoryClassifierGroup.CreateEngineAsync(_globals, "Project", default).ConfigureAwait(true);
+            project.ProbabilityThreshold = 0.2;
+            var helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, true).ConfigureAwait(true);
+            var results = project.GetMatchingCategories(helper).ToList();
+            return results;
         }
     }
 

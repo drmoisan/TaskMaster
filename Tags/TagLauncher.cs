@@ -120,6 +120,19 @@ namespace Tags
             {
                 return _autoFindDelegate(objItem);
             }
+
+            public Task<IList<string>> AutoFindAsync(object objItem)
+            {
+                try
+                {
+                    return Task.Run(() => AutoFind(objItem));
+                }
+                catch (System.Exception)
+                {
+
+                    throw;
+                }
+            }
         }
     }
 }

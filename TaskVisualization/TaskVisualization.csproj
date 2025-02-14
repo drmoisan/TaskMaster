@@ -67,6 +67,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoAssignContext.cs" />
     <Compile Include="AutoAssignPeople.cs" />
     <Compile Include="EditFilterController.cs" />
     <Compile Include="EditFilterViewer.cs">
