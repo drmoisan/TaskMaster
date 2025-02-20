@@ -95,5 +95,28 @@ namespace UtilitiesCS.HelperClasses
                 }
             }
         }
+
+        public static List<FieldInfo> GetAllFields(this Type type)
+        {
+            var fields = new List<FieldInfo>();
+            while (type != null)
+            {
+                fields.AddRange(type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly));
+                type = type.BaseType;
+            }
+            return fields;
+        }
+
+        public static List<FieldInfo> GetAllDerivedFields(this Type type, Type baseType)
+        {
+            var fields = new List<FieldInfo>();
+            while (type != null && type != baseType)
+            {
+                fields.AddRange(type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly));
+                type = type.BaseType;
+            }
+            return fields;
+        }
+
     }
 }

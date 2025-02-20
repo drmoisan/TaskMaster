@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
@@ -27,6 +28,7 @@ namespace UtilitiesCS
         string ProjInfo_Filename { get; }
         string FnameDictRemap { get; }
         string FnameIDList { get; }
+        Func<IEnumerable<string>, IPrefix, string, string, string> FindMatchingTag { get; }
 
     }
 }

@@ -59,6 +59,9 @@
     <Reference Include="Fizzler, Version=1.3.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
       <HintPath>..\packages\Fizzler.1.3.1\lib\netstandard2.0\Fizzler.dll</HintPath>
     </Reference>
+    <Reference Include="FluentAssertions, Version=8.0.1.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.8.0.1\lib\net47\FluentAssertions.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Core, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\FSharp.Core.9.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
@@ -545,6 +548,10 @@
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.Designer.cs">
       <DependentUpon>FolderInfoViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="NewtonsoftHelpers\PeopleScoConverter.cs" />
+    <Compile Include="EmailIntelligence\People\PeopleScoDictionaryNew.cs" />
+    <Compile Include="NewtonsoftHelpers\PeopleScoRemainingObjectConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperPeopleScoDictionaryNew.cs" />
     <Compile Include="Extensions\AsyncSerialization.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions.cs" />
     <Compile Include="Extensions\IControlExtensions.cs" />

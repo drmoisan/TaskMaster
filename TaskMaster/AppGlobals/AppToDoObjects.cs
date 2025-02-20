@@ -17,6 +17,7 @@ using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
+using Tags;
 
 namespace TaskMaster
 {
@@ -125,6 +126,7 @@ namespace TaskMaster
             if (Parent.IntelRes.Config.TryGetValue("People", out var config))
             {                
                 People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew(Parent));
+                People.Prefix = PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People);
                 People.CollectionChanged += People_CollectionChanged;
             }
             else { logger.Error("People config not found."); }
@@ -133,8 +135,9 @@ namespace TaskMaster
         public IPeopleScoDictionaryNew People {  get; private set; }
         public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
         {
-            var dict = (PeopleScoDictionaryNew)Sender;
-            dict.Serialize();
+            People.Serialize();
+            //var dict = (PeopleScoDictionaryNew)Sender;
+            //dict.Serialize();
         }
 
 
@@ -299,7 +302,7 @@ namespace TaskMaster
             _folderRemap = await Task.Run(LoadFolderRemap);
         }
 
-
+        public Func<IEnumerable<string>, IPrefix, string, string, string> FindMatchingTag { get; internal set; } = TagLauncher.LaunchAndFindMatch;
 
 
     }

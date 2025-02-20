@@ -167,6 +167,10 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
+            actual.Config.Should().BeEquivalentTo(expected.Config);
+            actual.AdditionalField3.Should().Be(expected.AdditionalField3);
+            actual.AdditionalField1.Should().Be(expected.AdditionalField1);
+            
         }
 
         [TestMethod]
@@ -213,7 +217,10 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var recreatedInstance = composedInstance.ToDerived(composedInstance);
 
             // Assert
-            expected.Should().BeEquivalentTo(recreatedInstance);
+            recreatedInstance.Should().BeEquivalentTo(expected);
+            recreatedInstance.Config.Should().BeEquivalentTo(expected.Config);
+            recreatedInstance.AdditionalField3.Should().Be(expected.AdditionalField3);
+            recreatedInstance.AdditionalField1.Should().Be(expected.AdditionalField1);
         }
 
         [TestMethod]
@@ -230,7 +237,10 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var recreatedInstance = wrapper.ToDerived();
 
             // Assert
-            derivedInstance.Should().BeEquivalentTo(recreatedInstance);
+            recreatedInstance.Should().BeEquivalentTo(derivedInstance);
+            recreatedInstance.Config.Should().BeEquivalentTo(derivedInstance.Config);
+            recreatedInstance.AdditionalField3.Should().Be(derivedInstance.AdditionalField3);
+            recreatedInstance.AdditionalField1.Should().Be(derivedInstance.AdditionalField1);
         }
 
         [TestMethod]

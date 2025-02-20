@@ -65,7 +65,7 @@ namespace UtilitiesCS {
         ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
-        ///  &quot;T&quot;: &quot;ToDoModel.Data_Model.People.PeopleScoDictionaryNew, ToDoModel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;,
+        ///  &quot;T&quot;: &quot;ToDoModel.Data_Model.People.PeopleScoDictionaryNew, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;,
         ///  &quot;Config&quot;: {
         ///    &quot;$id&quot;: &quot;2&quot;,
         ///    &quot;Disk&quot;: {
@@ -79,7 +79,7 @@ namespace UtilitiesCS {
         ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
         ///    },
         ///    &quot;NetDisk&quot;: {
-        ///      &quot;FileName&quot;: &quot;ppl [rest of string was truncated]&quot;;.
+        ///      &quot;FileName&quot;: &quot;p [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string People {
             get {

@@ -12,6 +12,7 @@ using Microsoft.Office.Interop.Outlook;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 
 
 namespace TaskVisualization
@@ -73,7 +74,7 @@ namespace TaskVisualization
 
         public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, 
             ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, IAutoAssign contextAssign,
-            Func<string, string> projectsToPrograms, string userEmailAddress, 
+            Func<string, string> projectsToPrograms, string userEmailAddress, IApplicationGlobals globals,
             Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
         {
             _viewer = formInstance;
@@ -82,6 +83,7 @@ namespace TaskVisualization
             _defaults = defaults;
             _autoAssign = autoAssign;
             _userEmailAddress = userEmailAddress;
+            Globals = globals;
 
             // Activate this controller within the viewer
             formInstance.SetController(this);
@@ -204,6 +206,8 @@ namespace TaskVisualization
         #endregion
 
         #region Public Properties
+
+        internal IApplicationGlobals Globals { get; set; }
 
         private Enums.FlagsToSet _options;
         /// <summary>
@@ -822,11 +826,15 @@ namespace TaskVisualization
         /// <summary>
         /// Iterates through _todo_list and applies the values in _active for the fields in _options
         /// </summary>
-        private async Task ApplyChanges()
+        internal async Task ApplyChanges()
         {            
             foreach (ToDoItem c in _todo_list)
             {
                 ToDoEvents.Editing.AddOrUpdate(c.OlItem.EntryID, 1, (key, existing) => existing + 1);
+
+                var tokens = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ?                     
+                    await (await MailItemHelper.FromMailItemAsync(c.OlItem.InnerObject as MailItem, Globals, default, false))?.TokenizeAsync() 
+                    : null;
 
                 c.FlagAsTask = true;
 
@@ -867,6 +875,13 @@ namespace TaskVisualization
                 ToDoEvents.Editing.UpdateOrRemove(c.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
             }
         }
+
+        internal async Task ApplyChange(Enums.FlagsToSet flag)
+        {
+
+        }
+
+
 
         #endregion
 

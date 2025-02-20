@@ -184,7 +184,11 @@ namespace ToDoModel
                     if (strMissing.Length > 0 & blNotifyMissing)
                     {
                         strMissing = strMissing.Substring(2);
-                        MessageBox.Show("Recipients not in list of people: " + strMissing);
+                        MyBox.ShowDialog(
+                            $"Recipients not in list of people: {strMissing}",
+                            "Unknown Recipients",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
                     }
                 }
             }

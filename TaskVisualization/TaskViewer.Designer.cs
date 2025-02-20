@@ -53,6 +53,8 @@
             this.XlSector1 = new System.Windows.Forms.Label();
             this.C1S1 = new System.Windows.Forms.Label();
             this.L0v4L1h_TlpOkCancel = new System.Windows.Forms.TableLayoutPanel();
+            this.AutoTagButton = new System.Windows.Forms.Button();
+            this.XlAutotag = new System.Windows.Forms.Label();
             this.OKButton = new System.Windows.Forms.Button();
             this.Cancel_Button = new System.Windows.Forms.Button();
             this.XlCancel = new System.Windows.Forms.Label();
@@ -107,8 +109,6 @@
             this.C3S3 = new System.Windows.Forms.Label();
             this.C4S3 = new System.Windows.Forms.Label();
             this.XlScBullpin = new System.Windows.Forms.Label();
-            this.XlAutotag = new System.Windows.Forms.Label();
-            this.AutoTagButton = new System.Windows.Forms.Button();
             this.L0v_Tlp.SuspendLayout();
             this.L0v1L2g_TlpTop.SuspendLayout();
             this.L0v4L1h_TlpOkCancel.SuspendLayout();
@@ -151,7 +151,7 @@
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.11259F));
             this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 94F));
+            this.L0v1L2g_TlpTop.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95F));
             this.L0v1L2g_TlpTop.Controls.Add(this.LblDuration, 2, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.XlWorktime, 1, 6);
             this.L0v1L2g_TlpTop.Controls.Add(this.LblKbf, 2, 5);
@@ -275,7 +275,7 @@
             this.TaskName.Location = new System.Drawing.Point(76, 63);
             this.TaskName.Margin = new System.Windows.Forms.Padding(6);
             this.TaskName.Name = "TaskName";
-            this.TaskName.Size = new System.Drawing.Size(1429, 37);
+            this.TaskName.Size = new System.Drawing.Size(1426, 37);
             this.TaskName.TabIndex = 15;
             // 
             // XlImportance
@@ -305,7 +305,7 @@
             this.PriorityBox.Location = new System.Drawing.Point(276, 120);
             this.PriorityBox.Margin = new System.Windows.Forms.Padding(6);
             this.PriorityBox.Name = "PriorityBox";
-            this.PriorityBox.Size = new System.Drawing.Size(403, 33);
+            this.PriorityBox.Size = new System.Drawing.Size(402, 33);
             this.PriorityBox.TabIndex = 23;
             this.PriorityBox.SelectedIndexChanged += new System.EventHandler(this.PriorityBox_SelectedIndexChanged);
             // 
@@ -323,7 +323,7 @@
             this.KbSelector.Location = new System.Drawing.Point(276, 170);
             this.KbSelector.Margin = new System.Windows.Forms.Padding(6);
             this.KbSelector.Name = "KbSelector";
-            this.KbSelector.Size = new System.Drawing.Size(403, 33);
+            this.KbSelector.Size = new System.Drawing.Size(402, 33);
             this.KbSelector.TabIndex = 7;
             this.KbSelector.SelectedIndexChanged += new System.EventHandler(this.KbSelector_SelectedIndexChanged);
             // 
@@ -336,7 +336,7 @@
             this.Duration.Location = new System.Drawing.Point(276, 220);
             this.Duration.Margin = new System.Windows.Forms.Padding(6);
             this.Duration.Name = "Duration";
-            this.Duration.Size = new System.Drawing.Size(403, 37);
+            this.Duration.Size = new System.Drawing.Size(402, 37);
             this.Duration.TabIndex = 9;
             // 
             // LblReminder
@@ -344,7 +344,7 @@
             this.LblReminder.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblReminder.AutoSize = true;
             this.LblReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblReminder.Location = new System.Drawing.Point(810, 124);
+            this.LblReminder.Location = new System.Drawing.Point(808, 124);
             this.LblReminder.Margin = new System.Windows.Forms.Padding(0);
             this.LblReminder.Name = "LblReminder";
             this.LblReminder.Size = new System.Drawing.Size(132, 30);
@@ -356,7 +356,7 @@
             this.LblDuedate.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.LblDuedate.AutoSize = true;
             this.LblDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblDuedate.Location = new System.Drawing.Point(816, 174);
+            this.LblDuedate.Location = new System.Drawing.Point(814, 174);
             this.LblDuedate.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.LblDuedate.Name = "LblDuedate";
             this.LblDuedate.Size = new System.Drawing.Size(128, 30);
@@ -369,7 +369,7 @@
             this.XlReminder.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlReminder.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlReminder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlReminder.Location = new System.Drawing.Point(1062, 121);
+            this.XlReminder.Location = new System.Drawing.Point(1059, 121);
             this.XlReminder.Margin = new System.Windows.Forms.Padding(0);
             this.XlReminder.Name = "XlReminder";
             this.XlReminder.Size = new System.Drawing.Size(36, 35);
@@ -382,7 +382,7 @@
             this.XlDuedate.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.XlDuedate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XlDuedate.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlDuedate.Location = new System.Drawing.Point(1062, 171);
+            this.XlDuedate.Location = new System.Drawing.Point(1059, 171);
             this.XlDuedate.Margin = new System.Windows.Forms.Padding(0);
             this.XlDuedate.Name = "XlDuedate";
             this.XlDuedate.Size = new System.Drawing.Size(36, 35);
@@ -396,7 +396,7 @@
             this.DtReminder.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtReminder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtReminder.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtReminder.Location = new System.Drawing.Point(1106, 120);
+            this.DtReminder.Location = new System.Drawing.Point(1103, 120);
             this.DtReminder.Margin = new System.Windows.Forms.Padding(6);
             this.DtReminder.Name = "DtReminder";
             this.DtReminder.ShowCheckBox = true;
@@ -410,7 +410,7 @@
             this.DtDuedate.CustomFormat = "MM/dd/yyyy hh:mm tt";
             this.DtDuedate.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DtDuedate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.DtDuedate.Location = new System.Drawing.Point(1106, 170);
+            this.DtDuedate.Location = new System.Drawing.Point(1103, 170);
             this.DtDuedate.Margin = new System.Windows.Forms.Padding(6);
             this.DtDuedate.Name = "DtDuedate";
             this.DtDuedate.ShowCheckBox = true;
@@ -420,7 +420,7 @@
             // C3S1
             // 
             this.C3S1.AutoSize = true;
-            this.C3S1.Location = new System.Drawing.Point(1064, 0);
+            this.C3S1.Location = new System.Drawing.Point(1061, 0);
             this.C3S1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.C3S1.Name = "C3S1";
             this.C3S1.Size = new System.Drawing.Size(24, 7);
@@ -431,7 +431,7 @@
             // C4S1
             // 
             this.C4S1.AutoSize = true;
-            this.C4S1.Location = new System.Drawing.Point(1475, 0);
+            this.C4S1.Location = new System.Drawing.Point(1472, 0);
             this.C4S1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.C4S1.Name = "C4S1";
             this.C4S1.Size = new System.Drawing.Size(24, 7);
@@ -470,7 +470,7 @@
             // C1S1
             // 
             this.C1S1.AutoSize = true;
-            this.C1S1.Location = new System.Drawing.Point(649, 0);
+            this.C1S1.Location = new System.Drawing.Point(648, 0);
             this.C1S1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.C1S1.Name = "C1S1";
             this.C1S1.Size = new System.Drawing.Size(24, 7);
@@ -511,6 +511,32 @@
             this.L0v4L1h_TlpOkCancel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.L0v4L1h_TlpOkCancel.Size = new System.Drawing.Size(1606, 118);
             this.L0v4L1h_TlpOkCancel.TabIndex = 1;
+            // 
+            // AutoTagButton
+            // 
+            this.AutoTagButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AutoTagButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AutoTagButton.Location = new System.Drawing.Point(1051, 13);
+            this.AutoTagButton.Margin = new System.Windows.Forms.Padding(6);
+            this.AutoTagButton.Name = "AutoTagButton";
+            this.AutoTagButton.Size = new System.Drawing.Size(316, 92);
+            this.AutoTagButton.TabIndex = 34;
+            this.AutoTagButton.Text = "Autotag";
+            this.AutoTagButton.UseVisualStyleBackColor = true;
+            this.AutoTagButton.Click += new System.EventHandler(this.AutoTagButton_Click);
+            // 
+            // XlAutotag
+            // 
+            this.XlAutotag.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.XlAutotag.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.XlAutotag.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.XlAutotag.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.XlAutotag.Location = new System.Drawing.Point(1007, 41);
+            this.XlAutotag.Margin = new System.Windows.Forms.Padding(0);
+            this.XlAutotag.Name = "XlAutotag";
+            this.XlAutotag.Size = new System.Drawing.Size(36, 35);
+            this.XlAutotag.TabIndex = 33;
+            this.XlAutotag.Text = "A";
             // 
             // OKButton
             // 
@@ -1315,32 +1341,6 @@
             this.XlScBullpin.TabIndex = 31;
             this.XlScBullpin.Text = "T";
             this.XlScBullpin.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // XlAutotag
-            // 
-            this.XlAutotag.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.XlAutotag.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.XlAutotag.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.XlAutotag.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.XlAutotag.Location = new System.Drawing.Point(1007, 41);
-            this.XlAutotag.Margin = new System.Windows.Forms.Padding(0);
-            this.XlAutotag.Name = "XlAutotag";
-            this.XlAutotag.Size = new System.Drawing.Size(36, 35);
-            this.XlAutotag.TabIndex = 33;
-            this.XlAutotag.Text = "A";
-            // 
-            // AutoTagButton
-            // 
-            this.AutoTagButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AutoTagButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AutoTagButton.Location = new System.Drawing.Point(1051, 13);
-            this.AutoTagButton.Margin = new System.Windows.Forms.Padding(6);
-            this.AutoTagButton.Name = "AutoTagButton";
-            this.AutoTagButton.Size = new System.Drawing.Size(316, 92);
-            this.AutoTagButton.TabIndex = 34;
-            this.AutoTagButton.Text = "Autotag";
-            this.AutoTagButton.UseVisualStyleBackColor = true;
-            this.AutoTagButton.Click += new System.EventHandler(this.AutoTagButton_Click);
             // 
             // TaskViewer
             // 

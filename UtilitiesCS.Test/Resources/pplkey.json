@@ -1,0 +1,39 @@
+{
+  "$id": "1",
+  "CoDictionary": {
+    "$id": "2",
+    "email1@domain.com": "Tag PPL FirstName1 LastName1",
+    "email2@domain.com": "Tag PPL FirstName2 LastName2",
+    "email3@domain.com": "Tag PPL FirstName3 LastName3",
+    "email4@domain.com": "Tag PPL FirstName4 LastName4",
+    "email5@domain.com": "Tag PPL FirstName5 LastName5",
+    "email6@domain.com": "Tag PPL FirstName6 LastName6",
+    "email7@domain.com": "Tag PPL FirstName7 LastName7",
+    "email8@domain.com": "Tag PPL FirstName8 LastName8"
+
+  },
+  "RemainingObject": {
+    "$id": "3",
+    "Config": {
+      "Disk": {
+        "FileName": "pplkey.json",
+        "RelativePath": "",
+        "SpecialFolderName": "AppData"
+      },
+      "LocalDisk": {
+        "FileName": "pplkey.json",
+        "RelativePath": "",
+        "SpecialFolderName": "AppData"
+      },
+      "NetDisk": {
+        "FileName": "pplkey.json",
+        "RelativePath": "",
+        "SpecialFolderName": "Flow"
+      },
+      "ClassifierActivated": true,
+      "ActiveDisk": 1
+    },
+    "Globals": "default",
+    "Prefix": null
+  }
+}

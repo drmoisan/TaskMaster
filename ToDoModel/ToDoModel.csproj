@@ -51,6 +51,9 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Mono.Reflection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.2.0.0\lib\net40\Mono.Reflection.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -96,8 +99,11 @@
     <Compile Include="Common Functions\FileOperationsPST.cs" />
     <Compile Include="Data Model\ID\BaseChanger.cs" />
     <Compile Include="Data Model\ID\IDList.cs" />
+    <Compile Include="Data Model\People\PeopleScoConverter.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionary.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionaryNew.cs" />
+    <Compile Include="Data Model\People\PeopleScoRemainingObjectConverter.cs" />
+    <Compile Include="Data Model\People\WrapperPeopleScoDictionaryNew.cs" />
     <Compile Include="Data Model\Project\ProgramData.cs" />
     <Compile Include="Data Model\Project\ProjectData.cs" />
     <Compile Include="Data Model\Project\ProjectController.cs" />

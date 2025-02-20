@@ -117,60 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="People" xml:space="preserve">
-    <value>{
-  "$id": "1",
-  "Engine": false,
-  "Globals": "default",
-  "T": "ToDoModel.Data_Model.People.PeopleScoDictionaryNew, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-  "Config": {
-    "$id": "2",
-    "Disk": {
-      "FileName": "pplkey.json",
-      "RelativePath": "",
-      "SpecialFolderName": "AppData"
-    },
-    "LocalDisk": {
-      "FileName": "pplkey.json",
-      "RelativePath": "",
-      "SpecialFolderName": "AppData"
-    },
-    "NetDisk": {
-      "FileName": "pplkey.json",
-      "RelativePath": "",
-      "SpecialFolderName": "Flow"
-    },
-    "ClassifierActivated": true,
-    "ActiveDisk": 1
-  },
-  "Name": "People"
-}</value>
-  </data>
-  <data name="RecentFolders" xml:space="preserve">
-    <value>{
-  "$id": "1",
-  "Engine": false,
-  "Globals": "default",
-  "Name": "Recents",
-  "Config": {
-    "$id": "2",
-    "Disk": {
-      "FileName": "9999999RecentsFile.json",
-      "RelativePath": "",
-      "SpecialFolderName": "Flow"
-    },
-    "LocalDisk": {
-      "FileName": "9999999RecentsFile.json",
-      "RelativePath": "",
-      "SpecialFolderName": "AppData"
-    },
-    "NetDisk": {
-      "FileName": "9999999RecentsFile.json",
-      "RelativePath": "",
-      "SpecialFolderName": "Flow"
-    },
-    "ClassifierActivated": true
-  }
-}</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="pplkey" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pplkey.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

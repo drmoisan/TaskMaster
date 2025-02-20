@@ -56,7 +56,8 @@ namespace TaskVisualization
                                              contextAssign: autoAssignContext,
                                              projectsToPrograms: globals.TD.ProjInfo.Programs_ByProjectNames,
                                              flagOptions: _flagsToSet,
-                                             userEmailAddress: globals.Ol.UserEmailAddress);
+                                             userEmailAddress: globals.Ol.UserEmailAddress,
+                                             globals: _globals);
             _userEmailAddress = globals.Ol.UserEmailAddress;
         }
 

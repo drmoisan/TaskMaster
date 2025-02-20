@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,13 @@ namespace Tags
             }   
         }
 
+        public static string LaunchAndFindMatch(IEnumerable<string> options, IPrefix prefix, string userEmail, string searchString)
+        {
+            var launcher = new TagLauncher(options, prefix, userEmail);
+            launcher.Viewer.Controls.Remove(launcher.Viewer.ButtonNew);
+            return launcher.FindMatch(searchString);
+        }
+        
         public string FindMatch(string searchString)
         {
             _controller.SetSearchText(searchString);

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UtilitiesCS.Test.Properties {
+namespace ToDoModel.Test.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace UtilitiesCS.Test.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UtilitiesCS.Test.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ToDoModel.Test.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,42 +57,6 @@ namespace UtilitiesCS.Test.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap AboutBox {
-            get {
-                object obj = ResourceManager.GetObject("AboutBox", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] AbstractCube {
-            get {
-                object obj = ResourceManager.GetObject("AbstractCube", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;html xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot; xmlns:w=&quot;urn:schemas-microsoft-com:office:word&quot; xmlns:m=&quot;http://schemas.microsoft.com/office/2004/12/omml&quot; xmlns=&quot;http://www.w3.org/TR/REC-html40&quot;&gt;
-        ///	&lt;head&gt;
-        ///		&lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered medium)&quot;&gt;
-        ///		&lt;!--[if !mso]&gt;&lt;style&gt;v\:* {behavior:url(#default#VML);}
-        ///		o\:* {behavior:url(#default#VML);}
-        ///		w\:* {behavior:url(#default#VML);}
-        ///		.shape {behavior:url(#default#VML);}
-        ///		&lt;/style&gt;&lt;! [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string HtmlBodyLinks {
-            get {
-                return ResourceManager.GetString("HtmlBodyLinks", resourceCulture);
             }
         }
         

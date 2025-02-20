@@ -1,47 +1,55 @@
-﻿using Mono.Reflection;
+﻿using log4net.Repository.Hierarchy;
+using Mono.Reflection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using UtilitiesCS;
 using UtilitiesCS.Extensions;
-using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.HelperClasses;
 using UtilitiesCS.NewtonsoftHelpers.MonoExtension;
+using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
-using Newtonsoft.Json;
 
-namespace UtilitiesCS.NewtonsoftHelpers
+namespace ToDoModel.Data_Model.People
 {
-    public class WrapperScoDictionary<TDerived, TKey, TValue> where TDerived : ScoDictionaryNew<TKey, TValue>
+    public class WrapperPeopleScoDictionaryNew//<TDerived, TKey, TValue> where TDerived : PeopleScoDictionaryNew
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [JsonProperty("CoDictionary")]
-        public ConcurrentObservableDictionary<TKey, TValue> CoDictionary { get; set; }
+        public ScoDictionaryNew<string, string> CoDictionary { get; set; }
 
         [JsonProperty("RemainingObject")]
+        [JsonConverter(typeof(PeopleScoRemainingObjectConverter))]
         public object RemainingObject { get; set; }
 
-        public WrapperScoDictionary()
+        public WrapperPeopleScoDictionaryNew()
         {
-            CoDictionary = new ConcurrentObservableDictionary<TKey, TValue>();
+            CoDictionary = new ScoDictionaryNew<string, string>();
         }
 
-        public TDerived ToDerived(WrapperScoDictionary<TDerived, TKey, TValue> wrapper)
+        public PeopleScoDictionaryNew ToDerived(WrapperPeopleScoDictionaryNew wrapper)
         {
             CoDictionary = wrapper.CoDictionary;
             RemainingObject = wrapper.RemainingObject;
             return ToDerived();
         }
 
-        public TDerived ToDerived()
+        public PeopleScoDictionaryNew ToDerived()
         {
             CoDictionary.ThrowIfNull();
             RemainingObject.ThrowIfNull();
 
             // Create an instance using reflection
-            var derivedInstance = (TDerived)Activator.CreateInstance(typeof(TDerived), true);
+            var derivedInstance = (PeopleScoDictionaryNew)Activator.CreateInstance(typeof(PeopleScoDictionaryNew), true);
 
             // Copy dictionary entries
             foreach (var kvp in CoDictionary)
@@ -50,24 +58,46 @@ namespace UtilitiesCS.NewtonsoftHelpers
             }
 
             // Set up the config field            
-            var configField = RemainingObject.GetType().GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var configField = typeof(PeopleScoRemainingObject).GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             var configValue = configField?.GetValue(RemainingObject) as NewSmartSerializableConfig;
-            derivedInstance.Config = configValue;
-            // Set additional fields
-            var derivedType = typeof(TDerived);
+            if (configValue is not null) { derivedInstance.Config = configValue; }
+            else { logger.Error("Config field is null in RemainingObject or did not deserialize correctly."); }
 
-            var additionalFields = RemainingObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
-            var drvdFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
-            foreach (var field in additionalFields)
+            // Get all other fields in the derived type except for ism which was captured by the _Config field
+            var derivedType = typeof(PeopleScoDictionaryNew);
+            //var derivedFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            //    .Where(field => field.Name != "<ism>k__BackingField")
+            //    .ToArray();
+            var derivedFields = derivedType
+                .GetAllDerivedFields(typeof(ConcurrentObservableDictionary<string, string>))
+                .Where(field => field.Name != "<ism>k__BackingField")
+                .ToArray();
+
+            foreach (var derivedField in derivedFields)
             {
-                var fieldInfo = derivedType.GetField(field.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-                if (fieldInfo != null)
-                {
-                    var fieldValue = field.GetValue(RemainingObject);
-                    fieldInfo.SetValue(derivedInstance, fieldValue);
-                }
+                var composedField = RemainingObject
+                    .GetType()
+                    .GetField(
+                        derivedField.Name, 
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var fieldValue = composedField?.GetValue(RemainingObject);
+                if (fieldValue is not null) { derivedField.SetValue(derivedInstance, fieldValue); }
             }
+
+            //    // Set additional fields
+
+            //    var composedFields = RemainingObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
+            //var drvdFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
+            //foreach (var field in composedFields)
+            //{
+            //    var fieldInfo = derivedType.GetField(field.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            //    if (fieldInfo != null)
+            //    {
+            //        var fieldValue = field.GetValue(RemainingObject);
+            //        fieldInfo.SetValue(derivedInstance, fieldValue);
+            //    }
+            //}
 
             // new 2/16/2025
             //var baseType = typeof(ConcurrentObservableDictionary<TKey, TValue>);
@@ -86,12 +116,12 @@ namespace UtilitiesCS.NewtonsoftHelpers
             return derivedInstance;
         }
 
-        public WrapperScoDictionary<TDerived, TKey, TValue> ToComposition(TDerived derivedInstance)
+        public WrapperPeopleScoDictionaryNew ToComposition(PeopleScoDictionaryNew derivedInstance)
         {
             derivedInstance.ThrowIfNull();
-            CoDictionary = new ConcurrentObservableDictionary<TKey, TValue>(derivedInstance);
+            CoDictionary = new ScoDictionaryNew<string, string>(derivedInstance);
 
-            Type objectType = CompileType();
+            Type objectType = typeof(PeopleScoRemainingObject);
             var instance = CopyTo(derivedInstance, objectType);
             RemainingObject = instance;
 
@@ -100,8 +130,8 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
         public Type CompileType()
         {
-            var derivedType = typeof(TDerived);
-            var baseType = typeof(ConcurrentObservableDictionary<TKey, TValue>);
+            var derivedType = typeof(PeopleScoDictionaryNew);
+            var baseType = typeof(ScoDictionaryNew<string, string>);
 
             var derivedProperties = derivedType
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -133,17 +163,22 @@ namespace UtilitiesCS.NewtonsoftHelpers
             return tb.CreateType();
         }
 
-        public object CopyTo(TDerived instance, Type objectType)
+        public object CopyTo(PeopleScoDictionaryNew instance, Type objectType)
         {
             var myObject = Activator.CreateInstance(objectType);
-            var derivedType = typeof(TDerived);
+            var derivedType = typeof(PeopleScoDictionaryNew);
 
             // Set up the config field
-            objectType.GetField("_Config", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.SetValue(myObject, instance.Config);
+            objectType.GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.SetValue(myObject, instance.Config);
 
             // Get all other fields in the derived type except for ism which was captured by the _Config field
-            var derivedFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(field => field.Name != "ism")
+            //var derivedFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            //    .Where(field => field.Name != "<ism>k__BackingField")
+            //    .ToArray();
+
+            var derivedFields = derivedType
+                .GetAllDerivedFields(typeof(ConcurrentObservableDictionary<string, string>))
+                .Where(field => field.Name != "<ism>k__BackingField")
                 .ToArray();
 
             foreach (var field in derivedFields)
@@ -157,7 +192,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
         private TypeBuilder GetTypeBuilder()
         {
-            var typeSignature = $"{typeof(TDerived).Name}_ExDictionary";
+            var typeSignature = $"{typeof(PeopleScoDictionaryNew).Name}_ExDictionary";
             var assemblyName = new AssemblyName(typeSignature);
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
                 assemblyName, AssemblyBuilderAccess.Run);
@@ -207,7 +242,8 @@ namespace UtilitiesCS.NewtonsoftHelpers
             if (getMethod is not null) { propertyBuilder.SetGetMethod(getMethod); }
 
             var setMethod = ModifySetMethod(tb, property, ref capturedFields);
-            if (setMethod is not null) { propertyBuilder.SetSetMethod(setMethod); };
+            if (setMethod is not null) { propertyBuilder.SetSetMethod(setMethod); }
+            ;
         }
 
         public void ReplicateProperty(TypeBuilder tb, PropertyInfo property, FieldInfo existingField)
@@ -396,5 +432,16 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
             throw new InvalidOperationException("Backing field not found.");
         }
+    }
+
+    public class PeopleScoRemainingObject 
+    {
+        [JsonProperty]
+        internal IApplicationGlobals Globals { get; set; }
+                
+        [JsonProperty]
+        public NewSmartSerializableConfig Config { get; set; }
+
+        public string Name { get; set; }
     }
 }
